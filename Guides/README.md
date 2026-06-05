@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/master_guide_banner.svg" alt="Core Builds Guide Banner" width="100%"/>
+  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/master guide banner.svg" alt="Core Builds Guide Banner" width="100%"/>
 </p>
 
 # 📖 Core Builds by Brevity — Complete Guide
