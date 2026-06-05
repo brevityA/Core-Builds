@@ -1,0 +1,25 @@
+<svg width="1280" height="400" viewBox="0 0 1280 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&amp;family=Inter:wght@400&amp;display=swap');
+    .title { font: 900 80px 'Montserrat', sans-serif; fill: #FFFFFF; letter-spacing: -2px; }
+    .subtitle { font: 400 24px 'Inter', sans-serif; fill: #757575; letter-spacing: 12px; text-transform: uppercase; }
+  </style>
+  
+  <rect width="1280" height="400" fill="#212121"/>
+  
+  <g stroke="#757575" stroke-opacity="0.2" stroke-width="1">
+    <path d="M0 100H1280M0 200H1280M0 300H1280"/>
+    <path d="M100 0V400M200 0V400M300 0V400M1100 0V400M1200 0V400"/>
+  </g>
+
+  <text x="100" y="200" class="title">COMMUNITY BUILDS</text>
+  <text x="105" y="245" class="subtitle">SANDBOX &amp; TEMPLATES</text>
+
+  <rect x="100" y="270" width="750" height="4" fill="#FFFFFF"/>
+
+  <g transform="translate(1080, 150)">
+    <path d="M40 0L75 60H5L40 0Z" fill="#757575"/>
+    <rect x="25" y="75" width="30" height="30" fill="#FFFFFF"/>
+    <path d="M40 165L5 105H75L40 165Z" fill="#757575"/>
+  </g>
+</svg>

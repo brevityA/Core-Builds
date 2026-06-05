@@ -1,0 +1,21 @@
+<svg width="1280" height="400" viewBox="0 0 1280 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="400" fill="#050B14"/>
+  
+  <g stroke="#0F1C36" stroke-width="2">
+    <path d="M0 100H1280M0 200H1280M0 300H1280"/>
+    <path d="M100 0V400M200 0V400M300 0V400M1100 0V400M1200 0V400"/>
+  </g>
+
+  <text x="100" y="205" font-family="Montserrat, 'Segoe UI', Helvetica, sans-serif" font-weight="900" font-size="85" font-style="italic" fill="#FF5E00" letter-spacing="2">AUBURN TIGER</text>
+  <text x="105" y="255" font-family="Inter, 'Segoe UI', Helvetica, sans-serif" font-weight="700" font-size="24" fill="#E2E8F0" letter-spacing="12">AIOSTREAMS COMMUNITY BUILD</text>
+
+  <rect x="100" y="285" width="700" height="4" fill="#FF5E00"/>
+
+  <g transform="translate(1080, 150)">
+    <path d="M40 0L75 60H5L40 0Z" fill="#FF5E00"/>
+    
+    <rect x="25" y="75" width="30" height="30" fill="#1E3A8A"/>
+    
+    <path d="M40 165L5 105H75L40 165Z" fill="#FF5E00"/>
+  </g>
+</svg>

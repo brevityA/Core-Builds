@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 250" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@800&amp;display=swap');
+      
+      .primary-logo {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 800;
+        font-size: 54px;
+        fill: #ffffff;
+        text-anchor: middle;
+        letter-spacing: 2px;
+      }
+      
+      .subtext {
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        font-size: 20px;
+        fill: #a3b3cc;
+        text-anchor: middle;
+        letter-spacing: 1px;
+      }
+
+      .author {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        fill: #6e7a8f;
+        text-anchor: middle;
+        letter-spacing: 3px;
+      }
+    </style>
+
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117" />
+      <stop offset="100%" stop-color="#161b22" />
+    </linearGradient>
+
+    <linearGradient id="zenith-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#4facfe" />
+    </linearGradient>
+
+    <linearGradient id="tiger-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7e5f" />
+      <stop offset="100%" stop-color="#ff4b2b" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="250" fill="url(#bg-grad)" rx="12" ry="12"/>
+
+  <g transform="translate(150, 125)">
+    <polygon points="0,-50 35,0 0,50 -35,0" fill="url(#zenith-grad)" opacity="0.9"/>
+    <polygon points="0,-75 55,0 0,75 -55,0" fill="none" stroke="url(#zenith-grad)" stroke-width="4" opacity="0.3"/>
+  </g>
+
+  <g transform="translate(850, 125)">
+    <path d="M-20,-50 L10,-50 L-10,50 L-40,50 Z" fill="url(#tiger-grad)" opacity="0.9"/>
+    <path d="M15,-50 L45,-50 L25,50 L-5,50 Z" fill="url(#tiger-grad)" opacity="0.4"/>
+  </g>
+
+  <text x="500" y="115" class="primary-logo">CORE FORMATTERS</text>
+  <text x="500" y="155" class="subtext">CUSTOM UI LAYOUTS FOR AIOSTREAMS</text>
+  
+  <text x="500" y="210" class="author">BUILT BY BREVITY</text>
+</svg>

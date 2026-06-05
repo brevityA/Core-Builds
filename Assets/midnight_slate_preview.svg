@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 250" width="850" height="250">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@700&amp;display=swap');
+      .bg { fill: #0D1017; }
+      .card { fill: #1F242A; rx: 8px; stroke: #2D333B; stroke-width: 1px; }
+      .title { font-family: 'Montserrat', sans-serif; font-size: 14.5px; font-weight: 700; fill: #FFFFFF; }
+      .desc { font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 400; fill: #C9D1D9; }
+      .accent { fill: #58A6FF; font-weight: 500; }
+    </style>
+  </defs>
+  
+  <rect class="bg" width="100%" height="100%" />
+  
+  <rect class="card" x="30" y="30" width="790" height="190" />
+  
+  <text x="50" y="70" class="title">✦ The Dark Knight 2008 Remux... [RD] 4K UHD REMUX Aᴛᴍᴏs TʀᴜᴇHD ★ Pʀᴇᴍɪᴜᴍ</text>
+  
+  <text x="50" y="110" class="desc">◼ torrentio ⬤ cached ⧗ 2 ᴅᴀʏs</text>
+  <text x="50" y="134" class="desc">▼ 80 ᴍʙᴘs ▤ 65 ɢʙ ▲ 124 ꜱᴇᴇᴅᴇʀꜱ</text>
+  <text x="50" y="168" class="desc">▶ Vɪᴅᴇᴏ: <tspan class="accent">ʜᴅʀ¹⁰⁺ ᴅᴠ 10ʙɪᴛ</tspan> ▣ ʜᴇᴠᴄ ⚑ Lᴀɴɢ: ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ</text>
+  <text x="50" y="194" class="desc">◆ Rᴇʟᴇᴀsᴇ: ★ Framestor ▰ ᴜʟᴛɪᴍᴀᴛᴇ ᴄᴜᴛ ⛶ Iᴍᴀx ⛨ 1080ᴘ ʀᴇᴍᴜx ✪ Bᴇꜱᴛ</text>
+</svg>

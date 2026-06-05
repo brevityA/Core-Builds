@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@700&amp;display=swap');
+      .bg { fill: #121212; }
+      .btn { fill: #1E1E1E; rx: 12px; stroke: #333333; stroke-width: 2px; }
+      .title { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 700; fill: #FFFFFF; }
+      .subtext { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; fill: #B0B0B0; }
+    </style>
+  </defs>
+  
+  <rect class="bg" width="100%" height="100%" />
+  
+  <rect class="btn" x="40" y="40" width="720" height="240" rx="12" />
+  
+  <text x="60" y="80" class="title">⚡ [RD] 🔹 METEOR 🟣 4K UHD 🛡️ SEADEX BEST</text>
+  
+  <text x="60" y="110" class="subtext">☀️ ✨ ʜᴅʀ¹⁰⁺ | ✨ DV | 🎨 10ʙɪᴛ</text>
+  <text x="60" y="136" class="subtext">🎬 ᴜʟᴛɪᴍᴀᴛᴇ ᴇᴅɪᴛɪᴏɴ  📡 ʜʙᴏ  ⏣ ʀᴇᴍᴀsᴛᴇʀᴇᴅ  🩸 ᴜɴᴄᴇɴsᴏʀᴇᴅ</text>
+  <text x="60" y="162" class="subtext">☰ Blade Runner (1982)  ☲ S01 · E01</text>
+  <text x="60" y="188" class="subtext">🔘 💎 Rᴇᴍᴜx • ⚙️ ʜᴇᴠᴄ • ⚡ 80 ᴍʙᴘs • 💾 65 GB • 🌱 124 • 🗓️ 2d</text>
+  <text x="60" y="214" class="subtext">🎶 Aᴛᴍᴏs • 💎 TʀᴜᴇHD • 🔊 7.1 | 5.1  🔊 JBL Sᴘᴀᴛɪᴀʟ</text>
+  <text x="60" y="240" class="subtext">🌍 ᴇɴɢʟɪsʜ 🔹 🗣️ ᴍᴜʟᴛɪ • 🎯 FʀᴀMᴇSTᴏR • 📛 Torrentio</text>
+</svg>

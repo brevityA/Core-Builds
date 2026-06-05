@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="1200" height="340">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#080b0f"/>
+      <stop offset="50%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#080b0f"/>
+    </linearGradient>
+
+    <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="outerGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="redGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="textGlow" x="-20%" y="-50%" width="140%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <linearGradient id="divGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0"/>
+      <stop offset="30%" style="stop-color:#00d4ff;stop-opacity:0.8"/>
+      <stop offset="70%" style="stop-color:#00d4ff;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0"/>
+    </linearGradient>
+
+    <clipPath id="circleClip">
+      <circle cx="170" cy="170" r="130"/>
+    </clipPath>
+    
+  </defs>
+
+  <rect width="1200" height="340" fill="url(#bgGrad)" rx="12"/>
+
+  <g opacity="0.04" stroke="#00d4ff" stroke-width="1">
+    <line x1="0" y1="85" x2="1200" y2="85"/>
+    <line x1="0" y1="170" x2="1200" y2="170"/>
+    <line x1="0" y1="255" x2="1200" y2="255"/>
+    <line x1="200" y1="0" x2="200" y2="340"/>
+    <line x1="400" y1="0" x2="400" y2="340"/>
+    <line x1="600" y1="0" x2="600" y2="340"/>
+    <line x1="800" y1="0" x2="800" y2="340"/>
+    <line x1="1000" y1="0" x2="1000" y2="340"/>
+  </g>
+
+  <circle cx="170" cy="170" r="140" fill="#00d4ff" opacity="0.04" filter="url(#outerGlow)"/>
+
+  <circle cx="170" cy="170" r="128" fill="#0a0c10" stroke="#1a2030" stroke-width="1.5"/>
+
+  <polygon points="170,62 255,111 255,209 170,258 85,209 85,111"
+    fill="none" stroke="#00d4ff" stroke-width="2" opacity="0.25" filter="url(#outerGlow)"/>
+
+  <polygon points="170,70 248,115 248,205 170,250 92,205 92,115"
+    fill="none" stroke="#00d4ff" stroke-width="14"
+    stroke-linejoin="round" filter="url(#cyanGlow)" opacity="0.95"/>
+
+  <polygon points="170,70 248,115 248,205 170,250 92,205 92,115"
+    fill="none" stroke="#7eeeff" stroke-width="2"
+    stroke-linejoin="round" opacity="0.4"/>
+
+  <rect x="126" y="126" width="88" height="88" rx="4" transform="rotate(45 170 170)"
+    fill="#c44020" opacity="0.3" filter="url(#outerGlow)"/>
+
+  <rect x="128" y="128" width="84" height="84" rx="3" transform="rotate(45 170 170)"
+    fill="#e05030" filter="url(#redGlow)"/>
+
+  <rect x="128" y="128" width="84" height="84" rx="3" transform="rotate(45 170 170)"
+    fill="none" stroke="#ff7a5a" stroke-width="1.5" opacity="0.5"/>
+
+  <rect x="134" y="134" width="72" height="72" rx="2" transform="rotate(45 170 170)"
+    fill="#bf4525" opacity="0.4"/>
+
+  <circle cx="170" cy="170" r="12" fill="white" opacity="0.95"/>
+  <circle cx="170" cy="170" r="12" fill="white" filter="url(#cyanGlow)" opacity="0.3"/>
+
+  <rect x="338" y="50" width="2" height="240" fill="url(#divGrad)" rx="1"/>
+
+  <text x="385" y="148"
+    font-family="'Montserrat', sans-serif"
+    font-size="72" font-weight="800" letter-spacing="-1"
+    fill="#ffffff" filter="url(#textGlow)">CORE</text>
+
+  <text x="385" y="220"
+    font-family="'Montserrat', sans-serif"
+    font-size="72" font-weight="800" letter-spacing="-1"
+    fill="#00d4ff" filter="url(#textGlow)">BUILDS</text>
+
+  <rect x="385" y="232" width="340" height="3" rx="1.5" fill="#00d4ff" opacity="0.5"/>
+
+  <text x="387" y="275"
+    font-family="'Inter', sans-serif"
+    font-size="22" font-weight="400" letter-spacing="8"
+    fill="#7eeeff" opacity="0.75">BY BREVITY</text>
+
+  <text x="820" y="145"
+    font-family="'Inter', sans-serif"
+    font-size="18" font-weight="300" letter-spacing="3"
+    fill="#7eeeff" opacity="0.6" text-anchor="middle">AIOSTREAMS TEMPLATES</text>
+
+  <circle cx="730" cy="175" r="2" fill="#00d4ff" opacity="0.4"/>
+  <circle cx="820" cy="175" r="2" fill="#00d4ff" opacity="0.6"/>
+  <circle cx="910" cy="175" r="2" fill="#00d4ff" opacity="0.4"/>
+
+  <text x="820" y="210"
+    font-family="'Inter', sans-serif"
+    font-size="30" font-weight="700" letter-spacing="1"
+    fill="#e8e8e8" opacity="0.9" text-anchor="middle">Frictionless Streaming</text>
+
+  <text x="820" y="248"
+    font-family="'Inter', sans-serif"
+    font-size="16" font-weight="300" letter-spacing="2"
+    fill="#888fa0" opacity="0.8" text-anchor="middle">HIGH QUALITY  ·  DEBRID  ·  TORBOX</text>
+
+  <path d="M 20 20 L 50 20 L 50 24 L 24 24 L 24 50 L 20 50 Z" fill="#00d4ff" opacity="0.3"/>
+  <path d="M 1180 20 L 1150 20 L 1150 24 L 1176 24 L 1176 50 L 1180 50 Z" fill="#00d4ff" opacity="0.3"/>
+  <path d="M 20 320 L 50 320 L 50 316 L 24 316 L 24 290 L 20 290 Z" fill="#00d4ff" opacity="0.3"/>
+  <path d="M 1180 320 L 1150 320 L 1150 316 L 1176 316 L 1176 290 L 1180 290 Z" fill="#00d4ff" opacity="0.3"/>
+</svg>
