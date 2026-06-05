@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+      .bg   { fill: #0d1117; }
+      .card { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .lbl  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; }
+      .name { font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 700; fill: #e6edf3; }
+      .d1   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
+      .d2   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
+      .tag  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #f0883e; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="800" height="320"/>
+
+  <!-- Label -->
+  <text x="20" y="20" class="lbl">Core Nexus Minimal — Stream Preview (TV / AppleTV optimised)</text>
+
+  <!-- Card 1: 4K REMUX, 3-line description -->
+  <rect class="card" x="16" y="30" width="768" height="128" rx="6"/>
+
+  <!-- name line: cache icon in name, audio in name -->
+  <text x="32" y="58" class="name">🟣 4K  ⚡ TB  🔮 ATMOS  OPPENHEIMER</text>
+
+  <!-- desc line 1: badges -->
+  <text x="32" y="80" class="d1">🚀 INSTANT  💎 ELITE  🏷️ DON  👑 PREMIER</text>
+
+  <!-- desc line 2: quality + audio (3-line: no separate audio line) -->
+  <text x="32" y="101" class="d2">💎 REMUX  👁️ DV ✨ HDR¹⁰⁺  🔮 ATMOS  7.1</text>
+
+  <!-- desc line 3: size/meta -->
+  <text x="32" y="122" class="d2">25.4 GB  45.2 Mbps  🌱 521  ⏱️ 2y  🔍 torrentio</text>
+
+  <!-- Card 2: 1080P WEB-DL, uncached -->
+  <rect class="card" x="16" y="168" width="768" height="128" rx="6"/>
+
+  <!-- ⏳ in name for uncached -->
+  <text x="32" y="196" class="name">🔵 1080P  ⏳ TB  🎶 DD+  THE DARK KNIGHT</text>
+
+  <text x="32" y="218" class="d1">⚠️ UNCACHED  ✦ QUALITY  🏷️ NTB</text>
+
+  <text x="32" y="239" class="d2">🍿 WEB-DL  🌟 HDR¹⁰  🎶 DD+  5.1</text>
+
+  <text x="32" y="260" class="d2">8.2 GB  🌱 89  ⏱️ 6m  🔍 nzbs.in</text>
+
+  <!-- footer -->
+  <text x="400" y="312" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/Branding-Brevity/Core-Builds-By-Brevity</text>
+</svg>

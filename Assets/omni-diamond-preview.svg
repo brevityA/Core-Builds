@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+      .bg   { fill: #121212; }
+      .card { fill: #1a1a1a; stroke: #333333; stroke-width: 1; }
+      .lbl  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; }
+      .name { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; fill: #ffffff; }
+      .d1   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #b0b0b0; }
+      .d2   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #787878; }
+    </style>
+  </defs>
+  <rect class="bg" width="800" height="420"/>
+  <text x="20" y="20" class="lbl">Omni Diamond v2.2.0 — Stream Preview  (Maximum metadata)</text>
+
+  <!-- Card 1: 4K REMUX — name has two lines (newLine in name field) -->
+  <rect class="card" x="16" y="30" width="768" height="198" rx="6"/>
+  <text x="32" y="58" class="name">⚡ [meteor] 🔹 torrentio 🟣 4K UHD 🛡️ ʀᴇᴍᴜx</text>
+  <text x="32" y="79" class="name">☀️ ✨ ʜᴅʀ¹⁰⁺ | ✨ DV | 🎨 10ʙɪᴛ</text>
+  <text x="32" y="101" class="d1">🎬 ᴜʟᴛɪᴍᴀᴛᴇ ᴇᴅɪᴛɪᴏɴ  📡 HBO  ⏣ ʀᴇᴍᴀsᴛᴇʀᴇᴅ</text>
+  <text x="32" y="122" class="d2">☰ Oppenheimer (2023)</text>
+  <text x="32" y="143" class="d2">🔘 💎 Rᴇᴍᴜx • ⚙️ ʜᴇᴠᴄ • ⚡ 45.2 ᴍʙᴘs • 💾 25.4 ɢʙ • 🌱 521 • 🗓️ 2d</text>
+  <text x="32" y="164" class="d2">🎶 Aᴛᴍᴏs • 💎 TʀᴜᴇHD • 🔊 7.1 | 5.1  🔊 JBL Sᴘᴀᴛɪᴀʟ</text>
+  <text x="32" y="185" class="d2">🌍 ᴇɴɢʟɪsʜ 🔹 🗣️ ᴍᴜʟᴛɪ • 🎯 DON • 📛 torrentio</text>
+
+  <!-- Card 2: 1080P WEB-DL -->
+  <rect class="card" x="16" y="238" width="768" height="158" rx="6"/>
+  <text x="32" y="266" class="name">⚡ [meteor] 🔹 torrentio 🔵 1080ᴘ 🛡️ ᴡᴇʙ-ᴅʟ</text>
+  <text x="32" y="287" class="name">☀️ 🌟 ʜᴅʀ¹⁰</text>
+  <text x="32" y="309" class="d2">☰ The Dark Knight (2008)</text>
+  <text x="32" y="330" class="d2">🔘 🍿 Wᴇʙ-DL • ⚙️ ʜᴇᴠᴄ • ⚡ 8.2 ᴍʙᴘs • 💾 8.2 ɢʙ • 🌱 89 • 🗓️ 180d</text>
+  <text x="32" y="351" class="d2">🌍 ᴇɴɢʟɪsʜ • 🎯 NTB • 📛 torrentio</text>
+
+  <text x="400" y="412" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/Branding-Brevity/Core-Builds-By-Brevity</text>
+</svg>

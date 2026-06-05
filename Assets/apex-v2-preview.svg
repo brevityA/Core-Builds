@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="800" height="380">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+      .bg   { fill: #0d1117; }
+      .card { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .lbl  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase; }
+      .sub  { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; fill: #3fb950; letter-spacing: 0.04em; }
+      .name { font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 700; fill: #e6edf3; }
+      .d1   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
+      .d2   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
+      .tag  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #f0883e; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="800" height="380"/>
+
+  <!-- Header -->
+  <text x="20" y="17" class="lbl">Core Nexus Apex v2 — Stream Preview</text>
+  <text x="20" y="28" class="sub">▲ Score number  ·  Bitrate before visual tags  ·  Subtitle language flags</text>
+
+  <!-- Card 1: 4K REMUX, Instant, ELITE 94 -->
+  <rect class="card" x="16" y="36" width="768" height="158" rx="6"/>
+
+  <text x="32" y="64" class="name">🟣 4K  ⚡ TB  👁️ DV ✨ HDR¹⁰⁺  🔮 ATMOS  OPPENHEIMER</text>
+
+  <!-- Line 1: ELITE + score number ✦ 94 -->
+  <text x="32" y="86" class="d1">🚀 INSTANT  💎 ELITE  ✦ 94  🏷️ DON  👑 PREMIER  🎞️ IMAX</text>
+
+  <!-- Line 2: bitrate (45.2 Mbps) BEFORE visual tags -->
+  <text x="32" y="107" class="d2">🎬 💎 REMUX  ʜᴇᴠᴄ  45.2 Mbps  👁️ DV ✨ HDR¹⁰⁺  🎨 10ʙɪᴛ</text>
+
+  <!-- Line 3: subtitle language flags 📝 🇬🇧 🇫🇷 -->
+  <text x="32" y="128" class="d2">🎛️ 🔮 ATMOS  💎 TRUEHD  🔊 7.1  🌍 🇬🇧 🇫🇷 🇩🇪  📝 🇬🇧 🇫🇷</text>
+
+  <!-- Line 4: size first, then pack -->
+  <text x="32" y="149" class="d2">28.7 GB  📦 PACK  🌱 521  ⏱️ 2y  🔍 torrentio  🔌 debrid</text>
+
+  <rect x="698" y="44" width="72" height="22" rx="4" fill="#1f3d2b"/>
+  <text x="734" y="59" class="tag" text-anchor="middle">INSTANT</text>
+
+  <!-- Card 2: 1080P WEB-DL, Instant, QUALITY score 67 -->
+  <rect class="card" x="16" y="204" width="768" height="158" rx="6"/>
+
+  <text x="32" y="232" class="name">🔵 1080P  ⚡ TB  🌟 HDR  🎶 DD+  THE DARK KNIGHT  S01 E01</text>
+
+  <!-- Line 1: ✦ 67 score number only (no "QUALITY" label) -->
+  <text x="32" y="254" class="d1">🚀 INSTANT  ✦ 67  🏷️ NTB</text>
+
+  <!-- Line 2: bitrate before visual tags -->
+  <text x="32" y="275" class="d2">🎬 🍿 WEB-DL  ʜᴇᴠᴄ  8.5 Mbps  🌟 HDR¹⁰  ☀️ SDR</text>
+
+  <!-- Line 3: subtitle flag -->
+  <text x="32" y="296" class="d2">🎛️ 🎶 EAC3  🔉 5.1  🌍 🇬🇧  📝 🇬🇧</text>
+
+  <!-- Line 4 -->
+  <text x="32" y="317" class="d2">8.2 GB  🌱 89  ⏱️ 6m  🔍 nzbs.in  🔌 debrid</text>
+
+  <rect x="698" y="212" width="72" height="22" rx="4" fill="#1a2d4a"/>
+  <text x="734" y="227" class="tag" text-anchor="middle" fill="#79c0ff">67</text>
+
+  <!-- footer -->
+  <text x="400" y="372" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/Branding-Brevity/Core-Builds-By-Brevity</text>
+</svg>

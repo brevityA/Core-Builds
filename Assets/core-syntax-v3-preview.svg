@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+      .bg   { fill: #0d1117; }
+      .card { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .lbl  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; }
+      .name { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700; fill: #e6edf3; }
+      .d1   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
+      .d2   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
+    </style>
+  </defs>
+  <rect class="bg" width="800" height="420"/>
+  <text x="20" y="20" class="lbl">Core Syntax V3 (Core Cipher) — Stream Preview</text>
+
+  <!-- Card 1: 4K REMUX, ELITE, JBL Spatial flagged for DD+ -->
+  <rect class="card" x="16" y="30" width="768" height="198" rx="6"/>
+  <text x="32" y="58" class="name">✦ Oppenheimer 「 TB 」 「 4K UHD 」 「 REMUX 」 「 Aᴛᴍᴏs | TʀᴜᴇHD 」 「 7.1 」 『 ★ Pʀᴇᴍɪᴜᴍ 』</text>
+  <text x="32" y="80" class="d1">「 ◼ TORRENTIO 」 「 ⬤ DEBRID 」 「 ⧗ 2ʏ 」 「 ◈ ELITE 」</text>
+  <text x="32" y="101" class="d2">「 ▤ 25.4 ɢʙ 」 「 ▼ 45.2 ᴍʙᴘs 」 「 ▲ 521 ꜱᴇᴇᴅᴇʀꜱ 」</text>
+  <text x="32" y="122" class="d2">▶ Vɪᴅᴇᴏ: 「 ʜᴅʀ¹⁰⁺ 」 「 ▣ ʜᴇᴠᴄ 」 「 ◩ ᴍᴋᴠ 」</text>
+  <text x="32" y="143" class="d2">⚑ Lᴀɴɢ: 「 ᴇɴɢʟɪꜱʜ 」 「 Sᴜʙꜱ: EN | FR 」</text>
+  <text x="32" y="164" class="d2">◆ Rᴇʟᴇᴀsᴇ: 『 ★ DON 』 『 ⌕ ᴛᴏʀʀᴇɴᴛɪᴏ 』 『 ⛶ Iᴍᴀx 』 『 ⛨ ʀᴇᴍᴜx 』 『 ✪ Bᴇꜱᴛ 』</text>
+  <text x="32" y="185" class="d1"> </text>
+
+  <!-- Card 2: 1080P WEB-DL with DD+ triggering JBL Spatial -->
+  <rect class="card" x="16" y="238" width="768" height="158" rx="6"/>
+  <text x="32" y="266" class="name">✧ The Dark Knight 「 TB 」 「 1080P 」 「 WEB-DL 」 「 SUB 」 「 ᴅᴅ+ 」 「 5.1 」 『 JBL Sᴘᴀᴛɪᴀʟ 』</text>
+  <text x="32" y="288" class="d1">「 ◼ TORRENTIO 」 「 ⬤ DEBRID 」 「 ⧗ 6ᴍ 」</text>
+  <text x="32" y="309" class="d2">「 ▤ 8.2 ɢʙ 」 「 ▼ 8.2 ᴍʙᴘs 」 「 ▲ 89 ꜱᴇᴇᴅᴇʀꜱ 」</text>
+  <text x="32" y="330" class="d2">▶ Vɪᴅᴇᴏ: 「 ʜᴅʀ¹⁰ 」 「 ▣ ʜᴇᴠᴄ 」  ⚑ Lᴀɴɢ: ᴇɴɢʟɪꜱʜ</text>
+  <text x="32" y="351" class="d2">◆ Rᴇʟᴇᴀsᴇ: 『 ★ NTB 』 『 ⛨ ᴡᴇʙ-ᴅʟ 』</text>
+
+  <text x="400" y="412" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/Branding-Brevity/Core-Builds-By-Brevity</text>
+</svg>
