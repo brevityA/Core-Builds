@@ -40,7 +40,10 @@ TorBox Pro?
 └── 1080p only? → Stream
 
 TorBox Essential?
-├── Instant play (2-3s)? → Speed tier
+├── Cached-only, single-click play? → Flash tier
+│   ├── 4K? → Flash 4K
+│   └── 1080p? → Flash
+├── Fast play (2-3s)? → Speed tier
 │   ├── + EasyNews, 4K → Speed 4K+
 │   ├── + EasyNews, 1080p → Speed+
 │   ├── No EasyNews, 4K → Speed 4K
@@ -75,6 +78,8 @@ Getting too few results / low-overhead host? → Lite variant of any template ab
 |---|---|
 | 4K with full addon stack | **[Core Nexus 4K Essential](../Templates/Torbox/Essential/core-nexus-4k-essential.json)** |
 | 1080p that works on any device | **[Core Nexus Essential](../Templates/Torbox/Essential/core-nexus-essential.json)** |
+| Cached-only 4K, single-click play | **[Core Nexus Flash 4K](../Templates/Torbox/Flash/core-nexus-flash-4k.json)** |
+| Cached-only 1080p, single-click play | **[Core Nexus Flash](../Templates/Torbox/Flash/core-nexus-flash.json)** |
 | Core Nexus Speed 4K+ | **[Core Nexus Speed 4K+](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json)** |
 | Core Nexus Speed+ | **[Core Nexus Speed+](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus.json)** |
 | Core Nexus Speed 4K | **[Core Nexus Speed 4K](../Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json)** |
@@ -474,7 +479,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Users who want cached + uncached streams on a single device*
 
 #### Recommended Template
-- **[Core Nexus Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Templates/Hybrid/core-nexus-tb-hybrid-1080p.json)** — TorBox + NZBGeek, cached and uncached
+- **[Core Nexus Hybrid](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json)** — TorBox + NZBGeek, cached and uncached
 
 #### What this build does
 - ✅ Shows both cached (instant) and uncached streams
