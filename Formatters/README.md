@@ -1,189 +1,225 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/formatters_banner.svg" alt="Formatters Banner" width="100%"/>
-</p>
+# Core Formatters
 
-# 🎨 Core Builds — Formatters
-
-Custom visual layouts that control how streams appear in your list. All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']` and are compatible with any Core Builds template.
-
-> **How to import:** Click a download link below → copy the URL from your browser's address bar → open AIOStreams → Formatter section → Import icon → paste URL → Save.
+Custom stream display layouts for AIOStreams. Formatters control how every stream appears in Stremio and WuPlay — the title line, the metadata rows, cache status, audio tags, release group, and everything else you see when picking a stream.
 
 ---
 
-## 📋 All Formatters
+## 📋 Active Formatters
 
-| Formatter | Style | Download |
-|---|---|---|
-| **Core Nexus Elite** ⭐ | Colour-coded circles, INSTANT/UNCACHED badge, 4-line layout | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json) |
-| **Core Nexus Apex v2** ⭐ | Score number in name, bitrate-first, subtitle language flags | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json) |
-| **Core Nexus Apex** | Audio codec in name, two-tier score badge (ELITE ≥75 · QUALITY ≥50) | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20Formatter.json) |
-| **Core Nexus TV** | UPPER CASE throughout, large-screen readable | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json) |
-| **Core Nexus Sigma** | Typographic `「 」` brackets, editorial feel | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Sigma%20Formatter.json) |
-| **Core Nexus Minimal** | 3-line layout, ⚡/⏳ indicator, first audio only | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Minimal%20Formatter.json) |
-| **Core Nexus Uniform** | Legacy — replaced by Core Nexus Elite | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Uniform%20Formatter.json) |
-| **Core Syntax V3** | Core Cipher personal build | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_V3.json) |
-| **Core Syntax** | Original syntax formatter | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_Formatter.json) |
-| **Nexus Prime** | Community formatter | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Nexus%20Prime%20Formatter%20.json) |
-| **Core Zenith Diamond** | Diamond-style layout | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Zenith_Diamond.json) |
-| **Auburn Tiger Edition** | Auburn Tiger colour scheme | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Zenith%20Auburn%20Tiger%20Edition.json) |
-| **Midnight Slate** | Dark slate aesthetic | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Midnight%20Slate.json) |
-| **Omni Diamond v2.2** | Omni Diamond layout | [Download →](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Omni_Diamond_v2.2.0.json) |
+### ⭐ Core Nexus Apex v2
 
----
+Apex v2 is the recommended upgrade over Apex v1. Three targeted changes: score number in line 1 (💎 ELITE ✦ 94 instead of a label), bitrate before visual tags in line 2 so the most decision-relevant spec comes first, and per-language subtitle flags (📝 🇬🇧 🇫🇷) replacing the binary SUB badge.
 
-## ⭐ Recommended
+![Core Nexus Apex v2 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg)
 
-### Core Nexus Elite *(Default — bundled in all templates)*
-
-Colour-coded resolution circles (🟣 4K · 🔵 1080P · 🟢 720P), INSTANT/UNCACHED badge, PREMIER release group detection, 4-line description.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg" alt="Core Nexus Elite Preview" width="100%"/>
-</p>
-
----
-
-### Core Nexus Apex v2 *(Recommended upgrade)*
-
-Score number in line 1 (`✦ 94`), bitrate before visual tags in line 2, per-language subtitle flags (`📝 🇬🇧 🇫🇷`).
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" alt="Core Nexus Apex v2 Preview" width="100%"/>
-</p>
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json)
 
 ---
 
 ### Core Nexus Apex
 
-Audio codec in name, two-tier score badge (ELITE ≥75 · QUALITY ≥50).
+Evolution of Elite. Adds audio codec to the name line, two-tier score badge (💎 ELITE ≥75 · ✦ QUALITY ≥50), season pack flag before size.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-preview.svg" alt="Core Nexus Apex Preview" width="100%"/>
-</p>
+![Core Nexus Apex Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20Formatter.json)
 
 ---
 
-### Core Nexus TV *(Large screen)*
+### Core Nexus Elite
 
-UPPER CASE throughout — readable at TV distance. Coloured circles (🔴 4K · 🔵 1080P · 🟢 720P), ⚡/⏳ cache indicator.
+High-contrast. Colour-coded resolution circles (🟣4K · 🔵1080P · 🟢720P · ⚫480P), HDR/DV in name, INSTANT/UNCACHED badge, PREMIER release group detection, 4-line description. **Bundled in all templates.**
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg" alt="Core Nexus TV Preview" width="100%"/>
-</p>
+![Core Nexus Elite Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json)
 
 ---
 
 ### Core Nexus Sigma
 
-Typographic `「 」` brackets, editorial feel.
+Typographic `「 」` / `『 』` bracket system. Title-first name line, smallcaps throughout, premium editorial feel.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg" alt="Core Nexus Sigma Preview" width="100%"/>
-</p>
+![Core Nexus Sigma Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Sigma%20Formatter.json)
 
 ---
 
 ### Core Nexus Minimal
 
-3-line layout, ⚡/⏳ indicator, first audio only. Great for Apple TV and small screens.
+3-line description, ⚡/⏳ cache indicator in name, first audio codec only. Built for TV, AppleTV, and small screens.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg" alt="Core Nexus Minimal Preview" width="100%"/>
-</p>
+![Core Nexus Minimal Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg)
 
----
-
-### Core Nexus Uniform *(Legacy)*
-
-Replaced by Core Nexus Elite. Kept for compatibility.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/uniform-preview.svg" alt="Core Nexus Uniform Preview" width="100%"/>
-</p>
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Minimal%20Formatter.json)
 
 ---
 
-### Core Syntax V3
+### 📺 Core Nexus TV
 
-Core Cipher personal build.
+Large-screen / 10-foot UI optimised. UPPER CASE throughout (no smallcaps — readable at distance), coloured resolution circles (🔴 4K · 🔵 1080P · 🟢 720P), 4-line description with clear section icons (🎬 video · 🔊 audio · 🔌 type/meta). Designed for projectors, smart TVs, and any setup where the screen is across the room.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" alt="Core Syntax V3 Preview" width="100%"/>
-</p>
+![Core Nexus TV Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json)
 
 ---
+
+### Core Nexus Uniform
+
+Legacy — replaced by Core Nexus Elite.
+
+![Core Nexus Uniform Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/uniform-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Uniform%20Formatter.json)
+
+---
+
+## 🗂️ Community & Additional Formatters
 
 ### Core Syntax
 
-Original syntax formatter.
+Original Core Builds formatter. `✦`/`✧` cache indicator in name, `「 」` bracket system for metadata, ◈ ELITE score badge, full release group and edition tagging.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-preview.svg" alt="Core Syntax Preview" width="100%"/>
-</p>
+![Core Syntax Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_Formatter.json)
 
 ---
 
-### Nexus Prime
+### Core Syntax V3 (Core Cipher)
 
-Community formatter.
+Personal build variant. JBL Spatial audio detection (`🔊 JBL Sᴘᴀᴛɪᴀʟ` when DD+/EAC3 present), ★ Premium release group badge, IMAX/Hybrid/edition flags, indexer in release line.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg" alt="Nexus Prime Preview" width="100%"/>
-</p>
+![Core Syntax V3 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_V3.json)
+
+---
+
+### Omni Diamond v2.2.0
+
+Maximum metadata density. Two-line name (visual tags on second line), edition/network/remastered flags, JBL Spatial detection, full language + release group + indexer in description.
+
+![Omni Diamond Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/omni-diamond-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Omni_Diamond_v2.2.0.json)
 
 ---
 
 ### Core Zenith Diamond
 
-Diamond-style layout.
+`🔹`/`🔸` dot separator style. Info-dense name line with encode, audio, channels, and PREMIER flag. 4-line description with bitrate, seeders, video, language, release group.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/zenith-diamond-preview.svg" alt="Core Zenith Diamond Preview" width="100%"/>
-</p>
+![Core Zenith Diamond Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/zenith-diamond-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Zenith_Diamond.json)
 
 ---
 
-### Auburn Tiger Edition
+### Core Zenith Auburn Tiger
 
-Auburn Tiger colour scheme.
+Auburn Tiger edition of Core Zenith Diamond. Orange `🟠` 4K badge, `🐅` release line prefix, amber card border for a distinct warm aesthetic.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/auburn-tiger-preview.svg" alt="Auburn Tiger Preview" width="100%"/>
-</p>
+![Core Zenith Auburn Tiger Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/auburn-tiger-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Zenith%20Auburn%20Tiger%20Edition.json)
 
 ---
 
 ### Midnight Slate
 
-Dark slate aesthetic.
+Dark minimal. `◼`/`⬤`/`▶`/`◆` ASCII symbols instead of emoji. Clean typographic lines — best for clients that render emoji poorly or for a no-clutter look.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/midnight-slate-preview.svg" alt="Midnight Slate Preview" width="100%"/>
-</p>
+![Midnight Slate Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/midnight-slate-preview.svg)
 
----
-
-### Omni Diamond v2.2
-
-Omni Diamond layout.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/omni-diamond-preview.svg" alt="Omni Diamond Preview" width="100%"/>
-</p>
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Midnight%20Slate.json)
 
 ---
 
-## 📥 How to Import
+### Nexus Prime
 
-1. Click a **Download →** link above — copy the URL from your browser's address bar
-2. Open your AIOStreams host → **Formatter** section → **Import/Export icon** (bottom right)
-3. Select **Import from URL** → paste the URL
-4. Click **Save** → refresh Stremio or WuPlay
+Early Core Builds formatter. Similar layout to Uniform with additional SEADEX/BEST detection, `📅` age format, subtitle emoji track listing, and folder size support.
 
-> ⚠️ Always use the raw URL — copying from the GitHub file view adds hidden characters that break the JSON parser.
+![Nexus Prime Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg)
 
-> **Tip:** Turn off **Show file name** and **Show bitrate** in AIOStreams main settings when using Elite or Apex v2 — these formatters handle those fields natively.
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Nexus%20Prime%20Formatter%20.json)
 
 ---
 
-*Backup mirror of [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity) · [Download all from Mega](https://mega.nz/folder/DvQGwYYJ#eAnBsID9nc4Nkr8eQfZ2Lg) · v2.5.1*
+## ⚙️ How to Apply
+
+### Using a Core Builds template
+Core Nexus Elite is already bundled in all templates — nothing to do on a fresh import. To switch formatter after importing:
+
+1. Download the formatter JSON from the table above
+2. Open your AIOStreams host → **Settings** → **Formatter** → **Custom**
+3. Paste the `name` value into the **Name Template** field
+4. Paste the `description` value into the **Description Template** field
+5. Save and reinstall the addon in Stremio
+
+> **Note:** If you updated from an older template and the formatter fields are blank, do a fresh import rather than an update. AIOStreams preserves the formatter as a user setting during updates.
+
+### Building your own template
+All Core Builds formatters use the `tamtaro` formatter type. The override key must match the `id`:
+
+```json
+"formatter": {
+  "id": "tamtaro",
+  "definitions": {
+    "overrides": {
+      "tamtaro": {
+        "name": "...",
+        "description": "..."
+      }
+    }
+  }
+}
+```
+
+---
+
+## 🔍 What the Stream Display Shows
+
+### Core Nexus Elite / Apex — Name line
+```
+🟣 4K  ⚡ TB  👁️ DV ✨ HDR¹⁰⁺  🔮 ATMOS  MOVIE TITLE S01
+```
+
+| Token | Meaning |
+|---|---|
+| 🟣 / 🔵 / 🟢 / ⚫ | Resolution (4K · 1080P · 720P · 480P) |
+| `⚡ TB` | Service short name |
+| 👁️ DV · 🌟 HDR · 🌤️ HLG | Visual tag (only when present) |
+| 🔮 ATMOS · 💎 TRUEHD · 🔷 DTS-HD | Top audio codec — Apex/Minimal only |
+| Title · Season/Episode | Parsed from filename |
+
+### Description rows (Elite / Apex v2)
+```
+🚀 INSTANT  💎 ELITE  ✦ 94  ⭐ BEST  🎯 Regex  🏷️ Group  👑 PREMIER
+🎬 💎 REMUX  hevc  45.2 Mbps  👁️ DV ✨ HDR¹⁰⁺
+🎛️ 🔮 ATMOS  💎 TRUEHD  🔊 7.1  🌍 🇬🇧  📝 🇬🇧 🇫🇷
+12.4 GB  📦 PACK  🌱 234  ⏱️ 2y  🔍 indexer  🔌 debrid
+```
+
+| Line | Content |
+|---|---|
+| Line 1 | Cache status · Score tier + number · SeaDex · Regex/SE match · Release group · PREMIER · IMAX |
+| Line 2 | Quality source · Encode · **Bitrate** · Visual tags · Network · Edition flags |
+| Line 3 | Audio codecs · Channels · Language emojis · Dub · **Subtitle language flags** |
+| Line 4 | File size · Season pack · Seeders · Age · Indexer · Stream type |
+
+---
+
+## 📝 Notes
+
+- Formatters are display-only — they don't affect which streams appear, filtering, or sorting
+- All formatters use `id: "tamtaro"` with `definitions.overrides.tamtaro` — this is the correct structure for AIOStreams
+- `{tools.newLine}` must be used for line breaks in the description — literal newlines will cause the formatter to be silently discarded on import
+- ELITE / QUALITY score badges only appear when a stream has a ranked regex or stream expression score
+- Compatible with AIOStreams v2.4.6+
+
+---
+
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · Filtering powered by [Tamtaro SEL Setup](https://git.tamtaro.de)*

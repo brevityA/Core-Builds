@@ -1,0 +1,39 @@
+name: Check for Broken Links
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'   # Every Monday at 8am UTC
+  workflow_dispatch:
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >
+            --verbose
+            --no-progress
+            --exclude 'shields.io'
+            --exclude 'badgen.net'
+            --exclude 'img.shields.io'
+            --exclude 'ko-fi.com'
+            --exclude 'torbox.app'
+            --exclude 'localhost'
+            --exclude 'example.com'
+            --timeout 20
+            './**/*.md'
+          fail: false   # Don't fail the build — just report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create issue if links are broken
+        if: env.lychee_exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: '🔗 Broken links detected'
+          content-filepath: ./lychee/out.md
+          labels: documentation

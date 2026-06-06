@@ -79,11 +79,11 @@ Nvidia Shield · Apple TV 4K · High-end Android TV · 4K OLED / QLED displays
 ## ⚡ Quick Import
 
 ```
-https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/main/Templates/TorBox/Single/core-nexus-4k-ht-torbox.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/TorBox/Single/core-nexus-4k-ht-torbox.json
 ```
 
 Paste directly into the **Template Import** menu in your AIOStreams host, then enable TorBox in the services panel.
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity) · [Import Guide](../../Guides/IMPORT_GUIDE.md) · [Changelog](../../CHANGELOG.md)*
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Import Guide](../../Guides/IMPORT_GUIDE.md) · [Changelog](../../CHANGELOG.md)*

@@ -76,11 +76,11 @@ Phones · Tablets · Budget Android TV boxes · Amazon Fire TV Sticks · Older 1
 ## ⚡ Quick Import
 
 ```
-https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/main/Templates/TorBox/Single/core-nexus-torbox-exclusive_rpdb.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/TorBox/Single/core-nexus-torbox-exclusive_rpdb.json
 ```
 
 Paste directly into the **Template Import** menu in your AIOStreams host, then enable TorBox in the services panel.
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity) · [Import Guide](../../Guides/IMPORT_GUIDE.md) · [Changelog](../../CHANGELOG.md)*
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Import Guide](../../Guides/IMPORT_GUIDE.md) · [Changelog](../../CHANGELOG.md)*

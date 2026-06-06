@@ -1,0 +1,484 @@
+{
+  "metadata": {
+    "id": "prism-torbox-essential-1080p",
+    "name": "Prism TorBox Essential 1080p",
+    "description": "A frictionless 1080p Full HD configuration powered exclusively by TorBox. Optimised for simplicity, compatibility, and fast playback, it prioritises WEB-DL, Blu-ray, and WEBRip sources while excluding Remux and all 4K content entirely.",
+    "source": "external",
+    "author": "MightyIcyy",
+    "version": "1.0.0",
+    "category": "Debrid",
+    "serviceRequired": false,
+    "setToSaveInstallMenu": true
+  },
+  "config": {
+    "trusted": false,
+    "appliedTemplates": [
+      {
+        "id": "prism-torbox-exclusive-1080p",
+        "version": "1.0.0"
+      }
+    ],
+    "excludedResolutions": [],
+    "includedResolutions": [],
+    "requiredResolutions": [
+      "1080p"
+    ],
+    "preferredResolutions": [
+      "1080p"
+    ],
+    "excludedQualities": [],
+    "includedQualities": [],
+    "requiredQualities": [
+      "BluRay",
+      "WEB-DL",
+      "WEBRip"
+    ],
+    "preferredQualities": [
+      "WEB-DL",
+      "BluRay",
+      "WEBRip"
+    ],
+    "excludedLanguages": [],
+    "includedLanguages": [],
+    "requiredLanguages": [],
+    "preferredLanguages": [
+      "English"
+    ],
+    "excludedSubtitles": [],
+    "includedSubtitles": [],
+    "requiredSubtitles": [],
+    "preferredSubtitles": [
+      "English"
+    ],
+    "excludedVisualTags": [
+      "3D",
+      "DV Only"
+    ],
+    "includedVisualTags": [],
+    "requiredVisualTags": [],
+    "preferredVisualTags": [
+      "10bit"
+    ],
+    "excludedAudioTags": [
+      "DTS:X",
+      "DTS-HD MA",
+      "DTS-HD",
+      "DTS-ES",
+      "TrueHD",
+      "FLAC"
+    ],
+    "includedAudioTags": [],
+    "requiredAudioTags": [],
+    "preferredAudioTags": [
+      "AAC",
+      "OPUS"
+    ],
+    "excludedAudioChannels": [],
+    "includedAudioChannels": [],
+    "requiredAudioChannels": [],
+    "preferredAudioChannels": [],
+    "excludedStreamTypes": [],
+    "includedStreamTypes": [],
+    "requiredStreamTypes": [],
+    "preferredStreamTypes": [
+      "debrid"
+    ],
+    "excludedEncodes": [
+      "AV1"
+    ],
+    "includedEncodes": [],
+    "requiredEncodes": [],
+    "preferredEncodes": [
+      "HEVC",
+      "AVC"
+    ],
+    "preferredReleaseGroups": [],
+    "excludedKeywords": [
+      "SCREENER",
+      "CAM",
+      "TS",
+      "TELESYNC",
+      "TC",
+      "HDTS",
+      "HDTC"
+    ],
+    "ageRangeTypes": [
+      "usenet"
+    ],
+    "digitalReleaseFilter": {
+      "enabled": false,
+      "tolerance": 0,
+      "requestTypes": [],
+      "addons": [],
+      "showInfoOnFilter": true
+    },
+    "enableSeadex": true,
+    "excludeCachedFromAddons": [],
+    "excludeCachedFromServices": [],
+    "excludeCachedFromStreamTypes": [],
+    "excludeUncached": true,
+    "excludeUncachedFromAddons": [],
+    "excludeUncachedFromServices": [],
+    "excludeUncachedFromStreamTypes": [],
+    "excludedStreamExpressions": [
+      {
+        "expression": "quality(streams, 'CAM', 'TS', 'TC', 'SCR', 'Bluray REMUX')",
+        "enabled": true
+      },
+      {
+        "expression": "language(streams, 'Russian', 'Ukrainian')",
+        "enabled": true
+      }
+    ],
+    "preferredStreamExpressions": [
+      {
+        "expression": "quality(streams, 'WEB-DL', 'Bluray', 'WEBRip')",
+        "enabled": true
+      },
+      {
+        "expression": "language(streams, 'English')",
+        "enabled": true
+      },
+      {
+        "expression": "resolution(streams, '1080p')",
+        "enabled": true
+      }
+    ],
+    "regexOverrides": [],
+    "sortCriteria": {
+      "global": [
+        {
+          "key": "cached",
+          "direction": "desc"
+        },
+        {
+          "key": "library",
+          "direction": "desc"
+        },
+        {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
+          "key": "regexPatterns",
+          "direction": "desc"
+        },
+        {
+          "key": "streamType",
+          "direction": "desc"
+        },
+        {
+          "key": "visualTag",
+          "direction": "desc"
+        },
+        {
+          "key": "audioTag",
+          "direction": "desc"
+        },
+        {
+          "key": "audioChannel",
+          "direction": "desc"
+        },
+        {
+          "key": "encode",
+          "direction": "desc"
+        },
+        {
+          "key": "language",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
+        },
+        {
+          "key": "size",
+          "direction": "desc"
+        }
+      ],
+      "movies": [],
+      "series": [],
+      "anime": [],
+      "cached": [],
+      "uncached": [],
+      "cachedMovies": [],
+      "uncachedMovies": [],
+      "cachedSeries": [],
+      "uncachedSeries": [],
+      "cachedAnime": [],
+      "uncachedAnime": []
+    },
+    "rpdbApiKey": "t0-free-rpdb",
+    "posterService": "rpdb",
+    "usePosterRedirectApi": true,
+    "usePosterServiceForMeta": true,
+    "formatter": {
+      "id": "prism"
+    },
+    "proxy": {
+      "id": "mediaflow",
+      "proxiedServices": []
+    },
+    "resultLimits": {
+      "global": 10,
+      "mode": "independent"
+    },
+    "size": {
+      "global": {
+        "movies": [
+          800000000,
+          15000000000
+        ],
+        "series": [
+          300000000,
+          8000000000
+        ]
+      }
+    },
+    "statistics": {
+      "enabled": false,
+      "position": "bottom",
+      "statsToShow": [
+        "addon",
+        "filter",
+        "timing"
+      ],
+      "showFilterStatsOnNoStreams": true
+    },
+    "tmdbAccessToken": "<template_placeholder>",
+    "tmdbApiKey": "<template_placeholder>",
+    "tvdbApiKey": "<template_placeholder>",
+    "yearMatching": {
+      "enabled": true,
+      "requestTypes": [],
+      "addons": []
+    },
+    "titleMatching": {
+      "mode": "exact",
+      "enabled": false,
+      "requestTypes": [],
+      "addons": []
+    },
+    "seasonEpisodeMatching": {
+      "enabled": true,
+      "requestTypes": [],
+      "addons": []
+    },
+    "deduplicator": {
+      "enabled": true,
+      "multiGroupBehaviour": "aggressive",
+      "keys": [
+        "filename",
+        "infoHash"
+      ],
+      "cached": "single_result",
+      "uncached": "per_service",
+      "p2p": "single_result",
+      "http": "disabled",
+      "live": "disabled",
+      "youtube": "disabled",
+      "external": "disabled",
+      "smartDetectAttributes": [
+        "size",
+        "resolution",
+        "quality",
+        "visualTags",
+        "audioTags",
+        "audioChannels",
+        "languages",
+        "encode",
+        "edition",
+        "network",
+        "remastered"
+      ],
+      "smartDetectRounding": 10,
+      "libraryBehaviour": "ignore"
+    },
+    "autoPlay": {
+      "enabled": true,
+      "method": "matchingFile",
+      "attributes": [
+        "resolution",
+        "quality",
+        "releaseGroup"
+      ]
+    },
+    "precacheNextEpisode": false,
+    "precacheSelector": "count(cached(streams)) == 0 ? uncached(streams) : []",
+    "precacheSingleStream": true,
+    "services": [
+      {
+        "id": "realdebrid",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "alldebrid",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "premiumize",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "debridlink",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "torbox",
+        "enabled": true,
+        "credentials": {}
+      },
+      {
+        "id": "stremio_nntp",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "nzbdav",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "altmount",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "offcloud",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "putio",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "easynews",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "easydebrid",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "debrider",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "pikpak",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "seedr",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "stremthru_newz",
+        "enabled": false,
+        "credentials": {}
+      }
+    ],
+    "presets": [
+      {
+        "type": "torrentio",
+        "instanceId": "eff",
+        "enabled": true,
+        "options": {
+          "name": "Torrentio",
+          "timeout": 10000,
+          "resources": [
+            "stream",
+            "catalog",
+            "meta"
+          ],
+          "providers": [
+            "yts",
+            "eztv",
+            "rarbg",
+            "1337x",
+            "thepiratebay",
+            "kickasstorrents",
+            "torrentgalaxy",
+            "magnetdl"
+          ],
+          "mediaTypes": [],
+          "useMultipleInstances": false
+        }
+      },
+      {
+        "type": "debridio",
+        "instanceId": "994",
+        "enabled": true,
+        "options": {
+          "name": "Debridio Scraper",
+          "timeout": 6500,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [],
+          "debridioApiKey": "<template_placeholder>"
+        }
+      }
+    ],
+    "catalogModifications": [
+      {
+        "id": "eff791b.torrentio-torbox-torrents",
+        "type": "other",
+        "name": "TorBox Torrents",
+        "shuffle": false,
+        "enabled": true,
+        "usePosterService": true,
+        "hideable": true,
+        "searchable": false,
+        "addonName": "Torrentio"
+      },
+      {
+        "id": "eff791b.torrentio-torbox-usenet",
+        "type": "other",
+        "name": "TorBox Usenet",
+        "shuffle": false,
+        "enabled": true,
+        "usePosterService": true,
+        "hideable": true,
+        "searchable": false,
+        "addonName": "Torrentio"
+      },
+      {
+        "id": "eff791b.torrentio-torbox-webdl",
+        "type": "other",
+        "name": "TorBox WebDL",
+        "shuffle": false,
+        "enabled": true,
+        "usePosterService": true,
+        "hideable": true,
+        "searchable": false,
+        "addonName": "Torrentio"
+      }
+    ],
+    "cacheAndPlay": {
+      "enabled": false,
+      "streamTypes": [
+        "usenet"
+      ]
+    },
+    "checkOwned": true
+  }
+}

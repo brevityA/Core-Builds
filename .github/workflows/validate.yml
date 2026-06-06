@@ -1,0 +1,110 @@
+name: Validate Templates
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Templates/**/*.json'
+      - 'Formatters/**/*.json'
+      - 'Filtering/**/*.json'
+      - 'validate_templates.py'
+  pull_request:
+    paths:
+      - 'Templates/**/*.json'
+      - 'Formatters/**/*.json'
+      - 'Filtering/**/*.json'
+      - 'Community-Templates/**/*.json'
+      - 'Templates/Personal/**/*.json'
+      - 'validate_templates.py'
+
+jobs:
+  validate:
+    name: Validate Templates
+    runs-on: ubuntu-latest
+    # No external actions used — zero dependency on actions/* org
+
+    steps:
+      # ── Checkout via git directly — no actions/checkout dependency ──────
+      # Fetch the specific SHA so this works on both push and PR branches.
+      # git clone --depth 1 (main) + git checkout <pr-sha> always fails because
+      # the PR merge commit is not in the shallow clone of main.
+      - name: Checkout repository
+        run: |
+          git init .
+          git remote add origin \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git fetch --depth=1 origin "${{ github.sha }}"
+          git checkout FETCH_HEAD
+
+      # ── Python 3 is pre-installed on ubuntu-latest ───────────────────────
+      # No actions/setup-python needed
+
+      # ── Step 1: JSON syntax check ────────────────────────────────────────
+      - name: Check JSON syntax
+        run: |
+          python3 - << 'PYEOF'
+          import json, sys, pathlib
+
+          files = [f for f in pathlib.Path('.').rglob('*.json') if '.github' not in str(f)]
+          print(f"Checking JSON syntax in {len(files)} file(s)...\n")
+          errors = []
+          for fpath in sorted(files):
+            try:
+              json.load(open(fpath))
+              print(f"  OK    {fpath}")
+            except json.JSONDecodeError as e:
+              errors.append(f"{fpath}: {e}")
+              print(f"  FAIL  {fpath} — {e}")
+          if errors:
+            print(f"\n❌ {len(errors)} invalid JSON file(s)")
+            sys.exit(1)
+          print(f"\n✅ All {len(files)} files are valid JSON")
+          PYEOF
+
+      # ── Step 2: Full schema validation ───────────────────────────────────
+      - name: Run template validator
+        id: validator
+        run: |
+          set +e
+          python3 validate_templates.py \
+            --dir Templates \
+            --dir Community-Templates \
+            2>&1 | tee /tmp/validation_output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
+      # ── Step 3: Post PR comment via GitHub API (no actions/github-script) ─
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        run: |
+          EXIT_CODE="${{ steps.validator.outputs.exit_code }}"
+          if [ "$EXIT_CODE" = "0" ]; then
+            ICON="✅"
+            STATUS="All checks passed"
+          else
+            ICON="❌"
+            STATUS="Validation errors found"
+          fi
+
+          OUTPUT=$(head -c 3000 /tmp/validation_output.txt)
+          BODY="## ${ICON} Template Validation — ${STATUS}
+
+          \`\`\`
+          ${OUTPUT}
+          \`\`\`"
+
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            -d "$(jq -n --arg body "$BODY" '{body: $body}')"
+
+      # ── Fail the job if validator found errors ────────────────────────────
+      - name: Check result
+        run: |
+          EXIT_CODE="${{ steps.validator.outputs.exit_code }}"
+          if [ "$EXIT_CODE" != "0" ]; then
+            echo "❌ Template validation failed — see output above"
+            exit 1
+          fi
+          echo "✅ All templates passed validation"

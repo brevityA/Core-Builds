@@ -47,7 +47,7 @@ If it fails repeatedly:
 
 **Fix:** Double-check the URL matches the exact path in the repo. Raw URLs follow this pattern:
 ```
-https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/main/Templates/Torbox/Dual/core-nexus-4k-dual-core.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/Torbox/Dual/core-nexus-4k-dual-core.json
 ```
 
 Note: `Torbox` has a lowercase `b`. `Dual`, `Single`, and `Hybrid` are capitalised. Filenames are all lowercase with hyphens.
@@ -144,7 +144,7 @@ Work through these in order:
 
 - See the [Reset Guide](./RESET_GUIDE.md) if your configuration is in a broken state and you need to start over
 - See the [Advanced Editing Guide](./ADVANCED_EDITING.md) for JSON editing and validation tips
-- Open an issue on the [GitHub repository](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/issues) with a description of the error
+- Open an issue on the [GitHub repository](https://github.com/brevityA/Core-Builds/issues) with a description of the error
 
 ---
 

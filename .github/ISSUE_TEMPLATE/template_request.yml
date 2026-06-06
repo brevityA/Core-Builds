@@ -1,0 +1,75 @@
+name: 📦 Template Request
+description: Request a new template or service combination
+labels: ["template request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a setup that isn't covered? Tell us what you need.
+
+  - type: dropdown
+    id: service
+    attributes:
+      label: Primary debrid service
+      options:
+        - TorBox Pro
+        - TorBox Essential
+        - Real-Debrid
+        - AllDebrid
+        - Premiumize
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: secondary
+    attributes:
+      label: Secondary service (if any)
+      options:
+        - None
+        - Real-Debrid
+        - EasyNews
+        - NZBGeek
+        - AllDebrid
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: resolution
+    attributes:
+      label: Target resolution
+      options:
+        - 4K HDR
+        - 1080p SDR
+        - 720p SDR
+        - Mixed
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Speed (instant load, fewer addons)
+        - Coverage (maximum sources)
+        - Balanced
+    validations:
+      required: true
+
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Target hardware
+      placeholder: "e.g. Nvidia Shield Pro, Samsung QLED, phone"
+    validations:
+      required: false
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: Additional details
+      description: Anything else that would help us understand what you need
+    validations:
+      required: false

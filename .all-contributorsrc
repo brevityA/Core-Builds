@@ -1,0 +1,60 @@
+{
+  "projectName": "Core-Builds-By-Brevity",
+  "projectOwner": "Branding-Brevity",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": ["README.md"],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "Branding-Brevity",
+      "name": "Branding Brevity",
+      "avatar_url": "https://avatars.githubusercontent.com/Branding-Brevity",
+      "profile": "https://github.com/Branding-Brevity",
+      "contributions": ["code", "doc", "maintenance", "design"]
+    },
+    {
+      "login": "Tam-Taro",
+      "name": "Tam-Taro",
+      "avatar_url": "https://avatars.githubusercontent.com/Tam-Taro",
+      "profile": "https://git.tamtaro.de",
+      "contributions": ["plugin", "tool"]
+    },
+    {
+      "login": "Vidhin05",
+      "name": "Vidhin05",
+      "avatar_url": "https://avatars.githubusercontent.com/Vidhin05",
+      "profile": "https://github.com/Vidhin05",
+      "contributions": ["code"]
+    },
+    {
+      "login": "Viren070",
+      "name": "Viren070",
+      "avatar_url": "https://avatars.githubusercontent.com/Viren070",
+      "profile": "https://github.com/Viren070",
+      "contributions": ["platform"]
+    },
+    {
+      "login": "midnightignite",
+      "name": "midnightignite",
+      "avatar_url": "https://avatars.githubusercontent.com/midnightignite",
+      "profile": "https://github.com/midnightignite",
+      "contributions": ["infra"]
+    },
+    {
+      "login": "MightyIcyy",
+      "name": "MightyIcyy",
+      "avatar_url": "https://avatars.githubusercontent.com/MightyIcyy",
+      "profile": "https://github.com/MightyIcyy",
+      "contributions": ["content"]
+    },
+    {
+      "login": "RB3",
+      "name": "RB3",
+      "avatar_url": "https://avatars.githubusercontent.com/RB3",
+      "profile": "https://github.com/RB3",
+      "contributions": ["content"]
+    }
+  ]
+}

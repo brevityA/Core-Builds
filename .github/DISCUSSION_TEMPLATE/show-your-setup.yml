@@ -1,0 +1,40 @@
+title: "[Setup] "
+labels: ["showcase"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Show off your Core Builds setup — formatter style, custom filtering, device combos, anything worth sharing.
+
+  - type: input
+    id: template
+    attributes:
+      label: Template(s) used
+      placeholder: "e.g. Core Nexus 4K Pro + Hybrid"
+    validations:
+      required: false
+
+  - type: input
+    id: formatter
+    attributes:
+      label: Formatter
+      placeholder: "e.g. Core Nexus Apex, custom"
+    validations:
+      required: false
+
+  - type: textarea
+    id: setup
+    attributes:
+      label: Your setup
+      description: Devices, plan, host, any custom tweaks — share what makes it work for you.
+      placeholder: "I run ElfHosted with TorBox Pro..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (optional)
+      description: Drag and drop images of your stream picker or formatter output.
+    validations:
+      required: false

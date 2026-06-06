@@ -1,0 +1,40 @@
+name: Welcome New Contributors
+
+on:
+  pull_request_target:
+    types: [opened]
+  issues:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            👋 Thanks for opening your first issue on Core Builds by Brevity!
+
+            To help us respond quickly, please make sure you've included:
+            - Your **TorBox plan** (Pro / Essential)
+            - Your **AIOStreams host** (ElfHosted, Yeb's, Midnight's, etc.)
+            - Your **template version** (check the `metadata.version` field in your imported template)
+            - Any **error messages** or screenshots
+
+            Check the [Troubleshooting Guide](https://github.com/brevityA/Core-Builds/blob/refs/heads/main/Guides/README.md#8--troubleshooting) and [FAQ](https://github.com/brevityA/Core-Builds/blob/refs/heads/main/Guides/README.md#9--faq) — your question may already be answered there.
+          pr-message: |
+            👋 Thanks for your first contribution to Core Builds by Brevity!
+
+            Before we review, please check your PR covers the checklist in the PR template:
+            - ✅ JSON is valid and passes the build check
+            - ✅ `instanceId` on all presets
+            - ✅ `timeout` in all preset options
+            - ✅ `formatter.id` is `"tamtaro"` (or `"custom"` for community formatters)
+            - ✅ No `not()` — use `negate()` instead
+            - ✅ Version bumped in `metadata.version`
+
+            We'll review as soon as possible. Thanks for helping improve Core Builds! 🚀

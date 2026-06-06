@@ -1,0 +1,58 @@
+[
+  {
+    "expression": "/* CB S-Tier 4K | Remux · DV · Atmos */ resolution(audioTag(visualTag(quality(streams, 'BluRay REMUX'), 'HDR+DV', 'DV'), 'Atmos', 'TrueHD', 'DTS:X'), '2160p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB S-Tier 4K | Remux · HDR10+ · Atmos */ resolution(audioTag(visualTag(quality(streams, 'BluRay REMUX'), 'HDR10+', 'HDR10', 'HDR'), 'Atmos', 'TrueHD', 'DTS:X', 'DTS-HD MA'), '2160p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB A-Tier 4K | WEB-DL · DV · Atmos */ resolution(audioTag(visualTag(quality(streams, 'WEB-DL'), 'HDR+DV', 'DV'), 'Atmos', 'TrueHD', 'DTS:X', 'DTS-HD MA'), '2160p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB A-Tier 4K | WEB-DL · HDR · Best Audio */ resolution(audioTag(visualTag(quality(streams, 'WEB-DL'), 'HDR10+', 'HDR10', 'HDR'), 'Atmos', 'TrueHD', 'DTS:X', 'DTS-HD MA', 'DD+'), '2160p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB B-Tier 4K | WEB-DL · Any HDR */ resolution(visualTag(quality(streams, 'WEB-DL'), 'HDR+DV', 'DV', 'HDR10+', 'HDR10', 'HDR', 'HLG'), '2160p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB C-Tier 4K | WEBRip · HDR */ resolution(visualTag(quality(streams, 'WEBRip'), 'HDR+DV', 'DV', 'HDR10+', 'HDR10', 'HDR'), '2160p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB D-Tier 4K | Any 2160p */ resolution(streams, '2160p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB S-Tier 1080p | Remux · Best Audio */ resolution(audioTag(quality(streams, 'BluRay REMUX'), 'Atmos', 'TrueHD', 'DTS:X', 'DTS-HD MA', 'DD+', 'DTS'), '1080p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB A-Tier 1080p | WEB-DL · DD+ */ resolution(audioTag(quality(streams, 'WEB-DL'), 'Atmos', 'TrueHD', 'DD+', 'DTS-HD MA', 'DTS'), '1080p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB B-Tier 1080p | WEB-DL · AAC */ resolution(audioTag(quality(streams, 'WEB-DL'), 'DD', 'AAC', 'OPUS', 'FLAC'), '1080p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB C-Tier 1080p | WEBRip */ resolution(quality(streams, 'WEBRip', 'BluRay'), '1080p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB D-Tier 1080p | Any 1080p */ resolution(streams, '1080p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB 720p Fallback | WEB-DL */ resolution(quality(streams, 'WEB-DL', 'WEBRip', 'BluRay'), '720p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB 720p Fallback | Any */ resolution(streams, '720p')",
+    "enabled": true
+  }
+]

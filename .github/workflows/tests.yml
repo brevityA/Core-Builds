@@ -1,0 +1,28 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - 'validate_templates.py'
+      - 'tests/**'
+  pull_request:
+    paths:
+      - 'validate_templates.py'
+      - 'tests/**'
+      - 'Templates/**/*.json'
+      - 'Formatters/**/*.json'
+
+jobs:
+  test:
+    name: Run pytest suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pytest
+        run: pip install pytest --quiet
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short

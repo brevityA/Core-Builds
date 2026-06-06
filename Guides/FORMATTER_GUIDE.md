@@ -15,7 +15,7 @@ Custom visual layouts that control how streams appear in your list. Swap between
 | **Core Nexus Sigma** | Typographic `「 」` brackets, editorial feel | Clean aesthetic |
 | **Core Nexus Minimal** | 3-line description, ⚡/⏳ indicator, first audio only | Apple TV, small screens |
 
-All formatters: [`Formatters/`](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/tree/main/Formatters)
+All formatters: [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters)
 
 ### ⭐ Core Nexus Apex v2 *(Recommended)*
 
@@ -36,13 +36,13 @@ UPPER CASE throughout — readable at TV distance. Coloured circles (🔴 4K · 
 Copy the raw URL for your chosen formatter:
 
 ```
-https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json
 ```
 ```
-https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json
 ```
 ```
-https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json
 ```
 
 > ⚠️ **Use the raw URL, not the GitHub file view.** The rendered page adds hidden characters that cause a "Failed to parse JSON" error on import.

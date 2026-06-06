@@ -96,7 +96,7 @@ Then open `http://localhost:3000/stremio/configure` in your browser and import y
 
 ## ❓ Questions
 
-Not a bug or contribution — just a question? Open a [Discussion](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/discussions) rather than an issue.
+Not a bug or contribution — just a question? Open a [Discussion](https://github.com/brevityA/Core-Builds/discussions) rather than an issue.
 
 ---
 

@@ -1,0 +1,114 @@
+# Label definitions — synced to the repo by .github/workflows/sync-labels.yml
+# To add a label: add it here and push to main (or run the workflow manually).
+
+# ── Triage ────────────────────────────────────────────────────────────────────
+- name: bug
+  color: "d73a4a"
+  description: Something is broken
+- name: enhancement
+  color: "a2eeef"
+  description: Improvement to an existing feature
+- name: question
+  color: "d876e3"
+  description: Help or clarification requested
+- name: duplicate
+  color: "cfd3d7"
+  description: This issue or PR already exists
+- name: wontfix
+  color: "ffffff"
+  description: This will not be addressed
+
+# ── Status ────────────────────────────────────────────────────────────────────
+- name: in-progress
+  color: "fbca04"
+  description: Actively being worked on
+- name: work-in-progress
+  color: "fbca04"
+  description: PR is not ready to merge yet
+- name: stale
+  color: "ededed"
+  description: No recent activity — will be closed soon
+- name: pinned
+  color: "0075ca"
+  description: Pinned — exempt from stale sweeper
+- name: security
+  color: "e4e669"
+  description: Security-related — exempt from stale sweeper
+
+# ── Resolution ────────────────────────────────────────────────────────────────
+- name: auto-resolved
+  color: "0e8a16"
+  description: Closed automatically by the auto-responder bot
+- name: deprecated
+  color: "b60205"
+  description: Related to deprecated templates or features
+- name: fix
+  color: "0e8a16"
+  description: Bug fix
+
+# ── Content type ──────────────────────────────────────────────────────────────
+- name: documentation
+  color: "0075ca"
+  description: Documentation changes
+- name: infrastructure
+  color: "5319e7"
+  description: CI, workflows, GitHub config
+- name: chore
+  color: "ededed"
+  description: Maintenance — no user-facing change
+- name: improvement
+  color: "a2eeef"
+  description: Code quality or UX improvement
+- name: new-template
+  color: "0e8a16"
+  description: Adds a new template
+
+# ── Template tier ─────────────────────────────────────────────────────────────
+- name: template-pro
+  color: "1d76db"
+  description: TorBox Pro tier templates
+- name: template-essential
+  color: "0075ca"
+  description: TorBox Essential tier templates
+- name: template-hybrid
+  color: "5319e7"
+  description: Hybrid (Usenet + TorBox) templates
+- name: template-anime
+  color: "e99695"
+  description: Anime templates
+- name: template-speed
+  color: "f9d0c4"
+  description: Speed / instant-cache templates
+- name: personal
+  color: "6f42c1"
+  description: Personal / custom builds
+
+# ── Component ─────────────────────────────────────────────────────────────────
+- name: filtering
+  color: "bfd4f2"
+  description: ESE / ISE / PSE filtering changes
+- name: formatter
+  color: "d4c5f9"
+  description: Formatter changes
+- name: community
+  color: "e4e669"
+  description: Community-submitted templates
+
+# ── Release notes ─────────────────────────────────────────────────────────────
+- name: skip-changelog
+  color: "ededed"
+  description: Exclude this PR from auto-generated release notes
+- name: automated
+  color: "ededed"
+  description: Automated PR — regex sync, upstream sync, etc.
+- name: automated-pr
+  color: "ededed"
+  description: PR created by an automated workflow
+- name: regex
+  color: "bfd4f2"
+  description: Regex pattern update (Vidhin05 sync)
+
+# ── Discussions ───────────────────────────────────────────────────────────────
+- name: showcase
+  color: "f9d0c4"
+  description: Community setup showcase

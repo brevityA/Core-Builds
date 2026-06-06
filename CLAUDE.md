@@ -14,13 +14,25 @@ A collection of optimised AIOStreams templates for TorBox subscribers. Templates
 
 ```
 Templates/Torbox/
-  Single/       → TorBox Pro templates (4K Pro, Stream)
-  Essential/    → TorBox Essential templates (4K Essential, Essential)
-  Flash/        → Cached-only instant play (Flash, Flash 4K)
-  Speed/TorBox/ → Fast cached play (Speed 4K, Speed)
-Formatters/     → 14 custom stream layout formatters
-Assets/         → Banners, icons, formatter preview images
-Guides/         → Import guide, troubleshooting, device profiles, FAQ
+  Single/           → TorBox Pro templates (4K Pro, Stream + Lite variants)
+  Essential/        → TorBox Essential templates (4K Essential, Essential + Lite variants)
+  Flash/            → Cached-only instant play (Flash, Flash 4K)
+  Speed/TorBox/     → Fast cached play (Speed 4K, Speed + Lite variants)
+  Speed/EasyNews/   → EasyNews dual-source variants (Speed, Speed 4K + Lite variants)
+  Anime/            → Anime-optimised templates (Anime, Anime 4K + Lite variants)
+  Hybrid/           → TorBox + RD hybrid templates (Hybrid, Hybrid Lite)
+  Nightly/          → Pre-release / nightly builds
+  Deprecated/       → Retired templates kept for reference
+Templates/Personal/ → Personal/experimental templates (core-cipher)
+Templates/Deprecated/ → Retired non-Torbox templates
+Community-Templates/ → Community-contributed templates (MightyIcyy, RB3)
+Formatters/         → 14 custom stream layout formatters
+Filtering/          → Shared filter expression files (ESEs, ISEs, PSEs)
+Regex/              → Excluded regex pattern lists
+Assets/             → Banners, icons, formatter preview images
+Guides/             → Import guide, troubleshooting, device profiles, FAQ
+tests/              → pytest test suite (template validation, integration)
+.github/            → Workflows, issue templates, discussion templates
 ```
 
 ---

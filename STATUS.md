@@ -65,14 +65,14 @@ Full self-hosting docs: [docs.aiostreams.viren070.me](https://docs.aiostreams.vi
 To enable the Core Builds Filtering System synced URLs on a self-hosted instance:
 
 ```env
-WHITELISTED_SYNCED_URLS=https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Filtering/Core-Builds-ESEs.json,https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Filtering/Core-Builds-PSEs.json,https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Filtering/Core-Builds-ISEs.json
+WHITELISTED_SYNCED_URLS=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-ESEs.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-PSEs.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-ISEs.json
 ```
 
 ---
 
 ## ➕ Missing an Instance?
 
-[Open an issue →](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/issues/new?title=Add+Instance:+&labels=instance)
+[Open an issue →](https://github.com/brevityA/Core-Builds/issues/new?title=Add+Instance:+&labels=instance)
 
 ---
 

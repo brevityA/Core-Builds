@@ -21,8 +21,8 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Phones · Tablets · Budget Android TV boxes · Projectors · Older TVs*
 
 ### Recommended Templates
-- **[Core Nexus TorBox Exclusive (RPDB)](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Templates/Torbox/Single/core-nexus-torbox-exclusive_rpdb.json)** — TorBox only, RPDB poster integration
-- **[Core Nexus Dual Core 1080p](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Templates/Torbox/Dual/core-nexus-dual-core-1080p.json)** — TorBox + Real-Debrid for maximum availability
+- **[Core Nexus TorBox Exclusive (RPDB)](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-torbox-exclusive_rpdb.json)** — TorBox only, RPDB poster integration
+- **[Core Nexus Dual Core 1080p](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Dual/core-nexus-dual-core-1080p.json)** — TorBox + Real-Debrid for maximum availability
 
 ### What these builds do
 - ✅ Targets WEB-DL and WEBRip sources
@@ -45,8 +45,8 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Nvidia Shield · Apple TV 4K · 4K OLED/QLED TVs · High-end Android TV*
 
 ### Recommended Templates
-- **[Core Nexus 4K Dual Core](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Templates/Torbox/Dual/core-nexus-4k-dual-core.json)** — TorBox + Real-Debrid, maximum quality and coverage
-- **[Core Nexus 4K HT TorBox](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Templates/Torbox/Single/core-nexus-4k-ht-torbox.json)** — TorBox only, home theater focused
+- **[Core Nexus 4K Dual Core](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Dual/core-nexus-4k-dual-core.json)** — TorBox + Real-Debrid, maximum quality and coverage
+- **[Core Nexus 4K HT TorBox](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-ht-torbox.json)** — TorBox only, home theater focused
 
 ### What these builds do
 - ✅ Targets 4K UHD sources
@@ -70,7 +70,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Users who want cached + uncached streams on a single device*
 
 ### Recommended Template
-- **[Core Nexus TB Hybrid 1080p](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Templates/Hybrid/core-nexus-tb-hybrid-1080p.json)** — TorBox + NZBGeek, cached and uncached
+- **[Core Nexus TB Hybrid 1080p](https://github.com/brevityA/Core-Builds/blob/main/Templates/Hybrid/core-nexus-tb-hybrid-1080p.json)** — TorBox + NZBGeek, cached and uncached
 
 ### What this build does
 - ✅ Shows both cached (instant) and uncached streams
