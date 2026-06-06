@@ -6,10 +6,10 @@
 
 <p align="center">
   <a href="https://github.com/brevityA/Core-Builds/actions/workflows/validate.yml">
-    <img src="https://img.shields.io/badge/BUILD-passing-2ea44f?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
+    <img src="https://img.shields.io/github/actions/workflow/status/brevityA/Core-Builds/validate.yml?style=for-the-badge&label=BUILD&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://img.shields.io/badge/RELEASE-v2.5.1-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
+    <img src="https://img.shields.io/github/v/release/brevityA/Core-Builds?style=for-the-badge&label=RELEASE&labelColor=1a1f27&color=00d4ff" alt="Latest Release"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/stargazers">
     <img src="https://img.shields.io/github/stars/brevityA/Core-Builds?style=for-the-badge&label=STARS&logo=github&logoColor=white&labelColor=1a1f27&color=00d4ff&cacheSeconds=86400" alt="Stars"/>
