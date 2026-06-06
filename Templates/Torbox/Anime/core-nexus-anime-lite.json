@@ -706,7 +706,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
