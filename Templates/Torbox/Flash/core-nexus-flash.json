@@ -288,44 +288,43 @@
       "global": [
         {
           "key": "resolution",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "language",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "visualTag",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
           "key": "audioChannel",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "audioTag",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "streamExpressionScore",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "bitrate",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "quality",
-          "order": "desc"
+          "direction": "desc"
         },
         {
           "key": "regexScore",
-          "order": "desc"
+          "direction": "desc"
         }
       ],
       "movies": [
