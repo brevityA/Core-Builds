@@ -66,14 +66,7 @@
       "Dubbed",
       "Unknown"
     ],
-    "requiredLanguages": [
-      "English",
-      "Original",
-      "Dual Audio",
-      "Multi",
-      "Dubbed",
-      "Unknown"
-    ],
+    "requiredLanguages": [],
     "preferredLanguages": [
       "English",
       "Original",
@@ -257,7 +250,12 @@
         "enabled": true
       }
     ],
-    "includedStreamExpressions": [],
+    "includedStreamExpressions": [
+      {
+        "enabled": true,
+        "expression": "/*0Cached*/ count(merge(cached(streams), type(streams, 'p2p','http','usenet','stremio'))) == 0 ? passthrough(streams) : []"
+      }
+    ],
     "rankedStreamExpressions": [
       {
         "expression": "releaseGroup == 'CtrlHD' or releaseGroup == 'Ember' or releaseGroup == 'Judas' or releaseGroup == 'Goki' or releaseGroup == 'KITSUNE' or releaseGroup == 'NOMA'",
@@ -478,35 +476,17 @@
     "tmdbApiKey": "<template_placeholder>",
     "yearMatching": {
       "enabled": true,
-      "tolerance": 1,
-      "strict": true,
-      "requestTypes": [
-        "movie",
-        "series",
-        "anime"
-      ],
-      "addons": []
+      "strict": false,
+      "tolerance": 2
     },
     "titleMatching": {
-      "mode": "exact",
-      "similarityThreshold": 1,
       "enabled": true,
-      "requestTypes": [
-        "movie",
-        "series",
-        "anime"
-      ],
-      "addons": []
+      "mode": "contains",
+      "similarityThreshold": 0.75
     },
     "seasonEpisodeMatching": {
       "enabled": true,
-      "strict": true,
-      "requestTypes": [
-        "movie",
-        "series",
-        "anime"
-      ],
-      "addons": []
+      "strict": false
     },
     "deduplicator": {
       "enabled": true,

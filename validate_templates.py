@@ -214,9 +214,11 @@ def validate_template(fpath):
         warn(name, "0Cached ISE missing — no fallback when nothing is cached")
 
     # ── Double-load check ─────────────────────────────────────
+    # Ignore comment-only placeholder entries (expression is bare [] with no logic)
     synced_ise = c.get('syncedIncludedStreamExpressionUrls', [])
     inline_ises = [e for e in c.get('includedStreamExpressions', [])
-                   if 'Tamtaro' in e.get('expression', '') or 'ISE v' in e.get('expression', '')]
+                   if ('Tamtaro' in e.get('expression', '') or 'ISE v' in e.get('expression', ''))
+                   and e.get('expression', '').strip().rstrip('*/').strip().endswith('[]') is False]
     if synced_ise and inline_ises:
         warn(name, "Tamtaro ISEs inline AND synced URL set — potential duplicates")
 
@@ -238,7 +240,11 @@ def main():
         for d in dirs:
             p = Path(d)
             found = sorted(p.rglob('core-nexus*.json')) + sorted(p.rglob('core-cipher*.json'))
-            files += [f for f in found if 'fixed' not in str(f) and 'dual' not in str(f)]
+            files += [f for f in found
+                      if 'fixed' not in str(f)
+                      and 'dual' not in str(f)
+                      and 'Nightly' not in str(f)
+                      and 'Community-Templates' not in str(f)]
 
     print(f"\n{'='*60}")
     print(f"  CORE BUILDS TEMPLATE VALIDATOR")

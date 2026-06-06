@@ -80,14 +80,7 @@
       "Dubbed",
       "Unknown"
     ],
-    "requiredLanguages": [
-      "English",
-      "Original",
-      "Dual Audio",
-      "Multi",
-      "Dubbed",
-      "Unknown"
-    ],
+    "requiredLanguages": [],
     "preferredLanguages": [
       "English",
       "Original",
