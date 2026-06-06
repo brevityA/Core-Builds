@@ -12,7 +12,7 @@ Apex v2 is the recommended upgrade over Apex v1. Three targeted changes: score n
 
 ![Core Nexus Apex v2 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json)
 
 ---
 
@@ -22,7 +22,7 @@ Evolution of Elite. Adds audio codec to the name line, two-tier score badge (�
 
 ![Core Nexus Apex Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-formatter.json)
 
 ---
 
@@ -32,7 +32,7 @@ High-contrast. Colour-coded resolution circles (🟣4K · 🔵1080P · 🟢720P 
 
 ![Core Nexus Elite Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json)
 
 ---
 
@@ -42,7 +42,7 @@ Typographic `「 」` / `『 』` bracket system. Title-first name line, smallca
 
 ![Core Nexus Sigma Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Sigma%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-sigma-formatter.json)
 
 ---
 
@@ -52,7 +52,7 @@ Typographic `「 」` / `『 』` bracket system. Title-first name line, smallca
 
 ![Core Nexus Minimal Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Minimal%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-minimal-formatter.json)
 
 ---
 
@@ -62,7 +62,7 @@ Large-screen / 10-foot UI optimised. UPPER CASE throughout (no smallcaps — rea
 
 ![Core Nexus TV Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json)
 
 ---
 
@@ -72,7 +72,7 @@ Legacy — replaced by Core Nexus Elite.
 
 ![Core Nexus Uniform Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/uniform-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Uniform%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-uniform-formatter.json)
 
 ---
 
@@ -84,7 +84,7 @@ Original Core Builds formatter. `✦`/`✧` cache indicator in name, `「 」` b
 
 ![Core Syntax Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-formatter.json)
 
 ---
 
@@ -94,7 +94,7 @@ Personal build variant. JBL Spatial audio detection (`🔊 JBL Sᴘᴀᴛɪᴀʟ
 
 ![Core Syntax V3 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_V3.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-v3.json)
 
 ---
 
@@ -104,7 +104,7 @@ Maximum metadata density. Two-line name (visual tags on second line), edition/ne
 
 ![Omni Diamond Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/omni-diamond-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Omni_Diamond_v2.2.0.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/omni-diamond-v2.2.0.json)
 
 ---
 
@@ -114,7 +114,7 @@ Maximum metadata density. Two-line name (visual tags on second line), edition/ne
 
 ![Core Zenith Diamond Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/zenith-diamond-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Zenith_Diamond.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-diamond.json)
 
 ---
 
@@ -124,7 +124,7 @@ Auburn Tiger edition of Core Zenith Diamond. Orange `🟠` 4K badge, `🐅` rele
 
 ![Core Zenith Auburn Tiger Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/auburn-tiger-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Zenith%20Auburn%20Tiger%20Edition.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-auburn-tiger-edition.json)
 
 ---
 
@@ -134,7 +134,7 @@ Dark minimal. `◼`/`⬤`/`▶`/`◆` ASCII symbols instead of emoji. Clean typo
 
 ![Midnight Slate Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/midnight-slate-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Midnight%20Slate.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/midnight-slate.json)
 
 ---
 
@@ -144,7 +144,7 @@ Early Core Builds formatter. Similar layout to Uniform with additional SEADEX/BE
 
 ![Nexus Prime Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Nexus%20Prime%20Formatter%20.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json)
 
 ---
 
