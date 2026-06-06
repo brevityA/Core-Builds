@@ -1415,11 +1415,15 @@
         "enabled": true
       },
       {
-        "expression": "/* CB 720p Fallback | WEB-DL */ resolution(quality(streams, 'WEB-DL', 'WEBRip'), '720p')",
+        "expression": "/* CB S-Tier 720p | WEB-DL */ resolution(quality(streams, 'WEB-DL'), '720p')",
         "enabled": true
       },
       {
-        "expression": "/* CB 720p Fallback | Any */ resolution(streams, '720p')",
+        "expression": "/* CB A-Tier 720p | WEBRip or BluRay */ resolution(quality(streams, 'WEBRip', 'BluRay'), '720p')",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB B-Tier 720p | Any 720p */ resolution(streams, '720p')",
         "enabled": true
       }
     ],
