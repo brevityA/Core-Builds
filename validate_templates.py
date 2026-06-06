@@ -244,7 +244,8 @@ def main():
                       if 'fixed' not in str(f)
                       and 'dual' not in str(f)
                       and 'Nightly' not in str(f)
-                      and 'Community-Templates' not in str(f)]
+                      and 'Community-Templates' not in str(f)
+                      and 'Formatters' not in str(f)]
 
     print(f"\n{'='*60}")
     print(f"  CORE BUILDS TEMPLATE VALIDATOR")
