@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Builds | AIOStreams Templates</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0d0d0d; /* Matte Black */
+            --surface-color: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-sub: #a0a0a0;
+            --accent: #00ff88;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        /* Primary Branding & Headers */
+        h1, h2, h3, .brand-logo {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+        }
+
+        .brand-logo {
+            font-size: 3rem;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Subtext */
+        .subtext {
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+
+        .card-container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .template-card {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 300px;
+            border: 1px solid #333;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .template-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .template-card p {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--text-primary);
+            color: var(--bg-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="brand-logo">CORE BUILDS</h1>
+    <p class="subtext">Premium, stutter-free AIOStreams templates optimized for TorBox. Copy the link and import directly into your dashboard.</p>
+
+    <div class="card-container">
+        <div class="template-card">
+            <h2>4K Home Theater</h2>
+            <p>Maximum quality proxy optimized for high-bandwidth setups and TorBox Pro.</p>
+            <a href="https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/main/Templates/Torbox/Single/core-nexus-4k-ht-torbox.json" class="btn">Copy Link</a>
+        </div>
+
+        <div class="template-card">
+            <h2>1080p Exclusive</h2>
+            <p>Reliable, buffer-free performance for standard displays and mobile.</p>
+            <a href="https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/main/Templates/Torbox/Single/core-nexus-torbox-exclusive_rpdb.json" class="btn">Copy Link</a>
+        </div>
+    </div>
+
+</body>
+</html>
