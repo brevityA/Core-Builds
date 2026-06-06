@@ -262,7 +262,7 @@ Applied across all 6 quality templates: 4K Pro, 4K Essential, Essential, Stream,
 
 ### Added
 - **Core Nexus Anime template** — Dedicated anime build with SeaDex + AnimeTosho + NekoBT, FLAC/AAC audio priority, SDR-first visual preference, 1080p WEB-DL focus with 4K support for newer titles. Japanese + English + Dual Audio language support. No anti-anime ESEs.
-- **Core Builds Filtering System** (`Filtering/`) — Custom ESE/PSE/ISE set hosted in-house at `Filtering/Core-Builds-ESEs.json`, `Core-Builds-PSEs.json`, `Core-Builds-ISEs.json`. No external whitelist dependency. Available as standalone synced URLs for self-hosters.
+- **Core Builds Filtering System** (`Filtering/`) — Custom ESE/PSE/ISE set hosted in-house at `Filtering/core-builds-eses.json`, `core-builds-pses.json`, `core-builds-ises.json`. No external whitelist dependency. Available as standalone synced URLs for self-hosters.
 - **Core Nexus Uniform Formatter** — Clean, emoji-coded formatter baked into all 10 templates. Resolution + service badge in title. 🚀 INSTANT / ⚠️ UNCACHED status, SE score, release group, video/audio/language/file detail rows. Replaces Tamtaro formatter reference.
 - **Torrent Galaxy addon** (`torrent-galaxy`) — Enabled on all quality templates after AIOStreams upstream fix. Adds stable secondary scraping coverage.
 - **AnimeTosho addon** (`animeTosho`) — Added to Anime template as primary anime source. Mirrors Nyaa.si + TokyoTosho. Replaces invalid `nyaa` preset.
@@ -289,7 +289,7 @@ Applied across all 6 quality templates: 4K Pro, 4K Essential, Essential, Stream,
 - **`seadex` removed from sort criteria** — Removed from non-anime template sort keys since SeaDex preset is disabled.
 
 ### Fixed
-- **`not()` → `negate()` in all season pack ESEs** — `not()` is not a valid SEL function. All season pack expressions now use `negate()` which matches confirmed-working Tamtaro patterns. Applied across all 10 templates and the `Core-Builds-ESEs.json` source file.
+- **`not()` → `negate()` in all season pack ESEs** — `not()` is not a valid SEL function. All season pack expressions now use `negate()` which matches confirmed-working Tamtaro patterns. Applied across all 10 templates and the `core-builds-eses.json` source file.
 - **`language()` removed from ISEs** — `language()` is not a valid SEL function in stream expressions. Language filtering is handled by `requiredLanguages` config. Invalid ISE removed from all templates.
 - **`or()` and `keyword()` removed from ESEs** — Both are invalid SEL functions. The Hard YouTube Kill ESE was rebuilt using only `type(streams, 'youtube', 'external')` which is confirmed valid.
 - **addonName mismatches fixed** — Speed 1080p EasyNews was identified as "Core Nexus 4K Dual Core", 1080p Essential as "Core Nexus TB Exclusive". Both corrected.
