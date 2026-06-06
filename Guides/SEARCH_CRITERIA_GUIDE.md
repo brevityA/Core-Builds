@@ -248,4 +248,4 @@ All three default to their strict forms in a fresh AIOStreams install. All three
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity)*
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds)*

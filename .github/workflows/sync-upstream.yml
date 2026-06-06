@@ -1,0 +1,87 @@
+name: Sync Upstream Rules
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  sync-upstream:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and format upstream JSON
+        run: |
+          import json
+          import urllib.request
+          import sys
+          import os
+
+          sources = {
+              "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json":
+                  "Regex/vidhin05-regexes.json",
+              "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json":
+                  "Regex/vidhin05-expressions.json",
+              "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-extended.json":
+                  "Regex/tamtaro-ese.json",
+              "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json":
+                  "Regex/tamtaro-pse.json",
+          }
+
+          errors = 0
+          for url, local_path in sources.items():
+              try:
+                  print(f"Fetching {url}...")
+                  req = urllib.request.Request(
+                      url, headers={"User-Agent": "Core-Builds-Sync/1.0"}
+                  )
+                  with urllib.request.urlopen(req) as resp:
+                      data = json.loads(resp.read().decode("utf-8"))
+                  os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                  with open(local_path, "w", encoding="utf-8") as f:
+                      json.dump(data, f, indent=2, ensure_ascii=False)
+                  print(f"  OK  {local_path}")
+              except Exception as e:
+                  print(f"  FAIL  {url}: {e}")
+                  errors += 1
+
+          if errors:
+              sys.exit(1)
+          print(f"\nAll {len(sources)} upstream files synced.")
+        shell: python
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [[ -n "$(git status --porcelain Regex/)" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No upstream changes detected."
+          fi
+
+      - name: Create pull request
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: sync upstream Vidhin05 regex + Tamtaro ESE/PSE"
+          title: "🔄 Sync upstream regex & expressions"
+          body: |
+            Automated weekly sync of upstream rule sets:
+
+            - `Regex/vidhin05-regexes.json` — Vidhin05 ranked regex
+            - `Regex/vidhin05-expressions.json` — Vidhin05 ranked expressions
+            - `Regex/tamtaro-ese.json` — Tamtaro synced ESEs (extended)
+            - `Regex/tamtaro-pse.json` — Tamtaro synced PSEs
+
+            Review diffs before merging to confirm upstream changes align with Core Builds logic.
+          branch: sync-upstream-rules
+          base: main
+          labels: "automated-pr,regex,chore"

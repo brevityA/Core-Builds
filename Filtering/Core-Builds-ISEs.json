@@ -1,0 +1,6 @@
+[
+  {
+    "expression": "/* CB | English Language */ language(streams, 'English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown')",
+    "enabled": true
+  }
+]

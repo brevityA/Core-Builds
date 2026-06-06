@@ -1,0 +1,149 @@
+name: Issue Auto-Responder
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  auto-reply:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Respond to deprecated / known-issue reports
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const issueBody = context.payload.issue.body
+              ? context.payload.issue.body.toLowerCase() : '';
+            const issueTitle = context.payload.issue.title.toLowerCase();
+            const text = issueTitle + ' ' + issueBody;
+
+            // ── Deprecated Dual Core / Real-Debrid ──────────────────────────
+            const deprecatedKeywords = [
+              'dual core', 'dual-core', 'real-debrid', 'realdebrid',
+              'rd hybrid', 'invalid character', 'proxy error',
+              'core-nexus-rd', 'torbox + rd', 'torbox+rd'
+            ];
+            if (deprecatedKeywords.some(k => text.includes(k))) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: [
+                  '👋 Hey there!',
+                  '',
+                  'It looks like you\'re asking about the **Dual Core** (TorBox + Real-Debrid) templates or hitting the "Invalid character" proxy error.',
+                  '',
+                  '⚠️ **These templates have been deprecated.** Due to Real-Debrid API changes they will fail to import and cause playback issues.',
+                  '',
+                  '**Fix your setup:**',
+                  '1. Remove the failed template from your AIOStreams dashboard.',
+                  '2. Import a supported TorBox-exclusive build:',
+                  '   - [Core Nexus 4K Pro](https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json)',
+                  '   - [Core Nexus Stream (1080p)](https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json)',
+                  '',
+                  '*This issue has been auto-closed. If you\'re still stuck, open a new issue with your current template version and host details.*'
+                ].join('\n')
+              });
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['deprecated', 'auto-resolved']
+              });
+              await github.rest.issues.update({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed',
+                state_reason: 'not_planned'
+              });
+              return;
+            }
+
+            // ── Blank formatter fields after update ─────────────────────────
+            const formatterKeywords = [
+              'formatter blank', 'formatter empty', 'formatter missing',
+              'formatter not showing', 'name template empty',
+              'description template empty', 'formatter disappeared',
+              'formatter reset', 'formatter gone', 'formatter field'
+            ];
+            if (formatterKeywords.some(k => text.includes(k))) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: [
+                  '👋 Hey there!',
+                  '',
+                  'This is a known AIOStreams behaviour — **the Update button preserves your formatter** as a user setting and does not overwrite it from the template.',
+                  '',
+                  '**Fix:** Do a **fresh import** (not an update):',
+                  '1. Copy your import URL from the [README](https://github.com/Branding-Brevity/Core-Builds-By-Brevity#-pick-your-template)',
+                  '2. In AIOStreams → Settings → About → Get Started → **Load Template** → paste the URL',
+                  '3. Re-enter your TorBox API key → Save → reinstall in Stremio',
+                  '',
+                  'The formatter fields (Name Template / Description Template) will be populated on a fresh import.',
+                  '',
+                  '*Auto-closing — please reopen if a fresh import doesn\'t resolve this.*'
+                ].join('\n')
+              });
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['auto-resolved']
+              });
+              await github.rest.issues.update({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed',
+                state_reason: 'completed'
+              });
+              return;
+            }
+
+            // ── Update / notification not showing ───────────────────────────
+            const updateKeywords = [
+              'update not showing', 'no update notification', 'update button missing',
+              'can\'t see update', 'cant see update', 'update not working',
+              'update notification', 'not seeing update'
+            ];
+            if (updateKeywords.some(k => text.includes(k))) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: [
+                  '👋 Hey there!',
+                  '',
+                  'AIOStreams shows an update notification only when the template has `"source": "external"` in its metadata and the version number has incremented.',
+                  '',
+                  '**If you\'re not seeing the update badge:**',
+                  '- Make sure you originally imported via a URL (not copy-pasted JSON)',
+                  '- Check that your template\'s `metadata.version` is older than the latest release',
+                  '- If the badge still doesn\'t appear, do a **fresh import** to get the latest version',
+                  '',
+                  'Latest import URLs are always in the [README](https://github.com/Branding-Brevity/Core-Builds-By-Brevity#-pick-your-template).',
+                  '',
+                  '*Auto-closing — please reopen if this doesn\'t help.*'
+                ].join('\n')
+              });
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['auto-resolved']
+              });
+              await github.rest.issues.update({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed',
+                state_reason: 'completed'
+              });
+              return;
+            }

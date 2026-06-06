@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050b14" />
+      <stop offset="50%" stop-color="#0a1930" />
+      <stop offset="100%" stop-color="#02060d" />
+    </linearGradient>
+    <linearGradient id="shield-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7b00" />
+      <stop offset="100%" stop-color="#dd550c" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="1200" height="400" fill="url(#bg-grad)" rx="16"/>
+
+  <g stroke="#1e2d4a" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="100" x2="1200" y2="100" />
+    <line x1="0" y1="200" x2="1200" y2="200" />
+    <line x1="0" y1="300" x2="1200" y2="300" />
+    <line x1="300" y1="0" x2="300" y2="400" />
+    <line x1="600" y1="0" x2="600" y2="400" />
+    <line x1="900" y1="0" x2="900" y2="400" />
+  </g>
+
+  <g transform="translate(550, 50) scale(1.5)">
+    <path d="M 33 0 L 0 14.6 L 0 36.6 C 0 54.4 14.1 70.8 33 75.3 C 51.9 70.8 66 54.4 66 36.6 L 66 14.6 L 33 0 Z" fill="none" stroke="url(#shield-grad)" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 33 10 L 10 20 L 10 36.6 C 10 50 20 62 33 65 C 46 62 56 50 56 36.6 L 56 20 Z" fill="url(#shield-grad)" opacity="0.15"/>
+    <path d="M 33 20 L 22 25 L 22 36.6 C 22 45 26.5 52.5 33 55 C 39.5 52.5 44 45 44 36.6 L 44 25 Z" fill="url(#shield-grad)"/>
+  </g>
+
+  <text x="600" y="240" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="52" font-weight="900" fill="#f0f6fc" text-anchor="middle" letter-spacing="4">RB3 HYBRID BUILDS</text>
+  
+  <text x="600" y="285" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#8b949e" text-anchor="middle" letter-spacing="2">COMMUNITY TEMPLATE</text>
+  
+  <text x="600" y="325" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="500" fill="#ff7b00" text-anchor="middle" letter-spacing="1">PREMIUM TORBOX PRO + REAL-DEBRID CONFIGURATIONS</text>
+
+  <g transform="translate(350, 350)">
+    <rect width="100" height="26" rx="13" fill="#238636" opacity="0.15"/>
+    <rect width="100" height="26" rx="13" fill="none" stroke="#238636" stroke-width="1" opacity="0.5"/>
+    <text x="50" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#3fb950" text-anchor="middle">TorBox Pro</text>
+  </g>
+  
+  <g transform="translate(470, 350)">
+    <rect width="120" height="26" rx="13" fill="#1f6feb" opacity="0.15"/>
+    <rect width="120" height="26" rx="13" fill="none" stroke="#1f6feb" stroke-width="1" opacity="0.5"/>
+    <text x="60" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#58a6ff" text-anchor="middle">Real-Debrid</text>
+  </g>
+  
+  <g transform="translate(610, 350)">
+    <rect width="110" height="26" rx="13" fill="#dd550c" opacity="0.15"/>
+    <rect width="110" height="26" rx="13" fill="none" stroke="#dd550c" stroke-width="1" opacity="0.5"/>
+    <text x="55" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ff7b00" text-anchor="middle">Usenet Boost</text>
+  </g>
+  
+  <g transform="translate(740, 350)">
+    <rect width="100" height="26" rx="13" fill="#8957e5" opacity="0.15"/>
+    <rect width="100" height="26" rx="13" fill="none" stroke="#8957e5" stroke-width="1" opacity="0.5"/>
+    <text x="50" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#d2a8ff" text-anchor="middle">Tamtaro SEL</text>
+  </g>
+</svg>

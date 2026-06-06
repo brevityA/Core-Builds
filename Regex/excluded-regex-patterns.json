@@ -1,0 +1,4 @@
+[
+  "\\.(iso|r\\d{2}|zip|rar|7z|tar|gz|zipx|arj|txt|nfo|jpg|png|pdf|exe|bat|cmd|scr|msi|ps1|vbs|js|jar|com|pif|reg|dll|sys|lnk|url)$",
+  "(?i)\\b(blu[-.]?ray|bluray|bdrip|bdremux|bdmux|bd(?:25|50|66|100)|remux|b[dr][-.]?remux|complete\\.bluray)\\b"
+]

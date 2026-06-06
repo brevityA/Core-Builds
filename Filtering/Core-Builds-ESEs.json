@@ -1,0 +1,22 @@
+[
+  {
+    "expression": "/* CB | Hard CAM Kill */ quality(streams, 'CAM', 'SCR', 'TS', 'TC', 'HC HD-Rip')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB | Hard YouTube Kill */ type(streams, 'youtube', 'external')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB | 3D Content Kill */ visualTag(streams, '3D', 'H-OU', 'H-SBS')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams, seasonPack(streams))) >= 3 ? seasonPack(streams) : []",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []",
+    "enabled": true
+  }
+]

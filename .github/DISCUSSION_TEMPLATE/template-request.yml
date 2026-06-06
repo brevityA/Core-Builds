@@ -1,0 +1,45 @@
+title: "[Request] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest a new template, formatter variant, or filtering configuration.
+        Check the [Roadmap](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/ROADMAP.md) first — it may already be planned.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Request type
+      options:
+        - New template
+        - Formatter variant
+        - Filtering change
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What would you like?
+      description: Describe the template/formatter/filter and what problem it solves.
+      placeholder: "A template for X that does Y..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: Who would this help and why isn't the current setup sufficient?
+    validations:
+      required: false
+
+  - type: input
+    id: plan
+    attributes:
+      label: TorBox plan this would target
+      placeholder: "Pro / Essential / Any"
+    validations:
+      required: false

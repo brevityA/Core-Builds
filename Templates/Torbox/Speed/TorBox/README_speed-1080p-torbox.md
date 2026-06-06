@@ -50,9 +50,9 @@ TorBox Essential users who want instant stream loading without a second subscrip
 ## Quick Import
 
 ```
-https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-1080p-torbox.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-1080p-torbox.json
 ```
 
 ---
 
-*[Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity) · [Import Guide](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/refs/heads/main/Guides/IMPORT_GUIDE.md) · [Changelog](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/refs/heads/main/CHANGELOG.md)*
+*[Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Import Guide](https://github.com/brevityA/Core-Builds/blob/refs/heads/main/Guides/IMPORT_GUIDE.md) · [Changelog](https://github.com/brevityA/Core-Builds/blob/refs/heads/main/CHANGELOG.md)*

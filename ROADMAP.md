@@ -73,8 +73,8 @@ This is a living list of planned work, active development, and recently complete
 
 ## 🙏 Want to Contribute?
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. For feature suggestions, open a [Discussion](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/discussions) rather than an issue — roadmap items that gain community traction get prioritised.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. For feature suggestions, open a [Discussion](https://github.com/brevityA/Core-Builds/discussions) rather than an issue — roadmap items that gain community traction get prioritised.
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity)*
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds)*

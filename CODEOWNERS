@@ -1,0 +1,14 @@
+# Core Builds by Brevity — Code Owners
+# These users are automatically requested for review on PRs
+
+# Default owner for everything
+* @Branding-Brevity
+
+# Templates — all changes reviewed by maintainer
+Templates/ @Branding-Brevity
+
+# Filtering system — critical, maintainer review required
+Filtering/ @Branding-Brevity
+
+# Workflows — maintainer review required
+.github/workflows/ @Branding-Brevity

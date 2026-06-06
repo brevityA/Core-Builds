@@ -1,0 +1,46 @@
+template-pro:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Single/**'
+
+template-essential:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Essential/**'
+
+template-hybrid:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Hybrid/**'
+
+template-anime:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Anime/**'
+
+template-speed:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Speed/**'
+
+filtering:
+  - changed-files:
+    - any-glob-to-any-file: 'Filtering/**'
+
+formatter:
+  - changed-files:
+    - any-glob-to-any-file: 'Formatters/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '*.md'
+      - 'Guides/**'
+
+community:
+  - changed-files:
+    - any-glob-to-any-file: 'Community-Templates/**'
+
+personal:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Personal/**'
+
+infrastructure:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**'
+

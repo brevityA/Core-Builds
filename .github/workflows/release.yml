@@ -1,0 +1,38 @@
+name: Package Release Assets
+
+on:
+  release:
+    types: [created]   # fires on draft creation — before publish, while still mutable
+
+jobs:
+  package-and-upload:
+    name: package-and-upload
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare release archive
+        run: |
+          mkdir -p release_assets
+          find Templates/ -name "*.json" ! -path "*/Deprecated/*" ! -path "*/Personal/*" -exec cp {} release_assets/ \;
+          find Formatters/ -name "*.json" -exec cp {} release_assets/ \;
+          cp README.md CHANGELOG.md release_assets/
+          cd release_assets
+          zip -r ../Core-Builds-${{ github.event.release.tag_name }}.zip .
+          cd ..
+          echo "Assets ready:"
+          ls release_assets/
+
+      - name: Upload zip to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release_assets/*.json
+            Core-Builds-${{ github.event.release.tag_name }}.zip
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

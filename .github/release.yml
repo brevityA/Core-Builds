@@ -1,0 +1,36 @@
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+      - automated
+  categories:
+    - title: "🆕 New Templates & Formatters"
+      labels:
+        - template-pro
+        - template-essential
+        - template-hybrid
+        - template-anime
+        - template-speed
+        - formatter
+        - new-template
+    - title: "🐛 Bug Fixes"
+      labels:
+        - bug
+        - fix
+    - title: "✨ Improvements"
+      labels:
+        - enhancement
+        - improvement
+    - title: "🔍 Filtering & Scoring"
+      labels:
+        - filtering
+    - title: "🌍 Community Templates"
+      labels:
+        - community
+    - title: "📖 Documentation"
+      labels:
+        - documentation
+    - title: "⚙️ Infrastructure"
+      labels:
+        - infrastructure
+        - chore

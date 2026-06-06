@@ -1,0 +1,100 @@
+name: 🐛 Bug Report
+description: Report a problem with a template, formatter, or guide
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Fill in as much as you can — it helps us fix it faster.
+
+  - type: dropdown
+    id: template
+    attributes:
+      label: Which template are you using?
+      options:
+        - Core Nexus 4K Pro
+        - Core Nexus Stream (1080p)
+        - Core Nexus Hybrid
+        - Core Nexus 4K Essential
+        - Core Nexus Essential (1080p)
+        - Speed 4K+ (EasyNews)
+        - Speed+ (EasyNews)
+        - Speed 4K (TorBox)
+        - Speed (TorBox)
+        - Core Nexus Anime
+        - Community template
+        - Formatter issue
+        - Other / Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: player
+    attributes:
+      label: Player / Platform
+      options:
+        - Stremio (Android)
+        - Stremio (iOS)
+        - Stremio (Windows)
+        - Stremio (macOS)
+        - Stremio (Linux)
+        - Stremio (Smart TV)
+        - WuPlay
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: host
+    attributes:
+      label: AIOStreams Host
+      options:
+        - ElfHosted
+        - Yeb's (fortheweak.cloud)
+        - Midnight's
+        - Viren's
+        - Kuu's (stremio.ru)
+        - ATBP Hosting
+        - Omni's
+        - Self-hosted
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the issue clearly. What did you expect vs what actually occurred?
+      placeholder: "e.g. After importing the 4K Essential template I get 'Every group must have at least one addon'..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Import template via URL
+        2. Enable TorBox service
+        3. Click Save
+        4. Error appears
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Template version
+      description: Check the template metadata or CHANGELOG for the version number
+      placeholder: "e.g. v2.2.8"
+    validations:
+      required: false
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Additional context
+      description: Screenshots, scrape summaries, or anything else that helps
+    validations:
+      required: false

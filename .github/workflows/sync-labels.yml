@@ -1,0 +1,85 @@
+name: Sync Labels
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/labels.yml'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Sync labels to repository
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Checkout
+        run: |
+          git init .
+          git remote add origin \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git fetch --depth=1 origin main
+          git checkout FETCH_HEAD
+
+      - name: Sync labels via GitHub API
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+
+            const raw = fs.readFileSync('.github/labels.yml', 'utf8');
+            // Strip comment lines before parsing
+            const cleaned = raw.split('\n').filter(l => !l.trim().startsWith('#')).join('\n');
+            const desired = yaml.load(cleaned);
+
+            // Get existing labels
+            const existing = await github.paginate(github.rest.issues.listLabelsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+
+            const existingMap = {};
+            for (const l of existing) existingMap[l.name.toLowerCase()] = l;
+
+            let created = 0, updated = 0, skipped = 0;
+
+            for (const label of desired) {
+              const name = label.name;
+              const color = label.color.replace('#', '');
+              const description = label.description || '';
+              const key = name.toLowerCase();
+
+              if (existingMap[key]) {
+                const ex = existingMap[key];
+                if (ex.color !== color || ex.description !== description) {
+                  await github.rest.issues.updateLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: ex.name,
+                    new_name: name,
+                    color,
+                    description
+                  });
+                  console.log(`  updated: ${name}`);
+                  updated++;
+                } else {
+                  skipped++;
+                }
+              } else {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color,
+                  description
+                });
+                console.log(`  created: ${name}`);
+                created++;
+              }
+            }
+
+            console.log(`\nDone — created: ${created}, updated: ${updated}, skipped: ${skipped}`);

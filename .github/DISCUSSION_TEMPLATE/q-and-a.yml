@@ -1,0 +1,41 @@
+title: "[Q&A] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask anything about Core Builds templates, formatters, filtering, or AIOStreams setup.
+        Check the [Guides](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Guides/README.md) and [FAQ](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Guides/README.md#9--faq) first — common questions are answered there.
+
+  - type: input
+    id: template
+    attributes:
+      label: Template
+      description: Which template are you using?
+      placeholder: "e.g. Core Nexus 4K Pro"
+    validations:
+      required: false
+
+  - type: input
+    id: plan
+    attributes:
+      label: TorBox plan
+      placeholder: "Pro / Essential"
+    validations:
+      required: false
+
+  - type: input
+    id: host
+    attributes:
+      label: AIOStreams host
+      placeholder: "e.g. ElfHosted, Yeb's, self-hosted"
+    validations:
+      required: false
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      placeholder: Describe what you're trying to do and what's happening.
+    validations:
+      required: true

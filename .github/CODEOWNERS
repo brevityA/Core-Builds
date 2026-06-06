@@ -1,0 +1,15 @@
+# Default owner — all files
+* @Branding-Brevity
+
+# Template files
+Templates/           @Branding-Brevity
+Community-Templates/ @Branding-Brevity
+
+# Formatter files
+Formatters/          @Branding-Brevity
+
+# Filtering configs
+Filtering/           @Branding-Brevity
+
+# CI / infra — extra review gate
+.github/             @Branding-Brevity

@@ -32,18 +32,18 @@ Result limits raised to 30 global / 12 per resolution (was 20/8).
 
 | Lite Template | Import URL |
 |---|---|
-| **4K Pro Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro-lite.json` |
-| **Stream Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json` |
-| **Hybrid Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |
-| **4K Essential Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json` |
-| **Essential Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json` |
-| **Speed 4K+ Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus-lite.json` |
-| **Speed+ Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus-lite.json` |
-| **Speed EasyNews Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews-lite.json` |
-| **Speed 4K Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json` |
-| **Speed Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json` |
-| **Anime Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json` |
-| **Anime 4K Lite** | `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json` |
+| **4K Pro Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro-lite.json` |
+| **Stream Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json` |
+| **Hybrid Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |
+| **4K Essential Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json` |
+| **Essential Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json` |
+| **Speed 4K+ Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus-lite.json` |
+| **Speed+ Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus-lite.json` |
+| **Speed EasyNews Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews-lite.json` |
+| **Speed 4K Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json` |
+| **Speed Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json` |
+| **Anime Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json` |
+| **Anime 4K Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json` |
 
 ---
 
@@ -51,7 +51,7 @@ Result limits raised to 30 global / 12 per resolution (was 20/8).
 
 4K-first variant of the Anime template. Resolution order: 2160p → 1080p fallback. Visual priority: DV → HDR+DV → HDR10+ → HDR. Audio priority: Atmos → TrueHD → DTS-HD MA → FLAC. New PSE tier stack with 4K S/A/B/C grades above the 1080p fallback tiers. Size caps raised to 80 GB movies / 40 GB series.
 
-**Import:** `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json`
+**Import:** `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json`
 
 ---
 
@@ -62,9 +62,9 @@ Three targeted upgrades over Apex v1:
 - **Bitrate before visual tags** in line 2 — encode → container → bitrate → HDR/DV decorations
 - **Subtitle language flags** — `📝 🇬🇧 🇫🇷` instead of binary `📝 SUB`
 
-Apex v1 remains available. Both formatters downloadable from the [Formatters directory](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/tree/main/Formatters).
+Apex v1 remains available. Both formatters downloadable from the [Formatters directory](https://github.com/brevityA/Core-Builds/tree/main/Formatters).
 
-**Download:** `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json`
+**Download:** `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json`
 
 ---
 
@@ -72,7 +72,7 @@ Apex v1 remains available. Both formatters downloadable from the [Formatters dir
 
 Large-screen / 10-foot UI formatter. UPPER CASE throughout (no smallcaps — readable at TV distance), coloured resolution circles (🔴 4K · 🔵 1080P · 🟢 720P), ⚡/⏳ cache indicator, 4-line description with 🎬 video / 🔊 audio / 🔌 meta section icons. Works with any template.
 
-**Download:** `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json`
+**Download:** `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json`
 
 ---
 
@@ -80,10 +80,10 @@ Large-screen / 10-foot UI formatter. UPPER CASE throughout (no smallcaps — rea
 
 EasyNews-only instant play. No TorBox subscription required. Usenet-first with debrid fallback. For users who have EasyNews but not TorBox.
 
-**Import:** `https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json`
+**Import:** `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json`
 
 ---
 
 ## Full Changelog
 
-[CHANGELOG.md](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)

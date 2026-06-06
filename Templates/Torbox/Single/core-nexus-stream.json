@@ -9,14 +9,14 @@
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
-    "sourceUrl": "https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json",
-    "changelogUrl": "https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/CHANGELOG.md"
+    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json",
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus Stream",
-    "addonLogo": "https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
     "addonDescription": "1080p WEB-DL focused. BluRay/Remux blocked · SDR · Pure streaming quality. RPDB posters included.",
     "appliedTemplates": [
       {

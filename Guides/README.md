@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/master_guide_banner.svg" alt="Core Builds Guide Banner" width="100%"/>
+  <img src="https://github.com/brevityA/Core-Builds/raw/refs/heads/main/Assets/master_guide_banner.svg" alt="Core Builds Guide Banner" width="100%"/>
 </p>
 
 # 📖 Core Builds by Brevity — Complete Guide
@@ -35,21 +35,27 @@ Not sure where to start? Answer the questions below to find your build.
 
 ```
 TorBox Pro?
+├── Got NZBGeek/Usenet indexer? → Hybrid
 ├── Want 4K? → 4K Pro
 └── 1080p only? → Stream
 
 TorBox Essential?
-├── Single-click instant play (cached only)? → Flash tier
-│   ├── 4K? → Flash 4K
-│   └── 1080p? → Flash
-├── Fast general play (2-3s)? → Speed tier
-│   ├── 4K? → Speed 4K
-│   └── 1080p? → Speed
+├── Instant play (2-3s)? → Speed tier
+│   ├── + EasyNews, 4K → Speed 4K+
+│   ├── + EasyNews, 1080p → Speed+
+│   ├── No EasyNews, 4K → Speed 4K
+│   └── No EasyNews, 1080p → Speed
 ├── Want 4K? → 4K Essential
 └── 1080p standard? → Essential
-```
 
-> For Hybrid, EasyNews, Anime, and Lite variants → [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity) · [Download from Mega](https://mega.nz/folder/DvQGwYYJ#eAnBsID9nc4Nkr8eQfZ2Lg)
+EasyNews only (no TorBox)? → Speed EasyNews
+
+Anime?
+├── Want 4K HDR? → Anime 4K
+└── Standard 1080p? → Anime
+
+Getting too few results / low-overhead host? → Lite variant of any template above
+```
 
 ---
 
@@ -61,6 +67,7 @@ TorBox Essential?
 |---|---|
 | 4K with Dolby Vision, Atmos, full BluRay REMUX | **[Core Nexus 4K Pro](../Templates/Torbox/Single/core-nexus-4k-pro.json)** |
 | 1080p that works on any device, RPDB poster art | **[Core Nexus Stream](../Templates/Torbox/Single/core-nexus-stream.json)** |
+| 1080p + NZBGeek for maximum Usenet coverage | **[Core Nexus Hybrid](../Templates/Torbox/Hybrid/core-nexus-hybrid.json)** |
 
 #### I have TorBox Essential (no Usenet)
 
@@ -68,10 +75,28 @@ TorBox Essential?
 |---|---|
 | 4K with full addon stack | **[Core Nexus 4K Essential](../Templates/Torbox/Essential/core-nexus-4k-essential.json)** |
 | 1080p that works on any device | **[Core Nexus Essential](../Templates/Torbox/Essential/core-nexus-essential.json)** |
-| Single-click instant 4K (cached only) | **[Core Nexus Flash 4K](../Templates/Torbox/Flash/core-nexus-flash-4k.json)** |
-| Single-click instant 1080p (cached only) | **[Core Nexus Flash](../Templates/Torbox/Flash/core-nexus-flash.json)** |
-| Fast general play, 4K (2-3s) | **[Core Nexus Speed 4K](../Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json)** |
-| Fast general play, 1080p (2-3s) | **[Core Nexus Speed](../Templates/Torbox/Speed/TorBox/core-nexus-speed.json)** |
+| Core Nexus Speed 4K+ | **[Core Nexus Speed 4K+](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json)** |
+| Core Nexus Speed+ | **[Core Nexus Speed+](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus.json)** |
+| Core Nexus Speed 4K | **[Core Nexus Speed 4K](../Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json)** |
+| Core Nexus Speed | **[Core Nexus Speed](../Templates/Torbox/Speed/TorBox/core-nexus-speed.json)** |
+
+#### I have TorBox + Real-Debrid
+
+The dual-core builds are **advanced** — they work best on WuPlay and require optional MediaFlow Proxy configuration for full RD protection. See [Advanced — Dual Core](../Templates/Torbox/Deprecated/Dual/).
+
+---
+
+#### Standard vs Speed — what's the difference?
+
+| | Standard | Speed |
+|---|---|---|
+| **Active addons** | 8 | 4 |
+| **Stream load time** | 3-6 seconds | 2-3 seconds |
+| **Source coverage** | Maximum | Core only (Library, Search NZB, Comet, Zilean) |
+| **Best for** | Most users | Fast hardware, low latency priority |
+| **Trade-off** | Slightly slower | May miss some niche sources |
+
+> Speed templates use the same filtering, ESEs, and regex ranking as Standard — just fewer scrapers. Quality of results is identical when streams are found.
 
 ---
 
@@ -84,7 +109,7 @@ TorBox Essential?
 | **NZBGeek support** | ✅ Hybrid template | ❌ |
 | **cacheAndPlay** | ✅ Active | ❌ Disabled |
 | **nzbFailover** | ✅ Active | ❌ Disabled |
-| **Template options** | Single | Essential + Flash + Speed |
+| **Template options** | Single + Hybrid | Essential + Speed |
 
 > All other features — ESE filtering, regex scoring, episode matching, formatter support — are identical between Pro and Essential builds.
 
@@ -97,7 +122,7 @@ AIOStreams cannot detect which device is requesting a stream. If you have a mix 
 - **Phone/tablet account** → install a 1080p template
 - **TV/Shield account** → install a 4K template
 
-Both accounts use the same TorBox credentials. See [Device Profiles](#4--device-profiles) for full setup.
+Both accounts use the same TorBox credentials. See [Device Profiles](README.md#3--device-profiles) for full setup.
 
 ---
 
@@ -120,8 +145,10 @@ Everything you need to import and configure your build. Follow the steps in orde
 
 | I have... | Use this tier |
 |---|---|
-| TorBox Pro | Single |
-| TorBox Essential | Essential, Flash, or Speed |
+| TorBox Pro | Single or Hybrid |
+| TorBox Essential | Essential or Speed |
+| TorBox Essential + EasyNews | Speed (EasyNews) |
+| TorBox Pro + NZBGeek | Hybrid |
 
 ---
 
@@ -147,31 +174,70 @@ No Usenet required. Torrent cache only.
 
 ---
 
-#### ⚡ Flash — Single-Click Instant Play (Cached Only)
+#### 🔀 Hybrid — TorBox Pro + NZBGeek
 
-Instant autoplay on first click. Cached streams only — no uncached results. Zero wait.
+Adds NZBGeek Usenet indexer for maximum source diversity. Requires a NZBGeek API key — see Step 4.
 
 | Template | Resolution | Best For |
 |---|---|---|
-| [Core Nexus Flash 4K](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json) | 4K HDR | Shield, Apple TV 4K — instant play |
-| [Core Nexus Flash](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json) | 1080p SDR | Budget hardware, phones — instant play |
+| [Core Nexus Hybrid](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json) | 1080p SDR | TorBox Pro + NZBGeek users |
 
 ---
 
-#### ⚡ Speed — Fast Autoplay (2-3 seconds)
+#### ⚡ Speed — Instant Autoplay (2-3 seconds)
 
 Stripped to 4 addons only. Maximum load speed, no compromise on filtering quality.
+
+#### TorBox Essential + EasyNews
+
+| Template | Resolution |
+|---|---|
+| [Core Nexus Speed 4K+](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json) | 4K HDR |
+| [Core Nexus Speed+](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus.json) | 1080p SDR |
 
 #### TorBox Essential Only
 
 | Template | Resolution |
 |---|---|
-| [Core Nexus Speed 4K](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json) | 4K HDR |
-| [Core Nexus Speed](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json) | 1080p SDR |
+| [Speed 4K](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json) | 4K HDR |
+| [Speed 1080p](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json) | 1080p SDR |
+
+#### EasyNews Only (no TorBox)
+
+| Template | Resolution |
+|---|---|
+| [Core Nexus Speed EasyNews](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json) | 1080p SDR |
 
 ---
 
-> For Hybrid, EasyNews, Anime, Lite, and Dual Core builds → [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity) · [Download from Mega](https://mega.nz/folder/DvQGwYYJ#eAnBsID9nc4Nkr8eQfZ2Lg)
+#### 🎌 Anime
+
+SeaDex best-release enforcement. Requires TorBox Essential.
+
+| Template | Resolution | Priority |
+|---|---|---|
+| [Core Nexus Anime](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json) | 1080p · 720p fallback | SDR-first, FLAC/AAC |
+| [Core Nexus Anime 4K](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json) | 4K · 1080p fallback | DV → HDR, Atmos/TrueHD |
+
+---
+
+#### 🪶 Lite Variants
+
+Every standard template above has a `-lite` variant. Lite removes 12 quality-gate ESEs (Low Bitrate, Low Seeders, Upscaled 4K, Bad Bluray, Extra Cached/Uncached limits) while keeping all hard kills (CAM, YouTube, 3D). Use Lite if you're seeing fewer than 5–6 results on mainstream content or running on a low-overhead host.
+
+All Lite import URLs: [Template Directory → Lite Variants](../Templates/Torbox/README.md#-lite-variants)
+
+---
+
+#### ⚗️ Advanced — TorBox + Real-Debrid
+
+Community-reported as working on WuPlay. Stremio users may see reduced RD results due to RD's May 2026 server-side filter. MediaFlow Proxy recommended — configure in Proxy section after import.
+
+| Template | Resolution |
+|---|---|
+| [4K Dual Core](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Deprecated/Dual/core-nexus-4k-dual-core.json) | 4K HDR |
+| [Dual Core 1080p](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Deprecated/Dual/core-nexus-dual-core-1080p.json) | 1080p SDR |
+| [Core Nexus 4K Essential + RD](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Deprecated/Dual/core-nexus-4k-essential-dual-core.json) | 4K HDR |
 
 ---
 
@@ -209,6 +275,17 @@ Full list: [docs.aiostreams.viren070.me](https://docs.aiostreams.viren070.me/get
 All other services are pre-loaded in the 12-service roster but toggled off — enable only what you subscribe to:
 
 `TorBox` · `Real-Debrid` · `AllDebrid` · `Premiumize` · `DebridLink` · `Offcloud` · `Put.io` · `EasyNews` · `EasyDebrid` · `PikPak` · `Seedr` · `Debrider`
+
+#### Hybrid Template — NZBGeek Setup
+
+NZBGeek is a Usenet indexer addon, not a debrid service — its API key is entered separately in the **Addons** section, not the Services modal.
+
+1. Load the template and save
+2. Scroll to **Addons → NZBGeek → ⚙️**
+3. Paste your API key from [nzbgeek.info](https://nzbgeek.info) → Account → API Key
+4. Save
+
+NZBGeek returns no results until this is done. All other addons work immediately.
 
 ---
 
@@ -348,8 +425,8 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Phones · Tablets · Budget Android TV boxes · Projectors · Older TVs*
 
 #### Recommended Templates
-- **[Core Nexus Stream](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-stream.json)** — TorBox Pro, RPDB poster integration
-- **[Core Nexus Essential](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Essential/core-nexus-essential.json)** — TorBox Essential, 1080p
+- **[Core Nexus Stream](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-stream.json)** — TorBox only, RPDB poster integration
+- **[Core Nexus Dual Core 1080p](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Deprecated/Dual/core-nexus-dual-core-1080p.json)** — TorBox + Real-Debrid for maximum availability
 
 #### What these builds do
 - ✅ Targets WEB-DL and WEBRip sources
@@ -372,8 +449,8 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Nvidia Shield · Apple TV 4K · 4K OLED/QLED TVs · High-end Android TV*
 
 #### Recommended Templates
-- **[Core Nexus 4K Pro](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox Pro, home theater focused
-- **[Core Nexus 4K Essential](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Essential/core-nexus-4k-essential.json)** — TorBox Essential, full 4K stack
+- **[Core Nexus 4K Dual Core](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Deprecated/Dual/core-nexus-4k-dual-core.json)** — TorBox + Real-Debrid, maximum quality and coverage
+- **[Core Nexus 4K Pro](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox only, home theater focused
 
 #### What these builds do
 - ✅ Targets 4K UHD sources
@@ -390,6 +467,21 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 - 4K OLED / QLED TVs with native Stremio or WuPlay apps
 - High-end Android TV boxes (Ugoos AM6B, MECOOL KM7)
 - Google TV Streamer
+
+---
+
+#### 🔀 Optional: Hybrid Account
+*Users who want cached + uncached streams on a single device*
+
+#### Recommended Template
+- **[Core Nexus Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Templates/Hybrid/core-nexus-tb-hybrid-1080p.json)** — TorBox + NZBGeek, cached and uncached
+
+#### What this build does
+- ✅ Shows both cached (instant) and uncached streams
+- ✅ Usenet integration via NZBGeek for wider source coverage
+- ✅ 1080p SDR — safe for most hardware
+- ⚠️ Requires a NZBGeek API key to activate the full Usenet tier
+- ⚠️ Uncached streams require TorBox to download the file before playback begins
 
 ---
 
@@ -411,7 +503,7 @@ Stremio syncs addon installations per-account, so each device automatically gets
 
 #### 💡 Tips
 
-> **Same debrid credentials on both accounts.** TorBox API keys are not tied to Stremio accounts — you can enter the same keys on both AIOStreams installations without issue.
+> **Same debrid credentials on both accounts.** TorBox and Real-Debrid API keys are not tied to Stremio accounts — you can enter the same keys on both AIOStreams installations without issue.
 
 > **RPDB posters work per-account.** The Core Nexus Stream template includes a free-tier RPDB key. If you upgrade to a paid RPDB plan, enter your personal key on the low-end account's template for richer poster art.
 
@@ -476,6 +568,7 @@ WuPlay does not inject these Cinemeta trailer entries alongside addon results, s
 
 **Use WuPlay if:**
 - You are on Android, Fire TV, or Android TV
+- You use the Advanced dual-core (TorBox + RD) builds
 - YouTube/external stream leakage has been a problem for you in Stremio
 - You want better handling of niche stream types
 
@@ -842,10 +935,10 @@ If it fails repeatedly:
 
 **Fix:** Double-check the URL matches the exact path in the repo. Raw URLs follow this pattern:
 ```
-https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/Torbox/Single/core-nexus-4k-pro.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/Torbox/Deprecated/Dual/core-nexus-4k-dual-core.json
 ```
 
-Note: `Torbox` has a lowercase `b`. `Single`, `Essential`, `Flash`, and `Speed` are capitalised. Filenames are all lowercase with hyphens.
+Note: `Torbox` has a lowercase `b`. `Dual`, `Single`, and `Hybrid` are capitalised. Filenames are all lowercase with hyphens.
 
 ---
 
@@ -1297,4 +1390,4 @@ All three default to their strict forms in a fresh AIOStreams install. All three
 
 ---
 
-*[Return to README](../README.md) · [Full library → Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity)*
+*[Return to README](../README.md) · [CHANGELOG](../CHANGELOG.md)*
