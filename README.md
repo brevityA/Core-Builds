@@ -169,9 +169,9 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Formatter | Bundled In | Download |
 |---|---|---|
-| **Core Nexus Elite** | All 14 Core Nexus templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json) |
-| **Core Nexus TV** | Stand-alone · all templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json) |
-| **Core Syntax V3** | Core Cipher personal build | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_V3.json) |
+| **Core Nexus Elite** | All 14 Core Nexus templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json) |
+| **Core Nexus TV** | Stand-alone · all templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json) |
+| **Core Syntax V3** | Core Cipher personal build | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-v3.json) |
 | **Core Nexus Uniform** | Legacy — replaced by Core Nexus Elite | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Uniform%20Formatter.json) |
 
 > 📁 [**Browse all formatters →**](https://github.com/brevityA/Core-Builds/tree/main/Formatters)
