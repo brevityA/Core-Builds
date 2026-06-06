@@ -12,6 +12,6 @@ These templates are provided "as-is." While they offer awesome alternative aesth
 ### 🛠️ How to Contribute
 Got a killer layout you want to share with the WuPlay ecosystem?
 1. **Fork** this repository.
-2. Add your `.json` file to this folder (`/Community-Builds`).
+2. Add your `.json` file to this folder (`/Community-Templates`).
 3. Open a **Pull Request**! Please include a screenshot of what your formatter looks like on-screen in the PR description so users can see your design before downloading.
 4. 

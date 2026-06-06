@@ -156,7 +156,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 | Template | Author | Plan | Import |
 |---|---|---|---|
-| [Prism TorBox Essential 1080p](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/prism-torbox-essential-1080p.json) | MightyIcyy | Essential | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/prism-torbox-essential-1080p.json) |
+| [Prism TorBox Essential 1080p](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) | MightyIcyy | Essential | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) |
 | [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) | RB3 | TorBox Pro + RD | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) · [README](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/RB3%20Hybrid/Readme.md) |
 
 > Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
