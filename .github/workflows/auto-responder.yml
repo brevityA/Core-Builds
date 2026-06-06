@@ -41,8 +41,8 @@ jobs:
                   '**Fix your setup:**',
                   '1. Remove the failed template from your AIOStreams dashboard.',
                   '2. Import a supported TorBox-exclusive build:',
-                  '   - [Core Nexus 4K Pro](https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json)',
-                  '   - [Core Nexus Stream (1080p)](https://raw.githubusercontent.com/Branding-Brevity/Core-Builds-By-Brevity/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json)',
+                  '   - [Core Nexus 4K Pro](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json)',
+                  '   - [Core Nexus Stream (1080p)](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json)',
                   '',
                   '*This issue has been auto-closed. If you\'re still stuck, open a new issue with your current template version and host details.*'
                 ].join('\n')
@@ -81,7 +81,7 @@ jobs:
                   'This is a known AIOStreams behaviour — **the Update button preserves your formatter** as a user setting and does not overwrite it from the template.',
                   '',
                   '**Fix:** Do a **fresh import** (not an update):',
-                  '1. Copy your import URL from the [README](https://github.com/Branding-Brevity/Core-Builds-By-Brevity#-pick-your-template)',
+                  '1. Copy your import URL from the [README](https://github.com/brevityA/Core-Builds#-pick-your-template)',
                   '2. In AIOStreams → Settings → About → Get Started → **Load Template** → paste the URL',
                   '3. Re-enter your TorBox API key → Save → reinstall in Stremio',
                   '',
@@ -127,7 +127,7 @@ jobs:
                   '- Check that your template\'s `metadata.version` is older than the latest release',
                   '- If the badge still doesn\'t appear, do a **fresh import** to get the latest version',
                   '',
-                  'Latest import URLs are always in the [README](https://github.com/Branding-Brevity/Core-Builds-By-Brevity#-pick-your-template).',
+                  'Latest import URLs are always in the [README](https://github.com/brevityA/Core-Builds#-pick-your-template).',
                   '',
                   '*Auto-closing — please reopen if this doesn\'t help.*'
                 ].join('\n')
