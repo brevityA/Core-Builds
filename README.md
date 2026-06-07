@@ -67,7 +67,8 @@ EasyNews only (no TorBox)? → Speed EasyNews
 
 Watching anime?
 ├── Want 4K HDR? → Anime 4K
-└── Standard 1080p? → Anime
+├── Standard 1080p? → Anime
+└── Prefer English dubs? → Anime Dub
 
 Getting too few results / low-overhead host? → use the Lite variant of any template above
 ```
@@ -126,8 +127,9 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 |---|---|---|
 | **Core Nexus Anime** | 1080p + 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` |
 | **Core Nexus Anime 4K** | 4K + 1080p fallback | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json` |
+| **Core Nexus Anime Dub** | 1080p · Dubbed-first | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json` |
 
-SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japanese + English + Dual Audio
+SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japanese + English + Dual Audio · Anime Dub prioritises English dubs and Dual Audio
 
 ---
 
@@ -149,6 +151,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | **Speed Lite** | Speed | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json` |
 | **Anime Lite** | Anime | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json` |
 | **Anime 4K Lite** | Anime 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json` |
+| **Anime Dub Lite** | Anime Dub | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json` |
 
 ---
 

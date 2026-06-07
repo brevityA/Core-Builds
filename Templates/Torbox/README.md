@@ -30,7 +30,8 @@ EasyNews only (no TorBox)? → Speed EasyNews
 
 Anime?
 ├── Want 4K HDR? → Anime 4K
-└── Standard 1080p? → Anime
+├── Standard 1080p? → Anime
+└── Prefer English dubs? → Anime Dub
 
 Getting too few results / low-overhead host? → use the Lite variant of any template above
 ```
@@ -174,13 +175,14 @@ Full 4K for Essential plan. No Usenet.
 
 SeaDex best-release enforcement · AnimeTosho (Nyaa.si mirror) · FLAC/AAC first · Japanese + English + Dual Audio.
 
-| | Anime | Anime 4K |
-|---|---|---|
-| **File** | `core-nexus-anime.json` | `core-nexus-anime-4k.json` |
-| **Resolution** | 1080p primary · 720p fallback | 2160p primary · 1080p fallback |
-| **Visual priority** | SDR-first | DV → HDR10+ → HDR |
-| **Audio priority** | FLAC → AAC | Atmos → TrueHD → FLAC |
-| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json` |
+| | Anime | Anime 4K | Anime Dub |
+|---|---|---|---|
+| **File** | `core-nexus-anime.json` | `core-nexus-anime-4k.json` | `core-nexus-anime-dub.json` |
+| **Resolution** | 1080p primary · 720p fallback | 2160p primary · 1080p fallback | 1080p primary · 720p fallback |
+| **Language priority** | Japanese → Dual Audio → English | Japanese → Dual Audio → English | Dubbed → Dual Audio → English → Japanese |
+| **Visual priority** | SDR-first | DV → HDR10+ → HDR | SDR-first |
+| **Audio priority** | FLAC → AAC | Atmos → TrueHD → FLAC | FLAC → AAC |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json` | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json` |
 
 ---
 
@@ -223,6 +225,7 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 | **Speed Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json` |
 | **Anime Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json` |
 | **Anime 4K Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json` |
+| **Anime Dub Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json` |
 
 ---
 
