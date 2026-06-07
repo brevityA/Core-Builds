@@ -47,10 +47,10 @@ If it fails repeatedly:
 
 **Fix:** Double-check the URL matches the exact path in the repo. Raw URLs follow this pattern:
 ```
-https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/Torbox/Dual/core-nexus-4k-dual-core.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json
 ```
 
-Note: `Torbox` has a lowercase `b`. `Dual`, `Single`, and `Hybrid` are capitalised. Filenames are all lowercase with hyphens.
+Note: `Torbox` has a lowercase `b`. `Single`, `Hybrid`, `Flash`, `Speed`, `Essential`, and `Anime` are capitalised. Filenames are all lowercase with hyphens.
 
 ---
 
@@ -87,7 +87,7 @@ keyword(streams, 'all', 'WEB-DL', 'WEBRip', 'AMZN')
 
 **What it means:** The streams are loading but the files have been flagged by your debrid service. This is most commonly the Real-Debrid "infringing file" issue where RD has blocked certain WEB-DL and streaming platform rips.
 
-**Fix:** The Core Builds dual-service templates include an RD Infringing File Scrub that filters these results before they reach Stremio. If you are seeing red errors, confirm you are on v2.1.2 or later and that the MediaFusion and Real-Debrid presets are correctly configured.
+**Fix:** This is an RD-side policy issue — RD blocks certain WEB-DL and streaming platform filenames server-side. TorBox does not apply this filter, so switching to a TorBox-primary template (Core Nexus Stream, Essential, Speed, or Hybrid) eliminates these errors. If you specifically need RD coverage, the community [RB3 Hybrid](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates/Templates/RB3) template is the current TorBox + RD option.
 
 ---
 

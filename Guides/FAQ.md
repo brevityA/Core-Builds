@@ -66,10 +66,10 @@ TorBox Essential is the entry-level plan — it gives you torrent caching but no
 Speed tier trades source coverage for load time. It uses 4 addons instead of 8-9, so it finds fewer total results but delivers them in 2-3 seconds. If TorBox has your content cached, Speed is excellent. If you regularly watch niche or older content that isn't well-cached, a standard template covers more ground.
 
 **Can I use Real-Debrid with Core Builds?**
-Yes — the Advanced (Dual Core) templates pair TorBox with RD. Due to RD's May 2026 filter enforcement, these work best on WuPlay. Stremio users may see reduced RD results for some content. See the [Advanced templates](https://github.com/brevityA/Core-Builds/tree/refs/heads/main/Templates/Torbox/Deprecated/Dual).
+Yes — use the [Core Nexus Hybrid](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json) template (TorBox Pro + NZBGeek). It does not pair TorBox with RD directly, but the Hybrid template gives you the broadest source coverage. For a pure TorBox + RD setup, community template [RB3 Hybrid](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates/Templates/RB3) is available. Note: RD's May 2026 server-side keyword filter reduces RD results for some WEB-DL content on Stremio.
 
 **What happened to the Dual Core templates?**
-They were briefly deprecated due to RD's May 2026 server-side filter causing issues, then reclassified as **Advanced** after community reports of them working well on WuPlay. They're still available and maintained — just moved to `Templates/Torbox/Deprecated/Dual/` for now.
+The old Dual Core templates (TorBox + Real-Debrid) are deprecated due to RD API changes causing import failures and playback issues. They remain in `Templates/Torbox/Deprecated/Dual/` for reference only. Use the [Core Nexus Hybrid](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json) or the community RB3 Hybrid template instead.
 
 ---
 
