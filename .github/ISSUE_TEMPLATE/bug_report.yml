@@ -14,14 +14,26 @@ body:
       options:
         - Core Nexus 4K Pro
         - Core Nexus Stream (1080p)
+        - Core Nexus Flash 4K
+        - Core Nexus Flash
         - Core Nexus Hybrid
+        - Core Nexus Hybrid Lite
         - Core Nexus 4K Essential
         - Core Nexus Essential (1080p)
-        - Speed 4K+ (EasyNews)
-        - Speed+ (EasyNews)
-        - Speed 4K (TorBox)
-        - Speed (TorBox)
+        - Core Nexus Speed 4K
+        - Core Nexus Speed 4K Lite
+        - Core Nexus Speed
+        - Core Nexus Speed Lite
+        - Core Nexus Speed 4K+
+        - Core Nexus Speed 4K+ Lite
+        - Core Nexus Speed+
+        - Core Nexus Speed+ Lite
+        - Core Nexus Speed EasyNews
+        - Core Nexus Speed EasyNews Lite
+        - Core Nexus Anime 4K
+        - Core Nexus Anime 4K Lite
         - Core Nexus Anime
+        - Core Nexus Anime Lite
         - Community template
         - Formatter issue
         - Other / Not sure
