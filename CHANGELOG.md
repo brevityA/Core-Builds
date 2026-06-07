@@ -1,7 +1,35 @@
 ## [Unreleased]
 
+### Added
+- **Core Nexus Stream (Fire Stick)** (`Templates/Torbox/Single/core-nexus-stream-firestick.json`) — 1080p SDR template tuned for Amazon Fire Stick and other low-RAM streaming devices. Reduced dynamic stop thresholds and lighter ESE stack optimised for the hardware constraints.
+- **Core Nexus Stream (Fire Stick) Lite** (`Templates/Torbox/Single/core-nexus-stream-firestick-lite.json`) — Lite variant of the Fire Stick template with further relaxed filtering (12 ESEs).
+- **Regional Content Guide** (`Guides/REGIONAL_CONTENT_GUIDE.md`) — How to surface non-English and regional-language content in Stremio's Discover section. Covers CINEMETA limitations, language-specific catalog addons, and TorBox passthrough behaviour.
+
 ### Fixed
-- **Formatter INSTANT/UNCACHED display on debrid streams** — AIOStreams does not evaluate nested `{expr}` conditionals inside the truthy branch of an outer conditional. The baked-in formatter description contained `{service.shortName::exists["{service.cached::istrue['🚀 INSTANT  '||'⚠️ UNCACHED  ']}"||""]}` which caused the inner expression to render as raw template text on any TorBox, RealDebrid, or other debrid-backed stream. Replaced with the flat two-expression form `{service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}` — the form already used correctly by the Flash templates. Affects all 28 active templates (Single, 4K Pro, Essential, Speed, Anime, Hybrid — all variants). Flash and core-cipher were already correct and are unchanged.
+- **Anime Non-Anime Query Guard** — Anime templates were sending non-anime queries to anime-specific scrapers (AnimeTosho, NyaaFH, BakaBT). Added `and not isAnime` guard to the Anime ISE so these sources are only queried for anime content. Previously, non-anime searches returned consistent 0-result noise from these indexers.
+- **Flash template `addonName` mismatch** — Flash templates had incorrect `addonName` values inherited from a previous template generation pass. Corrected to match the addon configuration so stream source labels display accurately.
+- **Formatter INSTANT/UNCACHED display on debrid streams** — AIOStreams does not evaluate nested `{expr}` conditionals inside the truthy branch of an outer conditional. The baked-in formatter description contained `{service.shortName::exists["{service.cached::istrue['🚀 INSTANT  '||'⚠️ UNCACHED  ']}"||""]}` which caused the inner expression to render as raw template text on any TorBox, RealDebrid, or other debrid-backed stream. Replaced with the flat two-expression form `{service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}` — the form already used correctly by the Flash templates. Affects all 30 active templates (Single, 4K Pro, Essential, Flash, Speed, Anime, Hybrid — all variants). core-cipher was already correct and is unchanged.
+
+### Infrastructure
+- **GitHub Actions version pins corrected** — All workflows updated from non-existent `actions/checkout@v6` and `actions/github-script@v9` to current `@v4` and `@v7` respectively.
+- **Link checker exit code comparison fixed** — `env.lychee_exit_code != 0` changed to `!= '0'`; GitHub Actions env vars are always strings, so the integer comparison never triggered the issue-creation step.
+- **Auto-responder keywords refined** — Removed `real-debrid` and `realdebrid` from deprecated trigger keywords (the Hybrid template is an active TorBox+RD build). Auto-reply updated to mention Hybrid as the current TorBox+RD option.
+- **Flash and Nightly labeler + label definitions added** — `template-flash` and `nightly` labels added to `labels.yml` and `labeler.yml`. Previously the labeler silently failed for Flash and Nightly PRs because the label definitions did not exist.
+- **Release archive excludes Nightly** — `release.yml` updated to exclude `Templates/Torbox/Nightly/` from the release zip. Nightly builds are pre-release and should not appear in stable release archives.
+- **Bug report template updated** — All current template variants added to the "Which template" dropdown, including Flash, Flash 4K, Hybrid Lite, all Speed Lite variants, Anime 4K, Anime Lite, Anime 4K Lite, Anime Dub, and Anime Dub Lite.
+- **Welcome workflow links fixed** — `blob/refs/heads/main` corrected to `blob/main` in both guide links (were returning 404 on GitHub).
+- **Issue template config links fixed** — Corrected broken `blob/refs/heads/main` URL and updated docs link from `Branding-Brevity/Core-Builds-By-Brevity` to `brevityA/Core-Builds`.
+- **Discussion template links fixed** — FAQ and template-request discussion templates corrected to point to `brevityA/Core-Builds`.
+- **Release changelog categories** — Added `template-flash` to "New Templates & Formatters" and a new `🌙 Nightly / Pre-release` category for `nightly`-labelled PRs.
+
+### Documentation
+- **IMPORT_GUIDE rewritten** — Replaced all pre-rename template filenames with current names. Added Flash tier section (was entirely absent). Added all Lite variants table. Fixed import navigation path. Added EasyNews Speed section.
+- **WHICH_TEMPLATE rewritten** — All old template names replaced with current names. Removed deprecated Dual Core decision path. Added Flash tier, Fire Stick variant, and Lite recommendation step. Updated At-a-Glance table to cover all 16 standard templates with correct filenames.
+- **DEVICE_PROFILES updated** — Removed all deprecated template references (`core-nexus-torbox-exclusive_rpdb`, `core-nexus-4k-dual-core`, `core-nexus-dual-core-1080p`). Replaced with current template names and corrected Hybrid template path.
+- **README template count and Fire Stick entry** — Template count corrected to 30 (16 standard + 14 Lite). Core Nexus Stream (Fire Stick) added to the TorBox Pro table; Stream Fire Stick Lite added to the Lite table.
+- **Templates/Torbox/README.md** — Core Nexus Stream (Fire Stick) added to the All Templates table.
+- **FAQ stale content fixed** — Real-Debrid answer updated to reference Hybrid template and RB3 community template as current options. Dual Core "what happened" entry clarified.
+- **TROUBLESHOOTING stale content fixed** — URL example updated from deprecated Dual Core path to current Single path. RD wall-of-red section rewritten to reflect RD's May 2026 server-side filter policy rather than deprecated dual-service templates.
 
 ---
 
