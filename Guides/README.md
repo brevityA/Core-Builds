@@ -20,6 +20,7 @@ Everything you need to set up, customise, and maintain your build.
 8. [Troubleshooting](#8--troubleshooting)
 9. [FAQ](#9--faq)
 10. [Adjusting Search Criteria](#10--adjusting-search-criteria)
+11. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
 
 
 ---
