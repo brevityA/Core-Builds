@@ -1098,7 +1098,7 @@
     "checkOwned": false,
     "trusted": false,
     "showChanges": true,
-    "addonName": "Core Nexus Speed 4K",
+    "addonName": "Core Nexus Flash 4K",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
     "addonDescription": "Speed 4K — TorBox Essential. Shows CACHED streams only for instant play. Zero results = content not yet in TorBox cache. Try a popular title first.",
     "appliedTemplates": [
