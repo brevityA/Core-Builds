@@ -1,6 +1,7 @@
 ## [Unreleased]
 
-*Nothing pending.*
+### Fixed
+- **Formatter INSTANT/UNCACHED display on debrid streams** — AIOStreams does not evaluate nested `{expr}` conditionals inside the truthy branch of an outer conditional. The baked-in formatter description contained `{service.shortName::exists["{service.cached::istrue['🚀 INSTANT  '||'⚠️ UNCACHED  ']}"||""]}` which caused the inner expression to render as raw template text on any TorBox, RealDebrid, or other debrid-backed stream. Replaced with the flat two-expression form `{service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}` — the form already used correctly by the Flash templates. Affects all 28 active templates (Single, 4K Pro, Essential, Speed, Anime, Hybrid — all variants). Flash and core-cipher were already correct and are unchanged.
 
 ---
 
