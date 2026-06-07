@@ -5,7 +5,7 @@ body:
     attributes:
       value: |
         Suggest a new template, formatter variant, or filtering configuration.
-        Check the [Roadmap](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/ROADMAP.md) first — it may already be planned.
+        Check the [Roadmap](https://github.com/brevityA/Core-Builds/blob/main/ROADMAP.md) first — it may already be planned.
 
   - type: dropdown
     id: type

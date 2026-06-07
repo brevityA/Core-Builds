@@ -11,8 +11,12 @@ changelog:
         - template-hybrid
         - template-anime
         - template-speed
+        - template-flash
         - formatter
         - new-template
+    - title: "🌙 Nightly / Pre-release"
+      labels:
+        - nightly
     - title: "🐛 Bug Fixes"
       labels:
         - bug
