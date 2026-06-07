@@ -24,7 +24,7 @@ jobs:
           git checkout FETCH_HEAD
 
       - name: Sync labels via GitHub API
-        uses: actions/github-script@v9
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
