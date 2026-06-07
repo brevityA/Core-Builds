@@ -81,6 +81,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 |---|---|---|
 | **Core Nexus 4K Pro** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Core Nexus Stream** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
+| **Core Nexus Stream (Fire Stick)** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Core Nexus Hybrid** ⚠️ | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 
 > ⚠️ Hybrid requires a **NZBGeek API key** — enter it in Add-ons → Newznab after loading.
@@ -141,6 +142,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 |---|---|---|
 | **4K Pro Lite** | 4K Pro | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro-lite.json` |
 | **Stream Lite** | Stream | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json` |
+| **Stream Fire Stick Lite** | Stream (Fire Stick) | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json` |
 | **Hybrid Lite** ⚠️ | Hybrid | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |
 | **4K Essential Lite** | 4K Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json` |
 | **Essential Lite** | Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json` |
@@ -202,7 +204,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 28 active templates — 16 standard + 12 Lite variants |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 30 active templates — 16 standard + 14 Lite variants |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
