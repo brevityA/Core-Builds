@@ -79,6 +79,12 @@
 - name: template-speed
   color: "f9d0c4"
   description: Speed / instant-cache templates
+- name: template-flash
+  color: "fbca04"
+  description: Flash (cached-only instant-play) templates
+- name: nightly
+  color: "e4e669"
+  description: Nightly / pre-release builds
 - name: personal
   color: "6f42c1"
   description: Personal / custom builds

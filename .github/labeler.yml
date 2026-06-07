@@ -18,6 +18,14 @@ template-speed:
   - changed-files:
     - any-glob-to-any-file: 'Templates/Torbox/Speed/**'
 
+template-flash:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Flash/**'
+
+nightly:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Nightly/**'
+
 filtering:
   - changed-files:
     - any-glob-to-any-file: 'Filtering/**'

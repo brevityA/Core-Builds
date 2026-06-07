@@ -13,12 +13,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Prepare release archive
         run: |
           mkdir -p release_assets
-          find Templates/ -name "*.json" ! -path "*/Deprecated/*" ! -path "*/Personal/*" -exec cp {} release_assets/ \;
+          find Templates/ -name "*.json" ! -path "*/Deprecated/*" ! -path "*/Personal/*" ! -path "*/Nightly/*" -exec cp {} release_assets/ \;
           find Formatters/ -name "*.json" -exec cp {} release_assets/ \;
           cp README.md CHANGELOG.md release_assets/
           cd release_assets
