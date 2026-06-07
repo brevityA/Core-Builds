@@ -8,6 +8,15 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| Unreleased | Core Nexus Stream (Fire Stick) + Lite variants |
+| Unreleased | Anime Non-Anime Query Guard — `and not isAnime` ISE guard |
+| Unreleased | Flash template `addonName` mismatch fix |
+| Unreleased | Regional Content Guide (`Guides/REGIONAL_CONTENT_GUIDE.md`) |
+| Unreleased | GitHub Actions version pins corrected (checkout @v4, github-script @v7) |
+| Unreleased | Link checker exit code string comparison fix |
+| Unreleased | Auto-responder keywords refined; Flash/Nightly labels + labeler added |
+| Unreleased | IMPORT_GUIDE, WHICH_TEMPLATE, DEVICE_PROFILES full rewrites |
+| Unreleased | FAQ and TROUBLESHOOTING stale content fixes |
 | v2.5.1 | Local test environment — `requirements.txt` + CONTRIBUTING.md setup guide |
 | v2.5.1 | Midnight's Meteor V2 Beta documented across STATUS.md and Guides |
 | v2.5.1 | README banner and badges fixed |
