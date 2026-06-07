@@ -21,8 +21,9 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Phones · Tablets · Budget Android TV boxes · Projectors · Older TVs*
 
 ### Recommended Templates
-- **[Core Nexus TorBox Exclusive (RPDB)](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-torbox-exclusive_rpdb.json)** — TorBox only, RPDB poster integration
-- **[Core Nexus Dual Core 1080p](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Dual/core-nexus-dual-core-1080p.json)** — TorBox + Real-Debrid for maximum availability
+- **[Core Nexus Stream](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-stream.json)** — TorBox Pro · 1080p SDR · full addon stack
+- **[Core Nexus Stream (Fire Stick)](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-stream-firestick.json)** — optimised for Fire Stick / low-RAM Android devices
+- **[Core Nexus Essential](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Essential/core-nexus-essential.json)** — TorBox Essential · 1080p SDR
 
 ### What these builds do
 - ✅ Targets WEB-DL and WEBRip sources
@@ -35,7 +36,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 ### Devices to sign this account into
 - Android phones and tablets
 - Budget Android TV boxes (X96, H96, MXQ, Ugoos AM6B at 1080p mode)
-- Amazon Fire TV Stick (4K stick can still benefit from the 1080p build for reliability)
+- Amazon Fire TV Stick (use the Fire Stick variant for best performance)
 - Projectors without native 4K panels
 - Older 1080p TVs
 
@@ -45,8 +46,8 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Nvidia Shield · Apple TV 4K · 4K OLED/QLED TVs · High-end Android TV*
 
 ### Recommended Templates
-- **[Core Nexus 4K Dual Core](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Dual/core-nexus-4k-dual-core.json)** — TorBox + Real-Debrid, maximum quality and coverage
-- **[Core Nexus 4K HT TorBox](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-ht-torbox.json)** — TorBox only, home theater focused
+- **[Core Nexus 4K Pro](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox Pro · 4K HDR · home theater quality
+- **[Core Nexus 4K Essential](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Essential/core-nexus-4k-essential.json)** — TorBox Essential · 4K HDR
 
 ### What these builds do
 - ✅ Targets 4K UHD sources
@@ -67,16 +68,16 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 ---
 
 ## 🔀 Optional: Hybrid Account
-*Users who want cached + uncached streams on a single device*
+*TorBox Pro + NZBGeek — cached and uncached streams, maximum source diversity*
 
 ### Recommended Template
-- **[Core Nexus TB Hybrid 1080p](https://github.com/brevityA/Core-Builds/blob/main/Templates/Hybrid/core-nexus-tb-hybrid-1080p.json)** — TorBox + NZBGeek, cached and uncached
+- **[Core Nexus Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json)** — TorBox Pro + NZBGeek · 1080p SDR
 
 ### What this build does
 - ✅ Shows both cached (instant) and uncached streams
 - ✅ Usenet integration via NZBGeek for wider source coverage
 - ✅ 1080p SDR — safe for most hardware
-- ⚠️ Requires a NZBGeek API key to activate the full Usenet tier
+- ⚠️ Requires a NZBGeek API key — enter it in Addons → Newznab after loading
 - ⚠️ Uncached streams require TorBox to download the file before playback begins
 
 ---
@@ -99,9 +100,7 @@ Stremio syncs addon installations per-account, so each device automatically gets
 
 ## 💡 Tips
 
-> **Same debrid credentials on both accounts.** TorBox and Real-Debrid API keys are not tied to Stremio accounts — you can enter the same keys on both AIOStreams installations without issue.
-
-> **RPDB posters work per-account.** The TorBox Exclusive (RPDB) template includes a free-tier RPDB key. If you upgrade to a paid RPDB plan, enter your personal key on the low-end account's template for richer poster art.
+> **Same debrid credentials on both accounts.** TorBox API keys are not tied to Stremio accounts — you can enter the same key on both AIOStreams installations without issue.
 
 > **WuPlay users.** WuPlay does not use Stremio accounts — it manages addons locally per device. Simply install the appropriate manifest URL on each device directly.
 
