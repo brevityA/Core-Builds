@@ -61,7 +61,7 @@
 TorBox Pro?
 ├── Got NZBGeek/Usenet indexer? → Hybrid
 ├── Want 4K? → 4K Pro
-├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly)
+├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -148,8 +148,9 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | Template | Device / Use-case | Res | Import URL |
 |---|---|---|---|
 | **Core Nexus Samsung TV** 🌙 | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
+| **Core Nexus Samsung TV 4K** 🌙 | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
 
-> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. Based on Core Nexus Stream · TorBox Pro · Essential plan.
+> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. 1080p variant based on Core Nexus Stream · 4K variant based on Core Nexus 4K Pro · TorBox Pro · Essential plan.
 
 ---
 

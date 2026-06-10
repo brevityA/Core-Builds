@@ -4,6 +4,13 @@
 
 ---
 
+## 2.6.4 (2026-06-10)
+
+### Added
+- **Core Nexus Samsung TV 4K** (`Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json`) — 4K variant of the Samsung TV Nightly template. DV-Only Kill ESE enabled by default — excludes DV-only streams; HDR10+, HDR10, HLG, SDR, and DV+HDR10 dual-layer content passes through normally. 2160p primary with 1080p fallback. HDR10+ visual priority (Samsung TVs support HDR10+). Full lossless audio enabled (TrueHD, Atmos, DTS:X, DTS-HD MA, FLAC) with 7.1 channel support. 4K PSE tier stack matching Core Nexus 4K Pro.
+
+---
+
 ## 2.6.3 (2026-06-10)
 
 ### Changed

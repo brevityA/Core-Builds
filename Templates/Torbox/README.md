@@ -12,7 +12,7 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 TorBox Pro?
 ├── Got NZBGeek/Usenet indexer? → Hybrid
 ├── Want 4K? → 4K Pro
-├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly)
+├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -47,6 +47,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Stream** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Core Nexus Stream (Fire Stick)** | TorBox Pro | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Core Nexus Samsung TV** 🌙 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
+| **Core Nexus Samsung TV 4K** 🌙 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
 | **Core Nexus Hybrid** | Pro + NZBGeek | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Core Nexus 4K Essential** | Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Core Nexus Essential** | Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
@@ -128,6 +129,22 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | **Version** | v0.1.0 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
 | **Resolution** | 1080p · 720p fallback |
+| **Usenet** | ❌ |
+
+> 🌙 Nightly — stable for daily use, gathering community feedback before promotion to stable.
+
+---
+
+### 🌙 Core Nexus Samsung TV 4K *(Nightly)*
+
+4K variant of the Samsung TV template. DV-Only Kill ESE enabled by default — DV-only streams excluded, HDR10+/HDR10/HLG/SDR and DV+HDR10 dual-layer pass through normally. HDR10+ is the preferred visual tag (Samsung TVs support HDR10+). Full lossless audio enabled with 7.1 channel support.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
 
 > 🌙 Nightly — stable for daily use, gathering community feedback before promotion to stable.
