@@ -4,6 +4,13 @@
 
 ---
 
+## 2.6.3 (2026-06-10)
+
+### Changed
+- **Updated addon logo** — new glowing gradient diamond icon. Hex outline retains cyan gradient with ambient glow; diamond transitions cyan → purple → orange. Version bump ensures AIOStreams update notification fires for all users on v2.6.2.
+
+---
+
 ## 2.6.2 (2026-06-10)
 
 ### Added
