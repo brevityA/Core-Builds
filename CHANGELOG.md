@@ -4,6 +4,16 @@
 
 ---
 
+## 2.6.2 (2026-06-10)
+
+### Added
+- **Lazy-load groups on all 28 non-Flash templates** — Comet and Meteor are now placed in a `groups` block so they are only queried when the addons ahead of them (Library, Zilean, StremThruTorz) return fewer cached results than the threshold. If your Library already has enough cached results, Comet and Meteor are **never called** — eliminating their fetch time entirely for well-stocked libraries.
+  - **Single / Essential / Hybrid / Anime**: condition `count(cached(previousStreams)) < 3` — skip heavy scrapers when 3+ cached results already exist
+  - **Speed**: condition `count(cached(previousStreams)) < 2` — tighter threshold matching Speed's fast-fetch design intent
+  - **Flash skipped** — DAF already fires at 2 cached results; groups would be redundant
+
+---
+
 ## 2.6.1 (2026-06-10)
 
 ### Fixed
