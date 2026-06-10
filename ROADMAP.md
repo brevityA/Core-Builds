@@ -8,6 +8,12 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| Unreleased | Core Nexus Samsung TV Nightly template — DV-only kill enabled, device-specific |
+| Unreleased | DV-Only Kill ESE — optional, disabled by default, all 30 templates |
+| Unreleased | Subtitle language flags — `uSubtitleEmojis` replaces generic 📝 SUB badge |
+| Unreleased | Flash `daysSinceRelease` guard — uncached allowed for ≤ 3-day-old content |
+| Unreleased | Balanced preload selector — `perGroup(resolution, 2)` across 28 templates |
+| Unreleased | Episode sort fix — global sort updated to canonical 14-key in 7 templates |
 | Unreleased | Core Nexus Stream (Fire Stick) + Lite variants |
 | Unreleased | Anime Non-Anime Query Guard — `and not isAnime` ISE guard |
 | Unreleased | Flash template `addonName` mismatch fix |

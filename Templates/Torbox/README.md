@@ -12,6 +12,7 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 TorBox Pro?
 ├── Got NZBGeek/Usenet indexer? → Hybrid
 ├── Want 4K? → 4K Pro
+├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly)
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -45,6 +46,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus 4K Pro** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Core Nexus Stream** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Core Nexus Stream (Fire Stick)** | TorBox Pro | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
+| **Core Nexus Samsung TV** 🌙 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
 | **Core Nexus Hybrid** | Pro + NZBGeek | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Core Nexus 4K Essential** | Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Core Nexus Essential** | Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
@@ -99,6 +101,36 @@ Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX.
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ✅ via Newznab (opt-in) |
+
+---
+
+### 📺 Core Nexus Stream (Fire Stick)
+
+1080p SDR build tuned for Fire Stick and low-RAM streaming devices.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Single/core-nexus-stream-firestick.json` |
+| **Version** | v2.5.1 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
+| **Resolution** | 1080p · SDR |
+| **Usenet** | ❌ |
+
+---
+
+### 🌙 Core Nexus Samsung TV *(Nightly)*
+
+Stream-based 1080p template for Samsung TVs and devices without Dolby Vision support. DV-only streams excluded by default. DV+HDR10 dual-layer files pass through normally.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
+| **Resolution** | 1080p · 720p fallback |
+| **Usenet** | ❌ |
+
+> 🌙 Nightly — stable for daily use, gathering community feedback before promotion to stable.
 
 ---
 
