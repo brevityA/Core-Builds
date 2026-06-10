@@ -1797,7 +1797,7 @@
     },
     "resultLimits": {
       "global": 20,
-      "resolution": 6,
+      "resolution": 8,
       "mode": "conjunctive"
     },
     "size": {
