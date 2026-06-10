@@ -5,7 +5,7 @@
     "description": "A speed-optimised 4K build for TorBox Essential users. Lives in Templates/Torbox/Speed/TorBox/. No secondary service required. Library, TorBox Search, Comet, and Zilean only -- the four fastest sources delivering cached results in 2-3 seconds. Targets 2160p with Dolby Vision and HDR10+ priority, TrueHD/Atmos audio, files up to 150 GB. SeaDex best-release enforced for anime. Timeouts at 3500ms, 10 results max, 5-key sort. A single TorBox Essential subscription is all that is required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.6.1",
+    "version": "2.7.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -2194,8 +2194,16 @@
       "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 4 or count(cached(resolution(totalStreams, \"1080p\"))) >= 5"
     },
     "groups": {
-      "enabled": false,
-      "groupings": []
+      "enabled": true,
+      "groupings": [
+        {
+          "addons": [
+            "nx-fix-01",
+            "5f6c2152-6b7f-4f8d-b1e2-c9068ffdc66e"
+          ],
+          "condition": "count(cached(previousStreams)) < 2"
+        }
+      ]
     },
     "proxy": {
       "id": "mediaflow",

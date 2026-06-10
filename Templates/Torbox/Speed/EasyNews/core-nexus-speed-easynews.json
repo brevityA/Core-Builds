@@ -5,7 +5,7 @@
     "description": "Speed-optimised 1080p build for EasyNews subscribers — no TorBox required. Streams exclusively from EasyNews Usenet cache for near-instant playback. Three fast scrapers: Library, Zilean, Meteor with Usenet enabled. SDR only, WEB-DL preferred, BluRay and Remux blocked. Timeouts at 3500ms, 10 results max. Requires an active EasyNews subscription.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.6.1",
+    "version": "2.7.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -2159,8 +2159,15 @@
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 5"
     },
     "groups": {
-      "enabled": false,
-      "groupings": []
+      "enabled": true,
+      "groupings": [
+        {
+          "addons": [
+            "1fa89382-5938-4d6e-bcba-a1aa9fc88a95"
+          ],
+          "condition": "count(cached(previousStreams)) < 2"
+        }
+      ]
     },
     "proxy": {
       "id": "mediaflow",
