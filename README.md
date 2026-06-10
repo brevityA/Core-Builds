@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/banner.svg" alt="Core Builds Banner" width="100%"/>
+    <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/banner_square.svg" alt="Core Builds Banner" width="400"/>
   </a>
 </p>
 
