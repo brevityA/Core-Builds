@@ -5,7 +5,7 @@
     "description": "Single-click instant play — 4K. Only cached streams appear — zero uncached results. Derived from Speed 4K but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. Resolution order: 2160p → 1080p fallback. DV → HDR10+ → HDR priority. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 4K · TorBox Essential · Library, TorBox Search, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
