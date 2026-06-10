@@ -4,6 +4,24 @@
 
 ---
 
+## 2.6.1 (2026-06-10)
+
+### Fixed
+- **DV-Only Kill ESE — invalid `negate()` call corrected (all 31 templates)** — The ESE introduced in v2.6.0 contained a broken single-argument `negate()` call: `visualTag(negate(merge(...)), 'DV')`. AIOStreams requires two stream arrays — `negate(A, B)` returns items in A not in B. Corrected to `negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), ...))` — DV streams that don't also carry a fallback HDR layer. Without this fix, AIOStreams rejected the ESE on import with *"Both arguments of the negate function must be arrays of streams"*, causing the v2.6.0 update to fail to load on some instances.
+- **Season pack threshold lowered: 10 → 3 (all 30 active templates)** — Streams were showing the correct episode label but playing wrong content (season packs served as individual episode matches). The previous threshold of 10 was unreachable in Flash templates which cap at 10 total results, meaning Flash users always saw season packs regardless of available individual streams.
+- **Kill Ambiguous Packs ESE added to all 30 active templates** — This ESE (`count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []`) has been in the Core Builds shared filter file since v2.2.3 but was never applied to any template. Fires at just 1 individual episode stream and kills full season packs while preserving multi-episode ranges (e.g. S01E01-E03). Works alongside the threshold ESE for two-layer pack filtering.
+- **Library timeout: 2000ms → 3000ms (Anime × 6, Essential × 2)** — Library is always the highest-quality source (user's own cached files) and should be given the same time budget as other critical addons. 2000ms was too short and could cause Library to time out before returning results on slower instances.
+
+### Changed
+- **StremThruTorz enabled in Flash × 2 and Speed × 10** — Was present in the preset list but switched off. StremThruTorz is the source that populates `stream.uSubtitleEmojis` — without it, the subtitle language flag badges shipped in v2.6.0 (🇬🇧 🇫🇷 🇩🇪) show nothing.
+- **StremThruTorz added to Anime × 6** — Was missing from the preset list entirely. Anime users particularly benefit from accurate subtitle language data given the sub vs dub use case.
+- **EZTV enabled in Speed × 10** — Was present but switched off. EZTV is a TV-specific indexer that improves series coverage on Speed builds. Not enabled in Flash (cached-only build — P2P indexer adds query overhead with no benefit when the dynamic stop fires at 2 cached results).
+
+### Infrastructure
+- **v2.6.1 version bump — update notification fix** — All fixes since the v2.6.0 bump landed at the same version number. Users who imported at v2.6.0 would never receive an update notification because `compareVersions(remote, local)` returned 0. This bump ensures the AIOStreams in-app update check fires correctly for all users currently on v2.6.0.
+
+---
+
 ## 2.6.0 (2026-06-10)
 
 ### Added
