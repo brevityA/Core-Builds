@@ -52,3 +52,7 @@ infrastructure:
   - changed-files:
     - any-glob-to-any-file: '.github/**'
 
+triage:
+  - changed-files:
+    - any-glob-to-any-file: '**'
+
