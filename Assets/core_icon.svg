@@ -14,36 +14,36 @@
       <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
     <filter id="diamGlow">
-      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feGaussianBlur stdDeviation="14" result="blur"/>
       <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
     <filter id="softGlow">
-      <feGaussianBlur stdDeviation="20"/>
+      <feGaussianBlur stdDeviation="24"/>
     </filter>
   </defs>
 
   <circle cx="256" cy="256" r="248" fill="#0d1117"/>
 
   <!-- Ambient glow -->
-  <polygon points="256,130 358,188 358,304 256,362 154,304 154,188"
+  <polygon points="256,41 442,149 442,363 256,471 70,363 70,149"
     fill="#00e5ff" opacity="0.04" filter="url(#softGlow)"/>
-  <polygon points="256,194 312,250 256,306 200,250"
+  <polygon points="256,166 346,256 256,346 166,256"
     fill="#c060c0" opacity="0.08" filter="url(#softGlow)"/>
 
   <!-- Hex glow layer -->
-  <polygon points="256,130 358,188 358,304 256,362 154,304 154,188"
+  <polygon points="256,41 442,149 442,363 256,471 70,363 70,149"
     fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round"
     opacity="0.3" filter="url(#hexGlow)"/>
 
   <!-- Hex outline -->
-  <polygon points="256,130 358,188 358,304 256,362 154,304 154,188"
+  <polygon points="256,41 442,149 442,363 256,471 70,363 70,149"
     fill="none" stroke="url(#hexGrad)" stroke-width="22" stroke-linejoin="round"/>
 
   <!-- Diamond glow -->
-  <polygon points="256,194 312,250 256,306 200,250"
+  <polygon points="256,166 346,256 256,346 166,256"
     fill="url(#diamGrad)" opacity="0.4" filter="url(#diamGlow)"/>
 
   <!-- Diamond -->
-  <polygon points="256,194 312,250 256,306 200,250"
+  <polygon points="256,166 346,256 256,346 166,256"
     fill="url(#diamGrad)" opacity="0.95"/>
 </svg>
