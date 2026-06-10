@@ -87,7 +87,7 @@
         "enabled": true,
         "options": {
           "name": "Library",
-          "timeout": 2000,
+          "timeout": 3000,
           "resources": [
             "stream",
             "catalog",
@@ -240,6 +240,20 @@
           ]
         },
         "instanceId": "2f483075-def2-461c-8657-ccb2e02c5e90",
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "stremthruTorz",
+        "instanceId": "c4d56d88",
+        "enabled": true,
+        "options": {
+          "name": "StremThru Torz",
+          "timeout": 3000,
+          "includeP2P": false,
+          "useMultipleInstances": false
+        },
         "resources": [
           "stream"
         ]

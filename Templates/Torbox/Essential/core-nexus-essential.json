@@ -1991,7 +1991,7 @@
         "enabled": true,
         "options": {
           "name": "Library",
-          "timeout": 2000,
+          "timeout": 3000,
           "resources": [
             "stream",
             "catalog",

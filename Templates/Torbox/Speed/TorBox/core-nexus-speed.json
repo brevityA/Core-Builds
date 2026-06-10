@@ -188,7 +188,7 @@
       },
       {
         "type": "eztv",
-        "enabled": false,
+        "enabled": true,
         "options": {
           "timeout": 3000,
           "name": "EZTV"
@@ -229,7 +229,7 @@
       },
       {
         "type": "stremthruTorz",
-        "enabled": false,
+        "enabled": true,
         "options": {
           "timeout": 3500,
           "name": "StremThru Torz"
