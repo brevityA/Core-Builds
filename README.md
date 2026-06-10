@@ -55,6 +55,7 @@
 TorBox Pro?
 ├── Got NZBGeek/Usenet indexer? → Hybrid
 ├── Want 4K? → 4K Pro
+├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly)
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -134,6 +135,18 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 ---
 
+### 🌙 Nightly / Device
+
+> Pre-release templates targeting specific hardware or use-cases. These are stable enough for daily use but ship under the Nightly label while they gather community feedback. Not included in stable release archives.
+
+| Template | Device / Use-case | Res | Import URL |
+|---|---|---|---|
+| **Core Nexus Samsung TV** 🌙 | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
+
+> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. Based on Core Nexus Stream · TorBox Pro · Essential plan.
+
+---
+
 ### 🪶 Lite — Relaxed Filtering
 
 > Same templates, fewer quality gates. **24 ESEs → 12.** Low Bitrate, Low Seeders, Low SEL Score, and all result limiters removed. Shows more streams, including ones the standard suite would cut. Hard kills (CAM, YouTube, 3D) remain. Use when the standard templates return too few results, or on low-overhead hosts.
@@ -204,7 +217,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 30 active templates — 16 standard + 14 Lite variants |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 31 active templates — 16 standard + 14 Lite variants + 1 Nightly |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
