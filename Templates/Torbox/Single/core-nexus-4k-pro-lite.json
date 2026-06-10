@@ -287,7 +287,11 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams, seasonPack(streams))) >= 10 ? seasonPack(streams) : []",
+        "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams, seasonPack(streams))) >= 3 ? seasonPack(streams) : []",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []",
         "enabled": true
       },
       {
