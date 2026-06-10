@@ -5,7 +5,7 @@
     "description": "A speed-optimised 1080p build for TorBox Essential users. Lives in Templates/Torbox/Speed/TorBox/. No secondary service required. Library, TorBox Search, Comet, and Zilean only -- the four fastest sources delivering cached results in 2-3 seconds. SDR only, BluRay and Remux blocked for broad hardware compatibility. Timeouts at 3500ms, 10 results max, 5-key sort. A single TorBox Essential subscription is all that is required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
