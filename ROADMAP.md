@@ -8,21 +8,21 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
-| Unreleased | Core Nexus Samsung TV Nightly template — DV-only kill enabled, device-specific |
-| Unreleased | DV-Only Kill ESE — optional, disabled by default, all 30 templates |
-| Unreleased | Subtitle language flags — `uSubtitleEmojis` replaces generic 📝 SUB badge |
-| Unreleased | Flash `daysSinceRelease` guard — uncached allowed for ≤ 3-day-old content |
-| Unreleased | Balanced preload selector — `perGroup(resolution, 2)` across 28 templates |
-| Unreleased | Episode sort fix — global sort updated to canonical 14-key in 7 templates |
-| Unreleased | Core Nexus Stream (Fire Stick) + Lite variants |
-| Unreleased | Anime Non-Anime Query Guard — `and not isAnime` ISE guard |
-| Unreleased | Flash template `addonName` mismatch fix |
-| Unreleased | Regional Content Guide (`Guides/REGIONAL_CONTENT_GUIDE.md`) |
-| Unreleased | GitHub Actions version pins corrected (checkout @v4, github-script @v7) |
-| Unreleased | Link checker exit code string comparison fix |
-| Unreleased | Auto-responder keywords refined; Flash/Nightly labels + labeler added |
-| Unreleased | IMPORT_GUIDE, WHICH_TEMPLATE, DEVICE_PROFILES full rewrites |
-| Unreleased | FAQ and TROUBLESHOOTING stale content fixes |
+| v2.6.0 | Core Nexus Samsung TV Nightly template — DV-only kill enabled, device-specific |
+| v2.6.0 | DV-Only Kill ESE — optional, disabled by default, all 30 templates |
+| v2.6.0 | Subtitle language flags — `uSubtitleEmojis` replaces generic 📝 SUB badge |
+| v2.6.0 | Flash `daysSinceRelease` guard — uncached allowed for ≤ 3-day-old content |
+| v2.6.0 | Balanced preload selector — `perGroup(resolution, 2)` across 28 templates |
+| v2.6.0 | Episode sort fix — global sort updated to canonical 14-key in 7 templates |
+| v2.6.0 | Core Nexus Stream (Fire Stick) + Lite variants |
+| v2.6.0 | Anime Non-Anime Query Guard — `and not isAnime` ISE guard |
+| v2.6.0 | Flash template `addonName` mismatch fix |
+| v2.6.0 | Regional Content Guide (`Guides/REGIONAL_CONTENT_GUIDE.md`) |
+| v2.6.0 | GitHub Actions version pins corrected (checkout @v4, github-script @v7) |
+| v2.6.0 | Link checker exit code string comparison fix |
+| v2.6.0 | Auto-responder keywords refined; Flash/Nightly labels + labeler added |
+| v2.6.0 | IMPORT_GUIDE, WHICH_TEMPLATE, DEVICE_PROFILES full rewrites |
+| v2.6.0 | FAQ and TROUBLESHOOTING stale content fixes |
 | v2.5.1 | Local test environment — `requirements.txt` + CONTRIBUTING.md setup guide |
 | v2.5.1 | Midnight's Meteor V2 Beta documented across STATUS.md and Guides |
 | v2.5.1 | README banner and badges fixed |

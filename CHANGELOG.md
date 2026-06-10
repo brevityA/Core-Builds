@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+---
+
+## 2.6.0 (2026-06-10)
+
 ### Added
 - **Core Nexus Samsung TV** (`Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json`) — Device-specific Nightly template for Samsung smart TVs and other hardware without Dolby Vision support. Derived from Core Nexus Stream with the DV-Only Kill ESE enabled by default. DV-only streams are excluded; HDR10, HDR10+, HLG, and SDR content passes through normally.
 - **DV-Only Kill ESE** — New optional ESE added to all 30 active templates (`enabled: false` by default). When toggled on, excludes streams where Dolby Vision is the only format tag with no HDR10/HDR10+/HLG/SDR fallback layer — the DV streams that cause black screens on non-DV devices. DV+HDR10 streams (dual-layer) are unaffected. `enabled: true` is pre-set in the Samsung TV Nightly template.
