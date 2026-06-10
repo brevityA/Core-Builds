@@ -5,7 +5,7 @@
     "description": "A full-featured 4K build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.6.1",
+    "version": "2.6.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1122,8 +1122,16 @@
       "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 10 or count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
     },
     "groups": {
-      "enabled": false,
-      "groupings": []
+      "enabled": true,
+      "groupings": [
+        {
+          "addons": [
+            "nx-fix-02",
+            "nx-fix-01"
+          ],
+          "condition": "count(cached(previousStreams)) < 3"
+        }
+      ]
     },
     "sortCriteria": {
       "global": [
