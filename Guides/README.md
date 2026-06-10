@@ -8,19 +8,52 @@ Everything you need to set up, customise, and maintain your build.
 
 ---
 
+## What Is This?
+
+**New here? Start here.**
+
+#### What is AIOStreams?
+
+AIOStreams is a self-hosted addon that sits between Stremio (or WuPlay) and your debrid service. When you open a movie or show, Stremio asks AIOStreams for streams. AIOStreams queries multiple torrent and Usenet sources, filters and ranks everything, then hands back a clean sorted list — only the best results, ready to play.
+
+Without AIOStreams you'd be adding dozens of separate addons (Comet, Jackett, MediaFusion, etc.) and getting a chaotic unfiltered mess. AIOStreams replaces all of that with one addon and one configuration.
+
+#### What is a debrid service?
+
+A debrid service (TorBox, Real-Debrid, AllDebrid, etc.) downloads torrents to their servers and caches them. When you press play, it streams directly from their fast server to you — no seeding, no waiting, instant playback on cached content.
+
+#### What is a template?
+
+A template is a pre-built AIOStreams configuration. It controls:
+- Which sources are queried (Comet, Zilean, Library, etc.)
+- Which streams are filtered out (CAM, low bitrate, bad releases)
+- How streams are ranked (4K before 1080p, cached before uncached, etc.)
+- What the stream cards look like (formatter)
+
+**Without a template:** you install AIOStreams from scratch and spend hours configuring every filter, sort rule, addon, and expression manually — and still might get poor results.
+
+**With a Core Builds template:** paste one URL, enter your API key, done. Every setting is already tuned and tested.
+
+#### What does "importing" a template mean?
+
+It's not installing new software. It loads a pre-configured settings file into your existing AIOStreams instance. Your AIOStreams host stays the same — the template just fills in all the settings for you. You can re-import a different template any time to switch builds.
+
+---
+
 ## Contents
 
 1. [Which Template Should I Use?](#1--which-template-should-i-use)
 2. [Importing a Template](#2--importing-a-template)
-3. [Formatters](#3--formatters)
-4. [Device Profiles](#4--device-profiles)
-5. [Stremio vs WuPlay](#5--stremio-vs-wuplay)
-6. [Advanced Editing](#6--advanced-editing)
-7. [Resetting Your Instance](#7--resetting-your-instance)
-8. [Troubleshooting](#8--troubleshooting)
-9. [FAQ](#9--faq)
-10. [Adjusting Search Criteria](#10--adjusting-search-criteria)
-11. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
+3. [Using a Different Debrid Service](#3--using-a-different-debrid-service)
+4. [Formatters](#4--formatters)
+5. [Device Profiles](#5--device-profiles)
+6. [Stremio vs WuPlay](#6--stremio-vs-wuplay)
+7. [Advanced Editing](#7--advanced-editing)
+8. [Resetting Your Instance](#8--resetting-your-instance)
+9. [Troubleshooting](#9--troubleshooting)
+10. [FAQ](#10--faq)
+11. [Adjusting Search Criteria](#11--adjusting-search-criteria)
+12. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
 
 
 ---
@@ -324,7 +357,92 @@ See [DEVICE_PROFILES.md](DEVICE_PROFILES.md) for full setup.
 
 ---
 
-## 3 — Formatters
+## 3 — Using a Different Debrid Service
+
+Core Builds templates are optimised for TorBox but work with any debrid service that AIOStreams supports. Switching is done entirely through the Services panel — no template changes required.
+
+---
+
+#### Supported Services
+
+| Service | Type | Notes |
+|---|---|---|
+| **TorBox** | Debrid + Usenet | Default in all templates. Pro plan unlocks Usenet. |
+| **Real-Debrid** | Debrid | Large cache. May 2026 server-side filter affects some WEB-DL files. |
+| **AllDebrid** | Debrid | Good cache coverage. API key from alldebrid.com. |
+| **Premiumize** | Debrid | Strong NZB/Usenet support. Good for Hybrid template users. |
+| **DebridLink** | Debrid | EU-based. Solid cache. |
+| **EasyDebrid** | Debrid | Lightweight option. |
+| **PikPak** | Debrid | Mobile-first. Works with AIOStreams. |
+| **Seedr** | Debrid | Torrent-only. No Usenet. |
+| **Offcloud** | Debrid | Multi-source. |
+| **Put.io** | Cloud storage + debrid | Useful for personal libraries. |
+| **EasyNews** | Usenet | Usenet-only. Used in Speed EasyNews template. |
+| **Debrider** | Debrid | Community debrid option. |
+
+---
+
+#### How to Switch Services
+
+1. Open your **AIOStreams dashboard**
+2. Go to the **Services** section
+3. **Toggle off TorBox** (or leave it on if you want both)
+4. **Toggle on your preferred service**
+5. Enter your **API key** for the new service
+6. Click **Save**
+
+That's it. No re-import needed — the template filters and sort rules work the same regardless of which debrid service is active.
+
+---
+
+#### Where to Find Your API Key
+
+| Service | API Key Location |
+|---|---|
+| TorBox | [torbox.app/settings](https://torbox.app/settings) → API |
+| Real-Debrid | [real-debrid.com/apitoken](https://real-debrid.com/apitoken) |
+| AllDebrid | [alldebrid.com/apikeys](https://alldebrid.com/apikeys) |
+| Premiumize | [premiumize.me/account](https://www.premiumize.me/account) → API |
+| DebridLink | [debrid-link.com/webapp/apikey](https://debrid-link.com/webapp/apikey) |
+| EasyNews | Your EasyNews username and password |
+| EasyDebrid | [easydebrid.com](https://easydebrid.com) → Account |
+| PikPak | App → Profile → Developer Settings |
+
+---
+
+#### Running Multiple Services at Once
+
+You can enable more than one service simultaneously. AIOStreams will query all enabled services and merge the results. Useful if you want TorBox as your primary with Real-Debrid as a fallback, for example.
+
+> Each service's cached streams are labelled separately in the stream card so you can see which service is serving each result.
+
+---
+
+#### Notes on Service Compatibility
+
+**Real-Debrid** — Works well with all templates. Since May 2026, RD applies a server-side filter to certain WEB-DL files which may reduce results for some content. `hideErrors: true` in all Core Builds templates suppresses the resulting error cards.
+
+**EasyNews** — Usenet-only. Best paired with a torrent debrid service. The Speed EasyNews template is specifically built around EasyNews as the sole source.
+
+**TorBox Pro vs Essential** — The template tier (Pro/Essential) refers to your TorBox plan's features (Usenet access, cacheAndPlay). If you switch to a different debrid service entirely, any template works — the Pro/Essential label is only relevant when using TorBox.
+
+**Flash templates** — Flash is cached-only (`excludeUncached: true`). This works with any debrid service, but your results depend entirely on what that service has already cached. Flash with a service that has a smaller cache will return fewer results than Flash with TorBox or RD.
+
+---
+
+#### Troubleshooting — No Streams After Switching
+
+1. Confirm the new service is **toggled on** in Services (not just API key entered)
+2. Confirm TorBox is **not the only enabled service** if you've switched away from it
+3. Try a popular mainstream title first — niche content may not be cached on every service
+4. Check your API key is correct and not expired
+5. Click **Save** again — some hosts require a second save to register service changes
+
+---
+
+---
+
+## 4 — Formatters
 Custom visual layouts that control how streams appear in your list. Swap between styles instantly without touching any template settings.
 
 ---
@@ -409,7 +527,7 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 
 ---
 
-## 4 — Device Profiles
+## 5 — Device Profiles
 AIOStreams cannot detect what device is making a request — every device looks identical to the server. A Shield Pro, a budget Android TV, and a phone all arrive at the same manifest URL with no identifying information. This means a single AIOStreams installation will serve the same streams to every device, regardless of whether they can play them.
 
 The solution is **two separate Stremio accounts** — one for low-end devices, one for high-end devices — each with its own AIOStreams addon installed.
@@ -522,7 +640,7 @@ Stremio syncs addon installations per-account, so each device automatically gets
 ---
 
 
-## 5 — Stremio vs WuPlay
+## 6 — Stremio vs WuPlay
 
 Both players work with Core Builds templates, but they behave differently in ways that matter. Here's what you need to know.
 
@@ -594,7 +712,7 @@ Both players fully support AIOStreams formatters. The `name` and `description` f
 
 ---
 
-## 6 — Advanced Editing
+## 7 — Advanced Editing
 The **Core Builds** are designed to be plug-and-play. However, if you want to adjust caching rules, tweak filtering, or edit the raw template JSON, this guide covers how to do it safely.
 
 ---
@@ -742,7 +860,7 @@ Before changing anything in a working build, export or copy your current configu
 
 ---
 
-## 7 — Resetting Your Instance
+## 8 — Resetting Your Instance
 Sometimes a template import goes wrong, credentials get stuck in a broken state, or you simply want to start completely fresh. This guide covers every reset scenario from a soft config wipe to a full account deletion.
 
 ---
@@ -893,7 +1011,7 @@ The NZBGeek API key is not entered in the credentials modal -- it must be config
 
 ---
 
-## 8 — Troubleshooting
+## 9 — Troubleshooting
 Quick fixes for the most common errors encountered when importing templates, saving configuration, or loading streams.
 
 ---
@@ -1046,7 +1164,7 @@ Work through these in order:
 
 ---
 
-## 9 — FAQ
+## 10 — FAQ
 
 Quick answers to the most common questions. If yours isn't here, open a [Discussion](https://github.com/brevityA/Core-Builds/discussions).
 
@@ -1144,7 +1262,7 @@ WuPlay and Stremio handle stream types differently. YouTube/external streams are
 
 ---
 
-## 10 — Adjusting Search Criteria
+## 11 — Adjusting Search Criteria
 
 This guide explains how to tune the matching settings in any Core Builds template to fix zero-result issues, handle edge cases, and get the best stream coverage for your content.
 
