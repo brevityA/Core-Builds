@@ -40,6 +40,37 @@ It's not installing new software. It loads a pre-configured settings file into y
 
 ---
 
+## Summary
+
+**The full setup in 3 steps:**
+
+1. **[Pick a template](#1--which-template-should-i-use)** — use the decision tree to find the right build for your debrid service and resolution
+2. **[Import it](#2--importing-a-template)** — paste the raw template URL into AIOStreams → import → save
+3. **Enter your API key** — grab it from your debrid dashboard and paste it when prompted
+
+That's it. You're watching in under 5 minutes.
+
+---
+
+**Quick reference — what each section covers:**
+
+| Section | What it does |
+|---|---|
+| [1 — Which Template?](#1--which-template-should-i-use) | Decision tree to find your build |
+| [2 — Importing](#2--importing-a-template) | Step-by-step import walkthrough |
+| [3 — Other Debrid Services](#3--using-a-different-debrid-service) | Switch from TorBox to RD, AD, Premiumize, etc. |
+| [4 — Formatters](#4--formatters) | Change how stream cards look |
+| [5 — Device Profiles](#5--device-profiles) | Optimise for Samsung, LG, Firestick, Apple TV, etc. |
+| [6 — Stremio vs WuPlay](#6--stremio-vs-wuplay) | Which player to use and why |
+| [7 — Advanced Editing](#7--advanced-editing) | Manually tweak filters and sort rules |
+| [8 — Resetting](#8--resetting-your-instance) | Start fresh without breaking anything |
+| [9 — Troubleshooting](#9--troubleshooting) | Fix buffering, no streams, slow results |
+| [10 — FAQ](#10--faq) | Common questions answered quickly |
+| [11 — Search Criteria](#11--adjusting-search-criteria) | Widen or narrow what sources are queried |
+| [Regional Guide](REGIONAL_CONTENT_GUIDE.md) | Discover content by country / language |
+
+---
+
 ## Contents
 
 1. [Which Template Should I Use?](#1--which-template-should-i-use)
