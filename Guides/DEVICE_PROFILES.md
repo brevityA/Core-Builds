@@ -106,4 +106,4 @@ Stremio syncs addon installations per-account, so each device automatically gets
 
 ---
 
-*Return to the [Main README](../README.md)*
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*

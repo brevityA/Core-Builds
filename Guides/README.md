@@ -619,7 +619,7 @@ Stremio syncs addon installations per-account, so each device automatically gets
 
 ---
 
-*Return to the [Main README](../README.md)*
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
 
 ---
 
@@ -840,7 +840,7 @@ Before changing anything in a working build, export or copy your current configu
 
 ---
 
-*Return to the [Main README](../README.md)*
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
 
 ---
 
@@ -991,7 +991,7 @@ The NZBGeek API key is not entered in the credentials modal -- it must be config
 
 ---
 
-*Return to the [Main README](../README.md) · [Importing a Template](#2--importing-a-template) · [Advanced Editing](#7--advanced-editing) · [Troubleshooting](#9--troubleshooting)*
+*[Master Guide](#) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
 
 ---
 
@@ -1503,4 +1503,4 @@ All three default to their strict forms in a fresh AIOStreams install. All three
 
 ---
 
-*[Return to README](../README.md) · [CHANGELOG](../CHANGELOG.md)*
+*[GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/) · [CHANGELOG](../CHANGELOG.md)*
