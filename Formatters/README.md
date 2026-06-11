@@ -153,11 +153,10 @@ Early Core Builds formatter. Similar layout to Uniform with additional SEADEX/BE
 ### Using a Core Builds template
 Core Nexus Elite is already bundled in all templates — nothing to do on a fresh import. To switch formatter after importing:
 
-1. Download the formatter JSON from the table above
-2. Open your AIOStreams host → **Settings** → **Formatter** → **Custom**
-3. Paste the `name` value into the **Name Template** field
-4. Paste the `description` value into the **Description Template** field
-5. Save and reinstall the addon in Stremio
+1. Click the **↓ Download JSON** link for your chosen formatter above — the file downloads automatically
+2. Open your AIOStreams dashboard → **Formatter** section → tap the **Import/Export icon** (bottom right corner)
+3. Select **Import from File** → choose the downloaded `.json` file
+4. Click **Save** — streams update immediately, no Stremio reinstall needed
 
 > **Note:** If you updated from an older template and the formatter fields are blank, do a fresh import rather than an update. AIOStreams preserves the formatter as a user setting during updates.
 

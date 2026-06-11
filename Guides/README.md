@@ -496,11 +496,11 @@ Full previews and all raw URLs → [Formatter Guide](FORMATTER_GUIDE.md)
 
 #### How to Import
 
-1. Copy the raw URL for your chosen formatter from the [Formatter Guide](FORMATTER_GUIDE.md)
+1. Open the raw URL for your chosen formatter from the [Formatter Guide](FORMATTER_GUIDE.md) in your browser — the `.json` file downloads automatically
 2. AIOStreams dashboard → **Formatter** section → tap the **Import/Export icon** (bottom right)
-3. Select **Import from URL** → paste the URL → Save
+3. Select **Import from File** → choose the downloaded file → Save
 
-> ⚠️ Always use the raw GitHub URL. Copying from the rendered file view adds hidden characters that break the JSON parser.
+> ⚠️ Open the raw GitHub URL in your browser. Do not copy-paste from the GitHub rendered file view — it adds hidden characters that break the JSON parser.
 
 **Settings note:** For Elite and Apex v2 — turn **Show file name** and **Show bitrate OFF** in AIOStreams main settings. These formatters handle both natively.
 

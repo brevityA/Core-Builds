@@ -117,7 +117,9 @@ REMUX · HDR10+ · DV · IMAX
 
 ## How to Import
 
-**Step 1 — Copy the raw URL** for your chosen formatter:
+**Step 1 — Download the formatter JSON**
+
+Open the raw URL for your chosen formatter in your browser — the file will download automatically.
 
 ```
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json
@@ -138,7 +140,7 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-formatter.json
 ```
 
-> ⚠️ **Use the raw URL, not the GitHub file view.** The rendered page adds hidden characters that cause a "Failed to parse JSON" error on import.
+> ⚠️ **Open the raw URL, not the GitHub file view.** The rendered page adds hidden characters that cause a "Failed to parse JSON" error on import.
 
 ---
 
@@ -150,10 +152,10 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 
 ---
 
-**Step 3 — Import**
+**Step 3 — Import the file**
 
-1. Select **Import from URL** in the pop-up
-2. Paste the raw URL
+1. Select **Import from File** in the pop-up
+2. Choose the `.json` formatter file you downloaded
 3. The name and description fields populate automatically
 4. Click **Save**
 
