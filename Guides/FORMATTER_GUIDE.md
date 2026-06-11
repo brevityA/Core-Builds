@@ -173,4 +173,4 @@ Streams update immediately — no Stremio reinstall needed.
 
 ---
 
-*[Master Guide](README.md) · [Import Guide](IMPORT_GUIDE.md) · [Troubleshooting](TROUBLESHOOTING.md)*
+*[Master Guide](README.md) · [Importing a Template](README.md#2--importing-a-template) · [Troubleshooting](README.md#9--troubleshooting)*

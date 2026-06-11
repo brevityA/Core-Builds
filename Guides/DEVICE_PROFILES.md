@@ -88,7 +88,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 Go to [stremio.com](https://www.stremio.com) and create a second account using a different email address. A free account is all you need.
 
 ### Step 2 — Install the right template on each account
-Sign into each account separately and follow the [Import Guide](./IMPORT_GUIDE.md) to install the appropriate template. Use the same debrid credentials on both accounts — your subscriptions are not account-locked.
+Sign into each account separately and follow [Section 2 — Importing a Template](README.md#2--importing-a-template) to install the appropriate template. Use the same debrid credentials on both accounts — your subscriptions are not account-locked.
 
 ### Step 3 — Sign each device into the right account
 - Sign your **phones, tablets, and budget TVs** into the Low-End account

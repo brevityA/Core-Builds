@@ -492,6 +492,8 @@ Formatters control how stream cards look in Stremio and WuPlay. Swap between the
 
 Full previews and all raw URLs → [Formatter Guide](FORMATTER_GUIDE.md)
 
+Additional community formatters (Midnight Slate, Omni Diamond, Core Zenith, Core Syntax, Nexus Prime) are available in the [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) directory with preview images.
+
 ---
 
 #### How to Import
@@ -530,8 +532,9 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Phones · Tablets · Budget Android TV boxes · Projectors · Older TVs*
 
 #### Recommended Templates
-- **[Core Nexus Stream](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-stream.json)** — TorBox only, RPDB poster integration
-- **[Core Nexus Dual Core 1080p](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Deprecated/Dual/core-nexus-dual-core-1080p.json)** — TorBox + Real-Debrid for maximum availability
+- **[Core Nexus Stream](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json)** — TorBox Pro · 1080p SDR · full addon stack
+- **[Core Nexus Stream (Fire Stick)](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json)** — optimised for Fire Stick and low-RAM Android devices
+- **[Core Nexus Essential](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json)** — TorBox Essential · 1080p SDR
 
 #### What these builds do
 - ✅ Targets WEB-DL and WEBRip sources
@@ -544,7 +547,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 #### Devices to sign this account into
 - Android phones and tablets
 - Budget Android TV boxes (X96, H96, MXQ, Ugoos AM6B at 1080p mode)
-- Amazon Fire TV Stick (4K stick can still benefit from the 1080p build for reliability)
+- Amazon Fire TV Stick (use the Fire Stick variant for best performance)
 - Projectors without native 4K panels
 - Older 1080p TVs
 
@@ -554,8 +557,8 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Nvidia Shield · Apple TV 4K · 4K OLED/QLED TVs · High-end Android TV*
 
 #### Recommended Templates
-- **[Core Nexus 4K Dual Core](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Deprecated/Dual/core-nexus-4k-dual-core.json)** — TorBox + Real-Debrid, maximum quality and coverage
-- **[Core Nexus 4K Pro](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox only, home theater focused
+- **[Core Nexus 4K Pro](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox Pro · 4K HDR · home theater quality
+- **[Core Nexus 4K Essential](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json)** — TorBox Essential · 4K HDR
 
 #### What these builds do
 - ✅ Targets 4K UHD sources
@@ -596,7 +599,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 Go to [stremio.com](https://www.stremio.com) and create a second account using a different email address. A free account is all you need.
 
 #### Step 2 — Install the right template on each account
-Sign into each account separately and follow the [Import Guide](./IMPORT_GUIDE.md) to install the appropriate template. Use the same debrid credentials on both accounts — your subscriptions are not account-locked.
+Sign into each account separately and follow [Section 2 — Importing a Template](#2--importing-a-template) to install the appropriate template. Use the same debrid credentials on both accounts — your subscriptions are not account-locked.
 
 #### Step 3 — Sign each device into the right account
 - Sign your **phones, tablets, and budget TVs** into the Low-End account
@@ -913,7 +916,7 @@ If Stremio still has the addon installed, you will need to uninstall it after th
 
 #### Step 4 -- Re-import your template
 
-Follow the steps in the [Import Guide](./IMPORT_GUIDE.md) to load a fresh template and enter your API keys.
+Follow the steps in [Section 2 — Importing a Template](#2--importing-a-template) to load a fresh template and enter your API keys.
 
 #### Step 5 -- Uninstall the old addon from Stremio
 
@@ -971,7 +974,7 @@ The old manifest is still installed. Uninstall it from the Stremio addon manager
 Some hosts cache the credential state. Try logging out and back in, or clearing your browser cache, then re-importing.
 
 **NZBGeek still not working after reset (Hybrid template)**
-The NZBGeek API key is not entered in the credentials modal -- it must be configured in the Addons section after loading. See the [Import Guide](./IMPORT_GUIDE.md) for the full NZBGeek setup step.
+The NZBGeek API key is not entered in the credentials modal -- it must be configured in the Addons section after loading. See [Section 2 — Importing a Template](#2--importing-a-template) for the full NZBGeek setup step.
 
 ---
 
@@ -988,7 +991,7 @@ The NZBGeek API key is not entered in the credentials modal -- it must be config
 
 ---
 
-*Return to the [Main README](../README.md) -- [Import Guide](./IMPORT_GUIDE.md) -- [Advanced Editing](./ADVANCED_EDITING.md) -- [Troubleshooting](./TROUBLESHOOTING.md)*
+*Return to the [Main README](../README.md) · [Importing a Template](#2--importing-a-template) · [Advanced Editing](#7--advanced-editing) · [Troubleshooting](#9--troubleshooting)*
 
 ---
 
@@ -1139,8 +1142,8 @@ You're on an old template using a deprecated `keyword()` syntax. Re-import the l
 
 ### Still Stuck?
 
-- [Reset Guide](./RESET_GUIDE.md) — start fresh without losing your API keys
-- [Advanced Editing Guide](./ADVANCED_EDITING.md) — JSON editing and expression validation
+- [Section 8 — Resetting Your Instance](#8--resetting-your-instance) — start fresh without losing your API keys
+- [Section 7 — Advanced Editing](#7--advanced-editing) — JSON editing and expression validation
 - [GitHub Issues](https://github.com/brevityA/Core-Builds/issues) — open an issue with a description of the error
 - [GitHub Discussions](https://github.com/brevityA/Core-Builds/discussions) — ask the community
 
@@ -1169,6 +1172,10 @@ You copied the formatter text from the GitHub file view. GitHub adds hidden char
 #### Services reset to off after re-importing
 
 Expected behaviour. Re-importing a template resets service toggles to the template defaults. Your API keys are preserved — just re-enable your services in the Services tab after each import.
+
+#### The BUILD badge shows "Repo or workflow not found"
+
+The GitHub Actions validation workflow hasn't run yet. It triggers automatically on the next commit that changes a JSON file — push any template update and the badge resolves itself.
 
 ---
 
