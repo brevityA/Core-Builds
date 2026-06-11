@@ -131,3 +131,7 @@ Adding MediaFusion or TMDB for regional Discover content has **zero impact** on 
 - TMDB requires a valid region code — use the two-letter ISO country code (e.g. `IN`, `JP`, `BR`)
 
 For further help, open a [Discussion](https://github.com/brevityA/Core-Builds/discussions).
+
+---
+
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*

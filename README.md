@@ -26,6 +26,9 @@
   <a href="https://github.com/brevityA/Core-Builds/discussions">
     <img src="https://img.shields.io/badge/DISCUSSIONS-Community-7c3aed?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Discussions"/>
   </a>
+  <a href="https://www.reddit.com/r/CoreBuilds/">
+    <img src="https://img.shields.io/badge/REDDIT-r%2FCoreBuilds-FF4500?style=for-the-badge&logo=reddit&logoColor=white&labelColor=1a1f27" alt="Reddit"/>
+  </a>
   <a href="https://github.com/brevityA/Core-Builds/blob/main/ROADMAP.md">
     <img src="https://img.shields.io/badge/ROADMAP-What's_Next-0ea5e9?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Roadmap"/>
   </a>

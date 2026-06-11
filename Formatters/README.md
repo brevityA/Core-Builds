@@ -221,4 +221,4 @@ All Core Builds formatters use the `tamtaro` formatter type. The override key mu
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · Filtering powered by [Tamtaro SEL Setup](https://git.tamtaro.de)*
+*[Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/) · Filtering powered by [Tamtaro SEL Setup](https://git.tamtaro.de)*
