@@ -474,85 +474,35 @@ You can enable more than one service simultaneously. AIOStreams will query all e
 ---
 
 ## 4 — Formatters
-Custom visual layouts that control how streams appear in your list. Swap between styles instantly without touching any template settings.
+
+Formatters control how stream cards look in Stremio and WuPlay. Swap between them any time — no template changes needed.
 
 ---
 
-#### Available Formatters
+#### Which Formatter?
 
 | Formatter | Style | Best For |
 |---|---|---|
-| **Core Nexus Elite** | Colour-coded circles, INSTANT/UNCACHED badge, 4-line description | Default — bundled in all templates |
-| **Core Nexus Apex v2** ⭐ | Score number in name, bitrate-first line 2, subtitle language flags | Recommended upgrade |
-| **Core Nexus Apex** | Audio codec in name, two-tier score badge (ELITE ≥75 · QUALITY ≥50) | Detailed monitoring |
-| **Core Nexus TV** | UPPER CASE throughout, large-screen readable | TV, projector, 10-foot UI |
-| **Core Nexus Sigma** | Typographic `「 」` brackets, editorial feel | Clean aesthetic |
-| **Core Nexus Minimal** | 3-line description, ⚡/⏳ indicator, first audio only | Apple TV, small screens |
+| **Core Nexus Apex v2** ⭐ | Score · bitrate-first · subtitle flags | Most setups — recommended upgrade |
+| **Core Nexus Elite** | Colour circles · INSTANT badge · release group | Default — bundled in all templates |
+| **Core Nexus TV** | UPPER CASE · section icons | Smart TVs, projectors, 10-foot UI |
+| **Core Nexus Minimal** | 3-line compact · first audio only | Apple TV, small screens |
+| **Core Nexus Sigma** | `「 」` brackets · title-first | Clean aesthetic |
+| **Core Nexus Apex** | Audio codec in name · ELITE/QUALITY badge | Detailed audio monitoring |
 
-All formatters: [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters)
-
-#### ⭐ Core Nexus Apex v2 *(Recommended)*
-
-Score number in line 1 (`✦ 94` instead of a label), bitrate before visual tags in line 2, per-language subtitle flags (`📝 🇬🇧 🇫🇷`). The recommended upgrade from Elite for most setups.
-
-#### Core Nexus Elite *(Default)*
-
-Bundled in all templates. Colour-coded resolution circles (🟣 4K · 🔵 1080P · 🟢 720P), INSTANT/UNCACHED badge, PREMIER release group detection, 4-line description.
-
-#### 📺 Core Nexus TV *(Large screen)*
-
-UPPER CASE throughout — readable at TV distance. Coloured circles (🔴 4K · 🔵 1080P · 🟢 720P), ⚡/⏳ cache indicator, 🎬/🔊/🔌 section icons. Designed for projectors and smart TVs.
+Full previews and all raw URLs → [Formatter Guide](FORMATTER_GUIDE.md)
 
 ---
 
-#### Step 1 — Get the Formatter JSON
+#### How to Import
 
-Copy the raw URL for your chosen formatter and open it in your browser, or paste it directly into AIOStreams' formatter import field.
+1. Copy the raw URL for your chosen formatter from the [Formatter Guide](FORMATTER_GUIDE.md)
+2. AIOStreams dashboard → **Formatter** section → tap the **Import/Export icon** (bottom right)
+3. Select **Import from URL** → paste the URL → Save
 
-```
-https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json
-```
-```
-https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json
-```
-```
-https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json
-```
+> ⚠️ Always use the raw GitHub URL. Copying from the rendered file view adds hidden characters that break the JSON parser.
 
-> ⚠️ **Use the raw URL, not the GitHub file view.** The rendered page adds hidden characters that cause a "Failed to parse JSON" error on import.
-
----
-
-#### Step 2 — Open the Formatter Import Menu
-
-1. Open your **AIOStreams dashboard**
-2. Navigate to the **Formatter** section
-3. Tap the **Import/Export icon** in the bottom right corner (box with inward arrow)
-
----
-
-#### Step 3 — Import the File
-
-1. Select **Import from File** in the pop-up
-2. Choose the `.json` formatter file you downloaded
-3. The Name and Description fields populate automatically
-
----
-
-#### Step 4 — Save and Refresh
-
-1. Click **Save** at the bottom of the dashboard
-2. Refresh Stremio or WuPlay — the new layout applies instantly
-
----
-
-#### Tips
-
-> **Core Nexus Elite / Apex v2:** Turn **Show file name** and **Show bitrate OFF** in AIOStreams main settings. These formatters handle bitrate natively — leaving the settings on duplicates the data in the stream card.
-
-> **Export your own:** Tap the **Export** icon next to the import button to save your current formatter as a JSON file you can back up or share.
-
-> **Parse error on import:** Always use the raw GitHub URL above. Do not copy the text from the GitHub file view — the rendered page adds characters that break the JSON parser.
+**Settings note:** For Elite and Apex v2 — turn **Show file name** and **Show bitrate OFF** in AIOStreams main settings. These formatters handle both natively.
 
 ---
 
