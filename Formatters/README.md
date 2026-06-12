@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/formatters_banner.svg" alt="Core Formatters Banner" width="100%"/>
+</p>
+
 # Core Formatters
 
 Custom stream display layouts for AIOStreams. Formatters control how every stream appears in Stremio and WuPlay — the title line, the metadata rows, cache status, audio tags, release group, and everything else you see when picking a stream.
