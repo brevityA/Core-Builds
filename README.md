@@ -62,7 +62,10 @@
 
 ```
 TorBox Pro?
-├── Got NZBGeek/Usenet indexer? → Hybrid
+├── Got NZBGeek/Usenet indexer?
+│   ├── Want 4K? → 4K Hybrid
+│   └── 1080p only? → Hybrid
+├── Want best quality filtering? → 4K Apex (IQR adaptive PSEs)
 ├── Want 4K? → 4K Pro
 ├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
 └── 1080p only? → Stream
@@ -89,12 +92,14 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 
 | Template | Res | Import URL |
 |---|---|---|
+| **Core Nexus 4K Apex** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Core Nexus 4K Pro** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Core Nexus Stream** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
-| **Core Nexus Stream (Fire Stick)** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
+| **Core Nexus Stream (Fire Stick)** | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
+| **Core Nexus 4K Hybrid** ⚠️ | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Core Nexus Hybrid** ⚠️ | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 
-> ⚠️ Hybrid requires a **NZBGeek API key** — enter it in Add-ons → Newznab after loading.
+> ⚠️ Hybrid templates require a **NZBGeek API key** — enter it in Add-ons → Newznab after loading.
 
 ---
 
