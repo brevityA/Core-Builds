@@ -166,6 +166,8 @@ Service-first layout by RB3. Three name lines — service + ⚡/⏳ cache status
 
 Original RB3 community formatter. Pairs with the Auburn Tiger template — orange/navy resolution badges, JBL Spatial audio detection, PREMIER release group tagging.
 
+![RB3 Formatter Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg)
+
 [↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-formatter.json)
 
 ---

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" width="720" height="420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#181b24"/>
+      <stop offset="100%" stop-color="#13151e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="720" height="420" fill="url(#bg)" rx="10"/>
+
+  <!-- Tab bar -->
+  <rect x="0" y="0" width="720" height="44" fill="#1e2130" rx="10"/>
+  <rect x="0" y="34" width="720" height="10" fill="#1e2130"/>
+  <text x="24" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#e0e4f0" font-weight="600">Streams</text>
+  <text x="110" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#6b7280">Files</text>
+  <rect x="24" y="38" width="64" height="2" rx="1" fill="#e87d2a"/>
+
+  <!-- ── Card 1 (cached 4K REMUX) ── -->
+  <rect x="0" y="44" width="720" height="172" fill="#181b24"/>
+
+  <!-- Name line -->
+  <text x="24" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" fill="#f0c674" font-weight="600" letter-spacing="0.3">⚡ ɪɴsᴛᴀɴᴛ 🔸 TB 🔸 🟠 4K UHD 🔸 💎 Rᴇᴍᴜx 🔸 ⚙️ ʜᴇᴠᴄ</text>
+  <text x="24" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" fill="#f0c674" font-weight="600" letter-spacing="0.3">🎶 Aᴛᴍᴏs 🔸 💎 TʀᴜᴇHD 🔸 🔊 7.1 🔸 🔊 JBL Sᴘᴀᴛɪᴀʟ 🔸 👑 Pʀᴇᴍɪᴜᴍ</text>
+
+  <!-- Description rows -->
+  <text x="24" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🦅 Nᴇᴡ ✨ 🔸 ☁️ Debrid 🔹 💾 45.2 GB 🔸 📈 85.4 ᴍʙᴘs</text>
+  <text x="24" y="139" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🐅 Vɪᴅᴇᴏ: ✨ DV 🔸 🌟 ʜᴅʀ¹⁰⁺</text>
+  <text x="24" y="158" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🦅 Lᴀɴɢ: English</text>
+  <text x="24" y="177" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🐅 Rᴇʟᴇᴀsᴇ: MZABI 🔸 🛡️ Regex 🔹 🏆 Bᴇsᴛ Rᴇʟᴇᴀsᴇ</text>
+
+  <!-- Divider -->
+  <rect x="0" y="216" width="720" height="1" fill="#2c3040"/>
+
+  <!-- ── Card 2 (cached 1080p WEB-DL) ── -->
+  <rect x="0" y="217" width="720" height="156" fill="#181b24"/>
+
+  <!-- Name line -->
+  <text x="24" y="249" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" fill="#f0c674" font-weight="600" letter-spacing="0.3">⚡ ɪɴsᴛᴀɴᴛ 🔸 TB 🔸 🔵 1080ᴘ 🔸 🍿 Wᴇʙ-DL 🔸 ⚙️ ʜᴇᴠᴄ</text>
+  <text x="24" y="269" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" fill="#f0c674" font-weight="600" letter-spacing="0.3">🎶 ᴅᴅ⁺ 🔸 🔊 JBL Sᴘᴀᴛɪᴀʟ 🔸 🔊 5.1</text>
+
+  <!-- Description rows -->
+  <text x="24" y="293" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🦅 2 Dᴀʏs 🔸 ☁️ Debrid 🔹 💾 8.4 GB 🔸 📈 18.2 ᴍʙᴘs</text>
+  <text x="24" y="312" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🐅 Vɪᴅᴇᴏ: ☀️ SDR</text>
+  <text x="24" y="331" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🦅 Lᴀɴɢ: English</text>
+  <text x="24" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ba3b8">🐅 Rᴇʟᴇᴀsᴇ: FLUX</text>
+
+  <!-- Divider -->
+  <rect x="0" y="373" width="720" height="1" fill="#2c3040"/>
+
+  <!-- Footer label -->
+  <rect x="0" y="374" width="720" height="46" fill="#1a1d29"/>
+  <text x="360" y="401" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4a5060" text-anchor="middle" letter-spacing="1">RB3 FORMATTER  ·  AUBURN TIGER EDITION  ·  CORE BUILDS</text>
+</svg>
