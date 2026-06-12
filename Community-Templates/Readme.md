@@ -1,17 +1,37 @@
 <p align="center">
-  <img src="../Assets/community_banner.svg" alt="Community Builds Banner">
+  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/community_banner.svg" alt="Community Builds Banner">
 </p>
 
 # 🤝 Community Builds
 
-Welcome to the **Sandbox**. This directory contains experimental, alternative, and user-submitted AIOStreams formatters that fall outside the official **Core Nexus** design language.
+A curated collection of community-contributed AIOStreams templates and formatters. Each build is authored and maintained by its contributor — offering a different aesthetic, approach, or device target from the official Core Nexus suite.
 
-### ⚠️ Disclaimer
-These templates are provided "as-is." While they offer awesome alternative aesthetics and layout concepts, they are not subjected to the same rigorous character-limit, UI-breaking, and crash-testing as the official Flagship builds. Expect occasional formatting quirks depending on your scraper results and device.
+---
 
-### 🛠️ How to Contribute
-Got a killer layout you want to share with the WuPlay ecosystem?
-1. **Fork** this repository.
-2. Add your `.json` file to this folder (`/Community-Templates`).
-3. Open a **Pull Request**! Please include a screenshot of what your formatter looks like on-screen in the PR description so users can see your design before downloading.
-4. 
+## 📦 Contributors
+
+| Author | Build | Type | Services |
+|---|---|---|---|
+| **RB3** | [Auburn Tiger Edition](Templates/RB3/Readme.md) | Template | TorBox Pro + Real-Debrid |
+| **RB3** | [Clean v4 Formatter](Templates/RB3/Readme.md#-formatters) | Formatter | All |
+| **MightyIcyy** | [Prism — TorBox Essential 1080p](Templates/MightyIcyy/README.md) | Template | TorBox Essential |
+
+---
+
+## ⚠️ Disclaimer
+
+Community builds are provided as-is by their authors. They are not subjected to the same testing as the official Core Nexus builds — expect occasional quirks depending on your device and scraper results.
+
+---
+
+## 🛠️ Want to Contribute?
+
+1. **Fork** this repository
+2. Add your `.json` file and a `README.md` to a new folder under `Community-Templates/Templates/YourName/`
+3. Open a **Pull Request** — include a screenshot or SVG preview so others can see your build before downloading
+
+> Never include your AIOStreams instance URL or API keys in contributed files.
+
+---
+
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
