@@ -65,7 +65,7 @@ Full self-hosting docs: [docs.aiostreams.viren070.me](https://docs.aiostreams.vi
 To enable the Core Builds Filtering System synced URLs on a self-hosted instance:
 
 ```env
-WHITELISTED_SYNCED_URLS=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-ESEs.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-PSEs.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-ISEs.json
+WHITELISTED_SYNCED_URLS=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-eses.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-pses.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-ises.json
 ```
 
 ---

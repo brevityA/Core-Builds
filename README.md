@@ -185,7 +185,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | Template | Author | Plan | Import |
 |---|---|---|---|
 | [Prism TorBox Essential 1080p](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) | MightyIcyy | Essential | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) |
-| [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) | RB3 | TorBox Pro + RD | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) · [README](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/RB3%20Hybrid/Readme.md) |
+| [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) | RB3 | TorBox Pro + RD | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) · [README](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/README.md) |
 
 > Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
 
@@ -200,7 +200,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 | **Core Nexus Elite** | All 14 Core Nexus templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json) |
 | **Core Nexus TV** | Stand-alone · all templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json) |
 | **Core Syntax V3** | Core Cipher personal build | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-v3.json) |
-| **Core Nexus Uniform** | Legacy — replaced by Core Nexus Elite | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Uniform%20Formatter.json) |
+| **Core Nexus Uniform** | Legacy — replaced by Core Nexus Elite | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-uniform-formatter.json) |
 
 > 📁 [**Browse all formatters →**](https://github.com/brevityA/Core-Builds/tree/main/Formatters)
 
