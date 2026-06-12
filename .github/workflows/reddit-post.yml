@@ -1,0 +1,38 @@
+name: Reddit Auto-Poster
+
+on:
+  schedule:
+    - cron: '0 18 * * *'   # 18:00 UTC daily
+  workflow_dispatch:         # manual trigger for testing
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install praw pyyaml
+
+      - name: Post scheduled content
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+        run: python .github/scripts/post_to_reddit.py
+
+      - name: Commit moved posts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add posts/
+          git diff --cached --quiet || git commit -m "chore: archive posted content [skip ci]"
+          git push

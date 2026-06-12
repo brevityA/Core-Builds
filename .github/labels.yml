@@ -114,6 +114,17 @@
   color: "bfd4f2"
   description: Regex pattern update (Vidhin05 sync)
 
+# ── Content & testing ─────────────────────────────────────────────────────────
+- name: content
+  color: "ff6314"
+  description: Reddit / social media content (posts calendar)
+- name: tests
+  color: "0e8a16"
+  description: Test suite changes
+- name: assets
+  color: "bfd4f2"
+  description: Banners, icons, images
+
 # ── Discussions ───────────────────────────────────────────────────────────────
 - name: showcase
   color: "f9d0c4"
