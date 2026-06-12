@@ -17,6 +17,7 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 | Template | Plan | Resolution | Best for |
 |---|---|---|---|
 | [4K Pro](#-core-nexus-4k-pro) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet |
+| [4K Apex](#-core-nexus-4k-apex) | Pro | 4K + 1080p | Adaptive bitrate floors — outperforms 4K Pro on quality filtering |
 | [Stream](#-core-nexus-stream) | Pro | 1080p | WEB-DL only, budget hardware |
 | [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
 | [Samsung TV](#-core-nexus-samsung-tv-nightly) 🌙 | Pro | 1080p | Samsung / no Dolby Vision |
@@ -85,6 +86,8 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | Template | Plan | Res | Import URL |
 |---|---|---|---|
 | **Core Nexus 4K Pro** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
+| **Core Nexus 4K Apex** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
+| **Core Nexus 4K Apex (TorBox)** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json` |
 | **Core Nexus Stream** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Core Nexus Stream (Fire Stick)** | TorBox Pro | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Core Nexus Samsung TV** 🌙 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
@@ -127,6 +130,20 @@ Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX.
 | **File** | `Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Version** | v2.6.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
+| **Resolution** | 2160p primary, 1080p fallback |
+| **Usenet** | ✅ cacheAndPlay + nzbFailover |
+
+---
+
+### 🎯 Core Nexus 4K Apex
+
+Adaptive flagship. Identical addon and ESE stack to 4K Pro — the difference is in the PSEs. Instead of fixed quality tiers, each tier sets its bitrate floor dynamically at 85% of the lowest ranked stream's bitrate in that tier. If ranked streams exist, only streams meeting the floor are preferred. If no ranked streams exist yet (new release, < 60 days), a median-cluster fallback shows streams within ±25% of the median bitrate. HDR and SDR WEB-DL are evaluated separately so HDR streams don't inflate the SDR floor.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Single/core-nexus-4k-apex.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ✅ cacheAndPlay + nzbFailover |
 
