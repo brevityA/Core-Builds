@@ -40,4 +40,41 @@ Departing from the standard Core Nexus UI design, this template features a warm,
 3. Paste the configuration code directly into the importer.
 4. Input your **TorBox** and **Real-Debrid** API keys when prompted by the setup sequence.
 5. **UI Optimization:** In your main AIOStreams settings, ensure that **Show file name** and **Show bitrate** are toggled **OFF**. The Auburn Tiger formatter handles these natively, and leaving the default settings on will break the visual layout.
-   
+
+---
+
+## 🎨 Formatters
+
+### RB3 Clean v4
+
+A minimal, clean formatter with a service-first layout. Bold unicode resolution numbers and italic unicode quality sources create clear visual hierarchy across three compact name lines, with structured `⁞`-separated metadata rows in the description.
+
+![RB3 Clean v4 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-clean-v4-preview.svg)
+
+**Name layout (3 lines)**
+
+| Line | Shows |
+|---|---|
+| Line 1 | Service shortname · `⚡` cached or `⏳` uncached · `[USN]` if usenet |
+| Line 2 | Resolution in bold unicode — `𝟰𝗞 𝗨𝗛𝗗` · `𝟭𝟬𝟴𝟬𝗽` · `𝟳𝟮𝟬𝗽` |
+| Line 3 | Source in italic unicode — `𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹` · `𝘞𝘌𝘉-𝘋𝘓` · `𝘞𝘌𝘉-𝘙𝘪𝘱` |
+
+**Description layout (up to 6 lines)**
+
+| Line | Shows |
+|---|---|
+| Line 1 | `📁` Title · year · episode |
+| Line 2 | `🎬` Visual tags · `💿` encode |
+| Line 3 | `🔊` Audio channels · `🎧` audio tags |
+| Line 4 | `🌐` Language codes |
+| Line 5 | `📦` File size · `〽️` bitrate |
+| Line 6 | `🌱` Seeders (uncached only) · `🧩` Addon name |
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/Formatter/rb3-clean-v4-formatter.json)
+
+**How to import:**
+
+1. Click the download link above — the JSON file saves automatically
+2. Open AIOStreams → **Formatter** section → tap the **Import/Export icon** (bottom right)
+3. Select **Import from File** → choose the downloaded `.json` → click **Save**
+
