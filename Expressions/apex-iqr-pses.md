@@ -1,4 +1,4 @@
-# Core Nexus 4K Apex — IQR PSE Expressions (v0.3.0)
+# Core Nexus 4K Apex — IQR PSE Expressions (v0.3.2)
 
 Tukey IQR outlier detection applied to every ranked-pool tier.
 

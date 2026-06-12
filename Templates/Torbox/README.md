@@ -6,7 +6,7 @@
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.
 
-> **Current version: v2.6.3** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+> **Current version: v2.7.2** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
 > 📖 **New here?** Start with the [Complete Setup Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md) — it covers picking a template, importing, API keys, device profiles, and troubleshooting.
 
@@ -132,7 +132,7 @@ Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-4k-pro.json` |
-| **Version** | v2.6.3 |
+| **Version** | v2.7.2 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ✅ cacheAndPlay + nzbFailover |
@@ -141,12 +141,12 @@ Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX.
 
 ### 🎯 Core Nexus 4K Apex
 
-Adaptive flagship. Identical addon and ESE stack to 4K Pro — the difference is in the PSEs. Instead of fixed quality tiers, each tier sets its bitrate floor dynamically at 85% of the lowest ranked stream's bitrate in that tier. If ranked streams exist, only streams meeting the floor are preferred. If no ranked streams exist yet (new release, < 60 days), a median-cluster fallback shows streams within ±25% of the median bitrate. HDR and SDR WEB-DL are evaluated separately so HDR streams don't inflate the SDR floor.
+Adaptive flagship. Identical addon and ESE stack to 4K Pro — the difference is in the PSEs. Uses IQR Tukey fence filtering (Q1−1.5×IQR / Q3+1.5×IQR) to set bitrate floors per tier, with a min/max fallback for thin pools and a median cluster for new releases under 60 days. BluRay REMUX tiers also enforce file size floors (15 GB for 4K, 8 GB for 1080p) to filter mislabeled fakes. HDR and SDR WEB-DL are evaluated separately so HDR streams don't inflate the SDR floor.
 
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-4k-apex.json` |
-| **Version** | v0.1.0 |
+| **Version** | v0.3.2 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ✅ cacheAndPlay + nzbFailover |
@@ -160,7 +160,7 @@ Adaptive flagship. Identical addon and ESE stack to 4K Pro — the difference is
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-stream.json` |
-| **Version** | v2.6.3 |
+| **Version** | v2.7.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ✅ via Newznab (opt-in) |
@@ -174,7 +174,7 @@ Adaptive flagship. Identical addon and ESE stack to 4K Pro — the difference is
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-stream-firestick.json` |
-| **Version** | v2.6.3 |
+| **Version** | v2.7.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Resolution** | 1080p · SDR |
 | **Usenet** | ❌ |
@@ -220,7 +220,7 @@ TorBox Pro + NZBGeek. Full 4K with maximum source diversity.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
-| **Version** | v1.0.0 |
+| **Version** | v1.0.2 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **HDR** | ✅ Full HDR — DV, HDR10+, HDR10 |
@@ -238,7 +238,7 @@ TorBox Pro + NZBGeek. Maximum source diversity.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
-| **Version** | v2.6.3 |
+| **Version** | v2.7.2 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ✅ NZBGeek API key required |
@@ -256,7 +256,7 @@ Full 4K for Essential plan. No Usenet.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Essential/core-nexus-4k-essential.json` |
-| **Version** | v2.6.3 |
+| **Version** | v2.7.2 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ❌ |
@@ -270,7 +270,7 @@ Full 4K for Essential plan. No Usenet.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Essential/core-nexus-essential.json` |
-| **Version** | v2.6.3 |
+| **Version** | v2.7.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ❌ |
