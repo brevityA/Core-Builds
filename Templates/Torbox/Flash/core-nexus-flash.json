@@ -5,7 +5,7 @@
     "description": "Single-click instant play. Only cached streams appear — zero uncached results. Derived from Speed but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 1080p · TorBox Essential · Library, TorBox Search, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.1",
+    "version": "2.7.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -104,7 +104,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
@@ -137,7 +140,10 @@
         "options": {
           "timeout": 3000,
           "name": "Meteor",
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "instanceId": "6bb55ebe-8005-4298-a22f-1b0e10bf3db2",
         "resources": [

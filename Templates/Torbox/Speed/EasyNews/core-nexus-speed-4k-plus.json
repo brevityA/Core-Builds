@@ -5,7 +5,7 @@
     "description": "A speed-optimised 4K build for TorBox Essential and EasyNews users. Lives in Templates/Torbox/Speed/EasyNews/. Library, TorBox Search, Comet, and Zilean only -- the four fastest sources delivering cached results in 2-3 seconds. Targets 2160p with Dolby Vision and HDR10+ priority, TrueHD/Atmos audio, files up to 150 GB. SeaDex best-release enforced for anime. Timeouts at 3500ms, 10 results max, 5-key sort. Requires an active TorBox Essential and EasyNews subscription.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.1",
+    "version": "2.7.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -104,7 +104,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
@@ -137,7 +140,10 @@
         "options": {
           "timeout": 3000,
           "name": "Meteor",
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "instanceId": "f03ac4fa-476b-42b3-b8ab-42fb829e80d1",
         "resources": [

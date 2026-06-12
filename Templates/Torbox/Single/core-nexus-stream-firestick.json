@@ -5,7 +5,7 @@
     "description": "Firestick and budget Android TV optimised build. Hard SDR-only enforcement — excludes Dolby Vision, HDR10+, HDR10, HLG, and 10-bit content that causes playback failures or tone-mapping artifacts on Fire TV hardware. AV1 excluded. TrueHD/Atmos/lossless audio excluded. 1080p + 720p · WEB-DL/WEBRip · TorBox Essential. Single TorBox subscription required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.1",
+    "version": "2.7.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -2051,7 +2051,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
@@ -2107,7 +2110,10 @@
             "enabled": true,
             "customSearchEngines": true
           },
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"

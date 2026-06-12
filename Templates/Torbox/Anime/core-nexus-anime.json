@@ -5,7 +5,7 @@
     "description": "Dedicated anime template. SeaDex best releases · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.1",
+    "version": "2.7.3",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -108,7 +108,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "instanceId": "f7083d27-a799-46df-a2cf-ed27bac3010f",
         "resources": [
@@ -148,7 +151,10 @@
             "enabled": false,
             "customSearchEngines": true
           },
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "instanceId": "60f24567-7539-4a79-afe1-e8fb2ffd3c13",
         "resources": [

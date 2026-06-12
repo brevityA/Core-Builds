@@ -5,7 +5,7 @@
     "description": "A full-featured 4K build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.1",
+    "version": "2.7.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -2093,7 +2093,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
@@ -2148,7 +2151,10 @@
             "enabled": false,
             "customSearchEngines": true
           },
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
