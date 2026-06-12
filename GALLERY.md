@@ -1,34 +1,53 @@
 # 📸 Core Builds Visual Gallery
 
-Get a look at the Core Builds and custom UI formatters in action. These layouts are designed to completely overhaul the Stremio and WuPlay experience, bringing premium, readable metadata straight to your TV.
+A look at the Core Builds formatter layouts in action. These stream display templates are designed to bring clean, readable metadata to Stremio and WuPlay.
 
 ---
 
 ## 💎 Core Zenith Diamond Formatter
-*High-contrast, sleek badging prioritizing resolution, Dolby Vision, and HDR10+.*
 
-![Zenith Diamond UI Preview](./Assets/zenith_diamond_preview.png)
-*(Note: Clean, minimalist spacing reduces UI clutter on large 4K displays.)*
+*High-contrast badging with `🔹`/`🔸` dot separators. Info-dense name line with encode, audio, channels, and PREMIER flag.*
+
+![Zenith Diamond Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/zenith-diamond-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-diamond.json)
 
 ---
 
 ## 🐅 Auburn Tiger Edition Formatter
-*Bold, aggressive color coding designed to highlight high-end surround sound audio tracks (Atmos, TrueHD, DTS:X).*
 
-![Auburn Tiger UI Preview](./Assets/auburn_tiger_preview.png)
-*(Note: Stripped-down metadata for punchier, faster-reading lists.)*
+*Warm orange/navy palette. `🔸`/`🔹` separators throughout, smallcaps text, JBL Spatial audio detection, and PREMIER release group tagging.*
+
+![Auburn Tiger Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/auburn-tiger-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-auburn-tiger-edition.json)
 
 ---
 
-## ⚙️ The Core Builds in AIOStreams
-*A look under the hood at the deeply optimized deduplication and caching configurations powering the Core Builds.*
+## ⭐ Core Nexus Apex v2
 
-![AIOStreams Config Preview](./Assets/aiostreams_config_preview.png)
+*Score number in line 1, bitrate before visual tags, per-language subtitle flags. Recommended upgrade over Apex v1.*
+
+![Apex v2 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json)
+
+---
+
+## 💎 Core Nexus Elite
+
+*High-contrast. Colour-coded resolution circles, HDR/DV in name, INSTANT/UNCACHED badge, PREMIER release group detection. Bundled in all templates.*
+
+![Elite Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json)
 
 ---
 
 ### Want to submit your own setup?
-If you've got a great shot of the Core Builds running on your home theater or WuPlay setup, feel free to submit an issue with the screenshot, and we might feature it here!
+
+If you've got a great shot of Core Builds running on your home theater or WuPlay setup, open an issue with the screenshot and we might feature it here.
 
 ---
-*Return to the [Main README](./README.md).*
+
+*Return to the [Main README](./README.md) · [All Formatters](./Formatters/README.md)*
