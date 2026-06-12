@@ -8,8 +8,7 @@
     "version": "2.7.4",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": "v2.7.4: Added 📖 chapter badge to formatter — BluRay REMUXes with embedded chapters are now visually distinguished"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "addonName": "Core Nexus Anime Dub",
