@@ -102,7 +102,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Flash** ⚡⚡ | Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json` |
 | **Core Nexus Flash 4K** ⚡⚡ | Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json` |
 
-> 🪶 Every template above also has a **Lite variant** (`-lite` suffix in the filename). Lite templates run 12 ESEs instead of 24 — quality gates removed, hard kills kept. See the [Lite section](#-lite-variants) below.
+> 🪶 Every template above also has a **Lite variant** (`-lite` suffix in the filename) *(except Nightly templates)*. Lite templates run 12 ESEs instead of 24 — quality gates removed, hard kills kept. See the [Lite section](#-lite-variants) below.
 
 ---
 
@@ -125,7 +125,7 @@ Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-4k-pro.json` |
-| **Version** | v2.5.0 |
+| **Version** | v2.6.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ✅ cacheAndPlay + nzbFailover |
@@ -139,7 +139,7 @@ Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-stream.json` |
-| **Version** | v2.5.0 |
+| **Version** | v2.6.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ✅ via Newznab (opt-in) |
@@ -153,7 +153,7 @@ Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-stream-firestick.json` |
-| **Version** | v2.5.1 |
+| **Version** | v2.6.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Resolution** | 1080p · SDR |
 | **Usenet** | ❌ |
@@ -199,7 +199,7 @@ TorBox Pro + NZBGeek. Maximum source diversity.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
-| **Version** | v2.5.0 |
+| **Version** | v2.6.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ✅ NZBGeek API key required |
@@ -217,7 +217,7 @@ Full 4K for Essential plan. No Usenet.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Essential/core-nexus-4k-essential.json` |
-| **Version** | v2.5.0 |
+| **Version** | v2.6.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ❌ |
@@ -231,7 +231,7 @@ Full 4K for Essential plan. No Usenet.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Essential/core-nexus-essential.json` |
-| **Version** | v2.5.0 |
+| **Version** | v2.6.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ❌ |
