@@ -6,6 +6,7 @@ Templates in this folder require a **TorBox Pro** subscription. Full documentati
 |---|---|
 | Core Nexus 4K Pro | `core-nexus-4k-pro.json` |
 | Core Nexus 4K Pro Lite | `core-nexus-4k-pro-lite.json` |
+| Core Nexus 4K Apex | `core-nexus-4k-apex.json` |
 | Core Nexus Stream | `core-nexus-stream.json` |
 | Core Nexus Stream Lite | `core-nexus-stream-lite.json` |
 | Core Nexus Stream (Fire Stick) | `core-nexus-stream-firestick.json` |
