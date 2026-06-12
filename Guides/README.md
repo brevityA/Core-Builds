@@ -50,6 +50,8 @@ It's not installing new software. It loads a pre-configured settings file into y
 
 That's it. You're watching in under 5 minutes.
 
+> 📋 **Ready to import?** Jump straight to the [Template Directory](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/README.md) for all import URLs and a quick reference table.
+
 ---
 
 **Quick reference — what each section covers:**

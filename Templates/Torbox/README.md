@@ -1,8 +1,49 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/templates_banner.svg" alt="Core Builds Template Directory Banner" width="100%"/>
+</p>
+
 # Core Builds — Template Directory
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.
 
 > **Current version: v2.6.3** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+
+> 📖 **New here?** Start with the [Complete Setup Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md) — it covers picking a template, importing, API keys, device profiles, and troubleshooting.
+
+---
+
+## ⚡ Quick Reference
+
+| Template | Plan | Resolution | Best for |
+|---|---|---|---|
+| [4K Pro](#-core-nexus-4k-pro) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet |
+| [Stream](#-core-nexus-stream) | Pro | 1080p | WEB-DL only, budget hardware |
+| [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
+| [Samsung TV](#-core-nexus-samsung-tv-nightly) 🌙 | Pro | 1080p | Samsung / no Dolby Vision |
+| [Samsung TV 4K](#-core-nexus-samsung-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
+| [Hybrid](#-core-nexus-hybrid) | Pro + NZBGeek | 1080p | Dual-source: TorBox + Usenet |
+| [4K Essential](#-core-nexus-4k-essential) | Essential | 4K + 1080p | Full 4K on Essential plan |
+| [Essential](#-core-nexus-essential) | Essential | 1080p | Standard Essential build |
+| [Speed 4K+](#easynews-speed-templates) | Essential + EasyNews | 4K | Instant cached 4K |
+| [Speed+](#easynews-speed-templates) | Essential + EasyNews | 1080p | Instant cached 1080p |
+| [Speed EasyNews](#easynews-speed-templates) | EasyNews only | 1080p | EasyNews — no TorBox needed |
+| [Speed 4K](#torbox-only-speed-templates) | Essential | 4K | Fast cached 4K |
+| [Speed](#torbox-only-speed-templates) | Essential | 1080p | Fast cached 1080p |
+| [Anime](#-anime) 🎌 | Essential | 1080p | SeaDex best-release anime |
+| [Anime 4K](#-anime) 🎌 | Essential | 4K + 1080p | HDR anime |
+| [Anime Dub](#-anime) 🎌 | Essential | 1080p | English dubbed anime |
+| [Flash](#️-flash-tier) ⚡⚡ | Essential | 1080p | Instant play, cached only |
+| [Flash 4K](#️-flash-tier) ⚡⚡ | Essential | 4K + 1080p | Instant play 4K, cached only |
+
+> 🪶 Every template above also has a **Lite variant** (`-lite` suffix in the filename). Import URLs are in the [All Templates](#-all-templates) table below.
+
+### 🌍 Community
+
+| Template | Author | Plan | Resolution | Best for |
+|---|---|---|---|---|
+| [Auburn Tiger Edition](#-community-templates) | RB3 | Pro + RD | 4K + 1080p | TorBox Pro + Real-Debrid, warm orange/navy UI |
+| [RB3 TorBox Pro + RD Hybrid](#-community-templates) | RB3 | Pro + RD | 1080p | Dual-source hybrid with Usenet |
+| [Prism TorBox Essential 1080p](#-community-templates) | MightyIcyy | Essential | 1080p | Simple, low-friction Essential build |
 
 ---
 
@@ -309,4 +350,10 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Main README](https://github.com/brevityA/Core-Builds/blob/main/README.md) · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)*
+## ⚠️ Disclaimer
+
+Core Builds is an independent community project and is not affiliated with, endorsed by, or supported by TorBox, AIOStreams, or any service provider referenced in these templates. Templates configure how the AIOStreams addon filters and displays streams — they do not host, proxy, or distribute any content. Use is entirely at your own risk.
+
+---
+
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Complete Setup Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md) · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)*
