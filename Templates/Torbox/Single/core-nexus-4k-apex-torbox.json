@@ -2341,7 +2341,7 @@
       {
         "type": "torbox-search",
         "instanceId": "5f6",
-        "enabled": false,
+        "enabled": true,
         "options": {
           "name": "TorBox Search",
           "timeout": 3000,
