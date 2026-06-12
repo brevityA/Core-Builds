@@ -8,6 +8,29 @@ Custom stream display layouts for AIOStreams. Formatters control how every strea
 
 ---
 
+## ⚡ Quick Comparison
+
+| Formatter | Style | Name lines | Desc lines | Key feature |
+|---|---|---|---|---|
+| **Core Nexus Apex v2** ⭐ | Emoji circles | 1 | 4 | Score number, bitrate-first, per-language subtitle flags |
+| **Core Nexus Apex** | Emoji circles | 1 | 4 | Audio codec in name, two-tier score badge |
+| **Core Nexus Elite** | Emoji circles | 1 | 4 | 🟣/🔵/🟢/⚫ resolution circles · INSTANT/UNCACHED · PREMIER |
+| **Core Nexus Sigma** | `「 」` brackets | 1 | 4 | Title-first name line, smallcaps, premium editorial feel |
+| **Core Nexus Minimal** | ⚡/⏳ indicator | 1 | 3 | 3-line description, first audio codec only, TV/AppleTV |
+| **Core Nexus TV** | UPPER CASE | 1 | 4 | 10-foot UI, 🔴/🔵/🟢 circles, projector & smart TV |
+| **Core Nexus Uniform** | Emoji circles | 1 | 4 | Legacy — replaced by Elite |
+| **Core Syntax** | `「 」` brackets | 1 | 4 | Original formatter, ✦/✧ cache indicator, ◈ ELITE badge |
+| **Core Syntax V3** | `「 」` brackets | 1 | 4 | JBL Spatial, ★ Premium badge, IMAX/Hybrid/edition flags |
+| **Omni Diamond v2.2.0** | Dense emoji | 2 | 4 | Two-line name, maximum metadata density |
+| **Core Zenith Diamond** | 🔹/🔸 dots | 1 | 4 | Dot separators, encode + audio + PREMIER in name |
+| **Core Zenith Auburn Tiger** | 🔸 orange dots | 1 | 4 | Warm orange/navy, 🐅 release prefix, Auburn Tiger pairs |
+| **Midnight Slate** | ASCII `◼⬤▶◆` | 1 | 4 | No emoji — for clients that render emoji poorly |
+| **Nexus Prime** | Emoji | 1 | 4 | SeaDex/BEST detection, 📅 age format, subtitle listing |
+| **RB3 Clean v4** | Bold unicode | 3 | 6 | Three-line name with bold resolution + italic quality source |
+| **RB3 Formatter** | 🔸/🔹 smallcaps | 1 | 4 | Auburn Tiger paired, JBL Spatial, PREMIER tagging |
+
+---
+
 ## 📋 Active Formatters
 
 ### ⭐ Core Nexus Apex v2
