@@ -8,6 +8,7 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| v2.7.3 | `zilean` + `meteor` catalog bleed fix — `resources: ['stream']` added to both scrapers across all 33 active templates; suppresses scraper catalog entries appearing in Stremio instead of playable streams |
 | v2.7.2 | `size()` floor guards on BluRay REMUX PSEs — 15 GB floor for 4K Remux, 8 GB floor for 1080p Remux; applied to 4K Apex, 4K Pro, 4K Essential, 4K Hybrid, and 1080p Hybrid |
 | v2.7.1 | Addon stack cleanup — Knaben moved to last P2P slot, `torbox-search` renamed-addon fix, AnimeTosho + NekoBT enabled across all 6 anime templates; applied to all 33 active templates |
 | v2.7.0 | Core Nexus 4K Hybrid — new TorBox + NZBGeek Usenet template; full 4K, full HDR, full lossless audio |

@@ -5,7 +5,7 @@
     "description": "Speed-optimised 1080p build for EasyNews subscribers — no TorBox required. Streams exclusively from EasyNews Usenet cache for near-instant playback. Three fast scrapers: Library, Zilean, Meteor with Usenet enabled. SDR only, WEB-DL preferred, BluRay and Remux blocked. Timeouts at 3500ms, 10 results max. Requires an active EasyNews subscription. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.1",
+    "version": "2.7.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -104,7 +104,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
@@ -137,7 +140,10 @@
         "options": {
           "timeout": 3000,
           "name": "Meteor",
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "instanceId": "1fa89382-5938-4d6e-bcba-a1aa9fc88a95",
         "resources": [

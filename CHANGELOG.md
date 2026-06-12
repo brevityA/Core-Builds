@@ -4,6 +4,13 @@
 
 ---
 
+## 2.7.3 (2026-06-12)
+
+### Fixed
+- **`zilean` and `meteor` missing `resources: ['stream']` (all 33 active templates)** — Without this field, both scrapers were also exposing catalog and meta entries in Stremio. Users would see "scraper information" results and clicking them would navigate to the scraper's homepage (AIOStreams GitHub for Meteor) instead of playing a stream. This is a regression from the v2.4.5 fix that added `resources: ['stream']` to `comet` and `mediafusion` but missed `zilean` and `meteor`. Now applied to all active templates.
+
+---
+
 ## 2.7.1 (2026-06-12)
 
 ### Fixed

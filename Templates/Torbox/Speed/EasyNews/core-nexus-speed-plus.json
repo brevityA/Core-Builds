@@ -5,7 +5,7 @@
     "description": "A speed-optimised 1080p build for TorBox Essential and EasyNews users. Lives in Templates/Torbox/Speed/EasyNews/. Strips all slow scrapers to just Library, TorBox Search, Comet, and Zilean -- the four fastest sources delivering cached results in 2-3 seconds. SDR only, BluRay and Remux blocked for broad hardware compatibility. Timeouts at 3500ms, 10 results max, 5-key sort. Requires an active TorBox Essential and EasyNews subscription.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.1",
+    "version": "2.7.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -104,7 +104,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
@@ -137,7 +140,10 @@
         "options": {
           "timeout": 3000,
           "name": "Meteor",
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "instanceId": "1fa89382-5938-4d6e-bcba-a1aa9fc88a95",
         "resources": [

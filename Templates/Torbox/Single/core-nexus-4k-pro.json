@@ -5,7 +5,7 @@
     "description": "A dedicated 4K home theater build running exclusively on TorBox. Targets 2160p with Dolby Vision, HDR10+, and HDR10 priority. Enforces 7.1 surround preference, TrueHD/Atmos/DTS:X audio chain, and AV1/HEVC encode priority. File range 5 GB–150 GB to accommodate full BluRay REMUX. SeaDex best-release enforced for anime. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No RD dependency — a single TorBox subscription is all that is required. Designed for Nvidia Shield, Apple TV 4K, and high-end OLED/QLED displays.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.2",
+    "version": "2.7.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -2143,7 +2143,10 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000
+          "timeout": 3000,
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
@@ -2199,7 +2202,10 @@
             "enabled": true,
             "customSearchEngines": true
           },
-          "url": "https://meteorfortheweebs.midnightignite.me"
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
         },
         "resources": [
           "stream"
