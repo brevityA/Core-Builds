@@ -1163,7 +1163,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1222,7 +1221,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1281,7 +1279,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1340,7 +1337,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1399,7 +1395,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1458,7 +1453,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1517,7 +1511,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1576,7 +1569,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1635,7 +1627,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1694,7 +1685,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
@@ -1753,7 +1743,6 @@
         },
         {
           "key": "encode",
-          "order": "desc",
           "direction": "desc"
         },
         {
