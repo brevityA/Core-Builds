@@ -4,6 +4,34 @@
 
 ---
 
+## 2.7.1 (2026-06-12)
+
+### Fixed
+- **Knaben moved to last P2P position (all 33 templates)** — Knaben is a slow, debrid-only indexer. Sitting mid-stack it blocked faster, broader indexers from being evaluated first. Now positioned last in the P2P block, immediately before subtitle addons, in every active template.
+- **`torbox-search` disabled (all 33 templates)** — Renamed in AIOStreams v2.30.2; the old addon identifier no longer resolves. Was still present and enabled in 4 templates (`core-nexus-4k-hybrid`, `core-nexus-hybrid`, `core-nexus-hybrid-lite`, `core-nexus-4k-apex-torbox`), creating a broken addon slot. Disabled across the board.
+- **AnimeTosho enabled in all 6 anime templates** — Was in the preset list but switched off. AnimeTosho is a primary high-quality anime indexer and should have been on from the start.
+- **NekoBT enabled in all 6 anime templates** — Same as above; present but disabled. Now on alongside AnimeTosho.
+
+---
+
+## 2.7.0 (2026-06-12)
+
+> **Version jump note — 2.6.x → 2.7.0**
+>
+> The 2.6.x series was entirely infrastructure and template additions (formatters, lazy-load, device templates, ESE fixes). 2.7.0 is the first release to change *how streams are evaluated* — IQR Tukey fence PSEs replace the previous `min×0.80 / max×1.20` approach with proper statistical outlier fencing. That's a meaningful behavioural change in the core filtering logic, warranting a minor version bump rather than another 2.6.x patch.
+
+### Added
+- **Core Nexus 4K Hybrid** (`Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json`) — New template combining TorBox debrid and NZBGeek Usenet as dual sources. Full 4K (2160p primary, 1080p fallback), no HDR restrictions, full lossless audio (TrueHD, Atmos, DTS:X, DTS-HD MA, FLAC), 7.1 channel support, AV1 allowed. Uses full IQR PSE stack (12 PSEs, "HYBRID" labels). Dynamic addon fetching fires when fewer than 15 cached 4K results exist. For users running both debrid and Usenet who want a single optimised template covering both.
+- **Standalone PSE reference files** — `Expressions/apex-iqr-pses.md` (human-readable) and `Expressions/apex-iqr-pses.json` (machine-readable export of all 12 Apex IQR PSEs). Community can inspect, adapt, or import the expressions independently of the full template.
+
+### Changed
+- **IQR Tukey fence PSEs — Core Nexus 4K Apex (v0.3.0)** — Replaced the v0.2.0 `min×0.80 / max×1.20` bitrate gate with a full Q1−1.5×IQR / Q3+1.5×IQR Tukey fence across all 12 PSE tiers. The fence is adaptive: ≥4 ranked results uses IQR; 1–3 results falls back to min/max ×0.80/×1.20 (pool too thin for IQR to be stable); 0 results + title ≤60 days old clusters around the median; 0 results + older title passes through. Prevents a single outlier stream from corrupting the bitrate range for the entire tier.
+- **IQR Tukey fence PSEs — Core Nexus 4K Pro (v2.7.0)** — Full 12-PSE IQR stack with "PRO" labels. Same three-tier adaptive fallback as Apex.
+- **IQR Tukey fence PSEs — Core Nexus 4K Essential (v2.7.0)** — Full 12-PSE IQR stack with "ESSENTIAL" labels.
+- **IQR Tukey fence PSEs — Core Nexus Hybrid 1080p (v2.7.0)** — 1080p-scoped IQR stack (PSEs 7–12 from Apex: S-Tier Remux IQR, A-Tier WEB-DL IQR, + 4 pass-throughs) with "HYBRID" labels. Hybrid covers 1080p as its primary quality tier.
+
+---
+
 ## 2.6.4 (2026-06-10)
 
 ### Added
