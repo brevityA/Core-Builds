@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/community_banner.svg" alt="Community Builds Banner">
+  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/community_banner.svg" alt="Community Builds Banner">
 </p>
 
 # 🤝 Community Builds
@@ -12,9 +12,11 @@ A curated collection of community-contributed AIOStreams templates and formatter
 
 | Author | Build | Type | Services |
 |---|---|---|---|
-| **RB3** | [Auburn Tiger Edition](Templates/RB3/Readme.md) | Template | TorBox Pro + Real-Debrid |
-| **RB3** | [Clean v4 Formatter](Templates/RB3/Readme.md#-formatters) | Formatter | All |
+| **RB3** | [Auburn Tiger Edition](Templates/RB3/README.md) | Template | TorBox Pro + Real-Debrid |
+| **RB3** | [Clean v4 Formatter](Templates/RB3/README.md#-formatters) | Formatter | All |
 | **MightyIcyy** | [Prism — TorBox Essential 1080p](Templates/MightyIcyy/README.md) | Template | TorBox Essential |
+
+> RB3 formatters (Clean v4 and the original Auburn Tiger formatter) are available in the main [Formatters directory](../Formatters/README.md) alongside all other community and official formatters.
 
 ---
 
