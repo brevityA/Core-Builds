@@ -10,13 +10,16 @@ import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
 RAW_URL_PATTERN = re.compile(
-    r"https://raw\.githubusercontent\.com/brevityA/Core-Builds/refs/heads/main/([^\s\)\"'>]+)"
+    r"https://raw\.githubusercontent\.com/brevityA/Core-Builds/refs/heads/main/([^\s\)\"'>,`]+)"
 )
 
 
 def _collect_broken_urls():
     broken = []
     for md in REPO_ROOT.rglob("*.md"):
+        # Skip historical release notes — URLs may reference renamed files
+        if md.name.startswith("RELEASE_"):
+            continue
         try:
             text = md.read_text(encoding="utf-8", errors="ignore")
         except OSError:
