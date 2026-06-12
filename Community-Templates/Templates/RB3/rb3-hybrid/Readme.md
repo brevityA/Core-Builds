@@ -48,3 +48,7 @@ To use this template to its full potential, ensure you have the following API ke
 3. **TMDB API Key & Read Access Token** (Free)
 4. **TVDB API Key** (Free)
 5. **RPDB API Key** (Free tier supported for custom posters)
+
+---
+
+*Community template by RB3 · Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Template Directory](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/README.md)*
