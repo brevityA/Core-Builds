@@ -4,6 +4,13 @@
 
 ---
 
+## 2.7.4 (2026-06-12)
+
+### Changed
+- **📖 Chapter badge added to formatter (all 33 active templates + standalone Elite, Apex-v2, Nexus Prime formatters)** — `{stream.hasChapters}` is now displayed as a `📖` badge in the stream description line, positioned after the container tag. BluRay REMUXes with embedded chapter markers are visually distinguished from encodes and WEB-DL sources that typically lack chapters. Badge only appears when chapters are present; no output when absent.
+
+---
+
 ## 2.7.3 (2026-06-12)
 
 ### Fixed
