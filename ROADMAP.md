@@ -8,6 +8,11 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| v2.7.1 | Addon stack cleanup — Knaben moved to last P2P slot, `torbox-search` disabled (deprecated in AIOStreams v2.30.2), AnimeTosho + NekoBT enabled across all 6 anime templates; applied to all 33 active templates |
+| v2.7.0 | Core Nexus 4K Hybrid — new TorBox + NZBGeek Usenet template; full 4K, full HDR, full lossless audio |
+| v2.7.0 | IQR Tukey fence PSEs rolled out to 4K Pro, 4K Essential, and Hybrid (1080p tiers) |
+| v0.3.0 | Core Nexus 4K Apex — IQR Tukey fence PSEs (Q1−1.5×IQR / Q3+1.5×IQR); three-tier adaptive gate with thin-pool and new-release fallbacks; replaces min/max approach |
+| v0.3.0 | Standalone PSE reference files — `Expressions/apex-iqr-pses.md` + `.json` |
 | v2.6.0 | Live nSeScore display — `💎 94` replaces binary `💎 ELITE` badge in formatter |
 | v2.6.0 | Smart content-type preload — movies get quality diversity, series get resolution balance |
 | v2.6.0 | v2.6.0 version bump — all 30 active templates; triggers in-app update notification |
@@ -42,15 +47,18 @@ This is a living list of planned work, active development, and recently complete
 
 | Item | Notes |
 |---|---|
+| `size()` guards on Remux PSEs | Add file-size floor to Remux tiers in Apex/Pro/Essential — filters mislabeled fakes before they corrupt the IQR pool |
+| `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate: if SeaDex data exists → require SeaDex-matched stream in top tier; else fall through to standard sort |
 | AllDebrid template suite | Flash + Speed + Essential variants; natively supported in AIOStreams; biggest unserved community segment |
 | Samsung TV Nightly → stable | Gather community feedback; promote out of Nightly once validated on hardware |
-| Hybrid template refresh | Review Newznab config after AIOStreams v2.5+ schema changes |
 
 ---
 
 ## 📋 Planned
 
 ### Templates
+- [ ] **`pin()` top result** — Pin the #1 PSE-matched stream to position 1 regardless of sort order; clean UX improvement across all quality-gated templates
+- [ ] **Speed 4K + Flash 4K adaptive PSEs** — Two-sided min×0.80 / max×1.20 bitrate gates; lighter than full IQR but still outlier-resistant for cached-only tiers
 - [ ] **AllDebrid Flash** — Cached-only instant play for AllDebrid subscribers (`Templates/AllDebrid/Flash/`)
 - [ ] **AllDebrid Speed** — Fast cached play variant for AllDebrid (`Templates/AllDebrid/Speed/`)
 - [ ] **AllDebrid Essential** — Full-coverage AllDebrid template with quality gates (`Templates/AllDebrid/Essential/`)
@@ -77,6 +85,7 @@ This is a living list of planned work, active development, and recently complete
 | Debrid-Link template | Under research — supported in AIOStreams; smaller user base than AllDebrid |
 | Premiumize template | Under research — natively supported; European user base overlap with AllDebrid |
 | RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results; situation under review |
+| `stddev()` / `variance()` PSE variants | Exploratory — z-score style gating (mean ± 2×stddev) as alternative to IQR for large pools |
 | Per-indexer score weighting in PSEs | Exploratory — reward high-trust indexers (e.g. BTN, PTP) above general public trackers |
 | Community formatter gallery | Under consideration — dedicated `Formatters/Community/` directory with user-submitted layouts |
 
