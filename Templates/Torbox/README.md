@@ -2,7 +2,7 @@
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.
 
-> **Current version: v2.5.1** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+> **Current version: v2.6.3** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
 ---
 
@@ -279,7 +279,7 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 
 ---
 
-## 🛠️ Common to All Templates (v2.5.1)
+## 🛠️ Common to All Templates (v2.6.3)
 
 | Feature | Detail |
 |---|---|
@@ -301,8 +301,9 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 
 | Template | Author | Import |
 |---|---|---|
+| [Auburn Tiger Edition](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/auburn-tiger-rb3.json) | RB3 | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/auburn-tiger-rb3.json) |
+| [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) | RB3 | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) |
 | [Prism TorBox Essential 1080p](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) | MightyIcyy | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) |
-| [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) | RB3 | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) |
 
 > Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
 

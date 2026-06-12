@@ -152,6 +152,24 @@ Early Core Builds formatter. Similar layout to Uniform with additional SEADEX/BE
 
 ---
 
+### RB3 Clean v4
+
+Service-first layout by RB3. Three name lines — service + ⚡/⏳ cache status · bold unicode resolution (`𝟰𝗞 𝗨𝗛𝗗` · `𝟭𝟬𝟴𝟬𝗽`) · italic unicode source (`𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹` · `𝘞𝘌𝘉-𝘋𝘓`). Up to 6 structured `⁞`-separated description rows.
+
+![RB3 Clean v4 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-clean-v4-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-clean-v4-formatter.json)
+
+---
+
+### RB3 Formatter
+
+Original RB3 community formatter. Pairs with the Auburn Tiger template — orange/navy resolution badges, JBL Spatial audio detection, PREMIER release group tagging.
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-formatter.json)
+
+---
+
 ## ⚙️ How to Apply
 
 ### Using a Core Builds template
