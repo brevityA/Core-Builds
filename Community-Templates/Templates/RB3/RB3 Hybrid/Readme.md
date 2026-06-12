@@ -34,7 +34,8 @@ A premium, dual-service AIOStreams template designed to maximize stream availabi
 ### 🧩 Included Addons (Presets)
 This template comes pre-wired with a highly optimized stack of scrapers and utilities:
 * **Debrid / Torrents:** Meteor, Comet, Torrentio, Knaben, Sootio
-* **Usenet Search:** * **Searchⁿᶻᵇ:** This is Tam's preloaded Newznab addon configured specifically for the TorBox Search indexer. All you need to do is paste your TorBox API key into it!
+* **Usenet Search:**
+  * **Newznab Search:** Tam's preloaded Newznab addon configured for the TorBox Search indexer. Paste your TorBox API key to activate.
   * **STorz:** Torznab integration.
 * **Anime:** SeaDex
 * **Subtitles:** OpenSubtitles V3+

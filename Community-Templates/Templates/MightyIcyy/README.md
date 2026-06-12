@@ -56,20 +56,20 @@ Users who want a clean, no-fuss 1080p experience on TorBox Essential without tun
 ## ⚡ Quick Import
 
 ```
-https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/prism-torbox-essential-1080p.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json
 ```
 
 ---
 
-## ⚠️ Known Issues
+## 📝 Configuration Notes
 
-**`DV Only` visual tag** — `'DV Only'` is not a valid AIOStreams enum value. Valid value is `'DV'`. The exclusion may not apply correctly.
+**`DV Only` visual tag** — AIOStreams uses `'DV'` not `'DV Only'` for this enum. If you're customising the exclusion list, use the correct value.
 
-**`language()` in ESE** — `language()` is not a valid AIOStreams SEL function for stream expressions. The Russian/Ukrainian language exclusion block may not work as intended. Use `requiredLanguages` config instead.
+**Language exclusions** — `language()` is not a valid SEL function for stream expressions. To exclude languages, use the `requiredLanguages` setting in AIOStreams config instead.
 
-**Case sensitivity** — `'Bluray'` in expressions should be `'BluRay'` (AIOStreams is case-sensitive for quality enums).
+**Quality enum case** — AIOStreams is case-sensitive: use `'BluRay'` not `'Bluray'` in custom expressions.
 
-**No hard resolution filter** — `includedResolutions` is not set, so 4K streams can still appear. Only `preferredResolutions: ['1080p']` is configured which scores but does not hard-block.
+**Resolution** — `preferredResolutions: ['1080p']` scores 1080p higher but does not hard-block 4K. Set `includedResolutions` if you want a strict cap.
 
 ---
 
@@ -77,7 +77,7 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community
 
 This template is intentionally minimal — two addons, light filtering, low result cap. Good for users who want fast stream loading without a large scraper stack.
 
-For more comprehensive coverage on TorBox Essential consider **Core Nexus Essential** from the main suite.
+For more comprehensive coverage on TorBox Essential, see **Core Nexus Essential** in the main suite.
 
 ---
 

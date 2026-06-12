@@ -271,7 +271,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ## 📜 Version
 
-Current: **`v2.5.1`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
+Current: **`v2.6.3`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
 
 ---
 
