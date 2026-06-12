@@ -22,6 +22,7 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 | [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
 | [Samsung TV](#-core-nexus-samsung-tv-nightly) 🌙 | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
+| [4K Hybrid](#-core-nexus-4k-hybrid) | Pro + NZBGeek | 4K + 1080p | Dual-source: TorBox + Usenet, full 4K |
 | [Hybrid](#-core-nexus-hybrid) | Pro + NZBGeek | 1080p | Dual-source: TorBox + Usenet |
 | [4K Essential](#-core-nexus-4k-essential) | Essential | 4K + 1080p | Full 4K on Essential plan |
 | [Essential](#-core-nexus-essential) | Essential | 1080p | Standard Essential build |
@@ -52,7 +53,9 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 
 ```
 TorBox Pro?
-├── Got NZBGeek/Usenet indexer? → Hybrid
+├── Got NZBGeek/Usenet indexer?
+│   ├── Want 4K? → 4K Hybrid
+│   └── 1080p only? → Hybrid
 ├── Want 4K? → 4K Pro
 ├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
 └── 1080p only? → Stream
@@ -92,6 +95,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Stream (Fire Stick)** | TorBox Pro | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Core Nexus Samsung TV** 🌙 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
 | **Core Nexus Samsung TV 4K** 🌙 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus 4K Hybrid** | Pro + NZBGeek | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Core Nexus Hybrid** | Pro + NZBGeek | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Core Nexus 4K Essential** | Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Core Nexus Essential** | Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
@@ -206,6 +210,24 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | **Usenet** | ❌ |
 
 > 🌙 Nightly — stable for daily use, gathering community feedback before promotion to stable.
+
+---
+
+### 🔀 Core Nexus 4K Hybrid
+
+TorBox Pro + NZBGeek. Full 4K with maximum source diversity.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
+| **Version** | v1.0.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
+| **Resolution** | 2160p primary, 1080p fallback |
+| **HDR** | ✅ Full HDR — DV, HDR10+, HDR10 |
+| **Usenet** | ✅ NZBGeek API key required |
+| **PSEs** | IQR Tukey fence adaptive bitrate filtering |
+
+> ⚠️ After import go to **Add-ons → Newznab** and enter your NZBGeek API key.
 
 ---
 
