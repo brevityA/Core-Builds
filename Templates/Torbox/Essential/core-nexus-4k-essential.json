@@ -2248,21 +2248,6 @@
         ]
       },
       {
-        "type": "knaben",
-        "instanceId": "tam-knaben",
-        "enabled": true,
-        "options": {
-          "name": "Knaben",
-          "timeout": 3000,
-          "mediaTypes": [],
-          "useMultipleInstances": false
-        },
-        "category": "Debrid",
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "torrent-galaxy",
         "enabled": true,
         "options": {
@@ -2282,6 +2267,21 @@
           "name": "EZTV"
         },
         "instanceId": "2dc445aa-2c65-40f9-a229-2d4f791b9a59",
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "knaben",
+        "instanceId": "tam-knaben",
+        "enabled": true,
+        "options": {
+          "name": "Knaben",
+          "timeout": 3000,
+          "mediaTypes": [],
+          "useMultipleInstances": false
+        },
+        "category": "Debrid",
         "resources": [
           "stream"
         ]

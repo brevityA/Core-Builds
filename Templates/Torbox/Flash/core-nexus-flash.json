@@ -145,18 +145,6 @@
         ]
       },
       {
-        "type": "knaben",
-        "enabled": true,
-        "options": {
-          "timeout": 3000,
-          "name": "Knaben"
-        },
-        "instanceId": "12f95428-f862-4cc3-a782-9b3aa42f1f6c",
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "torrent-galaxy",
         "enabled": false,
         "options": {
@@ -164,6 +152,18 @@
           "name": "Torrent Galaxy"
         },
         "instanceId": "67b8ee3e-0710-4ba6-8a99-301e7f87e293",
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "knaben",
+        "enabled": true,
+        "options": {
+          "timeout": 3000,
+          "name": "Knaben"
+        },
+        "instanceId": "12f95428-f862-4cc3-a782-9b3aa42f1f6c",
         "resources": [
           "stream"
         ]

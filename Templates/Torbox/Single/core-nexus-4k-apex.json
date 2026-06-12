@@ -2247,21 +2247,6 @@
         ]
       },
       {
-        "type": "knaben",
-        "instanceId": "tam-knaben",
-        "enabled": true,
-        "options": {
-          "name": "Knaben",
-          "timeout": 3000,
-          "mediaTypes": [],
-          "useMultipleInstances": false
-        },
-        "category": "Debrid",
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "torrent-galaxy",
         "enabled": true,
         "options": {
@@ -2307,6 +2292,21 @@
             "torbox"
           ]
         }
+      },
+      {
+        "type": "knaben",
+        "instanceId": "tam-knaben",
+        "enabled": true,
+        "options": {
+          "name": "Knaben",
+          "timeout": 3000,
+          "mediaTypes": [],
+          "useMultipleInstances": false
+        },
+        "category": "Debrid",
+        "resources": [
+          "stream"
+        ]
       },
       {
         "type": "opensubtitles-v3-plus",
