@@ -5,7 +5,7 @@
     "description": "A speed-optimised 4K build for TorBox Essential and EasyNews users. Lives in Templates/Torbox/Speed/EasyNews/. Library, TorBox Search, Comet, and Zilean only -- the four fastest sources delivering cached results in 2-3 seconds. Targets 2160p with Dolby Vision and HDR10+ priority, TrueHD/Atmos audio, files up to 150 GB. SeaDex best-release enforced for anime. Timeouts at 3500ms, 10 results max, 5-key sort. Requires an active TorBox Essential and EasyNews subscription.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.6.3",
+    "version": "2.7.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
