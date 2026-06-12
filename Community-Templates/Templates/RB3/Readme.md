@@ -70,7 +70,7 @@ A minimal, clean formatter with a service-first layout. Bold unicode resolution 
 | Line 5 | `📦` File size · `〽️` bitrate |
 | Line 6 | `🌱` Seeders (uncached only) · `🧩` Addon name |
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/Formatter/rb3-clean-v4-formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-clean-v4-formatter.json)
 
 **How to import:**
 
