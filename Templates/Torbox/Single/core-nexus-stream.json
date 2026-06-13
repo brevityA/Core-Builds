@@ -5,7 +5,7 @@
     "description": "A frictionless 1080p SDR build running exclusively on TorBox, with RPDB poster database integration for enhanced metadata visuals in Stremio. Targets 1080p and 720p WEB-DL and WEBRip sources. Blocks BluRay, Remux, 4K, and HDR content for reliable playback on any hardware. File range 1 GB\u201360 GB, 1080p capped at 25 GB. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No secondary debrid service required \u2014 a single TorBox subscription is sufficient. Designed for phones, tablets, budget Android TV boxes, and Fire TV Sticks.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.8",
+    "version": "2.7.9",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -354,6 +354,10 @@
       {
         "enabled": false,
         "expression": "/* DV-Only Kill \u2014 enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
+      },
+      {
+        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+        "enabled": true
       }
     ],
     "preferredStreamExpressions": [
@@ -421,6 +425,10 @@
       },
       {
         "expression": "/*0Cached*/ count(merge(cached(streams), type(streams, 'p2p','http','usenet','stremio-usenet')))==0?passthrough(streams,'title'):[]",
+        "enabled": true
+      },
+      {
+        "expression": "/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'))>0?passthrough(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'),'excluded','limit'):[]",
         "enabled": true
       }
     ],
