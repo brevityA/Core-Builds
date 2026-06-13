@@ -2144,6 +2144,24 @@
         ]
       },
       {
+        "type": "hdhub",
+        "enabled": false,
+        "instanceId": "hdhub-1",
+        "options": {
+          "name": "HdHub",
+          "timeout": 5000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ],
+          "tb_only": true
+        }
+      },
+      {
         "type": "torrent-galaxy",
         "enabled": true,
         "options": {
