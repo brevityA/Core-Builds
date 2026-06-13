@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/github/actions/workflow/status/brevityA/Core-Builds/validate.yml?style=for-the-badge&label=BUILD&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://img.shields.io/badge/RELEASE-v2.7.5-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
+    <img src="https://img.shields.io/badge/RELEASE-v2.7.6-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
   </a>
 </p>
 

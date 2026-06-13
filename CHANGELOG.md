@@ -4,6 +4,17 @@
 
 ---
 
+## 2.7.6 (2026-06-13)
+
+### Fixed
+- **Synced URL dependency removed — all 33 active templates** — Templates referenced three external URLs (`syncedPreferredStreamExpressionUrls`, `syncedIncludedStreamExpressionUrls`, `syncedExcludedRegexUrls`) pointing to `Tam-Taro/SEL-Filtering-and-Sorting`. AIOStreams enforces a URL whitelist for regex configuration fields and fetches all synced URLs on template load, causing "Forbidden URL" errors for non-whitelisted repos and transient "unexpected error" banners when GitHub CDN is slow. All three synced URL fields are now cleared. Expressions are inlined directly:
+  - **PSE v1.2.1 (4 expressions)** → `preferredStreamExpressions` — Tier 1–4 cached/uncached stream priority
+  - **ISE v1.2.3 (4 expressions)** → `includedStreamExpressions` — SeaDex routing, library passthrough, digitalRelease bypass, 0Cached fallback
+  - **File-extension kill regex** → `excludedRegexPatterns` — kills `.zip .rar .exe .nfo .torrent` etc.
+  No external URL fetches on template load. Expressions are version-pinned and self-contained.
+
+---
+
 ## 2.7.5 (2026-06-13)
 
 ### Added

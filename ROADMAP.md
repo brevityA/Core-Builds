@@ -8,6 +8,7 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| v2.7.6 | Synced URL dependency removed — PSEs, ISEs, and excluded regex inlined directly into all 33 active templates; eliminates external URL fetches and AIOStreams whitelist errors |
 | v2.7.5 | Addon timeout tuning — per-addon values replacing flat 3000ms across all 33 templates; fixes silent usenet result drops on Meteor + TorBox NZB |
 | v2.7.5 | Dedup tiebreakers explicitly configured — `torrent_seeders` + `usenet_age` (`before_addon`) added to all 33 templates; formalises AIOStreams v2.30.3 default behavior |
 | v2.7.5 | `hdhub` preset added (disabled by default) to 12 full non-Lite templates — TorBox-native P2P scraper; `resources: ['stream']`, 5000ms timeout, `tb_only: true`; enable in AIOStreams addon settings |
