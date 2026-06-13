@@ -8,19 +8,85 @@ Everything you need to set up, customise, and maintain your build.
 
 ---
 
+## What Is This?
+
+**New here? Start here.**
+
+#### What is AIOStreams?
+
+AIOStreams is a self-hosted addon that sits between Stremio (or WuPlay) and your debrid service. When you open a movie or show, Stremio asks AIOStreams for streams. AIOStreams queries multiple torrent and Usenet sources, filters and ranks everything, then hands back a clean sorted list — only the best results, ready to play.
+
+Without AIOStreams you'd be adding dozens of separate addons (Comet, Jackett, MediaFusion, etc.) and getting a chaotic unfiltered mess. AIOStreams replaces all of that with one addon and one configuration.
+
+#### What is a debrid service?
+
+A debrid service (TorBox, Real-Debrid, AllDebrid, etc.) downloads torrents to their servers and caches them. When you press play, it streams directly from their fast server to you — no seeding, no waiting, instant playback on cached content.
+
+#### What is a template?
+
+A template is a pre-built AIOStreams configuration. It controls:
+- Which sources are queried (Comet, Zilean, Library, etc.)
+- Which streams are filtered out (CAM, low bitrate, bad releases)
+- How streams are ranked (4K before 1080p, cached before uncached, etc.)
+- What the stream cards look like (formatter)
+
+**Without a template:** you install AIOStreams from scratch and spend hours configuring every filter, sort rule, addon, and expression manually — and still might get poor results.
+
+**With a Core Builds template:** paste one URL, enter your API key, done. Every setting is already tuned and tested.
+
+#### What does "importing" a template mean?
+
+It's not installing new software. It loads a pre-configured settings file into your existing AIOStreams instance. Your AIOStreams host stays the same — the template just fills in all the settings for you. You can re-import a different template any time to switch builds.
+
+---
+
+## Summary
+
+**The full setup in 3 steps:**
+
+1. **[Pick a template](#1--which-template-should-i-use)** — use the decision tree to find the right build for your debrid service and resolution
+2. **[Import it](#2--importing-a-template)** — paste the raw template URL into AIOStreams → import → save
+3. **Enter your API key** — grab it from your debrid dashboard and paste it when prompted
+
+That's it. You're watching in under 5 minutes.
+
+> 📋 **Ready to import?** Jump straight to the [Template Directory](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/README.md) for all import URLs and a quick reference table.
+
+---
+
+**Quick reference — what each section covers:**
+
+| Section | What it does |
+|---|---|
+| [1 — Which Template?](#1--which-template-should-i-use) | Decision tree to find your build |
+| [2 — Importing](#2--importing-a-template) | Step-by-step import walkthrough |
+| [3 — Other Debrid Services](#3--using-a-different-debrid-service) | Switch from TorBox to RD, AD, Premiumize, etc. |
+| [4 — Formatters](#4--formatters) | Change how stream cards look |
+| [5 — Device Profiles](#5--device-profiles) | Optimise for Samsung, LG, Firestick, Apple TV, etc. |
+| [6 — Stremio vs WuPlay](#6--stremio-vs-wuplay) | Which player to use and why |
+| [7 — Advanced Editing](#7--advanced-editing) | Manually tweak filters and sort rules |
+| [8 — Resetting](#8--resetting-your-instance) | Start fresh without breaking anything |
+| [9 — Troubleshooting](#9--troubleshooting) | Fix buffering, no streams, slow results |
+| [10 — FAQ](#10--faq) | Common questions answered quickly |
+| [11 — Search Criteria](#11--adjusting-search-criteria) | Widen or narrow what sources are queried |
+| [Regional Guide](REGIONAL_CONTENT_GUIDE.md) | Discover content by country / language |
+
+---
+
 ## Contents
 
 1. [Which Template Should I Use?](#1--which-template-should-i-use)
 2. [Importing a Template](#2--importing-a-template)
-3. [Formatters](#3--formatters)
-4. [Device Profiles](#4--device-profiles)
-5. [Stremio vs WuPlay](#5--stremio-vs-wuplay)
-6. [Advanced Editing](#6--advanced-editing)
-7. [Resetting Your Instance](#7--resetting-your-instance)
-8. [Troubleshooting](#8--troubleshooting)
-9. [FAQ](#9--faq)
-10. [Adjusting Search Criteria](#10--adjusting-search-criteria)
-11. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
+3. [Using a Different Debrid Service](#3--using-a-different-debrid-service)
+4. [Formatters](#4--formatters)
+5. [Device Profiles](#5--device-profiles)
+6. [Stremio vs WuPlay](#6--stremio-vs-wuplay)
+7. [Advanced Editing](#7--advanced-editing)
+8. [Resetting Your Instance](#8--resetting-your-instance)
+9. [Troubleshooting](#9--troubleshooting)
+10. [FAQ](#10--faq)
+11. [Adjusting Search Criteria](#11--adjusting-search-criteria)
+12. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
 
 
 ---
@@ -324,92 +390,129 @@ See [DEVICE_PROFILES.md](DEVICE_PROFILES.md) for full setup.
 
 ---
 
-## 3 — Formatters
-Custom visual layouts that control how streams appear in your list. Swap between styles instantly without touching any template settings.
+## 3 — Using a Different Debrid Service
+
+Core Builds templates are optimised for TorBox but work with any debrid service that AIOStreams supports. Switching is done entirely through the Services panel — no template changes required.
 
 ---
 
-#### Available Formatters
+#### Supported Services
+
+| Service | Type | Notes |
+|---|---|---|
+| **TorBox** | Debrid + Usenet | Default in all templates. Pro plan unlocks Usenet. |
+| **Real-Debrid** | Debrid | Large cache. May 2026 server-side filter affects some WEB-DL files. |
+| **AllDebrid** | Debrid | Good cache coverage. API key from alldebrid.com. |
+| **Premiumize** | Debrid | Strong NZB/Usenet support. Good for Hybrid template users. |
+| **DebridLink** | Debrid | EU-based. Solid cache. |
+| **EasyDebrid** | Debrid | Lightweight option. |
+| **PikPak** | Debrid | Mobile-first. Works with AIOStreams. |
+| **Seedr** | Debrid | Torrent-only. No Usenet. |
+| **Offcloud** | Debrid | Multi-source. |
+| **Put.io** | Cloud storage + debrid | Useful for personal libraries. |
+| **EasyNews** | Usenet | Usenet-only. Used in Speed EasyNews template. |
+| **Debrider** | Debrid | Community debrid option. |
+
+---
+
+#### How to Switch Services
+
+1. Open your **AIOStreams dashboard**
+2. Go to the **Services** section
+3. **Toggle off TorBox** (or leave it on if you want both)
+4. **Toggle on your preferred service**
+5. Enter your **API key** for the new service
+6. Click **Save**
+
+That's it. No re-import needed — the template filters and sort rules work the same regardless of which debrid service is active.
+
+---
+
+#### Where to Find Your API Key
+
+| Service | API Key Location |
+|---|---|
+| TorBox | [torbox.app/settings](https://torbox.app/settings) → API |
+| Real-Debrid | [real-debrid.com/apitoken](https://real-debrid.com/apitoken) |
+| AllDebrid | [alldebrid.com/apikeys](https://alldebrid.com/apikeys) |
+| Premiumize | [premiumize.me/account](https://www.premiumize.me/account) → API |
+| DebridLink | [debrid-link.com/webapp/apikey](https://debrid-link.com/webapp/apikey) |
+| EasyNews | Your EasyNews username and password |
+| EasyDebrid | [easydebrid.com](https://easydebrid.com) → Account |
+| PikPak | App → Profile → Developer Settings |
+
+---
+
+#### Running Multiple Services at Once
+
+You can enable more than one service simultaneously. AIOStreams will query all enabled services and merge the results. Useful if you want TorBox as your primary with Real-Debrid as a fallback, for example.
+
+> Each service's cached streams are labelled separately in the stream card so you can see which service is serving each result.
+
+---
+
+#### Notes on Service Compatibility
+
+**Real-Debrid** — Works well with all templates. Since May 2026, RD applies a server-side filter to certain WEB-DL files which may reduce results for some content. `hideErrors: true` in all Core Builds templates suppresses the resulting error cards.
+
+**EasyNews** — Usenet-only. Best paired with a torrent debrid service. The Speed EasyNews template is specifically built around EasyNews as the sole source.
+
+**TorBox Pro vs Essential** — The template tier (Pro/Essential) refers to your TorBox plan's features (Usenet access, cacheAndPlay). If you switch to a different debrid service entirely, any template works — the Pro/Essential label is only relevant when using TorBox.
+
+**Flash templates** — Flash is cached-only (`excludeUncached: true`). This works with any debrid service, but your results depend entirely on what that service has already cached. Flash with a service that has a smaller cache will return fewer results than Flash with TorBox or RD.
+
+---
+
+#### Troubleshooting — No Streams After Switching
+
+1. Confirm the new service is **toggled on** in Services (not just API key entered)
+2. Confirm TorBox is **not the only enabled service** if you've switched away from it
+3. Try a popular mainstream title first — niche content may not be cached on every service
+4. Check your API key is correct and not expired
+5. Click **Save** again — some hosts require a second save to register service changes
+
+---
+
+---
+
+## 4 — Formatters
+
+Formatters control how stream cards look in Stremio and WuPlay. Swap between them any time — no template changes needed.
+
+---
+
+#### Which Formatter?
 
 | Formatter | Style | Best For |
 |---|---|---|
-| **Core Nexus Elite** | Colour-coded circles, INSTANT/UNCACHED badge, 4-line description | Default — bundled in all templates |
-| **Core Nexus Apex v2** ⭐ | Score number in name, bitrate-first line 2, subtitle language flags | Recommended upgrade |
-| **Core Nexus Apex** | Audio codec in name, two-tier score badge (ELITE ≥75 · QUALITY ≥50) | Detailed monitoring |
-| **Core Nexus TV** | UPPER CASE throughout, large-screen readable | TV, projector, 10-foot UI |
-| **Core Nexus Sigma** | Typographic `「 」` brackets, editorial feel | Clean aesthetic |
-| **Core Nexus Minimal** | 3-line description, ⚡/⏳ indicator, first audio only | Apple TV, small screens |
+| **Core Nexus Apex v2** ⭐ | Score · bitrate-first · subtitle flags | Most setups — recommended upgrade |
+| **Core Nexus Elite** | Colour circles · INSTANT badge · release group | Default — bundled in all templates |
+| **Core Nexus TV** | UPPER CASE · section icons | Smart TVs, projectors, 10-foot UI |
+| **Core Nexus Minimal** | 3-line compact · first audio only | Apple TV, small screens |
+| **Core Nexus Sigma** | `「 」` brackets · title-first | Clean aesthetic |
+| **Core Nexus Apex** | Audio codec in name · ELITE/QUALITY badge | Detailed audio monitoring |
 
-All formatters: [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters)
+Full previews and all raw URLs → [Formatter Guide](FORMATTER_GUIDE.md)
 
-#### ⭐ Core Nexus Apex v2 *(Recommended)*
-
-Score number in line 1 (`✦ 94` instead of a label), bitrate before visual tags in line 2, per-language subtitle flags (`📝 🇬🇧 🇫🇷`). The recommended upgrade from Elite for most setups.
-
-#### Core Nexus Elite *(Default)*
-
-Bundled in all templates. Colour-coded resolution circles (🟣 4K · 🔵 1080P · 🟢 720P), INSTANT/UNCACHED badge, PREMIER release group detection, 4-line description.
-
-#### 📺 Core Nexus TV *(Large screen)*
-
-UPPER CASE throughout — readable at TV distance. Coloured circles (🔴 4K · 🔵 1080P · 🟢 720P), ⚡/⏳ cache indicator, 🎬/🔊/🔌 section icons. Designed for projectors and smart TVs.
+Additional community formatters (Midnight Slate, Omni Diamond, Core Zenith, Core Syntax, Nexus Prime) are available in the [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) directory with preview images.
 
 ---
 
-#### Step 1 — Get the Formatter JSON
+#### How to Import
 
-Copy the raw URL for your chosen formatter and open it in your browser, or paste it directly into AIOStreams' formatter import field.
+1. Open the raw URL for your chosen formatter from the [Formatter Guide](FORMATTER_GUIDE.md) in your browser — the `.json` file downloads automatically
+2. AIOStreams dashboard → **Formatter** section → tap the **Import/Export icon** (bottom right)
+3. Select **Import from File** → choose the downloaded file → Save
 
-```
-https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json
-```
-```
-https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json
-```
-```
-https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json
-```
+> ⚠️ Open the raw GitHub URL in your browser. Do not copy-paste from the GitHub rendered file view — it adds hidden characters that break the JSON parser.
 
-> ⚠️ **Use the raw URL, not the GitHub file view.** The rendered page adds hidden characters that cause a "Failed to parse JSON" error on import.
-
----
-
-#### Step 2 — Open the Formatter Import Menu
-
-1. Open your **AIOStreams dashboard**
-2. Navigate to the **Formatter** section
-3. Tap the **Import/Export icon** in the bottom right corner (box with inward arrow)
-
----
-
-#### Step 3 — Import the File
-
-1. Select **Import from File** in the pop-up
-2. Choose the `.json` formatter file you downloaded
-3. The Name and Description fields populate automatically
-
----
-
-#### Step 4 — Save and Refresh
-
-1. Click **Save** at the bottom of the dashboard
-2. Refresh Stremio or WuPlay — the new layout applies instantly
-
----
-
-#### Tips
-
-> **Core Nexus Elite / Apex v2:** Turn **Show file name** and **Show bitrate OFF** in AIOStreams main settings. These formatters handle bitrate natively — leaving the settings on duplicates the data in the stream card.
-
-> **Export your own:** Tap the **Export** icon next to the import button to save your current formatter as a JSON file you can back up or share.
-
-> **Parse error on import:** Always use the raw GitHub URL above. Do not copy the text from the GitHub file view — the rendered page adds characters that break the JSON parser.
+**Settings note:** For Elite and Apex v2 — turn **Show file name** and **Show bitrate OFF** in AIOStreams main settings. These formatters handle both natively.
 
 ---
 
 ---
 
-## 4 — Device Profiles
+## 5 — Device Profiles
 AIOStreams cannot detect what device is making a request — every device looks identical to the server. A Shield Pro, a budget Android TV, and a phone all arrive at the same manifest URL with no identifying information. This means a single AIOStreams installation will serve the same streams to every device, regardless of whether they can play them.
 
 The solution is **two separate Stremio accounts** — one for low-end devices, one for high-end devices — each with its own AIOStreams addon installed.
@@ -431,8 +534,9 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Phones · Tablets · Budget Android TV boxes · Projectors · Older TVs*
 
 #### Recommended Templates
-- **[Core Nexus Stream](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-stream.json)** — TorBox only, RPDB poster integration
-- **[Core Nexus Dual Core 1080p](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Deprecated/Dual/core-nexus-dual-core-1080p.json)** — TorBox + Real-Debrid for maximum availability
+- **[Core Nexus Stream](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json)** — TorBox Pro · 1080p SDR · full addon stack
+- **[Core Nexus Stream (Fire Stick)](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json)** — optimised for Fire Stick and low-RAM Android devices
+- **[Core Nexus Essential](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json)** — TorBox Essential · 1080p SDR
 
 #### What these builds do
 - ✅ Targets WEB-DL and WEBRip sources
@@ -445,7 +549,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 #### Devices to sign this account into
 - Android phones and tablets
 - Budget Android TV boxes (X96, H96, MXQ, Ugoos AM6B at 1080p mode)
-- Amazon Fire TV Stick (4K stick can still benefit from the 1080p build for reliability)
+- Amazon Fire TV Stick (use the Fire Stick variant for best performance)
 - Projectors without native 4K panels
 - Older 1080p TVs
 
@@ -455,8 +559,8 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Nvidia Shield · Apple TV 4K · 4K OLED/QLED TVs · High-end Android TV*
 
 #### Recommended Templates
-- **[Core Nexus 4K Dual Core](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Deprecated/Dual/core-nexus-4k-dual-core.json)** — TorBox + Real-Debrid, maximum quality and coverage
-- **[Core Nexus 4K Pro](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox only, home theater focused
+- **[Core Nexus 4K Pro](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox Pro · 4K HDR · home theater quality
+- **[Core Nexus 4K Essential](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json)** — TorBox Essential · 4K HDR
 
 #### What these builds do
 - ✅ Targets 4K UHD sources
@@ -497,7 +601,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 Go to [stremio.com](https://www.stremio.com) and create a second account using a different email address. A free account is all you need.
 
 #### Step 2 — Install the right template on each account
-Sign into each account separately and follow the [Import Guide](./IMPORT_GUIDE.md) to install the appropriate template. Use the same debrid credentials on both accounts — your subscriptions are not account-locked.
+Sign into each account separately and follow [Section 2 — Importing a Template](#2--importing-a-template) to install the appropriate template. Use the same debrid credentials on both accounts — your subscriptions are not account-locked.
 
 #### Step 3 — Sign each device into the right account
 - Sign your **phones, tablets, and budget TVs** into the Low-End account
@@ -517,12 +621,12 @@ Stremio syncs addon installations per-account, so each device automatically gets
 
 ---
 
-*Return to the [Main README](../README.md)*
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
 
 ---
 
 
-## 5 — Stremio vs WuPlay
+## 6 — Stremio vs WuPlay
 
 Both players work with Core Builds templates, but they behave differently in ways that matter. Here's what you need to know.
 
@@ -594,7 +698,7 @@ Both players fully support AIOStreams formatters. The `name` and `description` f
 
 ---
 
-## 6 — Advanced Editing
+## 7 — Advanced Editing
 The **Core Builds** are designed to be plug-and-play. However, if you want to adjust caching rules, tweak filtering, or edit the raw template JSON, this guide covers how to do it safely.
 
 ---
@@ -738,11 +842,11 @@ Before changing anything in a working build, export or copy your current configu
 
 ---
 
-*Return to the [Main README](../README.md)*
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
 
 ---
 
-## 7 — Resetting Your Instance
+## 8 — Resetting Your Instance
 Sometimes a template import goes wrong, credentials get stuck in a broken state, or you simply want to start completely fresh. This guide covers every reset scenario from a soft config wipe to a full account deletion.
 
 ---
@@ -814,7 +918,7 @@ If Stremio still has the addon installed, you will need to uninstall it after th
 
 #### Step 4 -- Re-import your template
 
-Follow the steps in the [Import Guide](./IMPORT_GUIDE.md) to load a fresh template and enter your API keys.
+Follow the steps in [Section 2 — Importing a Template](#2--importing-a-template) to load a fresh template and enter your API keys.
 
 #### Step 5 -- Uninstall the old addon from Stremio
 
@@ -872,7 +976,7 @@ The old manifest is still installed. Uninstall it from the Stremio addon manager
 Some hosts cache the credential state. Try logging out and back in, or clearing your browser cache, then re-importing.
 
 **NZBGeek still not working after reset (Hybrid template)**
-The NZBGeek API key is not entered in the credentials modal -- it must be configured in the Addons section after loading. See the [Import Guide](./IMPORT_GUIDE.md) for the full NZBGeek setup step.
+The NZBGeek API key is not entered in the credentials modal -- it must be configured in the Addons section after loading. See [Section 2 — Importing a Template](#2--importing-a-template) for the full NZBGeek setup step.
 
 ---
 
@@ -889,164 +993,165 @@ The NZBGeek API key is not entered in the credentials modal -- it must be config
 
 ---
 
-*Return to the [Main README](../README.md) -- [Import Guide](./IMPORT_GUIDE.md) -- [Advanced Editing](./ADVANCED_EDITING.md) -- [Troubleshooting](./TROUBLESHOOTING.md)*
+*[Master Guide](#) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
 
 ---
 
-## 8 — Troubleshooting
-Quick fixes for the most common errors encountered when importing templates, saving configuration, or loading streams.
+## 9 — Troubleshooting
+
+Find your symptom below. Most issues are one of three things: an import error, no streams, or streams that don't play.
 
 ---
 
-
-#### Clicking a Stream Opens the GitHub Page Instead of Playing
-
-**What it means:** AIOStreams returned an informational entry rather than a real stream. Stremio requires all entries to be clickable, so clicking the info card opens the AIOStreams GitHub page. This is expected behaviour -- the info entry is not a real stream.
-
-**Why it happens:** No real streams were found. The most common cause is that no debrid services are enabled.
-
-**Fix:**
-1. Open your AIOStreams dashboard
-2. Go to the **Services** section
-3. Enable at least one debrid service and enter its API key
-4. Click **Save** and reinstall the manifest in Stremio
-
-If services are already enabled and you still see the GitHub card, check that your API keys are valid and not expired.
-
----
-
-#### "Failed to fetch manifest for MediaFusion RD: 400 - Bad Request"
-
-**What it means:** AIOStreams tried to contact the MediaFusion server to build your personalised manifest but the request failed. This is almost always a transient server-side hiccup, not a problem with your configuration.
-
-**Fix:** Click **Save** again. The second attempt succeeds in the vast majority of cases.
-
-If it fails repeatedly:
-1. Wait 60 seconds and try again -- MediaFusion may be momentarily overloaded
-2. Check the [AIOStreams host status page](https://docs.aiostreams.viren070.me/getting-started/public-instances/) to confirm your instance is healthy
-3. Check MediaFusion's own status -- ElfHosted's public instance occasionally undergoes maintenance
-
-> This error does not mean your Real-Debrid credentials are wrong. It is a connectivity issue between AIOStreams and the MediaFusion server, not a credential validation failure.
-
----
+### Import Errors
 
 #### "Failed to import template: HTTP error! status: 404"
 
-**What it means:** The raw GitHub URL you pasted does not point to an existing file.
+The URL doesn't point to a real file.
 
-**Common causes:**
-- The file has not been uploaded to the repository yet
-- The folder path in the URL is wrong (folder names are case-sensitive on GitHub)
-- The filename in the URL does not match the actual filename on GitHub
+- Confirm the URL uses `brevityA/Core-Builds` (not `Branding-Brevity`)
+- Folder names are case-sensitive: `Torbox` (lowercase b), `Single`, `Essential`, `Flash`, `Speed`, `Hybrid`, `Anime`
+- Nightly templates are on a separate branch — confirm the URL matches
 
-**Fix:** Double-check the URL matches the exact path in the repo. Raw URLs follow this pattern:
+Raw URL format:
 ```
-https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/Torbox/Deprecated/Dual/core-nexus-4k-dual-core.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/Torbox/Single/core-nexus-stream.json
 ```
-
-Note: `Torbox` has a lowercase `b`. `Dual`, `Single`, and `Hybrid` are capitalised. Filenames are all lowercase with hyphens.
 
 ---
 
 #### "Failed to import template: Invalid template"
 
-**What it means:** The JSON file is malformed -- a missing comma, extra bracket, or other syntax error is preventing AIOStreams from parsing it.
+The JSON file has a syntax error — missing comma, bracket, or quote.
 
-**Fix:**
 1. Download the template file
-2. Paste its contents into [jsonlint.com](https://jsonlint.com)
-3. Fix the highlighted error
-4. Re-import the corrected file
+2. Paste into [jsonlint.com](https://jsonlint.com)
+3. Fix the highlighted error and re-import
 
 ---
 
-#### "invalid attribute 'WEB-DL'" (Stream Expression Error)
+#### "Every group must have at least one addon"
 
-**What it means:** A stream expression is using the `keyword()` function incorrectly. The `keyword()` function requires an attribute as its second argument (`filename`, `folderName`, `indexer`, `releaseGroup`, or `all`) before listing the keywords.
-
-**Wrong:**
-```
-keyword(streams, 'WEB-DL', 'WEBRip', 'AMZN')
-```
-**Correct:**
-```
-keyword(streams, 'all', 'WEB-DL', 'WEBRip', 'AMZN')
-```
-
-**Fix:** Update to v2.1.2 of the Core Builds templates -- this was corrected in that release.
+You're importing an outdated template version. Re-import using the current raw URL from the [template list](#1--which-template-should-i-use).
 
 ---
 
-#### Stremio Showing a Wall of Red Errors After Saving
+#### "Template has 1 regex pattern that is not trusted"
 
-**What it means:** The streams are loading but the files have been flagged by your debrid service. This is most commonly the Real-Debrid "infringing file" issue where RD has blocked certain WEB-DL and streaming platform rips.
-
-**Fix:** The Core Builds dual-service templates include an RD Infringing File Scrub that filters these results before they reach Stremio. If you are seeing red errors, confirm you are on v2.1.2 or later and that the MediaFusion and Real-Debrid presets are correctly configured.
+Safe to ignore — click **Import Anyway**. The pattern still applies; it just hasn't been whitelisted by the instance admin. No functionality is lost.
 
 ---
 
-#### Stremio Showing Old Streams After Saving New Config
+#### "Failed to parse JSON" when importing a formatter
 
-**What it means:** The Stremio addon is still using a cached version of the old manifest. Your configuration has changed but Stremio has not picked up the new URL.
-
-**Fix:**
-1. Open Stremio -- go to **Addons**
-2. Find the AIOStreams entry and tap **Uninstall**
-3. Open your AIOStreams dashboard and copy the manifest URL
-4. Paste it into Stremio's search bar or tap **Install** directly from the dashboard
-
-A full app restart after reinstalling speeds up the refresh.
+You copied from the GitHub rendered file view, which adds hidden characters that break JSON parsing. Always import from the **raw URL** — links are in [Section 4 — Formatters](#4--formatters). Do not copy-paste from the GitHub page.
 
 ---
 
+### No Streams
 
-#### AnimeTosho or TorrentGalaxy Returning Errors or No Results
-
-**AnimeTosho** is an anime-specific torrent source. It returns 0 results for movies and TV shows that are not anime -- this is expected and not a bug. It has been moved to opt-in as of v2.1.4.
-
-**TorrentGalaxy** is periodically blocked by Cloudflare, causing it to return an HTML page instead of JSON results. This produces a `Partial Success` or `Unexpected token '<'` error in the scrape summary. It has been moved to opt-in as of v2.1.4.
-
-Both addons are now **disabled by default**. Enable them in your addon settings only if you specifically want them -- AnimeTosho for anime content, TorrentGalaxy when it is not being blocked.
-
----
-
-#### No Streams Appearing At All
+#### Zero results after importing
 
 Work through these in order:
 
-1. **Are your debrid services enabled?** Open your AIOStreams dashboard and confirm at least one service has credentials entered and is toggled on.
-2. **Is the manifest installed in Stremio?** Go to Addons and confirm AIOStreams appears in the installed list.
-3. **Is your AIOStreams host online?** Check [docs.aiostreams.viren070.me](https://docs.aiostreams.viren070.me/getting-started/public-instances/).
-4. **Is the content available in your debrid library?** Try a well-known popular title first to rule out a content availability issue.
-5. **Are your ESEs filtering everything?** Open the AIOStreams dashboard, go to **Statistics**, and check the filter breakdown to see how many streams are being excluded at each stage.
+1. **Services enabled?** Dashboard → Services tab — at least one debrid service must be toggled on with a valid API key entered. TorBox is pre-toggled on but still needs your API key.
+2. **Manifest installed in Stremio?** Go to Addons and confirm AIOStreams appears in the installed list. If not, copy the manifest URL from your dashboard and install it.
+3. **AIOStreams host online?** Check [docs.aiostreams.viren070.me](https://docs.aiostreams.viren070.me/getting-started/public-instances/) for instance status.
+4. **ESEs filtering everything?** Dashboard → Statistics → check the filter breakdown to see how many streams are being excluded at each stage. An aggressive ESE can silently block all results.
+5. **Test with a popular title first** — try a major recent film before assuming the template is broken. Obscure or older content may genuinely have no cached streams.
 
 ---
 
-#### NZBGeek Returns No Results (Hybrid Template)
+#### Zero results after re-importing
 
-**What it means:** The NZBGeek API key placeholder has not been replaced with your actual key.
-
-**Fix:**
-1. Open your AIOStreams dashboard
-2. Go to **Addons** -- find **NZBGeek**
-3. Tap the settings icon and replace the placeholder text with your API key from [nzbgeek.info](https://nzbgeek.info) under Account -- API Key
-4. Tap **Save**
+Re-importing resets service toggles to template defaults. Your API keys are preserved but services are switched off. Re-enable your services in the Services tab after every import.
 
 ---
 
-#### Still Stuck?
+#### Very few results for older TV or niche content
 
-- See the [Reset Guide](./RESET_GUIDE.md) if your configuration is in a broken state and you need to start over
-- See the [Advanced Editing Guide](./ADVANCED_EDITING.md) for JSON editing and validation tips
-- Open an issue on the [GitHub repository](https://github.com/brevityA/Core-Builds/issues) with a description of the error
+Normal. Classic TV episodes under 512 MB and older encodes often have unrecognised audio or encode tags that trip filters. For niche or foreign content with low seeders, consider a template with EasyNews or Usenet coverage — the [Speed+](#1--which-template-should-i-use) and [Hybrid](#1--which-template-should-i-use) tiers add Usenet indexing on top of torrent sources.
 
 ---
 
-*Return to the [Main README](../README.md)*
+#### NZBGeek returns nothing (Hybrid template only)
+
+The NZBGeek API key placeholder hasn't been replaced.
+
+1. Dashboard → Addons → find **NZBGeek** → tap the settings icon
+2. Replace the placeholder with your API key from [nzbgeek.info](https://nzbgeek.info) → Account → API Key
+3. Save
 
 ---
 
-## 9 — FAQ
+### Streams Appear But Don't Play
+
+#### Clicking a stream opens the AIOStreams GitHub page
+
+AIOStreams returned an informational entry instead of a real stream. Stremio requires all entries to be clickable, so it links to the GitHub page. The info card is not a stream — it means no real streams were found. See [Zero results after importing](#zero-results-after-importing) above.
+
+---
+
+#### Old streams still showing after saving a new config
+
+Stremio cached the old manifest URL.
+
+1. Stremio → Addons → find AIOStreams → **Uninstall**
+2. Copy the manifest URL from your AIOStreams dashboard
+3. Paste it into Stremio's search bar or click **Install** from the dashboard
+4. Restart Stremio
+
+---
+
+#### Streams buffering or stuttering
+
+- **Uncached streams buffer** — look for `[cached]` in the stream card. Uncached content downloads in real-time.
+- **REMUX files are large** — 50–80 GB files need a fast connection to your debrid server. Try a HEVC or WEB-DL stream instead.
+- **Check debrid server status** — TorBox and other services have occasional slowdowns that affect all users.
+
+---
+
+### Specific Errors
+
+#### "Failed to fetch manifest for MediaFusion RD: 400 - Bad Request"
+
+A transient connection issue between AIOStreams and the MediaFusion server — not a credential problem.
+
+**Fix:** Click **Save** again. This resolves it in almost all cases. If it repeats, wait 60 seconds and try once more.
+
+---
+
+#### Wall of red errors in Stremio after saving
+
+Most commonly the Real-Debrid infringing file issue — RD has blocked certain WEB-DL and streaming platform rips. Core Builds templates include a scrub that filters these before they reach Stremio. If you still see red errors, confirm you're on the latest template version and that your MediaFusion and RD presets are correctly configured.
+
+---
+
+#### AnimeTosho or TorrentGalaxy errors
+
+Both are disabled by default:
+
+- **AnimeTosho** — anime-only source. Returns 0 results for regular TV and movies. Enable only for anime content.
+- **TorrentGalaxy** — periodically Cloudflare-blocked, which produces `Partial Success` or `Unexpected token '<'` errors. Enable only when it's not being blocked.
+
+---
+
+#### "invalid attribute 'WEB-DL'" expression error
+
+You're on an old template using a deprecated `keyword()` syntax. Re-import the latest version of your template.
+
+---
+
+### Still Stuck?
+
+- [Section 8 — Resetting Your Instance](#8--resetting-your-instance) — start fresh without losing your API keys
+- [Section 7 — Advanced Editing](#7--advanced-editing) — JSON editing and expression validation
+- [GitHub Issues](https://github.com/brevityA/Core-Builds/issues) — open an issue with a description of the error
+- [GitHub Discussions](https://github.com/brevityA/Core-Builds/discussions) — ask the community
+
+---
+
+## 10 — FAQ
 
 Quick answers to the most common questions. If yours isn't here, open a [Discussion](https://github.com/brevityA/Core-Builds/discussions).
 
@@ -1069,6 +1174,10 @@ You copied the formatter text from the GitHub file view. GitHub adds hidden char
 #### Services reset to off after re-importing
 
 Expected behaviour. Re-importing a template resets service toggles to the template defaults. Your API keys are preserved — just re-enable your services in the Services tab after each import.
+
+#### The BUILD badge shows "Repo or workflow not found"
+
+The GitHub Actions validation workflow hasn't run yet. It triggers automatically on the next commit that changes a JSON file — push any template update and the badge resolves itself.
 
 ---
 
@@ -1144,7 +1253,7 @@ WuPlay and Stremio handle stream types differently. YouTube/external streams are
 
 ---
 
-## 10 — Adjusting Search Criteria
+## 11 — Adjusting Search Criteria
 
 This guide explains how to tune the matching settings in any Core Builds template to fix zero-result issues, handle edge cases, and get the best stream coverage for your content.
 
@@ -1396,4 +1505,4 @@ All three default to their strict forms in a fresh AIOStreams install. All three
 
 ---
 
-*[Return to README](../README.md) · [CHANGELOG](../CHANGELOG.md)*
+*[GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/) · [CHANGELOG](../CHANGELOG.md)*

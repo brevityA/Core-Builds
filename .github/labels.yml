@@ -79,6 +79,12 @@
 - name: template-speed
   color: "f9d0c4"
   description: Speed / instant-cache templates
+- name: template-flash
+  color: "fbca04"
+  description: Flash (cached-only instant-play) templates
+- name: nightly
+  color: "e4e669"
+  description: Nightly / pre-release builds
 - name: personal
   color: "6f42c1"
   description: Personal / custom builds
@@ -107,6 +113,17 @@
 - name: regex
   color: "bfd4f2"
   description: Regex pattern update (Vidhin05 sync)
+
+# ── Content & testing ─────────────────────────────────────────────────────────
+- name: content
+  color: "ff6314"
+  description: Reddit / social media content (posts calendar)
+- name: tests
+  color: "0e8a16"
+  description: Test suite changes
+- name: assets
+  color: "bfd4f2"
+  description: Banners, icons, images
 
 # ── Discussions ───────────────────────────────────────────────────────────────
 - name: showcase

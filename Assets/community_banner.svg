@@ -1,25 +1,56 @@
-<svg width="1280" height="400" viewBox="0 0 1280 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&amp;family=Inter:wght@400&amp;display=swap');
-    .title { font: 900 80px 'Montserrat', sans-serif; fill: #FFFFFF; letter-spacing: -2px; }
-    .subtitle { font: 400 24px 'Inter', sans-serif; fill: #757575; letter-spacing: 12px; text-transform: uppercase; }
-  </style>
-  
-  <rect width="1280" height="400" fill="#212121"/>
-  
-  <g stroke="#757575" stroke-opacity="0.2" stroke-width="1">
-    <path d="M0 100H1280M0 200H1280M0 300H1280"/>
-    <path d="M100 0V400M200 0V400M300 0V400M1100 0V400M1200 0V400"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="1200" height="280">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080f0b"/>
+      <stop offset="50%" stop-color="#0d1710"/>
+      <stop offset="100%" stop-color="#080f0b"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3fb950" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#3fb950" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#3fb950" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#3fb950" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
 
-  <text x="100" y="200" class="title">COMMUNITY BUILDS</text>
-  <text x="105" y="245" class="subtitle">SANDBOX &amp; TEMPLATES</text>
+  <rect width="1200" height="280" fill="url(#bg)" rx="12"/>
+  <rect x="1" y="1" width="1198" height="278" rx="11" fill="none" stroke="#3fb950" stroke-width="1" stroke-opacity="0.15"/>
 
-  <rect x="100" y="270" width="750" height="4" fill="#FFFFFF"/>
+  <rect x="40" y="139" width="1120" height="1" fill="url(#line)" opacity="0.3"/>
 
-  <g transform="translate(1080, 150)">
-    <path d="M40 0L75 60H5L40 0Z" fill="#757575"/>
-    <rect x="25" y="75" width="30" height="30" fill="#FFFFFF"/>
-    <path d="M40 165L5 105H75L40 165Z" fill="#757575"/>
-  </g>
+  <!-- Main title -->
+  <text x="600" y="105"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="72" font-weight="800" letter-spacing="-1"
+    fill="#ffffff" text-anchor="middle">COMMUNITY BUILDS</text>
+
+  <!-- By line -->
+  <text x="600" y="148"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="18" font-weight="400" letter-spacing="12"
+    fill="#3fb950" text-anchor="middle" opacity="0.9">BY BREVITY</text>
+
+  <rect x="400" y="158" width="400" height="2" rx="1" fill="#3fb950" opacity="0.4"/>
+
+  <!-- Subtitle -->
+  <text x="600" y="208"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="18" font-weight="300" letter-spacing="4"
+    fill="#7ee89a" text-anchor="middle" opacity="0.7">FORMATTERS  ·  TEMPLATES  ·  CONTRIBUTIONS</text>
+
+  <!-- Tag line -->
+  <text x="600" y="244"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="14" font-weight="300" letter-spacing="3"
+    fill="#888fa0" text-anchor="middle" opacity="0.6">OPEN TO ALL AIOSTREAMS USERS</text>
+
+  <!-- Corner decorations -->
+  <rect x="40" y="20" width="30" height="4" rx="2" fill="#3fb950" opacity="0.4"/>
+  <rect x="40" y="20" width="4" height="30" rx="2" fill="#3fb950" opacity="0.4"/>
+  <rect x="1130" y="20" width="30" height="4" rx="2" fill="#3fb950" opacity="0.4"/>
+  <rect x="1156" y="20" width="4" height="30" rx="2" fill="#3fb950" opacity="0.4"/>
+  <rect x="40" y="256" width="30" height="4" rx="2" fill="#3fb950" opacity="0.4"/>
+  <rect x="40" y="230" width="4" height="30" rx="2" fill="#3fb950" opacity="0.4"/>
+  <rect x="1130" y="256" width="30" height="4" rx="2" fill="#3fb950" opacity="0.4"/>
+  <rect x="1156" y="230" width="4" height="30" rx="2" fill="#3fb950" opacity="0.4"/>
 </svg>

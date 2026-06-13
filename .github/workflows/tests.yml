@@ -11,6 +11,8 @@ on:
       - 'tests/**'
       - 'Templates/**/*.json'
       - 'Formatters/**/*.json'
+      - '**/*.md'
+      - 'Assets/**'
 
 jobs:
   test:

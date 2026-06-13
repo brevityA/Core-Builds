@@ -1,24 +1,33 @@
 <p align="center">
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/banner.svg" alt="Core Builds Banner" width="100%"/>
+    <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/banner_square.svg" alt="Core Builds Banner" width="400"/>
   </a>
 </p>
 
 <p align="center">
   <a href="https://github.com/brevityA/Core-Builds/actions/workflows/validate.yml">
-    <img src="https://img.shields.io/badge/BUILD-passing-2ea44f?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
+    <img src="https://img.shields.io/github/actions/workflow/status/brevityA/Core-Builds/validate.yml?style=for-the-badge&label=BUILD&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://img.shields.io/badge/RELEASE-v2.5.1-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
+    <img src="https://img.shields.io/badge/RELEASE-v2.7.5-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
   </a>
+</p>
+
+<p align="center">
   <a href="https://github.com/brevityA/Core-Builds/stargazers">
     <img src="https://img.shields.io/github/stars/brevityA/Core-Builds?style=for-the-badge&label=STARS&logo=github&logoColor=white&labelColor=1a1f27&color=00d4ff&cacheSeconds=86400" alt="Stars"/>
   </a>
   <a href="https://ko-fi.com/branding_brevity">
     <img src="https://img.shields.io/badge/DONATE-Ko--fi-ff5f5f?style=for-the-badge&logo=ko-fi&logoColor=white&labelColor=1a1f27" alt="Donate"/>
   </a>
+</p>
+
+<p align="center">
   <a href="https://github.com/brevityA/Core-Builds/discussions">
     <img src="https://img.shields.io/badge/DISCUSSIONS-Community-7c3aed?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Discussions"/>
+  </a>
+  <a href="https://www.reddit.com/r/CoreBuilds/">
+    <img src="https://img.shields.io/badge/REDDIT-r%2FCoreBuilds-FF4500?style=for-the-badge&logo=reddit&logoColor=white&labelColor=1a1f27" alt="Reddit"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/blob/main/ROADMAP.md">
     <img src="https://img.shields.io/badge/ROADMAP-What's_Next-0ea5e9?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Roadmap"/>
@@ -53,8 +62,12 @@
 
 ```
 TorBox Pro?
-├── Got NZBGeek/Usenet indexer? → Hybrid
+├── Got NZBGeek/Usenet indexer?
+│   ├── Want 4K? → 4K Hybrid
+│   └── 1080p only? → Hybrid
+├── Want best quality filtering? → 4K Apex (IQR adaptive PSEs)
 ├── Want 4K? → 4K Pro
+├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -67,7 +80,8 @@ EasyNews only (no TorBox)? → Speed EasyNews
 
 Watching anime?
 ├── Want 4K HDR? → Anime 4K
-└── Standard 1080p? → Anime
+├── Standard 1080p? → Anime
+└── Prefer English dubs? → Anime Dub
 
 Getting too few results / low-overhead host? → use the Lite variant of any template above
 ```
@@ -78,11 +92,14 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 
 | Template | Res | Import URL |
 |---|---|---|
+| **Core Nexus 4K Apex** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Core Nexus 4K Pro** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Core Nexus Stream** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
+| **Core Nexus Stream (Fire Stick)** | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
+| **Core Nexus 4K Hybrid** ⚠️ | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Core Nexus Hybrid** ⚠️ | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 
-> ⚠️ Hybrid requires a **NZBGeek API key** — enter it in Add-ons → Newznab after loading.
+> ⚠️ Hybrid templates require a **NZBGeek API key** — enter it in Add-ons → Newznab after loading.
 
 ---
 
@@ -126,8 +143,22 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 |---|---|---|
 | **Core Nexus Anime** | 1080p + 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` |
 | **Core Nexus Anime 4K** | 4K + 1080p fallback | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json` |
+| **Core Nexus Anime Dub** | 1080p · Dubbed-first | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json` |
 
-SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japanese + English + Dual Audio
+SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japanese + English + Dual Audio · Anime Dub prioritises English dubs and Dual Audio
+
+---
+
+### 🌙 Nightly / Device
+
+> Pre-release templates targeting specific hardware or use-cases. These are stable enough for daily use but ship under the Nightly label while they gather community feedback. Not included in stable release archives.
+
+| Template | Device / Use-case | Res | Import URL |
+|---|---|---|---|
+| **Core Nexus Samsung TV** 🌙 | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
+| **Core Nexus Samsung TV 4K** 🌙 | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+
+> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. 1080p variant based on Core Nexus Stream · 4K variant based on Core Nexus 4K Pro · TorBox Pro · Essential plan.
 
 ---
 
@@ -139,6 +170,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 |---|---|---|
 | **4K Pro Lite** | 4K Pro | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro-lite.json` |
 | **Stream Lite** | Stream | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json` |
+| **Stream Fire Stick Lite** | Stream (Fire Stick) | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json` |
 | **Hybrid Lite** ⚠️ | Hybrid | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |
 | **4K Essential Lite** | 4K Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json` |
 | **Essential Lite** | Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json` |
@@ -149,6 +181,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | **Speed Lite** | Speed | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json` |
 | **Anime Lite** | Anime | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json` |
 | **Anime 4K Lite** | Anime 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json` |
+| **Anime Dub Lite** | Anime Dub | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json` |
 
 ---
 
@@ -157,7 +190,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | Template | Author | Plan | Import |
 |---|---|---|---|
 | [Prism TorBox Essential 1080p](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) | MightyIcyy | Essential | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) |
-| [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) | RB3 | TorBox Pro + RD | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/RB3%20Hybrid/RB3%20TorBox%20Pro%20%2B%20RD%20Hybrid.json) · [README](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/RB3%20Hybrid/Readme.md) |
+| [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) | RB3 | TorBox Pro + RD | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) · [README](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/README.md) |
 
 > Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
 
@@ -169,10 +202,10 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Formatter | Bundled In | Download |
 |---|---|---|
-| **Core Nexus Elite** | All 14 Core Nexus templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json) |
-| **Core Nexus TV** | Stand-alone · all templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json) |
-| **Core Syntax V3** | Core Cipher personal build | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_V3.json) |
-| **Core Nexus Uniform** | Legacy — replaced by Core Nexus Elite | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Uniform%20Formatter.json) |
+| **Core Nexus Elite** | All 14 Core Nexus templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json) |
+| **Core Nexus TV** | Stand-alone · all templates | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json) |
+| **Core Syntax V3** | Core Cipher personal build | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-v3.json) |
+| **Core Nexus Uniform** | Legacy — replaced by Core Nexus Elite | [↓ Download](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-uniform-formatter.json) |
 
 > 📁 [**Browse all formatters →**](https://github.com/brevityA/Core-Builds/tree/main/Formatters)
 
@@ -199,7 +232,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 28 active templates — 16 standard + 12 Lite variants |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 31 active templates — 16 standard + 14 Lite variants + 1 Nightly |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
@@ -243,7 +276,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ## 📜 Version
 
-Current: **`v2.5.1`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
+Current: **`v2.7.5`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
 
 ---
 

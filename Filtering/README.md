@@ -10,16 +10,16 @@ A standalone quality scoring and filtering layer for AIOStreams — built around
 
 | File | Synced URL Field | Purpose |
 |---|---|---|
-| `Core-Builds-ESEs.json` | `syncedExcludedStreamExpressionUrls` | Blocks CAM, YouTube, AI Enhanced, 3D, season packs |
-| `Core-Builds-PSEs.json` | `syncedPreferredStreamExpressionUrls` | Scores streams into quality tiers (S → D) |
-| `Core-Builds-ISEs.json` | `syncedIncludedStreamExpressionUrls` | Prioritises cached + English streams |
+| `core-builds-eses.json` | `syncedExcludedStreamExpressionUrls` | Blocks CAM, YouTube, AI Enhanced, 3D, season packs |
+| `core-builds-pses.json` | `syncedPreferredStreamExpressionUrls` | Scores streams into quality tiers (S → D) |
+| `core-builds-ises.json` | `syncedIncludedStreamExpressionUrls` | Prioritises cached + English streams |
 
 ### Raw URLs
 
 ```
-https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/Core-Builds-ESEs.json
-https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/Core-Builds-PSEs.json
-https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/Core-Builds-ISEs.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/core-builds-eses.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/core-builds-pses.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/core-builds-ises.json
 ```
 
 ---

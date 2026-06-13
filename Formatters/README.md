@@ -1,6 +1,33 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/formatters_banner.svg" alt="Core Formatters Banner" width="100%"/>
+</p>
+
 # Core Formatters
 
 Custom stream display layouts for AIOStreams. Formatters control how every stream appears in Stremio and WuPlay — the title line, the metadata rows, cache status, audio tags, release group, and everything else you see when picking a stream.
+
+---
+
+## ⚡ Quick Comparison
+
+| Formatter | Style | Name lines | Desc lines | Key feature |
+|---|---|---|---|---|
+| **Core Nexus Apex v2** ⭐ | Emoji circles | 1 | 4 | Score number, bitrate-first, per-language subtitle flags |
+| **Core Nexus Apex** | Emoji circles | 1 | 4 | Audio codec in name, two-tier score badge |
+| **Core Nexus Elite** | Emoji circles | 1 | 4 | 🟣/🔵/🟢/⚫ resolution circles · INSTANT/UNCACHED · PREMIER |
+| **Core Nexus Sigma** | `「 」` brackets | 1 | 4 | Title-first name line, smallcaps, premium editorial feel |
+| **Core Nexus Minimal** | ⚡/⏳ indicator | 1 | 3 | 3-line description, first audio codec only, TV/AppleTV |
+| **Core Nexus TV** | UPPER CASE | 1 | 4 | 10-foot UI, 🔴/🔵/🟢 circles, projector & smart TV |
+| **Core Nexus Uniform** | Emoji circles | 1 | 4 | Legacy — replaced by Elite |
+| **Core Syntax** | `「 」` brackets | 1 | 4 | Original formatter, ✦/✧ cache indicator, ◈ ELITE badge |
+| **Core Syntax V3** | `「 」` brackets | 1 | 4 | JBL Spatial, ★ Premium badge, IMAX/Hybrid/edition flags |
+| **Omni Diamond v2.2.0** | Dense emoji | 2 | 4 | Two-line name, maximum metadata density |
+| **Core Zenith Diamond** | 🔹/🔸 dots | 1 | 4 | Dot separators, encode + audio + PREMIER in name |
+| **Core Zenith Auburn Tiger** | 🔸 orange dots | 1 | 4 | Warm orange/navy, 🐅 release prefix, Auburn Tiger pairs |
+| **Midnight Slate** | ASCII `◼⬤▶◆` | 1 | 4 | No emoji — for clients that render emoji poorly |
+| **Nexus Prime** | Emoji | 1 | 4 | SeaDex/BEST detection, 📅 age format, subtitle listing |
+| **RB3 Clean v4** | Bold unicode | 3 | 6 | Three-line name with bold resolution + italic quality source |
+| **RB3 Formatter** | 🔸/🔹 smallcaps | 1 | 4 | Auburn Tiger paired, JBL Spatial, PREMIER tagging |
 
 ---
 
@@ -12,7 +39,7 @@ Apex v2 is the recommended upgrade over Apex v1. Three targeted changes: score n
 
 ![Core Nexus Apex v2 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20v2%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json)
 
 ---
 
@@ -22,7 +49,7 @@ Evolution of Elite. Adds audio codec to the name line, two-tier score badge (�
 
 ![Core Nexus Apex Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Apex%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-formatter.json)
 
 ---
 
@@ -32,7 +59,7 @@ High-contrast. Colour-coded resolution circles (🟣4K · 🔵1080P · 🟢720P 
 
 ![Core Nexus Elite Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Elite%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json)
 
 ---
 
@@ -42,7 +69,7 @@ Typographic `「 」` / `『 』` bracket system. Title-first name line, smallca
 
 ![Core Nexus Sigma Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Sigma%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-sigma-formatter.json)
 
 ---
 
@@ -52,7 +79,7 @@ Typographic `「 」` / `『 』` bracket system. Title-first name line, smallca
 
 ![Core Nexus Minimal Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Minimal%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-minimal-formatter.json)
 
 ---
 
@@ -62,7 +89,7 @@ Large-screen / 10-foot UI optimised. UPPER CASE throughout (no smallcaps — rea
 
 ![Core Nexus TV Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20TV%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json)
 
 ---
 
@@ -72,7 +99,7 @@ Legacy — replaced by Core Nexus Elite.
 
 ![Core Nexus Uniform Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/uniform-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Nexus%20Uniform%20Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-uniform-formatter.json)
 
 ---
 
@@ -84,7 +111,7 @@ Original Core Builds formatter. `✦`/`✧` cache indicator in name, `「 」` b
 
 ![Core Syntax Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_Formatter.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-formatter.json)
 
 ---
 
@@ -94,7 +121,7 @@ Personal build variant. JBL Spatial audio detection (`🔊 JBL Sᴘᴀᴛɪᴀʟ
 
 ![Core Syntax V3 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Syntax_V3.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-v3.json)
 
 ---
 
@@ -104,7 +131,7 @@ Maximum metadata density. Two-line name (visual tags on second line), edition/ne
 
 ![Omni Diamond Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/omni-diamond-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Omni_Diamond_v2.2.0.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/omni-diamond-v2.2.0.json)
 
 ---
 
@@ -114,7 +141,7 @@ Maximum metadata density. Two-line name (visual tags on second line), edition/ne
 
 ![Core Zenith Diamond Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/zenith-diamond-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core_Zenith_Diamond.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-diamond.json)
 
 ---
 
@@ -124,7 +151,7 @@ Auburn Tiger edition of Core Zenith Diamond. Orange `🟠` 4K badge, `🐅` rele
 
 ![Core Zenith Auburn Tiger Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/auburn-tiger-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Core%20Zenith%20Auburn%20Tiger%20Edition.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-auburn-tiger-edition.json)
 
 ---
 
@@ -134,7 +161,7 @@ Dark minimal. `◼`/`⬤`/`▶`/`◆` ASCII symbols instead of emoji. Clean typo
 
 ![Midnight Slate Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/midnight-slate-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Midnight%20Slate.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/midnight-slate.json)
 
 ---
 
@@ -144,7 +171,27 @@ Early Core Builds formatter. Similar layout to Uniform with additional SEADEX/BE
 
 ![Nexus Prime Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg)
 
-[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/Nexus%20Prime%20Formatter%20.json)
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json)
+
+---
+
+### RB3 Clean v4
+
+Service-first layout by RB3. Three name lines — service + ⚡/⏳ cache status · bold unicode resolution (`𝟰𝗞 𝗨𝗛𝗗` · `𝟭𝟬𝟴𝟬𝗽`) · italic unicode source (`𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹` · `𝘞𝘌𝘉-𝘋𝘓`). Up to 6 structured `⁞`-separated description rows.
+
+![RB3 Clean v4 Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-clean-v4-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-clean-v4-formatter.json)
+
+---
+
+### RB3 Formatter
+
+Original RB3 community formatter. Pairs with the Auburn Tiger template — orange/navy resolution badges, JBL Spatial audio detection, PREMIER release group tagging.
+
+![RB3 Formatter Preview](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg)
+
+[↓ Download JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-formatter.json)
 
 ---
 
@@ -153,11 +200,10 @@ Early Core Builds formatter. Similar layout to Uniform with additional SEADEX/BE
 ### Using a Core Builds template
 Core Nexus Elite is already bundled in all templates — nothing to do on a fresh import. To switch formatter after importing:
 
-1. Download the formatter JSON from the table above
-2. Open your AIOStreams host → **Settings** → **Formatter** → **Custom**
-3. Paste the `name` value into the **Name Template** field
-4. Paste the `description` value into the **Description Template** field
-5. Save and reinstall the addon in Stremio
+1. Click the **↓ Download JSON** link for your chosen formatter above — the file downloads automatically
+2. Open your AIOStreams dashboard → **Formatter** section → tap the **Import/Export icon** (bottom right corner)
+3. Select **Import from File** → choose the downloaded `.json` file
+4. Click **Save** — streams update immediately, no Stremio reinstall needed
 
 > **Note:** If you updated from an older template and the formatter fields are blank, do a fresh import rather than an update. AIOStreams preserves the formatter as a user setting during updates.
 
@@ -222,4 +268,4 @@ All Core Builds formatters use the `tamtaro` formatter type. The override key mu
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · Filtering powered by [Tamtaro SEL Setup](https://git.tamtaro.de)*
+*[Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/) · Filtering powered by [Tamtaro SEL Setup](https://git.tamtaro.de)*

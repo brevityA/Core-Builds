@@ -1,6 +1,153 @@
+# Changelog
+
 ## [Unreleased]
 
-*Nothing pending.*
+---
+
+## 2.7.5 (2026-06-13)
+
+### Added
+- **`hdhub` preset added (12 full non-Lite templates)** — HdHub is a TorBox-native P2P scraper (`tb_only: true`) that serves movie, series, and anime streams. Added as a disabled-by-default preset with `resources: ["stream"]` (no catalog bleed), 5000ms timeout, and positioned before `torrent-galaxy` in the P2P block. Templates: 4K Pro, Stream, Stream FireStick, 4K Apex, 4K Apex TorBox, 4K Essential, Essential, Anime, Anime 4K, Anime Dub, 4K Hybrid, Hybrid. Enable via AIOStreams addon settings if your TorBox plan supports it.
+
+### Fixed
+- **Addon timeout tuning — all 33 active templates** — Every preset was set to a flat 3000ms regardless of addon characteristics. AIOStreams runs all addons in parallel and silently drops any addon that exceeds its timeout, so an undersized timeout causes silent result loss. Key fixes:
+  - `meteor` + `newznab` (TorBox NZB): 3000ms → **10,000ms** — multi-hop usenet sources and Tor-routed paginated queries routinely take 3–8s; 3000ms was dropping nearly all usenet results silently
+  - `comet`: 3000ms → **7,000ms** — cold scrapes for new/obscure titles regularly exceed 3s
+  - `knaben`: 3000ms → **6,000ms** — public multi-indexer with variable load
+  - `torrent-galaxy` + `eztv` + `animeTosho` + `nekobt`: 3000ms → **5,000ms** — public scrapers need headroom
+  - `zilean` + `torbox-search` + `seadex` + subtitle addons: 3000ms → **4,000ms** — minor headroom increase; these are fast by nature
+  - `library` + `stremthruTorz`: unchanged at 3000ms — direct API calls, consistently fast
+
+### Changed
+- **Dedup tiebreakers explicitly configured (all 33 templates)** — AIOStreams v2.30.3 introduced configurable deduplication tiebreakers. Added `torrent_seeders` (`before_addon`) and `usenet_age` (`before_addon`) to the `deduplicator` block in every active template. When two streams tie on all other criteria, P2P results now prefer higher seeder counts and usenet results prefer newer posts — before falling back to addon order. Behaviour matches the v2.30.3 defaults but is now explicit and documented in each template.
+
+---
+
+## 2.7.4 (2026-06-12)
+
+### Changed
+- **📖 Chapter badge added to formatter (all 33 active templates + standalone Elite, Apex-v2, Nexus Prime formatters)** — `{stream.hasChapters}` is now displayed as a `📖` badge in the stream description line, positioned after the container tag. BluRay REMUXes with embedded chapter markers are visually distinguished from encodes and WEB-DL sources that typically lack chapters. Badge only appears when chapters are present; no output when absent.
+
+---
+
+## 2.7.3 (2026-06-12)
+
+### Fixed
+- **`zilean` and `meteor` missing `resources: ['stream']` (all 33 active templates)** — Without this field, both scrapers were also exposing catalog and meta entries in Stremio. Users would see "scraper information" results and clicking them would navigate to the scraper's homepage (AIOStreams GitHub for Meteor) instead of playing a stream. This is a regression from the v2.4.5 fix that added `resources: ['stream']` to `comet` and `mediafusion` but missed `zilean` and `meteor`. Now applied to all active templates.
+
+---
+
+## 2.7.1 (2026-06-12)
+
+### Fixed
+- **Knaben moved to last P2P position (all 33 templates)** — Knaben is a slow, debrid-only indexer. Sitting mid-stack it blocked faster, broader indexers from being evaluated first. Now positioned last in the P2P block, immediately before subtitle addons, in every active template.
+- **`torbox-search` disabled (all 33 templates)** — Renamed in AIOStreams v2.30.2; the old addon identifier no longer resolves. Was still present and enabled in 4 templates (`core-nexus-4k-hybrid`, `core-nexus-hybrid`, `core-nexus-hybrid-lite`, `core-nexus-4k-apex-torbox`), creating a broken addon slot. Disabled across the board.
+- **AnimeTosho enabled in all 6 anime templates** — Was in the preset list but switched off. AnimeTosho is a primary high-quality anime indexer and should have been on from the start.
+- **NekoBT enabled in all 6 anime templates** — Same as above; present but disabled. Now on alongside AnimeTosho.
+
+---
+
+## 2.7.0 (2026-06-12)
+
+> **Version jump note — 2.6.x → 2.7.0**
+>
+> The 2.6.x series was entirely infrastructure and template additions (formatters, lazy-load, device templates, ESE fixes). 2.7.0 is the first release to change *how streams are evaluated* — IQR Tukey fence PSEs replace the previous `min×0.80 / max×1.20` approach with proper statistical outlier fencing. That's a meaningful behavioural change in the core filtering logic, warranting a minor version bump rather than another 2.6.x patch.
+
+### Added
+- **Core Nexus 4K Hybrid** (`Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json`) — New template combining TorBox debrid and NZBGeek Usenet as dual sources. Full 4K (2160p primary, 1080p fallback), no HDR restrictions, full lossless audio (TrueHD, Atmos, DTS:X, DTS-HD MA, FLAC), 7.1 channel support, AV1 allowed. Uses full IQR PSE stack (12 PSEs, "HYBRID" labels). Dynamic addon fetching fires when fewer than 15 cached 4K results exist. For users running both debrid and Usenet who want a single optimised template covering both.
+- **Standalone PSE reference files** — `Expressions/apex-iqr-pses.md` (human-readable) and `Expressions/apex-iqr-pses.json` (machine-readable export of all 12 Apex IQR PSEs). Community can inspect, adapt, or import the expressions independently of the full template.
+
+### Changed
+- **IQR Tukey fence PSEs — Core Nexus 4K Apex (v0.3.0)** — Replaced the v0.2.0 `min×0.80 / max×1.20` bitrate gate with a full Q1−1.5×IQR / Q3+1.5×IQR Tukey fence across all 12 PSE tiers. The fence is adaptive: ≥4 ranked results uses IQR; 1–3 results falls back to min/max ×0.80/×1.20 (pool too thin for IQR to be stable); 0 results + title ≤60 days old clusters around the median; 0 results + older title passes through. Prevents a single outlier stream from corrupting the bitrate range for the entire tier.
+- **IQR Tukey fence PSEs — Core Nexus 4K Pro (v2.7.0)** — Full 12-PSE IQR stack with "PRO" labels. Same three-tier adaptive fallback as Apex.
+- **IQR Tukey fence PSEs — Core Nexus 4K Essential (v2.7.0)** — Full 12-PSE IQR stack with "ESSENTIAL" labels.
+- **IQR Tukey fence PSEs — Core Nexus Hybrid 1080p (v2.7.0)** — 1080p-scoped IQR stack (PSEs 7–12 from Apex: S-Tier Remux IQR, A-Tier WEB-DL IQR, + 4 pass-throughs) with "HYBRID" labels. Hybrid covers 1080p as its primary quality tier.
+
+---
+
+## 2.6.4 (2026-06-10)
+
+### Added
+- **Core Nexus Samsung TV 4K** (`Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json`) — 4K variant of the Samsung TV Nightly template. DV-Only Kill ESE enabled by default — excludes DV-only streams; HDR10+, HDR10, HLG, SDR, and DV+HDR10 dual-layer content passes through normally. 2160p primary with 1080p fallback. HDR10+ visual priority (Samsung TVs support HDR10+). Full lossless audio enabled (TrueHD, Atmos, DTS:X, DTS-HD MA, FLAC) with 7.1 channel support. 4K PSE tier stack matching Core Nexus 4K Pro.
+
+---
+
+## 2.6.3 (2026-06-10)
+
+### Changed
+- **Updated addon logo** — new glowing gradient diamond icon. Hex outline retains cyan gradient with ambient glow; diamond transitions cyan → purple → orange. Version bump ensures AIOStreams update notification fires for all users on v2.6.2.
+
+---
+
+## 2.6.2 (2026-06-10)
+
+### Added
+- **Lazy-load groups on all 28 non-Flash templates** — Comet and Meteor are now placed in a `groups` block so they are only queried when the addons ahead of them (Library, Zilean, StremThruTorz) return fewer cached results than the threshold. If your Library already has enough cached results, Comet and Meteor are **never called** — eliminating their fetch time entirely for well-stocked libraries.
+  - **Single / Essential / Hybrid / Anime**: condition `count(cached(previousStreams)) < 3` — skip heavy scrapers when 3+ cached results already exist
+  - **Speed**: condition `count(cached(previousStreams)) < 2` — tighter threshold matching Speed's fast-fetch design intent
+  - **Flash skipped** — DAF already fires at 2 cached results; groups would be redundant
+
+---
+
+## 2.6.1 (2026-06-10)
+
+### Fixed
+- **DV-Only Kill ESE — invalid `negate()` call corrected (all 31 templates)** — The ESE introduced in v2.6.0 contained a broken single-argument `negate()` call: `visualTag(negate(merge(...)), 'DV')`. AIOStreams requires two stream arrays — `negate(A, B)` returns items in A not in B. Corrected to `negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), ...))` — DV streams that don't also carry a fallback HDR layer. Without this fix, AIOStreams rejected the ESE on import with *"Both arguments of the negate function must be arrays of streams"*, causing the v2.6.0 update to fail to load on some instances.
+- **Season pack threshold lowered: 10 → 3 (all 30 active templates)** — Streams were showing the correct episode label but playing wrong content (season packs served as individual episode matches). The previous threshold of 10 was unreachable in Flash templates which cap at 10 total results, meaning Flash users always saw season packs regardless of available individual streams.
+- **Kill Ambiguous Packs ESE added to all 30 active templates** — This ESE (`count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []`) has been in the Core Builds shared filter file since v2.2.3 but was never applied to any template. Fires at just 1 individual episode stream and kills full season packs while preserving multi-episode ranges (e.g. S01E01-E03). Works alongside the threshold ESE for two-layer pack filtering.
+- **Library timeout: 2000ms → 3000ms (Anime × 6, Essential × 2)** — Library is always the highest-quality source (user's own cached files) and should be given the same time budget as other critical addons. 2000ms was too short and could cause Library to time out before returning results on slower instances.
+
+### Changed
+- **StremThruTorz enabled in Flash × 2 and Speed × 10** — Was present in the preset list but switched off. StremThruTorz is the source that populates `stream.uSubtitleEmojis` — without it, the subtitle language flag badges shipped in v2.6.0 (🇬🇧 🇫🇷 🇩🇪) show nothing.
+- **StremThruTorz added to Anime × 6** — Was missing from the preset list entirely. Anime users particularly benefit from accurate subtitle language data given the sub vs dub use case.
+- **EZTV enabled in Speed × 10** — Was present but switched off. EZTV is a TV-specific indexer that improves series coverage on Speed builds. Not enabled in Flash (cached-only build — P2P indexer adds query overhead with no benefit when the dynamic stop fires at 2 cached results).
+
+### Infrastructure
+- **v2.6.1 version bump — update notification fix** — All fixes since the v2.6.0 bump landed at the same version number. Users who imported at v2.6.0 would never receive an update notification because `compareVersions(remote, local)` returned 0. This bump ensures the AIOStreams in-app update check fires correctly for all users currently on v2.6.0.
+
+---
+
+## 2.6.0 (2026-06-10)
+
+### Added
+- **Core Nexus Samsung TV** (`Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json`) — Device-specific Nightly template for Samsung smart TVs and other hardware without Dolby Vision support. Derived from Core Nexus Stream with the DV-Only Kill ESE enabled by default. DV-only streams are excluded; HDR10, HDR10+, HLG, and SDR content passes through normally.
+- **DV-Only Kill ESE** — New optional ESE added to all 30 active templates (`enabled: false` by default). When toggled on, excludes streams where Dolby Vision is the only format tag with no HDR10/HDR10+/HLG/SDR fallback layer — the DV streams that cause black screens on non-DV devices. DV+HDR10 streams (dual-layer) are unaffected. `enabled: true` is pre-set in the Samsung TV Nightly template.
+- **Core Nexus Stream (Fire Stick)** (`Templates/Torbox/Single/core-nexus-stream-firestick.json`) — 1080p SDR template tuned for Amazon Fire Stick and other low-RAM streaming devices. Reduced dynamic stop thresholds and lighter ESE stack optimised for the hardware constraints.
+- **Core Nexus Stream (Fire Stick) Lite** (`Templates/Torbox/Single/core-nexus-stream-firestick-lite.json`) — Lite variant of the Fire Stick template with further relaxed filtering (12 ESEs).
+- **Regional Content Guide** (`Guides/REGIONAL_CONTENT_GUIDE.md`) — How to surface non-English and regional-language content in Stremio's Discover section. Covers CINEMETA limitations, language-specific catalog addons, and TorBox passthrough behaviour.
+
+### Changed
+- **Formatter subtitle display — language flags replace generic badge** — All 30 active templates + standalone Core Nexus Elite formatter: `{stream.subbed::istrue["  📝 SUB"||""]}` replaced with `{stream.uSubtitleEmojis::exists["  📝 {stream.uSubtitleEmojis::join(' ')}"||""]}`. Users now see per-language subtitle emojis (🇬🇧 🇫🇷 🇩🇪 etc.) filtered to their configured language set, instead of a generic SUB badge. The badge only appears when accurate subtitle metadata is available (StremThru, nekoBT, Torznab sources with subtitle info).
+- **Flash — uncached streams for new releases** — Both Flash templates: `excludeUncached` set to `false`; the hard-kill string ESE replaced with a conditional `(daysSinceRelease > 3 or daysSinceRelease < 0) ? uncached(streams) : []`. Uncached streams now surface for content released within the last 3 days; everything older and all unknown-release-date content continues to show cached-only. Maintains the instant-play character for back-catalogue while not blocking day-one drops.
+- **Balanced preload selector** — All 28 non-Flash templates: `preloadStreams.selector` changed from `slice(cached(streams), 0, 3)` to `slice(perGroup(cached(streams), 'resolution', 2), 0, 4)`. Preloaded streams now include at most 2 per resolution group (4K, 1080p, etc.) rather than the top 3 by sort order, which previously could return 3× 4K with zero 1080p representation.
+- **CHANGELOG format** — Added `# Changelog` h1 heading required by the AIOStreams `changelogUrl` parser.
+
+### Fixed
+- **Episode sort — global sort criteria updated in 7 templates** — Flash and Speed-family templates (Speed, Speed Lite, Speed+, Speed+ Lite, Speed EasyNews, Speed EasyNews Lite, Flash) had a stale 10-key global sort starting with `resolution`. Updated to the canonical 14-key sort used by all other templates: `cached → streamExpressionMatched → streamExpressionScore → resolution → quality → audio → language → …`. Ensures streams that matched any active expression rank above plain quality-sorted results — addresses the community-reported issue where wrong-season episode streams were outranking correct matches for niche shows.
+- **Anime Non-Anime Query Guard** — Anime templates were sending non-anime queries to anime-specific scrapers (AnimeTosho, NyaaFH, BakaBT). Added `and not isAnime` guard to the Anime ISE so these sources are only queried for anime content. Previously, non-anime searches returned consistent 0-result noise from these indexers.
+- **Flash template `addonName` mismatch** — Flash templates had incorrect `addonName` values inherited from a previous template generation pass. Corrected to match the addon configuration so stream source labels display accurately.
+- **Formatter INSTANT/UNCACHED display on debrid streams** — AIOStreams does not evaluate nested `{expr}` conditionals inside the truthy branch of an outer conditional. The baked-in formatter description contained `{service.shortName::exists["{service.cached::istrue['🚀 INSTANT  '||'⚠️ UNCACHED  ']}"||""]}` which caused the inner expression to render as raw template text on any TorBox, RealDebrid, or other debrid-backed stream. Replaced with the flat two-expression form `{service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}` — the form already used correctly by the Flash templates. Affects all 30 active templates (Single, 4K Pro, Essential, Flash, Speed, Anime, Hybrid — all variants). core-cipher was already correct and is unchanged.
+
+### Infrastructure
+- **GitHub Actions version pins corrected** — All workflows updated from non-existent `actions/checkout@v6` and `actions/github-script@v9` to current `@v4` and `@v7` respectively.
+- **Link checker exit code comparison fixed** — `env.lychee_exit_code != 0` changed to `!= '0'`; GitHub Actions env vars are always strings, so the integer comparison never triggered the issue-creation step.
+- **Auto-responder keywords refined** — Removed `real-debrid` and `realdebrid` from deprecated trigger keywords (the Hybrid template is an active TorBox+RD build). Auto-reply updated to mention Hybrid as the current TorBox+RD option.
+- **Flash and Nightly labeler + label definitions added** — `template-flash` and `nightly` labels added to `labels.yml` and `labeler.yml`. Previously the labeler silently failed for Flash and Nightly PRs because the label definitions did not exist.
+- **Release archive excludes Nightly** — `release.yml` updated to exclude `Templates/Torbox/Nightly/` from the release zip. Nightly builds are pre-release and should not appear in stable release archives.
+- **Bug report template updated** — All current template variants added to the "Which template" dropdown, including Flash, Flash 4K, Hybrid Lite, all Speed Lite variants, Anime 4K, Anime Lite, Anime 4K Lite, Anime Dub, and Anime Dub Lite.
+- **Welcome workflow links fixed** — `blob/refs/heads/main` corrected to `blob/main` in both guide links (were returning 404 on GitHub).
+- **Issue template config links fixed** — Corrected broken `blob/refs/heads/main` URL and updated docs link from `Branding-Brevity/Core-Builds-By-Brevity` to `brevityA/Core-Builds`.
+- **Discussion template links fixed** — FAQ and template-request discussion templates corrected to point to `brevityA/Core-Builds`.
+- **Release changelog categories** — Added `template-flash` to "New Templates & Formatters" and a new `🌙 Nightly / Pre-release` category for `nightly`-labelled PRs.
+
+### Documentation
+- **IMPORT_GUIDE rewritten** — Replaced all pre-rename template filenames with current names. Added Flash tier section (was entirely absent). Added all Lite variants table. Fixed import navigation path. Added EasyNews Speed section.
+- **WHICH_TEMPLATE rewritten** — All old template names replaced with current names. Removed deprecated Dual Core decision path. Added Flash tier, Fire Stick variant, and Lite recommendation step. Updated At-a-Glance table to cover all 16 standard templates with correct filenames.
+- **DEVICE_PROFILES updated** — Removed all deprecated template references (`core-nexus-torbox-exclusive_rpdb`, `core-nexus-4k-dual-core`, `core-nexus-dual-core-1080p`). Replaced with current template names and corrected Hybrid template path.
+- **README template count and Fire Stick entry** — Template count corrected to 30 (16 standard + 14 Lite). Core Nexus Stream (Fire Stick) added to the TorBox Pro table; Stream Fire Stick Lite added to the Lite table.
+- **Templates/Torbox/README.md** — Core Nexus Stream (Fire Stick) added to the All Templates table.
+- **FAQ stale content fixed** — Real-Debrid answer updated to reference Hybrid template and RB3 community template as current options. Dual Core "what happened" entry clarified.
+- **TROUBLESHOOTING stale content fixed** — URL example updated from deprecated Dual Core path to current Single path. RD wall-of-red section rewritten to reflect RD's May 2026 server-side filter policy rather than deprecated dual-service templates.
 
 ---
 
@@ -262,7 +409,7 @@ Applied across all 6 quality templates: 4K Pro, 4K Essential, Essential, Stream,
 
 ### Added
 - **Core Nexus Anime template** — Dedicated anime build with SeaDex + AnimeTosho + NekoBT, FLAC/AAC audio priority, SDR-first visual preference, 1080p WEB-DL focus with 4K support for newer titles. Japanese + English + Dual Audio language support. No anti-anime ESEs.
-- **Core Builds Filtering System** (`Filtering/`) — Custom ESE/PSE/ISE set hosted in-house at `Filtering/Core-Builds-ESEs.json`, `Core-Builds-PSEs.json`, `Core-Builds-ISEs.json`. No external whitelist dependency. Available as standalone synced URLs for self-hosters.
+- **Core Builds Filtering System** (`Filtering/`) — Custom ESE/PSE/ISE set hosted in-house at `Filtering/core-builds-eses.json`, `core-builds-pses.json`, `core-builds-ises.json`. No external whitelist dependency. Available as standalone synced URLs for self-hosters.
 - **Core Nexus Uniform Formatter** — Clean, emoji-coded formatter baked into all 10 templates. Resolution + service badge in title. 🚀 INSTANT / ⚠️ UNCACHED status, SE score, release group, video/audio/language/file detail rows. Replaces Tamtaro formatter reference.
 - **Torrent Galaxy addon** (`torrent-galaxy`) — Enabled on all quality templates after AIOStreams upstream fix. Adds stable secondary scraping coverage.
 - **AnimeTosho addon** (`animeTosho`) — Added to Anime template as primary anime source. Mirrors Nyaa.si + TokyoTosho. Replaces invalid `nyaa` preset.
@@ -289,7 +436,7 @@ Applied across all 6 quality templates: 4K Pro, 4K Essential, Essential, Stream,
 - **`seadex` removed from sort criteria** — Removed from non-anime template sort keys since SeaDex preset is disabled.
 
 ### Fixed
-- **`not()` → `negate()` in all season pack ESEs** — `not()` is not a valid SEL function. All season pack expressions now use `negate()` which matches confirmed-working Tamtaro patterns. Applied across all 10 templates and the `Core-Builds-ESEs.json` source file.
+- **`not()` → `negate()` in all season pack ESEs** — `not()` is not a valid SEL function. All season pack expressions now use `negate()` which matches confirmed-working Tamtaro patterns. Applied across all 10 templates and the `core-builds-eses.json` source file.
 - **`language()` removed from ISEs** — `language()` is not a valid SEL function in stream expressions. Language filtering is handled by `requiredLanguages` config. Invalid ISE removed from all templates.
 - **`or()` and `keyword()` removed from ESEs** — Both are invalid SEL functions. The Hard YouTube Kill ESE was rebuilt using only `type(streams, 'youtube', 'external')` which is confirmed valid.
 - **addonName mismatches fixed** — Speed 1080p EasyNews was identified as "Core Nexus 4K Dual Core", 1080p Essential as "Core Nexus TB Exclusive". Both corrected.

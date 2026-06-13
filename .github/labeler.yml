@@ -18,6 +18,14 @@ template-speed:
   - changed-files:
     - any-glob-to-any-file: 'Templates/Torbox/Speed/**'
 
+template-flash:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Flash/**'
+
+nightly:
+  - changed-files:
+    - any-glob-to-any-file: 'Templates/Torbox/Nightly/**'
+
 filtering:
   - changed-files:
     - any-glob-to-any-file: 'Filtering/**'
@@ -43,4 +51,24 @@ personal:
 infrastructure:
   - changed-files:
     - any-glob-to-any-file: '.github/**'
+
+content:
+  - changed-files:
+    - any-glob-to-any-file: 'posts/**'
+
+tests:
+  - changed-files:
+    - any-glob-to-any-file: 'tests/**'
+
+assets:
+  - changed-files:
+    - any-glob-to-any-file: 'Assets/**'
+
+regex:
+  - changed-files:
+    - any-glob-to-any-file: 'Regex/**'
+
+triage:
+  - changed-files:
+    - any-glob-to-any-file: '**'
 

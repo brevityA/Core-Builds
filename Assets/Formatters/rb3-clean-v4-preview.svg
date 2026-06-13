@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 400" width="520" height="400">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+      .bg      { fill: #181b24; }
+      .hdr-bg  { fill: #1e2333; }
+      .tab-bg  { fill: #252c3e; }
+      .tab-txt { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #e8eaf0; }
+      .ttl     { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; fill: #e8eaf0; }
+      .n1      { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; fill: #c5c9d6; }
+      .n2      { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; fill: #e8eaf0; }
+      .n3      { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400; fill: #c5c9d6; font-style: italic; }
+      .recent  { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; fill: #e8882a; }
+      .d1      { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 400; fill: #9aa0b0; }
+      .d2      { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 400; fill: #6e7485; }
+      .div     { stroke: #2c3040; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="520" height="400"/>
+
+  <!-- Header bar -->
+  <rect class="hdr-bg" x="0" y="0" width="520" height="36"/>
+  <text x="16" y="23" class="ttl">Streams</text>
+
+  <!-- Tab bar -->
+  <rect class="hdr-bg" x="0" y="36" width="520" height="30"/>
+  <rect class="tab-bg" x="8" y="40" width="160" height="22" rx="4"/>
+  <text x="88" y="55" class="tab-txt" text-anchor="middle">RB3Streams · TorBox Pro</text>
+  <text x="220" y="55" class="tab-txt" fill="#6e7485">Debridio · TorBox Pro</text>
+
+  <!-- Divider under tabs -->
+  <line x1="0" y1="66" x2="520" y2="66" class="div"/>
+
+  <!-- ─── Stream 1: 4K UHD cached ─── -->
+  <text x="16" y="88"  class="n1">TB ⚡</text>
+  <text x="16" y="110" class="n2">𝟰𝗞 𝗨𝗛𝗗</text>
+  <text x="16" y="128" class="n3">𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹</text>
+  <text x="16" y="145" class="recent">▶️ Recent</text>
+
+  <!-- Description 1 -->
+  <text x="16" y="162" class="d1">📁 Oppenheimer (2023)</text>
+  <text x="16" y="177" class="d2">  ⁞  🎬 DV｜HDR10+   💿 x265</text>
+  <text x="16" y="192" class="d2">  ⁞  🔊 7.1   🎧 TrueHD Atmos</text>
+  <text x="16" y="207" class="d2">  ⁞  📦 58.4 GB   〽️ 45.2 Mbps   🧩 TorBox</text>
+
+  <!-- Divider -->
+  <line x1="0" y1="220" x2="520" y2="220" class="div"/>
+
+  <!-- ─── Stream 2: 1080p uncached ─── -->
+  <text x="16" y="242" class="n1">TB      ⏳</text>
+  <text x="16" y="264" class="n2">𝟭𝟬𝟴𝟬𝗽</text>
+  <text x="16" y="282" class="n3">𝘞𝘌𝘉-𝘋𝘓</text>
+
+  <!-- Description 2 -->
+  <text x="16" y="306" class="d1">📁 The Dark Knight (2008)</text>
+  <text x="16" y="321" class="d2">  ⁞  🎬 HDR10   💿 x264</text>
+  <text x="16" y="336" class="d2">  ⁞  🔊 5.1   🎧 DD+</text>
+  <text x="16" y="351" class="d2">  ⁞  📦 8.2 GB   〽️ 12.4 Mbps   🌱 89   🧩 TorBox</text>
+
+  <!-- Divider -->
+  <line x1="0" y1="364" x2="520" y2="364" class="div"/>
+
+  <!-- Footer -->
+  <rect class="hdr-bg" x="0" y="364" width="520" height="36"/>
+  <text x="260" y="386" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#3d4456" text-anchor="middle" letter-spacing="0.06em">CORE BUILDS BY BREVITY · github.com/brevityA/Core-Builds</text>
+</svg>

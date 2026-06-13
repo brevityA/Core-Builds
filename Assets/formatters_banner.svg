@@ -1,66 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 250" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="1200" height="280">
   <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@800&amp;display=swap');
-      
-      .primary-logo {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 800;
-        font-size: 54px;
-        fill: #ffffff;
-        text-anchor: middle;
-        letter-spacing: 2px;
-      }
-      
-      .subtext {
-        font-family: 'Inter', sans-serif;
-        font-weight: 400;
-        font-size: 20px;
-        fill: #a3b3cc;
-        text-anchor: middle;
-        letter-spacing: 1px;
-      }
-
-      .author {
-        font-family: 'Inter', sans-serif;
-        font-weight: 600;
-        font-size: 14px;
-        fill: #6e7a8f;
-        text-anchor: middle;
-        letter-spacing: 3px;
-      }
-    </style>
-
-    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0d1117" />
-      <stop offset="100%" stop-color="#161b22" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0a06"/>
+      <stop offset="50%" stop-color="#140e08"/>
+      <stop offset="100%" stop-color="#0f0a06"/>
     </linearGradient>
-
-    <linearGradient id="zenith-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00f2fe" />
-      <stop offset="100%" stop-color="#4facfe" />
-    </linearGradient>
-
-    <linearGradient id="tiger-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff7e5f" />
-      <stop offset="100%" stop-color="#ff4b2b" />
+    <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f0883e" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#f0883e" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#f0883e" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#f0883e" stop-opacity="0"/>
     </linearGradient>
   </defs>
 
-  <rect width="1000" height="250" fill="url(#bg-grad)" rx="12" ry="12"/>
+  <rect width="1200" height="280" fill="url(#bg)" rx="12"/>
+  <rect x="1" y="1" width="1198" height="278" rx="11" fill="none" stroke="#f0883e" stroke-width="1" stroke-opacity="0.15"/>
 
-  <g transform="translate(150, 125)">
-    <polygon points="0,-50 35,0 0,50 -35,0" fill="url(#zenith-grad)" opacity="0.9"/>
-    <polygon points="0,-75 55,0 0,75 -55,0" fill="none" stroke="url(#zenith-grad)" stroke-width="4" opacity="0.3"/>
-  </g>
+  <rect x="40" y="139" width="1120" height="1" fill="url(#line)" opacity="0.3"/>
 
-  <g transform="translate(850, 125)">
-    <path d="M-20,-50 L10,-50 L-10,50 L-40,50 Z" fill="url(#tiger-grad)" opacity="0.9"/>
-    <path d="M15,-50 L45,-50 L25,50 L-5,50 Z" fill="url(#tiger-grad)" opacity="0.4"/>
-  </g>
+  <text x="600" y="105"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="72" font-weight="800" letter-spacing="-1"
+    fill="#ffffff" text-anchor="middle">CORE FORMATTERS</text>
 
-  <text x="500" y="115" class="primary-logo">CORE FORMATTERS</text>
-  <text x="500" y="155" class="subtext">CUSTOM UI LAYOUTS FOR AIOSTREAMS</text>
-  
-  <text x="500" y="210" class="author">BUILT BY BREVITY</text>
+  <text x="600" y="148"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="18" font-weight="400" letter-spacing="12"
+    fill="#f0883e" text-anchor="middle" opacity="0.9">BY BREVITY</text>
+
+  <rect x="400" y="158" width="400" height="2" rx="1" fill="#f0883e" opacity="0.4"/>
+
+  <text x="600" y="208"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="18" font-weight="300" letter-spacing="4"
+    fill="#ffc09e" text-anchor="middle" opacity="0.7">STREAM DISPLAY LAYOUTS FOR AIOSTREAMS</text>
+
+  <text x="600" y="244"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="14" font-weight="300" letter-spacing="3"
+    fill="#888fa0" text-anchor="middle" opacity="0.6">14 FORMATTERS  ·  TAMTARO COMPATIBLE  ·  COMMUNITY INCLUDED</text>
+
+  <rect x="40" y="20" width="30" height="4" rx="2" fill="#f0883e" opacity="0.4"/>
+  <rect x="40" y="20" width="4" height="30" rx="2" fill="#f0883e" opacity="0.4"/>
+  <rect x="1130" y="20" width="30" height="4" rx="2" fill="#f0883e" opacity="0.4"/>
+  <rect x="1156" y="20" width="4" height="30" rx="2" fill="#f0883e" opacity="0.4"/>
+  <rect x="40" y="256" width="30" height="4" rx="2" fill="#f0883e" opacity="0.4"/>
+  <rect x="40" y="230" width="4" height="30" rx="2" fill="#f0883e" opacity="0.4"/>
+  <rect x="1130" y="256" width="30" height="4" rx="2" fill="#f0883e" opacity="0.4"/>
+  <rect x="1156" y="230" width="4" height="30" rx="2" fill="#f0883e" opacity="0.4"/>
 </svg>

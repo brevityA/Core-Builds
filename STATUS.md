@@ -13,12 +13,12 @@ Live status for all known public AIOStreams instances. Checked every 30 minutes 
 |---|---|---|
 | **ElfHosted** | 🟢 Online | [aiostreams.elfhosted.com](https://aiostreams.elfhosted.com/stremio/configure) |
 | **Yeb's** | 🟢 Online | [aiostreams.fortheweak.cloud](https://aiostreams.fortheweak.cloud/stremio/configure) |
-| **Midnight's** ⚠️ | 🟢 Online | [aiostreamsfortheweebsstable.midnightignite.me](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure) |
+| **Midnight's** | 🟢 Online | [aiostreamsfortheweebsstable.midnightignite.me](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure) |
 | **Kuu's** | 🟢 Online | [aiostreams.stremio.ru](https://aiostreams.stremio.ru/stremio/configure) |
 | **ATBP** | 🟢 Online | [aio.atbphosting.com](https://aio.atbphosting.com/stremio/configure) |
 | **Omni's** | 🟢 Online | [aiostreams.12312023.xyz](https://aiostreams.12312023.xyz/stremio/configure) |
 
-*Last checked: 2026-05-29 01:12 UTC*
+*Last checked: 2026-06-13 02:49 UTC*
 <!-- STATUS_STABLE_END -->
 
 ---
@@ -33,7 +33,7 @@ Live status for all known public AIOStreams instances. Checked every 30 minutes 
 | **Kuu's Nightly** | 🟢 Online | [aiostreams-nightly.stremio.ru](https://aiostreams-nightly.stremio.ru/stremio/configure) |
 | **Viren's Nightly** | 🟢 Online | [aiostreams.viren070.me](https://aiostreams.viren070.me/stremio/configure) |
 
-*Last checked: 2026-05-29 01:12 UTC*
+*Last checked: 2026-06-13 02:49 UTC*
 <!-- STATUS_NIGHTLY_END -->
 
 ---
@@ -65,7 +65,7 @@ Full self-hosting docs: [docs.aiostreams.viren070.me](https://docs.aiostreams.vi
 To enable the Core Builds Filtering System synced URLs on a self-hosted instance:
 
 ```env
-WHITELISTED_SYNCED_URLS=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-ESEs.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-PSEs.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Core-Builds-ISEs.json
+WHITELISTED_SYNCED_URLS=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-eses.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-pses.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-ises.json
 ```
 
 ---

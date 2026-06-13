@@ -1,0 +1,14 @@
+[
+  {
+    "expression": "/* CB Dub S-Tier | Dubbed + Dual Audio 1080p WEB-DL */ language(resolution(quality(streams, 'WEB-DL'), '1080p'), 'Dubbed', 'Dual Audio')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB Dub A-Tier | Dubbed + Dual Audio 1080p Any */ language(resolution(streams, '1080p'), 'Dubbed', 'Dual Audio')",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB Dub B-Tier | Eng Dub Encoder Keywords */ keyword(language(streams, 'Dubbed', 'Dual Audio', 'English'), 'filename', 'Signs and Songs', 'Signs & Songs', 'English CC', 'Eng Dub', 'Dual Audio')",
+    "enabled": true
+  }
+]

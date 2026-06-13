@@ -25,7 +25,7 @@ jobs:
             - Your **template version** (check the `metadata.version` field in your imported template)
             - Any **error messages** or screenshots
 
-            Check the [Troubleshooting Guide](https://github.com/brevityA/Core-Builds/blob/refs/heads/main/Guides/README.md#8--troubleshooting) and [FAQ](https://github.com/brevityA/Core-Builds/blob/refs/heads/main/Guides/README.md#9--faq) — your question may already be answered there.
+            Check the [Troubleshooting Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#8--troubleshooting) and [FAQ](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#9--faq) — your question may already be answered there.
           pr-message: |
             👋 Thanks for your first contribution to Core Builds by Brevity!
 

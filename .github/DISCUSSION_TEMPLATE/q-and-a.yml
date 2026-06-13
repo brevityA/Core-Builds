@@ -5,7 +5,7 @@ body:
     attributes:
       value: |
         Ask anything about Core Builds templates, formatters, filtering, or AIOStreams setup.
-        Check the [Guides](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Guides/README.md) and [FAQ](https://github.com/Branding-Brevity/Core-Builds-By-Brevity/blob/main/Guides/README.md#9--faq) first — common questions are answered there.
+        Check the [Guides](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md) and [FAQ](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#9--faq) first — common questions are answered there.
 
   - type: input
     id: template
