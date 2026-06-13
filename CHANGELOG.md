@@ -4,6 +4,19 @@
 
 ---
 
+## 2.7.5 (2026-06-13)
+
+### Fixed
+- **Addon timeout tuning — all 33 active templates** — Every preset was set to a flat 3000ms regardless of addon characteristics. AIOStreams runs all addons in parallel and silently drops any addon that exceeds its timeout, so an undersized timeout causes silent result loss. Key fixes:
+  - `meteor` + `newznab` (TorBox NZB): 3000ms → **10,000ms** — multi-hop usenet sources and Tor-routed paginated queries routinely take 3–8s; 3000ms was dropping nearly all usenet results silently
+  - `comet`: 3000ms → **7,000ms** — cold scrapes for new/obscure titles regularly exceed 3s
+  - `knaben`: 3000ms → **6,000ms** — public multi-indexer with variable load
+  - `torrent-galaxy` + `eztv` + `animeTosho` + `nekobt`: 3000ms → **5,000ms** — public scrapers need headroom
+  - `zilean` + `torbox-search` + `seadex` + subtitle addons: 3000ms → **4,000ms** — minor headroom increase; these are fast by nature
+  - `library` + `stremthruTorz`: unchanged at 3000ms — direct API calls, consistently fast
+
+---
+
 ## 2.7.4 (2026-06-12)
 
 ### Changed
