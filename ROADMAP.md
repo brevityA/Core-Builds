@@ -8,6 +8,7 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| v2.7.5 | Addon timeout tuning — per-addon values replacing flat 3000ms across all 33 templates; fixes silent usenet result drops on Meteor + TorBox NZB |
 | v2.7.4 | 📖 Chapter badge added to Elite/Apex-v2/Nexus Prime formatters and all 33 active templates — BluRay REMUXes with embedded chapters now visually distinguished |
 | v2.7.3 | `zilean` + `meteor` catalog bleed fix — `resources: ['stream']` added to both scrapers across all 33 active templates; suppresses scraper catalog entries appearing in Stremio instead of playable streams |
 | v2.7.2 | `size()` floor guards on BluRay REMUX PSEs — 15 GB floor for 4K Remux, 8 GB floor for 1080p Remux; applied to 4K Apex, 4K Pro, 4K Essential, 4K Hybrid, and 1080p Hybrid |

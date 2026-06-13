@@ -5,7 +5,7 @@
     "description": "Dubbed-first anime build. Prioritises English dubs and Dual Audio over raw Japanese sub tracks. SeaDex best releases · Nyaa-sourced · FLAC/AAC · TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.4",
+    "version": "2.7.5",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -108,7 +108,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "stream"
           ]
@@ -123,7 +123,7 @@
         "enabled": true,
         "options": {
           "name": "SeaDex",
-          "timeout": 3000,
+          "timeout": 4000,
           "mediaTypes": [
             "anime"
           ]
@@ -138,7 +138,7 @@
         "enabled": true,
         "options": {
           "name": "Meteor",
-          "timeout": 3000,
+          "timeout": 10000,
           "yourMedia": {
             "sources": [
               "torrent",
@@ -166,7 +166,7 @@
         "enabled": true,
         "options": {
           "name": "Comet",
-          "timeout": 3000,
+          "timeout": 7000,
           "resources": [
             "stream"
           ],
@@ -187,7 +187,7 @@
         "enabled": false,
         "instanceId": "2b4a42a6-f640-4906-9363-98761da35325",
         "options": {
-          "timeout": 3000,
+          "timeout": 7000,
           "name": "MediaFusion"
         },
         "resources": [
@@ -199,7 +199,7 @@
         "enabled": true,
         "instanceId": "d0ab7d2b-269b-4aa1-8696-f286186a2951",
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "Torrent Galaxy"
         },
         "resources": [
@@ -211,7 +211,7 @@
         "enabled": true,
         "options": {
           "name": "AnimeTosho",
-          "timeout": 3500,
+          "timeout": 5000,
           "mediaTypes": [
             "anime"
           ]
@@ -226,7 +226,7 @@
         "enabled": true,
         "options": {
           "name": "NekoBT",
-          "timeout": 3500,
+          "timeout": 5000,
           "mediaTypes": [
             "anime"
           ]
@@ -255,7 +255,7 @@
         "enabled": true,
         "options": {
           "name": "Knaben",
-          "timeout": 3000,
+          "timeout": 6000,
           "mediaTypes": [],
           "useMultipleInstances": false
         },
@@ -269,7 +269,7 @@
         "enabled": true,
         "options": {
           "name": "OpenSubtitles V3+",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "subtitles"
           ],
@@ -288,7 +288,7 @@
         "instanceId": "aio-sub-1",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 4000,
           "name": "AIOSubtitle",
           "languages": [
             "en"
@@ -300,7 +300,7 @@
         "enabled": false,
         "options": {
           "name": "TorBox Search",
-          "timeout": 3500,
+          "timeout": 4000,
           "sources": [
             "torrent",
             "usenet"

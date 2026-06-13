@@ -5,7 +5,7 @@
     "description": "A full-featured 1080p SDR build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache. Targets WEB-DL and WEBRip sources, blocks BluRay, Remux, 4K, and HDR for reliable playback on budget hardware. File range 1 GB-25 GB. Full addon stack including Comet, Meteor, Zilean, Knaben, and. A single TorBox Essential subscription is all that is required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.4",
+    "version": "2.7.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -2024,7 +2024,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "stream"
           ]
@@ -2039,7 +2039,7 @@
         "enabled": false,
         "options": {
           "name": "SeaDex",
-          "timeout": 3000,
+          "timeout": 4000,
           "mediaTypes": [
             "anime"
           ]
@@ -2069,7 +2069,7 @@
         "enabled": true,
         "options": {
           "name": "Meteor",
-          "timeout": 3000,
+          "timeout": 10000,
           "yourMedia": {
             "sources": [
               "torrent",
@@ -2098,7 +2098,7 @@
         "enabled": true,
         "options": {
           "name": "Comet RD",
-          "timeout": 3000,
+          "timeout": 7000,
           "resources": [
             "stream"
           ],
@@ -2118,7 +2118,7 @@
         "enabled": false,
         "instanceId": "30ab6dcc-8234-4e6f-bce4-6b781cd0066b",
         "options": {
-          "timeout": 3000,
+          "timeout": 7000,
           "name": "MediaFusion",
           "resources": [
             "stream"
@@ -2137,7 +2137,7 @@
         "type": "torrent-galaxy",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "Torrent Galaxy"
         },
         "instanceId": "e5afbfd3-6987-438b-b246-a345b4f90010",
@@ -2149,7 +2149,7 @@
         "type": "eztv",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "EZTV"
         },
         "instanceId": "a42458fd-db69-44c2-8be6-6a1319df3676",
@@ -2163,7 +2163,7 @@
         "enabled": true,
         "options": {
           "name": "Knaben",
-          "timeout": 3000,
+          "timeout": 6000,
           "mediaTypes": [],
           "useMultipleInstances": false
         },
@@ -2178,7 +2178,7 @@
         "enabled": true,
         "options": {
           "name": "OpenSubtitles V3+",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "subtitles"
           ],
@@ -2195,7 +2195,7 @@
         "instanceId": "aio-sub-1",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 4000,
           "name": "AIOSubtitle",
           "languages": [
             "en"
@@ -2208,7 +2208,7 @@
         "enabled": false,
         "options": {
           "name": "TorBox Search",
-          "timeout": 3500,
+          "timeout": 4000,
           "sources": [
             "torrent",
             "usenet"

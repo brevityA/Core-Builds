@@ -5,7 +5,7 @@
     "description": "A dedicated 4K home theater build running exclusively on TorBox. Targets 2160p with Dolby Vision, HDR10+, and HDR10 priority. Enforces 7.1 surround preference, TrueHD/Atmos/DTS:X audio chain, and AV1/HEVC encode priority. File range 5 GB–150 GB to accommodate full BluRay REMUX. SeaDex best-release enforced for anime. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No RD dependency — a single TorBox subscription is all that is required. Designed for Nvidia Shield, Apple TV 4K, and high-end OLED/QLED displays.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.4",
+    "version": "2.7.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -2143,7 +2143,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "stream"
           ]
@@ -2158,7 +2158,7 @@
         "enabled": false,
         "options": {
           "name": "SeaDex",
-          "timeout": 3000,
+          "timeout": 4000,
           "mediaTypes": [
             "anime"
           ]
@@ -2188,7 +2188,7 @@
         "enabled": true,
         "options": {
           "name": "Meteor",
-          "timeout": 3000,
+          "timeout": 10000,
           "yourMedia": {
             "sources": [
               "torrent",
@@ -2217,7 +2217,7 @@
         "enabled": true,
         "options": {
           "name": "Comet RD",
-          "timeout": 3000,
+          "timeout": 7000,
           "resources": [
             "stream"
           ],
@@ -2237,7 +2237,7 @@
         "enabled": false,
         "instanceId": "f6a38af4-a24d-43fc-8370-c10f07760c17",
         "options": {
-          "timeout": 3000,
+          "timeout": 7000,
           "name": "MediaFusion",
           "resources": [
             "stream"
@@ -2256,7 +2256,7 @@
         "type": "torrent-galaxy",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "Torrent Galaxy"
         },
         "instanceId": "0b7a37bd-6d57-4397-bdd3-28440b087da0",
@@ -2268,7 +2268,7 @@
         "type": "eztv",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "EZTV"
         },
         "instanceId": "495616cf-23f0-4dfb-96ba-104e8e5a85f0",
@@ -2284,7 +2284,7 @@
           "name": "Searchⁿᶻᵇ",
           "newznabUrl": "https://search-api.torbox.app/newznab",
           "apiPath": "/api",
-          "timeout": 3000,
+          "timeout": 10000,
           "mediaTypes": [
             "movie",
             "series",
@@ -2305,7 +2305,7 @@
         "enabled": true,
         "options": {
           "name": "Knaben",
-          "timeout": 3000,
+          "timeout": 6000,
           "mediaTypes": [],
           "useMultipleInstances": false
         },
@@ -2320,7 +2320,7 @@
         "enabled": true,
         "options": {
           "name": "OpenSubtitles V3+",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "subtitles"
           ],
@@ -2337,7 +2337,7 @@
         "instanceId": "aio-sub-1",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 4000,
           "name": "AIOSubtitle",
           "languages": [
             "en"
@@ -2350,7 +2350,7 @@
         "enabled": false,
         "options": {
           "name": "TorBox Search",
-          "timeout": 3000,
+          "timeout": 4000,
           "sources": [
             "torrent",
             "usenet"

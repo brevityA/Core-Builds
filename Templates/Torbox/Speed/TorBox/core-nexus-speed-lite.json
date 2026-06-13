@@ -5,7 +5,7 @@
     "description": "A speed-optimised 1080p build for TorBox Essential users. Lives in Templates/Torbox/Speed/TorBox/. No secondary service required. Library, TorBox Search, Comet, and Zilean only -- the four fastest sources delivering cached results in 2-3 seconds. SDR only, BluRay and Remux blocked for broad hardware compatibility. Timeouts at 3500ms, 10 results max, 5-key sort. A single TorBox Essential subscription is all that is required. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.4",
+    "version": "2.7.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -104,7 +104,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "stream"
           ]
@@ -119,7 +119,7 @@
         "enabled": true,
         "options": {
           "name": "Comet RD",
-          "timeout": 3500,
+          "timeout": 7000,
           "resources": [
             "stream"
           ],
@@ -138,7 +138,7 @@
         "type": "meteor",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 10000,
           "name": "Meteor",
           "url": "https://meteorfortheweebs.midnightignite.me",
           "resources": [
@@ -154,7 +154,7 @@
         "type": "torrent-galaxy",
         "enabled": false,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "Torrent Galaxy"
         },
         "instanceId": "67b8ee3e-0710-4ba6-8a99-301e7f87e293",
@@ -166,7 +166,7 @@
         "type": "knaben",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 6000,
           "name": "Knaben"
         },
         "instanceId": "12f95428-f862-4cc3-a782-9b3aa42f1f6c",
@@ -180,7 +180,7 @@
         "enabled": true,
         "options": {
           "name": "OpenSubtitles V3+",
-          "timeout": 3500,
+          "timeout": 4000,
           "resources": [
             "subtitles"
           ],
@@ -196,7 +196,7 @@
         "type": "eztv",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "EZTV"
         },
         "instanceId": "de911b68-2514-4c77-9d3d-dd6b9835643b",
@@ -208,7 +208,7 @@
         "type": "seadex",
         "enabled": false,
         "options": {
-          "timeout": 3500,
+          "timeout": 4000,
           "name": "SeaDex"
         },
         "instanceId": "547ae87c-61ec-4058-95c8-5b8aa870d79b",
@@ -222,7 +222,7 @@
         "enabled": false,
         "options": {
           "name": "TorBox Search",
-          "timeout": 3500,
+          "timeout": 4000,
           "sources": [
             "torrent",
             "usenet"

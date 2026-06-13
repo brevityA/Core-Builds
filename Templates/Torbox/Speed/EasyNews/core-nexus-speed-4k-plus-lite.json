@@ -5,7 +5,7 @@
     "description": "A speed-optimised 4K build for TorBox Essential and EasyNews users. Lives in Templates/Torbox/Speed/EasyNews/. Library, TorBox Search, Comet, and Zilean only -- the four fastest sources delivering cached results in 2-3 seconds. Targets 2160p with Dolby Vision and HDR10+ priority, TrueHD/Atmos audio, files up to 150 GB. SeaDex best-release enforced for anime. Timeouts at 3500ms, 10 results max, 5-key sort. Requires an active TorBox Essential and EasyNews subscription. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.4",
+    "version": "2.7.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -104,7 +104,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 3000,
+          "timeout": 4000,
           "resources": [
             "stream"
           ]
@@ -119,7 +119,7 @@
         "enabled": true,
         "options": {
           "name": "Comet RD",
-          "timeout": 3500,
+          "timeout": 7000,
           "resources": [
             "stream"
           ],
@@ -138,7 +138,7 @@
         "type": "meteor",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 10000,
           "name": "Meteor",
           "url": "https://meteorfortheweebs.midnightignite.me",
           "resources": [
@@ -154,7 +154,7 @@
         "type": "torrent-galaxy",
         "enabled": false,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "Torrent Galaxy"
         },
         "instanceId": "8eb06471-08c2-459b-a161-b3a66675df7c",
@@ -166,7 +166,7 @@
         "type": "knaben",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 6000,
           "name": "Knaben"
         },
         "instanceId": "fa590424-61b0-4042-b3ee-36e1146aa075",
@@ -180,7 +180,7 @@
         "enabled": true,
         "options": {
           "name": "OpenSubtitles V3+",
-          "timeout": 3500,
+          "timeout": 4000,
           "resources": [
             "subtitles"
           ],
@@ -197,7 +197,7 @@
         "instanceId": "aio-sub-1",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 4000,
           "name": "AIOSubtitle",
           "languages": [
             "en"
@@ -208,7 +208,7 @@
         "type": "eztv",
         "enabled": true,
         "options": {
-          "timeout": 3000,
+          "timeout": 5000,
           "name": "EZTV"
         },
         "instanceId": "a6aeecd6-b56b-440e-8f68-91f0272133b7",
@@ -220,7 +220,7 @@
         "type": "seadex",
         "enabled": false,
         "options": {
-          "timeout": 3500
+          "timeout": 4000
         },
         "instanceId": "ecf45540-ab17-4239-add1-32744edbd8aa",
         "resources": [
@@ -233,7 +233,7 @@
         "enabled": false,
         "options": {
           "name": "TorBox Search",
-          "timeout": 3500,
+          "timeout": 4000,
           "sources": [
             "torrent",
             "usenet"
