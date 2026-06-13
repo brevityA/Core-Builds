@@ -6,6 +6,9 @@
 
 ## 2.7.5 (2026-06-13)
 
+### Added
+- **`hdhub` preset added (12 full non-Lite templates)** — HdHub is a TorBox-native P2P scraper (`tb_only: true`) that serves movie, series, and anime streams. Added as a disabled-by-default preset with `resources: ["stream"]` (no catalog bleed), 5000ms timeout, and positioned before `torrent-galaxy` in the P2P block. Templates: 4K Pro, Stream, Stream FireStick, 4K Apex, 4K Apex TorBox, 4K Essential, Essential, Anime, Anime 4K, Anime Dub, 4K Hybrid, Hybrid. Enable via AIOStreams addon settings if your TorBox plan supports it.
+
 ### Fixed
 - **Addon timeout tuning — all 33 active templates** — Every preset was set to a flat 3000ms regardless of addon characteristics. AIOStreams runs all addons in parallel and silently drops any addon that exceeds its timeout, so an undersized timeout causes silent result loss. Key fixes:
   - `meteor` + `newznab` (TorBox NZB): 3000ms → **10,000ms** — multi-hop usenet sources and Tor-routed paginated queries routinely take 3–8s; 3000ms was dropping nearly all usenet results silently
