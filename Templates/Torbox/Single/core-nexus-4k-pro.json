@@ -5,7 +5,7 @@
     "description": "A dedicated 4K home theater build running exclusively on TorBox. Targets 2160p with Dolby Vision, HDR10+, and HDR10 priority. Enforces 7.1 surround preference, TrueHD/Atmos/DTS:X audio chain, and AV1/HEVC encode priority. File range 5 GB–150 GB to accommodate full BluRay REMUX. SeaDex best-release enforced for anime. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No RD dependency — a single TorBox subscription is all that is required. Designed for Nvidia Shield, Apple TV 4K, and high-end OLED/QLED displays.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.7.6",
+    "version": "2.7.7-test",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -205,9 +205,13 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedPreferredStreamExpressionUrls": [],
+    "syncedPreferredStreamExpressionUrls": [
+      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
+    ],
     "syncedExcludedStreamExpressionUrls": [],
-    "syncedIncludedStreamExpressionUrls": [],
+    "syncedIncludedStreamExpressionUrls": [
+      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
+    ],
     "syncedRankedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
     ],
@@ -2440,7 +2444,9 @@
       "Subs": "purple"
     },
     "mergedCatalogs": [],
-    "syncedExcludedRegexUrls": [],
+    "syncedExcludedRegexUrls": [
+      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
+    ],
     "seadexBestOnly": true,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
