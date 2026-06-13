@@ -5,7 +5,7 @@
     "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro + RealDebrid. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s.",
     "source": "external",
     "author": "Personal",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -275,6 +275,10 @@
       },
       {
         "expression": "/*Low Seeders Uncached*/ seeders(uncached(type(streams, 'debrid', 'p2p')), 0, 1)",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
         "enabled": true
       },
       {

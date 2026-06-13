@@ -5,7 +5,7 @@
     "description": "Anime-optimised build for Hotack L007CM. TorBox Pro + RealDebrid + SeaDex. Non-Anime Query Guard patched. SeaDex best releases · Dual audio · Sub + Dub aware. SDR · 1080p.",
     "source": "external",
     "author": "Personal",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "category": "Anime",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -274,6 +274,10 @@
       },
       {
         "expression": "/*Low Seeders Uncached*/ seeders(uncached(type(streams, 'debrid', 'p2p')), 0, 1)",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
         "enabled": true
       },
       {

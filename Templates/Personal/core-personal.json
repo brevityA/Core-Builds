@@ -5,7 +5,7 @@
     "description": "Personal 1080p SDR all-rounder. TorBox Pro + RealDebrid · Comet · Meteor · MediaFusion · Debridio · SeaDex · NZBGeek. WEB-DL preferred · DD+/AAC · SDR · HEVC/AV1/AVC · Tamtaro SEL. Hotack L007CM Full HD Projector.",
     "source": "external",
     "author": "Personal",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -287,6 +287,10 @@
       },
       {
         "expression": "/*Low Seeders Uncached*/ seeders(uncached(type(streams, 'debrid', 'p2p')), 0, 1)",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
         "enabled": true
       },
       {
