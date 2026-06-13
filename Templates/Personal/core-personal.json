@@ -5,7 +5,7 @@
     "description": "Personal 1080p SDR all-rounder. TorBox Pro + RealDebrid \u00b7 Comet \u00b7 Meteor \u00b7 MediaFusion \u00b7 Debridio \u00b7 SeaDex \u00b7 NZBGeek. WEB-DL preferred \u00b7 DD+/AAC \u00b7 SDR \u00b7 HEVC/AV1/AVC \u00b7 Tamtaro SEL. Hotack L007CM Full HD Projector.",
     "source": "external",
     "author": "Personal",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -898,7 +898,8 @@
         "options": {
           "name": "Debridio",
           "timeout": 5000,
-          "apiKey": "<template_placeholder>"
+          "apiKey": "<template_placeholder>",
+          "debridioApiKey": "<template_placeholder>"
         }
       },
       {
