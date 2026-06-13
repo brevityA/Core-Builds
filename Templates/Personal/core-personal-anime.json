@@ -321,10 +321,6 @@
         "enabled": true
       },
       {
-        "expression": "/*SeaDex*/merge(count(addon(cached(streams),'SeaDex'))>0?passthrough(addon(streams,'SeaDex'),'title','year'):passthrough(seadex(streams),'title','year'),queryType=='anime.movie'?passthrough(seadex(streams),'episode'):[])",
-        "enabled": false
-      },
-      {
         "expression": "/*Library*/count(streams)==count(library(streams))?library(streams):[]",
         "enabled": true
       },
