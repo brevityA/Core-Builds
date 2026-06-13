@@ -5,7 +5,7 @@
     "description": "Dubbed-first anime build. Prioritises English dubs and Dual Audio over raw Japanese sub tracks. SeaDex best releases \u00b7 Nyaa-sourced \u00b7 FLAC/AAC \u00b7 TorBox Essential. Ideal for users who prefer English voice acting or mixed households.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.1",
+    "version": "2.8.2",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -544,11 +544,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Hard YouTube Kill */ type(streams, 'youtube', 'external')",
-        "enabled": true
-      },
-      {
-        "expression": "/* CB | 3D Content Kill */ visualTag(streams, '3D', 'H-OU', 'H-SBS')",
+        "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
         "enabled": true
       },
       {
