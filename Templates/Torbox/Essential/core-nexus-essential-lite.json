@@ -274,10 +274,6 @@
         "enabled": true
       },
       {
-        "expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')",
-        "enabled": true
-      },
-      {
         "expression": "/*ongoingSeasonPack*/((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]",
         "enabled": true
       },
@@ -352,10 +348,6 @@
       {
         "expression": "/*ISE v1.2.3* [git.tamtaro.de]*/[]",
         "enabled": true
-      },
-      {
-        "expression": "/*SeaDex*/merge(count(addon(cached(streams),'SeaDex'))>0?passthrough(addon(streams,'SeaDex'),'title','year'):passthrough(seadex(streams),'title','year'),queryType=='anime.movie'?passthrough(seadex(streams),'episode'):[])",
-        "enabled": false
       },
       {
         "expression": "/*Library*/count(streams)==count(library(streams))?library(streams):[]",

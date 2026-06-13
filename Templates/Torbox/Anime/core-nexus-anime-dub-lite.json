@@ -449,10 +449,6 @@
         "enabled": true
       },
       {
-        "expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')",
-        "enabled": true
-      },
-      {
         "expression": "/*ongoingSeasonPack*/((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]",
         "enabled": true
       },
