@@ -16,8 +16,7 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 
 | Template | Plan | Resolution | Best for |
 |---|---|---|---|
-| [4K Pro](#-core-nexus-4k-pro) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet |
-| [4K Apex](#-core-nexus-4k-apex) | Pro | 4K + 1080p | Adaptive bitrate floors — outperforms 4K Pro on quality filtering |
+| [4K Apex](#-core-nexus-4k-apex) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet · IQR adaptive bitrate floors |
 | [Stream](#-core-nexus-stream) | Pro | 1080p | WEB-DL only, budget hardware |
 | [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
 | [Samsung TV](#-core-nexus-samsung-tv-nightly) 🌙 | Pro | 1080p | Samsung / no Dolby Vision |
@@ -56,7 +55,7 @@ TorBox Pro?
 ├── Got NZBGeek/Usenet indexer?
 │   ├── Want 4K? → 4K Hybrid
 │   └── 1080p only? → Hybrid
-├── Want 4K? → 4K Pro
+├── Want 4K? → 4K Apex
 ├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
 └── 1080p only? → Stream
 
@@ -88,7 +87,6 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 
 | Template | Plan | Res | Import URL |
 |---|---|---|---|
-| **Core Nexus 4K Pro** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Core Nexus 4K Apex** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Core Nexus 4K Apex (TorBox)** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json` |
 | **Core Nexus Stream** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
@@ -125,23 +123,9 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 
 ## 🔵 TorBox Pro Templates
 
-### 🏆 Core Nexus 4K Pro
+### 🏆 Core Nexus 4K Apex
 
-Flagship 4K build. Full addon stack. Targets DV/HDR, TrueHD/Atmos, BluRay REMUX. cacheAndPlay for both Usenet and debrid torrents.
-
-| | |
-|---|---|
-| **File** | `Templates/Torbox/Single/core-nexus-4k-pro.json` |
-| **Version** | v2.7.2 |
-| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
-| **Resolution** | 2160p primary, 1080p fallback |
-| **Usenet** | ✅ cacheAndPlay + nzbFailover |
-
----
-
-### 🎯 Core Nexus 4K Apex
-
-Adaptive flagship. Identical addon and ESE stack to 4K Pro — the difference is in the PSEs. Uses IQR Tukey fence filtering (Q1−1.5×IQR / Q3+1.5×IQR) to set bitrate floors per tier, with a min/max fallback for thin pools and a median cluster for new releases under 60 days. BluRay REMUX tiers also enforce file size floors (15 GB for 4K, 8 GB for 1080p) to filter mislabeled fakes. HDR and SDR WEB-DL are evaluated separately so HDR streams don't inflate the SDR floor.
+Flagship 4K build for TorBox Pro. Full addon stack — DV/HDR, TrueHD/Atmos, BluRay REMUX, cacheAndPlay for Usenet and debrid. IQR Tukey fence PSEs (Q1−1.5×IQR / Q3+1.5×IQR) set adaptive bitrate floors per tier, with min/max fallback for thin pools and a median cluster for new releases under 60 days. BluRay REMUX tiers enforce file size floors (15 GB for 4K, 8 GB for 1080p) to filter mislabeled fakes. HDR and SDR WEB-DL evaluated separately.
 
 | | |
 |---|---|
@@ -343,7 +327,6 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 
 | Lite Template | Import URL |
 |---|---|
-| **4K Pro Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro-lite.json` |
 | **Stream Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json` |
 | **Stream (Fire Stick) Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json` |
 | **Hybrid Lite** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |

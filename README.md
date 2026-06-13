@@ -65,8 +65,7 @@ TorBox Pro?
 ├── Got NZBGeek/Usenet indexer?
 │   ├── Want 4K? → 4K Hybrid
 │   └── 1080p only? → Hybrid
-├── Want best quality filtering? → 4K Apex (IQR adaptive PSEs)
-├── Want 4K? → 4K Pro
+├── Want 4K? → 4K Apex
 ├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
 └── 1080p only? → Stream
 
@@ -93,7 +92,6 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | Template | Res | Import URL |
 |---|---|---|
 | **Core Nexus 4K Apex** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
-| **Core Nexus 4K Pro** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json` |
 | **Core Nexus Stream** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Core Nexus Stream (Fire Stick)** | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Core Nexus 4K Hybrid** ⚠️ | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
@@ -158,7 +156,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | **Core Nexus Samsung TV** 🌙 | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
 | **Core Nexus Samsung TV 4K** 🌙 | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
 
-> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. 1080p variant based on Core Nexus Stream · 4K variant based on Core Nexus 4K Pro · TorBox Pro · Essential plan.
+> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. 1080p variant based on Core Nexus Stream · 4K variant based on Core Nexus 4K Apex · TorBox Pro · Essential plan.
 
 ---
 
@@ -168,7 +166,6 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 | Template | Base | Import URL |
 |---|---|---|
-| **4K Pro Lite** | 4K Pro | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro-lite.json` |
 | **Stream Lite** | Stream | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json` |
 | **Stream Fire Stick Lite** | Stream (Fire Stick) | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json` |
 | **Hybrid Lite** ⚠️ | Hybrid | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |
