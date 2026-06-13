@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/github/actions/workflow/status/brevityA/Core-Builds/validate.yml?style=for-the-badge&label=BUILD&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://img.shields.io/badge/RELEASE-v2.7.5-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
+    <img src="https://img.shields.io/badge/RELEASE-v2.8.0-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
   </a>
 </p>
 
@@ -71,7 +71,7 @@ TorBox Pro?
 
 TorBox Essential?
 ├── Want single-click instant play? → Flash tier
-├── Want fastest general play (2-3s)? → Speed tier
+├── Have EasyNews + want 4K cached? → Speed 4K+
 ├── Want 4K? → 4K Essential
 └── 1080p standard? → Essential
 
@@ -117,9 +117,6 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | Template | Res | Requires | Import URL |
 |---|---|---|---|
 | **Speed 4K+** | 4K | Essential + EasyNews | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json` |
-| **Speed+** | 1080p | Essential + EasyNews | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus.json` |
-| **Speed 4K** | 4K | Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json` |
-| **Speed** | 1080p | Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json` |
 | **Speed EasyNews** | 1080p | EasyNews only | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json` |
 
 ---
@@ -171,11 +168,6 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | **Hybrid Lite** ⚠️ | Hybrid | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |
 | **4K Essential Lite** | 4K Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json` |
 | **Essential Lite** | Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json` |
-| **Speed 4K+ Lite** | Speed 4K+ | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus-lite.json` |
-| **Speed+ Lite** | Speed+ | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus-lite.json` |
-| **Speed EasyNews Lite** | Speed EasyNews | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews-lite.json` |
-| **Speed 4K Lite** | Speed 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json` |
-| **Speed Lite** | Speed | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json` |
 | **Anime Lite** | Anime | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json` |
 | **Anime 4K Lite** | Anime 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json` |
 | **Anime Dub Lite** | Anime Dub | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json` |
@@ -273,7 +265,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ## 📜 Version
 
-Current: **`v2.7.5`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
+Current: **`v2.8.0`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
 
 ---
 
