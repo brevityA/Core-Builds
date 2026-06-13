@@ -15,6 +15,9 @@
   - `zilean` + `torbox-search` + `seadex` + subtitle addons: 3000ms → **4,000ms** — minor headroom increase; these are fast by nature
   - `library` + `stremthruTorz`: unchanged at 3000ms — direct API calls, consistently fast
 
+### Changed
+- **Dedup tiebreakers explicitly configured (all 33 templates)** — AIOStreams v2.30.3 introduced configurable deduplication tiebreakers. Added `torrent_seeders` (`before_addon`) and `usenet_age` (`before_addon`) to the `deduplicator` block in every active template. When two streams tie on all other criteria, P2P results now prefer higher seeder counts and usenet results prefer newer posts — before falling back to addon order. Behaviour matches the v2.30.3 defaults but is now explicit and documented in each template.
+
 ---
 
 ## 2.7.4 (2026-06-12)
