@@ -21,28 +21,16 @@ This is a living list of planned work, active development, and recently complete
 | v0.3.0 | Standalone PSE reference files — `Expressions/apex-iqr-pses.md` + `.json` |
 | v2.6.0 | Live nSeScore display — `💎 94` replaces binary `💎 ELITE` badge in formatter |
 | v2.6.0 | Smart content-type preload — movies get quality diversity, series get resolution balance |
-| v2.6.0 | v2.6.0 version bump — all 30 active templates; triggers in-app update notification |
 | v2.6.0 | Core Nexus Samsung TV Nightly — DV-only kill enabled, device-specific template |
 | v2.6.0 | DV-Only Kill ESE — optional, disabled by default, added to all 30 templates |
 | v2.6.0 | Subtitle language flags — `uSubtitleEmojis` replaces generic 📝 SUB badge |
 | v2.6.0 | Flash `daysSinceRelease` guard — uncached allowed for content ≤ 3 days old |
-| v2.6.0 | Balanced preload selector — `perGroup(resolution, 2)` across 28 templates |
-| v2.6.0 | Episode sort fix — canonical 14-key global sort applied to 7 outdated templates |
 | v2.6.0 | Core Nexus Stream (Fire Stick) + Lite variants |
 | v2.6.0 | Anime Non-Anime Query Guard — `and not isAnime` ISE guard |
-| v2.6.0 | Flash `addonName` mismatch fix |
-| v2.6.0 | Regional Content Guide (`Guides/REGIONAL_CONTENT_GUIDE.md`) |
-| v2.6.0 | GitHub Actions version pins corrected (checkout @v4, github-script @v7) |
-| v2.6.0 | Auto-responder keywords refined; Flash/Nightly labels + labeler added |
-| v2.6.0 | IMPORT_GUIDE, WHICH_TEMPLATE, DEVICE_PROFILES full rewrites |
-| v2.6.0 | FAQ and TROUBLESHOOTING stale content fixes |
 | v2.5.1 | Local test environment — `requirements.txt` + CONTRIBUTING.md setup guide |
-| v2.5.1 | README banner and badges fixed |
 | v2.5.0 | Lite template suite — 12 Lite variants of every active template |
 | v2.5.0 | Core Nexus Anime 4K template |
-| v2.5.0 | Core Nexus TV formatter — large-screen / 10-foot UI |
 | v2.5.0 | Core Nexus Speed EasyNews — EasyNews-only speed build |
-| v2.4.8 | Core Cipher personal build added to `Templates/Personal/` |
 | v2.4.7 | Core Nexus Apex, Sigma, and Minimal formatters |
 | v2.4.6 | Core Nexus Elite formatter (bundled in all templates) |
 | v2.4.5 | SeaDex best-release enforcement on Anime template |
@@ -53,20 +41,25 @@ This is a living list of planned work, active development, and recently complete
 
 | Item | Notes |
 |---|---|
+| **Core Builds Expression Layer — trial** | 4 custom SEL expressions in active testing on Stream template (v2.7.10): REPACK/PROPER Passthrough ISE, Per-Addon Flood Guard ESE, Usenet Propagation Guard ESE, Codec Efficiency Booster PSE. See `Expressions/core-builds-expression-layer.pdf` |
 | `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate: if SeaDex data exists → require SeaDex-matched stream in top tier; else fall through to standard sort |
-| `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate: if SeaDex data exists → require SeaDex-matched stream in top tier; else fall through to standard sort |
-| AllDebrid template suite | Flash + Speed + Essential variants; natively supported in AIOStreams; biggest unserved community segment |
+| AllDebrid template suite | Essential variant; natively supported in AIOStreams; biggest unserved community segment |
 | Samsung TV Nightly → stable | Gather community feedback; promote out of Nightly once validated on hardware |
 
 ---
 
 ## 📋 Planned
 
+### Expression Layer
+- [ ] **REPACK/PROPER Passthrough ISE** — Pins REPACK/PROPER releases to head of queue ahead of limit/excluded filters; ensures patched releases always surface. Roll out to Apex, Stream, Essential, Hybrid, Anime after trial validation
+- [ ] **Per-Addon Flood Guard ESE** — Per-addon result cap (Meteor ≤5, Comet ≤5, MediaFusion ≤4, Torrent Galaxy/EZTV/Knaben/HdHub ≤3) on cached non-library streams; prevents any single scraper from flooding results. Roll out post-trial
+- [ ] **Usenet Propagation Guard ESE** — Suppresses usenet results younger than 2 hours when any fully propagated NZBs exist; eliminates incomplete early-propagation grabs. Roll out post-trial
+- [ ] **Codec Efficiency Booster PSE** — Surfaces HEVC/AV1 encodes of 1080p + 720p Bluray REMUX and WEB-DL/WEBRip ahead of AVC equivalents; lowers bandwidth without sacrificing quality tier. Roll out post-trial
+
 ### Templates
+- [ ] **Deprecate Core Nexus 4K Pro + Pro Lite** — Apex is the fully upgraded successor; Pro adds no distinct value and creates maintenance overhead. Move to `Templates/Torbox/Deprecated/`
+- [ ] **Deprecate Speed + Flash suite** — Community feedback confirms these are redundant now that the core templates match their responsiveness. 8 templates moved to `Templates/Torbox/Deprecated/`
 - [ ] **`pin()` top result** — Pin the #1 PSE-matched stream to position 1 regardless of sort order; clean UX improvement across all quality-gated templates
-- [ ] **Speed 4K + Flash 4K adaptive PSEs** — Two-sided min×0.80 / max×1.20 bitrate gates; lighter than full IQR but still outlier-resistant for cached-only tiers
-- [ ] **AllDebrid Flash** — Cached-only instant play for AllDebrid subscribers (`Templates/AllDebrid/Flash/`)
-- [ ] **AllDebrid Speed** — Fast cached play variant for AllDebrid (`Templates/AllDebrid/Speed/`)
 - [ ] **AllDebrid Essential** — Full-coverage AllDebrid template with quality gates (`Templates/AllDebrid/Essential/`)
 - [ ] **Mobile / Bandwidth template** — 25 Mbps bitrate ceiling, SDR-preferred, no REMUX; covers mobile, travel, data-capped users
 - [ ] **Anime Dub 4K variant** — English-dub priority at 4K for the growing dub community
@@ -88,6 +81,7 @@ This is a living list of planned work, active development, and recently complete
 
 | Idea | Status |
 |---|---|
+| New unified template suite | Under consideration — if Speed/Flash/Pro are deprecated, explore a tighter 6-template lineup (Apex · Essential · Hybrid · Stream · Anime · Samsung TV) built around the Core Builds expression layer from the ground up |
 | Debrid-Link template | Under research — supported in AIOStreams; smaller user base than AllDebrid |
 | Premiumize template | Under research — natively supported; European user base overlap with AllDebrid |
 | RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results; situation under review |
