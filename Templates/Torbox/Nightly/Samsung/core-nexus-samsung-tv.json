@@ -5,7 +5,7 @@
     "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p · TorBox Essential · Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -329,6 +329,10 @@
       },
       {
         "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
         "enabled": true
       },
       {

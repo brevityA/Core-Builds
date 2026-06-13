@@ -5,7 +5,7 @@
     "description": "Single-click instant play — 4K. Only cached streams appear — zero uncached results. Derived from Speed 4K but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. Resolution order: 2160p → 1080p fallback. DV → HDR10+ → HDR priority. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 4K · TorBox Essential · Library, TorBox Search, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.1",
+    "version": "2.8.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1379,6 +1379,10 @@
       },
       {
         "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
         "enabled": true
       },
       {
