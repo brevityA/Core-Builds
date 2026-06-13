@@ -8,6 +8,9 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| v2.8.0 | Speed tier consolidation — 8 redundant Speed templates deprecated (4 TorBox-only, 4 EasyNews lite/plus variants); Speed 4K+ and Speed EasyNews retained as the two EasyNews-differentiated templates |
+| v2.8.0 | Core Builds Expression Layer rollout — all 7 expressions deployed to all 31 active templates (3 ESEs + 1 ISE + 3 PSEs); replaces trial-only Stream v2.7.10 scope |
+| v2.8.0 | Core Nexus 4K Pro deprecated — moved to `Templates/Torbox/Deprecated/`; Apex is the direct replacement |
 | v2.7.5 | Addon timeout tuning — per-addon values replacing flat 3000ms across all 33 templates; fixes silent usenet result drops on Meteor + TorBox NZB |
 | v2.7.5 | Dedup tiebreakers explicitly configured — `torrent_seeders` + `usenet_age` (`before_addon`) added to all 33 templates; formalises AIOStreams v2.30.3 default behavior |
 | v2.7.5 | `hdhub` preset added (disabled by default) to 12 full non-Lite templates — TorBox-native P2P scraper; `resources: ['stream']`, 5000ms timeout, `tb_only: true`; enable in AIOStreams addon settings |
@@ -41,7 +44,7 @@ This is a living list of planned work, active development, and recently complete
 
 | Item | Notes |
 |---|---|
-| **Core Builds Expression Layer — trial** | 4 custom SEL expressions in active testing on Stream template (v2.7.10): REPACK/PROPER Passthrough ISE, Per-Addon Flood Guard ESE, Usenet Propagation Guard ESE, Codec Efficiency Booster PSE. See `Expressions/core-builds-expression-layer.pdf` |
+| **Core Builds Expression Layer — post-trial rollout** | All 7 expressions deployed to all active templates at v2.8.0. Audio Pinnacle PSE, HDR/DV Priority PSE, AI Upscale Exclusion ESE added alongside the 4 trial expressions. See `Expressions/core-builds-expression-layer.pdf` |
 | `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate: if SeaDex data exists → require SeaDex-matched stream in top tier; else fall through to standard sort |
 | AllDebrid template suite | Essential variant; natively supported in AIOStreams; biggest unserved community segment |
 | Samsung TV Nightly → stable | Gather community feedback; promote out of Nightly once validated on hardware |
@@ -66,8 +69,7 @@ This is a living list of planned work, active development, and recently complete
 - [ ] **AI Upscale Exclusion ESE** — Excludes streams containing AI upscaling keywords (topaz, ai-upscale, aiupscale, upscaled, neural, enhancedai) using the `keyword()` function (AIOStreams v2.29.6+). First Core Builds expression to use `keyword()`. *Critical for all 4K templates and Anime 4K; high for Anime (upscaled 1080p); moderate for Stream/Essential*
 
 ### Templates
-- [ ] **Deprecate Core Nexus 4K Pro + Pro Lite** — Apex is the fully upgraded successor; Pro adds no distinct value and creates maintenance overhead. Move to `Templates/Torbox/Deprecated/`
-- [ ] **Deprecate Speed + Flash suite** — Community feedback confirms these are redundant now that the core templates match their responsiveness. 8 templates moved to `Templates/Torbox/Deprecated/`
+- [ ] **Deprecate Flash suite** — Flash 4K and Flash remain active; under review — their `excludeUncached: true` behaviour is genuinely distinct from Speed/Essential
 - [ ] **`pin()` top result** — Pin the #1 PSE-matched stream to position 1 regardless of sort order; clean UX improvement across all quality-gated templates
 - [ ] **AllDebrid Essential** — Full-coverage AllDebrid template with quality gates (`Templates/AllDebrid/Essential/`)
 - [ ] **Mobile / Bandwidth template** — 25 Mbps bitrate ceiling, SDR-preferred, no REMUX; covers mobile, travel, data-capped users
