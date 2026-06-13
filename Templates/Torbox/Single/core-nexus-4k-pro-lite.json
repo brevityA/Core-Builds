@@ -1978,7 +1978,17 @@
         "releaseGroup"
       ],
       "smartDetectRounding": 10,
-      "libraryBehaviour": "prefer"
+      "libraryBehaviour": "prefer",
+      "tiebreakers": [
+        {
+          "type": "torrent_seeders",
+          "position": "before_addon"
+        },
+        {
+          "type": "usenet_age",
+          "position": "before_addon"
+        }
+      ]
     },
     "autoPlay": {
       "enabled": true,
