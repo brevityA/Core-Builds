@@ -51,10 +51,19 @@ This is a living list of planned work, active development, and recently complete
 ## 📋 Planned
 
 ### Expression Layer
-- [ ] **REPACK/PROPER Passthrough ISE** — Pins REPACK/PROPER releases to head of queue ahead of limit/excluded filters; ensures patched releases always surface. Roll out to Apex, Stream, Essential, Hybrid, Anime after trial validation
-- [ ] **Per-Addon Flood Guard ESE** — Per-addon result cap (Meteor ≤5, Comet ≤5, MediaFusion ≤4, Torrent Galaxy/EZTV/Knaben/HdHub ≤3) on cached non-library streams; prevents any single scraper from flooding results. Roll out post-trial
-- [ ] **Usenet Propagation Guard ESE** — Suppresses usenet results younger than 2 hours when any fully propagated NZBs exist; eliminates incomplete early-propagation grabs. Roll out post-trial
-- [ ] **Codec Efficiency Booster PSE** — Surfaces HEVC/AV1 encodes of 1080p + 720p Bluray REMUX and WEB-DL/WEBRip ahead of AVC equivalents; lowers bandwidth without sacrificing quality tier. Roll out post-trial
+
+**In trial** (Core Nexus Stream v2.7.10 — roll out to all templates post-trial):
+
+- [ ] **REPACK/PROPER Passthrough ISE** — Pins REPACK/PROPER releases ahead of limit/excluded filters; ensures patched releases always surface. *All templates — critical for Anime (fansub REPACKs), Hybrid, and Stream (streaming service fix runs)*
+- [ ] **Per-Addon Flood Guard ESE** — Per-addon result cap (Meteor ≤5, Comet ≤5, MediaFusion ≤4, Torrent Galaxy/EZTV/Knaben/HdHub ≤3) on cached non-library streams. *All templates — most impactful on Stream, Essential, and Apex where Meteor can return 15–20+ results*
+- [ ] **Usenet Propagation Guard ESE** — Holds back NZBs younger than 2 hours when propagated alternatives exist; eliminates corrupt early-propagation grabs. *All Usenet-enabled templates — critical for Apex, 4K Hybrid, Hybrid; not applicable to Flash*
+- [ ] **Codec Efficiency Booster PSE** — Surfaces HEVC/AV1 encodes of 1080p + 720p Bluray REMUX and WEB-DL/WEBRip ahead of AVC equivalents. *Stream, Essential, Anime (primary) — limited effect on 4K REMUX templates where HEVC is already standard; not applicable to Flash*
+
+**Planned** (post-trial, pending research — no Tam-Taro equivalent exists for any of these):
+
+- [ ] **Audio Pinnacle PSE** — Promotes lossless/object-based audio tracks within the ranked pool: Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3/DD+. *Critical for Apex, 4K Apex, 4K Hybrid, 4K Essential (home theatre users); moderate for Stream, Hybrid, Essential; low impact on Anime (fansub FLAC/AAC standard) and Flash*
+- [ ] **HDR / DV Priority PSE** — Within 4K results, surfaces DV/HDR10+/HDR10 ahead of SDR equivalents. Safe no-op on 1080p-only templates (empty 2160p pool). *Critical for Apex, 4K Apex, 4K Essential, 4K Hybrid, Flash 4K, Speed 4K; high for Anime 4K; no effect on Stream/Essential/FireStick/Flash*
+- [ ] **AI Upscale Exclusion ESE** — Excludes streams containing AI upscaling keywords (topaz, ai-upscale, aiupscale, upscaled, neural, enhancedai) using the `keyword()` function (AIOStreams v2.29.6+). First Core Builds expression to use `keyword()`. *Critical for all 4K templates and Anime 4K; high for Anime (upscaled 1080p); moderate for Stream/Essential*
 
 ### Templates
 - [ ] **Deprecate Core Nexus 4K Pro + Pro Lite** — Apex is the fully upgraded successor; Pro adds no distinct value and creates maintenance overhead. Move to `Templates/Torbox/Deprecated/`
