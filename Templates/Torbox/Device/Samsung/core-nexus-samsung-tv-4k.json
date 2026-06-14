@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Samsung TV 4K",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
-    "addonDescription": "4K HDR focused. DV-Only Kill enabled · HDR10+ / HDR10 priority · TrueHD/Atmos · HEVC/AV1.",
+    "addonDescription": "4K HDR · No Dolby Vision · HDR10+ priority · DD+ / Atmos · HEVC only (AV1 / DTS:X / TrueHD excluded).",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",

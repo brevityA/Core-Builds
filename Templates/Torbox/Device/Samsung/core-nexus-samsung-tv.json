@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Stream",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
-    "addonDescription": "1080p WEB-DL focused. BluRay/Remux blocked · SDR · Pure streaming quality. RPDB posters included.",
+    "addonDescription": "1080p · No Dolby Vision · HDR10 / HLG preferred · DTS:X / TrueHD excluded · RPDB posters.",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
