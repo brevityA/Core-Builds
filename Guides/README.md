@@ -135,7 +135,7 @@ Getting too few results / low-overhead host? → Lite variant of any template ab
 
 | I want... | Use this |
 |---|---|
-| 4K with Dolby Vision, Atmos, full BluRay REMUX | **[Core Nexus 4K Pro](../Templates/Torbox/Single/core-nexus-4k-pro.json)** |
+| 4K with Dolby Vision, Atmos, full BluRay REMUX | **[Core Nexus 4K Apex](../Templates/Torbox/Single/core-nexus-4k-apex.json)** |
 | 1080p that works on any device, RPDB poster art | **[Core Nexus Stream](../Templates/Torbox/Single/core-nexus-stream.json)** |
 | 1080p + NZBGeek for maximum Usenet coverage | **[Core Nexus Hybrid](../Templates/Torbox/Hybrid/core-nexus-hybrid.json)** |
 
@@ -230,7 +230,7 @@ Full addon stack. Usenet included. Best overall coverage.
 
 | Template | Resolution | Best For |
 |---|---|---|
-| [Core Nexus 4K Pro](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json) | 4K HDR | Shield, Apple TV 4K, OLED/QLED |
+| [Core Nexus 4K Apex](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json) | 4K HDR | Shield, Apple TV 4K, OLED/QLED |
 | [Core Nexus Stream](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json) | 1080p SDR | Budget hardware, phones, RPDB art |
 
 ---
@@ -559,7 +559,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Nvidia Shield · Apple TV 4K · 4K OLED/QLED TVs · High-end Android TV*
 
 #### Recommended Templates
-- **[Core Nexus 4K Pro](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox Pro · 4K HDR · home theater quality
+- **[Core Nexus 4K Apex](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json)** — TorBox Pro · 4K HDR · home theater quality
 - **[Core Nexus 4K Essential](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json)** — TorBox Essential · 4K HDR
 
 #### What these builds do
