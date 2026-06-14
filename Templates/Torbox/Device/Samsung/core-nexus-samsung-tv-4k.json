@@ -2,7 +2,7 @@
   "metadata": {
     "id": "brevity.core-nexus-samsung-tv-4k",
     "name": "Core Nexus Samsung TV 4K",
-    "description": "4K template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded \u2014 only HDR10+, HDR10, HLG, and SDR content appears. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox \u00b7 Library, TorBox Search, Comet, Zilean).",
+    "description": "4K template tuned for Samsung smart TVs without native Dolby Vision support \u2014 including RU7100, RU8000, NU8000, Q60, and similar 2018\u20132022 models. DV-only streams are excluded (DV-Only Kill ESE); only HDR10+, HDR10, HLG, and SDR content appears. AV1 and VC-1 excluded (not supported on older Samsung hardware). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded \u2014 Samsung passes these through only via HDMI ARC/eARC to compatible receivers, which most users don't have. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox \u00b7 Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "0.2.2",
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Samsung TV 4K",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "4K HDR \u00b7 No Dolby Vision \u00b7 HDR10+ priority \u00b7 DD+ / Atmos \u00b7 HEVC only (AV1 / DTS:X / TrueHD excluded).",
+    "addonDescription": "4K HDR \u00b7 No Dolby Vision \u00b7 HDR10+/HDR10/HLG \u00b7 DD+/Atmos \u00b7 HEVC/AVC only (AV1/VC-1/TrueHD/DTS:X excluded).",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
