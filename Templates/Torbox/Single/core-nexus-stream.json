@@ -268,7 +268,7 @@
         "enabled": true
       },
       {
-        "expression": "/* Hard 4K Kill — Stream is 1080p-only */ resolution(streams, '2160p', '1440p')",
+        "expression": "/* Hard Resolution Kill — Stream is 1080p-only */ resolution(streams, '2160p', '1440p', '720p', '576p', '480p')",
         "enabled": true
       },
       {
@@ -375,14 +375,6 @@
       },
       {
         "expression": "/* C-Tier 1080p | Any 1080p */ resolution(streams, '1080p')",
-        "enabled": true
-      },
-      {
-        "expression": "/* 720p | WEB-DL */ resolution(quality(streams, 'WEB-DL', 'WEBRip'), '720p')",
-        "enabled": true
-      },
-      {
-        "expression": "/* 720p | Any */ resolution(streams, '720p')",
         "enabled": true
       },
       {

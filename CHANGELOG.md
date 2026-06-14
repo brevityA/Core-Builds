@@ -7,7 +7,9 @@
 ## 2.8.1 (2026-06-14)
 
 ### Fixed
-- **Core Nexus Stream 4K leak** (`core-nexus-stream.json`, v2.7.5 → v2.7.6) — PSEs rank streams in preferred order but do not exclude non-matching streams. Without a hard resolution ESE, 4K and 1440p streams from scrapers appeared at the bottom of results in a template designed to show 1080p only. Added `/* Hard 4K Kill */` ESE at position 1: `resolution(streams, '2160p', '1440p')` — all 2160p and 1440p streams are now excluded before any other logic fires.
+- **Core Nexus Stream strictly 1080p** (`core-nexus-stream.json`, v2.7.5 → v2.7.7) — PSEs rank but do not exclude non-matching streams. Without a hard resolution ESE, 4K/1440p/720p streams all appeared in results regardless of the 1080p-only PSE labels. Two changes:
+  1. Hard resolution kill ESE at position 1: `resolution(streams, '2160p', '1440p', '720p', '576p', '480p')` — all non-1080p streams excluded before any other logic fires.
+  2. Removed PSEs 5 and 6 (720p WEB-DL and 720p Any fallback tiers) — the template is 1080p-only and should not rank 720p content at all.
 
 ---
 
