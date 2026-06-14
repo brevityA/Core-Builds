@@ -198,8 +198,7 @@
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
     ],
     "syncedRankedRegexUrls": [
-      "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/ranked-regex-patterns.json",
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
+      "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/ranked-regex-patterns.json"
     ],
     "syncedPreferredStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
