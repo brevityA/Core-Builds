@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10+, HDR10, HLG, and SDR content appears. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -106,7 +106,12 @@
       "IMAX",
       "AI"
     ],
-    "excludedAudioTags": [],
+    "excludedAudioTags": [
+      "TrueHD",
+      "DTS-HD MA",
+      "DTS:X",
+      "FLAC"
+    ],
     "includedAudioTags": [],
     "requiredAudioTags": [],
     "preferredAudioTags": [
