@@ -28,6 +28,8 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 | [Essential](#-core-nexus-essential) | Essential | 1080p | Standard Essential build |
 | [4K AllDebrid](#-core-nexus-4k-alldebrid) | AllDebrid | 4K + 1080p | AllDebrid users — full 4K |
 | [AllDebrid](#-core-nexus-alldebrid) | AllDebrid | 1080p | AllDebrid users — 1080p |
+| [4K AllDebrid Lite](#-core-nexus-4k-alldebrid-lite) | AllDebrid | 4K + 1080p | AllDebrid — simple filtering |
+| [AllDebrid Lite](#-core-nexus-alldebrid-lite) | AllDebrid | 1080p | AllDebrid — simple filtering |
 | [Speed 4K+](#easynews-speed-templates) | Essential + EasyNews | 4K | Instant cached 4K |
 | [Speed+](#easynews-speed-templates) | Essential + EasyNews | 1080p | Instant cached 1080p |
 | [Speed EasyNews](#easynews-speed-templates) | EasyNews only | 1080p | EasyNews — no TorBox needed |
@@ -75,8 +77,12 @@ TorBox Essential?
 EasyNews only (no TorBox)? → Speed EasyNews
 
 AllDebrid (no TorBox)?
-├── Want 4K? → 4K AllDebrid
-└── 1080p only? → AllDebrid
+├── Want 4K?
+│   ├── Full IQR filtering → 4K AllDebrid
+│   └── Simpler filtering → 4K AllDebrid Lite
+└── 1080p only?
+    ├── Full → AllDebrid
+    └── Lite → AllDebrid Lite
 
 Anime?
 ├── Want 4K HDR? → Anime 4K
@@ -105,6 +111,8 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Essential** | Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
 | **Core Nexus 4K AllDebrid** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
 | **Core Nexus AllDebrid** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
+| **Core Nexus 4K AllDebrid Lite** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
+| **Core Nexus AllDebrid Lite** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
 | **Core Nexus Speed 4K+** | Essential + EasyNews | 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json` |
 | **Core Nexus Speed EasyNews** | EasyNews only | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json` |
 | **Core Nexus Anime** 🎌 | Essential | 1080p+4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` |
@@ -289,7 +297,7 @@ Full 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD
 | | |
 |---|---|
 | **File** | `Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
-| **Version** | v0.1.0 |
+| **Version** | v0.1.2 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 
@@ -302,6 +310,28 @@ Full 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD
 | **File** | `Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
 | **Version** | v0.1.0 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
+| **Resolution** | 1080p · 720p fallback |
+
+### 💡 Core Nexus 4K AllDebrid Lite
+
+4K AllDebrid with simple CB-style PSEs — no IQR Tukey fence. Lighter filtering for users who prefer less complexity.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
+| **Resolution** | 2160p primary, 1080p fallback |
+
+### 💡 Core Nexus AllDebrid Lite
+
+1080p AllDebrid Lite. WEB-DL / Remux · HDR preferred · same PSE stack as AllDebrid 1080p with the Lite naming convention.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
 | **Resolution** | 1080p · 720p fallback |
 
 ---
