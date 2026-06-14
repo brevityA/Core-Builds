@@ -150,8 +150,8 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 | Template | Device / Use-case | Res | Import URL |
 |---|---|---|---|
-| **Core Nexus Samsung TV** 🌙 | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
-| **Core Nexus Samsung TV 4K** 🌙 | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Samsung TV** | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
+| **Core Nexus Samsung TV 4K** | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
 
 > **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. 1080p variant based on Core Nexus Stream · 4K variant based on Core Nexus 4K Apex · TorBox Pro · Essential plan.
 
