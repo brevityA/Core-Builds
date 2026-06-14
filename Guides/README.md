@@ -148,9 +148,7 @@ Getting too few results / low-overhead host? → Lite variant of any template ab
 | Cached-only 4K, single-click play | **[Core Nexus Flash 4K](../Templates/Torbox/Flash/core-nexus-flash-4k.json)** |
 | Cached-only 1080p, single-click play | **[Core Nexus Flash](../Templates/Torbox/Flash/core-nexus-flash.json)** |
 | Core Nexus Speed 4K+ | **[Core Nexus Speed 4K+](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json)** |
-| Core Nexus Speed+ | **[Core Nexus Speed+](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus.json)** |
-| Core Nexus Speed 4K | **[Core Nexus Speed 4K](../Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json)** |
-| Core Nexus Speed | **[Core Nexus Speed](../Templates/Torbox/Speed/TorBox/core-nexus-speed.json)** |
+| Core Nexus Speed EasyNews | **[Core Nexus Speed EasyNews](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json)** |
 
 #### I have TorBox + Real-Debrid
 
@@ -265,14 +263,7 @@ Stripped to 4 addons only. Maximum load speed, no compromise on filtering qualit
 | Template | Resolution |
 |---|---|
 | [Core Nexus Speed 4K+](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json) | 4K HDR |
-| [Core Nexus Speed+](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-plus.json) | 1080p SDR |
-
-#### TorBox Essential Only
-
-| Template | Resolution |
-|---|---|
-| [Speed 4K](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json) | 4K HDR |
-| [Speed 1080p](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json) | 1080p SDR |
+| [Core Nexus Speed EasyNews](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json) | 1080p SDR |
 
 #### EasyNews Only (no TorBox)
 
