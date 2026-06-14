@@ -1,23 +1,44 @@
 {
   "metadata": {
-    "id": "brevity.core-nexus-4k-apex",
-    "name": "Core Nexus 4K Apex",
-    "description": "Adaptive flagship build. Extends 4K Pro with ranked-pool-relative bitrate PSEs using Tukey IQR outlier detection: when \u22654 ranked streams exist the window is Q1\u22121.5\u00d7IQR to Q3+1.5\u00d7IQR; for thin pools (1\u20133 ranked) it falls back to 80%\u2013120% of the ranked min/max; and for new releases (<60 days) with no ranked streams a median-cluster fallback keeps results flowing. HDR and SDR are evaluated separately in the WEB-DL tier. Full 4K Pro ESE stack retained.",
+    "id": "brevity.core-nexus-4k-alldebrid",
+    "name": "Core Nexus 4K AllDebrid",
+    "description": "Core Nexus 4K for AllDebrid. IQR Tukey fence bitrate PSEs \u00b7 DV/HDR priority \u00b7 TrueHD/Atmos \u00b7 uncapped bitrate. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.3",
+    "version": "0.1.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
-    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json",
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": [
+      {
+        "version": "0.1.2",
+        "date": "2026-06-14",
+        "changes": [
+          "Fix stale ESSENTIAL labels in PSE 6/9/10/11/12 \u2014 now correctly labelled ALLDEBRID"
+        ]
+      },
+      {
+        "version": "0.1.1",
+        "changes": [
+          "Replace hard daysSinceRelease<60 cliff with pow(0.95,daysSinceRelease) exponential decay window in thin-pool PSE fallback. Window \u00b140% at day 0, narrows to \u00b12% at day 60, effectively zero at day 90+. Eliminates arbitrary cutoff for niche/foreign content with 1\u20133 streams older than 60 days."
+        ]
+      },
+      {
+        "version": "0.1.0",
+        "changes": [
+          "Initial release. AllDebrid variant of Core Nexus 4K \u2014 same IQR PSE stack as 4K Essential, stremthruStore for AllDebrid cached playback."
+        ]
+      }
+    ]
   },
   "config": {
     "trusted": false,
     "showChanges": true,
-    "addonName": "Core Nexus 4K Apex",
+    "addonName": "Core Nexus 4K AllDebrid",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Adaptive 4K Flagship. Ranked-pool bitrate floors \u00b7 New-release fallback \u00b7 Full ESE stack.",
+    "addonDescription": "4K AllDebrid. DV/HDR priority \u00b7 TrueHD/Atmos \u00b7 IQR bitrate PSEs \u00b7 AV1. No TorBox required.",
     "appliedTemplates": [
       {
         "id": "core-nexus-4k-ht-torbox",
@@ -41,6 +62,9 @@
       "720p",
       "576p",
       "480p",
+      "360p",
+      "240p",
+      "144p",
       "Unknown"
     ],
     "excludedQualities": [],
@@ -100,7 +124,8 @@
       "HLG",
       "10bit",
       "SDR",
-      "IMAX"
+      "IMAX",
+      "AI"
     ],
     "excludedAudioTags": [],
     "includedAudioTags": [],
@@ -126,8 +151,7 @@
     "requiredAudioChannels": [],
     "preferredAudioChannels": [
       "7.1",
-      "5.1",
-      "2.0"
+      "5.1"
     ],
     "excludedStreamTypes": [
       "youtube"
@@ -135,7 +159,6 @@
     "includedStreamTypes": [],
     "requiredStreamTypes": [],
     "preferredStreamTypes": [
-      "usenet",
       "debrid"
     ],
     "excludedEncodes": [],
@@ -165,39 +188,35 @@
     "preferredRegexPatterns": [
       {
         "name": "Radarr Remux T1",
-        "pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i",
-        "score": 100
+        "pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i"
       },
       {
         "name": "Sonarr Remux T1",
-        "pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(BLURANiUM|BMF|FraMeSToR|PmP)\\b).*/i",
-        "score": 100
+        "pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(BLURANiUM|BMF|FraMeSToR|PmP)\\b).*/i"
       },
       {
         "name": "Radarr UHD Bluray T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:CtrlHD|MainFrame|W4NK3R)\\b).*/i",
-        "score": 90
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:CtrlHD|MainFrame|W4NK3R)\\b).*/i"
       },
       {
-        "name": "Radarr UHD Bluray T1 \u2014 DON",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*(?:\\b(?:DON)\\b)).*/",
-        "score": 90
+        "name": "Radarr UHD Bluray T1",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*(?:\\b(?:DON)\\b)).*/"
       },
       {
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i",
-        "score": 95
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i"
       },
       {
-        "name": "Anime BD T1 [sam]",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[sam\\]|-sam\\b)).*/",
-        "score": 95
+        "name": "Anime BD T1",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[sam\\]|-sam\\b)).*/"
       },
       {
         "name": "FraMeSToR",
-        "pattern": "/\\b(FraMeSToR)\\b/",
-        "score": 100
+        "pattern": "/\\b(FraMeSToR)\\b/"
       }
+    ],
+    "syncedExcludedRegexUrls": [
+      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
     ],
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/ranked-regex-patterns.json"
@@ -238,19 +257,8 @@
     "excludeUncachedFromAddons": [],
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
+    "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
-      {
-        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
-        "enabled": true
-      },
-      {
-        "expression": "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]",
-        "enabled": true
-      },
-      {
-        "expression": "/*AI Upscale Exclusion*/ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','aiupscale','upscaled','neural','enhancedai')",
-        "enabled": true
-      },
       {
         "expression": "/*Part of Tamtaro SEL Setup*/[]",
         "enabled": true
@@ -261,6 +269,10 @@
       },
       {
         "expression": "/*G's Low Bitrate*/negate((isAnime or 'Animation' in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))),cached(streams))>10?(isAnime or 'Animation'in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))):[]",
+        "enabled": true
+      },
+      {
+        "expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')",
         "enabled": true
       },
       {
@@ -332,11 +344,11 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
+        "expression": "/* CB | Hard YouTube Kill */ type(streams, 'youtube', 'external')",
         "enabled": true
       },
       {
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
+        "expression": "/* CB | 3D Content Kill */ visualTag(streams, '3D', 'H-OU', 'H-SBS')",
         "enabled": true
       },
       {
@@ -354,63 +366,51 @@
     ],
     "preferredStreamExpressions": [
       {
-        "expression": "/*APEX S-Tier 4K Remux \u2014 IQR Tukey fence (\u22654 ranked) \u00b7 min/max fallback (1\u20133) \u00b7 size floor 15GB*/ count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),q1(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))), '15GB'):count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),min(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))*1.20), '15GB'):[]",
+        "expression": "/*ALLDEBRID S-Tier 4K Remux \u2014 IQR Tukey fence (\u22654 ranked) \u00b7 min/max fallback (1\u20133) \u00b7 size floor 15GB*/ count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),q1(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))), '15GB'):count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),min(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','UHD Bluray T1','UHD Bluray T2','UHD Bluray T3'),'BluRay REMUX'),'2160p'),'bitrate'))*1.20), '15GB'):[]",
         "enabled": true
       },
       {
-        "expression": "/*APEX A-Tier 4K WEB-DL HDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
+        "expression": "/*ALLDEBRID A-Tier 4K WEB-DL HDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
         "enabled": true
       },
       {
-        "expression": "/*APEX B-Tier 4K WEB-DL SDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),q1(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))):count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),min(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
+        "expression": "/*ALLDEBRID B-Tier 4K WEB-DL SDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),q1(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))):count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),min(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
         "enabled": true
       },
       {
-        "expression": "/*APEX C-Tier 4K WEBRip HDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
+        "expression": "/*ALLDEBRID C-Tier 4K WEBRip HDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
         "enabled": true
       },
       {
-        "expression": "/*APEX D-Tier 4K WEBRip SDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133)*/ count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),q1(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))):count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'))>0?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),min(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))*1.20):[]",
+        "expression": "/*ALLDEBRID D-Tier 4K WEBRip SDR \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133)*/ count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),q1(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))):count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'))>0?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),min(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6'),'WEBRip'),'2160p'),'bitrate'))*1.20):[]",
         "enabled": true
       },
       {
-        "expression": "/* APEX E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
+        "expression": "/* ALLDEBRID E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
         "enabled": true
       },
       {
-        "expression": "/*APEX S-Tier 1080p Remux \u2014 IQR Tukey fence (\u22654 ranked) \u00b7 min/max fallback (1\u20133) \u00b7 size floor 8GB*/ count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),q1(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))), '8GB'):count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),min(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))*1.20), '8GB'):[]",
+        "expression": "/*ALLDEBRID S-Tier 1080p Remux \u2014 IQR Tukey fence (\u22654 ranked) \u00b7 min/max fallback (1\u20133) \u00b7 size floor 8GB*/ count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),q1(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))), '8GB'):count(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),min(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Remux T1','Remux T2','Remux T3','HD Bluray T1','HD Bluray T2','HD Bluray T3'),'BluRay REMUX'),'1080p'),'bitrate'))*1.20), '8GB'):[]",
         "enabled": true
       },
       {
-        "expression": "/*APEX A-Tier 1080p WEB-DL \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),q1(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))):count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),min(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
+        "expression": "/*ALLDEBRID A-Tier 1080p WEB-DL \u2014 IQR Tukey fence (\u22654) \u00b7 min/max fallback (1\u20133) \u00b7 age-decay median window (pow 0.95/d)*/ count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),q1(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate')),q3(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))):count(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),min(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(rseMatched(streams,'Web T1','Web T2','Web T3','Web T4','Web T5','Web T6','Web Scene','SeaDex Best','SeaDex Alt'),'WEB-DL'),'1080p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[])))",
         "enabled": true
       },
       {
-        "expression": "/* APEX B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
+        "expression": "/* ALLDEBRID B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
         "enabled": true
       },
       {
-        "expression": "/* APEX C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
+        "expression": "/* ALLDEBRID C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
         "enabled": true
       },
       {
-        "expression": "/* APEX 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
+        "expression": "/* ALLDEBRID 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
         "enabled": true
       },
       {
-        "expression": "/* APEX 720p | Any */ resolution(streams,'720p')",
-        "enabled": true
-      },
-      {
-        "expression": "/*Codec Efficiency Booster*/ merge(encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'720p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'720p'),'HEVC','AV1'))",
-        "enabled": true
-      },
-      {
-        "expression": "/*Audio Pinnacle*/ merge(audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'Atmos','TrueHD'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'DTS-HD MA','DTS-X'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'EAC3','DD+'))",
-        "enabled": true
-      },
-      {
-        "expression": "/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR10+/DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))",
+        "expression": "/* ALLDEBRID 720p | Any */ resolution(streams,'720p')",
         "enabled": true
       }
     ],
@@ -424,6 +424,10 @@
         "enabled": true
       },
       {
+        "expression": "/*SeaDex*/merge(count(addon(cached(streams),'SeaDex'))>0?passthrough(addon(streams,'SeaDex'),'title','year'):passthrough(seadex(streams),'title','year'),queryType=='anime.movie'?passthrough(seadex(streams),'episode'):[])",
+        "enabled": false
+      },
+      {
         "expression": "/*Library*/count(streams)==count(library(streams))?library(streams):[]",
         "enabled": true
       },
@@ -433,10 +437,6 @@
       },
       {
         "expression": "/*0Cached*/ count(merge(cached(streams), type(streams, 'p2p','http','usenet','stremio-usenet')))==0?passthrough(streams,'title'):[]",
-        "enabled": true
-      },
-      {
-        "expression": "/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'))>0?passthrough(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'),'excluded','limit'):[]",
         "enabled": true
       }
     ],
@@ -1158,6 +1158,10 @@
         }
       ]
     },
+    "rpdbApiKey": "t0-free-rpdb",
+    "posterService": "rpdb",
+    "usePosterRedirectApi": true,
+    "usePosterServiceForMeta": true,
     "formatter": {
       "id": "tamtaro",
       "definitions": {
@@ -1252,6 +1256,8 @@
       ],
       "showFilterStatsOnNoStreams": true
     },
+    "tmdbAccessToken": "<template_placeholder>",
+    "tmdbApiKey": "<template_placeholder>",
     "yearMatching": {
       "enabled": true,
       "strict": false,
@@ -1450,13 +1456,12 @@
         ]
       },
       {
-        "type": "stremthruTorz",
-        "instanceId": "67c",
+        "type": "stremthruStore",
+        "instanceId": "68a",
         "enabled": true,
         "options": {
-          "name": "StremThru Torz",
+          "name": "StremThru AllDebrid",
           "timeout": 3000,
-          "includeP2P": false,
           "useMultipleInstances": false
         },
         "resources": [
@@ -1473,14 +1478,13 @@
           "yourMedia": {
             "sources": [
               "torrent",
-              "webdl",
-              "usenet"
+              "webdl"
             ],
             "showStreams": true,
             "enabled": true
           },
           "usenet": {
-            "enabled": true,
+            "enabled": false,
             "customSearchEngines": true
           },
           "url": "https://meteorfortheweebs.midnightignite.me",
@@ -1516,7 +1520,7 @@
       {
         "type": "mediafusion",
         "enabled": false,
-        "instanceId": "f6a38af4-a24d-43fc-8370-c10f07760c17",
+        "instanceId": "5e733da8-f747-44bb-8713-0b9840492db3",
         "options": {
           "timeout": 7000,
           "name": "MediaFusion",
@@ -1558,7 +1562,7 @@
           "timeout": 5000,
           "name": "Torrent Galaxy"
         },
-        "instanceId": "0b7a37bd-6d57-4397-bdd3-28440b087da0",
+        "instanceId": "0ef926e5-117f-464a-820a-47395f119956",
         "resources": [
           "stream"
         ]
@@ -1570,33 +1574,10 @@
           "timeout": 5000,
           "name": "EZTV"
         },
-        "instanceId": "495616cf-23f0-4dfb-96ba-104e8e5a85f0",
+        "instanceId": "2dc445aa-2c65-40f9-a229-2d4f791b9a59",
         "resources": [
           "stream"
         ]
-      },
-      {
-        "type": "newznab",
-        "instanceId": "tb-nzb-1",
-        "enabled": true,
-        "options": {
-          "name": "Search\u207f\u1dbb\u1d47",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
-          "timeout": 10000,
-          "mediaTypes": [
-            "movie",
-            "series",
-            "anime"
-          ],
-          "searchMode": "both",
-          "paginate": true,
-          "checkOwned": false,
-          "useMultipleInstances": false,
-          "services": [
-            "torbox"
-          ]
-        }
       },
       {
         "type": "knaben",
@@ -1642,53 +1623,7 @@
             "en"
           ]
         }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       }
-    ],
-    "catalogModifications": [],
-    "cacheAndPlay": {
-      "enabled": true,
-      "streamTypes": [
-        "usenet",
-        "torrent"
-      ]
-    },
-    "checkOwned": false,
-    "nzbFailover": {
-      "enabled": true,
-      "position": "last"
-    },
-    "serviceWrap": {
-      "enabled": false,
-      "services": [
-        "torbox"
-      ],
-      "reconfigureService": false
-    },
-    "maxResults": 20,
-    "maxResultsPerResolution": 8,
-    "externalDownloads": false,
-    "autoRemoveDownloads": false,
-    "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
     ],
     "addonCategoryColors": {
       "Mix": "indigo",
@@ -1698,17 +1633,27 @@
       "P2P": "orange",
       "Subs": "purple"
     },
+    "catalogModifications": [],
     "mergedCatalogs": [],
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
-    ],
-    "seadexBestOnly": false,
-    "rpdbApiKey": "t0-free-rpdb",
-    "posterService": "rpdb",
-    "enhanceResults": true,
-    "tmdbAccessToken": "<template_placeholder>",
-    "tmdbApiKey": "<template_placeholder>",
-    "usePosterRedirectApi": true,
-    "usePosterServiceForMeta": true
+    "externalDownloads": false,
+    "cacheAndPlay": {
+      "enabled": true,
+      "streamTypes": [
+        "torrent"
+      ]
+    },
+    "autoRemoveDownloads": false,
+    "checkOwned": false,
+    "nzbFailover": {
+      "enabled": false,
+      "position": "last"
+    },
+    "serviceWrap": {
+      "enabled": false,
+      "services": [
+        "torbox"
+      ],
+      "reconfigureService": false
+    }
   }
 }

@@ -66,7 +66,7 @@ TorBox Pro?
 │   ├── Want 4K? → 4K Hybrid
 │   └── 1080p only? → Hybrid
 ├── Want 4K? → 4K Apex
-├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
+├── Samsung TV / no Dolby Vision? → Samsung TV · Samsung TV 4K
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -150,10 +150,13 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 | Template | Device / Use-case | Res | Import URL |
 |---|---|---|---|
-| **Core Nexus Samsung TV** 🌙 | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
-| **Core Nexus Samsung TV 4K** 🌙 | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Samsung TV** | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
+| **Core Nexus Samsung TV 4K** | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Apple TV 4K** 🌙 | Apple TV 4K / Infuse | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 
-> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). DV+HDR10 dual-layer files pass through. 1080p variant based on Core Nexus Stream · 4K variant based on Core Nexus 4K Apex · TorBox Pro · Essential plan.
+> **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). TrueHD / DTS:X / FLAC also excluded for Tizen compatibility. DV+HDR10 dual-layer files pass through. TorBox Pro · Essential plan.
+
+> **Apple TV 4K:** Dolby Vision Profile 5/8 native via Infuse — DV streams prioritised. AV1 hard-excluded (no hardware decoder on A15). DD+ Atmos top audio. Based on Core Nexus 4K Apex · TorBox Pro.
 
 ---
 
@@ -221,7 +224,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 31 active templates — 16 standard + 14 Lite variants + 1 Nightly |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 37 active templates — 33 stable (20 standard + 13 Lite variants) + 4 Nightly |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |

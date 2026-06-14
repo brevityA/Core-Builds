@@ -19,15 +19,22 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 | [4K Apex](#-core-nexus-4k-apex) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet · IQR adaptive bitrate floors |
 | [Stream](#-core-nexus-stream) | Pro | 1080p | WEB-DL only, budget hardware |
 | [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
-| [Samsung TV](#-core-nexus-samsung-tv-nightly) 🌙 | Pro | 1080p | Samsung / no Dolby Vision |
-| [Samsung TV 4K](#-core-nexus-samsung-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
+| [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
+| [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
+| [Apple TV 4K](#-core-nexus-apple-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Apple TV 4K / Dolby Vision |
 | [4K Hybrid](#-core-nexus-4k-hybrid) | Pro + NZBGeek | 4K + 1080p | Dual-source: TorBox + Usenet, full 4K |
 | [Hybrid](#-core-nexus-hybrid) | Pro + NZBGeek | 1080p | Dual-source: TorBox + Usenet |
 | [4K Essential](#-core-nexus-4k-essential) | Essential | 4K + 1080p | Full 4K on Essential plan |
 | [Essential](#-core-nexus-essential) | Essential | 1080p | Standard Essential build |
-| [Speed 4K+](#-speed-tier) | Essential + EasyNews | 4K | Instant cached 4K |
-| [Speed EasyNews](#-speed-tier) | EasyNews only | 1080p | EasyNews — no TorBox needed |
-| [Anime](#-anime) 🎌 | Essential | 1080p | SeaDex best-release anime |
+| [4K AllDebrid](#-core-nexus-4k-alldebrid) | AllDebrid | 4K + 1080p | AllDebrid users — full 4K |
+| [AllDebrid](#-core-nexus-alldebrid) | AllDebrid | 1080p | AllDebrid users — 1080p |
+| [4K AllDebrid Lite](#-core-nexus-4k-alldebrid-lite) | AllDebrid | 4K + 1080p | AllDebrid — simple filtering |
+| [AllDebrid Lite](#-core-nexus-alldebrid-lite) | AllDebrid | 1080p | AllDebrid — simple filtering |
+| [Speed 4K+](#easynews-speed-templates) | Essential + EasyNews | 4K | Instant cached 4K |
+| [Speed+](#easynews-speed-templates) | Essential + EasyNews | 1080p | Instant cached 1080p |
+| [Speed EasyNews](#easynews-speed-templates) | EasyNews only | 1080p | EasyNews — no TorBox needed |
+| [Speed 4K](#torbox-only-speed-templates) | Essential | 4K | Fast cached 4K |
+| [Speed](#torbox-only-speed-templates) | Essential | 1080p | Fast cached 1080p || [Anime](#-anime) 🎌 | Essential | 1080p | SeaDex best-release anime |
 | [Anime 4K](#-anime) 🎌 | Essential | 4K + 1080p | HDR anime |
 | [Anime Dub](#-anime) 🎌 | Essential | 1080p | English dubbed anime |
 | [Flash](#️-flash-tier) ⚡⚡ | Essential | 1080p | Instant play, cached only |
@@ -53,7 +60,8 @@ TorBox Pro?
 │   ├── Want 4K? → 4K Hybrid
 │   └── 1080p only? → Hybrid
 ├── Want 4K? → 4K Apex
-├── Samsung TV / no Dolby Vision? → Samsung TV (Nightly) · Samsung TV 4K (Nightly)
+├── Samsung TV / no Dolby Vision? → Samsung TV · Samsung TV 4K
+├── Apple TV 4K (Infuse)? → Apple TV 4K (Nightly)
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -67,6 +75,14 @@ TorBox Essential?
 └── 1080p standard? → Essential
 
 EasyNews only (no TorBox)? → Speed EasyNews
+
+AllDebrid (no TorBox)?
+├── Want 4K?
+│   ├── Full IQR filtering → 4K AllDebrid
+│   └── Simpler filtering → 4K AllDebrid Lite
+└── 1080p only?
+    ├── Full → AllDebrid
+    └── Lite → AllDebrid Lite
 
 Anime?
 ├── Want 4K HDR? → Anime 4K
@@ -86,12 +102,17 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus 4K Apex (TorBox)** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json` |
 | **Core Nexus Stream** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Core Nexus Stream (Fire Stick)** | TorBox Pro | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
-| **Core Nexus Samsung TV** 🌙 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
-| **Core Nexus Samsung TV 4K** 🌙 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Samsung TV** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
+| **Core Nexus Samsung TV 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Apple TV 4K** 🌙 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 | **Core Nexus 4K Hybrid** | Pro + NZBGeek | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Core Nexus Hybrid** | Pro + NZBGeek | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Core Nexus 4K Essential** | Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Core Nexus Essential** | Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
+| **Core Nexus 4K AllDebrid** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
+| **Core Nexus AllDebrid** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
+| **Core Nexus 4K AllDebrid Lite** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
+| **Core Nexus AllDebrid Lite** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
 | **Core Nexus Speed 4K+** | Essential + EasyNews | 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json` |
 | **Core Nexus Speed EasyNews** | EasyNews only | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json` |
 | **Core Nexus Anime** 🎌 | Essential | 1080p+4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` |
@@ -157,31 +178,43 @@ Flagship 4K build for TorBox Pro. Full addon stack — DV/HDR, TrueHD/Atmos, Blu
 
 ---
 
-### 🌙 Core Nexus Samsung TV *(Nightly)*
+### 📺 Core Nexus Samsung TV
 
 Stream-based 1080p template for Samsung TVs and devices without Dolby Vision support. DV-only streams excluded by default. DV+HDR10 dual-layer files pass through normally.
 
 | | |
 |---|---|
-| **File** | `Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
-| **Version** | v0.1.0 |
-| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv.json` |
+| **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
+| **Version** | v0.2.1 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ❌ |
 
-> 🌙 Nightly — stable for daily use, gathering community feedback before promotion to stable.
-
 ---
 
-### 🌙 Core Nexus Samsung TV 4K *(Nightly)*
+### 📺 Core Nexus Samsung TV 4K
 
-4K variant of the Samsung TV template. DV-Only Kill ESE enabled by default — DV-only streams excluded, HDR10+/HDR10/HLG/SDR and DV+HDR10 dual-layer pass through normally. HDR10+ is the preferred visual tag (Samsung TVs support HDR10+). Full lossless audio enabled with 7.1 channel support.
+4K variant of the Samsung TV template. DV-Only Kill ESE enabled by default — DV-only streams excluded, HDR10+/HDR10/HLG/SDR and DV+HDR10 dual-layer pass through normally. HDR10+ is the preferred visual tag. TrueHD, DTS:X, DTS-HD MA, and FLAC hard-excluded for Samsung Tizen compatibility — DD+ Atmos is the top audio format.
 
 | | |
 |---|---|
-| **File** | `Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Version** | v0.2.1 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Resolution** | 2160p · 1080p fallback |
+| **Usenet** | ❌ |
+
+---
+
+### 🌙 Core Nexus Apple TV 4K *(Nightly)*
+
+4K template for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 natively supported — DV streams prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR also shown. AV1 hard-excluded (no hardware decoder on A15 chip). DD+ Atmos is the native top audio format. Based on Core Nexus Samsung TV 4K with DV-Only Kill removed and visual tag order adjusted for DV preference.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 | **Version** | v0.1.0 |
-| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
 
@@ -250,6 +283,56 @@ Full 4K for Essential plan. No Usenet.
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ❌ |
+
+---
+
+## 🟠 AllDebrid Templates
+
+AllDebrid variants for users without a TorBox subscription. Same IQR Tukey fence PSE stack as the Essential tier — `stremthruStore` replaces `stremthruTorz`. After import, go to **Add-ons → StremThru AllDebrid** and enter your AllDebrid API key.
+
+### 💎 Core Nexus 4K AllDebrid
+
+Full 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD/Atmos · AV1.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
+| **Version** | v0.1.2 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
+| **Resolution** | 2160p primary, 1080p fallback |
+
+### 📱 Core Nexus AllDebrid
+
+1080p AllDebrid. WEB-DL / Remux · HDR preferred · TrueHD/Atmos.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
+| **Resolution** | 1080p · 720p fallback |
+
+### 💡 Core Nexus 4K AllDebrid Lite
+
+4K AllDebrid with simple CB-style PSEs — no IQR Tukey fence. Lighter filtering for users who prefer less complexity.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
+| **Resolution** | 2160p primary, 1080p fallback |
+
+### 💡 Core Nexus AllDebrid Lite
+
+1080p AllDebrid Lite. WEB-DL / Remux · HDR preferred · same PSE stack as AllDebrid 1080p with the Lite naming convention.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
+| **Resolution** | 1080p · 720p fallback |
 
 ---
 

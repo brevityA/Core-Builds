@@ -4,6 +4,46 @@
 
 ---
 
+## 2.8.1 (2026-06-14)
+
+### Fixed
+- **Core Nexus Stream strictly 1080p** (`core-nexus-stream.json`, v2.7.5 → v2.7.7) — PSEs rank but do not exclude non-matching streams. Without a hard resolution ESE, 4K/1440p/720p streams all appeared in results regardless of the 1080p-only PSE labels. Two changes:
+  1. Hard resolution kill ESE at position 1: `resolution(streams, '2160p', '1440p', '720p', '576p', '480p')` — all non-1080p streams excluded before any other logic fires.
+  2. Removed PSEs 5 and 6 (720p WEB-DL and 720p Any fallback tiers) — the template is 1080p-only and should not rank 720p content at all.
+
+---
+
+## 2.8.0 (2026-06-14)
+
+### Added
+- **AllDebrid template family** — Full suite of AllDebrid templates for users without a TorBox subscription. `stremthruStore` replaces `stremthruTorz`; all other presets, PSE logic, and filter stacks are carried over from their Essential counterparts.
+  - **Core Nexus 4K AllDebrid** (`Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json`, v0.1.2) — Full 4K with IQR Tukey fence PSEs, DV/HDR priority, TrueHD/Atmos, AV1.
+  - **Core Nexus AllDebrid** (`Templates/Torbox/AllDebrid/core-nexus-alldebrid.json`, v0.1.0) — 1080p AllDebrid with CB-style PSEs.
+  - **Core Nexus 4K AllDebrid Lite** (`Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json`, v0.1.0) — 4K AllDebrid without IQR filtering (CB-style simple PSEs). Lighter alternative for users who prefer less complexity.
+  - **Core Nexus AllDebrid Lite** (`Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json`, v0.1.0) — 1080p AllDebrid Lite companion.
+- **Core Nexus Apple TV 4K** (`Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json`, v0.1.0) — Nightly template for Apple TV 4K via Infuse. Dolby Vision Profile 5/8 native, DD+ Atmos preferred, AV1 hard-excluded (no hardware decoder on A15/A17), HEVC-only. Based on 4K Apex with Apple TV-specific codec constraints applied.
+- **Samsung TV promoted to stable** — Both Samsung TV templates moved from `Nightly/Samsung/` to `Templates/Torbox/Device/Samsung/` (new `Device/` category). v0.1.1 → v0.2.0. Samsung templates are no longer tagged as Nightly; `Device/` is the long-term home for device-specific variants.
+- **Hybrid TorBox-priority PSEs** (`core-nexus-4k-hybrid.json`, v1.2.0) — 4 new PSEs that prefer TorBox-cached streams within each quality tier before falling back to the all-service pool. Pairs each existing IQR tier with a `service(...,'torbox')` twin: S-Tier 4K Remux, A-Tier 4K WEB-DL, S-Tier 1080p Remux, A-Tier 1080p WEB-DL. TorBox users on the Hybrid template will now consistently see TorBox streams ranked above RealDebrid when both are present.
+
+### Changed
+- **`pow()` exponential age-decay window replaces hard 60-day cliff** — Five templates previously used a `daysSinceRelease<60` binary gate as the thin-pool fallback for quality tiers with fewer than 4 ranked streams. Day 59 content got a ±25% bitrate window; day 61 got nothing, falling to the E-Tier catch-all. Replaced with a smooth exponential decay using `pow(0.95, daysSinceRelease)`: ±40% at day 0, ±9% at day 30, ±2% at day 60, effectively zero by day 90. Content gradually ages out rather than hitting a cliff. Applied to 4 PSEs each in:
+  - Core Nexus 4K Apex (v0.3.5 → **v0.4.0**)
+  - Core Nexus 4K Apex TorBox (v0.1.4 → **v0.2.0**)
+  - Core Nexus 4K Hybrid (v1.1.0 → **v1.2.0**)
+  - Core Nexus 4K Essential (v2.7.5 → **v2.8.0**)
+  - Core Nexus 4K AllDebrid (v0.1.0 → v0.1.1, bundled with initial release)
+- **Core Nexus 4K Pro deprecated** — Superseded by 4K Apex (same IQR PSE stack, cleaner naming, active development). Moved to `Templates/Torbox/Deprecated/`. 4K Apex is the recommended replacement.
+
+### Fixed
+- **Samsung TV 4K missing audio exclusions** (`core-nexus-samsung-tv-4k.json`, v0.2.0 → v0.2.1) — `excludedAudioTags` was empty. DTS:X and TrueHD were preferred but never hard-excluded, meaning the template actively surfaced streams Samsung Tizen cannot decode. Fixed to match the 1080p template: `["TrueHD","DTS-HD MA","DTS:X","FLAC"]`. A user (Dom) reported streams playing for a few seconds then stuttering — this was the cause.
+- **Samsung TV 1080p visual tag order** (`core-nexus-samsung-tv.json`, v0.2.0 → v0.2.1) — `preferredVisualTags` was ordered SDR → HLG → HDR → HDR10 → HDR10+, ranking SDR above HDR content. Samsung supports HDR10 and HDR10+ at 1080p. Fixed to HDR10+ → HDR10 → HDR → HLG → 10bit → SDR.
+- **`addonLogo` URL in all stable templates** — 31 templates used `/main/Assets/` in the GitHub raw URL. Corrected to `/refs/heads/main/Assets/` per the CLAUDE.md spec. The old URL is a redirect that occasionally breaks on stale CDN caches.
+- **Samsung 1080p `addonName`** — Was `"Core Nexus Stream"` (copied from the Stream template base and never updated). Corrected to `"Core Nexus Samsung TV"`.
+- **Stream template CB tier labels** — PSE comment labels still used legacy `/* CB S-Tier 1080p */`, `/* CB A-Tier */` etc. from the original Community Builds naming. Renamed to `/* S-Tier 1080p | BluRay REMUX */` etc. to match the current naming convention.
+- **AllDebrid 4K stale PSE labels** (v0.1.1 → v0.1.2) — PSEs 6, 9, 10, 11, 12 still read `ESSENTIAL` after the template was derived from `core-nexus-4k-essential.json`. Corrected to `ALLDEBRID`.
+
+---
+
 ## 2.7.5 (2026-06-13)
 
 ### Added
