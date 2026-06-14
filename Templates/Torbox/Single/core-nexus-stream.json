@@ -268,6 +268,10 @@
         "enabled": true
       },
       {
+        "expression": "/* Hard 4K Kill — Stream is 1080p-only */ resolution(streams, '2160p', '1440p')",
+        "enabled": true
+      },
+      {
         "expression": "/*Part of Tamtaro SEL Setup*/[]",
         "enabled": true
       },
