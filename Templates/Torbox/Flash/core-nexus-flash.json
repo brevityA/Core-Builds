@@ -1092,7 +1092,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus Flash",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "Speed 1080p — TorBox Essential. Shows CACHED streams only for instant play. Zero results = content not yet in TorBox cache. Try a popular title first.",
     "appliedTemplates": [
       {

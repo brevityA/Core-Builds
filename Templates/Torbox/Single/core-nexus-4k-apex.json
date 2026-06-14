@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus 4K Apex",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "Adaptive 4K Flagship. Ranked-pool bitrate floors · New-release fallback · Full ESE stack.",
     "appliedTemplates": [
       {

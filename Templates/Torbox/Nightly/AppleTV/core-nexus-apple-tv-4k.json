@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus Apple TV 4K",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "4K HDR focused. Dolby Vision priority · HDR10+ / HDR10 · DD+ Atmos · HEVC only (AV1 excluded).",
     "appliedTemplates": [
       {

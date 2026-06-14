@@ -15,8 +15,8 @@
   "config": {
     "trusted": false,
     "showChanges": true,
-    "addonName": "Core Nexus Stream",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonName": "Core Nexus Samsung TV",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "1080p · No Dolby Vision · HDR10 / HLG preferred · DTS:X / TrueHD excluded · RPDB posters.",
     "appliedTemplates": [
       {

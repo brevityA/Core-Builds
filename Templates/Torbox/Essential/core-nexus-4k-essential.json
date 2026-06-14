@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus 4K Essential",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "4K TorBox Essential. DV/HDR · TrueHD/Atmos · Uncapped Bitrate · AV1. No Usenet required.",
     "appliedTemplates": [
       {

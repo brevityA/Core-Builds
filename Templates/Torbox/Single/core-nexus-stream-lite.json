@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus Stream Lite",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "1080p WEB-DL focused. BluRay/Remux blocked · SDR · Pure streaming quality. RPDB posters included. · Relaxed filtering.",
     "appliedTemplates": [
       {

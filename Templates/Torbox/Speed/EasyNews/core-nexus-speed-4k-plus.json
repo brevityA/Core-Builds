@@ -1103,7 +1103,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus Speed 4K+",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "Speed 4K + EasyNews — TorBox Essential. Shows CACHED streams only for instant play. Zero results = content not yet cached. Use Core Nexus 4K Essential for full coverage.",
     "appliedTemplates": [
       {

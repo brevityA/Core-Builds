@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus Essential Lite",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "1080p TorBox Essential. WEB-DL · DD+ · SDR-first · Clean streams. No Usenet required. · Relaxed filtering.",
     "appliedTemplates": [
       {
