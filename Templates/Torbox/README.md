@@ -21,6 +21,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | Template | Version | Testing | Import URL |
 |---|---|---|---|
 | **4K Apex Labs** | v0.4.0 | Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`, bad dual audio via `releaseGroup()` ESE. Simple group-name patterns removed from `rankedRegexPatterns`. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Stream Labs** | v0.2.0 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Apple TV 4K** | v0.1.0 | Device profile — DV Profile 5/8, AV1 excluded, Atmos preferred | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 
 ### 🗂️ Stable Templates
