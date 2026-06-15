@@ -22,6 +22,8 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
 | [Apple TV 4K](#-core-nexus-apple-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Apple TV 4K / Dolby Vision |
+| [4K Apex Labs](#-labs-templates) 🧪 | Pro | 4K + 1080p | Nightly — jsDelivr synced regex test |
+| [Stream Labs](#-labs-templates) 🧪 | Pro | 1080p | Nightly — jsDelivr synced regex test |
 | [4K Hybrid](#-core-nexus-4k-hybrid) | Pro + NZBGeek | 4K + 1080p | Dual-source: TorBox + Usenet, full 4K |
 | [Hybrid](#-core-nexus-hybrid) | Pro + NZBGeek | 1080p | Dual-source: TorBox + Usenet |
 | [4K Essential](#-core-nexus-4k-essential) | Essential | 4K + 1080p | Full 4K on Essential plan |
@@ -105,6 +107,8 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Samsung TV** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
 | **Core Nexus Samsung TV 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
 | **Core Nexus Apple TV 4K** 🌙 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
+| **Core Nexus 4K Apex Labs** 🧪 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Core Nexus Stream Labs** 🧪 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Core Nexus 4K Hybrid** | Pro + NZBGeek | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Core Nexus Hybrid** | Pro + NZBGeek | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Core Nexus 4K Essential** | Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
@@ -219,6 +223,38 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | **Usenet** | ❌ |
 
 > 🌙 Nightly — stable for daily use, gathering community feedback before promotion to stable.
+
+---
+
+### 🧪 Labs Templates
+
+Experimental builds testing features that may graduate to stable. Currently testing: **jsDelivr CDN as a `syncedRankedRegexUrls` source** — if `cdn.jsdelivr.net` is not blocked by public AIOStreams instances (elfhosted, fortheweak.cloud), this unlocks live-synced regex scoring without embedding patterns inline.
+
+Both templates keep the full inline `rankedRegexPatterns` as a fallback.
+
+#### Core Nexus 4K Apex Labs
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Version** | v0.2.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Resolution** | 2160p · 1080p fallback |
+| **Base** | 4K Apex v0.4.3 |
+| **Usenet** | ❌ |
+
+#### Core Nexus Stream Labs
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **Resolution** | 1080p |
+| **Base** | Stream v2.8.2 |
+| **Usenet** | ❌ |
+
+> 🧪 Labs — import and report whether you see a "Forbidden URL" error on your AIOStreams instance. If it loads cleanly, jsDelivr is allowed and we can enable synced regex for all templates.
 
 ---
 
