@@ -4,7 +4,7 @@
 
 # Core Builds — Template Directory
 
-All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.
+All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Core Builds ESEs + kill ESEs, and in-app update notifications.
 
 > **Current version: v2.8.2** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
