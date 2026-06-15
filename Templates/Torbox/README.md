@@ -14,6 +14,17 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 
 ## ⚡ Quick Reference
 
+### 🧪 Active Lab Tests
+
+| Template | Resolution | Testing | Import URL |
+|---|---|---|---|
+| **4K Apex Labs** | 4K + 1080p | jsDelivr `syncedRankedRegexUrls` — does `cdn.jsdelivr.net` pass the URL whitelist on your instance? | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Stream Labs** | 1080p | Same jsDelivr test — 1080p variant | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+
+> Import one of these on your AIOStreams instance and report back: **does it load without a "Forbidden URL" error?** If yes, we can enable live-synced regex scoring across all templates. If it errors, that CDN is also blocked.
+
+### 🗂️ Stable Templates
+
 | Template | Plan | Resolution | Best for |
 |---|---|---|---|
 | [4K Apex](#-core-nexus-4k-apex) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet · IQR adaptive bitrate floors |
@@ -22,8 +33,6 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
 | [Apple TV 4K](#-core-nexus-apple-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Apple TV 4K / Dolby Vision |
-| [4K Apex Labs](#-labs-templates) 🧪 | Pro | 4K + 1080p | Nightly — jsDelivr synced regex test |
-| [Stream Labs](#-labs-templates) 🧪 | Pro | 1080p | Nightly — jsDelivr synced regex test |
 | [4K Hybrid](#-core-nexus-4k-hybrid) | Pro + NZBGeek | 4K + 1080p | Dual-source: TorBox + Usenet, full 4K |
 | [Hybrid](#-core-nexus-hybrid) | Pro + NZBGeek | 1080p | Dual-source: TorBox + Usenet |
 | [4K Essential](#-core-nexus-4k-essential) | Essential | 4K + 1080p | Full 4K on Essential plan |
