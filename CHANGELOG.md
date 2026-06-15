@@ -11,6 +11,8 @@
 - **Anime templates — empty `rankedRegexPatterns`** — Anime templates (`core-nexus-anime*.json` × 6) retain `rankedRegexPatterns: []`. Live-action release group patterns don't match anime naming; SeaDex ISE and dedicated anime indexers handle quality selection.
 
 ### Fixed
+- **`rseMatched` removed from PSEs in 6 templates** (`core-nexus-4k-hybrid.json`, `core-nexus-hybrid.json`, `core-nexus-hybrid-lite.json`, `core-nexus-4k-apex-torbox.json`, `core-nexus-4k-essential.json`, `core-nexus-4k-essential-lite.json`) — PSEs used `rseMatched(streams, 'tier_name_1', ...)` to filter by RSE tier names. These calls throw "Invalid stream expression" on any instance where the Vidhin05 RSE URL is blocked. Replaced with bare `streams` — the PSE size/bitrate windows still apply to all streams.
+- **`rseMatched` replaced in ESEs across 23 templates (98 expressions)** — Four ESE patterns (Bad 4k Anime, Upscaled 4k, Bad 4k Bluray, Bad 1080P Bluray) all contained `and count(rseMatched(resolution(streams, '2160p'), 'tier1', ...)) == 0` guards. Same failure mode. Replaced with equivalent `count(seadex(...))` and `count(quality(..., 'Bluray REMUX'))` checks that work on any instance.
 - **Samsung TV 4K audit fixes** (`core-nexus-samsung-tv-4k.json`, v0.2.1 → v0.2.2)
   - AV1 and VC-1 removed from `preferredEncodes`, added to `excludedEncodes` — Samsung Tizen (2018–2022 models: RU7100, RU8000, NU8000, Q60) has no hardware AV1 decoder; VC-1 is absent. Previously the template ranked AV1/VC-1 above HEVC, causing silent playback failures.
   - Dolby Vision, HDR+DV (dual-layer), and AI upscale removed from `preferredVisualTags` — DV streams are already excluded by the DV-Only Kill ESE. AI upscale is not a real HDR format.
