@@ -14,14 +14,17 @@ All active templates for AIOStreams v2.30+. Every template requires a **TorBox s
 
 ## ⚡ Quick Reference
 
-### 🧪 Active Lab Tests
+### 🧪 Nightly / Labs
 
-| Template | Resolution | Testing | Import URL |
+Nightly templates test new optimisations before they're promoted to stable. They may change frequently and are not guaranteed to be stable. Use them to give feedback on new ideas — report findings in the Nightly thread.
+
+| Template | Version | Testing | Import URL |
 |---|---|---|---|
-| **4K Apex Labs** | 4K + 1080p | jsDelivr `syncedRankedRegexUrls` — does `cdn.jsdelivr.net` pass the URL whitelist on your instance? | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| **Stream Labs** | 1080p | Same jsDelivr test — 1080p variant | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **4K Apex Labs** | v0.4.0 | Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`, bad dual audio via `releaseGroup()` ESE. Simple group-name patterns removed from `rankedRegexPatterns`. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Stream Labs** | v0.2.0 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **Apple TV 4K** | v0.1.0 | Device profile — DV Profile 5/8, AV1 excluded, Atmos preferred | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 
-> Import one of these on your AIOStreams instance and report back: **does it load without a "Forbidden URL" error?** If yes, we can enable live-synced regex scoring across all templates. If it errors, that CDN is also blocked.
+> **[What's being tested? → Full Labs changelog & testing guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/LABS.md)**
 
 ### 🗂️ Stable Templates
 

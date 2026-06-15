@@ -2,10 +2,10 @@
   "metadata": {
     "id": "core-nexus-stream-labs",
     "name": "Core Nexus Stream Labs",
-    "description": "Experimental Nightly. Tests: syncedRankedRegexUrls via jsDelivr CDN whitelist validation on public instances. Based on Stream v2.8.2.",
+    "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Based on Stream v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Stream Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs — jsDelivr synced regex test. Report findings in the Nightly thread.",
+    "addonDescription": "Nightly Labs v0.2.0 — hybrid regex+SEL: elite groups via releaseGroup() pin, x264/IMAX via native fields, bad dual via ESE. Report findings in the Nightly thread.",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
@@ -331,6 +331,14 @@
         "enabled": true
       },
       {
+        "expression": "/* LABS v0.2.0 | x264 Hard Exclude — native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
+        "enabled": false
+      },
+      {
+        "expression": "/* LABS v0.2.0 | Bad Dual Audio Groups — releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
+        "enabled": false
+      },
+      {
         "expression": "/* CB | Hard CAM Kill */ quality(streams, 'CAM', 'SCR', 'TS', 'TC', 'HC HD-Rip')",
         "enabled": true
       },
@@ -352,6 +360,14 @@
       }
     ],
     "preferredStreamExpressions": [
+      {
+        "expression": "/* LABS v0.2.0 | Elite Group pin — releaseGroup() replaces simple regex patterns */ pin(releaseGroup(streams, 'FraMeSToR', 'TheFarm', '126811', 'FLUX', 'SiC', 'hallowed', 'BHDStudio'), 'top')",
+        "enabled": true
+      },
+      {
+        "expression": "/* LABS v0.2.0 | IMAX pin — native visualTag() replaces regex pattern */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
+        "enabled": true
+      },
       {
         "expression": "/* S-Tier 1080p | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '1080p')",
         "enabled": true
@@ -520,16 +536,6 @@
         "score": -75
       },
       {
-        "pattern": "/\\b(alfaHD.*|BAT|BlackBit|BNd|C\\.A\\.A|Cory|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|MGE|N3G4N|ONLYMOViE|PD|PTHome|RiPER|RK|SiGLA|Tars|TM|tokar86a|TURG|TvR|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
-        "name": "Radarr Bad Dual Groups",
-        "score": -50
-      },
-      {
-        "pattern": "/\\b(alfaHD.*|BAT|BiOMA|BlackBit|BNd|C\\.A\\.A|Cory|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|N3G4N|PD|PTHome|RiPER|RK|SiGLA|Tars|tokar86a|TURG|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
-        "name": "Sonarr Bad Dual Groups",
-        "score": -50
-      },
-      {
         "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "name": "Upscaled",
         "score": -75
@@ -553,16 +559,6 @@
         "pattern": "/^(?=.*\\b(Flights|GuyZo|BR-GuyZo)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/",
         "name": "Generated Dynamic HDR [B]",
         "score": -50
-      },
-      {
-        "pattern": "/\\b(FraMeSToR)\\b/",
-        "name": "FraMeSToR",
-        "score": 100
-      },
-      {
-        "pattern": "/\\b(TheFarm)\\b/i",
-        "name": "TheFarm",
-        "score": 80
       },
       {
         "pattern": "/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/",
