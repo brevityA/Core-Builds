@@ -24,6 +24,8 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | **Stream Labs** | v0.2.0 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Apple TV 4K** | v0.1.0 | Device profile — DV Profile 5/8, AV1 excluded, Atmos preferred | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 
+> **[What's being tested? → Full Labs changelog & testing guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/LABS.md)**
+
 ### 🗂️ Stable Templates
 
 | Template | Plan | Resolution | Best for |
