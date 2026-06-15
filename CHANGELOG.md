@@ -4,6 +4,28 @@
 
 ---
 
+## 2.8.2 (2026-06-15)
+
+### Changed
+- **Regex scoring — 53 high-impact patterns inline (all 31 non-Anime templates)** — The <100KB approach used `syncedRankedRegexUrls` pointing to `Filtering/ranked-regex-patterns.json`. AIOStreams instances that block raw GitHub URLs throw a "Forbidden URL in regex configuration" error on import, leaving templates with zero scoring. Fixed by embedding 53 patterns with `|score| ≥ 50` directly inline (16 KB overhead). All templates under 100 KB except 4K Hybrid (105 KB). Retained tiers: S-tier (100), A-tier (80), B-tier (60), and penalised tiers (−50, −75, −200). Mid-tier score=0/20/40 patterns dropped — no meaningful ranking differentiation. `syncedRankedRegexUrls` key removed from all templates.
+- **Anime templates — empty `rankedRegexPatterns`** — Anime templates (`core-nexus-anime*.json` × 6) retain `rankedRegexPatterns: []`. Live-action release group patterns don't match anime naming; SeaDex ISE and dedicated anime indexers handle quality selection.
+
+### Fixed
+- **Samsung TV 4K audit fixes** (`core-nexus-samsung-tv-4k.json`, v0.2.1 → v0.2.2)
+  - AV1 and VC-1 removed from `preferredEncodes`, added to `excludedEncodes` — Samsung Tizen (2018–2022 models: RU7100, RU8000, NU8000, Q60) has no hardware AV1 decoder; VC-1 is absent. Previously the template ranked AV1/VC-1 above HEVC, causing silent playback failures.
+  - Dolby Vision, HDR+DV (dual-layer), and AI upscale removed from `preferredVisualTags` — DV streams are already excluded by the DV-Only Kill ESE. AI upscale is not a real HDR format.
+  - `maxResults` → 20, `maxResultsPerResolution` → 8 (aligned with standard defaults).
+- **Samsung TV 1080p audit fixes** (`core-nexus-samsung-tv.json`, v0.2.1 → v0.2.2) — same AV1/VC-1 exclusion, DV/AI visual tag, and result limit fixes as the 4K variant.
+- **4K Apex audit fixes** (`core-nexus-4k-apex.json`, v0.4.2 → v0.4.3)
+  - AI upscale removed from `preferredVisualTags`.
+  - `2.0` added to `preferredAudioChannels` → `["7.1", "5.1", "2.0"]` — stereo streams were unranked.
+  - `seadexBestOnly` set to `false` — was silently dropping non-SeaDex streams for anime queries.
+  - `maxResults` → 20, `maxResultsPerResolution` → 8.
+  - Duplicate `preferredRegexPatterns` entries renamed with `[B]` suffix.
+  - Low resolutions (144p, 240p, 360p) removed from `preferredResolutions`.
+
+---
+
 ## 2.8.1 (2026-06-14)
 
 ### Fixed
