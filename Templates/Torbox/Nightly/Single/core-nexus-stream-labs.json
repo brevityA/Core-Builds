@@ -215,6 +215,10 @@
         "score": 75
       }
     ],
+    "syncedPreferredStreamExpressionUrls": [],
+    "syncedExcludedStreamExpressionUrls": [],
+    "syncedIncludedStreamExpressionUrls": [],
+    "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
