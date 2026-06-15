@@ -56,42 +56,60 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `addonLogo` URL must use `/refs/heads/main/` not `/main/` — the short form breaks on stale CDN caches
 - `stremthruTorz` is TorBox-specific; `stremthruStore` is for other debrid services (AllDebrid, RD)
 - `torbox-search` was renamed/removed in AIOStreams v2.30.2 — keep it `enabled: false`
+- `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — do not use; embed patterns inline in `rankedRegexPatterns` instead
 
 ---
 
-## Active Template Inventory (as of v2.8.0)
+## Active Template Inventory (as of v2.8.2)
 
 ### Single (TorBox Pro)
-- `core-nexus-4k-apex.json` v0.4.0 — flagship 4K, IQR PSEs, pow() decay
-- `core-nexus-4k-apex-torbox.json` v0.2.0 — TorBox-cached-only Apex variant
-- `core-nexus-stream.json` v2.7.6 — 1080p streaming quality
-- `core-nexus-stream-lite.json` — lite variant
-- `core-nexus-stream-firestick.json` — Fire Stick optimised
-- `core-nexus-stream-firestick-lite.json`
+- `Single/core-nexus-4k-apex.json` v0.4.3 — flagship 4K, IQR PSEs, pow() decay
+- `Single/core-nexus-4k-apex-torbox.json` v2.8.2 — TorBox-cached-only Apex variant
+- `Single/core-nexus-stream.json` v2.8.2 — 1080p streaming quality
+- `Single/core-nexus-stream-lite.json` v2.8.2 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.8.2 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick-lite.json` v2.8.2
 
 ### Essential (TorBox Essential)
-- `core-nexus-4k-essential.json` v2.8.0 — 4K with IQR PSEs, pow() decay
-- `core-nexus-4k-essential-lite.json` — CB-style PSEs
-- `core-nexus-essential.json` — 1080p
-- `core-nexus-essential-lite.json`
+- `Essential/core-nexus-4k-essential.json` v2.8.2 — 4K with IQR PSEs, pow() decay
+- `Essential/core-nexus-4k-essential-lite.json` v2.8.2 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.8.2 — 1080p
+- `Essential/core-nexus-essential-lite.json` v2.8.2
+
+### Flash
+- `Flash/core-nexus-flash-4k.json` v2.8.2 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.8.2 — cached-only 1080p instant play
+
+### Speed (EasyNews)
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.2 — EasyNews 4K
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.2 — EasyNews 1080p
 
 ### AllDebrid
-- `core-nexus-4k-alldebrid.json` v0.1.2 — 4K with IQR PSEs
-- `core-nexus-alldebrid.json` v0.1.0 — 1080p
-- `core-nexus-4k-alldebrid-lite.json` v0.1.0 — 4K CB-style
-- `core-nexus-alldebrid-lite.json` v0.1.0 — 1080p lite
-
-### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.1 — 1080p, DV-Only Kill on, HDR preferred
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.1 — 4K, DV-Only Kill on, excludedAudioTags set
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.2 — 4K with IQR PSEs
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.0 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.0 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.0 — 1080p lite
 
 ### Hybrid
-- `core-nexus-4k-hybrid.json` v1.2.0 — TorBox + RD, service() priority PSEs, IQR
-- `core-nexus-hybrid.json` — 1080p hybrid
-- `core-nexus-hybrid-lite.json`
+- `Hybrid/core-nexus-4k-hybrid.json` v2.8.2 — TorBox + RD, service() priority PSEs, IQR
+- `Hybrid/core-nexus-hybrid.json` v2.8.2 — 1080p hybrid
+- `Hybrid/core-nexus-hybrid-lite.json` v2.8.2
 
-### Nightly
+### Device
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.2 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.2 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+
+### Anime
+- `Anime/core-nexus-anime-4k.json` v2.8.3 — 4K anime, SeaDex + AnimeTosho
+- `Anime/core-nexus-anime-4k-lite.json` v2.8.3
+- `Anime/core-nexus-anime.json` v2.8.3 — 1080p anime
+- `Anime/core-nexus-anime-lite.json` v2.8.3
+- `Anime/core-nexus-anime-dub.json` v2.8.3 — dubbed variant
+- `Anime/core-nexus-anime-dub-lite.json` v2.8.3
+
+### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.0 — DV Profile 5/8, AV1 excluded
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.1.0 — experimental Apex variant
 
 ---
 
@@ -125,13 +143,42 @@ service(size(bitrate(STREAMS, IQR_LO, IQR_HI), '15GB'), 'torbox')
 ```
 Returns `[]` if no TorBox streams match → falls through to the all-service PSE.
 
-### ongoingSeason PSE (all 46 templates)
+### ongoingSeason PSE (all active templates)
 ```
 /*ongoingSeasonPack*/
 ((queryType=='series' or queryType=='anime.series') and ongoingSeason 
   and (daysSinceLastAired < -1 or daysUntilNextEpisode >= 0))
 ? seasonPack(streams, 'onlySeasons') : []
 ```
+
+---
+
+## Regex Scoring Architecture (v2.8.2)
+
+Two separate systems operate simultaneously per template. They must have **no overlapping pattern names** — duplicates cause double-scoring.
+
+### `preferredRegexPatterns` (template-specific, always present)
+Radarr/Sonarr quality guide patterns embedded per template category. Scores 70–100.
+
+| Template type | Count | Example patterns |
+|---|---|---|
+| 4K templates | 7 | Radarr Remux T1, Sonarr Remux T1, Radarr UHD Bluray T1, FraMeSToR, Anime BD T1 |
+| 1080p templates | 8 | Radarr Web T1, Sonarr Web T1, FLUX, hallowed, BHDStudio, SiC, 126811, Web T1 |
+| Anime templates | 0 | (none — SeaDex/AnimeTosho handle quality) |
+
+### `rankedRegexPatterns` (shared subset, embedded inline)
+53 high-impact patterns from `Filtering/ranked-regex-patterns.json` (|score| ≥ 50), minus any names already in `preferredRegexPatterns`.
+
+| Template type | Count | Score tiers |
+|---|---|---|
+| 4K templates | 48 | S(+100), A(+80), B(+60), Penalised(−50), Bad(−75), Blacklist(−200) |
+| 1080p templates | 45 | Same tiers |
+| Anime templates | 0 | Cleared — live-action group names don't match anime naming |
+
+**Source of truth:** `Filtering/ranked-regex-patterns.json` — 149 patterns, 10 score tiers. The 53 inline are the |score| ≥ 50 subset.
+
+### `syncedRankedRegexUrls`
+**Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL(s) in regex configuration". Embed patterns inline.
 
 ---
 
