@@ -5,22 +5,12 @@
     "description": "Experimental Nightly. Tests: syncedRankedRegexUrls via jsDelivr CDN whitelist validation on public instances. Based on Stream v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": [
-      {
-        "version": "0.1.0",
-        "date": "2026-06-15",
-        "changes": [
-          "Initial Labs build — syncedRankedRegexUrls via jsDelivr CDN. Tests whitelist bypass on elfhosted/fortheweak.cloud. Based on Core Nexus Stream v2.8.2.",
-          "rankedRegexPatterns kept inline (45 patterns) as fallback."
-        ]
-      }
-    ]
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "trusted": false,
@@ -225,16 +215,10 @@
         "score": 75
       }
     ],
-    "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
-    ],
+    "syncedPreferredStreamExpressionUrls": [],
     "syncedExcludedStreamExpressionUrls": [],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ],
+    "syncedIncludedStreamExpressionUrls": [],
+    "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1942,9 +1926,7 @@
       "YouTube",
       "AI Enhanced"
     ],
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
-    ],
+    "syncedExcludedRegexUrls": [],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
