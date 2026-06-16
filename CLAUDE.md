@@ -131,8 +131,10 @@ Preset `type` values confirmed in AIOStreams source:
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.0 — DV Profile 5/8, AV1 excluded
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.5.0 — experimental Apex variant (dynamicAddonFetching, releaseGroup() PSEs)
-- `Nightly/Single/core-nexus-stream-labs.json` v0.3.0 — experimental 1080p variant (dynamicAddonFetching)
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.6.0 — experimental Apex variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
+- `Nightly/Single/core-nexus-stream-labs.json` v0.4.0 — experimental 1080p variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.0 — TorBox debrid-only 1080p (no external scrapers, TorBox Search toggle + exit thresholds)
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.0 — TorBox debrid-only 4K (no external scrapers, TorBox Search toggle + exit thresholds)
 
 ---
 
