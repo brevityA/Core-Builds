@@ -61,8 +61,24 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `sortCriteria` entries must use `"direction"` (not `"order"`) — AIOStreams rejects `"order"` on import
 - `addonLogo` URL must use `/refs/heads/main/` not `/main/` — the short form breaks on stale CDN caches
 - `stremthruTorz` is TorBox-specific; `stremthruStore` is for other debrid services (AllDebrid, RD)
-- `torbox-search` was renamed/removed in AIOStreams v2.30.2 — keep it `enabled: false`
+- `torbox-search` is a valid TorBox-wrapped search addon — it is not removed or broken
 - `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — do not use; embed patterns inline in `rankedRegexPatterns` instead
+
+## Known Preset Types
+
+Preset `type` values confirmed in AIOStreams source:
+
+**Debrid/service:** `stremthruTorz`, `stremthruStore`, `torrent-io`, `torbox`, `torbox-search`
+
+**Scrapers:** `comet`, `mediafusion`, `mediafusion-public`, `jackettio`, `prowlarr`, `orionoid`, `annatar`, `knaben`, `torrentio`, `debridio`, `meteor`, `torrent-galaxy`, `zilean`, `hdhub`, `eztv`
+
+**Usenet:** `newznab`, `easynews`, `easynews-plus`
+
+**Anime-specific:** `seadex`, `animetosho`, `neko-bt`
+
+**Subtitles:** `opensubtitles-v3-plus`, `aiosubtitle`
+
+**System:** `library` (continue watching / user library), `custom`
 
 ---
 
@@ -97,9 +113,9 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.0 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.8.2 — TorBox + RD, service() priority PSEs, IQR
-- `Hybrid/core-nexus-hybrid.json` v2.8.2 — 1080p hybrid
-- `Hybrid/core-nexus-hybrid-lite.json` v2.8.2
+- `Hybrid/core-nexus-4k-hybrid.json` v2.8.3 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
+- `Hybrid/core-nexus-hybrid.json` v2.8.3 — 1080p hybrid, NZBGeek preset
+- `Hybrid/core-nexus-hybrid-lite.json` v2.8.3 — NZBGeek preset
 
 ### Device
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.2.2 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
@@ -115,7 +131,8 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.0 — DV Profile 5/8, AV1 excluded
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.1.0 — experimental Apex variant
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.5.0 — experimental Apex variant (dynamicAddonFetching, releaseGroup() PSEs)
+- `Nightly/Single/core-nexus-stream-labs.json` v0.3.0 — experimental 1080p variant (dynamicAddonFetching)
 
 ---
 
@@ -200,7 +217,7 @@ Radarr/Sonarr quality guide patterns embedded per template category. Scores 70�
 
 **Array ops:** `count`, `negate`, `merge`, `slice`, `perGroup`, `pin`
 
-**Math:** `pow` (from expr-eval)
+**Math:** `pow`, `sqrt`, `random` (from expr-eval)
 
 ### Key function details
 
@@ -229,6 +246,20 @@ Radarr/Sonarr quality guide patterns embedded per template category. Scores 70�
 **`indexer(streams, ...names)`**
 - Filter by indexer/scraper name
 
+### SEL Variables (available as bare names in expressions)
+
+**Content metadata:**
+`queryType` (`'movie'`, `'series'`, `'anime.movie'`, `'anime.series'`), `isAnime`, `title`, `year`, `yearEnd`, `season`, `episode`, `absoluteEpisode`, `genres`, `runtime`, `originalLanguage`, `hasSeaDex`
+
+**Release timing:**
+`daysSinceRelease`, `daysSinceFirstAired`, `daysSinceLastAired`, `daysUntilNextEpisode`, `hasNextEpisode`, `latestSeason`, `ongoingSeason`
+
+**Dynamic addon fetching (exit condition only):**
+`totalStreams`, `totalTimeTaken`, `queriedAddons`, `allAddons`
+
+**Groups (group condition only):**
+`previousStreams`, `previousGroupTimeTaken`
+
 ### NOT available in SEL (formatter DSL only)
 `hasChapters`, `editions`, `regraded`, `date`, `dubbed`, `subbed` — these exist as `stream.X` in formatter DSL only, not as SEL variables in PSE/ESE/ISE expressions.
 
@@ -251,6 +282,21 @@ All used via `{stream.fieldName::operator[...]}` in formatter `name`/`descriptio
 | `uSubtitleEmojis` | string[] | Per-language subtitle flags (🇬🇧 🇫🇷 etc.) |
 | `seMatched` | string | Name of the stream expression that matched this stream |
 | `rseMatched` | string[] | Regex set expression tier(s) matched |
+| `nSeScore` | number | Normalised stream expression score |
+| `nRegexScore` | number | Normalised regex score |
+| `folderSeasons` | string[] | Season folders in multi-season packs |
+| `folderEpisodes` | string[] | Episode entries in folder-based releases |
+
+### Formatter String Modifiers (appended after `::`)
+
+| Modifier | Effect |
+|---|---|
+| `smallcaps` | Renders text in small caps |
+| `rsort` | Reverse-sort array before joining |
+| `lsort` | Logical (natural) sort of array |
+| `slice(start, end)` | Trim array to index range |
+| `remove(val)` | Remove a value from array/string |
+| `star` / `pstar` | Star/partial-star rating display |
 
 ---
 
