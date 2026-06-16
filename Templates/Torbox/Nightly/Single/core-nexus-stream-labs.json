@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Added dynamicAddonFetching (exit at 5+ cached 1080p or 5s). Based on Stream v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Stream Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.3.0 — hybrid regex+SEL: elite groups via releaseGroup() pin, x264/IMAX via native fields, bad dual via ESE. dynamicAddonFetching: exit at 5+ cached 1080p or 5s. Report findings in the Nightly thread.",
+    "addonDescription": "Nightly Labs v0.3.1 — hybrid regex+SEL: elite groups via releaseGroup() pin, x264/IMAX via native fields, bad dual via ESE. dynamicAddonFetching: exit at 5+ cached 1080p or 5s. Fix: x264 exclude ESE (negate() removed).",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
@@ -331,7 +331,7 @@
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.2.0 | x264 Hard Exclude — native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
+        "expression": "/* LABS v0.4.1 | x264 Hard Exclude — native encode() replaces regex score -25 */ encode(streams, 'x264', 'h.264')",
         "enabled": false
       },
       {

@@ -20,8 +20,8 @@ Nightly templates test new optimisations before they're promoted to stable. They
 
 | Template | Version | Testing | Import URL |
 |---|---|---|---|
-| **4K Apex Labs** | v0.4.0 | Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`, bad dual audio via `releaseGroup()` ESE. Simple group-name patterns removed from `rankedRegexPatterns`. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| **Stream Labs** | v0.2.0 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **4K Apex Labs** | v0.5.1 | Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`. `dynamicAddonFetching`: exit at 5+ cached 4K or 6s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Stream Labs** | v0.3.1 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant. `dynamicAddonFetching`: exit at 5+ cached 1080p or 5s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Apple TV 4K** | v0.1.0 | Device profile — DV Profile 5/8, AV1 excluded, Atmos preferred | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 
 > **[What's being tested? → Full Labs changelog & testing guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/LABS.md)**
@@ -249,7 +249,7 @@ Both templates keep the full inline `rankedRegexPatterns` as a fallback.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| **Version** | v0.2.0 |
+| **Version** | v0.5.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Base** | 4K Apex v0.4.3 |
@@ -260,7 +260,7 @@ Both templates keep the full inline `rankedRegexPatterns` as a fallback.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| **Version** | v0.1.0 |
+| **Version** | v0.3.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Resolution** | 1080p |
 | **Base** | Stream v2.8.2 |
