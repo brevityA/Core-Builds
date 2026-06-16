@@ -4,6 +4,12 @@ This is **brevityA/Core-Builds**, a backup mirror of [Core Builds by Brevity](ht
 
 ---
 
+## Workflow Rules
+
+- **Create a new PR for every task.** After committing and pushing changes, always open a pull request — even for small or experimental changes.
+
+---
+
 ## What This Repo Is
 
 A collection of optimised AIOStreams templates for TorBox subscribers. Templates control how streams are filtered, sorted, deduplicated, and formatted inside [AIOStreams](https://github.com/Viren070/AIOStreams).
