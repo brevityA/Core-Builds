@@ -1889,9 +1889,7 @@
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
-    "syncedRankedRegexUrls": [
-      "https://cdn.jsdelivr.net/gh/brevityA/Core-Builds@main/Filtering/ranked-regex-patterns.json"
-    ],
+    "syncedRankedRegexUrls": [],
     "dynamicAddonFetching": {
       "enabled": true,
       "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 5 or totalTimeTaken > 6000"

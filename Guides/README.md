@@ -70,6 +70,7 @@ That's it. You're watching in under 5 minutes.
 | [10 — FAQ](#10--faq) | Common questions answered quickly |
 | [11 — Search Criteria](#11--adjusting-search-criteria) | Widen or narrow what sources are queried |
 | [12 — Catalogs](#12--catalogs) | Add "Your Movies / Series / Anime" library tabs to Stremio |
+| [13 — TMDB & TVDB Keys](#13--tmdb--tvdb-keys) | Set up metadata API keys for title matching and season detection |
 | [Regional Guide](REGIONAL_CONTENT_GUIDE.md) | Discover content by country / language |
 
 ---
@@ -88,6 +89,7 @@ That's it. You're watching in under 5 minutes.
 10. [FAQ](#10--faq)
 11. [Adjusting Search Criteria](#11--adjusting-search-criteria)
 12. [Catalogs](#12--catalogs)
+13. [TMDB & TVDB Keys](#13--tmdb--tvdb-keys)
 13. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
 
 
@@ -1607,3 +1609,115 @@ Expected. Re-importing resets `mergedCatalogs` to the template's defaults. Re-ad
 ---
 
 *[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
+
+---
+
+---
+
+## 13 — TMDB & TVDB Keys
+
+AIOStreams uses TMDB (The Movie Database) for title matching, season detection, and metadata enrichment. Without a key, some features degrade silently — season pack filtering stops working, "continue watching" recommendations don't load, and some marketplace addons refuse to start.
+
+TVDB is optional and only needed if you use addons that specifically require it.
+
+---
+
+### Why You Need a TMDB Key
+
+AIOStreams uses TMDB for:
+
+| Feature | Requires TMDB |
+|---|---|
+| Title matching accuracy | ✅ Yes |
+| Season detection (`ongoingSeasonPack` ESE) | ✅ Yes |
+| "Recommended" content in catalogs | ✅ Yes |
+| Episode air date awareness | ✅ Yes |
+| Some marketplace addons | ✅ One or the other |
+
+The templates ship with `"tmdbAccessToken": "<template_placeholder>"` and `"tmdbApiKey": "<template_placeholder>"`. These placeholders must be replaced with your real key — the template will not prompt you automatically.
+
+---
+
+### TMDB — Which Key to Use
+
+TMDB offers two credential types. **You only need one.**
+
+| | Read Access Token | API Key |
+|---|---|---|
+| **Format** | Long JWT string (~200 chars) | 32-character hex string |
+| **Recommended** | ✅ Yes — use this one | Only if an addon specifically asks for it |
+| **Where to find** | TMDB → Settings → API → Read Access Token | TMDB → Settings → API → API Key (v3 auth) |
+
+Use the **Read Access Token** for AIOStreams. It's the long string starting with `eyJ...`. Do not copy the short 32-character API Key by mistake — they are different credentials on the same settings page.
+
+---
+
+### Step 1 — Get Your TMDB Read Access Token
+
+1. Go to [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
+   - If you don't have an account, register at [themoviedb.org/signup](https://www.themoviedb.org/signup) — it's free
+2. Scroll down to **API Read Access Token**
+3. Copy the full token (it's long — make sure you copy all of it)
+
+> ⚠️ Don't copy the **API Key (v3 auth)** by mistake — it's the shorter string directly above the Read Access Token on the same page.
+
+---
+
+### Step 2 — Enter It in AIOStreams
+
+1. Open your AIOStreams dashboard
+2. Scroll to the **Metadata** section (usually near the bottom, below Formatter)
+3. Paste your Read Access Token into the **TMDB Read Access Token** field
+4. Leave the **TMDB API Key** field blank unless a specific addon asks for it
+5. Click **Save**
+
+> 💡 If you re-import a template, the TMDB fields reset to `<template_placeholder>`. You'll need to re-enter your key after every import.
+
+---
+
+### TVDB — Optional
+
+TVDB is a separate TV-focused metadata database. AIOStreams supports it but does not require it for any Core Builds functionality.
+
+**When you need a TVDB key:**
+- A specific addon you're using explicitly requires it
+- You use TVDB as a preferred metadata source
+
+**How to get one:**
+1. Go to [thetvdb.com](https://www.thetvdb.com) and register (free)
+2. Navigate to your profile → **API Keys**
+3. Generate a new API key and paste it into the **TVDB API Key** field in AIOStreams → Metadata
+
+If you're only using Core Builds templates with TorBox, you can leave the TVDB field blank.
+
+---
+
+### Troubleshooting
+
+#### Season packs showing when they shouldn't
+
+The `ongoingSeasonPack` ESE (present in all Core Builds templates) uses TMDB data to detect whether a show is currently airing. If your TMDB token is missing or invalid, this ESE stops working — season packs may appear alongside individual episode streams.
+
+Fix: enter your TMDB Read Access Token in the Metadata section and save.
+
+#### "Recommended" catalog is empty
+
+The Recommended tab in Stremio pulls TMDB recommendation data. Without a valid token, it returns nothing.
+
+#### An addon says "TMDB API key required"
+
+Some marketplace addons require the short 32-character **API Key (v3 auth)** rather than the Read Access Token. Go back to [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api), copy the **API Key (v3 auth)** field, and paste it into the **TMDB API Key** field in AIOStreams → Metadata (not the Read Access Token field).
+
+#### Token resets after re-importing a template
+
+Expected. Re-importing replaces all config including the TMDB placeholder fields. Always re-enter your key in the Metadata section after any template import.
+
+---
+
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
+
+---
+
+---
+
+*[GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/) · [CHANGELOG](../CHANGELOG.md)*
