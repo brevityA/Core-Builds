@@ -69,6 +69,7 @@ That's it. You're watching in under 5 minutes.
 | [9 — Troubleshooting](#9--troubleshooting) | Fix buffering, no streams, slow results |
 | [10 — FAQ](#10--faq) | Common questions answered quickly |
 | [11 — Search Criteria](#11--adjusting-search-criteria) | Widen or narrow what sources are queried |
+| [12 — Catalogs](#12--catalogs) | Add "Your Movies / Series / Anime" library tabs to Stremio |
 | [Regional Guide](REGIONAL_CONTENT_GUIDE.md) | Discover content by country / language |
 
 ---
@@ -86,7 +87,8 @@ That's it. You're watching in under 5 minutes.
 9. [Troubleshooting](#9--troubleshooting)
 10. [FAQ](#10--faq)
 11. [Adjusting Search Criteria](#11--adjusting-search-criteria)
-12. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
+12. [Catalogs](#12--catalogs)
+13. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
 
 
 ---
@@ -1496,4 +1498,112 @@ All three default to their strict forms in a fresh AIOStreams install. All three
 
 ---
 
-*[GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/) · [CHANGELOG](../CHANGELOG.md)*
+## 12 — Catalogs
+
+Catalogs are the browse tabs that appear in Stremio's **Discover** screen and on the home page — "Your Movies", "Your Series", "Your Anime", and "Continue Watching" lists. They are separate from stream results and are powered by your debrid service's library, not the scrapers.
+
+---
+
+### What Happened to My Catalogs?
+
+When you import a new template, the `mergedCatalogs` field in the config is replaced along with everything else. If your previous build had 5 catalogs and the new one shipped with 2 (or none), the template author configured fewer catalog entries in that version.
+
+**This is the most common cause of missing catalog tabs after a template update.** The catalogs themselves (your TorBox library) are untouched — only the Stremio-facing entries that expose them have changed.
+
+---
+
+### The Standard Catalog Types
+
+AIOStreams can expose any combination of these catalog entries:
+
+| Catalog | What it shows |
+|---|---|
+| **Your Movies** | Movies you've cached or downloaded via TorBox |
+| **Your Series** | TV series in your TorBox library |
+| **Your Anime** | Anime titles in your TorBox library |
+| **Continue Watching — Movies** | Movies you've started but not finished |
+| **Continue Watching — Series** | Episodes you've started but not finished |
+
+The "Continue Watching" entries are sourced from your Stremio watch history combined with what's in your library.
+
+---
+
+### How to Add Catalogs Back
+
+#### Step 1 — Open your AIOStreams dashboard
+
+Go to your AIOStreams host and log in with your password.
+
+#### Step 2 — Find the Catalogs section
+
+Scroll down until you see the **Catalogs** section. It's usually between the Addons and Formatter sections.
+
+#### Step 3 — Add the catalog entries you want
+
+Click **Add Catalog** (or the `+` button, depending on your host's UI version). Each entry has two fields:
+
+- **Addon** — which addon provides this catalog. For TorBox library catalogs, select `Library` or `TorBox`.
+- **Type** — the content type: `movie`, `series`, or `anime` (sometimes labelled "category").
+- **ID** — the catalog ID string. Common values: `torbox_movies`, `torbox_series`, `torbox_anime`, or the format your host uses.
+
+> 💡 **Not sure of the exact IDs?** Add the Library addon from AIOStreams → Addons, then open the Catalogs section — the available catalog IDs should auto-populate or be listed in the addon's configuration.
+
+#### Step 4 — Save and reinstall
+
+Click **Save**. Your AIOStreams manifest URL changes when catalog entries are added or removed. **Uninstall the old AIOStreams addon from Stremio and reinstall with the new manifest URL** — catalog tabs only appear after a fresh manifest install.
+
+---
+
+### Why Your Template Shipped With Fewer Catalogs
+
+Templates shipped through Core Builds default to `"mergedCatalogs": []` — an empty catalog list. This is intentional:
+
+- Catalog availability depends on which addons you have enabled and which debrid service you're using
+- TorBox catalog IDs differ from AllDebrid catalog IDs — a pre-filled catalog list from a TorBox template would break for AllDebrid users
+- Empty is the safe default — users add the catalogs that match their own setup
+
+If you previously had a build with pre-filled catalogs, those were likely added manually or came from a community-configured variant.
+
+---
+
+### Catalogs vs Stream Results
+
+| | Catalogs | Stream Results |
+|---|---|---|
+| **Where they appear** | Stremio Home / Discover tabs | Inside a movie or show page |
+| **What they show** | Browsable library lists | Ranked streams ready to play |
+| **What controls them** | `mergedCatalogs` in config | ESEs, PSEs, sort criteria |
+| **Updated when** | Manifest reinstalled | Every stream request |
+| **Affected by template import** | ✅ Yes — reset to template defaults | ✅ Yes — all settings replaced |
+
+---
+
+### Troubleshooting
+
+#### Catalog tabs not appearing after adding them
+
+The manifest URL must be **reinstalled** in Stremio. Adding catalogs changes the manifest — the old URL in Stremio does not update automatically.
+
+1. AIOStreams dashboard → copy the new manifest URL
+2. Stremio → Addons → find AIOStreams → **Uninstall**
+3. Paste the new manifest URL → **Install**
+4. Restart Stremio
+
+#### Catalogs appear but are empty
+
+Your TorBox library is empty or the Library addon is not enabled.
+
+- Go to AIOStreams → Addons → confirm the **Library** addon is present and enabled
+- Add a few files to TorBox first, then refresh the catalog in Stremio
+
+#### "Your Anime" tab is missing even after adding it
+
+The anime catalog type depends on your debrid service tagging content as anime. TorBox auto-categorises most content based on TMDB genre. If your TorBox library contains anime but the catalog is empty, the issue is usually that the titles were cached before TorBox's genre tagging updated — try re-adding one title to TorBox and checking again.
+
+#### Catalogs disappeared after re-importing a template
+
+Expected. Re-importing resets `mergedCatalogs` to the template's defaults. Re-add your catalog entries through the Catalogs section and reinstall the manifest after saving.
+
+---
+
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
