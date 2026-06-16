@@ -2,8 +2,8 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.4.0",
-    "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Based on 4K Apex v0.4.3.",
+    "version": "0.5.0",
+    "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Added dynamicAddonFetching (exit at 5+ cached 4K or 6s). Based on 4K Apex v0.4.3.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json"
   },
   "config": {
@@ -11,7 +11,7 @@
     "showChanges": true,
     "addonName": "Core Nexus 4K Apex Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.4.0 — hybrid regex+SEL: elite groups via releaseGroup() pin, x264/IMAX via native fields, bad dual via ESE. Report findings in the Nightly thread.",
+    "addonDescription": "Nightly Labs v0.5.0 — hybrid regex+SEL: elite groups via releaseGroup() pin, x264/IMAX via native fields, bad dual via ESE. dynamicAddonFetching: exit at 5+ cached 4K or 6s. Report findings in the Nightly thread.",
     "appliedTemplates": [
       {
         "id": "core-nexus-4k-ht-torbox",
@@ -1891,6 +1891,10 @@
     "usePosterServiceForMeta": true,
     "syncedRankedRegexUrls": [
       "https://cdn.jsdelivr.net/gh/brevityA/Core-Builds@main/Filtering/ranked-regex-patterns.json"
-    ]
+    ],
+    "dynamicAddonFetching": {
+      "enabled": true,
+      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 5 or totalTimeTaken > 6000"
+    }
   }
 }
