@@ -2,22 +2,60 @@
   "metadata": {
     "id": "core-nexus-stream-labs",
     "name": "Core Nexus Stream Labs",
-    "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Added dynamicAddonFetching (exit at 5+ cached 1080p or 5s). Based on Stream v2.8.2.",
+    "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) — optional scrapers (MediaFusion, SeaDex) toggled at import via inputs; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on Stream v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "inputs": [
+      {
+        "key": "exitThreshold",
+        "path": "config.dynamicAddonFetching.condition",
+        "label": "Early exit — cached stream count",
+        "description": "Stop querying addons when this many cached 1080p streams are found. Default: 5. Lower = faster. Higher = more options but slower start.",
+        "type": "string",
+        "required": false,
+        "value": "5"
+      },
+      {
+        "key": "maxWaitMs",
+        "path": "config.dynamicAddonFetching.condition",
+        "label": "Early exit — max wait (ms)",
+        "description": "Stop querying addons after this many milliseconds. Default: 5000. Reduce to 3000 for faster response on fast connections.",
+        "type": "string",
+        "required": false,
+        "value": "5000"
+      },
+      {
+        "key": "enableScrapers",
+        "path": "config.presets",
+        "label": "Enable optional scrapers (MediaFusion)",
+        "description": "Type anything to add MediaFusion as an additional source. Broader coverage but adds ~3–5s latency. Leave blank to skip.",
+        "type": "string",
+        "required": false,
+        "value": ""
+      },
+      {
+        "key": "enableAnime",
+        "path": "config.presets",
+        "label": "Enable SeaDex (anime quality)",
+        "description": "Type anything to add SeaDex for best-quality anime releases. Only useful for anime content. Leave blank to skip.",
+        "type": "string",
+        "required": false,
+        "value": ""
+      }
+    ]
   },
   "config": {
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus Stream Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.3.0 — hybrid regex+SEL: elite groups via releaseGroup() pin, x264/IMAX via native fields, bad dual via ESE. dynamicAddonFetching: exit at 5+ cached 1080p or 5s. Report findings in the Nightly thread.",
+    "addonDescription": "Nightly Labs v0.4.0 — template directives: optional scrapers + configurable exit thresholds via import inputs. Hybrid regex+SEL architecture. Report findings in the Nightly thread.",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
@@ -1622,9 +1660,10 @@
         ]
       },
       {
+        "__if": "inputs.enableAnime",
         "type": "seadex",
         "instanceId": "tam-seadex",
-        "enabled": false,
+        "enabled": true,
         "options": {
           "name": "SeaDex",
           "timeout": 4000,
@@ -1702,8 +1741,9 @@
         ]
       },
       {
+        "__if": "inputs.enableScrapers",
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4",
         "options": {
           "timeout": 7000,
@@ -1942,7 +1982,7 @@
     "syncedRankedRegexUrls": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= 5 or totalTimeTaken > 5000"
+      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     }
   }
 }
