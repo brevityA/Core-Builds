@@ -240,15 +240,15 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ---
 
-## 📖 Guides
+## 📖 Wiki
 
 | Guide | Link |
 |---|---|
-| Import a template | [Guides → Import](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#1--importing-a-template) |
-| Formatters | [Guides → Formatters](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#2--formatters) |
-| Filtering | [Guides → Filtering](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#3--filtering) |
-| Device profiles | [Guides → Device Profiles](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#4--device-profiles) |
-| Troubleshooting | [Guides → Troubleshooting](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#6--troubleshooting) |
+| Import a template | [Wiki → Importing a Template](https://github.com/brevityA/Core-Builds/wiki/Importing-a-Template) |
+| Formatters | [Wiki → Formatters](https://github.com/brevityA/Core-Builds/wiki/Formatters) |
+| Filtering | [Wiki → Expression Rules](https://github.com/brevityA/Core-Builds/blob/main/Guides/EXPRESSION_RULES.md) |
+| Device profiles | [Wiki → Device Profiles](https://github.com/brevityA/Core-Builds/wiki/Device-Profiles) |
+| Troubleshooting | [Wiki → Troubleshooting and FAQ](https://github.com/brevityA/Core-Builds/wiki/Troubleshooting-and-FAQ) |
 
 ---
 
