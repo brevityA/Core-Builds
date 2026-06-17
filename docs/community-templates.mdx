@@ -1,0 +1,122 @@
+---
+title: "Community Templates"
+description: "Community-contributed templates and formatters built on the Core Builds framework."
+---
+
+<Frame>
+  <img
+    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/community_banner.svg"
+    alt="Community Builds"
+    style={{ width: '100%', display: 'block' }}
+  />
+</Frame>
+
+Community builds are authored and maintained by their contributors. They use the same AIOStreams framework as Core Builds but offer different aesthetics, service combinations, or device targets.
+
+<Note>
+  Community templates are not maintained by Brevity. For support, contact the template's author in the GitHub repository.
+</Note>
+
+---
+
+## RB3 — Auburn Tiger Edition
+
+**Author:** RB3 · **Services:** TorBox Pro + Real-Debrid · **Resolution:** 4K + 1080p
+
+A performance-focused dual-service build engineered for power users. TorBox Pro handles primary Usenet-priority streaming; Real-Debrid fills gaps as a secondary cache. Named for the Auburn Tigers colour palette — orange and navy resolution badges throughout.
+
+**Highlights:**
+- Usenet supremacy PSE — cached TorBox Usenet results forced to the absolute top
+- 100 GB file size limits, 250 Mbps uncapped bitrate ceiling
+- Full premium A/V: Dolby Vision, HDR10+, IMAX, Atmos/TrueHD/DTS:X preferred
+- Aggressive deduplication across dual-service results
+- Custom Auburn Tiger formatter — warm high-contrast orange/navy visual language
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/auburn-tiger-rb3.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/auburn-tiger-rb3.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/auburn-tiger-rb3.json
+```
+
+<Warning>
+  Requires both a **TorBox Pro API key** and a **Real-Debrid API key**. Set Show file name and Show bitrate to **OFF** in AIOStreams settings — the Auburn Tiger formatter handles these natively.
+</Warning>
+
+---
+
+## RB3 — TorBox Pro + RD Hybrid
+
+**Author:** RB3 · **Services:** TorBox Pro + Real-Debrid · **Resolution:** 4K
+
+Dual-service template built on the Tamtaro SEL framework v2.6.1. Prioritises cached TorBox Usenet releases with Real-Debrid as seamless fallback. Includes SeaDex, Meteor, Comet, Torrentio, Knaben, Newznab (TorBox Search), and STorz.
+
+**Highlights:**
+- Tamtaro SEL PSEs/ESEs/ISEs (live-synced from Tamtaro URLs)
+- Vidhin's ranked regex patterns for release group scoring
+- AutoPlay configured for both Stremio and WuPlay (no Cinemeta required)
+- Smart language detection — multilingual tracks displayed as `🗣️ MULTI`
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json
+```
+
+---
+
+## MightyIcyy — Prism
+
+**Author:** MightyIcyy · **Services:** TorBox Essential · **Resolution:** 1080p · **Version:** 1.0.0
+
+A clean, no-fuss 1080p build for TorBox Essential subscribers. Targets WEB-DL, BluRay, and WEBRip — no REMUX, no 4K. Built for simplicity and fast cached playback without a complex addon stack.
+
+**Highlights:**
+- WEB-DL → BluRay → WEBRip quality priority
+- 4K and REMUX hard-excluded
+- English preferred, Russian/Ukrainian excluded
+- AutoPlay on `matchingFile` (resolution + quality + release group)
+- Torrentio + Debridio scraper stack
+- File size limits: movies 800 MB–15 GB, episodes 300 MB–8 GB
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json
+```
+
+---
+
+## Community Formatters
+
+### RB3 Clean v4
+
+Minimal, clean formatter with a service-first layout. Bold unicode resolution numbers and italic unicode quality sources create clear visual hierarchy.
+
+| Line | Content |
+|---|---|
+| Name 1 | Service shortname · ⚡ cached or ⏳ uncached · `[USN]` if Usenet |
+| Name 2 | Resolution — `𝟰𝗞 𝗨𝗛𝗗` · `𝟭𝟬𝟴𝟬𝗽` · `𝟳𝟮𝟬𝗽` |
+| Name 3 | Source — `𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹` · `𝘞𝘌𝘉-𝘋𝘓` |
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-clean-v4-formatter.json
+```
+
+---
+
+## Submit a Community Template
+
+Open a pull request to [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) in the GitHub repository. Include:
+
+- Your template JSON file
+- A `README.md` with author, services required, resolution, and what makes it different
+- A banner SVG (optional but encouraged — match the 1200×280 format from `Assets/`)

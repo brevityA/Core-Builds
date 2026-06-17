@@ -1,0 +1,75 @@
+---
+title: "EasyNews Setup"
+description: "Setting up EasyNews with Core Builds — standalone and TorBox+ variants."
+---
+
+EasyNews is a Usenet provider with its own search interface — no separate indexer (like NZBGeek) required. Core Builds supports two EasyNews use cases: **standalone** (EasyNews only, no TorBox) and **Speed+** (TorBox Essential + EasyNews combined).
+
+## Which Template?
+
+| Template | Services needed | Best for |
+|---|---|---|
+| **Speed EasyNews** | EasyNews only | EasyNews subscribers without TorBox |
+| **Speed 4K+** | TorBox Essential + EasyNews | Essential subscribers who want EasyNews as a second source |
+| **Speed+** | TorBox Essential + EasyNews | Same as 4K+ but 1080p |
+
+---
+
+## Steps
+
+<Steps>
+  <Step title="Get your EasyNews credentials">
+    EasyNews uses your account username and password — not a separate API key.
+
+    Log in at [easynews.com](https://easynews.com) and confirm your subscription is active.
+  </Step>
+  <Step title="Import your template">
+    → [Template Directory — EasyNews](/template-directory#easynews) for import buttons and URLs.
+  </Step>
+  <Step title="Enter EasyNews credentials">
+    In AIOStreams → **Add-ons**, find the **EasyNews** addon and enter your EasyNews **username** and **password**.
+  </Step>
+  <Step title="(Speed+ only) Add TorBox API key">
+    If using Speed 4K+ or Speed+, also add your TorBox API key in **Services → StremThru TorBox**.
+  </Step>
+  <Step title="Save and install">
+    Click **Save** → copy the manifest URL → install in Stremio or WuPlay.
+  </Step>
+</Steps>
+
+---
+
+## How Speed EasyNews Works
+
+Speed EasyNews is a cached-only EasyNews template with an exit condition: it stops querying after finding **3 cached results** or hitting a **timeout**. This makes it very fast for popular titles.
+
+<Info>
+  Speed EasyNews uses EasyNews as its only source — no TorBox or other debrid service is required. If EasyNews doesn't have a title cached, you'll get no results. Use a standard TorBox template as your primary and EasyNews as a supplement if needed.
+</Info>
+
+---
+
+## EasyNews vs Newznab (NZBGeek)
+
+| | EasyNews | Newznab (NZBGeek) |
+|---|---|---|
+| Access | Username + password | API key |
+| Indexer | Built-in (EasyNews catalogue) | Third-party (NZBGeek database) |
+| Templates | Speed EasyNews, Speed 4K+, Speed+ | 4K Hybrid, Hybrid, Hybrid Lite |
+| TorBox required | No (standalone) or Yes (Speed+) | Yes |
+| Coverage | EasyNews retention (3,000+ days) | NZBGeek index |
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No results from EasyNews">
+    - Check your EasyNews username and password in Add-ons (not API key — EasyNews uses login credentials)
+    - Confirm your EasyNews subscription is active at easynews.com
+    - Speed templates exit early — test with a very popular title (e.g. Inception) to confirm EasyNews is working
+  </Accordion>
+  <Accordion title="Speed+ returning only TorBox results">
+    EasyNews may be timing out. Check AIOStreams logs for EasyNews addon timeout errors. The EasyNews addon timeout is set to 8,000ms — increase to 12,000ms in Add-ons if your EasyNews connection is slow.
+  </Accordion>
+</AccordionGroup>

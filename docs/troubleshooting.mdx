@@ -3,13 +3,33 @@ title: "Troubleshooting and FAQ"
 description: "Common problems and fixes."
 ---
 
+## Check Your Versions First
+
+Before troubleshooting, confirm what you're running.
+
+<AccordionGroup>
+  <Accordion title="How do I check my template version?">
+    In AIOStreams → **About → Get Started** — the loaded template name and version are shown at the top of the template card.
+
+    Alternatively, check the template JSON directly: open the raw URL in a browser and look for `"version"` inside the `"metadata"` object.
+  </Accordion>
+  <Accordion title="How do I check my AIOStreams version?">
+    In AIOStreams → **About** — the AIOStreams version is shown in the footer. Core Builds templates require **v2.30+**.
+  </Accordion>
+  <Accordion title="How do I update a template?">
+    Re-import the same URL — AIOStreams merges the new version over your existing config and preserves your API keys. Check for an in-app update notification first (AIOStreams will prompt you automatically when a new version is available).
+  </Accordion>
+</AccordionGroup>
+
+---
+
 ## Common Issues
 
 <AccordionGroup>
   <Accordion title="No results / very few results">
     **Check first:**
     - Is the title in TorBox's cache? Search at [torbox.app](https://torbox.app)
-    - Are your scrapers enabled? Open AIOStreams → Add-ons — confirm Comet, Mediafusion, etc. are enabled
+    - Are your scrapers enabled? Open AIOStreams → Add-ons — confirm Comet, MediaFusion, etc. are enabled
     - Are your API keys entered? TorBox key in Services, TMDB in Settings
 
     **If you're on a Flash or Speed template:**
@@ -55,6 +75,8 @@ description: "Common problems and fixes."
   </Accordion>
 </AccordionGroup>
 
+---
+
 ## FAQ
 
 <AccordionGroup>
@@ -84,5 +106,9 @@ description: "Common problems and fixes."
 
   <Accordion title="What is seadexBestOnly?">
     SeaDex is an anime release quality database. When `seadexBestOnly: true`, only streams flagged as SeaDex best releases are shown for anime queries. This was incorrectly enabled on several non-Anime templates and fixed in v2.8.3.
+  </Accordion>
+
+  <Accordion title="Why does the expression layer page say not to grow the Final Limit ESE?">
+    AIOStreams enforces a hard 3,000 character limit per expression. The Final Limit ESE is currently at 2,953 characters — 47 characters of headroom. Adding anything risks hitting the limit and breaking import.
   </Accordion>
 </AccordionGroup>
