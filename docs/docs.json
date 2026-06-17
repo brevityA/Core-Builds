@@ -1,4 +1,6 @@
 {
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
   "name": "Core Builds",
   "logo": {
     "light": "/logo/core_icon.svg",
