@@ -84,31 +84,31 @@ Preset `type` values confirmed in AIOStreams source:
 
 ---
 
-## Active Template Inventory (as of v2.8.3)
+## Active Template Inventory (as of v2.8.4)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.4 — flagship 4K, IQR PSEs, pow() decay, 48 ranked patterns inline (|score| ≥ 50)
-- `Single/core-nexus-4k-apex-torbox.json` v2.8.3 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.8.3 — 1080p streaming quality
-- `Single/core-nexus-stream-lite.json` v2.8.3 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.8.3 — Fire Stick optimised
-- `Single/core-nexus-stream-firestick-lite.json` v2.8.3
+- `Single/core-nexus-4k-apex.json` v0.4.6 — flagship 4K, IQR PSEs, pow() decay, 48 ranked patterns inline (|score| ≥ 50)
+- `Single/core-nexus-4k-apex-torbox.json` v2.8.5 — TorBox-cached-only Apex variant
+- `Single/core-nexus-stream.json` v2.8.4 — 1080p streaming quality
+- `Single/core-nexus-stream-lite.json` v2.8.4 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.8.4 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick-lite.json` v2.8.4
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.8.3 — 4K with IQR PSEs, pow() decay
-- `Essential/core-nexus-4k-essential-lite.json` v2.8.3 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.8.3 — 1080p
-- `Essential/core-nexus-essential-lite.json` v2.8.3
+- `Essential/core-nexus-4k-essential.json` v2.8.4 — 4K with IQR PSEs, pow() decay
+- `Essential/core-nexus-4k-essential-lite.json` v2.8.4 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.8.4 — 1080p
+- `Essential/core-nexus-essential-lite.json` v2.8.4
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.8.3 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.8.3 — cached-only 1080p instant play
+- `Flash/core-nexus-flash-4k.json` v2.8.4 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.8.4 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.3 — TorBox-only 4K, library + Zilean + TorBox Search, exit at 3 cached 4K or 4s
-- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.3 — lite variant
-- `Speed/TorBox/core-nexus-speed.json` v2.8.3 — TorBox-only 1080p, library + Zilean + TorBox Search, exit at 3 cached or 4s
-- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.3 — lite variant
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.4 — TorBox-only 4K, library + Zilean + TorBox Search, exit at 3 cached 4K or 4s
+- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.4 — lite variant
+- `Speed/TorBox/core-nexus-speed.json` v2.8.4 — TorBox-only 1080p, library + Zilean + TorBox Search, exit at 3 cached or 4s
+- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.4 — lite variant
 
 ### Speed (EasyNews)
 - `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.3 — EasyNews 4K
@@ -121,13 +121,13 @@ Preset `type` values confirmed in AIOStreams source:
 - `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.1 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.8.3 — TorBox + RD, service() priority PSEs, IQR
-- `Hybrid/core-nexus-hybrid.json` v2.8.3 — 1080p hybrid
-- `Hybrid/core-nexus-hybrid-lite.json` v2.8.3
+- `Hybrid/core-nexus-4k-hybrid.json` v2.8.5 — TorBox + RD, service() priority PSEs, IQR
+- `Hybrid/core-nexus-hybrid.json` v2.8.5 — 1080p hybrid
+- `Hybrid/core-nexus-hybrid-lite.json` v2.8.5
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.2 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.2 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.3 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.3 — 4K, DV-Only Kill on, AV1/VC-1 excluded
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.3 — 4K anime, SeaDex + AnimeTosho
@@ -138,12 +138,12 @@ Preset `type` values confirmed in AIOStreams source:
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.3
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.0 — DV Profile 5/8, AV1 excluded
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.5.1 — experimental Apex variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
-- `Nightly/Single/core-nexus-stream-labs.json` v0.3.1 — experimental 1080p variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.0 — TorBox debrid-only 1080p (no external scrapers, TorBox Search toggle + exit thresholds)
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.0 — TorBox debrid-only 4K (no external scrapers, TorBox Search toggle + exit thresholds)
-- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.4 — Samsung RU7100 (2019) 4K: FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV, APEX IQR PSEs, full ESE stack
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.1 — DV Profile 5/8, AV1 excluded
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.5.3 — experimental Apex variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
+- `Nightly/Single/core-nexus-stream-labs.json` v0.3.2 — experimental 1080p variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.1 — TorBox debrid-only 1080p (no external scrapers, TorBox Search toggle + exit thresholds)
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.1 — TorBox debrid-only 4K (no external scrapers, TorBox Search toggle + exit thresholds)
+- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.6 — Samsung RU7100 (2019) 4K: FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV, APEX IQR PSEs, full ESE stack
 
 ---
 

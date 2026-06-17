@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. build. Template directives: TorBox Search and exit thresholds configurable at import. Based on Essential v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -412,6 +412,10 @@
       },
       {
         "expression": "/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR10+/DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))",
         "enabled": true
       }
     ],

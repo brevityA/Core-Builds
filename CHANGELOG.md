@@ -4,6 +4,17 @@
 
 ---
 
+## 2.8.4 (2026-06-17)
+
+### Added
+- **Boost Cached Usenet PSE — all 27 TorBox templates** — Appended as the final PSE in every non-AllDebrid, non-Anime, non-EasyNews template:
+  ```
+  /*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))
+  ```
+  Cached TorBox Usenet streams that don't fit inside the quality-window PSEs (e.g. `Unknown` quality NZBs, bitrate outliers) previously fell through all PSEs and appeared after the `streamExpressionMatched: desc` sort as unmatched — below cached debrid with a PSE hit. This PSE catches any remaining cached usenet and gives it a PSE match, so it ranks above uncached/unmatched streams. Enabled by default. Templates affected: all Single, Essential, Flash, Speed/TorBox, Hybrid, Device/Samsung, and Nightly TorBox/Samsung/AppleTV templates.
+
+---
+
 ## 2.8.3 (2026-06-17)
 
 ### Fixed

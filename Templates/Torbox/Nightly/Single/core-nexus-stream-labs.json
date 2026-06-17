@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Added dynamicAddonFetching (exit at 5+ cached 1080p or 5s). Based on Stream v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -394,6 +394,10 @@
       },
       {
         "expression": "/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR10+/DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))",
         "enabled": true
       }
     ],
