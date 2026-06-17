@@ -6,9 +6,9 @@
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.
 
-> **Current version: v2.8.3** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+> **Current version: v2.8.4** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
-> 📖 **New here?** Start with the [Complete Setup Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md) — it covers picking a template, importing, API keys, device profiles, and troubleshooting.
+> 📖 **New here?** Start with the [Complete Setup Guide](https://github.com/brevityA/Core-Builds/wiki) — it covers picking a template, importing, API keys, device profiles, and troubleshooting.
 
 ---
 
@@ -20,14 +20,14 @@ Nightly templates test new optimisations before they're promoted to stable. They
 
 | Template | Version | Testing | Import URL |
 |---|---|---|---|
-| **4K Apex Labs** | v0.5.1 | Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`. `dynamicAddonFetching`: exit at 5+ cached 4K or 6s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| **Stream Labs** | v0.3.1 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant. `dynamicAddonFetching`: exit at 5+ cached 1080p or 5s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| **Apple TV 4K** | v0.1.0 | Device profile — DV Profile 5/8, AV1 excluded, Atmos preferred | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
-| **Samsung RU7100 4K** | v0.2.4 | Samsung RU7100 (2019) device profile — FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV, IQR PSEs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
-| **Essential Labs** | v0.1.0 | TorBox debrid-only 1080p — no external scrapers, TorBox Search toggle + exit thresholds | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
-| **4K Essential Labs** | v0.1.0 | TorBox debrid-only 4K — no external scrapers, TorBox Search toggle + exit thresholds | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
+| **4K Apex Labs** | v0.5.3 | Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`. `dynamicAddonFetching`: exit at 5+ cached 4K or 6s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Stream Labs** | v0.3.2 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant. `dynamicAddonFetching`: exit at 5+ cached 1080p or 5s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **Apple TV 4K** | v0.1.1 | Device profile — DV Profile 5/8, AV1 excluded, Atmos preferred | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
+| **Samsung RU7100 4K** | v0.2.6 | Samsung RU7100 (2019) device profile — FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV, IQR PSEs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Essential Labs** | v0.1.1 | TorBox debrid-only 1080p — no external scrapers, TorBox Search toggle + exit thresholds | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
+| **4K Essential Labs** | v0.1.1 | TorBox debrid-only 4K — no external scrapers, TorBox Search toggle + exit thresholds | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 
-> **[What's being tested? → Full Labs changelog & testing guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/LABS.md)**
+> **[What's being tested? → Full Labs changelog & testing guide](https://github.com/brevityA/Core-Builds/wiki/Nightly-and-Labs)**
 
 ### 🗂️ Stable Templates
 
@@ -167,7 +167,7 @@ Flagship 4K build for TorBox Pro. Full addon stack — DV/HDR, TrueHD/Atmos, Blu
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-4k-apex.json` |
-| **Version** | v0.4.4 |
+| **Version** | v0.4.6 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ✅ cacheAndPlay + nzbFailover |
@@ -181,7 +181,7 @@ Flagship 4K build for TorBox Pro. Full addon stack — DV/HDR, TrueHD/Atmos, Blu
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-stream.json` |
-| **Version** | v2.8.3 |
+| **Version** | v2.8.4 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ✅ via Newznab (opt-in) |
@@ -195,7 +195,7 @@ Flagship 4K build for TorBox Pro. Full addon stack — DV/HDR, TrueHD/Atmos, Blu
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Single/core-nexus-stream-firestick.json` |
-| **Version** | v2.8.3 |
+| **Version** | v2.8.4 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Resolution** | 1080p · SDR |
 | **Usenet** | ❌ |
@@ -209,7 +209,7 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
-| **Version** | v0.2.2 |
+| **Version** | v0.2.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ❌ |
@@ -223,7 +223,7 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
-| **Version** | v0.2.2 |
+| **Version** | v0.2.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
@@ -237,7 +237,7 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
-| **Version** | v0.1.0 |
+| **Version** | v0.1.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
@@ -255,10 +255,10 @@ Experimental builds testing new PSE architectures and addon configurations befor
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| **Version** | v0.5.1 |
+| **Version** | v0.5.3 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
 | **Resolution** | 2160p · 1080p fallback |
-| **Base** | 4K Apex v0.4.4 |
+| **Base** | 4K Apex v0.4.6 |
 | **Usenet** | ❌ |
 
 #### Core Nexus Stream Labs
@@ -266,10 +266,10 @@ Experimental builds testing new PSE architectures and addon configurations befor
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| **Version** | v0.3.1 |
+| **Version** | v0.3.2 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Resolution** | 1080p |
-| **Base** | Stream v2.8.3 |
+| **Base** | Stream v2.8.4 |
 | **Usenet** | ❌ |
 
 #### Core Nexus Essential Labs
@@ -279,7 +279,7 @@ TorBox debrid-only 1080p — no external scrapers. Tests template directives for
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
-| **Version** | v0.1.0 |
+| **Version** | v0.1.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
 | **Resolution** | 1080p |
 | **Usenet** | ❌ |
@@ -291,7 +291,7 @@ TorBox debrid-only 4K — no external scrapers. Tests template directives for To
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
-| **Version** | v0.1.0 |
+| **Version** | v0.1.1 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
@@ -305,7 +305,7 @@ TorBox Pro + NZBGeek. Full 4K with maximum source diversity.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
-| **Version** | v2.8.3 |
+| **Version** | v2.8.5 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **HDR** | ✅ Full HDR — DV, HDR10+, HDR10 |
@@ -323,7 +323,7 @@ TorBox Pro + NZBGeek. Maximum source diversity.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
-| **Version** | v2.8.3 |
+| **Version** | v2.8.5 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ✅ NZBGeek API key required |
@@ -341,7 +341,7 @@ Full 4K for Essential plan. No Usenet.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Essential/core-nexus-4k-essential.json` |
-| **Version** | v2.8.3 |
+| **Version** | v2.8.4 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ❌ |
@@ -355,7 +355,7 @@ Full 4K for Essential plan. No Usenet.
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Essential/core-nexus-essential.json` |
-| **Version** | v2.8.3 |
+| **Version** | v2.8.4 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ❌ |
@@ -495,7 +495,7 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 
 ---
 
-## 🛠️ Common to All Templates (v2.8.3)
+## 🛠️ Common to All Templates (v2.8.4)
 
 | Feature | Detail |
 |---|---|
@@ -531,4 +531,4 @@ Core Builds is an independent community project and is not affiliated with, endo
 
 ---
 
-*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Complete Setup Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md) · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)*
+*Part of [Core Builds by Brevity](https://github.com/brevityA/Core-Builds) · [Wiki](https://github.com/brevityA/Core-Builds/wiki) · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)*
