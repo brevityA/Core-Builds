@@ -3,8 +3,8 @@
   "theme": "mint",
   "name": "Core Builds",
   "logo": {
-    "light": "/logo/core_icon.svg",
-    "dark": "/logo/core_icon.svg"
+    "light": "/logo/banner_square.svg",
+    "dark": "/logo/banner_square.svg"
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
