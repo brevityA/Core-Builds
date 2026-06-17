@@ -69,7 +69,7 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 ## Active Template Inventory (as of v2.8.2)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.4 — flagship 4K, IQR PSEs, pow() decay, 144 ranked patterns inline
+- `Single/core-nexus-4k-apex.json` v0.4.4 — flagship 4K, IQR PSEs, pow() decay, 48 ranked patterns inline (|score| ≥ 50)
 - `Single/core-nexus-4k-apex-torbox.json` v2.8.2 — TorBox-cached-only Apex variant
 - `Single/core-nexus-stream.json` v2.8.2 — 1080p streaming quality
 - `Single/core-nexus-stream-lite.json` v2.8.2 — lite variant
@@ -176,16 +176,16 @@ Radarr/Sonarr quality guide patterns embedded per template category. Scores 70�
 | 1080p templates | 8 | Radarr Web T1, Sonarr Web T1, FLUX, hallowed, BHDStudio, SiC, 126811, Web T1 |
 | Anime templates | 0 | (none — SeaDex/AnimeTosho handle quality) |
 
-### `rankedRegexPatterns` (all patterns, embedded inline)
-All 149 patterns from `Filtering/ranked-regex-patterns.json`, minus any names already in `preferredRegexPatterns`. Goal: no name overlap between the two lists (double-scoring).
+### `rankedRegexPatterns` (high-impact subset, embedded inline)
+53 patterns from `Filtering/ranked-regex-patterns.json` where `|score| ≥ 50`, minus any names already in `preferredRegexPatterns`. Patterns with `|score| < 50` (streaming service tags, edition names, low-tier group labels) are excluded — they add file bulk with no meaningful ranking signal.
 
-| Template type | Target count | Score tiers |
+| Template type | Count | Score tiers kept |
 |---|---|---|
-| 4K templates | 144 | All 10 tiers (+100 to −200) minus 5 preferredRegexPatterns overlaps |
-| 1080p templates | ~141 | Same minus 8 preferredRegexPatterns overlaps |
+| 4K templates | 48 | S(+100), A(+80), B(+60), Penalised(−50), Bad(−75), Blacklist(−200) |
+| 1080p templates | 45 | Same tiers |
 | Anime templates | 0 | Cleared — live-action group names don't match anime naming |
 
-**Source of truth:** `Filtering/ranked-regex-patterns.json` — 149 patterns, 10 score tiers (100, 80, 60, 40, 20, 0, −25, −50, −75, −200). Embed all minus preferredRegexPatterns name overlaps.
+**Source of truth:** `Filtering/ranked-regex-patterns.json` — 149 patterns, 10 score tiers. Embed only the 53 with `|score| ≥ 50`, minus `preferredRegexPatterns` name overlaps to prevent double-scoring.
 
 ### `syncedRankedRegexUrls`
 **Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL(s) in regex configuration". Embed patterns inline.
