@@ -15,37 +15,48 @@ Formatters control how streams are displayed in Stremio — the text shown for e
     Click the **Import** icon in the top right corner.
   </Step>
   <Step title="Paste the URL">
-    Paste the formatter's raw GitHub URL and click **Load**.
+    Copy the formatter URL below, paste it into the import dialog, and click **Load**.
   </Step>
   <Step title="Save">
     Click **Save** to apply.
   </Step>
 </Steps>
 
-## Available Formatters
+<Note>
+  Formatters are imported via the **Formatter tab** in AIOStreams — not via the Load Template flow. Use the raw URLs below.
+</Note>
 
-<CardGroup cols={2}>
-  <Card title="Core Syntax" icon="code">
-    Clean, information-dense. Default in all templates — no import needed.
-  </Card>
-  <Card title="Apex v2" icon="crown" href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json">
-    4K-focused, visual tags prominent. Copy URL to import.
-  </Card>
-  <Card title="Elite" icon="star" href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json">
-    Minimal, quality-first. Copy URL to import.
-  </Card>
-  <Card title="Nexus Prime" icon="list" href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json">
-    Full detail — codec, HDR, audio, size, seeders. Copy URL to import.
-  </Card>
-</CardGroup>
+---
 
-## Formatter URLs
+## Apex v2
 
-| Formatter | Import URL |
-|---|---|
-| Apex v2 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json` |
-| Elite | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json` |
-| Nexus Prime | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json` |
+4K-focused layout. Visual tags (DV, HDR10+, Atmos) front and centre. Designed for the 4K Apex template but works with any.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json
+```
+
+---
+
+## Elite
+
+Minimal and quality-first. Clean one-liner per stream with the essentials only.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json
+```
+
+---
+
+## Nexus Prime
+
+Full detail — codec, HDR, audio, size, seeders, and stream expression match score. Best for power users who want to see everything.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json
+```
+
+---
 
 ## Field Reference
 
@@ -59,7 +70,7 @@ Formatters control how streams are displayed in Stremio — the text shown for e
 | `stream.size` | File size |
 | `stream.bitrate` | Bitrate in Mbps |
 | `stream.seeders` | P2P seeders (torrent only) |
-| `stream.hasChapters` | Chapter badge for BluRay REMUXes with chapter markers |
+| `stream.hasChapters` | Chapter badge for BluRay REMUXes |
 | `stream.editions` | Director's Cut, Extended, IMAX, etc. |
 | `stream.regraded` | Colour regrade flag |
 | `stream.repack` | REPACK/PROPER flag |
