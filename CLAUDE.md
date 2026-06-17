@@ -84,41 +84,41 @@ Preset `type` values confirmed in AIOStreams source:
 
 ---
 
-## Active Template Inventory (as of v2.8.2)
+## Active Template Inventory (as of v2.8.3)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.4.4 — flagship 4K, IQR PSEs, pow() decay, 48 ranked patterns inline (|score| ≥ 50)
-- `Single/core-nexus-4k-apex-torbox.json` v2.8.2 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.8.2 — 1080p streaming quality
-- `Single/core-nexus-stream-lite.json` v2.8.2 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.8.2 — Fire Stick optimised
-- `Single/core-nexus-stream-firestick-lite.json` v2.8.2
+- `Single/core-nexus-4k-apex-torbox.json` v2.8.3 — TorBox-cached-only Apex variant
+- `Single/core-nexus-stream.json` v2.8.3 — 1080p streaming quality
+- `Single/core-nexus-stream-lite.json` v2.8.3 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.8.3 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick-lite.json` v2.8.3
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.8.2 — 4K with IQR PSEs, pow() decay
-- `Essential/core-nexus-4k-essential-lite.json` v2.8.2 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.8.2 — 1080p
-- `Essential/core-nexus-essential-lite.json` v2.8.2
+- `Essential/core-nexus-4k-essential.json` v2.8.3 — 4K with IQR PSEs, pow() decay
+- `Essential/core-nexus-4k-essential-lite.json` v2.8.3 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.8.3 — 1080p
+- `Essential/core-nexus-essential-lite.json` v2.8.3
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.8.2 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.8.2 — cached-only 1080p instant play
+- `Flash/core-nexus-flash-4k.json` v2.8.3 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.8.3 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.2 — TorBox-only 4K, library + Zilean + TorBox Search, exit at 3 cached 4K or 4s
-- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.2 — lite variant
-- `Speed/TorBox/core-nexus-speed.json` v2.8.2 — TorBox-only 1080p, library + Zilean + TorBox Search, exit at 3 cached or 4s
-- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.2 — lite variant
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.3 — TorBox-only 4K, library + Zilean + TorBox Search, exit at 3 cached 4K or 4s
+- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.3 — lite variant
+- `Speed/TorBox/core-nexus-speed.json` v2.8.3 — TorBox-only 1080p, library + Zilean + TorBox Search, exit at 3 cached or 4s
+- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.3 — lite variant
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.2 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.2 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.3 — EasyNews 4K
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.3 — EasyNews 1080p
 
 ### AllDebrid
 - `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.2 — 4K with IQR PSEs
 - `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.0 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.0 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.0 — 1080p lite
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.1 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.1 — 1080p lite
 
 ### Hybrid
 - `Hybrid/core-nexus-4k-hybrid.json` v2.8.3 — TorBox + RD, service() priority PSEs, IQR
