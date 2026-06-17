@@ -4,6 +4,26 @@
 
 ---
 
+## 2.8.4 (2026-06-17)
+
+### Added
+- **Boost Cached Usenet PSE — all 27 TorBox templates** — Appended as the final PSE in every non-AllDebrid, non-Anime, non-EasyNews template:
+  ```
+  /*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))
+  ```
+  Cached TorBox Usenet streams that don't fit inside the quality-window PSEs (e.g. `Unknown` quality NZBs, bitrate outliers) previously fell through all PSEs and appeared after the `streamExpressionMatched: desc` sort as unmatched — below cached debrid with a PSE hit. This PSE catches any remaining cached usenet and gives it a PSE match, so it ranks above uncached/unmatched streams. Enabled by default. Templates affected: all Single, Essential, Flash, Speed/TorBox, Hybrid, Device/Samsung, and Nightly TorBox/Samsung/AppleTV templates.
+
+---
+
+## 2.8.3 (2026-06-17)
+
+### Fixed
+- **`seadexBestOnly: false` — 5 non-Anime templates** (`core-nexus-flash-4k.json`, `core-nexus-4k-hybrid.json`, `core-nexus-4k-apex-torbox.json`, `core-nexus-speed-4k-plus.json`, `Nightly/core-nexus-4k-apex-labs.json`) — `seadexBestOnly: true` silently dropped every stream not indexed by SeaDex for anime queries. SeaDex is an anime-only database; on general-purpose 4K templates it discarded results whenever coverage was thin. Set to `false` (same fix applied to 4K Apex in v0.4.3).
+- **Hard resolution kill ESE — 13 1080p templates** — All explicitly 1080p templates now carry `resolution(streams, '2160p', '1440p', '720p', '576p', '480p')` as their first ESE. PSEs rank but do not exclude; without the hard kill, 4K streams can surface on 1080p-only devices. Templates fixed: `core-nexus-stream-lite`, `core-nexus-stream-firestick`, `core-nexus-stream-firestick-lite`, `core-nexus-essential`, `core-nexus-essential-lite`, `core-nexus-flash`, `core-nexus-hybrid`, `core-nexus-alldebrid`, `core-nexus-alldebrid-lite`, `core-nexus-speed`, `core-nexus-speed-lite`, `core-nexus-speed-easynews`, `core-nexus-speed-4k-plus` (seadexBestOnly only — 4K template, no kill added).
+- **Vidhin05 stale URL removed — Speed/TorBox templates** (`core-nexus-speed-4k.json`, `core-nexus-speed-4k-lite.json`, `core-nexus-speed.json`, `core-nexus-speed-lite.json`) — `syncedRankedStreamExpressionUrls` still referenced `https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json` from before the v2.8.2 audit. The Speed/TorBox templates were added after that audit ran. Removed; these templates now carry zero synced expression URLs.
+
+---
+
 ## 2.8.2 (2026-06-15)
 
 ### Changed

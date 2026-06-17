@@ -1,0 +1,114 @@
+---
+title: "Troubleshooting and FAQ"
+description: "Common problems and fixes."
+---
+
+## Check Your Versions First
+
+Before troubleshooting, confirm what you're running.
+
+<AccordionGroup>
+  <Accordion title="How do I check my template version?">
+    In AIOStreams → **About → Get Started** — the loaded template name and version are shown at the top of the template card.
+
+    Alternatively, check the template JSON directly: open the raw URL in a browser and look for `"version"` inside the `"metadata"` object.
+  </Accordion>
+  <Accordion title="How do I check my AIOStreams version?">
+    In AIOStreams → **About** — the AIOStreams version is shown in the footer. Core Builds templates require **v2.30+**.
+  </Accordion>
+  <Accordion title="How do I update a template?">
+    Re-import the same URL — AIOStreams merges the new version over your existing config and preserves your API keys. Check for an in-app update notification first (AIOStreams will prompt you automatically when a new version is available).
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Common Issues
+
+<AccordionGroup>
+  <Accordion title="No results / very few results">
+    **Check first:**
+    - Is the title in TorBox's cache? Search at [torbox.app](https://torbox.app)
+    - Are your scrapers enabled? Open AIOStreams → Add-ons — confirm Comet, MediaFusion, etc. are enabled
+    - Are your API keys entered? TorBox key in Services, TMDB in Settings
+
+    **If you're on a Flash or Speed template:**
+    These templates exit as soon as they find cached results. If TorBox doesn't have the title cached, Flash returns nothing. Switch to Core Nexus Essential for full coverage with uncached fallback.
+
+    **Try the Lite variant:**
+    The standard template runs 24 ESEs (quality gates). Lite runs 12 — hard kills stay but quality gates are removed. If Lite returns results, one of the quality gates is filtering your content.
+  </Accordion>
+
+  <Accordion title='"Forbidden URL" or "regex blocked" error on import'>
+    You're on a public AIOStreams instance (elfhosted, fortheweak.cloud). These block raw GitHub URLs by default.
+
+    **Solutions:**
+    - Contact your host and ask them to add your UUID to `TRUSTED_UUIDS`
+    - Self-host AIOStreams and set `REGEX_FILTER_ACCESS=all`
+    - Use the Lite variant (fewer SEL expressions, same hard kills)
+  </Accordion>
+
+  <Accordion title="Cached Usenet NZBs appearing below debrid results">
+    Fixed in v2.8.4. Re-import your template. The Boost Cached Usenet PSE now catches any cached NZBs that fall outside the quality-window PSEs and ensures they rank above uncached streams.
+  </Accordion>
+
+  <Accordion title="Samsung TV — audio not playing / stuttering">
+    Check that your template has `excludedAudioTags: ["TrueHD","DTS-HD MA","DTS:X","FLAC"]`. The Samsung TV and Samsung TV 4K stable templates have these excluded by default. If you imported an older version, re-import to pick up the fix.
+  </Accordion>
+
+  <Accordion title="Samsung TV — Dolby Vision content I can't play">
+    The DV-Only Kill ESE is enabled by default on Samsung templates. If you're still seeing DV streams, check:
+    - Your template version is v0.2.2 or later (re-import if not)
+    - You haven't disabled the `No DV-Only` ESE in the AIOStreams editor
+  </Accordion>
+
+  <Accordion title="4K streams showing on a 1080p template">
+    Fixed in v2.8.3. All 1080p templates now have a hard resolution kill ESE as their first filter. Re-import your template.
+  </Accordion>
+
+  <Accordion title="SeaDex filtering out all results for anime">
+    Fixed in v2.8.3. `seadexBestOnly: true` was dropping all non-SeaDex streams on several non-Anime templates. Re-import to pick up the fix.
+  </Accordion>
+
+  <Accordion title="Usenet results slow or not appearing">
+    Fixed in v2.7.5. The newznab timeout was 3000ms — too short for TorBox Usenet. Updated to 10,000ms. Additionally `searchMode: auto` and `checkOwned: true` are now set. Re-import your template.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need a TorBox subscription?">
+    Yes for all TorBox templates. AllDebrid and EasyNews templates work without TorBox.
+  </Accordion>
+
+  <Accordion title="Can I use these on a free/public AIOStreams instance?">
+    Yes, but inline regex scoring may be blocked on public instances. See the "Forbidden URL" section above.
+  </Accordion>
+
+  <Accordion title="How do I update a template?">
+    Re-import the same URL. Your API keys are preserved. Check AIOStreams for an in-app update notification first — it will prompt you automatically.
+  </Accordion>
+
+  <Accordion title="What's the difference between Standard and Lite?">
+    Standard runs 24 ESEs including quality gates (low bitrate, low seeders, upscaled 4K, bad Bluray). Lite runs 12 — hard kills only (CAM, YouTube, 3D, bad NZBs). See [Which Template?](/which-template#lite-vs-standard) for full comparison.
+  </Accordion>
+
+  <Accordion title="Can I submit my own template?">
+    Yes — open a PR to `Community-Templates/` in the [repository](https://github.com/brevityA/Core-Builds). Include a README with what your template does and what service/plan it requires.
+  </Accordion>
+
+  <Accordion title="Do I need a TMDB API token?">
+    It's optional but recommended. Without it, title matching falls back to AIOStreams defaults, which is less accurate for foreign titles and anime.
+  </Accordion>
+
+  <Accordion title="What is seadexBestOnly?">
+    SeaDex is an anime release quality database. When `seadexBestOnly: true`, only streams flagged as SeaDex best releases are shown for anime queries. This was incorrectly enabled on several non-Anime templates and fixed in v2.8.3.
+  </Accordion>
+
+  <Accordion title="Why does the expression layer page say not to grow the Final Limit ESE?">
+    AIOStreams enforces a hard 3,000 character limit per expression. The Final Limit ESE is currently at 2,953 characters — 47 characters of headroom. Adding anything risks hitting the limit and breaking import.
+  </Accordion>
+</AccordionGroup>

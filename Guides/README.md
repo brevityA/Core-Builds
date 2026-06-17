@@ -2,6 +2,12 @@
   <img src="https://github.com/brevityA/Core-Builds/raw/refs/heads/main/Assets/master_guide_banner.svg" alt="Core Builds Guide Banner" width="100%"/>
 </p>
 
+<p align="center">
+  <a href="https://core-builds.mintlify.app">
+    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-3B82F6?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
+  </a>
+</p>
+
 # 📖 Core Builds by Brevity — Complete Guide
 
 Everything you need to set up, customise, and maintain your build.
@@ -69,6 +75,8 @@ That's it. You're watching in under 5 minutes.
 | [9 — Troubleshooting](#9--troubleshooting) | Fix buffering, no streams, slow results |
 | [10 — FAQ](#10--faq) | Common questions answered quickly |
 | [11 — Search Criteria](#11--adjusting-search-criteria) | Widen or narrow what sources are queried |
+| [12 — Catalogs](#12--catalogs) | Add "Your Movies / Series / Anime" library tabs to Stremio |
+| [13 — TMDB & TVDB Keys](#13--tmdb--tvdb-keys) | Set up metadata API keys for title matching and season detection |
 | [Regional Guide](REGIONAL_CONTENT_GUIDE.md) | Discover content by country / language |
 
 ---
@@ -86,7 +94,9 @@ That's it. You're watching in under 5 minutes.
 9. [Troubleshooting](#9--troubleshooting)
 10. [FAQ](#10--faq)
 11. [Adjusting Search Criteria](#11--adjusting-search-criteria)
-12. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
+12. [Catalogs](#12--catalogs)
+13. [TMDB & TVDB Keys](#13--tmdb--tvdb-keys)
+13. [Regional Content in Discover](REGIONAL_CONTENT_GUIDE.md)
 
 
 ---
@@ -1491,6 +1501,226 @@ seasonEpisodeMatching.strict: true   ← kills BluRay REMUX and older content
 ```
 
 All three default to their strict forms in a fresh AIOStreams install. All three Core Builds templates correct this. If you're building your own config from scratch or editing someone else's, these are the first three settings to check when streams aren't appearing.
+
+---
+
+---
+
+## 12 — Catalogs
+
+Catalogs are the browse tabs that appear in Stremio's **Discover** screen and on the home page — "Your Movies", "Your Series", "Your Anime", and "Continue Watching" lists. They are separate from stream results and are powered by your debrid service's library, not the scrapers.
+
+---
+
+### What Happened to My Catalogs?
+
+When you import a new template, the `mergedCatalogs` field in the config is replaced along with everything else. If your previous build had 5 catalogs and the new one shipped with 2 (or none), the template author configured fewer catalog entries in that version.
+
+**This is the most common cause of missing catalog tabs after a template update.** The catalogs themselves (your TorBox library) are untouched — only the Stremio-facing entries that expose them have changed.
+
+---
+
+### The Standard Catalog Types
+
+AIOStreams can expose any combination of these catalog entries:
+
+| Catalog | What it shows |
+|---|---|
+| **Your Movies** | Movies you've cached or downloaded via TorBox |
+| **Your Series** | TV series in your TorBox library |
+| **Your Anime** | Anime titles in your TorBox library |
+| **Continue Watching — Movies** | Movies you've started but not finished |
+| **Continue Watching — Series** | Episodes you've started but not finished |
+
+The "Continue Watching" entries are sourced from your Stremio watch history combined with what's in your library.
+
+---
+
+### How to Add Catalogs Back
+
+#### Step 1 — Open your AIOStreams dashboard
+
+Go to your AIOStreams host and log in with your password.
+
+#### Step 2 — Find the Catalogs section
+
+Scroll down until you see the **Catalogs** section. It's usually between the Addons and Formatter sections.
+
+#### Step 3 — Add the catalog entries you want
+
+Click **Add Catalog** (or the `+` button, depending on your host's UI version). Each entry has two fields:
+
+- **Addon** — which addon provides this catalog. For TorBox library catalogs, select `Library` or `TorBox`.
+- **Type** — the content type: `movie`, `series`, or `anime` (sometimes labelled "category").
+- **ID** — the catalog ID string. Common values: `torbox_movies`, `torbox_series`, `torbox_anime`, or the format your host uses.
+
+> 💡 **Not sure of the exact IDs?** Add the Library addon from AIOStreams → Addons, then open the Catalogs section — the available catalog IDs should auto-populate or be listed in the addon's configuration.
+
+#### Step 4 — Save and reinstall
+
+Click **Save**. Your AIOStreams manifest URL changes when catalog entries are added or removed. **Uninstall the old AIOStreams addon from Stremio and reinstall with the new manifest URL** — catalog tabs only appear after a fresh manifest install.
+
+---
+
+### Why Your Template Shipped With Fewer Catalogs
+
+Templates shipped through Core Builds default to `"mergedCatalogs": []` — an empty catalog list. This is intentional:
+
+- Catalog availability depends on which addons you have enabled and which debrid service you're using
+- TorBox catalog IDs differ from AllDebrid catalog IDs — a pre-filled catalog list from a TorBox template would break for AllDebrid users
+- Empty is the safe default — users add the catalogs that match their own setup
+
+If you previously had a build with pre-filled catalogs, those were likely added manually or came from a community-configured variant.
+
+---
+
+### Catalogs vs Stream Results
+
+| | Catalogs | Stream Results |
+|---|---|---|
+| **Where they appear** | Stremio Home / Discover tabs | Inside a movie or show page |
+| **What they show** | Browsable library lists | Ranked streams ready to play |
+| **What controls them** | `mergedCatalogs` in config | ESEs, PSEs, sort criteria |
+| **Updated when** | Manifest reinstalled | Every stream request |
+| **Affected by template import** | ✅ Yes — reset to template defaults | ✅ Yes — all settings replaced |
+
+---
+
+### Troubleshooting
+
+#### Catalog tabs not appearing after adding them
+
+The manifest URL must be **reinstalled** in Stremio. Adding catalogs changes the manifest — the old URL in Stremio does not update automatically.
+
+1. AIOStreams dashboard → copy the new manifest URL
+2. Stremio → Addons → find AIOStreams → **Uninstall**
+3. Paste the new manifest URL → **Install**
+4. Restart Stremio
+
+#### Catalogs appear but are empty
+
+Your TorBox library is empty or the Library addon is not enabled.
+
+- Go to AIOStreams → Addons → confirm the **Library** addon is present and enabled
+- Add a few files to TorBox first, then refresh the catalog in Stremio
+
+#### "Your Anime" tab is missing even after adding it
+
+The anime catalog type depends on your debrid service tagging content as anime. TorBox auto-categorises most content based on TMDB genre. If your TorBox library contains anime but the catalog is empty, the issue is usually that the titles were cached before TorBox's genre tagging updated — try re-adding one title to TorBox and checking again.
+
+#### Catalogs disappeared after re-importing a template
+
+Expected. Re-importing resets `mergedCatalogs` to the template's defaults. Re-add your catalog entries through the Catalogs section and reinstall the manifest after saving.
+
+---
+
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
+
+---
+
+---
+
+## 13 — TMDB & TVDB Keys
+
+AIOStreams uses TMDB (The Movie Database) for title matching, season detection, and metadata enrichment. Without a key, some features degrade silently — season pack filtering stops working, "continue watching" recommendations don't load, and some marketplace addons refuse to start.
+
+TVDB is optional and only needed if you use addons that specifically require it.
+
+---
+
+### Why You Need a TMDB Key
+
+AIOStreams uses TMDB for:
+
+| Feature | Requires TMDB |
+|---|---|
+| Title matching accuracy | ✅ Yes |
+| Season detection (`ongoingSeasonPack` ESE) | ✅ Yes |
+| "Recommended" content in catalogs | ✅ Yes |
+| Episode air date awareness | ✅ Yes |
+| Some marketplace addons | ✅ One or the other |
+
+The templates ship with `"tmdbAccessToken": "<template_placeholder>"` and `"tmdbApiKey": "<template_placeholder>"`. These placeholders must be replaced with your real key — the template will not prompt you automatically.
+
+---
+
+### TMDB — Which Key to Use
+
+TMDB offers two credential types. **You only need one.**
+
+| | Read Access Token | API Key |
+|---|---|---|
+| **Format** | Long JWT string (~200 chars) | 32-character hex string |
+| **Recommended** | ✅ Yes — use this one | Only if an addon specifically asks for it |
+| **Where to find** | TMDB → Settings → API → Read Access Token | TMDB → Settings → API → API Key (v3 auth) |
+
+Use the **Read Access Token** for AIOStreams. It's the long string starting with `eyJ...`. Do not copy the short 32-character API Key by mistake — they are different credentials on the same settings page.
+
+---
+
+### Step 1 — Get Your TMDB Read Access Token
+
+1. Go to [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
+   - If you don't have an account, register at [themoviedb.org/signup](https://www.themoviedb.org/signup) — it's free
+2. Scroll down to **API Read Access Token**
+3. Copy the full token (it's long — make sure you copy all of it)
+
+> ⚠️ Don't copy the **API Key (v3 auth)** by mistake — it's the shorter string directly above the Read Access Token on the same page.
+
+---
+
+### Step 2 — Enter It in AIOStreams
+
+1. Open your AIOStreams dashboard
+2. Scroll to the **Metadata** section (usually near the bottom, below Formatter)
+3. Paste your Read Access Token into the **TMDB Read Access Token** field
+4. Leave the **TMDB API Key** field blank unless a specific addon asks for it
+5. Click **Save**
+
+> 💡 If you re-import a template, the TMDB fields reset to `<template_placeholder>`. You'll need to re-enter your key after every import.
+
+---
+
+### TVDB — Optional
+
+TVDB is a separate TV-focused metadata database. AIOStreams supports it but does not require it for any Core Builds functionality.
+
+**When you need a TVDB key:**
+- A specific addon you're using explicitly requires it
+- You use TVDB as a preferred metadata source
+
+**How to get one:**
+1. Go to [thetvdb.com](https://www.thetvdb.com) and register (free)
+2. Navigate to your profile → **API Keys**
+3. Generate a new API key and paste it into the **TVDB API Key** field in AIOStreams → Metadata
+
+If you're only using Core Builds templates with TorBox, you can leave the TVDB field blank.
+
+---
+
+### Troubleshooting
+
+#### Season packs showing when they shouldn't
+
+The `ongoingSeasonPack` ESE (present in all Core Builds templates) uses TMDB data to detect whether a show is currently airing. If your TMDB token is missing or invalid, this ESE stops working — season packs may appear alongside individual episode streams.
+
+Fix: enter your TMDB Read Access Token in the Metadata section and save.
+
+#### "Recommended" catalog is empty
+
+The Recommended tab in Stremio pulls TMDB recommendation data. Without a valid token, it returns nothing.
+
+#### An addon says "TMDB API key required"
+
+Some marketplace addons require the short 32-character **API Key (v3 auth)** rather than the Read Access Token. Go back to [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api), copy the **API Key (v3 auth)** field, and paste it into the **TMDB API Key** field in AIOStreams → Metadata (not the Read Access Token field).
+
+#### Token resets after re-importing a template
+
+Expected. Re-importing replaces all config including the TMDB placeholder fields. Always re-enter your key in the Metadata section after any template import.
+
+---
+
+*[Master Guide](README.md) · [GitHub](https://github.com/brevityA/Core-Builds) · [r/CoreBuilds](https://www.reddit.com/r/CoreBuilds/)*
 
 ---
 

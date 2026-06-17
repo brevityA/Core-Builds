@@ -1,0 +1,66 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Core Builds",
+  "logo": {
+    "light": "/logo/banner_square.svg",
+    "dark": "/logo/banner_square.svg"
+  },
+  "favicon": "/logo/core_icon.svg",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#93C5FD",
+    "dark": "#1D4ED8"
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/brevityA/Core-Builds"
+    },
+    {
+      "name": "AIOStreams",
+      "url": "https://github.com/Viren070/AIOStreams"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Template Directory",
+    "url": "/template-directory"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["introduction", "how-it-works", "which-template", "importing", "alldebrid-setup", "easynews-setup"]
+          },
+          {
+            "group": "Templates",
+            "pages": ["template-directory", "community-templates"]
+          },
+          {
+            "group": "Reference",
+            "pages": ["expression-layer", "device-profiles", "formatters", "glossary", "nightly-and-labs"]
+          },
+          {
+            "group": "Support",
+            "pages": ["troubleshooting", "changelog", "roadmap"]
+          }
+        ]
+      }
+    ]
+  },
+  "footerSocials": {
+    "github": "https://github.com/brevityA/Core-Builds"
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true
+  },
+  "metadata": {
+    "og:image": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_builds_banner.png",
+    "og:site_name": "Core Builds",
+    "twitter:card": "summary_large_image"
+  }
+}

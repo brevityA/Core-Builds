@@ -1,0 +1,148 @@
+---
+title: "Which Template?"
+description: "Find the right template in 30 seconds."
+---
+
+Every template has a **Lite variant** (`-lite` suffix). Use Lite if you get too few results or are on a low-overhead shared host.
+
+<Tabs>
+  <Tab title="TorBox Pro">
+    <CardGroup cols={2}>
+      <Card title="4K Apex" icon="crown" href="/template-directory">
+        Flagship 4K. DV/HDR REMUX, Usenet via Newznab, IQR adaptive bitrate filtering.
+        **Best for:** most Pro users who want 4K.
+      </Card>
+      <Card title="4K Apex (TorBox-only)" icon="bolt" href="/template-directory">
+        Cached-only Apex variant. No external scrapers — instant results from TorBox cache.
+        **Best for:** Pro users who want Apex quality without scraper wait times.
+      </Card>
+      <Card title="4K Hybrid" icon="shuffle" href="/template-directory">
+        TorBox + NZBGeek dual-source. Requires an NZBGeek API key.
+        **Best for:** Pro users with a Usenet indexer who want 4K.
+      </Card>
+      <Card title="Stream" icon="play" href="/template-directory">
+        1080p WEB-DL only. BluRay and Remux excluded.
+        **Best for:** budget hardware or WEB-DL purists.
+      </Card>
+      <Card title="Hybrid" icon="shuffle" href="/template-directory">
+        TorBox + NZBGeek, 1080p. Requires NZBGeek API key.
+        **Best for:** Pro users with a Usenet indexer who want 1080p.
+      </Card>
+      <Card title="Stream (Fire Stick)" icon="tv" href="/template-directory">
+        1080p SDR, tuned for Fire Stick and low-RAM devices.
+        **Best for:** Fire Stick, Chromecast, budget streamers.
+      </Card>
+      <Card title="Samsung TV" icon="monitor" href="/template-directory">
+        AV1/VC-1/DV hard-excluded for Tizen compatibility. 1080p and 4K variants.
+        **Best for:** Samsung TVs without Dolby Vision support.
+      </Card>
+    </CardGroup>
+
+    <Info>
+      **Have a Usenet indexer (NZBGeek)?** → 4K Hybrid or Hybrid. Otherwise → 4K Apex or Stream.
+    </Info>
+  </Tab>
+
+  <Tab title="TorBox Essential">
+    <CardGroup cols={2}>
+      <Card title="4K Essential" icon="star" href="/template-directory">
+        Full 4K on Essential plan. IQR PSEs, no Usenet.
+        **Best for:** Essential users who want 4K quality filtering.
+      </Card>
+      <Card title="Essential" icon="star" href="/template-directory">
+        1080p standard build for Essential subscribers.
+        **Best for:** Essential users — the go-to 1080p template.
+      </Card>
+      <Card title="Flash 4K / Flash" icon="bolt" href="/template-directory">
+        Cached-only, instant play. Returns nothing if title isn't cached.
+        **Best for:** single-click instant play with no wait.
+      </Card>
+      <Card title="Speed 4K / Speed" icon="gauge" href="/template-directory">
+        Fast cached play, exits at 3 cached results or timeout.
+        **Best for:** fast results without EasyNews.
+      </Card>
+      <Card title="Speed 4K+ / Speed+" icon="gauge" href="/template-directory">
+        Speed with EasyNews dual-source. Requires EasyNews credentials.
+        **Best for:** Essential + EasyNews subscribers.
+      </Card>
+    </CardGroup>
+
+    <Tip>
+      Not sure between Essential and Flash? Use Essential — it falls back to uncached if nothing is cached. Flash returns nothing if the title isn't in TorBox's cache.
+    </Tip>
+  </Tab>
+
+  <Tab title="AllDebrid">
+    <CardGroup cols={2}>
+      <Card title="4K AllDebrid" icon="crown" href="/template-directory">
+        Full 4K with IQR Tukey fence PSEs. Maximum quality filtering.
+        **Best for:** AllDebrid users who want the full quality stack.
+      </Card>
+      <Card title="4K AllDebrid Lite" icon="star" href="/template-directory">
+        4K with simpler CB-style PSEs. Less filtering complexity.
+        **Best for:** AllDebrid users who prefer lighter filtering.
+      </Card>
+      <Card title="AllDebrid" icon="play" href="/template-directory">
+        1080p with full quality gates.
+        **Best for:** AllDebrid users on 1080p.
+      </Card>
+      <Card title="AllDebrid Lite" icon="play" href="/template-directory">
+        1080p with hard kills only. Maximum result count.
+        **Best for:** thin libraries or shared hosts.
+      </Card>
+    </CardGroup>
+  </Tab>
+
+  <Tab title="Anime">
+    <CardGroup cols={2}>
+      <Card title="Anime 4K" icon="tv" href="/template-directory">
+        SeaDex best-release enforcement, AnimeTosho + NekoBT. HDR at 4K.
+        **Best for:** 4K HDR anime.
+      </Card>
+      <Card title="Anime" icon="tv" href="/template-directory">
+        SeaDex best-release, 1080p. The standard anime template.
+        **Best for:** most anime users.
+      </Card>
+      <Card title="Anime Dub" icon="tv" href="/template-directory">
+        English-dub priority, 1080p.
+        **Best for:** users who prefer English dubs.
+      </Card>
+    </CardGroup>
+
+    <Note>
+      All anime templates use SeaDex for quality selection. SeaDex is an anime-only best-release database — it doesn't affect non-anime content.
+    </Note>
+  </Tab>
+
+  <Tab title="EasyNews">
+    <Card title="Speed EasyNews" icon="gauge" href="/template-directory">
+      EasyNews-only speed build — no TorBox required. Fast cached Usenet play, exits at 3 results or timeout.
+      **Best for:** EasyNews subscribers without TorBox.
+    </Card>
+  </Tab>
+</Tabs>
+
+---
+
+## Lite vs Standard
+
+<Tabs>
+  <Tab title="Standard">
+    - 24 ESEs — full quality gate stack
+    - Includes low-bitrate, low-seeder, upscaled 4K, and bad Bluray quality gates
+    - Recommended for most users on self-hosted or dedicated instances
+  </Tab>
+  <Tab title="Lite">
+    - 12 ESEs — hard kills only (CAM, YouTube, 3D, bad NZBs)
+    - Quality gates removed for maximum result count
+    - Recommended for shared hosts, thin libraries, or debugging
+  </Tab>
+</Tabs>
+
+<Tip>
+  If the standard template returns very few results, switch to the Lite variant. If Lite returns results, one of the quality gates is filtering your content.
+</Tip>
+
+---
+
+→ [Template Directory](/template-directory) for all import URLs

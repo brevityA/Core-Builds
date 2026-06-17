@@ -1,0 +1,122 @@
+---
+title: "Nightly and Labs"
+description: "Experimental templates testing new features before stable promotion."
+---
+
+## Nightly vs Labs
+
+| | Nightly | Labs |
+|---|---|---|
+| Stability | Stable for daily use | Experimental — may break |
+| Purpose | Finalising before stable promotion | Testing new PSE/SEL architecture |
+| Update frequency | Periodic | Frequent |
+
+## Nightly Templates
+
+### Apple TV 4K (v0.1.1)
+
+Device profile for Apple TV 4K (3rd gen) via Infuse. DV Profile 5/8 prioritised, DD+ Atmos, AV1 hard-excluded (no A15 hardware decoder).
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json
+```
+
+---
+
+### Samsung RU7100 4K (v0.2.6)
+
+Samsung RU7100 (2019) 4K — FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV. Full APEX IQR PSE stack. More aggressive filtering than the stable Samsung TV template.
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json
+```
+
+---
+
+## Labs Templates
+
+<Warning>
+  Labs templates are experimental. They may change frequently and are not guaranteed to be stable. Use them to give feedback on new ideas.
+</Warning>
+
+### 4K Apex Labs (v0.5.3)
+
+Experimental Apex variant testing:
+- `dynamicAddonFetching` exit conditions (exit at 5+ cached 4K or 6s)
+- Template directives for per-scraper toggles
+- Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json
+```
+
+---
+
+### Stream Labs (v0.3.2)
+
+1080p variant of 4K Apex Labs. Same hybrid architecture, exit at 5+ cached 1080p or 5s.
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json
+```
+
+---
+
+### Essential Labs (v0.1.1)
+
+TorBox debrid-only 1080p — no external scrapers. Library + TorBox Search only. Tests template directives for TorBox Search toggle and exit thresholds. Fast and lightweight.
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json
+```
+
+---
+
+### 4K Essential Labs (v0.1.1)
+
+Same as Essential Labs but 4K. TorBox debrid-only, no external scrapers.
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json
+```
+
+---
+
+## How to Give Feedback
+
+Post in the Nightly or Labs thread in the community. Include:
+
+- Template name and version
+- Title that triggered the issue
+- What you expected vs what happened
+- AIOStreams version and host type (self-hosted / elfhosted / etc.)

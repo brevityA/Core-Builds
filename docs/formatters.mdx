@@ -1,0 +1,97 @@
+---
+title: "Formatters"
+description: "Stream display layouts — how to install and customise them."
+---
+
+<Frame>
+  <img
+    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/formatters_banner.svg"
+    alt="Core Formatters"
+    style={{ width: '100%', display: 'block' }}
+  />
+</Frame>
+
+Formatters control how streams are displayed in Stremio — the text shown for each result (title, quality, size, audio, etc.). All Core Builds templates ship with the **Core Syntax** formatter pre-loaded.
+
+## How to Import a Formatter
+
+<Steps>
+  <Step title="Open the Formatter tab">
+    In AIOStreams, go to the **Formatter** tab.
+  </Step>
+  <Step title="Click Import">
+    Click the **Import** icon in the top right corner.
+  </Step>
+  <Step title="Paste the URL">
+    Copy the formatter URL below, paste it into the import dialog, and click **Load**.
+  </Step>
+  <Step title="Save">
+    Click **Save** to apply.
+  </Step>
+</Steps>
+
+<Note>
+  Formatters are imported via the **Formatter tab** in AIOStreams — not via the Load Template flow. Use the raw URLs below.
+</Note>
+
+---
+
+## Apex v2
+
+4K-focused layout. Visual tags (DV, HDR10+, Atmos) front and centre. Designed for the 4K Apex template but works with any.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json
+```
+
+---
+
+## Elite
+
+Minimal and quality-first. Clean one-liner per stream with the essentials only.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json
+```
+
+---
+
+## Nexus Prime
+
+Full detail — codec, HDR, audio, size, seeders, and stream expression match score. Best for power users who want to see everything.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json
+```
+
+---
+
+## Field Reference
+
+| Field | What it shows |
+|---|---|
+| `stream.resolution` | 2160p, 1080p, 720p, etc. |
+| `stream.quality` | BluRay REMUX, WEB-DL, WEBRip, etc. |
+| `stream.encode` | HEVC, AVC, AV1 |
+| `stream.visualTag` | DV, HDR10+, HDR10, HLG, SDR |
+| `stream.audioTag` | Atmos, TrueHD, DTS:X, DD+, AAC |
+| `stream.size` | File size |
+| `stream.bitrate` | Bitrate in Mbps |
+| `stream.seeders` | P2P seeders (torrent only) |
+| `stream.hasChapters` | Chapter badge for BluRay REMUXes |
+| `stream.editions` | Director's Cut, Extended, IMAX, etc. |
+| `stream.regraded` | Colour regrade flag |
+| `stream.repack` | REPACK/PROPER flag |
+| `stream.seMatched` | Name of the stream expression that matched |
+| `stream.nSeScore` | Normalised SEL score (0–1) |
+| `stream.nRegexScore` | Normalised regex score (0–1) |
+
+## Customising a Formatter
+
+Formatters are JSON files. To customise:
+
+1. Download the formatter JSON from GitHub
+2. Edit the `name` and `description` template strings
+3. Re-import via the Formatter import button
+
+See the [Formatter Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/FORMATTER_GUIDE.md) in the repo for the full field and modifier reference.

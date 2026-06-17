@@ -1,0 +1,90 @@
+---
+title: "How It Works"
+description: "What happens between clicking play and a stream appearing — and what Core Builds does differently."
+---
+
+## The Pipeline
+
+When you hit play in Stremio, a lot happens in under a second.
+
+<Steps>
+  <Step title="Stremio sends a stream request">
+    Stremio asks your AIOStreams instance: *"give me streams for Breaking Bad S01E01."* AIOStreams receives the IMDB ID and the query type (movie, series episode, anime).
+  </Step>
+  <Step title="AIOStreams queries scrapers in parallel">
+    All enabled scrapers fire simultaneously — Comet, MediaFusion, TorBox, Zilean, Knaben, and any others you have configured. Each returns a raw list of streams: torrents, Usenet NZBs, debrid links.
+
+    Without Core Builds, this already produces 50–200+ results in no particular order.
+  </Step>
+  <Step title="ESEs remove junk">
+    **Excluded Stream Expressions** run first. Streams matching any ESE are removed entirely before ranking starts. Core Builds standard ESEs kill: CAM recordings, YouTube rips, 3D streams, sub-720p resolutions, season packs on episode queries, bad NZBs, and more.
+
+    Standard: 24 ESEs. Lite: 12 (hard kills only — no quality gates).
+  </Step>
+  <Step title="ISEs boost priority streams">
+    **Included Stream Expressions** pin certain streams to the top of the sorted list regardless of ranking. Core Builds ISEs boost: streams from your library (continue watching), cached streams, and English-language streams.
+  </Step>
+  <Step title="PSEs score everything else">
+    **Preferred Stream Expressions** assign a score to each remaining stream. Core Builds uses IQR Tukey fence PSEs — they compare each stream's bitrate against the statistical distribution of all streams for that title, then rank within the "normal" window highest.
+
+    Streams are scored into tiers: S (REMUX/high-bitrate), A, B, C, D (low-bitrate/low-quality).
+  </Step>
+  <Step title="Deduplication">
+    Identical files from different scrapers are merged into a single result. Core Builds uses aggressive smart deduplication with tiebreakers: seeder count (torrents) and age (Usenet).
+  </Step>
+  <Step title="Formatter renders the display">
+    Each stream's metadata is formatted into the title and description lines you see in Stremio. Core Builds formatters show: resolution, codec, HDR type, audio, file size, bitrate, cache status, release group, and more.
+  </Step>
+  <Step title="Sorted results returned to Stremio">
+    Stremio receives the final list — typically 10–20 clean, ranked results. The best option for your setup is at the top.
+  </Step>
+</Steps>
+
+---
+
+## What Core Builds Adds
+
+Vanilla AIOStreams with default settings returns raw, unsorted results. Core Builds layers a full quality stack on top:
+
+<CardGroup cols={2}>
+  <Card title="IQR Tukey Fence PSEs" icon="chart-line">
+    Bitrate-based ranking using real statistics across all streams for a title — not hardcoded cutoffs. Adapts to thin libraries and new releases via the pow() decay window.
+  </Card>
+  <Card title="Core Builds Expression Layer" icon="filter">
+    Seven stream expressions deployed across all templates: REPACK passthrough, season pack gating, resolution kill, library boost, Usenet boost, cached-first sort, and format exclusions.
+  </Card>
+  <Card title="Release Group Scoring" icon="star">
+    149 release groups scored across 10 tiers (+100 to -200). Elite groups (FraMeSToR, FLUX, BHDStudio) surface above generic encodes automatically.
+  </Card>
+  <Card title="Device Profiles" icon="tv">
+    Samsung TV, Apple TV, Fire Stick templates hard-exclude codecs and HDR formats the device can't play — no more silent playback failures from AV1 or DV on unsupported hardware.
+  </Card>
+  <Card title="Usenet Priority" icon="bolt">
+    Cached TorBox Usenet NZBs are boosted above standard debrid results via a dedicated PSE. The Boost Cached Usenet PSE ensures Usenet results never silently sort below torrents.
+  </Card>
+  <Card title="pow() Age Decay" icon="clock">
+    Bitrate windows for new releases expand over time using an exponential decay function — ±40% tolerance on day 0, narrowing to ±2% by day 60 as more encodes appear.
+  </Card>
+</CardGroup>
+
+---
+
+## PSE / ESE / ISE at a Glance
+
+| Type | Role | Count (Standard) | Count (Lite) |
+|---|---|---|---|
+| ESE | Remove — stream is excluded from results | 24 | 12 |
+| ISE | Boost — stream jumps to top regardless of score | 3 | 3 |
+| PSE | Rank — stream gets a quality score | 7–12 | 7–12 |
+
+ESEs run first, then ISEs, then PSEs. A stream matched by an ESE never reaches PSE scoring.
+
+---
+
+## Why Lite Returns More Results
+
+Lite templates remove the quality-gate ESEs (low bitrate, low seeders, upscaled 4K, bad BluRay encodes). Only hard kills remain (CAM, YouTube, 3D, sub-720p). More results come through — but without quality filtering, some bad encodes will appear.
+
+Use Lite when: your library is thin, you're on a shared host, or you're debugging why a specific title returns no results on the standard template.
+
+→ [Expression Layer deep-dive](/expression-layer) for the full technical reference

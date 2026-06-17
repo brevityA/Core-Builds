@@ -1,0 +1,190 @@
+---
+title: "Glossary"
+description: "Key terms used across Core Builds and AIOStreams."
+---
+
+## A
+
+<AccordionGroup>
+  <Accordion title="AIOStreams">
+    A self-hosted addon that sits between Stremio (or WuPlay) and your debrid service. When you open a title, AIOStreams queries multiple scrapers simultaneously, filters and ranks every result, deduplicates, and returns a clean sorted stream list. One addon replaces a dozen separate torrent/debrid addons.
+  </Accordion>
+  <Accordion title="AV1">
+    A modern video codec — more efficient than HEVC at the same quality, but hardware decoder support is patchy. Samsung Tizen TVs (2018–2022) and Apple TV (A15) lack a hardware AV1 decoder — these device templates hard-exclude AV1 to prevent silent playback failures.
+  </Accordion>
+  <Accordion title="Atmos (Dolby Atmos)">
+    Object-based surround audio format. Comes in two forms: TrueHD Atmos (lossless, BluRay) and DD+ Atmos (lossy, streaming). All 4K templates prefer Atmos where available.
+  </Accordion>
+</AccordionGroup>
+
+## B
+
+<AccordionGroup>
+  <Accordion title="Bitrate">
+    Data throughput of a video stream, typically measured in Mbps. Higher bitrate = more data = better quality (up to a point). Core Builds uses bitrate as a primary ranking signal via the IQR Tukey fence — streams with suspiciously low or high bitrates relative to peers are deprioritised.
+  </Accordion>
+  <Accordion title="BluRay REMUX">
+    A lossless copy of a Blu-ray disc with no re-encoding — the video and audio bitstreams are extracted directly. Largest file sizes, highest quality. Preferred on 4K templates. Excluded on the Stream template (WEB-DL only).
+  </Accordion>
+</AccordionGroup>
+
+## C
+
+<AccordionGroup>
+  <Accordion title="Cached">
+    A file that has already been downloaded to a debrid service's servers. Clicking a cached stream starts playing instantly — no torrent download wait. Core Builds ISEs boost cached streams above uncached results.
+  </Accordion>
+  <Accordion title="Core Builds Expression Layer">
+    The set of seven Stream Expressions deployed in all active Core Builds templates. Covers: REPACK/PROPER passthrough, season pack gating, resolution kill, library boost, Usenet boost, cached-first sorting, and format exclusions. See [Expression Layer](/expression-layer).
+  </Accordion>
+</AccordionGroup>
+
+## D
+
+<AccordionGroup>
+  <Accordion title="Debrid service">
+    A subscription service (TorBox, AllDebrid, Real-Debrid) that downloads torrents or NZBs to its own servers and gives you direct HTTP links. You stream from their servers rather than from the torrent swarm — faster, more reliable, ISP-friendly.
+  </Accordion>
+  <Accordion title="Dolby Vision (DV)">
+    HDR format with per-frame dynamic metadata. Produces the best HDR image on compatible displays. Comes in several profiles — Profile 5 (DV-only, no HDR10 fallback) and Profile 7/8 (dual-layer, includes HDR10 fallback). Samsung Tizen TVs cannot decode DV — Samsung templates hard-exclude it.
+  </Accordion>
+  <Accordion title="DTS-HD MA / DTS:X">
+    Lossless (DTS-HD MA) and object-based (DTS:X) audio formats found on BluRay discs. High quality but large files. Excluded on Samsung templates (Tizen cannot pass these through).
+  </Accordion>
+</AccordionGroup>
+
+## E
+
+<AccordionGroup>
+  <Accordion title="ESE (Excluded Stream Expression)">
+    A filter that removes streams from results entirely. ESEs run before PSEs — anything matched by an ESE is gone before ranking starts. Examples: CAM kill, YouTube rip kill, 3D kill, low-resolution kill. Standard templates run 24 ESEs; Lite templates run 12 (hard kills only).
+  </Accordion>
+  <Accordion title="EasyNews">
+    A Usenet provider with a web-based search interface. Supported in AIOStreams as a scraper addon. Used in Speed+ and Speed EasyNews templates — no TorBox required for the standalone EasyNews template.
+  </Accordion>
+</AccordionGroup>
+
+## F
+
+<AccordionGroup>
+  <Accordion title="Formatter">
+    Controls the text displayed for each stream in Stremio — the title line, metadata rows, codec, HDR tag, audio, file size, seeders, etc. Core Builds ships 14 formatters. The default is Core Syntax; others (Apex v2, Elite, Nexus Prime) can be swapped via the Formatter tab.
+  </Accordion>
+</AccordionGroup>
+
+## H
+
+<AccordionGroup>
+  <Accordion title="HDR10 / HDR10+ / HLG">
+    Open HDR formats. HDR10 is static metadata (most common). HDR10+ adds per-scene dynamic metadata (Samsung displays, some Samsung TVs support this). HLG is broadcast-friendly HDR. All are supported on a wider range of devices than Dolby Vision.
+  </Accordion>
+  <Accordion title="HEVC (H.265)">
+    Current mainstream video codec. More efficient than AVC at the same quality — smaller files, same picture. Broadly supported with hardware decoders on modern devices. Preferred on most Core Builds templates.
+  </Accordion>
+</AccordionGroup>
+
+## I
+
+<AccordionGroup>
+  <Accordion title="IQR (Interquartile Range)">
+    A statistical measure of spread: the range between the 25th percentile (Q1) and 75th percentile (Q3) of a dataset. Used in Core Builds PSEs to define a "normal" bitrate window for a given title — streams inside the Tukey fence are ranked, outliers are deprioritised.
+  </Accordion>
+  <Accordion title="ISE (Included Stream Expression)">
+    A filter that boosts certain streams to the top of results, ahead of PSE ranking. Core Builds ISEs boost: library streams, cached streams, and English-language streams. ISEs run after ESEs but before PSEs in the evaluation order.
+  </Accordion>
+</AccordionGroup>
+
+## N
+
+<AccordionGroup>
+  <Accordion title="Newznab">
+    A Usenet indexer API protocol. NZBGeek is a Newznab indexer — it returns NZB files (Usenet download links). Used in Hybrid templates (4K Hybrid, Hybrid, Hybrid Lite) as a second source alongside TorBox.
+  </Accordion>
+  <Accordion title="NZBGeek">
+    A popular Usenet indexer that supports the Newznab API. Required for Hybrid templates. Provides NZBs (Usenet releases) as a supplement to TorBox's torrent cache.
+  </Accordion>
+  <Accordion title="NZB">
+    A file that describes a Usenet post (like a torrent file for Usenet). AIOStreams can query Newznab indexers and return NZBs to TorBox or another debrid service for downloading.
+  </Accordion>
+</AccordionGroup>
+
+## P
+
+<AccordionGroup>
+  <Accordion title="pow() decay">
+    `pow(0.95, daysSinceRelease)` — a mathematical function used in Core Builds PSEs to produce a smooth bitrate window that narrows over time. A new release (day 0) gets ±40% tolerance; by day 30 it's ±9%; by day 60 it's ±2%. Replaces the old hard 60-day cliff.
+  </Accordion>
+  <Accordion title="PSE (Preferred Stream Expression)">
+    A filter that scores and ranks streams into quality tiers. PSEs don't exclude — they sort. Core Builds uses IQR Tukey fence PSEs for statistically sound bitrate-based ranking. The highest-scoring PSE match determines a stream's position in the final sorted list.
+  </Accordion>
+</AccordionGroup>
+
+## R
+
+<AccordionGroup>
+  <Accordion title="Release group">
+    The team that produced a release (e.g. FraMeSToR, FLUX, BHDStudio). Some groups are consistently high quality; others are known for bad encodes. Core Builds `rankedRegexPatterns` scores 149 release groups across 10 tiers (S/A/B tier down to blacklist).
+  </Accordion>
+  <Accordion title="REMUX">
+    See BluRay REMUX.
+  </Accordion>
+  <Accordion title="REPACK / PROPER">
+    A re-released version of a file correcting a quality defect in the original (audio sync issue, corrupt encode, wrong runtime). REPACK is from the original group; PROPER is from another group flagging the issue. Core Builds passthrough ISEs are planned to always surface these ahead of quality gates.
+  </Accordion>
+</AccordionGroup>
+
+## S
+
+<AccordionGroup>
+  <Accordion title="Scraper">
+    An AIOStreams addon that searches for streams — Comet, MediaFusion, TorBox Search, Knaben, Meteor, etc. Each scraper queries different sources (torrent indexes, debrid caches, Usenet). Core Builds templates configure which scrapers are enabled and their timeouts.
+  </Accordion>
+  <Accordion title="SeaDex">
+    An anime-only best-release database. Tracks which fansub/encode group produced the definitive release for each anime title. Used in Anime templates — `seadexBestOnly` restricts results to SeaDex-approved releases when data exists.
+  </Accordion>
+  <Accordion title="SEL (Stream Expression Language)">
+    The expression language built into AIOStreams for writing PSEs, ESEs, and ISEs. Supports statistical functions (`iqr`, `q1`, `q3`, `percentile`), stream filters (`bitrate`, `resolution`, `quality`, `cached`), math (`pow`, `sqrt`), and array operations (`merge`, `count`, `slice`, `pin`).
+  </Accordion>
+</AccordionGroup>
+
+## T
+
+<AccordionGroup>
+  <Accordion title="Template">
+    A JSON configuration file that defines every aspect of an AIOStreams setup — addons, filters, sorting, formatter, deduplication, and branding. Core Builds provides 30+ templates for different services, resolutions, and devices.
+  </Accordion>
+  <Accordion title="TorBox">
+    A debrid service with both torrent and Usenet support. Core Builds is primarily built for TorBox subscribers. Plans: Essential (basic cached-only) and Pro (full Usenet + uncached support).
+  </Accordion>
+  <Accordion title="TrueHD">
+    Dolby's lossless audio format, found on BluRay discs. Often paired with Atmos metadata. Requires passthrough to an AVR — Samsung TVs and most streaming devices cannot decode TrueHD natively. Excluded on Samsung templates.
+  </Accordion>
+  <Accordion title="Tukey fence">
+    A statistical outlier detection method: `[Q1 - 1.5×IQR, Q3 + 1.5×IQR]`. Streams with bitrates inside the fence are "normal" for that title; streams outside are outliers (unusually low-quality or suspiciously large). Core Builds uses this to rank within-window streams highest.
+  </Accordion>
+</AccordionGroup>
+
+## U
+
+<AccordionGroup>
+  <Accordion title="Uncached">
+    A torrent or NZB not yet downloaded to a debrid service's servers. AIOStreams can return uncached results — clicking them triggers a download first (may take minutes to hours). Core Builds ISEs sort cached results above uncached by default.
+  </Accordion>
+  <Accordion title="Usenet">
+    A distributed text and binary posting system predating the web. Used as a file distribution network — NZBs point to binary posts containing video files. Faster propagation than torrents for new releases; no seeder dependency. Supported via Newznab indexers (NZBGeek) in Core Builds Hybrid templates.
+  </Accordion>
+</AccordionGroup>
+
+## W
+
+<AccordionGroup>
+  <Accordion title="WEB-DL">
+    A stream captured directly from a digital distribution source (Netflix, Amazon, Disney+) at its native bitrate — no re-encoding. Clean, consistent quality. The default quality tier on Stream and Essential templates.
+  </Accordion>
+  <Accordion title="WEBRip">
+    A recording of a WEB-DL stream, often re-encoded at lower bitrates. Lower quality than WEB-DL. Ranked below WEB-DL in Core Builds sort criteria.
+  </Accordion>
+  <Accordion title="WuPlay">
+    A web-based streaming client that works alongside AIOStreams. Useful for Chromecast, smart TVs, or any device without a native Stremio app.
+  </Accordion>
+</AccordionGroup>
