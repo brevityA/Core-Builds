@@ -61,10 +61,26 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `sortCriteria` entries must use `"direction"` (not `"order"`) — AIOStreams rejects `"order"` on import
 - `addonLogo` URL must use `/refs/heads/main/` not `/main/` — the short form breaks on stale CDN caches
 - `stremthruTorz` is TorBox-specific; `stremthruStore` is for other debrid services (AllDebrid, RD)
-- `torbox-search` was renamed/removed in AIOStreams v2.30.2 — keep it `enabled: false`
+- `torbox-search` is a valid TorBox-wrapped search addon (not removed or broken) — keep it `enabled: false` to disable it per-template
 - `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — triggers "Forbidden URL" error. Do not use; embed patterns inline in `rankedRegexPatterns` instead
 - **Regex requires trusted access** — `REGEX_FILTER_ACCESS=trusted` is the AIOStreams default; inline `rankedRegexPatterns`/`preferredRegexPatterns` are ALSO blocked for non-trusted users unless host adds UUID to `TRUSTED_UUIDS` or sets `REGEX_FILTER_ACCESS=all`. Self-hosted with no auth: set `REGEX_FILTER_ACCESS=all`
 - **SEL hard limits** — Max **3,000 chars per expression** (`MAX_SEL_LENGTH`); max **50,000 chars total** across all expressions (`MAX_STREAM_EXPRESSIONS_TOTAL_CHARACTERS`); max **200 total expressions** (`MAX_STREAM_EXPRESSIONS`). Current templates: highest single = 2,953 chars (47-char headroom), highest total = ~35,000 chars. Do not grow the `Final Limit (All)` ESE further
+
+## Known Preset Types
+
+Preset `type` values confirmed in AIOStreams source:
+
+**Debrid/service:** `stremthruTorz`, `stremthruStore`, `torrent-io`, `torbox`, `torbox-search`
+
+**Scrapers:** `comet`, `mediafusion`, `mediafusion-public`, `jackettio`, `prowlarr`, `orionoid`, `annatar`, `knaben`, `torrentio`, `debridio`, `meteor`, `torrent-galaxy`, `zilean`, `hdhub`, `eztv`
+
+**Usenet:** `newznab`, `easynews`, `easynews-plus`
+
+**Anime-specific:** `seadex`, `animetosho`, `neko-bt`
+
+**Subtitles:** `opensubtitles-v3-plus`, `aiosubtitle`
+
+**System:** `library` (continue watching / user library), `custom`
 
 ---
 
@@ -214,7 +230,7 @@ Note: inline `rankedRegexPatterns` are ALSO blocked for non-trusted users on pub
 
 **Array ops:** `count`, `negate`, `merge`, `slice`, `perGroup`, `pin`
 
-**Math:** `pow` (from expr-eval)
+**Math:** `pow`, `sqrt`, `random` (from expr-eval)
 
 ### Key function details
 
@@ -243,6 +259,20 @@ Note: inline `rankedRegexPatterns` are ALSO blocked for non-trusted users on pub
 **`indexer(streams, ...names)`**
 - Filter by indexer/scraper name
 
+### SEL Variables (available as bare names in expressions)
+
+**Content metadata:**
+`queryType` (`'movie'`, `'series'`, `'anime.movie'`, `'anime.series'`), `isAnime`, `title`, `year`, `yearEnd`, `season`, `episode`, `absoluteEpisode`, `genres`, `runtime`, `originalLanguage`, `hasSeaDex`
+
+**Release timing:**
+`daysSinceRelease`, `daysSinceFirstAired`, `daysSinceLastAired`, `daysUntilNextEpisode`, `hasNextEpisode`, `latestSeason`, `ongoingSeason`
+
+**Dynamic addon fetching (exit condition only):**
+`totalStreams`, `totalTimeTaken`, `queriedAddons`, `allAddons`
+
+**Groups (group condition only):**
+`previousStreams`, `previousGroupTimeTaken`
+
 ### NOT available in SEL (formatter DSL only)
 `hasChapters`, `editions`, `regraded`, `date`, `dubbed`, `subbed` — these exist as `stream.X` in formatter DSL only, not as SEL variables in PSE/ESE/ISE expressions.
 
@@ -265,6 +295,23 @@ All used via `{stream.fieldName::operator[...]}` in formatter `name`/`descriptio
 | `uSubtitleEmojis` | string[] | Per-language subtitle flags (🇬🇧 🇫🇷 etc.) |
 | `seMatched` | string | Name of the stream expression that matched this stream |
 | `rseMatched` | string[] | Regex set expression tier(s) matched |
+| `nSeScore` | number | Normalised stream expression score (0–1) |
+| `nRegexScore` | number | Normalised regex score (0–1) |
+| `folderSeasons` | string[] | Season folders in multi-season packs |
+| `folderEpisodes` | string[] | Episode entries in folder-based releases |
+
+### Formatter String Modifiers
+
+Appended after `::` in `{stream.field::modifier}` expressions:
+
+| Modifier | Effect |
+|---|---|
+| `smallcaps` | Renders text in small caps |
+| `rsort` | Reverse-sort array before joining |
+| `lsort` | Logical (natural) sort of array |
+| `slice(start, end)` | Trim array to index range |
+| `remove(val)` | Remove a value from array/string |
+| `star` / `pstar` | Star / partial-star rating display |
 
 ---
 
