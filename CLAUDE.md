@@ -62,7 +62,9 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `addonLogo` URL must use `/refs/heads/main/` not `/main/` — the short form breaks on stale CDN caches
 - `stremthruTorz` is TorBox-specific; `stremthruStore` is for other debrid services (AllDebrid, RD)
 - `torbox-search` was renamed/removed in AIOStreams v2.30.2 — keep it `enabled: false`
-- `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — do not use; embed patterns inline in `rankedRegexPatterns` instead
+- `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — triggers "Forbidden URL" error. Do not use; embed patterns inline in `rankedRegexPatterns` instead
+- **Regex requires trusted access** — `REGEX_FILTER_ACCESS=trusted` is the AIOStreams default; inline `rankedRegexPatterns`/`preferredRegexPatterns` are ALSO blocked for non-trusted users unless host adds UUID to `TRUSTED_UUIDS` or sets `REGEX_FILTER_ACCESS=all`. Self-hosted with no auth: set `REGEX_FILTER_ACCESS=all`
+- **SEL hard limits** — Max **3,000 chars per expression** (`MAX_SEL_LENGTH`); max **50,000 chars total** across all expressions (`MAX_STREAM_EXPRESSIONS_TOTAL_CHARACTERS`); max **200 total expressions** (`MAX_STREAM_EXPRESSIONS`). Current templates: highest single = 2,953 chars (47-char headroom), highest total = ~35,000 chars. Do not grow the `Final Limit (All)` ESE further
 
 ---
 
@@ -188,7 +190,9 @@ Radarr/Sonarr quality guide patterns embedded per template category. Scores 70�
 **Source of truth:** `Filtering/ranked-regex-patterns.json` — 149 patterns, 10 score tiers. Embed only the 53 with `|score| ≥ 50`, minus `preferredRegexPatterns` name overlaps to prevent double-scoring.
 
 ### `syncedRankedRegexUrls`
-**Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL(s) in regex configuration". Embed patterns inline.
+**Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL" error (`SEL_SYNC_ACCESS=trusted` is the default). Embed patterns inline.
+
+Note: inline `rankedRegexPatterns` are ALSO blocked for non-trusted users on public instances (`REGEX_FILTER_ACCESS=trusted`). For self-hosted instances, set `REGEX_FILTER_ACCESS=all`.
 
 ---
 
