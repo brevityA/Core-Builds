@@ -1,0 +1,90 @@
+---
+title: "Device Profiles"
+description: "Template recommendations and codec constraints for Samsung TV, Apple TV, Fire Stick, and low-RAM devices."
+---
+
+## Samsung TV (Tizen 2018–2022)
+
+**Models:** RU7100, RU8000, NU8000, Q60 and similar
+
+**Recommended templates:** [Samsung TV](/template-directory#torbox-pro) (1080p) or [Samsung TV 4K](/template-directory#torbox-pro)
+
+| Feature | Support |
+|---|---|
+| Dolby Vision | No hardware DV decoder — DV-Only streams excluded by default |
+| AV1 | No hardware decoder — hard-excluded |
+| VC-1 | Not supported — hard-excluded |
+| HEVC (H.265) | Hardware decode |
+| AVC (H.264) | Hardware decode |
+| HDR10+ | Supported (preferred) |
+| HDR10 | Supported |
+| HLG | Supported |
+| TrueHD / DTS:X / DTS-HD MA / FLAC | Hard-excluded — Tizen cannot pass these through |
+| DD+ Atmos | Top preferred audio |
+| AAC | Native |
+
+<Info>
+  **Nightly option:** Samsung RU7100 4K (Nightly) — full APEX IQR PSE stack, FLAC/AAC native audio, tuned specifically for the RU7100 (2019).
+</Info>
+
+---
+
+## Apple TV 4K (3rd gen, A15/A17)
+
+**Recommended template:** [Apple TV 4K (Nightly)](/nightly-and-labs) via Infuse
+
+| Feature | Support |
+|---|---|
+| Dolby Vision | Profile 5 and 8 — prioritised |
+| AV1 | No hardware decoder on A15 — hard-excluded |
+| HEVC (H.265) | Hardware decode |
+| AVC (H.264) | Hardware decode |
+| HDR10+ | 3rd gen exclusive |
+| HDR10 / HLG | Supported |
+| DD+ Atmos | Native preferred audio |
+| TrueHD | Passthrough only (requires AVR) |
+
+---
+
+## Fire Stick (4K / 4K Max)
+
+**Recommended template:** [Stream (Fire Stick)](/template-directory#torbox-pro) or Stream (Fire Stick) Lite
+
+| Feature | Support |
+|---|---|
+| 4K | Fire Stick 4K / 4K Max only |
+| Dolby Vision | Fire Stick 4K Max only |
+| HEVC | Supported |
+| AV1 | Fire Stick 4K Max only |
+| RAM | Low — Lite variant recommended if buffering |
+
+<Tip>
+  Fire Stick 4K Max supports AV1; Fire Stick 4K does not. Use SDR or HDR10 priority if buffering is an issue.
+</Tip>
+
+---
+
+## Low-RAM / Budget Devices
+
+Any device with 2 GB RAM or less (older Fire Sticks, budget Android TV boxes):
+
+- Use the **Lite variant** of any template — removes quality gates to maximise result count
+- Enable **Flash** if you only need instant cached results
+- Disable HDR to reduce stream sizes
+- Set a bitrate cap via AIOStreams settings if buffering persists
+
+---
+
+## General Tips
+
+<AccordionGroup>
+  <Accordion title="DV-Only Kill ESE">
+    Enabled by default on Samsung templates. Removes streams where Dolby Vision is the only signal layer (no HDR10 fallback). Safe to disable if your device supports DV natively.
+  </Accordion>
+  <Accordion title="Audio exclusions on Samsung">
+    Samsung templates hard-exclude TrueHD / DTS:X / DTS-HD MA / FLAC. Remove these exclusions if your device passes audio through to an AVR that supports them.
+  </Accordion>
+  <Accordion title="AV1 on Samsung and Apple TV">
+    Excluded on both. Keep AV1 in `excludedEncodes` for these devices. Enable it for Fire Stick 4K Max or modern Android TV.
+  </Accordion>
+</AccordionGroup>

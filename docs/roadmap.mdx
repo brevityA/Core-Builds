@@ -1,0 +1,97 @@
+---
+title: "Roadmap"
+description: "Planned work, active development, and recently completed milestones."
+---
+
+## Recently Completed
+
+| Version | Item |
+|---|---|
+| v2.8.4 | Boost Cached Usenet PSE restored — all 27 TorBox templates |
+| v2.8.3 | seadexBestOnly fixed on 5 general-purpose 4K templates |
+| v2.8.3 | Hard resolution kill ESE added to all 13 x 1080p templates |
+| v2.8.2 | Samsung TV codec fixes — AV1/VC-1 hard-excluded, DV/AI upscale removed |
+| v2.8.2 | Regex patterns embedded inline — fixes public instance "Forbidden URL" errors |
+| v2.8.0 | AllDebrid template family (4 templates) |
+| v2.8.0 | Apple TV 4K (Nightly) |
+| v2.8.0 | Samsung TV promoted to stable |
+| v2.8.0 | pow() exponential age-decay replaces hard 60-day cliff |
+| v2.8.0 | Core Builds Expression Layer — all 7 expressions deployed |
+| v2.7.5 | Addon timeout tuning — fixes silent Usenet result drops |
+| v2.7.5 | Dedup tiebreakers — torrent_seeders + usenet_age |
+| v2.7.0 | Core Nexus 4K Hybrid — TorBox + NZBGeek Usenet |
+| v2.7.0 | IQR Tukey fence PSEs |
+
+---
+
+## In Progress
+
+| Item | Notes |
+|---|---|
+| `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate — if SeaDex data exists, require SeaDex-matched stream in top tier; else fall through to standard sort |
+| Hybrid TorBox-priority PSEs — 1080p | TorBox-cached twins already in 4K Hybrid; carry over to Hybrid and Hybrid Lite |
+
+---
+
+## Planned
+
+### Expression Layer
+
+<AccordionGroup>
+  <Accordion title="REPACK/PROPER Passthrough ISE">
+    Pins REPACK/PROPER releases ahead of limit/excluded filters. Ensures patched releases always surface. Critical for Anime (fansub REPACKs), Hybrid, and Stream.
+  </Accordion>
+  <Accordion title="Per-Addon Flood Guard ESE">
+    Per-addon result cap (Meteor ≤5, Comet ≤5, MediaFusion ≤4, Torrent Galaxy/EZTV/Knaben/HdHub ≤3) on cached non-library streams. Most impactful on Stream, Essential, and Apex where Meteor can return 15–20+ results.
+  </Accordion>
+  <Accordion title="Usenet Propagation Guard ESE">
+    Holds back NZBs younger than 2 hours when propagated alternatives exist. Eliminates corrupt early-propagation grabs. All Usenet-enabled templates.
+  </Accordion>
+  <Accordion title="Codec Efficiency Booster PSE">
+    Surfaces HEVC/AV1 encodes ahead of AVC equivalents. Stream, Essential, Anime primarily.
+  </Accordion>
+  <Accordion title="Audio Pinnacle PSE">
+    Promotes lossless/object-based audio: Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3/DD+. Critical for Apex, 4K Hybrid, 4K Essential.
+  </Accordion>
+  <Accordion title="HDR / DV Priority PSE">
+    Within 4K results, surfaces DV/HDR10+/HDR10 ahead of SDR. Critical for Apex, 4K Essential, 4K Hybrid, Flash 4K.
+  </Accordion>
+  <Accordion title="pin() top result">
+    Pin the #1 PSE-matched stream to position 1 regardless of sort order.
+  </Accordion>
+</AccordionGroup>
+
+### Templates
+
+- **Mobile / Bandwidth template** — 25 Mbps bitrate ceiling, SDR-preferred, no REMUX. Covers mobile, travel, data-capped users
+- **Anime Dub 4K variant** — English-dub priority at 4K
+- **Flash suite review** — Flash 4K and Flash under evaluation; `excludeUncached: true` behaviour is genuinely distinct from Speed/Essential
+
+### Infrastructure
+
+- **GitHub Sponsors setup** — Ko-fi is live; exploring GitHub-native sponsorship
+- **Automated live AIOStreams testing** — Docker-based end-to-end validation against a real AIOStreams instance
+
+### Documentation
+
+- **Video walkthrough** — Import flow and template selection for new users
+- **AllDebrid setup guide** — Mirror of the TorBox import guide scoped to AllDebrid
+
+---
+
+## Ideas / Under Consideration
+
+| Idea | Status |
+|---|---|
+| New unified template suite | Under consideration — tighter 6-template lineup built around the Core Builds expression layer |
+| Debrid-Link template | Under research — supported in AIOStreams |
+| Premiumize template | Under research — natively supported |
+| RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results |
+| stddev() / variance() PSE variants | Exploratory — z-score gating as IQR alternative for large pools |
+| Community formatter gallery | Under consideration — Formatters/Community/ with user-submitted layouts |
+
+---
+
+## Want to Contribute?
+
+Feature suggestions belong in [Discussions](https://github.com/brevityA/Core-Builds/discussions) rather than issues — roadmap items that gain community traction get prioritised.
