@@ -3,96 +3,142 @@ title: "Which Template?"
 description: "Find the right template in 30 seconds."
 ---
 
-Every template also has a **Lite variant** (`-lite` suffix). Use Lite if you get too few results or are on a low-overhead shared host.
+Every template has a **Lite variant** (`-lite` suffix). Use Lite if you get too few results or are on a low-overhead shared host.
 
-## Decision Tree
+<Tabs>
+  <Tab title="TorBox Pro">
+    <CardGroup cols={2}>
+      <Card title="4K Apex" icon="crown" href="/template-directory">
+        Flagship 4K. DV/HDR REMUX, Usenet via Newznab, IQR adaptive bitrate filtering.
+        **Best for:** most Pro users who want 4K.
+      </Card>
+      <Card title="4K Hybrid" icon="shuffle" href="/template-directory">
+        TorBox + NZBGeek dual-source. Requires an NZBGeek API key.
+        **Best for:** Pro users with a Usenet indexer who want 4K.
+      </Card>
+      <Card title="Stream" icon="play" href="/template-directory">
+        1080p WEB-DL only. BluRay and Remux excluded.
+        **Best for:** budget hardware or WEB-DL purists.
+      </Card>
+      <Card title="Hybrid" icon="shuffle" href="/template-directory">
+        TorBox + NZBGeek, 1080p. Requires NZBGeek API key.
+        **Best for:** Pro users with a Usenet indexer who want 1080p.
+      </Card>
+      <Card title="Stream (Fire Stick)" icon="tv" href="/template-directory">
+        1080p SDR, tuned for Fire Stick and low-RAM devices.
+        **Best for:** Fire Stick, Chromecast, budget streamers.
+      </Card>
+      <Card title="Samsung TV" icon="monitor" href="/template-directory">
+        AV1/VC-1/DV hard-excluded for Tizen compatibility. 1080p and 4K variants.
+        **Best for:** Samsung TVs without Dolby Vision support.
+      </Card>
+    </CardGroup>
 
-```
-TorBox Pro?
-├── Got NZBGeek/Usenet indexer?
-│   ├── Want 4K? → 4K Hybrid
-│   └── 1080p only? → Hybrid
-├── Want 4K? → 4K Apex
-├── Samsung TV / no Dolby Vision? → Samsung TV · Samsung TV 4K
-├── Apple TV 4K (Infuse)? → Apple TV 4K (Nightly)
-├── Fire Stick / low-RAM? → Stream (Fire Stick)
-└── 1080p only? → Stream
+    <Info>
+      **Have a Usenet indexer (NZBGeek)?** → 4K Hybrid or Hybrid. Otherwise → 4K Apex or Stream.
+    </Info>
+  </Tab>
 
-TorBox Essential?
-├── Single-click instant play (cached only)?
-│   ├── 4K? → Flash 4K
-│   └── 1080p? → Flash
-├── Fast cached play, no EasyNews?
-│   ├── 4K? → Speed 4K
-│   └── 1080p? → Speed
-├── Fast cached play + EasyNews?
-│   ├── 4K? → Speed 4K+
-│   └── 1080p? → Speed+
-├── Want 4K? → 4K Essential
-└── 1080p standard? → Essential
+  <Tab title="TorBox Essential">
+    <CardGroup cols={2}>
+      <Card title="4K Essential" icon="star" href="/template-directory">
+        Full 4K on Essential plan. IQR PSEs, no Usenet.
+        **Best for:** Essential users who want 4K quality filtering.
+      </Card>
+      <Card title="Essential" icon="star" href="/template-directory">
+        1080p standard build for Essential subscribers.
+        **Best for:** Essential users — the go-to 1080p template.
+      </Card>
+      <Card title="Flash 4K / Flash" icon="bolt" href="/template-directory">
+        Cached-only, instant play. Returns nothing if title isn't cached.
+        **Best for:** single-click instant play with no wait.
+      </Card>
+      <Card title="Speed 4K / Speed" icon="gauge" href="/template-directory">
+        Fast cached play, exits at 3 cached results or timeout.
+        **Best for:** fast results without EasyNews.
+      </Card>
+      <Card title="Speed 4K+ / Speed+" icon="gauge" href="/template-directory">
+        Speed with EasyNews dual-source. Requires EasyNews credentials.
+        **Best for:** Essential + EasyNews subscribers.
+      </Card>
+    </CardGroup>
 
-EasyNews only (no TorBox)? → Speed EasyNews
+    <Tip>
+      Not sure between Essential and Flash? Use Essential — it falls back to uncached if nothing is cached. Flash returns nothing if the title isn't in TorBox's cache.
+    </Tip>
+  </Tab>
 
-AllDebrid (no TorBox)?
-├── Want 4K?
-│   ├── Full IQR filtering → 4K AllDebrid
-│   └── Simpler filtering → 4K AllDebrid Lite
-└── 1080p only?
-    ├── Full → AllDebrid
-    └── Lite → AllDebrid Lite
+  <Tab title="AllDebrid">
+    <CardGroup cols={2}>
+      <Card title="4K AllDebrid" icon="crown" href="/template-directory">
+        Full 4K with IQR Tukey fence PSEs. Maximum quality filtering.
+        **Best for:** AllDebrid users who want the full quality stack.
+      </Card>
+      <Card title="4K AllDebrid Lite" icon="star" href="/template-directory">
+        4K with simpler CB-style PSEs. Less filtering complexity.
+        **Best for:** AllDebrid users who prefer lighter filtering.
+      </Card>
+      <Card title="AllDebrid" icon="play" href="/template-directory">
+        1080p with full quality gates.
+        **Best for:** AllDebrid users on 1080p.
+      </Card>
+      <Card title="AllDebrid Lite" icon="play" href="/template-directory">
+        1080p with hard kills only. Maximum result count.
+        **Best for:** thin libraries or shared hosts.
+      </Card>
+    </CardGroup>
+  </Tab>
 
-Anime?
-├── Want 4K HDR? → Anime 4K
-├── Standard 1080p? → Anime
-└── Prefer English dubs? → Anime Dub
-```
+  <Tab title="Anime">
+    <CardGroup cols={2}>
+      <Card title="Anime 4K" icon="tv" href="/template-directory">
+        SeaDex best-release enforcement, AnimeTosho + NekoBT. HDR at 4K.
+        **Best for:** 4K HDR anime.
+      </Card>
+      <Card title="Anime" icon="tv" href="/template-directory">
+        SeaDex best-release, 1080p. The standard anime template.
+        **Best for:** most anime users.
+      </Card>
+      <Card title="Anime Dub" icon="tv" href="/template-directory">
+        English-dub priority, 1080p.
+        **Best for:** users who prefer English dubs.
+      </Card>
+    </CardGroup>
+
+    <Note>
+      All anime templates use SeaDex for quality selection. SeaDex is an anime-only best-release database — it doesn't affect non-anime content.
+    </Note>
+  </Tab>
+
+  <Tab title="EasyNews">
+    <Card title="Speed EasyNews" icon="gauge" href="/template-directory">
+      EasyNews-only speed build — no TorBox required. Fast cached Usenet play, exits at 3 results or timeout.
+      **Best for:** EasyNews subscribers without TorBox.
+    </Card>
+  </Tab>
+</Tabs>
+
+---
 
 ## Lite vs Standard
 
 <Tabs>
   <Tab title="Standard">
-    - 24 ESEs (full quality gate stack)
+    - 24 ESEs — full quality gate stack
     - Includes low-bitrate, low-seeder, upscaled 4K, and bad Bluray quality gates
     - Recommended for most users on self-hosted or dedicated instances
   </Tab>
   <Tab title="Lite">
-    - 12 ESEs (hard kills only — CAM, YouTube, 3D, bad NZBs)
+    - 12 ESEs — hard kills only (CAM, YouTube, 3D, bad NZBs)
     - Quality gates removed for maximum result count
     - Recommended for shared hosts, thin libraries, or debugging
   </Tab>
 </Tabs>
 
 <Tip>
-  If the standard template returns very few results, switch to the Lite variant. If Lite returns results, one of the quality gates is filtering your content — you can enable/disable individual ESEs in AIOStreams.
+  If the standard template returns very few results, switch to the Lite variant. If Lite returns results, one of the quality gates is filtering your content.
 </Tip>
 
-## Template Comparison
+---
 
-<CardGroup cols={2}>
-  <Card title="4K Apex" icon="crown">
-    Flagship 4K. IQR Tukey fence adaptive bitrate filtering, DV/HDR priority, Usenet via Newznab. TorBox Pro.
-  </Card>
-  <Card title="4K Hybrid" icon="shuffle">
-    TorBox Pro + NZBGeek. Dual-source: debrid + Usenet. Full 4K, TorBox-priority PSEs.
-  </Card>
-  <Card title="Stream" icon="play">
-    1080p WEB-DL only. BluRay and Remux excluded. Best for budget hardware. TorBox Pro.
-  </Card>
-  <Card title="4K Essential" icon="star">
-    Full 4K on TorBox Essential plan. IQR PSEs, no Usenet.
-  </Card>
-  <Card title="Flash" icon="bolt">
-    Cached-only instant play. Returns immediately if cached, nothing if not. TorBox Essential.
-  </Card>
-  <Card title="Speed" icon="gauge">
-    Fast cached play. Exits at 3 cached results or timeout. TorBox Essential.
-  </Card>
-  <Card title="Anime" icon="tv">
-    SeaDex best-release enforcement, AnimeTosho + NekoBT scrapers. TorBox Essential.
-  </Card>
-  <Card title="Samsung TV" icon="monitor">
-    AV1/VC-1/DV hard-excluded for Tizen compatibility. 1080p and 4K variants.
-  </Card>
-</CardGroup>
-
-→ [Full import URLs and versions](/template-directory)
+→ [Template Directory](/template-directory) for all import URLs
