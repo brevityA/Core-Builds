@@ -1923,7 +1923,7 @@
     },
     "mergedCatalogs": [],
     "syncedExcludedRegexUrls": [],
-    "seadexBestOnly": true,
+    "seadexBestOnly": false,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
     "enhanceResults": true,

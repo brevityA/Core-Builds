@@ -257,6 +257,10 @@
     "excludeUncachedFromStreamTypes": [],
     "excludedStreamExpressions": [
       {
+        "expression": "/* Hard Resolution Kill — 1080p-only */ resolution(streams, '2160p', '1440p', '720p', '576p', '480p')",
+        "enabled": true
+      },
+      {
         "expression": "/*Part of Tamtaro SEL Setup*/[]",
         "enabled": true
       },
