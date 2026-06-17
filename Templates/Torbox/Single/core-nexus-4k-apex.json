@@ -206,9 +206,7 @@
     "syncedIncludedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
     ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ],
+    "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -317,14 +315,6 @@
         "enabled": true
       },
       {
-        "expression": "/*Unknown Resolution*/ count(resolution(merge(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet'), cached(type(streams, 'debrid'))), '2160p', '1440p', '1080p','720p','576p','480p')) > 5 ? negate(merge(library(streams), seadex(streams)), resolution(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet', 'debrid'), 'Unknown')): []",
-        "enabled": false
-      },
-      {
-        "expression": "/*Unknown Quality*/ count(quality(merge(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet'), cached(type(streams, 'debrid'))), 'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV')) > 5 ? negate(merge(library(streams), seadex(streams)), quality(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet', 'debrid'), 'Unknown')): []",
-        "enabled": false
-      },
-      {
         "expression": "/* CB | Hard CAM Kill */ quality(streams, 'CAM', 'SCR', 'TS', 'TC', 'HC HD-Rip')",
         "enabled": true
       },
@@ -343,10 +333,6 @@
       {
         "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []",
         "enabled": true
-      },
-      {
-        "enabled": false,
-        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
       }
     ],
     "preferredStreamExpressions": [

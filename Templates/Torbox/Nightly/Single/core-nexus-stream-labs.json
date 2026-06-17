@@ -536,6 +536,16 @@
         "score": -75
       },
       {
+        "pattern": "/\\b(alfaHD.*|BAT|BlackBit|BNd|C\\.A\\.A|Cory|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|MGE|N3G4N|ONLYMOViE|PD|PTHome|RiPER|RK|SiGLA|Tars|TM|tokar86a|TURG|TvR|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
+        "name": "Radarr Bad Dual Groups",
+        "score": -50
+      },
+      {
+        "pattern": "/\\b(alfaHD.*|BAT|BiOMA|BlackBit|BNd|C\\.A\\.A|Cory|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|N3G4N|PD|PTHome|RiPER|RK|SiGLA|Tars|tokar86a|TURG|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
+        "name": "Sonarr Bad Dual Groups",
+        "score": -50
+      },
+      {
         "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "name": "Upscaled",
         "score": -75
@@ -559,6 +569,16 @@
         "pattern": "/^(?=.*\\b(Flights|GuyZo|BR-GuyZo)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/",
         "name": "Generated Dynamic HDR [B]",
         "score": -50
+      },
+      {
+        "pattern": "/\\b(FraMeSToR)\\b/",
+        "name": "FraMeSToR",
+        "score": 100
+      },
+      {
+        "pattern": "/\\b(TheFarm)\\b/i",
+        "name": "TheFarm",
+        "score": 80
       },
       {
         "pattern": "/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/",
@@ -635,7 +655,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
+      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= 5 or totalTimeTaken > 5000"
     },
     "groups": {
       "enabled": true,
@@ -1939,10 +1959,6 @@
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
-    "syncedRankedRegexUrls": [],
-    "dynamicAddonFetching": {
-      "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= 5 or totalTimeTaken > 5000"
-    }
+    "syncedRankedRegexUrls": []
   }
 }
