@@ -3,109 +3,333 @@ title: "Template Directory"
 description: "Every active template with import URLs, versions, and plan requirements. Current version: v2.8.4"
 ---
 
+<Frame>
+  <img
+    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/templates_banner.svg"
+    alt="Template Directory"
+    style={{ width: '100%', display: 'block' }}
+  />
+</Frame>
+
 All templates require **AIOStreams v2.30+**. Every standard template has a **Lite variant** (`-lite` suffix) for shared hosts or thin libraries.
 
 <Note>
-  To import: copy the URL → AIOStreams → **About → Get Started → Load Template** → paste → Load.
+  **Quick import:** click an Import button to open the template directly in your AIOStreams instance. Or copy the raw URL to paste manually into any host.
 </Note>
 
 ## TorBox Pro
 
 <Tabs>
   <Tab title="4K">
-    | Template | Version | Import URL |
-    |---|---|---|
-    | **4K Apex** | v0.4.6 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
-    | **4K Apex (TorBox-only)** | v2.8.5 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json` |
-    | **4K Hybrid** | v2.8.5 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
-    | **Samsung TV 4K** | v0.2.3 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
+    ### 4K Apex — v0.4.6
+    Flagship 4K. IQR Tukey fence adaptive bitrate filtering, DV/HDR priority, Usenet via Newznab.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json
+    ```
+
+    ---
+
+    ### 4K Apex (TorBox-only) — v2.8.5
+    Cached-only Apex variant. No external scrapers.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json
+    ```
+
+    ---
+
+    ### 4K Hybrid — v2.8.5
+    TorBox Pro + NZBGeek. Full 4K with TorBox-priority PSEs. Requires NZBGeek API key.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json
+    ```
+
+    ---
+
+    ### Samsung TV 4K — v0.2.3
+    AV1/VC-1/DV hard-excluded for Tizen. HDR10+ preferred.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json
+    ```
   </Tab>
+
   <Tab title="1080p">
-    | Template | Version | Import URL |
-    |---|---|---|
-    | **Stream** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
-    | **Stream Lite** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json` |
-    | **Stream (Fire Stick)** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
-    | **Stream (Fire Stick) Lite** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json` |
-    | **Samsung TV** | v0.2.3 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
-    | **Hybrid** | v2.8.5 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
-    | **Hybrid Lite** | v2.8.5 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json` |
+    ### Stream — v2.8.4
+    1080p WEB-DL only. BluRay and Remux excluded.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json
+    ```
+    Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json`
+
+    ---
+
+    ### Stream (Fire Stick) — v2.8.4
+    1080p SDR, tuned for Fire Stick and low-RAM devices.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json
+    ```
+    Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json`
+
+    ---
+
+    ### Samsung TV — v0.2.3
+    1080p, AV1/VC-1/DV hard-excluded for Tizen.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json
+    ```
+
+    ---
+
+    ### Hybrid — v2.8.5
+    TorBox + NZBGeek, 1080p. Requires NZBGeek API key.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json
+    ```
+    Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json`
   </Tab>
 </Tabs>
+
+---
 
 ## TorBox Essential
 
 <Tabs>
-  <Tab title="4K Essential">
-    | Template | Version | Import URL |
-    |---|---|---|
-    | **4K Essential** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
-    | **4K Essential Lite** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json` |
-    | **Flash 4K** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json` |
-    | **Speed 4K** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json` |
-    | **Speed 4K Lite** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json` |
+  <Tab title="4K">
+    ### 4K Essential — v2.8.4
+    Full 4K on Essential plan. IQR PSEs, no Usenet.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json
+    ```
+    Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json`
+
+    ---
+
+    ### Flash 4K — v2.8.4
+    Cached-only instant play. Returns nothing if title isn't cached.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json
+    ```
+
+    ---
+
+    ### Speed 4K — v2.8.4
+    Fast cached 4K. Exits at 3 cached results or timeout.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json
+    ```
+    Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json`
   </Tab>
-  <Tab title="1080p Essential">
-    | Template | Version | Import URL |
-    |---|---|---|
-    | **Essential** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
-    | **Essential Lite** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json` |
-    | **Flash** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json` |
-    | **Speed** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json` |
-    | **Speed Lite** | v2.8.4 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json` |
+
+  <Tab title="1080p">
+    ### Essential — v2.8.4
+    Standard 1080p for Essential subscribers.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json
+    ```
+    Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json`
+
+    ---
+
+    ### Flash — v2.8.4
+    Cached-only instant 1080p play.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json
+    ```
+
+    ---
+
+    ### Speed — v2.8.4
+    Fast cached 1080p. Exits at 3 cached results or timeout.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json
+    ```
+    Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json`
   </Tab>
 </Tabs>
 
+---
+
 ## AllDebrid
 
-| Template | Version | Resolution | Import URL |
-|---|---|---|---|
-| **4K AllDebrid** | v0.1.2 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
-| **4K AllDebrid Lite** | v0.1.0 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
-| **AllDebrid** | v0.1.1 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
-| **AllDebrid Lite** | v0.1.1 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
+### 4K AllDebrid — v0.1.2
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
+</CardGroup>
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json
+```
+Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json`
+
+### AllDebrid — v0.1.1
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
+</CardGroup>
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json
+```
+Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json`
+
+---
 
 ## EasyNews Speed
 
-| Template | Version | Resolution | Import URL |
-|---|---|---|---|
-| **Speed 4K+** | v2.8.3 | 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json` |
-| **Speed EasyNews** | v2.8.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json` |
+### Speed 4K+ — v2.8.3
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
+</CardGroup>
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json
+```
+
+### Speed EasyNews — v2.8.3
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
+</CardGroup>
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json
+```
+
+---
 
 ## Anime
 
-| Template | Version | Resolution | Import URL |
-|---|---|---|---|
-| **Anime** | v2.8.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` |
-| **Anime Lite** | v2.8.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json` |
-| **Anime 4K** | v2.8.3 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json` |
-| **Anime 4K Lite** | v2.8.3 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json` |
-| **Anime Dub** | v2.8.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json` |
-| **Anime Dub Lite** | v2.8.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json` |
+### Anime 4K — v2.8.3
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json" />
+</CardGroup>
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json
+```
+Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json`
+
+### Anime — v2.8.3
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json" />
+</CardGroup>
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json
+```
+Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json`
+
+### Anime Dub — v2.8.3
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json" />
+</CardGroup>
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json
+```
+Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json`
+
+---
 
 ## Nightly
 
 <Warning>
-  Nightly (🌙) = stable enough for daily use, gathering feedback. Labs (🧪) = experimental, may change frequently.
+  Nightly (stable for daily use) and Labs (experimental) templates. May change frequently.
 </Warning>
 
 | Template | Version | Status | Import URL |
 |---|---|---|---|
-| **Apple TV 4K** | v0.1.1 | 🌙 Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
-| **Samsung RU7100 4K** | v0.2.6 | 🌙 Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
-| **4K Apex Labs** | v0.5.3 | 🧪 Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| **Stream Labs** | v0.3.2 | 🧪 Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| **Essential Labs** | v0.1.1 | 🧪 Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
-| **4K Essential Labs** | v0.1.1 | 🧪 Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
+| Apple TV 4K | v0.1.1 | Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
+| Samsung RU7100 4K | v0.2.6 | Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| 4K Apex Labs | v0.5.3 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| Stream Labs | v0.3.2 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| Essential Labs | v0.1.1 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
+| 4K Essential Labs | v0.1.1 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 
-→ [What's being tested in Labs?](/nightly-and-labs)
+→ [What's being tested?](/nightly-and-labs)
+
+---
 
 ## Community Templates
 
 | Template | Author | Import URL |
 |---|---|---|
-| **Auburn Tiger Edition** | RB3 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/auburn-tiger-rb3.json` |
-| **RB3 TorBox Pro + RD Hybrid** | RB3 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json` |
-| **Prism TorBox Essential 1080p** | MightyIcyy | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json` |
+| Auburn Tiger Edition | RB3 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/auburn-tiger-rb3.json` |
+| RB3 TorBox Pro + RD Hybrid | RB3 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json` |
+| Prism TorBox Essential 1080p | MightyIcyy | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json` |
 
 Want your template listed? Open a PR to `Community-Templates/` in the [GitHub repository](https://github.com/brevityA/Core-Builds).

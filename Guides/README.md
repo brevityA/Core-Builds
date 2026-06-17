@@ -2,6 +2,12 @@
   <img src="https://github.com/brevityA/Core-Builds/raw/refs/heads/main/Assets/master_guide_banner.svg" alt="Core Builds Guide Banner" width="100%"/>
 </p>
 
+<p align="center">
+  <a href="https://core-builds.mintlify.app">
+    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-3B82F6?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
+  </a>
+</p>
+
 # 📖 Core Builds by Brevity — Complete Guide
 
 Everything you need to set up, customise, and maintain your build.

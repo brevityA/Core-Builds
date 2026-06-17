@@ -1,5 +1,11 @@
 # Core Builds Filtering System
 
+<p align="center">
+  <a href="https://core-builds.mintlify.app">
+    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-3B82F6?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
+  </a>
+</p>
+
 A standalone quality scoring and filtering layer for AIOStreams — built around the **Core Builds scoring philosophy**: rank everything, block nothing except hard trash.
 
 > Pull these files into any AIOStreams setup via the **Synced URL** fields. No template required.

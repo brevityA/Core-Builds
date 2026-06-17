@@ -2,6 +2,12 @@
   <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/templates_banner.svg" alt="Core Builds Template Directory Banner" width="100%"/>
 </p>
 
+<p align="center">
+  <a href="https://core-builds.mintlify.app/template-directory">
+    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-3B82F6?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
+  </a>
+</p>
+
 # Core Builds — Template Directory
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.

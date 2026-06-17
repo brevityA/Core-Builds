@@ -32,6 +32,9 @@
   <a href="https://github.com/brevityA/Core-Builds/blob/main/ROADMAP.md">
     <img src="https://img.shields.io/badge/ROADMAP-What's_Next-0ea5e9?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Roadmap"/>
   </a>
+  <a href="https://core-builds.mintlify.app">
+    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-3B82F6?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
+  </a>
 </p>
 
 <p align="center">
