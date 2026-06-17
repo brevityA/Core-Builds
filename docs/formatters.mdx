@@ -1,0 +1,78 @@
+---
+title: "Formatters"
+description: "Stream display layouts — how to install and customise them."
+---
+
+Formatters control how streams are displayed in Stremio — the text shown for each result (title, quality, size, audio, etc.). All Core Builds templates ship with the **Core Syntax** formatter pre-loaded.
+
+## How to Import a Formatter
+
+<Steps>
+  <Step title="Open the Formatter tab">
+    In AIOStreams, go to the **Formatter** tab.
+  </Step>
+  <Step title="Click Import">
+    Click the **Import** icon in the top right corner.
+  </Step>
+  <Step title="Paste the URL">
+    Paste the formatter's raw GitHub URL and click **Load**.
+  </Step>
+  <Step title="Save">
+    Click **Save** to apply.
+  </Step>
+</Steps>
+
+## Available Formatters
+
+<CardGroup cols={2}>
+  <Card title="Core Syntax" icon="code">
+    Clean, information-dense. Default in all templates — no import needed.
+  </Card>
+  <Card title="Apex v2" icon="crown" href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json">
+    4K-focused, visual tags prominent. Copy URL to import.
+  </Card>
+  <Card title="Elite" icon="star" href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json">
+    Minimal, quality-first. Copy URL to import.
+  </Card>
+  <Card title="Nexus Prime" icon="list" href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json">
+    Full detail — codec, HDR, audio, size, seeders. Copy URL to import.
+  </Card>
+</CardGroup>
+
+## Formatter URLs
+
+| Formatter | Import URL |
+|---|---|
+| Apex v2 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json` |
+| Elite | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json` |
+| Nexus Prime | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json` |
+
+## Field Reference
+
+| Field | What it shows |
+|---|---|
+| `stream.resolution` | 2160p, 1080p, 720p, etc. |
+| `stream.quality` | BluRay REMUX, WEB-DL, WEBRip, etc. |
+| `stream.encode` | HEVC, AVC, AV1 |
+| `stream.visualTag` | DV, HDR10+, HDR10, HLG, SDR |
+| `stream.audioTag` | Atmos, TrueHD, DTS:X, DD+, AAC |
+| `stream.size` | File size |
+| `stream.bitrate` | Bitrate in Mbps |
+| `stream.seeders` | P2P seeders (torrent only) |
+| `stream.hasChapters` | Chapter badge for BluRay REMUXes with chapter markers |
+| `stream.editions` | Director's Cut, Extended, IMAX, etc. |
+| `stream.regraded` | Colour regrade flag |
+| `stream.repack` | REPACK/PROPER flag |
+| `stream.seMatched` | Name of the stream expression that matched |
+| `stream.nSeScore` | Normalised SEL score (0–1) |
+| `stream.nRegexScore` | Normalised regex score (0–1) |
+
+## Customising a Formatter
+
+Formatters are JSON files. To customise:
+
+1. Download the formatter JSON from GitHub
+2. Edit the `name` and `description` template strings
+3. Re-import via the Formatter import button
+
+See the [Formatter Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/FORMATTER_GUIDE.md) in the repo for the full field and modifier reference.

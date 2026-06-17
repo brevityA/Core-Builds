@@ -1,0 +1,57 @@
+---
+title: "Changelog"
+description: "Release history for Core Builds."
+---
+
+Full history: [CHANGELOG.md](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+
+---
+
+## v2.8.4 — 2026-06-17
+
+**Fixed: Cached Usenet missing priority signal — all 27 TorBox templates**
+
+Cached TorBox Usenet NZBs with Unknown quality metadata, or bitrates outside the IQR window, had no PSE match — sorted below cached debrid results that did have one. New final fallback PSE added to all templates:
+
+```
+/*Boost Cached Usenet*/
+merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))
+```
+
+---
+
+## v2.8.3 — 2026-06-17
+
+- `seadexBestOnly: false` — fixed on 5 non-Anime templates that were silently dropping all non-SeaDex streams
+- Hard resolution kill ESE added to all 13 x 1080p templates — prevents 4K streams leaking into 1080p-only results
+- Usenet preset config aligned across Pro templates: `checkOwned: true`, `searchMode: auto`, `timeout: 5000ms`
+- Vidhin05 stale RSE URL removed from Speed/TorBox templates
+
+---
+
+## v2.8.2 — 2026-06-15
+
+- Regex scoring changed from synced URLs to inline embedded patterns (53 patterns, |score| >= 50) — fixes "Forbidden URL" errors on public instances
+- `rseMatched` removed from PSEs and ESEs — was causing "Invalid stream expression" on instances where the Vidhin05 RSE URL is blocked
+- Samsung TV and Samsung TV 4K — AV1/VC-1 hard-excluded; DV and AI upscale removed from preferred visual tags
+- 4K Apex — stereo (2.0) added to ranked audio; AI upscale and low resolutions removed; seadexBestOnly fixed
+
+---
+
+## v2.8.1 — 2026-06-14
+
+- Core Nexus Stream — hard resolution kill ESE added; PSEs no longer allow 4K/1440p/720p to surface on the 1080p-only template
+- 720p fallback PSE tiers removed from Stream
+
+---
+
+## v2.8.0 — 2026-06-14
+
+- AllDebrid template family added (4K AllDebrid, AllDebrid, 4K AllDebrid Lite, AllDebrid Lite)
+- Apple TV 4K (Nightly) added — DV Profile 5/8, AV1 excluded, Atmos preferred
+- Samsung TV promoted from Nightly to stable Device category
+- Hybrid TorBox-priority PSEs added to 4K Hybrid — TorBox-cached twins for each IQR tier
+- `pow()` exponential age-decay window replaces hard 60-day cliff in 5 templates
+- Core Builds Expression Layer — all 7 expressions deployed to all active templates
+
+→ [Full history on GitHub](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
