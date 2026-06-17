@@ -10,10 +10,7 @@
   "colors": {
     "primary": "#3B82F6",
     "light": "#93C5FD",
-    "dark": "#1D4ED8",
-    "background": {
-      "dark": "#0F1117"
-    }
+    "dark": "#1D4ED8"
   },
   "topbarLinks": [
     {
@@ -29,24 +26,31 @@
     "name": "Template Directory",
     "url": "/template-directory"
   },
-  "navigation": [
-    {
-      "group": "Getting Started",
-      "pages": ["introduction", "which-template", "importing"]
-    },
-    {
-      "group": "Templates",
-      "pages": ["template-directory"]
-    },
-    {
-      "group": "Reference",
-      "pages": ["device-profiles", "formatters", "nightly-and-labs"]
-    },
-    {
-      "group": "Support",
-      "pages": ["troubleshooting", "changelog", "roadmap"]
-    }
-  ],
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["introduction", "which-template", "importing"]
+          },
+          {
+            "group": "Templates",
+            "pages": ["template-directory"]
+          },
+          {
+            "group": "Reference",
+            "pages": ["device-profiles", "formatters", "nightly-and-labs"]
+          },
+          {
+            "group": "Support",
+            "pages": ["troubleshooting", "changelog", "roadmap"]
+          }
+        ]
+      }
+    ]
+  },
   "footerSocials": {
     "github": "https://github.com/brevityA/Core-Builds"
   },
