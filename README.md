@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/github/actions/workflow/status/brevityA/Core-Builds/validate.yml?style=for-the-badge&label=BUILD&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://img.shields.io/badge/RELEASE-v2.8.0-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
+    <img src="https://img.shields.io/badge/RELEASE-v2.8.3-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
   </a>
 </p>
 
@@ -92,8 +92,11 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | Template | Res | Import URL |
 |---|---|---|
 | **Core Nexus 4K Apex** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
+| **Core Nexus 4K Apex (TorBox)** | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json` |
 | **Core Nexus Stream** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Core Nexus Stream (Fire Stick)** | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
+| **Core Nexus Samsung TV** | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
+| **Core Nexus Samsung TV 4K** | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
 | **Core Nexus 4K Hybrid** ⚠️ | 4K HDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
 | **Core Nexus Hybrid** ⚠️ | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json` |
 
@@ -116,6 +119,8 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 
 | Template | Res | Requires | Import URL |
 |---|---|---|---|
+| **Speed 4K** | 4K + 1080p | TorBox Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json` |
+| **Speed** | 1080p | TorBox Essential | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json` |
 | **Speed 4K+** | 4K | Essential + EasyNews | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json` |
 | **Speed EasyNews** | 1080p | EasyNews only | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json` |
 
@@ -150,9 +155,10 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 | Template | Device / Use-case | Res | Import URL |
 |---|---|---|---|
-| **Core Nexus Samsung TV** | Samsung TVs · non-DV devices | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
-| **Core Nexus Samsung TV 4K** | Samsung TVs · non-DV devices | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
 | **Core Nexus Apple TV 4K** 🌙 | Apple TV 4K / Infuse | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
+| **Core Nexus Samsung RU7100 4K** 🌙 | Samsung RU7100 (2019) | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Essential Labs** 🧪 | TorBox debrid-only 1080p | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
+| **Core Nexus 4K Essential Labs** 🧪 | TorBox debrid-only 4K | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 
 > **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). TrueHD / DTS:X / FLAC also excluded for Tizen compatibility. DV+HDR10 dual-layer files pass through. TorBox Pro · Essential plan.
 
@@ -213,7 +219,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 | **Deduplication** | filename + infoHash + smartDetect · 14 attributes · libraryBehaviour: prefer |
 | **Matching** | titleMatching contains/0.75 · yearMatching ±2yr · seasonEpisode non-strict |
 | **Auto features** | autoPlay · precacheNextEpisode · preloadStreams · dynamicAddonFetching · checkOwned |
-| **Scoring** | Vidhin05 ranked regex synced · Tamtaro PSE synced URL |
+| **Scoring** | Inline `rankedRegexPatterns` (53 patterns, `|score|≥50`) + template-specific `preferredRegexPatterns` |
 | **RPDB** | `t0-free-rpdb` baked in |
 | **TMDB** | `<template_placeholder>` — fill in during import for best matching |
 | **In-app updates** | `metadata.changelog` embedded — shows what changed on re-import |
@@ -224,7 +230,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 37 active templates — 33 stable (20 standard + 13 Lite variants) + 4 Nightly |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 39 active templates — 33 stable (25 standard + 8 Lite) + 6 Nightly |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
@@ -268,7 +274,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ## 📜 Version
 
-Current: **`v2.8.0`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
+Current: **`v2.8.3`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
 
 ---
 
@@ -285,7 +291,7 @@ Core Builds by Brevity is built on the work of the following projects and author
 | Project | Author | Contribution |
 |---|---|---|
 | [Tamtaro SEL Setup](https://git.tamtaro.de) | [@Tam-Taro](https://github.com/Tam-Taro) | ISEs, ESEs, PSEs, synced URL patterns, and the `tamtaro` formatter type powering every template in this repo |
-| [Releases-Regex](https://github.com/Vidhin05/Releases-Regex) | [@Vidhin05](https://github.com/Vidhin05) | Ranked regex patterns for quality detection, synced into all templates |
+| [Releases-Regex](https://github.com/Vidhin05/Releases-Regex) | [@Vidhin05](https://github.com/Vidhin05) | Ranked regex pattern format that influenced the `Filtering/ranked-regex-patterns.json` scoring architecture |
 | [AIOStreams](https://github.com/Viren070/AIOStreams) | [@Viren070](https://github.com/Viren070) | The open-source platform all templates are built for |
 | Meteor for the Weebs | [@midnightignite](https://github.com/midnightignite) | Community Meteor endpoint pinned across all templates |
 
