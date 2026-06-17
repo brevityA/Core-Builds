@@ -5,7 +5,7 @@
     "description": "4K flagship for TorBox users who also run a Usenet indexer. Pairs TorBox debrid with NZBGeek for maximum source diversity across debrid, torrent, and Usenet streams. Prioritises 2160p with 1080p fallback. Full HDR and lossless audio. Adaptive IQR bitrate PSEs — Tukey fence (≥4 ranked) with min/max and new-release median cluster fallbacks. NZBGeek API key required — enter your key in the Usenet preset before saving.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.3",
+    "version": "2.8.4",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1825,15 +1825,15 @@
           "name": "Searchⁿᶻᵇ",
           "newznabUrl": "https://search-api.torbox.app/newznab",
           "apiPath": "/api",
-          "timeout": 10000,
+          "timeout": 5000,
           "mediaTypes": [
             "movie",
             "series",
             "anime"
           ],
-          "searchMode": "both",
+          "searchMode": "auto",
           "paginate": true,
-          "checkOwned": false,
+          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
@@ -1849,13 +1849,13 @@
           "newznabUrl": "https://api.nzbgeek.info",
           "apiPath": "/api",
           "apiKey": "<template_placeholder>",
-          "timeout": 10000,
+          "timeout": 5000,
           "mediaTypes": [
             "movie",
             "series",
             "anime"
           ],
-          "searchMode": "both",
+          "searchMode": "auto",
           "paginate": true,
           "checkOwned": false,
           "useMultipleInstances": false

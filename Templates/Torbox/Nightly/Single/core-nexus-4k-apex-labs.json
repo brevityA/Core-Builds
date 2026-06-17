@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Added dynamicAddonFetching (exit at 5+ cached 4K or 6s). Based on 4K Apex v0.4.3.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json"
   },
   "config": {
@@ -1806,15 +1806,15 @@
           "name": "Searchⁿᶻᵇ",
           "newznabUrl": "https://search-api.torbox.app/newznab",
           "apiPath": "/api",
-          "timeout": 10000,
+          "timeout": 5000,
           "mediaTypes": [
             "movie",
             "series",
             "anime"
           ],
-          "searchMode": "both",
+          "searchMode": "auto",
           "paginate": true,
-          "checkOwned": false,
+          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
