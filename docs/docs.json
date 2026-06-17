@@ -3,8 +3,8 @@
   "theme": "mint",
   "name": "Core Builds",
   "logo": {
-    "light": "/logo/core_icon.svg",
-    "dark": "/logo/core_icon.svg"
+    "light": "/logo/banner_square.svg",
+    "dark": "/logo/banner_square.svg"
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
@@ -33,15 +33,15 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["introduction", "which-template", "importing"]
+            "pages": ["introduction", "how-it-works", "which-template", "importing", "alldebrid-setup", "easynews-setup"]
           },
           {
             "group": "Templates",
-            "pages": ["template-directory"]
+            "pages": ["template-directory", "community-templates"]
           },
           {
             "group": "Reference",
-            "pages": ["device-profiles", "formatters", "nightly-and-labs"]
+            "pages": ["expression-layer", "device-profiles", "formatters", "glossary", "nightly-and-labs"]
           },
           {
             "group": "Support",

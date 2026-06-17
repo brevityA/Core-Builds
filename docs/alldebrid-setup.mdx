@@ -1,0 +1,86 @@
+---
+title: "AllDebrid Setup"
+description: "Step-by-step guide to importing and configuring AllDebrid templates."
+---
+
+AllDebrid templates use `stremthruStore` (not `stremthruTorz`) and have no TorBox-specific addons. The import flow is the same as TorBox templates — just with a different API key.
+
+## Steps
+
+<Steps>
+  <Step title="Pick your template">
+    | Template | Plan | Resolution | Notes |
+    |---|---|---|---|
+    | 4K AllDebrid | AllDebrid | 4K | Full IQR Tukey fence PSEs |
+    | 4K AllDebrid Lite | AllDebrid | 4K | Simpler CB-style PSEs, more results |
+    | AllDebrid | AllDebrid | 1080p | Full quality gates |
+    | AllDebrid Lite | AllDebrid | 1080p | Hard kills only, maximum result count |
+
+    Not sure? Use **4K AllDebrid** for 4K or **AllDebrid** for 1080p. Switch to a Lite variant if you get too few results.
+  </Step>
+  <Step title="Get your AllDebrid API key">
+    1. Log in at [alldebrid.com](https://alldebrid.com)
+    2. Go to **My Account → API Keys**
+    3. Create a new key — name it "AIOStreams" for clarity
+    4. Copy the key
+  </Step>
+  <Step title="Import the template">
+    Click an Import button below, or copy the URL and paste it into AIOStreams → **About → Get Started → Load Template**.
+
+    → [Template Directory — AllDebrid](/template-directory#alldebrid)
+  </Step>
+  <Step title="Enter your API key">
+    In AIOStreams → **Services**, find the **StremThru (AllDebrid)** service and paste your AllDebrid API key.
+  </Step>
+  <Step title="Add a TMDB Access Token (recommended)">
+    Go to [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api) → **Read Access Token** and paste it into AIOStreams → **Settings → TMDB Access Token**. Improves title matching accuracy.
+  </Step>
+  <Step title="Save and install">
+    Click **Save** → copy the manifest URL → install in Stremio or WuPlay.
+  </Step>
+</Steps>
+
+---
+
+## AllDebrid vs TorBox — Key Differences
+
+| | AllDebrid | TorBox |
+|---|---|---|
+| Service field | `stremthruStore` | `stremthruTorz` |
+| Usenet support | No Newznab/NZBGeek | Yes (Pro plan) |
+| TorBox Search addon | Not included | Optional |
+| Scraper stack | Comet, MediaFusion, Meteor, Torrentio | Comet, MediaFusion, Meteor, Torrentio |
+| Plan tiers | Single plan | Essential / Pro |
+
+<Info>
+  AllDebrid templates use `stremthruStore` because AllDebrid is not a TorBox-native service. Do not mix up `stremthruTorz` (TorBox only) and `stremthruStore` (AllDebrid and other debrid services).
+</Info>
+
+---
+
+## After Importing
+
+<AccordionGroup>
+  <Accordion title="No results on AllDebrid templates">
+    - Confirm your AllDebrid API key is entered in Services → StremThru (AllDebrid)
+    - Check that your AllDebrid subscription is active at alldebrid.com
+    - Try the Lite variant — if Lite returns results, a quality gate ESE is filtering your content
+    - Check that Comet and MediaFusion are enabled in Add-ons
+  </Accordion>
+  <Accordion title="Streams not playing">
+    - Ensure your AllDebrid account can access the file (some torrents are geo-restricted)
+    - Check AllDebrid's status page for outages
+    - Try a different scraper — disable Comet or MediaFusion individually to isolate the issue
+  </Accordion>
+  <Accordion title="4K vs Lite — which PSE approach?">
+    **4K AllDebrid** uses IQR Tukey fence PSEs — statistically sound, adapts to the actual pool of streams. Best for large libraries and popular titles.
+
+    **4K AllDebrid Lite** uses CB-style (hard cutoff) PSEs — simpler, returns more results, less filtering. Better for thin libraries or niche content.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Updating an AllDebrid Template
+
+Re-import the same URL. Your API key is preserved. Check AIOStreams for an in-app update notification — it will prompt you automatically when a new version is available.

@@ -1,0 +1,180 @@
+---
+title: "Expression Layer"
+description: "How Core Builds PSEs, ESEs, and ISEs work — the IQR Tukey fence, pow() decay, and the full quality stack."
+---
+
+The Core Builds Expression Layer is the set of Stream Expressions (SEL) deployed across all active templates. It is what separates Core Builds from a default AIOStreams install.
+
+## Expression Types
+
+| Type | Role | Execution order |
+|---|---|---|
+| **ESE** (Excluded Stream Expression) | Removes streams from results entirely | First |
+| **ISE** (Included Stream Expression) | Pins streams to the top ahead of ranking | Second |
+| **PSE** (Preferred Stream Expression) | Scores and ranks remaining streams | Third |
+
+A stream matched by an ESE never reaches PSE scoring. ISE-matched streams jump to the top regardless of their PSE score.
+
+---
+
+## ESEs — The Kill Stack
+
+Standard templates run **24 ESEs**. Lite templates run **12** (hard kills only — quality gates removed).
+
+### Hard Kills (both Standard and Lite)
+These always run — they remove streams that are broken, unwatchable, or inappropriate regardless of library size:
+
+| ESE | What it kills |
+|---|---|
+| CAM Kill | Camera recordings, TS (Telesync), TC, SCR |
+| YouTube Kill | Streams sourced from YouTube rips |
+| 3D Kill | Full SBS / OU 3D streams |
+| Sub-720p Kill | 144p, 240p, 360p, 480p, 576p resolutions |
+| Bad NZB Kill | Malformed or incomplete Usenet NZBs |
+| Season Pack (episode query) | Season pack results on single-episode queries |
+| Hard Resolution Kill (1080p templates) | 2160p and 1440p on 1080p-only templates |
+
+### Quality Gates (Standard only)
+These run only on standard templates and can filter legitimate content on thin libraries:
+
+| ESE | What it gates |
+|---|---|
+| Low Bitrate Kill | Streams with bitrate below the statistical floor for that title |
+| Low Seeder Kill | Torrents with fewer than 3 seeders |
+| Upscaled 4K Kill | AI-upscaled 4K that isn't native UHD |
+| Bad BluRay Kill | BluRay releases from known low-quality groups |
+| Corrupt Encode Kill | Releases flagged by community as defective |
+
+<Tip>
+  If the standard template returns very few results, switch to the Lite variant. If Lite returns results, one of the quality gate ESEs is filtering your content — likely the bitrate floor or low-seeder kill.
+</Tip>
+
+---
+
+## ISEs — Boost Stack
+
+ISEs run after ESEs and before PSEs. Matched streams jump to the top of results regardless of their PSE score.
+
+| ISE | What it boosts |
+|---|---|
+| Library | Streams from your AIOStreams library (continue watching) |
+| Cached First | All cached debrid/Usenet streams above uncached |
+| English | English-language streams above non-English |
+
+The `ongoingSeasonPack` ISE is also deployed — on ongoing series, season packs surface if no individual episode stream is available.
+
+---
+
+## PSEs — The IQR Tukey Fence
+
+The flagship Core Builds ranking system. Rather than fixed bitrate cutoffs (which break on thin libraries and new releases), PSEs use live statistics computed from the actual pool of streams returned for each query.
+
+### Three-tier adaptive logic
+
+**Tier 1 — IQR Tukey fence (≥4 peers)**
+
+When 4 or more streams exist for a title, the fence is statistically sound:
+
+```
+size(
+  bitrate(STREAMS,
+    q1(values(bitrate(STREAMS,'5Mbps'),'bitrate')) - 1.5 * iqr(values(...)),
+    q3(values(bitrate(STREAMS,'5Mbps'),'bitrate')) + 1.5 * iqr(values(...))
+  ),
+  '15GB'
+)
+```
+
+The window is `[Q1 - 1.5×IQR, Q3 + 1.5×IQR]`. Streams inside the fence are ranked; outliers (suspiciously low bitrate or bloated) are skipped by this PSE tier and fall to lower tiers.
+
+**Tier 2 — Min/max ±20% (1–3 peers)**
+
+On thin results (rare titles, niche content), full IQR isn't statistically meaningful. The PSE switches to a simpler min/max window:
+
+```
+size(bitrate(STREAMS, min(values(...)) * 0.80, max(values(...)) * 1.20), '15GB')
+```
+
+**Tier 3 — pow() decay fallback (0 peers)**
+
+When no peers exist (brand-new release, no comparison data), the PSE falls back to an age-decaying window around the median:
+
+```
+bitrate(STREAMS,
+  MEDIAN * (1 - 0.4 * pow(0.95, daysSinceRelease)),
+  MEDIAN * (1 + 0.4 * pow(0.95, daysSinceRelease))
+)
+```
+
+### pow() decay explained
+
+`pow(0.95, daysSinceRelease)` produces smooth exponential decay:
+
+| Day | Tolerance |
+|---|---|
+| 0 (release day) | ±40% |
+| 7 | ±28% |
+| 14 | ±20% |
+| 30 | ±9% |
+| 60 | ±2% |
+| 90+ | ~0% |
+
+On release day, a wide window accepts most encodes — you want something to play. Over 90 days, the window converges on the median as more encodes appear and the statistical picture stabilises. This replaces the old hard 60-day cliff that caused all streams to drop in rank exactly on day 61.
+
+---
+
+## Hybrid TorBox-Priority PSEs
+
+The 4K Hybrid template adds a TorBox-cached twin PSE before each IQR tier:
+
+```
+service(
+  size(bitrate(STREAMS, IQR_LO, IQR_HI), '15GB'),
+  'torbox'
+)
+```
+
+This returns only TorBox-cached streams that match the IQR window. If no TorBox streams match, it returns `[]` and the all-service PSE runs as a fallback. Result: TorBox cache is always preferred over RD/other services when quality is equivalent.
+
+---
+
+## Release Group Scoring
+
+Two regex systems run simultaneously and must have no overlapping pattern names (duplicates cause double-scoring):
+
+### `preferredRegexPatterns`
+Template-specific patterns embedded per category. Score range: 70–100.
+
+| Template type | Count | Patterns |
+|---|---|---|
+| 4K | 7 | Radarr Remux T1, Sonarr Remux T1, Radarr UHD Bluray T1, FraMeSToR, Anime BD T1 |
+| 1080p | 8 | Radarr Web T1, Sonarr Web T1, FLUX, hallowed, BHDStudio, SiC, 126811, Web T1 |
+| Anime | 0 | SeaDex/AnimeTosho handle quality |
+
+### `rankedRegexPatterns`
+53 patterns from the shared database (`Filtering/ranked-regex-patterns.json`) where `|score| ≥ 50`, minus names already in `preferredRegexPatterns`.
+
+| Tier | Score | Examples |
+|---|---|---|
+| S | +100 | FraMeSToR, SURCODE, EPSiLON |
+| A | +80 | KRaLiMaRKo, HONE, FGT (4K) |
+| B | +60 | DON, NCmt, SA89 |
+| Penalised | −50 | Known upscale groups |
+| Bad | −75 | Consistently poor encode groups |
+| Blacklist | −200 | Scene groups releasing defective content |
+
+---
+
+## SEL Character Limits
+
+AIOStreams enforces hard limits on expression size:
+
+| Limit | Value | Current highest |
+|---|---|---|
+| Max per expression | 3,000 chars | 2,953 chars (47 headroom) |
+| Max total (all expressions) | 50,000 chars | ~35,000 chars |
+| Max expression count | 200 | Well under |
+
+<Warning>
+  Do not grow the `Final Limit (All)` ESE further — it is already at 2,953 characters. Any addition risks hitting the 3,000 char hard limit.
+</Warning>
