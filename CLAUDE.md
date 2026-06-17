@@ -86,6 +86,12 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `Flash/core-nexus-flash-4k.json` v2.8.2 — cached-only 4K instant play
 - `Flash/core-nexus-flash.json` v2.8.2 — cached-only 1080p instant play
 
+### Speed (TorBox)
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.2 — TorBox-only 4K, library + Zilean + TorBox Search, exit at 3 cached 4K or 4s
+- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.2 — lite variant
+- `Speed/TorBox/core-nexus-speed.json` v2.8.2 — TorBox-only 1080p, library + Zilean + TorBox Search, exit at 3 cached or 4s
+- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.2 — lite variant
+
 ### Speed (EasyNews)
 - `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.2 — EasyNews 4K
 - `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.2 — EasyNews 1080p

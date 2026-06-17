@@ -47,8 +47,8 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [Speed 4K+](#easynews-speed-templates) | Essential + EasyNews | 4K | Instant cached 4K |
 | [Speed+](#easynews-speed-templates) | Essential + EasyNews | 1080p | Instant cached 1080p |
 | [Speed EasyNews](#easynews-speed-templates) | EasyNews only | 1080p | EasyNews — no TorBox needed |
-| [Speed 4K](#torbox-only-speed-templates) | Essential | 4K | Fast cached 4K |
-| [Speed](#torbox-only-speed-templates) | Essential | 1080p | Fast cached 1080p || [Anime](#-anime) 🎌 | Essential | 1080p | SeaDex best-release anime |
+| [Speed 4K](#torbox-only-speed-templates) | Essential | 4K | Fast cached 4K — no EasyNews needed |
+| [Speed](#torbox-only-speed-templates) | Essential | 1080p | Fast cached 1080p — no EasyNews needed || [Anime](#-anime) 🎌 | Essential | 1080p | SeaDex best-release anime |
 | [Anime 4K](#-anime) 🎌 | Essential | 4K + 1080p | HDR anime |
 | [Anime Dub](#-anime) 🎌 | Essential | 1080p | English dubbed anime |
 | [Flash](#️-flash-tier) ⚡⚡ | Essential | 1080p | Instant play, cached only |
@@ -129,6 +129,8 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus AllDebrid** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
 | **Core Nexus 4K AllDebrid Lite** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
 | **Core Nexus AllDebrid Lite** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
+| **Core Nexus Speed 4K** | TorBox Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json` |
+| **Core Nexus Speed** | TorBox Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json` |
 | **Core Nexus Speed 4K+** | Essential + EasyNews | 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json` |
 | **Core Nexus Speed EasyNews** | EasyNews only | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json` |
 | **Core Nexus Anime** 🎌 | Essential | 1080p+4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json` |
@@ -386,7 +388,23 @@ Full 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD
 
 ## ⚡ Speed Tier
 
-> **Zero results?** Speed templates only show cached streams — try a popular title first (e.g. Breaking Bad S01E01). Use Core Nexus Essential for full coverage.
+> **Zero results?** Speed templates prioritise cached streams — try a popular title first (e.g. Breaking Bad S01E01). Use Core Nexus Essential for full coverage with uncached fallback.
+
+### TorBox-only Speed Templates
+
+No EasyNews required. Library + Zilean + TorBox Search. Exits as soon as 3 cached streams are found or 4 seconds elapse — faster than the full Essential stack, broader than Flash.
+
+| | Speed 4K | Speed |
+|---|---|---|
+| **Resolution** | 4K + 1080p | 1080p · 720p fallback |
+| **Requires** | TorBox Essential | TorBox Essential |
+| **Presets** | Library · Zilean · TorBox Search | Library · Zilean · TorBox Search |
+| **Exit condition** | 3 cached 4K or 4s | 3 cached 1080p or 4s |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json` | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json` |
+
+> 🪶 Lite variants available: [`core-nexus-speed-4k-lite.json`](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json) · [`core-nexus-speed-lite.json`](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json)
+
+### EasyNews Speed Templates
 
 | | Speed 4K+ | Speed EasyNews |
 |---|---|---|
@@ -394,7 +412,7 @@ Full 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD
 | **Requires** | Essential + EasyNews | EasyNews only |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json` | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json` |
 
-> **Speed EasyNews** — EasyNews-only instant play. No TorBox subscription required. Great for EasyNews users who want fast cached results without a TorBox plan.
+> **Speed EasyNews** — EasyNews-only instant play. No TorBox subscription required.
 
 ---
 
