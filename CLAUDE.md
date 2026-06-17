@@ -121,9 +121,9 @@ Preset `type` values confirmed in AIOStreams source:
 - `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.0 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.8.2 — TorBox + RD, service() priority PSEs, IQR
-- `Hybrid/core-nexus-hybrid.json` v2.8.2 — 1080p hybrid
-- `Hybrid/core-nexus-hybrid-lite.json` v2.8.2
+- `Hybrid/core-nexus-4k-hybrid.json` v2.8.3 — TorBox + RD, service() priority PSEs, IQR
+- `Hybrid/core-nexus-hybrid.json` v2.8.3 — 1080p hybrid
+- `Hybrid/core-nexus-hybrid-lite.json` v2.8.3
 
 ### Device
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.2.2 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
@@ -139,8 +139,8 @@ Preset `type` values confirmed in AIOStreams source:
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.0 — DV Profile 5/8, AV1 excluded
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.6.0 — experimental Apex variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
-- `Nightly/Single/core-nexus-stream-labs.json` v0.4.0 — experimental 1080p variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.5.1 — experimental Apex variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
+- `Nightly/Single/core-nexus-stream-labs.json` v0.3.1 — experimental 1080p variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
 - `Nightly/Essential/core-nexus-essential-labs.json` v0.1.0 — TorBox debrid-only 1080p (no external scrapers, TorBox Search toggle + exit thresholds)
 - `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.0 — TorBox debrid-only 4K (no external scrapers, TorBox Search toggle + exit thresholds)
 - `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.4 — Samsung RU7100 (2019) 4K: FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV, APEX IQR PSEs, full ESE stack
