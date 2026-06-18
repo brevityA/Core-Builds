@@ -2,10 +2,10 @@
   "metadata": {
     "id": "core-nexus-alldebrid-lite",
     "name": "Core Nexus AllDebrid Lite",
-    "description": "1080p AllDebrid Lite. DTS:X / TrueHD / HEVC · Relaxed filtering. No TorBox required.",
+    "description": "1080p AllDebrid Lite. DTS:X / TrueHD / HEVC · Relaxed filtering. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
