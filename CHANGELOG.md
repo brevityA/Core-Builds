@@ -4,16 +4,36 @@
 
 ---
 
+## 2.8.7 (2026-06-18)
+
+### Changed
+- **Complete `rankedRegexPatterns` override set — all 33 active non-Anime templates.**
+  Replaced the partial (36/39-entry) inline sets with comprehensive score-override sets
+  against all quality-relevant Vidhin05 pattern names. `syncedRankedRegexUrls` supplies
+  the pattern content (Vidhin05 at score 0); our entries override only the score.
+
+  **1080p templates — 48 overrides** (was 36):
+  - *New:* `Radarr Remux T3` (+40), `Radarr UHD/HD Bluray T3` (+40), `Web T1` / `Radarr Web T1` /
+    `Sonarr Web T1` (+60), `Radarr Web T3` / `Sonarr Web T3` (+20), `Repack/Proper` (+10), `Repack2` (+5),
+    `FraMeSToR` (+100) was present; `TheFarm` (+80), `Radarr/Sonarr Remux T2` (+60) added.
+
+  **4K templates — 53 overrides** (was 39):
+  - *New:* `Radarr Remux T1` (+100), `Sonarr Remux T1` (+100), `FraMeSToR` (+100),
+    `Radarr UHD Bluray T1` (+80), `Radarr/Sonarr Remux T2` (+60), `Radarr Remux T3` (+40),
+    `Radarr UHD/HD Bluray T3` (+40), `Radarr Web T3` / `Sonarr Web T3` (+20),
+    `Repack/Proper` (+10), `Repack2` (+5).
+  - These were previously left at Vidhin05's default score of 0.
+
+  All override names verified to exist in Vidhin05's 174-pattern file; no inline `pattern`
+  field on any entry — the synced URL provides all pattern content.
+
 ## 2.8.6 (2026-06-18)
 
 ### Fixed
-- **Blocked `excludedRegexPatterns` removed — all 33 active templates** — Four patterns using lookbehind (`(?<=...)`) or negative lookahead (`(?!...)`) syntax were present in every non-Anime template's `excludedRegexPatterns`. elfhosted's regex validator rejects these constructs, contributing to the "regexes not allowed" error on save even after clearing `preferredRegexPatterns` (v2.8.5) and `[B]`-variant names. Removed:
-  - `/(?<=\b[12]\d{3}\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i` — year-prefixed extras (lookbehind)
-  - `/(?<=\bS\d+\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i` — season-prefixed extras (lookbehind)
-  - `/(?<=\b[12]\d{3}\b).*\b(Sing[-_. ]Along)\b/i` — year-prefixed sing-along (lookbehind)
-  - `/^(?!.*\b((?<!HD[._ -]|HD)DVD|BDRip|...)...).*$/i` — BR-DISK detection (negative lookahead + lookbehind)
-
-  Coverage retained via `rankedRegexPatterns`: `Extras (Radarr)` / `Extras (Sonarr)` at −200, `Sing-Along Versions` at −75, `BR-DISK` at −75. Each template's `excludedRegexPatterns` drops from 12 → 8 patterns.
+- **Final elfhosted regex allowlist fix — all 33 active templates (+ Nightly).** Two remaining sources of inline lookahead/lookbehind regex were the cause of the persistent "X/N regexes not allowed" error on import, surviving the v2.8.5 `preferredRegexPatterns`/`[B]`-variant cleanup:
+  - **`rankedRegexPatterns` pattern content stripped.** Each ranked entry carried the full Vidhin05 `pattern` field inline — 24 of 36 (1080p) / 24 of 39 (4K) patterns used `(?=...)`, `(?!...)`, `(?<=...)`, or `(?<!...)`, which elfhosted rejects in any regex field. Entries reduced to `{name, score}` score-override pairs only. **`syncedRankedRegexUrls` restored** to `https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json` — the synced URL now supplies the actual pattern content (at score 0) while our inline name+score entries override the ranking. This is the same approach Tamtaro's templates use successfully on elfhosted.
+  - **4 `excludedRegexPatterns` with lookbehind/lookahead removed** (`excludedRegexPatterns`: 12 → 8 per template): `/(?<=\b[12]\d{3}\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i`, `/(?<=\bS\d+\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i`, `/(?<=\b[12]\d{3}\b).*\b(Sing[-_. ]Along)\b/i`, and the negative-lookahead BR-DISK/non-Bluray guard. Coverage retained via `rankedRegexPatterns` scoring: Extras (Radarr/Sonarr) at −200, Sing-Along at −75, BR-DISK at −75.
+- After this change **no template carries any inline lookahead/lookbehind regex in any field** — verified across all 39 active templates. All affected templates bumped a patch version.
 
 ---
 

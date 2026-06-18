@@ -62,7 +62,7 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `addonLogo` URL must use `/refs/heads/main/` not `/main/` — the short form breaks on stale CDN caches
 - `stremthruTorz` is TorBox-specific; `stremthruStore` is for other debrid services (AllDebrid, RD)
 - `torbox-search` is a valid TorBox-wrapped search addon — it is not removed or broken
-- `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — do not use; embed patterns inline in `rankedRegexPatterns` instead
+- `syncedRankedRegexUrls` is **allowed** on public instances (elfhosted, fortheweak.cloud) and is used to serve `rankedRegexPatterns` content from Vidhin05. The real elfhosted blocker is **inline lookahead/lookbehind regex** (`(?=...)`, `(?!...)`, `(?<=...)`, `(?<!...)`) in any regex field — keep inline patterns lookahead-free
 
 ## Known Preset Types
 
@@ -82,50 +82,50 @@ Preset `type` values confirmed in AIOStreams source:
 
 ---
 
-## Active Template Inventory (as of v2.8.6)
+## Active Template Inventory (as of v2.8.7)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.7 — flagship 4K, IQR PSEs, pow() decay
-- `Single/core-nexus-4k-apex-torbox.json` v2.8.6 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.8.5 — 1080p streaming quality
-- `Single/core-nexus-stream-lite.json` v2.8.5 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.8.5 — Fire Stick optimised
-- `Single/core-nexus-stream-firestick-lite.json` v2.8.5
+- `Single/core-nexus-4k-apex.json` v0.4.8 — flagship 4K, IQR PSEs, pow() decay
+- `Single/core-nexus-4k-apex-torbox.json` v2.8.7 — TorBox-cached-only Apex variant
+- `Single/core-nexus-stream.json` v2.8.6 — 1080p streaming quality
+- `Single/core-nexus-stream-lite.json` v2.8.6 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.8.6 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick-lite.json` v2.8.6
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.8.5 — 4K with IQR PSEs, pow() decay
-- `Essential/core-nexus-4k-essential-lite.json` v2.8.5 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.8.5 — 1080p
-- `Essential/core-nexus-essential-lite.json` v2.8.5
+- `Essential/core-nexus-4k-essential.json` v2.8.6 — 4K with IQR PSEs, pow() decay
+- `Essential/core-nexus-4k-essential-lite.json` v2.8.6 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.8.6 — 1080p
+- `Essential/core-nexus-essential-lite.json` v2.8.6
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.8.5 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.8.5 — cached-only 1080p instant play
+- `Flash/core-nexus-flash-4k.json` v2.8.6 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.8.6 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.5 — fast cached 4K
-- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.5
-- `Speed/TorBox/core-nexus-speed.json` v2.8.5 — fast cached 1080p
-- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.5
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.6 — fast cached 4K
+- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.6
+- `Speed/TorBox/core-nexus-speed.json` v2.8.6 — fast cached 1080p
+- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.6
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.4 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.4 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.5 — EasyNews 4K
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.5 — EasyNews 1080p
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.3 — 4K with IQR PSEs
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.1 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.2 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.2 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.4 — 4K with IQR PSEs
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.2 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.3 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.3 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.8.6 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
-- `Hybrid/core-nexus-hybrid.json` v2.8.6 — 1080p hybrid, NZBGeek preset
-- `Hybrid/core-nexus-hybrid-lite.json` v2.8.6 — NZBGeek preset
+- `Hybrid/core-nexus-4k-hybrid.json` v2.8.7 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
+- `Hybrid/core-nexus-hybrid.json` v2.8.7 — 1080p hybrid, NZBGeek preset
+- `Hybrid/core-nexus-hybrid-lite.json` v2.8.7 — NZBGeek preset
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.4 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.4 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.5 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.8 — 4K, DV-Only Kill on, AV1/VC-1 excluded
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.3 — 4K anime, SeaDex + AnimeTosho
@@ -136,12 +136,12 @@ Preset `type` values confirmed in AIOStreams source:
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.3
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.2 — DV Profile 5/8, AV1 excluded
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.2 — Essential 4K experimental
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.2 — Essential 1080p experimental
-- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.7 — Samsung 4K nightly (RU7100)
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.1 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
-- `Nightly/Single/core-nexus-stream-labs.json` v0.6.1 — perGroup() prototypes, dynamicAddonFetching
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.3 — DV Profile 5/8, AV1 excluded
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.3 — Essential 4K experimental
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.3 — Essential 1080p experimental
+- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.8 — Samsung 4K nightly (RU7100)
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.2 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
+- `Nightly/Single/core-nexus-stream-labs.json` v0.6.2 — perGroup() prototypes, dynamicAddonFetching
 
 ---
 
@@ -187,11 +187,13 @@ Returns `[]` if no TorBox streams match → falls through to the all-service PSE
 
 ## Regex Scoring Architecture (v2.8.6)
 
-### `preferredRegexPatterns`
-**Always `[]` on all active templates.** Radarr/Sonarr quality-guide patterns use lookahead syntax (`(?=...)`) blocked by elfhosted's regex allowlist. Cleared in v2.8.5. The A-tier and B-tier entries in `rankedRegexPatterns` cover the same release groups with compatible regex syntax.
+**The elfhosted blocker is inline lookahead/lookbehind regex syntax (`(?=...)`, `(?!...)`, `(?<=...)`, `(?<!...)`) in ANY regex field — not synced URLs.** A pattern fetched from a `synced*RegexUrls` URL is accepted even if it contains lookahead; the same pattern declared inline is rejected. Keep inline regex lookahead-free; push anything needing lookahead to a synced URL.
 
-### `rankedRegexPatterns` (inline, |score| ≥ 50 subset)
-High-impact patterns from `Filtering/ranked-regex-patterns.json` embedded directly in each template.
+### `preferredRegexPatterns`
+**Always `[]` on all active templates.** Radarr/Sonarr quality-guide patterns use lookahead syntax (`(?=...)`) blocked by elfhosted's regex allowlist. Cleared in v2.8.5.
+
+### `rankedRegexPatterns` (name + score only — no inline `pattern`)
+Score-override entries only: `{name, score}`. The actual pattern content is fetched from `syncedRankedRegexUrls` (Vidhin05). Our inline names match Vidhin05's entries and override their score-0 ranking. **No inline `pattern` field** — Vidhin05's patterns use lookahead/lookbehind that elfhosted rejects inline (the v2.8.5–v2.8.6 root cause).
 
 | Template type | Count | Score tiers |
 |---|---|---|
@@ -202,10 +204,10 @@ High-impact patterns from `Filtering/ranked-regex-patterns.json` embedded direct
 **Source of truth:** `Filtering/ranked-regex-patterns.json` — 149 patterns, 10 score tiers. The inline set is the |score| ≥ 50 subset, **with no `[B]`/`[C]` suffix variants** — these names are not on elfhosted's allowlist and were removed in v2.8.5.
 
 ### `excludedRegexPatterns`
-**Do not use lookahead/lookbehind syntax.** elfhosted's regex validator rejects patterns containing `(?=...)`, `(?!...)`, `(?<=...)`, or `(?<!...)`. Each template carries 8 inline excluded patterns (file extensions, AI upscale, scene groups, LQ groups, RARBG tags). The 4 Radarr/Sonarr lookbehind patterns (Extras, Sing-Along, BR-DISK) were removed in v2.8.6; coverage via `rankedRegexPatterns` negative scores.
+**8 inline patterns, all lookahead/lookbehind-free.** In v2.8.6 the 4 lookbehind/lookahead entries (Extras/Bonus by year, Extras/Bonus by season, Sing-Along, and the negative-lookahead BR-DISK guard) were removed — they triggered the allowlist error. Coverage retained via `rankedRegexPatterns` scoring (Extras −200, Sing-Along −75, BR-DISK −75).
 
 ### `syncedRankedRegexUrls`
-**Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL(s) in regex configuration". Embed patterns inline.
+**In use — points to Vidhin05** (`raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json`). elfhosted does NOT block this URL (Tamtaro uses the same one). Supplies the pattern content for `rankedRegexPatterns`. The earlier "blocked, do not use" guidance was wrong — the real blocker was always inline lookahead, not the synced URL.
 
 ---
 
