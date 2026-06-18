@@ -21,7 +21,7 @@ mode: "wide"
         <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>SERVICES</div>
       </div>
       <div style={{ flex: 1, textAlign: 'center', padding: '18px 0' }}>
-        <div style={{ fontSize: '20px', fontWeight: '800', color: '#60a5fa' }}>v2.8.8</div>
+        <div style={{ fontSize: '20px', fontWeight: '800', color: '#60a5fa' }}>v2.8.9</div>
         <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>LATEST</div>
       </div>
     </div>
@@ -36,7 +36,7 @@ mode: "wide"
 </div>
 
 <Info>
-  **What's new in v2.8.8:** Regex configuration corrected across all templates — full `{name, pattern, score}` entries restored in `rankedRegexPatterns`, `preferredRegexPatterns` reinstated, 12 `excludedRegexPatterns` restored (including lookbehind), and `syncedExcludedRegexUrls` to Tamtaro re-added. elfhosted's whitelist covers all these patterns — the prior removals in v2.8.6/v2.8.7 were unnecessary and degraded quality ranking.
+  **What's new in v2.8.9:** Regex whitelist sync — 8 pattern strings had drifted from Vidhin05's current entries (missing `MADSKY`, `CYPHER/EniaHD/MLH/XiQUEXiQUE`, misplaced `R&H`). All templates now pass elfhosted's exact-string whitelist check. The file extension excludedRegexPattern was also removed (not in whitelist; not needed in practice).
 </Info>
 
 <CardGroup cols={2}>

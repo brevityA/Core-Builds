@@ -4,6 +4,18 @@
 
 ---
 
+## 2.8.9 (2026-06-18)
+
+### Fixed
+- **Regex whitelist sync — all 39 active templates.** Our pattern strings had drifted from Vidhin05's current `English/regexes.json` (174 entries). elfhosted's allowlist check is exact string equality against Vidhin05's `pattern` field values; any divergence causes "X/183 regexes not allowed" on import. Eight unique pattern strings were stale:
+  - **`Radarr Web T1` / `Sonarr Web T1`** — missing `MADSKY` from the group lookahead list
+  - **`Radarr Bad Dual Groups`** — missing `CYPHER|EniaHD|MLH|XiQUEXiQUE`
+  - **`Sonarr Bad Dual Groups`** — missing `CYPHER|MLH|XiQUEXiQUE|EniaHD`
+  - **`LQ (Radarr) [B]` / `LQ (Sonarr) [B]`** — had `R&H` that Vidhin05's current pattern omits (R&H moved to LQ Release Title)
+  - **`LQ (Release Title) (Radarr)` / `LQ (Release Title) (Sonarr)`** — missing `R&H` (Vidhin05 moved it here)
+  - **File extension `excludedRegexPatterns` entry** — `/\.(iso|img|bin|...)$/i` is not in Vidhin05's whitelist; removed from all templates. Hard ISO/archive exclusion is not needed in practice (AIOStreams streams are always direct video links; scraper results for these types are extremely rare).
+  All pattern strings now exactly match Vidhin05's `English/regexes.json` v174 entries. Verified with automated comparison against the live file.
+
 ## 2.8.8 (2026-06-18)
 
 ### Fixed

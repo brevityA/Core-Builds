@@ -185,31 +185,44 @@ Returns `[]` if no TorBox streams match → falls through to the all-service PSE
 
 ---
 
-## Regex Scoring Architecture (v2.8.8)
+## Regex Scoring Architecture (v2.8.9)
 
-**elfhosted's "Allowed Regex Patterns" whitelist is large** — it includes all Radarr/Sonarr quality-guide patterns and Vidhin05 patterns, including those with lookahead/lookbehind syntax. Patterns are whitelisted by CONTENT (exact string match), not by name or syntax class. The original "regexes not allowed" errors were caused by patterns whose content was not on the whitelist (e.g. `[B]`-variant names with no pattern, custom patterns not sourced from the whitelist), NOT by lookahead syntax itself.
+### How elfhosted's whitelist works (definitive)
+
+elfhosted's AIOStreams validates ALL regex fields (`preferredRegexPatterns`, `rankedRegexPatterns`, `excludedRegexPatterns`, `includedRegexPatterns`, `requiredRegexPatterns`) against an allowlist built from Vidhin05's `English/regexes.json`. The check is **exact string equality on the `pattern` field value** — not on the name, not on syntax class. Lookahead/lookbehind syntax is irrelevant; what matters is whether the raw pattern string appears verbatim as a `pattern` value in Vidhin05's file.
+
+**Whitelist source:** `https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json` — 174 entries. elfhosted loads this file and populates allowedPatterns from every `pattern` field.
+
+**Rule for future additions:** Only add inline `pattern` strings that appear verbatim in Vidhin05's file. For anything else, use `keyword()` or `releaseGroup()` in SEL expressions instead of regex.
+
+**Drift risk:** Vidhin05 updates their file (adding/removing groups). Our patterns must stay in sync. If elfhosted re-reports "X/N not allowed" after a Vidhin05 update, re-run the comparison script in `scripts/` and bump to the new strings.
 
 ### `preferredRegexPatterns`
-**Active on all templates with full `{name, pattern}` entries.**
+Full `{name, pattern}` entries on all active non-Anime templates.
 - **4K templates (7 entries):** Radarr Remux T1, Sonarr Remux T1, Radarr UHD Bluray T1, Radarr UHD Bluray T1 — DON, Anime BD T1, Anime BD T1 [sam], FraMeSToR
 - **1080p templates (8 entries):** Radarr Web T1, Sonarr Web T1, Web T1, 126811, FLUX, SiC, hallowed, BHDStudio
-- All pattern strings are on elfhosted's whitelist. Lookahead syntax is allowed.
+- All `pattern` strings exactly match Vidhin05's entries.
 
 ### `rankedRegexPatterns`
-**Full `{name, pattern, score}` entries on all active templates.**
-- **4K templates:** 48 entries — T2 quality tiers, release group scores (126811/FLUX/SiC +80, BHDStudio +60, TheFarm +80), negative scores for LQ/bad/extras
+Full `{name, pattern, score}` entries on all active non-Anime templates.
+- **4K templates:** 48 entries — T2 quality tiers, group scores (126811/FLUX/SiC +80, BHDStudio +60, TheFarm +80), negative scores for LQ/bad/extras
 - **1080p templates:** 45 entries — Remux T1/T2 (+100/+60), FraMeSToR (+100), TheFarm (+80), HD Bluray T1/T2, Anime, negatives
-- **`[B]` variants are allowed** when they carry a full `pattern` field — the whitelist checks pattern content, not name
-- **Anime templates:** `[]` — live-action group names don't match anime release naming
+- **`[B]` variants:** use Vidhin05's SECOND entry pattern for that name (e.g. "Radarr UHD Bluray T1 [B]" uses Vidhin05's second "Radarr UHD Bluray T1" pattern). Pattern must be an EXACT verbatim copy from Vidhin05.
+- **Anime templates:** `[]`
 
 ### `excludedRegexPatterns`
-**12 inline patterns per template.** Includes 4 lookbehind entries (Extras by year, Extras by season, Sing-Along, BR-DISK guard) — all on elfhosted's whitelist. Do NOT remove these; their lookbehind syntax is whitelisted.
+**11 inline patterns per template** (was 12 — file extension filter removed in v2.8.9, not in Vidhin05's whitelist). All remaining 11 strings appear verbatim in Vidhin05's `pattern` fields:
+- Extras (Radarr), Extras (Sonarr) — lookbehind patterns — whitelisted ✓
+- Sing-Along Versions — lookbehind — whitelisted ✓
+- BR-DISK — negative lookahead guard — whitelisted ✓
+- LQ groups (Radarr/Sonarr) — whitelisted ✓
+- Upscaled, Retags, Hebrew/EZTV patterns — whitelisted ✓
 
 ### `syncedRankedRegexUrls`
-Points to Vidhin05 (`raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json`) on all templates except Hybrid variants. Supplements `rankedRegexPatterns` with Vidhin05's full 174-pattern set at score 0.
+Points to Vidhin05's file on all non-Hybrid templates. Supplements ranked patterns with Vidhin05's 174-pattern set at score 0; our inline entries override scoring by name.
 
 ### `syncedExcludedRegexUrls`
-Points to Tamtaro's file (`raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json`) on all active templates. This URL is whitelisted on elfhosted.
+Points to Tamtaro's file on all active templates. This URL is on elfhosted's URL whitelist.
 
 ---
 
