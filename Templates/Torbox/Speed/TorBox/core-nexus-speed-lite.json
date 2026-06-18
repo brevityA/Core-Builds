@@ -5,7 +5,7 @@
     "description": "Speed-optimised 1080p build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Lite: hard kills only, quality gates removed. Exits as soon as 3 cached 1080p streams found or 4s elapsed. Based on Essential v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.7",
+    "version": "2.9.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -163,23 +163,12 @@
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/",
-      "/\\b(24xHD|41RGB|4K4U|AOC|AROMA|aXXo|AZAZE|BARC0DE|BAUCKLEY|BdC|BTM|C1NEM4|C4K|CDDHD|CHAOS|CHD|CHX|CiNE|CREATiVE24|CrEwSaDe|CTFOH|d3g|DDR|DepraveD|DNL|DRX|EuReKA|EVO|FaNGDiNG0|Feranki1980|FGT|FMD|FRDS|FZHD|GalaxyRG|GHD|GHOSTS|GPTHD|HDHUB4U|HDS|HDT|HDTime|HDWinG|HiQVE|iNTENSO|iPlanet|jennaortega(UHD)?|JFF|KC|KIRA|L0SERNIGHT|LAMA|Leffe|Liber8|LiGaS|MarkII|MeGusta|Mesc|mHD|mSD|MTeam|MT|MySiLU|nhanc3|NhaNc3|nHD|nikt0|nSD|OFT|PATOMiEL|PRODJi|PSA|PTNK|RARBG|RDN|Rifftrax|RU4HD|SANTi|SasukeducK|SHD|ShieldBearer|STUTTERSHIT|TBS|TEKNO3D|TG|Tigole|TIKO|VIDEOHOLE|VISIONPLUSHDR(-X|1000)?|WAF|WiKi|worldmkv|x0r|XLF|YIFY|YTS(.(MX|LT|AG))?|Zero00|Zeus)\\b|Pahe(\\.(ph|in))?\\b|\\bx265-E/i",
-      "/\\b(iVy)\\b/",
-      "/\\b(BRiNK|BTM|CHX|CTFOH|d3g|DepraveD|EVO|Feranki1980|FGT|FMD|GHOSTS|HiQVE|iNTENSO|JFF|KC|MeGusta|nhanc3|OFT|PSA|SasukeducK|SHD|ShieldBearer|TBS|TG|VIDEOHOLE|worldmkv|XLF|Zero00)\\b|Pahe(\\.(ph|in))?\\b/i",
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i",
       "/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i",
       "/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i",
       "/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"
     ],
     "preferredRegexPatterns": [
-      {
-        "name": "Radarr Web T1",
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:ABBIE|AJP69|BLUTONiUM|BYNDR|CMRG|CRFW|CRUD|GNOME|HONE|Kitsune|MADSKY|NOSiViD|NTb|NTG|PAXA|PEXA|RAWR|SiC|TEPES|TheFarm|XEPA|ZoroSenpai)\\b).*/i"
-      },
-      {
-        "name": "Sonarr Web T1",
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:ABBiE|AJP69|CasStudio|CRFW|CtrlHD|HONE|Kitsune|MADSKY|monkee|NOSiViD|NTb|NTG|PAXA|PEXA|QOQ|RAWR|RTN|SiC|T6D|ViSUM|XEPA)\\b).*/i"
-      },
       {
         "name": "Web T1",
         "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:APEX|FLUX|KiNGS|TOMMY)\\b).*/"
@@ -195,10 +184,6 @@
       {
         "name": "SiC",
         "pattern": "/\\b(SiC)\\b/"
-      },
-      {
-        "name": "hallowed",
-        "pattern": "/\\b(hallowed)\\b/i"
       },
       {
         "name": "BHDStudio",
@@ -478,16 +463,6 @@
         "score": -75
       },
       {
-        "pattern": "/\\b(alfaHD.*|BAT|BlackBit|BNd|C\\.A\\.A|Cory|CYPHER|EniaHD|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|MGE|MLH|N3G4N|ONLYMOViE|PD|PTHome|RiPER|RK|SiGLA|Tars|TM|tokar86a|TURG|TvR|vnlls|WTV|XiQUEXiQUE|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
-        "name": "Radarr Bad Dual Groups",
-        "score": -50
-      },
-      {
-        "pattern": "/\\b(alfaHD.*|BAT|CYPHER|MLH|XiQUEXiQUE|BiOMA|BlackBit|BNd|C\\.A\\.A|Cory|EniaHD|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|N3G4N|PD|PTHome|RiPER|RK|SiGLA|Tars|tokar86a|TURG|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
-        "name": "Sonarr Bad Dual Groups",
-        "score": -50
-      },
-      {
         "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "name": "Upscaled",
         "score": -75
@@ -521,36 +496,6 @@
         "pattern": "/\\b(TheFarm)\\b/i",
         "name": "TheFarm",
         "score": 80
-      },
-      {
-        "pattern": "/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/",
-        "name": "LQ (Radarr)",
-        "score": -75
-      },
-      {
-        "pattern": "/\\b(24xHD|41RGB|4K4U|AOC|AROMA|aXXo|AZAZE|BARC0DE|BAUCKLEY|BdC|BTM|C1NEM4|C4K|CDDHD|CHAOS|CHD|CHX|CiNE|CREATiVE24|CrEwSaDe|CTFOH|d3g|DDR|DepraveD|DNL|DRX|EuReKA|EVO|FaNGDiNG0|Feranki1980|FGT|FMD|FRDS|FZHD|GalaxyRG|GHD|GHOSTS|GPTHD|HDHUB4U|HDS|HDT|HDTime|HDWinG|HiQVE|iNTENSO|iPlanet|jennaortega(UHD)?|JFF|KC|KIRA|L0SERNIGHT|LAMA|Leffe|Liber8|LiGaS|MarkII|MeGusta|Mesc|mHD|mSD|MTeam|MT|MySiLU|nhanc3|NhaNc3|nHD|nikt0|nSD|OFT|PATOMiEL|PRODJi|PSA|PTNK|RARBG|RDN|Rifftrax|RU4HD|SANTi|SasukeducK|SHD|ShieldBearer|STUTTERSHIT|TBS|TEKNO3D|TG|Tigole|TIKO|VIDEOHOLE|VISIONPLUSHDR(-X|1000)?|WAF|WiKi|worldmkv|x0r|XLF|YIFY|YTS(.(MX|LT|AG))?|Zero00|Zeus)\\b|Pahe(\\.(ph|in))?\\b|\\bx265-E/i",
-        "name": "LQ (Radarr) [B]",
-        "score": -75
-      },
-      {
-        "pattern": "/\\b(iVy)\\b/",
-        "name": "LQ (Sonarr)",
-        "score": -75
-      },
-      {
-        "pattern": "/\\b(BRiNK|BTM|CHX|CTFOH|d3g|DepraveD|EVO|Feranki1980|FGT|FMD|GHOSTS|HiQVE|iNTENSO|JFF|KC|MeGusta|nhanc3|OFT|PSA|SasukeducK|SHD|ShieldBearer|TBS|TG|VIDEOHOLE|worldmkv|XLF|Zero00)\\b|Pahe(\\.(ph|in))?\\b/i",
-        "name": "LQ (Sonarr) [B]",
-        "score": -75
-      },
-      {
-        "pattern": "/\\b(1XBET|BEN[ ._-]THE[ ._-]MEN|Feranki1980|GalaxyRG|(?<!-)jennaortega(UHD)?|R&H|READ(\\s|\\.)+NOTE|SWTYBLZ|TeeWee|TEKNO3D|Will1869)\\b|(-D3US|D3US-)|(?<=\\b[12]\\d{3}\\b.*?)(?<!\\b(web[ ._-]?(dl|rip)?).*?)\\b(EVO|PiRaTeS)\\b|^(?!.*\\bMA\\b.*\\bWEB-?DL\\b).*\\b(HHWEB)\\b|(?<!\\b(remux).*?)\\b(unkn0wn)\\b/i",
-        "name": "LQ (Release Title) (Radarr)",
-        "score": -75
-      },
-      {
-        "pattern": "/\\b(BEN[ ._-]THE[ ._-]MEN|CREATiVE24|Feranki1980|R&H|TeeWee)\\b|(?=.*?(\\b2160p\\b))(?=.*?(\\bBiTOR\\b))/i",
-        "name": "LQ (Release Title) (Sonarr)",
-        "score": -75
       },
       {
         "pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i",
