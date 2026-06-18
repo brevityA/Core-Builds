@@ -4,6 +4,16 @@
 
 ---
 
+## 2.8.8 (2026-06-18)
+
+### Fixed
+- **Regex configuration correction — all 33 active non-Anime templates.** v2.8.6 and v2.8.7 incorrectly stripped regex configuration based on a wrong assumption about elfhosted's blocking mechanism. elfhosted's "Allowed Regex Patterns" whitelist is large and includes all Radarr/Sonarr quality-guide patterns with lookahead syntax — these were never blocked by syntax, only by missing entries. Reverted all changes from those versions and aligned to verified working configuration:
+  - **`rankedRegexPatterns` restored** to full `{name, pattern, score}` entries — all 48 (4K) / 45 (1080p) entries with complete pattern content from Vidhin05/Radarr/Sonarr guide
+  - **`preferredRegexPatterns` restored** — 7 entries for 4K (Radarr/Sonarr Remux T1, Radarr UHD Bluray T1 + DON, Anime BD T1 + [sam], FraMeSToR); 8 entries for 1080p (Radarr/Sonarr/Web T1, 126811, FLUX, SiC, hallowed, BHDStudio)
+  - **`excludedRegexPatterns` restored to 12** — the 4 lookbehind patterns (Extras by year, Extras by season, Sing-Along, BR-DISK guard) reinstated; these are on elfhosted's whitelist
+  - **`syncedExcludedRegexUrls` restored** to Tamtaro's file
+  - **`[B]` variants retained** in `rankedRegexPatterns` — entries with full pattern fields are whitelisted by pattern content, not by name; `[B]` suffix does not cause rejection
+
 ## 2.8.7 (2026-06-18)
 
 ### Changed
