@@ -4,6 +4,16 @@
 
 ---
 
+## 2.8.6 (2026-06-18)
+
+### Fixed
+- **Final elfhosted regex allowlist fix — all 33 active templates (+ Nightly).** Two remaining sources of inline lookahead/lookbehind regex were the cause of the persistent "X/N regexes not allowed" error on import, surviving the v2.8.5 `preferredRegexPatterns`/`[B]`-variant cleanup:
+  - **`rankedRegexPatterns` pattern content stripped.** Each ranked entry carried the full Vidhin05 `pattern` field inline — 24 of 36 (1080p) / 24 of 39 (4K) patterns used `(?=...)`, `(?!...)`, `(?<=...)`, or `(?<!...)`, which elfhosted rejects in any regex field. Entries reduced to `{name, score}` score-override pairs only. **`syncedRankedRegexUrls` restored** to `https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json` — the synced URL now supplies the actual pattern content (at score 0) while our inline name+score entries override the ranking. This is the same approach Tamtaro's templates use successfully on elfhosted.
+  - **4 `excludedRegexPatterns` with lookbehind/lookahead removed** (`excludedRegexPatterns`: 12 → 8 per template): `/(?<=\b[12]\d{3}\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i`, `/(?<=\bS\d+\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i`, `/(?<=\b[12]\d{3}\b).*\b(Sing[-_. ]Along)\b/i`, and the negative-lookahead BR-DISK/non-Bluray guard. Coverage retained via `rankedRegexPatterns` scoring: Extras (Radarr/Sonarr) at −200, Sing-Along at −75, BR-DISK at −75.
+- After this change **no template carries any inline lookahead/lookbehind regex in any field** — verified across all 39 active templates. All affected templates bumped a patch version.
+
+---
+
 ## 2.8.5 (2026-06-18)
 
 ### Fixed
