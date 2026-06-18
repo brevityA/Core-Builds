@@ -560,7 +560,6 @@
         "enabled": true
       }
     ],
-    "syncedRankedStreamExpressionUrls": [],
     "syncedExcludedStreamExpressionUrls": [],
     "syncedIncludedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"

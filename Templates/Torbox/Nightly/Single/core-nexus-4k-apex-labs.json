@@ -226,9 +226,6 @@
     "syncedPreferredStreamExpressionUrls": [],
     "syncedExcludedStreamExpressionUrls": [],
     "syncedIncludedStreamExpressionUrls": [],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
