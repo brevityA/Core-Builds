@@ -82,10 +82,10 @@ Preset `type` values confirmed in AIOStreams source:
 
 ---
 
-## Active Template Inventory (as of v2.8.8)
+## Active Template Inventory (as of v2.9.0)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.10 — flagship 4K, IQR PSEs, pow() decay
+- `Single/core-nexus-4k-apex.json` v0.4.11 — flagship 4K, IQR PSEs, pow() decay
 - `Single/core-nexus-4k-apex-torbox.json` v2.9.0 — TorBox-cached-only Apex variant
 - `Single/core-nexus-stream.json` v2.9.0 — 1080p streaming quality
 - `Single/core-nexus-stream-lite.json` v2.9.0 — lite variant
@@ -113,10 +113,10 @@ Preset `type` values confirmed in AIOStreams source:
 - `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.0 — EasyNews 1080p
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.6 — 4K with IQR PSEs
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.4 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.5 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.5 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.7 — 4K with IQR PSEs
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.5 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.6 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.6 — 1080p lite
 
 ### Hybrid
 - `Hybrid/core-nexus-4k-hybrid.json` v2.9.0 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
@@ -124,8 +124,8 @@ Preset `type` values confirmed in AIOStreams source:
 - `Hybrid/core-nexus-hybrid-lite.json` v2.9.0 — NZBGeek preset
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.7 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.7 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.8 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.8 — 4K, DV-Only Kill on, AV1/VC-1 excluded
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.3 — 4K anime, SeaDex + AnimeTosho
