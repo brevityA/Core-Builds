@@ -2,10 +2,10 @@
   "metadata": {
     "id": "core-nexus-4k-alldebrid-lite",
     "name": "Core Nexus 4K AllDebrid Lite",
-    "description": "4K AllDebrid Lite. DV/HDR · TrueHD/Atmos · Relaxed filtering (no IQR). No TorBox required.",
+    "description": "4K AllDebrid Lite. DV/HDR · TrueHD/Atmos · Relaxed filtering. No TorBox required. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

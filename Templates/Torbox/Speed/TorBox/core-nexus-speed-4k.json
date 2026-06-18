@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-speed-4k",
     "name": "Core Nexus Speed 4K",
-    "description": "Speed-optimised 4K + 1080p build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Exits as soon as 3 cached 4K streams found or 4s elapsed. Based on Essential v2.8.2.",
+    "description": "Speed-optimised 4K build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Exits as soon as 3 cached 4K streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "2.9.0",

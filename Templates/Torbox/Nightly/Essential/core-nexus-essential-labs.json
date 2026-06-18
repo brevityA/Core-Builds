@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-essential-labs",
     "name": "Core Nexus Essential Labs",
-    "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. build. Template directives: TorBox Search and exit thresholds configurable at import. Based on Essential v2.8.2.",
+    "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. 1080p build. Template directives: TorBox Search and exit thresholds configurable at import.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "0.1.5",
