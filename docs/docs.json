@@ -4,7 +4,8 @@
   "name": "Core Builds",
   "logo": {
     "light": "/logo/banner_square.png",
-    "dark": "/logo/banner_square.png"
+    "dark": "/logo/banner_square.png",
+    "height": 70
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
