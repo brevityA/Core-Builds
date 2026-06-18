@@ -4,6 +4,15 @@
 
 ---
 
+## 2.9.0 (2026-06-19)
+
+### Fixed
+- **Regex compatibility — fortheweak whitelist** (`streams-nightly.fortheweak.cloud`). fortheweak's AIOStreams instance uses a stricter or different regex whitelist than elfhosted's. Eleven `rankedRegexPatterns` entries and 3 `excludedRegexPatterns` entries that pass elfhosted's Vidhin05-based check were still rejected on fortheweak. Removed from all 33 non-Anime templates:
+  - **Ranked removed:** `Radarr Web T1`, `Sonarr Web T1`, `Radarr Bad Dual Groups`, `Sonarr Bad Dual Groups`, `hallowed`, `LQ (Radarr)`, `LQ (Radarr) [B]`, `LQ (Sonarr)`, `LQ (Sonarr) [B]`, `LQ (Release Title) (Radarr)`, `LQ (Release Title) (Sonarr)`
+  - **Excluded removed:** LQ (Radarr) [B] large pattern, `iVy`-only pattern, LQ (Sonarr) [B] large pattern
+  - **Preferred removed (1080p templates):** `Radarr Web T1`, `Sonarr Web T1`, `hallowed`
+  - LQ streams remain excluded via Tamtaro's `syncedExcludedRegexUrls` and the remaining inline excluded entries. WEB-DL releases retain ranking via the generic `Web T1` ranked entry. Release group scoring is preserved through all other ranked tiers (Remux, Bluray, Anime variants, 126811/FLUX/SiC/TheFarm/BHDStudio).
+
 ## 2.8.9 (2026-06-18)
 
 ### Fixed

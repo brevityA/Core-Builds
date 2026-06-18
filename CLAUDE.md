@@ -85,47 +85,47 @@ Preset `type` values confirmed in AIOStreams source:
 ## Active Template Inventory (as of v2.8.8)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.9 — flagship 4K, IQR PSEs, pow() decay
-- `Single/core-nexus-4k-apex-torbox.json` v2.8.8 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.8.7 — 1080p streaming quality
-- `Single/core-nexus-stream-lite.json` v2.8.7 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.8.7 — Fire Stick optimised
-- `Single/core-nexus-stream-firestick-lite.json` v2.8.7
+- `Single/core-nexus-4k-apex.json` v0.4.10 — flagship 4K, IQR PSEs, pow() decay
+- `Single/core-nexus-4k-apex-torbox.json` v2.9.0 — TorBox-cached-only Apex variant
+- `Single/core-nexus-stream.json` v2.9.0 — 1080p streaming quality
+- `Single/core-nexus-stream-lite.json` v2.9.0 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.9.0 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick-lite.json` v2.9.0
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.8.7 — 4K with IQR PSEs, pow() decay
-- `Essential/core-nexus-4k-essential-lite.json` v2.8.7 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.8.7 — 1080p
-- `Essential/core-nexus-essential-lite.json` v2.8.7
+- `Essential/core-nexus-4k-essential.json` v2.9.0 — 4K with IQR PSEs, pow() decay
+- `Essential/core-nexus-4k-essential-lite.json` v2.9.0 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.9.0 — 1080p
+- `Essential/core-nexus-essential-lite.json` v2.9.0
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.8.7 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.8.7 — cached-only 1080p instant play
+- `Flash/core-nexus-flash-4k.json` v2.9.0 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.9.0 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.7 — fast cached 4K
-- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.7
-- `Speed/TorBox/core-nexus-speed.json` v2.8.7 — fast cached 1080p
-- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.7
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.9.0 — fast cached 4K
+- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.9.0
+- `Speed/TorBox/core-nexus-speed.json` v2.9.0 — fast cached 1080p
+- `Speed/TorBox/core-nexus-speed-lite.json` v2.9.0
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.6 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.6 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.9.0 — EasyNews 4K
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.0 — EasyNews 1080p
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.5 — 4K with IQR PSEs
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.3 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.4 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.4 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.6 — 4K with IQR PSEs
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.4 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.5 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.5 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.8.8 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
-- `Hybrid/core-nexus-hybrid.json` v2.8.8 — 1080p hybrid, NZBGeek preset
-- `Hybrid/core-nexus-hybrid-lite.json` v2.8.8 — NZBGeek preset
+- `Hybrid/core-nexus-4k-hybrid.json` v2.9.0 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
+- `Hybrid/core-nexus-hybrid.json` v2.9.0 — 1080p hybrid, NZBGeek preset
+- `Hybrid/core-nexus-hybrid-lite.json` v2.9.0 — NZBGeek preset
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.6 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.6 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.7 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.7 — 4K, DV-Only Kill on, AV1/VC-1 excluded
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.3 — 4K anime, SeaDex + AnimeTosho
@@ -136,12 +136,12 @@ Preset `type` values confirmed in AIOStreams source:
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.3
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.4 — DV Profile 5/8, AV1 excluded
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.4 — Essential 4K experimental
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.4 — Essential 1080p experimental
-- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.9 — Samsung 4K nightly (RU7100)
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.3 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
-- `Nightly/Single/core-nexus-stream-labs.json` v0.6.3 — perGroup() prototypes, dynamicAddonFetching
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.5 — DV Profile 5/8, AV1 excluded
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.5 — Essential 4K experimental
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.5 — Essential 1080p experimental
+- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.10 — Samsung 4K nightly (RU7100)
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.4 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
+- `Nightly/Single/core-nexus-stream-labs.json` v0.6.4 — perGroup() prototypes, dynamicAddonFetching
 
 ---
 
@@ -185,38 +185,40 @@ Returns `[]` if no TorBox streams match → falls through to the all-service PSE
 
 ---
 
-## Regex Scoring Architecture (v2.8.9)
+## Regex Scoring Architecture (v2.9.0)
 
 ### How elfhosted's whitelist works (definitive)
 
-elfhosted's AIOStreams validates ALL regex fields (`preferredRegexPatterns`, `rankedRegexPatterns`, `excludedRegexPatterns`, `includedRegexPatterns`, `requiredRegexPatterns`) against an allowlist built from Vidhin05's `English/regexes.json`. The check is **exact string equality on the `pattern` field value** — not on the name, not on syntax class. Lookahead/lookbehind syntax is irrelevant; what matters is whether the raw pattern string appears verbatim as a `pattern` value in Vidhin05's file.
+elfhosted's AIOStreams validates ALL regex fields against an allowlist built from Vidhin05's `English/regexes.json`. The check is **exact string equality on the `pattern` field value** — not on the name, not on syntax class.
 
-**Whitelist source:** `https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json` — 174 entries. elfhosted loads this file and populates allowedPatterns from every `pattern` field.
+**Whitelist source:** `https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json` — 174 entries.
 
-**Rule for future additions:** Only add inline `pattern` strings that appear verbatim in Vidhin05's file. For anything else, use `keyword()` or `releaseGroup()` in SEL expressions instead of regex.
+**fortheweak uses a different/stricter whitelist.** Patterns that pass elfhosted's Vidhin05 check may still be rejected on `streams-nightly.fortheweak.cloud`. As of v2.9.0, the following entries have been removed from all templates to ensure cross-host compatibility: `Radarr Web T1`, `Sonarr Web T1`, `Radarr Bad Dual Groups`, `Sonarr Bad Dual Groups`, `hallowed`, `LQ (Radarr)`, `LQ (Radarr) [B]`, `LQ (Sonarr)`, `LQ (Sonarr) [B]`, `LQ (Release Title) (Radarr)`, `LQ (Release Title) (Sonarr)` (ranked); LQ[B] large patterns + iVy-only (excluded). Do NOT re-add these without verifying on fortheweak first.
 
-**Drift risk:** Vidhin05 updates their file (adding/removing groups). Our patterns must stay in sync. If elfhosted re-reports "X/N not allowed" after a Vidhin05 update, re-run the comparison script in `scripts/` and bump to the new strings.
+**Drift risk:** Vidhin05 updates their file (adding/removing groups). If elfhosted reports "X/N not allowed" after a Vidhin05 update, re-run the comparison script in `scripts/` and bump to the new strings.
 
 ### `preferredRegexPatterns`
 Full `{name, pattern}` entries on all active non-Anime templates.
 - **4K templates (7 entries):** Radarr Remux T1, Sonarr Remux T1, Radarr UHD Bluray T1, Radarr UHD Bluray T1 — DON, Anime BD T1, Anime BD T1 [sam], FraMeSToR
-- **1080p templates (8 entries):** Radarr Web T1, Sonarr Web T1, Web T1, 126811, FLUX, SiC, hallowed, BHDStudio
+- **1080p templates (5 entries):** Web T1, 126811, FLUX, SiC, BHDStudio
 - All `pattern` strings exactly match Vidhin05's entries.
 
 ### `rankedRegexPatterns`
 Full `{name, pattern, score}` entries on all active non-Anime templates.
-- **4K templates:** 48 entries — T2 quality tiers, group scores (126811/FLUX/SiC +80, BHDStudio +60, TheFarm +80), negative scores for LQ/bad/extras
-- **1080p templates:** 45 entries — Remux T1/T2 (+100/+60), FraMeSToR (+100), TheFarm (+80), HD Bluray T1/T2, Anime, negatives
-- **`[B]` variants:** use Vidhin05's SECOND entry pattern for that name (e.g. "Radarr UHD Bluray T1 [B]" uses Vidhin05's second "Radarr UHD Bluray T1" pattern). Pattern must be an EXACT verbatim copy from Vidhin05.
+- **4K templates:** 37 entries — Remux T2, Bluray T1/T2 variants, group scores (126811/FLUX/SiC +80, BHDStudio +60, TheFarm +80), negative scores for extras/3D/obfuscated/retags/BR-DISK/sing-along/atmos/truehd
+- **1080p templates:** 37 entries — same set minus 4K-specific UHD Bluray variants
+- **`[B]` variants:** use Vidhin05's SECOND entry pattern for that name. Pattern must be an EXACT verbatim copy from Vidhin05.
 - **Anime templates:** `[]`
 
 ### `excludedRegexPatterns`
-**11 inline patterns per template** (was 12 — file extension filter removed in v2.8.9, not in Vidhin05's whitelist). All remaining 11 strings appear verbatim in Vidhin05's `pattern` fields:
-- Extras (Radarr), Extras (Sonarr) — lookbehind patterns — whitelisted ✓
-- Sing-Along Versions — lookbehind — whitelisted ✓
-- BR-DISK — negative lookahead guard — whitelisted ✓
-- LQ groups (Radarr/Sonarr) — whitelisted ✓
-- Upscaled, Retags, Hebrew/EZTV patterns — whitelisted ✓
+**8 inline patterns per template** (was 11 — 3 LQ patterns removed in v2.9.0 for fortheweak compatibility). All remaining 8 strings appear verbatim in Vidhin05's `pattern` fields:
+- Upscaled (AI) — plain ✓
+- Extras (Radarr), Extras (Sonarr) — lookbehind patterns ✓
+- LQ (Radarr) small `/\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\b/` ✓
+- Sing-Along Versions — lookbehind ✓
+- BR-DISK — lookbehind+lookahead guard ✓
+- Retags (Radarr), Retags (Sonarr) — plain ✓
+- Hebrew/EZTV (Radarr), Hebrew/EZTV (Sonarr) — plain ✓
 
 ### `syncedRankedRegexUrls`
 Points to Vidhin05's file on all non-Hybrid templates. Supplements ranked patterns with Vidhin05's 174-pattern set at score 0; our inline entries override scoring by name.
