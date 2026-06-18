@@ -21,7 +21,7 @@ mode: "wide"
         <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>SERVICES</div>
       </div>
       <div style={{ flex: 1, textAlign: 'center', padding: '18px 0' }}>
-        <div style={{ fontSize: '20px', fontWeight: '800', color: '#60a5fa' }}>v2.8.6</div>
+        <div style={{ fontSize: '20px', fontWeight: '800', color: '#60a5fa' }}>v2.8.7</div>
         <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>LATEST</div>
       </div>
     </div>
@@ -36,7 +36,7 @@ mode: "wide"
 </div>
 
 <Info>
-  **What's new in v2.8.6:** Final elfhosted regex allowlist fix — inline lookahead/lookbehind stripped from `rankedRegexPatterns` (now name+score only, patterns served via `syncedRankedRegexUrls`) and 4 lookbehind `excludedRegexPatterns` removed across all 33 active templates. No more "regexes not allowed" errors on import. Already imported? Re-import to pick up the fix.
+  **What's new in v2.8.7:** Complete Vidhin05 score override set — 48 overrides on 1080p templates and 53 on 4K templates, covering all T1–T3 quality tiers, top release groups (FraMeSToR, FLUX, 126811, etc.), and Repack/Proper. Previously missing entries (FraMeSToR and remux T1 on 4K; T3 tier and web T1 on 1080p) defaulted to score 0 — now properly ranked.
 </Info>
 
 <CardGroup cols={2}>

@@ -5,7 +5,7 @@
     "description": "A full-featured 1080p SDR build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache. Targets WEB-DL and WEBRip sources, blocks BluRay, Remux, 4K, and HDR for reliable playback on budget hardware. File range 1 GB-25 GB. Full addon stack including Comet, Meteor, Zilean, Knaben, and. A single TorBox Essential subscription is all that is required. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.5",
+    "version": "2.8.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -339,12 +339,12 @@
         "score": 100
       },
       {
-        "name": "Radarr Remux T2",
-        "score": 60
+        "name": "FraMeSToR",
+        "score": 100
       },
       {
-        "name": "Sonarr Remux T2",
-        "score": 60
+        "name": "Anime BD T1",
+        "score": 100
       },
       {
         "name": "Radarr UHD Bluray T1",
@@ -359,6 +359,18 @@
         "score": 80
       },
       {
+        "name": "TheFarm",
+        "score": 80
+      },
+      {
+        "name": "Radarr Remux T2",
+        "score": 60
+      },
+      {
+        "name": "Sonarr Remux T2",
+        "score": 60
+      },
+      {
         "name": "Radarr UHD Bluray T2",
         "score": 60
       },
@@ -371,8 +383,16 @@
         "score": 60
       },
       {
-        "name": "Anime BD T1",
-        "score": 100
+        "name": "Web T1",
+        "score": 60
+      },
+      {
+        "name": "Radarr Web T1",
+        "score": 60
+      },
+      {
+        "name": "Sonarr Web T1",
+        "score": 60
       },
       {
         "name": "Anime BD T2",
@@ -387,12 +407,48 @@
         "score": 60
       },
       {
-        "name": "3D",
+        "name": "Radarr Remux T3",
+        "score": 40
+      },
+      {
+        "name": "Radarr UHD Bluray T3",
+        "score": 40
+      },
+      {
+        "name": "Radarr HD Bluray T3",
+        "score": 40
+      },
+      {
+        "name": "Radarr Web T2",
+        "score": 40
+      },
+      {
+        "name": "Sonarr Web T2",
+        "score": 40
+      },
+      {
+        "name": "Radarr Web T3",
+        "score": 20
+      },
+      {
+        "name": "Sonarr Web T3",
+        "score": 20
+      },
+      {
+        "name": "Repack/Proper",
+        "score": 10
+      },
+      {
+        "name": "Repack2",
+        "score": 5
+      },
+      {
+        "name": "Generated Dynamic HDR",
         "score": -50
       },
       {
-        "name": "Anime LQ Groups",
-        "score": -75
+        "name": "3D",
+        "score": -50
       },
       {
         "name": "Radarr Bad Dual Groups",
@@ -403,28 +459,28 @@
         "score": -50
       },
       {
-        "name": "Upscaled",
-        "score": -75
-      },
-      {
-        "name": "Extras (Radarr)",
-        "score": -200
-      },
-      {
-        "name": "Extras (Sonarr)",
-        "score": -200
-      },
-      {
-        "name": "Generated Dynamic HDR",
+        "name": "Obfuscated (Radarr)",
         "score": -50
       },
       {
-        "name": "FraMeSToR",
-        "score": 100
+        "name": "Obfuscated (Sonarr)",
+        "score": -50
       },
       {
-        "name": "TheFarm",
-        "score": 80
+        "name": "Atmos Exclude Groups",
+        "score": -50
+      },
+      {
+        "name": "TrueHD Exclude Groups",
+        "score": -50
+      },
+      {
+        "name": "Anime LQ Groups",
+        "score": -75
+      },
+      {
+        "name": "Upscaled",
+        "score": -75
       },
       {
         "name": "LQ (Radarr)",
@@ -447,14 +503,6 @@
         "score": -75
       },
       {
-        "name": "Obfuscated (Radarr)",
-        "score": -50
-      },
-      {
-        "name": "Obfuscated (Sonarr)",
-        "score": -50
-      },
-      {
         "name": "BR-DISK",
         "score": -75
       },
@@ -467,12 +515,12 @@
         "score": -75
       },
       {
-        "name": "Atmos Exclude Groups",
-        "score": -50
+        "name": "Extras (Radarr)",
+        "score": -200
       },
       {
-        "name": "TrueHD Exclude Groups",
-        "score": -50
+        "name": "Extras (Sonarr)",
+        "score": -200
       }
     ],
     "regexOverrides": [],

@@ -4,6 +4,29 @@
 
 ---
 
+## 2.8.7 (2026-06-18)
+
+### Changed
+- **Complete `rankedRegexPatterns` override set — all 33 active non-Anime templates.**
+  Replaced the partial (36/39-entry) inline sets with comprehensive score-override sets
+  against all quality-relevant Vidhin05 pattern names. `syncedRankedRegexUrls` supplies
+  the pattern content (Vidhin05 at score 0); our entries override only the score.
+
+  **1080p templates — 48 overrides** (was 36):
+  - *New:* `Radarr Remux T3` (+40), `Radarr UHD/HD Bluray T3` (+40), `Web T1` / `Radarr Web T1` /
+    `Sonarr Web T1` (+60), `Radarr Web T3` / `Sonarr Web T3` (+20), `Repack/Proper` (+10), `Repack2` (+5),
+    `FraMeSToR` (+100) was present; `TheFarm` (+80), `Radarr/Sonarr Remux T2` (+60) added.
+
+  **4K templates — 53 overrides** (was 39):
+  - *New:* `Radarr Remux T1` (+100), `Sonarr Remux T1` (+100), `FraMeSToR` (+100),
+    `Radarr UHD Bluray T1` (+80), `Radarr/Sonarr Remux T2` (+60), `Radarr Remux T3` (+40),
+    `Radarr UHD/HD Bluray T3` (+40), `Radarr Web T3` / `Sonarr Web T3` (+20),
+    `Repack/Proper` (+10), `Repack2` (+5).
+  - These were previously left at Vidhin05's default score of 0.
+
+  All override names verified to exist in Vidhin05's 174-pattern file; no inline `pattern`
+  field on any entry — the synced URL provides all pattern content.
+
 ## 2.8.6 (2026-06-18)
 
 ### Fixed

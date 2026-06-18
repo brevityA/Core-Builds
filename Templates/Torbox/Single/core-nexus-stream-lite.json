@@ -5,7 +5,7 @@
     "description": "A frictionless 1080p SDR build running exclusively on TorBox, with RPDB poster database integration for enhanced metadata visuals in Stremio. Targets 1080p and 720p WEB-DL and WEBRip sources. Blocks BluRay, Remux, 4K, and HDR content for reliable playback on any hardware. File range 1 GB–60 GB, 1080p capped at 25 GB. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No secondary debrid service required — a single TorBox subscription is sufficient. Designed for phones, tablets, budget Android TV boxes, and Fire TV Sticks. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.5",
+    "version": "2.8.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -341,12 +341,12 @@
         "score": 100
       },
       {
-        "name": "Radarr Remux T2",
-        "score": 60
+        "name": "FraMeSToR",
+        "score": 100
       },
       {
-        "name": "Sonarr Remux T2",
-        "score": 60
+        "name": "Anime BD T1",
+        "score": 100
       },
       {
         "name": "Radarr UHD Bluray T1",
@@ -361,6 +361,18 @@
         "score": 80
       },
       {
+        "name": "TheFarm",
+        "score": 80
+      },
+      {
+        "name": "Radarr Remux T2",
+        "score": 60
+      },
+      {
+        "name": "Sonarr Remux T2",
+        "score": 60
+      },
+      {
         "name": "Radarr UHD Bluray T2",
         "score": 60
       },
@@ -373,8 +385,16 @@
         "score": 60
       },
       {
-        "name": "Anime BD T1",
-        "score": 100
+        "name": "Web T1",
+        "score": 60
+      },
+      {
+        "name": "Radarr Web T1",
+        "score": 60
+      },
+      {
+        "name": "Sonarr Web T1",
+        "score": 60
       },
       {
         "name": "Anime BD T2",
@@ -389,12 +409,48 @@
         "score": 60
       },
       {
-        "name": "3D",
+        "name": "Radarr Remux T3",
+        "score": 40
+      },
+      {
+        "name": "Radarr UHD Bluray T3",
+        "score": 40
+      },
+      {
+        "name": "Radarr HD Bluray T3",
+        "score": 40
+      },
+      {
+        "name": "Radarr Web T2",
+        "score": 40
+      },
+      {
+        "name": "Sonarr Web T2",
+        "score": 40
+      },
+      {
+        "name": "Radarr Web T3",
+        "score": 20
+      },
+      {
+        "name": "Sonarr Web T3",
+        "score": 20
+      },
+      {
+        "name": "Repack/Proper",
+        "score": 10
+      },
+      {
+        "name": "Repack2",
+        "score": 5
+      },
+      {
+        "name": "Generated Dynamic HDR",
         "score": -50
       },
       {
-        "name": "Anime LQ Groups",
-        "score": -75
+        "name": "3D",
+        "score": -50
       },
       {
         "name": "Radarr Bad Dual Groups",
@@ -405,28 +461,28 @@
         "score": -50
       },
       {
-        "name": "Upscaled",
-        "score": -75
-      },
-      {
-        "name": "Extras (Radarr)",
-        "score": -200
-      },
-      {
-        "name": "Extras (Sonarr)",
-        "score": -200
-      },
-      {
-        "name": "Generated Dynamic HDR",
+        "name": "Obfuscated (Radarr)",
         "score": -50
       },
       {
-        "name": "FraMeSToR",
-        "score": 100
+        "name": "Obfuscated (Sonarr)",
+        "score": -50
       },
       {
-        "name": "TheFarm",
-        "score": 80
+        "name": "Atmos Exclude Groups",
+        "score": -50
+      },
+      {
+        "name": "TrueHD Exclude Groups",
+        "score": -50
+      },
+      {
+        "name": "Anime LQ Groups",
+        "score": -75
+      },
+      {
+        "name": "Upscaled",
+        "score": -75
       },
       {
         "name": "LQ (Radarr)",
@@ -449,14 +505,6 @@
         "score": -75
       },
       {
-        "name": "Obfuscated (Radarr)",
-        "score": -50
-      },
-      {
-        "name": "Obfuscated (Sonarr)",
-        "score": -50
-      },
-      {
         "name": "BR-DISK",
         "score": -75
       },
@@ -469,12 +517,12 @@
         "score": -75
       },
       {
-        "name": "Atmos Exclude Groups",
-        "score": -50
+        "name": "Extras (Radarr)",
+        "score": -200
       },
       {
-        "name": "TrueHD Exclude Groups",
-        "score": -50
+        "name": "Extras (Sonarr)",
+        "score": -200
       }
     ],
     "regexOverrides": [],
