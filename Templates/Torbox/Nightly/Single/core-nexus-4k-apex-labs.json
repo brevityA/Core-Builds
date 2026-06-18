@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) — optional scrapers (MediaFusion, HdHub, SeaDex) toggled at import via inputs; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on 4K Apex v0.4.3.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "inputs": [

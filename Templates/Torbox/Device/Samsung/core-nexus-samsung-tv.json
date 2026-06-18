@@ -5,7 +5,7 @@
     "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p · TorBox Essential · Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1784,9 +1784,6 @@
     "excludedStreamSources": [
       "YouTube",
       "AI Enhanced"
-    ],
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
     ],
     "addonCategoryColors": {
       "Mix": "indigo",

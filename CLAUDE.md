@@ -204,8 +204,8 @@ High-impact patterns from `Filtering/ranked-regex-patterns.json` embedded direct
 ### `excludedRegexPatterns`
 **Do not use lookahead/lookbehind syntax.** elfhosted's regex validator rejects patterns containing `(?=...)`, `(?!...)`, `(?<=...)`, or `(?<!...)`. Each template carries 8 inline excluded patterns (file extensions, AI upscale, scene groups, LQ groups, RARBG tags). The 4 Radarr/Sonarr lookbehind patterns (Extras, Sing-Along, BR-DISK) were removed in v2.8.6; coverage via `rankedRegexPatterns` negative scores.
 
-### `syncedRankedRegexUrls`
-**Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL(s) in regex configuration". Embed patterns inline.
+### `syncedRankedRegexUrls` / `syncedExcludedRegexUrls` / `syncedPreferredRegexUrls`
+**Do not use any synced regex URL fields.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block ALL `raw.githubusercontent.com` URLs in regex configuration, throwing "Forbidden URL(s) in regex configuration". `syncedRankedRegexUrls` was removed in v2.8.2; `syncedExcludedRegexUrls` removed in v2.8.7. Embed all patterns inline.
 
 ---
 

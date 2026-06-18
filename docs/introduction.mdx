@@ -21,7 +21,7 @@ mode: "wide"
         <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>SERVICES</div>
       </div>
       <div style={{ flex: 1, textAlign: 'center', padding: '18px 0' }}>
-        <div style={{ fontSize: '20px', fontWeight: '800', color: '#60a5fa' }}>v2.8.6</div>
+        <div style={{ fontSize: '20px', fontWeight: '800', color: '#60a5fa' }}>v2.8.7</div>
         <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>LATEST</div>
       </div>
     </div>
@@ -36,7 +36,7 @@ mode: "wide"
 </div>
 
 <Info>
-  **What's new in v2.8.6:** Final regex allowlist fix — 4 `excludedRegexPatterns` with lookbehind/lookahead syntax removed from all 33 active templates. Coverage retained via `rankedRegexPatterns` (Extras −200, Sing-Along −75, BR-DISK −75). Re-import to clear any remaining "regexes not allowed" errors on elfhosted.
+  **What's new in v2.8.7:** Final elfhosted regex fix — `syncedExcludedRegexUrls` (raw GitHub URL, blocked by elfhosted) removed from all 31 non-Anime templates. The single pattern it contained was already inline. Re-import to fully clear "regexes not allowed" errors.
 </Info>
 
 <CardGroup cols={2}>

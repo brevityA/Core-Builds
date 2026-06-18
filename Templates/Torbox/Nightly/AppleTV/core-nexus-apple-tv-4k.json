@@ -5,7 +5,7 @@
     "description": "4K template tuned for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 is natively supported — DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. AV1 hard-excluded (no hardware decoder on the A15 chip — severe performance hit). DD+ Atmos is the native top audio format. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1771,9 +1771,6 @@
     "excludedStreamSources": [
       "YouTube",
       "AI Enhanced"
-    ],
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
     ],
     "addonCategoryColors": {
       "Mix": "indigo",

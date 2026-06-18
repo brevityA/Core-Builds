@@ -4,6 +4,13 @@
 
 ---
 
+## 2.8.7 (2026-06-18)
+
+### Fixed
+- **`syncedExcludedRegexUrls` removed — all 31 non-Anime active templates** — The field pointed to `https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json`, a `raw.githubusercontent.com` URL. elfhosted blocks all raw GitHub URLs in regex configuration fields, throwing "Forbidden URL(s) in regex configuration". The file contained exactly one pattern (file extension filter) which was already present inline as `excludedRegexPatterns[0]` — the URL was fully redundant. Removed from all 31 templates; Anime templates and Nightly labs were unaffected (field was absent or empty).
+
+---
+
 ## 2.8.6 (2026-06-18)
 
 ### Fixed

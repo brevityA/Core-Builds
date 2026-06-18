@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) — optional scrapers (MediaFusion, SeaDex) toggled at import via inputs; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on Stream v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
