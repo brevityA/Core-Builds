@@ -4,6 +4,17 @@
 
 ---
 
+## 2.8.5 (2026-06-18)
+
+### Fixed
+- **`preferredRegexPatterns: []` — all 33 active templates** — The 7–8 Radarr/Sonarr quality-guide patterns in `preferredRegexPatterns` use lookahead syntax (`(?=...)`) that is blocked by elfhosted's regex allowlist, causing "X/N regexes not allowed" errors on save. Cleared to `[]` on all non-Anime active templates. The `rankedRegexPatterns` inline set retains full scoring for these release groups via its A-tier and B-tier entries.
+- **`[B]`-variant names removed from `rankedRegexPatterns` — all 33 active templates** — In v2.8.2, nine patterns with duplicate names were renamed with `[B]` suffixes (e.g. `"Radarr UHD Bluray T1 [B]"`). These names are not on elfhosted's allowlist (derived from Vidhin05's exact pattern names), causing a secondary "8/54 regexes not allowed" error even after `preferredRegexPatterns` was cleared. Removed all `[B]` variants: `Radarr UHD Bluray T1 [B]`, `Radarr HD Bluray T1 [B]`, `Sonarr HD Bluray T1 [B]`, `Anime BD T1 [B]`, `Anime BD T2 [B]`, `Anime Web T1 [B]`, `Generated Dynamic HDR [B]`, `LQ (Radarr) [B]`, `LQ (Sonarr) [B]`. Pattern counts: 4K templates 48 → 39, 1080p templates 45 → 36. Deprecated templates left unchanged.
+
+### Nightly
+- **Apex Labs v0.8.0 / Stream Labs v0.6.0** — `perGroup()` prototype ESEs: Extra Cached HQ, Extra Cached LQ, and Extra Uncached ESEs replaced with single-expression `perGroup(..., 'resolution', 3)` equivalents (old 20+15+35-clause merge/slice ESEs disabled for side-by-side comparison). Score IQR Guard ESE added (disabled — uses `values(streams, 'seScore')` IQR fence for adaptive low-score filtering). Indexer Diversity ESE added (disabled — `perGroup(..., 'indexer', 2)` caps per-scraper flooding). Both labs also receive Boost Cached Usenet PSE and full ESE parity with production (No Sootio Library, YouTube Kill, 3D Content Kill).
+
+---
+
 ## 2.8.4 (2026-06-17)
 
 ### Added
