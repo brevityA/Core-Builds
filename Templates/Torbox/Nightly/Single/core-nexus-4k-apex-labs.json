@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) \u2014 optional scrapers (MediaFusion, HdHub, SeaDex) toggled at import via inputs; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on 4K Apex v0.4.3.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "inputs": [
@@ -286,23 +286,23 @@
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.4.0 | 4K Remux elite pin \u2014 releaseGroup() replaces keyword() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
+        "expression": "/* LABS v0.6.0 | 4K Remux elite pin \u2014 releaseGroup() replaces keyword() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.4.0 | 1080p Remux elite pin \u2014 releaseGroup() replaces keyword() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
+        "expression": "/* LABS v0.6.0 | 1080p Remux elite pin \u2014 releaseGroup() replaces keyword() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.4.0 | LQ pin bottom \u2014 releaseGroup() replaces keyword() */ pin(releaseGroup(streams, 'YIFY', 'RARBG', 'EVO', 'YTS', 'PSA', 'MeGusta', 'Tigole'), 'bottom')",
+        "expression": "/* LABS v0.6.0 | LQ pin bottom \u2014 releaseGroup() replaces keyword() */ pin(releaseGroup(streams, 'YIFY', 'RARBG', 'EVO', 'YTS', 'PSA', 'MeGusta', 'Tigole'), 'bottom')",
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.4.0 | x264 Hard Exclude \u2014 native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
+        "expression": "/* LABS v0.6.0 | x264 Hard Exclude \u2014 native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
         "enabled": false
       },
       {
-        "expression": "/* LABS v0.4.0 | Bad Dual Audio Groups \u2014 releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
+        "expression": "/* LABS v0.6.0 | Bad Dual Audio Groups \u2014 releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
         "enabled": false
       },
       {
@@ -356,11 +356,11 @@
     ],
     "preferredStreamExpressions": [
       {
-        "expression": "/* LABS v0.4.0 | Elite Group pin \u2014 releaseGroup() replaces simple regex patterns */ pin(releaseGroup(streams, '126811', 'FLUX', 'SiC', 'hallowed', 'TheFarm', 'BHDStudio'), 'top')",
+        "expression": "/* LABS v0.6.0 | Elite Group pin \u2014 releaseGroup() replaces simple regex patterns */ pin(releaseGroup(streams, '126811', 'FLUX', 'SiC', 'hallowed', 'TheFarm', 'BHDStudio'), 'top')",
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.4.0 | IMAX pin \u2014 native visualTag() replaces regex pattern */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
+        "expression": "/* LABS v0.6.0 | IMAX pin \u2014 native visualTag() replaces regex pattern */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
         "enabled": true
       },
       {
@@ -393,6 +393,10 @@
       },
       {
         "expression": "/* B-Tier 1080p any */ resolution(streams,'1080p')",
+        "enabled": true
+      },
+      {
+        "expression": "/*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))",
         "enabled": true
       }
     ],

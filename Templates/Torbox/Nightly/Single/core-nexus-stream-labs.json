@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) \u2014 optional scrapers (MediaFusion, SeaDex) toggled at import via inputs; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on Stream v2.8.2.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -328,11 +328,11 @@
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.2.0 | x264 Hard Exclude \u2014 native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
+        "expression": "/* LABS v0.5.0 | x264 Hard Exclude \u2014 native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
         "enabled": false
       },
       {
-        "expression": "/* LABS v0.2.0 | Bad Dual Audio Groups \u2014 releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
+        "expression": "/* LABS v0.5.0 | Bad Dual Audio Groups \u2014 releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
         "enabled": false
       },
       {
@@ -354,15 +354,31 @@
       {
         "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []",
         "enabled": true
+      },
+      {
+        "expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Hard YouTube Kill */ type(streams, 'youtube', 'external')",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | 3D Content Kill */ visualTag(streams, '3D', 'H-OU', 'H-SBS')",
+        "enabled": true
+      },
+      {
+        "enabled": false,
+        "expression": "/* DV-Only Kill \u2014 enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
       }
     ],
     "preferredStreamExpressions": [
       {
-        "expression": "/* LABS v0.2.0 | Elite Group pin \u2014 releaseGroup() replaces simple regex patterns */ pin(releaseGroup(streams, 'FraMeSToR', 'TheFarm', '126811', 'FLUX', 'SiC', 'hallowed', 'BHDStudio'), 'top')",
+        "expression": "/* LABS v0.5.0 | Elite Group pin \u2014 releaseGroup() replaces simple regex patterns */ pin(releaseGroup(streams, 'FraMeSToR', 'TheFarm', '126811', 'FLUX', 'SiC', 'hallowed', 'BHDStudio'), 'top')",
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.2.0 | IMAX pin \u2014 native visualTag() replaces regex pattern */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
+        "expression": "/* LABS v0.5.0 | IMAX pin \u2014 native visualTag() replaces regex pattern */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
         "enabled": true
       },
       {
@@ -391,6 +407,10 @@
       },
       {
         "expression": "/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR10+/DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))",
         "enabled": true
       }
     ],
