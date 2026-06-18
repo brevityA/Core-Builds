@@ -374,6 +374,22 @@
       {
         "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []",
         "enabled": true
+      },
+      {
+        "expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Hard YouTube Kill */ type(streams, 'youtube', 'external')",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | 3D Content Kill */ visualTag(streams, '3D', 'H-OU', 'H-SBS')",
+        "enabled": true
+      },
+      {
+        "enabled": false,
+        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
       }
     ],
     "preferredStreamExpressions": [
