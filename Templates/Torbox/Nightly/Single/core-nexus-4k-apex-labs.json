@@ -2,18 +2,54 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "description": "Experimental Nightly. Tests: hybrid regex+SEL architecture — elite groups via releaseGroup() pin() PSEs, x264/IMAX via native encode()/visualTag(), bad dual audio groups via releaseGroup() ESE. Simple group-name regex patterns removed from rankedRegexPatterns. Added dynamicAddonFetching (exit at 5+ cached 4K or 6s). Based on 4K Apex v0.4.3.",
-    "source": "external",
-    "author": "Branding-Brevity",
-    "version": "0.5.3",
-    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json"
+    "version": "0.6.0",
+    "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) — optional scrapers (MediaFusion, HdHub, SeaDex) toggled at import via inputs; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on 4K Apex v0.4.3.",
+    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
+    "inputs": [
+      {
+        "key": "exitThreshold",
+        "path": "config.dynamicAddonFetching.condition",
+        "label": "Early exit — cached stream count",
+        "description": "Stop querying addons when this many cached 4K streams are found. Default: 5. Lower = faster but fewer options. Higher = more streams but slower start.",
+        "type": "string",
+        "required": false,
+        "value": "5"
+      },
+      {
+        "key": "maxWaitMs",
+        "path": "config.dynamicAddonFetching.condition",
+        "label": "Early exit — max wait (ms)",
+        "description": "Stop querying addons after this many milliseconds regardless of stream count. Default: 6000. Reduce to 4000 for faster response on fast connections.",
+        "type": "string",
+        "required": false,
+        "value": "6000"
+      },
+      {
+        "key": "enableScrapers",
+        "path": "config.presets",
+        "label": "Enable optional scrapers (MediaFusion + HdHub)",
+        "description": "Type anything to add MediaFusion and HdHub as sources. Broader coverage but adds ~3–5s latency. Leave blank to skip.",
+        "type": "string",
+        "required": false,
+        "value": ""
+      },
+      {
+        "key": "enableAnime",
+        "path": "config.presets",
+        "label": "Enable SeaDex (anime quality)",
+        "description": "Type anything to add SeaDex for best-quality anime releases. Only useful for anime content. Leave blank to skip.",
+        "type": "string",
+        "required": false,
+        "value": ""
+      }
+    ]
   },
   "config": {
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Nexus 4K Apex Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.5.1 — hybrid regex+SEL: elite groups via releaseGroup() pin, x264/IMAX via native fields, bad dual via ESE. dynamicAddonFetching: exit at 5+ cached 4K or 6s. Fix: x264 exclude ESE (negate() removed).",
+    "addonDescription": "Nightly Labs v0.6.0 — template directives: optional scrapers + configurable exit thresholds via import inputs. Hybrid regex+SEL architecture. Report findings in the Nightly thread.",
     "appliedTemplates": [
       {
         "id": "core-nexus-4k-ht-torbox",
@@ -298,7 +334,7 @@
         "enabled": true
       },
       {
-        "expression": "/* LABS v0.6.1 | x264 Hard Exclude — native encode() replaces regex score -25 */ encode(streams, 'x264', 'h.264')",
+        "expression": "/* LABS v0.4.0 | x264 Hard Exclude — native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
         "enabled": false
       },
       {
@@ -393,10 +429,6 @@
       },
       {
         "expression": "/* B-Tier 1080p any */ resolution(streams,'1080p')",
-        "enabled": true
-      },
-      {
-        "expression": "/*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))",
         "enabled": true
       }
     ],
@@ -534,16 +566,6 @@
         "score": -75
       },
       {
-        "pattern": "/\\b(alfaHD.*|BAT|BlackBit|BNd|C\\.A\\.A|Cory|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|MGE|N3G4N|ONLYMOViE|PD|PTHome|RiPER|RK|SiGLA|Tars|TM|tokar86a|TURG|TvR|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
-        "name": "Radarr Bad Dual Groups",
-        "score": -50
-      },
-      {
-        "pattern": "/\\b(alfaHD.*|BAT|BiOMA|BlackBit|BNd|C\\.A\\.A|Cory|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|N3G4N|PD|PTHome|RiPER|RK|SiGLA|Tars|tokar86a|TURG|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
-        "name": "Sonarr Bad Dual Groups",
-        "score": -50
-      },
-      {
         "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "name": "Upscaled",
         "score": -75
@@ -567,36 +589,6 @@
         "pattern": "/^(?=.*\\b(Flights|GuyZo|BR-GuyZo)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/",
         "name": "Generated Dynamic HDR [B]",
         "score": -50
-      },
-      {
-        "pattern": "/\\b(126811)\\b/i",
-        "name": "126811",
-        "score": 80
-      },
-      {
-        "pattern": "/\\b(FLUX)\\b/i",
-        "name": "FLUX",
-        "score": 80
-      },
-      {
-        "pattern": "/\\b(SiC)\\b/",
-        "name": "SiC",
-        "score": 80
-      },
-      {
-        "pattern": "/\\b(TheFarm)\\b/i",
-        "name": "TheFarm",
-        "score": 80
-      },
-      {
-        "pattern": "/\\b(hallowed)\\b/i",
-        "name": "hallowed",
-        "score": 80
-      },
-      {
-        "pattern": "/\\b(BHDStudio)\\b/i",
-        "name": "BHDStudio",
-        "score": 60
       },
       {
         "pattern": "/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/",
@@ -673,7 +665,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 5 or totalTimeTaken > 6000"
+      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 10 or count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
     },
     "groups": {
       "enabled": true,
@@ -1661,9 +1653,10 @@
         ]
       },
       {
+        "__if": "inputs.enableAnime",
         "type": "seadex",
         "instanceId": "tam-seadex",
-        "enabled": false,
+        "enabled": true,
         "options": {
           "name": "SeaDex",
           "timeout": 4000,
@@ -1741,8 +1734,9 @@
         ]
       },
       {
+        "__if": "inputs.enableScrapers",
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "f6a38af4-a24d-43fc-8370-c10f07760c17",
         "options": {
           "timeout": 7000,
@@ -1761,8 +1755,9 @@
         ]
       },
       {
+        "__if": "inputs.enableScrapers",
         "type": "hdhub",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",
@@ -1810,15 +1805,15 @@
           "name": "Searchⁿᶻᵇ",
           "newznabUrl": "https://search-api.torbox.app/newznab",
           "apiPath": "/api",
-          "timeout": 5000,
+          "timeout": 10000,
           "mediaTypes": [
             "movie",
             "series",
             "anime"
           ],
-          "searchMode": "auto",
+          "searchMode": "both",
           "paginate": true,
-          "checkOwned": true,
+          "checkOwned": false,
           "useMultipleInstances": false,
           "services": [
             "torbox"
@@ -1927,7 +1922,7 @@
     },
     "mergedCatalogs": [],
     "syncedExcludedRegexUrls": [],
-    "seadexBestOnly": false,
+    "seadexBestOnly": true,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
     "enhanceResults": true,
@@ -1935,6 +1930,10 @@
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
-    "syncedRankedRegexUrls": []
+    "syncedRankedRegexUrls": [],
+    "dynamicAddonFetching": {
+      "enabled": true,
+      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
+    }
   }
 }

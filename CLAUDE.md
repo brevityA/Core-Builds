@@ -61,10 +61,8 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `sortCriteria` entries must use `"direction"` (not `"order"`) — AIOStreams rejects `"order"` on import
 - `addonLogo` URL must use `/refs/heads/main/` not `/main/` — the short form breaks on stale CDN caches
 - `stremthruTorz` is TorBox-specific; `stremthruStore` is for other debrid services (AllDebrid, RD)
-- `torbox-search` is a valid TorBox-wrapped search addon (not removed or broken) — keep it `enabled: false` to disable it per-template
-- `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — triggers "Forbidden URL" error. Do not use; embed patterns inline in `rankedRegexPatterns` instead
-- **Regex requires trusted access** — `REGEX_FILTER_ACCESS=trusted` is the AIOStreams default; inline `rankedRegexPatterns`/`preferredRegexPatterns` are ALSO blocked for non-trusted users unless host adds UUID to `TRUSTED_UUIDS` or sets `REGEX_FILTER_ACCESS=all`. Self-hosted with no auth: set `REGEX_FILTER_ACCESS=all`
-- **SEL hard limits** — Max **3,000 chars per expression** (`MAX_SEL_LENGTH`); max **50,000 chars total** across all expressions (`MAX_STREAM_EXPRESSIONS_TOTAL_CHARACTERS`); max **200 total expressions** (`MAX_STREAM_EXPRESSIONS`). Current templates: highest single = 2,953 chars (47-char headroom), highest total = ~35,000 chars. Do not grow the `Final Limit (All)` ESE further
+- `torbox-search` is a valid TorBox-wrapped search addon — it is not removed or broken
+- `syncedRankedRegexUrls` is **blocked on public instances** (elfhosted, fortheweak.cloud) — do not use; embed patterns inline in `rankedRegexPatterns` instead
 
 ## Known Preset Types
 
@@ -84,50 +82,44 @@ Preset `type` values confirmed in AIOStreams source:
 
 ---
 
-## Active Template Inventory (as of v2.8.4)
+## Active Template Inventory (as of v2.8.2)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.6 — flagship 4K, IQR PSEs, pow() decay, 48 ranked patterns inline (|score| ≥ 50)
-- `Single/core-nexus-4k-apex-torbox.json` v2.8.5 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.8.4 — 1080p streaming quality
-- `Single/core-nexus-stream-lite.json` v2.8.4 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.8.4 — Fire Stick optimised
-- `Single/core-nexus-stream-firestick-lite.json` v2.8.4
+- `Single/core-nexus-4k-apex.json` v0.4.3 — flagship 4K, IQR PSEs, pow() decay
+- `Single/core-nexus-4k-apex-torbox.json` v2.8.2 — TorBox-cached-only Apex variant
+- `Single/core-nexus-stream.json` v2.8.2 — 1080p streaming quality
+- `Single/core-nexus-stream-lite.json` v2.8.2 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.8.2 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick-lite.json` v2.8.2
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.8.4 — 4K with IQR PSEs, pow() decay
-- `Essential/core-nexus-4k-essential-lite.json` v2.8.4 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.8.4 — 1080p
-- `Essential/core-nexus-essential-lite.json` v2.8.4
+- `Essential/core-nexus-4k-essential.json` v2.8.2 — 4K with IQR PSEs, pow() decay
+- `Essential/core-nexus-4k-essential-lite.json` v2.8.2 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.8.2 — 1080p
+- `Essential/core-nexus-essential-lite.json` v2.8.2
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.8.4 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.8.4 — cached-only 1080p instant play
-
-### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.8.4 — TorBox-only 4K, library + Zilean + TorBox Search, exit at 3 cached 4K or 4s
-- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.8.4 — lite variant
-- `Speed/TorBox/core-nexus-speed.json` v2.8.4 — TorBox-only 1080p, library + Zilean + TorBox Search, exit at 3 cached or 4s
-- `Speed/TorBox/core-nexus-speed-lite.json` v2.8.4 — lite variant
+- `Flash/core-nexus-flash-4k.json` v2.8.2 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.8.2 — cached-only 1080p instant play
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.3 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.3 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.8.2 — EasyNews 4K
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.8.2 — EasyNews 1080p
 
 ### AllDebrid
 - `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.2 — 4K with IQR PSEs
 - `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.0 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.1 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.1 — 1080p lite
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.0 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.0 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.8.5 — TorBox + RD, service() priority PSEs, IQR
-- `Hybrid/core-nexus-hybrid.json` v2.8.5 — 1080p hybrid
-- `Hybrid/core-nexus-hybrid-lite.json` v2.8.5
+- `Hybrid/core-nexus-4k-hybrid.json` v2.8.3 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
+- `Hybrid/core-nexus-hybrid.json` v2.8.3 — 1080p hybrid, NZBGeek preset
+- `Hybrid/core-nexus-hybrid-lite.json` v2.8.3 — NZBGeek preset
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.3 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.3 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.2 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.2 — 4K, DV-Only Kill on, AV1/VC-1 excluded
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.3 — 4K anime, SeaDex + AnimeTosho
@@ -138,12 +130,9 @@ Preset `type` values confirmed in AIOStreams source:
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.3
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.1 — DV Profile 5/8, AV1 excluded
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.5.3 — experimental Apex variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
-- `Nightly/Single/core-nexus-stream-labs.json` v0.3.2 — experimental 1080p variant (dynamicAddonFetching, template directives: scraper toggles + exit thresholds)
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.1 — TorBox debrid-only 1080p (no external scrapers, TorBox Search toggle + exit thresholds)
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.1 — TorBox debrid-only 4K (no external scrapers, TorBox Search toggle + exit thresholds)
-- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.6 — Samsung RU7100 (2019) 4K: FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV, APEX IQR PSEs, full ESE stack
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.0 — DV Profile 5/8, AV1 excluded
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.5.0 — experimental Apex variant (dynamicAddonFetching, releaseGroup() PSEs)
+- `Nightly/Single/core-nexus-stream-labs.json` v0.3.0 — experimental 1080p variant (dynamicAddonFetching)
 
 ---
 
@@ -200,21 +189,19 @@ Radarr/Sonarr quality guide patterns embedded per template category. Scores 70�
 | 1080p templates | 8 | Radarr Web T1, Sonarr Web T1, FLUX, hallowed, BHDStudio, SiC, 126811, Web T1 |
 | Anime templates | 0 | (none — SeaDex/AnimeTosho handle quality) |
 
-### `rankedRegexPatterns` (high-impact subset, embedded inline)
-53 patterns from `Filtering/ranked-regex-patterns.json` where `|score| ≥ 50`, minus any names already in `preferredRegexPatterns`. Patterns with `|score| < 50` (streaming service tags, edition names, low-tier group labels) are excluded — they add file bulk with no meaningful ranking signal.
+### `rankedRegexPatterns` (shared subset, embedded inline)
+53 high-impact patterns from `Filtering/ranked-regex-patterns.json` (|score| ≥ 50), minus any names already in `preferredRegexPatterns`.
 
-| Template type | Count | Score tiers kept |
+| Template type | Count | Score tiers |
 |---|---|---|
 | 4K templates | 48 | S(+100), A(+80), B(+60), Penalised(−50), Bad(−75), Blacklist(−200) |
 | 1080p templates | 45 | Same tiers |
 | Anime templates | 0 | Cleared — live-action group names don't match anime naming |
 
-**Source of truth:** `Filtering/ranked-regex-patterns.json` — 149 patterns, 10 score tiers. Embed only the 53 with `|score| ≥ 50`, minus `preferredRegexPatterns` name overlaps to prevent double-scoring.
+**Source of truth:** `Filtering/ranked-regex-patterns.json` — 149 patterns, 10 score tiers. The 53 inline are the |score| ≥ 50 subset.
 
 ### `syncedRankedRegexUrls`
-**Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL" error (`SEL_SYNC_ACCESS=trusted` is the default). Embed patterns inline.
-
-Note: inline `rankedRegexPatterns` are ALSO blocked for non-trusted users on public instances (`REGEX_FILTER_ACCESS=trusted`). For self-hosted instances, set `REGEX_FILTER_ACCESS=all`.
+**Do not use.** Public AIOStreams instances (elfhosted, fortheweak.cloud) block `raw.githubusercontent.com` URLs, throwing "Forbidden URL(s) in regex configuration". Embed patterns inline.
 
 ---
 
@@ -295,14 +282,12 @@ All used via `{stream.fieldName::operator[...]}` in formatter `name`/`descriptio
 | `uSubtitleEmojis` | string[] | Per-language subtitle flags (🇬🇧 🇫🇷 etc.) |
 | `seMatched` | string | Name of the stream expression that matched this stream |
 | `rseMatched` | string[] | Regex set expression tier(s) matched |
-| `nSeScore` | number | Normalised stream expression score (0–1) |
-| `nRegexScore` | number | Normalised regex score (0–1) |
+| `nSeScore` | number | Normalised stream expression score |
+| `nRegexScore` | number | Normalised regex score |
 | `folderSeasons` | string[] | Season folders in multi-season packs |
 | `folderEpisodes` | string[] | Episode entries in folder-based releases |
 
-### Formatter String Modifiers
-
-Appended after `::` in `{stream.field::modifier}` expressions:
+### Formatter String Modifiers (appended after `::`)
 
 | Modifier | Effect |
 |---|---|
@@ -311,7 +296,7 @@ Appended after `::` in `{stream.field::modifier}` expressions:
 | `lsort` | Logical (natural) sort of array |
 | `slice(start, end)` | Trim array to index range |
 | `remove(val)` | Remove a value from array/string |
-| `star` / `pstar` | Star / partial-star rating display |
+| `star` / `pstar` | Star/partial-star rating display |
 
 ---
 
