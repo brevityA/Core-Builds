@@ -4,6 +4,19 @@
 
 ---
 
+## 2.8.6 (2026-06-18)
+
+### Fixed
+- **Blocked `excludedRegexPatterns` removed — all 33 active templates** — Four patterns using lookbehind (`(?<=...)`) or negative lookahead (`(?!...)`) syntax were present in every non-Anime template's `excludedRegexPatterns`. elfhosted's regex validator rejects these constructs, contributing to the "regexes not allowed" error on save even after clearing `preferredRegexPatterns` (v2.8.5) and `[B]`-variant names. Removed:
+  - `/(?<=\b[12]\d{3}\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i` — year-prefixed extras (lookbehind)
+  - `/(?<=\bS\d+\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i` — season-prefixed extras (lookbehind)
+  - `/(?<=\b[12]\d{3}\b).*\b(Sing[-_. ]Along)\b/i` — year-prefixed sing-along (lookbehind)
+  - `/^(?!.*\b((?<!HD[._ -]|HD)DVD|BDRip|...)...).*$/i` — BR-DISK detection (negative lookahead + lookbehind)
+
+  Coverage retained via `rankedRegexPatterns`: `Extras (Radarr)` / `Extras (Sonarr)` at −200, `Sing-Along Versions` at −75, `BR-DISK` at −75. Each template's `excludedRegexPatterns` drops from 12 → 8 patterns.
+
+---
+
 ## 2.8.5 (2026-06-18)
 
 ### Fixed
