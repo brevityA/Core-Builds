@@ -2012,6 +2012,9 @@
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
-    "syncedRankedRegexUrls": []
+    "syncedRankedRegexUrls": [],
+    "syncedRankedStreamExpressionUrls": [
+      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
+    ]
   }
 }
