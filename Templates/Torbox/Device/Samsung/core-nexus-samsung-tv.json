@@ -10,8 +10,7 @@
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": "v0.2.9: Per-Addon Flood Guard ESE added \u2014 caps Meteor \u2264 5, Comet RD \u2264 5, MediaFusion \u2264 4, Torrent Galaxy/EZTV/Knaben/HdHub \u2264 3 on non-library, non-SeaDex streams."
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "trusted": false,
