@@ -72,13 +72,13 @@ Re-import the same URL. AIOStreams will load the latest version and merge it ove
 
 | | Hosted (elfhosted, fortheweak.cloud) | Self-hosted |
 |---|---|---|
-| Inline regex | Blocked unless trusted user | Works — set `REGEX_FILTER_ACCESS=all` |
-| Synced regex URLs | Blocked (GitHub raw URLs forbidden) | Works |
+| Inline regex | Validated against host allowlist | Works — all patterns allowed |
+| Synced regex URLs | Whitelisted URLs only | All URLs allowed |
 | Performance | Shared resources | Dedicated |
 
-<Warning>
-  If you see a "Forbidden URL" or "regex blocked" error on import, you're on a public instance that blocks raw GitHub URLs. Contact your host to add your UUID to `TRUSTED_UUIDS`, or self-host AIOStreams with `REGEX_FILTER_ACCESS=all`.
-</Warning>
+<Info>
+  As of v2.9.0, all Core Builds templates are verified against both elfhosted and fortheweak allowlists. If you see a "regex not allowed" error after importing, re-import the latest template version — older templates may contain pattern strings that predate the v2.9.0 allowlist sync.
+</Info>
 
 ## Stremio vs WuPlay
 
