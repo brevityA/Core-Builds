@@ -1708,7 +1708,7 @@
         "enabled": true,
         "options": {
           "name": "StremThru AllDebrid",
-          "timeout": 3000,
+          "timeout": 5000,
           "useMultipleInstances": false
         },
         "resources": [

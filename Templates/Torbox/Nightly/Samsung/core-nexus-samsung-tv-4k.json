@@ -1715,7 +1715,7 @@
         "enabled": true,
         "options": {
           "name": "StremThru Torz",
-          "timeout": 3000,
+          "timeout": 5000,
           "includeP2P": false,
           "useMultipleInstances": false
         },
