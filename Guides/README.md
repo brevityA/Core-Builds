@@ -8,6 +8,11 @@
   </a>
 </p>
 
+<p align="center">
+  Template directory, import links, and full documentation have moved to<br/>
+  <a href="https://core-builds.mintlify.app/template-directory"><b>core-builds.mintlify.app</b></a>
+</p>
+
 # 📖 Core Builds by Brevity — Complete Guide
 
 Everything you need to set up, customise, and maintain your build.
