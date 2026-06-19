@@ -13,40 +13,40 @@
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "inputs": [
       {
-        "key": "exitThreshold",
         "path": "config.dynamicAddonFetching.condition",
-        "label": "Early exit — cached stream count",
         "description": "Stop querying addons when this many cached 1080p streams are found. Default: 5. Lower = faster. Higher = more options but slower start.",
         "type": "string",
         "required": false,
-        "value": "5"
+        "value": "5",
+        "id": "exitThreshold",
+        "name": "Early exit — cached stream count"
       },
       {
-        "key": "maxWaitMs",
         "path": "config.dynamicAddonFetching.condition",
-        "label": "Early exit — max wait (ms)",
         "description": "Stop querying addons after this many milliseconds. Default: 5000. Reduce to 3000 for faster response on fast connections.",
         "type": "string",
         "required": false,
-        "value": "5000"
+        "value": "5000",
+        "id": "maxWaitMs",
+        "name": "Early exit — max wait (ms)"
       },
       {
-        "key": "enableScrapers",
         "path": "config.presets",
-        "label": "Enable optional scrapers (MediaFusion)",
         "description": "Type anything to add MediaFusion as an additional source. Broader coverage but adds ~3–5s latency. Leave blank to skip.",
         "type": "string",
         "required": false,
-        "value": ""
+        "value": "",
+        "id": "enableScrapers",
+        "name": "Enable optional scrapers (MediaFusion)"
       },
       {
-        "key": "enableAnime",
         "path": "config.presets",
-        "label": "Enable SeaDex (anime quality)",
         "description": "Type anything to add SeaDex for best-quality anime releases. Only useful for anime content. Leave blank to skip.",
         "type": "string",
         "required": false,
-        "value": ""
+        "value": "",
+        "id": "enableAnime",
+        "name": "Enable SeaDex (anime quality)"
       }
     ]
   },

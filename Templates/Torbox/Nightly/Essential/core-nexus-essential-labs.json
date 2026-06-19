@@ -12,31 +12,31 @@
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json",
     "inputs": [
       {
-        "key": "enableTorboxSearch",
         "path": "config.presets",
-        "label": "Enable TorBox Search",
         "description": "TorBox native search addon. Type anything to include it (default: enabled). Tests whether TorBox Search adds value beyond the cached library.",
         "type": "string",
         "required": false,
-        "value": "yes"
+        "value": "yes",
+        "id": "enableTorboxSearch",
+        "name": "Enable TorBox Search"
       },
       {
-        "key": "exitThreshold",
         "path": "config.dynamicAddonFetching.condition",
-        "label": "Early exit — cached stream count",
         "description": "Stop querying when this many cached streams are found. Default: 5. Debrid-only is fast — lower threshold recommended.",
         "type": "string",
         "required": false,
-        "value": "5"
+        "value": "5",
+        "id": "exitThreshold",
+        "name": "Early exit — cached stream count"
       },
       {
-        "key": "maxWaitMs",
         "path": "config.dynamicAddonFetching.condition",
-        "label": "Early exit — max wait (ms)",
         "description": "Stop querying after this many milliseconds. Default: 4000.",
         "type": "string",
         "required": false,
-        "value": "4000"
+        "value": "4000",
+        "id": "maxWaitMs",
+        "name": "Early exit — max wait (ms)"
       }
     ]
   },
