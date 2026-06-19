@@ -5,7 +5,7 @@
     "description": "A full-featured 1080p SDR build for TorBox Essential users. No Usenet access required \u2014 runs entirely on TorBox's torrent cache. Targets WEB-DL and WEBRip sources, blocks BluRay, Remux, 4K, and HDR for reliable playback on budget hardware. File range 1 GB\u201325 GB. Full addon stack: Comet, Meteor, Zilean, Knaben. A single TorBox Essential subscription is all that is required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -269,7 +269,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {

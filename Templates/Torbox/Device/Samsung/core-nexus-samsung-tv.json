@@ -5,7 +5,7 @@
     "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded \u2014 only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p \u00b7 TorBox Essential \u00b7 Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.10",
+    "version": "0.2.11",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -255,7 +255,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {

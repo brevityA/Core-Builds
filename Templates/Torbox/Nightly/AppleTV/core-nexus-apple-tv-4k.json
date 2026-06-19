@@ -5,7 +5,7 @@
     "description": "4K template tuned for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 is natively supported \u2014 DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. AV1 hard-excluded (no hardware decoder on the A15 chip \u2014 severe performance hit). DD+ Atmos is the native top audio format. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox \u00b7 Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -254,7 +254,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {

@@ -5,7 +5,7 @@
     "description": "4K flagship for TorBox users who also run a Usenet indexer. Pairs TorBox debrid with NZBGeek for maximum source diversity across debrid, torrent, and Usenet streams. Prioritises 2160p with 1080p fallback. Full HDR and lossless audio. Adaptive IQR bitrate PSEs \u2014 Tukey fence (\u22654 ranked) with min/max and new-release median cluster fallbacks. NZBGeek API key required \u2014 enter your key in the Usenet preset before saving.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -266,7 +266,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {

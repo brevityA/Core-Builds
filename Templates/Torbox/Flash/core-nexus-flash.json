@@ -5,7 +5,7 @@
     "description": "Single-click instant play. Only cached streams appear \u2014 zero uncached results. Derived from Speed but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 1080p \u00b7 TorBox Essential \u00b7 Library, TorBox Search, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1549,7 +1549,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {
