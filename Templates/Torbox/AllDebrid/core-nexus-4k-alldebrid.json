@@ -5,13 +5,13 @@
     "description": "Core Nexus 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD/Atmos · uncapped bitrate. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": "v0.1.5: Restore correct regex configuration — full {name, pattern, score} entries in rankedRegexPatterns, preferredRegexPatterns restored, excludedRegexPatterns restored to 12 (including lookbehind), syncedExcludedRegexUrls restored to Tamtaro. Aligns with verified working elfhosted configuration."
+    "changelog": "v0.1.8: Per-Addon Flood Guard ESE added — caps Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, Torrent Galaxy/EZTV/Knaben/HdHub ≤ 3 on non-library, non-SeaDex streams.\nv0.1.5: Restore correct regex configuration — full {name, pattern, score} entries in rankedRegexPatterns, preferredRegexPatterns restored, excludedRegexPatterns restored to 12 (including lookbehind), syncedExcludedRegexUrls restored to Tamtaro. Aligns with verified working elfhosted configuration."
   },
   "config": {
     "trusted": false,
@@ -229,6 +229,10 @@
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
+      {
+        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+        "enabled": true
+      },
       {
         "expression": "/*Part of Tamtaro SEL Setup*/[]",
         "enabled": true

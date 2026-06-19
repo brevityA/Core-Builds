@@ -5,12 +5,13 @@
     "description": "4K template tuned for Samsung smart TVs without native Dolby Vision support — including RU7100, RU8000, NU8000, Q60, and similar 2018–2022 models. DV-only streams are excluded (DV-Only Kill ESE); only HDR10+, HDR10, HLG, and SDR content appears. AV1 and VC-1 excluded (not supported on older Samsung hardware). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded — Samsung passes these through only via HDMI ARC/eARC to compatible receivers, which most users don't have. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "v0.2.9: Per-Addon Flood Guard ESE added — caps Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, Torrent Galaxy/EZTV/Knaben/HdHub ≤ 3 on non-library, non-SeaDex streams."
   },
   "config": {
     "trusted": false,
@@ -224,6 +225,10 @@
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
     "excludedStreamExpressions": [
+      {
+        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+        "enabled": true
+      },
       {
         "expression": "/*Part of Tamtaro SEL Setup*/[]",
         "enabled": true

@@ -5,13 +5,13 @@
     "description": "Core Nexus 1080p for AllDebrid. WEB-DL / Remux quality tiers · HDR preferred · TrueHD/Atmos. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": "v0.1.4: Restore correct regex configuration — full {name, pattern, score} entries in rankedRegexPatterns, preferredRegexPatterns restored, excludedRegexPatterns restored to 12 (including lookbehind), syncedExcludedRegexUrls restored to Tamtaro. Aligns with verified working elfhosted configuration."
+    "changelog": "v0.1.7: Per-Addon Flood Guard ESE added — caps Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, Torrent Galaxy/EZTV/Knaben/HdHub ≤ 3 on non-library, non-SeaDex streams.\nv0.1.4: Restore correct regex configuration — full {name, pattern, score} entries in rankedRegexPatterns, preferredRegexPatterns restored, excludedRegexPatterns restored to 12 (including lookbehind), syncedExcludedRegexUrls restored to Tamtaro. Aligns with verified working elfhosted configuration."
   },
   "config": {
     "trusted": false,
@@ -225,6 +225,10 @@
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
     "excludedStreamExpressions": [
+      {
+        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+        "enabled": true
+      },
       {
         "expression": "/* Hard Resolution Kill — 1080p-only */ resolution(streams, '2160p', '1440p', '720p', '576p', '480p')",
         "enabled": true
