@@ -23,7 +23,43 @@ Before troubleshooting, confirm what you're running.
 
 ---
 
-## Common Issues
+## Import Errors
+
+<AccordionGroup>
+  <Accordion title='"X/N regexes not allowed" on save (elfhosted or fortheweak)'>
+    This is a regex whitelist error. Public AIOStreams hosts validate inline pattern strings against an allowlist before saving. The pattern content must match the allowlist **exactly** — even a single character difference causes rejection.
+
+    **Fix: re-import the latest template.** As of v2.9.0, all pattern strings are synced to the host allowlists. The most common cause is importing an older template that predates the v2.8.9 / v2.9.0 sync.
+
+    If you're still seeing this after re-importing v2.9.0+, paste the exact error text in the community thread — it may indicate the allowlist has been updated again.
+  </Accordion>
+
+  <Accordion title='"Forbidden URL" error on import'>
+    A URL inside the template (regex source, expression URL, or logo URL) has been blocked by your host.
+
+    **Most common cause:** an old template referencing a raw GitHub URL that the host doesn't whitelist.
+
+    **Fix:** re-import the current template. All URL references are up to date from v2.9.0 onwards.
+
+    If the error persists on a self-hosted instance, set `REGEX_FILTER_ACCESS=all` in your AIOStreams environment.
+  </Accordion>
+
+  <Accordion title="Labs template fails to load — 8 errors about metadata.inputs">
+    AIOStreams updated the `metadata.inputs` schema — the field previously named `key` was renamed to `id`, and `label` was renamed to `name`. Labs templates built before v2.9.0 used the old field names.
+
+    **Fix: re-import the Labs template.** The schema fix is live from the current main branch. If errors persist, paste the full error list in the community thread.
+  </Accordion>
+
+  <Accordion title="Template loads but shows warnings about undeclared inputs">
+    Warnings like `interpolation {{inputs.exitThreshold}} references undeclared input` appear when the template uses directive interpolation and the input IDs don't match what's declared in `metadata.inputs`. This is a Labs-only issue — stable templates don't use template directives.
+
+    Re-import the latest Labs template. If the warnings continue, they are non-fatal — the template will still function, but the configurable inputs at import may not work as intended.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Results Issues
 
 <AccordionGroup>
   <Accordion title="No results / very few results">
@@ -39,31 +75,12 @@ Before troubleshooting, confirm what you're running.
     The standard template runs 24 ESEs (quality gates). Lite runs 12 — hard kills stay but quality gates are removed. If Lite returns results, one of the quality gates is filtering your content.
   </Accordion>
 
-  <Accordion title='"Forbidden URL" or "regex blocked" error on import'>
-    You're on a public AIOStreams instance (elfhosted, fortheweak.cloud). These block raw GitHub URLs by default.
-
-    **Solutions:**
-    - Contact your host and ask them to add your UUID to `TRUSTED_UUIDS`
-    - Self-host AIOStreams and set `REGEX_FILTER_ACCESS=all`
-    - Use the Lite variant (fewer SEL expressions, same hard kills)
+  <Accordion title="4K streams showing on a 1080p template">
+    Fixed in v2.8.3. All 1080p templates now have a hard resolution kill ESE as their first filter. Re-import your template.
   </Accordion>
 
   <Accordion title="Cached Usenet NZBs appearing below debrid results">
     Fixed in v2.8.4. Re-import your template. The Boost Cached Usenet PSE now catches any cached NZBs that fall outside the quality-window PSEs and ensures they rank above uncached streams.
-  </Accordion>
-
-  <Accordion title="Samsung TV — audio not playing / stuttering">
-    Check that your template has `excludedAudioTags: ["TrueHD","DTS-HD MA","DTS:X","FLAC"]`. The Samsung TV and Samsung TV 4K stable templates have these excluded by default. If you imported an older version, re-import to pick up the fix.
-  </Accordion>
-
-  <Accordion title="Samsung TV — Dolby Vision content I can't play">
-    The DV-Only Kill ESE is enabled by default on Samsung templates. If you're still seeing DV streams, check:
-    - Your template version is v0.2.2 or later (re-import if not)
-    - You haven't disabled the `No DV-Only` ESE in the AIOStreams editor
-  </Accordion>
-
-  <Accordion title="4K streams showing on a 1080p template">
-    Fixed in v2.8.3. All 1080p templates now have a hard resolution kill ESE as their first filter. Re-import your template.
   </Accordion>
 
   <Accordion title="SeaDex filtering out all results for anime">
@@ -73,6 +90,41 @@ Before troubleshooting, confirm what you're running.
   <Accordion title="Usenet results slow or not appearing">
     Fixed in v2.7.5. The newznab timeout was 3000ms — too short for TorBox Usenet. Updated to 10,000ms. Additionally `searchMode: auto` and `checkOwned: true` are now set. Re-import your template.
   </Accordion>
+
+  <Accordion title="Results appear but nothing plays">
+    Most common causes:
+    - **Codec not supported on your device** — check the stream's codec in the formatter display. If it's AV1 on a device without hardware AV1 decode (Fire Stick 4K, older Samsung Tizen), the stream will buffer or fail. Switch to a device-specific template (Samsung TV, Fire Stick) which hard-exclude unsupported codecs.
+    - **DV-only stream on a non-DV device** — the Samsung templates have a DV-Only Kill ESE enabled by default. If you're on a generic template, enable the DV-Only Kill ESE manually in AIOStreams.
+    - **Bitrate too high** — very high-bitrate REMUX streams can stall on slower connections or budget hardware. Try the B-tier or lower result in the list.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Device Issues
+
+<AccordionGroup>
+  <Accordion title="Samsung TV — audio not playing / stuttering">
+    The Samsung TV templates exclude lossless audio (`TrueHD`, `DTS-HD MA`, `DTS:X`, `FLAC`) by default — these formats require HDMI ARC/eARC passthrough to a compatible receiver. If you have a compatible receiver and want lossless audio, remove those tags from `excludedAudioTags` in the AIOStreams settings after importing.
+
+    If audio is stuttering on tracks that should work, confirm your template is v0.2.8 or later and re-import.
+  </Accordion>
+
+  <Accordion title="Samsung TV — Dolby Vision streams still appearing">
+    The DV-Only Kill ESE is enabled by default on Samsung templates. If you're still seeing DV streams:
+    - Confirm your template version is v0.2.8 or later (re-import if not)
+    - Check you haven't disabled the `No DV-Only` ESE in the AIOStreams expression editor
+  </Accordion>
+
+  <Accordion title="Fire Stick — playback stuttering or buffering">
+    Use the **Stream (Fire Stick)** template. It hard-excludes AV1 (no hardware decoder on most Fire Stick models), HDR10+, Dolby Vision, and lossless audio. If you're on a generic Stream template, these formats may be served and cause transcoding or failure.
+  </Accordion>
+
+  <Accordion title="Apple TV — DV not playing in Infuse">
+    The Apple TV 4K Nightly template prioritises DV Profile 5/8 — the profiles natively supported by the A15 chip. If DV isn't playing, confirm you're using Infuse (native DV support) rather than a player that doesn't decode DV.
+
+    AV1 is hard-excluded on the Apple TV template — the A15 chip has no hardware AV1 decoder.
+  </Accordion>
 </AccordionGroup>
 
 ---
@@ -81,27 +133,43 @@ Before troubleshooting, confirm what you're running.
 
 <AccordionGroup>
   <Accordion title="Do I need a TorBox subscription?">
-    Yes for all TorBox templates. AllDebrid and EasyNews templates work without TorBox.
+    Yes for all TorBox templates. AllDebrid templates require an AllDebrid account. EasyNews templates require an EasyNews subscription. The Speed EasyNews template is the only one that works without TorBox.
   </Accordion>
 
-  <Accordion title="Can I use these on a free/public AIOStreams instance?">
-    Yes, but inline regex scoring may be blocked on public instances. See the "Forbidden URL" section above.
-  </Accordion>
+  <Accordion title="Which public host should I use — elfhosted or fortheweak?">
+    Both work with Core Builds v2.9.0+. The main difference is the regex whitelist — fortheweak is stricter. As of v2.9.0, all templates are verified against both allowlists.
 
-  <Accordion title="How do I update a template?">
-    Re-import the same URL. Your API keys are preserved. Check AIOStreams for an in-app update notification first — it will prompt you automatically.
+    If you're self-hosting, no whitelist applies — all templates work as-is.
   </Accordion>
 
   <Accordion title="What's the difference between Standard and Lite?">
-    Standard runs 24 ESEs including quality gates (low bitrate, low seeders, upscaled 4K, bad Bluray). Lite runs 12 — hard kills only (CAM, YouTube, 3D, bad NZBs). See [Which Template?](/which-template#lite-vs-standard) for full comparison.
+    Standard runs 24 ESEs including quality gates (low bitrate, low seeders, upscaled 4K, bad Bluray encodes). Lite runs 12 — hard kills only (CAM, YouTube, 3D, bad NZBs). More results come through on Lite, but without quality filtering some bad encodes may appear.
+
+    Use Lite when: your library is thin, you're on a shared host, or you're debugging why a title returns no results on Standard.
+  </Accordion>
+
+  <Accordion title="What's the difference between stable Samsung TV and Nightly Samsung RU7100 4K?">
+    The stable **Samsung TV 4K** (Device folder) is general-purpose — targets all 2018–2022 Samsung Tizen TVs without DV support. It uses standard Core Builds PSEs.
+
+    The **Nightly Samsung RU7100 4K** is model-specific — tuned for the RU7100 (UA65RU7100W) and compatible TVs. It runs the full APEX IQR Tukey fence PSE stack and more aggressive filtering. Use it if you specifically have an RU7100 or want to test the more aggressive expression set.
+  </Accordion>
+
+  <Accordion title="Why are Labs templates experimental?">
+    Labs templates test AIOStreams features that aren't fully stabilised yet — template directives (`__if`/`__value` interpolation), `dynamicAddonFetching` conditions, and per-scraper toggles at import time. These features depend on AIOStreams schema versions that change without notice, which is why Labs can break between AIOStreams updates.
+
+    Labs import errors are expected — reporting them helps identify schema changes.
+  </Accordion>
+
+  <Accordion title="Can I use these on a free/public AIOStreams instance?">
+    Yes. As of v2.9.0, all inline patterns are verified against both elfhosted and fortheweak allowlists. Import the template, enter your API keys, and save.
+  </Accordion>
+
+  <Accordion title="Do I need a TMDB API token?">
+    Optional but recommended. Without it, title matching falls back to AIOStreams defaults, which is less accurate for foreign titles and anime.
   </Accordion>
 
   <Accordion title="Can I submit my own template?">
     Yes — open a PR to `Community-Templates/` in the [repository](https://github.com/brevityA/Core-Builds). Include a README with what your template does and what service/plan it requires.
-  </Accordion>
-
-  <Accordion title="Do I need a TMDB API token?">
-    It's optional but recommended. Without it, title matching falls back to AIOStreams defaults, which is less accurate for foreign titles and anime.
   </Accordion>
 
   <Accordion title="What is seadexBestOnly?">
