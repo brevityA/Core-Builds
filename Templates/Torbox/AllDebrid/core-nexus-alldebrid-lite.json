@@ -10,8 +10,7 @@
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": "v0.1.7: Per-Addon Flood Guard ESE added \u2014 caps Meteor \u2264 5, Comet RD \u2264 5, MediaFusion \u2264 4, Torrent Galaxy/EZTV/Knaben/HdHub \u2264 3 on non-library, non-SeaDex streams.\nv0.1.4: Restore correct regex configuration \u2014 full {name, pattern, score} entries in rankedRegexPatterns, preferredRegexPatterns restored, excludedRegexPatterns restored to 12 (including lookbehind), syncedExcludedRegexUrls restored to Tamtaro. Aligns with verified working elfhosted configuration."
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "trusted": false,
