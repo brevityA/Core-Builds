@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.8.6",
+    "version": "0.8.5",
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) \u2014 optional scrapers (MediaFusion, HdHub, SeaDex) toggled at import; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on 4K Apex.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "inputs": [
@@ -765,7 +765,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= {{inputs.exitThreshold}} || totalTimeTaken > {{inputs.maxWaitMs}}"
+      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     },
     "groups": {
       "enabled": true,

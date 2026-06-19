@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) \u2014 optional scrapers (MediaFusion, SeaDex) toggled at import; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on Stream.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.6.6",
+    "version": "0.6.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -771,7 +771,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= {{inputs.exitThreshold}} || totalTimeTaken > {{inputs.maxWaitMs}}"
+      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     },
     "groups": {
       "enabled": true,

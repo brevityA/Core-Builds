@@ -5,7 +5,7 @@
     "description": "Speed-optimised 4K build for TorBox Essential \u2014 no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Exits as soon as 3 cached 4K streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.2",
+    "version": "2.9.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -728,7 +728,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 3 || totalTimeTaken > 4000"
+      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 3 or totalTimeTaken > 4000"
     },
     "groups": {
       "enabled": true,
