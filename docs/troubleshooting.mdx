@@ -93,6 +93,7 @@ Before troubleshooting, confirm what you're running.
 
   <Accordion title="Results appear but nothing plays">
     Most common causes:
+    - **Debrid link timeout (Nuvio / AIOStreams v2.24.0+)** — If you see a visible Playback Error, the debrid link resolver timed out. Re-import the v2.9.0+ template — the `stremthruTorz`/`stremthruStore` timeout was raised to 5000ms to cover congested periods. If errors persist, check [TorBox's status page](https://torbox.app/status) for outages, or try a different stream from the list.
     - **Codec not supported on your device** — check the stream's codec in the formatter display. If it's AV1 on a device without hardware AV1 decode (Fire Stick 4K, older Samsung Tizen), the stream will buffer or fail. Switch to a device-specific template (Samsung TV, Fire Stick) which hard-exclude unsupported codecs.
     - **DV-only stream on a non-DV device** — the Samsung templates have a DV-Only Kill ESE enabled by default. If you're on a generic template, enable the DV-Only Kill ESE manually in AIOStreams.
     - **Bitrate too high** — very high-bitrate REMUX streams can stall on slower connections or budget hardware. Try the B-tier or lower result in the list.

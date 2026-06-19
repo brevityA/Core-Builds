@@ -13,6 +13,12 @@ Full history: [CHANGELOG.md](https://github.com/brevityA/Core-Builds/blob/main/C
   **Latest release.** If you already have a template imported, check AIOStreams for an in-app update notification.
 </Info>
 
+**Fixed: Debrid timeout raised — 35 templates**
+
+`stremthruTorz` and `stremthruStore` timeout increased from 3000ms to 5000ms across all 35 active templates (excludes Flash and Speed EasyNews which were already at 3500ms+). AIOStreams v2.24.0 changed debrid timeout behaviour — timeouts now propagate as active Playback Errors to the client rather than failing silently. On Nuvio and similar clients, this surfaced as a visible error on every slow debrid link resolution. The 5000ms budget gives TorBox's link resolver enough headroom to handle congested periods without triggering the error.
+
+---
+
 **Fixed: Labs templates — metadata.inputs schema**
 
 AIOStreams renamed fields in the `metadata.inputs` schema — `key` → `id` and `label` → `name`. All 4 Labs templates were failing to load with 8 errors each. Fixed across 4K Apex Labs, Stream Labs, Essential Labs, and 4K Essential Labs.

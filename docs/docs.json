@@ -5,7 +5,7 @@
   "logo": {
     "light": "/logo/core_builds_banner.png",
     "dark": "/logo/core_builds_banner.png",
-    "height": 55
+    "height": 75
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
