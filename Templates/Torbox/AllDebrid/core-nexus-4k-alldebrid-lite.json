@@ -5,21 +5,13 @@
     "description": "4K AllDebrid Lite. DV/HDR · TrueHD/Atmos · Relaxed filtering (no IQR). No TorBox required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": [
-      {
-        "version": "0.1.0",
-        "date": "2026-06-14",
-        "changes": [
-          "Initial release — 4K AllDebrid Lite variant (CB-style PSEs, no IQR Tukey fence). Based on Essential 4K Lite with stremthruStore preset for AllDebrid."
-        ]
-      }
-    ]
+    "changelog": "v0.1.1: Per-Addon Flood Guard ESE added — caps Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, Torrent Galaxy/EZTV/Knaben/HdHub ≤ 3 on non-library, non-SeaDex streams. Aligns with v2.9.0 standard templates."
   },
   "config": {
     "trusted": false,
@@ -242,6 +234,10 @@
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
+      {
+        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+        "enabled": true
+      },
       {
         "expression": "/*Part of Tamtaro SEL Setup*/[]",
         "enabled": true
