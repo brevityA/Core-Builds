@@ -4,6 +4,20 @@
 
 ---
 
+## 2.9.2 (2026-06-19)
+
+### Changed
+- **Knaben and Torrent Galaxy demoted to backup scrapers — all 39 active templates.** Both confirmed slow and debrid-only (community Discussion #528). Demoted from peer scrapers to true backups:
+  - Moved to end of preset list, after Meteor / Comet / MediaFusion / HdHub
+  - Flood guard cap reduced from ≤ 3 → **≤ 1** result each (was equal to EZTV/HdHub; now a last-resort contribution)
+  - All other caps unchanged: Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3
+
+### Removed
+- **`opensubtitles-v3-plus` preset — all 39 active templates.** AIOSubtitle covers the same subtitle sources. Removing one redundant subtitle call per request with no user-visible difference.
+- **EZTV preset — Flash and EasyNews Speed templates** (`flash-4k`, `flash`, `speed-4k-plus`, `speed-easynews`). EZTV is a TV-series-only indexer; Flash and EasyNews Speed are cached-only templates where TV-series torrents from EZTV are unlikely to be cached. No coverage loss for cached content. EZTV remains on all full-scraper templates.
+
+---
+
 ## 2.9.1 (2026-06-19)
 
 ### Added
