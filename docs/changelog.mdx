@@ -7,11 +7,23 @@ Full history: [CHANGELOG.md](https://github.com/brevityA/Core-Builds/blob/main/C
 
 ---
 
-## v2.9.0 — 2026-06-19
+## v2.9.0 (patch) — 2026-06-19
 
 <Info>
   **Latest release.** If you already have a template imported, check AIOStreams for an in-app update notification.
 </Info>
+
+**Fixed: Labs templates — metadata.inputs schema**
+
+AIOStreams renamed fields in the `metadata.inputs` schema — `key` → `id` and `label` → `name`. All 4 Labs templates were failing to load with 8 errors each. Fixed across 4K Apex Labs, Stream Labs, Essential Labs, and 4K Essential Labs.
+
+**Fixed: Nightly Samsung RU7100 4K — unique template ID**
+
+The Nightly Samsung RU7100 4K shared `id: brevity.core-nexus-samsung-tv-4k` with the stable Samsung TV 4K template. AIOStreams uses the ID for update tracking — the collision caused update notifications and version state to bleed between the two. Changed to `brevity.core-nexus-samsung-ru7100-4k`.
+
+---
+
+**Fixed: Regex compatibility — fortheweak whitelist**
 
 **Fixed: Regex compatibility — fortheweak whitelist**
 
