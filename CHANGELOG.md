@@ -4,6 +4,21 @@
 
 ---
 
+## 2.9.1 (2026-06-19)
+
+### Added
+- **Per-Addon Flood Guard ESE — AllDebrid and Samsung TV templates.** The flood guard already present in all v2.9.0 standard templates is now applied to the 6 templates that were missing it:
+  - `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.7 → **v0.1.8**
+  - `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.5 → **v0.1.6**
+  - `AllDebrid/core-nexus-alldebrid.json` v0.1.6 → **v0.1.7**
+  - `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.6 → **v0.1.7**
+  - `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.8 → **v0.2.9**
+  - `Device/Samsung/core-nexus-samsung-tv.json` v0.2.8 → **v0.2.9**
+
+  Guard caps per-addon on non-library, non-SeaDex streams: Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, Torrent Galaxy / EZTV / Knaben / HdHub ≤ 3. Inserted at ESE position 0 (runs before quality gates). Pre-rollout audit confirmed exact `options.name` match across all 19 active non-Flash/Speed/Anime templates — zero name discrepancies.
+
+---
+
 ## 2.9.0 (2026-06-19)
 
 ### Fixed

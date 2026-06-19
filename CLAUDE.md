@@ -82,7 +82,7 @@ Preset `type` values confirmed in AIOStreams source:
 
 ---
 
-## Active Template Inventory (as of v2.9.0)
+## Active Template Inventory (as of v2.9.1)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.4.11 — flagship 4K, IQR PSEs, pow() decay
