@@ -1,6 +1,6 @@
 ---
 title: "Template Directory"
-description: "Every active template with import URLs, versions, and plan requirements. Current version: v2.8.4"
+description: "Every active template with import URLs, versions, and plan requirements. Current version: v2.9.0"
 ---
 
 <Frame>
@@ -17,11 +17,17 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
   **Quick import:** click an Import button to open the template directly in your AIOStreams instance. Or copy the raw URL to paste manually into any host.
 </Note>
 
+<Warning>
+  **A TMDB Read Access Token is required for templates to work correctly.** Without it, title matching falls back to AIOStreams defaults — foreign titles, anime, and anything with multiple versions will match poorly or return no results.
+
+  Get yours free at [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api) → **Read Access Token** → paste into AIOStreams → **Settings → TMDB Access Token**.
+</Warning>
+
 ## TorBox Pro
 
 <Tabs>
   <Tab title="4K">
-    ### 4K Apex — v0.4.6
+    ### 4K Apex — v0.4.11
     Flagship 4K. IQR Tukey fence adaptive bitrate filtering, DV/HDR priority, Usenet via Newznab.
 
     <CardGroup cols={2}>
@@ -34,7 +40,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### 4K Apex (TorBox-only) — v2.8.5
+    ### 4K Apex (TorBox-only) — v2.9.0
     Cached-only Apex variant. No external scrapers.
 
     <CardGroup cols={2}>
@@ -47,7 +53,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### 4K Hybrid — v2.8.5
+    ### 4K Hybrid — v2.9.0
     TorBox Pro + NZBGeek. Full 4K with TorBox-priority PSEs. Requires NZBGeek API key.
 
     <CardGroup cols={2}>
@@ -60,7 +66,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Samsung TV 4K — v0.2.3
+    ### Samsung TV 4K — v0.2.8
     AV1/VC-1/DV hard-excluded for Tizen. HDR10+ preferred.
 
     <CardGroup cols={2}>
@@ -73,7 +79,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
   </Tab>
 
   <Tab title="1080p">
-    ### Stream — v2.8.4
+    ### Stream — v2.9.0
     1080p WEB-DL only. BluRay and Remux excluded.
 
     <CardGroup cols={2}>
@@ -87,7 +93,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Stream (Fire Stick) — v2.8.4
+    ### Stream (Fire Stick) — v2.9.0
     1080p SDR, tuned for Fire Stick and low-RAM devices.
 
     <CardGroup cols={2}>
@@ -101,7 +107,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Samsung TV — v0.2.3
+    ### Samsung TV — v0.2.8
     1080p, AV1/VC-1/DV hard-excluded for Tizen.
 
     <CardGroup cols={2}>
@@ -114,7 +120,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Hybrid — v2.8.5
+    ### Hybrid — v2.9.0
     TorBox + NZBGeek, 1080p. Requires NZBGeek API key.
 
     <CardGroup cols={2}>
@@ -134,7 +140,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
 <Tabs>
   <Tab title="4K">
-    ### 4K Essential — v2.8.4
+    ### 4K Essential — v2.9.0
     Full 4K on Essential plan. IQR PSEs, no Usenet.
 
     <CardGroup cols={2}>
@@ -148,7 +154,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Flash 4K — v2.8.4
+    ### Flash 4K — v2.9.0
     Cached-only instant play. Returns nothing if title isn't cached.
 
     <CardGroup cols={2}>
@@ -161,7 +167,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Speed 4K — v2.8.4
+    ### Speed 4K — v2.9.0
     Fast cached 4K. Exits at 3 cached results or timeout.
 
     <CardGroup cols={2}>
@@ -175,7 +181,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
   </Tab>
 
   <Tab title="1080p">
-    ### Essential — v2.8.4
+    ### Essential — v2.9.0
     Standard 1080p for Essential subscribers.
 
     <CardGroup cols={2}>
@@ -189,7 +195,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Flash — v2.8.4
+    ### Flash — v2.9.0
     Cached-only instant 1080p play.
 
     <CardGroup cols={2}>
@@ -202,7 +208,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
     ---
 
-    ### Speed — v2.8.4
+    ### Speed — v2.9.0
     Fast cached 1080p. Exits at 3 cached results or timeout.
 
     <CardGroup cols={2}>
@@ -220,7 +226,7 @@ All templates require **AIOStreams v2.30+**. Every standard template has a **Lit
 
 ## AllDebrid
 
-### 4K AllDebrid — v0.1.2
+### 4K AllDebrid — v0.1.7
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
@@ -231,7 +237,7 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
 ```
 Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json`
 
-### AllDebrid — v0.1.1
+### AllDebrid — v0.1.6
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
@@ -246,7 +252,7 @@ Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Te
 
 ## EasyNews Speed
 
-### Speed 4K+ — v2.8.3
+### Speed 4K+ — v2.9.0
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
@@ -256,7 +262,7 @@ Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Te
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json
 ```
 
-### Speed EasyNews — v2.8.3
+### Speed EasyNews — v2.9.0
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
@@ -308,17 +314,17 @@ Lite: `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Te
 ## Nightly
 
 <Warning>
-  Nightly (stable for daily use) and Labs (experimental) templates. May change frequently.
+  **Nightly** templates are stable for daily use. **Labs** templates are experimental and may fail to load — do not use Labs in production.
 </Warning>
 
 | Template | Version | Status | Import URL |
 |---|---|---|---|
-| Apple TV 4K | v0.1.1 | Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
-| Samsung RU7100 4K | v0.2.6 | Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
-| 4K Apex Labs | v0.5.3 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| Stream Labs | v0.3.2 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| Essential Labs | v0.1.1 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
-| 4K Essential Labs | v0.1.1 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
+| Apple TV 4K | v0.1.5 | Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
+| Samsung RU7100 4K | v0.2.10 | Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| 4K Apex Labs | v0.8.4 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| Stream Labs | v0.6.4 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| Essential Labs | v0.1.5 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
+| 4K Essential Labs | v0.1.5 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 
 → [What's being tested?](/nightly-and-labs)
 

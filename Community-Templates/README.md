@@ -8,6 +8,11 @@
   </a>
 </p>
 
+<p align="center">
+  Template directory, import links, and full documentation have moved to<br/>
+  <a href="https://core-builds.mintlify.app/template-directory"><b>core-builds.mintlify.app</b></a>
+</p>
+
 # 🤝 Community Builds
 
 A curated collection of community-contributed AIOStreams templates and formatters. Each build is authored and maintained by its contributor — offering a different aesthetic, approach, or device target from the official Core Nexus suite.

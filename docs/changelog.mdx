@@ -7,13 +7,65 @@ Full history: [CHANGELOG.md](https://github.com/brevityA/Core-Builds/blob/main/C
 
 ---
 
-## v2.8.4 — 2026-06-17
+## v2.9.0 (patch) — 2026-06-19
 
 <Info>
   **Latest release.** If you already have a template imported, check AIOStreams for an in-app update notification.
 </Info>
 
-**Fixed: Cached Usenet missing priority signal — all 27 TorBox templates**
+**Fixed: Debrid timeout raised — 35 templates**
+
+`stremthruTorz` and `stremthruStore` timeout increased from 3000ms to 5000ms across all 35 active templates (excludes Flash and Speed EasyNews which were already at 3500ms+). AIOStreams v2.24.0 changed debrid timeout behaviour — timeouts now propagate as active Playback Errors to the client rather than failing silently. On Nuvio and similar clients, this surfaced as a visible error on every slow debrid link resolution. The 5000ms budget gives TorBox's link resolver enough headroom to handle congested periods without triggering the error.
+
+---
+
+**Fixed: Labs templates — metadata.inputs schema**
+
+AIOStreams renamed fields in the `metadata.inputs` schema — `key` → `id` and `label` → `name`. All 4 Labs templates were failing to load with 8 errors each. Fixed across 4K Apex Labs, Stream Labs, Essential Labs, and 4K Essential Labs.
+
+**Fixed: Nightly Samsung RU7100 4K — unique template ID**
+
+The Nightly Samsung RU7100 4K shared `id: brevity.core-nexus-samsung-tv-4k` with the stable Samsung TV 4K template. AIOStreams uses the ID for update tracking — the collision caused update notifications and version state to bleed between the two. Changed to `brevity.core-nexus-samsung-ru7100-4k`.
+
+---
+
+**Fixed: Regex compatibility — fortheweak whitelist**
+
+fortheweak's AIOStreams instance uses a stricter regex whitelist than elfhosted's. Eleven ranked and three excluded inline pattern entries were rejected on import. Removed from all 33 non-Anime templates:
+
+- **Ranked removed:** `Radarr Web T1`, `Sonarr Web T1`, `Radarr Bad Dual Groups`, `Sonarr Bad Dual Groups`, `hallowed`, `LQ (Radarr)`, `LQ (Radarr) [B]`, `LQ (Sonarr)`, `LQ (Sonarr) [B]`, `LQ (Release Title) (Radarr)`, `LQ (Release Title) (Sonarr)`
+- **Excluded removed:** LQ (Radarr) [B] large pattern, `iVy`-only, LQ (Sonarr) [B] large pattern
+- **Preferred removed (1080p):** `Radarr Web T1`, `Sonarr Web T1`, `hallowed`
+
+LQ streams remain excluded via Tamtaro's `syncedExcludedRegexUrls`. WEB-DL releases retain ranking via the generic `Web T1` tier. Release group scoring preserved through Remux, Bluray, Anime, and group-specific tiers.
+
+---
+
+## v2.8.9 — 2026-06-18
+
+**Fixed: Regex whitelist sync — all 39 active templates**
+
+Eight pattern strings had drifted from Vidhin05's current `English/regexes.json`. elfhosted checks exact string equality against Vidhin05's pattern values — any divergence causes "X/183 regexes not allowed" on import. Fixed: `Radarr Web T1`, `Sonarr Web T1`, `Radarr Bad Dual Groups`, `Sonarr Bad Dual Groups`, `LQ (Radarr) [B]`, `LQ (Sonarr) [B]`, `LQ (Release Title) (Radarr)`, `LQ (Release Title) (Sonarr)`. File extension excluded pattern removed (not in Vidhin05's whitelist).
+
+---
+
+## v2.8.8 — 2026-06-18
+
+**Fixed: Regex configuration reverted — all 33 non-Anime templates**
+
+v2.8.6 and v2.8.7 incorrectly stripped regex configuration based on a wrong assumption about elfhosted's blocking mechanism. elfhosted's whitelist includes all Radarr/Sonarr quality-guide patterns including lookahead syntax — these were never blocked by syntax, only by missing entries. Full `rankedRegexPatterns`, `preferredRegexPatterns`, and `excludedRegexPatterns` restored to verified working configuration.
+
+---
+
+## v2.8.5–v2.8.7 — 2026-06-18
+
+Intermediate regex investigation builds. Superseded by v2.8.8.
+
+---
+
+## v2.8.4 — 2026-06-17
+
+**Added: Boost Cached Usenet PSE — all 27 TorBox templates**
 
 Cached TorBox Usenet NZBs with Unknown quality metadata, or bitrates outside the IQR window, had no PSE match — sorted below cached debrid results that did have one. New final fallback PSE added to all templates:
 

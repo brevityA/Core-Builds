@@ -260,7 +260,7 @@
         "enabled": true,
         "options": {
           "name": "StremThru Torz",
-          "timeout": 3000,
+          "timeout": 5000,
           "includeP2P": false,
           "useMultipleInstances": false
         },
@@ -627,7 +627,6 @@
         "enabled": true
       }
     ],
-    "syncedRankedStreamExpressionUrls": [],
     "syncedExcludedStreamExpressionUrls": [],
     "syncedIncludedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
@@ -1519,9 +1518,7 @@
       "English",
       "Japanese"
     ],
-    "excludedRegexPatterns": [
-      "/\\.(iso|img|bin|dmg|pkg|r\\d{2}|zip|rar|7z|tar|gz|zipx|arj|txt|nfo|html|htm|torrent|jpg|png|pdf|epub|cbz|exe|bat|cmd|scr|msi|ps1|vbs|js|jar|com|pif|reg|dll|sys|lnk|url|uue|sfv|m2ts)$/i"
-    ],
+    "excludedRegexPatterns": [],
     "showChanges": true,
     "rankedRegexPatterns": []
   }

@@ -51,10 +51,10 @@ Vanilla AIOStreams with default settings returns raw, unsorted results. Core Bui
     Bitrate-based ranking using real statistics across all streams for a title — not hardcoded cutoffs. Adapts to thin libraries and new releases via the pow() decay window.
   </Card>
   <Card title="Core Builds Expression Layer" icon="filter">
-    Seven stream expressions deployed across all templates: REPACK passthrough, season pack gating, resolution kill, library boost, Usenet boost, cached-first sort, and format exclusions.
+    24 ESEs remove junk before ranking ever starts. 3 ISEs pin library, cached, and English streams to the top. IQR Tukey fence PSEs score everything else by bitrate percentile against real peers.
   </Card>
   <Card title="Release Group Scoring" icon="star">
-    149 release groups scored across 10 tiers (+100 to -200). Elite groups (FraMeSToR, FLUX, BHDStudio) surface above generic encodes automatically.
+    37 inline ranked patterns per template (score range −200 to +100) plus 174 additional patterns synced from Vidhin05's release database. Elite groups (FraMeSToR, FLUX, BHDStudio) surface above generic encodes automatically.
   </Card>
   <Card title="Device Profiles" icon="tv">
     Samsung TV, Apple TV, Fire Stick templates hard-exclude codecs and HDR formats the device can't play — no more silent playback failures from AV1 or DV on unsupported hardware.
@@ -75,7 +75,7 @@ Vanilla AIOStreams with default settings returns raw, unsorted results. Core Bui
 |---|---|---|---|
 | ESE | Remove — stream is excluded from results | 24 | 12 |
 | ISE | Boost — stream jumps to top regardless of score | 3 | 3 |
-| PSE | Rank — stream gets a quality score | 7–12 | 7–12 |
+| PSE | Rank — stream gets a quality score | varies by template | varies by template |
 
 ESEs run first, then ISEs, then PSEs. A stream matched by an ESE never reaches PSE scoring.
 

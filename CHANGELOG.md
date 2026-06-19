@@ -4,6 +4,81 @@
 
 ---
 
+## 2.9.0 (2026-06-19)
+
+### Fixed
+- **Regex compatibility — fortheweak whitelist** (`streams-nightly.fortheweak.cloud`). fortheweak's AIOStreams instance uses a stricter or different regex whitelist than elfhosted's. Eleven `rankedRegexPatterns` entries and 3 `excludedRegexPatterns` entries that pass elfhosted's Vidhin05-based check were still rejected on fortheweak. Removed from all 33 non-Anime templates:
+  - **Ranked removed:** `Radarr Web T1`, `Sonarr Web T1`, `Radarr Bad Dual Groups`, `Sonarr Bad Dual Groups`, `hallowed`, `LQ (Radarr)`, `LQ (Radarr) [B]`, `LQ (Sonarr)`, `LQ (Sonarr) [B]`, `LQ (Release Title) (Radarr)`, `LQ (Release Title) (Sonarr)`
+  - **Excluded removed:** LQ (Radarr) [B] large pattern, `iVy`-only pattern, LQ (Sonarr) [B] large pattern
+  - **Preferred removed (1080p templates):** `Radarr Web T1`, `Sonarr Web T1`, `hallowed`
+  - LQ streams remain excluded via Tamtaro's `syncedExcludedRegexUrls` and the remaining inline excluded entries. WEB-DL releases retain ranking via the generic `Web T1` ranked entry. Release group scoring is preserved through all other ranked tiers (Remux, Bluray, Anime variants, 126811/FLUX/SiC/TheFarm/BHDStudio).
+
+## 2.8.9 (2026-06-18)
+
+### Fixed
+- **Regex whitelist sync — all 39 active templates.** Our pattern strings had drifted from Vidhin05's current `English/regexes.json` (174 entries). elfhosted's allowlist check is exact string equality against Vidhin05's `pattern` field values; any divergence causes "X/183 regexes not allowed" on import. Eight unique pattern strings were stale:
+  - **`Radarr Web T1` / `Sonarr Web T1`** — missing `MADSKY` from the group lookahead list
+  - **`Radarr Bad Dual Groups`** — missing `CYPHER|EniaHD|MLH|XiQUEXiQUE`
+  - **`Sonarr Bad Dual Groups`** — missing `CYPHER|MLH|XiQUEXiQUE|EniaHD`
+  - **`LQ (Radarr) [B]` / `LQ (Sonarr) [B]`** — had `R&H` that Vidhin05's current pattern omits (R&H moved to LQ Release Title)
+  - **`LQ (Release Title) (Radarr)` / `LQ (Release Title) (Sonarr)`** — missing `R&H` (Vidhin05 moved it here)
+  - **File extension `excludedRegexPatterns` entry** — `/\.(iso|img|bin|...)$/i` is not in Vidhin05's whitelist; removed from all templates. Hard ISO/archive exclusion is not needed in practice (AIOStreams streams are always direct video links; scraper results for these types are extremely rare).
+  All pattern strings now exactly match Vidhin05's `English/regexes.json` v174 entries. Verified with automated comparison against the live file.
+
+## 2.8.8 (2026-06-18)
+
+### Fixed
+- **Regex configuration correction — all 33 active non-Anime templates.** v2.8.6 and v2.8.7 incorrectly stripped regex configuration based on a wrong assumption about elfhosted's blocking mechanism. elfhosted's "Allowed Regex Patterns" whitelist is large and includes all Radarr/Sonarr quality-guide patterns with lookahead syntax — these were never blocked by syntax, only by missing entries. Reverted all changes from those versions and aligned to verified working configuration:
+  - **`rankedRegexPatterns` restored** to full `{name, pattern, score}` entries — all 48 (4K) / 45 (1080p) entries with complete pattern content from Vidhin05/Radarr/Sonarr guide
+  - **`preferredRegexPatterns` restored** — 7 entries for 4K (Radarr/Sonarr Remux T1, Radarr UHD Bluray T1 + DON, Anime BD T1 + [sam], FraMeSToR); 8 entries for 1080p (Radarr/Sonarr/Web T1, 126811, FLUX, SiC, hallowed, BHDStudio)
+  - **`excludedRegexPatterns` restored to 12** — the 4 lookbehind patterns (Extras by year, Extras by season, Sing-Along, BR-DISK guard) reinstated; these are on elfhosted's whitelist
+  - **`syncedExcludedRegexUrls` restored** to Tamtaro's file
+  - **`[B]` variants retained** in `rankedRegexPatterns` — entries with full pattern fields are whitelisted by pattern content, not by name; `[B]` suffix does not cause rejection
+
+## 2.8.7 (2026-06-18)
+
+### Changed
+- **Complete `rankedRegexPatterns` override set — all 33 active non-Anime templates.**
+  Replaced the partial (36/39-entry) inline sets with comprehensive score-override sets
+  against all quality-relevant Vidhin05 pattern names. `syncedRankedRegexUrls` supplies
+  the pattern content (Vidhin05 at score 0); our entries override only the score.
+
+  **1080p templates — 48 overrides** (was 36):
+  - *New:* `Radarr Remux T3` (+40), `Radarr UHD/HD Bluray T3` (+40), `Web T1` / `Radarr Web T1` /
+    `Sonarr Web T1` (+60), `Radarr Web T3` / `Sonarr Web T3` (+20), `Repack/Proper` (+10), `Repack2` (+5),
+    `FraMeSToR` (+100) was present; `TheFarm` (+80), `Radarr/Sonarr Remux T2` (+60) added.
+
+  **4K templates — 53 overrides** (was 39):
+  - *New:* `Radarr Remux T1` (+100), `Sonarr Remux T1` (+100), `FraMeSToR` (+100),
+    `Radarr UHD Bluray T1` (+80), `Radarr/Sonarr Remux T2` (+60), `Radarr Remux T3` (+40),
+    `Radarr UHD/HD Bluray T3` (+40), `Radarr Web T3` / `Sonarr Web T3` (+20),
+    `Repack/Proper` (+10), `Repack2` (+5).
+  - These were previously left at Vidhin05's default score of 0.
+
+  All override names verified to exist in Vidhin05's 174-pattern file; no inline `pattern`
+  field on any entry — the synced URL provides all pattern content.
+
+## 2.8.6 (2026-06-18)
+
+### Fixed
+- **Final elfhosted regex allowlist fix — all 33 active templates (+ Nightly).** Two remaining sources of inline lookahead/lookbehind regex were the cause of the persistent "X/N regexes not allowed" error on import, surviving the v2.8.5 `preferredRegexPatterns`/`[B]`-variant cleanup:
+  - **`rankedRegexPatterns` pattern content stripped.** Each ranked entry carried the full Vidhin05 `pattern` field inline — 24 of 36 (1080p) / 24 of 39 (4K) patterns used `(?=...)`, `(?!...)`, `(?<=...)`, or `(?<!...)`, which elfhosted rejects in any regex field. Entries reduced to `{name, score}` score-override pairs only. **`syncedRankedRegexUrls` restored** to `https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json` — the synced URL now supplies the actual pattern content (at score 0) while our inline name+score entries override the ranking. This is the same approach Tamtaro's templates use successfully on elfhosted.
+  - **4 `excludedRegexPatterns` with lookbehind/lookahead removed** (`excludedRegexPatterns`: 12 → 8 per template): `/(?<=\b[12]\d{3}\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i`, `/(?<=\bS\d+\b).*\b(Extras|Bonus|Extended[ ._-]Clip)\b/i`, `/(?<=\b[12]\d{3}\b).*\b(Sing[-_. ]Along)\b/i`, and the negative-lookahead BR-DISK/non-Bluray guard. Coverage retained via `rankedRegexPatterns` scoring: Extras (Radarr/Sonarr) at −200, Sing-Along at −75, BR-DISK at −75.
+- After this change **no template carries any inline lookahead/lookbehind regex in any field** — verified across all 39 active templates. All affected templates bumped a patch version.
+
+---
+
+## 2.8.5 (2026-06-18)
+
+### Fixed
+- **`preferredRegexPatterns: []` — all 33 active templates** — The 7–8 Radarr/Sonarr quality-guide patterns in `preferredRegexPatterns` use lookahead syntax (`(?=...)`) that is blocked by elfhosted's regex allowlist, causing "X/N regexes not allowed" errors on save. Cleared to `[]` on all non-Anime active templates. The `rankedRegexPatterns` inline set retains full scoring for these release groups via its A-tier and B-tier entries.
+- **`[B]`-variant names removed from `rankedRegexPatterns` — all 33 active templates** — In v2.8.2, nine patterns with duplicate names were renamed with `[B]` suffixes (e.g. `"Radarr UHD Bluray T1 [B]"`). These names are not on elfhosted's allowlist (derived from Vidhin05's exact pattern names), causing a secondary "8/54 regexes not allowed" error even after `preferredRegexPatterns` was cleared. Removed all `[B]` variants: `Radarr UHD Bluray T1 [B]`, `Radarr HD Bluray T1 [B]`, `Sonarr HD Bluray T1 [B]`, `Anime BD T1 [B]`, `Anime BD T2 [B]`, `Anime Web T1 [B]`, `Generated Dynamic HDR [B]`, `LQ (Radarr) [B]`, `LQ (Sonarr) [B]`. Pattern counts: 4K templates 48 → 39, 1080p templates 45 → 36. Deprecated templates left unchanged.
+
+### Nightly
+- **Apex Labs v0.8.0 / Stream Labs v0.6.0** — `perGroup()` prototype ESEs: Extra Cached HQ, Extra Cached LQ, and Extra Uncached ESEs replaced with single-expression `perGroup(..., 'resolution', 3)` equivalents (old 20+15+35-clause merge/slice ESEs disabled for side-by-side comparison). Score IQR Guard ESE added (disabled — uses `values(streams, 'seScore')` IQR fence for adaptive low-score filtering). Indexer Diversity ESE added (disabled — `perGroup(..., 'indexer', 2)` caps per-scraper flooding). Both labs also receive Boost Cached Usenet PSE and full ESE parity with production (No Sootio Library, YouTube Kill, 3D Content Kill).
+
+---
+
 ## 2.8.4 (2026-06-17)
 
 ### Added

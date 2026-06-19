@@ -8,6 +8,11 @@
   </a>
 </p>
 
+<p align="center">
+  Template directory, import links, and full documentation have moved to<br/>
+  <a href="https://core-builds.mintlify.app/template-directory"><b>core-builds.mintlify.app</b></a>
+</p>
+
 # Core Formatters
 
 Custom stream display layouts for AIOStreams. Formatters control how every stream appears in Stremio and WuPlay — the title line, the metadata rows, cache status, audio tags, release group, and everything else you see when picking a stream.

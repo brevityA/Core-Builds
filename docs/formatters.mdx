@@ -1,6 +1,6 @@
 ---
 title: "Formatters"
-description: "Stream display layouts — how to install and customise them."
+description: "Stream display layouts — all 16 formatters with import URLs and comparisons."
 ---
 
 <Frame>
@@ -11,7 +11,7 @@ description: "Stream display layouts — how to install and customise them."
   />
 </Frame>
 
-Formatters control how streams are displayed in Stremio — the text shown for each result (title, quality, size, audio, etc.). All Core Builds templates ship with the **Core Syntax** formatter pre-loaded.
+Formatters control how streams are displayed in Stremio — the text shown for each result (title, quality, size, audio, cache status, etc.). All Core Builds templates ship with **Core Nexus Elite** pre-loaded.
 
 ## How to Import a Formatter
 
@@ -20,13 +20,13 @@ Formatters control how streams are displayed in Stremio — the text shown for e
     In AIOStreams, go to the **Formatter** tab.
   </Step>
   <Step title="Click Import">
-    Click the **Import** icon in the top right corner.
+    Click the **Import** icon in the top-right corner.
   </Step>
   <Step title="Paste the URL">
-    Copy the formatter URL below, paste it into the import dialog, and click **Load**.
+    Copy a formatter URL from below, paste it into the import dialog, and click **Load**.
   </Step>
   <Step title="Save">
-    Click **Save** to apply.
+    Click **Save** to apply. No Stremio reinstall needed.
   </Step>
 </Steps>
 
@@ -36,9 +36,34 @@ Formatters control how streams are displayed in Stremio — the text shown for e
 
 ---
 
-## Apex v2
+## Quick Comparison
 
-4K-focused layout. Visual tags (DV, HDR10+, Atmos) front and centre. Designed for the 4K Apex template but works with any.
+| Formatter | Style | Key feature |
+|---|---|---|
+| **Core Nexus Apex v2** ⭐ | Emoji circles | Score number, bitrate-first layout, per-language subtitle flags |
+| **Core Nexus Apex** | Emoji circles | Audio codec in name, two-tier score badge (ELITE / QUALITY) |
+| **Core Nexus Elite** | Emoji circles | 🟣/🔵/🟢/⚫ resolution circles · INSTANT/UNCACHED · PREMIER |
+| **Core Nexus Sigma** | `「 」` brackets | Title-first name, smallcaps, premium editorial feel |
+| **Core Nexus Minimal** | ⚡/⏳ indicator | 3-line description, TV/Apple TV optimised |
+| **Core Nexus TV** | UPPER CASE | 10-foot UI — 🔴/🔵/🟢 circles, projector and smart TV |
+| **Core Nexus Uniform** | Emoji circles | Legacy — replaced by Elite |
+| **Core Syntax** | `「 」` brackets | Original formatter, ✦/✧ cache indicator, ◈ ELITE badge |
+| **Core Syntax V3** | `「 」` brackets | JBL Spatial, ★ Premium badge, IMAX/edition flags |
+| **Omni Diamond v2.2.0** | Dense emoji | Two-line name, maximum metadata density |
+| **Core Zenith Diamond** | 🔹/🔸 dots | Encode + audio + PREMIER in name line |
+| **Core Zenith Auburn Tiger** | 🔸 orange | Warm orange/navy, 🐅 release prefix |
+| **Midnight Slate** | ASCII symbols | No emoji — for clients that render emoji poorly |
+| **Nexus Prime** | Emoji | SeaDex/BEST detection, 📅 age format, subtitle listing |
+| **RB3 Clean v4** | Bold unicode | Three-line name with bold resolution + italic quality source |
+| **RB3 Formatter** | 🔸/🔹 smallcaps | Auburn Tiger paired, JBL Spatial, PREMIER tagging |
+
+---
+
+## Official Formatters
+
+### Core Nexus Apex v2 ⭐ Recommended
+
+Score number in the name line (💎 ELITE ✦ 94 instead of a label), bitrate before visual tags in line 2, per-language subtitle flags (📝 🇬🇧 🇫🇷) replacing the binary SUB badge. Best pick for 4K Apex users.
 
 ```
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json
@@ -46,9 +71,19 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 
 ---
 
-## Elite
+### Core Nexus Apex
 
-Minimal and quality-first. Clean one-liner per stream with the essentials only.
+Adds audio codec to the name line, two-tier score badge (💎 ELITE ≥75 · ✦ QUALITY ≥50), and season pack flag before size.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-formatter.json
+```
+
+---
+
+### Core Nexus Elite (bundled in all templates)
+
+High-contrast. Colour-coded resolution circles (🟣 4K · 🔵 1080P · 🟢 720P · ⚫ 480P), HDR/DV in the name line, INSTANT/UNCACHED badge, PREMIER release group detection. Ships pre-loaded in every Core Builds template.
 
 ```
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json
@@ -56,12 +91,134 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 
 ---
 
-## Nexus Prime
+### Core Nexus Sigma
 
-Full detail — codec, HDR, audio, size, seeders, and stream expression match score. Best for power users who want to see everything.
+Typographic `「 」` / `『 』` bracket system. Title-first name line, smallcaps throughout — premium editorial feel for users who prefer a clean typographic layout over emoji.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-sigma-formatter.json
+```
+
+---
+
+### Core Nexus Minimal
+
+3-line description, ⚡/⏳ cache indicator in name, first audio codec only. Built for TV, Apple TV, and small screens where horizontal space is limited.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-minimal-formatter.json
+```
+
+---
+
+### Core Nexus TV
+
+10-foot UI optimised. UPPER CASE throughout (readable across the room), coloured resolution circles (🔴 4K · 🔵 1080P · 🟢 720P), 4-line description with clear section icons (🎬 video · 🔊 audio · 🔌 type/meta). Designed for projectors, smart TVs, and large-screen setups.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json
+```
+
+---
+
+### Core Nexus Uniform
+
+Legacy formatter — replaced by Core Nexus Elite. Kept for users who prefer the older layout.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-uniform-formatter.json
+```
+
+---
+
+### Core Syntax
+
+Original Core Builds formatter. `✦`/`✧` cache indicator in name, `「 」` bracket metadata system, ◈ ELITE score badge, full release group and edition tagging.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-formatter.json
+```
+
+---
+
+### Core Syntax V3
+
+Personal build variant with extra features: JBL Spatial audio detection (`🔊 JBL Sᴘᴀᴛɪᴀʟ` for DD+/EAC3), ★ Premium release group badge, IMAX/Hybrid/edition flags, indexer in release line.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-v3.json
+```
+
+---
+
+### Omni Diamond v2.2.0
+
+Maximum metadata density. Two-line name (visual tags on the second line), edition/network/remastered flags, JBL Spatial detection, full language + release group + indexer in description. Best for users who want to see everything at a glance.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/omni-diamond-v2.2.0.json
+```
+
+---
+
+### Core Zenith Diamond
+
+🔹/🔸 dot separator style. Info-dense name line with encode, audio, channels, and PREMIER flag. 4-line description with bitrate, seeders, video, language, and release group.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-diamond.json
+```
+
+---
+
+### Core Zenith Auburn Tiger Edition
+
+Auburn Tiger edition of Core Zenith Diamond. Orange 🟠 4K badge, 🐅 release line prefix, amber colour palette — designed to pair with the RB3 Auburn Tiger template.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-auburn-tiger-edition.json
+```
+
+---
+
+### Midnight Slate
+
+Dark minimal. `◼`/`⬤`/`▶`/`◆` ASCII symbols instead of emoji. Clean typographic lines — best for clients that render emoji poorly or for a no-clutter look.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/midnight-slate.json
+```
+
+---
+
+### Nexus Prime
+
+SeaDex/BEST detection, 📅 age format, subtitle emoji track listing, and folder size support. An early Core Builds formatter — similar layout to Uniform with additional metadata fields.
 
 ```
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json
+```
+
+---
+
+## Community Formatters
+
+### RB3 Clean v4
+
+Service-first layout by **RB3**. Three name lines — service + ⚡/⏳ cache status · bold unicode resolution (`𝟰𝗞 𝗨𝗛𝗗` · `𝟭𝟬𝟴𝟬𝗽`) · italic unicode source (`𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹`). Up to 6 structured `⁞`-separated description rows. Highest metadata density of any formatter.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-clean-v4-formatter.json
+```
+
+---
+
+### RB3 Formatter
+
+Original RB3 community formatter. Pairs with the Auburn Tiger template — orange/navy resolution badges, JBL Spatial audio detection, PREMIER release group tagging.
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-formatter.json
 ```
 
 ---
@@ -85,13 +242,14 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 | `stream.seMatched` | Name of the stream expression that matched |
 | `stream.nSeScore` | Normalised SEL score (0–1) |
 | `stream.nRegexScore` | Normalised regex score (0–1) |
+| `stream.dubbed` | Dubbed audio flag |
+| `stream.subbed` | Subtitles present |
+| `stream.uSubtitleEmojis` | Per-language subtitle flag emojis |
 
-## Customising a Formatter
+## Notes
 
-Formatters are JSON files. To customise:
-
-1. Download the formatter JSON from GitHub
-2. Edit the `name` and `description` template strings
-3. Re-import via the Formatter import button
-
-See the [Formatter Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/FORMATTER_GUIDE.md) in the repo for the full field and modifier reference.
+- Formatters are display-only — they don't affect which streams appear, filtering, or sorting
+- All formatters use `id: "tamtaro"` — this is the correct formatter type for AIOStreams
+- Score badges (ELITE / QUALITY) only appear when a stream has a ranked regex or stream expression score
+- `{tools.newLine}` must be used for line breaks in the description — literal newlines cause the formatter to be silently discarded on import
+- Compatible with AIOStreams v2.4.6+

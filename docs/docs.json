@@ -4,7 +4,8 @@
   "name": "Core Builds",
   "logo": {
     "light": "/logo/banner_square.png",
-    "dark": "/logo/banner_square.png"
+    "dark": "/logo/banner_square.png",
+    "height": 75
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
@@ -33,19 +34,39 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["introduction", "how-it-works", "which-template", "importing", "alldebrid-setup", "easynews-setup"]
+            "pages": [
+              "introduction",
+              "how-it-works",
+              "which-template",
+              "importing",
+              "alldebrid-setup",
+              "easynews-setup"
+            ]
           },
           {
             "group": "Templates",
-            "pages": ["template-directory", "community-templates"]
+            "pages": [
+              "template-directory",
+              "community-templates"
+            ]
           },
           {
             "group": "Reference",
-            "pages": ["expression-layer", "device-profiles", "formatters", "glossary", "nightly-and-labs"]
+            "pages": [
+              "expression-layer",
+              "device-profiles",
+              "formatters",
+              "glossary",
+              "nightly-and-labs"
+            ]
           },
           {
             "group": "Support",
-            "pages": ["troubleshooting", "changelog", "roadmap"]
+            "pages": [
+              "troubleshooting",
+              "changelog",
+              "roadmap"
+            ]
           }
         ]
       }

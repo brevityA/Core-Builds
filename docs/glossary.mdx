@@ -35,7 +35,7 @@ description: "Key terms used across Core Builds and AIOStreams."
     A file that has already been downloaded to a debrid service's servers. Clicking a cached stream starts playing instantly — no torrent download wait. Core Builds ISEs boost cached streams above uncached results.
   </Accordion>
   <Accordion title="Core Builds Expression Layer">
-    The set of seven Stream Expressions deployed in all active Core Builds templates. Covers: REPACK/PROPER passthrough, season pack gating, resolution kill, library boost, Usenet boost, cached-first sorting, and format exclusions. See [Expression Layer](/expression-layer).
+    The full set of Stream Expressions deployed in all active Core Builds templates: 24 ESEs (hard kills + quality gates), 3 ISEs (library / cached / language boosts), and the IQR Tukey fence PSEs. See [Expression Layer](/expression-layer).
   </Accordion>
 </AccordionGroup>
 
@@ -60,7 +60,7 @@ description: "Key terms used across Core Builds and AIOStreams."
     A filter that removes streams from results entirely. ESEs run before PSEs — anything matched by an ESE is gone before ranking starts. Examples: CAM kill, YouTube rip kill, 3D kill, low-resolution kill. Standard templates run 24 ESEs; Lite templates run 12 (hard kills only).
   </Accordion>
   <Accordion title="EasyNews">
-    A Usenet provider with a web-based search interface. Supported in AIOStreams as a scraper addon. Used in Speed+ and Speed EasyNews templates — no TorBox required for the standalone EasyNews template.
+    A Usenet provider with a web-based search interface. Supported in AIOStreams as a scraper addon. Used in Speed 4K+ and Speed EasyNews templates — no TorBox required for the standalone EasyNews template.
   </Accordion>
 </AccordionGroup>
 
@@ -68,7 +68,7 @@ description: "Key terms used across Core Builds and AIOStreams."
 
 <AccordionGroup>
   <Accordion title="Formatter">
-    Controls the text displayed for each stream in Stremio — the title line, metadata rows, codec, HDR tag, audio, file size, seeders, etc. Core Builds ships 14 formatters. The default is Core Syntax; others (Apex v2, Elite, Nexus Prime) can be swapped via the Formatter tab.
+    Controls the text displayed for each stream in Stremio — the title line, metadata rows, codec, HDR tag, audio, file size, seeders, etc. Core Builds ships 14 official formatters plus 2 community formatters. All templates default to Core Nexus Elite; others can be swapped via the Formatter tab. See [Formatters](/formatters).
   </Accordion>
 </AccordionGroup>
 
@@ -123,7 +123,7 @@ description: "Key terms used across Core Builds and AIOStreams."
 
 <AccordionGroup>
   <Accordion title="Release group">
-    The team that produced a release (e.g. FraMeSToR, FLUX, BHDStudio). Some groups are consistently high quality; others are known for bad encodes. Core Builds `rankedRegexPatterns` scores 149 release groups across 10 tiers (S/A/B tier down to blacklist).
+    The team that produced a release (e.g. FraMeSToR, FLUX, BHDStudio). Some groups are consistently high quality; others are known for bad encodes. Core Builds embeds 37 inline `rankedRegexPatterns` per template (score range −200 to +100), supplemented by Vidhin05's 174-pattern set via `syncedRankedRegexUrls`. Elite groups surface above generic encodes automatically.
   </Accordion>
   <Accordion title="REMUX">
     See BluRay REMUX.
@@ -151,7 +151,7 @@ description: "Key terms used across Core Builds and AIOStreams."
 
 <AccordionGroup>
   <Accordion title="Template">
-    A JSON configuration file that defines every aspect of an AIOStreams setup — addons, filters, sorting, formatter, deduplication, and branding. Core Builds provides 30+ templates for different services, resolutions, and devices.
+    A JSON configuration file that defines every aspect of an AIOStreams setup — addons, filters, sorting, formatter, deduplication, and branding. Core Builds provides 40+ templates for different services, resolutions, and devices.
   </Accordion>
   <Accordion title="TorBox">
     A debrid service with both torrent and Usenet support. Core Builds is primarily built for TorBox subscribers. Plans: Essential (basic cached-only) and Pro (full Usenet + uncached support).

@@ -68,17 +68,43 @@ Re-import the same URL. AIOStreams will load the latest version and merge it ove
   </Accordion>
 </AccordionGroup>
 
-## Hosted vs Self-Hosted
+## Choosing a Host
+
+<CardGroup cols={2}>
+  <Card title="elfhosted (paid private)" icon="server" href="https://store.elfhosted.com/product/aiostreams">
+    **$9/month** — dedicated instance, no rate limits, Torrentio enabled. Best for serious daily use.
+  </Card>
+  <Card title="fortheweak.cloud" icon="users" href="https://aiostreams.fortheweak.cloud">
+    **Free** — community-run by nhyyeb, stable and nightly builds. Core Builds verified against their allowlist. Best free option.
+  </Card>
+</CardGroup>
+
+<Tip>
+  Not sure? Start with **fortheweak** (free, no signup) to test your template. Upgrade to elfhosted private if you need Torrentio or want a dedicated instance with no shared load.
+</Tip>
+
+| | elfhosted private | fortheweak | elfhosted free | Self-hosted |
+|---|---|---|---|---|
+| Cost | $9/month | Free | Free | Free (server cost) |
+| Rate limits | None | Shared | Shared + Torrentio disabled | None |
+| Torrentio | Enabled | Enabled | Disabled | Enabled |
+| Core Builds verified | ✓ | ✓ | ✓ | ✓ |
+| Nightly builds | — | ✓ | — | ✓ |
+
+For the full list of public instances, see the [AIOStreams public instances page](https://docs.aiostreams.viren070.me/getting-started/public-instances/).
+
+### Regex and allowlists
+
+Hosted instances validate inline regex patterns against an allowlist. v2.9.0 templates are verified against both elfhosted and fortheweak allowlists — import errors from regex patterns indicate an outdated template.
 
 | | Hosted (elfhosted, fortheweak.cloud) | Self-hosted |
 |---|---|---|
-| Inline regex | Blocked unless trusted user | Works — set `REGEX_FILTER_ACCESS=all` |
-| Synced regex URLs | Blocked (GitHub raw URLs forbidden) | Works |
-| Performance | Shared resources | Dedicated |
+| Inline regex | Validated against host allowlist | Works — all patterns allowed |
+| Synced regex URLs | Whitelisted URLs only | All URLs allowed |
 
-<Warning>
-  If you see a "Forbidden URL" or "regex blocked" error on import, you're on a public instance that blocks raw GitHub URLs. Contact your host to add your UUID to `TRUSTED_UUIDS`, or self-host AIOStreams with `REGEX_FILTER_ACCESS=all`.
-</Warning>
+<Info>
+  As of v2.9.0, all Core Builds templates are verified against both elfhosted and fortheweak allowlists. If you see a "regex not allowed" error after importing, re-import the latest template version — older templates may contain pattern strings that predate the v2.9.0 allowlist sync.
+</Info>
 
 ## Stremio vs WuPlay
 

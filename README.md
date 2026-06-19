@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/github/actions/workflow/status/brevityA/Core-Builds/validate.yml?style=for-the-badge&label=BUILD&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://img.shields.io/badge/RELEASE-v2.8.3-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
+    <img src="https://img.shields.io/badge/RELEASE-v2.9.0-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
   </a>
 </p>
 
@@ -41,6 +41,11 @@
   <a href="https://torbox.app/subscription?referral=d1ccddb0-f094-45ca-b52b-942a2635855e">
     <img src="https://img.shields.io/badge/TorBox-Get_15_days_free_with_code_d1ccddb0-f97316?style=for-the-badge&logo=thunder&logoColor=white&labelColor=1a1f27" alt="TorBox Referral"/>
   </a>
+</p>
+
+<p align="center">
+  Template directory, import links, and full documentation have moved to<br/>
+  <a href="https://core-builds.mintlify.app/template-directory"><b>core-builds.mintlify.app</b></a>
 </p>
 
 > 🚀 **These templates are built for [TorBox](https://torbox.app/subscription?referral=d1ccddb0-f094-45ca-b52b-942a2635855e).** Use the referral link above and get **up to 84 extra days free** depending on the plan — and support this project.
