@@ -132,6 +132,28 @@ Any device with 2 GB RAM or less (older Fire Sticks, budget Android TV boxes, en
 
 ---
 
+## Streaming Clients
+
+### Nuvio
+
+[Nuvio](https://nuvio.app) is a Stremio-compatible streaming client (by Tapframe) available on Android, iOS, Apple TV, Android TV, and web. It works with all Stremio addons including AIOStreams — no configuration changes are needed.
+
+**One key difference from Stremio:** Nuvio surfaces debrid errors immediately rather than retrying silently. If a stream fails to resolve, you'll see a **Playback Error** message instead of a buffering spinner. This makes debrid timeouts visible — which is useful for diagnosing problems, but can appear alarming on the first encounter.
+
+<Info>
+  If you see Playback Error on Nuvio but the same stream works in Stremio, the most likely cause is a debrid link resolution timeout. Core Builds templates run `stremthruTorz`/`stremthruStore` at a 5000ms timeout (raised in v2.9.0) to reduce this. If errors persist, check TorBox's status page for outages or try a different stream from the list.
+</Info>
+
+### Stremio
+
+Standard setup — install AIOStreams as an add-on via manifest URL. Stremio auto-retries failed stream requests without surfacing the error to the user. Compatible on Windows, macOS, Linux, Android, iOS, and smart TVs with the Stremio app.
+
+### WuPlay
+
+Web-based streaming client. Use it for Chromecast or any device without a native Stremio app. Copy the manifest URL from AIOStreams → paste into WuPlay → stream directly in browser.
+
+---
+
 ## General Tips
 
 <AccordionGroup>
