@@ -1,0 +1,76 @@
+---
+title: "Instance Status"
+description: "Live status of all known public AIOStreams instances. Auto-checked every 6 hours."
+---
+
+<Warning>
+  **Green = host is reachable.** Does not guarantee the instance accepts new configs or that your template will import correctly. Always test with a fresh import after choosing a host.
+</Warning>
+
+## Stable Instances
+
+<!-- STATUS_STABLE_START -->
+| Instance | Status | URL |
+|---|---|---|
+| **ElfHosted** | 🟢 Online | [aiostreams.elfhosted.com](https://aiostreams.elfhosted.com/stremio/configure) |
+| **Yeb's** | 🟢 Online | [aiostreams.fortheweak.cloud](https://aiostreams.fortheweak.cloud/stremio/configure) |
+| **Midnight's** | 🟢 Online | [aiostreamsfortheweebsstable.midnightignite.me](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure) |
+| **Kuu's** | 🟢 Online | [aiostreams.stremio.ru](https://aiostreams.stremio.ru/stremio/configure) |
+| **ATBP** | 🟢 Online | [aio.atbphosting.com](https://aio.atbphosting.com/stremio/configure) |
+| **Omni's** | 🟢 Online | [aiostreams.12312023.xyz](https://aiostreams.12312023.xyz/stremio/configure) |
+
+*Last checked: 2026-06-19 13:07 UTC*
+<!-- STATUS_STABLE_END -->
+
+---
+
+## Nightly Instances
+
+<Note>
+  Nightly instances run the latest AIOStreams development build. Features may be incomplete or unstable. Use for Labs templates only.
+</Note>
+
+<!-- STATUS_NIGHTLY_START -->
+| Instance | Status | URL |
+|---|---|---|
+| **Yeb's Nightly** | 🟢 Online | [aiostreams-nightly.fortheweak.cloud](https://aiostreams-nightly.fortheweak.cloud/stremio/configure) |
+| **Midnight's Nightly** | 🟢 Online | [aiostreamsfortheweebs.midnightignite.me](https://aiostreamsfortheweebs.midnightignite.me/stremio/configure) |
+| **Kuu's Nightly** | 🟢 Online | [aiostreams-nightly.stremio.ru](https://aiostreams-nightly.stremio.ru/stremio/configure) |
+| **Viren's Nightly** | 🟢 Online | [aiostreams.viren070.me](https://aiostreams.viren070.me/stremio/configure) |
+
+*Last checked: 2026-06-19 13:07 UTC*
+<!-- STATUS_NIGHTLY_END -->
+
+---
+
+## Instance Notes
+
+<AccordionGroup>
+  <Accordion title="ElfHosted">
+    Most stable public option. Public instance is debrid-only — no P2P or HTTP streams, which suits Core Builds perfectly. Paid private plan available at store.elfhosted.com/product/aiostreams (~$9/month) with no rate limits.
+  </Accordion>
+  <Accordion title="Yeb's (fortheweak)">
+    Run by an AIOStreams Discord admin. Reliable uptime, fast. Uses a stricter regex whitelist than ElfHosted — as of v2.9.0 all Core Builds templates are verified against it.
+  </Accordion>
+  <Accordion title="Midnight's">
+    Run by the TorBox community manager. Optimised for TorBox setups. ⚠️ Currently running **Meteor Rewrite V2 Beta** — Your Media is not yet available. You may need to reconfigure your manifest after importing.
+  </Accordion>
+  <Accordion title="Viren's Nightly">
+    The AIOStreams developer's own instance. Nightly only — tracks the main branch directly. Most up-to-date features but least stable.
+  </Accordion>
+  <Accordion title="Kuu's">
+    Community-run. Both stable and nightly available.
+  </Accordion>
+  <Accordion title="ATBP">
+    Community-run. Good uptime track record.
+  </Accordion>
+  <Accordion title="Omni's">
+    Community-run.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Missing an Instance?
+
+If you run a public AIOStreams instance and want it listed here, [open an issue](https://github.com/brevityA/Core-Builds/issues/new?title=Add+Instance:+&labels=instance) with the URL and it will be added to the status checker.

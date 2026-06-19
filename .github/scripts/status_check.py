@@ -40,15 +40,7 @@ def build_table(instances):
     return "\n".join(lines)
 
 
-def update_status_md(path="STATUS.md"):
-    ts = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-
-    print("\nChecking stable instances...")
-    stable_table = build_table(STABLE) + f"\n\n*Last checked: {ts}*"
-
-    print("\nChecking nightly instances...")
-    nightly_table = build_table(NIGHTLY) + f"\n\n*Last checked: {ts}*"
-
+def update_file(path, stable_table, nightly_table):
     with open(path, "r") as f:
         content = f.read()
 
@@ -66,7 +58,27 @@ def update_status_md(path="STATUS.md"):
     with open(path, "w") as f:
         f.write(content)
 
-    print(f"\n✓ STATUS.md updated at {ts}")
+    print(f"✓ {path} updated")
+
+
+def update_status_md(path="STATUS.md"):
+    ts = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+
+    print("\nChecking stable instances...")
+    stable_table = build_table(STABLE) + f"\n\n*Last checked: {ts}*"
+
+    print("\nChecking nightly instances...")
+    nightly_table = build_table(NIGHTLY) + f"\n\n*Last checked: {ts}*"
+
+    update_file(path, stable_table, nightly_table)
+
+    docs_path = "docs/instance-status.mdx"
+    try:
+        update_file(docs_path, stable_table, nightly_table)
+    except FileNotFoundError:
+        print(f"  (skipped {docs_path} — not found)")
+
+    print(f"\nDone at {ts}")
 
 
 if __name__ == "__main__":
