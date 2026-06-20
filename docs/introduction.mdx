@@ -66,7 +66,7 @@ mode: "wide"
 
 <div style={{ maxWidth: '680px', margin: '0 auto', padding: '0 24px 72px' }}>
 
-  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', marginBottom: '16px' }}>GET STARTED</p>
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', marginBottom: '16px' }}>GETTING STARTED</p>
 
   <CardGroup cols={2}>
     <Card title="Which Template?" icon="map" href="/which-template" color="#3B82F6">
@@ -75,17 +75,71 @@ mode: "wide"
     <Card title="Import a Template" icon="download" href="/importing">
       Step-by-step first-run guide — API keys, TMDB token, Stremio install.
     </Card>
+    <Card title="Complete Guide" icon="book-open" href="/master-guide">
+      Stremio vs WuPlay, advanced editing, resetting, search criteria, catalogs, and TMDB setup.
+    </Card>
     <Card title="How It Works" icon="gear" href="/how-it-works">
       Bitrate filtering, PSE/ESE architecture, and addon stack explained.
     </Card>
+    <Card title="Instance Status" icon="signal" href="/instance-status">
+      Live status of ElfHosted and Fortheweak AIOStreams instances.
+    </Card>
+    <Card title="AllDebrid Setup" icon="bolt" href="/alldebrid-setup">
+      Configure AIOStreams with your AllDebrid API key.
+    </Card>
+    <Card title="EasyNews Setup" icon="newspaper" href="/easynews-setup">
+      Add EasyNews credentials and enable Usenet streams.
+    </Card>
+    <Card title="Regional Content" icon="globe" href="/regional-content">
+      Get regional and non-English content in Stremio's Discover section.
+    </Card>
+  </CardGroup>
+
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>TEMPLATES</p>
+
+  <CardGroup cols={2}>
     <Card title="Template Directory" icon="list" href="/template-directory">
       Every template with one-click import buttons and raw URLs.
     </Card>
+    <Card title="Community Templates" icon="users" href="/community-templates">
+      User-contributed templates from the Core Builds community.
+    </Card>
+  </CardGroup>
+
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>REFERENCE</p>
+
+  <CardGroup cols={2}>
     <Card title="Expression Layer" icon="code" href="/expression-layer">
       IQR PSEs, flood guards, and the full SEL function reference.
     </Card>
+    <Card title="Device Profiles" icon="mobile" href="/device-profiles">
+      Samsung, Fire Stick, Apple TV codec and HDR compatibility.
+    </Card>
+    <Card title="Formatters" icon="paintbrush" href="/formatters">
+      Stream display layouts — import and customise formatter templates.
+    </Card>
+    <Card title="Glossary" icon="book" href="/glossary">
+      PSE, ESE, ISE, IQR, SEL and every other term defined.
+    </Card>
+    <Card title="Nightly & Labs" icon="flask" href="/nightly-and-labs">
+      Pre-release templates with experimental features and new PSE patterns.
+    </Card>
+    <Card title="Addon Reference" icon="plug" href="/addon-reference">
+      Resource definitions for every addon preset — catalog bleed prevention.
+    </Card>
+  </CardGroup>
+
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>SUPPORT</p>
+
+  <CardGroup cols={2}>
     <Card title="Troubleshooting" icon="wrench" href="/troubleshooting">
       Common problems, regex errors, and import failures.
+    </Card>
+    <Card title="Changelog" icon="clock-rotate-left" href="/changelog">
+      Full version history — what changed, what was fixed.
+    </Card>
+    <Card title="Roadmap" icon="flag" href="/roadmap">
+      Planned features, upcoming templates, and known limitations.
     </Card>
   </CardGroup>
 

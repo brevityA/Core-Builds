@@ -36,12 +36,14 @@
             "group": "Getting Started",
             "pages": [
               "introduction",
+              "master-guide",
               "how-it-works",
               "which-template",
               "importing",
               "instance-status",
               "alldebrid-setup",
-              "easynews-setup"
+              "easynews-setup",
+              "regional-content"
             ]
           },
           {
@@ -58,7 +60,8 @@
               "device-profiles",
               "formatters",
               "glossary",
-              "nightly-and-labs"
+              "nightly-and-labs",
+              "addon-reference"
             ]
           },
           {
