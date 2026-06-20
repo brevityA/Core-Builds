@@ -90,25 +90,25 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 
 ---
 
-## Active Template Inventory (as of v2.9.2)
+## Active Template Inventory (as of v2.9.3)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.4.12 — flagship 4K, IQR PSEs, pow() decay
 - `Single/core-nexus-4k-apex-torbox.json` v2.9.1 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.9.1 — 1080p streaming quality
+- `Single/core-nexus-stream.json` v2.9.2 — 1080p streaming quality
 - `Single/core-nexus-stream-lite.json` v2.9.1 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.9.1 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick.json` v2.9.2 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.9.1
 
 ### Essential (TorBox Essential)
 - `Essential/core-nexus-4k-essential.json` v2.9.1 — 4K with IQR PSEs, pow() decay
 - `Essential/core-nexus-4k-essential-lite.json` v2.9.1 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.9.1 — 1080p
+- `Essential/core-nexus-essential.json` v2.9.2 — 1080p
 - `Essential/core-nexus-essential-lite.json` v2.9.1
 
 ### Flash
 - `Flash/core-nexus-flash-4k.json` v2.9.1 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.9.1 — cached-only 1080p instant play
+- `Flash/core-nexus-flash.json` v2.9.2 — cached-only 1080p instant play
 
 ### Speed (TorBox)
 - `Speed/TorBox/core-nexus-speed-4k.json` v2.9.1 — fast cached 4K
@@ -118,36 +118,36 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 
 ### Speed (EasyNews)
 - `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.9.1 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.1 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.2 — EasyNews 1080p
 
 ### AllDebrid
 - `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.9 — 4K with IQR PSEs
 - `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.7 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.8 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.8 — 1080p lite
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.9 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.9 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.9.1 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
-- `Hybrid/core-nexus-hybrid.json` v2.9.1 — 1080p hybrid, NZBGeek preset
+- `Hybrid/core-nexus-4k-hybrid.json` v2.9.2 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
+- `Hybrid/core-nexus-hybrid.json` v2.9.2 — 1080p hybrid, NZBGeek preset
 - `Hybrid/core-nexus-hybrid-lite.json` v2.9.1 — NZBGeek preset
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.10 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.10 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.11 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.11 — 4K, DV-Only Kill on, AV1/VC-1 excluded
 
 ### Anime
-- `Anime/core-nexus-anime-4k.json` v2.8.4 — 4K anime, SeaDex + AnimeTosho
+- `Anime/core-nexus-anime-4k.json` v2.8.5 — 4K anime, SeaDex + AnimeTosho
 - `Anime/core-nexus-anime-4k-lite.json` v2.8.4
-- `Anime/core-nexus-anime.json` v2.8.4 — 1080p anime
+- `Anime/core-nexus-anime.json` v2.8.5 — 1080p anime
 - `Anime/core-nexus-anime-lite.json` v2.8.4
-- `Anime/core-nexus-anime-dub.json` v2.8.4 — dubbed variant
+- `Anime/core-nexus-anime-dub.json` v2.8.5 — dubbed variant
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.4
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.6 — DV Profile 5/8, AV1 excluded
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.7 — DV Profile 5/8, AV1 excluded
 - `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.6 — Essential 4K experimental
 - `Nightly/Essential/core-nexus-essential-labs.json` v0.1.6 — Essential 1080p experimental
-- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.11 — Samsung 4K nightly (RU7100)
+- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.12 — Samsung 4K nightly (RU7100)
 - `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.5 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
 - `Nightly/Single/core-nexus-stream-labs.json` v0.6.5 — perGroup() prototypes, dynamicAddonFetching
 
