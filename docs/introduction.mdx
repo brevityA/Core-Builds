@@ -51,7 +51,7 @@ mode: "wide"
       <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>TEMPLATES</div>
     </div>
     <div style={{ flex: 1, textAlign: 'center', padding: '20px 0' }}>
-      <div style={{ fontSize: '22px', fontWeight: '800', color: '#60a5fa' }}><a href="/changelog" style={{ color: 'inherit', textDecoration: 'none' }}>v2.9.3</a></div>
+      <div style={{ fontSize: '22px', fontWeight: '800', color: '#60a5fa' }}><a href="/changelog" style={{ color: 'inherit', textDecoration: 'none' }}>v2.9.4</a></div>
       <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>LATEST — <a href="/changelog" style={{ color: '#475569', fontSize: '9px', textDecoration: 'none', letterSpacing: '1px' }}>CHANGELOG ↗</a></div>
     </div>
   </div>
@@ -69,7 +69,10 @@ mode: "wide"
   <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', marginBottom: '16px' }}>GETTING STARTED</p>
 
   <CardGroup cols={2}>
-    <Card title="Which Template?" icon="map" href="/which-template" color="#3B82F6">
+    <Card title="Quick Start" icon="rocket" href="/quick-start" color="#3B82F6">
+      Up and running in five steps — no prior experience needed.
+    </Card>
+    <Card title="Which Template?" icon="map" href="/which-template">
       Find the right template for your setup in 30 seconds.
     </Card>
     <Card title="Import a Template" icon="download" href="/importing">
@@ -78,17 +81,14 @@ mode: "wide"
     <Card title="Complete Guide" icon="book-open" href="/master-guide">
       Stremio vs WuPlay, advanced editing, resetting, search criteria, catalogs, and TMDB setup.
     </Card>
-    <Card title="How It Works" icon="gear" href="/how-it-works">
-      Bitrate filtering, PSE/ESE architecture, and addon stack explained.
+    <Card title="Lite vs Standard" icon="sliders" href="/lite-vs-standard">
+      Which variant is right for you — what each Lite template removes and when that matters.
+    </Card>
+    <Card title="Debrid Comparison" icon="scale-balanced" href="/debrid-comparison">
+      TorBox vs AllDebrid vs Real-Debrid vs EasyNews — what each service unlocks.
     </Card>
     <Card title="Instance Status" icon="signal" href="/instance-status">
       Live status of ElfHosted and Fortheweak AIOStreams instances.
-    </Card>
-    <Card title="AllDebrid Setup" icon="bolt" href="/alldebrid-setup">
-      Configure AIOStreams with your AllDebrid API key.
-    </Card>
-    <Card title="EasyNews Setup" icon="newspaper" href="/easynews-setup">
-      Add EasyNews credentials and enable Usenet streams.
     </Card>
     <Card title="Regional Content" icon="globe" href="/regional-content">
       Get regional and non-English content in Stremio's Discover section.
@@ -109,6 +109,12 @@ mode: "wide"
   <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>REFERENCE</p>
 
   <CardGroup cols={2}>
+    <Card title="Formatter Gallery" icon="image" href="/formatter-gallery">
+      Side-by-side previews of all 16 formatters with import links.
+    </Card>
+    <Card title="Which Formatter?" icon="paintbrush" href="/which-formatter">
+      Pick the right layout for your screen size and info preferences.
+    </Card>
     <Card title="Expression Layer" icon="code" href="/expression-layer">
       IQR PSEs, flood guards, and the full SEL function reference.
     </Card>
@@ -132,6 +138,12 @@ mode: "wide"
   <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>SUPPORT</p>
 
   <CardGroup cols={2}>
+    <Card title="What's New" icon="sparkles" href="/whats-new">
+      Plain-English release highlights — no JSON field names, no PR numbers.
+    </Card>
+    <Card title="FAQ" icon="circle-question" href="/faq">
+      Answers to the most common setup questions and stream problems.
+    </Card>
     <Card title="Troubleshooting" icon="wrench" href="/troubleshooting">
       Common problems, regex errors, and import failures.
     </Card>

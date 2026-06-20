@@ -1,0 +1,65 @@
+---
+title: "Which Formatter?"
+sidebarTitle: "Which Formatter?"
+description: "Find the right stream display layout for your setup in 30 seconds."
+---
+
+Formatters control how stream cards look — the title line, metadata rows, cache badge, audio tags, and release group. They're completely separate from your template: swap one any time without reimporting or changing any filtering logic.
+
+## Quick Decision Table
+
+| My setup | Best formatter |
+|---|---|
+| Smart TV or projector (10-foot UI) | Core Nexus TV |
+| Apple TV / Infuse / small screen | Core Nexus Minimal |
+| I want score numbers visible | Core Nexus Apex v2 ⭐ |
+| I want the default — just works | Core Nexus Elite (bundled) |
+| I want clean typographic style | Core Nexus Sigma |
+| I want maximum metadata density | Omni Diamond v2.2.0 |
+| My client renders emoji poorly | Midnight Slate |
+| I watch a lot of anime (SeaDex) | Nexus Prime |
+| I want audio codec in the name line | Core Nexus Apex |
+| I don't want to decide | Core Nexus Apex v2 ⭐ |
+
+---
+
+## What each formatter emphasises
+
+### Score-focused — Apex v2, Nexus Prime
+
+Shows a numeric score or tier badge (💎 ELITE · ✦ QUALITY) prominently in the title line so you can see at a glance which stream the template ranked highest. Apex v2 adds a score number alongside the badge; Nexus Prime includes SeaDex detection and an age format for anime. Best when you care about which result is actually ranked first and want that confirmed visually.
+
+### Resolution-focused — Elite, Core Nexus TV, Core Nexus Uniform
+
+Colour-coded resolution circles (🟣/🔴 4K · 🔵 1080P · 🟢 720P) or UPPER CASE labels that are readable from across the room. Core Nexus TV is tuned for the 10-foot distance — everything uppercase, large section icons (🎬 🔊 🔌), no smallcaps. Core Nexus Elite ships bundled in every template and is the safe default if you're not sure.
+
+### Typographic — Sigma, Core Syntax, Core Syntax V3
+
+`「 」` and `『 』` bracket systems, smallcaps throughout, clean editorial feel. No trade-off in information — the same metadata fields are present, just presented without heavy emoji. Core Syntax V3 adds JBL Spatial audio detection and IMAX/Hybrid edition flags for users who want those surfaced.
+
+### Density-focused — Omni Diamond v2.2.0, RB3 Clean v4
+
+Maximum fields shown, sometimes across two name lines or six description rows. Edition and network flags, full language track listings, indexer, release group, and bitrate all visible without opening a stream. Best for power users who want every detail at a glance.
+
+### Minimal — Core Nexus Minimal, Midnight Slate
+
+Fewer lines, first audio codec only, no emoji (Midnight Slate uses `◼ ⬤ ▶ ◆` ASCII shapes instead). For Apple TV, Infuse, small screens, clients that wrap long descriptions, or emoji-unfriendly UIs. Midnight Slate is also the right pick if your client substitutes coloured blocks for emoji.
+
+---
+
+## How to import a formatter
+
+1. Go to the [Formatter Gallery](/formatter-gallery) and copy the raw URL for your chosen formatter.
+2. Open your AIOStreams dashboard and go to the **Formatter** section.
+3. Click the **Import** icon (download arrow), paste the URL, and click **Load**.
+4. Click **Save** — then reinstall the AIOStreams manifest in Stremio.
+
+<Note>
+  Formatters are applied through the Formatter tab, not through the Load Template flow. The manifest reinstall is required because Stremio caches stream card layouts — skipping it means you'll see the old formatter until the cache expires.
+</Note>
+
+---
+
+<Card title="Formatter Gallery" icon="image" href="/formatter-gallery">
+  Browse all 16 formatters with visual previews and one-click import links.
+</Card>

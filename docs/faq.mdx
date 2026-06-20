@@ -1,0 +1,141 @@
+---
+title: "FAQ"
+sidebarTitle: "FAQ"
+description: "Quick answers to the most common Core Builds questions."
+---
+
+## Getting Started
+
+<AccordionGroup>
+  <Accordion title='"Every group must have at least one addon" error on import'>
+    You are importing an outdated template. This error appeared in versions before v2.4.6 where a removed addon was still referenced in the groups config. **Re-import** using the latest raw URL from the [Import Guide](/importing).
+  </Accordion>
+
+  <Accordion title='"Template has X regex patterns that are not trusted"'>
+    Safe to ignore — click **Import Anyway**. This warning means a regex pattern is not on your instance's whitelist. The pattern is still applied and no functionality is lost. It does not affect stream quality or filtering.
+  </Accordion>
+
+  <Accordion title='"Failed to parse JSON" when importing a formatter'>
+    You copied the formatter text from the GitHub rendered file view. GitHub adds hidden characters to rendered files that break the JSON parser. Always import from the **raw URL** — links are in the [Formatters guide](/formatters). Do not copy-paste from the GitHub page.
+  </Accordion>
+
+  <Accordion title='"Invalid input → at metadata.changelog" error on import'>
+    You are importing an older template that uses a string value for the `changelog` field. The AIOStreams schema now requires a structured object. **Re-import** the latest version of your template using the current raw URL.
+  </Accordion>
+
+  <Accordion title="Services reset to off after re-importing">
+    This is expected behaviour. Re-importing a template resets all service toggles to the template defaults. Your API keys are preserved — **re-enable your services** in the Services tab after every import.
+  </Accordion>
+
+  <Accordion title='"Failed to import template: HTTP error! status: 404"'>
+    The URL does not point to a real file. Confirm the URL uses `brevityA/Core-Builds` (not `Branding-Brevity`) and that folder and file names match exactly — they are case-sensitive. The correct raw URL format is `https://raw.githubusercontent.com/brevityA/Core-Builds/main/Templates/Torbox/Single/core-nexus-stream.json`.
+  </Accordion>
+</AccordionGroup>
+
+## No Streams
+
+<AccordionGroup>
+  <Accordion title="Zero results after importing for the first time">
+    Most likely your services are not enabled. TorBox is pre-toggled on in all templates but still requires your API key. Go to the **Services** tab, enter your TorBox API key, and save. If you still get nothing, test with a popular recent film before assuming the template is broken — try a major release from the last 12 months.
+  </Accordion>
+
+  <Accordion title="Zero results after re-importing a template">
+    Re-importing resets service toggles to template defaults. Your API keys are preserved but services are switched off. **Re-enable your services** in the Services tab and confirm your API key is still shown, then save.
+  </Accordion>
+
+  <Accordion title="Only a handful of streams for older TV shows">
+    Normal for older content. Classic TV episodes under 512 MB and older encodes often have unrecognised audio or encode tags that trip size and quality filters. Templates from v2.4.6 onwards lower size minimums and add `Unknown` fallbacks. For niche or foreign content with low seeders, consider a [Speed+](/master-guide) or [Hybrid](/master-guide) template that adds Usenet coverage.
+  </Accordion>
+
+  <Accordion title="Very few results on any content — even popular films">
+    Check that MediaFusion and HdHub are enabled in the **Addons** tab. Both are toggled off by default in some template variants. Enabling them significantly increases stream pool size, especially for non-cached content. Also confirm your TorBox subscription tier matches the template — Essential templates are tuned for TorBox Essential accounts.
+  </Accordion>
+
+  <Accordion title="NZBGeek returns nothing (Hybrid template only)">
+    The NZBGeek API key placeholder has not been replaced. Go to **Addons**, find NZBGeek, tap the settings icon, and replace the placeholder with your actual API key from [nzbgeek.info](https://nzbgeek.info) under Account → API Key. Save to apply.
+  </Accordion>
+</AccordionGroup>
+
+## Streams Won't Play
+
+<AccordionGroup>
+  <Accordion title="Clicking a stream opens the AIOStreams GitHub page">
+    This is an informational card, not a broken link. AIOStreams injects these cards when it has no real streams to return — Stremio requires every entry to be clickable, so they link to GitHub. It means no actual streams were found for that title. See the [No Streams](/troubleshooting#no-streams) section for how to diagnose the cause.
+  </Accordion>
+
+  <Accordion title="YouTube trailers are appearing in my stream list">
+    Fixed in v2.4.6. Three layers now block YouTube content: the Hard YouTube Kill ESE catches type, external, source, and quality field variants; `excludedStreamSources` covers all case variants; `excludedStreamTypes` includes youtube. **Re-import** the latest template to get these fixes.
+  </Accordion>
+
+  <Accordion title="The wrong episode is playing">
+    Fixed in v2.4.6. Two ESEs were added: `Kill Ambiguous Season Packs` blocks streams with only season info and no episode reference, and `Kill Season Packs When Episode Streams Exist` blocks full packs when individual episode streams are available. **Re-import** the latest template.
+  </Accordion>
+
+  <Accordion title="Stream plays for a few seconds then stutters or stops">
+    You are playing an uncached stream. Look for a `[cached]` badge in the stream card — only cached streams play reliably without buffering. Uncached content downloads in real time and depends on seeder count. REMUX files (50–80 GB) also require a fast connection to the debrid server; try a HEVC or WEB-DL stream instead if REMUX stutters.
+  </Accordion>
+</AccordionGroup>
+
+## After Re-importing
+
+<AccordionGroup>
+  <Accordion title="My manifest URL changed and the old Stremio addon stopped working">
+    Any re-import that changes the config structure generates a new manifest URL. The old URL in Stremio will return no results. **Uninstall** the old AIOStreams addon from Stremio → Addons, copy the new manifest URL from your AIOStreams dashboard, and reinstall. On WuPlay, remove the old URL from Add-ons and paste the new one.
+  </Accordion>
+
+  <Accordion title="My TMDB API key was reset after re-importing">
+    Expected behaviour. TMDB and other credential fields reset on every import. **Re-enter your TMDB key** in the Metadata section after each import and save before installing the manifest.
+  </Accordion>
+
+  <Accordion title="My catalog tabs disappeared after re-importing">
+    Catalog tabs are tied to the manifest. After a re-import that changes the manifest URL, re-add any catalog sources and reinstall the manifest in Stremio. If you did a soft re-import (URL unchanged), a full Stremio restart should restore the tabs.
+  </Accordion>
+
+  <Accordion title="Old streams still showing after saving a new config">
+    Stremio cached the old manifest. Go to **Addons**, find AIOStreams, and tap **Uninstall**. Copy the manifest URL from your AIOStreams dashboard, paste it into Stremio's addon search bar or tap Install from the dashboard, then restart Stremio.
+  </Accordion>
+</AccordionGroup>
+
+## Real-Debrid
+
+<AccordionGroup>
+  <Accordion title='"File removed due to copyright infringement" errors'>
+    This is Real-Debrid's server-side enforcement, not a template issue. RD began filtering certain cached files in May 2026 based on filename keywords. All Core Builds templates include `hideErrors: true`, which suppresses these error cards so they do not appear in your stream list. Nothing can be done about the underlying RD filter.
+  </Accordion>
+
+  <Accordion title="Fewer RD streams than before May 2026">
+    Expected. RD's server-side filter blocks many WEB-DL and streaming-platform rips that were previously cached. TorBox covers the gap for most content — if you are on a Hybrid template, TorBox streams are prioritised over RD equivalents when both are available. See the [Master Guide](/master-guide) for template recommendations.
+  </Accordion>
+
+  <Accordion title="Should I use WuPlay or Stremio with Real-Debrid?">
+    WuPlay handles RD streams more reliably. The RD filter impact is less visible on WuPlay because it processes the stream URL differently. The [Master Guide](/master-guide) covers the full WuPlay vs Stremio comparison including setup steps for each.
+  </Accordion>
+</AccordionGroup>
+
+## Formatters
+
+<AccordionGroup>
+  <Accordion title="The formatter is not showing after import">
+    After importing a formatter, click **Save** and then fully refresh your client. Stremio and WuPlay both cache stream card layouts and will not display a new formatter until the addon manifest is refreshed. If refreshing does not help, uninstall and reinstall the AIOStreams addon, then check that the formatter was imported to the correct Formatter section (not the Template section).
+  </Accordion>
+
+  <Accordion title="Stream cards look identical before and after switching formatter">
+    The formatter controls the `name` and `description` fields of each stream card. If cards look unchanged, confirm the formatter JSON imported without a parse error and that you clicked **Save** after importing. Also verify the formatter was loaded into the right section — importing a formatter URL into the Template import field will fail silently.
+  </Accordion>
+</AccordionGroup>
+
+## Platform & Devices
+
+<AccordionGroup>
+  <Accordion title="Statistics or scrape summary cards are showing in my stream list">
+    `statistics.enabled` was set to `true` in older template versions. This was fixed in v2.4.6. **Re-import** the latest template to disable the scrape summary display.
+  </Accordion>
+
+  <Accordion title="Features work in WuPlay but not in Stremio (or vice versa)">
+    WuPlay and Stremio handle stream types differently. YouTube and external-type streams are suppressed more reliably in WuPlay. The Hard YouTube Kill ESE catches most of these in both clients, but some edge cases still slip through in Stremio. The [Master Guide](/master-guide) covers the full behaviour differences and per-platform recommendations.
+  </Accordion>
+
+  <Accordion title="Samsung TV template not working — streams fail to play">
+    Samsung TV templates disable TrueHD, DTS-HD MA, DTS:X, and FLAC audio tracks by default because Samsung TVs cannot pass these formats through without a compatible AV receiver. If all your streams are failing, confirm your TV firmware is up to date. If only audio-heavy streams fail, this is expected — the template will serve the next compatible stream instead.
+  </Accordion>
+</AccordionGroup>
