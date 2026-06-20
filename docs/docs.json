@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "Core Builds",
   "logo": {
-    "light": "/logo/banner_square.svg",
-    "dark": "/logo/banner_square.svg",
-    "height": 24
+    "light": "/logo/nav_logo.svg",
+    "dark": "/logo/nav_logo.svg",
+    "height": 32
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
