@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <linearGradient id="hexGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <linearGradient id="diamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4facfe"/>
+      <stop offset="50%" stop-color="#c060c0"/>
+      <stop offset="100%" stop-color="#ff4b2b"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ff9472"/>
+      <stop offset="100%" stop-color="#e8401a"/>
+    </linearGradient>
+    <filter id="hexGlow"><feGaussianBlur stdDeviation="10" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+    <filter id="diamGlow"><feGaussianBlur stdDeviation="12" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+    <filter id="softGlow"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <!-- Ambient glow -->
+  <polygon points="300,152 400,208 400,320 300,376 200,320 200,208" fill="#00e5ff" opacity="0.04" filter="url(#softGlow)"/>
+  <polygon points="300,212 356,268 300,324 244,268" fill="#c060c0" opacity="0.08" filter="url(#softGlow)"/>
+
+  <!-- Hex glow -->
+  <polygon points="300,152 400,208 400,320 300,376 200,320 200,208" fill="none" stroke="#00e5ff" stroke-width="28" stroke-linejoin="round" opacity="0.3" filter="url(#hexGlow)"/>
+
+  <!-- Hex outline -->
+  <polygon points="300,152 400,208 400,320 300,376 200,320 200,208" fill="none" stroke="url(#hexGrad)" stroke-width="20" stroke-linejoin="round"/>
+
+  <!-- Diamond glow -->
+  <polygon points="300,212 356,268 300,324 244,268" fill="url(#diamGrad)" opacity="0.4" filter="url(#diamGlow)"/>
+
+  <!-- Diamond -->
+  <polygon points="300,212 356,268 300,324 244,268" fill="url(#diamGrad)" opacity="0.95"/>
+
+  <!-- CORE BUILDS -->
+  <text x="300" y="450"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="26" font-weight="600" letter-spacing="5"
+    fill="#00e5ff" text-anchor="middle">CORE BUILDS</text>
+
+  <!-- BY BREVITY -->
+  <text x="300" y="476"
+    font-family="'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="19" font-weight="300" letter-spacing="5"
+    fill="url(#orangeGrad)" text-anchor="middle" opacity="0.65">BY BREVITY</text>
+</svg>
