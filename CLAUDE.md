@@ -95,7 +95,7 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.4.13 — flagship 4K, IQR PSEs, pow() decay
 - `Single/core-nexus-4k-apex-torbox.json` v2.9.2 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.9.3 — 1080p streaming quality
+- `Single/core-nexus-stream.json` v2.9.4 — 1080p streaming quality, 720p fallback
 - `Single/core-nexus-stream-lite.json` v2.9.2 — lite variant
 - `Single/core-nexus-stream-firestick.json` v2.9.3 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.9.2
