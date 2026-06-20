@@ -2,10 +2,10 @@
   "metadata": {
     "id": "brevity.core-personal",
     "name": "Core Personal",
-    "description": "Personal 1080p SDR all-rounder. TorBox Pro + RealDebrid · Comet · Meteor · MediaFusion · Debridio · SeaDex · NZBGeek. WEB-DL preferred · DD+/AAC · SDR · HEVC/AV1/AVC · Tamtaro SEL. Hotack L007CM Full HD Projector.",
+    "description": "Personal 1080p SDR all-rounder. TorBox Pro + RealDebrid · Comet · Meteor · Debridio · SeaDex · NZBGeek · EZTV. WEB-DL preferred · DD+/AAC · SDR · HEVC/AV1/AVC · Tamtaro SEL. Hotack L007CM Full HD Projector.",
     "source": "external",
     "author": "Personal",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Personal",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "1080p SDR · TorBox + RealDebrid · Comet · Meteor · MediaFusion · Debridio · NZBGeek · WEB-DL · DD+/AAC",
     "appliedTemplates": [
       {
@@ -223,6 +223,14 @@
       },
       {
         "expression": "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]",
+        "enabled": true
+      },
+      {
+        "expression": "/*Bad NZBs*/ merge(releaseGroup(type(streams,'usenet','stremio-usenet'),'sample'),message(type(streams,'usenet','stremio-usenet'),'includes','🚫'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
         "enabled": true
       },
       {

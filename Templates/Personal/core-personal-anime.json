@@ -2,10 +2,10 @@
   "metadata": {
     "id": "brevity.core-personal-anime",
     "name": "Core Personal Anime",
-    "description": "Anime-optimised build for Hotack L007CM. TorBox Pro + RealDebrid + SeaDex. Non-Anime Query Guard patched. SeaDex best releases · Dual audio · Sub + Dub aware. SDR · 1080p.",
+    "description": "Anime-optimised build for Hotack L007CM. TorBox Pro + RealDebrid · SeaDex · NZBGeek · EZTV · Meteor. Non-Anime Query Guard. SeaDex best releases · Dual audio · Sub + Dub aware. SDR · 1080p · DD+/AAC/FLAC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "category": "Anime",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Personal Anime",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "Anime · SeaDex best · 1080p · TorBox + RealDebrid · Dual audio · Sub + Dub",
     "appliedTemplates": [
       {
@@ -214,6 +214,22 @@
     "excludedStreamExpressions": [
       {
         "expression": "/* CB | Non-Anime Query Guard */ (queryType == 'movie' or queryType == 'series') and not isAnime ? streams : []",
+        "enabled": true
+      },
+      {
+        "expression": "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]",
+        "enabled": true
+      },
+      {
+        "expression": "/*AI Upscale Exclusion*/ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','aiupscale','upscaled','neural','enhancedai')",
+        "enabled": true
+      },
+      {
+        "expression": "/*Bad NZBs*/ merge(releaseGroup(type(streams,'usenet','stremio-usenet'),'sample'),message(type(streams,'usenet','stremio-usenet'),'includes','🚫'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
         "enabled": true
       },
       {
@@ -543,7 +559,17 @@
         "releaseGroup"
       ],
       "smartDetectRounding": 10,
-      "libraryBehaviour": "prefer"
+      "libraryBehaviour": "prefer",
+      "tiebreakers": [
+        {
+          "type": "torrent_seeders",
+          "position": "before_addon"
+        },
+        {
+          "type": "usenet_age",
+          "position": "before_addon"
+        }
+      ]
     },
     "autoPlay": {
       "enabled": true,
@@ -953,6 +979,11 @@
         "torbox"
       ],
       "reconfigureService": false
-    }
+    },
+    "enhanceResults": true,
+    "excludedStreamSources": [
+      "YouTube",
+      "AI Enhanced"
+    ]
   }
 }
