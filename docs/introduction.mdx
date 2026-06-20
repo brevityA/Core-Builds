@@ -4,14 +4,15 @@ mode: "wide"
 ---
 
 <style>{`
-  article nav,
-  article header,
-  article > h1,
-  [class*="Breadcrumb"], [class*="breadcrumb"],
-  [class*="PageHeader"], [class*="page-header"],
-  [class*="ContentHeader"], [class*="content-header"],
-  [class*="ArticleHeader"], [class*="article-header"],
-  [class*="eyebrow"], [class*="Eyebrow"] { display: none !important; }
+  h1 { display: none !important; }
+  nav:has(button + a) { display: none !important; }
+  :has(+ h1) { display: none !important; }
+  article nav, article header, article > h1 { display: none !important; }
+  [class*="Breadcrumb" i], [class*="breadcrumb" i],
+  [class*="PageHeader" i], [class*="page-header" i],
+  [class*="eyebrow" i], [class*="Eyebrow" i],
+  [class*="ContentHeader" i], [class*="content-header" i],
+  [class*="ArticleHeader" i], [class*="article-header" i] { display: none !important; }
 `}</style>
 
 <div style={{ maxWidth: '680px', margin: '0 auto', padding: '64px 24px 0', textAlign: 'center' }}>
