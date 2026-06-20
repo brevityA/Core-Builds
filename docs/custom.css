@@ -1,0 +1,9 @@
+/* Hide the auto-generated page title on the introduction page.
+   Detected by the presence of banner_square_transparent.svg — unique to that page. */
+body:has(img[src*="banner_square_transparent"]) h1 {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}

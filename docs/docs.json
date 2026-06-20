@@ -84,5 +84,9 @@
     "og:image": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_builds_banner.png",
     "og:site_name": "Core Builds",
     "twitter:card": "summary_large_image"
-  }
+  },
+  "styling": {
+    "eyebrow": "never"
+  },
+  "css": "/custom.css"
 }
