@@ -5,7 +5,7 @@
     "description": "1080p AllDebrid Lite. DTS:X / TrueHD / HEVC \u00b7 Relaxed filtering. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1729,7 +1729,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "30ab6dcc-8234-4e6f-bce4-6b781cd0066b",
         "options": {
           "timeout": 7000,

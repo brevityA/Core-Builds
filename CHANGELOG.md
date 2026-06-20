@@ -4,6 +4,15 @@
 
 ---
 
+## 2.9.4 (2026-06-20)
+
+### Changed
+- **MediaFusion enabled by default — all 28 non-Speed templates.** MediaFusion was previously opt-in (`enabled: false`) on every template. It is now on by default. Users who do not want it can toggle it off via the AIOStreams addon settings. The resources field (`["stream"]`) ensures no catalog bleed into Stremio Discover.
+- **HdHub enabled by default — 14 full TorBox templates.** HdHub is a TorBox-native P2P scraper (`tb_only: true`, meaning it only serves results when TorBox is the active debrid service). Previously opt-in; now on by default on all full (non-Lite) TorBox templates. Lite, Flash, Speed, and AllDebrid templates unchanged.
+- **StremThru Torz enabled by default — `core-nexus-4k-apex-torbox.json`.** The cached-only TorBox variant shipped with StremThru Torz disabled, which prevented any TorBox stream delivery. Now on by default; the cached-only design is preserved by the `excludeUncached: true` flag rather than by disabling the provider.
+
+---
+
 ## 2.9.3 (2026-06-20)
 
 ### Fixed

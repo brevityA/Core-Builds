@@ -5,7 +5,7 @@
     "description": "4K AllDebrid Lite. DV/HDR \u00b7 TrueHD/Atmos \u00b7 Relaxed filtering. No TorBox required. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1717,7 +1717,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "5e733da8-f747-44bb-8713-0b9840492db3",
         "options": {
           "timeout": 7000,

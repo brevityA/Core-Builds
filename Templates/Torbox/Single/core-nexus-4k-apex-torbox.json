@@ -5,7 +5,7 @@
     "description": "TorBox-native build of Core Nexus 4K Apex. Uses only TorBox's own search and Usenet \u2014 no third-party indexers. Identical adaptive ranked-pool bitrate PSEs and full ESE stack. Simpler, faster to load, fewer moving parts.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1719,7 +1719,7 @@
       {
         "type": "stremthruTorz",
         "instanceId": "67c",
-        "enabled": false,
+        "enabled": true,
         "options": {
           "name": "StremThru Torz",
           "timeout": 5000,

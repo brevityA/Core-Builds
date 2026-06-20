@@ -5,7 +5,7 @@
     "description": "A full-featured 1080p SDR build for TorBox Essential users. No Usenet access required \u2014 runs entirely on TorBox's torrent cache. Targets WEB-DL and WEBRip sources, blocks BluRay, Remux, 4K, and HDR for reliable playback on budget hardware. File range 1 GB\u201325 GB. Full addon stack: Comet, Meteor, Zilean, Knaben. Relaxed filtering \u2014 quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1702,7 +1702,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "30ab6dcc-8234-4e6f-bce4-6b781cd0066b",
         "options": {
           "timeout": 7000,

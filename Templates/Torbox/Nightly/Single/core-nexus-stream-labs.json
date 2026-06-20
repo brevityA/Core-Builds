@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) \u2014 optional scrapers (MediaFusion, SeaDex) toggled at import; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. Based on Stream.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.6.5",
+    "version": "0.6.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1861,7 +1861,7 @@
       },
       {
         "type": "hdhub",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",

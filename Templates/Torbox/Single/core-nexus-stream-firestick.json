@@ -5,7 +5,7 @@
     "description": "Firestick and budget Android TV optimised build. Hard SDR-only enforcement \u2014 excludes Dolby Vision, HDR10+, HDR10, HLG, and 10-bit content that causes playback failures or tone-mapping artifacts on Fire TV hardware. AV1 excluded. TrueHD/Atmos/lossless audio excluded. 1080p + 720p \u00b7 WEB-DL/WEBRip \u00b7 TorBox Essential. Single TorBox subscription required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.2",
+    "version": "2.9.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1771,7 +1771,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4",
         "options": {
           "timeout": 7000,
@@ -1791,7 +1791,7 @@
       },
       {
         "type": "hdhub",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",

@@ -5,7 +5,7 @@
     "description": "4K template tuned for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 is natively supported \u2014 DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. AV1 hard-excluded (no hardware decoder on the A15 chip \u2014 severe performance hit). DD+ Atmos is the native top audio format. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox \u00b7 Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1707,7 +1707,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4",
         "options": {
           "timeout": 3000,
