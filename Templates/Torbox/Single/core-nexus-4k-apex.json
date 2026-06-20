@@ -5,7 +5,7 @@
     "description": "Adaptive flagship build. Ranked-pool-relative bitrate PSEs using Tukey IQR outlier detection: \u22654 ranked streams \u2192 Q1\u22121.5\u00d7IQR to Q3+1.5\u00d7IQR window; 1\u20133 ranked \u2192 80%\u2013120% of min/max; 0 ranked \u2192 pow(0.95, daysSinceRelease) decay median cluster. HDR and SDR evaluated separately in the WEB-DL tier. Full ESE stack: REPACK passthrough, per-addon flood guard, Usenet propagation guard, codec efficiency booster, DV-Only Kill, audio pinnacle, and more.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.12",
+    "version": "0.4.13",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -263,7 +263,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {
@@ -1779,7 +1779,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "f6a38af4-a24d-43fc-8370-c10f07760c17",
         "options": {
           "timeout": 7000,
@@ -1799,7 +1799,7 @@
       },
       {
         "type": "hdhub",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",

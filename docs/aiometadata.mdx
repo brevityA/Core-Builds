@@ -1,0 +1,174 @@
+---
+title: "AIOMetadata Setup"
+description: "Add rich catalogs and metadata to Stremio — Netflix rows, genre discovery, anime schedules, and more — using the Core Builds AIOMetadata configs."
+---
+
+AIOMetadata is a separate Stremio addon that handles the discovery side of your setup. Your Core Builds template controls which streams you see and how they're sorted — AIOMetadata controls what you browse, how titles look, and what catalog rows appear on your home screen.
+
+<Note>
+  AIOMetadata and AIOStreams are completely independent. AIOMetadata never touches stream quality, debrid, or playback. Installing it won't change how your Core Builds template works.
+</Note>
+
+## What You Get
+
+Without AIOMetadata, Stremio's home screen shows Cinemeta's default rows — a single TMDB-backed source with no customisation and a known filter that hides most theatrical releases.
+
+With the Core Builds config imported:
+
+- **Home rows for every major service** — Netflix, Amazon Prime, HBO Max, Disney+, Apple TV+, Paramount+, Hulu — sorted by latest release
+- **Genre rows** — Action, Comedy, Crime, Drama, Horror, Sci-Fi, Thriller, Animated, Documentaries, Trending Kids, and more
+- **Discovery lists** — Trakt Trending, Latest Digital Release, Seasonal picks, Must-See Modern Horror, Must-See Mindfuck
+- **Browse by year, language, TVDB collections** — in the Discover section, not the home screen
+- **Full anime catalog** (Full config only) — MAL Airing Now, AniList Trending, AniDB Latest Ended, Crunchyroll Latest, MAL decade catalogs (1980s–2020s)
+- **TMDB metadata for movies, TVDB for series** — richer episode data, better artwork, more languages
+
+---
+
+## Pick a Config
+
+Two Core Builds configs are available in the `AIOMetadata/` folder:
+
+| Config | Catalogs | Use if |
+|---|---|---|
+| **Full** (`core-builds-aiometadata-full.json`) | 91 total, 74 enabled | You watch anime alongside movies and TV |
+| **Movies & TV** (`core-builds-aiometadata-movies-tv.json`) | 71 total, 60 enabled | Movies and TV only — no anime rows |
+
+Both configs have the same movie and TV catalog set. The Full version adds 20 anime-specific catalogs and enables Crunchyroll.
+
+---
+
+## Pick an Instance
+
+Use any public AIOMetadata instance — they all run the same addon, the config is stored per-user.
+
+| Instance | URL | Notes |
+|---|---|---|
+| **ElfHosted** | [aiometadata.elfhosted.com](https://aiometadata.elfhosted.com/configure/) | Most stable public option |
+| **Fortheweak** | [aiometadata.fortheweak.cloud](https://aiometadata.fortheweak.cloud/configure/) | Run by an AIOStreams Discord admin |
+| **Viren070** | [aiometadata.viren070.me](https://aiometadata.viren070.me/configure/) | AIOStreams developer's instance |
+
+<Tip>
+  ElfHosted also sells a [private hosted instance](https://store.elfhosted.com/product/aiometadata/) (~$9/month) with pre-warmed caches for faster poster loading. Worth it if you self-host or use AIOMetadata heavily.
+</Tip>
+
+---
+
+## Setup
+
+<Steps>
+  <Step title="Get your API keys">
+    You need three free API keys before saving your config. Get them now so you have them ready.
+
+    - **TMDB API Key** — [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api) — free account, instant access
+    - **TheTVDB API Key** — [thetvdb.com/dashboard/account/apikey](https://thetvdb.com/dashboard/account/apikey) — free account required
+    - **MDBList API Key** — [mdblist.com/account](https://mdblist.com/account) — free tier, enables all the curated catalog rows
+
+    Optional but recommended:
+    - **RPDB Key** — use `t0-free-rpdb` for free rating badges on posters (no signup needed)
+    - **Fanart.tv API Key** — [fanart.tv/get-an-api-key](https://fanart.tv/get-an-api-key/) — higher-quality artwork
+  </Step>
+
+  <Step title="Download the config file">
+    Pick the config that matches your setup:
+
+    - [Full config (with anime)](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/AIOMetadata/core-builds-aiometadata-full.json) — right-click → Save As
+    - [Movies & TV config](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/AIOMetadata/core-builds-aiometadata-movies-tv.json) — right-click → Save As
+
+    Save the file somewhere you can find it — you'll upload it in the next step.
+  </Step>
+
+  <Step title="Import the config">
+    1. Go to your chosen instance's configure page (e.g. [aiometadata.elfhosted.com](https://aiometadata.elfhosted.com/configure/))
+    2. Open the **Configuration** tab
+    3. Click **Import Configuration** and select the JSON file you downloaded
+    4. The catalog list will populate automatically
+  </Step>
+
+  <Step title="Add your API keys">
+    Open the **Integrations** tab and paste in:
+    - TMDB API Key
+    - TheTVDB API Key
+    - MDBList API Key
+    - RPDB Key (use `t0-free-rpdb` for the free tier)
+    - Fanart.tv key (optional)
+
+    Click **Test** next to each key to confirm it's working before saving.
+  </Step>
+
+  <Step title="Save and install">
+    1. Go back to the **Configuration** tab and click **Save Configuration**
+    2. Set a password — write it down along with the UUID shown after saving
+    3. Click **Install** → **Open in Stremio** (or copy the manifest URL for Stremio Web)
+    4. Stremio will prompt you to install — confirm
+
+    <Warning>
+      Every time you change your catalog selection, you need to re-install the addon URL in Stremio. Use [StremThru SideKick](https://www.stremthru.net/) to update in one click without losing your addon order.
+    </Warning>
+  </Step>
+</Steps>
+
+---
+
+## Catalog Reference
+
+### Always on home screen
+
+| Catalog | Type | Source |
+|---|---|---|
+| TMDB Popular | Movies + Series | TMDB |
+| Trakt Trending | Movies + Series | MDBList |
+| Latest Digital Release | Movies | MDBList |
+| Latest Airing | Series | MDBList |
+| Seasonal | Movies | MDBList (Tamtaro) |
+| Netflix Latest | Movies + Series | MDBList |
+| Amazon Prime Latest | Movies + Series | MDBList |
+| HBO Max Latest | Movies + Series | MDBList |
+| Disney+ Latest | Movies + Series | MDBList |
+| Apple TV+ Latest | Movies + Series | MDBList |
+| Paramount+ Latest | Movies + Series | MDBList |
+| Hulu Latest | Movies + Series | MDBList |
+| Action | Movies + Series | MDBList |
+| Comedy | Movies + Series | MDBList |
+| Crime | Movies + Series | MDBList |
+| Drama | Movies + Series | MDBList |
+| Horror | Movies + Series | MDBList |
+| Must-See Modern Horror | Movies | MDBList |
+| Sci-Fi | Movies + Series | MDBList |
+| Thriller | Movies + Series | MDBList |
+| Animated | Movies + Series | MDBList |
+| Documentaries | Movies + Series | MDBList |
+| Stand-Up Comedy | Movies | MDBList |
+| Must-See Mindfuck | Movies | MDBList |
+| Trending Kids | Movies + Series | MDBList |
+
+### Anime (Full config only)
+
+| Catalog | Source |
+|---|---|
+| MAL Airing Now | MyAnimeList |
+| AniList Trending | AniList |
+| AniDB Latest Ended | AniDB |
+| Crunchyroll Latest | TMDB Streaming |
+| MAL Top Series | MyAnimeList |
+| MAL Top Movies | MyAnimeList |
+| MAL Top 2020s–1980s | MyAnimeList |
+
+### In Discover only (not on home screen)
+
+TMDB By Year, TMDB By Language, TVDB Genres, TVDB Collections, History & War, Top Nature, Top Reality TV, Top 2025, Top 2020s–1980s movie decade lists.
+
+### Pre-wired but disabled
+
+TMDB Trending, TMDB Top Rated, TVDB Trending, TMDB Favorites, TMDB Watchlist, TVmaze Daily Schedule. Enable any of these in the Catalogs tab.
+
+---
+
+## Notes
+
+**Disable Cinemeta after installing.** Running both causes duplicate metadata and slower load times. Use [Cinebye](https://cinebye.pages.dev/) to deactivate Cinemeta without removing it — this lets Stremio fall back to it if AIOMetadata is unreachable.
+
+**Anime and the Jikan API.** The public Jikan API (used for MyAnimeList data) is scheduled to shut down on October 1, 2026. After that date, MAL catalogs will stop working on hosted instances unless the instance operator self-hosts Jikan. AniList catalogs are unaffected.
+
+**Backup your UUID and password.** There's no account recovery — if you lose them you'll need to create a fresh config from scratch.
+
+**AI-powered search is off by default.** If you have a Google Gemini API key, enable it in the Search tab for natural-language catalog queries. Free tier is available via [Google AI Studio](https://aistudio.google.com/).

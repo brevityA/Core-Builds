@@ -1,78 +1,160 @@
 ---
-title: "Core Builds"
-description: "Optimised AIOStreams templates for TorBox, AllDebrid and EasyNews."
+sidebarTitle: "Introduction"
 mode: "wide"
 ---
 
-<div style={{ maxWidth: '720px', margin: '0 auto', padding: '48px 24px 0', textAlign: 'center' }}>
+<style>{`
+  h1 { display: none !important; }
+  nav:has(button + a) { display: none !important; }
+  :has(+ h1) { display: none !important; }
+  article nav, article header, article > h1 { display: none !important; }
+  [class*="Breadcrumb" i], [class*="breadcrumb" i],
+  [class*="PageHeader" i], [class*="page-header" i],
+  [class*="eyebrow" i], [class*="Eyebrow" i],
+  [class*="ContentHeader" i], [class*="content-header" i],
+  [class*="ArticleHeader" i], [class*="article-header" i] { display: none !important; }
+`}</style>
 
-  <div style={{ display: 'inline-block', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#93C5FD', padding: '4px 14px', borderRadius: '999px', fontSize: '13px', fontWeight: '500', marginBottom: '24px', letterSpacing: '0.01em' }}>
+<div style={{ maxWidth: '680px', margin: '0 auto', padding: '16px 24px 0', textAlign: 'center' }}>
+
+  <img
+    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/docs/logo/banner_square_transparent.svg"
+    alt="Core Builds"
+    style={{ width: '320px', height: '320px', display: 'block', margin: '0 auto 24px' }}
+  />
+
+  <div style={{ display: 'inline-block', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#93C5FD', padding: '4px 14px', borderRadius: '999px', fontSize: '13px', fontWeight: '500', marginBottom: '20px', letterSpacing: '0.01em' }}>
     AIOStreams Templates
   </div>
 
-  <img
-    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_builds_banner.png"
-    alt="Core Builds"
-    style={{ width: '100%', maxWidth: '480px', display: 'block', margin: '0 auto 32px' }}
-  />
-
-  <p style={{ fontSize: '18px', color: '#94a3b8', margin: '0 0 32px', lineHeight: '1.6' }}>
-    Optimised <strong style={{ color: '#e2e8f0' }}>AIOStreams</strong> templates for TorBox, AllDebrid and EasyNews.
-    Smart filtering, bitrate-capped results, and zero-friction playback out of the box.
+  <p style={{ fontSize: '18px', color: '#94a3b8', margin: '0 0 8px', lineHeight: '1.65' }}>
+    Smart filtering, scored sorting, and zero-friction playback —<br />
+    optimised for TorBox, AllDebrid and EasyNews.
   </p>
 
-  <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '40px' }}>
-    <a href="/template-directory" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#3B82F6', color: '#fff', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>Browse Templates</a>
-    <a href="https://github.com/brevityA/Core-Builds" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'transparent', color: '#94a3b8', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>GitHub</a>
-    <a href="/importing" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'transparent', color: '#94a3b8', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>Quick Start</a>
+  <p style={{ fontSize: '13px', color: '#475569', margin: '0 0 32px' }}>
+    One-click install for Stremio via AIOStreams.
+  </p>
+
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '32px' }}>
+    <a href="/which-template" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#3B82F6', color: '#ffffff', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      Get Started
+    </a>
+    <a href="https://github.com/brevityA/Core-Builds" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#94a3b8', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>GitHub</a>
+    <a href="/template-directory" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#94a3b8', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>Templates</a>
   </div>
 
-  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '48px' }}>
-    <span style={{ background: '#1a2e1a', color: '#4ade80', padding: '4px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: '500' }}>TorBox</span>
-    <span style={{ background: '#1e1a2e', color: '#c084fc', padding: '4px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: '500' }}>AllDebrid</span>
-    <span style={{ background: '#1a1e2e', color: '#60a5fa', padding: '4px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: '500' }}>EasyNews</span>
-    <span style={{ background: '#2e1a1a', color: '#f87171', padding: '4px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: '500' }}>Anime</span>
-  </div>
-
-  <div style={{ display: 'flex', background: '#0f172a', borderRadius: '12px', border: '1px solid #1e3a5f', overflow: 'hidden', marginBottom: '56px' }}>
+  <div style={{ display: 'flex', background: '#0f172a', borderRadius: '12px', border: '1px solid #1e3a5f', overflow: 'hidden', marginBottom: '16px' }}>
     <div style={{ flex: 1, textAlign: 'center', padding: '20px 0', borderRight: '1px solid #1e3a5f' }}>
       <div style={{ fontSize: '28px', fontWeight: '800', color: '#60a5fa' }}>40+</div>
       <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>TEMPLATES</div>
     </div>
-    <div style={{ flex: 1, textAlign: 'center', padding: '20px 0', borderRight: '1px solid #1e3a5f' }}>
-      <div style={{ fontSize: '28px', fontWeight: '800', color: '#60a5fa' }}>3</div>
-      <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>SERVICES</div>
-    </div>
     <div style={{ flex: 1, textAlign: 'center', padding: '20px 0' }}>
-      <div style={{ fontSize: '22px', fontWeight: '800', color: '#60a5fa' }}>v2.9.2</div>
-      <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>LATEST</div>
+      <div style={{ fontSize: '22px', fontWeight: '800', color: '#60a5fa' }}><a href="/changelog" style={{ color: 'inherit', textDecoration: 'none' }}>v2.9.4</a></div>
+      <div style={{ fontSize: '9px', color: '#52525b', letterSpacing: '1.5px', marginTop: '4px' }}>LATEST — <a href="/changelog" style={{ color: '#475569', fontSize: '9px', textDecoration: 'none', letterSpacing: '1px' }}>CHANGELOG ↗</a></div>
     </div>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '56px' }}>
+    <a href="/template-directory#torbox-pro" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#0f172a', border: '1px solid #1e3a5f', borderRadius: '999px', padding: '6px 14px', fontSize: '12px', fontWeight: '600', color: '#94a3b8', textDecoration: 'none' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3B82F6', flexShrink: 0 }}></span>TorBox</a>
+    <a href="/template-directory#alldebrid" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#0f172a', border: '1px solid #1e3a5f', borderRadius: '999px', padding: '6px 14px', fontSize: '12px', fontWeight: '600', color: '#94a3b8', textDecoration: 'none' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#a78bfa', flexShrink: 0 }}></span>AllDebrid</a>
+    <a href="/template-directory#easynews-speed" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#0f172a', border: '1px solid #1e3a5f', borderRadius: '999px', padding: '6px 14px', fontSize: '12px', fontWeight: '600', color: '#94a3b8', textDecoration: 'none' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', flexShrink: 0 }}></span>EasyNews</a>
   </div>
 
 </div>
 
-<div style={{ maxWidth: '720px', margin: '0 auto', padding: '0 24px 64px' }}>
+<div style={{ maxWidth: '680px', margin: '0 auto', padding: '0 24px 72px' }}>
 
-  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#475569', marginBottom: '16px' }}>EXPLORE THE DOCS</p>
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', marginBottom: '16px' }}>GETTING STARTED</p>
 
   <CardGroup cols={2}>
-    <Card title="Which Template?" icon="map" href="/which-template">
-      Find the right template in 30 seconds with the decision tree.
+    <Card title="Quick Start" icon="rocket" href="/quick-start" color="#3B82F6">
+      Up and running in five steps — no prior experience needed.
     </Card>
-    <Card title="Template Directory" icon="list" href="/template-directory">
-      Every template with one-click import buttons and raw URLs.
+    <Card title="Which Template?" icon="map" href="/which-template">
+      Find the right template for your setup in 30 seconds.
     </Card>
     <Card title="Import a Template" icon="download" href="/importing">
       Step-by-step first-run guide — API keys, TMDB token, Stremio install.
     </Card>
-    <Card title="How It Works" icon="gear" href="/how-it-works">
-      Bitrate filtering, PSE/ESE architecture, and addon stack explained.
+    <Card title="Complete Guide" icon="book-open" href="/master-guide">
+      Stremio vs WuPlay, advanced editing, resetting, search criteria, catalogs, and TMDB setup.
+    </Card>
+    <Card title="Lite vs Standard" icon="sliders" href="/lite-vs-standard">
+      Which variant is right for you — what each Lite template removes and when that matters.
+    </Card>
+    <Card title="AIOMetadata Setup" icon="table-columns" href="/aiometadata">
+      Add rich catalog rows — Netflix, genre lists, anime schedules — alongside your template.
+    </Card>
+    <Card title="Debrid Comparison" icon="scale-balanced" href="/debrid-comparison">
+      TorBox vs AllDebrid vs Real-Debrid vs EasyNews — what each service unlocks.
+    </Card>
+    <Card title="Instance Status" icon="signal" href="/instance-status">
+      Live status of ElfHosted and Fortheweak AIOStreams instances.
+    </Card>
+    <Card title="Regional Content" icon="globe" href="/regional-content">
+      Get regional and non-English content in Stremio's Discover section.
+    </Card>
+  </CardGroup>
+
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>TEMPLATES</p>
+
+  <CardGroup cols={2}>
+    <Card title="Template Directory" icon="list" href="/template-directory">
+      Every template with one-click import buttons and raw URLs.
+    </Card>
+    <Card title="Community Templates" icon="users" href="/community-templates">
+      User-contributed templates from the Core Builds community.
+    </Card>
+  </CardGroup>
+
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>REFERENCE</p>
+
+  <CardGroup cols={2}>
+    <Card title="Formatter Gallery" icon="image" href="/formatter-gallery">
+      Side-by-side previews of all 16 formatters with import links.
+    </Card>
+    <Card title="Which Formatter?" icon="paintbrush" href="/which-formatter">
+      Pick the right layout for your screen size and info preferences.
     </Card>
     <Card title="Expression Layer" icon="code" href="/expression-layer">
       IQR PSEs, flood guards, and the full SEL function reference.
     </Card>
+    <Card title="Device Profiles" icon="mobile" href="/device-profiles">
+      Samsung, Fire Stick, Apple TV codec and HDR compatibility.
+    </Card>
+    <Card title="Formatters" icon="paintbrush" href="/formatters">
+      Stream display layouts — import and customise formatter templates.
+    </Card>
+    <Card title="Glossary" icon="book" href="/glossary">
+      PSE, ESE, ISE, IQR, SEL and every other term defined.
+    </Card>
+    <Card title="Nightly & Labs" icon="flask" href="/nightly-and-labs">
+      Pre-release templates with experimental features and new PSE patterns.
+    </Card>
+    <Card title="Addon Reference" icon="plug" href="/addon-reference">
+      Resource definitions for every addon preset — catalog bleed prevention.
+    </Card>
+  </CardGroup>
+
+  <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: '#64748b', margin: '40px 0 16px' }}>SUPPORT</p>
+
+  <CardGroup cols={2}>
+    <Card title="What's New" icon="sparkles" href="/whats-new">
+      Plain-English release highlights — no JSON field names, no PR numbers.
+    </Card>
+    <Card title="FAQ" icon="circle-question" href="/faq">
+      Answers to the most common setup questions and stream problems.
+    </Card>
     <Card title="Troubleshooting" icon="wrench" href="/troubleshooting">
       Common problems, regex errors, and import failures.
+    </Card>
+    <Card title="Changelog" icon="clock-rotate-left" href="/changelog">
+      Full version history — what changed, what was fixed.
+    </Card>
+    <Card title="Roadmap" icon="flag" href="/roadmap">
+      Planned features, upcoming templates, and known limitations.
     </Card>
   </CardGroup>
 

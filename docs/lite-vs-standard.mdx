@@ -1,0 +1,75 @@
+---
+title: "Lite vs Standard"
+sidebarTitle: "Lite vs Standard"
+description: "When to use Lite templates and what they leave out."
+---
+
+## The one-line answer
+
+Use Standard. Switch to Lite only if you're consistently getting fewer than 5–6 results on mainstream, recently-released content.
+
+---
+
+## What Lite removes
+
+Standard templates include a set of quality-gate ESEs that Lite drops. These are the ones removed:
+
+| ESE removed in Lite | What it does in Standard |
+|---|---|
+| Low Bitrate Kill | Excludes streams below a minimum bitrate threshold |
+| Low Seeders Kill | Excludes P2P streams with very few seeders |
+| Upscaled 4K Kill | Excludes 1080p content AI-upscaled to 4K |
+| Bad 4K Bluray Kill | Excludes 4K Blu-ray encodes from known poor-quality groups |
+| Bad 1080p Bluray Kill | Same for 1080p |
+| Extra Cached HQ / LQ limits | Caps the number of cached results per quality tier |
+| Extra Uncached limit | Caps uncached results |
+
+---
+
+## What Lite keeps
+
+All hard kills remain active in Lite: CAM/SCR exclusion, YouTube and external stream blocking, 3D content blocking, resolution enforcement (1080p templates still block 4K), and all regex score filtering.
+
+<Note>
+  Lite is not a lower-quality mode — it is a less restrictive filter mode. The regex scoring, sort order, and PSE ranking logic are identical to Standard.
+</Note>
+
+---
+
+## When to use Lite
+
+- You're getting 0–3 results on popular mainstream movies
+- You're on a low-overhead AIOStreams host with limited compute
+- The content you watch is mostly older or niche where quality metadata is sparse
+- You're on a host like fortheweak where resources are more constrained
+
+## When to stay on Standard
+
+- You're getting 5+ results on most content
+- You want to avoid upscaled or low-bitrate streams appearing
+- You're on ElfHosted or self-hosted (no resource constraints)
+
+<Tip>
+  If you switch to Lite and immediately get many more results, that means Standard was working correctly — your library of content just has sparse metadata. You can stay on Lite if the result quality feels acceptable.
+</Tip>
+
+---
+
+## Available Lite templates
+
+All Lite templates share the same PSE logic and sort criteria as their Standard counterparts. Import via **Template → Import** in AIOStreams.
+
+| Template | Raw import URL |
+|---|---|
+| Core Nexus Stream Lite | [core-nexus-stream-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json) |
+| Core Nexus Stream Firestick Lite | [core-nexus-stream-firestick-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json) |
+| Core Nexus 4K Essential Lite | [core-nexus-4k-essential-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json) |
+| Core Nexus Essential Lite | [core-nexus-essential-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json) |
+| Core Nexus 4K AllDebrid Lite | [core-nexus-4k-alldebrid-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json) |
+| Core Nexus AllDebrid Lite | [core-nexus-alldebrid-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json) |
+| Core Nexus Hybrid Lite | [core-nexus-hybrid-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json) |
+| Core Nexus Speed 4K Lite | [core-nexus-speed-4k-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json) |
+| Core Nexus Speed Lite | [core-nexus-speed-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json) |
+| Core Nexus Anime 4K Lite | [core-nexus-anime-4k-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json) |
+| Core Nexus Anime Lite | [core-nexus-anime-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json) |
+| Core Nexus Anime Dub Lite | [core-nexus-anime-dub-lite.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json) |

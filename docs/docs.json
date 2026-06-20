@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "Core Builds",
   "logo": {
-    "light": "/logo/core_builds_banner.png",
-    "dark": "/logo/core_builds_banner.png",
-    "height": 120
+    "light": "/logo/nav_logo.svg",
+    "dark": "/logo/nav_logo.svg",
+    "height": 32
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
@@ -36,12 +36,18 @@
             "group": "Getting Started",
             "pages": [
               "introduction",
+              "quick-start",
+              "master-guide",
               "how-it-works",
               "which-template",
               "importing",
+              "lite-vs-standard",
               "instance-status",
+              "debrid-comparison",
+              "aiometadata",
               "alldebrid-setup",
-              "easynews-setup"
+              "easynews-setup",
+              "regional-content"
             ]
           },
           {
@@ -57,13 +63,18 @@
               "expression-layer",
               "device-profiles",
               "formatters",
+              "formatter-gallery",
+              "which-formatter",
               "glossary",
-              "nightly-and-labs"
+              "nightly-and-labs",
+              "addon-reference"
             ]
           },
           {
             "group": "Support",
             "pages": [
+              "whats-new",
+              "faq",
               "troubleshooting",
               "changelog",
               "roadmap"
@@ -84,5 +95,9 @@
     "og:image": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_builds_banner.png",
     "og:site_name": "Core Builds",
     "twitter:card": "summary_large_image"
-  }
+  },
+  "styling": {
+    "eyebrow": "never"
+  },
+  "css": "/custom.css"
 }

@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung smart TVs without native Dolby Vision support \u2014 including RU7100, RU8000, NU8000, Q60, and similar 2018\u20132022 models. DV-only streams are excluded (DV-Only Kill ESE); only HDR10+, HDR10, HLG, and SDR content appears. AV1 and VC-1 excluded (not supported on older Samsung hardware). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded \u2014 Samsung passes these through only via HDMI ARC/eARC to compatible receivers, which most users don't have. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox \u00b7 Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.10",
+    "version": "0.2.12",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -261,7 +261,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {
@@ -1722,7 +1722,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4",
         "options": {
           "timeout": 3000,

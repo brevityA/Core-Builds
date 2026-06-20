@@ -4,6 +4,26 @@
 
 ---
 
+## 2.9.4 (2026-06-20)
+
+### Changed
+- **MediaFusion enabled by default — all 28 non-Speed templates.** MediaFusion was previously opt-in (`enabled: false`) on every template. It is now on by default. Users who do not want it can toggle it off via the AIOStreams addon settings. The resources field (`["stream"]`) ensures no catalog bleed into Stremio Discover.
+- **HdHub enabled by default — 14 full TorBox templates.** HdHub is a TorBox-native P2P scraper (`tb_only: true`, meaning it only serves results when TorBox is the active debrid service). Previously opt-in; now on by default on all full (non-Lite) TorBox templates. Lite, Flash, Speed, and AllDebrid templates unchanged.
+- **StremThru Torz enabled by default — `core-nexus-4k-apex-torbox.json`.** The cached-only TorBox variant shipped with StremThru Torz disabled, which prevented any TorBox stream delivery. Now on by default; the cached-only design is preserved by the `excludeUncached: true` flag rather than by disabling the provider.
+
+---
+
+## 2.9.3 (2026-06-20)
+
+### Fixed
+- **`/*Upscaled 4k*/` ESE — WEB-DL/WEBRip exemption** (24 stable templates + `Nightly/Samsung/core-nexus-samsung-tv-4k.json`). The ESE blocked all 4K streams whenever a 1080p Bluray REMUX existed but no 4K REMUX was found. This incorrectly suppressed genuine 4K WEB-DL releases for new theatrical releases (e.g. Spider-Man: Brand New Day) where a streaming master exists but the Blu-ray hasn't shipped yet. Added `and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0` as an additional gate — 4K WEB-DL and WEBRip streams are now preserved in this scenario.
+- **`metadata.changelog` string field** removed from 6 templates (`core-nexus-4k-alldebrid-lite.json`, `core-nexus-4k-alldebrid.json`, `core-nexus-alldebrid-lite.json`, `core-nexus-alldebrid.json`, `core-nexus-samsung-tv-4k.json`, `core-nexus-samsung-tv.json`). AIOStreams schema requires `metadata.changelog` to be an array or absent — a plain string causes "Invalid input → at metadata.changelog" on import.
+
+### Chore
+- **`docs/template-directory.mdx` version sync** — all 38 template version numbers in the docs were stale. Synced to actual template `metadata.version` values.
+
+---
+
 ## 2.9.2 (2026-06-19)
 
 ### Changed

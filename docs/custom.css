@@ -1,0 +1,17 @@
+/* Introduction page: hide auto-generated header elements.
+   Detected by presence of banner_square_transparent.svg — unique to that page. */
+body:has(img[src*="banner_square_transparent"]) h1,
+body:has(img[src*="banner_square_transparent"]) [class*="eyebrow" i],
+body:has(img[src*="banner_square_transparent"]) [class*="Eyebrow" i],
+body:has(img[src*="banner_square_transparent"]) [class*="breadcrumb" i],
+body:has(img[src*="banner_square_transparent"]) [class*="Breadcrumb" i],
+body:has(img[src*="banner_square_transparent"]) [class*="PageHeader" i],
+body:has(img[src*="banner_square_transparent"]) [class*="page-header" i],
+body:has(img[src*="banner_square_transparent"]) [class*="ContentHeader" i],
+body:has(img[src*="banner_square_transparent"]) [class*="ArticleHeader" i] {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}

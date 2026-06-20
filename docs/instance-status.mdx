@@ -3,13 +3,35 @@ title: "Instance Status"
 description: "Live status of all known public AIOStreams instances. Auto-checked every 6 hours."
 ---
 
+## Which Instance Should I Use?
+
+The short answer: **ElfHosted** for most people, **ElfHosted Private** if you hit rate limits, **Yeb's** as a solid backup.
+
+<CardGroup cols={3}>
+  <Card title="ElfHosted (Free)" icon="star">
+    Best starting point. Debrid-only — no P2P or HTTP streams, which matches Core Builds perfectly. All templates are tested and verified here first. Expect rate limiting under heavy use.
+  </Card>
+  <Card title="ElfHosted Private" icon="lock">
+    Same host, no rate limits. ~$9/month from the ElfHosted store. Worth it if you stream several hours a day or share a config across multiple profiles.
+  </Card>
+  <Card title="Yeb's (fortheweak)" icon="shield">
+    Run by an AIOStreams Discord admin. Fast and reliable. Uses a stricter regex whitelist — all Core Builds templates (v2.9.0+) are verified against it. Good free alternative to ElfHosted.
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Self-hosting** is always the best option if you're comfortable with Docker — no rate limits, full control, and you stay on your own hardware. See the [AIOStreams self-hosting guide](https://github.com/Viren070/AIOStreams#self-hosting).
+</Tip>
+
+---
+
 <Warning>
   **Green = host is reachable.** Does not guarantee the instance accepts new configs or that your template will import correctly. Always test with a fresh import after choosing a host.
 </Warning>
 
 ## Stable Instances
 
-<!-- STATUS_STABLE_START -->
+{/* STATUS_STABLE_START */}
 | Instance | Status | URL |
 |---|---|---|
 | **ElfHosted** | 🟢 Online | [aiostreams.elfhosted.com](https://aiostreams.elfhosted.com/stremio/configure) |
@@ -19,8 +41,8 @@ description: "Live status of all known public AIOStreams instances. Auto-checked
 | **ATBP** | 🟢 Online | [aio.atbphosting.com](https://aio.atbphosting.com/stremio/configure) |
 | **Omni's** | 🟢 Online | [aiostreams.12312023.xyz](https://aiostreams.12312023.xyz/stremio/configure) |
 
-*Last checked: 2026-06-19 15:14 UTC*
-<!-- STATUS_STABLE_END -->
+*Last checked: 2026-06-20 08:46 UTC*
+{/* STATUS_STABLE_END */}
 
 ---
 
@@ -30,7 +52,7 @@ description: "Live status of all known public AIOStreams instances. Auto-checked
   Nightly instances run the latest AIOStreams development build. Features may be incomplete or unstable. Use for Labs templates only.
 </Note>
 
-<!-- STATUS_NIGHTLY_START -->
+{/* STATUS_NIGHTLY_START */}
 | Instance | Status | URL |
 |---|---|---|
 | **Yeb's Nightly** | 🟢 Online | [aiostreams-nightly.fortheweak.cloud](https://aiostreams-nightly.fortheweak.cloud/stremio/configure) |
@@ -38,8 +60,8 @@ description: "Live status of all known public AIOStreams instances. Auto-checked
 | **Kuu's Nightly** | 🟢 Online | [aiostreams-nightly.stremio.ru](https://aiostreams-nightly.stremio.ru/stremio/configure) |
 | **Viren's Nightly** | 🟢 Online | [aiostreams.viren070.me](https://aiostreams.viren070.me/stremio/configure) |
 
-*Last checked: 2026-06-19 15:14 UTC*
-<!-- STATUS_NIGHTLY_END -->
+*Last checked: 2026-06-20 08:46 UTC*
+{/* STATUS_NIGHTLY_END */}
 
 ---
 

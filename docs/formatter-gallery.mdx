@@ -1,0 +1,280 @@
+---
+title: "Formatter Gallery"
+sidebarTitle: "Formatter Gallery"
+description: "Visual previews and import links for all 16 Core Builds stream formatters."
+---
+
+Formatters control how every stream card looks in Stremio and WuPlay — the title line, metadata rows, cache badge, audio tags, and release group. You can swap them any time without changing your template.
+
+## How to Import a Formatter
+
+1. Copy the raw JSON URL for your chosen formatter from this page.
+2. Open your AIOStreams dashboard.
+3. Go to the **Formatter** section and click the **Import** icon (download arrow).
+4. Paste the URL and click **Load**.
+5. Click **Save** — then reinstall the AIOStreams manifest in Stremio.
+
+<Note>
+  Formatters are applied through the **Formatter tab** in AIOStreams, not through the Load Template flow. No Stremio reinstall is needed after switching a formatter.
+</Note>
+
+---
+
+## Quick Comparison
+
+| Formatter | Style | Best for | Bundled? |
+|---|---|---|---|
+| Core Nexus Apex v2 ⭐ | Emoji circles | Most setups — recommended | No |
+| Core Nexus Elite | Emoji circles | Default out of the box | **Yes** |
+| Core Nexus Sigma | `「 」` brackets | Clean typographic feel | No |
+| Core Nexus Minimal | ⚡/⏳ indicator | Apple TV, small screens, TV UI | No |
+| Core Nexus TV | UPPER CASE | Smart TVs, projectors, 10-foot UI | No |
+| Core Nexus Apex | Emoji circles | Audio codec detail | No |
+| Core Syntax | `「 」` brackets | Original style | No |
+| Core Syntax V3 | `「 」` brackets | JBL Spatial, IMAX flags | No |
+| Omni Diamond v2.2.0 | Dense emoji | Maximum metadata density | No |
+| Core Zenith Diamond | 🔹/🔸 dots | Dot separator style | No |
+| Core Zenith Auburn Tiger | 🔸 orange dots | Warm colour scheme | No |
+| Midnight Slate | ASCII `◼⬤▶◆` | No-emoji clients | No |
+| Nexus Prime | Emoji | SeaDex detection, age format | No |
+| Core Nexus Uniform | Emoji circles | Legacy | No |
+| RB3 Clean v4 | Bold unicode | Three-line name | No |
+| RB3 Formatter | 🔸/🔹 smallcaps | Auburn Tiger pairing | No |
+
+---
+
+## Active / Recommended Formatters
+
+### Core Nexus Apex v2 ⭐ Recommended
+
+The recommended upgrade over Apex v1. Three targeted improvements over Elite: a score number in line 1 (💎 ELITE ✦ 94 instead of a label only), bitrate before visual tags in line 2 so the most decision-relevant spec comes first, and per-language subtitle flags (📝 🇬🇧 🇫🇷) replacing the binary SUB badge. Best all-round pick for 4K Apex users.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg"
+  alt="Core Nexus Apex v2 preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-v2-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Nexus Elite (Bundled in all templates)
+
+High-contrast and immediately legible. Colour-coded resolution circles (🟣 4K · 🔵 1080P · 🟢 720P · ⚫ 480P), HDR/DV in the name line, INSTANT/UNCACHED cache badge, and PREMIER release group detection. Ships pre-loaded in every Core Builds template — nothing to do on a fresh import.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg"
+  alt="Core Nexus Elite preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-elite-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Nexus Sigma
+
+Typographic `「 」` / `『 』` bracket system. Title-first name line, smallcaps throughout — a premium editorial feel for users who prefer clean typography over emoji-heavy layouts.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg"
+  alt="Core Nexus Sigma preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-sigma-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Nexus Minimal
+
+3-line description, ⚡/⏳ cache indicator in the name, first audio codec only. Built for TV, Apple TV, and small screens where horizontal space is limited. The most compact layout in the official set.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg"
+  alt="Core Nexus Minimal preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-minimal-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Nexus TV
+
+10-foot UI optimised. UPPER CASE throughout — readable across the room without smallcaps — with coloured resolution circles (🔴 4K · 🔵 1080P · 🟢 720P), a 4-line description with clear section icons (🎬 video · 🔊 audio · 🔌 type/meta). Designed for projectors, smart TVs, and any setup where the screen is across the room.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg"
+  alt="Core Nexus TV preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-tv-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Nexus Apex
+
+Evolution of Elite. Adds audio codec to the name line, a two-tier score badge (💎 ELITE ≥75 · ✦ QUALITY ≥50), and a season pack flag before the file size. Apex v2 is the current recommended variant for most users.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-preview.svg"
+  alt="Core Nexus Apex preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-apex-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Syntax
+
+The original Core Builds formatter. `✦`/`✧` cache indicator in the name, `「 」` bracket metadata system, ◈ ELITE score badge, full release group and edition tagging. The foundation that later formatters were built on.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-preview.svg"
+  alt="Core Syntax preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Syntax V3
+
+Personal build variant with extra features: JBL Spatial audio detection (`🔊 JBL Sᴘᴀᴛɪᴀʟ` when DD+/EAC3 is present), ★ Premium release group badge, IMAX/Hybrid/edition flags, and indexer in the release line.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg"
+  alt="Core Syntax V3 preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-syntax-v3.json" target="_blank">Import Formatter</a>
+
+---
+
+### Omni Diamond v2.2.0
+
+Maximum metadata density. Two-line name (visual tags on a second line), edition/network/remastered flags, JBL Spatial detection, full language + release group + indexer in the description. Best for users who want to see everything at a glance without opening a stream.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/omni-diamond-preview.svg"
+  alt="Omni Diamond v2.2.0 preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/omni-diamond-v2.2.0.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Zenith Diamond
+
+🔹/🔸 dot separator style throughout. Info-dense name line with encode, audio, channels, and PREMIER flag. 4-line description with bitrate, seeders, video quality, language, and release group.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/zenith-diamond-preview.svg"
+  alt="Core Zenith Diamond preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-diamond.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Zenith Auburn Tiger
+
+Auburn Tiger edition of Core Zenith Diamond. Orange 🟠 4K badge, 🐅 release line prefix, amber card palette — a distinct warm aesthetic designed to pair with the Auburn Tiger template.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/auburn-tiger-preview.svg"
+  alt="Core Zenith Auburn Tiger preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-zenith-auburn-tiger-edition.json" target="_blank">Import Formatter</a>
+
+---
+
+### Midnight Slate
+
+Dark minimal. `◼`/`⬤`/`▶`/`◆` ASCII symbols instead of emoji — clean typographic lines for clients that render emoji poorly, or for users who prefer a no-clutter look.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/midnight-slate-preview.svg"
+  alt="Midnight Slate preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/midnight-slate.json" target="_blank">Import Formatter</a>
+
+---
+
+### Nexus Prime
+
+An early Core Builds formatter. Similar layout to Uniform with additional metadata: SeaDex/BEST detection, 📅 age format, per-language subtitle emoji track listing, and folder size support.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg"
+  alt="Nexus Prime preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/nexus-prime-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### Core Nexus Uniform (Legacy)
+
+The predecessor to Core Nexus Elite. Kept for users who prefer the older layout. For new setups, Elite or Apex v2 are the recommended replacements.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/uniform-preview.svg"
+  alt="Core Nexus Uniform preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/core-nexus-uniform-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+## Community Formatters
+
+### RB3 Clean v4
+
+Service-first layout by **RB3**. Three name lines — service + ⚡/⏳ cache status · bold unicode resolution (`𝟰𝗞 𝗨𝗛𝗗` · `𝟭𝟬𝟴𝟬𝗽`) · italic unicode quality source (`𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹` · `𝘞𝘌𝘉-𝘋𝘓`). Up to 6 structured `⁞`-separated description rows — the highest raw metadata density of any formatter in the collection.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-clean-v4-preview.svg"
+  alt="RB3 Clean v4 preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-clean-v4-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+### RB3 Formatter
+
+Original RB3 community formatter. Pairs with the Auburn Tiger template — orange/navy resolution badges, JBL Spatial audio detection, and PREMIER release group tagging. The 🔸/🔹 smallcaps style makes it a natural companion to the Auburn Tiger colour scheme.
+
+<img
+  src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg"
+  alt="RB3 Formatter preview"
+  style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+/>
+
+<a href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatters/rb3-formatter.json" target="_blank">Import Formatter</a>
+
+---
+
+## Notes
+
+- Formatters are display-only — they do not affect which streams appear, filtering, or sort order.
+- All Core Builds formatters use `id: "tamtaro"` with `definitions.overrides.tamtaro` — this is the correct structure for AIOStreams.
+- Score badges (ELITE / QUALITY) only appear when a stream has a ranked regex or stream expression score.
+- `{tools.newLine}` must be used for line breaks in the description — literal newlines cause the formatter to be silently discarded on import.
+- Compatible with AIOStreams v2.4.6+.

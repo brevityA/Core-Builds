@@ -5,7 +5,7 @@
     "description": "TorBox-native build of Core Nexus 4K Apex. Uses only TorBox's own search and Usenet \u2014 no third-party indexers. Identical adaptive ranked-pool bitrate PSEs and full ESE stack. Simpler, faster to load, fewer moving parts.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -266,7 +266,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {
@@ -1719,7 +1719,7 @@
       {
         "type": "stremthruTorz",
         "instanceId": "67c",
-        "enabled": false,
+        "enabled": true,
         "options": {
           "name": "StremThru Torz",
           "timeout": 5000,

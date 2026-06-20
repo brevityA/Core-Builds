@@ -1,0 +1,72 @@
+---
+title: "What's New"
+sidebarTitle: "What's New"
+description: "Plain-English highlights from recent Core Builds releases."
+---
+
+For full technical details, see the [Changelog](/changelog).
+
+---
+
+## v2.9.4 — June 2026
+
+**MediaFusion and HdHub now on by default.**
+Previously these two scrapers were opt-in — you had to manually enable them after every template import before they'd contribute any results. They're now enabled out of the box so templates work fully on a fresh import. MediaFusion adds regional content coverage that TorBox's native scraper misses; HdHub is a TorBox-native P2P scraper for additional cached sources. If you don't want either of them, toggle them off in the Addons section of your AIOStreams dashboard.
+
+**Cached-only template fixed — streams now actually load.**
+The 4K Apex TorBox variant (the cached-only version of 4K Apex) was shipping with its stream delivery addon disabled. This meant importing it and hitting play returned nothing — the template was technically correct but the service that delivers the streams was switched off. Fixed. The cached-only behaviour is preserved through the exclude-uncached setting, not by disabling the provider.
+
+---
+
+## v2.9.3 — June 2026
+
+**4K WEB-DL streams no longer suppressed on new releases.**
+When a film releases digitally before its Blu-ray ships — think Spider-Man: Brand New Day — the template was accidentally blocking all 4K WEB-DL streams. The logic was designed to avoid showing upscaled content when a proper 4K Blu-ray exists, but it was too aggressive: it also blocked legitimate 4K streaming masters for titles that simply don't have a Blu-ray yet. Fixed. Streaming masters for theatrical releases come through correctly now. Once the Blu-ray arrives and remuxes are indexed, those will rank above the WEB-DL as normal.
+
+---
+
+## v2.9.2 — June 2026
+
+**Knaben and Torrent Galaxy moved to backup scrapers.**
+Both scrapers were confirmed slow and only useful for content already in debrid cache — they weren't meaningfully adding results that faster scrapers missed. They're still in the template as last-resort sources (capped at one result each) so they can catch a cache hit when everything else comes up empty, but they no longer slow down your stream request on every query.
+
+**AIOSubtitle is now the sole subtitle source.**
+OpenSubtitles V3+ has been removed from all templates. AIOSubtitle covers the same subtitle content, so there's no loss in coverage — this just removes a redundant network call on every stream request.
+
+---
+
+## v2.9.1 — June 2026
+
+**Per-addon flood guard extended to AllDebrid and Samsung TV templates.**
+A flood guard that caps how many results any single scraper can contribute to your list has been in the main TorBox templates for a while. It prevents one slow or noisy scraper from flooding your stream list with 20 low-quality results. This release extends that guard to the AllDebrid and Samsung TV templates that were previously missing it.
+
+---
+
+## v2.9.0 — June 2026
+
+**Templates now work on both ElfHosted and fortheweak.cloud.**
+If you use Yeb's AIOStreams instance at fortheweak.cloud, you may have seen regex import errors with earlier templates — patterns that imported cleanly on ElfHosted were being rejected on fortheweak's stricter setup. Eleven ranking patterns and three exclusion patterns that caused these rejections have been removed from all templates. All Core Builds templates from v2.9.0 onwards are verified clean on both hosts. Quality ranking and LQ exclusion are preserved through the remaining patterns and the shared Tamtaro exclusion list.
+
+---
+
+## v2.8.4 — June 2026
+
+**Cached Usenet streams now rank where they belong.**
+TorBox supports Usenet (NZB) sources alongside torrents. When a cached Usenet stream didn't fit neatly inside the quality-window filters, it was falling below all the ranked torrent streams — sometimes even below uncached content. A new sorting pass at the end of each template catches any remaining cached Usenet streams that slipped through and promotes them above uncached results. If you use TorBox Pro's Usenet features, NZB results now appear in a sensible position.
+
+---
+
+## v2.8.0 — June 2026
+
+**AllDebrid template family launched.**
+Four dedicated templates for AllDebrid users: 4K AllDebrid, 4K AllDebrid Lite, AllDebrid, and AllDebrid Lite. The full quality filtering stack — IQR Tukey fence adaptive bitrate windows, all the hard quality kills, regex scoring — carries over from the TorBox equivalents. The only structural difference is that AllDebrid uses a different stream delivery service than TorBox.
+
+**Fire Stick optimised template added.**
+Core Nexus Stream Fire Stick is a 1080p template tuned for Fire Stick codec constraints — same quality filtering as Core Nexus Stream, adjusted for the hardware limitations of Fire Stick and similar low-RAM devices.
+
+**Age-decay replaces the hard 60-day cliff.**
+Previously, when a title had very few ranked peers, content older than 60 days fell through all quality filters and ended up at the bottom of your list. Day 59 got a bitrate window; day 61 got nothing. This has been replaced with a smooth exponential curve — content gradually ages out of the quality window over about 90 days rather than hitting an abrupt cutoff. Newer releases get tighter filtering; older releases progressively relax until they're no longer windowed at all. Applied to the 4K Apex, 4K Hybrid, and 4K Essential templates.
+
+---
+
+Older releases → [Full Changelog](/changelog)

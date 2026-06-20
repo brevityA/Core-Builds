@@ -1,0 +1,634 @@
+---
+title: "Complete Guide"
+sidebarTitle: "Complete Guide"
+description: "Everything about Core Builds — Stremio vs WuPlay, advanced editing, resetting, search criteria, catalogs, and TMDB setup."
+---
+
+Core Builds templates are plug-and-play, but there is more to explore once you are up and running. This page covers everything that is not already on a dedicated doc page — from choosing between Stremio and WuPlay, to editing raw JSON safely, resetting a broken instance, tuning search criteria, adding library catalog tabs, and setting up TMDB metadata keys.
+
+<CardGroup cols={3}>
+  <Card title="Which Template?" icon="map" href="/which-template" />
+  <Card title="Import a Template" icon="download" href="/importing" />
+  <Card title="How It Works" icon="gear" href="/how-it-works" />
+  <Card title="Formatters" icon="paintbrush" href="/formatters" />
+  <Card title="Device Profiles" icon="mobile" href="/device-profiles" />
+  <Card title="Troubleshooting" icon="wrench" href="/troubleshooting" />
+</CardGroup>
+
+---
+
+## Stremio vs WuPlay
+
+Both players work with Core Builds templates, but they behave differently in ways that matter.
+
+### At a Glance
+
+| Feature | Stremio | WuPlay |
+|---|---|---|
+| Platform | Windows, Mac, Linux, Android, iOS, Smart TV | Android, Fire TV, Android TV |
+| Stream type handling | Some YouTube/external streams slip through | Suppresses these more reliably |
+| UI maturity | Polished, well-established | Newer, actively developed |
+| Metadata | Excellent (Cinemeta) | Good |
+| Deep links | Standard | Extended |
+| Offline support | Limited | Better |
+| Cost | Free (Stremio+/Web is paid) | Free |
+
+### Stream Type Differences
+
+The biggest practical difference between the two players is how they handle YouTube and external-type streams.
+
+When Stremio's native catalog (Cinemeta) finds no streams for a title, it sometimes injects YouTube trailer links or external info cards alongside the AIOStreams results. These appear as clickable "streams" in your list but open a web browser instead of playing video.
+
+**AIOStreams mitigation (v2.4.6+):**
+- The `Hard YouTube Kill` ESE blocks `type(streams, 'youtube')`, `type(streams, 'external')`, and keyword matches
+- `excludedStreamSources` blocks YouTube source variants
+- `hideErrors: true` suppresses AIOStreams' own error cards
+
+WuPlay does not inject these Cinemeta trailer entries alongside addon results, so the problem simply does not occur. If you encounter YouTube links in WuPlay, the ESE fix will still catch them.
+
+### Real-Debrid Behaviour
+
+**Stremio** interacts with RD through its standard addon API. RD's May 2026 server-side filter causes error cards to appear in the stream list when cached files are flagged — `hideErrors: true` suppresses these, but the underlying RD streams are gone.
+
+**WuPlay** processes RD stream responses slightly differently, and community testing shows reduced impact from the RD filter. The Advanced dual-core builds are consistently reported as working better on WuPlay than on Stremio.
+
+### Which Should I Use?
+
+**Use Stremio if:**
+- You are on a platform where WuPlay is not available (Windows, Mac, Linux, iOS, Smart TV)
+- You want the most stable, polished experience
+- You primarily use TorBox-only templates (no RD dependency)
+
+**Use WuPlay if:**
+- You are on Android, Fire TV, or Android TV
+- You use the Hybrid (TorBox + RD) templates
+- YouTube/external stream leakage has been a problem for you in Stremio
+- You want better handling of niche stream types
+
+### Using Both
+
+There is no conflict. You can install the same AIOStreams manifest in both players simultaneously. Many users run Stremio on desktop and WuPlay on a Fire TV Stick — the same template works across both.
+
+### Formatter Compatibility
+
+Both players fully support AIOStreams formatters. The `name` and `description` fields render correctly in both. WuPlay may display slightly different line heights or wrapping on very long description lines, but all Core Builds formatters are tested on both platforms.
+
+---
+
+## Advanced Editing
+
+Core Builds are designed to be plug-and-play, but you can adjust caching rules, tweak filtering, or edit the raw template JSON. This section covers how to do it safely.
+
+### Step 1 — Access Your AIOStreams Host
+
+Open your preferred AIOStreams instance and navigate to your existing configuration. You can reach it via the **Configure** button in Stremio next to the AIOStreams addon, or by visiting your host directly and entering your password.
+
+| Rank | Host | URL |
+|---|---|---|
+| 🥇 | ElfHosted | `https://aiostreams.elfhosted.com` |
+| 🥈 | Yeb's (ForTheWeak) | `https://aiostreams.fortheweak.cloud` |
+| 🥉 | Midnight's | `https://aiostreamsfortheweebsstable.midnightignite.me` |
+| 4 | Viren's | `https://aiostreams.viren070.me` |
+| 5 | Kuu's | `https://aiostreams.stremio.ru` |
+| 6 | ATBP | `https://aio.atbphosting.com` |
+| 7 | Omni's | `https://aiostreams.12312023.xyz` |
+
+### Step 2 — Enable Advanced Mode
+
+1. Look near the top of the configuration page — usually top-right or just below the main header
+2. Find the toggle labelled **"Advanced Mode"** or **"Show Advanced Settings"**
+3. Toggle it **ON**
+
+Once enabled, the UI expands to show deeper developer settings.
+
+### Step 3 — What Advanced Mode Unlocks
+
+- **Raw JSON Editor** — directly edit `excludedStreamExpressions`, resolution limits, scraper timeouts, and any other config field
+- **Granular Scraper Controls** — fine-tune how each addon (Comet, Meteor, MediaFusion, etc.) behaves within the build
+- **Proxy Configuration** — direct access to MediaFlow proxy URLs and credentials
+- **Synced URL Management** — view and edit the external regex and expression URLs your template pulls from
+
+### Editing Rules
+
+<Warning>
+JSON syntax is strict. A single missing comma or mismatched bracket will break the entire template and prevent it from loading.
+
+```json
+// ❌ WRONG — trailing comma before closing bracket
+"excludedQualities": ["CAM", "SCR",]
+
+// ✅ CORRECT
+"excludedQualities": ["CAM", "SCR"]
+```
+</Warning>
+
+**Quality values must match exactly.** AIOStreams only accepts specific enum strings for quality fields. Case matters:
+
+| Correct | Wrong |
+|---|---|
+| `BluRay REMUX` | `Bluray REMUX` |
+| `BluRay` | `Bluray` |
+| `WEB-DL` | `WEBDL` |
+| `WEBRip` | `Webrip` |
+| `HC HD-Rip` | `HC HD-RIP` |
+
+**Stream Expression functions must exist.** AIOStreams SEL only recognises specific built-in functions. Common mistakes that break expressions silently:
+
+| Correct | Wrong |
+|---|---|
+| `type(streams, 'youtube')` | `streamType(streams, 'youtube')` |
+| `keyword(streams, 'WEB-DL')` | `filename(streams, 'WEB-DL')` |
+| `quality(streams, 'BluRay')` | `quality(streams, 'Bluray')` |
+
+**Sort keys must be valid.** The `sortCriteria` field only accepts recognised sort keys. These are not valid and will throw an import error:
+- `season`
+- `episode`
+
+Valid keys include: `quality`, `resolution`, `cached`, `seeders`, `size`, `age`, `bitrate`, `releaseGroup`, `streamExpressionMatched`, `seadex`, and others listed in the AIOStreams schema.
+
+**`sortCriteria` requires `"direction"`, not `"order"`.** AIOStreams rejects `"order"` on import with a schema validation error even though both names seem intuitive. Always use:
+
+```json
+"sortCriteria": {
+  "global": [
+    { "key": "streamExpressionMatched", "direction": "desc" },
+    { "key": "cached", "direction": "desc" }
+  ]
+}
+```
+
+**Formatter expressions — use `||` not `|`.** In the formatter's name and description fields, condition separators must be double-pipe `||`. A single pipe will cause the expression to fail and render raw template text.
+
+```
+// ❌ WRONG
+{stream.quality::exists["BluRay"|"Unknown"]}
+
+// ✅ CORRECT
+{stream.quality::exists["BluRay"||"Unknown"]}
+```
+
+**`stream.age` already includes its unit.** In current versions of AIOStreams, `stream.age` returns the age value with a `d` suffix already appended (e.g. `10d`). Do not add another `d` in your formatter template or it will display `10dd`:
+
+```
+// ❌ WRONG — produces "10dd"
+{stream.age::>0["• {stream.age}d"||"• New"]}
+
+// ✅ CORRECT
+{stream.age::>0["• {stream.age}"||"• New"]}
+```
+
+<Warning>
+Services — all opt-in, none required. All templates ship with the full 12-service roster set to `enabled: false`. Do not set any service to `enabled: true` in the raw JSON. This forces the template to require that service and will break it for anyone who does not have it. Enable services through the UI only.
+</Warning>
+
+**`stremthruTorz` vs `stremthruStore`.** The debrid provider preset differs by service:
+- `stremthruTorz` — TorBox-specific (used in all TorBox templates)
+- `stremthruStore` — all other debrid services: AllDebrid, Real-Debrid, Premiumize, etc.
+
+Do not swap these. Using `stremthruTorz` with a non-TorBox API key produces zero streams silently.
+
+**Regex patterns — whitelist applies on public instances.** If you add custom entries to `rankedRegexPatterns`, `preferredRegexPatterns`, or `excludedRegexPatterns`, hosted AIOStreams instances (elfhosted, fortheweak) only allow patterns whose `pattern` string exactly matches an entry in their whitelist. Adding a new pattern with a custom regex will be rejected on import with "X/N regexes not allowed" — your pattern must already exist verbatim in the host's allowed list. See [Expression Layer](/expression-layer) for the full regex architecture reference.
+
+### Validate Before Saving
+
+<Tip>
+If you make any manual edits, always validate before saving. Copy your edited JSON and paste it into [JSONLint](https://jsonlint.com/) or [JSON Formatter](https://jsonformatter.curiousconcept.com/) to catch syntax errors before they break your build.
+</Tip>
+
+---
+
+## Resetting Your Instance
+
+Sometimes a template import goes wrong, credentials get stuck in a broken state, or you simply want to start completely fresh.
+
+### Before You Reset — Back Up First
+
+If your instance is still accessible, export your current configuration before doing anything else.
+
+1. Open your AIOStreams dashboard
+2. Go to the **Template** section
+3. Tap the **Export** icon (box with outward arrow)
+4. Save the JSON file somewhere safe
+
+### Choosing the Right Reset
+
+| Situation | What to do |
+|---|---|
+| Template imported wrong settings | Soft reset — re-import over existing config |
+| Config is broken but you can still log in | Soft reset or hard reset |
+| Forgotten password | Hard reset — Delete User |
+| Stremio showing errors after config change | Re-install manifest only |
+| Want to switch templates entirely | Soft reset — re-import new template |
+| Something is fundamentally broken | Hard reset — Delete User |
+
+### Option 1 — Soft Reset (Re-Import a Template)
+
+Re-importing a template replaces your entire configuration without deleting your account or credentials. This is the quickest fix for most problems.
+
+1. Open your AIOStreams dashboard
+2. Go to the **Template** section
+3. Tap the **Import** icon
+4. Paste the raw GitHub URL for your chosen template or select a local file
+5. Enter your credentials when prompted
+6. Tap **Load Template**
+7. Review that services and addons look correct
+8. Tap **Save**
+9. Copy the new manifest URL and reinstall in Stremio or WuPlay
+
+<Note>
+The re-import replaces all filter settings, addons, sort criteria, and formatter settings. Your password is not affected.
+</Note>
+
+### Option 2 — Hard Reset (Delete User)
+
+Deletes your entire account and configuration. Use this when a soft reset is not enough or when you have forgotten your password.
+
+<AccordionGroup>
+  <Accordion title="Step 1 — Note your manifest URL (if possible)">
+    If Stremio still has the addon installed, you will need to uninstall it after the reset. Having the old URL makes this easier, but it is not required.
+  </Accordion>
+  <Accordion title="Step 2 — Delete your user account">
+    1. Open your AIOStreams host in a browser
+    2. Scroll to the very bottom of the configuration page
+    3. Tap **Delete User**
+    4. Confirm the deletion
+
+    <Warning>
+    This permanently removes your account, password, and all saved configuration. It cannot be undone.
+    </Warning>
+  </Accordion>
+  <Accordion title="Step 3 — Create a new account">
+    1. Refresh the page — you will be returned to the initial setup screen
+    2. Enter a new password (or the same one)
+    3. Tap **Create User** or **Register**
+  </Accordion>
+  <Accordion title="Step 4 — Re-import your template">
+    Follow the steps in the [Import a Template](/importing) guide to load a fresh template and enter your API keys.
+  </Accordion>
+  <Accordion title="Step 5 — Uninstall the old addon from Stremio">
+    1. Open Stremio
+    2. Go to **Addons**
+    3. Find the old AIOStreams entry and tap **Uninstall**
+    4. Tap **Install** on the new manifest URL from your fresh setup
+  </Accordion>
+</AccordionGroup>
+
+### Option 3 — Password Reset
+
+If you have forgotten your password and cannot log in, a full Delete User is the only option on most hosted instances — there is no password recovery email flow. Follow Option 2 above.
+
+<Note>
+On self-hosted Docker instances, you can reset the password by clearing the relevant environment variable or database entry and restarting the container. Check your host's documentation for the exact procedure.
+</Note>
+
+### Reinstalling in Stremio After Any Reset
+
+Any time you reset or change your AIOStreams configuration, your manifest URL changes. The old URL in Stremio will stop returning results. You must reinstall.
+
+<Tabs>
+  <Tab title="Stremio">
+    1. Go to **Addons**
+    2. Find the old AIOStreams entry — tap **Uninstall**
+    3. Open your AIOStreams dashboard and copy the new manifest URL
+    4. Paste it into Stremio's addon search bar or tap **Install** from the dashboard
+  </Tab>
+  <Tab title="WuPlay">
+    1. Open WuPlay configurer
+    2. Navigate to **Add-ons**
+    3. Remove the old AIOStreams manifest URL
+    4. Paste the new URL and confirm
+  </Tab>
+</Tabs>
+
+<Note>
+If you did a soft reset (re-imported a template) and your manifest URL did not change, you do not need to reinstall. Stremio will pick up the updated configuration automatically on the next stream request. A full app restart speeds this up.
+</Note>
+
+### Common Problems After a Reset
+
+<AccordionGroup>
+  <Accordion title="Import fails with HTTP 404">
+    The template URL is wrong or the file does not exist at that path on GitHub. Check the URL carefully — folder names and filenames are case-sensitive.
+  </Accordion>
+  <Accordion title='Import fails with "Invalid template"'>
+    The JSON file is malformed. Validate it at [jsonlint.com](https://jsonlint.com) before importing.
+  </Accordion>
+  <Accordion title="Stremio still showing the old stream list">
+    The old manifest is still installed. Uninstall it from the Stremio addon manager and reinstall with the new URL.
+  </Accordion>
+  <Accordion title="Credentials modal does not appear after re-import">
+    Some hosts cache the credential state. Try logging out and back in, or clearing your browser cache, then re-importing.
+  </Accordion>
+  <Accordion title="NZBGeek still not working after reset (Hybrid template)">
+    The NZBGeek API key is not entered in the credentials modal — it must be configured in the Addons section after loading. See the [Import a Template](/importing) guide for the full NZBGeek setup step.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Search Criteria
+
+### What Is Search Criteria?
+
+When you open a movie or show in Stremio, AIOStreams sends a request to your addons with the title, year, and episode information. Search criteria controls how strictly the returned streams must match that request before they are shown to you.
+
+Too strict → zero results on valid content
+Too loose → wrong content appearing (a movie showing episodes from a show with the same name)
+
+All three matching settings live in the same section of the config:
+
+```json
+"titleMatching": {
+  "enabled": true,
+  "mode": "contains",
+  "similarityThreshold": 0.75
+},
+"yearMatching": {
+  "enabled": true,
+  "strict": false,
+  "tolerance": 2
+},
+"seasonEpisodeMatching": {
+  "enabled": true,
+  "strict": false
+}
+```
+
+### Title Matching
+
+Controls whether the stream's filename must contain the title of the content you're watching.
+
+| Setting | Values | Default (Core Builds) |
+|---|---|---|
+| `enabled` | `true` / `false` | `true` |
+| `mode` | `"contains"` / `"exact"` | `"contains"` |
+| `similarityThreshold` | `0.0` – `1.0` | `0.75` |
+
+**`contains` (recommended)** — the stream filename just needs to include the title somewhere. "Gladiator.II.2024.2160p..." would match a search for "Gladiator 2".
+
+**`exact`** — the stream filename must match the title almost perfectly. `exact` mode causes zero results on sequels, films with alternate titles, and anything with punctuation differences. Never use `exact` for public templates.
+
+**Similarity Threshold** — how closely the title in the stream filename must resemble the requested title. Only applies in `contains` mode.
+
+| Threshold | Effect |
+|---|---|
+| `1.0` | Perfect match required — same as `exact` mode effectively |
+| `0.75` | Recommended — handles minor variations, punctuation, romanisation |
+| `0.60` | Loose — may allow unrelated streams with partial title matches |
+| `0.50` | Very loose — not recommended |
+
+### Year Matching
+
+Filters streams based on the release year. Prevents you from seeing a 1990 film when you open a 2023 remake with the same name.
+
+| Setting | Values | Default (Core Builds) |
+|---|---|---|
+| `enabled` | `true` / `false` | `true` |
+| `strict` | `true` / `false` | `false` |
+| `tolerance` | Integer (years) | `2` |
+
+**`strict: false` (recommended)** — a stream is allowed if its year is within the tolerance range. A ±2 tolerance means a 2023 film will match streams tagged 2021–2025.
+
+**`strict: true`** — streams must match the year exactly. This causes zero results because TMDB and release groups sometimes disagree on release year by 1–2 years, films released at year-end get tagged as the following year, and international releases sometimes use the local premiere year.
+
+**Tolerance** — how many years either side of the TMDB year are accepted. Only applies when `strict: false`.
+
+| Tolerance | Effect |
+|---|---|
+| `0` | Same as `strict: true` |
+| `1` | One year either side — can still miss some edge cases |
+| `2` | Recommended — covers all common year discrepancy scenarios |
+| `3+` | Too loose for most content — remakes may collide with originals |
+
+### Season / Episode Matching
+
+For series content, controls whether streams must have explicit season and episode metadata matching the episode you're watching.
+
+| Setting | Values | Default (Core Builds) |
+|---|---|---|
+| `enabled` | `true` / `false` | `true` |
+| `strict` | `true` / `false` | `false` |
+
+**`strict: false` (recommended)** — streams are allowed through even if they don't have explicit S/E metadata in the filename. BluRay and REMUX releases frequently omit S/E numbering in filenames, older releases used different naming conventions, and season packs often don't have per-episode tags.
+
+**`strict: true`** — every stream must have a season and episode number that exactly matches the requested episode. This will drop all BluRay REMUXes, most older content, and any stream that uses non-standard episode naming.
+
+### Language Settings
+
+| Field | Effect |
+|---|---|
+| `requiredLanguages` | Hard-requires every stream to match. Streams without any of these languages are dropped completely. |
+| `preferredLanguages` | Soft preference used for sorting. Streams with these languages rank higher. Nothing is blocked. |
+
+Core Builds sets `requiredLanguages: []` (empty) on all templates. This is intentional — hard-requiring languages blocks streams that don't have language metadata embedded (common in older releases, scene content, and some Usenet uploads) even when the content is perfectly valid English content.
+
+<Warning>
+If you do add languages to `requiredLanguages`, always include `"Unknown"` — a large proportion of valid streams have no language tag and would be dropped without it.
+</Warning>
+
+### Common Scenarios
+
+| Symptom | Fix |
+|---|---|
+| Zero results on a specific title | Lower `similarityThreshold` to `0.65`, confirm `yearMatching.tolerance` is `2`, confirm `strict: false` on both year and season/episode matching |
+| Wrong show or movie results appearing alongside correct ones | Increase `similarityThreshold` to `0.80`, confirm `yearMatching.tolerance` is not too high |
+| Older content (pre-2000) returning few results | Lower `similarityThreshold` to `0.65`, increase `yearMatching.tolerance` to `3`, confirm `seasonEpisodeMatching.strict` is `false` |
+| Anime returning wrong dubs or wrong shows | Lower `similarityThreshold` to `0.65`, ensure SeaDex ISE is enabled, ensure `preferredLanguages` includes `"Dubbed"` if dubs are wanted |
+| Series returning season packs instead of individual episodes | Confirm the `ongoingSeasonPack` ESE is enabled, check your TMDB API key is correctly set |
+
+### Full Reference Config
+
+The safest, most permissive matching configuration for maximum stream coverage:
+
+```json
+"titleMatching": {
+  "enabled": true,
+  "mode": "contains",
+  "similarityThreshold": 0.75
+},
+"yearMatching": {
+  "enabled": true,
+  "strict": false,
+  "tolerance": 2
+},
+"seasonEpisodeMatching": {
+  "enabled": true,
+  "strict": false
+},
+"requiredLanguages": [],
+"preferredLanguages": ["English", "Original", "Dual Audio", "Multi", "Dubbed", "Unknown"]
+```
+
+<Warning>
+The three strict settings that break things most often:
+
+- `titleMatching.mode: "exact"` — kills sequels, alternate titles, romanised anime
+- `yearMatching.strict: true` — kills year-boundary releases
+- `seasonEpisodeMatching.strict: true` — kills BluRay REMUX and older content
+
+All three default to their strict forms in a fresh AIOStreams install. All three Core Builds templates correct this. If you are building your own config from scratch or editing someone else's, these are the first three settings to check when streams are not appearing.
+</Warning>
+
+---
+
+## Catalogs
+
+Catalogs are the browse tabs that appear in Stremio's **Discover** screen and on the home page — "Your Movies", "Your Series", "Your Anime", and "Continue Watching" lists. They are separate from stream results and are powered by your debrid service's library, not the scrapers.
+
+### Why Templates Ship With Empty Catalogs
+
+Templates shipped through Core Builds default to `"mergedCatalogs": []`. This is intentional:
+
+- Catalog availability depends on which addons you have enabled and which debrid service you're using
+- TorBox catalog IDs differ from AllDebrid catalog IDs — a pre-filled catalog list from a TorBox template would break for AllDebrid users
+- Empty is the safe default — users add the catalogs that match their own setup
+
+### Standard Catalog Types
+
+| Catalog | What it shows |
+|---|---|
+| Your Movies | Movies you've cached or downloaded via TorBox |
+| Your Series | TV series in your TorBox library |
+| Your Anime | Anime titles in your TorBox library |
+| Continue Watching — Movies | Movies you've started but not finished |
+| Continue Watching — Series | Episodes you've started but not finished |
+
+The "Continue Watching" entries are sourced from your Stremio watch history combined with what's in your library.
+
+### How to Add Catalogs
+
+1. Open your AIOStreams dashboard and log in
+2. Scroll down until you see the **Catalogs** section (usually between Addons and Formatter)
+3. Click **Add Catalog** (or the `+` button). Each entry has these fields:
+   - **Addon** — which addon provides this catalog. For TorBox library catalogs, select `Library` or `TorBox`
+   - **Type** — the content type: `movie`, `series`, or `anime`
+   - **ID** — the catalog ID string. Common TorBox values: `torbox_movies`, `torbox_series`, `torbox_anime`
+4. Click **Save**
+5. **Uninstall the old AIOStreams addon from Stremio and reinstall with the new manifest URL** — catalog tabs only appear after a fresh manifest install
+
+<Note>
+Catalog IDs are service-specific. TorBox uses `torbox_movies`, `torbox_series`, `torbox_anime`. AllDebrid catalog IDs differ — check your AIOStreams instance's Catalog section after enabling the Library addon to see which IDs are available for your service.
+</Note>
+
+<Tip>
+Not sure of the exact catalog IDs? Add the Library addon from AIOStreams → Addons, then open the Catalogs section — the available catalog IDs should auto-populate or be listed in the addon's configuration.
+</Tip>
+
+### Catalogs vs Stream Results
+
+| | Catalogs | Stream Results |
+|---|---|---|
+| Where they appear | Stremio Home / Discover tabs | Inside a movie or show page |
+| What they show | Browsable library lists | Ranked streams ready to play |
+| What controls them | `mergedCatalogs` in config | ESEs, PSEs, sort criteria |
+| Updated when | Manifest reinstalled | Every stream request |
+| Affected by template import | Yes — reset to template defaults | Yes — all settings replaced |
+
+### Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Catalog tabs not appearing after adding them">
+    The manifest URL must be reinstalled in Stremio. Adding catalogs changes the manifest — the old URL does not update automatically.
+
+    1. AIOStreams dashboard → copy the new manifest URL
+    2. Stremio → Addons → find AIOStreams → **Uninstall**
+    3. Paste the new manifest URL → **Install**
+    4. Restart Stremio
+  </Accordion>
+  <Accordion title="Catalogs appear but are empty">
+    Your TorBox library is empty or the Library addon is not enabled.
+
+    - Go to AIOStreams → Addons → confirm the **Library** addon is present and enabled
+    - Add a few files to TorBox first, then refresh the catalog in Stremio
+  </Accordion>
+  <Accordion title='"Your Anime" tab is missing even after adding it'>
+    The anime catalog type depends on your debrid service tagging content as anime. TorBox auto-categorises most content based on TMDB genre. If your TorBox library contains anime but the catalog is empty, the issue is usually that the titles were cached before TorBox's genre tagging updated — try re-adding one title to TorBox and checking again.
+  </Accordion>
+  <Accordion title="Catalogs disappeared after re-importing a template">
+    Expected. Re-importing resets `mergedCatalogs` to the template's defaults. Re-add your catalog entries through the Catalogs section and reinstall the manifest after saving.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## TMDB & TVDB Keys
+
+AIOStreams uses TMDB (The Movie Database) for title matching, season detection, and metadata enrichment. Without a key, some features degrade silently — season pack filtering stops working, "continue watching" recommendations don't load, and some marketplace addons refuse to start.
+
+### Why You Need a TMDB Key
+
+| Feature | Requires TMDB |
+|---|---|
+| Title matching accuracy | Yes |
+| Season detection (`ongoingSeasonPack` ESE) | Yes |
+| "Recommended" content in catalogs | Yes |
+| Episode air date awareness | Yes |
+| Some marketplace addons | Yes |
+
+Templates ship with `"tmdbAccessToken": "<template_placeholder>"` and `"tmdbApiKey": "<template_placeholder>"`. These placeholders must be replaced with your real key — the template will not prompt you automatically.
+
+### Which Key to Use
+
+TMDB offers two credential types. You only need one.
+
+| | Read Access Token | API Key |
+|---|---|---|
+| Format | Long JWT string (~200 chars) | 32-character hex string |
+| Recommended | Yes — use this one | Only if an addon specifically asks for it |
+| Where to find | TMDB → Settings → API → Read Access Token | TMDB → Settings → API → API Key (v3 auth) |
+
+Use the **Read Access Token** for AIOStreams. It's the long string starting with `eyJ...`.
+
+### Step 1 — Get Your TMDB Read Access Token
+
+1. Go to [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
+   - If you don't have an account, register at [themoviedb.org/signup](https://www.themoviedb.org/signup) — it's free
+2. Scroll down to **API Read Access Token**
+3. Copy the full token (it's long — make sure you copy all of it)
+
+<Warning>
+Do not copy the **API Key (v3 auth)** by mistake — it's the shorter string directly above the Read Access Token on the same page. They look similar but are different credentials.
+</Warning>
+
+### Step 2 — Enter It in AIOStreams
+
+1. Open your AIOStreams dashboard
+2. Scroll to the **Metadata** section (usually near the bottom, below Formatter)
+3. Paste your Read Access Token into the **TMDB Read Access Token** field
+4. Leave the **TMDB API Key** field blank unless a specific addon asks for it
+5. Click **Save**
+
+<Note>
+If you re-import a template, the TMDB fields reset to their placeholder values. You will need to re-enter your key after every import.
+</Note>
+
+### TVDB — Optional
+
+TVDB is a separate TV-focused metadata database. AIOStreams supports it but does not require it for any Core Builds functionality.
+
+You only need a TVDB key if a specific addon you're using explicitly requires it. To get one:
+
+1. Go to [thetvdb.com](https://www.thetvdb.com) and register (free)
+2. Navigate to your profile → **API Keys**
+3. Generate a new API key and paste it into the **TVDB API Key** field in AIOStreams → Metadata
+
+If you're only using Core Builds templates with TorBox, you can leave the TVDB field blank.
+
+### Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Season packs showing when they shouldn't">
+    The `ongoingSeasonPack` ESE uses TMDB data to detect whether a show is currently airing. If your TMDB token is missing or invalid, this ESE stops working — season packs may appear alongside individual episode streams.
+
+    Fix: enter your TMDB Read Access Token in the Metadata section and save.
+  </Accordion>
+  <Accordion title='"Recommended" catalog is empty'>
+    The Recommended tab in Stremio pulls TMDB recommendation data. Without a valid token, it returns nothing.
+  </Accordion>
+  <Accordion title='An addon says "TMDB API key required"'>
+    Some marketplace addons require the short 32-character **API Key (v3 auth)** rather than the Read Access Token. Go back to [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api), copy the **API Key (v3 auth)** field, and paste it into the **TMDB API Key** field in AIOStreams → Metadata — not the Read Access Token field.
+  </Accordion>
+  <Accordion title="Token resets after re-importing a template">
+    Expected. Re-importing replaces all config including the TMDB placeholder fields. Always re-enter your key in the Metadata section after any template import.
+  </Accordion>
+</AccordionGroup>

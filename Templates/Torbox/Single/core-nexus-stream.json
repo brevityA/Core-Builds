@@ -5,7 +5,7 @@
     "description": "A frictionless 1080p SDR build running exclusively on TorBox, with RPDB poster database integration for enhanced metadata visuals in Stremio. Targets 1080p and 720p WEB-DL and WEBRip sources. Blocks BluRay, Remux, 4K, and HDR content for reliable playback on any hardware. File range 1 GB\u201360 GB, 1080p capped at 25 GB. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No secondary debrid service required \u2014 a single TorBox subscription is sufficient. Designed for phones, tablets, budget Android TV boxes, and Fire TV Sticks.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.1",
+    "version": "2.9.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -270,7 +270,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
+        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
         "enabled": true
       },
       {
@@ -1753,7 +1753,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4",
         "options": {
           "timeout": 7000,
@@ -1773,7 +1773,7 @@
       },
       {
         "type": "hdhub",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",
