@@ -36,11 +36,14 @@
             "group": "Getting Started",
             "pages": [
               "introduction",
+              "quick-start",
               "master-guide",
               "how-it-works",
               "which-template",
               "importing",
+              "lite-vs-standard",
               "instance-status",
+              "debrid-comparison",
               "alldebrid-setup",
               "easynews-setup",
               "regional-content"
@@ -59,6 +62,8 @@
               "expression-layer",
               "device-profiles",
               "formatters",
+              "formatter-gallery",
+              "which-formatter",
               "glossary",
               "nightly-and-labs",
               "addon-reference"
@@ -67,6 +72,8 @@
           {
             "group": "Support",
             "pages": [
+              "whats-new",
+              "faq",
               "troubleshooting",
               "changelog",
               "roadmap"

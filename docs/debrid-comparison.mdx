@@ -1,0 +1,219 @@
+---
+title: "Debrid Service Comparison"
+sidebarTitle: "Debrid Comparison"
+description: "TorBox, AllDebrid, Real-Debrid, and EasyNews compared for Core Builds users."
+---
+
+A debrid service downloads and caches torrents or Usenet files on their own fast servers so you can stream immediately — no waiting for a torrent to download on your device. AIOStreams sits between your player (Stremio or WuPlay) and whichever debrid service you use, fetching and filtering streams from each enabled service before passing results to your player.
+
+Core Builds supports 12 services in every template: TorBox, Real-Debrid, AllDebrid, Premiumize, DebridLink, Offcloud, Put.io, EasyNews, EasyDebrid, PikPak, Seedr, and Debrider. You enable the ones you subscribe to and ignore the rest.
+
+---
+
+## Which Service Should I Use?
+
+| I want... | Best choice |
+|---|---|
+| Best TorBox integration, Usenet access, broadest template family | TorBox Pro |
+| Torrent caching without Usenet | TorBox Essential or AllDebrid |
+| Large European-friendly torrent cache | AllDebrid |
+| Biggest existing cache of any debrid service | Real-Debrid |
+| Usenet-only streaming | EasyNews |
+| TorBox + a Usenet indexer as a supplemental source | TorBox Pro + NZBGeek (Hybrid templates) |
+
+---
+
+## TorBox
+
+TorBox is the service Core Builds was built around. It has the most dedicated templates, the deepest feature integration, and is the only service with a native two-tier plan structure.
+
+### Plans
+
+| | TorBox Essential | TorBox Pro |
+|---|---|---|
+| Torrent cache | Yes | Yes |
+| Usenet access | No | Yes |
+| Hybrid templates (NZBGeek) | No | Yes |
+| cacheAndPlay / nzbFailover | No | Yes |
+| Flash and Speed templates | Yes | Yes |
+
+### Stream delivery
+
+TorBox templates use the `stremthruTorz` preset for stream delivery — this is TorBox-specific and is separate from the `stremthruStore` preset used by AllDebrid and other non-TorBox services.
+
+### What Pro unlocks
+
+<CardGroup cols={2}>
+  <Card title="Hybrid Templates" icon="shuffle">
+    4K Hybrid, Hybrid, and Hybrid Lite — TorBox torrent cache combined with NZBGeek Usenet. Requires a separate NZBGeek API key. One of the most complete dual-source setups available.
+  </Card>
+  <Card title="Usenet Scrapers" icon="database">
+    The `newznab` preset (NZBGeek) is only meaningful on TorBox Pro. Usenet streams are delivered via the Pro plan's NZB download capability.
+  </Card>
+</CardGroup>
+
+### API key
+
+Settings → API at [torbox.app](https://torbox.app/settings). One key covers both Essential and Pro features.
+
+<Tip>
+  Not sure which plan? Start with Essential — it unlocks Flash, Speed, and all standard Essential templates. Upgrade to Pro if you want the Hybrid templates or NZBGeek Usenet integration.
+</Tip>
+
+---
+
+## AllDebrid
+
+AllDebrid is the second most fully supported service in Core Builds, with its own dedicated template family.
+
+### Dedicated templates
+
+| Template | Resolution | PSE style |
+|---|---|---|
+| 4K AllDebrid | 4K | IQR Tukey fence |
+| 4K AllDebrid Lite | 4K | CB-style (simpler, more results) |
+| AllDebrid | 1080p | Full quality gates |
+| AllDebrid Lite | 1080p | Hard kills only, maximum results |
+
+### Key differences from TorBox
+
+- Uses `stremthruStore` instead of `stremthruTorz` — do not mix these up
+- No Usenet support — torrent cache only
+- EU-based infrastructure with strong European cache coverage
+- No TorBox Search addon in the stack
+
+### API key
+
+Log in at [alldebrid.com](https://alldebrid.com) → My Account → API Keys → create a new key named "AIOStreams".
+
+<Info>
+  For a full AllDebrid setup walkthrough, see the [AllDebrid Setup](/alldebrid-setup) guide.
+</Info>
+
+---
+
+## Real-Debrid
+
+Real-Debrid has the largest existing torrent cache of any debrid service. It works with every Core Builds template and does not have a dedicated template family — you enable it via the Services panel in any template.
+
+### How it works with Core Builds
+
+Real-Debrid is added through **Services** in AIOStreams — no re-import required. It can run alongside TorBox or AllDebrid simultaneously, and AIOStreams will merge and rank streams from all enabled services.
+
+### May 2026 server-side filter
+
+<Warning>
+  In May 2026, Real-Debrid introduced a server-side filter that removes certain WEB-DL cached files from their API responses. This causes error cards to appear in Stremio when a stream was found but Real-Debrid declined to deliver it. All Core Builds templates include `hideErrors: true` to suppress these cards automatically. If you see red error cards, re-import the latest template version.
+</Warning>
+
+### Stremio vs WuPlay
+
+Real-Debrid results are generally better on **WuPlay** than on Stremio. Stremio shows more error cards for filtered files even with `hideErrors: true`, while WuPlay handles the filtered responses more cleanly.
+
+### Running Real-Debrid alongside TorBox
+
+This is one of the most common multi-service setups:
+
+- TorBox handles files it has cached (fast, native integration)
+- Real-Debrid fills in content that isn't in TorBox's cache yet
+- AIOStreams ranks streams from both services together
+
+### API key
+
+Log in at [real-debrid.com](https://real-debrid.com) → My Account → [API token page](https://real-debrid.com/apitoken).
+
+---
+
+## EasyNews
+
+EasyNews is a Usenet provider with its own built-in search — no separate indexer like NZBGeek is required. It is Usenet-only and does not provide torrent cache delivery.
+
+### Dedicated templates
+
+| Template | Services needed | Best for |
+|---|---|---|
+| Speed EasyNews | EasyNews only | EasyNews subscribers without TorBox |
+| Speed 4K+ | TorBox Essential + EasyNews | Dual-source 4K coverage |
+
+### How EasyNews credentials work
+
+EasyNews uses your account **username and password** — not an API key. Enter them in AIOStreams → Add-ons → EasyNews.
+
+### EasyNews vs NZBGeek (Newznab)
+
+| | EasyNews | NZBGeek (Newznab) |
+|---|---|---|
+| Access method | Username + password | API key |
+| Indexer | Built-in EasyNews catalogue | Third-party NZBGeek database |
+| TorBox required | No (standalone) | Yes (Pro) |
+| Core Builds templates | Speed EasyNews, Speed 4K+ | 4K Hybrid, Hybrid, Hybrid Lite |
+| Usenet retention | 3,000+ days | Depends on NZBGeek |
+
+<Info>
+  For a full EasyNews setup walkthrough, see the [EasyNews Setup](/easynews-setup) guide.
+</Info>
+
+---
+
+## Running Multiple Services
+
+AIOStreams queries all enabled services simultaneously and merges the results into a single ranked stream list. Each stream card is labelled with which service cached it, so you always know the source.
+
+### Common multi-service combinations
+
+<CardGroup cols={2}>
+  <Card title="TorBox + Real-Debrid" icon="layer-group">
+    Broadest cache coverage. TorBox handles its native cache; Real-Debrid fills gaps. Best for content that isn't TorBox-cached yet, especially newer releases.
+  </Card>
+  <Card title="TorBox Pro + EasyNews" icon="newspaper">
+    Full dual-source coverage: torrent cache via TorBox and Usenet via EasyNews. No NZBGeek account needed — EasyNews includes its own search.
+  </Card>
+  <Card title="TorBox + AllDebrid" icon="copy">
+    Double torrent cache check. Useful if one service hasn't cached a specific file yet. EU and US infrastructure covered.
+  </Card>
+  <Card title="TorBox Pro + NZBGeek" icon="shuffle">
+    The Hybrid template configuration. TorBox torrent cache plus NZBGeek Usenet indexer with TorBox delivering the NZB. Requires a Pro plan and an NZBGeek subscription.
+  </Card>
+</CardGroup>
+
+<Note>
+  Each service's streams are labelled separately in the stream card. You can always see at a glance whether a result is coming from TorBox, Real-Debrid, AllDebrid, or another service.
+</Note>
+
+---
+
+## Switching Services
+
+No re-import is needed when switching or adding a service. Changes take effect on the next stream request after you save.
+
+<Steps>
+  <Step title="Open Services">
+    In AIOStreams → **Services**, find the service you want to change.
+  </Step>
+  <Step title="Toggle and enter your key">
+    Toggle off the old service if removing it. Toggle on the new service and enter your API key (or username and password for EasyNews).
+  </Step>
+  <Step title="Save">
+    Click **Save**. Your manifest URL does not change — no reinstall required in Stremio or WuPlay.
+  </Step>
+</Steps>
+
+### Troubleshooting after a service switch
+
+<AccordionGroup>
+  <Accordion title="Service is toggled on but returning no results">
+    - Confirm the API key is entered correctly — copy it fresh from the service's dashboard rather than retyping
+    - Check that your subscription is active on the service's website
+    - Test with a popular mainstream title (e.g. a recent blockbuster) — niche content may not be cached
+    - Click **Save** a second time; AIOStreams occasionally requires a double-save for service changes to register
+  </Accordion>
+  <Accordion title="Real-Debrid error cards still appearing after re-import">
+    The May 2026 Real-Debrid server-side filter produces error cards even with `hideErrors: true` in some Stremio versions. Switch to WuPlay if the cards are disruptive — WuPlay handles the filtered responses more cleanly. Ensure you are on the latest template version (v2.9.3+).
+  </Accordion>
+  <Accordion title="EasyNews credentials not working">
+    EasyNews uses your account login credentials, not a separate API key. Enter your EasyNews **username** and **password** in Add-ons → EasyNews — not in the Services panel.
+  </Accordion>
+  <Accordion title="stremthruTorz vs stremthruStore confusion">
+    `stremthruTorz` is TorBox-only. `stremthruStore` is for AllDebrid and other non-TorBox services. If you switched from TorBox to AllDebrid, make sure you are using an AllDebrid template (which uses `stremthruStore`) — a TorBox template will not deliver AllDebrid streams correctly.
+  </Accordion>
+</AccordionGroup>
