@@ -44,14 +44,26 @@ def update_file(path, stable_table, nightly_table):
     with open(path, "r") as f:
         content = f.read()
 
+    mdx = path.endswith(".mdx")
+    if mdx:
+        stable_start, stable_end = r"\{/\* STATUS_STABLE_START \*/\}", r"\{/\* STATUS_STABLE_END \*/\}"
+        stable_wrap = "{/* STATUS_STABLE_START */}", "{/* STATUS_STABLE_END */}"
+        nightly_start, nightly_end = r"\{/\* STATUS_NIGHTLY_START \*/\}", r"\{/\* STATUS_NIGHTLY_END \*/\}"
+        nightly_wrap = "{/* STATUS_NIGHTLY_START */}", "{/* STATUS_NIGHTLY_END */}"
+    else:
+        stable_start, stable_end = r"<!-- STATUS_STABLE_START -->", r"<!-- STATUS_STABLE_END -->"
+        stable_wrap = "<!-- STATUS_STABLE_START -->", "<!-- STATUS_STABLE_END -->"
+        nightly_start, nightly_end = r"<!-- STATUS_NIGHTLY_START -->", r"<!-- STATUS_NIGHTLY_END -->"
+        nightly_wrap = "<!-- STATUS_NIGHTLY_START -->", "<!-- STATUS_NIGHTLY_END -->"
+
     content = re.sub(
-        r"<!-- STATUS_STABLE_START -->.*?<!-- STATUS_STABLE_END -->",
-        f"<!-- STATUS_STABLE_START -->\n{stable_table}\n<!-- STATUS_STABLE_END -->",
+        f"{stable_start}.*?{stable_end}",
+        f"{stable_wrap[0]}\n{stable_table}\n{stable_wrap[1]}",
         content, flags=re.DOTALL
     )
     content = re.sub(
-        r"<!-- STATUS_NIGHTLY_START -->.*?<!-- STATUS_NIGHTLY_END -->",
-        f"<!-- STATUS_NIGHTLY_START -->\n{nightly_table}\n<!-- STATUS_NIGHTLY_END -->",
+        f"{nightly_start}.*?{nightly_end}",
+        f"{nightly_wrap[0]}\n{nightly_table}\n{nightly_wrap[1]}",
         content, flags=re.DOTALL
     )
 
