@@ -5,7 +5,7 @@
     "description": "Dedicated 4K anime template. SeaDex best releases \u00b7 DV/HDR10+ priority \u00b7 Dual audio \u00b7 Nyaa-sourced \u00b7 Sub + Dub aware. TorBox Essential.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.5",
+    "version": "2.8.6",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -184,7 +184,7 @@
       },
       {
         "type": "mediafusion",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "2b4a42a6-f640-4906-9363-98761da35325",
         "options": {
           "timeout": 7000,
@@ -196,7 +196,7 @@
       },
       {
         "type": "hdhub",
-        "enabled": false,
+        "enabled": true,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",
