@@ -61,7 +61,7 @@ WuPlay does not inject these Cinemeta trailer entries alongside addon results, s
 
 **Use WuPlay if:**
 - You are on Android, Fire TV, or Android TV
-- You use the Advanced dual-core (TorBox + RD) builds
+- You use the Hybrid (TorBox + RD) templates
 - YouTube/external stream leakage has been a problem for you in Stremio
 - You want better handling of niche stream types
 
@@ -146,6 +146,17 @@ JSON syntax is strict. A single missing comma or mismatched bracket will break t
 
 Valid keys include: `quality`, `resolution`, `cached`, `seeders`, `size`, `age`, `bitrate`, `releaseGroup`, `streamExpressionMatched`, `seadex`, and others listed in the AIOStreams schema.
 
+**`sortCriteria` requires `"direction"`, not `"order"`.** AIOStreams rejects `"order"` on import with a schema validation error even though both names seem intuitive. Always use:
+
+```json
+"sortCriteria": {
+  "global": [
+    { "key": "streamExpressionMatched", "direction": "desc" },
+    { "key": "cached", "direction": "desc" }
+  ]
+}
+```
+
 **Formatter expressions — use `||` not `|`.** In the formatter's name and description fields, condition separators must be double-pipe `||`. A single pipe will cause the expression to fail and render raw template text.
 
 ```
@@ -169,6 +180,14 @@ Valid keys include: `quality`, `resolution`, `cached`, `seeders`, `size`, `age`,
 <Warning>
 Services — all opt-in, none required. All templates ship with the full 12-service roster set to `enabled: false`. Do not set any service to `enabled: true` in the raw JSON. This forces the template to require that service and will break it for anyone who does not have it. Enable services through the UI only.
 </Warning>
+
+**`stremthruTorz` vs `stremthruStore`.** The debrid provider preset differs by service:
+- `stremthruTorz` — TorBox-specific (used in all TorBox templates)
+- `stremthruStore` — all other debrid services: AllDebrid, Real-Debrid, Premiumize, etc.
+
+Do not swap these. Using `stremthruTorz` with a non-TorBox API key produces zero streams silently.
+
+**Regex patterns — whitelist applies on public instances.** If you add custom entries to `rankedRegexPatterns`, `preferredRegexPatterns`, or `excludedRegexPatterns`, hosted AIOStreams instances (elfhosted, fortheweak) only allow patterns whose `pattern` string exactly matches an entry in their whitelist. Adding a new pattern with a custom regex will be rejected on import with "X/N regexes not allowed" — your pattern must already exist verbatim in the host's allowed list. See [Expression Layer](/expression-layer) for the full regex architecture reference.
 
 ### Validate Before Saving
 
@@ -483,9 +502,13 @@ The "Continue Watching" entries are sourced from your Stremio watch history comb
 3. Click **Add Catalog** (or the `+` button). Each entry has these fields:
    - **Addon** — which addon provides this catalog. For TorBox library catalogs, select `Library` or `TorBox`
    - **Type** — the content type: `movie`, `series`, or `anime`
-   - **ID** — the catalog ID string. Common values: `torbox_movies`, `torbox_series`, `torbox_anime`
+   - **ID** — the catalog ID string. Common TorBox values: `torbox_movies`, `torbox_series`, `torbox_anime`
 4. Click **Save**
 5. **Uninstall the old AIOStreams addon from Stremio and reinstall with the new manifest URL** — catalog tabs only appear after a fresh manifest install
+
+<Note>
+Catalog IDs are service-specific. TorBox uses `torbox_movies`, `torbox_series`, `torbox_anime`. AllDebrid catalog IDs differ — check your AIOStreams instance's Catalog section after enabling the Library addon to see which IDs are available for your service.
+</Note>
 
 <Tip>
 Not sure of the exact catalog IDs? Add the Library addon from AIOStreams → Addons, then open the Catalogs section — the available catalog IDs should auto-populate or be listed in the addon's configuration.
@@ -576,7 +599,7 @@ Do not copy the **API Key (v3 auth)** by mistake — it's the shorter string dir
 5. Click **Save**
 
 <Note>
-If you re-import a template, the TMDB fields reset to `<template_placeholder>`. You will need to re-enter your key after every import.
+If you re-import a template, the TMDB fields reset to their placeholder values. You will need to re-enter your key after every import.
 </Note>
 
 ### TVDB — Optional
