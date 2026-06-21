@@ -71,7 +71,11 @@ Preset `type` values confirmed in AIOStreams source (as of v2.30.x):
 **Debrid/service:** `stremthruTorz`, `stremthruStore`, `torbox-search`, `sootio`, `peerflix`
 - `torbox` — **DEPRECATED** (removed/disabled v2.30.2); use `torbox-search`
 
-**Scrapers:** `comet`, `mediafusion`, `jackettio`, `prowlarr`, `knaben`, `torrentio`, `debridio`, `meteor`, `torrent-galaxy`, `zilean`, `hdhub`, `eztv`, `torrents-db`, `streamfusion`, `baguettio`, `flix-streams`, `brazuca-torrents`, `yastream`, `bitmagnet`, `dmm-cast`
+**Scrapers:** `comet`, `mediafusion`, `jackettio`, `prowlarr`, `knaben`, `torrentio`, `debridio`, `meteor`, `torrent-galaxy`, `zilean`, `hdhub`, `eztv`, `torrents-db`, `streamfusion`, `baguettio`, `flix-streams`, `brazuca-torrents`, `yastream`, `bitmagnet`, `dmm-cast`, `torznab`, `webstreamr`, `nuvio-streams`, `ai-search`
+
+**HTTP stream / direct-play:** `webstreamr` (multi-language HTTP streams from streaming sites), `nuvio-streams` (Showbox/VidSrc/VidZee), `flix-streams` (50+ provider aggregator, paid tier)
+
+**Google Drive / personal media:** `stremio-gdrive` (Google Drive integration, builtin — requires OAuth setup)
 - `orion` — Orionoid aggregator; **TorBox deliberately excluded** from supported services
 - `annatar` — **does not exist** in current codebase (no preset file); remove from any config
 - `mediafusion-public` — not a separate preset file; likely a config option on `mediafusion`, not a distinct type
@@ -85,25 +89,25 @@ Preset `type` values confirmed in AIOStreams source (as of v2.30.x):
 
 **System:** `library` (continue watching / user library), `custom`, `aiostreams` (self-reference/chaining)
 
-**Per-Addon Flood Guard caps (current — v2.9.2):**
-Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent Galaxy ≤ 1 (backup), Knaben ≤ 1 (backup)
+**Per-Addon Flood Guard caps (current — v2.9.5):**
+Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent Galaxy ≤ 1 (backup), Knaben ≤ 1 (backup), TorrentsDB ≤ 1 (backup)
 
 ---
 
-## Active Template Inventory (as of v2.9.4)
+## Active Template Inventory (as of v2.9.5)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.13 — flagship 4K, IQR PSEs, pow() decay
-- `Single/core-nexus-4k-apex-torbox.json` v2.9.2 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.9.4 — 1080p streaming quality, 720p fallback
+- `Single/core-nexus-4k-apex.json` v0.4.14 — flagship 4K, IQR PSEs, pow() decay
+- `Single/core-nexus-4k-apex-torbox.json` v2.9.3 — TorBox-cached-only Apex variant
+- `Single/core-nexus-stream.json` v2.9.5 — 1080p streaming quality, 720p fallback
 - `Single/core-nexus-stream-lite.json` v2.9.2 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.9.3 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick.json` v2.9.4 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.9.2
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.9.2 — 4K with IQR PSEs, pow() decay
+- `Essential/core-nexus-4k-essential.json` v2.9.3 — 4K with IQR PSEs, pow() decay
 - `Essential/core-nexus-4k-essential-lite.json` v2.9.2 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.9.3 — 1080p
+- `Essential/core-nexus-essential.json` v2.9.4 — 1080p
 - `Essential/core-nexus-essential-lite.json` v2.9.2
 
 ### Flash
@@ -121,14 +125,14 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.2 — EasyNews 1080p
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.10 — 4K with IQR PSEs
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.11 — 4K with IQR PSEs
 - `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.8 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.10 — 1080p
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.11 — 1080p
 - `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.10 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.9.3 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
-- `Hybrid/core-nexus-hybrid.json` v2.9.3 — 1080p hybrid, NZBGeek preset
+- `Hybrid/core-nexus-4k-hybrid.json` v2.9.4 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
+- `Hybrid/core-nexus-hybrid.json` v2.9.4 — 1080p hybrid, NZBGeek preset
 - `Hybrid/core-nexus-hybrid-lite.json` v2.9.2 — NZBGeek preset
 
 ### Device
@@ -137,11 +141,11 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.14 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
 
 ### Anime
-- `Anime/core-nexus-anime-4k.json` v2.8.6 — 4K anime, SeaDex + AnimeTosho
+- `Anime/core-nexus-anime-4k.json` v2.8.7 — 4K anime, SeaDex + AnimeTosho
 - `Anime/core-nexus-anime-4k-lite.json` v2.8.5
-- `Anime/core-nexus-anime.json` v2.8.6 — 1080p anime
+- `Anime/core-nexus-anime.json` v2.8.7 — 1080p anime
 - `Anime/core-nexus-anime-lite.json` v2.8.5
-- `Anime/core-nexus-anime-dub.json` v2.8.6 — dubbed variant
+- `Anime/core-nexus-anime-dub.json` v2.8.7 — dubbed variant
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.5
 
 ### Nightly (gitignored — force-add to commit)
@@ -347,6 +351,9 @@ Top-level field: `parentConfig`
       "sorting":   "inherit" | "override",
       "formatter": "inherit" | "override",
       "branding":  "inherit" | "override",
+      "proxy":     "inherit" | "override",
+      "metadata":  "inherit" | "override",
+      "misc":      "inherit" | "override",
       "fieldOverrides": {
         "addonName": "override"
       }
@@ -356,12 +363,36 @@ Top-level field: `parentConfig`
 ```
 
 - **Runtime resolution** — parent is fetched and merged on every `getUser()` call; only child is stored
+- **`proxy`, `metadata`, `misc`** are also valid `mergeStrategies` keys (confirmed v2.30.x) — CLAUDE.md previously documented only 6 of 9 keys
 - Minimum child: just `{ "parentConfig": { "uuid": "...", "password": "..." } }` (all sections inherit)
 - `extend` (presets/services only) merges parent + child lists
 - `fieldOverrides` overrides a single field while inheriting the rest
 - Graceful fallback: if parent unreachable, child loads unmerged
 
 **Planned use:** "Core Builds Base" parent config holding all presets (with tuned timeouts), ESEs, ISEs, sort criteria, and formatter. Child templates specify only PSEs and branding. One change propagates to all 46 templates instantly.
+
+---
+
+## AIOStreams v2.30.x Schema Notes
+
+### `config.deduplicator.tiebreakers` (v2.30.3)
+Controls whether seeder count / usenet age takes precedence before or after addon priority when scores are tied:
+```json
+"tiebreakers": [
+  { "type": "torrent_seeders", "position": "before_addon" },
+  { "type": "usenet_age",      "position": "before_addon" }
+]
+```
+- `position`: `"before_addon"` (seeder/age beats addon order) or `"after_addon"` (addon order wins)
+- Omitting the field defaults to both at `before_addon`
+- Core Builds templates currently omit this field (inheriting the default)
+
+### `VC-1` encode tag
+Now a valid value in `encode()` SEL expressions and `excludedEncodes`. Samsung templates already exclude AV1 and VC-1 — the tag is formally available if needed elsewhere.
+
+### Granular `sortCriteria` keys
+Beyond `global`/`movies`/`series`/`anime`, these per-type × cached/uncached keys are also valid:
+`cachedMovies`, `uncachedMovies`, `cachedSeries`, `uncachedSeries`, `cachedAnime`, `uncachedAnime`
 
 ---
 
