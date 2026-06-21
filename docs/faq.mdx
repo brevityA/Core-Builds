@@ -48,7 +48,11 @@ description: "Quick answers to the most common Core Builds questions."
   </Accordion>
 
   <Accordion title="Very few results on any content — even popular films">
-    Check that MediaFusion and HdHub are enabled in the **Addons** tab. Both are toggled off by default in some template variants. Enabling them significantly increases stream pool size, especially for non-cached content. Also confirm your TorBox subscription tier matches the template — Essential templates are tuned for TorBox Essential accounts.
+    Confirm your TorBox subscription tier matches the template — Essential templates are tuned for TorBox Essential accounts. Also check the **Addons** tab to confirm MediaFusion and HdHub are toggled on (they are on by default from v2.9.4; if you imported an older template they may be off).
+  </Accordion>
+
+  <Accordion title="MediaFusion and HdHub appeared in my add-ons after re-importing">
+    This is expected from v2.9.4 onwards. Both scrapers are now enabled out of the box — MediaFusion for regional and international content that TorBox's native scraper misses, and HdHub for additional TorBox-cached P2P sources. If you don't want either of them, go to **Addons**, find the scraper, and toggle it off. Your stream results for popular English content will be unchanged; the main impact is on non-English and niche titles where TorBox's native search returns nothing.
   </Accordion>
 
   <Accordion title="NZBGeek returns nothing (Hybrid template only)">
