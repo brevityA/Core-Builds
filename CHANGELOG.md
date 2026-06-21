@@ -8,6 +8,10 @@
 
 ### Added
 - **TorrentsDB scraper — 13 non-Lite templates.** `torrents-db` added as a backup scraper (flood guard cap ≤ 1, after Knaben in preset order). TorrentsDB is a Torrentio fork with 21+ indexed providers: YTS, 1337x, Nyaa, AnimeTosho, Rutor, Rutracker, Torrent9, Tamil trackers, and others. Native TorBox debrid support, no API key required. Affected templates: 4K Apex (→ 0.4.14), 4K Apex TorBox (→ 2.9.3), Stream (→ 2.9.5), Stream Firestick (→ 2.9.4), Essential (→ 2.9.4), 4K Essential (→ 2.9.3), Hybrid (→ 2.9.4), 4K Hybrid (→ 2.9.4), AllDebrid (→ 0.1.11), 4K AllDebrid (→ 0.1.11), Anime (→ 2.8.7), Anime 4K (→ 2.8.7), Anime Dub (→ 2.8.7).
+- **TorrentsDB scraper — Samsung TV templates.** Same preset and flood guard configuration (cap ≤ 1) applied to all three Samsung device templates: Samsung TV (v0.2.12 → v0.2.13), Samsung TV 4K (v0.2.12 → v0.2.13), Samsung RU7100 4K (v0.2.14 → v0.2.15).
+
+### Fixed
+- **`useMultipleInstances: false` — TorrentsDB preset on all 16 affected templates.** Initial TorrentsDB deploy shipped without the `useMultipleInstances` field in `options`. AIOStreams v2.30.x requires this field and rejects any preset where it is absent — import returned "Option useMultipleInstances is required, got undefined". Added `"useMultipleInstances": false` to all templates in a follow-up batch.
 
 ---
 
