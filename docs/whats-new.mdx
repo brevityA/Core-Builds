@@ -8,6 +8,13 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## v2.9.5 — June 2026
+
+**More scraper coverage — TorrentsDB added to all full templates.**
+TorrentsDB is a Torrentio fork that indexes 21+ torrent providers including YTS, 1337x, Nyaa, AnimeTosho, and a handful of regional trackers that the existing scrapers don't hit. It works natively with TorBox — no API key or account needed. It's configured as a backup scraper (capped at one result like Knaben and Torrent Galaxy), so it won't slow down queries on popular titles that Meteor, MediaFusion, and HdHub already cover well. Where it makes a difference is niche content, older releases, and anime — titles where TorBox's native scraper and the faster general scrapers come up short. Added to all 13 full-feature templates; Lite, Flash, and Speed templates unchanged.
+
+---
+
 ## v2.9.4 — June 2026
 
 **Stream template now shows 720p when no 1080p source exists.**
