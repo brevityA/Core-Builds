@@ -1,0 +1,243 @@
+---
+title: "Customising Templates"
+sidebarTitle: "Customising"
+description: "Adjust scrapers, result limits, audio, codec, and language settings — with or without editing JSON."
+---
+
+Most changes don't require touching a JSON file at all. Start with the dashboard — only go to the JSON if you need something the UI doesn't expose.
+
+---
+
+## Dashboard-Only Changes (No JSON Needed)
+
+These live in your AIOStreams dashboard and survive re-imports:
+
+**Addons tab**
+- Toggle any scraper on or off (MediaFusion, HdHub, Knaben, EZTV, etc.)
+- Adjust per-addon timeout values
+- Enter API keys for Newznab or EasyNews
+
+**Formatter tab**
+- Swap the stream card layout any time — see [Which Formatter?](/which-formatter)
+
+**Services tab**
+- Enable/disable services, enter API keys
+
+**Template controls (Filters / Sort)**
+- AIOStreams exposes many template fields directly: result limits, size windows, dedup settings, sort order
+
+<Tip>
+  If a setting exists in the dashboard, change it there. Dashboard changes persist across re-imports; JSON edits get overwritten if you re-import the same URL.
+</Tip>
+
+---
+
+## How to Fork and Edit a Template
+
+When you need a change that isn't in the dashboard, you edit the JSON directly and self-host the file.
+
+<Steps>
+  <Step title="Download the template JSON">
+    Open the raw URL for your template and save the file locally. Raw URLs look like:
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json
+    ```
+    Right-click → **Save Link As** (or use `curl`). Save it as a `.json` file.
+  </Step>
+  <Step title="Edit the file">
+    Open it in any text editor. The entire template is a single JSON object. Make your changes in the `config` section (see recipes below).
+  </Step>
+  <Step title="Host the file">
+    AIOStreams imports from a URL, not a local file path. Options:
+    - **GitHub Gist** — paste your JSON, set to secret, copy the raw URL
+    - **Your own GitHub fork** — commit the file, use its raw URL
+    - **Pastebin** — use raw output URL (no syntax highlighting in URL)
+
+    The URL must return raw JSON — not a GitHub rendered page.
+  </Step>
+  <Step title="Import your URL">
+    In AIOStreams → **About → Get Started → Load Template** — paste your hosted URL. Done.
+  </Step>
+</Steps>
+
+<Note>
+  Change `metadata.id` in your fork (e.g. append `.custom`) so AIOStreams doesn't confuse your version with the upstream one for update tracking.
+</Note>
+
+---
+
+## Common Recipes
+
+### Allow TrueHD / Atmos / Lossless Audio
+
+Stream, Essential, and Speed templates block TrueHD, DTS-HD MA, DTS:X, and FLAC by default because most users stream rather than pass through lossless audio. If you have a receiver and want lossless:
+
+```json
+"excludedAudioTags": []
+```
+
+Remove the tags you want to allow. The full default exclusion list is:
+```json
+"excludedAudioTags": ["TrueHD", "DTS-HD MA", "DTS:X", "FLAC"]
+```
+
+---
+
+### Allow AV1 Encodes
+
+AV1 is excluded by default because most smart TVs and older Apple TV hardware can't decode it. If your player supports it (recent Android TV, PC, Apple TV 4K 3rd gen):
+
+```json
+"excludedEncodes": []
+```
+
+To keep AV1 allowed but prefer HEVC over it, add it to the end of `preferredEncodes` instead of removing the exclusion:
+
+```json
+"preferredEncodes": ["HEVC", "AVC", "AV1"]
+```
+
+---
+
+### Change Result Limit
+
+Default is 25 total results, 10 per resolution. Increase for a wider list or decrease for a tighter one:
+
+```json
+"maxResults": 40,
+"maxResultsPerResolution": 15
+```
+
+---
+
+### Add a Language Preference
+
+To surface streams in a specific language ahead of others without excluding anything else:
+
+```json
+"preferredLanguages": ["English", "French"],
+```
+
+To exclude streams in a language entirely:
+
+```json
+"excludedLanguages": ["Hindi"]
+```
+
+<Note>
+  Language detection depends on how the scraper tags the stream. Coverage is best for English and major European languages; tag quality varies across scrapers.
+</Note>
+
+---
+
+### Allow 720p on a 1080p Template
+
+Stream, Essential, and their Lite variants already include a 720p fallback tier for titles where no 1080p source exists. But if you want 720p results even when 1080p is available, remove `'720p'` from the Hard Resolution Kill ESE.
+
+Find the ESE with the comment `Hard Resolution Kill`:
+
+```json
+{
+  "expression": "/* Hard Resolution Kill — Stream is 1080p-only */ resolution(streams, '2160p', '1440p')",
+  "enabled": true
+}
+```
+
+The original includes `'720p'` in the resolution list. Remove it:
+
+```json
+{
+  "expression": "/* Hard Resolution Kill — modified */ resolution(streams, '2160p', '1440p')",
+  "enabled": true
+}
+```
+
+The `requiredResolutions` field also gates what resolutions count as "required" for result display — make sure `720p` is in there:
+
+```json
+"requiredResolutions": ["1080p", "720p"]
+```
+
+---
+
+### Disable a Specific ESE
+
+Every ESE in the `excludedStreamExpressions` array has an `"enabled"` flag. To disable one without removing it:
+
+```json
+{
+  "expression": "/*AI Upscale Exclusion*/ ...",
+  "enabled": false
+}
+```
+
+Set `"enabled": false` and the ESE is skipped at query time. The expression stays in place so you can re-enable it later.
+
+---
+
+### Add a Scraper
+
+Add a preset object to the `presets` array. Scraper presets follow this pattern:
+
+```json
+{
+  "type": "knaben",
+  "options": {
+    "name": "Knaben",
+    "enabled": true,
+    "timeout": 5000,
+    "resources": ["stream"]
+  }
+}
+```
+
+Valid `type` values for scrapers: `comet`, `mediafusion`, `knaben`, `torrent-galaxy`, `eztv`, `meteor`, `hdhub`, `zilean`, `jackettio`, `prowlarr`. See [Addon Reference](/addon-reference) for the full list and resource rules.
+
+<Warning>
+  Scrapers that expose `catalog` or `meta` by default (mediafusion, meteor) must include `"resources": ["stream"]` to prevent their catalog entries from appearing in Stremio's Discover section.
+</Warning>
+
+---
+
+### Prefer HEVC Over AVC
+
+`preferredEncodes` controls encode ranking within a quality tier. Move HEVC first:
+
+```json
+"preferredEncodes": ["HEVC", "AVC", "x265", "x264"]
+```
+
+---
+
+### Increase Scraper Timeouts
+
+If a scraper is timing out before returning results (visible in AIOStreams logs), increase its timeout in the preset:
+
+```json
+{
+  "type": "mediafusion",
+  "options": {
+    "timeout": 10000
+  }
+}
+```
+
+Timeout is in milliseconds. Don't go above 15000ms or it will delay the whole request when the scraper is down.
+
+---
+
+## What Not to Touch
+
+| Field | Why |
+|---|---|
+| `metadata.id` | Changing this on an upstream template breaks update tracking — only change it on a fork |
+| `config.addonLogo` | Must stay on the `raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/` URL or the logo breaks |
+| `syncedExcludedRegexUrls` | Points to Tamtaro's LQ exclusion list — removing it lets junk encodes through |
+| `syncedRankedRegexUrls` | Points to the shared release-group scoring database — removing it zeroes out group scores |
+| PSE order | PSE tiers are ordered by priority — inserting a new tier in the wrong position can bury or surface the wrong results |
+
+---
+
+## Template vs Lite — The Simpler Alternative
+
+Before editing JSON, consider whether switching to a Lite template achieves what you want. Lite removes the quality-gate ESEs (low bitrate, low seeders, bad encodes) and leaves only hard kills. More results come through without any customisation. See [Lite vs Standard](/lite-vs-standard).
