@@ -54,6 +54,7 @@
             "group": "Templates",
             "pages": [
               "template-directory",
+              "customising",
               "community-templates"
             ]
           },

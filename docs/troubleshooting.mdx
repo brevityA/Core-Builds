@@ -65,14 +65,18 @@ Before troubleshooting, confirm what you're running.
   <Accordion title="No results / very few results">
     **Check first:**
     - Is the title in TorBox's cache? Search at [torbox.app](https://torbox.app)
-    - Are your scrapers enabled? Open AIOStreams → Add-ons — confirm Comet, MediaFusion, etc. are enabled
     - Are your API keys entered? TorBox key in Services, TMDB in Settings
+    - Are your scrapers enabled? Open AIOStreams → Add-ons — from v2.9.4, MediaFusion and HdHub are on by default; on older imports they may be toggled off
 
     **If you're on a Flash or Speed template:**
     These templates exit as soon as they find cached results. If TorBox doesn't have the title cached, Flash returns nothing. Switch to Core Nexus Essential for full coverage with uncached fallback.
 
     **Try the Lite variant:**
-    The standard template runs 24 ESEs (quality gates). Lite runs 12 — hard kills stay but quality gates are removed. If Lite returns results, one of the quality gates is filtering your content.
+    The standard template runs quality-gate ESEs (low bitrate, low seeders, bad encodes). Lite removes those gates — hard kills stay but quality filters are gone. If Lite returns results, one of the quality gates is filtering your content.
+  </Accordion>
+
+  <Accordion title="Stream returns only 1080p — no 720p results">
+    Fixed in v2.9.4. Earlier versions of the base Stream template had no 720p fallback tier — if a title had no 1080p source indexed, the template returned zero results instead of falling back to 720p WEB-DL or WEBRip. Re-import the latest Stream template. The Lite and Fire Stick variants already had this fallback; it now applies to the base template too.
   </Accordion>
 
   <Accordion title="4K streams showing on a 1080p template">
@@ -108,12 +112,12 @@ Before troubleshooting, confirm what you're running.
   <Accordion title="Samsung TV — audio not playing / stuttering">
     The Samsung TV templates exclude lossless audio (`TrueHD`, `DTS-HD MA`, `DTS:X`, `FLAC`) by default — these formats require HDMI ARC/eARC passthrough to a compatible receiver. If you have a compatible receiver and want lossless audio, remove those tags from `excludedAudioTags` in the AIOStreams settings after importing.
 
-    If audio is stuttering on tracks that should work, confirm your template is v0.2.8 or later and re-import.
+    If audio is stuttering on tracks that should work, re-import the latest Samsung TV template.
   </Accordion>
 
   <Accordion title="Samsung TV — Dolby Vision streams still appearing">
     The DV-Only Kill ESE is enabled by default on Samsung templates. If you're still seeing DV streams:
-    - Confirm your template version is v0.2.8 or later (re-import if not)
+    - Re-import the latest Samsung TV template
     - Check you haven't disabled the `No DV-Only` ESE in the AIOStreams expression editor
   </Accordion>
 
