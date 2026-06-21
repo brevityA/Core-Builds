@@ -7,6 +7,14 @@ description: "Planned work, active development, and recently completed milestone
 
 | Version | Item |
 |---|---|
+| v2.9.4 | Stream 720p fallback PSEs — surfaces 720p WEB-DL/WEBRip when no 1080p source exists |
+| v2.9.4 | MediaFusion and HdHub enabled by default on all non-Speed, non-Flash TorBox templates |
+| v2.9.4 | Cached-only TorBox Apex variant fixed — StremThru Torz now on by default |
+| v2.9.4 | Nightly and Labs templates — all 6 import cleanly (regex blockers, missing metadata, audio/resolution fixes) |
+| v2.9.3 | 4K WEB-DL exemption — prevents new theatrical releases from being suppressed when no Blu-ray exists |
+| v2.9.2 | Knaben and Torrent Galaxy demoted to backup scrapers (≤1 result each) |
+| v2.9.2 | OpenSubtitles V3+ removed — AIOSubtitle covers the same sources with no redundant network call |
+| v2.9.1 | Per-Addon Flood Guard ESE — AllDebrid and Samsung TV templates |
 | v2.9.0 | Regex compatibility — fortheweak whitelist sync (11 ranked + 3 excluded removed from all 33 non-Anime templates) |
 | v2.9.0 | Debrid timeout raised 3000ms → 5000ms on 35 templates — fixes playback errors on Nuvio and AIOStreams v2.24.0+ |
 | v2.9.0 | AllDebrid setup guide |
@@ -44,9 +52,6 @@ description: "Planned work, active development, and recently completed milestone
 <AccordionGroup>
   <Accordion title="REPACK/PROPER Passthrough ISE">
     Pins REPACK/PROPER releases ahead of limit/excluded filters. Ensures patched releases always surface. Critical for Anime (fansub REPACKs), Hybrid, and Stream.
-  </Accordion>
-  <Accordion title="Per-Addon Flood Guard ESE">
-    Per-addon result cap (Meteor ≤5, Comet ≤5, MediaFusion ≤4, Torrent Galaxy/EZTV/Knaben/HdHub ≤3) on cached non-library streams. Most impactful on Stream, Essential, and Apex where Meteor can return 15–20+ results.
   </Accordion>
   <Accordion title="Usenet Propagation Guard ESE">
     Holds back NZBs younger than 2 hours when propagated alternatives exist. Eliminates corrupt early-propagation grabs. All Usenet-enabled templates.

@@ -30,6 +30,7 @@ Without an explicit `resources` override, AIOStreams uses the addon's default `S
 | `stremthruTorz` | `stremthruTorz.ts` | `[stream]` | No | No override needed |
 | `torrent-galaxy` | `torrentGalaxy.ts` | `[stream]` | No | No override needed |
 | `eztv` | `eztv.ts` | `[stream]` | No | No override needed |
+| `hdhub` | `hdhub.ts` | `[stream]` | No | No override needed — TorBox-native only (`tb_only: true`) |
 | `knaben` | `knaben.ts` | `[stream]` | No | No override needed |
 | `seadex` | `seadex.ts` | `[stream]` | No | No override needed |
 | `animeTosho` | `animetosho.ts` | `[stream]` | No | No override needed |
@@ -66,7 +67,16 @@ The `library` preset intentionally exposes catalog and meta — this is the TorB
 
 ### Stream-only by default — no override required
 
-`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `knaben`, `seadex`, `animeTosho`, `nekobt`, `torbox-search`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
+`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `hdhub`, `knaben`, `seadex`, `animeTosho`, `nekobt`, `torbox-search`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
+
+### Default-on scrapers (v2.9.4+)
+
+**MediaFusion** and **HdHub** are enabled by default on all non-Speed, non-Flash TorBox templates from v2.9.4 onwards.
+
+- **MediaFusion** — general-purpose scraper with regional/international content coverage. `resources: ['stream']` is set on every template — no catalog bleed. Timeout: 7000ms.
+- **HdHub** — TorBox-native P2P scraper (`tb_only: true`). Returns results only when TorBox is the active debrid service. Timeout: 5000ms. Not present on Lite, Flash, Speed, or AllDebrid templates.
+
+Both are toggleable. Go to **Addons** in your AIOStreams dashboard to disable either one.
 
 ---
 
@@ -120,4 +130,4 @@ Run this script from the root of the `Core-Builds` repository. It checks all non
 
 ---
 
-*Last updated: v2.7.3 · Sources: [AIOStreams presets](https://github.com/Viren070/AIOStreams/tree/main/packages/core/src/presets)*
+*Last updated: v2.9.4 · Sources: [AIOStreams presets](https://github.com/Viren070/AIOStreams/tree/main/packages/core/src/presets)*
