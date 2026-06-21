@@ -10,11 +10,17 @@ For full technical details, see the [Changelog](/changelog).
 
 ## v2.9.4 — June 2026
 
+**Stream template now shows 720p when no 1080p source exists.**
+The base Stream template was missing the 720p fallback that the Lite and Fire Stick variants already had. If you searched for an older or niche title where only 720p streams are indexed, Stream returned zero results instead of showing what was available. It now surfaces 720p WEB-DL and WEBRip as a fallback tier below the four 1080p priority tiers — so for any title where 1080p exists, your list is unchanged; for titles with only 720p sources, you now get results. Re-import from the [Template Directory](/template-directory) to pick up this fix.
+
 **MediaFusion and HdHub now on by default.**
 Previously these two scrapers were opt-in — you had to manually enable them after every template import before they'd contribute any results. They're now enabled out of the box so templates work fully on a fresh import. MediaFusion adds regional content coverage that TorBox's native scraper misses; HdHub is a TorBox-native P2P scraper for additional cached sources. If you don't want either of them, toggle them off in the Addons section of your AIOStreams dashboard.
 
 **Cached-only template fixed — streams now actually load.**
 The 4K Apex TorBox variant (the cached-only version of 4K Apex) was shipping with its stream delivery addon disabled. This meant importing it and hitting play returned nothing — the template was technically correct but the service that delivers the streams was switched off. Fixed. The cached-only behaviour is preserved through the exclude-uncached setting, not by disabling the provider.
+
+**Nightly and Labs templates fixed — all 6 now import cleanly.**
+A batch of import blockers has been cleared across the full Nightly and Labs template set. Every template had eleven regex patterns in its scoring layer that were being rejected by fortheweak's stricter import filter — those have been removed. Additional per-template fixes: Apple TV Nightly (v0.1.9) was clean besides the regex; Samsung Nightly (v0.2.14) had wrong audio exclusions and missing SEL sync URLs; Essential Labs (v0.1.7) was missing a changelog link and a resolution kill rule; 4K Essential Labs (v0.1.7) was missing its changelog link; 4K Apex Labs (v0.8.6) had six required metadata fields completely absent; Stream Labs (v0.6.7) had a contradiction between its resolution settings and its exclusion filter that was blocking 720p streams it was supposed to allow.
 
 ---
 
