@@ -44,7 +44,7 @@ description: "Quick answers to the most common Core Builds questions."
   </Accordion>
 
   <Accordion title="Only a handful of streams for older TV shows">
-    Normal for older content. Classic TV episodes under 512 MB and older encodes often have unrecognised audio or encode tags that trip size and quality filters. Templates from v2.4.6 onwards lower size minimums and add `Unknown` fallbacks. For niche or foreign content with low seeders, consider a [Speed+](/master-guide) or [Hybrid](/master-guide) template that adds Usenet coverage.
+    Normal for older content. Classic TV episodes under 512 MB and older encodes often have unrecognised audio or encode tags that trip size and quality filters. Templates from v2.4.6 onwards lower size minimums and add `Unknown` fallbacks. For niche or foreign content with low seeders, consider a [Speed 4K+](/master-guide) or [Hybrid](/master-guide) template that adds Usenet coverage.
   </Accordion>
 
   <Accordion title="Very few results on any content — even popular films">
@@ -124,9 +124,29 @@ description: "Quick answers to the most common Core Builds questions."
   </Accordion>
 </AccordionGroup>
 
+## AIOMetadata
+
+<AccordionGroup>
+  <Accordion title="The config file downloaded as a .txt file — it won't import">
+    Some browsers save raw GitHub files with a `.txt` extension instead of `.json`. The fix is simple: locate the downloaded file, rename it, and remove the `.txt` at the end so the filename ends in `.json`. On Windows, you may need to enable "Show file extensions" in Explorer first. Once renamed, import it normally via **Import Configuration** in the AIOMetadata configure page.
+  </Accordion>
+
+  <Accordion title="4K labels are showing on 1080p content in my catalog rows">
+    This is expected behaviour and not a bug. The 4K badge shown on catalog poster cards comes from TMDB or TVDB metadata indicating that a 4K version of the title exists somewhere — it is not connected to what resolution you actually stream. AIOMetadata has no control over stream quality; it only handles how titles look in your browse rows. Your Core Builds template controls the stream resolution you receive when you click play.
+  </Accordion>
+
+  <Accordion title="My AIOMetadata catalog rows disappeared after changing my catalog selection">
+    Every time you enable or disable catalogs in AIOMetadata, the manifest URL changes. Stremio's existing addon installation points to the old URL. After saving a new catalog selection, click **Install** in AIOMetadata, copy the new manifest URL, and reinstall the addon in Stremio. Use [StremThru SideKick](https://www.stremthru.net/) to update in one click without losing your addon order.
+  </Accordion>
+</AccordionGroup>
+
 ## Platform & Devices
 
 <AccordionGroup>
+  <Accordion title="TorBox Library is appearing on my Stremio home screen">
+    The TorBox Library row is added by your AIOStreams configuration, not by AIOMetadata. It appears when the `stremthruStore` (or Torrentio) preset has `"catalog"` in its resources array, which tells Stremio to show your TorBox downloads as a catalog row. To remove it, go to **Addons** in AIOStreams, find the TorBox/StremThru preset, and disable the **Catalog** resource toggle. Save and reinstall the manifest. If you are using a Core Builds template, Library rows are already excluded — this typically affects users who built a custom config or imported from someone else's settings.
+  </Accordion>
+
   <Accordion title="Statistics or scrape summary cards are showing in my stream list">
     `statistics.enabled` was set to `true` in older template versions. This was fixed in v2.4.6. **Re-import** the latest template to disable the scrape summary display.
   </Accordion>

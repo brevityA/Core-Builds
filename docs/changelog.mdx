@@ -7,11 +7,19 @@ Full history: [CHANGELOG.md](https://github.com/brevityA/Core-Builds/blob/main/C
 
 ---
 
-## v2.9.0 (patch) — 2026-06-19
+## v2.9.4 — 2026-06-20
 
 <Info>
   **Latest release.** If you already have a template imported, check AIOStreams for an in-app update notification.
 </Info>
+
+**Changed: Stream — 720p fallback added (`core-nexus-stream.json`)**
+
+Two 720p fallback PSEs added after the C-Tier 1080p tier. For titles where 1080p is available, 720p is deprioritised below all four 1080p tiers. For titles with no 1080p source, 720p WEB-DL/WEBRip results now surface as a fallback instead of returning zero results. Lite and Firestick variants already had these PSEs — this brings the base Stream template into parity.
+
+---
+
+## v2.9.0 (patch) — 2026-06-19
 
 **Fixed: Debrid timeout raised — 35 templates**
 

@@ -2,10 +2,10 @@
   "metadata": {
     "id": "brevity.core-personal-speed",
     "name": "Core Personal Speed",
-    "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro + RealDebrid. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s.",
+    "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro + RealDebrid. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -16,7 +16,7 @@
     "trusted": false,
     "showChanges": true,
     "addonName": "Core Personal Speed",
-    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg",
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "Speed · 1080p · TorBox + RealDebrid · Cached priority · Fast play",
     "appliedTemplates": [
       {
@@ -217,6 +217,14 @@
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
+      {
+        "expression": "/*AI Upscale Exclusion*/ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','aiupscale','upscaled','neural','enhancedai')",
+        "enabled": true
+      },
+      {
+        "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
+        "enabled": true
+      },
       {
         "expression": "/*Hard CAM Kill*/ quality(streams, 'CAM', 'SCR', 'TS', 'TC', 'HC HD-Rip')",
         "enabled": true
