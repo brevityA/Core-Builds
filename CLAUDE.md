@@ -132,8 +132,8 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 
 ### Hybrid
 - `Hybrid/core-nexus-4k-hybrid.json` v2.9.4 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
-- `Hybrid/core-nexus-hybrid.json` v2.9.4 — 1080p hybrid, NZBGeek preset
-- `Hybrid/core-nexus-hybrid-lite.json` v2.9.2 — NZBGeek preset
+- `Hybrid/core-nexus-hybrid.json` v2.9.5 — 1080p hybrid, TorBox-priority twins (IQR), NZBGeek preset
+- `Hybrid/core-nexus-hybrid-lite.json` v2.9.5 — TorBox-priority twins (CB-style), NZBGeek preset
 
 ### Device
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.2.13 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
