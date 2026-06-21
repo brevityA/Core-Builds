@@ -164,7 +164,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | Template | Device / Use-case | Res | Import URL |
 |---|---|---|---|
 | **Core Nexus Apple TV 4K** 🌙 | Apple TV 4K / Infuse | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
-| **Core Nexus Samsung RU7100 4K** 🌙 | Samsung RU7100 (2019) | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Samsung RU7100 4K** | Samsung RU7100 (2019) | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
 | **Core Nexus Essential Labs** 🧪 | TorBox debrid-only 1080p | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
 | **Core Nexus 4K Essential Labs** 🧪 | TorBox debrid-only 4K | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 
