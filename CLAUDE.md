@@ -133,7 +133,8 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 
 ### Device
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.2.12 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.12 — 4K, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.12 — 4K, DV-Only Kill on, AV1/VC-1 excluded, simple quality-tier PSEs
+- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.14 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.6 — 4K anime, SeaDex + AnimeTosho
@@ -145,11 +146,10 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.9 — DV Profile 5/8, AV1 excluded
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.6 — Essential 4K experimental
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.6 — Essential 1080p experimental
-- `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.13 — Samsung 4K nightly (RU7100)
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.5 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
-- `Nightly/Single/core-nexus-stream-labs.json` v0.6.6 — perGroup() prototypes, dynamicAddonFetching
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.7 — Essential 4K experimental
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.1.7 — Essential 1080p experimental
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.6 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
+- `Nightly/Single/core-nexus-stream-labs.json` v0.6.7 — perGroup() prototypes, dynamicAddonFetching
 
 ---
 
