@@ -136,9 +136,9 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Hybrid/core-nexus-hybrid-lite.json` v2.9.2 — NZBGeek preset
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.12 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.12 — 4K, DV-Only Kill on, AV1/VC-1 excluded, simple quality-tier PSEs
-- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.14 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.13 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.13 — 4K, DV-Only Kill on, AV1/VC-1 excluded, simple quality-tier PSEs
+- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.15 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.7 — 4K anime, SeaDex + AnimeTosho
