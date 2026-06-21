@@ -144,7 +144,7 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.5
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.8 — DV Profile 5/8, AV1 excluded
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.9 — DV Profile 5/8, AV1 excluded
 - `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.6 — Essential 4K experimental
 - `Nightly/Essential/core-nexus-essential-labs.json` v0.1.6 — Essential 1080p experimental
 - `Nightly/Samsung/core-nexus-samsung-tv-4k.json` v0.2.13 — Samsung 4K nightly (RU7100)
