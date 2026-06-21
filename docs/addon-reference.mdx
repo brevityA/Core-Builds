@@ -32,6 +32,7 @@ Without an explicit `resources` override, AIOStreams uses the addon's default `S
 | `eztv` | `eztv.ts` | `[stream]` | No | No override needed |
 | `hdhub` | `hdhub.ts` | `[stream]` | No | No override needed — TorBox-native only (`tb_only: true`) |
 | `knaben` | `knaben.ts` | `[stream]` | No | No override needed |
+| `torrents-db` | `torrentsDb.ts` | `[stream]` | No | No override needed — 21+ providers, TorBox native, no API key |
 | `seadex` | `seadex.ts` | `[stream]` | No | No override needed |
 | `animeTosho` | `animetosho.ts` | `[stream]` | No | No override needed |
 | `nekobt` | `nekoBt.ts` | `[stream]` | No | No override needed |
@@ -67,7 +68,7 @@ The `library` preset intentionally exposes catalog and meta — this is the TorB
 
 ### Stream-only by default — no override required
 
-`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `hdhub`, `knaben`, `seadex`, `animeTosho`, `nekobt`, `torbox-search`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
+`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `hdhub`, `knaben`, `torrents-db`, `seadex`, `animeTosho`, `nekobt`, `torbox-search`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
 
 ### Default-on scrapers (v2.9.4+)
 
@@ -130,4 +131,4 @@ Run this script from the root of the `Core-Builds` repository. It checks all non
 
 ---
 
-*Last updated: v2.9.4 · Sources: [AIOStreams presets](https://github.com/Viren070/AIOStreams/tree/main/packages/core/src/presets)*
+*Last updated: v2.9.5 · Sources: [AIOStreams presets](https://github.com/Viren070/AIOStreams/tree/main/packages/core/src/presets)*
