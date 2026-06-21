@@ -19,8 +19,12 @@
       "url": "https://github.com/brevityA/Core-Builds"
     },
     {
-      "name": "AIOStreams",
-      "url": "https://github.com/Viren070/AIOStreams"
+      "name": "Reddit",
+      "url": "https://www.reddit.com/r/CoreBuilds/"
+    },
+    {
+      "name": "Ko-fi",
+      "url": "https://ko-fi.com/branding_brevity"
     }
   ],
   "topbarCtaButton": {
@@ -86,7 +90,8 @@
     ]
   },
   "footerSocials": {
-    "github": "https://github.com/brevityA/Core-Builds"
+    "github": "https://github.com/brevityA/Core-Builds",
+    "reddit": "https://www.reddit.com/r/CoreBuilds/"
   },
   "feedback": {
     "thumbsRating": true,
