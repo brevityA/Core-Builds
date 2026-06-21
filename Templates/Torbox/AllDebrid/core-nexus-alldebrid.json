@@ -1810,7 +1810,8 @@
         "instanceId": "nx-tdb-1",
         "options": {
           "name": "TorrentsDB",
-          "timeout": 5000
+          "timeout": 5000,
+          "useMultipleInstances": false
         },
         "resources": [
           "stream"
