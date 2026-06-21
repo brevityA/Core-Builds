@@ -34,7 +34,6 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | **4K Apex Labs** | v0.5.3 | Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`. `dynamicAddonFetching`: exit at 5+ cached 4K or 6s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
 | **Stream Labs** | v0.3.2 | Same hybrid regex+SEL as 4K Apex Labs — 1080p variant. `dynamicAddonFetching`: exit at 5+ cached 1080p or 5s. | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Apple TV 4K** | v0.1.1 | Device profile — DV Profile 5/8, AV1 excluded, Atmos preferred | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
-| **Samsung RU7100 4K** | v0.2.6 | Samsung RU7100 (2019) device profile — FLAC/AAC native audio, HDR10+/HDR10/HLG, HEVC/AVC, no AV1/DV, IQR PSEs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
 | **Essential Labs** | v0.1.1 | TorBox debrid-only 1080p — no external scrapers, TorBox Search toggle + exit thresholds | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
 | **4K Essential Labs** | v0.1.1 | TorBox debrid-only 4K — no external scrapers, TorBox Search toggle + exit thresholds | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 
@@ -49,6 +48,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
+| [Samsung RU7100 4K](#-core-nexus-samsung-ru7100-4k) | Pro | 4K + 1080p | Samsung RU7100 (2019) — full IQR PSE stack |
 | [Apple TV 4K](#-core-nexus-apple-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Apple TV 4K / Dolby Vision |
 | [4K Hybrid](#-core-nexus-4k-hybrid) | Pro + NZBGeek | 4K + 1080p | Dual-source: TorBox + Usenet, full 4K |
 | [Hybrid](#-core-nexus-hybrid) | Pro + NZBGeek | 1080p | Dual-source: TorBox + Usenet |
@@ -135,7 +135,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Apple TV 4K** 🌙 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 | **Core Nexus 4K Apex Labs** 🧪 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
 | **Core Nexus Stream Labs** 🧪 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| **Core Nexus Samsung RU7100 4K** 🌙 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Core Nexus Samsung RU7100 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
 | **Core Nexus Essential Labs** 🧪 | TorBox Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
 | **Core Nexus 4K Essential Labs** 🧪 | TorBox Essential | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 | **Core Nexus 4K Hybrid** | Pro + NZBGeek | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
@@ -220,7 +220,7 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
-| **Version** | v0.2.3 |
+| **Version** | v0.2.12 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
 | **Resolution** | 1080p · 720p fallback |
 | **Usenet** | ❌ |
@@ -234,8 +234,22 @@ Stream-based 1080p template for Samsung TVs and devices without Dolby Vision sup
 | | |
 |---|---|
 | **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
-| **Version** | v0.2.3 |
+| **Version** | v0.2.12 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |
+| **Resolution** | 2160p · 1080p fallback |
+| **Usenet** | ❌ |
+
+---
+
+### 📺 Core Nexus Samsung RU7100 4K
+
+Full 4K template for the Samsung RU7100 (2019). Runs the complete APEX IQR PSE stack — 16 PSEs with Tukey fence adaptive bitrate floors. FLAC and AAC pass through natively (Samsung RU7100 decodes these without a receiver). HDR10+, HDR10, and HLG supported; Dolby Vision excluded (Tizen 5.0 has no DV licence). AV1 and VC-1 hard-excluded. TrueHD, DTS:X, and DTS-HD MA excluded for Tizen compatibility.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
+| **Version** | v0.2.14 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
 
