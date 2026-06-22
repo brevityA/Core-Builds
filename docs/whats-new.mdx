@@ -8,6 +8,13 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## v2.9.6 — June 2026
+
+**Hybrid templates now prioritise TorBox streams first.**
+If you use the Hybrid or Hybrid Lite template (TorBox + Real-Debrid), your TorBox-cached streams will now appear before equivalent Real-Debrid results at the top two quality tiers. The logic has been in 4K Hybrid since v2.9.4 — this release brings it to the 1080p Hybrid variants. Hybrid uses the same IQR-adaptive prioritisation as 4K Hybrid; Hybrid Lite uses a simpler quality-tier version consistent with its lighter design. The change only affects ordering within the same quality tier — if no TorBox stream matches, the expression returns empty and falls through to the all-service result as before. Re-import from the [Template Directory](/template-directory) to pick up this update.
+
+---
+
 ## v2.9.5 — June 2026
 
 **More scraper coverage — TorrentsDB added to all full templates.**

@@ -4,6 +4,22 @@
 
 ---
 
+## 2.9.7 (2026-06-22)
+
+### Fixed
+- **Meteor scraper timeout — 28 templates.** Meteor was set to 10000ms on every template that used it (excluding Samsung TV/4K which were already at 3000ms). For new or niche series, the secondary scraper group (Meteor + Comet RD) always fires because the primary group returns fewer than 3 cached streams. Meteor waiting up to 10 seconds in that group was causing total addon request times to exceed Nuvio's (and similar players') internal timeout, resulting in "addon request timed out" errors even when streams exist. Lowered to 6000ms across all 28 affected templates.
+
+---
+
+## 2.9.6 (2026-06-21)
+
+### Added
+- **TorBox-priority PSEs — Hybrid and Hybrid Lite.** TorBox-cached twin PSEs now precede their all-service counterparts in both 1080p Hybrid templates, completing the pattern already deployed in 4K Hybrid (v2.9.4).
+  - **Hybrid** (v2.9.4 → **v2.9.5**): Two IQR-based TorBox-priority twins inserted — S-Tier 1080p Remux (IQR Tukey fence + min/max fallback, 8GB size floor) and A-Tier 1080p WEB-DL (IQR + min/max + pow() age-decay). Each returns `[]` if no TorBox streams match, falling through cleanly to the all-service tier.
+  - **Hybrid Lite** (v2.9.2 → **v2.9.5**): Two CB-style TorBox-priority twins inserted — `service(resolution(quality(streams,'BluRay REMUX'),'1080p'),'torbox')` and `service(resolution(quality(streams,'WEB-DL'),'1080p'),'torbox')`. Consistent with the simpler quality-tier architecture of Lite templates.
+
+---
+
 ## 2.9.5 (2026-06-21)
 
 ### Added
