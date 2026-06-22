@@ -484,15 +484,96 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   **Nightly** templates are stable for daily use. **Labs** templates are experimental and may fail to load — do not use Labs in production.
 </Warning>
 
-| Template | Version | Status | Import URL |
-|---|---|---|---|
-| Apple TV 4K | v0.1.9 | Nightly | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
-| 4K Apex Labs | v0.9.0 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| Stream Labs | v0.6.7 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| All-Rounder Labs | v0.1.0 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
-| Anime 4K Labs | v0.1.0 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json` |
-| Essential Labs | v0.1.7 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
-| 4K Essential Labs | v0.1.7 | Labs | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
+<Tabs>
+  <Tab title="Nightly">
+    ### Apple TV 4K — v0.1.9
+    DV Profile 5/8 prioritised. AV1 hard-excluded for tvOS compatibility.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json
+    ```
+  </Tab>
+
+  <Tab title="Labs">
+    ### 4K Apex Labs — v0.9.0
+    Full Apex PSE stack with all LABS features enabled: Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json
+    ```
+
+    ---
+
+    ### Stream Labs — v0.6.7
+    1080p with perGroup() dedup prototypes and dynamic addon fetching.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json
+    ```
+
+    ---
+
+    ### All-Rounder Labs — v0.1.0
+    Single template for live-action TV, movies, and anime. Uses `isAnime` + `hasSeaDex` conditional PSEs to switch quality tiers dynamically. Includes SeaDex, AnimeTosho, and NekoBT alongside standard scrapers.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json
+    ```
+
+    ---
+
+    ### Anime 4K Labs — v0.1.0
+    Anime 4K with `hasSeaDex` conditional PSEs, SeaDex Best pin, anime group pins (SubsPlease, Erai-raws, VCB-Studio), Score IQR Guard, and Indexer Diversity.
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json
+    ```
+
+    ---
+
+    ### Essential Labs — v0.1.7
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json
+    ```
+
+    ---
+
+    ### 4K Essential Labs — v0.1.7
+
+    <CardGroup cols={2}>
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
+      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
+    </CardGroup>
+    ```
+    https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json
+    ```
+  </Tab>
+</Tabs>
 
 → [What's being tested?](/nightly-and-labs)
 
