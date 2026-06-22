@@ -97,7 +97,7 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 ## Active Template Inventory (as of v2.9.5)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.15 — flagship 4K, IQR PSEs, pow() decay
+- `Single/core-nexus-4k-apex.json` v0.4.16 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap
 - `Single/core-nexus-4k-apex-torbox.json` v2.9.4 — TorBox-cached-only Apex variant
 - `Single/core-nexus-stream.json` v2.9.6 — 1080p streaming quality, 720p fallback
 - `Single/core-nexus-stream-lite.json` v2.9.3 — lite variant
