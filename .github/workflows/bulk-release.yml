@@ -1,0 +1,43 @@
+name: Bulk Create Missing Releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: 'Comma-separated versions (e.g. "2.9.6,2.9.7") or "all_missing"'
+        required: false
+        default: 'all_missing'
+      since_version:
+        description: 'Earliest version to include when using all_missing'
+        required: false
+        default: '2.5.1'
+      dry_run:
+        description: 'Dry run — list what would be created without creating anything'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  bulk-release:
+    name: Bulk create releases
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create missing releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSIONS_INPUT: ${{ inputs.versions }}
+          SINCE_VERSION: ${{ inputs.since_version }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python3 .github/scripts/bulk_release.py
