@@ -2,10 +2,10 @@
   "metadata": {
     "id": "brevity.core-personal",
     "name": "Core Personal",
-    "description": "Personal 1080p SDR all-rounder. TorBox Pro + RealDebrid · Comet · Meteor · Debridio · SeaDex · NZBGeek · EZTV. WEB-DL preferred · DD+/AAC · SDR · HEVC/AV1/AVC · Tamtaro SEL. Hotack L007CM Full HD Projector.",
+    "description": "Personal 1080p SDR all-rounder. TorBox Pro · Comet · Meteor · Debridio · SeaDex · NZBGeek · EZTV. WEB-DL preferred · DD+/AAC · SDR · HEVC/AV1/AVC · Tamtaro SEL. Hotack L007CM Full HD Projector.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Personal",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "1080p SDR · TorBox + RealDebrid · Comet · Meteor · MediaFusion · Debridio · NZBGeek · WEB-DL · DD+/AAC",
+    "addonDescription": "1080p SDR · TorBox Pro · Comet · Meteor · Debridio · NZBGeek · WEB-DL · DD+/AAC",
     "appliedTemplates": [
       {
         "id": "brevity.core-cipher",
@@ -598,7 +598,7 @@
     "services": [
       {
         "id": "realdebrid",
-        "enabled": true,
+        "enabled": false,
         "credentials": {}
       },
       {
