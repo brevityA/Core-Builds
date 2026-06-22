@@ -4,6 +4,13 @@
 
 ---
 
+## 2.9.7 (2026-06-22)
+
+### Fixed
+- **Meteor scraper timeout — 28 templates.** Meteor was set to 10000ms on every template that used it (excluding Samsung TV/4K which were already at 3000ms). For new or niche series, the secondary scraper group (Meteor + Comet RD) always fires because the primary group returns fewer than 3 cached streams. Meteor waiting up to 10 seconds in that group was causing total addon request times to exceed Nuvio's (and similar players') internal timeout, resulting in "addon request timed out" errors even when streams exist. Lowered to 6000ms across all 28 affected templates.
+
+---
+
 ## 2.9.6 (2026-06-21)
 
 ### Added

@@ -5,7 +5,7 @@
     "description": "Adaptive flagship build. Ranked-pool-relative bitrate PSEs using Tukey IQR outlier detection: ≥4 ranked streams → Q1−1.5×IQR to Q3+1.5×IQR window; 1–3 ranked → 80%–120% of min/max; 0 ranked → pow(0.95, daysSinceRelease) decay median cluster. HDR and SDR evaluated separately in the WEB-DL tier. Full ESE stack: REPACK passthrough, per-addon flood guard, Usenet propagation guard, codec efficiency booster, DV-Only Kill, audio pinnacle, and more.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.14",
+    "version": "0.4.15",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1733,7 +1733,7 @@
         "enabled": true,
         "options": {
           "name": "Meteor",
-          "timeout": 10000,
+          "timeout": 6000,
           "yourMedia": {
             "sources": [
               "torrent",

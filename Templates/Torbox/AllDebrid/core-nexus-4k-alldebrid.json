@@ -5,7 +5,7 @@
     "description": "Core Nexus 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD/Atmos · uncapped bitrate. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1724,7 +1724,7 @@
         "enabled": true,
         "options": {
           "name": "Meteor",
-          "timeout": 10000,
+          "timeout": 6000,
           "yourMedia": {
             "sources": [
               "torrent",
