@@ -152,8 +152,10 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.9 — DV Profile 5/8, AV1 excluded
 - `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.7 — Essential 4K experimental
 - `Nightly/Essential/core-nexus-essential-labs.json` v0.1.7 — Essential 1080p experimental
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.8.6 — perGroup() prototypes, dynamicAddonFetching, releaseGroup() ESEs
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.9.0 — Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins
 - `Nightly/Single/core-nexus-stream-labs.json` v0.6.7 — perGroup() prototypes, dynamicAddonFetching
+- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.1.0 — isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, all LABS features
+- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.1.0 — Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins
 
 ---
 
