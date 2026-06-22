@@ -5,7 +5,7 @@
     "description": "Personal 1080p SDR all-rounder. TorBox Pro · Comet · Meteor · Debridio · SeaDex · NZBGeek · EZTV. WEB-DL preferred · DD+/AAC · SDR · HEVC/AV1/AVC · Tamtaro SEL. Hotack L007CM Full HD Projector.",
     "source": "external",
     "author": "Personal",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -95,18 +95,19 @@
       "HDR",
       "HDR10",
       "HDR10+",
-      "HLG",
       "3D",
       "H-OU",
       "H-SBS"
     ],
     "includedVisualTags": [
       "SDR",
-      "Unknown"
+      "Unknown",
+      "HLG"
     ],
     "requiredVisualTags": [],
     "preferredVisualTags": [
-      "SDR"
+      "SDR",
+      "HLG"
     ],
     "excludedAudioTags": [
       "TrueHD",
@@ -231,7 +232,7 @@
       },
       {
         "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-        "enabled": true
+        "enabled": false
       },
       {
         "expression": "/*AI Upscale Exclusion*/ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','aiupscale','upscaled','neural','enhancedai')",
