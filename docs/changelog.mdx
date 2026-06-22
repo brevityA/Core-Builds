@@ -7,11 +7,39 @@ Full history: [CHANGELOG.md](https://github.com/brevityA/Core-Builds/blob/main/C
 
 ---
 
-## v2.9.4 — 2026-06-20
+## v2.9.7 — 2026-06-22
 
 <Info>
   **Latest release.** If you already have a template imported, check AIOStreams for an in-app update notification.
 </Info>
+
+**Fixed: Meteor scraper timeout — 28 templates**
+
+Meteor was set to a 10-second timeout on all templates. For niche or new series, the secondary scraper group (Meteor + Comet RD) fires because the primary scrapers don't find enough cached results. With Meteor at 10 seconds, total addon request time regularly exceeded Nuvio's internal timeout — showing "the addon request timed out" even when streams exist. Lowered to 6000ms across all 28 affected templates. Samsung TV templates were already at 3000ms and are unchanged.
+
+**Fixed: 4K Apex — time-based dynamicAddonFetching exit (v0.4.16)**
+
+4K Apex now exits dynamic addon fetching after 5 seconds regardless of stream count, or when ≥5 cached 4K streams are found. Previously the only exit condition required 10+ cached 4K streams — a threshold that almost never fired for niche content, leaving slow scrapers to run until they timed out. The 5-second hard cap prevents total request time from exceeding player timeouts on Nuvio and similar clients.
+
+---
+
+## v2.9.6 — 2026-06-21
+
+**Added: Hybrid TorBox-priority PSEs**
+
+Hybrid and Hybrid Lite templates now prioritise TorBox-cached streams at the top two quality tiers. Each IQR tier on Hybrid has a TorBox-only twin PSE that returns `[]` if no TorBox streams match — falling through cleanly to the all-service tier. Hybrid Lite uses simpler CB-style TorBox twins consistent with its lighter PSE architecture. Logic was already present in 4K Hybrid since v2.9.4; this release brings it to the 1080p Hybrid variants.
+
+---
+
+## v2.9.5 — 2026-06-21
+
+**Added: TorrentsDB scraper — 13 non-Lite templates**
+
+TorrentsDB (`torrents-db`) added as a backup scraper (flood guard cap ≤ 1). TorrentsDB is a Torrentio fork indexing 21+ providers: YTS, 1337x, Nyaa, AnimeTosho, Rutor, Rutracker, Torrent9, and regional trackers. Native TorBox support, no API key required. Configured with `useMultipleInstances: false`. Added to all 13 full-feature templates; Lite, Flash, and Speed templates unchanged.
+
+---
+
+## v2.9.4 — 2026-06-20
 
 **Changed: Stream — 720p fallback added (`core-nexus-stream.json`)**
 
