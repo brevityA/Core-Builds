@@ -2,10 +2,10 @@
   "metadata": {
     "id": "brevity.core-personal-speed",
     "name": "Core Personal Speed",
-    "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro + RealDebrid. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
+    "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Personal Speed",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Speed · 1080p · TorBox + RealDebrid · Cached priority · Fast play",
+    "addonDescription": "Speed · 1080p · TorBox Pro · Cached priority · Fast play",
     "appliedTemplates": [
       {
         "id": "brevity.core-cipher",
@@ -577,7 +577,7 @@
     "services": [
       {
         "id": "realdebrid",
-        "enabled": true,
+        "enabled": false,
         "credentials": {}
       },
       {
