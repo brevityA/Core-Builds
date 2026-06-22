@@ -8,6 +8,16 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## v2.9.7 — June 2026
+
+**Meteor scraper timeout lowered — fixes "addon request timed out" on Nuvio and similar players.**
+Meteor was set to a 10-second timeout on all templates. For new or niche series, the template's secondary scraper group (Meteor + Comet RD) almost always fires because the faster primary scrapers don't find enough cached results. With Meteor waiting up to 10 seconds, the total addon request time was regularly exceeding Nuvio's internal timeout — showing "the addon request timed out" even when streams actually exist. Lowered to 6 seconds across all 28 affected templates. Samsung TV templates were already at 3 seconds and are unchanged. Re-import your template to pick up this fix.
+
+**4K Apex now has a 5-second hard cap on scraper wait time.**
+4K Apex v0.4.16 adds a time-based exit to its dynamic addon fetching: if 5 seconds pass and fewer than 5 cached 4K streams have been found, AIOStreams stops querying and shows what's available rather than waiting for slow scrapers to time out. Previously the only exit condition required 10+ cached 4K streams — a threshold that almost never fired for new or niche content. This change is live on 4K Apex only while it's being validated; it will extend to other full templates once confirmed.
+
+---
+
 ## v2.9.6 — June 2026
 
 **Hybrid templates now prioritise TorBox streams first.**
