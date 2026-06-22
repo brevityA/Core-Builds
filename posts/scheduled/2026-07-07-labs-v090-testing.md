@@ -38,13 +38,39 @@ Pins are applied before the IQR PSEs so the bitrate window logic still runs, the
 
 ## How to test
 
-Two nightly templates have all five features enabled:
+Three nightly templates have all five features enabled. Pick the one that matches your setup and click the import link for your instance.
 
-**Core Nexus 4K Apex Labs** (v0.9.0)
-Import URL: https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json
+---
 
-**Core Nexus Stream Labs** (v0.6.7 — includes earlier perGroup() and Indexer Diversity; Score IQR Guard and elite pins landing in next labs update)
-Import URL: https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json
+**Core Nexus 4K Apex Labs** (v0.9.0) — full 4K stack with all LABS features
+
+ElfHosted: https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json
+
+Fortheweak: https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json
+
+Raw URL: https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json
+
+---
+
+**Core Nexus Anime 4K Labs** (v0.1.0) — all LABS features + hasSeaDex conditional PSEs, SeaDex Best pin, anime group pins
+
+ElfHosted: https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json
+
+Fortheweak: https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json
+
+Raw URL: https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json
+
+---
+
+**Core Nexus All-Rounder Labs** (v0.1.0) — single template for TV, movies, and anime with isAnime/hasSeaDex conditional tiers
+
+ElfHosted: https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json
+
+Fortheweak: https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json
+
+Raw URL: https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json
+
+---
 
 Labs templates are nightly builds — they receive changes faster and without the same audit gate as stable templates. Not recommended as a daily driver unless you want to catch issues early.
 
