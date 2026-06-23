@@ -8,6 +8,22 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## v2.9.8 — June 2026
+
+**REPACK/PROPER releases now always surface, even when they'd normally be filtered out.**
+When a release group issues a REPACK or PROPER — a corrected re-encode replacing a broken or mislabelled original — the previous filtering logic could suppress it if it fell outside the quality window or hit a limit cap. It now bypasses those filters and always reaches your stream list. This is especially relevant for anime fansub groups, which frequently issue REPACKs for audio sync or subtitle fixes. Applied to all templates via the shared ISE file.
+
+**Booster PSEs added to AllDebrid and Samsung TV templates.**
+Three new priority expressions are now active on all AllDebrid and Samsung TV templates: Codec Efficiency Booster (surfaces HEVC/AV1 ahead of AVC at equivalent quality), Audio Pinnacle (promotes Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3 within each quality tier), and HDR/DV Priority (surfaces Dolby Vision and HDR10+ ahead of HDR10 and SDR within 4K results). These were previously Apex and 4K Hybrid only — the AllDebrid and Samsung families now have the same priority stack.
+
+**Apple TV 4K Nightly — SeaDex passthrough fixed.**
+The Apple TV 4K Nightly template had SeaDex enabled in its preset list and its config, but was missing the SeaDex passthrough ISE that tells AIOStreams to treat SeaDex-matched streams as untouchable. In practice this meant SeaDex results were subject to the same limit and exclusion filters as everything else. Fixed — SeaDex streams now bypass those filters on Apple TV 4K exactly as they do on every other template.
+
+**Speed templates — dynamic group references corrected.**
+All four Speed TorBox templates (Speed 4K, Speed 4K Lite, Speed, Speed Lite) had a broken reference in their dynamic addon grouping: the group was pointing at instanceIds `nx-fix-01` and `nx-fix-02` which don't exist in any of the templates. AIOStreams' group validation was failing silently on import. Fixed to point at the correct Zilean and StremThru Torz instanceIds. A disabled MediaFusion preset has also been added as a fallback so fresh imports don't fail validation before TorBox credentials are configured.
+
+---
+
 ## v2.9.7 — June 2026
 
 **Meteor scraper timeout lowered — fixes "addon request timed out" on Nuvio and similar players.**

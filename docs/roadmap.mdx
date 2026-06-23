@@ -7,8 +7,14 @@ description: "Planned work, active development, and recently completed milestone
 
 | Version | Item |
 |---|---|
+| v2.9.8 | REPACK/PROPER Passthrough ISE — pins REPACK/PROPER releases ahead of limit/excluded filters; all templates via shared ISE file |
+| v2.9.8 | Codec Efficiency Booster PSE — HEVC/AV1 over AVC; AllDebrid and Samsung TV templates |
+| v2.9.8 | Audio Pinnacle PSE — Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3 priority; AllDebrid and Samsung TV templates |
+| v2.9.8 | HDR / DV Priority PSE — DV/HDR10+/HDR10 over SDR within 4K; AllDebrid and Samsung TV templates |
+| v2.9.8 | Apple TV 4K Nightly — SeaDex passthrough ISE added (was missing despite SeaDex preset being enabled) |
+| v2.9.8 | Speed TorBox templates — broken dynamic group instanceId references fixed; disabled MediaFusion fallback added |
 | v2.9.7 | Meteor timeout 10000ms → 6000ms — 28 templates — fixes Nuvio "addon request timed out" on niche/new series |
-| v2.9.7 | 4K Apex v0.4.16 — time-based dynamicAddonFetching exit (5s hard cap + ≥5 cached 4K) |
+| v2.9.7 | 4K Apex v0.4.17 — time-based dynamicAddonFetching exit (5s hard cap + ≥5 cached 4K) |
 | v2.9.6 | Hybrid TorBox-priority PSEs — Hybrid (IQR twins) and Hybrid Lite (CB-style twins) complete the pattern from 4K Hybrid |
 | v2.9.5 | TorrentsDB added to 13 non-Lite templates — 21+ provider coverage (YTS, 1337x, Nyaa, AnimeTosho, regional), TorBox native, no API key, flood guard ≤1 |
 | v2.9.4 | Stream 720p fallback PSEs — surfaces 720p WEB-DL/WEBRip when no 1080p source exists |
@@ -53,20 +59,17 @@ description: "Planned work, active development, and recently completed milestone
 ### Expression Layer
 
 <AccordionGroup>
-  <Accordion title="REPACK/PROPER Passthrough ISE">
-    Pins REPACK/PROPER releases ahead of limit/excluded filters. Ensures patched releases always surface. Critical for Anime (fansub REPACKs), Hybrid, and Stream.
-  </Accordion>
   <Accordion title="Usenet Propagation Guard ESE">
     Holds back NZBs younger than 2 hours when propagated alternatives exist. Eliminates corrupt early-propagation grabs. All Usenet-enabled templates.
   </Accordion>
-  <Accordion title="Codec Efficiency Booster PSE">
-    Surfaces HEVC/AV1 encodes ahead of AVC equivalents. Stream, Essential, Anime primarily.
+  <Accordion title="Codec Efficiency Booster PSE — broader rollout">
+    Shipped on AllDebrid and Samsung TV in v2.9.8. Planned expansion: Stream, Essential, Anime.
   </Accordion>
-  <Accordion title="Audio Pinnacle PSE">
-    Promotes lossless/object-based audio: Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3/DD+. Critical for Apex, 4K Hybrid, 4K Essential.
+  <Accordion title="Audio Pinnacle PSE — broader rollout">
+    Shipped on AllDebrid and Samsung TV in v2.9.8. Planned expansion: Apex, 4K Hybrid, 4K Essential.
   </Accordion>
-  <Accordion title="HDR / DV Priority PSE">
-    Within 4K results, surfaces DV/HDR10+/HDR10 ahead of SDR. Critical for Apex, 4K Essential, 4K Hybrid, Flash 4K.
+  <Accordion title="HDR / DV Priority PSE — broader rollout">
+    Shipped on AllDebrid and Samsung TV in v2.9.8. Planned expansion: Apex, 4K Essential, 4K Hybrid, Flash 4K.
   </Accordion>
   <Accordion title="pin() top result">
     Pin the #1 PSE-matched stream to position 1 regardless of sort order.
