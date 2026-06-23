@@ -5,7 +5,7 @@
     "description": "Core Nexus 4K for AllDebrid. IQR Tukey fence bitrate PSEs \u00b7 DV/HDR priority \u00b7 TrueHD/Atmos \u00b7 uncapped bitrate. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.13",
+    "version": "0.1.14",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -372,6 +372,18 @@
       },
       {
         "expression": "/* ALLDEBRID 720p | Any */ resolution(streams,'720p')",
+        "enabled": true
+      },
+      {
+        "expression": "/*Codec Efficiency Booster*/ merge(encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'720p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'720p'),'HEVC','AV1'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*Audio Pinnacle*/ merge(audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'Atmos','TrueHD'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'DTS-HD MA','DTS-X'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'EAC3','DD+'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))",
         "enabled": true
       }
     ],

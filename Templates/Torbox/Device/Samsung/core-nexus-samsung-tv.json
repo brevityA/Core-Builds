@@ -5,7 +5,7 @@
     "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded \u2014 only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p \u00b7 TorBox Essential \u00b7 Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.14",
+    "version": "0.2.15",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -338,6 +338,18 @@
       },
       {
         "expression": "/* CB 720p Fallback | Any */ resolution(streams, '720p')",
+        "enabled": true
+      },
+      {
+        "expression": "/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR10+/DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*Audio Pinnacle*/ merge(audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'Atmos','TrueHD'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'DTS-HD MA','DTS-X'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'EAC3','DD+'))",
+        "enabled": true
+      },
+      {
+        "expression": "/*Codec Efficiency Booster*/ merge(encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'720p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'720p'),'HEVC','AV1'))",
         "enabled": true
       },
       {
