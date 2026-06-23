@@ -5,7 +5,7 @@
     "description": "A full-featured 4K build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.6",
+    "version": "2.9.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -314,6 +314,18 @@
       },
       {
         "expression": "/* CB | Indexer Diversity — caps 2 results per scraper when pool > 20 */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 20 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Bitrate Low-Fence — 4K BluRay REMUX (excludes thin fakes below adaptive floor or 25 Mbps) */ count(resolution(quality(streams, 'BluRay REMUX'), '2160p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, max(25, q1(values(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 'bitrate')) - 1.5 * iqr(values(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, 25))",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Bitrate Low-Fence — 1080p BluRay REMUX (excludes thin fakes below adaptive floor or 10 Mbps) */ count(resolution(quality(streams, 'BluRay REMUX'), '1080p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, max(10, q1(values(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 'bitrate')) - 1.5 * iqr(values(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, 10))",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB | Bitrate Low-Fence — 4K WEB-DL (excludes thin fakes below adaptive floor or 8 Mbps) */ count(resolution(quality(streams, 'WEB-DL'), '2160p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'WEB-DL'), '2160p'), 0, max(8, q1(values(resolution(quality(streams, 'WEB-DL'), '2160p'), 'bitrate')) - 1.5 * iqr(values(resolution(quality(streams, 'WEB-DL'), '2160p'), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'WEB-DL'), '2160p'), 0, 8))",
         "enabled": true
       },
       {
