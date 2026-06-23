@@ -121,8 +121,8 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Speed/TorBox/core-nexus-speed-lite.json` v2.9.1
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.9.2 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.3 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.9.3 — EasyNews 4K
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.4 — EasyNews 1080p
 
 ### AllDebrid
 - `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.12 — 4K with IQR PSEs
