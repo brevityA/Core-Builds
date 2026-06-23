@@ -5,7 +5,7 @@
     "description": "4K template tuned for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 is natively supported \u2014 DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. AV1 hard-excluded (no hardware decoder on the A15 chip \u2014 severe performance hit). DD+ Atmos is the native top audio format. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox \u00b7 Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -347,6 +347,10 @@
       },
       {
         "expression": "/*ISE v1.2.3* [git.tamtaro.de]*/[]",
+        "enabled": true
+      },
+      {
+        "expression": "/*SeaDex*/merge(count(addon(cached(streams),'SeaDex'))>0?passthrough(addon(streams,'SeaDex'),'title'):[],count(addon(cached(streams),'SeaDex'))==0 and count(addon(streams,'SeaDex'))>0?addon(streams,'SeaDex'):[])",
         "enabled": true
       },
       {
