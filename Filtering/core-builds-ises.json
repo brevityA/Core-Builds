@@ -2,5 +2,9 @@
   {
     "expression": "/* CB | English Language */ language(streams, 'English', 'Original', 'Dual Audio', 'Multi', 'Dubbed')",
     "enabled": true
+  },
+  {
+    "expression": "/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'))>0?passthrough(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'),'excluded','limit'):[]",
+    "enabled": true
   }
 ]
