@@ -125,10 +125,10 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.4 — EasyNews 1080p
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.12 — 4K with IQR PSEs
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.9 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.12 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.11 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.14 — 4K with IQR PSEs
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.11 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.14 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.13 — 1080p lite
 
 ### Hybrid
 - `Hybrid/core-nexus-4k-hybrid.json` v2.9.5 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset
@@ -136,8 +136,8 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Hybrid/core-nexus-hybrid-lite.json` v2.9.6 — TorBox-priority twins (CB-style), NZBGeek preset
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.13 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.13 — 4K, DV-Only Kill on, AV1/VC-1 excluded, simple quality-tier PSEs
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.15 — 1080p, DV-Only Kill on, AV1/VC-1 excluded
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.15 — 4K, DV-Only Kill on, AV1/VC-1 excluded, simple quality-tier PSEs
 - `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.16 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
 
 ### Anime
@@ -149,7 +149,7 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.6
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.9 — DV Profile 5/8, AV1 excluded
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.1.10 — DV Profile 5/8, AV1 excluded
 - `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.1.7 — Essential 4K experimental
 - `Nightly/Essential/core-nexus-essential-labs.json` v0.1.7 — Essential 1080p experimental
 - `Nightly/Single/core-nexus-4k-apex-labs.json` v0.9.0 — Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins
