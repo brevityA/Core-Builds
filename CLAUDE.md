@@ -115,10 +115,10 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Flash/core-nexus-flash.json` v2.9.4 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.9.2 — fast cached 4K
-- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.9.2
-- `Speed/TorBox/core-nexus-speed.json` v2.9.2 — fast cached 1080p
-- `Speed/TorBox/core-nexus-speed-lite.json` v2.9.2
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.9.4 — fast cached 4K
+- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.9.4
+- `Speed/TorBox/core-nexus-speed.json` v2.9.4 — fast cached 1080p
+- `Speed/TorBox/core-nexus-speed-lite.json` v2.9.4
 
 ### Speed (EasyNews)
 - `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.9.4 — EasyNews 4K
