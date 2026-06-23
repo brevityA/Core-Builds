@@ -5,7 +5,7 @@
     "description": "Speed-optimised 4K build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Exits as soon as 3 cached 4K streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.3",
+    "version": "2.9.4",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -735,8 +735,8 @@
       "groupings": [
         {
           "addons": [
-            "nx-fix-02",
-            "nx-fix-01"
+            "nx-fix-04",
+            "67c"
           ],
           "condition": "count(cached(previousStreams)) < 3"
         }
