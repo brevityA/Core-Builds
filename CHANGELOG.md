@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1 (2026-06-24)
+
+### Fixed
+- **Essential Labs groups validation error** (`core-nexus-4k-essential-labs.json`, `core-nexus-essential-labs.json`). Both templates copied the `groups.groupings` block from the Apex family, referencing `nx-fix-01` and `nx-fix-02` (Comet and Meteor instanceIds). Neither preset exists in the Essential Labs templates — AIOStreams' group validator rejects imports when a grouping references an addon that isn't in the preset list. Fixed by disabling `groups` and clearing `groupings: []`. Essential-style templates use `dynamicAddonFetching` for conditional scraper fetching, not addon groups.
+- **Essential Labs `dynamicAddonFetching` condition** — both templates had `{{inputs.exitThreshold}}` and `{{inputs.maxWaitMs}}` placeholder variables with no corresponding `inputs` section, causing the condition to fail at runtime. Replaced with hardcoded values matching the stable Essential 4K pattern: `>= 10 cached 2160p streams or > 5000 ms` (4K) and `>= 15 cached 1080p streams or > 5000 ms` (1080p).
+  - `core-nexus-4k-essential-labs.json`: v0.2.0 → v0.2.3
+  - `core-nexus-essential-labs.json`: v0.1.9 → v0.1.12
+
+---
+
 ## 3.0.0 (2026-06-24)
 
 ### Added
