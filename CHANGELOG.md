@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.0.0 (2026-06-24)
+
+### Added
+- **Bad Dual Audio Groups ESE — all 28 stable non-Anime templates.** Excludes 27 known mislabelled dual-audio release groups: alfaHD, BAT, BiOMA, BlackBit, BNd, Cory, EXTREME, FF, FOXX, G4RiS, GUEIRA, LCD, N3G4N, PD, PTHome, RiPER, RK, SiGLA, Tars, TM, tokar86a, TURG, vnlls, WTV, Yatogam1, YusukeFLA, ZigZag, ZNM. These groups produce streams falsely labelled as dual-audio (English + original) when the English track is either absent or a low-quality dub. Inserted immediately after the Flood Guard ESE. Graduated from Labs.
+- **Indexer Diversity ESE — all 28 stable non-Anime templates.** Caps results per scraper at 2 when the total cached+P2P pool exceeds 20 streams, using `perGroup(indexer)`. Prevents any single slow or noisy indexer from dominating the result list when faster scrapers have already found sufficient coverage. Inserted just before the CB hard-kill block. Graduated from Labs.
+- **Score IQR Guard ESE — 5 IQR-architecture 4K templates.** When the eligible stream pool is ≥ 8, removes streams whose `seScore` falls below `q1(seScore) − 1.5×IQR(seScore)` — the Tukey lower fence applied to the PSE score distribution. Eliminates statistical outliers that the quality tiers ranked poorly relative to the rest of the pool. Only applied to templates where PSEs produce a meaningful score distribution (IQR architecture): 4K Apex (→ **v0.5.0**), 4K Apex TorBox (→ **v2.10.0**), 4K Hybrid (→ **v2.10.0**), 4K Essential (→ **v2.10.0**), 4K AllDebrid (→ **v0.2.0**). CB-style and Lite templates excluded — flat scores produce no IQR distribution. Graduated from Labs.
+- **Core Builds Base Config** (`Templates/Core-Builds-Base-Config.json`). A draft parent config for AIOStreams' parent/child config architecture (v2.28.0+). Contains all 12 scraper presets with tuned timeouts, the full universal ESE layer, ISEs, standard sort criteria, formatter, and all Tamtaro/Vidhin05 synced URLs. Import into AIOStreams to get a UUID; child templates then reference it via `parentConfig` and only need to define their service preset, PSEs, and template-specific ESEs. Activating this is deferred until a permanent hosted AIOStreams instance is available — the file is included for reference and future use.
+
+### Fixed
+- **Flash template plain-string ESE.** Both Flash 4K and Flash had one ESE stored as a bare string (`(daysSinceRelease > 3 or daysSinceRelease < 0) ? uncached(streams) : []`) instead of the standard `{expression, enabled}` dict format. Converted.
+
+---
+
 ## 2.9.9 (2026-06-24)
 
 ### Added

@@ -8,6 +8,19 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## v3.0.0 — June 2026
+
+**Bad dual-audio groups are now excluded from every template.**
+27 release groups that falsely label streams as dual-audio (alfaHD, BAT, BiOMA, BlackBit, and 23 others) are now excluded across all 28 stable non-Anime templates. These groups produce streams where the English track is either absent or a low-quality dub — the label is inaccurate. You won't see those results any more without any manual configuration.
+
+**One scraper can no longer flood your results.**
+A new Indexer Diversity rule caps any single scraper at 2 results when your total stream pool exceeds 20. Previously, if Meteor or MediaFusion returned 15 results for a popular title, they could crowd out higher-quality matches from other scrapers that returned fewer. Now every active scraper gets fair representation in the list. Applied to all 28 stable non-Anime templates.
+
+**Score IQR Guard — statistical outlier filtering on 4K full templates.**
+The five 4K templates with IQR-adaptive quality tiers (4K Apex, 4K Apex TorBox, 4K Hybrid, 4K Essential, 4K AllDebrid) now automatically filter streams whose quality score falls below the statistical lower fence of the pool. In plain terms: if your stream list has a clear quality cluster and a handful of results that scored much worse, those low outliers are now removed rather than appearing at the bottom. This has been in Labs for several releases — it's now stable.
+
+---
+
 ## v2.9.9 — June 2026
 
 **Anime BD T1 regex updated — resolves the "1 regex not allowed" import error.**
