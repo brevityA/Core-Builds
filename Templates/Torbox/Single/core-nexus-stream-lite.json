@@ -5,7 +5,7 @@
     "description": "A frictionless 1080p SDR build running exclusively on TorBox, with RPDB poster database integration for enhanced metadata visuals in Stremio. Targets 1080p and 720p WEB-DL and WEBRip sources. Blocks BluRay, Remux, 4K, and HDR content for reliable playback on any hardware. File range 1 GB\u201360 GB, 1080p capped at 25 GB. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No secondary debrid service required \u2014 a single TorBox subscription is sufficient. Designed for phones, tablets, budget Android TV boxes, and Fire TV Sticks. Relaxed filtering \u2014 quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.4",
+    "version": "2.9.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -434,7 +434,7 @@
       {
         "originalName": "Anime BD T1",
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i",
         "score": 100
       },
       {

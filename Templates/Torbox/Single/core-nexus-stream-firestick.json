@@ -5,7 +5,7 @@
     "description": "Firestick and budget Android TV optimised build. Hard SDR-only enforcement \u2014 excludes Dolby Vision, HDR10+, HDR10, HLG, and 10-bit content that causes playback failures or tone-mapping artifacts on Fire TV hardware. AV1 excluded. TrueHD/Atmos/lossless audio excluded. 1080p + 720p \u00b7 WEB-DL/WEBRip \u00b7 TorBox Essential. Single TorBox subscription required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.6",
+    "version": "2.9.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -492,7 +492,7 @@
       {
         "originalName": "Anime BD T1",
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i",
         "score": 100
       },
       {

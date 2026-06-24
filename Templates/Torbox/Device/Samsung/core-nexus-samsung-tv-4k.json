@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung smart TVs without native Dolby Vision support \u2014 including RU7100, RU8000, NU8000, Q60, and similar 2018\u20132022 models. DV-only streams are excluded (DV-Only Kill ESE); only HDR10+, HDR10, HLG, and SDR content appears. AV1 and VC-1 excluded (not supported on older Samsung hardware). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded \u2014 Samsung passes these through only via HDMI ARC/eARC to compatible receivers, which most users don't have. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox \u00b7 Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.16",
+    "version": "0.2.17",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -179,7 +179,7 @@
       },
       {
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i"
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i"
       },
       {
         "name": "Anime BD T1 [sam]",

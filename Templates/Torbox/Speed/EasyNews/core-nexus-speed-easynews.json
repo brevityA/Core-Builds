@@ -5,7 +5,7 @@
     "description": "Speed-optimised 1080p build for EasyNews subscribers \u2014 no TorBox required. Streams exclusively from EasyNews Usenet cache for near-instant playback. Three fast scrapers: Library, Zilean, Meteor with Usenet enabled. SDR only, WEB-DL preferred, BluRay and Remux blocked. Timeouts at 3500ms, 10 results max. Requires an active EasyNews subscription.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.5",
+    "version": "2.9.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1171,7 +1171,7 @@
       {
         "originalName": "Anime BD T1",
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i",
         "score": 100
       },
       {

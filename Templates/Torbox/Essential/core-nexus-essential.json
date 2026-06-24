@@ -5,7 +5,7 @@
     "description": "A full-featured 1080p SDR build for TorBox Essential users. No Usenet access required \u2014 runs entirely on TorBox's torrent cache. Targets WEB-DL and WEBRip sources, blocks BluRay, Remux, 4K, and HDR for reliable playback on budget hardware. File range 1 GB\u201325 GB. Full addon stack: Comet, Meteor, Zilean, Knaben. A single TorBox Essential subscription is all that is required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.6",
+    "version": "2.9.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -481,7 +481,7 @@
       {
         "originalName": "Anime BD T1",
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i",
         "score": 100
       },
       {
