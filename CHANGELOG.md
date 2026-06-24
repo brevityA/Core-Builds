@@ -1,6 +1,23 @@
 # Changelog
 
-## [Unreleased]
+## 2.9.9 (2026-06-24)
+
+### Added
+- **REPACK/PROPER Passthrough ISE — all templates.** A new ISE pins REPACK and PROPER releases ahead of limit filters and exclusion logic. Previously, a corrected re-encode could be suppressed if it fell outside the quality window or hit a result cap before being evaluated. It now bypasses those gates and always surfaces in the stream list. Applied via the shared ISE file — no per-template change required; all templates pick this up automatically.
+- **Codec Efficiency Booster PSE — AllDebrid and Samsung TV templates.** HEVC and AV1 streams are prioritised over AVC at equivalent quality and bitrate. Previously this boost was Apex and 4K Hybrid only; now active on all 4 AllDebrid templates and all 3 Samsung TV templates.
+- **Audio Pinnacle PSE — AllDebrid and Samsung TV templates.** Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3 priority ordering within each quality tier. Same expansion as Codec Efficiency Booster.
+- **HDR/DV Priority PSE — AllDebrid and Samsung TV templates.** Dolby Vision and HDR10+ surface above HDR10 and SDR within 4K results. Same expansion.
+
+### Fixed
+- **Apple TV 4K Nightly — SeaDex passthrough ISE.** The template had SeaDex enabled in its preset list and config but was missing the passthrough ISE that marks SeaDex-matched streams as exempt from limit and exclusion filters. SeaDex results were being filtered the same as everything else. Added — SeaDex streams now bypass those filters on Apple TV 4K.
+- **Speed TorBox templates — broken dynamic group addon references** (`speed-4k`, `speed-4k-lite`, `speed`, `speed-lite`). The dynamic addon group was pointing at instanceIds `nx-fix-01` and `nx-fix-02` which do not exist in any of the templates. AIOStreams' group validation was failing silently on import. Fixed to reference the correct Zilean and StremThru Torz instanceIds. A disabled MediaFusion fallback preset also added so fresh imports pass validation before TorBox credentials are configured.
+- **Anime BD T1 regex drift — 34 templates.** Vidhin05 updated `English/regexes.json`, removing ZR and NAN0 from the Anime BD T1 pattern. The old `preferredRegexPatterns` entry (which included `/\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\b|(?<=remux).*\b(NAN0)\b/`) no longer matched elfhosted's allowlist — causing a "1 regex not allowed" error on import. Updated to match Vidhin05's current pattern (without ZR/NAN0) across all 34 non-Anime templates. `regexOverrides` entries for Anime BD T1 also updated for consistency.
+
+### Changed
+- **NZBGeek preset disabled by default — Hybrid templates** (`4K Hybrid`, `Hybrid`, `Hybrid Lite`). On shared hosting (ElfHosted, fortheweak.cloud), AIOStreams search and NZB grab requests can originate from different IPs. NZBGeek detects this pattern as multi-IP access and bans the account. The NZBGeek (`newznab`) preset is now `enabled: false` on all three Hybrid templates. Users on ElfHosted can re-enable it after routing requests through the [Zyclops proxy](https://zyclops.elfhosted.com); self-hosted users with a single IP can enable it directly.
+
+### Docs
+- **NZBGeek shared-hosting guidance.** The Hybrid accordion in `importing.mdx` now explains the IP-mismatch ban mechanism, the Zyclops proxy workaround for ElfHosted, and the NZBHydra2 alternative for self-hosted instances. NinjaCentral (the only indexer to publicly confirm AIOStreams public-instance compatibility) documented as a no-restrictions alternative. Same guidance added to the NZBGeek troubleshooting accordion in `master-guide.mdx`.
 
 ---
 

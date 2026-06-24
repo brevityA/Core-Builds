@@ -8,6 +8,16 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## v2.9.9 — June 2026
+
+**Anime BD T1 regex updated — resolves the "1 regex not allowed" import error.**
+Vidhin05 (the source elfhosted uses to validate allowed regex patterns) silently updated their file, removing two release groups — ZR and NAN0 — from the Anime BD T1 pattern. If you saw a "1 out of N regexes not allowed" error when importing a template, this was the cause. All templates now match Vidhin05's current version of the pattern. Re-import from the [Template Directory](/template-directory) to clear the error.
+
+**NZBGeek preset now disabled by default on Hybrid templates.**
+NZBGeek has been issuing account bans to users running AIOStreams on shared hosting (ElfHosted, fortheweak.cloud). The root cause is an IP mismatch: on these platforms, search queries and NZB grabs can come from different IPs, which NZBGeek flags as multi-account sharing. The NZBGeek preset is still included in all Hybrid templates — it is just switched off out of the box. Re-enabling it on ElfHosted requires routing requests through the [Zyclops proxy](https://zyclops.elfhosted.com) so both operations share a single IP. On a private or self-hosted instance where all requests originate from one IP, you can enable the preset directly. See [Importing a Template](/importing) for the full setup steps.
+
+---
+
 ## v2.9.8 — June 2026
 
 **REPACK/PROPER releases now always surface, even when they'd normally be filtered out.**
