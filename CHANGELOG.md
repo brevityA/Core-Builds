@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.0.0 (2026-06-24)
+
+### Added
+- **Bad Dual Audio Groups ESE — all 28 stable non-Anime templates.** Excludes 27 known mislabelled dual-audio release groups: alfaHD, BAT, BiOMA, BlackBit, BNd, Cory, EXTREME, FF, FOXX, G4RiS, GUEIRA, LCD, N3G4N, PD, PTHome, RiPER, RK, SiGLA, Tars, TM, tokar86a, TURG, vnlls, WTV, Yatogam1, YusukeFLA, ZigZag, ZNM. These groups produce streams falsely labelled as dual-audio (English + original) when the English track is either absent or a low-quality dub. Inserted immediately after the Flood Guard ESE. Graduated from Labs.
+- **Indexer Diversity ESE — all 28 stable non-Anime templates.** Caps results per scraper at 2 when the total cached+P2P pool exceeds 20 streams, using `perGroup(indexer)`. Prevents any single slow or noisy indexer from dominating the result list when faster scrapers have already found sufficient coverage. Inserted just before the CB hard-kill block. Graduated from Labs.
+- **Score IQR Guard ESE — 5 IQR-architecture 4K templates.** When the eligible stream pool is ≥ 8, removes streams whose `seScore` falls below `q1(seScore) − 1.5×IQR(seScore)` — the Tukey lower fence applied to the PSE score distribution. Eliminates statistical outliers that the quality tiers ranked poorly relative to the rest of the pool. Only applied to templates where PSEs produce a meaningful score distribution (IQR architecture): 4K Apex (→ **v0.6.0**), 4K Apex TorBox (→ **v2.11.0**), 4K Hybrid (→ **v2.11.0**), 4K Essential (→ **v2.11.0**), 4K AllDebrid (→ **v0.3.0**). CB-style and Lite templates excluded — flat scores produce no IQR distribution. Graduated from Labs.
+- **Core Builds Base Config** (`Templates/Core-Builds-Base-Config.json`). A draft parent config for AIOStreams' parent/child config architecture (v2.28.0+). Contains all 12 scraper presets with tuned timeouts, the full universal ESE layer, ISEs, standard sort criteria, formatter, and all Tamtaro/Vidhin05 synced URLs. Import into AIOStreams to get a UUID; child templates then reference it via `parentConfig` and only need to define their service preset, PSEs, and template-specific ESEs. Activating this is deferred until a permanent hosted AIOStreams instance is available — the file is included for reference and future use.
+
+- **perGroup() Extra Cached dedup — 5 IQR 4K templates.** The Extra Cached HQ, Extra Cached LQ, and Extra Uncached ESEs previously used verbose 20–35 clause `merge(slice(...))` chains to cap per-resolution results. Replaced with `negate(perGroup(..., 'resolution', 3), ...)` — a single expression that caps 3 streams per resolution bucket regardless of quality tier, with no maintenance overhead as new resolutions are added. Applies to all 5 IQR templates (4K Apex, 4K Apex TorBox, 4K Hybrid, 4K Essential, 4K AllDebrid). Graduated from Labs.
+- **Elite group pin PSEs — 5 IQR 4K templates.** Four new PSEs prepended to the PSE list using `pin()`:
+  - **4K Remux elite pin** — FraMeSToR, DON, FLUX, HIFI, playBD, BMF, QxR, EPSiLON, BLURANiUM, PmP pinned to position 1 within the 2160p Remux tier.
+  - **1080p Remux elite pin** — NTb, FLUX, KiNGS, NTG, BHDStudio, FraMeSToR, SiC, 126811 pinned within the 1080p Remux tier.
+  - **LQ group pin bottom** — YIFY, RARBG, EVO, YTS, PSA, MeGusta, Tigole always appear last.
+  - **IMAX pin** — any IMAX-tagged stream pinned to position 1 when present.
+  Graduated from Labs (tested in 4K Apex Labs v0.9.x).
+
+### Fixed
+- **Flash template plain-string ESE.** Both Flash 4K and Flash had one ESE stored as a bare string (`(daysSinceRelease > 3 or daysSinceRelease < 0) ? uncached(streams) : []`) instead of the standard `{expression, enabled}` dict format. Converted.
+
+---
+
 ## 2.9.9 (2026-06-24)
 
 ### Added

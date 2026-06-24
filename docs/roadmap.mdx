@@ -7,6 +7,11 @@ description: "Planned work, active development, and recently completed milestone
 
 | Version | Item |
 |---|---|
+| v3.0.0 | Bad Dual Audio Groups ESE — 27 mislabelled dual-audio release groups excluded across all 28 stable non-Anime templates; graduated from Labs |
+| v3.0.0 | Indexer Diversity ESE — perGroup(indexer) caps 2 results per scraper when pool > 20; all 28 stable non-Anime templates; graduated from Labs |
+| v3.0.0 | Score IQR Guard ESE — Tukey lower-fence filter on seScore distribution; 4K Apex (v0.5.0), 4K Apex TorBox (v2.10.0), 4K Hybrid (v2.10.0), 4K Essential (v2.10.0), 4K AllDebrid (v0.2.0); graduated from Labs |
+| v3.0.0 | Core Builds Base Config draft — parent config with all scraper presets + universal ESE/ISE layer for AIOStreams parent/child architecture (activation deferred until hosted instance available) |
+| v3.0.0 | Flash plain-string ESE fix — converted bare-string ESE to standard dict format |
 | v2.9.9 | Anime BD T1 regex drift fix — Vidhin05 removed ZR/NAN0; pattern updated across all 34 non-Anime templates; resolves "1 regex not allowed" on elfhosted |
 | v2.9.9 | NZBGeek preset disabled by default — Hybrid, Hybrid Lite, 4K Hybrid — prevents IP-mismatch bans on shared hosting (ElfHosted, fortheweak.cloud) |
 | v2.9.9 | NZBGeek shared-hosting docs — Zyclops proxy workaround, NinjaCentral as public-instance alternative, IP-mismatch mechanism explained |
@@ -59,9 +64,9 @@ description: "Planned work, active development, and recently completed milestone
 
 ## Planned
 
-### v3.0.0 — Major Release
+### Parent/Child Config Architecture
 
-The next major version is a full suite redesign. Details will be announced closer to release. Feedback welcome in [Discussions](https://github.com/brevityA/Core-Builds/discussions).
+The Core Builds Base Config (`Templates/Core-Builds-Base-Config.json`) is drafted and ready — it contains all scraper presets, the universal ESE layer, ISEs, sort criteria, formatter, and synced URLs. Activation is deferred until a permanent hosted AIOStreams instance is available to hold the parent config UUID. Once live, each child template only needs its service preset + PSEs + template-specific ESEs. One timeout change in the parent propagates to all templates instantly.
 
 ### Expression Layer
 
