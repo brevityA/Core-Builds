@@ -17,7 +17,7 @@
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.
 
-> **Current version: v2.9.7** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+> **Current version: v3.0.1** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
 > 📖 **New here?** Start with the [Complete Setup Guide](https://github.com/brevityA/Core-Builds/wiki) — it covers picking a template, importing, API keys, device profiles, and troubleshooting.
 
