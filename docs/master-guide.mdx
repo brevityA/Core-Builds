@@ -319,8 +319,14 @@ If you did a soft reset (re-imported a template) and your manifest URL did not c
   <Accordion title="Credentials modal does not appear after re-import">
     Some hosts cache the credential state. Try logging out and back in, or clearing your browser cache, then re-importing.
   </Accordion>
-  <Accordion title="NZBGeek still not working after reset (Hybrid template)">
-    The NZBGeek API key is not entered in the credentials modal — it must be configured in the Addons section after loading. See the [Import a Template](/importing) guide for the full NZBGeek setup step.
+  <Accordion title="NZBGeek not working on ElfHosted / fortheweak (Hybrid template)">
+    NZBGeek flags accounts accessed from multiple IP addresses simultaneously. On shared hosting, the search request and the NZB download can originate from different IPs, which triggers this.
+
+    The NZBGeek preset is **disabled by default** from v2.9.8 onwards. To use it on ElfHosted, route it through [Zyclops](https://zyclops.elfhosted.com) — set the Zyclops proxy URL in the Newznab addon config so search and grab share one IP, then enter your API key.
+
+    On a private/self-hosted AIOStreams instance this is not an issue — enable the preset and enter your API key normally.
+
+    If you want a Usenet indexer that explicitly allows public AIOStreams instances, [NinjaCentral](https://ninjacentral.co.za) has confirmed compatibility.
   </Accordion>
 </AccordionGroup>
 
