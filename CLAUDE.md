@@ -97,15 +97,15 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 ## Active Template Inventory (as of v3.0.0-dev)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.5.0 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard
-- `Single/core-nexus-4k-apex-torbox.json` v2.10.0 — TorBox-cached-only Apex variant, Score IQR Guard
+- `Single/core-nexus-4k-apex.json` v0.6.0 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `Single/core-nexus-4k-apex-torbox.json` v2.11.0 — TorBox-cached-only Apex variant, Score IQR Guard, elite group pins, perGroup() Extra Cached
 - `Single/core-nexus-stream.json` v2.9.9 — 1080p streaming quality, 720p fallback
 - `Single/core-nexus-stream-lite.json` v2.9.6 — lite variant
 - `Single/core-nexus-stream-firestick.json` v2.9.8 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.9.6
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.10.0 — 4K with IQR PSEs, pow() decay, Score IQR Guard
+- `Essential/core-nexus-4k-essential.json` v2.11.0 — 4K with IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached
 - `Essential/core-nexus-4k-essential-lite.json` v2.9.6 — CB-style PSEs
 - `Essential/core-nexus-essential.json` v2.9.8 — 1080p
 - `Essential/core-nexus-essential-lite.json` v2.9.6
@@ -125,13 +125,13 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.7 — EasyNews 1080p
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.2.0 — 4K with IQR PSEs, Score IQR Guard
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.3.0 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
 - `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.14 — 4K CB-style
 - `AllDebrid/core-nexus-alldebrid.json` v0.1.17 — 1080p
 - `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.16 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.10.0 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-4k-hybrid.json` v2.11.0 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, NZBGeek preset (disabled by default)
 - `Hybrid/core-nexus-hybrid.json` v2.9.10 — 1080p hybrid, TorBox-priority twins (IQR), NZBGeek preset (disabled by default)
 - `Hybrid/core-nexus-hybrid-lite.json` v2.9.10 — TorBox-priority twins (CB-style), NZBGeek preset (disabled by default)
 
