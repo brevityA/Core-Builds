@@ -94,51 +94,51 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 
 ---
 
-## Active Template Inventory (as of v2.9.9)
+## Active Template Inventory (as of v3.0.0-dev)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.4.18 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap
-- `Single/core-nexus-4k-apex-torbox.json` v2.9.6 — TorBox-cached-only Apex variant
-- `Single/core-nexus-stream.json` v2.9.8 — 1080p streaming quality, 720p fallback
-- `Single/core-nexus-stream-lite.json` v2.9.5 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.9.7 — Fire Stick optimised
-- `Single/core-nexus-stream-firestick-lite.json` v2.9.5
+- `Single/core-nexus-4k-apex.json` v0.5.0 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard
+- `Single/core-nexus-4k-apex-torbox.json` v2.10.0 — TorBox-cached-only Apex variant, Score IQR Guard
+- `Single/core-nexus-stream.json` v2.9.9 — 1080p streaming quality, 720p fallback
+- `Single/core-nexus-stream-lite.json` v2.9.6 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.9.8 — Fire Stick optimised
+- `Single/core-nexus-stream-firestick-lite.json` v2.9.6
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.9.6 — 4K with IQR PSEs, pow() decay
-- `Essential/core-nexus-4k-essential-lite.json` v2.9.5 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.9.7 — 1080p
-- `Essential/core-nexus-essential-lite.json` v2.9.5
+- `Essential/core-nexus-4k-essential.json` v2.10.0 — 4K with IQR PSEs, pow() decay, Score IQR Guard
+- `Essential/core-nexus-4k-essential-lite.json` v2.9.6 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.9.8 — 1080p
+- `Essential/core-nexus-essential-lite.json` v2.9.6
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.9.4 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.9.5 — cached-only 1080p instant play
+- `Flash/core-nexus-flash-4k.json` v2.9.5 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.9.6 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.9.5 — fast cached 4K
-- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.9.5
-- `Speed/TorBox/core-nexus-speed.json` v2.9.5 — fast cached 1080p
-- `Speed/TorBox/core-nexus-speed-lite.json` v2.9.5
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.9.6 — fast cached 4K
+- `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.9.6
+- `Speed/TorBox/core-nexus-speed.json` v2.9.6 — fast cached 1080p
+- `Speed/TorBox/core-nexus-speed-lite.json` v2.9.6
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.9.5 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.6 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.9.6 — EasyNews 4K
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.9.7 — EasyNews 1080p
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.1.16 — 4K with IQR PSEs
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.13 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.1.16 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.15 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.2.0 — 4K with IQR PSEs, Score IQR Guard
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.1.14 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.1.17 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.1.16 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.9.8 — TorBox + RD, service() priority PSEs, IQR, NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid.json` v2.9.9 — 1080p hybrid, TorBox-priority twins (IQR), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid-lite.json` v2.9.9 — TorBox-priority twins (CB-style), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-4k-hybrid.json` v2.10.0 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid.json` v2.9.10 — 1080p hybrid, TorBox-priority twins (IQR), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid-lite.json` v2.9.10 — TorBox-priority twins (CB-style), NZBGeek preset (disabled by default)
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.17 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.17 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
-- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.18 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.2.18 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.18 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
+- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.19 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.8 — 4K anime, SeaDex + AnimeTosho
