@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung RU7100 (UA65RU7100W) and compatible TVs. Native video containers: MKV, MP4, AVI, MOV, FLV, ASF, 3GP, VOB. Native audio: FLAC, AAC, MP3, M4A, WMA, WAV. No AV1 or Dolby Vision \u2014 DV streams excluded. HDR10+, HDR10, HLG priority. HEVC/AVC encodes only. Audio prioritises FLAC and AAC for native playback; Atmos/TrueHD/DTS ranked lower (passthrough/transcode). Full Core Builds expression layer: IQR Apex PSEs \u00b7 REPACK/PROPER Passthrough \u00b7 Per-Addon Flood Guard \u00b7 Usenet Propagation Guard \u00b7 AI Upscale Exclusion \u00b7 Codec Efficiency Booster \u00b7 Audio Pinnacle (native-first) \u00b7 HDR Priority (no DV) \u00b7 Ranked regex pool \u00b7 Full CB ESE stack.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.17",
+    "version": "0.2.18",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -181,7 +181,7 @@
       },
       {
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i"
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i"
       },
       {
         "name": "Anime BD T1 [sam]",

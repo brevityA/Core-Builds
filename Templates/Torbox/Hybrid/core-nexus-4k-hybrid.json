@@ -5,7 +5,7 @@
     "description": "4K flagship for TorBox users who also run a Usenet indexer. Pairs TorBox debrid with NZBGeek for maximum source diversity across debrid, torrent, and Usenet streams. Prioritises 2160p with 1080p fallback. Full HDR and lossless audio. Adaptive IQR bitrate PSEs \u2014 Tukey fence (\u22654 ranked) with min/max and new-release median cluster fallbacks. NZBGeek API key required \u2014 enter your key in the Usenet preset before saving.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.6",
+    "version": "2.9.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -180,7 +180,7 @@
       },
       {
         "name": "Anime BD T1",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|-ZR-)).*/i"
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i"
       },
       {
         "name": "Anime BD T1 [sam]",
