@@ -9,9 +9,7 @@
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": [
-      "v0.1.0 — Initial Labs build: SeaDex-aware PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins"
-    ]
+    "changelog": "v0.1.0 — Initial Labs build: SeaDex-aware PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins"
   },
   "config": {
     "addonName": "Core Nexus Anime 4K",
