@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. 1080p build. Template directives: TorBox Search and exit thresholds configurable at import.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -655,7 +655,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
+      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= 15 or totalTimeTaken > 5000"
     },
     "groups": {
       "enabled": false,
