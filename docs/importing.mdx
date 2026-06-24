@@ -59,7 +59,13 @@ Re-import the same URL. AIOStreams will load the latest version and merge it ove
   </Accordion>
 
   <Accordion title="Hybrid templates (4K Hybrid, Hybrid, Hybrid Lite)">
-    Go to **Add-ons → Newznab** and enter your NZBGeek API key.
+    The NZBGeek (Newznab) preset is included but **disabled by default**. NZBGeek flags accounts accessed from multiple IP addresses simultaneously — a pattern that occurs on shared hosting (ElfHosted, fortheweak.cloud) where search and download requests can originate from different IPs.
+
+    **To enable on ElfHosted:** use the [Zyclops proxy](https://zyclops.elfhosted.com) — set the proxy URL in the Newznab addon config so both search and grab route through the same IP. Then enter your NZBGeek API key in **Add-ons → Newznab**.
+
+    **On a private/self-hosted AIOStreams instance:** enable the preset, enter your API key, and ensure the built-in NZB grab proxy is active (`AIOSTREAMS_AUTH` credentials set) so search and grab share the same IP.
+
+    If you want a Usenet indexer with no IP restrictions on shared hosting, [NinjaCentral](https://ninjacentral.co.za) has publicly confirmed AIOStreams public-instance compatibility.
   </Accordion>
   <Accordion title="AllDebrid templates">
     Go to **Add-ons → StremThru AllDebrid** and enter your AllDebrid API key.
