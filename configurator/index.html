@@ -91,11 +91,14 @@ const DEFS = [
   },
   { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c2',
     opts:[
-      { v:'generic',    icon:'📺', name:'Standard TV / Streaming Box', desc:'No device restrictions applied' },
-      { v:'samsung',    icon:'🔵', name:'Samsung TV (Tizen)',           desc:'DV-Only Kill on · AV1, VC-1, TrueHD, DTS-HD excluded' },
-      { v:'appletv',    icon:'🍎', name:'Apple TV (Infuse)',            desc:'Dolby Vision prioritised · AV1 excluded' },
-      { v:'windows',    icon:'🖥️', name:'Windows PC / Ultrawide',      desc:'Full lossless audio · AV1 + HEVC preferred · HDR-first' },
-      { v:'firestick',  icon:'🔥', name:'Fire Stick / Fire TV',        desc:'AV1 + VC-1 excluded · DD+ max audio' },
+      { v:'generic',         icon:'📺', name:'Standard TV / Streaming Box',    desc:'No device restrictions applied — broadest compatibility' },
+      { v:'samsung',         icon:'🔵', name:'Samsung TV (Tizen)',              desc:'DV-Only Kill on · AV1, VC-1 excluded · TrueHD, DTS-HD MA excluded · HDR10+ preferred' },
+      { v:'appletv-old',     icon:'🍎', name:'Apple TV 4K (1st / 2nd gen)',     desc:'DV prioritised · AV1 excluded (no hardware decoder) · TrueHD + Atmos passthrough · 7.1' },
+      { v:'appletv-new',     icon:'🍏', name:'Apple TV 4K (3rd gen / A15)',     desc:'DV prioritised · AV1 via software · TrueHD + Atmos passthrough · 7.1' },
+      { v:'lgtv',            icon:'🟢', name:'LG TV (webOS 2019+)',             desc:'DV native · AV1 hardware decode · TrueHD + DTS-HD MA via eARC · 7.1' },
+      { v:'windows',         icon:'🖥️', name:'Windows PC / Ultrawide',         desc:'Full lossless audio · AV1 + HEVC preferred · HDR-first · 7.1' },
+      { v:'firestick-hd',    icon:'🔥', name:'Fire Stick (HD)',                 desc:'DV-Only Kill on · AV1 + VC-1 excluded · TrueHD, DTS-HD MA excluded · HDR10/HLG only' },
+      { v:'firestick-4kmax', icon:'🔶', name:'Fire Stick 4K Max',               desc:'DV supported · AV1 hardware decode · VC-1 excluded · TrueHD, DTS-HD MA excluded' },
     ]
   },
   { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c1',
@@ -357,17 +360,19 @@ function resolutionCfg() {
 
 function encodeCfg() {
   const dev = S.device;
-  if (dev==='samsung'||dev==='firestick') return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
-  if (dev==='appletv')                    return { excludedEncodes:['AV1'],         preferredEncodes:['HEVC','AVC','Unknown'] };
-  if (dev==='windows')                    return { excludedEncodes:['VC-1'],         preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
-  return                                         { excludedEncodes:[],              preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  if (dev==='samsung'||dev==='firestick-hd')  return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
+  if (dev==='firestick-4kmax')                return { excludedEncodes:['VC-1'],        preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  if (dev==='appletv-old')                    return { excludedEncodes:['AV1'],          preferredEncodes:['HEVC','AVC','Unknown'] };
+  if (dev==='appletv-new'||dev==='lgtv')      return { excludedEncodes:[],               preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  if (dev==='windows')                        return { excludedEncodes:['VC-1'],          preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  return                                             { excludedEncodes:[],               preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
 }
 
 function audioCfg() {
   const dev     = S.device;
-  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick';
+  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick-hd' || dev==='firestick-4kmax';
   const lossless= S.audio==='lossless';
-  const wide    = dev==='windows' || lossless;
+  const wide    = dev==='windows' || dev==='lgtv' || dev==='appletv-old' || dev==='appletv-new' || lossless;
   return {
     excludedAudioTags: limited ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [],
     preferredAudioTags:['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','EAC3','DD+','AAC','DTS','AC3'],
@@ -377,10 +382,12 @@ function audioCfg() {
 
 function visualTags() {
   const dev = S.device;
-  if (dev==='appletv')   return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
-  if (dev==='samsung')   return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
-  if (dev==='firestick') return ['HDR10','HDR','HLG','SDR'];
-  if (dev==='windows')   return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='appletv-old'||dev==='appletv-new') return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='lgtv')          return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='samsung')       return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='firestick-hd')  return ['HDR10','HDR','HLG','SDR'];
+  if (dev==='firestick-4kmax') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='windows')       return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   // generic
   if (S.resolution==='4k') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
@@ -430,8 +437,8 @@ function eses() {
     out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
   }
 
-  // DV-Only Kill (Samsung / Fire Stick)
-  if (dev==='samsung'||dev==='firestick') {
+  // DV-Only Kill (Samsung / Fire Stick HD — devices with no DV support)
+  if (dev==='samsung'||dev==='firestick-hd') {
     out.push({ enabled:true, expression:
       "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
     });
@@ -458,7 +465,8 @@ function eses() {
 function pses() {
   const out  = [];
   const res  = S.resolution;
-  const dv   = S.device === 'appletv';
+  const dev  = S.device;
+  const dv   = dev==='appletv-old' || dev==='appletv-new' || dev==='lgtv' || dev==='firestick-4kmax';
 
   const pin4kElite   = { enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" };
   const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" };
@@ -579,8 +587,10 @@ function build() {
     'alldebrid':'AllDebrid','hybrid':'Hybrid'
   }[S.service];
   const devName = {
-    'generic':'Generic','samsung':'Samsung TV','appletv':'Apple TV',
-    'windows':'Windows PC','firestick':'Fire Stick'
+    'generic':'Generic','samsung':'Samsung TV (Tizen)',
+    'appletv-old':'Apple TV 4K (1st/2nd gen)','appletv-new':'Apple TV 4K (3rd gen)',
+    'lgtv':'LG TV (webOS)','windows':'Windows PC',
+    'firestick-hd':'Fire Stick HD','firestick-4kmax':'Fire Stick 4K Max'
   }[S.device];
   const resName = {'4k':'4K','1080p':'1080p','ultrawide':'1080p+4K'}[S.resolution];
 
