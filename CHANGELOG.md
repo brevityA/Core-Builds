@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.0.2 (2026-06-25)
+
+### Fixed
+- **Essential Labs full audit pass** — both `core-nexus-4k-essential-labs.json` (v0.2.3 → v0.2.4) and `core-nexus-essential-labs.json` (v0.1.12 → v0.1.13):
+  - **`{{inputs.exitThreshold}}` / `{{inputs.maxWaitMs}}` restored** — PR #267 hardcoded these values, orphaning the import-time configuration UI and substituting wrong thresholds (10 cached streams / 5000 ms instead of the designed 5 / 4000 ms). The `inputs` section in both templates is now wired back to the `dynamicAddonFetching.condition` string.
+  - **Dead Flood Guard replaced** — the ESE referenced Meteor, Comet RD, MediaFusion, EZTV, Knaben, and HdHub, none of which exist in these templates (only StremThru Torz + TorBox Search). Replaced with live caps: StremThru Torz ≤ 10, TorBox Search ≤ 5.
+  - **Extra Cached ESEs → `perGroup()`** — verbose 20–35 clause `merge(slice(...))` chains replaced with `perGroup(..., 'resolution', 3)` expressions, matching the stable 3.0.0 pattern.
+  - **Low resolutions removed from `preferredResolutions`** — 144p, 240p, 360p removed.
+  - **AV1 and VC-1 removed from `preferredEncodes`** — these encodes ranked ahead of standard HEVC/AVC without device justification.
+  - **`enableSeadex: false`** — neither template has a SeaDex preset; all `seadex(streams)` ESE calls were returning `[]`.
+  - **`addonDescription` updated** — was stuck at `"Nightly Labs v0.1.0"` since initial creation.
+
+---
+
 ## 3.0.1 (2026-06-24)
 
 ### Fixed
