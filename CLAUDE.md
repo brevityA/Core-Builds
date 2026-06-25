@@ -29,6 +29,7 @@ Templates/Torbox/
   Hybrid/           → TorBox + RD hybrid templates (4K Hybrid, Hybrid, Hybrid Lite)
   AllDebrid/        → AllDebrid variants (4K AllDebrid, AllDebrid + Lite variants)
   Device/Samsung/   → Samsung TV device templates (Samsung TV, Samsung TV 4K)
+  Device/Windows/   → Windows PC device templates (Ultrawide)
   Nightly/          → Pre-release / nightly builds (Apple TV 4K)
   Deprecated/       → Retired templates kept for reference
 Templates/Personal/ → Personal/experimental templates (core-cipher) — do not document
@@ -139,6 +140,7 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.2.18 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
 - `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.2.18 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
 - `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.2.20 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
+- `Device/Windows/core-nexus-ultrawide.json` v0.1.0 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
 
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.8 — 4K anime, SeaDex + AnimeTosho

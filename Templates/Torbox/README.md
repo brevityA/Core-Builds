@@ -49,6 +49,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
 | [Samsung RU7100 4K](#-core-nexus-samsung-ru7100-4k) | Pro | 4K + 1080p | Samsung RU7100 (2019) — full IQR PSE stack |
+| [Windows Ultrawide](#-core-nexus-ultrawide) | Pro | 1080p + 4K capable | Windows PC / ultrawide monitor — full audio, HDR-first |
 | [Apple TV 4K](#-core-nexus-apple-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Apple TV 4K / Dolby Vision |
 | [4K Hybrid](#-core-nexus-4k-hybrid) | Pro + NZBGeek | 4K + 1080p | Dual-source: TorBox + Usenet, full 4K |
 | [Hybrid](#-core-nexus-hybrid) | Pro + NZBGeek | 1080p | Dual-source: TorBox + Usenet |
@@ -90,6 +91,7 @@ TorBox Pro?
 ├── Want 4K? → 4K Apex
 ├── Samsung TV / no Dolby Vision? → Samsung TV · Samsung TV 4K
 ├── Apple TV 4K (Infuse)? → Apple TV 4K (Nightly)
+├── Windows PC / ultrawide monitor? → Ultrawide
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -136,6 +138,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus 4K Apex Labs** 🧪 | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
 | **Core Nexus Stream Labs** 🧪 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Core Nexus Samsung RU7100 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
+| **Core Nexus Ultrawide** | TorBox Pro | 1080p + 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json` |
 | **Core Nexus Essential Labs** 🧪 | TorBox Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
 | **Core Nexus 4K Essential Labs** 🧪 | TorBox Essential | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 | **Core Nexus 4K Hybrid** | Pro + NZBGeek | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json` |
@@ -252,6 +255,20 @@ Full 4K template for the Samsung RU7100 (2019). Runs the complete APEX IQR PSE s
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
+
+---
+
+### 🖥️ Core Nexus Ultrawide
+
+Windows PC / ultrawide monitor template. Prioritises 1080p quality tiers (S/A/B/C) before falling through to 1440p, then 4K as a quality fallback — designed for ultrawide displays that upscale well but primary content is 1080p. Full lossless audio unlocked (TrueHD, DTS-HD MA, DTS:X, FLAC). HDR-first visual tag ordering (HDR+DV, DV, HDR10+, HDR10). AV1 and HEVC preferred for codec efficiency. VC-1 excluded. No hard resolution kill — 1440p and 4K streams are shown when no 1080p stream passes quality thresholds.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Device/Windows/core-nexus-ultrawide.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json` |
+| **Resolution** | 1080p primary · 1440p + 2160p fallback |
+| **Usenet** | ✅ |
 
 ---
 
