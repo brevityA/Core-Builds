@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.0.3 (2026-06-25)
+
+### Added
+- **Core Nexus Ultrawide** (`Device/Windows/core-nexus-ultrawide.json`, v0.1.0) — new Windows PC / ultrawide monitor template. 1080p-primary with 1440p and 4K fallback tiers; designed for ultrawide displays that upscale well but receive primary content at 1080p. Key differences from Stream:
+  - `requiredResolutions: []` and no Hard Resolution Kill ESE — 1440p and 4K streams are shown when 1080p quality thresholds are not met
+  - `excludedAudioTags: []` — full lossless audio unlocked (TrueHD, DTS-HD MA, DTS:X, FLAC, Atmos)
+  - `preferredAudioChannels: ["7.1", "5.1", "2.0"]` — 7.1 surround added
+  - `preferredVisualTags: ["HDR+DV", "DV", "HDR10+", "HDR10", "HDR", "HLG", "10bit", "SDR", "IMAX"]` — HDR-first ordering
+  - 14-tier PSE stack: S/A/B/C 1080p tiers → 1440p tier → 4K REMUX / WEB-DL HDR / any 4K → 720p last resort → codec + audio + HDR boosters
+  - VC-1 removed from `preferredEncodes`; AV1 retained (Windows hardware decode supported)
+
+---
+
 ## 3.0.2 (2026-06-25)
 
 ### Fixed
