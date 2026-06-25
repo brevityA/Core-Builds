@@ -58,6 +58,7 @@
             "group": "Templates",
             "pages": [
               "template-directory",
+              "configurator",
               "customising",
               "community-templates"
             ]

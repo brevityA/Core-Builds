@@ -1,0 +1,151 @@
+---
+title: "Template Configurator"
+description: "Build a custom AIOStreams template in 6 steps — no manual JSON editing required."
+---
+
+<Frame>
+  <img
+    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_builds_banner.png"
+    alt="Core Builds"
+    style={{ width: '100%', display: 'block' }}
+  />
+</Frame>
+
+The **Template Configurator** is a self-contained HTML tool that generates a ready-to-import AIOStreams template based on your setup. Answer 5 questions, download the JSON, import it — done.
+
+<CardGroup cols={2}>
+  <Card title="Download Configurator" icon="download" href="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/configurator/index.html">
+    Save `index.html` and open it in any browser. Works fully offline — no internet required after download.
+  </Card>
+  <Card title="View on GitHub" icon="github" href="https://github.com/brevityA/Core-Builds/blob/main/configurator/index.html">
+    Inspect the source or open the raw file directly.
+  </Card>
+</CardGroup>
+
+<Note>
+  **How to open it:** right-click the Download link → Save As → open the saved `.html` file in Chrome, Firefox, or Edge. The wizard runs entirely in your browser — no data is sent anywhere.
+</Note>
+
+---
+
+## The 6 Steps
+
+<Steps>
+  <Step title="Debrid Service">
+    Choose your streaming service. This sets which presets are included and how the cache layer is configured.
+
+    | Choice | What changes |
+    |---|---|
+    | **TorBox Pro** | `StremThru Torz` cache · HdHub enabled · `TorBox Search` included |
+    | **TorBox Essential** | Same scraper stack as Pro, Essential plan |
+    | **AllDebrid** | `StremThru AllDebrid` (Store) · HdHub disabled |
+    | **Hybrid (TorBox + RD)** | TorBox primary · Comet+Meteor conditional group fetching |
+  </Step>
+
+  <Step title="Your Device">
+    Device profile sets audio exclusions, codec restrictions, and HDR/DV handling automatically.
+
+    | Device | Audio excluded | Encodes excluded | DV-Only Kill |
+    |---|---|---|---|
+    | Generic TV / Box | — | — | Off |
+    | Samsung TV (Tizen) | TrueHD · DTS-HD MA · DTS:X · FLAC | AV1 · VC-1 | **On** |
+    | Apple TV (Infuse) | — | AV1 | Off |
+    | Windows PC / Ultrawide | — | VC-1 | Off |
+    | Fire Stick / Fire TV | TrueHD · DTS-HD MA · DTS:X · FLAC | AV1 · VC-1 | **On** |
+  </Step>
+
+  <Step title="Resolution">
+    Determines the PSE stack, resolution locks, and dynamic addon fetching threshold.
+
+    | Choice | `requiredResolutions` | PSE stack | Hard Kill ESE |
+    |---|---|---|---|
+    | **4K HDR primary** | `[]` | 4K tiers → 1080p fallback | — |
+    | **1080p only** | `["1080p","720p"]` | 1080p tiers → 720p fallback | Excludes 2160p + 1440p |
+    | **1080p-first + 4K** | `[]` | 1080p → 1440p → 4K → 720p | — |
+  </Step>
+
+  <Step title="Audio">
+    Sets `excludedAudioTags` and `preferredAudioChannels`. Device-managed means the device profile (Step 2) decides.
+
+    | Choice | Excluded | Channels |
+    |---|---|---|
+    | **Full lossless** | Nothing | 7.1 · 5.1 · 2.0 |
+    | **DD+ / Atmos** | Nothing | 5.1 · 2.0 |
+    | **Device-managed** | Per device profile | Per device profile |
+  </Step>
+
+  <Step title="Content Type">
+    Controls SeaDex integration and Bad Dual Audio Groups filtering.
+
+    | Choice | `enableSeadex` | `seadexBestOnly` | Bad Dual Audio ESE |
+    |---|---|---|---|
+    | **Live-action only** | `false` | `false` | ✅ Included |
+    | **Live-action + Anime** | `true` | `false` | ✅ Included |
+    | **Anime-focused** | `true` | `true` | — |
+  </Step>
+
+  <Step title="Review & Download">
+    See a summary of your choices, optionally give the template a custom name, then click **Generate & Download**. The file is saved as a `.json` ready to import directly into AIOStreams.
+  </Step>
+</Steps>
+
+---
+
+## What the generated template includes
+
+Every generated template contains the full production infrastructure from Core Builds stable releases:
+
+<AccordionGroup>
+  <Accordion title="Presets & scrapers">
+    - **Library** — continue watching / user library
+    - **Zilean** — fast cached torrent search
+    - **SeaDex** — best-release anime (enabled based on content choice)
+    - **StremThru Torz / StremThru Store** — debrid cache layer
+    - **Meteor, Comet, MediaFusion** — primary scrapers
+    - **HdHub, EZTV, Torrent Galaxy, Knaben, TorrentsDB** — supplementary scrapers
+    - **AIOSubtitle** — English subtitles
+    - **TorBox Search** — TorBox-native search (disabled by default, enable as needed)
+  </Accordion>
+
+  <Accordion title="Excluded Stream Expressions (ESEs)">
+    - **Per-Addon Flood Guard** — caps per scraper (Meteor ≤5, Comet ≤5, MediaFusion ≤4, EZTV ≤3, HdHub ≤3, Knaben ≤1, TorrentsDB ≤1)
+    - **Bad Dual Audio Groups** — 27 groups that falsely label tracks as dual-audio
+    - **Usenet Propagation Guard** — hides Usenet streams younger than 2 hours
+    - **Hard YouTube Kill, 3D Content Kill, Season Pack Kill**
+    - **Hard Resolution Kill** — 4K excluded when 1080p-only is selected
+    - **DV-Only Kill** — Dolby Vision-only streams excluded on Samsung / Fire Stick
+    - **Extra Cached HQ / LQ / Uncached** — `perGroup()` dedup capping 3 streams per quality tier per resolution
+  </Accordion>
+
+  <Accordion title="Preferred Stream Expressions (PSEs)">
+    Quality-tier PSE stack matched to your resolution choice:
+
+    - **4K:** Elite REMUX pin → S-Tier 4K REMUX → A-Tier 4K WEB-DL HDR → B-Tier 4K WEB-DL → C-Tier any 4K → 1080p tiers → codec/audio/HDR boosters
+    - **1080p:** Elite REMUX pin → S/A/B/C 1080p tiers → 720p fallback → codec booster
+    - **Ultrawide:** 1080p tiers → 1440p → 4K REMUX → 4K WEB-DL HDR → any 4K → 720p → boosters
+
+    Release group pins (top): FraMeSToR · DON · FLUX · HIFI · playBD · BMF · QxR · EPSiLON  
+    Release group pins (bottom): YIFY · RARBG · EVO · YTS · PSA · MeGusta · Tigole
+  </Accordion>
+
+  <Accordion title="Regex & sorting">
+    - `syncedRankedRegexUrls` → Vidhin05 English regex scoring (174 patterns)
+    - `syncedExcludedRegexUrls` → Tamtaro excluded regex set
+    - Full `sortCriteria` stack: cached → SE matched → SE score → resolution → quality → regex score → visual tag → encode → audio → seeders → size
+    - Smart deduplicator with `single_result` cached mode and `aggressive` multi-group behaviour
+    - Tamtaro formatter with emoji stream labels
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## After importing
+
+1. **Set your service credentials** — AIOStreams → Settings → enter your TorBox / AllDebrid / RD API key
+2. **Set your TMDB token** — Settings → TMDB Access Token (required for accurate title matching)
+3. **Configure StremThru** — the StremThru preset needs your debrid service linked in the StremThru Store options
+4. **Tune PSEs** — the generated PSEs are solid defaults; see [Customising](/customising) to add IQR adaptive bitrate floors or other advanced tiers
+
+<Tip>
+  The configurator generates a **v0.1.0 starting point**. For the most advanced filtering (IQR Tukey fence PSEs, Score IQR Guard, elite group scoring), use the hand-tuned [template directory](/template-directory) templates directly.
+</Tip>
