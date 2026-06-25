@@ -115,7 +115,7 @@ const DEFS = [
     opts:[
       { v:'lossless', icon:'🎛️', name:'Full lossless (TrueHD / Atmos / DTS-HD MA / FLAC)', desc:'You have an AV receiver or soundbar with HDMI eARC. No audio tag exclusions — all lossless formats unlocked. 7.1 surround preferred.' },
       { v:'standard', icon:'🎵', name:'DD+ / Atmos (standard)',                             desc:'Soundbar or smart TV. Dolby Digital Plus and Atmos supported, no lossless decoding required.' },
-      { v:'limited',  icon:'🔊', name:'Device-managed (auto)',                              desc:'Let the device profile decide. Samsung TV automatically excludes TrueHD, DTS-HD MA, DTS:X and FLAC.' },
+      { v:'limited',  icon:'🔊', name:'Device-managed (auto)',                              desc:'Let the device profile decide. Samsung TV and Fire Stick automatically exclude TrueHD, DTS-HD MA, DTS:X and FLAC.' },
     ]
   },
   { id:'content', title:'Content Type', desc:'What will you primarily watch?', key:'content', cols:'c1',
@@ -474,12 +474,19 @@ function pses() {
   const dev  = S.device;
   const dv   = dev==='appletv-old' || dev==='appletv-new' || dev==='lgtv' || dev==='firestick-4kmax';
 
+  const av1Ok     = !['samsung','firestick-hd','appletv-old'].includes(dev);
+  const codecExpr = av1Ok
+    ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')"
+    : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
+  const seasonPSE = { enabled:true, expression:"/* ongoingSeasonPack */ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired < -1 or daysUntilNextEpisode >= 0)) ? seasonPack(streams,'onlySeasons') : []" };
+  const audPinn   = { enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" };
+
   const pin4kElite   = { enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" };
   const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" };
   const pinLQ        = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" };
 
   if (res === '4k') {
-    out.push(pin4kElite, pin1080Elite, pinLQ);
+    out.push(pin4kElite, pin1080Elite, pinLQ, seasonPSE);
     if (dv) out.push({ enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" });
     out.push(
       { enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" },
@@ -490,14 +497,14 @@ function pses() {
       { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" },
       { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" },
       { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" },
-      { enabled:true, expression:"/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" },
-      { enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" },
+      { enabled:true, expression:codecExpr },
+      audPinn,
       { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" },
       { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }
     );
 
   } else if (res === '1080p') {
-    out.push(pin1080Elite, pinLQ);
+    out.push(pin1080Elite, pinLQ, seasonPSE);
     out.push(
       { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" },
       { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" },
@@ -505,12 +512,13 @@ function pses() {
       { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" },
       { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" },
       { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" },
-      { enabled:true, expression:"/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" },
+      { enabled:true, expression:codecExpr },
+      audPinn,
       { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }
     );
 
   } else { // ultrawide
-    out.push(pin1080Elite, pinLQ);
+    out.push(pin1080Elite, pinLQ, seasonPSE);
     out.push(
       { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" },
       { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" },
@@ -522,8 +530,8 @@ function pses() {
       { enabled:true, expression:"/* 4K Fallback Any */ resolution(streams,'2160p')" },
       { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" },
       { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" },
-      { enabled:true, expression:"/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" },
-      { enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" },
+      { enabled:true, expression:codecExpr },
+      audPinn,
       { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" },
       { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }
     );
@@ -670,7 +678,9 @@ function build() {
       maxResults:rc.maxResults,
       maxResultsPerResolution:rc.maxResultsPerResolution,
       excludedStreamExpressions:eses(),
-      includedStreamExpressions:[],
+      includedStreamExpressions:[
+        { enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" }
+      ],
       preferredStreamExpressions:pses(),
       sortCriteria:sortCriteria(),
       deduplicator:deduplicator(),
