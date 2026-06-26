@@ -150,7 +150,7 @@ details[open] summary svg{transform:rotate(180deg)}
 <script>
 const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceUrl:'', instanceUuid:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d',
@@ -266,26 +266,32 @@ function render() {
           <div class="tab-hint" id="tabHint">Installs the addon directly into Stremio.</div>
           <div class="aio-fields" style="margin-top:12px">
             <div class="name-row" style="margin-bottom:0">
-              <label>AIOStreams Instance URL</label>
-              <input class="name-input" id="aioUrl" type="url" placeholder="https://aiostreams.elfhosted.com"
-                value="${S.instanceUrl}" oninput="S.instanceUrl=this.value.trim()" maxlength="200">
+              <label>AIOStreams Host</label>
+              <select class="name-input" id="aioHost" onchange="onHostChange(this.value)" style="cursor:pointer;color-scheme:dark">
+                <option value="auto" ${S.instanceHost==='auto'?'selected':''}>Auto (tries all public hosts)</option>
+                <option value="elfhosted" ${S.instanceHost==='elfhosted'||S.instanceHost===''?'selected':''}>ElfHosted — aiostreams.elfhosted.com</option>
+                <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthewWeak — aiostreams.fortheweak.cloud</option>
+                <option value="custom" ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted</option>
+              </select>
+            </div>
+            <div id="aioUrlRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='custom'?'':'display:none'}">
+              <label>Instance URL</label>
+              <input class="name-input" id="aioUrl" type="url" placeholder="https://your-aiostreams.example.com"
+                value="${S.instanceHost==='custom'?S.instanceUrl:''}" oninput="S.instanceUrl=this.value.trim()" maxlength="200">
             </div>
             <div class="name-row" style="margin-bottom:0">
-              <label>Password</label>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">Password</span>
+                <button type="button" onclick="genPwd()" style="font-size:.75rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
+              </div>
               <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
                 value="${S.instancePassword}" oninput="S.instancePassword=this.value" maxlength="200" autocomplete="new-password">
             </div>
-            <details style="margin-top:4px">
-              <summary style="font-size:.78rem;color:#4b5563;cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;gap:6px">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-                Existing account? Enter your UUID
-              </summary>
-              <div class="name-row" style="margin-top:10px;margin-bottom:0">
-                <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(from your AIOStreams configure page)</span></label>
-                <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                  value="${S.instanceUuid}" oninput="S.instanceUuid=this.value.trim()" maxlength="36" style="font-family:monospace;font-size:.88rem">
-              </div>
-            </details>
+            <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='custom'||S.instanceHost==='auto'||S.instanceHost==='fortheweak'?'display:none':''}">
+              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(from your ElfHosted configure page)</span></label>
+              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                value="${S.instanceUuid}" oninput="S.instanceUuid=this.value.trim()" maxlength="36" style="font-family:monospace;font-size:.88rem">
+            </div>
           </div>
           <button class="btn-aio" id="btnAio" onclick="openInAIOStreams()" style="margin-top:14px">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -982,6 +988,52 @@ function setTab(t) {
     : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Get Manifest URL';
 }
 
+const PUBLIC_HOSTS = [
+  'https://aiostreams.elfhosted.com',
+  'https://aiostreams.fortheweak.cloud',
+];
+
+function resolvedInstanceUrl() {
+  if (S.instanceHost === 'elfhosted') return 'https://aiostreams.elfhosted.com';
+  if (S.instanceHost === 'fortheweak') return 'https://aiostreams.fortheweak.cloud';
+  return (S.instanceUrl || '').trim().replace(/\/$/, '');
+}
+
+function onHostChange(val) {
+  S.instanceHost = val;
+  const urlRow  = document.getElementById('aioUrlRow');
+  const uuidRow = document.getElementById('aioUuidRow');
+  const showUuid = val === 'elfhosted';
+  const showUrl  = val === 'custom';
+  if (urlRow)  urlRow.style.display  = showUrl  ? '' : 'none';
+  if (uuidRow) uuidRow.style.display = showUuid ? '' : 'none';
+  if (showUrl) {
+    S.instanceUrl = '';
+    const el = document.getElementById('aioUrl');
+    if (el) { el.value = ''; el.focus(); }
+  }
+}
+
+const PWD_WORDS = ['Blue','Red','Dark','Bright','Swift','Deep','High','Storm','Wild','Sharp',
+  'Iron','Gold','Stone','Silver','Flash','Frost','Fire','Wind','Thunder','Star',
+  'River','Forest','Ocean','Mountain','Canyon','Desert','Arctic','Ember','Shadow','Crystal',
+  'Falcon','Tiger','Wolf','Eagle','Phoenix','Dragon','Hawk','Raven','Cobra','Viper'];
+
+function genPwd() {
+  const arr = new Uint8Array(4);
+  crypto.getRandomValues(arr);
+  const w1 = PWD_WORDS[arr[0] % PWD_WORDS.length];
+  const w2 = PWD_WORDS[arr[1] % PWD_WORDS.length];
+  const w3 = PWD_WORDS[arr[2] % PWD_WORDS.length];
+  const num = String(100 + (arr[3] % 900));
+  const pwd = `${w1}${w2}${w3}${num}`;
+  S.instancePassword = pwd;
+  const el = document.getElementById('aioPwd');
+  if (el) { el.value = pwd; el.type = 'text'; }
+  showToast('Password generated — copy it now');
+  setTimeout(() => { const e = document.getElementById('aioPwd'); if (e) e.type = 'password'; }, 5000);
+}
+
 function buildPublic() {
   const tmpl = build();
   const pub = JSON.parse(JSON.stringify(tmpl));
@@ -1035,71 +1087,90 @@ async function createImportUrl() {
   }
 }
 
+async function tryInstallToHost(base, tmpl, uuid, pwd) {
+  const endpoint = uuid ? `${base}/api/v1/user/${uuid}` : `${base}/api/v1/user`;
+  const method   = uuid ? 'PATCH' : 'POST';
+  const body     = uuid
+    ? JSON.stringify({ config: tmpl.config, password: pwd })
+    : JSON.stringify({ config: tmpl, password: pwd });
+  const res = await fetch(endpoint, { method, headers:{'Content-Type':'application/json'}, body });
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok || data?.success === false) return null;
+  const resolvedUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
+  return resolvedUuid ? { base, uuid: resolvedUuid, data } : null;
+}
+
 async function openInAIOStreams() {
-  const base = (S.instanceUrl || '').trim().replace(/\/$/, '');
-  if (!base) { showToast('Enter your AIOStreams instance URL first', true); return; }
+  const isAuto = S.instanceHost === 'auto';
+  const base   = resolvedInstanceUrl();
+  if (!isAuto && !base) { showToast('Enter your AIOStreams instance URL first', true); return; }
 
   const tmpl = build();
   try { await navigator.clipboard.writeText(JSON.stringify(tmpl, null, 2)); } catch(e) {}
 
   const result = document.getElementById('aioResult');
-  const uuid = (S.instanceUuid || '').trim();
-  const pwd  = S.instancePassword;
+  const btn    = document.getElementById('btnAio');
+  const uuid   = (S.instanceUuid || '').trim();
+  const pwd    = S.instancePassword;
 
   if (pwd) {
+    const origHtml = btn.innerHTML;
+    btn.disabled = true; btn.textContent = 'Connecting…';
+    result.innerHTML = '';
     try {
-      // If UUID provided: PATCH existing config (e.g. ElfHosted pre-provisioned accounts)
-      // If no UUID: POST to create new config
-      const endpoint = uuid ? `${base}/api/v1/user/${uuid}` : `${base}/api/v1/user`;
-      const method   = uuid ? 'PATCH' : 'POST';
-      const body     = uuid
-        ? JSON.stringify({ config: tmpl.config, password: pwd })
-        : JSON.stringify({ config: tmpl, password: pwd });
-
-      const res = await fetch(endpoint, { method, headers:{'Content-Type':'application/json'}, body });
-      const data = await res.json().catch(()=>({}));
-
-      if (res.ok && (data?.success !== false)) {
-        const resolvedUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
-        if (resolvedUuid) {
-          const manifestUrl = `${base}/api/stremio/${resolvedUuid}/manifest.json`;
-          const stremioUrl  = `https://web.stremio.com/#/?addon=${encodeURIComponent(manifestUrl)}`;
-          const configUrl   = `${base}/stremio/configure`;
-          const label = uuid ? 'Config updated' : 'Config created';
-          result.innerHTML = `<div class="import-success" style="margin-top:12px">
-            <strong>${label} in AIOStreams ✓</strong>
-            <div style="color:#6b7280;font-size:.79rem;margin:4px 0 10px">Your manifest URL — click to copy, or install directly into Stremio.</div>
-            <div class="manifest-url" onclick="navigator.clipboard.writeText('${manifestUrl}');showToast('Manifest URL copied')" title="Click to copy">${manifestUrl}</div>
-            <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-              ${aioTab==='direct' ? `<a href="${stremioUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.88rem;text-decoration:none">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Install to Stremio
-              </a>` : ''}
-              <a href="${configUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.88rem;text-decoration:none">
-                Open AIOStreams →
-              </a>
-            </div>
-          </div>`;
-          showToast(uuid ? 'Config updated — manifest ready' : 'Config created — manifest ready');
-          return;
+      let ok = null;
+      if (isAuto) {
+        for (const host of PUBLIC_HOSTS) {
+          try { ok = await tryInstallToHost(host, tmpl, '', pwd); if (ok) break; } catch(e) {}
         }
+      } else {
+        ok = await tryInstallToHost(base, tmpl, uuid, pwd);
       }
 
-      const errMsg = data?.error?.message || data?.message || JSON.stringify(data).slice(0,120);
+      if (ok) {
+        const manifestUrl = `${ok.base}/api/stremio/${ok.uuid}/manifest.json`;
+        const stremioUrl  = `https://web.stremio.com/#/?addon=${encodeURIComponent(manifestUrl)}`;
+        const configUrl   = `${ok.base}/stremio/configure`;
+        const lbl = uuid && !isAuto ? 'Config updated' : 'Config created';
+        result.innerHTML = `<div class="import-success" style="margin-top:12px">
+          <strong>${lbl} in AIOStreams ✓</strong>
+          <div style="color:#6b7280;font-size:.79rem;margin:4px 0 10px">Your manifest URL — click to copy, or install directly into Stremio.</div>
+          <div class="manifest-url" onclick="navigator.clipboard.writeText('${manifestUrl}');showToast('Manifest URL copied')" title="Click to copy">${manifestUrl}</div>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            ${aioTab==='direct' ? `<a href="${stremioUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.88rem;text-decoration:none">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Install to Stremio
+            </a>` : ''}
+            <a href="${configUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.88rem;text-decoration:none">
+              Open AIOStreams →
+            </a>
+          </div>
+        </div>`;
+        showToast(uuid && !isAuto ? 'Config updated — manifest ready' : 'Config created — manifest ready');
+        btn.disabled = false; btn.innerHTML = origHtml;
+        return;
+      }
+
+      const hostHint = S.instanceHost === 'elfhosted' && !uuid
+        ? '<div style="color:#6b7280;font-size:.78rem;margin-top:6px">💡 ElfHosted accounts are pre-provisioned — enter your UUID from the ElfHosted configure page.</div>'
+        : '';
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
-        <strong style="color:#f87171">API error ${res.status}</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">${errMsg}</div>
-        ${!uuid ? '<div style="color:#6b7280;font-size:.78rem;margin-top:6px">💡 ElfHosted accounts are pre-provisioned — enter your UUID above to update your existing config instead of creating a new one.</div>' : ''}
+        <strong style="color:#f87171">Could not connect to AIOStreams</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">${isAuto ? 'All public hosts failed. JSON copied to clipboard — try a Custom host or paste manually.' : 'Check your URL, UUID, and password. JSON copied to clipboard.'}</div>
+        ${hostHint}
       </div>`;
     } catch(e) {
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
         <strong style="color:#f87171">Could not reach API</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">CORS or network error. JSON copied to clipboard — open AIOStreams and paste manually.</div>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">Network or CORS error. JSON copied to clipboard — open AIOStreams and paste manually.</div>
       </div>`;
     }
+    btn.disabled = false; btn.innerHTML = origHtml;
+    return;
   }
 
-  window.open(`${base}/stremio/configure`, '_blank');
+  const openBase = isAuto ? PUBLIC_HOSTS[0] : base;
+  window.open(`${openBase}/stremio/configure`, '_blank');
   showToast('JSON copied — paste in Templates → Import');
 }
 
