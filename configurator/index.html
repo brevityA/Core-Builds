@@ -101,7 +101,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', rpdbKey:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', rpdbKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''} };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d',
@@ -175,7 +175,7 @@ function render() {
 
   if (step === STEPS) {
     const auto = defaultName();
-    const hasApis = S.tmdbToken || S.tmdbApiKey || S.rpdbKey;
+    const hasApis = S.tmdbToken || S.tmdbApiKey || S.rpdbKey || Object.values(S.creds).some(v=>v);
     main.innerHTML = `
       <div class="card">
         <h2>Your Configuration</h2>
@@ -190,7 +190,12 @@ function render() {
           }).join('')}
           ${hasApis ? `<div class="sum-item" style="grid-column:1/-1">
             <div class="sum-lbl">API Keys</div>
-            <div class="sum-val" style="font-weight:400;font-size:.85rem">${S.tmdbToken ? '✓ TMDB token' : ''}${S.tmdbApiKey ? (S.tmdbToken ? ' · ' : '') + '✓ TMDB API key' : ''}${S.rpdbKey ? ((S.tmdbToken || S.tmdbApiKey) ? ' · ' : '') + '✓ RPDB key' : ''}</div>
+            <div class="sum-val" style="font-weight:400;font-size:.85rem">${[
+              Object.values(S.creds).filter(v=>v).length ? '✓ debrid credentials' : '',
+              S.tmdbToken ? '✓ TMDB token' : '',
+              S.tmdbApiKey ? '✓ TMDB API key' : '',
+              S.rpdbKey ? '✓ RPDB key' : ''
+            ].filter(Boolean).join(' · ')}</div>
           </div>` : ''}
         </div>
         <div class="name-row">
@@ -213,16 +218,28 @@ function render() {
     document.getElementById('nameIn').value = S.name;
 
   } else if (def.id === 'apis') {
+    const debridInputs = getDebridInputs();
     main.innerHTML = `
       <div class="card">
         <h2>API Keys <span style="color:#8b949e;font-size:.85rem;font-weight:400">(Optional)</span></h2>
         <p class="desc">${def.desc}</p>
-        <div class="name-row" style="margin-bottom:16px">
+        ${debridInputs.length ? `
+        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
+        ${debridInputs.map(inp => `
+        <div class="name-row" style="margin-bottom:14px">
+          <label>${inp.label}</label>
+          <input class="name-input" id="cred_${inp.id}" type="text" placeholder="${inp.placeholder}"
+            value="" oninput="S.creds['${inp.id}']=this.value" maxlength="120">
+        </div>`).join('')}
+        <div style="border-top:1px solid #21262d;margin:18px 0 14px"></div>
+        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Metadata &amp; Posters</div>
+        ` : ''}
+        <div class="name-row" style="margin-bottom:14px">
           <label>TMDB Read Access Token (v4)</label>
           <input class="name-input" id="tmdbIn" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
             value="" oninput="S.tmdbToken=this.value" maxlength="400">
         </div>
-        <div class="name-row" style="margin-bottom:16px">
+        <div class="name-row" style="margin-bottom:14px">
           <label>TMDB API Key (v3)</label>
           <input class="name-input" id="tmdbKeyIn" type="text" placeholder="abc123def456…"
             value="" oninput="S.tmdbApiKey=this.value" maxlength="60">
@@ -234,12 +251,17 @@ function render() {
         </div>
         <div class="notice" style="margin-top:14px">
           <strong>Where to find these</strong>
-          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API → both the Read Access Token (v4) and API Key (v3) are listed there<br>
-          <strong style="color:#8b949e;font-weight:400">RPDB:</strong> ratingposterdb.com → your account → API key (free tier starts with t0-)
+          ${debridInputs.map(inp => `<strong style="color:#8b949e;font-weight:400">${inp.label.replace(' API Key','')}:</strong> ${inp.where}<br>`).join('')}
+          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API (both keys listed there)<br>
+          <strong style="color:#8b949e;font-weight:400">RPDB:</strong> ratingposterdb.com → your account → API key (free tier: t0-…)
         </div>
       </div>`;
     nav.style.display = 'flex';
     document.getElementById('btnBack').style.visibility = 'visible';
+    debridInputs.forEach(inp => {
+      const el = document.getElementById('cred_' + inp.id);
+      if (el) el.value = S.creds[inp.id] || '';
+    });
     document.getElementById('tmdbIn').value = S.tmdbToken;
     document.getElementById('tmdbKeyIn').value = S.tmdbApiKey;
     document.getElementById('rpdbIn').value = S.rpdbKey;
@@ -323,6 +345,25 @@ function toggleMulti(val) {
 }
 
 // ─── Template generation ─────────────────────────────────────────────────────
+
+function getDebridInputs() {
+  const svc = S.service;
+  const defs = {
+    torbox:    { label:'TorBox API Key',    placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', where:'torbox.app → Account → API' },
+    realdebrid:{ label:'Real-Debrid API Key', placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',  where:'real-debrid.com/apitoken' },
+    alldebrid: { label:'AllDebrid API Key', placeholder:'XXXXXXXXXXXXXXXX',                    where:'alldebrid.com/apikeys' },
+    premiumize:{ label:'Premiumize API Key', placeholder:'XXXXXXXXXXXXXXXX',                   where:'premiumize.me/account' },
+    debridlink:{ label:'Debrid-Link API Key', placeholder:'XXXXXXXXXXXXXXXX',                  where:'debrid-link.com → Account → API' },
+  };
+  const ids = [];
+  if (svc==='torbox-pro'||svc==='torbox-ess'||svc==='hybrid') ids.push('torbox');
+  if (svc==='realdebrid'||svc==='hybrid') ids.push('realdebrid');
+  if (svc==='alldebrid')  ids.push('alldebrid');
+  if (svc==='premiumize') ids.push('premiumize');
+  if (svc==='debridlink') ids.push('debridlink');
+  if (svc==='multi') S.multiServices.forEach(s => ids.push(s));
+  return ids.map(id => ({id, ...defs[id]}));
+}
 
 function ruid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -443,16 +484,18 @@ function presets() {
   return list;
 }
 
+function cred(id) { return S.creds[id] ? {apiKey: S.creds[id]} : {}; }
+
 function services() {
   const svc = S.service;
   const isMulti = svc === 'multi';
   const m = S.multiServices;
   return [
-    {id:'realdebrid',  enabled: svc==='realdebrid' || svc==='hybrid' || (isMulti && m.includes('realdebrid')), credentials:{}},
-    {id:'alldebrid',   enabled: svc==='alldebrid'  || (isMulti && m.includes('alldebrid')),  credentials:{}},
-    {id:'premiumize',  enabled: svc==='premiumize'  || (isMulti && m.includes('premiumize')), credentials:{}},
-    {id:'debridlink',  enabled: svc==='debridlink'  || (isMulti && m.includes('debridlink')), credentials:{}},
-    {id:'torbox',      enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid', credentials:{}},
+    {id:'realdebrid',  enabled: svc==='realdebrid' || svc==='hybrid' || (isMulti && m.includes('realdebrid')), credentials:cred('realdebrid')},
+    {id:'alldebrid',   enabled: svc==='alldebrid'  || (isMulti && m.includes('alldebrid')),  credentials:cred('alldebrid')},
+    {id:'premiumize',  enabled: svc==='premiumize'  || (isMulti && m.includes('premiumize')), credentials:cred('premiumize')},
+    {id:'debridlink',  enabled: svc==='debridlink'  || (isMulti && m.includes('debridlink')), credentials:cred('debridlink')},
+    {id:'torbox',      enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid', credentials:cred('torbox')},
     {id:'offcloud',    enabled: false, credentials:{}},
     {id:'putio',       enabled: false, credentials:{}},
     {id:'easynews',    enabled: false, credentials:{}},
