@@ -338,7 +338,10 @@ function render() {
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
         ${debridInputs.map(inp => `
         <div class="name-row" style="margin-bottom:14px">
-          <label>${inp.label}</label>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
+            <a href="${inp.url}" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+          </div>
           <input class="name-input" id="cred_${inp.id}" type="text" placeholder="${inp.placeholder}"
             value="" oninput="S.creds['${inp.id}']=this.value" maxlength="120">
         </div>`).join('')}
@@ -346,19 +349,20 @@ function render() {
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Metadata &amp; Posters</div>
         ` : ''}
         <div class="name-row" style="margin-bottom:14px">
-          <label>TMDB Read Access Token (v4)</label>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token (v4)</span>
+            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+          </div>
           <input class="name-input" id="tmdbIn" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
             value="" oninput="S.tmdbToken=this.value" maxlength="400">
         </div>
         <div class="name-row">
-          <label>TMDB API Key (v3)</label>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key (v3)</span>
+            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+          </div>
           <input class="name-input" id="tmdbKeyIn" type="text" placeholder="abc123def456…"
             value="" oninput="S.tmdbApiKey=this.value" maxlength="60">
-        </div>
-        <div class="notice" style="margin-top:14px">
-          <strong>Where to find these</strong>
-          ${debridInputs.map(inp => `<strong style="color:#8b949e;font-weight:400">${inp.label.replace(' API Key','')}:</strong> ${inp.where}<br>`).join('')}
-          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API (both keys listed there)
         </div>
       </div>`;
     nav.style.display = 'flex';
@@ -453,11 +457,11 @@ function toggleMulti(val) {
 function getDebridInputs() {
   const svc = S.service;
   const defs = {
-    torbox:    { label:'TorBox API Key',    placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', where:'torbox.app → Account → API' },
-    realdebrid:{ label:'Real-Debrid API Key', placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',  where:'real-debrid.com/apitoken' },
-    alldebrid: { label:'AllDebrid API Key', placeholder:'XXXXXXXXXXXXXXXX',                    where:'alldebrid.com/apikeys' },
-    premiumize:{ label:'Premiumize API Key', placeholder:'XXXXXXXXXXXXXXXX',                   where:'premiumize.me/account' },
-    debridlink:{ label:'Debrid-Link API Key', placeholder:'XXXXXXXXXXXXXXXX',                  where:'debrid-link.com → Account → API' },
+    torbox:    { label:'TorBox API Key',      placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', where:'torbox.app → Account → API',         url:'https://torbox.app/settings' },
+    realdebrid:{ label:'Real-Debrid API Key', placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',      where:'real-debrid.com/apitoken',            url:'https://real-debrid.com/apitoken' },
+    alldebrid: { label:'AllDebrid API Key',   placeholder:'XXXXXXXXXXXXXXXX',                      where:'alldebrid.com/apikeys',               url:'https://alldebrid.com/apikeys' },
+    premiumize:{ label:'Premiumize API Key',  placeholder:'XXXXXXXXXXXXXXXX',                      where:'premiumize.me/account',               url:'https://www.premiumize.me/account' },
+    debridlink:{ label:'Debrid-Link API Key', placeholder:'XXXXXXXXXXXXXXXX',                      where:'debrid-link.com → Account → API',     url:'https://debrid-link.com/webapp#/account/api' },
   };
   const ids = [];
   if (svc==='torbox-pro'||svc==='torbox-ess'||svc==='hybrid') ids.push('torbox');
