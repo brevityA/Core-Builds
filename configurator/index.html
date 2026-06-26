@@ -39,12 +39,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opts.c3d{grid-template-columns:1fr}
 .opts.c2d{grid-template-columns:1fr}
 .opt input{display:none}
-.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:16px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
-.opt input:checked+label{border-color:#00d4ff;background:#00131c}
+.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
+.opt input:checked+label{border-color:#00d4ff;background:#00131c;box-shadow:0 0 0 3px rgba(0,212,255,.15)}
 .opt label:hover{border-color:#005c7a}
-.opt-icon{font-size:1.4rem;margin-bottom:7px;flex-shrink:0}
-.opt-name{font-weight:700;font-size:.93rem}
-.opt-desc{color:#8b949e;font-size:.8rem;margin-top:4px;line-height:1.45}
+.opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.opt-icon svg{width:36px;height:36px}
+.opt-body{display:flex;flex-direction:column;flex:1;min-width:0}
+.opt-name{font-weight:700;font-size:.88rem;line-height:1.25}
+.opt-desc{color:#8b949e;font-size:.76rem;margin-top:3px;line-height:1.4}
+.opts.c3d .opt label,.opts.c2d .opt label{flex-direction:row;align-items:center;gap:12px;padding:14px}
+.opts.c3d .opt-icon,.opts.c2d .opt-icon{margin-bottom:0}
+.opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:30px;height:30px}
 .name-row label{color:#8b949e;font-size:.82rem;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
 .name-input{width:100%;background:#0d1117;border:2px solid #30363d;border-radius:8px;color:#e6edf3;padding:12px 16px;font-size:1rem;transition:border-color .15s;outline:none}
 .name-input:focus{border-color:#00d4ff}
@@ -86,6 +91,36 @@ details[open] summary svg{transform:rotate(180deg)}
 .notice{background:#0d2317;border:1px solid #2ea043;border-radius:9px;padding:13px 16px;font-size:.83rem;color:#8b949e;margin-top:14px;line-height:1.5}
 .notice strong{color:#3fb950;display:block;margin-bottom:3px}
 .tag{display:inline-block;background:#1f2937;border:1px solid #374151;border-radius:5px;padding:2px 8px;font-size:.75rem;color:#9ca3af;margin-top:6px;font-family:monospace}
+/* List layout */
+.opts.list{grid-template-columns:1fr}
+.opts.list .opt label{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
+.opts.list .opt-icon{margin-bottom:0}
+.opts.list .opt-icon svg{width:28px;height:28px}
+/* Pill layout */
+.opts.pills{display:flex;gap:4px;background:#161b22;border:1px solid #30363d;border-radius:11px;padding:4px}
+.opts.pills .opt{flex:1}
+.opts.pills .opt label{flex-direction:column;align-items:center;gap:5px;padding:12px 6px;border-radius:8px;border:2px solid transparent;background:transparent;color:#8b949e;height:auto;text-align:center}
+.opts.pills .opt label:hover{border-color:transparent;background:#21262d;color:#e6edf3}
+.opts.pills .opt input:checked+label{background:#00d4ff;color:#000;border-color:transparent;box-shadow:none}
+.opts.pills .opt-icon{margin-bottom:0}
+.opts.pills .opt-icon svg{width:22px;height:22px}
+.opts.pills .opt-body{align-items:center}
+.opts.pills .opt-name{font-size:.82rem;text-align:center}
+.opts.pills .opt-desc{font-size:.68rem;margin-top:1px;opacity:.85;text-align:center}
+/* Hero layout */
+.hero-wrap{display:flex;flex-direction:column;gap:8px}
+.hero-hero .opt label{flex-direction:row;align-items:flex-start;gap:16px;padding:18px;border-radius:12px}
+.hero-hero .opt-icon{margin-bottom:0;flex-shrink:0}
+.hero-hero .opt-icon svg{width:44px;height:44px}
+.hero-badge{display:inline-block;background:#003344;color:#00d4ff;font-size:.67rem;font-weight:700;letter-spacing:.07em;padding:3px 10px;border-radius:20px;margin-bottom:6px;text-transform:uppercase}
+.hero-hero .opt-name{font-size:1rem;font-weight:800}
+.hero-hero .opt-desc{font-size:.8rem}
+.hero-sub{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hero-sub .opt label{flex-direction:row;align-items:center;gap:10px;padding:12px;border-radius:9px}
+.hero-sub .opt-icon{margin-bottom:0}
+.hero-sub .opt-icon svg{width:24px;height:24px}
+.hero-sub .opt-name{font-size:.84rem}
+.hero-sub .opt-desc{font-size:.7rem;margin-top:2px}
 @media(min-width:720px){
   .wrap{max-width:980px}
   .card{padding:36px}
@@ -99,12 +134,18 @@ details[open] summary svg{transform:rotate(180deg)}
   .opts.c4d{grid-template-columns:repeat(4,1fr)}
   .opts.c3d{grid-template-columns:repeat(3,1fr)}
   .opts.c2d{grid-template-columns:repeat(2,1fr)}
-  .opts.c3d .opt label,.opts.c2d .opt label{flex-direction:row;align-items:flex-start;gap:14px;padding:18px}
-  .opts.c3d .opt-icon,.opts.c2d .opt-icon{margin-bottom:0}
-  .opts.c3d .opt-desc,.opts.c2d .opt-desc{font-size:.83rem}
+  .opt-icon svg{width:44px;height:44px}
+  .opt-name{font-size:.93rem}
+  .opt-desc{font-size:.82rem}
+  .opts.c3d .opt label,.opts.c2d .opt label{align-items:flex-start;padding:18px}
+  .opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:34px;height:34px}
+  .opts.c4d .opt label{padding:16px}
   .summary{grid-template-columns:repeat(3,1fr)}
   .nav{max-width:480px}
   .btn-dl,.btn-aio{max-width:480px}
+  .hero-sub{grid-template-columns:repeat(4,1fr)}
+  .hero-sub .opt-icon svg{width:28px;height:28px}
+  .opts.list .opt-icon svg{width:32px;height:32px}
 }
 </style>
 </head>
@@ -154,7 +195,7 @@ let step = 1;
 const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const DEFS = [
-  { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d',
+  { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'hero',
     opts:[
       { v:'torbox-pro',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="#051408"/><polygon points="22,14 30,18 22,22 14,18" fill="#1a5c2a"/><polygon points="14,18 14,27 22,31 22,22" fill="#166534"/><polygon points="22,22 30,18 30,27 22,31" fill="#15803d"/><path d="M27 20 L22 26 L25 26 L23 31 L28 24 L25 24 Z" fill="#fde047"/></svg>', name:'TorBox Pro', desc:'Best pick — full scraper stack + HdHub<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Stream · 4K Apex</span>' },
       { v:'torbox-ess',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#16a34a" stroke-width="2" fill="#041008"/><polygon points="22,15 30,19 22,23 14,19" fill="#14532d"/><polygon points="14,19 14,28 22,32 22,23" fill="#166534"/><polygon points="22,23 30,19 30,28 22,32" fill="#15803d"/><text x="22" y="12" text-anchor="middle" fill="#16a34a" font-size="5" font-weight="700" font-family="system-ui,sans-serif">ESS</text></svg>', name:'TorBox Essential', desc:'Essential plan — same smart sorting<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Essential · 4K Essential</span>' },
@@ -166,38 +207,38 @@ const DEFS = [
       { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
     ]
   },
-  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c4d',
+  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c4d', layout:'list',
     opts:[
-      { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="13" width="38" height="22" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="7" y="16" width="30" height="15" fill="#1a0a3a"/><line x1="15" y1="35" x2="12" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="29" y1="35" x2="32" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="42" x2="34" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="12" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="13" x2="32" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>', name:'Standard TV / Streaming Box',    desc:'No device restrictions applied — broadest compatibility' },
-      { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="9" width="40" height="24" rx="2" stroke="#3d72e8" stroke-width="2"/><rect x="4" y="11" width="36" height="20" fill="#040e22"/><rect x="19" y="33" width="6" height="3" fill="#3d72e8"/><path d="M12 41 Q22 37 32 41" stroke="#3d72e8" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="8" y1="21" x2="36" y2="21" stroke="#3d72e8" stroke-width="0.5" opacity="0.5"/></svg>', name:'Samsung TV (Tizen)',              desc:'DV-Only Kill on · AV1, VC-1 excluded · TrueHD, DTS-HD MA excluded · HDR10+ preferred' },
-      { v:'appletv-old',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="18" rx="7" fill="#1c1c1e" stroke="#888" stroke-width="1.5"/><path d="M19 22.5 C19 19.5 21 18 22.5 18 C23 18 23.5 18.3 24 18.5 24.5 18.3 25 18 25.5 18 C27 18 29 19.5 29 22.5 C29 25.5 27.5 27 25.5 27 C25 27 24.5 26.7 24 26.5 23.5 26.7 23 27 22.5 27 C21 27 19 25.5 19 22.5Z" fill="#888"/><line x1="23.5" y1="16" x2="25" y2="14" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="34" r="2" fill="#f59e0b"/><text x="22" y="12" text-anchor="middle" fill="#666" font-size="6" font-family="system-ui,sans-serif">GEN 1 · 2</text></svg>', name:'Apple TV 4K (1st / 2nd gen)',     desc:'DV prioritised · AV1 excluded (no hardware decoder) · TrueHD + Atmos passthrough · 7.1' },
-      { v:'appletv-new',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="13" width="28" height="18" rx="7" fill="#1c1c1e" stroke="#a0a0a8" stroke-width="1.5"/><path d="M19 21.5 C19 18.5 21 17 22.5 17 C23 17 23.5 17.3 24 17.5 24.5 17.3 25 17 25.5 17 C27 17 29 18.5 29 21.5 C29 24.5 27.5 26 25.5 26 C25 26 24.5 25.7 24 25.5 23.5 25.7 23 26 22.5 26 C21 26 19 24.5 19 21.5Z" fill="#a0a0a8"/><line x1="23.5" y1="15" x2="25" y2="13" stroke="#a0a0a8" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="34" r="2" fill="#fff" opacity="0.8"/><text x="22" y="11" text-anchor="middle" fill="#7ab4ff" font-size="6" font-family="system-ui,sans-serif">A15 · AV1</text></svg>', name:'Apple TV 4K (3rd gen / A15)',     desc:'DV prioritised · AV1 hardware decode · TrueHD + Atmos passthrough · 7.1' },
-      { v:'lgtv',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="7" width="40" height="27" rx="2" stroke="#c00000" stroke-width="2"/><rect x="4" y="9" width="36" height="23" fill="#080000"/><circle cx="12" cy="21" r="3.5" fill="#cc0000" opacity="0.7"/><circle cx="22" cy="21" r="3.5" fill="#00bb44" opacity="0.7"/><circle cx="32" cy="21" r="3.5" fill="#0044cc" opacity="0.7"/><rect x="17" y="34" width="10" height="4" rx="1" fill="#c00000"/><line x1="12" y1="42" x2="32" y2="42" stroke="#c00000" stroke-width="2" stroke-linecap="round"/></svg>', name:'LG TV (webOS 2019+)',             desc:'DV native · AV1 hardware decode · TrueHD + DTS-HD MA via eARC · 7.1' },
-      { v:'windows',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="6" width="38" height="26" rx="3" stroke="#0078d4" stroke-width="2"/><rect x="7" y="9" width="30" height="20" fill="#001428"/><rect x="10" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="10" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="18" y="32" width="8" height="4" rx="1" fill="#0078d4"/><line x1="12" y1="40" x2="32" y2="40" stroke="#0078d4" stroke-width="2" stroke-linecap="round"/></svg>', name:'Windows PC / Ultrawide',         desc:'Full lossless audio · AV1 + HEVC preferred · HDR-first · 7.1' },
-      { v:'firestick-hd',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff6b00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff6b00"/><path d="M16 20 C16 16 14 13 16 10 C16 10 17.5 12 19 11 C19 8 21.5 5 23 3 C23 3 23 7.5 26 10 C27.5 11 27 13.5 25 15.5 C25 15.5 25 13 23 14 C23 17 21 20 16 20Z" fill="#ff6b00"/><text x="19" y="29" text-anchor="middle" fill="#ff6b00" font-size="7.5" font-weight="800" font-family="system-ui,sans-serif">HD</text></svg>', name:'Fire Stick (HD)',                 desc:'DV-Only Kill on · AV1 + VC-1 excluded · TrueHD, DTS-HD MA excluded · HDR10/HLG only' },
-      { v:'firestick-4kmax', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff8c00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff8c00"/><path d="M15 20 C15 15 13 11 16 8 C16 8 18 11 20 10 C20 6 23 2 24 1 C24 1 24 6 28 9 C30 11 29.5 14 27 17 C27 17 27 14 24 15 C24 18 22 20 15 20Z" fill="#ff8c00"/><text x="19" y="29" text-anchor="middle" fill="#ff8c00" font-size="6.5" font-weight="800" font-family="system-ui,sans-serif">4K MAX</text></svg>', name:'Fire Stick 4K Max',               desc:'DV supported · AV1 hardware decode · VC-1 excluded · TrueHD, DTS-HD MA excluded' },
+      { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="13" width="38" height="22" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="7" y="16" width="30" height="15" fill="#1a0a3a"/><line x1="15" y1="35" x2="12" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="29" y1="35" x2="32" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="42" x2="34" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="12" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="13" x2="32" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>', name:'Standard TV',          desc:'Broadest compatibility · no restrictions' },
+      { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="9" width="40" height="24" rx="2" stroke="#3d72e8" stroke-width="2"/><rect x="4" y="11" width="36" height="20" fill="#040e22"/><rect x="19" y="33" width="6" height="3" fill="#3d72e8"/><path d="M12 41 Q22 37 32 41" stroke="#3d72e8" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="8" y1="21" x2="36" y2="21" stroke="#3d72e8" stroke-width="0.5" opacity="0.5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+' },
+      { v:'appletv-old',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="18" rx="7" fill="#1c1c1e" stroke="#888" stroke-width="1.5"/><path d="M19 22.5 C19 19.5 21 18 22.5 18 C23 18 23.5 18.3 24 18.5 24.5 18.3 25 18 25.5 18 C27 18 29 19.5 29 22.5 C29 25.5 27.5 27 25.5 27 C25 27 24.5 26.7 24 26.5 23.5 26.7 23 27 22.5 27 C21 27 19 25.5 19 22.5Z" fill="#888"/><line x1="23.5" y1="16" x2="25" y2="14" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="34" r="2" fill="#f59e0b"/><text x="22" y="12" text-anchor="middle" fill="#666" font-size="6" font-family="system-ui,sans-serif">GEN 1 · 2</text></svg>', name:'Apple TV 4K Gen 1–2', desc:'DV · TrueHD · Atmos · no AV1 · 7.1' },
+      { v:'appletv-new',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="13" width="28" height="18" rx="7" fill="#1c1c1e" stroke="#a0a0a8" stroke-width="1.5"/><path d="M19 21.5 C19 18.5 21 17 22.5 17 C23 17 23.5 17.3 24 17.5 24.5 17.3 25 17 25.5 17 C27 17 29 18.5 29 21.5 C29 24.5 27.5 26 25.5 26 C25 26 24.5 25.7 24 25.5 23.5 25.7 23 26 22.5 26 C21 26 19 24.5 19 21.5Z" fill="#a0a0a8"/><line x1="23.5" y1="15" x2="25" y2="13" stroke="#a0a0a8" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="34" r="2" fill="#fff" opacity="0.8"/><text x="22" y="11" text-anchor="middle" fill="#7ab4ff" font-size="6" font-family="system-ui,sans-serif">A15 · AV1</text></svg>', name:'Apple TV 4K Gen 3',   desc:'DV · TrueHD · Atmos · AV1 · 7.1' },
+      { v:'lgtv',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="7" width="40" height="27" rx="2" stroke="#c00000" stroke-width="2"/><rect x="4" y="9" width="36" height="23" fill="#080000"/><circle cx="12" cy="21" r="3.5" fill="#cc0000" opacity="0.7"/><circle cx="22" cy="21" r="3.5" fill="#00bb44" opacity="0.7"/><circle cx="32" cy="21" r="3.5" fill="#0044cc" opacity="0.7"/><rect x="17" y="34" width="10" height="4" rx="1" fill="#c00000"/><line x1="12" y1="42" x2="32" y2="42" stroke="#c00000" stroke-width="2" stroke-linecap="round"/></svg>', name:'LG TV webOS',          desc:'DV · AV1 · eARC · TrueHD · 7.1' },
+      { v:'windows',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="6" width="38" height="26" rx="3" stroke="#0078d4" stroke-width="2"/><rect x="7" y="9" width="30" height="20" fill="#001428"/><rect x="10" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="10" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="18" y="32" width="8" height="4" rx="1" fill="#0078d4"/><line x1="12" y1="40" x2="32" y2="40" stroke="#0078d4" stroke-width="2" stroke-linecap="round"/></svg>', name:'Windows PC',           desc:'Full lossless · AV1 · HDR-first · 7.1' },
+      { v:'firestick-hd',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff6b00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff6b00"/><path d="M16 20 C16 16 14 13 16 10 C16 10 17.5 12 19 11 C19 8 21.5 5 23 3 C23 3 23 7.5 26 10 C27.5 11 27 13.5 25 15.5 C25 15.5 25 13 23 14 C23 17 21 20 16 20Z" fill="#ff6b00"/><text x="19" y="29" text-anchor="middle" fill="#ff6b00" font-size="7.5" font-weight="800" font-family="system-ui,sans-serif">HD</text></svg>', name:'Fire Stick HD',        desc:'DV-Only Kill · no AV1/lossless · HDR10/HLG' },
+      { v:'firestick-4kmax', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff8c00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff8c00"/><path d="M15 20 C15 15 13 11 16 8 C16 8 18 11 20 10 C20 6 23 2 24 1 C24 1 24 6 28 9 C30 11 29.5 14 27 17 C27 17 27 14 24 15 C24 18 22 20 15 20Z" fill="#ff8c00"/><text x="19" y="29" text-anchor="middle" fill="#ff8c00" font-size="6.5" font-weight="800" font-family="system-ui,sans-serif">4K MAX</text></svg>', name:'Fire Stick 4K Max',   desc:'DV · AV1 · VC-1 excluded · no lossless' },
     ]
   },
-  { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c3d',
+  { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c3d', layout:'pills',
     opts:[
-      { v:'4k',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 40,16 22,42 4,16" stroke="#7c3aed" stroke-width="2" fill="#1a0a3a"/><polygon points="22,3 40,16 22,16 4,16" fill="#7c3aed" opacity="0.4"/><text x="22" y="34" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="800" font-family="system-ui,sans-serif">4K</text></svg>', name:'4K HDR primary',              desc:'2160p streams preferred. 1080p shown as fallback. Best for 4K OLED/QLED displays.' },
-      { v:'1080p',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="8" width="38" height="24" rx="3" stroke="#3b82f6" stroke-width="2" fill="#0a1428"/><text x="22" y="25" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="800" font-family="system-ui,sans-serif">1080p</text><rect x="17" y="32" width="10" height="4" rx="1" fill="#3b82f6"/><line x1="13" y1="40" x2="31" y2="40" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/></svg>', name:'1080p only',                  desc:'Hard resolution lock — 2160p streams excluded entirely. Best for budget devices or limited bandwidth.' },
-      { v:'ultrawide', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="11" width="40" height="22" rx="2" stroke="#8b5cf6" stroke-width="2" fill="#0e0a1f"/><text x="22" y="26" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="700" font-family="system-ui,sans-serif">21 : 9</text><rect x="17" y="33" width="10" height="4" rx="1" fill="#8b5cf6"/><line x1="12" y1="41" x2="32" y2="41" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>', name:'1080p-first with 4K fallback', desc:'1080p quality tiers first, then 1440p, then full 4K. For ultrawide monitors and Windows PCs — pair with the Windows PC device for best results.' },
+      { v:'4k',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 40,16 22,42 4,16" stroke="#7c3aed" stroke-width="2" fill="#1a0a3a"/><polygon points="22,3 40,16 22,16 4,16" fill="#7c3aed" opacity="0.4"/><text x="22" y="34" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="800" font-family="system-ui,sans-serif">4K</text></svg>', name:'4K HDR',        desc:'2160p first · 1080p fallback · for 4K displays' },
+      { v:'1080p',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="8" width="38" height="24" rx="3" stroke="#3b82f6" stroke-width="2" fill="#0a1428"/><text x="22" y="25" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="800" font-family="system-ui,sans-serif">1080p</text><rect x="17" y="32" width="10" height="4" rx="1" fill="#3b82f6"/><line x1="13" y1="40" x2="31" y2="40" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/></svg>', name:'1080p',          desc:'Hard lock · 2160p excluded · bandwidth-friendly' },
+      { v:'ultrawide', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="11" width="40" height="22" rx="2" stroke="#8b5cf6" stroke-width="2" fill="#0e0a1f"/><text x="22" y="26" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="700" font-family="system-ui,sans-serif">21 : 9</text><rect x="17" y="33" width="10" height="4" rx="1" fill="#8b5cf6"/><line x1="12" y1="41" x2="32" y2="41" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>', name:'Ultrawide',      desc:'1080p → 1440p → 4K tiers · pair with Windows PC device' },
     ]
   },
-  { id:'audio', title:'Audio', desc:'What formats does your audio setup support?', key:'audio', cols:'c3d',
+  { id:'audio', title:'Audio', desc:'What formats does your audio setup support?', key:'audio', cols:'c3d', layout:'pills',
     opts:[
-      { v:'lossless', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full lossless (TrueHD / Atmos / DTS-HD MA / FLAC)', desc:'AV receiver or soundbar with HDMI eARC — all lossless formats unlocked, 7.1 surround preferred. Samsung TV and Fire Stick device profiles always restrict audio regardless of this setting.' },
-      { v:'standard', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos (standard)',                             desc:'Soundbar or smart TV — Dolby Digital Plus and Atmos supported. Samsung TV and Fire Stick device profiles always exclude lossless regardless of this choice.' },
-      { v:'limited',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Device-managed (auto)',                              desc:'Let the device profile decide. Samsung TV and Fire Stick automatically exclude TrueHD, DTS-HD MA, DTS:X and FLAC.' },
+      { v:'lossless', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless',   desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
+      { v:'standard', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos',     desc:'Soundbar or smart TV · Dolby Digital Plus' },
+      { v:'limited',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto',             desc:'Let device profile decide · safe default' },
     ]
   },
-  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c2d',
+  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c4d', layout:'pills',
     opts:[
-      { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><text x="22" y="29" text-anchor="middle" fill="#94a3b8" font-size="22" font-weight="900" font-family="system-ui,sans-serif">?</text></svg>', name:'Skip — all content',        desc:'Covers movies, TV, and anime. SeaDex enabled alongside standard scrapers. Safe default if you\'re not sure.' },
-      { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Live-action only',         desc:'Standard movies and TV. No anime scrapers. SeaDex disabled.' },
-      { v:'mixed', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="15" width="18" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/><rect x="3" y="8" width="18" height="9" rx="2" fill="#ef4444"/><line x1="9" y1="8" x2="6" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="8" x2="12" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="8" x2="18" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="4" fill="#f9a8d4"/><circle cx="39" cy="19" r="4" fill="#f9a8d4"/><circle cx="37" cy="27" r="4" fill="#f9a8d4"/><circle cx="27" cy="27" r="4" fill="#f9a8d4"/><circle cx="25" cy="19" r="4" fill="#f9a8d4"/><circle cx="33" cy="22" r="5" fill="#fce7f3"/></svg>', name:'Live-action + Anime',      desc:'SeaDex enabled alongside standard scrapers. Best-release SeaDex picks for anime titles.' },
-      { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime-focused',            desc:'SeaDex enabled and Best-Only mode active — only the confirmed best release per anime.' },
+      { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><text x="22" y="29" text-anchor="middle" fill="#94a3b8" font-size="22" font-weight="900" font-family="system-ui,sans-serif">?</text></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
+      { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Live-action',      desc:'Movies & TV · no anime scrapers' },
+      { v:'mixed', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="15" width="18" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/><rect x="3" y="8" width="18" height="9" rx="2" fill="#ef4444"/><line x1="9" y1="8" x2="6" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="8" x2="12" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="8" x2="18" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="4" fill="#f9a8d4"/><circle cx="39" cy="19" r="4" fill="#f9a8d4"/><circle cx="37" cy="27" r="4" fill="#f9a8d4"/><circle cx="27" cy="27" r="4" fill="#f9a8d4"/><circle cx="25" cy="19" r="4" fill="#f9a8d4"/><circle cx="33" cy="22" r="5" fill="#fce7f3"/></svg>', name:'Live + Anime',     desc:'Standard + SeaDex best releases' },
+      { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
     ]
   },
   { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored only in the downloaded JSON file and are never sent to any server.', key:null, cols:'c1', opts:[] },
@@ -211,10 +252,35 @@ function label(key, val) {
   return o ? o.name : val || '';
 }
 
+function renderOpts(def) {
+  const key = def.key, id = def.id;
+  const onch = `S['${key}']=this.value;syncNext()${id==='service'?';updateMultiPanel()':''}`;
+  const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} onchange="${onch}">`;
+  const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
+  const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
+
+  if (def.layout === 'list') {
+    return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
+  }
+  if (def.layout === 'pills') {
+    return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
+  }
+  if (def.layout === 'hero') {
+    const hero = def.opts[0], rest = def.opts.slice(1);
+    return `<div class="hero-wrap">
+      <div class="hero-hero opt">${inp(hero)}<label for="o_${hero.v}"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">★ Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
+      <div class="hero-sub">${rest.map(o => std(o)).join('')}</div>
+    </div>`;
+  }
+  return `<div class="opts ${def.cols}">${def.opts.map(o => std(o)).join('')}</div>`;
+}
+
 function renderProgress() {
   const pct = ((step - 1) / (STEPS - 1)) * 100;
   document.getElementById('pFill').style.width = pct + '%';
-  document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS}`;
+  const def = DEFS[step - 1];
+  const titles = ['Service','Device','Resolution','Audio','Content','APIs','Review'];
+  document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS} · ${titles[step-1] || ''}`;
 }
 
 function render() {
@@ -380,19 +446,7 @@ function render() {
       <div class="card">
         <h2>${def.title}</h2>
         <p class="desc">${def.desc}</p>
-        <div class="opts ${def.cols}">
-          ${def.opts.map(o => `
-            <div class="opt">
-              <input type="radio" name="${def.id}" id="o_${o.v}" value="${o.v}"
-                ${S[def.key] === o.v ? 'checked' : ''}
-                onchange="S['${def.key}']=this.value;syncNext()${def.id === 'service' ? ';updateMultiPanel()' : ''}">
-              <label for="o_${o.v}">
-                <div class="opt-icon">${o.icon}</div>
-                <div class="opt-name">${o.name}</div>
-                <div class="opt-desc">${o.desc}</div>
-              </label>
-            </div>`).join('')}
-        </div>
+        ${renderOpts(def)}
         ${def.id === 'service' ? '<div id="multiPanel"></div>' : ''}
       </div>`;
     nav.style.display = 'flex';
@@ -1107,6 +1161,10 @@ async function createImportUrl() {
   btn.disabled = true; btn.textContent = 'Creating…';
   result.innerHTML = '';
 
+  // Open AIOStreams synchronously before any await (preserves browser gesture for popup permission)
+  const aioBase = resolvedInstanceUrl() || 'https://aiostreams.elfhosted.com';
+  const aioWin = window.open(aioBase + '/stremio/configure', '_blank');
+
   const json = JSON.stringify(buildPublic(), null, 2);
   let url = null;
 
@@ -1126,14 +1184,16 @@ async function createImportUrl() {
   btn.disabled = false; btn.innerHTML = origHtml;
 
   if (url) {
+    navigator.clipboard.writeText(url).catch(()=>{});
     const safeUrl = url.replace(/"/g,'&quot;');
     result.innerHTML = `<div class="import-success" style="margin-top:10px">
-      <strong>Import URL ready</strong>
-      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">AIOStreams → Templates → Import → paste this URL. API keys are stripped — add them in AIOStreams after import.</div>
+      <strong>Import URL copied ✓</strong>
+      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">AIOStreams is open in a new tab — go to <strong style="color:#e6edf3">Templates → Import</strong> and paste. API keys are stripped — add them in AIOStreams after import.</div>
       <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeUrl}');showToast('URL copied')" title="Click to copy">${url}</div>
     </div>`;
-    showToast('Import URL ready — click to copy');
+    showToast('Import URL copied — paste in AIOStreams → Templates → Import');
   } else {
+    if (aioWin) aioWin.close();
     result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px">
       <strong style="color:#f87171">Could not reach paste service</strong>
       <div style="color:#6b7280;font-size:.79rem;margin-top:4px">Use ⬇ Download instead, then import the file in AIOStreams → Templates → Import.</div>
