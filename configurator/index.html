@@ -8,16 +8,22 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px}
 .wrap{width:100%;max-width:700px}
-.hdr{text-align:center;margin-bottom:28px}
-.hdr-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
-.hdr-logo img{width:40px;height:40px;filter:drop-shadow(0 0 8px rgba(124,58,237,.5))}
-.hdr h1{font-size:1.9rem;font-weight:800;letter-spacing:-0.02em;color:#fff}
-.hdr h1 span{background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hdr p{color:#8b949e;margin-top:6px;font-size:.95rem}
-.prog-wrap{margin:20px 0 6px}
-.prog-track{background:#21262d;border-radius:4px;height:6px;overflow:hidden}
-.prog-fill{background:linear-gradient(90deg,#7c3aed,#a855f7);height:100%;transition:width .35s ease;border-radius:4px}
-.prog-label{color:#8b949e;font-size:.78rem;text-align:right;margin-top:5px;letter-spacing:.03em}
+.hdr{margin-bottom:22px}
+.hdr-banner{display:flex;align-items:center;gap:16px;background:#080c10;border:1px solid #162030;border-radius:14px;padding:18px 22px;margin-bottom:16px;position:relative;overflow:hidden}
+.hdr-banner::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.035) 1px,transparent 1px);background-size:56px 56px;pointer-events:none}
+.hdr-icon{width:52px;height:52px;flex-shrink:0;position:relative;z-index:1;filter:drop-shadow(0 0 10px rgba(0,212,255,.35))}
+.hdr-divider{width:1.5px;height:52px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.6),transparent);flex-shrink:0;position:relative;z-index:1}
+.hdr-text{position:relative;z-index:1}
+.hdr-title{font-size:1.7rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:3px}
+.hdr-core{color:#fff}
+.hdr-builds{color:#00d4ff}
+.hdr-underline{height:2px;width:110px;background:rgba(0,212,255,.45);border-radius:1px;margin-bottom:5px}
+.hdr-by{font-size:.68rem;letter-spacing:.14em;color:#7eeeff;opacity:.7;margin-bottom:4px}
+.hdr-sub{font-size:.82rem;color:#8b949e}
+.prog-wrap{margin:0 0 6px}
+.prog-track{background:#21262d;border-radius:4px;height:5px;overflow:hidden}
+.prog-fill{background:linear-gradient(90deg,#0891b2,#00d4ff);height:100%;transition:width .35s ease;border-radius:4px}
+.prog-label{color:#8b949e;font-size:.75rem;text-align:right;margin-top:5px;letter-spacing:.03em}
 .card{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:28px;margin-bottom:14px;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .card h2{font-size:1.15rem;font-weight:700;margin-bottom:5px}
@@ -31,14 +37,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opts.c2d{grid-template-columns:1fr}
 .opt input{display:none}
 .opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:16px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
-.opt input:checked+label{border-color:#7c3aed;background:#110d2a}
-.opt label:hover{border-color:#584090}
+.opt input:checked+label{border-color:#00d4ff;background:#00131c}
+.opt label:hover{border-color:#005c7a}
 .opt-icon{font-size:1.4rem;margin-bottom:7px;flex-shrink:0}
 .opt-name{font-weight:700;font-size:.93rem}
 .opt-desc{color:#8b949e;font-size:.8rem;margin-top:4px;line-height:1.45}
 .name-row label{color:#8b949e;font-size:.82rem;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
 .name-input{width:100%;background:#0d1117;border:2px solid #30363d;border-radius:8px;color:#e6edf3;padding:12px 16px;font-size:1rem;transition:border-color .15s;outline:none}
-.name-input:focus{border-color:#7c3aed}
+.name-input:focus{border-color:#00d4ff}
 .name-input::placeholder{color:#484f58}
 .summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
 .sum-item{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 14px}
@@ -49,7 +55,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn:active{transform:scale(.97)}
 .btn:hover{opacity:.86}
 .btn-back{background:#21262d;color:#e6edf3;flex-shrink:0}
-.btn-next{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;flex:1}
+.btn-next{background:linear-gradient(135deg,#0e7490,#00d4ff);color:#fff;flex:1}
 .btn-next:disabled{opacity:.38;cursor:not-allowed}
 .btn-dl{width:100%;padding:16px;font-size:1.08rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff;margin-top:16px;transition:opacity .15s,transform .1s}
 .btn-dl:active{transform:scale(.98)}
@@ -61,8 +67,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .wrap{max-width:980px}
   .card{padding:36px}
   .card h2{font-size:1.3rem}
-  .hdr h1{font-size:2.2rem}
-  .hdr-logo img{width:48px;height:48px}
+  .hdr-banner{padding:22px 32px;gap:22px}
+  .hdr-icon{width:64px;height:64px}
+  .hdr-divider{height:64px}
+  .hdr-title{font-size:2.1rem}
+  .hdr-underline{width:136px}
   .opts{gap:12px}
   .opts.c4d{grid-template-columns:repeat(4,1fr)}
   .opts.c3d{grid-template-columns:repeat(3,1fr)}
@@ -79,17 +88,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <body>
 <div class="wrap">
   <header class="hdr">
-    <div class="hdr-logo">
-      <img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg" alt="Core Builds">
-      <div>
-        <h1><span>Core Builds</span></h1>
-        <div style="font-size:.78rem;color:#8b949e;letter-spacing:.06em;margin-top:1px">by Brevity</div>
+    <div class="hdr-banner">
+      <svg class="hdr-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <defs>
+          <linearGradient id="hg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
+          <linearGradient id="hg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
+          <filter id="hf1"><feGaussianBlur stdDeviation="10" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+          <filter id="hf2"><feGaussianBlur stdDeviation="14" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+          <filter id="hf3"><feGaussianBlur stdDeviation="24"/></filter>
+        </defs>
+        <circle cx="256" cy="256" r="248" fill="#080c10"/>
+        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.05" filter="url(#hf3)"/>
+        <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.09" filter="url(#hf3)"/>
+        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#hf1)"/>
+        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#hg1)" stroke-width="22" stroke-linejoin="round"/>
+        <polygon points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.4" filter="url(#hf2)"/>
+        <polygon points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.95"/>
+      </svg>
+      <div class="hdr-divider"></div>
+      <div class="hdr-text">
+        <div class="hdr-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
+        <div class="hdr-underline"></div>
+        <div class="hdr-by">BY BREVITY</div>
+        <div class="hdr-sub">Template Configurator — AIOStreams</div>
       </div>
     </div>
-    <p>Template Configurator — generate a custom AIOStreams template</p>
     <div class="prog-wrap">
       <div class="prog-track"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
-      <div class="prog-label" id="pLabel">Step 1 of 6</div>
+      <div class="prog-label" id="pLabel">Step 1 of 7</div>
     </div>
   </header>
   <div id="main"></div>
