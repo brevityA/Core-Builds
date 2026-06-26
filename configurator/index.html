@@ -720,7 +720,7 @@ function audioCfg() {
   const wide    = dev==='windows' || dev==='lgtv' || dev==='appletv-old' || dev==='appletv-new' || lossless;
   return {
     excludedAudioTags: limited ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [],
-    preferredAudioTags:['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','EAC3','DD+','AAC','DTS','AC3'],
+    preferredAudioTags:['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','DTS-HD','DD+','AAC','DTS','DD'],
     preferredAudioChannels: wide ? ['7.1','5.1','2.0'] : ['5.1','2.0']
   };
 }
