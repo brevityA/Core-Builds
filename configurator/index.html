@@ -69,6 +69,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .aio-section{margin-top:20px;border-top:1px solid #21262d;padding-top:18px}
 .aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
 .aio-fields{display:grid;gap:10px;margin-bottom:0}
+.tab-row{display:flex;gap:0;background:#0d1117;border:1px solid #30363d;border-radius:9px;padding:3px;margin-bottom:8px}
+.tab-btn{flex:1;padding:8px;border:none;border-radius:7px;font-size:.85rem;font-weight:600;cursor:pointer;background:transparent;color:#8b949e;transition:all .15s}
+.tab-btn.active{background:#00d4ff;color:#000}
+.tab-hint{font-size:.78rem;color:#4b5563;margin-bottom:2px}
+details summary::-webkit-details-marker{display:none}
+details[open] summary svg{transform:rotate(180deg)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0a2a1a;border:1px solid #2ea043;color:#3fb950;padding:12px 22px;border-radius:10px;font-size:.9rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.error{background:#1a0a0a;border-color:#8b1a1a;color:#f87171}
@@ -252,27 +258,38 @@ function render() {
         </button>
         <div id="importUrlResult"></div>
         <div class="aio-section">
-          <h3>Open in AIOStreams</h3>
-          <div class="aio-fields">
+          <h3>Get Manifest URL</h3>
+          <div class="tab-row">
+            <button class="tab-btn active" id="tabDirect" onclick="setTab('direct')">Direct Install</button>
+            <button class="tab-btn" id="tabManifest" onclick="setTab('manifest')">Get Manifest URL</button>
+          </div>
+          <div class="tab-hint" id="tabHint">Installs the addon directly into Stremio.</div>
+          <div class="aio-fields" style="margin-top:12px">
             <div class="name-row" style="margin-bottom:0">
               <label>AIOStreams Instance URL</label>
               <input class="name-input" id="aioUrl" type="url" placeholder="https://aiostreams.elfhosted.com"
                 value="${S.instanceUrl}" oninput="S.instanceUrl=this.value.trim()" maxlength="200">
             </div>
             <div class="name-row" style="margin-bottom:0">
-              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(shown in your AIOStreams configure page)</span></label>
-              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                value="${S.instanceUuid}" oninput="S.instanceUuid=this.value.trim()" maxlength="36" style="font-family:monospace;font-size:.88rem">
-            </div>
-            <div class="name-row" style="margin-bottom:0">
               <label>Password</label>
-              <input class="name-input" id="aioPwd" type="password" placeholder="your AIOStreams password"
-                value="${S.instancePassword}" oninput="S.instancePassword=this.value" maxlength="200">
+              <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
+                value="${S.instancePassword}" oninput="S.instancePassword=this.value" maxlength="200" autocomplete="new-password">
             </div>
+            <details style="margin-top:4px">
+              <summary style="font-size:.78rem;color:#4b5563;cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;gap:6px">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                Existing account? Enter your UUID
+              </summary>
+              <div class="name-row" style="margin-top:10px;margin-bottom:0">
+                <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(from your AIOStreams configure page)</span></label>
+                <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                  value="${S.instanceUuid}" oninput="S.instanceUuid=this.value.trim()" maxlength="36" style="font-family:monospace;font-size:.88rem">
+              </div>
+            </details>
           </div>
-          <button class="btn-aio" onclick="openInAIOStreams()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Open in AIOStreams
+          <button class="btn-aio" id="btnAio" onclick="openInAIOStreams()" style="margin-top:14px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Install to Stremio
           </button>
           <div id="aioResult"></div>
         </div>
@@ -951,6 +968,20 @@ function showToast(msg, isError) {
   t._timer = setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3200);
 }
 
+let aioTab = 'direct';
+function setTab(t) {
+  aioTab = t;
+  document.getElementById('tabDirect').classList.toggle('active', t==='direct');
+  document.getElementById('tabManifest').classList.toggle('active', t==='manifest');
+  document.getElementById('tabHint').textContent = t==='direct'
+    ? 'Installs the addon directly into Stremio.'
+    : 'Generates an AIOStreams manifest URL for any streaming client.';
+  const btn = document.getElementById('btnAio');
+  if (btn) btn.innerHTML = t==='direct'
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Install to Stremio'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Get Manifest URL';
+}
+
 function buildPublic() {
   const tmpl = build();
   const pub = JSON.parse(JSON.stringify(tmpl));
@@ -1032,14 +1063,24 @@ async function openInAIOStreams() {
         const resolvedUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
         if (resolvedUuid) {
           const manifestUrl = `${base}/api/stremio/${resolvedUuid}/manifest.json`;
+          const stremioUrl  = `https://web.stremio.com/#/?addon=${encodeURIComponent(manifestUrl)}`;
           const configUrl   = `${base}/stremio/configure`;
-          result.innerHTML = `<div class="import-success">
-            <strong>${uuid ? 'Config updated' : 'Config created'} in AIOStreams ✓</strong>
-            <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Install this manifest in Stremio, or open AIOStreams to verify.</div>
+          const label = uuid ? 'Config updated' : 'Config created';
+          result.innerHTML = `<div class="import-success" style="margin-top:12px">
+            <strong>${label} in AIOStreams ✓</strong>
+            <div style="color:#6b7280;font-size:.79rem;margin:4px 0 10px">Your manifest URL — click to copy, or install directly into Stremio.</div>
             <div class="manifest-url" onclick="navigator.clipboard.writeText('${manifestUrl}');showToast('Manifest URL copied')" title="Click to copy">${manifestUrl}</div>
-            <div style="margin-top:10px"><a href="${configUrl}" target="_blank" style="color:#3fb950;font-size:.85rem">Open AIOStreams configure →</a></div>
+            <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+              ${aioTab==='direct' ? `<a href="${stremioUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.88rem;text-decoration:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Install to Stremio
+              </a>` : ''}
+              <a href="${configUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.88rem;text-decoration:none">
+                Open AIOStreams →
+              </a>
+            </div>
           </div>`;
-          showToast(uuid ? 'Config updated — manifest URL ready' : 'Config created — manifest URL ready');
+          showToast(uuid ? 'Config updated — manifest ready' : 'Config created — manifest ready');
           return;
         }
       }
