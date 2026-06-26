@@ -79,9 +79,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 <script>
-const STEPS = 6;
+const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', rpdbKey:'' };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c2',
@@ -93,6 +93,7 @@ const DEFS = [
       { v:'premiumize',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#d97706" stroke-width="2" fill="#1a1000"/><text x="22" y="28" text-anchor="middle" fill="#d97706" font-size="17" font-weight="900" font-family="system-ui,sans-serif">P</text></svg>', name:'Premiumize', desc:'Premiumize cache via StremThru Store · HdHub disabled' },
       { v:'debridlink',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#0284c7" stroke-width="2" fill="#00111a"/><rect x="10" y="19" width="14" height="7" rx="3.5" fill="none" stroke="#0284c7" stroke-width="1.8"/><rect x="20" y="19" width="14" height="7" rx="3.5" fill="none" stroke="#0284c7" stroke-width="1.8"/></svg>', name:'Debrid-Link', desc:'Debrid-Link cache via StremThru Store · HdHub disabled' },
       { v:'hybrid',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><clipPath id="hybL"><rect x="0" y="0" width="22" height="44"/></clipPath><clipPath id="hybR"><rect x="22" y="0" width="22" height="44"/></clipPath></defs><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#051408" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="none" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#1a0000" clip-path="url(#hybR)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="none" clip-path="url(#hybR)"/><line x1="22" y1="4" x2="22" y2="40" stroke="#333" stroke-width="0.5"/><polygon points="13,16 19,19 13,22 7,19" fill="#1a5c2a"/><polygon points="7,19 7,26 13,29 13,22" fill="#166534"/><polygon points="13,22 19,19 19,26 13,29" fill="#15803d"/><path d="M31 15 L25 24 L28 24 L26 30 L33 21 L30 21 Z" fill="#dc2626"/></svg>', name:'Hybrid (TorBox + RD)', desc:'TorBox Pro primary plus Real-Debrid fallback with priority fetching' },
+      { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Combine AllDebrid, Real-Debrid, Premiumize, or Debrid-Link — pick which services to include' },
     ]
   },
   { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c2',
@@ -128,6 +129,7 @@ const DEFS = [
       { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime-focused',            desc:'SeaDex enabled and Best-Only mode active — only the confirmed best release per anime.' },
     ]
   },
+  { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored only in the downloaded JSON file and are never sent to any server.', key:null, cols:'c1', opts:[] },
   { id:'review', title:'Review & Download', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
 ];
 
@@ -150,30 +152,9 @@ function render() {
   const nav  = document.getElementById('nav');
   const def  = DEFS[step - 1];
 
-  if (step < STEPS) {
-    main.innerHTML = `
-      <div class="card">
-        <h2>${def.title}</h2>
-        <p class="desc">${def.desc}</p>
-        <div class="opts ${def.cols}">
-          ${def.opts.map(o => `
-            <div class="opt">
-              <input type="radio" name="${def.id}" id="o_${o.v}" value="${o.v}"
-                ${S[def.key] === o.v ? 'checked' : ''}
-                onchange="S['${def.key}']=this.value;syncNext()">
-              <label for="o_${o.v}">
-                <div class="opt-icon">${o.icon}</div>
-                <div class="opt-name">${o.name}</div>
-                <div class="opt-desc">${o.desc}</div>
-              </label>
-            </div>`).join('')}
-        </div>
-      </div>`;
-    nav.style.display = 'flex';
-    document.getElementById('btnBack').style.visibility = step > 1 ? 'visible' : 'hidden';
-    syncNext();
-  } else {
+  if (step === STEPS) {
     const auto = defaultName();
+    const hasApis = S.tmdbToken || S.rpdbKey;
     main.innerHTML = `
       <div class="card">
         <h2>Your Configuration</h2>
@@ -186,6 +167,10 @@ function render() {
               <div class="sum-val">${label(k, S[k])}${audioOverride ? '<div style="color:#f59e0b;font-size:.7rem;margin-top:3px">⚠ device profile limits to DD+</div>' : ''}</div>
             </div>`;
           }).join('')}
+          ${hasApis ? `<div class="sum-item" style="grid-column:1/-1">
+            <div class="sum-lbl">API Keys</div>
+            <div class="sum-val" style="font-weight:400;font-size:.85rem">${S.tmdbToken ? '✓ TMDB access token' : ''}${S.tmdbToken && S.rpdbKey ? ' · ' : ''}${S.rpdbKey ? '✓ RPDB key' : ''}</div>
+          </div>` : ''}
         </div>
         <div class="name-row">
           <label>Template name (optional)</label>
@@ -196,7 +181,7 @@ function render() {
         <div class="notice">
           <strong>How to import</strong>
           AIOStreams → Templates → Import → paste the raw file URL, or upload the JSON file directly.<br>
-          Enter your service credentials after import — this template leaves credentials blank.
+          Enter your service credentials after import.${hasApis ? ' TMDB and RPDB keys are baked in.' : ' API keys left as placeholders — fill in after import if needed.'}
           <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1a3a24;color:#6b7280;font-size:.78rem">
             Core Builds by Brevity &nbsp;·&nbsp;
             <a href="https://github.com/brevityA/Core-Builds" target="_blank" style="color:#3fb950;text-decoration:none">github.com/brevityA/Core-Builds</a>
@@ -205,23 +190,109 @@ function render() {
       </div>`;
     nav.style.display = 'none';
     document.getElementById('nameIn').value = S.name;
+
+  } else if (def.id === 'apis') {
+    main.innerHTML = `
+      <div class="card">
+        <h2>API Keys <span style="color:#8b949e;font-size:.85rem;font-weight:400">(Optional)</span></h2>
+        <p class="desc">${def.desc}</p>
+        <div class="name-row" style="margin-bottom:16px">
+          <label>TMDB Read Access Token</label>
+          <input class="name-input" id="tmdbIn" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+            value="" oninput="S.tmdbToken=this.value" maxlength="400">
+        </div>
+        <div class="name-row">
+          <label>RPDB API Key</label>
+          <input class="name-input" id="rpdbIn" type="text" placeholder="t0-abcdef123…"
+            value="" oninput="S.rpdbKey=this.value" maxlength="80">
+        </div>
+        <div class="notice" style="margin-top:14px">
+          <strong>Where to find these</strong>
+          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API → Read Access Token (v4)<br>
+          <strong style="color:#8b949e;font-weight:400">RPDB:</strong> ratingposterdb.com → your account → API key (free tier starts with t0-)
+        </div>
+      </div>`;
+    nav.style.display = 'flex';
+    document.getElementById('btnBack').style.visibility = 'visible';
+    document.getElementById('tmdbIn').value = S.tmdbToken;
+    document.getElementById('rpdbIn').value = S.rpdbKey;
+    syncNext();
+
+  } else {
+    main.innerHTML = `
+      <div class="card">
+        <h2>${def.title}</h2>
+        <p class="desc">${def.desc}</p>
+        <div class="opts ${def.cols}">
+          ${def.opts.map(o => `
+            <div class="opt">
+              <input type="radio" name="${def.id}" id="o_${o.v}" value="${o.v}"
+                ${S[def.key] === o.v ? 'checked' : ''}
+                onchange="S['${def.key}']=this.value;syncNext()${def.id === 'service' ? ';updateMultiPanel()' : ''}">
+              <label for="o_${o.v}">
+                <div class="opt-icon">${o.icon}</div>
+                <div class="opt-name">${o.name}</div>
+                <div class="opt-desc">${o.desc}</div>
+              </label>
+            </div>`).join('')}
+        </div>
+        ${def.id === 'service' ? '<div id="multiPanel"></div>' : ''}
+      </div>`;
+    nav.style.display = 'flex';
+    document.getElementById('btnBack').style.visibility = step > 1 ? 'visible' : 'hidden';
+    if (def.id === 'service') updateMultiPanel();
+    syncNext();
   }
 }
 
 function syncNext() {
   const def = DEFS[step - 1];
   const btn = document.getElementById('btnNext');
-  const ok  = !def.key || !!S[def.key];
+  let ok = !def.key || !!S[def.key];
+  if (S.service === 'multi' && step === 1) ok = S.multiServices.length > 0;
   btn.disabled = !ok;
 }
 
 function next() {
   if (DEFS[step-1].key && !S[DEFS[step-1].key]) return;
+  if (S.service === 'multi' && step === 1 && S.multiServices.length === 0) return;
   if (step < STEPS) { step++; render(); window.scrollTo(0,0); }
 }
 
 function back() {
   if (step > 1) { step--; render(); window.scrollTo(0,0); }
+}
+
+function updateMultiPanel() {
+  const panel = document.getElementById('multiPanel');
+  if (!panel) return;
+  if (S.service !== 'multi') { panel.style.display = 'none'; syncNext(); return; }
+  panel.style.display = '';
+  const multiOpts = [
+    { v:'alldebrid',  label:'AllDebrid',   color:'#ea580c' },
+    { v:'realdebrid', label:'Real-Debrid', color:'#dc2626' },
+    { v:'premiumize', label:'Premiumize',  color:'#d97706' },
+    { v:'debridlink', label:'Debrid-Link', color:'#0284c7' },
+  ];
+  panel.innerHTML = `
+    <div style="border-top:1px solid #30363d;padding-top:14px;margin-top:4px">
+      <div style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Select your services</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${multiOpts.map(m => `
+          <label style="display:flex;align-items:center;gap:10px;background:#0d1117;border:2px solid ${S.multiServices.includes(m.v) ? m.color : '#30363d'};border-radius:8px;padding:12px;cursor:pointer;user-select:none;transition:border-color .15s">
+            <input type="checkbox" ${S.multiServices.includes(m.v) ? 'checked' : ''} onchange="toggleMulti('${m.v}')">
+            <span style="font-weight:700;font-size:.9rem;color:${S.multiServices.includes(m.v) ? m.color : '#e6edf3'}">${m.label}</span>
+          </label>`).join('')}
+      </div>
+    </div>`;
+  syncNext();
+}
+
+function toggleMulti(val) {
+  const i = S.multiServices.indexOf(val);
+  if (i >= 0) S.multiServices.splice(i, 1);
+  else S.multiServices.push(val);
+  updateMultiPanel();
 }
 
 // ─── Template generation ─────────────────────────────────────────────────────
@@ -235,19 +306,25 @@ function ruid() {
 function sid() { return Math.random().toString(36).substring(2,8); }
 
 function defaultName() {
-  const svc = {
-    'torbox-pro':'TorBox Pro','torbox-ess':'TorBox Essential',
-    'alldebrid':'AllDebrid','realdebrid':'Real-Debrid',
-    'premiumize':'Premiumize','debridlink':'Debrid-Link','hybrid':'Hybrid'
-  }[S.service] || '';
+  let svc;
+  if (S.service === 'multi') {
+    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL'};
+    svc = 'Multi (' + S.multiServices.map(s => abbr[s] || s).join('+') + ')';
+  } else {
+    svc = {'torbox-pro':'TorBox Pro','torbox-ess':'TorBox Essential',
+      'alldebrid':'AllDebrid','realdebrid':'Real-Debrid',
+      'premiumize':'Premiumize','debridlink':'Debrid-Link','hybrid':'Hybrid'}[S.service] || '';
+  }
   const res = {'4k':'4K','1080p':'1080p','ultrawide':'Ultrawide'}[S.resolution] || '';
   return `Core Nexus Custom ${svc} ${res}`.trim();
 }
 
 function presets() {
-  const useStore   = ['alldebrid','realdebrid','premiumize','debridlink'].includes(S.service);
+  const isMulti    = S.service === 'multi';
+  const useStore   = ['alldebrid','realdebrid','premiumize','debridlink'].includes(S.service) || isMulti;
   const hasSeaDex  = S.content !== 'live';
-  const storeLabel = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','hybrid':'StremThru RD'}[S.service] || 'StremThru Store';
+  const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','hybrid':'StremThru RD'};
+  const storeLabel = storeLabels[S.service] || 'StremThru Store';
 
   const lib = {
     type:'library', instanceId:'lib-1', enabled:true,
@@ -328,18 +405,26 @@ function presets() {
   };
 
   const isHybrid = S.service === 'hybrid';
-  const list = [lib, zilean, seadex, ...(useStore ? [store] : isHybrid ? [torz, store] : [torz]), meteor, comet, mf, hdhub, eztv, tg, knaben, tdb, sub];
+  const multiStores = isMulti ? S.multiServices.map((svc, i) => ({
+    type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true,
+    options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false },
+    resources:['stream']
+  })) : [];
+  const storeSlot = isMulti ? multiStores : useStore ? [store] : isHybrid ? [torz, store] : [torz];
+  const list = [lib, zilean, seadex, ...storeSlot, meteor, comet, mf, hdhub, eztv, tg, knaben, tdb, sub];
   if (!useStore) list.push(tbSearch);
   return list;
 }
 
 function services() {
   const svc = S.service;
+  const isMulti = svc === 'multi';
+  const m = S.multiServices;
   return [
-    {id:'realdebrid',  enabled: svc==='realdebrid' || svc==='hybrid', credentials:{}},
-    {id:'alldebrid',   enabled: svc==='alldebrid',   credentials:{}},
-    {id:'premiumize',  enabled: svc==='premiumize',  credentials:{}},
-    {id:'debridlink',  enabled: svc==='debridlink',  credentials:{}},
+    {id:'realdebrid',  enabled: svc==='realdebrid' || svc==='hybrid' || (isMulti && m.includes('realdebrid')), credentials:{}},
+    {id:'alldebrid',   enabled: svc==='alldebrid'  || (isMulti && m.includes('alldebrid')),  credentials:{}},
+    {id:'premiumize',  enabled: svc==='premiumize'  || (isMulti && m.includes('premiumize')), credentials:{}},
+    {id:'debridlink',  enabled: svc==='debridlink'  || (isMulti && m.includes('debridlink')), credentials:{}},
     {id:'torbox',      enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid', credentials:{}},
     {id:'offcloud',    enabled: false, credentials:{}},
     {id:'putio',       enabled: false, credentials:{}},
@@ -609,11 +694,11 @@ function build() {
   const rc   = resolutionCfg();
   const ec   = encodeCfg();
   const ac   = audioCfg();
-  const svcName = {
-    'torbox-pro':'TorBox Pro','torbox-ess':'TorBox Essential',
-    'alldebrid':'AllDebrid','realdebrid':'Real-Debrid',
-    'premiumize':'Premiumize','debridlink':'Debrid-Link','hybrid':'Hybrid'
-  }[S.service];
+  const svcName = S.service === 'multi'
+    ? 'Multi-Debrid'
+    : {'torbox-pro':'TorBox Pro','torbox-ess':'TorBox Essential',
+       'alldebrid':'AllDebrid','realdebrid':'Real-Debrid',
+       'premiumize':'Premiumize','debridlink':'Debrid-Link','hybrid':'Hybrid'}[S.service];
   const devName = {
     'generic':'Generic','samsung':'Samsung TV (Tizen)',
     'appletv-old':'Apple TV 4K (1st/2nd gen)','appletv-new':'Apple TV 4K (3rd gen)',
@@ -627,7 +712,6 @@ function build() {
       id, name,
       description:`Custom template — ${svcName} · ${devName} · ${resName}. Generated by Core Builds Configurator.`,
       source:'external',
-      author:'Core Builds by Brevity',
       version:'0.1.0',
       category:'Debrid',
       serviceRequired:false,
@@ -680,10 +764,10 @@ function build() {
       excludedRegexPatterns:[],
       addonCategoryColors:{Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
       mergedCatalogs:[],
-      rpdbApiKey:'t0-free-rpdb',
+      rpdbApiKey:S.rpdbKey || 't0-free-rpdb',
       posterService:'rpdb',
       enhanceResults:true,
-      tmdbAccessToken:'<template_placeholder>',
+      tmdbAccessToken:S.tmdbToken || '<template_placeholder>',
       tmdbApiKey:'<template_placeholder>',
       usePosterRedirectApi:true,
       usePosterServiceForMeta:true,
