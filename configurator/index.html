@@ -92,6 +92,8 @@ details[open] summary svg{transform:rotate(180deg)}
 .inst-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
 .inst-chip{display:inline-flex;align-items:center;padding:5px 12px;background:#0d1117;border:1px solid #30363d;border-radius:20px;font-size:.76rem;color:#8b949e;text-decoration:none;transition:border-color .15s,color .15s;white-space:nowrap}
 .inst-chip:hover{border-color:#00d4ff;color:#00d4ff}
+.inst-chip-import{background:#001428;border-color:#0e7490;color:#00d4ff}
+.inst-chip-import:hover{background:#002a50;border-color:#00d4ff;color:#7ee8ff}
 .notice strong{color:#3fb950;display:block;margin-bottom:3px}
 .tag{display:inline-block;background:#1f2937;border:1px solid #374151;border-radius:5px;padding:2px 8px;font-size:.75rem;color:#9ca3af;margin-top:6px;font-family:monospace}
 /* List layout */
@@ -1157,7 +1159,7 @@ function buildPublic() {
   return pub;
 }
 
-function instanceChips() {
+function instanceChips(templateUrl) {
   const hosts = [
     ['ElfHosted',   'https://aiostreams.elfhosted.com/stremio/configure'],
     ['ForthWeak',   'https://aiostreams.fortheweak.cloud/stremio/configure'],
@@ -1167,6 +1169,10 @@ function instanceChips() {
     ['ATBP',        'https://aio.atbphosting.com/stremio/configure'],
     ["Omni's",      'https://aiostreams.12312023.xyz/stremio/configure'],
   ];
+  if (templateUrl) {
+    const enc = encodeURIComponent(templateUrl);
+    return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}?template=${enc}" target="_blank" class="inst-chip inst-chip-import">▶ ${n}</a>`).join('')}</div>`;
+  }
   return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}" target="_blank" class="inst-chip">${n}</a>`).join('')}</div>`;
 }
 
@@ -1199,12 +1205,13 @@ async function createImportUrl() {
     navigator.clipboard.writeText(url).catch(()=>{});
     const safeUrl = url.replace(/"/g,'&quot;');
     result.innerHTML = `<div class="import-success" style="margin-top:10px">
-      <strong>Import URL copied ✓</strong>
-      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 2px">Go to <strong style="color:#e6edf3">Templates → Import</strong> and paste. API keys stripped — add after import.</div>
-      ${instanceChips()}
+      <strong>▶ Click your instance to auto-import</strong>
+      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Opens AIOStreams with your template pre-loaded. API keys stripped — add after import.</div>
+      ${instanceChips(url)}
+      <div style="color:#4b5563;font-size:.74rem;margin:8px 0 3px">Or copy the URL to import manually (Templates → Import → paste):</div>
       <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeUrl}');showToast('URL copied')" title="Click to copy">${url}</div>
     </div>`;
-    showToast('Import URL copied — open an instance and paste in Templates → Import');
+    showToast('Click an instance chip to auto-import your template');
   } else {
     result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px">
       <strong style="color:#f87171">Could not reach paste service</strong>
@@ -1257,8 +1264,9 @@ function manifestCard(base, uuid, pwd) {
 }
 
 async function openInAIOStreams() {
-  const isAuto = S.instanceHost === 'auto';
-  const base   = resolvedInstanceUrl();
+  const isAuto   = S.instanceHost === 'auto';
+  const isCustom = S.instanceHost === 'custom';
+  const base     = resolvedInstanceUrl();
   if (!isAuto && !base) { showToast('Enter your AIOStreams instance URL first', true); return; }
 
   const result = document.getElementById('aioResult');
@@ -1266,75 +1274,65 @@ async function openInAIOStreams() {
   const uuid   = (S.instanceUuid || '').trim();
   const pwd    = S.instancePassword;
 
-  // Known UUID → construct manifest URL directly, no API call needed (avoids CORS)
+  // UUID known → construct manifest URL directly (no API call, no CORS)
   if (uuid && !isAuto) {
     result.innerHTML = manifestCard(base, uuid, pwd);
     showToast('Manifest URL ready — click to copy');
     return;
   }
 
-  // All other cases: build template, then try API
-  const tmpl = build();
+  // No UUID on a named/auto host → guide user (API will CORS-block anyway)
+  if (!uuid && !isCustom) {
+    result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px">
+      <strong style="color:#e6edf3">No UUID entered</strong>
+      <div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px">Sign in to your AIOStreams instance, then copy your UUID from the configure page and paste it in the UUID field above.</div>
+      <div style="color:#4b5563;font-size:.77rem;margin:6px 0 4px">Or use <strong style="color:#8b949e">Create Import URL</strong> above — click a chip below to open AIOStreams and import in one click (no UUID needed):</div>
+      ${instanceChips()}
+    </div>`;
+    return;
+  }
 
+  // Custom host without UUID + has password → attempt API (user's own instance, no CORS guarantee)
+  const tmpl = build();
   if (pwd) {
     const origHtml = btn.innerHTML;
     btn.disabled = true; btn.textContent = 'Connecting…';
     result.innerHTML = '';
     try {
-      let ok = null;
-      if (isAuto) {
-        for (const host of PUBLIC_HOSTS) {
-          try { ok = await tryInstallToHost(host, tmpl, '', pwd); if (ok) break; } catch(e) {}
-        }
-      } else {
-        ok = await tryInstallToHost(base, tmpl, uuid, pwd);
-      }
-
+      const ok = await tryInstallToHost(base, tmpl, uuid, pwd);
       if (ok) {
         result.innerHTML = manifestCard(ok.base, ok.uuid, pwd);
-        showToast(uuid && !isAuto ? 'Config updated — manifest ready' : 'Config created — manifest ready');
+        showToast('Config saved — manifest ready');
         btn.disabled = false; btn.innerHTML = origHtml;
         return;
       }
-
-      // Server responded but rejected the request
-      const hostHint = S.instanceHost === 'elfhosted' && !uuid
-        ? '<div style="color:#6b7280;font-size:.78rem;margin-top:8px">💡 ElfHosted accounts are pre-provisioned — enter your UUID from your <a href="https://aiostreams.elfhosted.com/stremio/configure" target="_blank" style="color:#00d4ff;text-decoration:none">ElfHosted configure page</a> and your password above.</div>'
-        : '';
-      const configUrl = `${isAuto ? PUBLIC_HOSTS[0] : base}/stremio/configure`;
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px">
-        <strong style="color:#f87171">${isAuto ? 'All public hosts unavailable' : 'API returned an error'}</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">${isAuto ? 'Try a specific host from the dropdown, or import manually:' : 'Check your UUID and password, or import manually:'}</div>
-        ${hostHint}
+        <strong style="color:#f87171">API returned an error</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Check your instance URL and password. Or import the template file manually:</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button onclick="generate()" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.83rem;cursor:pointer">⬇ Download Template</button>
-          <a href="${configUrl}" target="_blank" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.83rem;text-decoration:none">Open AIOStreams →</a>
+          <button onclick="generate()" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.83rem;cursor:pointer">⬇ Download</button>
+          <a href="${base}/stremio/configure" target="_blank" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.83rem;text-decoration:none">Open Instance →</a>
         </div>
-        <div style="color:#4b5563;font-size:.75rem;margin-top:8px">Templates → Import → Choose File. Or use the <em>Create Import URL</em> button above to get a link instead.</div>
+        <div style="color:#4b5563;font-size:.75rem;margin-top:8px">Or use <em>Create Import URL</em> above for a one-click import link.</div>
       </div>`;
     } catch(e) {
-      // fetch threw — CORS pre-flight blocked or network unreachable
-      const configUrl = `${isAuto ? PUBLIC_HOSTS[0] : base}/stremio/configure`;
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px">
-        <strong style="color:#f87171">Direct API blocked by browser (CORS)</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">AIOStreams' management API blocks cross-origin requests. Download and upload the template instead.</div>
+        <strong style="color:#f87171">Could not reach instance</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Check your instance URL — the API may also block browser requests (CORS). Use Create Import URL above for a reliable alternative.</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button onclick="generate()" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.83rem;cursor:pointer">⬇ Download Template</button>
-          <a href="${configUrl}" target="_blank" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.83rem;text-decoration:none">Open AIOStreams →</a>
+          <button onclick="generate()" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.83rem;cursor:pointer">⬇ Download</button>
+          <a href="${base}/stremio/configure" target="_blank" style="flex:1;min-width:110px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.83rem;text-decoration:none">Open Instance →</a>
         </div>
-        <div style="color:#4b5563;font-size:.75rem;margin-top:8px">Templates → Import → Choose File. Or use the <em>Create Import URL</em> button above to get a link instead.</div>
       </div>`;
     }
     btn.disabled = false; btn.innerHTML = origHtml;
     return;
   }
 
-  // No password — guide user to set up credentials
+  // Custom host, no UUID, no password
   result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px">
-    <strong style="color:#9ca3af">UUID + password required</strong>
-    <div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Sign up on your AIOStreams instance to get your UUID, then enter it and a password above to get your Stremio install links.</div>
-    <div style="color:#6b7280;font-size:.76rem;margin-bottom:2px">Jump to your instance:</div>
-    ${instanceChips()}
+    <strong style="color:#e6edf3">Enter a password to proceed</strong>
+    <div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Set a password above to generate or save your config. Or use <strong style="color:#8b949e">Create Import URL</strong> for a one-click import link — no account needed.</div>
   </div>`;
 }
 
