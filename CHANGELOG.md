@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.0.4 (2026-06-26)
+
+### Changed
+- **Configurator overhaul** (`configurator/index.html`) — series of UX refinements to the Core Builds wizard:
+  - **Password show/hide toggle** — eye icon added to the password field so users can verify what they typed without a timed reveal
+  - **UUID field links to ElfHosted configure page** — label now includes a direct clickable link to `aiostreams.elfhosted.com/stremio/configure`
+  - **Tab consolidation** — "Direct Install" and "Get Manifest URL" tabs removed; both produced the same output (App + Web install buttons) so the distinction was moot; replaced with a single "Install to Stremio" action area
+  - **Paste-manifest-URL shortcut** — new input at the bottom of the install section accepts an existing manifest URL and immediately renders App + Web install buttons with no API call, covering returning users who already have an AIOStreams account on any host
+  - **ElfHosted error hint now links to configure page** — the inline hint shown when an ElfHosted CORS error occurs now links directly to the configure page instead of describing it
+  - **Host switch clears result card** — switching hosts now clears any previously shown manifest / error card to avoid stale results
+
+---
+
 ## 3.0.3 (2026-06-25)
 
 ### Added
