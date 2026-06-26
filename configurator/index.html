@@ -259,12 +259,7 @@ function render() {
         </button>
         <div id="importUrlResult"></div>
         <div class="aio-section">
-          <h3>Get Manifest URL</h3>
-          <div class="tab-row">
-            <button class="tab-btn active" id="tabDirect" onclick="setTab('direct')">Direct Install</button>
-            <button class="tab-btn" id="tabManifest" onclick="setTab('manifest')">Get Manifest URL</button>
-          </div>
-          <div class="tab-hint" id="tabHint">Installs the addon directly into Stremio.</div>
+          <h3>Install to Stremio</h3>
           <div class="aio-fields" style="margin-top:12px">
             <div class="name-row" style="margin-bottom:0">
               <label>AIOStreams Host</label>
@@ -290,11 +285,19 @@ function render() {
                 <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">Password</span>
                 <button type="button" onclick="genPwd()" style="font-size:.75rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
               </div>
-              <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
-                value="${S.instancePassword}" oninput="S.instancePassword=this.value" maxlength="200" autocomplete="new-password">
+              <div style="position:relative">
+                <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
+                  value="${S.instancePassword}" oninput="S.instancePassword=this.value" maxlength="200" autocomplete="new-password"
+                  style="padding-right:40px">
+                <button type="button" id="pwdEye" onclick="togglePwd()"
+                  title="Show/hide password"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
             </div>
             <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='elfhosted'?'':'display:none'}">
-              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(from your ElfHosted configure page)</span></label>
+              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">— find it at <a href="https://aiostreams.elfhosted.com/stremio/configure" target="_blank" style="color:#00d4ff;text-decoration:none">your ElfHosted configure page</a></span></label>
               <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 value="${S.instanceUuid}" oninput="S.instanceUuid=this.value.trim()" maxlength="36" style="font-family:monospace;font-size:.88rem">
             </div>
@@ -304,6 +307,14 @@ function render() {
             Install to Stremio
           </button>
           <div id="aioResult"></div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid #21262d">
+            <div style="color:#6b7280;font-size:.79rem;margin-bottom:8px">Already have a manifest URL? Paste it for instant install links:</div>
+            <input class="name-input" id="pasteManifest" type="url"
+              placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
+              oninput="onPasteManifest(this.value)"
+              style="font-size:.8rem;font-family:monospace">
+            <div id="pasteManifestResult"></div>
+          </div>
         </div>
         <div class="notice" style="margin-top:14px">
           <strong>Manual import</strong>
@@ -980,18 +991,37 @@ function showToast(msg, isError) {
   t._timer = setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3200);
 }
 
-let aioTab = 'direct';
-function setTab(t) {
-  aioTab = t;
-  document.getElementById('tabDirect').classList.toggle('active', t==='direct');
-  document.getElementById('tabManifest').classList.toggle('active', t==='manifest');
-  document.getElementById('tabHint').textContent = t==='direct'
-    ? 'Installs the addon directly into Stremio.'
-    : 'Generates an AIOStreams manifest URL for any streaming client.';
-  const btn = document.getElementById('btnAio');
-  if (btn) btn.innerHTML = t==='direct'
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Install to Stremio'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Get Manifest URL';
+function togglePwd() {
+  const el  = document.getElementById('aioPwd');
+  const eye = document.getElementById('pwdEye');
+  if (!el) return;
+  const show = el.type === 'password';
+  el.type = show ? 'text' : 'password';
+  if (eye) eye.style.color = show ? '#00d4ff' : '#4b5563';
+}
+
+function onPasteManifest(val) {
+  val = (val || '').trim();
+  const result = document.getElementById('pasteManifestResult');
+  if (!val) { result.innerHTML = ''; return; }
+  try { new URL(val); } catch(e) { result.innerHTML = ''; return; }
+  const desktopUrl = val.replace(/^https?:\/\//, 'stremio://');
+  const webUrl     = `https://web.stremio.com/#/addons?addon=${encodeURIComponent(val)}`;
+  const safeVal    = val.replace(/"/g, '&quot;');
+  const btnBase    = 'flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:8px;font-weight:700;font-size:.85rem;text-decoration:none';
+  result.innerHTML = `<div style="margin-top:10px">
+    <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeVal}');showToast('Manifest URL copied')" title="Click to copy" style="margin-bottom:10px;font-size:.79rem">${val}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="${desktopUrl}" style="${btnBase};background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Install (App)
+      </a>
+      <a href="${webUrl}" target="_blank" style="${btnBase};background:#1a1f2e;border:1px solid #00d4ff;color:#00d4ff">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Install (Web)
+      </a>
+    </div>
+  </div>`;
 }
 
 const PUBLIC_HOSTS = [
@@ -1193,7 +1223,7 @@ async function openInAIOStreams() {
 
       // Server responded but rejected the request
       const hostHint = S.instanceHost === 'elfhosted' && !uuid
-        ? '<div style="color:#6b7280;font-size:.78rem;margin-top:8px">💡 ElfHosted accounts are pre-provisioned — enter your UUID from the ElfHosted configure page, then use the Get Manifest URL tab.</div>'
+        ? '<div style="color:#6b7280;font-size:.78rem;margin-top:8px">💡 ElfHosted accounts are pre-provisioned — enter your UUID from your <a href="https://aiostreams.elfhosted.com/stremio/configure" target="_blank" style="color:#00d4ff;text-decoration:none">ElfHosted configure page</a> and your password above.</div>'
         : '';
       const configUrl = `${isAuto ? PUBLIC_HOSTS[0] : base}/stremio/configure`;
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px">
