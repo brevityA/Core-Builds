@@ -63,6 +63,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-dl{width:100%;padding:16px;font-size:1.08rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff;margin-top:16px;transition:opacity .15s,transform .1s}
 .btn-dl:active{transform:scale(.98)}
 .btn-dl:hover{opacity:.9}
+.btn-aio{width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;cursor:pointer;background:transparent;color:#00d4ff;margin-top:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-aio:hover{background:#00131c;border-color:#00d4ff}
+.btn-aio:active{transform:scale(.98)}
+.aio-section{margin-top:20px;border-top:1px solid #21262d;padding-top:18px}
+.aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.aio-fields{display:grid;gap:10px;margin-bottom:0}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0a2a1a;border:1px solid #2ea043;color:#3fb950;padding:12px 22px;border-radius:10px;font-size:.9rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:#1a0a0a;border-color:#8b1a1a;color:#f87171}
+.import-success{background:#061a0e;border:1px solid #2ea043;border-radius:10px;padding:16px;margin-top:12px;font-size:.85rem}
+.import-success strong{color:#3fb950;display:block;margin-bottom:8px;font-size:.95rem}
+.manifest-url{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.78rem;color:#8b949e;word-break:break-all;margin-top:6px;cursor:pointer;transition:border-color .15s}
+.manifest-url:hover{border-color:#00d4ff;color:#00d4ff}
 .notice{background:#0d2317;border:1px solid #2ea043;border-radius:9px;padding:13px 16px;font-size:.83rem;color:#8b949e;margin-top:14px;line-height:1.5}
 .notice strong{color:#3fb950;display:block;margin-bottom:3px}
 .tag{display:inline-block;background:#1f2937;border:1px solid #374151;border-radius:5px;padding:2px 8px;font-size:.75rem;color:#9ca3af;margin-top:6px;font-family:monospace}
@@ -84,11 +97,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .opts.c3d .opt-desc,.opts.c2d .opt-desc{font-size:.83rem}
   .summary{grid-template-columns:repeat(3,1fr)}
   .nav{max-width:480px}
-  .btn-dl{max-width:480px}
+  .btn-dl,.btn-aio{max-width:480px}
 }
 </style>
 </head>
 <body>
+<div id="toast" class="toast"></div>
 <div class="wrap">
   <header class="hdr">
     <div class="hdr-banner">
@@ -130,7 +144,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''} };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceUrl:'', instancePassword:'' };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d',
@@ -232,10 +246,29 @@ function render() {
             value="" oninput="S.name=this.value" maxlength="60">
         </div>
         <button class="btn-dl" onclick="generate()">⬇ Generate &amp; Download Template</button>
-        <div class="notice">
-          <strong>How to import</strong>
-          AIOStreams → Templates → Import → paste the raw file URL, or upload the JSON file directly.<br>
-          Enter your service credentials after import.${hasApis ? ' TMDB and RPDB keys are baked in.' : ' API keys left as placeholders — fill in after import if needed.'}
+        <div class="aio-section">
+          <h3>Open in AIOStreams</h3>
+          <div class="aio-fields">
+            <div class="name-row" style="margin-bottom:0">
+              <label>AIOStreams Instance URL</label>
+              <input class="name-input" id="aioUrl" type="url" placeholder="https://aiostreams.elfhosted.com"
+                value="${S.instanceUrl}" oninput="S.instanceUrl=this.value.trim()" maxlength="200">
+            </div>
+            <div class="name-row" style="margin-bottom:0">
+              <label>Password <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(optional — enables auto-create via API)</span></label>
+              <input class="name-input" id="aioPwd" type="password" placeholder="your AIOStreams password"
+                value="${S.instancePassword}" oninput="S.instancePassword=this.value" maxlength="200">
+            </div>
+          </div>
+          <button class="btn-aio" onclick="openInAIOStreams()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open in AIOStreams
+          </button>
+          <div id="aioResult"></div>
+        </div>
+        <div class="notice" style="margin-top:14px">
+          <strong>Manual import</strong>
+          AIOStreams → Templates → Import → paste the raw file URL, or upload the JSON file directly.${hasApis ? ' TMDB and RPDB keys are baked in.' : ' API keys left as placeholders — fill in after import if needed.'}
           <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1a3a24;color:#6b7280;font-size:.78rem">
             Core Builds by Brevity &nbsp;·&nbsp;
             <a href="https://github.com/brevityA/Core-Builds" target="_blank" style="color:#3fb950;text-decoration:none">github.com/brevityA/Core-Builds</a>
@@ -898,6 +931,67 @@ function generate() {
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3200);
+}
+
+async function openInAIOStreams() {
+  const base = (S.instanceUrl || '').trim().replace(/\/$/, '');
+  if (!base) { showToast('Enter your AIOStreams instance URL first', true); return; }
+
+  const tmpl = build();
+  const json = JSON.stringify(tmpl, null, 2);
+
+  try { await navigator.clipboard.writeText(json); } catch(e) {}
+
+  const result = document.getElementById('aioResult');
+
+  if (S.instancePassword) {
+    try {
+      const res = await fetch(`${base}/api/v1/user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: tmpl, password: S.instancePassword })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const uuid = data?.uuid || data?.user?.uuid || data?.id;
+        if (uuid) {
+          const manifestUrl = `${base}/api/stremio/${uuid}/manifest.json`;
+          const configUrl   = `${base}/stremio/configure#${uuid}`;
+          result.innerHTML = `<div class="import-success">
+            <strong>Template created in AIOStreams</strong>
+            Install this manifest URL in Stremio:<br>
+            <div class="manifest-url" onclick="navigator.clipboard.writeText('${manifestUrl}');showToast('Manifest URL copied')" title="Click to copy">${manifestUrl}</div>
+            <div style="margin-top:10px">
+              <a href="${configUrl}" target="_blank" style="color:#3fb950;font-size:.85rem">Open in AIOStreams configure →</a>
+            </div>
+          </div>`;
+          showToast('Template created — manifest URL ready');
+          return;
+        }
+      }
+      const errText = await res.text().catch(()=>'');
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
+        <strong style="color:#f87171">API responded ${res.status}</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">${errText.slice(0,200)||'Check your password and instance URL'}</div>
+      </div>`;
+    } catch(e) {
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
+        <strong style="color:#f87171">Could not reach API</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">CORS or network error — opening configure page instead. JSON is copied to your clipboard.</div>
+      </div>`;
+    }
+  }
+
+  window.open(`${base}/stremio/configure`, '_blank');
+  showToast('JSON copied — paste in Templates → Import');
 }
 
 render();
