@@ -144,7 +144,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceUrl:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d',
@@ -246,6 +246,11 @@ function render() {
             value="" oninput="S.name=this.value" maxlength="60">
         </div>
         <button class="btn-dl" onclick="generate()">⬇ Generate &amp; Download Template</button>
+        <button class="btn-aio" onclick="createImportUrl()" id="btnImport" style="margin-top:10px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Create Import URL
+        </button>
+        <div id="importUrlResult"></div>
         <div class="aio-section">
           <h3>Open in AIOStreams</h3>
           <div class="aio-fields">
@@ -255,7 +260,12 @@ function render() {
                 value="${S.instanceUrl}" oninput="S.instanceUrl=this.value.trim()" maxlength="200">
             </div>
             <div class="name-row" style="margin-bottom:0">
-              <label>Password <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(optional — enables auto-create via API)</span></label>
+              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">(shown in your AIOStreams configure page)</span></label>
+              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                value="${S.instanceUuid}" oninput="S.instanceUuid=this.value.trim()" maxlength="36" style="font-family:monospace;font-size:.88rem">
+            </div>
+            <div class="name-row" style="margin-bottom:0">
+              <label>Password</label>
               <input class="name-input" id="aioPwd" type="password" placeholder="your AIOStreams password"
                 value="${S.instancePassword}" oninput="S.instancePassword=this.value" maxlength="200">
             </div>
@@ -941,51 +951,109 @@ function showToast(msg, isError) {
   t._timer = setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3200);
 }
 
+function buildPublic() {
+  const tmpl = build();
+  const pub = JSON.parse(JSON.stringify(tmpl));
+  if (pub.config) {
+    if (pub.config.tmdbAccessToken && pub.config.tmdbAccessToken !== '<TMDB_READ_ACCESS_TOKEN>') pub.config.tmdbAccessToken = '<TMDB_READ_ACCESS_TOKEN>';
+    if (pub.config.tmdbApiKey && pub.config.tmdbApiKey !== '<TMDB_API_KEY>') pub.config.tmdbApiKey = '<TMDB_API_KEY>';
+    if (pub.config.services) pub.config.services = pub.config.services.map(s => ({ ...s, credentials: {} }));
+  }
+  return pub;
+}
+
+async function createImportUrl() {
+  const btn = document.getElementById('btnImport');
+  const result = document.getElementById('importUrlResult');
+  const origHtml = btn.innerHTML;
+  btn.disabled = true; btn.textContent = 'Creating…';
+  result.innerHTML = '';
+
+  const json = JSON.stringify(buildPublic(), null, 2);
+  let url = null;
+
+  try {
+    const r = await fetch('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:json });
+    if (r.ok) url = (await r.text()).trim();
+  } catch(e) {}
+
+  if (!url) {
+    try {
+      const body = new URLSearchParams({ content:json, syntax:'json', expiry_days:'365' });
+      const r = await fetch('https://dpaste.com/api/v2/', { method:'POST', body });
+      if (r.ok) { const t=(await r.text()).trim().replace(/"/g,''); url = t.startsWith('http') ? t+'.txt' : null; }
+    } catch(e) {}
+  }
+
+  btn.disabled = false; btn.innerHTML = origHtml;
+
+  if (url) {
+    const safeUrl = url.replace(/"/g,'&quot;');
+    result.innerHTML = `<div class="import-success" style="margin-top:10px">
+      <strong>Import URL ready</strong>
+      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">AIOStreams → Templates → Import → paste this URL. API keys are stripped — add them in AIOStreams after import.</div>
+      <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeUrl}');showToast('URL copied')" title="Click to copy">${url}</div>
+    </div>`;
+    showToast('Import URL ready — click to copy');
+  } else {
+    result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px">
+      <strong style="color:#f87171">Could not reach paste service</strong>
+      <div style="color:#6b7280;font-size:.79rem;margin-top:4px">Use ⬇ Download instead, then import the file in AIOStreams → Templates → Import.</div>
+    </div>`;
+    showToast('Paste service unreachable — use Download instead', true);
+  }
+}
+
 async function openInAIOStreams() {
   const base = (S.instanceUrl || '').trim().replace(/\/$/, '');
   if (!base) { showToast('Enter your AIOStreams instance URL first', true); return; }
 
   const tmpl = build();
-  const json = JSON.stringify(tmpl, null, 2);
-
-  try { await navigator.clipboard.writeText(json); } catch(e) {}
+  try { await navigator.clipboard.writeText(JSON.stringify(tmpl, null, 2)); } catch(e) {}
 
   const result = document.getElementById('aioResult');
+  const uuid = (S.instanceUuid || '').trim();
+  const pwd  = S.instancePassword;
 
-  if (S.instancePassword) {
+  if (pwd) {
     try {
-      const res = await fetch(`${base}/api/v1/user`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config: tmpl, password: S.instancePassword })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const uuid = data?.uuid || data?.user?.uuid || data?.id;
-        if (uuid) {
-          const manifestUrl = `${base}/api/stremio/${uuid}/manifest.json`;
-          const configUrl   = `${base}/stremio/configure#${uuid}`;
+      // If UUID provided: PATCH existing config (e.g. ElfHosted pre-provisioned accounts)
+      // If no UUID: POST to create new config
+      const endpoint = uuid ? `${base}/api/v1/user/${uuid}` : `${base}/api/v1/user`;
+      const method   = uuid ? 'PATCH' : 'POST';
+      const body     = uuid
+        ? JSON.stringify({ config: tmpl.config, password: pwd })
+        : JSON.stringify({ config: tmpl, password: pwd });
+
+      const res = await fetch(endpoint, { method, headers:{'Content-Type':'application/json'}, body });
+      const data = await res.json().catch(()=>({}));
+
+      if (res.ok && (data?.success !== false)) {
+        const resolvedUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
+        if (resolvedUuid) {
+          const manifestUrl = `${base}/api/stremio/${resolvedUuid}/manifest.json`;
+          const configUrl   = `${base}/stremio/configure`;
           result.innerHTML = `<div class="import-success">
-            <strong>Template created in AIOStreams</strong>
-            Install this manifest URL in Stremio:<br>
+            <strong>${uuid ? 'Config updated' : 'Config created'} in AIOStreams ✓</strong>
+            <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Install this manifest in Stremio, or open AIOStreams to verify.</div>
             <div class="manifest-url" onclick="navigator.clipboard.writeText('${manifestUrl}');showToast('Manifest URL copied')" title="Click to copy">${manifestUrl}</div>
-            <div style="margin-top:10px">
-              <a href="${configUrl}" target="_blank" style="color:#3fb950;font-size:.85rem">Open in AIOStreams configure →</a>
-            </div>
+            <div style="margin-top:10px"><a href="${configUrl}" target="_blank" style="color:#3fb950;font-size:.85rem">Open AIOStreams configure →</a></div>
           </div>`;
-          showToast('Template created — manifest URL ready');
+          showToast(uuid ? 'Config updated — manifest URL ready' : 'Config created — manifest URL ready');
           return;
         }
       }
-      const errText = await res.text().catch(()=>'');
+
+      const errMsg = data?.error?.message || data?.message || JSON.stringify(data).slice(0,120);
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
-        <strong style="color:#f87171">API responded ${res.status}</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">${errText.slice(0,200)||'Check your password and instance URL'}</div>
+        <strong style="color:#f87171">API error ${res.status}</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">${errMsg}</div>
+        ${!uuid ? '<div style="color:#6b7280;font-size:.78rem;margin-top:6px">💡 ElfHosted accounts are pre-provisioned — enter your UUID above to update your existing config instead of creating a new one.</div>' : ''}
       </div>`;
     } catch(e) {
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
         <strong style="color:#f87171">Could not reach API</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">CORS or network error — opening configure page instead. JSON is copied to your clipboard.</div>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">CORS or network error. JSON copied to clipboard — open AIOStreams and paste manually.</div>
       </div>`;
     }
   }
