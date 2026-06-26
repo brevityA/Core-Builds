@@ -1100,18 +1100,47 @@ async function tryInstallToHost(base, tmpl, uuid, pwd) {
   return resolvedUuid ? { base, uuid: resolvedUuid, data } : null;
 }
 
+function manifestCard(base, uuid, showInstall) {
+  const manifestUrl = `${base}/api/stremio/${uuid}/manifest.json`;
+  const stremioUrl  = `https://web.stremio.com/#/?addon=${encodeURIComponent(manifestUrl)}`;
+  const configUrl   = `${base}/stremio/configure`;
+  const safeUrl     = manifestUrl.replace(/"/g, '&quot;');
+  return `<div class="import-success" style="margin-top:12px">
+    <strong>Manifest URL ✓</strong>
+    <div style="color:#6b7280;font-size:.79rem;margin:4px 0 10px">Click to copy — paste into any Stremio-compatible client under Add-ons → Install by URL.</div>
+    <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeUrl}');showToast('Manifest URL copied')" title="Click to copy">${manifestUrl}</div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      ${showInstall ? `<a href="${stremioUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.88rem;text-decoration:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Install to Stremio
+      </a>` : ''}
+      <a href="${configUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.88rem;text-decoration:none">
+        Open AIOStreams →
+      </a>
+    </div>
+  </div>`;
+}
+
 async function openInAIOStreams() {
   const isAuto = S.instanceHost === 'auto';
   const base   = resolvedInstanceUrl();
   if (!isAuto && !base) { showToast('Enter your AIOStreams instance URL first', true); return; }
 
-  const tmpl = build();
-  try { await navigator.clipboard.writeText(JSON.stringify(tmpl, null, 2)); } catch(e) {}
-
   const result = document.getElementById('aioResult');
   const btn    = document.getElementById('btnAio');
   const uuid   = (S.instanceUuid || '').trim();
   const pwd    = S.instancePassword;
+
+  // "Get Manifest URL" tab + known UUID → construct directly, no API call (avoids CORS)
+  if (aioTab === 'manifest' && uuid && !isAuto) {
+    result.innerHTML = manifestCard(base, uuid, false);
+    showToast('Manifest URL ready — click to copy');
+    return;
+  }
+
+  // All other cases: copy JSON first, then try API
+  const tmpl = build();
+  try { await navigator.clipboard.writeText(JSON.stringify(tmpl, null, 2)); } catch(e) {}
 
   if (pwd) {
     const origHtml = btn.innerHTML;
@@ -1128,50 +1157,44 @@ async function openInAIOStreams() {
       }
 
       if (ok) {
-        const manifestUrl = `${ok.base}/api/stremio/${ok.uuid}/manifest.json`;
-        const stremioUrl  = `https://web.stremio.com/#/?addon=${encodeURIComponent(manifestUrl)}`;
-        const configUrl   = `${ok.base}/stremio/configure`;
-        const lbl = uuid && !isAuto ? 'Config updated' : 'Config created';
-        result.innerHTML = `<div class="import-success" style="margin-top:12px">
-          <strong>${lbl} in AIOStreams ✓</strong>
-          <div style="color:#6b7280;font-size:.79rem;margin:4px 0 10px">Your manifest URL — click to copy, or install directly into Stremio.</div>
-          <div class="manifest-url" onclick="navigator.clipboard.writeText('${manifestUrl}');showToast('Manifest URL copied')" title="Click to copy">${manifestUrl}</div>
-          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-            ${aioTab==='direct' ? `<a href="${stremioUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.88rem;text-decoration:none">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Install to Stremio
-            </a>` : ''}
-            <a href="${configUrl}" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.88rem;text-decoration:none">
-              Open AIOStreams →
-            </a>
-          </div>
-        </div>`;
+        result.innerHTML = manifestCard(ok.base, ok.uuid, aioTab === 'direct');
         showToast(uuid && !isAuto ? 'Config updated — manifest ready' : 'Config created — manifest ready');
         btn.disabled = false; btn.innerHTML = origHtml;
         return;
       }
 
+      // Server responded but rejected the request
       const hostHint = S.instanceHost === 'elfhosted' && !uuid
-        ? '<div style="color:#6b7280;font-size:.78rem;margin-top:6px">💡 ElfHosted accounts are pre-provisioned — enter your UUID from the ElfHosted configure page.</div>'
+        ? '<div style="color:#6b7280;font-size:.78rem;margin-top:8px">💡 ElfHosted accounts are pre-provisioned — enter your UUID from the ElfHosted configure page, then switch to Get Manifest URL.</div>'
         : '';
-      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
-        <strong style="color:#f87171">Could not connect to AIOStreams</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">${isAuto ? 'All public hosts failed. JSON copied to clipboard — try a Custom host or paste manually.' : 'Check your URL, UUID, and password. JSON copied to clipboard.'}</div>
+      const configUrl = `${isAuto ? PUBLIC_HOSTS[0] : base}/stremio/configure`;
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px">
+        <strong style="color:#f87171">${isAuto ? 'All public hosts unavailable' : 'API returned an error'}</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">${isAuto ? 'Try a specific host from the dropdown.' : 'Check your UUID and password — config JSON is in your clipboard.'}</div>
         ${hostHint}
+        <div style="margin-top:10px"><a href="${configUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:8px;font-weight:600;font-size:.85rem;text-decoration:none">Open AIOStreams to paste manually →</a></div>
       </div>`;
     } catch(e) {
-      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606">
-        <strong style="color:#f87171">Could not reach API</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">Network or CORS error. JSON copied to clipboard — open AIOStreams and paste manually.</div>
+      // fetch threw — CORS pre-flight blocked or network unreachable
+      const configUrl = `${isAuto ? PUBLIC_HOSTS[0] : base}/stremio/configure`;
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px">
+        <strong style="color:#f87171">Direct API blocked by browser (CORS)</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin-top:4px">The AIOStreams management API can't be called cross-origin from a browser. Config JSON is in your clipboard — open AIOStreams and paste it manually.</div>
+        <div style="margin-top:10px">
+          <a href="${configUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;border-radius:8px;font-weight:700;font-size:.85rem;text-decoration:none">
+            Open AIOStreams →
+          </a>
+        </div>
       </div>`;
     }
     btn.disabled = false; btn.innerHTML = origHtml;
     return;
   }
 
+  // No password — open configure page with JSON already in clipboard
   const openBase = isAuto ? PUBLIC_HOSTS[0] : base;
   window.open(`${openBase}/stremio/configure`, '_blank');
-  showToast('JSON copied — paste in Templates → Import');
+  showToast('JSON copied — paste in AIOStreams → Templates → Import');
 }
 
 render();
