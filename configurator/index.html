@@ -40,14 +40,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opts.c2d{grid-template-columns:1fr}
 .opt input{display:none}
 .opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
-.opt input:checked+label{border-color:#00d4ff;background:#00131c}
+.opt input:checked+label{border-color:#00d4ff;background:#00131c;box-shadow:0 0 0 3px rgba(0,212,255,.15)}
 .opt label:hover{border-color:#005c7a}
-.opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .opt-icon svg{width:36px;height:36px}
+.opt-body{display:flex;flex-direction:column;flex:1;min-width:0}
 .opt-name{font-weight:700;font-size:.88rem;line-height:1.25}
 .opt-desc{color:#8b949e;font-size:.76rem;margin-top:3px;line-height:1.4}
 .opts.c3d .opt label,.opts.c2d .opt label{flex-direction:row;align-items:center;gap:12px;padding:14px}
 .opts.c3d .opt-icon,.opts.c2d .opt-icon{margin-bottom:0}
+.opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:30px;height:30px}
 .name-row label{color:#8b949e;font-size:.82rem;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
 .name-input{width:100%;background:#0d1117;border:2px solid #30363d;border-radius:8px;color:#e6edf3;padding:12px 16px;font-size:1rem;transition:border-color .15s;outline:none}
 .name-input:focus{border-color:#00d4ff}
@@ -106,6 +108,7 @@ details[open] summary svg{transform:rotate(180deg)}
   .opt-name{font-size:.93rem}
   .opt-desc{font-size:.82rem}
   .opts.c3d .opt label,.opts.c2d .opt label{align-items:flex-start;padding:18px}
+  .opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:34px;height:34px}
   .opts.c4d .opt label{padding:16px}
   .summary{grid-template-columns:repeat(3,1fr)}
   .nav{max-width:480px}
@@ -197,7 +200,7 @@ const DEFS = [
       { v:'limited',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto',             desc:'Let device profile decide · safe default' },
     ]
   },
-  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c2d',
+  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c4d',
     opts:[
       { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><text x="22" y="29" text-anchor="middle" fill="#94a3b8" font-size="22" font-weight="900" font-family="system-ui,sans-serif">?</text></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
       { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Live-action',      desc:'Movies & TV · no anime scrapers' },
@@ -219,7 +222,9 @@ function label(key, val) {
 function renderProgress() {
   const pct = ((step - 1) / (STEPS - 1)) * 100;
   document.getElementById('pFill').style.width = pct + '%';
-  document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS}`;
+  const def = DEFS[step - 1];
+  const titles = ['Service','Device','Resolution','Audio','Content','APIs','Review'];
+  document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS} · ${titles[step-1] || ''}`;
 }
 
 function render() {
@@ -393,8 +398,10 @@ function render() {
                 onchange="S['${def.key}']=this.value;syncNext()${def.id === 'service' ? ';updateMultiPanel()' : ''}">
               <label for="o_${o.v}">
                 <div class="opt-icon">${o.icon}</div>
-                <div class="opt-name">${o.name}</div>
-                <div class="opt-desc">${o.desc}</div>
+                <div class="opt-body">
+                  <div class="opt-name">${o.name}</div>
+                  <div class="opt-desc">${o.desc}</div>
+                </div>
               </label>
             </div>`).join('')}
         </div>
