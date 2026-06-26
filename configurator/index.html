@@ -89,6 +89,9 @@ details[open] summary svg{transform:rotate(180deg)}
 .manifest-url{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.78rem;color:#8b949e;word-break:break-all;margin-top:6px;cursor:pointer;transition:border-color .15s}
 .manifest-url:hover{border-color:#00d4ff;color:#00d4ff}
 .notice{background:#0d2317;border:1px solid #2ea043;border-radius:9px;padding:13px 16px;font-size:.83rem;color:#8b949e;margin-top:14px;line-height:1.5}
+.inst-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.inst-chip{display:inline-flex;align-items:center;padding:5px 12px;background:#0d1117;border:1px solid #30363d;border-radius:20px;font-size:.76rem;color:#8b949e;text-decoration:none;transition:border-color .15s,color .15s;white-space:nowrap}
+.inst-chip:hover{border-color:#00d4ff;color:#00d4ff}
 .notice strong{color:#3fb950;display:block;margin-bottom:3px}
 .tag{display:inline-block;background:#1f2937;border:1px solid #374151;border-radius:5px;padding:2px 8px;font-size:.75rem;color:#9ca3af;margin-top:6px;font-family:monospace}
 /* List layout */
@@ -362,8 +365,8 @@ function render() {
                 </button>
               </div>
             </div>
-            <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='elfhosted'?'':'display:none'}">
-              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">— find it at <a href="https://aiostreams.elfhosted.com/stremio/configure" target="_blank" style="color:#00d4ff;text-decoration:none">your ElfHosted configure page</a></span></label>
+            <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">— find it on your instance's configure page</span></label>
               <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 value="${S.instanceUuid}" oninput="S.instanceUuid=this.value.trim()" maxlength="36" style="font-family:monospace;font-size:.88rem">
             </div>
@@ -1111,7 +1114,7 @@ function onHostChange(val) {
   S.instanceHost = val;
   const urlRow  = document.getElementById('aioUrlRow');
   const uuidRow = document.getElementById('aioUuidRow');
-  const showUuid = val === 'elfhosted';
+  const showUuid = val !== 'custom' && val !== 'auto';
   const showUrl  = val === 'custom';
   if (urlRow)  urlRow.style.display  = showUrl  ? '' : 'none';
   if (uuidRow) uuidRow.style.display = showUuid ? '' : 'none';
@@ -1154,16 +1157,25 @@ function buildPublic() {
   return pub;
 }
 
+function instanceChips() {
+  const hosts = [
+    ['ElfHosted',   'https://aiostreams.elfhosted.com/stremio/configure'],
+    ['ForthWeak',   'https://aiostreams.fortheweak.cloud/stremio/configure'],
+    ["Midnight's",  'https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure'],
+    ["Viren's",     'https://aiostreams.viren070.me/stremio/configure'],
+    ["Kuu's",       'https://aiostreams.stremio.ru/stremio/configure'],
+    ['ATBP',        'https://aio.atbphosting.com/stremio/configure'],
+    ["Omni's",      'https://aiostreams.12312023.xyz/stremio/configure'],
+  ];
+  return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}" target="_blank" class="inst-chip">${n}</a>`).join('')}</div>`;
+}
+
 async function createImportUrl() {
   const btn = document.getElementById('btnImport');
   const result = document.getElementById('importUrlResult');
   const origHtml = btn.innerHTML;
   btn.disabled = true; btn.textContent = 'Creating…';
   result.innerHTML = '';
-
-  // Open AIOStreams synchronously before any await (preserves browser gesture for popup permission)
-  const aioBase = resolvedInstanceUrl() || 'https://aiostreams.elfhosted.com';
-  const aioWin = window.open(aioBase + '/stremio/configure', '_blank');
 
   const json = JSON.stringify(buildPublic(), null, 2);
   let url = null;
@@ -1188,12 +1200,12 @@ async function createImportUrl() {
     const safeUrl = url.replace(/"/g,'&quot;');
     result.innerHTML = `<div class="import-success" style="margin-top:10px">
       <strong>Import URL copied ✓</strong>
-      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">AIOStreams is open in a new tab — go to <strong style="color:#e6edf3">Templates → Import</strong> and paste. API keys are stripped — add them in AIOStreams after import.</div>
+      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 2px">Go to <strong style="color:#e6edf3">Templates → Import</strong> and paste. API keys stripped — add after import.</div>
+      ${instanceChips()}
       <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeUrl}');showToast('URL copied')" title="Click to copy">${url}</div>
     </div>`;
-    showToast('Import URL copied — paste in AIOStreams → Templates → Import');
+    showToast('Import URL copied — open an instance and paste in Templates → Import');
   } else {
-    if (aioWin) aioWin.close();
     result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px">
       <strong style="color:#f87171">Could not reach paste service</strong>
       <div style="color:#6b7280;font-size:.79rem;margin-top:4px">Use ⬇ Download instead, then import the file in AIOStreams → Templates → Import.</div>
@@ -1317,10 +1329,13 @@ async function openInAIOStreams() {
     return;
   }
 
-  // No password — open configure page
-  const openBase = isAuto ? PUBLIC_HOSTS[0] : base;
-  window.open(`${openBase}/stremio/configure`, '_blank');
-  showToast('Use ↑ Download or ↑ Create Import URL to import your template');
+  // No password — guide user to set up credentials
+  result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px">
+    <strong style="color:#9ca3af">UUID + password required</strong>
+    <div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Sign up on your AIOStreams instance to get your UUID, then enter it and a password above to get your Stremio install links.</div>
+    <div style="color:#6b7280;font-size:.76rem;margin-bottom:2px">Jump to your instance:</div>
+    ${instanceChips()}
+  </div>`;
 }
 
 render();
