@@ -101,7 +101,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', rpdbKey:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', rpdbKey:'' };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d',
@@ -175,7 +175,7 @@ function render() {
 
   if (step === STEPS) {
     const auto = defaultName();
-    const hasApis = S.tmdbToken || S.rpdbKey;
+    const hasApis = S.tmdbToken || S.tmdbApiKey || S.rpdbKey;
     main.innerHTML = `
       <div class="card">
         <h2>Your Configuration</h2>
@@ -190,7 +190,7 @@ function render() {
           }).join('')}
           ${hasApis ? `<div class="sum-item" style="grid-column:1/-1">
             <div class="sum-lbl">API Keys</div>
-            <div class="sum-val" style="font-weight:400;font-size:.85rem">${S.tmdbToken ? '✓ TMDB access token' : ''}${S.tmdbToken && S.rpdbKey ? ' · ' : ''}${S.rpdbKey ? '✓ RPDB key' : ''}</div>
+            <div class="sum-val" style="font-weight:400;font-size:.85rem">${S.tmdbToken ? '✓ TMDB token' : ''}${S.tmdbApiKey ? (S.tmdbToken ? ' · ' : '') + '✓ TMDB API key' : ''}${S.rpdbKey ? ((S.tmdbToken || S.tmdbApiKey) ? ' · ' : '') + '✓ RPDB key' : ''}</div>
           </div>` : ''}
         </div>
         <div class="name-row">
@@ -218,9 +218,14 @@ function render() {
         <h2>API Keys <span style="color:#8b949e;font-size:.85rem;font-weight:400">(Optional)</span></h2>
         <p class="desc">${def.desc}</p>
         <div class="name-row" style="margin-bottom:16px">
-          <label>TMDB Read Access Token</label>
+          <label>TMDB Read Access Token (v4)</label>
           <input class="name-input" id="tmdbIn" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
             value="" oninput="S.tmdbToken=this.value" maxlength="400">
+        </div>
+        <div class="name-row" style="margin-bottom:16px">
+          <label>TMDB API Key (v3)</label>
+          <input class="name-input" id="tmdbKeyIn" type="text" placeholder="abc123def456…"
+            value="" oninput="S.tmdbApiKey=this.value" maxlength="60">
         </div>
         <div class="name-row">
           <label>RPDB API Key</label>
@@ -229,13 +234,14 @@ function render() {
         </div>
         <div class="notice" style="margin-top:14px">
           <strong>Where to find these</strong>
-          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API → Read Access Token (v4)<br>
+          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API → both the Read Access Token (v4) and API Key (v3) are listed there<br>
           <strong style="color:#8b949e;font-weight:400">RPDB:</strong> ratingposterdb.com → your account → API key (free tier starts with t0-)
         </div>
       </div>`;
     nav.style.display = 'flex';
     document.getElementById('btnBack').style.visibility = 'visible';
     document.getElementById('tmdbIn').value = S.tmdbToken;
+    document.getElementById('tmdbKeyIn').value = S.tmdbApiKey;
     document.getElementById('rpdbIn').value = S.rpdbKey;
     syncNext();
 
@@ -789,7 +795,7 @@ function build() {
       posterService:'rpdb',
       enhanceResults:true,
       tmdbAccessToken:S.tmdbToken || '<template_placeholder>',
-      tmdbApiKey:'<template_placeholder>',
+      tmdbApiKey:S.tmdbApiKey || '<template_placeholder>',
       usePosterRedirectApi:true,
       usePosterServiceForMeta:true,
       maxResults:rc.maxResults,
