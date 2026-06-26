@@ -185,7 +185,7 @@ function render() {
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
-            value="${S.name}" oninput="S.name=this.value" maxlength="60">
+            value="" oninput="S.name=this.value" maxlength="60">
         </div>
         <button class="btn-dl" onclick="generate()">⬇ Generate &amp; Download Template</button>
         <div class="notice">
@@ -195,6 +195,7 @@ function render() {
         </div>
       </div>`;
     nav.style.display = 'none';
+    document.getElementById('nameIn').value = S.name;
   }
 }
 
@@ -237,7 +238,7 @@ function defaultName() {
 function presets() {
   const useStore   = ['alldebrid','realdebrid','premiumize','debridlink'].includes(S.service);
   const hasSeaDex  = S.content !== 'live';
-  const storeLabel = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link'}[S.service] || 'StremThru Store';
+  const storeLabel = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','hybrid':'StremThru RD'}[S.service] || 'StremThru Store';
 
   const lib = {
     type:'library', instanceId:'lib-1', enabled:true,
@@ -317,7 +318,8 @@ function presets() {
       useMultipleInstances:false }
   };
 
-  const list = [lib, zilean, seadex, useStore?store:torz, meteor, comet, mf, hdhub, eztv, tg, knaben, tdb, sub];
+  const isHybrid = S.service === 'hybrid';
+  const list = [lib, zilean, seadex, ...(useStore ? [store] : isHybrid ? [torz, store] : [torz]), meteor, comet, mf, hdhub, eztv, tg, knaben, tdb, sub];
   if (!useStore) list.push(tbSearch);
   return list;
 }
@@ -395,7 +397,7 @@ function visualTags() {
   if (dev==='firestick-4kmax') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='windows')       return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   // generic
-  if (S.resolution==='4k') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (S.resolution==='4k' || S.resolution==='ultrawide') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
 }
 
@@ -698,8 +700,11 @@ function generate() {
   const url    = URL.createObjectURL(blob);
   const a      = document.createElement('a');
   const fname  = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
-  a.href = url; a.download = fname; a.click();
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 render();
