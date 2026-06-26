@@ -246,6 +246,11 @@ function render() {
             value="" oninput="S.name=this.value" maxlength="60">
         </div>
         <button class="btn-dl" onclick="generate()">⬇ Generate &amp; Download Template</button>
+        <button class="btn-aio" onclick="createImportUrl()" id="btnImport">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Create Import URL
+        </button>
+        <div id="importUrlResult"></div>
         <div class="aio-section">
           <h3>Open in AIOStreams</h3>
           <div class="aio-fields">
@@ -939,6 +944,65 @@ function showToast(msg, isError) {
   t.className = 'toast' + (isError ? ' error' : '') + ' show';
   clearTimeout(t._timer);
   t._timer = setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3200);
+}
+
+function buildPublic() {
+  const tmpl = build();
+  const pub = JSON.parse(JSON.stringify(tmpl));
+  if (pub.config) {
+    if (pub.config.tmdbAccessToken && pub.config.tmdbAccessToken !== '<TMDB_READ_ACCESS_TOKEN>') pub.config.tmdbAccessToken = '<TMDB_READ_ACCESS_TOKEN>';
+    if (pub.config.tmdbApiKey && pub.config.tmdbApiKey !== '<TMDB_API_KEY>') pub.config.tmdbApiKey = '<TMDB_API_KEY>';
+    if (pub.config.services) pub.config.services = pub.config.services.map(s => ({ ...s, credentials: {} }));
+  }
+  return pub;
+}
+
+async function createImportUrl() {
+  const btn = document.getElementById('btnImport');
+  const result = document.getElementById('importUrlResult');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  result.innerHTML = '';
+
+  const json = JSON.stringify(buildPublic(), null, 2);
+  let url = null;
+
+  // Try paste.rs
+  try {
+    const r = await fetch('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:json });
+    if (r.ok) url = (await r.text()).trim();
+  } catch(e) {}
+
+  // Fallback: dpaste.com
+  if (!url) {
+    try {
+      const body = new URLSearchParams({ content: json, syntax:'json', expiry_days:'365' });
+      const r = await fetch('https://dpaste.com/api/v2/', { method:'POST', body });
+      if (r.ok) {
+        const t = (await r.text()).trim().replace(/"/g,'');
+        url = t.startsWith('http') ? t + '.txt' : null;
+      }
+    } catch(e) {}
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Create Import URL';
+
+  if (url) {
+    const safeUrl = url.replace(/"/g,'&quot;');
+    result.innerHTML = `<div class="import-success" style="margin-top:10px">
+      <strong>Import URL ready</strong>
+      <div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">AIOStreams → Templates → Import → paste this URL. API keys stripped — add them in AIOStreams after import.</div>
+      <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeUrl}');showToast('URL copied')" title="Click to copy">${url}</div>
+    </div>`;
+    showToast('Import URL ready — click to copy');
+  } else {
+    result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px">
+      <strong style="color:#f87171">Could not reach paste service</strong>
+      <div style="color:#6b7280;font-size:.79rem;margin-top:4px">Use ⬇ Download instead, then import the file in AIOStreams → Templates → Import.</div>
+    </div>`;
+    showToast('Paste service unreachable — try Download instead', true);
+  }
 }
 
 async function openInAIOStreams() {
