@@ -101,7 +101,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', rpdbKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''} };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''} };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d',
@@ -175,7 +175,7 @@ function render() {
 
   if (step === STEPS) {
     const auto = defaultName();
-    const hasApis = S.tmdbToken || S.tmdbApiKey || S.rpdbKey || Object.values(S.creds).some(v=>v);
+    const hasApis = S.tmdbToken || S.tmdbApiKey || Object.values(S.creds).some(v=>v);
     main.innerHTML = `
       <div class="card">
         <h2>Your Configuration</h2>
@@ -193,8 +193,7 @@ function render() {
             <div class="sum-val" style="font-weight:400;font-size:.85rem">${[
               Object.values(S.creds).filter(v=>v).length ? '✓ debrid credentials' : '',
               S.tmdbToken ? '✓ TMDB token' : '',
-              S.tmdbApiKey ? '✓ TMDB API key' : '',
-              S.rpdbKey ? '✓ RPDB key' : ''
+              S.tmdbApiKey ? '✓ TMDB API key' : ''
             ].filter(Boolean).join(' · ')}</div>
           </div>` : ''}
         </div>
@@ -239,21 +238,15 @@ function render() {
           <input class="name-input" id="tmdbIn" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
             value="" oninput="S.tmdbToken=this.value" maxlength="400">
         </div>
-        <div class="name-row" style="margin-bottom:14px">
+        <div class="name-row">
           <label>TMDB API Key (v3)</label>
           <input class="name-input" id="tmdbKeyIn" type="text" placeholder="abc123def456…"
             value="" oninput="S.tmdbApiKey=this.value" maxlength="60">
         </div>
-        <div class="name-row">
-          <label>RPDB API Key</label>
-          <input class="name-input" id="rpdbIn" type="text" placeholder="t0-abcdef123…"
-            value="" oninput="S.rpdbKey=this.value" maxlength="80">
-        </div>
         <div class="notice" style="margin-top:14px">
           <strong>Where to find these</strong>
           ${debridInputs.map(inp => `<strong style="color:#8b949e;font-weight:400">${inp.label.replace(' API Key','')}:</strong> ${inp.where}<br>`).join('')}
-          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API (both keys listed there)<br>
-          <strong style="color:#8b949e;font-weight:400">RPDB:</strong> ratingposterdb.com → your account → API key (free tier: t0-…)
+          <strong style="color:#8b949e;font-weight:400">TMDB:</strong> themoviedb.org → Settings → API (both keys listed there)
         </div>
       </div>`;
     nav.style.display = 'flex';
@@ -264,7 +257,6 @@ function render() {
     });
     document.getElementById('tmdbIn').value = S.tmdbToken;
     document.getElementById('tmdbKeyIn').value = S.tmdbApiKey;
-    document.getElementById('rpdbIn').value = S.rpdbKey;
     syncNext();
 
   } else {
@@ -834,7 +826,7 @@ function build() {
       excludedRegexPatterns:[],
       addonCategoryColors:{Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
       mergedCatalogs:[],
-      rpdbApiKey:S.rpdbKey || 't0-free-rpdb',
+      rpdbApiKey:'t0-free-rpdb',
       posterService:'rpdb',
       enhanceResults:true,
       tmdbAccessToken:S.tmdbToken || '<template_placeholder>',
