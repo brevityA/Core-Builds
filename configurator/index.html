@@ -6,8 +6,8 @@
 <title>Core Builds — Template Configurator</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px}
-.wrap{width:100%;max-width:700px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#e6edf3;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
+.wrap{width:100%;max-width:700px;flex:1;display:flex;flex-direction:column}
 .hdr{margin-bottom:22px}
 .hdr-banner{display:flex;align-items:center;gap:16px;background:#080c10;border:1px solid #162030;border-radius:14px;padding:18px 22px;margin-bottom:16px;position:relative;overflow:hidden}
 .hdr-banner::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.035) 1px,transparent 1px);background-size:56px 56px;pointer-events:none}
@@ -24,7 +24,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .prog-track{background:#21262d;border-radius:4px;height:5px;overflow:hidden}
 .prog-fill{background:linear-gradient(90deg,#0891b2,#00d4ff);height:100%;transition:width .35s ease;border-radius:4px}
 .prog-label{color:#8b949e;font-size:.75rem;text-align:right;margin-top:5px;letter-spacing:.03em}
-.card{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:28px;margin-bottom:14px;animation:fadeIn .2s ease}
+.card{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:28px;margin-bottom:14px;animation:fadeIn .2s ease;flex:1;display:flex;flex-direction:column}
+#main{flex:1;display:flex;flex-direction:column}
+.opts{align-content:start}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .card h2{font-size:1.15rem;font-weight:700;margin-bottom:5px}
 .card .desc{color:#8b949e;font-size:.88rem;margin-bottom:20px;line-height:1.5}
@@ -50,7 +52,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .sum-item{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 14px}
 .sum-lbl{color:#8b949e;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
 .sum-val{font-weight:700;font-size:.9rem;margin-top:3px;color:#e6edf3}
-.nav{display:flex;gap:12px;margin-top:6px}
+.nav{display:flex;gap:12px;margin-top:6px;position:sticky;bottom:16px;z-index:10}
+.nav::before{content:'';position:absolute;inset:-20px -16px 0;background:linear-gradient(to bottom,transparent,#0d1117 35%);pointer-events:none;z-index:-1}
 .btn{padding:12px 28px;border-radius:9px;border:none;font-size:.97rem;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
 .btn:hover{opacity:.86}
