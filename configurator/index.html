@@ -214,7 +214,7 @@ function render() {
         </div>
       </div>`;
     nav.style.display = 'none';
-    document.getElementById('nameIn').value = S.name;
+    document.getElementById('nameIn').value = S.name || defaultName();
 
   } else if (def.id === 'apis') {
     const debridInputs = getDebridInputs();
@@ -366,17 +366,25 @@ function ruid() {
 function sid() { return Math.random().toString(36).substring(2,8); }
 
 function defaultName() {
-  let svc;
-  if (S.service === 'multi') {
+  const res = S.resolution;
+  const svc = S.service;
+  const is4k = res === '4k';
+  const isUW = res === 'ultrawide';
+  const names = {
+    'torbox-pro':  is4k ? 'Core Nexus 4K Apex'        : isUW ? 'Core Nexus Ultrawide'            : 'Core Nexus Stream',
+    'torbox-ess':  is4k ? 'Core Nexus 4K Essential'   : isUW ? 'Core Nexus Essential Ultrawide'  : 'Core Nexus Essential',
+    'alldebrid':   is4k ? 'Core Nexus 4K AllDebrid'   : isUW ? 'Core Nexus AllDebrid Ultrawide'  : 'Core Nexus AllDebrid',
+    'realdebrid':  is4k ? 'Core Nexus 4K RD'          : isUW ? 'Core Nexus RD Ultrawide'         : 'Core Nexus RD',
+    'premiumize':  is4k ? 'Core Nexus 4K Premiumize'  : isUW ? 'Core Nexus Premiumize Ultrawide' : 'Core Nexus Premiumize',
+    'debridlink':  is4k ? 'Core Nexus 4K Debrid-Link' : isUW ? 'Core Nexus Debrid-Link Ultrawide': 'Core Nexus Debrid-Link',
+    'hybrid':      is4k ? 'Core Nexus 4K Hybrid'      : isUW ? 'Core Nexus Hybrid Ultrawide'     : 'Core Nexus Hybrid',
+  };
+  if (svc === 'multi') {
     const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL'};
-    svc = 'Multi (' + S.multiServices.map(s => abbr[s] || s).join('+') + ')';
-  } else {
-    svc = {'torbox-pro':'TorBox Pro','torbox-ess':'TorBox Essential',
-      'alldebrid':'AllDebrid','realdebrid':'Real-Debrid',
-      'premiumize':'Premiumize','debridlink':'Debrid-Link','hybrid':'Hybrid'}[S.service] || '';
+    const svcs = S.multiServices.map(s => abbr[s] || s).join('+');
+    return `Core Nexus${is4k?' 4K':''} Multi (${svcs})${isUW?' Ultrawide':''}`.trim();
   }
-  const res = {'4k':'4K','1080p':'1080p','ultrawide':'Ultrawide'}[S.resolution] || '';
-  return `Core Nexus Custom ${svc} ${res}`.trim();
+  return names[svc] || 'Core Nexus Custom';
 }
 
 function presets() {
