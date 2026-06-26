@@ -437,3 +437,150 @@
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
+      a.href = url; a.download = 'core-build-template.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      showToast('Template downloaded successfully');
+    }
+
+    // --- AIOStreams API & Deep Linking --- //
+
+    function resolvedInstanceUrl() {
+      if (HOST_URLS[S.instanceHost]) return HOST_URLS[S.instanceHost];
+      return (S.instanceUrl || '').trim().replace(/\/$/, '');
+    }
+
+    async function tryInstallToHost(base, tmpl, uuid, pwd) {
+      const endpoint = uuid ? `${base}/api/v1/user/${uuid}` : `${base}/api/v1/user`;
+      const method   = uuid ? 'PATCH' : 'POST';
+      const body     = uuid ? JSON.stringify({ config: tmpl.config, password: pwd }) : JSON.stringify({ config: tmpl, password: pwd });
+      
+      const res = await fetch(endpoint, { method, headers: {'Content-Type': 'application/json'}, body });
+      const data = await res.json().catch(()=>({}));
+      if (!res.ok || data?.success === false) return null;
+      
+      const resolvedUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
+      return resolvedUuid ? { base, uuid: resolvedUuid, data } : null;
+    }
+
+    function manifestCard(base, uuid, pwd) {
+      const manifestUrl = pwd ? `${base}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json` : `${base}/stremio/${uuid}/manifest.json`;
+      const desktopUrl  = manifestUrl.replace(/^https?:\/\//, 'stremio://');
+      const webUrl      = `https://web.stremio.com/#/addons?addon=${encodeURIComponent(manifestUrl)}`;
+      const safeUrl     = manifestUrl.replace(/"/g, '&quot;');
+      const btnBase     = 'display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;text-decoration:none';
+      
+      return `<div class="import-success" style="margin-top:12px">
+        <strong>Manifest URL Generated ✓</strong>
+        <div style="color:var(--text-muted);font-size:.79rem;margin:4px 0 10px">Your configuration was saved to AIOStreams. Use the buttons below to install it into Stremio.</div>
+        <div class="manifest-url" onclick="navigator.clipboard.writeText('${safeUrl}');" title="Click to copy">${manifestUrl}</div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <a href="${desktopUrl}" style="flex:1;${btnBase};background:var(--btn-next-bg);color:#000">▶ Install (App)</a>
+          <a href="${webUrl}" target="_blank" style="flex:1;${btnBase};background:#1a1f2e;border:1px solid var(--accent-cyan);color:var(--accent-cyan)">🌐 Install (Web)</a>
+        </div>
+      </div>`;
+    }
+
+    async function installToStremio() {
+      const base = resolvedInstanceUrl();
+      if (!base) { showToast('Enter your AIOStreams instance URL', true); return; }
+
+      const result = document.getElementById('aioResult');
+      const btn = document.getElementById('btnAio');
+      const uuid = S.instanceUuid.trim();
+      const pwd = S.instancePassword;
+
+      if (!pwd && !uuid) {
+        showToast('Please generate a password or provide an existing UUID', true);
+        return;
+      }
+
+      const origHtml = btn.innerHTML;
+      btn.disabled = true; btn.textContent = 'Connecting to AIOStreams...';
+      result.innerHTML = '';
+
+      try {
+        const tmpl = build();
+        const ok = await tryInstallToHost(base, tmpl, uuid, pwd);
+        
+        if (ok) {
+          result.innerHTML = manifestCard(ok.base, ok.uuid, pwd);
+          showToast('Config saved — manifest ready');
+          // If this was a new creation, populate UUID for future updates
+          if (!uuid) {
+            S.instanceUuid = ok.uuid;
+            const uuidInput = document.getElementById('aioUuid');
+            if (uuidInput) uuidInput.value = ok.uuid;
+          }
+        } else {
+          result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;">
+            <strong style="color:#f87171">API returned an error</strong>
+            <div style="color:var(--text-muted);font-size:.8rem;margin:6px 0">Check your instance URL and password. Or download the file manually to import.</div>
+          </div>`;
+          showToast('Failed to connect to AIOStreams API', true);
+        }
+      } catch (e) {
+        result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;">
+          <strong style="color:#f87171">Could not reach instance</strong>
+          <div style="color:var(--text-muted);font-size:.8rem;margin:6px 0">Network error or CORS blockage. Use ⬇ Download instead.</div>
+        </div>`;
+      }
+
+      btn.disabled = false; btn.innerHTML = origHtml;
+    }
+
+    // --- Global Event Delegation --- //
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btnNext').addEventListener('click', () => { if (step < STEPS) { step++; render(); window.scrollTo(0,0); } });
+      document.getElementById('btnBack').addEventListener('click', () => { if (step > 1) { step--; render(); window.scrollTo(0,0); } });
+
+      document.addEventListener('change', (e) => {
+        if (e.target.dataset.action === 'update-radio') { S[e.target.dataset.key] = e.target.value; syncNext(); }
+        if (e.target.dataset.action === 'update-host') {
+          S.instanceHost = e.target.value;
+          const urlRow = document.getElementById('aioUrlRow');
+          if (urlRow) urlRow.style.display = S.instanceHost === 'custom' ? '' : 'none';
+        }
+      });
+      
+      document.addEventListener('input', (e) => {
+        if (e.target.dataset.action === 'update-name') S.name = e.target.value;
+        if (e.target.dataset.action === 'update-api') S.creds[e.target.dataset.service] = e.target.value;
+        if (e.target.dataset.action === 'update-tmdb') S.tmdbToken = e.target.value;
+        if (e.target.dataset.action === 'update-instance-url') S.instanceUrl = e.target.value;
+        if (e.target.dataset.action === 'update-pwd') S.instancePassword = e.target.value;
+        if (e.target.dataset.action === 'update-uuid') S.instanceUuid = e.target.value;
+      });
+      
+      document.addEventListener('click', (e) => {
+        const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
+        if (!action) return;
+        
+        if (action === 'download') generate();
+        if (action === 'install-stremio') installToStremio();
+        if (action === 'toggle-pwd') {
+          const el = document.getElementById('aioPwd');
+          const eye = document.getElementById('pwdEye');
+          if (!el) return;
+          const show = el.type === 'password';
+          el.type = show ? 'text' : 'password';
+          if (eye) eye.style.color = show ? 'var(--accent-cyan)' : 'var(--text-dark)';
+        }
+        if (action === 'gen-pwd') {
+          const arr = new Uint8Array(4); crypto.getRandomValues(arr);
+          const pwd = `${PWD_WORDS[arr[0]%PWD_WORDS.length]}${PWD_WORDS[arr[1]%PWD_WORDS.length]}${PWD_WORDS[arr[2]%PWD_WORDS.length]}${100+(arr[3]%900)}`;
+          S.instancePassword = pwd;
+          const el = document.getElementById('aioPwd');
+          if (el) { el.value = pwd; el.type = 'text'; }
+          showToast('Password generated');
+        }
+      });
+
+      render(); // Initial Render
+    });
+  </script>
+</body>
+</html>
