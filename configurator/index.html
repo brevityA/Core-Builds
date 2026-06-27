@@ -1143,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'copy-wuplay') {
       const url = e.target.dataset.url || e.target.closest('[data-action="copy-wuplay"]')?.dataset.url;
-      navigator.clipboard.writeText(url).then(() => showToast('Copied! Paste into WuPlay → Addons → Add Addon'));
+      navigator.clipboard.writeText(url).then(() => showToast('Copied! Paste into WuPlay configurer → Addons'));
     }
     if (action === 'toggle-pref') {
       const key = (e.target.closest('[data-action="toggle-pref"]') || e.target).dataset.key;
@@ -1504,7 +1504,7 @@ function showManifestModal(manifestUrl, password, hostLabel) {
   const FMTS = [
     { key:'app',    label:'Stremio App', getUrl: u => u.replace(/^https?:\/\//, 'stremio://'), action:'link' },
     { key:'web',    label:'Web',         getUrl: u => `https://web.stremio.com/#/addons?addon=${encodeURIComponent(u)}`, action:'link' },
-    { key:'wuplay', label:'WuPlay',      getUrl: u => u, action:'copy' },
+    { key:'wuplay', label:'WuPlay',      getUrl: u => u, action:'open', configUrl:'https://config.wuplay.app/#addons' },
     { key:'nuvio',  label:'Nuvio',       getUrl: u => u, action:'copy' },
   ];
   const qrSrc = u => `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=00d4ff&bgcolor=0d1117&qzone=2&data=${encodeURIComponent(u)}`;
@@ -1577,7 +1577,7 @@ function showManifestModal(manifestUrl, password, hostLabel) {
   const BTN_LABELS = [
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install`,
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web`,
-    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`,
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open WuPlay`,
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`,
   ];
 
@@ -1594,6 +1594,10 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       actionBtn.href = url;
       actionBtn.target = fi === 1 ? '_blank' : '';
       actionBtn.onclick = null;
+    } else if (f.action === 'open') {
+      actionBtn.href = f.configUrl;
+      actionBtn.target = '_blank';
+      actionBtn.onclick = () => { navigator.clipboard.writeText(url).catch(() => {}); };
     } else {
       actionBtn.href = '#';
       actionBtn.target = '';
@@ -1602,7 +1606,9 @@ function showManifestModal(manifestUrl, password, hostLabel) {
         navigator.clipboard.writeText(url).then(() => showToast(`Copied! Paste into ${f.label} → Addons`));
       };
     }
-    document.getElementById('mUrlLabel').textContent = fi >= 2 ? 'Manifest URL (paste into app)' : 'Manifest URL';
+    document.getElementById('mUrlLabel').textContent =
+      fi === 2 ? 'Manifest URL — copy then paste in WuPlay' :
+      fi === 3 ? 'Manifest URL (paste into app)' : 'Manifest URL';
     document.getElementById('mCopyUrl').textContent = 'Copy';
     document.getElementById('mCopyUrl').classList.remove('copied');
   }
