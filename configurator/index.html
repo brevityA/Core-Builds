@@ -285,8 +285,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .step-lbl{font-size:.52rem;font-weight:600;color:#374151;margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:36px}
 .step-active .step-lbl{color:#00d4ff;font-weight:700}
 .step-done .step-lbl{color:#4b7c93}
-.btn-reset-strip{background:none;border:none;color:#374151;font-size:.85rem;cursor:pointer;padding:4px 2px;border-radius:4px;transition:color .15s;flex-shrink:0;align-self:flex-start;margin-top:4px;line-height:1}
-.btn-reset-strip:hover{color:#00d4ff}
+.btn-reset-strip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)!important;color:#4b5563;font-size:.6rem;font-weight:700;cursor:pointer;padding:4px 10px;border-radius:20px;transition:all .15s;flex-shrink:0;align-self:center;letter-spacing:.05em;text-transform:uppercase;line-height:1.4}
+.btn-reset-strip:hover{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.25)!important;color:#f87171}
 .bc-row{display:flex;flex-wrap:nowrap;gap:5px;padding:1px 0 7px;overflow-x:auto;scrollbar-width:none}
 .bc-row::-webkit-scrollbar{display:none}
 .bc-chip{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#001018;border:1px solid #1a3040;color:#3d9db5;white-space:nowrap;flex-shrink:0}
@@ -468,16 +468,23 @@ function renderOpts(def) {
   const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
   const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
-  if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:10px">' +
+  if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:8px">' +
     FORMATTERS.map(f => {
       const on = S.formatter === f.id;
-      return `<div data-action="set-formatter" data-val="${f.id}" style="border:2px solid ${on?'#00d4ff':'#30363d'};border-radius:12px;background:${on?'#00131c':'#0d1117'};cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s;box-shadow:${on?'0 0 0 3px rgba(0,212,255,.15)':'none'}">` +
-        `<img src="${f.img}" alt="${f.label} preview" style="width:100%;display:block;border-bottom:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'">` +
-        `<div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">` +
-        `<span class="fmt-lbl" style="font-weight:800;font-size:1rem;color:${on?'#00d4ff':'#e6edf3'};min-width:64px">${f.label}</span>` +
-        `<span style="font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:5px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
-        `<span style="color:#6b7280;font-size:.85rem">${f.desc}</span>` +
-        `</div><div class="fmt-preview-wrap" style="display:${on?'block':'none'};padding:0 14px 14px"><div style="color:#4b5563;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">Stream Preview</div>${fmtPreviewHtml(f.id)}</div></div>`;
+      return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+              <span class="fmt-lbl" style="font-weight:700;font-size:.9rem;color:${on?'#00d4ff':'#e6edf3'}">${f.label}</span>
+              <span style="font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:5px;background:${f.bc}22;color:${f.bc}">${f.badge}</span>
+            </div>
+            <div style="color:#6b7280;font-size:.72rem">${f.desc}</div>
+          </div>
+          ${on ? '<span style="color:#00d4ff;font-size:.9rem;flex-shrink:0">✓</span>' : '<span style="color:#374151;font-size:.9rem;flex-shrink:0">›</span>'}
+        </div>
+        <div class="fmt-preview-wrap" style="padding:0 13px 11px;${on?'':'display:none'}">${fmtPreviewHtml(f.id)}</div>
+      </div>`;
     }).join('') +
   '</div>';
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
@@ -616,7 +623,7 @@ function renderProgress() {
   }).join('');
 
   const strip = document.getElementById('stepStrip');
-  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Reset progress">↺</button></div>`;
+  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Reset all choices">↺ Reset</button></div>`;
 
   // Breadcrumb chips — show completed selections
   const chips = keys.slice(0, step - 1).map((k, i) => {
@@ -992,13 +999,15 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-formatter"]').forEach(card => {
         const on = card.dataset.val === S.formatter;
-        card.style.borderColor = on ? '#00d4ff' : '#30363d';
-        card.style.background  = on ? '#00131c' : '#0d1117';
-        card.style.boxShadow   = on ? '0 0 0 3px rgba(0,212,255,.15)' : 'none';
+        card.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.1)';
+        card.style.background  = on ? 'rgba(0,212,255,.07)' : 'rgba(8,12,18,.9)';
+        card.style.boxShadow   = on ? '0 0 0 3px rgba(0,212,255,.1)' : 'none';
         const lbl = card.querySelector('.fmt-lbl');
         if (lbl) lbl.style.color = on ? '#00d4ff' : '#e6edf3';
         const pw = card.querySelector('.fmt-preview-wrap');
-        if (pw) pw.style.display = on ? 'block' : 'none';
+        if (pw) pw.style.display = on ? '' : 'none';
+        const arr = card.querySelector('[style*="flex-shrink:0"]');
+        if (arr && (arr.textContent === '✓' || arr.textContent === '›')) arr.textContent = on ? '✓' : '›';
       });
     }
   });
