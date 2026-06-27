@@ -1556,13 +1556,13 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       </div>
       <details style="margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
         <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.03em;user-select:none">
-          <span>🎮 Install via Stremio Auth Key</span><span style="font-size:.7rem">›</span>
+          <span>🎮 Push to Stremio Library</span><span style="font-size:.7rem">›</span>
         </summary>
-        <div style="margin-top:10px">
-          <div style="color:#6b7280;font-size:.72rem;line-height:1.5;margin-bottom:8px">Paste your key to push directly into your Stremio library. Get it from <strong style="color:#8b949e">web.stremio.com</strong> console: <code style="background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px;font-size:.68rem">JSON.parse(localStorage.getItem('profile')).auth.key</code></div>
-          <input id="stremioAuthKey" type="password" placeholder="Paste your Stremio auth key…" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;font-family:monospace;outline:none;margin-bottom:8px">
-          <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s">📥 Add to My Stremio Library</button>
-          <div id="stremioInstallResult" style="margin-top:8px;font-size:.75rem"></div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+          <input id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <input id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s">📥 Log in &amp; Install</button>
+          <div id="stremioInstallResult" style="font-size:.75rem"></div>
         </div>
       </details>
     </div>`;
@@ -1642,13 +1642,19 @@ function showManifestModal(manifestUrl, password, hostLabel) {
   document.addEventListener('keydown', escKey);
 
   document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
-    const authKey = document.getElementById('stremioAuthKey').value.trim();
-    const resEl   = document.getElementById('stremioInstallResult');
-    const btn     = document.getElementById('stremioInstallBtn');
-    if (!authKey) { resEl.innerHTML = `<span style="color:#f87171">Paste your auth key first.</span>`; return; }
-    btn.disabled = true; btn.textContent = 'Installing…'; resEl.innerHTML = '';
+    const email    = document.getElementById('stremioEmail').value.trim();
+    const password = document.getElementById('stremioPassword').value;
+    const resEl    = document.getElementById('stremioInstallResult');
+    const btn      = document.getElementById('stremioInstallBtn');
+    if (!email || !password) { resEl.innerHTML = `<span style="color:#f87171">Enter your Stremio email and password.</span>`; return; }
+    btn.disabled = true; btn.textContent = 'Signing in…'; resEl.innerHTML = '';
     try {
       const SAPI = 'https://api.strem.io/api/';
+      const loginRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'Login', email, password, facebook:false }) });
+      const loginData = await loginRes.json();
+      const authKey = loginData?.result?.authKey;
+      if (!authKey) throw new Error(loginData?.error || 'Login failed — check your email and password.');
+      btn.textContent = 'Installing…';
       const getRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionGet', authKey, update:true }) });
       const getData = await getRes.json();
       if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
@@ -1663,7 +1669,7 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       btn.textContent = '✓ Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
       resEl.innerHTML = already ? `<span style="color:#f59e0b">Already in your library.</span>` : `<span style="color:#3fb950">Done — reopen Stremio to see it.</span>`;
     } catch(err) {
-      btn.disabled = false; btn.textContent = '📥 Add to My Stremio Library';
+      btn.disabled = false; btn.textContent = '📥 Log in &amp; Install';
       resEl.innerHTML = `<span style="color:#f87171">${err.message}</span>`;
     }
   });
