@@ -103,15 +103,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .size-btn-active{border-color:#00d4ff!important;background:#00131c!important;color:#00d4ff!important}
 /* List layout */
 .opts.list{grid-template-columns:1fr}
-.opts.list .opt label{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
+.opts.list .opt label{flex-direction:row;align-items:center;gap:14px;padding:13px 16px;border-color:rgba(255,255,255,.1)}
 .opts.list .opt-icon{margin-bottom:0}
-.opts.list .opt-icon svg{width:28px;height:28px}
+.opts.list .opt-icon svg{width:28px;height:28px;filter:drop-shadow(0 0 5px rgba(255,255,255,.12))}
+.opts.list .opt input:checked+label .opt-icon svg{filter:drop-shadow(0 0 10px rgba(0,212,255,.4))}
 /* Pill layout */
 .opts.pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:transparent;border:none;padding:0}
 .opts.pills .opt{flex:1}
-.opts.pills .opt label{flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.07);background:rgba(13,17,23,.7);color:#6b7280;height:auto;text-align:center}
-.opts.pills .opt label:hover{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.03);color:#e6edf3}
-.opts.pills .opt input:checked+label{background:rgba(0,212,255,.07);color:#00d4ff;border-color:rgba(0,212,255,.4);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 16px rgba(0,150,180,.1)}
+.opts.pills .opt label{flex-direction:column;align-items:center;gap:8px;padding:18px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(8,12,18,.9);color:#6b7280;height:auto;text-align:center}
+.opts.pills .opt label:hover{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.04);color:#e6edf3}
+.opts.pills .opt input:checked+label{background:rgba(0,212,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.4);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 20px rgba(0,150,180,.12)}
+.opts.pills .opt-icon svg{filter:drop-shadow(0 0 6px rgba(255,255,255,.1))}
+.opts.pills .opt input:checked+label .opt-icon svg{filter:drop-shadow(0 0 12px rgba(0,212,255,.35))}
 .opts.pills .opt-icon{margin-bottom:0}
 .opts.pills .opt-icon svg{width:30px;height:30px}
 .opts.pills .opt-body{align-items:center}
@@ -131,6 +134,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .hero-sub .opt-icon svg{width:24px;height:24px}
 .hero-sub .opt-name{font-size:.84rem}
 .hero-sub .opt-desc{font-size:.7rem;margin-top:2px}
+/* Service vertical list layout (variant B) */
+.svc-list{display:flex;flex-direction:column;gap:7px}
+.svc-list-hero label{flex-direction:row!important;align-items:flex-start!important;gap:14px!important;padding:14px 16px!important;border-radius:12px!important;background:rgba(0,212,255,.04)!important;border-color:rgba(0,212,255,.16)!important}
+.svc-list-hero .opt-icon{margin-bottom:0!important;flex-shrink:0}
+.svc-list-hero .opt-icon svg{width:36px!important;height:36px!important}
+.svc-list-hero input:checked+label{background:rgba(0,212,255,.08)!important;border-color:rgba(0,212,255,.4)!important}
+.svc-hero-badge{font-size:.58rem;font-weight:800;letter-spacing:.1em;color:#00d4ff;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.22);border-radius:20px;padding:1px 8px;margin-left:7px;vertical-align:middle;white-space:nowrap}
+.svc-hero-tags{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.svc-hero-tag{font-size:.6rem;font-weight:600;background:rgba(255,255,255,.04);border:1px solid #1e2d3d;border-radius:8px;padding:2px 7px;color:#9ca3af}
+.svc-list-row label{flex-direction:row!important;align-items:center!important;gap:12px!important;padding:11px 14px!important;border-radius:11px!important}
+.svc-list-row .opt-icon{margin-bottom:0!important;flex-shrink:0}
+.svc-list-row .opt-icon svg{width:28px!important;height:28px!important}
+.svc-list-row .opt-name{font-size:.86rem!important}
+.svc-list-row .opt-desc{font-size:.69rem!important;margin-top:1px!important}
+.svc-list-arr{color:#374151;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
+.svc-list-row input:checked+label .svc-list-arr{color:#00d4ff}
 @media(min-width:720px){
   .wrap{max-width:980px}
   .card{padding:36px}
@@ -357,7 +376,7 @@ const FORMATTERS = [
 ];
 
 const DEFS = [
-  { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'hero',
+  { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'svc-list',
     opts:[
       { v:'torbox-pro',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="#051408"/><polygon points="22,14 30,18 22,22 14,18" fill="#1a5c2a"/><polygon points="14,18 14,27 22,31 22,22" fill="#166534"/><polygon points="22,22 30,18 30,27 22,31" fill="#15803d"/><path d="M27 20 L22 26 L25 26 L23 31 L28 24 L25 24 Z" fill="#fde047"/></svg>', name:'TorBox Pro', desc:'Best pick — full scraper stack + HdHub<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Stream · 4K Apex</span>' },
       { v:'torbox-ess',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#16a34a" stroke-width="2" fill="#041008"/><polygon points="22,15 30,19 22,23 14,19" fill="#14532d"/><polygon points="14,19 14,28 22,32 22,23" fill="#166534"/><polygon points="22,23 30,19 30,28 22,32" fill="#15803d"/><text x="22" y="12" text-anchor="middle" fill="#16a34a" font-size="5" font-weight="700" font-family="system-ui,sans-serif">ESS</text></svg>', name:'TorBox Essential', desc:'Essential plan — same smart sorting<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Essential · 4K Essential</span>' },
@@ -460,6 +479,43 @@ function renderOpts(def) {
   '</div>';
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
+  if (def.layout === 'svc-list') {
+    const SVC_TAGS = {
+      'torbox-pro': ['4K Apex','Stream','Flash','Speed','Anime'],
+      'torbox-ess': ['4K Essential','Essential'],
+      'alldebrid':  ['4K AllDebrid','AllDebrid'],
+      'realdebrid': ['Core Nexus RD'],
+      'premiumize': ['Core Nexus Premiumize'],
+      'debridlink': ['Debrid-Link'],
+      'hybrid':     ['4K Hybrid','Hybrid'],
+    };
+    const SVC_DESC = {
+      'torbox-pro': 'Full scraper stack · HdHub · best results',
+      'torbox-ess': 'Same smart sorting, Essential plan',
+      'alldebrid':  'AllDebrid subscribers',
+      'realdebrid': 'Real-Debrid subscribers',
+      'premiumize': 'Premiumize subscribers',
+      'debridlink': 'Debrid-Link subscribers',
+      'hybrid':     'TorBox Pro + Real-Debrid fallback',
+      'multi':      'Mix two or more services',
+    };
+    const hero = def.opts[0];
+    const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
+    const heroHtml = `<div class="svc-list-hero opt">${inp(hero)}<label for="o_${hero.v}">
+      <div class="opt-icon">${hero.icon}</div>
+      <div class="opt-body">
+        <div class="opt-name">${hero.name} <span class="svc-hero-badge">★ POPULAR</span></div>
+        <div class="opt-desc">${SVC_DESC[hero.v] || ''}</div>
+        ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
+      </div>
+    </label></div>`;
+    const rowsHtml = def.opts.slice(1).map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+      <div class="opt-icon">${o.icon}</div>
+      <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
+      <span class="svc-list-arr">›</span>
+    </label></div>`).join('');
+    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>`;
+  }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
     return `<div class="hero-wrap">
@@ -624,8 +680,10 @@ function render() {
 
   if (step === 0) {
     main.innerHTML = splashHtml();
+    main.style.justifyContent = 'center';
     return;
   }
+  main.style.justifyContent = '';
 
   const def  = DEFS[step - 1];
 
@@ -750,10 +808,25 @@ function render() {
 
   } else if (def.id === 'apis') {
     const debridInputs = getDebridInputs();
+    const ringC = 131.9, ringPct = (step - 1) / (STEPS - 1);
     main.innerHTML = `
       <div class="card">
-        <h2>API Keys <span style="color:#8b949e;font-size:.85rem;font-weight:400">(Optional)</span></h2>
-        <p class="desc">${def.desc}</p>
+        <div class="srh">
+          <div class="srh-ring">
+            <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
+                stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC*(1-ringPct)).toFixed(1)}"
+                stroke-linecap="round" transform="rotate(-90 26 26)"/>
+            </svg>
+            <div class="srh-num">${step}</div>
+          </div>
+          <div>
+            <div class="srh-title">${def.title} <span style="font-size:.72rem;font-weight:600;color:#374151;letter-spacing:.04em">OPTIONAL</span></div>
+            <div class="srh-sub">${def.desc}</div>
+          </div>
+        </div>
         ${debridInputs.length ? `
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
         ${debridInputs.map(inp => `
@@ -832,6 +905,8 @@ function syncNext() {
     btn.innerHTML = `<span style="flex:1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
   } else if (val) {
     btn.innerHTML = `<div style="flex:1"><div class="cta-step-lbl">${def.title}</div><div class="cta-step-val">${val}</div></div><span class="cta-arr">→</span>`;
+  } else if (!def.key) {
+    btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
   } else {
     btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;opacity:.5">Select one to continue</span><span class="cta-arr" style="opacity:.3">→</span>`;
   }
