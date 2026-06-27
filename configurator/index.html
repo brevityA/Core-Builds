@@ -42,8 +42,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opts.c3d{grid-template-columns:1fr}
 .opts.c2d{grid-template-columns:1fr}
 .opt input{display:none}
-.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:15px 13px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
+.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:15px 13px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none;position:relative}
 .opt input:checked+label{border-color:#00d4ff;background:#00131c;box-shadow:0 0 0 3px rgba(0,212,255,.15)}
+.opt input:checked+label::after{content:'✓';position:absolute;top:7px;right:7px;width:18px;height:18px;background:#00d4ff;color:#0d1117;border-radius:50%;font-size:.65rem;font-weight:900;display:grid;place-items:center}
 .opt label:hover{border-color:#005c7a}
 .opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .opt-icon svg{width:42px;height:42px}
@@ -242,6 +243,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .hex-glow-layer{animation:hexBreath 2.6s ease-in-out infinite}
 .hdr-core{animation:coreTextPulse 2.6s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.diamond-core,.diamond-glow,.core-ring,.hex-glow-layer,.hdr-core{animation:none}}
+.step-strip{display:flex;align-items:flex-start;padding:8px 0 4px;position:relative}
+.step-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0}
+.step-unit:not(:first-child)::before{content:'';position:absolute;top:14px;right:50%;width:100%;height:2px;background:#21262d;z-index:0;transition:background .3s}
+.step-unit.done::before{background:#00d4ff}
+.step-bub{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;position:relative;z-index:1;flex-shrink:0;transition:all .2s}
+.step-pending .step-bub{background:#161b22;border:2px solid #21262d;color:#4b5563}
+.step-active .step-bub{background:linear-gradient(135deg,#0096b4,#005a8a);border:2px solid #00d4ff;color:#fff;box-shadow:0 0 12px rgba(0,212,255,.4)}
+.step-done .step-bub{background:#00131c;border:2px solid #00d4ff;color:#00d4ff;font-size:.6rem}
+.step-lbl{font-size:.52rem;font-weight:600;color:#374151;margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:36px}
+.step-active .step-lbl{color:#00d4ff;font-weight:700}
+.step-done .step-lbl{color:#4b7c93}
+.btn-reset-strip{background:none;border:none;color:#374151;font-size:.85rem;cursor:pointer;padding:4px 2px;border-radius:4px;transition:color .15s;flex-shrink:0;align-self:flex-start;margin-top:4px;line-height:1}
+.btn-reset-strip:hover{color:#00d4ff}
+.bc-row{display:flex;flex-wrap:nowrap;gap:5px;padding:1px 0 7px;overflow-x:auto;scrollbar-width:none}
+.bc-row::-webkit-scrollbar{display:none}
+.bc-chip{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#001018;border:1px solid #1a3040;color:#3d9db5;white-space:nowrap;flex-shrink:0}
+.receipt-card{border:1px solid #1e2d3d;border-radius:12px;overflow:hidden;margin-bottom:16px}
+.receipt-hdr{display:flex;align-items:center;gap:12px;padding:13px 16px;background:linear-gradient(135deg,#00111e,#000e18);border-bottom:1px solid #1a2a3a}
+.receipt-hdr-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#0096b4,#005c7a);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.receipt-hdr-name{font-weight:800;font-size:.95rem;color:#e6edf3;line-height:1.2}
+.receipt-hdr-sub{font-size:.68rem;color:#3d6a85;margin-top:1px}
+.receipt-row{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid #0f1a24;gap:8px}
+.receipt-row:last-child{border-bottom:none}
+.receipt-row-left{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.receipt-row-ico{font-size:.8rem;width:16px;text-align:center}
+.receipt-row-lbl{font-size:.74rem;color:#4b5563;font-weight:600;text-transform:capitalize}
+.receipt-row-val{font-size:.84rem;font-weight:700;color:#c9d1d9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:54%}
+.receipt-row-val.hl{color:#00d4ff}
 .splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px 36px}
 .splash-icon{width:96px;height:96px;margin-bottom:18px;filter:drop-shadow(0 0 24px rgba(0,212,255,.5))}
 .splash-title{font-size:2.15rem;font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:5px}
@@ -289,11 +318,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </div>
     </div>
     <div class="prog-wrap">
-      <div class="prog-header">
-        <div class="prog-label" id="pLabel">Step 1 of 7</div>
-        <button class="btn-reset" data-action="reset-state" title="Clear saved progress and start over">↺ Reset Progress</button>
-      </div>
-      <div class="prog-track"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
+      <div id="stepStrip"></div>
+      <div id="breadcrumbs"></div>
     </div>
   </header>
   
@@ -536,10 +562,33 @@ function renderProgress() {
   }
   if (progWrap) progWrap.style.display = '';
   if (nav) nav.style.display = '';
-  const pct = ((step - 1) / (STEPS - 1)) * 100;
-  document.getElementById('pFill').style.width = pct + '%';
-  const titles = ['Service','Device','Resolution','Audio','Content','Layout','APIs','Review'];
-  document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS} · ${titles[step-1] || ''}`;
+
+  const lbls  = ['Svc','Device','Res.','Audio','Cont.','Layout','APIs','Review'];
+  const keys  = ['service','device','resolution','audio','content','formatter',null,null];
+
+  // Step bubble strip
+  const bubbles = Array.from({length: STEPS}, (_, i) => {
+    const n = i + 1;
+    const state = n < step ? 'done' : n === step ? 'active' : 'pending';
+    const inner = state === 'done' ? '✓' : n;
+    return `<div class="step-unit ${state}">
+      <div class="step-bub">${inner}</div>
+      <div class="step-lbl">${lbls[i]}</div>
+    </div>`;
+  }).join('');
+
+  const strip = document.getElementById('stepStrip');
+  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Reset progress">↺</button></div>`;
+
+  // Breadcrumb chips — show completed selections
+  const chips = keys.slice(0, step - 1).map((k, i) => {
+    if (!k || !S[k]) return '';
+    const lbl = label(k, S[k]);
+    return lbl ? `<span class="bc-chip">✓ ${lbl}</span>` : '';
+  }).filter(Boolean);
+
+  const bc = document.getElementById('breadcrumbs');
+  if (bc) bc.innerHTML = chips.length ? `<div class="bc-row">${chips.join('')}</div>` : '';
 }
 
 function splashHtml() {
@@ -602,22 +651,43 @@ function render() {
     const hasApis = S.tmdbToken || S.tmdbApiKey || Object.values(S.creds).some(v=>v);
     main.innerHTML = `
       <div class="card">
-        <h2>Your Configuration</h2>
-        <p class="desc">Review your choices, optionally name your template, then download.</p>
-        <div class="summary">
-          ${['service','device','resolution','audio','content','formatter'].map(k => {
+        <div class="receipt-card">
+          <div class="receipt-hdr">
+            <div class="receipt-hdr-icon">⚡</div>
+            <div>
+              <div class="receipt-hdr-name">${S.name || auto}</div>
+              <div class="receipt-hdr-sub">Template ready to generate</div>
+            </div>
+          </div>
+          ${[
+            {k:'service',    ico:'🔌'},
+            {k:'device',     ico:'📺'},
+            {k:'resolution', ico:'🖥️'},
+            {k:'audio',      ico:'🔊'},
+            {k:'content',    ico:'🎬'},
+            {k:'formatter',  ico:'🎨'},
+          ].map(({k, ico}) => {
             const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
-            return `<div class="sum-item">
-              <div class="sum-lbl">${k}</div>
-              <div class="sum-val">${label(k, S[k])}${audioOverride ? '<div style="color:#f59e0b;font-size:.7rem;margin-top:3px">⚠ device profile limits to DD+</div>' : ''}</div>
+            const val = label(k, S[k]) || '—';
+            return `<div class="receipt-row">
+              <div class="receipt-row-left">
+                <span class="receipt-row-ico">${ico}</span>
+                <span class="receipt-row-lbl">${k}</span>
+              </div>
+              <div class="receipt-row-val${k==='service'?' hl':''}">
+                ${val}${audioOverride ? ' <span style="color:#f59e0b;font-size:.7rem">⚠ DD+</span>' : ''}
+              </div>
             </div>`;
           }).join('')}
-          ${hasApis ? `<div class="sum-item" style="grid-column:1/-1">
-            <div class="sum-lbl">API Keys</div>
-            <div class="sum-val" style="font-weight:400;font-size:.85rem">${[
-              Object.values(S.creds).filter(v=>v).length ? '✓ debrid credentials' : '',
-              S.tmdbToken ? '✓ TMDB token' : '',
-              S.tmdbApiKey ? '✓ TMDB API key' : ''
+          ${hasApis ? `<div class="receipt-row">
+            <div class="receipt-row-left">
+              <span class="receipt-row-ico">🔑</span>
+              <span class="receipt-row-lbl">API Keys</span>
+            </div>
+            <div class="receipt-row-val" style="color:#10b981">${[
+              Object.values(S.creds).filter(v=>v).length ? '✓ Debrid' : '',
+              S.tmdbToken ? '✓ TMDB' : '',
+              S.tmdbApiKey ? '✓ TMDB Key' : ''
             ].filter(Boolean).join(' · ')}</div>
           </div>` : ''}
         </div>
