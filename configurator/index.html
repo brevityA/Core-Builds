@@ -339,7 +339,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 const STEPS = 6;
 let step = 0;
 let showAdvanced = false;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const FORMATTERS = [
   {
@@ -642,8 +642,8 @@ function renderMatchMode() {
       <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
     </button>`;
   }).join('');
-  return `<div style="margin-top:10px;background:#0d1117;border:1.5px solid #30363d;border-radius:10px;padding:14px 16px">
-    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase;margin-bottom:10px">Match Aggressiveness</div>
+  return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
+    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase">Match Aggressiveness</div>
     <div style="display:flex;gap:6px">${pills}</div>
   </div>`;
 }
@@ -748,7 +748,8 @@ function renderProgress() {
     const n = i + 1;
     const state = n < step ? 'done' : n === step ? 'active' : 'pending';
     const inner = state === 'done' ? '✓' : n;
-    return `<div class="step-unit ${state}"><div class="step-bub">${inner}</div></div>`;
+    const tipName = DEFS[i] ? DEFS[i].title : (n === STEPS ? 'Review' : `Step ${n}`);
+    return `<div class="step-unit ${state}" title="${tipName}"><div class="step-bub">${inner}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
@@ -804,6 +805,7 @@ function splashHtml() {
       <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
     </div>
     <button class="splash-cta" data-action="start-setup">Start Setup →</button>
+    <button data-action="quick-start" style="width:100%;max-width:310px;margin-top:10px;padding:12px 20px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.01em" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start — 4K · Lossless Audio</button>
     <div class="splash-paste" data-action="paste-manifest-splash">Already have a manifest? Paste it</div>
   </div>`;
 }
@@ -881,6 +883,12 @@ function render() {
         ${videoPrefHtml()}
         ${insightsHtml()}
         ${sizeLimitHtml()}
+        <details id="jsonPreviewDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
+          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
+            <span>Preview JSON</span><span style="font-size:.7rem;color:#374151">›</span>
+          </summary>
+          <pre id="jsonPreview" style="margin:0;padding:12px 16px;background:#0d1117;overflow-x:auto;font-size:.68rem;color:#8b949e;font-family:monospace;line-height:1.5;max-height:260px;overflow-y:auto"></pre>
+        </details>
         <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
         <button class="btn-aio" data-action="create-import" id="btnImport" style="margin-top:10px">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -952,6 +960,11 @@ function render() {
         </div>
       </div>`;
     nav.style.display = 'none';
+    const jpd = document.getElementById('jsonPreviewDetails');
+    if (jpd) jpd.addEventListener('toggle', () => {
+      const pre = document.getElementById('jsonPreview');
+      if (jpd.open && pre && !pre.textContent) pre.textContent = JSON.stringify(build(), null, 2);
+    }, { once: true });
 
   } else if (def.id === 'apis') {
     const debridInputs = getDebridInputs();
@@ -1025,7 +1038,8 @@ function render() {
             <div class="srh-num">${step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}</div>
+            <div class="srh-title">${def.title}${step===1&&S.resolution==='4k'&&S.audio==='lossless'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}
+            </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
@@ -1102,6 +1116,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'nav-back') {
       if (step > 0) { document.getElementById('main').classList.add('nav-back'); step--; saveState(); render(); window.scrollTo(0,0); }
+    }
+    if (action === 'quick-start') {
+      Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true });
+      saveState(); document.getElementById('main').classList.remove('nav-back');
+      step = 1; render(); window.scrollTo(0,0);
     }
     if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
     if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
@@ -1183,6 +1202,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('change', (e) => {
     if (e.target.dataset.action === 'update-radio') {
       S[e.target.dataset.key] = e.target.value;
+      if (e.target.dataset.key === 'device') {
+        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        if (DEV_AUDIO[e.target.value]) S.audio = DEV_AUDIO[e.target.value];
+      }
       saveState();
       syncNext();
       if (e.target.dataset.key === 'service') updateMultiPanel();
@@ -1526,6 +1549,17 @@ function showManifestModal(manifestUrl, password, hostLabel) {
         </a>
         <button class="m-btn m-done" id="mDone">Done</button>
       </div>
+      <details style="margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.03em;user-select:none">
+          <span>🎮 Install via Stremio Auth Key</span><span style="font-size:.7rem">›</span>
+        </summary>
+        <div style="margin-top:10px">
+          <div style="color:#6b7280;font-size:.72rem;line-height:1.5;margin-bottom:8px">Paste your key to push directly into your Stremio library. Get it from <strong style="color:#8b949e">web.stremio.com</strong> console: <code style="background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px;font-size:.68rem">JSON.parse(localStorage.getItem('profile')).auth.key</code></div>
+          <input id="stremioAuthKey" type="password" placeholder="Paste your Stremio auth key…" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;font-family:monospace;outline:none;margin-bottom:8px">
+          <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s">📥 Add to My Stremio Library</button>
+          <div id="stremioInstallResult" style="margin-top:8px;font-size:.75rem"></div>
+        </div>
+      </details>
     </div>`;
   document.body.appendChild(overlay);
 
@@ -1601,6 +1635,33 @@ function showManifestModal(manifestUrl, password, hostLabel) {
   overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   const escKey = e => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escKey); } };
   document.addEventListener('keydown', escKey);
+
+  document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
+    const authKey = document.getElementById('stremioAuthKey').value.trim();
+    const resEl   = document.getElementById('stremioInstallResult');
+    const btn     = document.getElementById('stremioInstallBtn');
+    if (!authKey) { resEl.innerHTML = `<span style="color:#f87171">Paste your auth key first.</span>`; return; }
+    btn.disabled = true; btn.textContent = 'Installing…'; resEl.innerHTML = '';
+    try {
+      const SAPI = 'https://api.strem.io/api/';
+      const getRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionGet', authKey, update:true }) });
+      const getData = await getRes.json();
+      if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
+      const existing = getData.result.addons;
+      const already = existing.some(a => a.transportUrl === manifestUrl);
+      if (!already) {
+        const updated = [...existing, { transportName:'http', transportUrl: manifestUrl, flags:{} }];
+        const setRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionSet', authKey, addons: updated }) });
+        const setData = await setRes.json();
+        if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
+      }
+      btn.textContent = '✓ Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
+      resEl.innerHTML = already ? `<span style="color:#f59e0b">Already in your library.</span>` : `<span style="color:#3fb950">Done — reopen Stremio to see it.</span>`;
+    } catch(err) {
+      btn.disabled = false; btn.textContent = '📥 Add to My Stremio Library';
+      resEl.innerHTML = `<span style="color:#f87171">${err.message}</span>`;
+    }
+  });
 }
 
 function showToast(msg, isError) {
