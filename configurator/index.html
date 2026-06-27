@@ -28,10 +28,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .prog-label{color:#8b949e;font-size:.75rem;letter-spacing:.03em}
 .btn-reset{background:none;border:none;color:#8b949e;font-size:.7rem;cursor:pointer;text-decoration:underline;padding:0;transition:color .15s}
 .btn-reset:hover{color:#00d4ff}
-.card{background:#0e1318;background-image:radial-gradient(ellipse at 12% 15%,rgba(0,180,210,.07) 0%,transparent 55%),radial-gradient(ellipse at 88% 85%,rgba(110,30,180,.05) 0%,transparent 55%);border:1px solid #1e2d3d;border-radius:14px;padding:28px;margin-bottom:14px;animation:fadeIn .2s ease;flex:1;display:flex;flex-direction:column}
+.card{background:#0e1318;background-image:radial-gradient(ellipse at 12% 15%,rgba(0,180,210,.07) 0%,transparent 55%),radial-gradient(ellipse at 88% 85%,rgba(110,30,180,.05) 0%,transparent 55%);border:1px solid #1e2d3d;border-radius:14px;padding:28px;margin-bottom:14px;animation:slideInRight .22s ease;flex:1;display:flex;flex-direction:column}
+#main.nav-back .card{animation-name:slideInBack}
 #main{flex:1;display:flex;flex-direction:column}
 .opts{align-content:start}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(13px)}to{opacity:1;transform:none}}
+@keyframes slideInBack{from{opacity:0;transform:translateX(-13px)}to{opacity:1;transform:none}}
 .card h2{font-size:1.15rem;font-weight:700;margin-bottom:5px}
 .card .desc{color:#8b949e;font-size:.88rem;margin-bottom:20px;line-height:1.5}
 .opts{display:grid;gap:10px}
@@ -66,8 +69,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .nav::before{content:'';position:absolute;inset:-28px -16px 0;background:linear-gradient(to bottom,transparent,#0d1117 40%);pointer-events:none;z-index:-1}
 .btn{border:none;cursor:pointer;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
-.btn-back{background:none;color:#4b5563;font-size:.76rem;font-weight:600;padding:4px 2px;align-self:flex-start;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
-.btn-back:hover{color:#9ca3af}
+.btn-back{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)!important;color:#6b7280;font-size:.84rem;font-weight:700;padding:11px 18px;border-radius:11px;align-self:stretch;transition:all .15s;text-align:center;letter-spacing:.01em}
+.btn-back:hover{background:rgba(255,255,255,.08);color:#9ca3af;border-color:rgba(255,255,255,.18)!important}
 .btn-next{width:100%;background:linear-gradient(135deg,#005c7a 0%,#003a56 100%);color:#fff;border-radius:13px;padding:14px 18px;font-size:.95rem;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 24px rgba(0,150,180,.2),inset 0 1px 0 rgba(255,255,255,.07);text-align:left;transition:box-shadow .2s,transform .15s}
 .btn-next:hover:not(:disabled){box-shadow:0 6px 28px rgba(0,150,180,.35),inset 0 1px 0 rgba(255,255,255,.1);transform:translateY(-1px)}
 .btn-next:disabled{background:#111820;border:1px solid #1e2a35;color:#374151;box-shadow:none;cursor:not-allowed}
@@ -476,16 +479,19 @@ function renderOpts(def) {
   if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:8px">' +
     FORMATTERS.map(f => {
       const on = S.formatter === f.id;
-      return `<div class="svc-list-row opt" data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;display:flex;align-items:center;gap:14px;padding:13px 16px;transition:border-color .15s,background .15s">
-        <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
-            <span style="font-weight:700;font-size:.9rem;color:${on?'#00d4ff':'#e6edf3'}">${f.label}</span>
-            <span style="font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:5px;background:${f.bc}22;color:${f.bc}">${f.badge}</span>
+      return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+              <span class="fmt-lbl" style="font-weight:700;font-size:.9rem;color:${on?'#00d4ff':'#e6edf3'}">${f.label}</span>
+              <span style="font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:5px;background:${f.bc}22;color:${f.bc}">${f.badge}</span>
+            </div>
+            <div style="color:#6b7280;font-size:.72rem">${f.desc}</div>
           </div>
-          <div style="color:#6b7280;font-size:.72rem">${f.desc}</div>
+          ${on ? '<span style="color:#00d4ff;font-size:.9rem;flex-shrink:0">✓</span>' : '<span style="color:#374151;font-size:.9rem;flex-shrink:0">›</span>'}
         </div>
-        ${on ? '<span style="color:#00d4ff;font-size:.9rem;flex-shrink:0">✓</span>' : '<span style="color:#374151;font-size:.9rem;flex-shrink:0">›</span>'}
+        <div class="fmt-preview-wrap" style="padding:0 13px 11px;${on?'':'display:none'}">${fmtPreviewHtml(f.id)}</div>
       </div>`;
     }).join('') +
   '</div>';
@@ -615,12 +621,12 @@ function videoPrefHtml() {
 
 function renderP2pToggle() {
   const on = S.p2pEnabled !== false;
-  return `<div style="margin-top:16px;padding-top:14px;border-top:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;gap:16px">
-    <div>
-      <div style="font-weight:700;font-size:.95rem;color:#e6edf3">Include P2P Streams</div>
-      <div style="color:#6b7280;font-size:.8rem;margin-top:3px;line-height:1.4">Show torrents alongside cached streams. Disable for cached-only results.</div>
+  return `<div class="pref-card${on?' pref-on':''}" style="margin-top:12px;cursor:default">
+    <div class="pref-body-inner">
+      <div class="pref-title">Include P2P Streams</div>
+      <div class="pref-desc">Show torrents alongside cached streams. Disable for cached-only results.</div>
     </div>
-    <label class="toggle-sw">
+    <label class="toggle-sw" style="cursor:pointer;flex-shrink:0">
       <input type="checkbox" data-action="toggle-p2p"${on ? ' checked' : ''}>
       <span class="toggle-track"></span>
     </label>
@@ -638,7 +644,6 @@ function renderProgress() {
   if (progWrap) progWrap.style.display = '';
   if (nav) nav.style.display = '';
 
-  const lbls  = ['Svc','Device','Res.','Audio','Cont.','Layout','APIs','Review'];
   const keys  = ['service','device','resolution','audio','content','formatter',null,null];
 
   // Step bubble strip
@@ -646,10 +651,7 @@ function renderProgress() {
     const n = i + 1;
     const state = n < step ? 'done' : n === step ? 'active' : 'pending';
     const inner = state === 'done' ? '✓' : n;
-    return `<div class="step-unit ${state}">
-      <div class="step-bub">${inner}</div>
-      <div class="step-lbl">${lbls[i]}</div>
-    </div>`;
+    return `<div class="step-unit ${state}"><div class="step-bub">${inner}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
@@ -835,13 +837,19 @@ function render() {
             Generate Manifest
           </button>
           <div id="aioResult"></div>
-          <div style="margin-top:16px;padding-top:14px;border-top:1px solid #21262d">
-            <div style="color:#6b7280;font-size:.79rem;margin-bottom:8px">Already have a manifest URL? Paste it for instant install links:</div>
-            <input class="name-input" id="pasteManifest" type="url"
-              placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
-              data-action="paste-manifest" style="font-size:.8rem;font-family:monospace">
-            <div id="pasteManifestResult"></div>
-          </div>
+          <details style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px">
+            <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
+              <span>Already have a manifest URL?</span>
+              <span style="font-size:.75rem;color:#374151">›</span>
+            </summary>
+            <div style="margin-top:10px">
+              <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
+              <input class="name-input" id="pasteManifest" type="url"
+                placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
+                data-action="paste-manifest" style="font-size:.8rem;font-family:monospace">
+              <div id="pasteManifestResult"></div>
+            </div>
+          </details>
         </div>
       </div>`;
     nav.style.display = 'none';
@@ -994,13 +1002,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'nav-next') {
       if (DEFS[step-1].key && !S[DEFS[step-1].key]) return;
       if (S.service === 'multi' && step === 1 && S.multiServices.length === 0) return;
-      if (step < STEPS) { step++; saveState(); render(); window.scrollTo(0,0); }
+      if (step < STEPS) { document.getElementById('main').classList.remove('nav-back'); step++; saveState(); render(); window.scrollTo(0,0); }
     }
     if (action === 'nav-back') {
-      if (step > 0) { step--; saveState(); render(); window.scrollTo(0,0); }
+      if (step > 0) { document.getElementById('main').classList.add('nav-back'); step--; saveState(); render(); window.scrollTo(0,0); }
     }
-    if (action === 'start-setup') { step = 1; saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'paste-manifest-splash') { step = STEPS; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'start-setup') { document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') clearState();
     if (action === 'generate-dl') generate();
     if (action === 'create-import') createImportUrl();
@@ -1031,13 +1039,15 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-formatter"]').forEach(card => {
         const on = card.dataset.val === S.formatter;
-        card.style.borderColor = on ? '#00d4ff' : '#30363d';
-        card.style.background  = on ? '#00131c' : '#0d1117';
-        card.style.boxShadow   = on ? '0 0 0 3px rgba(0,212,255,.15)' : 'none';
+        card.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.1)';
+        card.style.background  = on ? 'rgba(0,212,255,.07)' : 'rgba(8,12,18,.9)';
+        card.style.boxShadow   = on ? '0 0 0 3px rgba(0,212,255,.1)' : 'none';
         const lbl = card.querySelector('.fmt-lbl');
         if (lbl) lbl.style.color = on ? '#00d4ff' : '#e6edf3';
+        const arr = card.querySelector('[data-arrow]');
+        if (arr) arr.textContent = on ? '✓' : '›';
         const pw = card.querySelector('.fmt-preview-wrap');
-        if (pw) pw.style.display = on ? 'block' : 'none';
+        if (pw) pw.style.display = on ? '' : 'none';
       });
     }
   });
