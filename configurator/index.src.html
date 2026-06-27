@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Builds — Template Configurator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImhleEdyYWQiIHgxPSI1MCUiIHkxPSIwJSIgeDI9IjUwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDBlNWZmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzRmYWNmZSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZGlhbUdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGZhY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjYzA2MGMwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmNGIyYiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9ImhleEdsb3ciPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJibHVyIi8+CiAgICAgIDxmZUNvbXBvc2l0ZSBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJibHVyIiBvcGVyYXRvcj0ib3ZlciIvPgogICAgPC9maWx0ZXI+CiAgICA8ZmlsdGVyIGlkPSJkaWFtR2xvdyI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjE0IiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlQ29tcG9zaXRlIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImJsdXIiIG9wZXJhdG9yPSJvdmVyIi8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9InNvZnRHbG93Ij4KICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMjQiLz4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KCiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyNDgiIGZpbGw9IiMwZDExMTciLz4KCiAgPCEtLSBBbWJpZW50IGdsb3cgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyNTYsNDEgNDQyLDE0OSA0NDIsMzYzIDI1Niw0NzEgNzAsMzYzIDcwLDE0OSIKICAgIGZpbGw9IiMwMGU1ZmYiIG9wYWNpdHk9IjAuMDQiIGZpbHRlcj0idXJsKCNzb2Z0R2xvdykiLz4KICA8cG9seWdvbiBwb2ludHM9IjI1NiwxNjYgMzQ2LDI1NiAyNTYsMzQ2IDE2NiwyNTYiCiAgICBmaWxsPSIjYzA2MGMwIiBvcGFjaXR5PSIwLjA4IiBmaWx0ZXI9InVybCgjc29mdEdsb3cpIi8+CgogIDwhLS0gSGV4IGdsb3cgbGF5ZXIgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyNTYsNDEgNDQyLDE0OSA0NDIsMzYzIDI1Niw0NzEgNzAsMzYzIDcwLDE0OSIKICAgIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwZTVmZiIgc3Ryb2tlLXdpZHRoPSIzMCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKICAgIG9wYWNpdHk9IjAuMyIgZmlsdGVyPSJ1cmwoI2hleEdsb3cpIi8+CgogIDwhLS0gSGV4IG91dGxpbmUgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyNTYsNDEgNDQyLDE0OSA0NDIsMzYzIDI1Niw0NzEgNzAsMzYzIDcwLDE0OSIKICAgIGZpbGw9Im5vbmUiIHN0cm9rZT0idXJsKCNoZXhHcmFkKSIgc3Ryb2tlLXdpZHRoPSIyMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgoKICA8IS0tIERpYW1vbmQgZ2xvdyAtLT4KICA8cG9seWdvbiBwb2ludHM9IjI1NiwxNjYgMzQ2LDI1NiAyNTYsMzQ2IDE2NiwyNTYiCiAgICBmaWxsPSJ1cmwoI2RpYW1HcmFkKSIgb3BhY2l0eT0iMC40IiBmaWx0ZXI9InVybCgjZGlhbUdsb3cpIi8+CgogIDwhLS0gRGlhbW9uZCAtLT4KICA8cG9seWdvbiBwb2ludHM9IjI1NiwxNjYgMzQ2LDI1NiAyNTYsMzQ2IDE2NiwyNTYiCiAgICBmaWxsPSJ1cmwoI2RpYW1HcmFkKSIgb3BhY2l0eT0iMC45NSIvPgo8L3N2Zz4K">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#e6edf3;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
+.wrap{width:100%;max-width:700px;flex:1;display:flex;flex-direction:column}
+.hdr{margin-bottom:8px}
+.hdr-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#080c10 0%,#0a1018 100%);border:1px solid #1a2535;border-radius:16px;padding:16px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.hdr-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,212,255,.06) 0%,transparent 60%);pointer-events:none}
+.hdr-icon{width:46px;height:46px;flex-shrink:0;position:relative;z-index:1;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
+.hdr-divider{width:1px;height:44px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.5),transparent);flex-shrink:0;position:relative;z-index:1}
+.hdr-text{position:relative;z-index:1;display:flex;flex-direction:column;gap:1px}
+.hdr-title{font-size:1.55rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:2px}
+.hdr-core{color:#fff}
+.hdr-builds{color:#00d4ff}
+.hdr-underline{height:1.5px;width:96px;background:linear-gradient(90deg,rgba(0,212,255,.55),transparent);border-radius:1px;margin-bottom:3px}
+.hdr-by{font-size:.63rem;letter-spacing:.16em;color:#4b8fa8;margin-bottom:2px}
+.hdr-sub{font-size:.78rem;color:#6b7280;line-height:1.3}
+.prog-wrap{margin:0 0 6px}
+.prog-track{background:#21262d;border-radius:4px;height:5px;overflow:hidden}
+.prog-fill{background:linear-gradient(90deg,#0891b2,#00d4ff);height:100%;transition:width .35s ease;border-radius:4px}
+.prog-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:5px}
+.prog-label{color:#8b949e;font-size:.75rem;letter-spacing:.03em}
+.btn-reset{background:none;border:none;color:#8b949e;font-size:.7rem;cursor:pointer;text-decoration:underline;padding:0;transition:color .15s}
+.btn-reset:hover{color:#00d4ff}
+.card{background:#0e1318;background-image:radial-gradient(ellipse at 12% 15%,rgba(0,180,210,.07) 0%,transparent 55%),radial-gradient(ellipse at 88% 85%,rgba(110,30,180,.05) 0%,transparent 55%);border:1px solid #1e2d3d;border-radius:14px;padding:28px;margin-bottom:14px;animation:slideInRight .22s ease;flex:1;display:flex;flex-direction:column}
+#main.nav-back .card{animation-name:slideInBack}
+#main{flex:1;display:flex;flex-direction:column}
+.opts{align-content:start}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(13px)}to{opacity:1;transform:none}}
+@keyframes slideInBack{from{opacity:0;transform:translateX(-13px)}to{opacity:1;transform:none}}
+.card h2{font-size:1.15rem;font-weight:700;margin-bottom:5px}
+.card .desc{color:#8b949e;font-size:.88rem;margin-bottom:20px;line-height:1.5}
+.opts{display:grid;gap:10px}
+.opts.c2{grid-template-columns:1fr 1fr}
+.opts.c3{grid-template-columns:1fr 1fr}
+.opts.c1{grid-template-columns:1fr}
+.opts.c4d{grid-template-columns:1fr 1fr}
+.opts.c3d{grid-template-columns:1fr}
+.opts.c2d{grid-template-columns:1fr}
+.opt input{display:none}
+.opt label{display:flex;flex-direction:column;background:rgba(13,17,23,.7);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:15px 13px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;height:100%;user-select:none;position:relative}
+.opt input:checked+label{border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.06);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 20px rgba(0,150,180,.1)}
+.opt input:checked+label::after{content:'✓';position:absolute;top:7px;right:7px;width:18px;height:18px;background:#00d4ff;color:#0d1117;border-radius:50%;font-size:.65rem;font-weight:900;display:grid;place-items:center}
+.opt label:hover{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.03)}
+.opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.opt-icon svg{width:42px;height:42px}
+.opt-body{display:flex;flex-direction:column;flex:1;min-width:0}
+.opt-name{font-weight:700;font-size:1rem;line-height:1.25}
+.opt-desc{color:#8b949e;font-size:.84rem;margin-top:4px;line-height:1.45}
+.opts.c3d .opt label,.opts.c2d .opt label{flex-direction:row;align-items:center;gap:12px;padding:14px}
+.opts.c3d .opt-icon,.opts.c2d .opt-icon{margin-bottom:0}
+.opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:30px;height:30px}
+.name-row label{color:#8b949e;font-size:.82rem;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.name-input{width:100%;background:#0d1117;border:2px solid #30363d;border-radius:8px;color:#e6edf3;padding:12px 16px;font-size:1rem;transition:border-color .15s;outline:none}
+.name-input:focus{border-color:#00d4ff}
+.name-input::placeholder{color:#484f58}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.sum-item{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 14px}
+.sum-lbl{color:#8b949e;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+.sum-val{font-weight:700;font-size:.9rem;margin-top:3px;color:#e6edf3}
+.nav{display:flex;flex-direction:column;gap:6px;margin-top:8px;position:sticky;bottom:16px;z-index:10}
+.nav::before{content:'';position:absolute;inset:-28px -16px 0;background:linear-gradient(to bottom,transparent,#0d1117 40%);pointer-events:none;z-index:-1}
+.btn{border:none;cursor:pointer;transition:opacity .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-back{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)!important;color:#6b7280;font-size:.84rem;font-weight:700;padding:11px 18px;border-radius:11px;align-self:stretch;transition:all .15s;text-align:center;letter-spacing:.01em}
+.btn-back:hover{background:rgba(255,255,255,.08);color:#9ca3af;border-color:rgba(255,255,255,.18)!important}
+.btn-next{width:100%;background:linear-gradient(135deg,#005c7a 0%,#003a56 100%);color:#fff;border-radius:13px;padding:14px 18px;font-size:.95rem;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 24px rgba(0,150,180,.2),inset 0 1px 0 rgba(255,255,255,.07);text-align:left;transition:box-shadow .2s,transform .15s}
+.btn-next:hover:not(:disabled){box-shadow:0 6px 28px rgba(0,150,180,.35),inset 0 1px 0 rgba(255,255,255,.1);transform:translateY(-1px)}
+.btn-next:disabled{background:#111820;border:1px solid #1e2a35;color:#374151;box-shadow:none;cursor:not-allowed}
+.cta-step-lbl{font-size:.62rem;font-weight:600;opacity:.6;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.cta-step-val{font-size:.95rem;font-weight:800;line-height:1}
+.cta-arr{font-size:1.15rem;opacity:.75;flex-shrink:0}
+.btn-dl{width:100%;padding:16px;font-size:1.08rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff;margin-top:16px;transition:opacity .15s,transform .1s}
+.btn-dl:active{transform:scale(.98)}
+.btn-dl:hover{opacity:.9}
+.btn-aio{width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;cursor:pointer;background:transparent;color:#00d4ff;margin-top:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-aio:hover{background:#00131c;border-color:#00d4ff}
+.btn-aio:active{transform:scale(.98)}
+.aio-section{margin-top:20px;border-top:1px solid #21262d;padding-top:18px}
+.aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.aio-fields{display:grid;gap:10px;margin-bottom:0}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0a2a1a;border:1px solid #2ea043;color:#3fb950;padding:12px 22px;border-radius:10px;font-size:.9rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:#1a0a0a;border-color:#8b1a1a;color:#f87171}
+.import-success{background:#061a0e;border:1px solid #2ea043;border-radius:10px;padding:16px;margin-top:12px;font-size:.85rem}
+.import-success strong{color:#3fb950;display:block;margin-bottom:8px;font-size:.95rem}
+.manifest-url{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.78rem;color:#8b949e;word-break:break-all;margin-top:6px;cursor:pointer;transition:border-color .15s}
+.manifest-url:hover{border-color:#00d4ff;color:#00d4ff}
+.notice{background:#0d2317;border:1px solid #2ea043;border-radius:9px;padding:13px 16px;font-size:.83rem;color:#8b949e;margin-top:14px;line-height:1.5}
+.inst-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.inst-chip{display:inline-flex;align-items:center;padding:5px 12px;background:#0d1117;border:1px solid #30363d;border-radius:20px;font-size:.76rem;color:#8b949e;text-decoration:none;transition:border-color .15s,color .15s;white-space:nowrap}
+.inst-chip:hover{border-color:#00d4ff;color:#00d4ff}
+.inst-chip-import{background:#001428;border-color:#0e7490;color:#00d4ff}
+.inst-chip-import:hover{background:#002a50;border-color:#00d4ff;color:#7ee8ff}
+.notice strong{color:#3fb950;display:block;margin-bottom:3px}
+/* Size limit presets */
+.size-btn{padding:7px 16px;border-radius:8px;border:1.5px solid #30363d;background:#0d1117;color:#8b949e;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
+.size-btn:hover{border-color:#005c7a;color:#e6edf3}
+.size-btn-active{border-color:#00d4ff!important;background:#00131c!important;color:#00d4ff!important}
+/* List layout */
+.opts.list{grid-template-columns:1fr}
+.opts.list .opt label{flex-direction:row;align-items:center;gap:14px;padding:13px 16px;border-color:rgba(255,255,255,.1)}
+.opts.list .opt-icon{margin-bottom:0}
+.opts.list .opt-icon svg{width:28px;height:28px;filter:drop-shadow(0 0 5px rgba(255,255,255,.12))}
+.opts.list .opt input:checked+label .opt-icon svg{filter:drop-shadow(0 0 10px rgba(0,212,255,.4))}
+/* Pill layout */
+.opts.pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:transparent;border:none;padding:0}
+.opts.pills .opt{flex:1}
+.opts.pills .opt label{flex-direction:column;align-items:center;gap:8px;padding:18px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(8,12,18,.9);color:#6b7280;height:auto;text-align:center}
+.opts.pills .opt label:hover{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.04);color:#e6edf3}
+.opts.pills .opt input:checked+label{background:rgba(0,212,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.4);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 20px rgba(0,150,180,.12)}
+.opts.pills .opt-icon svg{filter:drop-shadow(0 0 6px rgba(255,255,255,.1))}
+.opts.pills .opt input:checked+label .opt-icon svg{filter:drop-shadow(0 0 12px rgba(0,212,255,.35))}
+.opts.pills .opt-icon{margin-bottom:0}
+.opts.pills .opt-icon svg{width:30px;height:30px}
+.opts.pills .opt-body{align-items:center}
+.opts.pills .opt-name{font-size:.97rem;text-align:center}
+.opts.pills .opt-desc{font-size:.8rem;margin-top:3px;opacity:.85;text-align:center}
+/* Hero layout */
+.hero-wrap{display:flex;flex-direction:column;gap:8px}
+.hero-hero .opt label{flex-direction:row;align-items:flex-start;gap:16px;padding:18px;border-radius:12px}
+.hero-hero .opt-icon{margin-bottom:0;flex-shrink:0}
+.hero-hero .opt-icon svg{width:44px;height:44px}
+.hero-badge{display:inline-block;background:#003344;color:#00d4ff;font-size:.67rem;font-weight:700;letter-spacing:.07em;padding:3px 10px;border-radius:20px;margin-bottom:6px;text-transform:uppercase}
+.hero-hero .opt-name{font-size:1rem;font-weight:800}
+.hero-hero .opt-desc{font-size:.8rem}
+.hero-sub{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hero-sub .opt label{flex-direction:row;align-items:center;gap:10px;padding:12px;border-radius:9px}
+.hero-sub .opt-icon{margin-bottom:0}
+.hero-sub .opt-icon svg{width:24px;height:24px}
+.hero-sub .opt-name{font-size:.84rem}
+.hero-sub .opt-desc{font-size:.7rem;margin-top:2px}
+/* Service vertical list layout (variant B) */
+.svc-list{display:flex;flex-direction:column;gap:7px}
+.svc-list-hero label{flex-direction:row!important;align-items:center!important;gap:12px!important;padding:11px 14px!important;border-radius:11px!important;background:rgba(13,17,23,.7)!important;border-color:rgba(255,255,255,.07)!important}
+.svc-list-hero .opt-icon{margin-bottom:0!important;flex-shrink:0}
+.svc-list-hero .opt-icon svg{width:28px!important;height:28px!important}
+.svc-list-hero .opt-name{font-size:.86rem!important}
+.svc-list-hero .opt-desc{font-size:.69rem!important;margin-top:1px!important}
+.svc-list-hero .svc-hero-tags{display:none}
+.svc-list-hero input:checked+label{flex-direction:row!important;align-items:flex-start!important;gap:14px!important;padding:14px 16px!important;border-radius:12px!important;background:rgba(0,212,255,.08)!important;border-color:rgba(0,212,255,.4)!important}
+.svc-list-hero input:checked+label .opt-icon svg{width:36px!important;height:36px!important}
+.svc-list-hero input:checked+label .svc-hero-tags{display:flex!important;flex-wrap:wrap;gap:4px;margin-top:7px}
+.svc-list-hero input:checked+label .opt-name{font-size:.9rem!important}
+.svc-list-hero input:checked+label .opt-desc{font-size:.8rem!important}
+.svc-hero-badge{font-size:.58rem;font-weight:800;letter-spacing:.1em;color:#00d4ff;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.22);border-radius:20px;padding:1px 8px;margin-left:7px;vertical-align:middle;white-space:nowrap}
+.svc-hero-tags{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.svc-hero-tag{font-size:.6rem;font-weight:600;background:rgba(255,255,255,.04);border:1px solid #1e2d3d;border-radius:8px;padding:2px 7px;color:#9ca3af}
+.svc-list-row label{flex-direction:row!important;align-items:center!important;gap:12px!important;padding:11px 14px!important;border-radius:11px!important}
+.svc-list-row .opt-icon{margin-bottom:0!important;flex-shrink:0}
+.svc-list-row .opt-icon svg{width:28px!important;height:28px!important}
+.svc-list-row .opt-name{font-size:.86rem!important}
+.svc-list-row .opt-desc{font-size:.69rem!important;margin-top:1px!important}
+.svc-list-arr{color:#374151;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
+.svc-list-row input:checked+label .svc-list-arr{color:#00d4ff}
+@media(min-width:720px){
+  .wrap{max-width:980px}
+  .card{padding:36px}
+  .card h2{font-size:1.3rem}
+  .hdr-banner{padding:22px 32px;gap:22px}
+  .hdr-icon{width:64px;height:64px}
+  .hdr-divider{height:64px}
+  .hdr-title{font-size:2.1rem}
+  .hdr-underline{width:136px}
+  .opts{gap:14px}
+  .opts.c4d{grid-template-columns:repeat(4,1fr)}
+  .opts.c3{grid-template-columns:repeat(3,1fr)}
+  .opts.c3d{grid-template-columns:repeat(3,1fr)}
+  .opts.c2d{grid-template-columns:repeat(2,1fr)}
+  .opts.pills{grid-template-columns:repeat(4,1fr);gap:10px}
+  .opts.pills .opt label{padding:18px 12px}
+  .opts.pills .opt-icon svg{width:34px;height:34px}
+  .opts.pills .opt-name{font-size:1rem}
+  .opts.pills .opt-desc{font-size:.82rem}
+  .opt-icon svg{width:48px;height:48px}
+  .opt-name{font-size:1.05rem}
+  .opt-desc{font-size:.88rem}
+  .opt label{padding:18px 16px}
+  .opts.c3d .opt label,.opts.c2d .opt label{align-items:flex-start;padding:18px}
+  .opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:34px;height:34px}
+  .opts.c4d .opt label{padding:18px 14px}
+  .summary{grid-template-columns:repeat(3,1fr)}
+  .nav{max-width:480px}
+  .btn-dl,.btn-aio,.btn-manifest{max-width:480px}
+  .hero-sub{grid-template-columns:repeat(4,1fr)}
+  .hero-sub .opt-icon svg{width:28px;height:28px}
+  .opts.list .opt-icon svg{width:34px;height:34px}
+  .opts.list .opt label{padding:16px 18px}
+}
+/* Toggle switch */
+.toggle-sw{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;cursor:pointer;inset:0;background:#30363d;border-radius:24px;transition:.15s}
+.toggle-track::before{position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:#e6edf3;border-radius:50%;transition:.15s}
+.toggle-sw input:checked~.toggle-track{background:#00d4ff}
+.toggle-sw input:checked~.toggle-track::before{transform:translateX(20px);background:#fff}
+/* Version badge */
+.ver-badge{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;background:#00131c;border:1px solid #005c7a;color:#00d4ff;text-decoration:none;letter-spacing:.04em;vertical-align:middle;transition:all .15s}
+.ver-badge:hover{background:#002a40;border-color:#00d4ff;color:#7eeeff}
+/* Manifest modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px);animation:fadeIn .18s ease}
+.modal-box{background:#161b22;border:1px solid #30363d;border-radius:16px;padding:24px 22px;max-width:460px;width:100%;position:relative;animation:slideUp .22s ease;max-height:90dvh;overflow-y:auto}
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:1.5rem;line-height:1;padding:2px 8px;border-radius:6px;transition:color .15s}
+.modal-close:hover{color:#e6edf3}
+.modal-success-icon{width:48px;height:48px;background:#061a0e;border:2px solid #2ea043;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.modal-title{font-size:1.18rem;font-weight:800;text-align:center;margin-bottom:4px}
+.modal-sub{color:#6b7280;font-size:.8rem;text-align:center;margin-bottom:18px;line-height:1.5}
+.fmt-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.fmt-tab{padding:5px 13px;border-radius:7px;border:1.5px solid #30363d;background:#0d1117;color:#6b7280;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fmt-tab:hover{border-color:#005c7a;color:#e6edf3}
+.fmt-tab.active{border-color:#00d4ff;background:#00131c;color:#00d4ff}
+.copy-field{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.copy-field-label{color:#6b7280;font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+.copy-field-val{font-family:monospace;font-size:.74rem;color:#c9d1d9;word-break:break-all}
+.copy-field-val.pwd-val{font-size:.9rem;letter-spacing:.05em;color:#e6edf3;font-family:inherit}
+.copy-btn{background:#21262d;border:none;border-radius:6px;color:#8b949e;cursor:pointer;padding:5px 9px;flex-shrink:0;font-size:.72rem;font-weight:700;transition:all .15s}
+.copy-btn:hover{background:#30363d;color:#e6edf3}
+.copy-btn.copied{background:#061a0e;color:#3fb950}
+.qr-wrap{display:flex;justify-content:center;margin:12px 0 3px}
+.qr-wrap img{border-radius:8px;border:1px solid #21262d;background:#0d1117}
+.modal-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.m-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;border:none;text-decoration:none;transition:all .15s;white-space:nowrap;min-width:0}
+.m-btn:active{transform:scale(.97)}
+.m-install{background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000}
+.m-web{background:#1a1f2e;border:1.5px solid #00d4ff!important;color:#00d4ff}
+.m-wu{background:#16103a;border:1.5px solid #4f46e5!important;color:#a78bfa}
+.m-nuvio{background:#1a1200;border:1.5px solid #d97706!important;color:#f59e0b}
+.m-done{background:#21262d;color:#8b949e}
+.m-done:hover{color:#e6edf3}
+/* Manifest primary button */
+.btn-manifest{width:100%;padding:15px;font-size:1.05rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px}
+.btn-manifest:hover{opacity:.88}
+.btn-manifest:active{transform:scale(.98)}
+.btn-manifest:disabled{opacity:.38;cursor:not-allowed}
+/* Connecting dots animation */
+@keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.dot-spin span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:currentColor;animation:dotPulse 1.2s ease-in-out infinite}
+.dot-spin span:nth-child(2){animation-delay:.2s}
+.dot-spin span:nth-child(3){animation-delay:.4s}
+/* Duck-style preference toggle cards */
+.pref-section{margin-bottom:20px}
+.pref-section-label{font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.pref-card{background:#0d1117;border:1.5px solid #30363d;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;margin-bottom:8px}
+.pref-card:last-child{margin-bottom:0}
+.pref-card:hover{border-color:#005c7a}
+.pref-card.pref-on{border-color:#00d4ff;background:#00131c}
+.pref-body-inner{flex:1;min-width:0}
+.pref-title{font-weight:700;font-size:.9rem;color:#e6edf3;line-height:1.3}
+.pref-desc{color:#6b7280;font-size:.78rem;margin-top:2px;line-height:1.4}
+.pref-circle{width:22px;height:22px;border-radius:50%;border:2px solid #374151;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent}
+.pref-card.pref-on .pref-circle{background:#00d4ff;border-color:#00d4ff}
+/* Formatter live preview card */
+.fmt-live-preview{background:#111827;border:1px solid #1e2837;border-radius:8px;padding:11px 13px;margin-top:10px;display:flex;gap:10px;align-items:flex-start}
+.fmt-live-poster{width:36px;height:52px;border-radius:4px;background:#1e2837;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.fmt-live-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.fmt-live-n{font-size:.73rem;color:#e2e8f0;line-height:1.55;word-break:break-word}
+.fmt-live-d{font-size:.7rem;color:#6b7280;line-height:1.55;word-break:break-word}
+/* Animated logo */
+@keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
+@keyframes coreGlowPulse{0%,100%{transform:scale(1);opacity:.38}50%{transform:scale(1.24);opacity:.84}}
+@keyframes coreRingOut{0%{transform:scale(.5);opacity:.7}100%{transform:scale(2);opacity:0}}
+@keyframes hexBreath{0%,100%{opacity:.28}50%{opacity:.5}}
+@keyframes coreTextPulse{0%,100%{text-shadow:none}50%{text-shadow:0 0 14px rgba(255,255,255,.55),0 0 28px rgba(255,255,255,.18)}}
+.diamond-core{transform-box:fill-box;transform-origin:center;animation:corePulse 2.6s ease-in-out infinite}
+.diamond-glow{transform-box:fill-box;transform-origin:center;animation:coreGlowPulse 2.6s ease-in-out infinite}
+.core-ring{transform-box:fill-box;transform-origin:center;fill:none;stroke-width:5;animation:coreRingOut 2.6s ease-out infinite}
+.core-ring-2{animation-delay:1.3s}
+.hex-glow-layer{animation:hexBreath 2.6s ease-in-out infinite}
+.hdr-core{animation:coreTextPulse 2.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.diamond-core,.diamond-glow,.core-ring,.hex-glow-layer,.hdr-core{animation:none}}
+.srh{display:flex;align-items:center;gap:14px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,.05)}
+.srh-ring{position:relative;width:52px;height:52px;flex-shrink:0}
+.srh-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:900;color:#00d4ff}
+.srh-title{font-size:1.15rem;font-weight:900;letter-spacing:-.02em;line-height:1.1;color:#e6edf3}
+.srh-sub{font-size:.75rem;color:#3d6880;margin-top:4px;line-height:1.4}
+.step-strip{display:flex;align-items:center;padding:10px 0 6px;position:relative}
+.step-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0}
+.step-unit:not(:first-child)::before{content:'';position:absolute;top:50%;transform:translateY(-50%);right:50%;width:100%;height:1px;background:#2d333b;z-index:0;transition:background .3s}
+.step-unit.done::before{background:rgba(0,212,255,.4)}
+.step-bub{width:10px;height:10px;border-radius:50%;position:relative;z-index:1;flex-shrink:0;transition:all .25s}
+.step-pending .step-bub{background:#2d333b}
+.step-active .step-bub{background:#00d4ff;box-shadow:0 0 10px rgba(0,212,255,.7);transform:scale(1.4)}
+.step-done .step-bub{background:#00d4ff;opacity:.45}
+.step-lbl{font-size:.52rem;font-weight:600;color:#374151;margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:36px}
+.step-active .step-lbl{color:#00d4ff;font-weight:700}
+.step-done .step-lbl{color:#4b7c93}
+.btn-reset-strip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)!important;color:#4b5563;font-size:.6rem;font-weight:700;cursor:pointer;padding:4px 10px;border-radius:20px;transition:all .15s;flex-shrink:0;align-self:center;letter-spacing:.05em;text-transform:uppercase;line-height:1.4}
+.btn-reset-strip:hover{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.25)!important;color:#f87171}
+.bc-row{display:flex;flex-wrap:nowrap;gap:5px;padding:1px 0 7px;overflow-x:auto;scrollbar-width:none}
+.bc-row::-webkit-scrollbar{display:none}
+.bc-chip{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;background:#001018;border:1px solid #1a3040;color:#3d9db5;white-space:nowrap;flex-shrink:0}
+.receipt-card{border:1px solid #1e2d3d;border-radius:12px;overflow:hidden;margin-bottom:16px}
+.receipt-hdr{display:flex;align-items:center;gap:12px;padding:13px 16px;background:linear-gradient(135deg,#00111e,#000e18);border-bottom:1px solid #1a2a3a}
+.receipt-hdr-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#0096b4,#005c7a);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.receipt-hdr-name{font-weight:800;font-size:.95rem;color:#e6edf3;line-height:1.2}
+.receipt-hdr-sub{font-size:.68rem;color:#3d6a85;margin-top:1px}
+.receipt-row{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid #0f1a24;gap:8px}
+.receipt-row:last-child{border-bottom:none}
+.receipt-row-left{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.receipt-row-ico{font-size:.8rem;width:16px;text-align:center}
+.receipt-row-lbl{font-size:.74rem;color:#4b5563;font-weight:600;text-transform:capitalize}
+.receipt-row-val{font-size:.84rem;font-weight:700;color:#c9d1d9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:54%}
+.receipt-row-val.hl{color:#00d4ff}
+.card.splash{background:#0a0f16;background-image:radial-gradient(ellipse at 50% 18%,rgba(0,180,210,.13) 0%,transparent 55%),radial-gradient(ellipse at 50% 92%,rgba(120,30,180,.08) 0%,transparent 50%)}
+.splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px 36px}
+.splash-icon{width:96px;height:96px;margin-bottom:18px;filter:drop-shadow(0 0 24px rgba(0,212,255,.5))}
+.splash-title{font-size:2.15rem;font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:5px}
+.splash-by{font-size:.67rem;font-weight:700;letter-spacing:.18em;color:#374151;text-transform:uppercase;margin-bottom:13px}
+.splash-tagline{font-size:.9rem;color:#9ca3af;line-height:1.5;margin-bottom:20px;max-width:290px}
+.splash-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:7px}
+.splash-chip{font-size:.69rem;font-weight:700;padding:4px 11px;border-radius:20px;letter-spacing:.02em}
+.splash-chip-svc{border:1px solid rgba(0,212,255,.22);color:#67e8f9;background:rgba(0,212,255,.06)}
+.splash-chip-feat{border:1px solid #1e2a35;color:#4b5563;background:transparent}
+.splash-cta{margin-top:24px;width:100%;max-width:310px;padding:15px 24px;font-size:1rem;font-weight:800;border:none;border-radius:12px;background:linear-gradient(135deg,#0096b4 0%,#006a9a 100%);color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(0,150,180,.3);transition:all .2s;letter-spacing:.01em}
+.splash-cta:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(0,150,180,.45)}
+.splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
+.splash-paste:hover{color:#6b7280}
+/* ── Theme toggle ─────────────────────────────────────── */
+#themeToggle{position:fixed;top:14px;right:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
+#themeToggle:hover{background:rgba(255,255,255,.12);color:#e6edf3;border-color:rgba(255,255,255,.2)}
+#themeToggle::before{content:'☀';margin-right:4px}
+[data-theme="light"] #themeToggle::before{content:'🌙'}
+/* ── Light theme ──────────────────────────────────────── */
+[data-theme="light"]{color-scheme:light}
+[data-theme="light"] body{background:#f6f8fa;color:#1c2128}
+[data-theme="light"] .card{background:#ffffff;border-color:#d0d7de;background-image:none}
+[data-theme="light"] .card.splash{background:#f0f4f8}
+[data-theme="light"] .card h2{color:#1c2128}
+[data-theme="light"] .card .desc{color:#57606a}
+[data-theme="light"] .prog-track{background:#d0d7de}
+[data-theme="light"] .prog-label{color:#57606a}
+[data-theme="light"] .btn-reset{color:#57606a}
+[data-theme="light"] .btn-reset:hover{color:#0969da}
+[data-theme="light"] .nav::before{background:linear-gradient(to bottom,transparent,#f6f8fa 40%)}
+[data-theme="light"] .btn-back{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.09)!important;color:#57606a}
+[data-theme="light"] .btn-back:hover{background:rgba(0,0,0,.08);color:#1c2128;border-color:rgba(0,0,0,.18)!important}
+[data-theme="light"] .btn-next{background:linear-gradient(135deg,#0969da 0%,#0550ae 100%);color:#fff}
+[data-theme="light"] .btn-next:disabled{background:#eaedf0;border-color:#d0d7de;color:#8c959f;box-shadow:none}
+[data-theme="light"] .opt label{background:#ffffff;border-color:#d0d7de}
+[data-theme="light"] .opt label:hover{background:#f6f8fa;border-color:rgba(9,105,218,.2);background:rgba(9,105,218,.02)}
+[data-theme="light"] .opt input:checked+label{border-color:rgba(9,105,218,.45);background:rgba(9,105,218,.06);box-shadow:0 0 0 1px rgba(9,105,218,.15),0 4px 20px rgba(9,105,218,.09)}
+[data-theme="light"] .opt-desc{color:#57606a}
+[data-theme="light"] .name-input{background:#ffffff;border-color:#d0d7de;color:#1c2128}
+[data-theme="light"] .name-input:focus{border-color:#0969da}
+[data-theme="light"] .name-input::placeholder{color:#8c959f}
+[data-theme="light"] select.name-input{color-scheme:light}
+[data-theme="light"] .sum-item{background:#f6f8fa;border-color:#d0d7de}
+[data-theme="light"] .sum-lbl{color:#57606a}
+[data-theme="light"] .sum-val{color:#1c2128}
+[data-theme="light"] .toggle-track{background:#d0d7de}
+[data-theme="light"] .pref-card{background:#f6f8fa;border-color:#d0d7de}
+[data-theme="light"] .pref-card:hover{border-color:#0969da}
+[data-theme="light"] .pref-card.pref-on{border-color:#0969da;background:rgba(9,105,218,.06)}
+[data-theme="light"] .pref-title{color:#1c2128}
+[data-theme="light"] .pref-desc{color:#57606a}
+[data-theme="light"] .pref-section-label{color:#57606a}
+[data-theme="light"] .size-btn{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .size-btn:hover{border-color:#0969da;color:#1c2128}
+[data-theme="light"] .size-btn-active{border-color:#0969da!important;background:rgba(9,105,218,.07)!important;color:#0969da!important}
+[data-theme="light"] .receipt-card{border-color:#d0d7de}
+[data-theme="light"] .receipt-hdr{background:linear-gradient(135deg,#f0f4f8,#e8ecf0);border-color:#d0d7de}
+[data-theme="light"] .receipt-hdr-name{color:#1c2128}
+[data-theme="light"] .receipt-hdr-sub{color:#57606a}
+[data-theme="light"] .receipt-row{border-color:#eaedf0}
+[data-theme="light"] .receipt-row-lbl{color:#8c959f}
+[data-theme="light"] .receipt-row-val{color:#1c2128}
+[data-theme="light"] .srh-title{color:#1c2128}
+[data-theme="light"] .srh-sub{color:#57606a}
+[data-theme="light"] .splash-by{color:#8c959f}
+[data-theme="light"] .splash-tagline{color:#57606a}
+[data-theme="light"] .splash-chip-feat{color:#57606a}
+[data-theme="light"] .step-pending .step-bub{background:#d0d7de}
+[data-theme="light"] .step-unit:not(:first-child)::before{background:#d0d7de}
+[data-theme="light"] .btn-reset-strip{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.09)!important;color:#8c959f}
+[data-theme="light"] .btn-reset-strip:hover{background:rgba(207,34,46,.08);border-color:rgba(207,34,46,.25)!important;color:#cf222e}
+[data-theme="light"] .bc-chip{background:#eaedf0;border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .ver-badge{background:#ddf4ff;border-color:#0969da;color:#0969da}
+[data-theme="light"] .svc-list-row label{background:#ffffff!important;border-color:#d0d7de!important}
+[data-theme="light"] .svc-list-row label:hover{background:#f6f8fa!important;border-color:rgba(9,105,218,.2)!important}
+[data-theme="light"] .svc-list-row input:checked+label{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.4)!important}
+[data-theme="light"] .svc-list-hero label{background:#ffffff!important;border-color:#d0d7de!important}
+[data-theme="light"] .svc-list-hero input:checked+label{background:rgba(9,105,218,.08)!important;border-color:rgba(9,105,218,.4)!important}
+[data-theme="light"] .svc-list-arr{color:#afb8c1}
+[data-theme="light"] .modal-box{background:#ffffff;border-color:#d0d7de}
+[data-theme="light"] .modal-overlay{background:rgba(0,0,0,.45)}
+[data-theme="light"] .modal-close{color:#57606a}
+[data-theme="light"] .modal-close:hover{color:#1c2128}
+[data-theme="light"] .modal-title{color:#1c2128}
+[data-theme="light"] .modal-sub{color:#57606a}
+[data-theme="light"] .fmt-tab{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .fmt-tab:hover{border-color:#0969da;color:#1c2128}
+[data-theme="light"] .fmt-tab.active{border-color:#0969da;background:rgba(9,105,218,.07);color:#0969da}
+[data-theme="light"] .copy-field{background:#f6f8fa;border-color:#d0d7de}
+[data-theme="light"] .copy-field-label{color:#57606a}
+[data-theme="light"] .copy-field-val{color:#1c2128}
+[data-theme="light"] .copy-btn{background:#eaedf0;color:#57606a}
+[data-theme="light"] .copy-btn:hover{background:#d0d7de;color:#1c2128}
+[data-theme="light"] .copy-btn.copied{background:#f0fff4;color:#1a7f37}
+[data-theme="light"] .manifest-url{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .manifest-url:hover{border-color:#0969da;color:#0969da}
+[data-theme="light"] .notice{background:#f0fff4;border-color:#2da44e;color:#57606a}
+[data-theme="light"] .import-success{background:#f0fff4;border-color:#2da44e}
+[data-theme="light"] .inst-chip{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .inst-chip:hover{border-color:#0969da;color:#0969da}
+[data-theme="light"] .inst-chip-import{background:#ddf4ff;border-color:#0969da;color:#0969da}
+[data-theme="light"] .toast{background:#f0fff4;border-color:#2da44e;color:#1a7f37}
+[data-theme="light"] .toast.error{background:#fff0f0;border-color:#cf222e;color:#cf222e}
+[data-theme="light"] .fmt-live-preview{background:#f6f8fa;border-color:#d0d7de}
+[data-theme="light"] .fmt-live-n{color:#1c2128}
+[data-theme="light"] .fmt-live-d{color:#57606a}
+[data-theme="light"] .aio-section{border-color:#d0d7de}
+[data-theme="light"] .aio-section h3{color:#57606a}
+[data-theme="light"] #themeToggle{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#57606a}
+[data-theme="light"] #themeToggle:hover{background:rgba(0,0,0,.09);color:#1c2128;border-color:rgba(0,0,0,.2)}
+[data-theme="light"] [data-action="set-formatter"]{background:#f6f8fa!important;border-color:#d0d7de!important}
+[data-theme="light"] [data-action="set-audio"]{background:#f6f8fa!important;border-color:#d0d7de!important}
+[data-theme="light"] [data-action="set-match-mode"]{background:#f6f8fa!important;border-color:#d0d7de!important;color:#57606a!important}
+</style>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<div class="wrap">
+  <header class="hdr">
+    <div class="prog-wrap">
+      <div id="stepStrip"></div>
+      <div id="breadcrumbs"></div>
+    </div>
+  </header>
+  
+  <div id="main"></div>
+  
+  <div class="nav" id="nav">
+    <button class="btn btn-back" id="btnBack" data-action="nav-back">← Back</button>
+    <button class="btn btn-next" id="btnNext" data-action="nav-next">Next →</button>
+  </div>
+</div>
+<button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle theme"> Mode</button>
+<script>
+function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
+const STEPS = 6;
+const CONFIGURATOR_VERSION = '1.6';
+const CHANGELOG = [
+  { v:'1.6', date:'Jun 27 2026', items:[
+    'Light / dark mode toggle — top-right button, persists across sessions',
+    'TorBox Pro collapses to same size as other options; expands only when selected',
+    'Back button now visible on Review step — return to any step without resetting',
+    'TMDB keys now included in import URL — no need to re-enter after import',
+  ]},
+  { v:'1.5', date:'Jun 27 2026', items:[
+    'Advanced Options button redesigned — cyan border, "Audio · Video · Formatter" subtitle',
+    'TMDB API fields omitted when empty — fixes 401 errors on AIOStreams import',
+    'Changelog on splash reverted to collapsible — click "What\'s New" to expand',
+    'Version badge removed from step strip — clean dots + Reset only',
+    'Formatter descriptions updated to accurately reflect each layout',
+  ]},
+  { v:'1.4', date:'Jun 27 2026', items:[
+    'Step progress strip replaced with minimal dots',
+    'JS obfuscated — source file protected from public repo',
+    'Live changelog added to splash screen',
+  ]},
+  { v:'1.3', date:'Jun 27 2026', items:[
+    'Stremio login — sign in with email + password to push template to your library',
+    'WuPlay tab opens config.wuplay.app directly with manifest URL auto-copied',
+    'Quick Start skips device / resolution / content steps — lands on APIs',
+  ]},
+  { v:'1.2', date:'Jun 26 2026', items:[
+    'Advanced Options panel — audio profile, video prefs (4K/DV exclusions), formatter picker',
+    'Match Aggressiveness — relaxed / balanced / strict deduplication modes',
+    'Device → audio auto-suggestion when selecting a device profile',
+    'P2P toggle on content step — enable or block uncached torrent streams',
+    'Quality-first sort mode — resolution before cached status',
+  ]},
+  { v:'1.1', date:'Jun 25 2026', items:[
+    'Quick Start presets — 4K Lossless and 1080p DD+ one-click setup',
+    'Audio profiles in resolution step accordion — Lossless / DD+ / Auto / Dolby Only',
+    'Install tabs in manifest modal — Stremio App · Web · WuPlay · Nuvio',
+    'All steps redesigned to svc-list row layout with icons and descriptions',
+  ]},
+  { v:'1.0', date:'Jun 24 2026', items:[
+    'Initial launch — 6-step wizard: Service → Device → Resolution → Content → APIs → Review',
+    'Services: TorBox Pro / Essential, AllDebrid, Real-Debrid, Premiumize, Debrid-Link, Hybrid, Multi-Debrid, EasyNews',
+    'Device profiles — Standard TV, Samsung, Apple TV, LG webOS, Windows PC, Fire Stick, Nuvio',
+    'Resolution — 4K · Ultrawide · 1080p · 720p with per-resolution template routing',
+    'Content type — All, Anime Only, No Anime, Live TV',
+    'APIs — TorBox, AllDebrid, Real-Debrid, TMDB, instance host selection',
+    'Review step — named config, one-click manifest generation and download',
+    'Instance support — elfhosted, fortheweak, custom URL with UUID/password',
+  ]},
+];
+let step = 0;
+let showAdvanced = false;
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
+
+const FORMATTERS = [
+  {
+    id: 'apex-v2', label: 'Apex v2', badge: 'Rich', bc: '#7c3aed',
+    desc: '4-line · colored resolution · emoji HDR tags · elite badges · bitrate',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg',
+    name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::replace('360p','⚫ 360P')}  "||"📺 HD  "]}{service.shortName::exists["⚡ {service.shortName::upper}  "||"📡 P2P  "]}{stream.library::istrue["🗄️  "||""]}{stream.proxied::istrue["🕵️  "||""]}{stream.visualTags::~(?i)(DV|HDR|HLG)["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','')::replace('10BIT','')::replace('10bit','')::replace('STANDARD','')}  "||""]}  {stream.title::exists["{stream.title::upper}"||""]}{stream.formattedSeasons::exists[" {stream.formattedSeasons::upper}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes::upper}"||""]}`,
+    d: ` {service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}{stream.nSeScore::>=75["💎 ELITE  "||""]}{stream.nSeScore::>=50["✦ {stream.nSeScore}  "||""]}{stream.seadexBest::istrue["⭐ BEST  "||""]}{stream.seadex::istrue["✅ SEADEX  "||""]}{stream.regexMatched::exists["🎯 {stream.regexMatched::truncate(12)::smallcaps}  "||""]}{stream.seMatched::exists["🧲 {stream.seMatched::truncate(12)::smallcaps}  "||""]}{stream.releaseGroup::exists["🏷️ {stream.releaseGroup::smallcaps}  "||""]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]}{stream.filename::~(?i)IMAX["🎞️ IMAX  "||""]}{tools.newLine} 🎬 {stream.quality::exists["{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('BLURAY','💿 BLURAY')::replace('BLU-RAY REMUX','💎 REMUX')::replace('BLU-RAY','💿 BLURAY')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('HDTV','🎞️ HDTV')::replace('HDRIP','🎞️ HDRIP')}  "||""]}{stream.encode::exists["{stream.encode::smallcaps}  "||""]}{stream.container::exists["{stream.container::smallcaps}  "||""]}{stream.hasChapters::istrue["📖  "||""]}{stream.bitrate::exists["{stream.bitrate::sbitrate::smallcaps}  "||""]}{stream.visualTags::exists["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','☀️ SDR')::replace('10BIT','🎨 10ʙɪᴛ')::replace('10bit','🎨 10ʙɪᴛ')::replace('STANDARD','☀️ SDR')}  "||"☀️ SDR  "]}{stream.network::exists["🍿 {stream.network::upper}  "||""]}{stream.upscaled::istrue["🔬 UPSCALED  "||""]}{stream.unrated::istrue["🚫 UNRATED  "||""]}{stream.uncensored::istrue["🔞  "||""]}{stream.editions::exists["✂️ {stream.editions::join(' ')::upper}  "||""]}{tools.newLine} 🎛️ {stream.audioTags::exists["{stream.audioTags::join(' ')::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD MA')::replace('DTS-X','🎵 DTS-X')::replace('EAC3','🎶 EAC3')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('AAC','🎧 AAC')::replace('FLAC','💿 FLAC')::replace('AC3','🎵 AC3')}  "||"ᴀᴜᴅɪᴏ  "]}{stream.audioChannels::first::=2.0["🔈 "||""]}{stream.audioChannels::first::=5.1["🔉 "||""]}{stream.audioChannels::first::=7.1["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]}{stream.dubbed::istrue["  🎙️ DUB"||""]}{stream.uSubtitleEmojis::exists["  📝 {stream.uSubtitleEmojis::slice(0,3)::join(' ')}"||""]}{tools.newLine} {stream.size::exists["{stream.size::sbytes}  "||""]}{stream.folderSize::exists["📁 {stream.folderSize::sbytes}  "||""]}{stream.seasonPack::istrue["📦 PACK  "||""]}{stream.repack::istrue["🛠️ REPACK  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.freeleech::istrue["🆓 FREE  "||""]}{stream.age::exists["⏱️ {stream.age::smallcaps}  "||""]}{stream.indexer::exists["🔍 {stream.indexer::truncate(12)::smallcaps}  "||""]}🔌 {stream.type::exists["{stream.type::smallcaps}"||""]}`
+  },
+  {
+    id: 'sigma', label: 'Sigma', badge: 'Elegant', bc: '#0891b2',
+    desc: '4-line · 「 」 brackets · 『 』 elite marks · smallcaps audio',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg',
+    name: `{service.cached::istrue["✦ "||"✧ "]}{stream.title::exists["{stream.title::title::truncate(30)} "||""]}{service.shortName::exists["「 {service.shortName::upper} 」 "||"「 P2P 」 "]}{stream.resolution::exists["「 {stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::upper} 」 "||""]}{ stream.quality::exists["「 {stream.quality::upper::replace('BLURAY REMUX','REMUX')::replace('BLU-RAY REMUX','REMUX')::replace('WEB-DL','WEB-DL')::replace('WEBRIP','WEBRIP')::replace('BLURAY','BLURAY')} 」 "||""]} {stream.visualTags::~(?i)(DV|HDR|HLG)["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','')::replace('10BIT','')::replace('STANDARD','')} "||""]}{stream.audioTags::exists["「 {stream.audioTags::first::upper::replace('ATMOS','🔮 ᴀᴛᴍᴏs')::replace('TRUEHD','💎 ᴛʀᴜᴇʜᴅ')::replace('DTS-HD MA','🔷 ᴅᴛs-ʜᴅ ᴍᴀ')::replace('DTS-X','🎵 ᴅᴛs-x')::replace('EAC3','🎶 ᴅᴅ+')::replace('DDP','🎶 ᴅᴅ+')::replace('DD+','🎶 ᴅᴅ+')::replace('FLAC','💿 ꜰʟᴀᴄ')::replace('AAC','🎧 ᴀᴀᴄ')::replace('AC3','🎵 ᴀᴄ3')::smallcaps} 」 "||""]}{stream.audioChannels::exists["「 {stream.audioChannels::first} 」 "||""]}{stream.formattedSeasons::exists["「 {stream.formattedSeasons::upper} 」 "||""]}{stream.formattedEpisodes::exists["「 {stream.formattedEpisodes::upper} 」 "||""]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["『 👑 ᴘʀᴇᴍɪᴇʀ 』"||""]}`,
+    d: `{stream.nSeScore::>=75["『 💎 ELITE 』 "||""]}{stream.nSeScore::>=50["『 ✦ QUALITY 』 "||""]}{stream.seadexBest::istrue["『 ⭐ BEST 』 "||""]}{stream.seadex::istrue["『 ✅ SEADEX 』 "||""]}{service.cached::istrue["『 🚀 INSTANT 』 "||""]}{service.cached::isfalse["『 ⚠️ UNCACHED 』 "||""]}{stream.regexMatched::exists["『 🎯 {stream.regexMatched::truncate(12)::smallcaps} 』 "||""]}{stream.seMatched::exists["『 🧲 {stream.seMatched::truncate(12)::smallcaps} 』 "||""]}{stream.releaseGroup::exists["『 🏷️ {stream.releaseGroup::smallcaps} 』 "||""]}{stream.filename::~(?i)IMAX["『 🎞️ IMAX 』 "||""]}{tools.newLine}「 🎬 {stream.quality::exists["{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('BLU-RAY REMUX','💎 REMUX')::replace('BLURAY','💿 BLURAY')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('HDTV','🎞️ HDTV')} 」 "||"📼 STANDARD 」 "]}{stream.encode::exists["「 {stream.encode::smallcaps} 」 "||""]}{stream.bitrate::exists["「 {stream.bitrate::sbitrate::smallcaps} 」 "||""]}{stream.visualTags::exists["「 {stream.visualTags::join(' | ')::replace('DV','👁️ ᴅᴠ')::replace('HDR10+','✨ ʜᴅʀ¹⁰⁺')::replace('HDR10','🌟 ʜᴅʀ¹⁰')::replace('HLG','🌤️ ʜʟɢ')::replace('HDR','🌟 ʜᴅʀ')::replace('SDR','☀️ sᴅʀ')::replace('10BIT','🎨 10ʙɪᴛ')::replace('10bit','🎨 10ʙɪᴛ')::replace('STANDARD','☀️ sᴅʀ')::smallcaps} 」 "||""]} {tools.newLine}「 🎛️ {stream.audioTags::exists["{stream.audioTags::join(' | ')::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD MA')::replace('DTS-X','🎵 DTS-X')::replace('EAC3','🎶 DD+')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('AAC','🎧 AAC')::replace('FLAC','💿 FLAC')::replace('AC3','🎵 AC3')} 」 "||"ᴀᴜᴅɪᴏ 」 "]}{stream.audioChannels::first::=7.1["🔊 "||""]}{stream.audioChannels::first::=5.1["🔉 "||""]}{stream.audioChannels::first::=2.0["🔈 "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]}{stream.dubbed::istrue["  🎙️ DUB"||""]}{stream.subbed::istrue["  📝 SUB"||""]}{tools.newLine}「 {stream.seasonPack::istrue["📦 PACK → "||""]}{stream.size::exists["{stream.size::sbytes} 」 "||"? 」 "]}{stream.folderSize::exists["「 📁 {stream.folderSize::sbytes} 」 "||""]}{stream.seeders::exists["「 🌱 {stream.seeders} 」 "||""]}{stream.repack::istrue["「 🛠️ REPACK 」 "||""]}{stream.freeleech::istrue["「 🆓 FREE 」 "||""]}{stream.age::exists["「 ⏱️ {stream.age::smallcaps} 」 "||""]}{stream.indexer::exists["「 🔍 {stream.indexer::truncate(12)::smallcaps} 」 "||""]}`
+  },
+  {
+    id: 'minimal', label: 'Minimal', badge: 'Clean', bc: '#059669',
+    desc: '3-line · audio tag in title · quality · bitrate · size below',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg',
+    name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')}  "||"⚪ ?  "]}{service.cached::istrue["⚡ "||"⏳ "]}{service.shortName::exists["{service.shortName::upper}  "||"P2P  "]}{stream.audioTags::exists["{stream.audioTags::first::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD')::replace('EAC3','🎶 DD+')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('FLAC','💿 FLAC')::replace('AAC','🎧 AAC')}  "||""]}{stream.title::exists["{stream.title::upper}"||""]}{stream.formattedSeasons::exists[" {stream.formattedSeasons::upper}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes::upper}"||""]}`,
+    d: `{service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}{stream.nSeScore::>=75["💎 ELITE  "||""]}{stream.nSeScore::>=50["✦ QUALITY  "||""]}{stream.seadexBest::istrue["⭐ BEST  "||""]}{stream.regexMatched::exists["🎯 {stream.regexMatched::truncate(10)::smallcaps}  "||""]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]}{stream.releaseGroup::exists["🏷️ {stream.releaseGroup::smallcaps}"||""]} {tools.newLine}{stream.quality::exists["{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('BLURAY','💿 BLURAY')}  "||""]}{stream.visualTags::~(?i)(DV|HDR|HLG)["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')}  "||""]}{stream.audioTags::exists["{stream.audioTags::first::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD')::replace('EAC3','🎶 DD+')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('FLAC','💿 FLAC')::replace('AAC','🎧 AAC')}  "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}{tools.newLine}{stream.seasonPack::istrue["📦 PACK  "||""]}{stream.size::exists["{stream.size::sbytes}  "||""]}{stream.bitrate::exists["{stream.bitrate::sbitrate::smallcaps}  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.age::exists["⏱️ {stream.age::smallcaps}  "||""]}{stream.indexer::exists["🔍 {stream.indexer::truncate(12)::smallcaps}"||""]}`
+  },
+  {
+    id: 'prime', label: 'Prime', badge: 'Classic', bc: '#d97706',
+    desc: '4-line · 🖥️ resolution · plain text audio labels · full metadata',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg',
+    name: `{stream.resolution::exists["🖥️ {stream.resolution::upper}  "||"📺 HD  "]}{service.shortName::exists["⚡ {service.shortName::upper}  "||"📡 P2P  "]}{stream.proxied::istrue["🕵️  "||""]}{stream.library::istrue["🗄️  "||""]}{stream.title::exists["{stream.title::upper}"||""]}{stream.formattedSeasons::exists[" {stream.formattedSeasons::upper}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes::upper}"||""]}`,
+    d: ` {service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}{stream.nSeScore::>=75["💎 ELITE  "||""]}{stream.seadexBest::istrue["⭐ BEST  "||""]}{stream.seadex::istrue["✅ SEADEX  "||""]}{stream.regexMatched::exists["🎯 {stream.regexMatched::truncate(12)::smallcaps}  "||""]}{stream.seMatched::exists["🧲 {stream.seMatched::truncate(12)::smallcaps}  "||""]}{stream.releaseGroup::exists["🏷️ {stream.releaseGroup::smallcaps}  "||""]}\n 🎬 {stream.quality::exists["{stream.quality::upper}  "||""]}{stream.encode::exists["{stream.encode::smallcaps}  "||""]}{stream.container::exists["{stream.container::smallcaps}  "||""]}{stream.hasChapters::istrue["📖  "||""]}{stream.visualTags::exists["{stream.visualTags::join(' ')::upper}  "||""]}{stream.bitrate::exists["{stream.bitrate::sbitrate::smallcaps}  "||""]}{stream.network::exists["🍿 {stream.network::upper}  "||""]}{stream.editions::exists["✂️ {stream.editions::join(' ')::upper}  "||""]}\n 🎛️ {stream.audioTags::exists["{stream.audioTags::join(' ')::upper}  "||"ᴀᴜᴅɪᴏ  "]}{stream.audioChannels::first::=2.0["🔈 "||""]}{stream.audioChannels::first::=5.1["🔉 "||""]}{stream.audioChannels::first::=7.1["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]}{stream.dubbed::istrue["  🎙️ DUB"||""]}{stream.subbed::istrue["  📝 SUB"||""]}\n 💾 {stream.size::exists["{stream.size::sbytes}  "||""]}{stream.folderSize::exists["📦 {stream.folderSize::sbytes}  "||""]}{stream.seasonPack::istrue["🗂️ PACK  "||""]}{stream.repack::istrue["🛠️ REPACK  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.freeleech::istrue["🆓 FREE  "||""]}{stream.age::exists["📅 {stream.age::smallcaps}  "||""]}{stream.indexer::exists["🔍 {stream.indexer::truncate(12)::smallcaps}  "||""]}🔌 {stream.type::exists["{stream.type::smallcaps}"||""]}`
+  },
+  {
+    id: 'tv', label: 'TV', badge: 'Compact', bc: '#dc2626',
+    desc: '3-line · uppercase · quality+visual+size on one line · TV-friendly',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg',
+    name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🔴 4K')::replace('1440p','🟣 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::replace('Unknown','📺 HD')}  "||"📺 HD  "]{service.cached::istrue["⚡ "||"⏳ "]}{service.shortName::exists["{service.shortName::upper}  "||"P2P  "]}{stream.library::istrue["📚  "||""]} {stream.title::exists["{stream.title::upper}"||""]} {stream.formattedSeasons::exists["{stream.formattedSeasons::upper}"||""]} {stream.formattedEpisodes::exists["{stream.formattedEpisodes::upper}"||""]}`,
+    d: ` {service.cached::istrue["🚀 INSTANT  "||"⚠️ UNCACHED  "]}{stream.nSeScore::>=75["💎 ELITE  "||""]} {stream.seadexBest::istrue["⭐ BEST  "||""]} {stream.seadex::istrue["✅ SEADEX  "||""]} {stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]} {stream.filename::~(?i)IMAX["🎞️ IMAX  "||""]} \n 🎬 {stream.quality::exists["{stream.quality::upper}  "||""]} {stream.encode::exists["{stream.encode::upper}  "||""]} {stream.visualTags::exists["{stream.visualTags::join(' ')::upper}  "||"SDR  "]} {stream.bitrate::exists["{stream.bitrate::sbitrate::upper}  "||""]} {stream.size::exists["{stream.size::sbytes}"||""]} \n 🔊 {stream.audioTags::exists["{stream.audioTags::join(' ')::upper}  "||"AUDIO  "]}{stream.audioChannels::first::=2.0["🔈 "||""]} {stream.audioChannels::first::=5.1["🔉 "||""]} {stream.audioChannels::first::=7.1["🔊 "||""]} {stream.audioChannels::exists["{stream.audioChannels::first}  "||""]} 🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]} {stream.dubbed::istrue["  🎙️ DUB"||""]} {stream.subbed::istrue["  📝 SUB"||""]}\n 🔌 {stream.type::exists["{stream.type::upper}  "||""]} {stream.seeders::exists["🌱 {stream.seeders}  "||""]} {stream.repack::istrue["🛠️ REPACK  "||""]} {stream.age::exists["📅 {stream.age::upper}  "||""]} {stream.indexer::exists["🔍 {stream.indexer::truncate(15)::upper}"||""]}`
+  }
+];
+
+const DEFS = [
+  { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'svc-list',
+    opts:[
+      { v:'torbox-pro',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="#051408"/><polygon points="22,14 30,18 22,22 14,18" fill="#1a5c2a"/><polygon points="14,18 14,27 22,31 22,22" fill="#166534"/><polygon points="22,22 30,18 30,27 22,31" fill="#15803d"/><path d="M27 20 L22 26 L25 26 L23 31 L28 24 L25 24 Z" fill="#fde047"/></svg>', name:'TorBox Pro', desc:'Best pick — full scraper stack + HdHub<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Stream · 4K Apex</span>' },
+      { v:'torbox-ess',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#16a34a" stroke-width="2" fill="#041008"/><polygon points="22,15 30,19 22,23 14,19" fill="#14532d"/><polygon points="14,19 14,28 22,32 22,23" fill="#166534"/><polygon points="22,23 30,19 30,28 22,32" fill="#15803d"/><text x="22" y="12" text-anchor="middle" fill="#16a34a" font-size="5" font-weight="700" font-family="system-ui,sans-serif">ESS</text></svg>', name:'TorBox Essential', desc:'Essential plan — same smart sorting<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Essential · 4K Essential</span>' },
+      { v:'alldebrid',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#ea580c" stroke-width="2" fill="#1a0500"/><polygon points="19,15 25,22 19,29 13,22" fill="none" stroke="#ea580c" stroke-width="1.8"/><polygon points="25,15 31,22 25,29 19,22" fill="none" stroke="#ea580c" stroke-width="1.8"/></svg>', name:'AllDebrid', desc:'AllDebrid subscribers<br><span style="color:#ea580c;font-size:.8em">e.g. Core Nexus AllDebrid · 4K AllDebrid</span>' },
+      { v:'realdebrid',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="#1a0000"/><path d="M25 13 L18 23 L22 23 L19 31 L27 21 L23 21 Z" fill="#dc2626"/></svg>', name:'Real-Debrid', desc:'Real-Debrid subscribers<br><span style="color:#dc2626;font-size:.8em">e.g. Core Nexus RD</span>' },
+      { v:'premiumize',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#d97706" stroke-width="2" fill="#1a1000"/><text x="22" y="28" text-anchor="middle" fill="#d97706" font-size="17" font-weight="900" font-family="system-ui,sans-serif">P</text></svg>', name:'Premiumize', desc:'Premiumize subscribers<br><span style="color:#d97706;font-size:.8em">e.g. Core Nexus Premiumize</span>' },
+      { v:'debridlink',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#0284c7" stroke-width="2" fill="#00111a"/><rect x="10" y="19" width="14" height="7" rx="3.5" fill="none" stroke="#0284c7" stroke-width="1.8"/><rect x="20" y="19" width="14" height="7" rx="3.5" fill="none" stroke="#0284c7" stroke-width="1.8"/></svg>', name:'Debrid-Link', desc:'Debrid-Link subscribers<br><span style="color:#0284c7;font-size:.8em">e.g. Core Nexus Debrid-Link</span>' },
+      { v:'hybrid',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><clipPath id="hybL"><rect x="0" y="0" width="22" height="44"/></clipPath><clipPath id="hybR"><rect x="22" y="0" width="22" height="44"/></clipPath></defs><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#051408" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="none" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#1a0000" clip-path="url(#hybR)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="none" clip-path="url(#hybR)"/><line x1="22" y1="4" x2="22" y2="40" stroke="#333" stroke-width="0.5"/><polygon points="13,16 19,19 13,22 7,19" fill="#1a5c2a"/><polygon points="7,19 7,26 13,29 13,22" fill="#166534"/><polygon points="13,22 19,19 19,26 13,29" fill="#15803d"/><path d="M31 15 L25 24 L28 24 L26 30 L33 21 L30 21 Z" fill="#dc2626"/></svg>', name:'Hybrid', desc:'TorBox Pro + Real-Debrid fallback<br><span style="color:#8b949e;font-size:.8em">e.g. 4K Hybrid · Core Nexus Hybrid</span>' },
+      { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
+    ]
+  },
+  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'svc-list', noHero:true,
+    opts:[
+      { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="13" width="38" height="22" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="7" y="16" width="30" height="15" fill="#1a0a3a"/><line x1="15" y1="35" x2="12" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="29" y1="35" x2="32" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="42" x2="34" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="12" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="13" x2="32" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>', name:'Standard TV',          desc:'Broadest compatibility · no restrictions' },
+      { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="9" width="40" height="24" rx="2" stroke="#3d72e8" stroke-width="2"/><rect x="4" y="11" width="36" height="20" fill="#040e22"/><rect x="19" y="33" width="6" height="3" fill="#3d72e8"/><path d="M12 41 Q22 37 32 41" stroke="#3d72e8" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="8" y1="21" x2="36" y2="21" stroke="#3d72e8" stroke-width="0.5" opacity="0.5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+' },
+      { v:'appletv-old',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="18" rx="7" fill="#1c1c1e" stroke="#888" stroke-width="1.5"/><path d="M19 22.5 C19 19.5 21 18 22.5 18 C23 18 23.5 18.3 24 18.5 24.5 18.3 25 18 25.5 18 C27 18 29 19.5 29 22.5 C29 25.5 27.5 27 25.5 27 C25 27 24.5 26.7 24 26.5 23.5 26.7 23 27 22.5 27 C21 27 19 25.5 19 22.5Z" fill="#888"/><line x1="23.5" y1="16" x2="25" y2="14" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="34" r="2" fill="#f59e0b"/><text x="22" y="12" text-anchor="middle" fill="#666" font-size="6" font-family="system-ui,sans-serif">GEN 1 · 2</text></svg>', name:'Apple TV 4K Gen 1–2', desc:'DV · TrueHD · Atmos · no AV1 · 7.1' },
+      { v:'appletv-new',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="13" width="28" height="18" rx="7" fill="#1c1c1e" stroke="#a0a0a8" stroke-width="1.5"/><path d="M19 21.5 C19 18.5 21 17 22.5 17 C23 17 23.5 17.3 24 17.5 24.5 17.3 25 17 25.5 17 C27 17 29 18.5 29 21.5 C29 24.5 27.5 26 25.5 26 C25 26 24.5 25.7 24 25.5 23.5 25.7 23 26 22.5 26 C21 26 19 24.5 19 21.5Z" fill="#a0a0a8"/><line x1="23.5" y1="15" x2="25" y2="13" stroke="#a0a0a8" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="34" r="2" fill="#fff" opacity="0.8"/><text x="22" y="11" text-anchor="middle" fill="#7ab4ff" font-size="6" font-family="system-ui,sans-serif">A15 · AV1</text></svg>', name:'Apple TV 4K Gen 3',   desc:'DV · TrueHD · Atmos · AV1 · 7.1' },
+      { v:'lgtv',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="7" width="40" height="27" rx="2" stroke="#c00000" stroke-width="2"/><rect x="4" y="9" width="36" height="23" fill="#080000"/><circle cx="12" cy="21" r="3.5" fill="#cc0000" opacity="0.7"/><circle cx="22" cy="21" r="3.5" fill="#00bb44" opacity="0.7"/><circle cx="32" cy="21" r="3.5" fill="#0044cc" opacity="0.7"/><rect x="17" y="34" width="10" height="4" rx="1" fill="#c00000"/><line x1="12" y1="42" x2="32" y2="42" stroke="#c00000" stroke-width="2" stroke-linecap="round"/></svg>', name:'LG TV webOS',          desc:'DV · AV1 · eARC · TrueHD · 7.1' },
+      { v:'windows',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="6" width="38" height="26" rx="3" stroke="#0078d4" stroke-width="2"/><rect x="7" y="9" width="30" height="20" fill="#001428"/><rect x="10" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="10" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="18" y="32" width="8" height="4" rx="1" fill="#0078d4"/><line x1="12" y1="40" x2="32" y2="40" stroke="#0078d4" stroke-width="2" stroke-linecap="round"/></svg>', name:'Windows PC',           desc:'Full lossless · AV1 · HDR-first · 7.1' },
+      { v:'firestick-hd',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff6b00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff6b00"/><path d="M16 20 C16 16 14 13 16 10 C16 10 17.5 12 19 11 C19 8 21.5 5 23 3 C23 3 23 7.5 26 10 C27.5 11 27 13.5 25 15.5 C25 15.5 25 13 23 14 C23 17 21 20 16 20Z" fill="#ff6b00"/><text x="19" y="29" text-anchor="middle" fill="#ff6b00" font-size="7.5" font-weight="800" font-family="system-ui,sans-serif">HD</text></svg>', name:'Fire Stick HD',        desc:'DV-Only Kill · no AV1/lossless · HDR10/HLG' },
+      { v:'firestick-4kmax', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff8c00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff8c00"/><path d="M15 20 C15 15 13 11 16 8 C16 8 18 11 20 10 C20 6 23 2 24 1 C24 1 24 6 28 9 C30 11 29.5 14 27 17 C27 17 27 14 24 15 C24 18 22 20 15 20Z" fill="#ff8c00"/><text x="19" y="29" text-anchor="middle" fill="#ff8c00" font-size="6.5" font-weight="800" font-family="system-ui,sans-serif">4K MAX</text></svg>', name:'Fire Stick 4K Max',   desc:'DV · AV1 · VC-1 excluded · no lossless' },
+      { v:'shield', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="4" y="21" width="29" height="11" rx="3" fill="#0d1a0a" stroke="#76b900" stroke-width="1.5"/><rect x="34" y="23" width="7" height="7" rx="2" fill="#76b900"/><path d="M22 6 L30 10 L30 19 Q30 22 22 25 Q14 22 14 19 L14 10 Z" fill="none" stroke="#76b900" stroke-width="1.5" stroke-linejoin="round"/><path d="M22 8 L28 11.5 L28 19 Q28 21 22 23.5" stroke="#76b900" stroke-width="0.5" stroke-linejoin="round" fill="#76b900" opacity="0.2"/></svg>', name:'Streaming Box', desc:'No AV1 · no HLG · Nvidia Shield / Android TV' },
+    ]
+  },
+  { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c1', layout:'svc-list', noHero:true,
+    opts:[
+      { v:'4k',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 40,16 22,42 4,16" stroke="#7c3aed" stroke-width="2" fill="#1a0a3a"/><polygon points="22,3 40,16 22,16 4,16" fill="#7c3aed" opacity="0.4"/><text x="22" y="34" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="800" font-family="system-ui,sans-serif">4K</text></svg>', name:'4K HDR',        desc:'2160p first · 1080p fallback · for 4K displays' },
+      { v:'1080p',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="8" width="38" height="24" rx="3" stroke="#3b82f6" stroke-width="2" fill="#0a1428"/><text x="22" y="25" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="800" font-family="system-ui,sans-serif">1080p</text><rect x="17" y="32" width="10" height="4" rx="1" fill="#3b82f6"/><line x1="13" y1="40" x2="31" y2="40" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/></svg>', name:'1080p',          desc:'Hard lock · 2160p excluded · bandwidth-friendly' },
+      { v:'ultrawide', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="11" width="40" height="22" rx="2" stroke="#8b5cf6" stroke-width="2" fill="#0e0a1f"/><text x="22" y="26" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="700" font-family="system-ui,sans-serif">21 : 9</text><rect x="17" y="33" width="10" height="4" rx="1" fill="#8b5cf6"/><line x1="12" y1="41" x2="32" y2="41" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>', name:'Ultrawide',      desc:'1080p → 1440p → 4K tiers · pair with Windows PC device' },
+    ]
+  },
+  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c1', layout:'svc-list', noHero:true,
+    opts:[
+      { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><text x="22" y="29" text-anchor="middle" fill="#94a3b8" font-size="22" font-weight="900" font-family="system-ui,sans-serif">?</text></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
+      { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Movies & TV',      desc:'Films &amp; series · no anime scrapers' },
+      { v:'mixed', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="15" width="18" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/><rect x="3" y="8" width="18" height="9" rx="2" fill="#ef4444"/><line x1="9" y1="8" x2="6" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="8" x2="12" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="8" x2="18" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="4" fill="#f9a8d4"/><circle cx="39" cy="19" r="4" fill="#f9a8d4"/><circle cx="37" cy="27" r="4" fill="#f9a8d4"/><circle cx="27" cy="27" r="4" fill="#f9a8d4"/><circle cx="25" cy="19" r="4" fill="#f9a8d4"/><circle cx="33" cy="22" r="5" fill="#fce7f3"/></svg>', name:'Live + Anime',     desc:'Standard + SeaDex best releases' },
+      { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
+    ]
+  },
+  { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored only in the downloaded JSON file and are never sent to any server.', key:null, cols:'c1', opts:[] },
+  { id:'review', title:'Review & Download', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
+];
+
+/* STATE MANAGEMENT */
+function saveState() {
+  localStorage.setItem('coreBuild', JSON.stringify(S));
+  localStorage.setItem('coreBuildStep', step);
+}
+function loadState() {
+  try {
+    const savedS = localStorage.getItem('coreBuild');
+    const savedStep = localStorage.getItem('coreBuildStep');
+    if (savedS) Object.assign(S, JSON.parse(savedS));
+    if (savedStep) step = parseInt(savedStep, 10) || 0;
+  } catch (e) { console.warn("Failed to load state", e); }
+}
+function clearState() {
+  if(confirm("Clear progress and start over?")) {
+    localStorage.removeItem('coreBuild');
+    localStorage.removeItem('coreBuildStep');
+    location.reload();
+  }
+}
+
+/* RENDERING */
+function label(key, val) {
+  if (key === 'formatter') { const f = FORMATTERS.find(x => x.id === val); return f ? f.label : val || ''; }
+  if (key === 'audio') { const m = {lossless:'Full Lossless',standard:'DD+ / Atmos',limited:'Auto',dolby:'Dolby Only'}; return m[val] || val || ''; }
+  const d = DEFS.find(x => x.key === key);
+  if (!d) return val || '';
+  const o = d.opts.find(x => x.v === val);
+  return o ? o.name : val || '';
+}
+
+function renderOpts(def) {
+  const key = def.key, id = def.id;
+  const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} data-action="update-radio" data-key="${key}">`;
+  const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
+  const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
+
+  if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:8px">' +
+    FORMATTERS.map(f => {
+      const on = S.formatter === f.id;
+      return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+              <span class="fmt-lbl" style="font-weight:700;font-size:.9rem;color:${on?'#00d4ff':'#e6edf3'}">${f.label}</span>
+              <span style="font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:5px;background:${f.bc}22;color:${f.bc}">${f.badge}</span>
+            </div>
+            <div style="color:#6b7280;font-size:.72rem">${f.desc}</div>
+          </div>
+          ${on ? '<span style="color:#00d4ff;font-size:.9rem;flex-shrink:0">✓</span>' : '<span style="color:#374151;font-size:.9rem;flex-shrink:0">›</span>'}
+        </div>
+        <div class="fmt-preview-wrap" style="padding:0 13px 11px;${on?'':'display:none'}">${fmtPreviewHtml(f.id)}</div>
+      </div>`;
+    }).join('') +
+  '</div>';
+  if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
+  if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
+  if (def.layout === 'svc-list') {
+    if (def.noHero) {
+      const rows = def.opts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+        <div class="opt-icon">${o.icon}</div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc.replace(/<[^>]*>/g,'')}</div></div>
+        <span class="svc-list-arr">›</span>
+      </label></div>`).join('');
+      if (def.id === 'resolution') {
+        const AUDIO_OPTS = [
+          { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
+          { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
+          { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
+          { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
+        ];
+        const audioRows = AUDIO_OPTS.map(o => {
+          const on = S.audio === o.v;
+          return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+            <div class="opt-icon" style="flex-shrink:0;pointer-events:none">${o.icon}</div>
+            <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
+            <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
+          </div>`;
+        }).join('');
+        const curAudioLabel = AUDIO_OPTS.find(o => o.v === S.audio)?.name || 'Auto';
+        const advOpen = !!S.audio && S.audio !== 'limited';
+        return `<div class="svc-list">${rows}</div>
+        <details class="adv-audio-details"${advOpen ? ' open' : ''} style="margin-top:10px">
+          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);user-select:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'">
+            <span style="font-size:.78rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase">Advanced options · Sound profile</span>
+            <span style="font-size:.76rem;color:#374151;font-weight:600">${curAudioLabel} ›</span>
+          </summary>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${audioRows}</div>
+        </details>`;
+      }
+      return `<div class="svc-list">${rows}</div>`;
+    }
+    const SVC_TAGS = {
+      'torbox-pro': ['4K Apex','Stream','Flash','Speed','Anime'],
+      'torbox-ess': ['4K Essential','Essential'],
+      'alldebrid':  ['4K AllDebrid','AllDebrid'],
+      'realdebrid': ['Core Nexus RD'],
+      'premiumize': ['Core Nexus Premiumize'],
+      'debridlink': ['Debrid-Link'],
+      'hybrid':     ['4K Hybrid','Hybrid'],
+    };
+    const SVC_DESC = {
+      'torbox-pro': 'Full scraper stack · HdHub · best results',
+      'torbox-ess': 'Same smart sorting, Essential plan',
+      'alldebrid':  'AllDebrid subscribers',
+      'realdebrid': 'Real-Debrid subscribers',
+      'premiumize': 'Premiumize subscribers',
+      'debridlink': 'Debrid-Link subscribers',
+      'hybrid':     'TorBox Pro + Real-Debrid fallback',
+      'multi':      'Mix two or more services',
+    };
+    const hero = def.opts[0];
+    const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
+    const heroHtml = `<div class="svc-list-hero opt">${inp(hero)}<label for="o_${hero.v}">
+      <div class="opt-icon">${hero.icon}</div>
+      <div class="opt-body">
+        <div class="opt-name">${hero.name} <span class="svc-hero-badge">★ POPULAR</span></div>
+        <div class="opt-desc">${SVC_DESC[hero.v] || ''}</div>
+        ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
+      </div>
+    </label></div>`;
+    const rowsHtml = def.opts.slice(1).map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+      <div class="opt-icon">${o.icon}</div>
+      <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
+      <span class="svc-list-arr">›</span>
+    </label></div>`).join('');
+    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>`;
+  }
+  if (def.layout === 'hero') {
+    const hero = def.opts[0], rest = def.opts.slice(1);
+    return `<div class="hero-wrap">
+      <div class="hero-hero opt">${inp(hero)}<label for="o_${hero.v}"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">★ Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
+      <div class="hero-sub">${rest.map(o => std(o)).join('')}</div>
+    </div>`;
+  }
+  return `<div class="opts ${def.cols}">${def.opts.map(o => std(o)).join('')}</div>`;
+}
+
+const FMT_PREVIEWS = {
+  'apex-v2': {
+    n:'🟣 4K  ⚡ TORBOX  🌟 HDR¹⁰  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  🏷️ FraMeSToR  👑 PREMIER','🎬 💎 REMUX  x265  38.4 Mbps  🌟 HDR¹⁰','🎛️ 💎 TRUEHD  🔮 ATMOS  🔊 7.1  🌍 🇬🇧','45.2 GB  🌱 1 247  ⏱️ 3d  🔌 cached']
+  },
+  'sigma': {
+    n:'✦ Frankenstein 「 TORBOX 」 「 🟣 4K 」 「 💎 REMUX 」',
+    d:['『 💎 ELITE 』 『 🚀 INSTANT 』 『 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 』','「 🎬 💎 REMUX 」 「 ʜᴇᴠᴄ 」 「 38.4 Mbs 」','「 🎛️ 💎 ᴛʀᴜᴇʜᴅ 」 「 7.1 」 🌍 🇬🇧','「 45.2 GB 」 「 🌱 1 247 」']
+  },
+  'minimal': {
+    n:'🟣 4K  ⚡ TORBOX  💎 TRUEHD  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  🏷️ FraMeSToR','🎬 💎 REMUX  🌟 HDR¹⁰  💎 TRUEHD  7.1','45.2 GB  38.4 Mbps  🌱 1 247  ⏱️ 3d']
+  },
+  'prime': {
+    n:'🖥️ 2160P  ⚡ TORBOX  FRANKENSTEIN',
+    d:['💎 ELITE  🏷️ FraMeSToR  👑 PREMIER','🎬 BLURAY REMUX  X265  🌟 HDR10+  38.4 Mbps','🎛️ TRUEHD  ATMOS  7.1  🌍 🇬🇧','💾 45.2 GB  🌱 1 247  📅 3d  🔌 Cached']
+  },
+  'tv': {
+    n:'🔴 4K  ⚡ TORBOX  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  👑 PREMIER','🎬 BLURAY REMUX  HEVC  HDR10+  38.4 MBPS  45.2 GB','🔊 TRUEHD  ATMOS  7.1  🌍 🇬🇧','🔌 CACHED  🌱 1 247  📅 3D']
+  }
+};
+
+function fmtPreviewHtml(fmtId) {
+  const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['apex-v2'];
+  return `<div class="fmt-live-preview">
+    <div class="fmt-live-poster">🎬</div>
+    <div class="fmt-live-lines">
+      <div class="fmt-live-n">${p.n}</div>
+      ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function videoPrefHtml() {
+  const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const card = (key, title, desc) => {
+    const on = !!S[key];
+    return `<div class="pref-card${on?' pref-on':''}" data-action="toggle-pref" data-key="${key}">
+      <div class="pref-body-inner"><div class="pref-title">${title}</div><div class="pref-desc">${desc}</div></div>
+      <div class="pref-circle">${on?chk:''}</div>
+    </div>`;
+  };
+  return `<div class="pref-section">
+    <div class="pref-section-label">Video Preferences</div>
+    ${card('qualityFirst','Prioritize Quality over Resolution','Sorts by source quality (e.g. REMUX) before resolution.')}
+    ${card('exclude4K','Exclude 4K / UHD','Removes 2160p content. Good for bandwidth saving.')}
+    ${card('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
+  </div>`;
+}
+
+function renderP2pToggle() {
+  const on = S.p2pEnabled !== false;
+  return `<div class="pref-card${on?' pref-on':''}" style="margin-top:12px;cursor:default">
+    <div class="pref-body-inner">
+      <div class="pref-title">Include P2P Streams</div>
+      <div class="pref-desc">Show torrents alongside cached streams. Disable for cached-only results.</div>
+    </div>
+    <label class="toggle-sw" style="cursor:pointer;flex-shrink:0">
+      <input type="checkbox" data-action="toggle-p2p"${on ? ' checked' : ''}>
+      <span class="toggle-track"></span>
+    </label>
+  </div>`;
+}
+
+function renderMatchMode() {
+  const modes = [
+    { v:'relaxed',  label:'Relaxed',  desc:'More results, conservative dedup' },
+    { v:'balanced', label:'Balanced', desc:'Smart dedup, recommended default' },
+    { v:'strict',   label:'Strict',   desc:'Aggressive dedup, quality-first sort' },
+  ];
+  const cur = S.matchMode || 'balanced';
+  const pills = modes.map(m => {
+    const on = cur === m.v;
+    return `<button data-action="set-match-mode" data-val="${m.v}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.73rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
+      <div>${m.label}</div>
+      <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
+    </button>`;
+  }).join('');
+  return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
+    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase">Match Aggressiveness</div>
+    <div style="display:flex;gap:6px">${pills}</div>
+  </div>`;
+}
+
+function renderAdvancedPanel() {
+  const AUDIO_OPTS = [
+    { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
+    { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
+    { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
+    { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
+  ];
+  const audioRows = AUDIO_OPTS.map(o => {
+    const on = S.audio === o.v;
+    return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+      <div style="flex-shrink:0;pointer-events:none">${o.icon}</div>
+      <div style="flex:1;min-width:0;pointer-events:none"><div style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
+      <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
+    </div>`;
+  }).join('');
+
+  const fmtCards = FORMATTERS.map(f => {
+    const on = S.formatter === f.id;
+    return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <span class="fmt-lbl" style="font-weight:700;font-size:.9rem;color:${on?'#00d4ff':'#e6edf3'}">${f.label}</span>
+          <span style="margin-left:6px;background:rgba(255,255,255,.06);border-radius:4px;padding:2px 6px;font-size:.65rem;color:#6b7280">${f.badge}</span>
+          <div style="color:#6b7280;font-size:.72rem;margin-top:2px">${f.desc}</div>
+        </div>
+        ${on ? '<span style="color:#00d4ff;font-size:.85rem;flex-shrink:0">✓</span>' : '<span style="color:#374151;font-size:.85rem;flex-shrink:0">›</span>'}
+      </div>
+      <div class="fmt-preview-wrap" style="padding:0 13px 11px;${on?'':'display:none'}">${fmtPreviewHtml(f.id)}</div>
+    </div>`;
+  }).join('');
+
+  const sizeOpts = ['10GB','20GB','30GB','50GB','unlimited'];
+  const sizePills = sizeOpts.map(v => {
+    const on = (S.sizeLimit || 'unlimited') === v;
+    const lbl = v === 'unlimited' ? 'Unlimited' : v;
+    return `<button data-action="set-size-limit" data-val="${v}" class="size-btn${on?' size-btn-active':''}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.72rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s">${lbl}</button>`;
+  }).join('');
+
+  const prefCard = (key, title, desc) => {
+    const on = !!S[key];
+    return `<div class="pref-card${on?' pref-on':''}" data-action="toggle-pref" data-key="${key}" style="cursor:pointer">
+      <div class="pref-body-inner"><div class="pref-title">${title}</div><div class="pref-desc">${desc}</div></div>
+      <div class="pref-circle"></div>
+    </div>`;
+  };
+
+  return `<div class="card" style="padding:0">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <button data-action="close-advanced" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">← Back</button>
+      <div>
+        <div style="font-weight:800;font-size:1rem;color:#e6edf3">Advanced Options</div>
+        <div style="font-size:.72rem;color:#4b5563;margin-top:1px">Audio · Video · Formatter</div>
+      </div>
+    </div>
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:20px">
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🔊 Sound Profile</div>
+        <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎬 Video Preferences</div>
+        <div style="background:#0d1117;border:1.5px solid #30363d;border-radius:10px;padding:14px 16px;margin-bottom:8px">
+          <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:10px">Size Limit</div>
+          <div style="display:flex;gap:5px">${sizePills}</div>
+        </div>
+        ${prefCard('qualityFirst','Prioritize Quality over Resolution','Sorts by source quality (e.g. REMUX) before resolution.')}
+        ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
+        ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎨 Stream Layout (Formatter)</div>
+        <div style="display:flex;flex-direction:column;gap:8px">${fmtCards}</div>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+function renderProgress() {
+  const progWrap = document.querySelector('.prog-wrap');
+  const nav = document.getElementById('nav');
+  if (step === 0) {
+    if (progWrap) progWrap.style.display = 'none';
+    if (nav) nav.style.display = 'none';
+    return;
+  }
+  if (progWrap) progWrap.style.display = '';
+  if (nav) nav.style.display = '';
+
+  const keys  = ['service','device','resolution','audio','content',null];
+
+  // Step bubble strip
+  const bubbles = Array.from({length: STEPS}, (_, i) => {
+    const n = i + 1;
+    const state = n < step ? 'done' : n === step ? 'active' : 'pending';
+    const tipName = DEFS[i] ? DEFS[i].title : (n === STEPS ? 'Review' : `Step ${n}`);
+    return `<div class="step-unit ${state}" title="${tipName}"><div class="step-bub"></div></div>`;
+  }).join('');
+
+  const strip = document.getElementById('stepStrip');
+  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Reset all choices">↺ Reset</button></div>`;
+
+  // Breadcrumb chips — show completed selections
+  const chips = keys.slice(0, step - 1).map((k, i) => {
+    if (!k || !S[k]) return '';
+    const lbl = label(k, S[k]);
+    return lbl ? `<span class="bc-chip">✓ ${lbl}</span>` : '';
+  }).filter(Boolean);
+
+  const bc = document.getElementById('breadcrumbs');
+  if (bc) bc.innerHTML = chips.length ? `<div class="bc-row">${chips.join('')}</div>` : '';
+}
+
+function splashHtml() {
+  return `<div class="card splash">
+    <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <defs>
+        <linearGradient id="sg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
+        <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
+        <filter id="sf1"><feGaussianBlur stdDeviation="10" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+        <filter id="sf2"><feGaussianBlur stdDeviation="14" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+        <filter id="sf3"><feGaussianBlur stdDeviation="24"/></filter>
+      </defs>
+      <circle cx="256" cy="256" r="248" fill="#080c10"/>
+      <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.05" filter="url(#sf3)"/>
+      <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.09" filter="url(#sf3)"/>
+      <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#sf1)"/>
+      <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#sg1)" stroke-width="22" stroke-linejoin="round"/>
+      <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#sg2)" opacity="0.4" filter="url(#sf2)"/>
+      <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#sg2)" opacity="0.95"/>
+      <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
+      <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
+    </svg>
+    <div class="splash-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
+    <div class="splash-by">By Brevity</div>
+    <div class="splash-tagline">Build your perfect AIOStreams template in 2 minutes. No manual JSON editing.</div>
+    <div class="splash-chips">
+      <span class="splash-chip splash-chip-svc">TorBox Pro</span>
+      <span class="splash-chip splash-chip-svc">TorBox Essential</span>
+      <span class="splash-chip splash-chip-svc">AllDebrid</span>
+      <span class="splash-chip splash-chip-svc">Real-Debrid</span>
+      <span class="splash-chip splash-chip-svc">EasyNews</span>
+      <span class="splash-chip splash-chip-svc">Hybrid</span>
+    </div>
+    <div class="splash-chips">
+      <span class="splash-chip splash-chip-feat">5 Formatters</span>
+      <span class="splash-chip splash-chip-feat">Smart Sorting</span>
+      <span class="splash-chip splash-chip-feat">Video Prefs</span>
+      <span class="splash-chip splash-chip-feat">Anime Ready</span>
+      <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
+    </div>
+    <button class="splash-cta" data-action="start-setup">Start Setup →</button>
+    <div style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:10px">
+      <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
+      <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
+    </div>
+    <details style="width:100%;max-width:310px;margin-top:18px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
+      <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:#4b5563;letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
+        What's new
+        <span style="color:#00d4ff;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
+        <span style="margin-left:auto;font-size:.75rem;opacity:.4">▾</span>
+      </summary>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px">
+        ${CHANGELOG.map((entry, i) => `
+        <div>
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+            <span style="font-size:.63rem;font-weight:800;color:${i===0?'#00d4ff':'#4b5563'};background:${i===0?'rgba(0,212,255,.08)':'rgba(255,255,255,.03)'};border:1px solid ${i===0?'rgba(0,212,255,.18)':'rgba(255,255,255,.06)'};border-radius:4px;padding:1px 6px">v${entry.v}</span>
+            <span style="font-size:.61rem;color:#2d333b">${entry.date}</span>
+          </div>
+          <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px;text-align:left">
+            ${entry.items.map(it => `<li style="font-size:.7rem;color:${i===0?'#6b7280':'#2d333b'};line-height:1.4">${it}</li>`).join('')}
+          </ul>
+        </div>`).join('')}
+      </div>
+    </details>
+    <div class="splash-paste" data-action="paste-manifest-splash" style="margin-top:16px">Already have a manifest? Paste it</div>
+  </div>`;
+}
+
+function render() {
+  renderProgress();
+  const main = document.getElementById('main');
+  const nav  = document.getElementById('nav');
+
+  if (step === 0) {
+    main.innerHTML = splashHtml();
+    main.style.justifyContent = 'center';
+    return;
+  }
+  main.style.justifyContent = '';
+
+  if (showAdvanced) {
+    main.innerHTML = renderAdvancedPanel();
+    nav.style.display = 'none';
+    return;
+  }
+
+  const def  = DEFS[step - 1];
+
+  if (step === STEPS) {
+    const auto = defaultName();
+    const hasApis = S.tmdbToken || S.tmdbApiKey || Object.values(S.creds).some(v=>v);
+    main.innerHTML = `
+      <div class="card">
+        <div class="receipt-card">
+          <div class="receipt-hdr">
+            <div class="receipt-hdr-icon">⚡</div>
+            <div>
+              <div class="receipt-hdr-name">${S.name || auto}</div>
+              <div class="receipt-hdr-sub">Template ready to generate</div>
+            </div>
+          </div>
+          ${[
+            {k:'service',    ico:'🔌'},
+            {k:'device',     ico:'📺'},
+            {k:'resolution', ico:'🖥️'},
+            {k:'audio',      ico:'🔊'},
+            {k:'content',    ico:'🎬'},
+            {k:'formatter',  ico:'🎨'},
+          ].map(({k, ico}) => {
+            const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
+            const val = label(k, S[k]) || '—';
+            return `<div class="receipt-row">
+              <div class="receipt-row-left">
+                <span class="receipt-row-ico">${ico}</span>
+                <span class="receipt-row-lbl">${k}</span>
+              </div>
+              <div class="receipt-row-val${k==='service'?' hl':''}">
+                ${val}${audioOverride ? ' <span style="color:#f59e0b;font-size:.7rem">⚠ DD+</span>' : ''}
+              </div>
+            </div>`;
+          }).join('')}
+          ${hasApis ? `<div class="receipt-row">
+            <div class="receipt-row-left">
+              <span class="receipt-row-ico">🔑</span>
+              <span class="receipt-row-lbl">API Keys</span>
+            </div>
+            <div class="receipt-row-val" style="color:#10b981">${[
+              Object.values(S.creds).filter(v=>v).length ? '✓ Debrid' : '',
+              S.tmdbToken ? '✓ TMDB' : '',
+              S.tmdbApiKey ? '✓ TMDB Key' : ''
+            ].filter(Boolean).join(' · ')}</div>
+          </div>` : ''}
+        </div>
+        <div class="name-row">
+          <label>Template name (optional)</label>
+          <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
+            value="${S.name}" data-action="update-name" maxlength="60">
+        </div>
+        ${insightsHtml()}
+        ${sizeLimitHtml()}
+        <details id="jsonPreviewDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
+          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
+            <span>Preview JSON</span><span style="font-size:.7rem;color:#374151">›</span>
+          </summary>
+          <pre id="jsonPreview" style="margin:0;padding:12px 16px;background:#0d1117;overflow-x:auto;font-size:.68rem;color:#8b949e;font-family:monospace;line-height:1.5;max-height:260px;overflow-y:auto"></pre>
+        </details>
+        <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
+        <button class="btn-aio" data-action="create-import" id="btnImport" style="margin-top:10px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Create Import URL
+        </button>
+        <div id="importUrlResult"></div>
+        <div class="aio-section">
+          <h3>Get Manifest URL</h3>
+          <div class="aio-fields" style="margin-top:12px">
+            <div class="name-row" style="margin-bottom:0">
+              <label>AIOStreams Host</label>
+              <select class="name-input" id="aioHost" data-action="update-host" style="cursor:pointer;color-scheme:dark">
+                <option value="auto"       ${S.instanceHost==='auto'?'selected':''}>Auto (tries all public hosts)</option>
+                <option value="elfhosted"  ${S.instanceHost==='elfhosted'||S.instanceHost===''?'selected':''}>ElfHosted — aiostreams.elfhosted.com</option>
+                <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthewWeak — aiostreams.fortheweak.cloud</option>
+                <option value="midnight"   ${S.instanceHost==='midnight'?'selected':''}>Midnight's — midnightignite.me</option>
+                <option value="viren"      ${S.instanceHost==='viren'?'selected':''}>Viren's — aiostreams.viren070.me</option>
+                <option value="kuu"        ${S.instanceHost==='kuu'?'selected':''}>Kuu's — aiostreams.stremio.ru</option>
+                <option value="atbp"       ${S.instanceHost==='atbp'?'selected':''}>ATBP — aio.atbphosting.com</option>
+                <option value="omni"       ${S.instanceHost==='omni'?'selected':''}>Omni's — aiostreams.12312023.xyz</option>
+                <option value="custom"     ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted</option>
+              </select>
+            </div>
+            <div id="aioUrlRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='custom'?'':'display:none'}">
+              <label>Instance URL</label>
+              <input class="name-input" id="aioUrl" type="url" placeholder="https://your-aiostreams.example.com"
+                value="${S.instanceHost==='custom'?S.instanceUrl:''}" data-action="update-url" maxlength="200">
+            </div>
+            <div class="name-row" style="margin-bottom:0">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">Password</span>
+                <button type="button" data-action="gen-pwd" style="font-size:.75rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
+              </div>
+              <div style="position:relative">
+                <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
+                  value="${S.instancePassword}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
+                  style="padding-right:40px">
+                <button type="button" id="pwdEye" data-action="toggle-pwd"
+                  title="Show/hide password"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">— find it on your instance's configure page</span></label>
+              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                value="${S.instanceUuid}" data-action="update-uuid" maxlength="36" style="font-family:monospace;font-size:.88rem">
+            </div>
+          </div>
+          <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Generate Manifest
+          </button>
+          <div id="aioResult"></div>
+          <details style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px">
+            <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
+              <span>Already have a manifest URL?</span>
+              <span style="font-size:.75rem;color:#374151">›</span>
+            </summary>
+            <div style="margin-top:10px">
+              <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
+              <input class="name-input" id="pasteManifest" type="url"
+                placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
+                data-action="paste-manifest" style="font-size:.8rem;font-family:monospace">
+              <div id="pasteManifestResult"></div>
+            </div>
+          </details>
+        </div>
+      </div>`;
+    nav.style.display = 'flex';
+    document.getElementById('btnBack').style.visibility = 'visible';
+    document.getElementById('btnNext').style.display = 'none';
+    const jpd = document.getElementById('jsonPreviewDetails');
+    if (jpd) jpd.addEventListener('toggle', () => {
+      const pre = document.getElementById('jsonPreview');
+      if (jpd.open && pre && !pre.textContent) pre.textContent = JSON.stringify(build(), null, 2);
+    }, { once: true });
+
+  } else if (def.id === 'apis') {
+    const debridInputs = getDebridInputs();
+    const ringC = 131.9, ringPct = (step - 1) / (STEPS - 1);
+    main.innerHTML = `
+      <div class="card">
+        <div class="srh">
+          <div class="srh-ring">
+            <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
+                stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC*(1-ringPct)).toFixed(1)}"
+                stroke-linecap="round" transform="rotate(-90 26 26)"/>
+            </svg>
+            <div class="srh-num">${step}</div>
+          </div>
+          <div>
+            <div class="srh-title">${def.title} <span style="font-size:.72rem;font-weight:600;color:#374151;letter-spacing:.04em">OPTIONAL</span></div>
+            <div class="srh-sub">${def.desc}</div>
+          </div>
+        </div>
+        ${debridInputs.length ? `
+        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
+        ${debridInputs.map(inp => `
+        <div class="name-row" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
+            <a href="${inp.url}" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+          </div>
+          <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="text" placeholder="${inp.placeholder}"
+            value="${S.creds[inp.id] || ''}" maxlength="120">
+        </div>`).join('')}
+        <div style="border-top:1px solid #21262d;margin:18px 0 14px"></div>
+        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Metadata &amp; Posters</div>
+        ` : ''}
+        <div class="name-row" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token (v4)</span>
+            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+          </div>
+          <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+            value="${S.tmdbToken}" maxlength="400">
+        </div>
+        <div class="name-row">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key (v3)</span>
+            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+          </div>
+          <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="text" placeholder="abc123def456…"
+            value="${S.tmdbApiKey}" maxlength="60">
+        </div>
+      </div>`;
+    nav.style.display = 'flex';
+    document.getElementById('btnBack').style.visibility = 'visible';
+    syncNext();
+  } else {
+    const ringC = 131.9;
+    const ringPct = (step - 1) / (STEPS - 1);
+    main.innerHTML = `
+      <div class="card">
+        <div class="srh">
+          <div class="srh-ring">
+            <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
+                stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC * (1 - ringPct)).toFixed(1)}"
+                stroke-linecap="round" transform="rotate(-90 26 26)"/>
+            </svg>
+            <div class="srh-num">${step}</div>
+          </div>
+          <div>
+            <div class="srh-title">${def.title}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}
+            </div>
+            <div class="srh-sub">${def.desc}</div>
+          </div>
+        </div>
+        ${renderOpts(def)}
+        ${def.id === 'service' ? '<div id="multiPanel"></div>' : ''}
+        ${def.id === 'content' ? renderP2pToggle() + renderMatchMode() : ''}
+        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Advanced Options</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
+      </div>`;
+    nav.style.display = 'flex';
+    document.getElementById('btnBack').style.visibility = step > 1 ? 'visible' : 'hidden';
+    if (def.id === 'service') updateMultiPanel();
+    syncNext();
+  }
+}
+
+function syncNext() {
+  const def = DEFS[step - 1];
+  const btn = document.getElementById('btnNext');
+  btn.style.display = '';
+  let ok = !def.key || !!S[def.key];
+  if (S.service === 'multi' && step === 1) ok = S.multiServices.length > 0;
+  if (!btn) return;
+  btn.disabled = !ok;
+  const val = def.key && S[def.key] ? label(def.key, S[def.key]) : null;
+  if (step === STEPS) {
+    btn.innerHTML = `<span style="flex:1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
+  } else if (val) {
+    btn.innerHTML = `<div style="flex:1"><div class="cta-step-lbl">${def.title}</div><div class="cta-step-val">${val}</div></div><span class="cta-arr">→</span>`;
+  } else if (!def.key) {
+    btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
+  } else {
+    btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;opacity:.5">Select one to continue</span><span class="cta-arr" style="opacity:.3">→</span>`;
+  }
+}
+
+function updateMultiPanel() {
+  const panel = document.getElementById('multiPanel');
+  if (!panel) return;
+  if (S.service !== 'multi') { panel.style.display = 'none'; syncNext(); return; }
+  panel.style.display = '';
+  const multiOpts = [
+    { v:'alldebrid',  label:'AllDebrid',   color:'#ea580c' },
+    { v:'realdebrid', label:'Real-Debrid', color:'#dc2626' },
+    { v:'premiumize', label:'Premiumize',  color:'#d97706' },
+    { v:'debridlink', label:'Debrid-Link', color:'#0284c7' },
+  ];
+  panel.innerHTML = `
+    <div style="border-top:1px solid #30363d;padding-top:14px;margin-top:4px">
+      <div style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Select your services</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${multiOpts.map(m => `
+          <label style="display:flex;align-items:center;gap:10px;background:#0d1117;border:2px solid ${S.multiServices.includes(m.v) ? m.color : '#30363d'};border-radius:8px;padding:12px;cursor:pointer;user-select:none;transition:border-color .15s">
+            <input type="checkbox" data-action="toggle-multi" value="${m.v}" ${S.multiServices.includes(m.v) ? 'checked' : ''}>
+            <span style="font-weight:700;font-size:.9rem;color:${S.multiServices.includes(m.v) ? m.color : '#e6edf3'}">${m.label}</span>
+          </label>`).join('')}
+      </div>
+    </div>`;
+  syncNext();
+}
+
+/* DELEGATED EVENTS */
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  render();
+
+  // Handle all clicks
+  document.addEventListener('click', (e) => {
+    const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
+    if(!action) return;
+
+    if (action === 'nav-next') {
+      if (DEFS[step-1].key && !S[DEFS[step-1].key]) return;
+      if (S.service === 'multi' && step === 1 && S.multiServices.length === 0) return;
+      if (step < STEPS) {
+        document.getElementById('main').classList.remove('nav-back');
+        step = (step === 1 && S.quickStart) ? 5 : step + 1;
+        saveState(); render(); window.scrollTo(0,0);
+      }
+    }
+    if (action === 'nav-back') {
+      if (step > 0) {
+        document.getElementById('main').classList.add('nav-back');
+        step = (step === 5 && S.quickStart) ? 1 : step - 1;
+        saveState(); render(); window.scrollTo(0,0);
+      }
+    }
+    if (action === 'quick-start') {
+      const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
+      if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
+      else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
+      saveState(); document.getElementById('main').classList.remove('nav-back');
+      step = 1; render(); window.scrollTo(0,0);
+    }
+    if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
+    if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
+    if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'reset-state') { showAdvanced = false; clearState(); }
+    if (action === 'generate-dl') generate();
+    if (action === 'create-import') createImportUrl();
+    if (action === 'gen-pwd') genPwd();
+    if (action === 'toggle-pwd') togglePwd();
+    if (action === 'install-stremio') openInAIOStreams();
+    if (action === 'copy-manifest') {
+      const url = e.target.dataset.url || e.target.closest('[data-url]')?.dataset.url;
+      navigator.clipboard.writeText(url).then(() => showToast('Manifest URL copied'));
+    }
+    if (action === 'copy-wuplay') {
+      const url = e.target.dataset.url || e.target.closest('[data-action="copy-wuplay"]')?.dataset.url;
+      navigator.clipboard.writeText(url).then(() => showToast('Copied! Paste into WuPlay configurer → Addons'));
+    }
+    if (action === 'toggle-pref') {
+      const key = (e.target.closest('[data-action="toggle-pref"]') || e.target).dataset.key;
+      if (key && key in S) { S[key] = !S[key]; saveState(); render(); }
+    }
+    if (action === 'set-size-limit') {
+      S.sizeLimit = (e.target.closest('[data-action]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-size-limit"]').forEach(b => {
+        b.classList.toggle('size-btn-active', b.dataset.val === S.sizeLimit);
+      });
+    }
+    if (action === 'set-match-mode') {
+      S.matchMode = (e.target.closest('[data-action="set-match-mode"]') || e.target).dataset.val;
+      if (S.matchMode === 'strict') S.qualityFirst = true;
+      else S.qualityFirst = false;
+      saveState();
+      document.querySelectorAll('[data-action="set-match-mode"]').forEach(btn => {
+        const on = btn.dataset.val === S.matchMode;
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.07)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
+        btn.style.fontWeight  = on ? '700' : '500';
+      });
+    }
+    if (action === 'set-audio') {
+      S.audio = (e.target.closest('[data-action="set-audio"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-audio"]').forEach(row => {
+        const on = row.dataset.val === S.audio;
+        row.style.borderColor = on ? 'rgba(0,212,255,.35)' : 'rgba(255,255,255,.07)';
+        row.style.background  = on ? 'rgba(0,212,255,.05)' : 'rgba(13,17,23,.7)';
+        const nm = row.querySelector('.opt-name');
+        if (nm) nm.style.color = on ? '#00d4ff' : '#e6edf3';
+        const arr = row.querySelector('span:last-child');
+        if (arr) { arr.textContent = on ? '✓' : '›'; arr.style.color = on ? '#00d4ff' : '#374151'; }
+      });
+      const sum = document.querySelector('.adv-audio-details summary span:last-child');
+      const AUDIO_LABELS = { lossless:'Full Lossless', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
+      if (sum) sum.textContent = (AUDIO_LABELS[S.audio] || 'Auto') + ' ›';
+    }
+    if (action === 'set-formatter') {
+      S.formatter = (e.target.closest('[data-action="set-formatter"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-formatter"]').forEach(card => {
+        const on = card.dataset.val === S.formatter;
+        card.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.1)';
+        card.style.background  = on ? 'rgba(0,212,255,.07)' : 'rgba(8,12,18,.9)';
+        card.style.boxShadow   = on ? '0 0 0 3px rgba(0,212,255,.1)' : 'none';
+        const lbl = card.querySelector('.fmt-lbl');
+        if (lbl) lbl.style.color = on ? '#00d4ff' : '#e6edf3';
+        const pw = card.querySelector('.fmt-preview-wrap');
+        if (pw) pw.style.display = on ? '' : 'none';
+        const arr = card.querySelector('[style*="flex-shrink:0"]');
+        if (arr && (arr.textContent === '✓' || arr.textContent === '›')) arr.textContent = on ? '✓' : '›';
+      });
+    }
+  });
+
+  // Handle inputs and changes
+  document.addEventListener('change', (e) => {
+    if (e.target.dataset.action === 'update-radio') {
+      S[e.target.dataset.key] = e.target.value;
+      if (e.target.dataset.key === 'device') {
+        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        if (DEV_AUDIO[e.target.value]) S.audio = DEV_AUDIO[e.target.value];
+      }
+      saveState();
+      syncNext();
+      if (e.target.dataset.key === 'service') updateMultiPanel();
+    }
+    if (e.target.dataset.action === 'toggle-p2p') {
+      S.p2pEnabled = e.target.checked;
+      saveState();
+    }
+    if (e.target.dataset.action === 'toggle-multi') {
+      const val = e.target.value;
+      const i = S.multiServices.indexOf(val);
+      if (i >= 0) S.multiServices.splice(i, 1);
+      else S.multiServices.push(val);
+      saveState();
+      updateMultiPanel();
+    }
+    if (e.target.dataset.action === 'update-host') {
+      S.instanceHost = e.target.value;
+      saveState();
+      const val = S.instanceHost;
+      const urlRow  = document.getElementById('aioUrlRow');
+      const uuidRow = document.getElementById('aioUuidRow');
+      if (urlRow)  urlRow.style.display  = (val === 'custom') ? '' : 'none';
+      if (uuidRow) uuidRow.style.display = (val !== 'custom' && val !== 'auto') ? '' : 'none';
+      if (val === 'custom') { S.instanceUrl = ''; document.getElementById('aioUrl').value = ''; }
+      document.getElementById('aioResult').innerHTML = '';
+    }
+  });
+
+  document.addEventListener('input', (e) => {
+    const a = e.target.dataset.action;
+    if (a === 'update-name') S.name = e.target.value;
+    else if (a === 'update-cred') S.creds[e.target.dataset.service] = e.target.value;
+    else if (a === 'update-tmdb') S.tmdbToken = e.target.value;
+    else if (a === 'update-tmdb-key') S.tmdbApiKey = e.target.value;
+    else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
+    else if (a === 'update-pwd') S.instancePassword = e.target.value;
+    else if (a === 'update-uuid') S.instanceUuid = e.target.value.trim();
+    else if (a === 'paste-manifest') onPasteManifest(e.target.value);
+    
+    if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid'].includes(a)){
+      saveState();
+    }
+  });
+});
+
+/* PAYLOAD GENERATION & API LOGIC */
+function insights() {
+  const pts = [], dev = S.device, aud = S.audio, cnt = S.content, svc = S.service;
+  if (dev === 'samsung') pts.push('<b>DV-Only Kill</b> — blocks DV streams missing HDR10 fallback (prevents purple screen)');
+  else if (dev === 'firestick-hd') pts.push('<b>DV-Only Kill</b> on · AV1 excluded · limited audio (DD+ max)');
+  else if (dev === 'shield') pts.push('<b>AV1 + HLG excluded</b> — prevents Nvidia Shield playback failures');
+  else if (dev === 'appletv-old') pts.push('<b>AV1 excluded</b> — Apple TV 4K Gen 1/2 hardware limit');
+  else if (dev === 'appletv-new') pts.push('<b>Full AV1 + DV</b> — optimised for Apple TV 4K Gen 3 (A15)');
+  else if (dev === 'windows') pts.push('<b>Full lossless + AV1</b> — Windows PC optimised, HDR-first visual tags');
+  else if (dev === 'lgtv') pts.push('<b>Full DV + eARC + 7.1</b> — best-case LG webOS profile');
+  if (aud === 'dolby') pts.push('<b>All DTS excluded</b> — safe for Bose / Dolby soundbars (Atmos · TrueHD · DD+ only)');
+  else if (aud === 'lossless') pts.push('<b>Full lossless audio ranked</b> — TrueHD · Atmos · DTS-HD MA · FLAC prioritised');
+  else if (aud === 'standard') pts.push('<b>DD+ / Atmos ranked</b> — soundbar and smart TV profile');
+  if (cnt === 'anime') pts.push('<b>SeaDex Best-Only</b> — only the confirmed best release group per title');
+  else if (cnt === 'mixed') pts.push('<b>SeaDex + live-action</b> scrapers active simultaneously');
+  else if (cnt === 'live') pts.push('<b>Anime scrapers off</b> — leaner fetch stack for Movies &amp; TV');
+  if (svc === 'hybrid') pts.push('<b>TorBox + Real-Debrid fallback</b> — widest cache coverage');
+  else if (svc === 'torbox-pro') pts.push('<b>Full scraper stack</b> — Meteor · Comet · MediaFusion · HdHub · Zilean');
+  if (!S.p2pEnabled) pts.push('<b>P2P excluded</b> — cached debrid streams only, no torrent seeders');
+  if (S.qualityFirst) pts.push('<b>Quality over resolution</b> — REMUX ranked above resolution in sort order');
+  if (S.exclude4K) pts.push('<b>4K / UHD excluded</b> — 1080p and below only');
+  if (S.excludeDV) pts.push('<b>Dolby Vision excluded</b> — DV streams removed, prevents tint on unsupported screens');
+  if (S.sizeLimit !== 'unlimited') pts.push('<b>Size limit: max ' + S.sizeLimit + 'GB</b> — streams over ' + S.sizeLimit + 'GB excluded from results');
+  pts.push('<b>Per-Addon Flood Guard</b> — no single scraper can flood results');
+  pts.push('<b>REPACK / PROPER priority</b> — fixed releases ranked above originals');
+  return pts.slice(0, 6);
+}
+
+function insightsHtml() {
+  const pts = insights();
+  if (!pts.length) return '';
+  return '<div style="background:#060e15;border:1px solid #162030;border-radius:10px;padding:14px 16px;margin-bottom:16px"><div style="color:#7eeeff;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">Template Highlights</div><ul style="list-style:none;display:flex;flex-direction:column;gap:5px">' + pts.map(p => '<li style="color:#8b949e;font-size:.8rem;line-height:1.4;display:flex;gap:6px"><span style="color:#3fb950;flex-shrink:0">✓</span><span>' + p + '</span></li>').join('') + '</ul></div>';
+}
+
+function sizeLimitHtml() {
+  return '<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Max File Size</span><span style="color:#4b5563;font-size:.72rem">Unlimited preserves REMUXes</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">' + ['10','20','30','50','unlimited'].map(v => '<button type="button" data-action="set-size-limit" data-val="' + v + '" class="size-btn' + (S.sizeLimit === v ? ' size-btn-active' : '') + '">' + (v === 'unlimited' ? '♾ Unlimited' : v + 'GB') + '</button>').join('') + '</div></div>';
+}
+
+function formatterPickerHtml() {
+  return '<div style="margin-bottom:16px"><div style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Stream Layout</div><div style="display:flex;flex-direction:column;gap:8px">' +
+    FORMATTERS.map(f => {
+      const on = S.formatter === f.id;
+      return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'#00d4ff':'#30363d'};border-radius:10px;background:${on?'#00131c':'#0d1117'};cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s">` +
+        `<img src="${f.img}" alt="${f.label} preview" style="width:100%;display:block;border-bottom:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'">` +
+        `<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">` +
+        `<span class="fmt-lbl" style="font-weight:700;font-size:.85rem;color:${on?'#00d4ff':'#e6edf3'};min-width:52px">${f.label}</span>` +
+        `<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
+        `<span style="color:#6b7280;font-size:.77rem">${f.desc}</span>` +
+        `</div></div>`;
+    }).join('') +
+  '</div></div>';
+}
+
+function getDebridInputs() {
+  const svc = S.service;
+  const defs = {
+    torbox:    { label:'TorBox API Key',      placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', url:'https://torbox.app/settings' },
+    realdebrid:{ label:'Real-Debrid API Key', placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',      url:'https://real-debrid.com/apitoken' },
+    alldebrid: { label:'AllDebrid API Key',   placeholder:'XXXXXXXXXXXXXXXX',                      url:'https://alldebrid.com/apikeys' },
+    premiumize:{ label:'Premiumize API Key',  placeholder:'XXXXXXXXXXXXXXXX',                      url:'https://www.premiumize.me/account' },
+    debridlink:{ label:'Debrid-Link API Key', placeholder:'XXXXXXXXXXXXXXXX',                      url:'https://debrid-link.com/webapp#/account/api' },
+  };
+  const ids = [];
+  if (svc==='torbox-pro'||svc==='torbox-ess'||svc==='hybrid') ids.push('torbox');
+  if (svc==='realdebrid'||svc==='hybrid') ids.push('realdebrid');
+  if (svc==='alldebrid')  ids.push('alldebrid');
+  if (svc==='premiumize') ids.push('premiumize');
+  if (svc==='debridlink') ids.push('debridlink');
+  if (svc==='multi') S.multiServices.forEach(s => ids.push(s));
+  return ids.map(id => ({id, ...defs[id]}));
+}
+
+function ruid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); }); }
+function sid() { return Math.random().toString(36).substring(2,8); }
+
+function defaultName() {
+  const res = S.resolution, svc = S.service;
+  const is4k = res === '4k', isUW = res === 'ultrawide';
+  const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
+  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'hybrid':'Hybrid' }[svc] || '';
+  if (svc === 'multi') {
+    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL'};
+    return `Core Builds${suffix} Multi (${S.multiServices.map(s => abbr[s] || s).join('+')})`.trim();
+  }
+  return `Core Builds${suffix}${svcLabel ? ' · ' + svcLabel : ''}`.trim();
+}
+
+function presets() {
+  const isMulti = S.service === 'multi', useStore = ['alldebrid','realdebrid','premiumize','debridlink'].includes(S.service) || isMulti;
+  const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','hybrid':'StremThru RD'};
+  const storeSlot = isMulti ? S.multiServices.map((svc, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] })) : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[S.service] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }] : S.service === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }] : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
+  
+  const list = [
+    { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+    { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] }, resources:['stream'] },
+    { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
+    ...storeSlot,
+    { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] }, resources:['stream'] },
+    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true }, resources:['stream'] },
+    { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] }, resources:['stream'] },
+    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
+    { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
+    { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
+    { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
+    { type:'torrents-db', instanceId:'nx-tdb-1', enabled:true, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
+    { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
+  ];
+  if (!useStore) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  return list;
+}
+
+function cred(id) { return S.creds[id] ? {apiKey: S.creds[id]} : {}; }
+function services() {
+  const svc = S.service, isMulti = svc === 'multi', m = S.multiServices;
+  return [
+    {id:'realdebrid', enabled: svc==='realdebrid' || svc==='hybrid' || (isMulti && m.includes('realdebrid')), credentials:cred('realdebrid')},
+    {id:'alldebrid', enabled: svc==='alldebrid' || (isMulti && m.includes('alldebrid')), credentials:cred('alldebrid')},
+    {id:'premiumize', enabled: svc==='premiumize' || (isMulti && m.includes('premiumize')), credentials:cred('premiumize')},
+    {id:'debridlink', enabled: svc==='debridlink' || (isMulti && m.includes('debridlink')), credentials:cred('debridlink')},
+    {id:'torbox', enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid', credentials:cred('torbox')},
+    {id:'offcloud', enabled: false, credentials:{}}, {id:'putio', enabled: false, credentials:{}}, {id:'easynews', enabled: false, credentials:{}},
+    {id:'easydebrid', enabled: false, credentials:{}}, {id:'pikpak', enabled: false, credentials:{}}, {id:'seedr', enabled: false, credentials:{}}, {id:'debrider', enabled: false, credentials:{}}
+  ];
+}
+
+function resolutionCfg() {
+  const ex = ['144p','240p','360p'];
+  if (S.resolution === '4k') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','720p','Unknown'], maxResults:20, maxResultsPerResolution:8 };
+  if (S.resolution === '1080p') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:['1080p','720p'], preferredResolutions:['1080p','720p','Unknown'], maxResults:25, maxResultsPerResolution:10 };
+  return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['1080p','1440p','2160p','720p','576p','480p','Unknown'], maxResults:25, maxResultsPerResolution:10 };
+}
+
+function encodeCfg() {
+  const dev = S.device;
+  if (dev==='samsung'||dev==='firestick-hd'||dev==='shield') return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
+  if (dev==='firestick-4kmax') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  if (dev==='appletv-old') return { excludedEncodes:['AV1'], preferredEncodes:['HEVC','AVC','Unknown'] };
+  if (dev==='windows') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  return { excludedEncodes:[], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+}
+
+function audioCfg() {
+  const dev = S.device;
+  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick-hd' || dev==='firestick-4kmax';
+  const dolby   = S.audio==='dolby';
+  const wide     = dev==='windows' || dev==='lgtv' || dev==='appletv-old' || dev==='appletv-new' || S.audio==='lossless' || dolby;
+  if (dolby) return {
+    excludedAudioTags: ['DTS','DTS-HD MA','DTS:X','DTS-HD','DTS-ES'],
+    preferredAudioTags: ['TrueHD','Atmos','DD+','AAC','DD'],
+    preferredAudioChannels: ['7.1','5.1','2.0']
+  };
+  return { excludedAudioTags: limited ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [], preferredAudioTags:['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','DTS-HD','DD+','AAC','DTS','DD'], preferredAudioChannels: wide ? ['7.1','5.1','2.0'] : ['5.1','2.0'] };
+}
+
+function visualTags() {
+  const dev = S.device;
+  if (['appletv-old','appletv-new','lgtv'].includes(dev)) return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='samsung') return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='firestick-hd') return ['HDR10','HDR','HLG','SDR'];
+  if (dev==='firestick-4kmax') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='shield') return ['DV','HDR+DV','HDR10+','HDR10','HDR','10bit','SDR','IMAX'];
+  if (dev==='windows' || S.resolution==='4k' || S.resolution==='ultrawide') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
+}
+
+function eses() {
+  const out = [], dev = S.device, is1080= S.resolution === '1080p';
+  out.push({ enabled:true, expression: "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))" });
+  if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
+  out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
+  if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
+  if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+  out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" }, { enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
+  if (!S.p2pEnabled) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
+  if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
+  if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
+  if (S.sizeLimit !== 'unlimited') {
+    const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
+    out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
+  }
+  return out;
+}
+
+function pses() {
+  const out = [], res = S.resolution, dev = S.device, dv = dev==='appletv-old' || dev==='appletv-new' || dev==='lgtv' || dev==='firestick-4kmax', codecExpr = !['samsung','firestick-hd','appletv-old'].includes(dev) ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
+  const audPinnArr = (S.audio === 'limited' || ['samsung','firestick-hd','firestick-4kmax'].includes(dev)) ? [] : S.audio === 'dolby' ? [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos')" }] : [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" }];
+  const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" }, pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" }, seasonPSE = { enabled:true, expression:"/* ongoingSeasonPack */ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired < -1 or daysUntilNextEpisode >= 0)) ? seasonPack(streams,'onlySeasons') : []" };
+
+  if (res === '4k') {
+    out.push({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" }, pin1080Elite, pinLQ, seasonPSE);
+    if (dv) out.push({ enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" });
+    out.push({ enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 4K WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* B-Tier 4K WEB-DL */ quality(resolution(streams,'2160p'),'WEB-DL')" }, { enabled:true, expression:"/* C-Tier Any 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:codecExpr }, ...audPinnArr, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+  } else if (res === '1080p') {
+    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:codecExpr }, ...audPinnArr, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+  } else {
+    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 1440p Any Quality */ quality(resolution(streams,'1440p'),'BluRay REMUX','BluRay','WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 4K Fallback BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* 4K Fallback WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* 4K Fallback Any */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:codecExpr }, ...audPinnArr, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+  }
+  return out;
+}
+
+function build() {
+  const name = (S.name.trim() || defaultName()), rc = resolutionCfg(), ec = encodeCfg(), ac = audioCfg();
+  return {
+    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: 'Debrid', serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
+    config: {
+      trusted: false, showChanges: true, addonName: name, addonLogo: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg', addonDescription: name, presets: presets(), services: services(),
+      excludedResolutions: rc.excludedResolutions, includedResolutions: rc.includedResolutions, requiredResolutions: rc.requiredResolutions, preferredResolutions: rc.preferredResolutions,
+      excludedQualities: [], includedQualities: [], requiredQualities: [], preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','SCR','TC','TS','CAM','Unknown'],
+      excludedLanguages: [], includedLanguages: ['English','Original','Dual Audio','Multi','Dubbed','Unknown'],
+      excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes, excludedAudioTags: ac.excludedAudioTags, preferredAudioTags: ac.preferredAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
+      enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
+      excludeCached: false, excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [], excludeUncached: false, excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
+      checkOwned: false, externalDownloads: false, autoRemoveDownloads: false, excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
+      syncedExcludedRegexUrls: ['https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json'], syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'], rankedRegexPatterns: [], preferredRegexPatterns: [], excludedRegexPatterns: [],
+      addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'}, mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
+      ...(S.tmdbToken ? { tmdbAccessToken: S.tmdbToken } : {}),
+      ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
+      usePosterRedirectApi: true, usePosterServiceForMeta: true,
+      maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
+      excludedStreamExpressions: eses(), includedStreamExpressions: [{ enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" }], preferredStreamExpressions: pses(),
+      sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
+      deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
+      dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
+      groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid'), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
+      formatter: (function(){ const _f = FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })()
+    }
+  };
+}
+
+function generate() {
+  const json = JSON.stringify(build(), null, 2), blob = new Blob([json], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+function showManifestModal(manifestUrl, password, hostLabel) {
+  const ex = document.getElementById('manifestModal');
+  if (ex) ex.remove();
+
+  const FMTS = [
+    { key:'app',    label:'Stremio App', getUrl: u => u.replace(/^https?:\/\//, 'stremio://'), action:'link' },
+    { key:'web',    label:'Web',         getUrl: u => `https://web.stremio.com/#/addons?addon=${encodeURIComponent(u)}`, action:'link' },
+    { key:'wuplay', label:'WuPlay',      getUrl: u => u, action:'open', configUrl:'https://config.wuplay.app/#addons' },
+    { key:'nuvio',  label:'Nuvio',       getUrl: u => u, action:'copy' },
+  ];
+  const qrSrc = u => `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=00d4ff&bgcolor=0d1117&qzone=2&data=${encodeURIComponent(u)}`;
+  const esc  = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+  // Extract password from AIOStreams URL format if not provided
+  if (!password) {
+    const m = manifestUrl.match(/\/stremio\/[^\/]+\/([^\/]+)\/manifest\.json/);
+    if (m) try { password = decodeURIComponent(m[1]); } catch(e) {}
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'manifestModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Manifest Ready">
+      <button class="modal-close" id="mClose" aria-label="Close">×</button>
+      <div class="modal-success-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="modal-title">Manifest Ready 🎉</div>
+      <div class="modal-sub">${hostLabel ? `<span style="color:#3fb950">${esc(hostLabel)}</span> · ` : ''}Your config is live — install or copy below</div>
+      <div class="fmt-tabs" id="mFmtTabs">
+        ${FMTS.map((f,i) => `<button class="fmt-tab${i===0?' active':''}" data-fi="${i}">${f.label}</button>`).join('')}
+      </div>
+      <div class="copy-field">
+        <div style="flex:1;min-width:0">
+          <div class="copy-field-label" id="mUrlLabel">Manifest URL</div>
+          <div class="copy-field-val" id="mUrlVal">${esc(FMTS[0].getUrl(manifestUrl))}</div>
+        </div>
+        <button class="copy-btn" id="mCopyUrl">Copy</button>
+      </div>
+      ${password ? `<div class="copy-field">
+        <div style="flex:1;min-width:0">
+          <div class="copy-field-label">Password</div>
+          <div class="copy-field-val pwd-val">${esc(password)}</div>
+        </div>
+        <button class="copy-btn" id="mCopyPwd">Copy</button>
+      </div>` : ''}
+      <div class="qr-wrap">
+        <img id="mQr" src="${qrSrc(FMTS[0].getUrl(manifestUrl))}" width="140" height="140" alt="QR code" loading="lazy" onerror="this.parentElement.style.display='none'">
+      </div>
+      <div style="text-align:center;color:#4b5563;font-size:.7rem;margin-bottom:2px">Scan to install on another device</div>
+      <div class="modal-actions">
+        <a href="${esc(FMTS[0].getUrl(manifestUrl))}" id="mActionBtn" class="m-btn m-install">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install
+        </a>
+        <button class="m-btn m-done" id="mDone">Done</button>
+      </div>
+      <details style="margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.03em;user-select:none">
+          <span>🎮 Push to Stremio Library</span><span style="font-size:.7rem">›</span>
+        </summary>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+          <input id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <input id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s">📥 Log in &amp; Install</button>
+          <div id="stremioInstallResult" style="font-size:.75rem"></div>
+        </div>
+      </details>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const urlVal   = document.getElementById('mUrlVal');
+  const qrImg    = document.getElementById('mQr');
+  const actionBtn = document.getElementById('mActionBtn');
+  let activeFi = 0;
+
+  const BTN_CLS = ['m-install','m-web','m-wu','m-nuvio'];
+  const BTN_LABELS = [
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install`,
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web`,
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open WuPlay`,
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`,
+  ];
+
+  function switchFmt(fi) {
+    activeFi = fi;
+    const f = FMTS[fi];
+    const url = f.getUrl(manifestUrl);
+    urlVal.textContent = url;
+    if (qrImg) qrImg.src = qrSrc(url);
+    // action button
+    actionBtn.className = `m-btn ${BTN_CLS[fi]}`;
+    actionBtn.innerHTML = BTN_LABELS[fi];
+    if (f.action === 'link') {
+      actionBtn.href = url;
+      actionBtn.target = fi === 1 ? '_blank' : '';
+      actionBtn.onclick = null;
+    } else if (f.action === 'open') {
+      actionBtn.href = f.configUrl;
+      actionBtn.target = '_blank';
+      actionBtn.onclick = () => { navigator.clipboard.writeText(url).catch(() => {}); };
+    } else {
+      actionBtn.href = '#';
+      actionBtn.target = '';
+      actionBtn.onclick = ev => {
+        ev.preventDefault();
+        navigator.clipboard.writeText(url).then(() => showToast(`Copied! Paste into ${f.label} → Addons`));
+      };
+    }
+    document.getElementById('mUrlLabel').textContent =
+      fi === 2 ? 'Manifest URL — copy then paste in WuPlay' :
+      fi === 3 ? 'Manifest URL (paste into app)' : 'Manifest URL';
+    document.getElementById('mCopyUrl').textContent = 'Copy';
+    document.getElementById('mCopyUrl').classList.remove('copied');
+  }
+
+  document.getElementById('mFmtTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.fmt-tab');
+    if (!btn) return;
+    document.querySelectorAll('#mFmtTabs .fmt-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    switchFmt(parseInt(btn.dataset.fi));
+  });
+
+  document.getElementById('mCopyUrl').addEventListener('click', function() {
+    navigator.clipboard.writeText(urlVal.textContent).then(() => {
+      this.textContent = '✓'; this.classList.add('copied');
+      setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2200);
+    });
+  });
+
+  if (password) {
+    document.getElementById('mCopyPwd').addEventListener('click', function() {
+      navigator.clipboard.writeText(password).then(() => {
+        this.textContent = '✓'; this.classList.add('copied');
+        setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2200);
+      });
+    });
+  }
+
+  const close = () => {
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => overlay.remove(), 160);
+  };
+  document.getElementById('mClose').addEventListener('click', close);
+  document.getElementById('mDone').addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  const escKey = e => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escKey); } };
+  document.addEventListener('keydown', escKey);
+
+  document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
+    const email    = document.getElementById('stremioEmail').value.trim();
+    const password = document.getElementById('stremioPassword').value;
+    const resEl    = document.getElementById('stremioInstallResult');
+    const btn      = document.getElementById('stremioInstallBtn');
+    if (!email || !password) { resEl.innerHTML = `<span style="color:#f87171">Enter your Stremio email and password.</span>`; return; }
+    btn.disabled = true; btn.textContent = 'Signing in…'; resEl.innerHTML = '';
+    try {
+      const SAPI = 'https://api.strem.io/api/';
+      const loginRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'Login', email, password, facebook:false }) });
+      const loginData = await loginRes.json();
+      const authKey = loginData?.result?.authKey;
+      if (!authKey) throw new Error(loginData?.error || 'Login failed — check your email and password.');
+      btn.textContent = 'Installing…';
+      const getRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionGet', authKey, update:true }) });
+      const getData = await getRes.json();
+      if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
+      const existing = getData.result.addons;
+      const already = existing.some(a => a.transportUrl === manifestUrl);
+      if (!already) {
+        const updated = [...existing, { transportName:'http', transportUrl: manifestUrl, flags:{} }];
+        const setRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionSet', authKey, addons: updated }) });
+        const setData = await setRes.json();
+        if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
+      }
+      btn.textContent = '✓ Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
+      resEl.innerHTML = already ? `<span style="color:#f59e0b">Already in your library.</span>` : `<span style="color:#3fb950">Done — reopen Stremio to see it.</span>`;
+    } catch(err) {
+      btn.disabled = false; btn.textContent = '📥 Log in &amp; Install';
+      resEl.innerHTML = `<span style="color:#f87171">${err.message}</span>`;
+    }
+  });
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3200);
+}
+
+function togglePwd() {
+  const el = document.getElementById('aioPwd'), eye = document.getElementById('pwdEye');
+  if (!el) return;
+  const show = el.type === 'password'; el.type = show ? 'text' : 'password';
+  if (eye) eye.style.color = show ? '#00d4ff' : '#4b5563';
+}
+
+function genPwd() {
+  const PWD_WORDS = ['Blue','Red','Dark','Bright','Swift','Deep','High','Storm','Wild','Sharp','Iron','Gold','Stone','Silver','Flash','Frost','Fire','Wind','Thunder','Star','River','Forest','Ocean','Mountain','Canyon','Desert','Arctic','Ember','Shadow','Crystal','Falcon','Tiger','Wolf','Eagle','Phoenix','Dragon','Hawk','Raven','Cobra','Viper'];
+  const arr = new Uint8Array(4); crypto.getRandomValues(arr);
+  const pwd = `${PWD_WORDS[arr[0] % PWD_WORDS.length]}${PWD_WORDS[arr[1] % PWD_WORDS.length]}${PWD_WORDS[arr[2] % PWD_WORDS.length]}${String(100 + (arr[3] % 900))}`;
+  S.instancePassword = pwd; saveState();
+  const el = document.getElementById('aioPwd'); if (el) { el.value = pwd; el.type = 'text'; }
+  showToast('Password generated — copy it now');
+  setTimeout(() => { const e = document.getElementById('aioPwd'); if (e) e.type = 'password'; }, 5000);
+}
+
+function onPasteManifest(val) {
+  val = (val || '').trim();
+  const result = document.getElementById('pasteManifestResult');
+  if (!val) { result.innerHTML = ''; return; }
+  try { new URL(val); } catch(e) { result.innerHTML = ''; return; }
+  result.innerHTML = '';
+  showManifestModal(val, null, null);
+}
+
+function wuplayBtn(manifestUrl) {
+  const safe = (manifestUrl||'').replace(/"/g,'&quot;');
+  return `<button type="button" data-action="copy-wuplay" data-url="${safe}" title="Copy manifest URL — paste into WuPlay → Addons → Add Addon" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;border:1px solid #4f46e5;background:#16103a;color:#a78bfa;transition:all .15s"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>WuPlay</button>`;
+}
+
+function instanceChips(templateUrl) {
+  const hosts = [['ElfHosted','https://aiostreams.elfhosted.com/stremio/configure'],['ForthWeak','https://aiostreams.fortheweak.cloud/stremio/configure'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure'],["Viren's",'https://aiostreams.viren070.me/stremio/configure'],["Kuu's",'https://aiostreams.stremio.ru/stremio/configure'],['ATBP','https://aio.atbphosting.com/stremio/configure'],["Omni's",'https://aiostreams.12312023.xyz/stremio/configure']];
+  return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}${templateUrl?`?template=${encodeURIComponent(templateUrl)}`:''}" target="_blank" class="inst-chip ${templateUrl?'inst-chip-import':''}">${templateUrl?'▶ ':''}${n}</a>`).join('')}</div>`;
+}
+
+async function fetchWithTimeout(url, options = {}, timeout = 6000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  const response = await fetch(url, { ...options, signal: controller.signal });
+  clearTimeout(id);
+  return response;
+}
+
+async function createImportUrl() {
+  const btn = document.getElementById('btnImport'), result = document.getElementById('importUrlResult'), origHtml = btn.innerHTML;
+  btn.disabled = true; btn.textContent = 'Creating…'; result.innerHTML = '';
+  const tmpl = build();
+  if (tmpl.config) {
+    if (tmpl.config.services) tmpl.config.services = tmpl.config.services.map(s => ({ ...s, credentials: {} }));
+  }
+  const json = JSON.stringify(tmpl, null, 2);
+  let url = null;
+  
+  // Paste API with Timeout
+  try {
+    const r = await fetchWithTimeout('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:json }, 5000);
+    if (r.ok) url = (await r.text()).trim();
+  } catch(e) { console.warn("paste.rs failed/timed out", e); }
+
+  if (!url) {
+    try {
+      const r = await fetchWithTimeout('https://dpaste.com/api/v2/', { method:'POST', body:new URLSearchParams({ content:json, syntax:'json', expiry_days:'365' }) }, 5000);
+      if (r.ok) { const t=(await r.text()).trim().replace(/"/g,''); url = t.startsWith('http') ? t+'.txt' : null; }
+    } catch(e) { console.warn("dpaste failed/timed out", e); }
+  }
+
+  btn.disabled = false; btn.innerHTML = origHtml;
+
+  if (url) {
+    navigator.clipboard.writeText(url).catch(()=>{});
+    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Click your instance to auto-import</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Opens AIOStreams with your template pre-loaded. Debrid credentials stripped for security — TMDB keys are included.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 3px">Or copy the URL to import manually:</div><div class="manifest-url" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div></div>`;
+    showToast('Click an instance chip to auto-import your template');
+  } else {
+    result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">Your browser's security blocked the cross-origin request. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
+    showToast('Paste service unreachable', true);
+  }
+}
+
+async function openInAIOStreams() {
+  const HOST_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
+  const HOST_LABELS = { 'https://aiostreams.elfhosted.com':'ElfHosted', 'https://aiostreams.fortheweak.cloud':'ForthWeak', 'https://aiostreamsfortheweebsstable.midnightignite.me':"Midnight's", 'https://aiostreams.viren070.me':"Viren's", 'https://aiostreams.stremio.ru':"Kuu's", 'https://aio.atbphosting.com':'ATBP', 'https://aiostreams.12312023.xyz':"Omni's" };
+  const isAuto = S.instanceHost === 'auto', isCustom = S.instanceHost === 'custom';
+  const base = HOST_URLS[S.instanceHost] || (S.instanceUrl || '').trim().replace(/\/$/, '');
+
+  if (!isAuto && !base) { showToast('Enter your AIOStreams instance URL first', true); return; }
+
+  const result = document.getElementById('aioResult'), btn = document.getElementById('btnAio');
+  const uuid = (S.instanceUuid || '').trim(), pwd = S.instancePassword;
+  const hostLabel = base ? (HOST_LABELS[base] || base.replace('https://','').split('/')[0]) : null;
+
+  const setBtnLoading = () => { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Connecting…`; };
+  const resetBtn = orig => { btn.disabled = false; btn.innerHTML = orig; };
+
+  /* Auto mode — parallel host detection via Promise.any() */
+  if (isAuto && pwd) {
+    const origHtml = btn.innerHTML;
+    setBtnLoading(); result.innerHTML = '';
+    const cfg = build().config;
+    try {
+      const winner = await Promise.any(
+        Object.values(HOST_URLS).map(host =>
+          fetchWithTimeout(`${host}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
+            .then(async res => {
+              const data = await res.json().catch(()=>({}));
+              if (res.ok && data?.success !== false) return { host, uuid: data?.uuid || data?.user?.uuid || data?.id };
+              throw new Error('rejected');
+            })
+        )
+      );
+      if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); }
+      resetBtn(origHtml);
+      showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
+    } catch(e) {
+      resetBtn(origHtml);
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">CORS blocked requests or all hosts timed out. Use <strong style="color:#8b949e">Create Import URL</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+    }
+    return;
+  }
+
+  /* Known host + UUID — show manifest URL directly, no API call */
+  if (uuid && !isAuto) {
+    const manifestUrl = pwd ? `${base}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json` : `${base}/stremio/${uuid}/manifest.json`;
+    showManifestModal(manifestUrl, pwd || null, hostLabel);
+    return;
+  }
+
+  /* No UUID, not auto or custom — guide to get UUID */
+  if (!uuid && !isCustom && !isAuto) {
+    result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px"><strong style="color:#e6edf3">No UUID entered</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px">Sign in to your AIOStreams instance, copy your UUID from the configure page and paste it above.</div><div style="color:#4b5563;font-size:.77rem;margin:6px 0 4px">Or use <strong style="color:#8b949e">Create Import URL</strong> above — click a chip below to open AIOStreams and import in one click:</div>${instanceChips()}</div>`;
+    return;
+  }
+
+  /* Known host + password + no UUID — create new config via API */
+  if (pwd) {
+    const origHtml = btn.innerHTML;
+    setBtnLoading(); result.innerHTML = '';
+    try {
+      const res = await fetchWithTimeout(uuid ? `${base}/api/v1/user/${uuid}` : `${base}/api/v1/user`, { method: uuid ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: build().config, password: pwd }) });
+      const data = await res.json().catch(()=>({}));
+      if (res.ok && data?.success !== false) {
+        const outUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
+        if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
+        resetBtn(origHtml);
+        showManifestModal(`${base}/stremio/${outUuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabel);
+      } else throw new Error('API Error');
+    } catch(e) {
+      resetBtn(origHtml);
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">The API blocked the request (CORS) or timed out. Use Create Import URL or Download instead.</div></div>`;
+    }
+    return;
+  }
+
+  result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px"><strong style="color:#e6edf3">Enter a password to proceed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Set a password above to generate or save your config. Or use <strong style="color:#8b949e">Create Import URL</strong> above.</div></div>`;
+}
+</script>
+</body>
+</html>
