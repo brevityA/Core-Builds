@@ -391,7 +391,7 @@ const DEFS = [
       { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
     ]
   },
-  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c4d', layout:'list',
+  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'svc-list', noHero:true,
     opts:[
       { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="13" width="38" height="22" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="7" y="16" width="30" height="15" fill="#1a0a3a"/><line x1="15" y1="35" x2="12" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="29" y1="35" x2="32" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="42" x2="34" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="12" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="13" x2="32" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>', name:'Standard TV',          desc:'Broadest compatibility · no restrictions' },
       { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="9" width="40" height="24" rx="2" stroke="#3d72e8" stroke-width="2"/><rect x="4" y="11" width="36" height="20" fill="#040e22"/><rect x="19" y="33" width="6" height="3" fill="#3d72e8"/><path d="M12 41 Q22 37 32 41" stroke="#3d72e8" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="8" y1="21" x2="36" y2="21" stroke="#3d72e8" stroke-width="0.5" opacity="0.5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+' },
@@ -404,14 +404,14 @@ const DEFS = [
       { v:'shield', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="4" y="21" width="29" height="11" rx="3" fill="#0d1a0a" stroke="#76b900" stroke-width="1.5"/><rect x="34" y="23" width="7" height="7" rx="2" fill="#76b900"/><path d="M22 6 L30 10 L30 19 Q30 22 22 25 Q14 22 14 19 L14 10 Z" fill="none" stroke="#76b900" stroke-width="1.5" stroke-linejoin="round"/><path d="M22 8 L28 11.5 L28 19 Q28 21 22 23.5" stroke="#76b900" stroke-width="0.5" stroke-linejoin="round" fill="#76b900" opacity="0.2"/></svg>', name:'Streaming Box', desc:'No AV1 · no HLG · Nvidia Shield / Android TV' },
     ]
   },
-  { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c3d', layout:'pills',
+  { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c1', layout:'svc-list', noHero:true,
     opts:[
       { v:'4k',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 40,16 22,42 4,16" stroke="#7c3aed" stroke-width="2" fill="#1a0a3a"/><polygon points="22,3 40,16 22,16 4,16" fill="#7c3aed" opacity="0.4"/><text x="22" y="34" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="800" font-family="system-ui,sans-serif">4K</text></svg>', name:'4K HDR',        desc:'2160p first · 1080p fallback · for 4K displays' },
       { v:'1080p',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="8" width="38" height="24" rx="3" stroke="#3b82f6" stroke-width="2" fill="#0a1428"/><text x="22" y="25" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="800" font-family="system-ui,sans-serif">1080p</text><rect x="17" y="32" width="10" height="4" rx="1" fill="#3b82f6"/><line x1="13" y1="40" x2="31" y2="40" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/></svg>', name:'1080p',          desc:'Hard lock · 2160p excluded · bandwidth-friendly' },
       { v:'ultrawide', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="11" width="40" height="22" rx="2" stroke="#8b5cf6" stroke-width="2" fill="#0e0a1f"/><text x="22" y="26" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="700" font-family="system-ui,sans-serif">21 : 9</text><rect x="17" y="33" width="10" height="4" rx="1" fill="#8b5cf6"/><line x1="12" y1="41" x2="32" y2="41" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>', name:'Ultrawide',      desc:'1080p → 1440p → 4K tiers · pair with Windows PC device' },
     ]
   },
-  { id:'audio', title:'Audio', desc:'What formats does your audio setup support?', key:'audio', cols:'c3d', layout:'pills',
+  { id:'audio', title:'Audio', desc:'What formats does your audio setup support?', key:'audio', cols:'c1', layout:'svc-list', noHero:true,
     opts:[
       { v:'lossless', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless',   desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
       { v:'standard', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos',     desc:'Soundbar or smart TV · Dolby Digital Plus' },
@@ -419,7 +419,7 @@ const DEFS = [
       { v:'dolby',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only',     desc:'Atmos · TrueHD · DD+ · no DTS — Bose / Dolby soundbars' },
     ]
   },
-  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c4d', layout:'pills',
+  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c1', layout:'svc-list', noHero:true,
     opts:[
       { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><text x="22" y="29" text-anchor="middle" fill="#94a3b8" font-size="22" font-weight="900" font-family="system-ui,sans-serif">?</text></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
       { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Movies & TV',      desc:'Films &amp; series · no anime scrapers' },
@@ -490,6 +490,14 @@ function renderOpts(def) {
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
+    if (def.noHero) {
+      const rows = def.opts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+        <div class="opt-icon">${o.icon}</div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc.replace(/<[^>]*>/g,'')}</div></div>
+        <span class="svc-list-arr">›</span>
+      </label></div>`).join('');
+      return `<div class="svc-list">${rows}</div>`;
+    }
     const SVC_TAGS = {
       'torbox-pro': ['4K Apex','Stream','Flash','Speed','Anime'],
       'torbox-ess': ['4K Essential','Essential'],
