@@ -38,3 +38,6 @@ venv/
 # Nightly/ — pre-release gating. New files here won't be staged automatically.
 # Use: git add -f <path> to force-add when promoting a nightly template.
 Nightly/
+configurator/index.src.html
+node_modules/
+package*.json
