@@ -312,7 +312,7 @@ details[open] .adv-arr{transform:rotate(90deg);color:#00d4ff}
 .splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px 36px}
 .splash-icon{width:96px;height:96px;margin-bottom:18px;filter:drop-shadow(0 0 24px rgba(0,212,255,.5))}
 .splash-title{font-size:2.15rem;font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:5px}
-.splash-by{font-size:.67rem;font-weight:700;letter-spacing:.18em;color:#374151;text-transform:uppercase;margin-bottom:13px}
+.splash-by{font-size:.67rem;font-weight:700;letter-spacing:.18em;color:#4b8fa8;text-transform:uppercase;margin-bottom:0}
 .splash-tagline{font-size:.9rem;color:#9ca3af;line-height:1.5;margin-bottom:20px;max-width:290px}
 .splash-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:7px}
 .splash-chip{font-size:.69rem;font-weight:700;padding:4px 11px;border-radius:20px;letter-spacing:.02em}
@@ -397,7 +397,7 @@ const DEFS = [
       { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
     ]
   },
-  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c4d', layout:'list',
+  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c4d', layout:'svc-list', noHero:true,
     opts:[
       { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="13" width="38" height="22" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="7" y="16" width="30" height="15" fill="#1a0a3a"/><line x1="15" y1="35" x2="12" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="29" y1="35" x2="32" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="42" x2="34" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="12" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="13" x2="32" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>', name:'Standard TV',          desc:'Broadest compatibility · no restrictions' },
       { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="9" width="40" height="24" rx="2" stroke="#3d72e8" stroke-width="2"/><rect x="4" y="11" width="36" height="20" fill="#040e22"/><rect x="19" y="33" width="6" height="3" fill="#3d72e8"/><path d="M12 41 Q22 37 32 41" stroke="#3d72e8" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="8" y1="21" x2="36" y2="21" stroke="#3d72e8" stroke-width="0.5" opacity="0.5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+' },
@@ -687,8 +687,11 @@ function splashHtml() {
       <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
     </svg>
     <div class="splash-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
-    <div class="splash-by">By Brevity</div>
-    <div class="splash-tagline">Build your perfect AIOStreams template in 2 minutes. No manual JSON editing.</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:13px">
+      <div class="splash-by">By Brevity</div>
+      <span style="font-size:.58rem;font-weight:800;letter-spacing:.1em;color:#00d4ff;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:20px;padding:1px 8px">v3.0</span>
+    </div>
+    <div class="splash-tagline">The only AIOStreams configurator built for end users. No JSON. No manual importing.</div>
     <div class="splash-chips">
       <span class="splash-chip splash-chip-svc">TorBox Pro</span>
       <span class="splash-chip splash-chip-svc">TorBox Essential</span>
@@ -737,19 +740,20 @@ function render() {
             </div>
           </div>
           ${[
-            {k:'service',    ico:'🔌'},
-            {k:'device',     ico:'📺'},
-            {k:'resolution', ico:'🖥️'},
-            {k:'audio',      ico:'🔊'},
-            {k:'content',    ico:'🎬'},
-            {k:'formatter',  ico:'🎨'},
-          ].map(({k, ico}) => {
+            {k:'service',    lbl:'Service',  dot:'#00d4ff'},
+            {k:'device',     lbl:'Device',   dot:'#a78bfa'},
+            {k:'resolution', lbl:'Quality',  dot:'#7c3aed'},
+            {k:'audio',      lbl:'Audio',    dot:'#10b981'},
+            {k:'content',    lbl:'Content',  dot:'#f9a8d4'},
+            {k:'formatter',  lbl:'Layout',   dot:'#f59e0b'},
+          ].map(({k, lbl, dot}) => {
             const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
-            const val = label(k, S[k]) || '—';
+            const rawVal = k==='audio' ? (label(k, S[k]) || 'Auto') : (label(k, S[k]) || '—');
+            const val = rawVal;
             return `<div class="receipt-row">
               <div class="receipt-row-left">
-                <span class="receipt-row-ico">${ico}</span>
-                <span class="receipt-row-lbl">${k}</span>
+                <span style="width:8px;height:8px;border-radius:50%;background:${dot};flex-shrink:0;display:inline-block;box-shadow:0 0 6px ${dot}88"></span>
+                <span class="receipt-row-lbl">${lbl}</span>
               </div>
               <div class="receipt-row-val${k==='service'?' hl':''}">
                 ${val}${audioOverride ? ' <span style="color:#f59e0b;font-size:.7rem">⚠ DD+</span>' : ''}
@@ -863,36 +867,41 @@ function render() {
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
+        <div style="background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:.75rem;color:#4b8fa8;line-height:1.4;flex:1">All keys are optional — they're baked into your downloaded template file and never sent to any server.</span>
+          <button type="button" data-action="nav-next" style="font-size:.75rem;font-weight:700;color:#00d4ff;background:none;border:none;cursor:pointer;white-space:nowrap;padding:0">Skip →</button>
+        </div>
         ${debridInputs.length ? `
-        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
+        <div style="color:#8b949e;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:700">Debrid API Key</div>
         ${debridInputs.map(inp => `
-        <div class="name-row" style="margin-bottom:14px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
-            <a href="${inp.url}" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+        <div style="background:rgba(13,17,23,.8);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:14px 16px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span style="font-size:.88rem;font-weight:700;color:#e6edf3">${inp.label}</span>
+            <a href="${inp.url}" target="_blank" style="font-size:.72rem;color:#00d4ff;text-decoration:none;font-weight:700;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:6px;padding:3px 9px">Get key →</a>
           </div>
           <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="text" placeholder="${inp.placeholder}"
-            value="${S.creds[inp.id] || ''}" maxlength="120">
+            value="${S.creds[inp.id] || ''}" maxlength="120" style="border-color:rgba(255,255,255,.1);background:#080c12">
         </div>`).join('')}
-        <div style="border-top:1px solid #21262d;margin:18px 0 14px"></div>
-        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Metadata &amp; Posters</div>
         ` : ''}
-        <div class="name-row" style="margin-bottom:14px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token (v4)</span>
-            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+        <details style="border:1px solid rgba(255,255,255,.07);border-radius:11px;overflow:hidden;margin-top:4px">
+          <summary style="padding:13px 16px;font-size:.82rem;font-weight:700;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">
+            <span>TMDB (Metadata &amp; Posters)</span>
+            <span style="font-size:.75rem;color:#374151">›</span>
+          </summary>
+          <div style="padding:0 16px 16px;border-top:1px solid rgba(255,255,255,.06)">
+            <div style="font-size:.74rem;color:#4b5563;margin:12px 0 14px;line-height:1.5">Improves movie poster quality and metadata accuracy. <a href="https://www.themoviedb.org/settings/api" target="_blank" style="color:#00d4ff;text-decoration:none">Get a free TMDB key →</a></div>
+            <div style="background:rgba(13,17,23,.8);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:14px 16px;margin-bottom:10px">
+              <div style="font-size:.82rem;font-weight:700;color:#e6edf3;margin-bottom:10px">Read Access Token (v4)</div>
+              <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+                value="${S.tmdbToken}" maxlength="400" style="border-color:rgba(255,255,255,.1);background:#080c12">
+            </div>
+            <div style="background:rgba(13,17,23,.8);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:14px 16px">
+              <div style="font-size:.82rem;font-weight:700;color:#e6edf3;margin-bottom:10px">API Key (v3)</div>
+              <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="text" placeholder="abc123def456…"
+                value="${S.tmdbApiKey}" maxlength="60" style="border-color:rgba(255,255,255,.1);background:#080c12">
+            </div>
           </div>
-          <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
-            value="${S.tmdbToken}" maxlength="400">
-        </div>
-        <div class="name-row">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key (v3)</span>
-            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
-          </div>
-          <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="text" placeholder="abc123def456…"
-            value="${S.tmdbApiKey}" maxlength="60">
-        </div>
+        </details>
       </div>`;
     nav.style.display = 'flex';
     document.getElementById('btnBack').style.visibility = 'visible';
