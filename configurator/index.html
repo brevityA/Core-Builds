@@ -92,6 +92,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .inst-chip-import{background:#001428;border-color:#0e7490;color:#00d4ff}
 .inst-chip-import:hover{background:#002a50;border-color:#00d4ff;color:#7ee8ff}
 .notice strong{color:#3fb950;display:block;margin-bottom:3px}
+/* Size limit presets */
+.size-btn{padding:7px 16px;border-radius:8px;border:1.5px solid #30363d;background:#0d1117;color:#8b949e;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
+.size-btn:hover{border-color:#005c7a;color:#e6edf3}
+.size-btn-active{border-color:#00d4ff!important;background:#00131c!important;color:#00d4ff!important}
 /* List layout */
 .opts.list{grid-template-columns:1fr}
 .opts.list .opt label{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
@@ -148,6 +152,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .hero-sub .opt-icon svg{width:28px;height:28px}
   .opts.list .opt-icon svg{width:32px;height:32px}
 }
+/* Animated logo */
+@keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
+@keyframes coreGlowPulse{0%,100%{transform:scale(1);opacity:.38}50%{transform:scale(1.24);opacity:.84}}
+@keyframes coreRingOut{0%{transform:scale(.5);opacity:.7}100%{transform:scale(2);opacity:0}}
+@keyframes hexBreath{0%,100%{opacity:.28}50%{opacity:.5}}
+@keyframes coreTextPulse{0%,100%{text-shadow:none}50%{text-shadow:0 0 14px rgba(255,255,255,.55),0 0 28px rgba(255,255,255,.18)}}
+.diamond-core{transform-box:fill-box;transform-origin:center;animation:corePulse 2.6s ease-in-out infinite}
+.diamond-glow{transform-box:fill-box;transform-origin:center;animation:coreGlowPulse 2.6s ease-in-out infinite}
+.core-ring{transform-box:fill-box;transform-origin:center;fill:none;stroke-width:5;animation:coreRingOut 2.6s ease-out infinite}
+.core-ring-2{animation-delay:1.3s}
+.hex-glow-layer{animation:hexBreath 2.6s ease-in-out infinite}
+.hdr-core{animation:coreTextPulse 2.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.diamond-core,.diamond-glow,.core-ring,.hex-glow-layer,.hdr-core{animation:none}}
 </style>
 </head>
 <body>
@@ -166,10 +183,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <circle cx="256" cy="256" r="248" fill="#080c10"/>
         <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.05" filter="url(#hf3)"/>
         <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.09" filter="url(#hf3)"/>
-        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#hf1)"/>
+        <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#hf1)"/>
         <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#hg1)" stroke-width="22" stroke-linejoin="round"/>
-        <polygon points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.4" filter="url(#hf2)"/>
-        <polygon points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.95"/>
+        <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.4" filter="url(#hf2)"/>
+        <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.95"/>
+        <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#hg2)"/>
+        <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#hg2)"/>
       </svg>
       <div class="hdr-divider"></div>
       <div class="hdr-text">
@@ -198,7 +217,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 7;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'hero',
@@ -343,6 +362,8 @@ function render() {
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
             value="${S.name}" data-action="update-name" maxlength="60">
         </div>
+        ${insightsHtml()}
+        ${sizeLimitHtml()}
         <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
         <button class="btn-aio" data-action="create-import" id="btnImport" style="margin-top:10px">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -525,6 +546,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = e.target.dataset.url || e.target.closest('[data-url]')?.dataset.url;
       navigator.clipboard.writeText(url).then(() => showToast('Manifest URL copied'));
     }
+    if (action === 'set-size-limit') {
+      S.sizeLimit = (e.target.closest('[data-action]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-size-limit"]').forEach(b => {
+        b.classList.toggle('size-btn-active', b.dataset.val === S.sizeLimit);
+      });
+    }
   });
 
   // Handle inputs and changes
@@ -574,6 +602,39 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* PAYLOAD GENERATION & API LOGIC */
+function insights() {
+  const pts = [], dev = S.device, aud = S.audio, cnt = S.content, svc = S.service;
+  if (dev === 'samsung') pts.push('<b>DV-Only Kill</b> — blocks DV streams missing HDR10 fallback (prevents purple screen)');
+  else if (dev === 'firestick-hd') pts.push('<b>DV-Only Kill</b> on · AV1 excluded · limited audio (DD+ max)');
+  else if (dev === 'shield') pts.push('<b>AV1 + HLG excluded</b> — prevents Nvidia Shield playback failures');
+  else if (dev === 'appletv-old') pts.push('<b>AV1 excluded</b> — Apple TV 4K Gen 1/2 hardware limit');
+  else if (dev === 'appletv-new') pts.push('<b>Full AV1 + DV</b> — optimised for Apple TV 4K Gen 3 (A15)');
+  else if (dev === 'windows') pts.push('<b>Full lossless + AV1</b> — Windows PC optimised, HDR-first visual tags');
+  else if (dev === 'lgtv') pts.push('<b>Full DV + eARC + 7.1</b> — best-case LG webOS profile');
+  if (aud === 'dolby') pts.push('<b>All DTS excluded</b> — safe for Bose / Dolby soundbars (Atmos · TrueHD · DD+ only)');
+  else if (aud === 'lossless') pts.push('<b>Full lossless audio ranked</b> — TrueHD · Atmos · DTS-HD MA · FLAC prioritised');
+  else if (aud === 'standard') pts.push('<b>DD+ / Atmos ranked</b> — soundbar and smart TV profile');
+  if (cnt === 'anime') pts.push('<b>SeaDex Best-Only</b> — only the confirmed best release group per title');
+  else if (cnt === 'mixed') pts.push('<b>SeaDex + live-action</b> scrapers active simultaneously');
+  else if (cnt === 'live') pts.push('<b>Anime scrapers off</b> — leaner fetch stack for Movies &amp; TV');
+  if (svc === 'hybrid') pts.push('<b>TorBox + Real-Debrid fallback</b> — widest cache coverage');
+  else if (svc === 'torbox-pro') pts.push('<b>Full scraper stack</b> — Meteor · Comet · MediaFusion · HdHub · Zilean');
+  if (S.sizeLimit !== 'unlimited') pts.push('<b>Size limit: max ' + S.sizeLimit + 'GB</b> — streams over ' + S.sizeLimit + 'GB excluded from results');
+  pts.push('<b>Per-Addon Flood Guard</b> — no single scraper can flood results');
+  pts.push('<b>REPACK / PROPER priority</b> — fixed releases ranked above originals');
+  return pts.slice(0, 6);
+}
+
+function insightsHtml() {
+  const pts = insights();
+  if (!pts.length) return '';
+  return '<div style="background:#060e15;border:1px solid #162030;border-radius:10px;padding:14px 16px;margin-bottom:16px"><div style="color:#7eeeff;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">Template Highlights</div><ul style="list-style:none;display:flex;flex-direction:column;gap:5px">' + pts.map(p => '<li style="color:#8b949e;font-size:.8rem;line-height:1.4;display:flex;gap:6px"><span style="color:#3fb950;flex-shrink:0">✓</span><span>' + p + '</span></li>').join('') + '</ul></div>';
+}
+
+function sizeLimitHtml() {
+  return '<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Max File Size</span><span style="color:#4b5563;font-size:.72rem">Unlimited preserves REMUXes</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">' + ['10','20','30','50','unlimited'].map(v => '<button type="button" data-action="set-size-limit" data-val="' + v + '" class="size-btn' + (S.sizeLimit === v ? ' size-btn-active' : '') + '">' + (v === 'unlimited' ? '♾ Unlimited' : v + 'GB') + '</button>').join('') + '</div></div>';
+}
+
 function getDebridInputs() {
   const svc = S.service;
   const defs = {
@@ -701,6 +762,10 @@ function eses() {
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
   if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
   out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" }, { enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
+  if (S.sizeLimit !== 'unlimited') {
+    const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
+    out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
+  }
   return out;
 }
 
