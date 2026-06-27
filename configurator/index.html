@@ -242,6 +242,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .hex-glow-layer{animation:hexBreath 2.6s ease-in-out infinite}
 .hdr-core{animation:coreTextPulse 2.6s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.diamond-core,.diamond-glow,.core-ring,.hex-glow-layer,.hdr-core{animation:none}}
+.splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px 36px}
+.splash-icon{width:96px;height:96px;margin-bottom:18px;filter:drop-shadow(0 0 24px rgba(0,212,255,.5))}
+.splash-title{font-size:2.15rem;font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:5px}
+.splash-by{font-size:.67rem;font-weight:700;letter-spacing:.18em;color:#374151;text-transform:uppercase;margin-bottom:13px}
+.splash-tagline{font-size:.9rem;color:#9ca3af;line-height:1.5;margin-bottom:20px;max-width:290px}
+.splash-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:7px}
+.splash-chip{font-size:.69rem;font-weight:700;padding:4px 11px;border-radius:20px;letter-spacing:.02em}
+.splash-chip-svc{border:1px solid rgba(0,212,255,.22);color:#67e8f9;background:rgba(0,212,255,.06)}
+.splash-chip-feat{border:1px solid #1e2a35;color:#4b5563;background:transparent}
+.splash-cta{margin-top:24px;width:100%;max-width:310px;padding:15px 24px;font-size:1rem;font-weight:800;border:none;border-radius:12px;background:linear-gradient(135deg,#0096b4 0%,#006a9a 100%);color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(0,150,180,.3);transition:all .2s;letter-spacing:.01em}
+.splash-cta:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(0,150,180,.45)}
+.splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
+.splash-paste:hover{color:#6b7280}
 </style>
 </head>
 <body>
@@ -293,7 +306,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <script>
 const STEPS = 8;
-let step = 1;
+let step = 0;
 const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const FORMATTERS = [
@@ -398,7 +411,7 @@ function loadState() {
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
     if (savedS) Object.assign(S, JSON.parse(savedS));
-    if (savedStep) step = parseInt(savedStep, 10) || 1;
+    if (savedStep) step = parseInt(savedStep, 10) || 0;
   } catch (e) { console.warn("Failed to load state", e); }
 }
 function clearState() {
@@ -514,17 +527,74 @@ function renderP2pToggle() {
 }
 
 function renderProgress() {
+  const progWrap = document.querySelector('.prog-wrap');
+  const nav = document.getElementById('nav');
+  if (step === 0) {
+    if (progWrap) progWrap.style.display = 'none';
+    if (nav) nav.style.display = 'none';
+    return;
+  }
+  if (progWrap) progWrap.style.display = '';
+  if (nav) nav.style.display = '';
   const pct = ((step - 1) / (STEPS - 1)) * 100;
   document.getElementById('pFill').style.width = pct + '%';
-  const def = DEFS[step - 1];
   const titles = ['Service','Device','Resolution','Audio','Content','Layout','APIs','Review'];
   document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS} · ${titles[step-1] || ''}`;
+}
+
+function splashHtml() {
+  return `<div class="card splash">
+    <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <defs>
+        <linearGradient id="sg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
+        <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
+        <filter id="sf1"><feGaussianBlur stdDeviation="10" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+        <filter id="sf2"><feGaussianBlur stdDeviation="14" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+        <filter id="sf3"><feGaussianBlur stdDeviation="24"/></filter>
+      </defs>
+      <circle cx="256" cy="256" r="248" fill="#080c10"/>
+      <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.05" filter="url(#sf3)"/>
+      <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.09" filter="url(#sf3)"/>
+      <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#sf1)"/>
+      <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#sg1)" stroke-width="22" stroke-linejoin="round"/>
+      <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#sg2)" opacity="0.4" filter="url(#sf2)"/>
+      <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#sg2)" opacity="0.95"/>
+      <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
+      <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
+    </svg>
+    <div class="splash-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
+    <div class="splash-by">By Brevity</div>
+    <div class="splash-tagline">Build your perfect AIOStreams template in 2 minutes. No manual JSON editing.</div>
+    <div class="splash-chips">
+      <span class="splash-chip splash-chip-svc">TorBox Pro</span>
+      <span class="splash-chip splash-chip-svc">TorBox Essential</span>
+      <span class="splash-chip splash-chip-svc">AllDebrid</span>
+      <span class="splash-chip splash-chip-svc">Real-Debrid</span>
+      <span class="splash-chip splash-chip-svc">EasyNews</span>
+      <span class="splash-chip splash-chip-svc">Hybrid</span>
+    </div>
+    <div class="splash-chips">
+      <span class="splash-chip splash-chip-feat">5 Formatters</span>
+      <span class="splash-chip splash-chip-feat">Smart Sorting</span>
+      <span class="splash-chip splash-chip-feat">Video Prefs</span>
+      <span class="splash-chip splash-chip-feat">Anime Ready</span>
+      <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
+    </div>
+    <button class="splash-cta" data-action="start-setup">Start Setup →</button>
+    <div class="splash-paste" data-action="paste-manifest-splash">Already have a manifest? Paste it</div>
+  </div>`;
 }
 
 function render() {
   renderProgress();
   const main = document.getElementById('main');
   const nav  = document.getElementById('nav');
+
+  if (step === 0) {
+    main.innerHTML = splashHtml();
+    return;
+  }
+
   const def  = DEFS[step - 1];
 
   if (step === STEPS) {
@@ -730,8 +800,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (step < STEPS) { step++; saveState(); render(); window.scrollTo(0,0); }
     }
     if (action === 'nav-back') {
-      if (step > 1) { step--; saveState(); render(); window.scrollTo(0,0); }
+      if (step > 0) { step--; saveState(); render(); window.scrollTo(0,0); }
     }
+    if (action === 'start-setup') { step = 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'paste-manifest-splash') { step = STEPS; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') clearState();
     if (action === 'generate-dl') generate();
     if (action === 'create-import') createImportUrl();
