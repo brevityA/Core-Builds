@@ -36,20 +36,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .card .desc{color:#8b949e;font-size:.88rem;margin-bottom:20px;line-height:1.5}
 .opts{display:grid;gap:10px}
 .opts.c2{grid-template-columns:1fr 1fr}
-.opts.c3{grid-template-columns:1fr 1fr 1fr}
+.opts.c3{grid-template-columns:1fr 1fr}
 .opts.c1{grid-template-columns:1fr}
 .opts.c4d{grid-template-columns:1fr 1fr}
 .opts.c3d{grid-template-columns:1fr}
 .opts.c2d{grid-template-columns:1fr}
 .opt input{display:none}
-.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
+.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:15px 13px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
 .opt input:checked+label{border-color:#00d4ff;background:#00131c;box-shadow:0 0 0 3px rgba(0,212,255,.15)}
 .opt label:hover{border-color:#005c7a}
 .opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
-.opt-icon svg{width:36px;height:36px}
+.opt-icon svg{width:42px;height:42px}
 .opt-body{display:flex;flex-direction:column;flex:1;min-width:0}
-.opt-name{font-weight:700;font-size:.88rem;line-height:1.25}
-.opt-desc{color:#8b949e;font-size:.76rem;margin-top:3px;line-height:1.4}
+.opt-name{font-weight:700;font-size:1rem;line-height:1.25}
+.opt-desc{color:#8b949e;font-size:.84rem;margin-top:4px;line-height:1.45}
 .opts.c3d .opt label,.opts.c2d .opt label{flex-direction:row;align-items:center;gap:12px;padding:14px}
 .opts.c3d .opt-icon,.opts.c2d .opt-icon{margin-bottom:0}
 .opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:30px;height:30px}
@@ -102,16 +102,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opts.list .opt-icon{margin-bottom:0}
 .opts.list .opt-icon svg{width:28px;height:28px}
 /* Pill layout */
-.opts.pills{display:flex;gap:4px;background:#161b22;border:1px solid #30363d;border-radius:11px;padding:4px}
+.opts.pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:transparent;border:none;padding:0}
 .opts.pills .opt{flex:1}
-.opts.pills .opt label{flex-direction:column;align-items:center;gap:5px;padding:12px 6px;border-radius:8px;border:2px solid transparent;background:transparent;color:#8b949e;height:auto;text-align:center}
-.opts.pills .opt label:hover{border-color:transparent;background:#21262d;color:#e6edf3}
-.opts.pills .opt input:checked+label{background:#00d4ff;color:#000;border-color:transparent;box-shadow:none}
+.opts.pills .opt label{flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border-radius:10px;border:2px solid #30363d;background:#0d1117;color:#8b949e;height:auto;text-align:center}
+.opts.pills .opt label:hover{border-color:#005c7a;background:#0d1117;color:#e6edf3}
+.opts.pills .opt input:checked+label{background:#00131c;color:#00d4ff;border-color:#00d4ff;box-shadow:0 0 0 3px rgba(0,212,255,.12)}
 .opts.pills .opt-icon{margin-bottom:0}
-.opts.pills .opt-icon svg{width:22px;height:22px}
+.opts.pills .opt-icon svg{width:30px;height:30px}
 .opts.pills .opt-body{align-items:center}
-.opts.pills .opt-name{font-size:.82rem;text-align:center}
-.opts.pills .opt-desc{font-size:.68rem;margin-top:1px;opacity:.85;text-align:center}
+.opts.pills .opt-name{font-size:.97rem;text-align:center}
+.opts.pills .opt-desc{font-size:.8rem;margin-top:3px;opacity:.85;text-align:center}
 /* Hero layout */
 .hero-wrap{display:flex;flex-direction:column;gap:8px}
 .hero-hero .opt label{flex-direction:row;align-items:flex-start;gap:16px;padding:18px;border-radius:12px}
@@ -135,23 +135,82 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .hdr-divider{height:64px}
   .hdr-title{font-size:2.1rem}
   .hdr-underline{width:136px}
-  .opts{gap:12px}
+  .opts{gap:14px}
   .opts.c4d{grid-template-columns:repeat(4,1fr)}
+  .opts.c3{grid-template-columns:repeat(3,1fr)}
   .opts.c3d{grid-template-columns:repeat(3,1fr)}
   .opts.c2d{grid-template-columns:repeat(2,1fr)}
-  .opt-icon svg{width:44px;height:44px}
-  .opt-name{font-size:.93rem}
-  .opt-desc{font-size:.82rem}
+  .opts.pills{grid-template-columns:repeat(4,1fr);gap:10px}
+  .opts.pills .opt label{padding:18px 12px}
+  .opts.pills .opt-icon svg{width:34px;height:34px}
+  .opts.pills .opt-name{font-size:1rem}
+  .opts.pills .opt-desc{font-size:.82rem}
+  .opt-icon svg{width:48px;height:48px}
+  .opt-name{font-size:1.05rem}
+  .opt-desc{font-size:.88rem}
+  .opt label{padding:18px 16px}
   .opts.c3d .opt label,.opts.c2d .opt label{align-items:flex-start;padding:18px}
   .opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:34px;height:34px}
-  .opts.c4d .opt label{padding:16px}
+  .opts.c4d .opt label{padding:18px 14px}
   .summary{grid-template-columns:repeat(3,1fr)}
   .nav{max-width:480px}
-  .btn-dl,.btn-aio{max-width:480px}
+  .btn-dl,.btn-aio,.btn-manifest{max-width:480px}
   .hero-sub{grid-template-columns:repeat(4,1fr)}
   .hero-sub .opt-icon svg{width:28px;height:28px}
-  .opts.list .opt-icon svg{width:32px;height:32px}
+  .opts.list .opt-icon svg{width:34px;height:34px}
+  .opts.list .opt label{padding:16px 18px}
 }
+/* Toggle switch */
+.toggle-sw{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;cursor:pointer;inset:0;background:#30363d;border-radius:24px;transition:.15s}
+.toggle-track::before{position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:#e6edf3;border-radius:50%;transition:.15s}
+.toggle-sw input:checked~.toggle-track{background:#00d4ff}
+.toggle-sw input:checked~.toggle-track::before{transform:translateX(20px);background:#fff}
+/* Version badge */
+.ver-badge{font-size:.67rem;font-weight:700;padding:2px 8px;border-radius:4px;background:#003344;color:#00d4ff;text-decoration:none;letter-spacing:.04em;vertical-align:middle;transition:background .15s}
+.ver-badge:hover{background:#004d66;color:#7eeeff}
+/* Manifest modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px);animation:fadeIn .18s ease}
+.modal-box{background:#161b22;border:1px solid #30363d;border-radius:16px;padding:24px 22px;max-width:460px;width:100%;position:relative;animation:slideUp .22s ease;max-height:90dvh;overflow-y:auto}
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:1.5rem;line-height:1;padding:2px 8px;border-radius:6px;transition:color .15s}
+.modal-close:hover{color:#e6edf3}
+.modal-success-icon{width:48px;height:48px;background:#061a0e;border:2px solid #2ea043;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.modal-title{font-size:1.18rem;font-weight:800;text-align:center;margin-bottom:4px}
+.modal-sub{color:#6b7280;font-size:.8rem;text-align:center;margin-bottom:18px;line-height:1.5}
+.fmt-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.fmt-tab{padding:5px 13px;border-radius:7px;border:1.5px solid #30363d;background:#0d1117;color:#6b7280;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fmt-tab:hover{border-color:#005c7a;color:#e6edf3}
+.fmt-tab.active{border-color:#00d4ff;background:#00131c;color:#00d4ff}
+.copy-field{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.copy-field-label{color:#6b7280;font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+.copy-field-val{font-family:monospace;font-size:.74rem;color:#c9d1d9;word-break:break-all}
+.copy-field-val.pwd-val{font-size:.9rem;letter-spacing:.05em;color:#e6edf3;font-family:inherit}
+.copy-btn{background:#21262d;border:none;border-radius:6px;color:#8b949e;cursor:pointer;padding:5px 9px;flex-shrink:0;font-size:.72rem;font-weight:700;transition:all .15s}
+.copy-btn:hover{background:#30363d;color:#e6edf3}
+.copy-btn.copied{background:#061a0e;color:#3fb950}
+.qr-wrap{display:flex;justify-content:center;margin:12px 0 3px}
+.qr-wrap img{border-radius:8px;border:1px solid #21262d;background:#0d1117}
+.modal-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.m-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;border:none;text-decoration:none;transition:all .15s;white-space:nowrap;min-width:0}
+.m-btn:active{transform:scale(.97)}
+.m-install{background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000}
+.m-web{background:#1a1f2e;border:1.5px solid #00d4ff!important;color:#00d4ff}
+.m-wu{background:#16103a;border:1.5px solid #4f46e5!important;color:#a78bfa}
+.m-nuvio{background:#1a1200;border:1.5px solid #d97706!important;color:#f59e0b}
+.m-done{background:#21262d;color:#8b949e}
+.m-done:hover{color:#e6edf3}
+/* Manifest primary button */
+.btn-manifest{width:100%;padding:15px;font-size:1.05rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px}
+.btn-manifest:hover{opacity:.88}
+.btn-manifest:active{transform:scale(.98)}
+.btn-manifest:disabled{opacity:.38;cursor:not-allowed}
+/* Connecting dots animation */
+@keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.dot-spin span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:currentColor;animation:dotPulse 1.2s ease-in-out infinite}
+.dot-spin span:nth-child(2){animation-delay:.2s}
+.dot-spin span:nth-child(3){animation-delay:.4s}
 /* Animated logo */
 @keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
 @keyframes coreGlowPulse{0%,100%{transform:scale(1);opacity:.38}50%{transform:scale(1.24);opacity:.84}}
@@ -195,7 +254,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <div class="hdr-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
         <div class="hdr-underline"></div>
         <div class="hdr-by">BY BREVITY</div>
-        <div class="hdr-sub">Template Configurator — AIOStreams</div>
+        <div class="hdr-sub">Template Configurator — AIOStreams &nbsp;<a href="https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md" target="_blank" class="ver-badge" title="View changelog">v1.0.0</a></div>
       </div>
     </div>
     <div class="prog-wrap">
@@ -215,9 +274,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 <script>
-const STEPS = 7;
+const STEPS = 8;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
+
+const FORMATTERS = [
+  {
+    id: 'apex-v2', label: 'Apex v2', badge: 'Rich', bc: '#7c3aed',
+    desc: '4-line · emoji icons · bitrate · full metadata',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg',
+    name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::replace('360p','⚫ 360P')}  "||"📺 HD  "]}{service.shortName::exists["⚡ {service.shortName::upper}  "||"📡 P2P  "]}{stream.library::istrue["🗄️  "||""]}{stream.proxied::istrue["🕵️  "||""]}{stream.visualTags::~(?i)(DV|HDR|HLG)["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','')::replace('10BIT','')::replace('10bit','')::replace('STANDARD','')}  "||""]}  {stream.title::exists["{stream.title::upper}"||""]}{stream.formattedSeasons::exists[" {stream.formattedSeasons::upper}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes::upper}"||""]}`,
+    d: ` {service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}{stream.nSeScore::>=75["💎 ELITE  "||""]}{stream.nSeScore::>=50["✦ {stream.nSeScore}  "||""]}{stream.seadexBest::istrue["⭐ BEST  "||""]}{stream.seadex::istrue["✅ SEADEX  "||""]}{stream.regexMatched::exists["🎯 {stream.regexMatched::truncate(12)::smallcaps}  "||""]}{stream.seMatched::exists["🧲 {stream.seMatched::truncate(12)::smallcaps}  "||""]}{stream.releaseGroup::exists["🏷️ {stream.releaseGroup::smallcaps}  "||""]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]}{stream.filename::~(?i)IMAX["🎞️ IMAX  "||""]}{tools.newLine} 🎬 {stream.quality::exists["{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('BLURAY','💿 BLURAY')::replace('BLU-RAY REMUX','💎 REMUX')::replace('BLU-RAY','💿 BLURAY')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('HDTV','🎞️ HDTV')::replace('HDRIP','🎞️ HDRIP')}  "||""]}{stream.encode::exists["{stream.encode::smallcaps}  "||""]}{stream.container::exists["{stream.container::smallcaps}  "||""]}{stream.hasChapters::istrue["📖  "||""]}{stream.bitrate::exists["{stream.bitrate::sbitrate::smallcaps}  "||""]}{stream.visualTags::exists["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','☀️ SDR')::replace('10BIT','🎨 10ʙɪᴛ')::replace('10bit','🎨 10ʙɪᴛ')::replace('STANDARD','☀️ SDR')}  "||"☀️ SDR  "]}{stream.network::exists["🍿 {stream.network::upper}  "||""]}{stream.upscaled::istrue["🔬 UPSCALED  "||""]}{stream.unrated::istrue["🚫 UNRATED  "||""]}{stream.uncensored::istrue["🔞  "||""]}{stream.editions::exists["✂️ {stream.editions::join(' ')::upper}  "||""]}{tools.newLine} 🎛️ {stream.audioTags::exists["{stream.audioTags::join(' ')::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD MA')::replace('DTS-X','🎵 DTS-X')::replace('EAC3','🎶 EAC3')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('AAC','🎧 AAC')::replace('FLAC','💿 FLAC')::replace('AC3','🎵 AC3')}  "||"ᴀᴜᴅɪᴏ  "]}{stream.audioChannels::first::=2.0["🔈 "||""]}{stream.audioChannels::first::=5.1["🔉 "||""]}{stream.audioChannels::first::=7.1["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]}{stream.dubbed::istrue["  🎙️ DUB"||""]}{stream.uSubtitleEmojis::exists["  📝 {stream.uSubtitleEmojis::slice(0,3)::join(' ')}"||""]}{tools.newLine} {stream.size::exists["{stream.size::sbytes}  "||""]}{stream.folderSize::exists["📁 {stream.folderSize::sbytes}  "||""]}{stream.seasonPack::istrue["📦 PACK  "||""]}{stream.repack::istrue["🛠️ REPACK  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.freeleech::istrue["🆓 FREE  "||""]}{stream.age::exists["⏱️ {stream.age::smallcaps}  "||""]}{stream.indexer::exists["🔍 {stream.indexer::truncate(12)::smallcaps}  "||""]}🔌 {stream.type::exists["{stream.type::smallcaps}"||""]}`
+  },
+  {
+    id: 'sigma', label: 'Sigma', badge: 'Elegant', bc: '#0891b2',
+    desc: '4-line · Japanese bracket style 「 」 · smallcaps',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg',
+    name: `{service.cached::istrue["✦ "||"✧ "]}{stream.title::exists["{stream.title::title::truncate(30)} "||""]}{service.shortName::exists["「 {service.shortName::upper} 」 "||"「 P2P 」 "]}{stream.resolution::exists["「 {stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::upper} 」 "||""]}{ stream.quality::exists["「 {stream.quality::upper::replace('BLURAY REMUX','REMUX')::replace('BLU-RAY REMUX','REMUX')::replace('WEB-DL','WEB-DL')::replace('WEBRIP','WEBRIP')::replace('BLURAY','BLURAY')} 」 "||""]} {stream.visualTags::~(?i)(DV|HDR|HLG)["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','')::replace('10BIT','')::replace('STANDARD','')} "||""]}{stream.audioTags::exists["「 {stream.audioTags::first::upper::replace('ATMOS','🔮 ᴀᴛᴍᴏs')::replace('TRUEHD','💎 ᴛʀᴜᴇʜᴅ')::replace('DTS-HD MA','🔷 ᴅᴛs-ʜᴅ ᴍᴀ')::replace('DTS-X','🎵 ᴅᴛs-x')::replace('EAC3','🎶 ᴅᴅ+')::replace('DDP','🎶 ᴅᴅ+')::replace('DD+','🎶 ᴅᴅ+')::replace('FLAC','💿 ꜰʟᴀᴄ')::replace('AAC','🎧 ᴀᴀᴄ')::replace('AC3','🎵 ᴀᴄ3')::smallcaps} 」 "||""]}{stream.audioChannels::exists["「 {stream.audioChannels::first} 」 "||""]}{stream.formattedSeasons::exists["「 {stream.formattedSeasons::upper} 」 "||""]}{stream.formattedEpisodes::exists["「 {stream.formattedEpisodes::upper} 」 "||""]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["『 👑 ᴘʀᴇᴍɪᴇʀ 』"||""]}`,
+    d: `{stream.nSeScore::>=75["『 💎 ELITE 』 "||""]}{stream.nSeScore::>=50["『 ✦ QUALITY 』 "||""]}{stream.seadexBest::istrue["『 ⭐ BEST 』 "||""]}{stream.seadex::istrue["『 ✅ SEADEX 』 "||""]}{service.cached::istrue["『 🚀 INSTANT 』 "||""]}{service.cached::isfalse["『 ⚠️ UNCACHED 』 "||""]}{stream.regexMatched::exists["『 🎯 {stream.regexMatched::truncate(12)::smallcaps} 』 "||""]}{stream.seMatched::exists["『 🧲 {stream.seMatched::truncate(12)::smallcaps} 』 "||""]}{stream.releaseGroup::exists["『 🏷️ {stream.releaseGroup::smallcaps} 』 "||""]}{stream.filename::~(?i)IMAX["『 🎞️ IMAX 』 "||""]}{tools.newLine}「 🎬 {stream.quality::exists["{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('BLU-RAY REMUX','💎 REMUX')::replace('BLURAY','💿 BLURAY')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('HDTV','🎞️ HDTV')} 」 "||"📼 STANDARD 」 "]}{stream.encode::exists["「 {stream.encode::smallcaps} 」 "||""]}{stream.bitrate::exists["「 {stream.bitrate::sbitrate::smallcaps} 」 "||""]}{stream.visualTags::exists["「 {stream.visualTags::join(' | ')::replace('DV','👁️ ᴅᴠ')::replace('HDR10+','✨ ʜᴅʀ¹⁰⁺')::replace('HDR10','🌟 ʜᴅʀ¹⁰')::replace('HLG','🌤️ ʜʟɢ')::replace('HDR','🌟 ʜᴅʀ')::replace('SDR','☀️ sᴅʀ')::replace('10BIT','🎨 10ʙɪᴛ')::replace('10bit','🎨 10ʙɪᴛ')::replace('STANDARD','☀️ sᴅʀ')::smallcaps} 」 "||""]} {tools.newLine}「 🎛️ {stream.audioTags::exists["{stream.audioTags::join(' | ')::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD MA')::replace('DTS-X','🎵 DTS-X')::replace('EAC3','🎶 DD+')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('AAC','🎧 AAC')::replace('FLAC','💿 FLAC')::replace('AC3','🎵 AC3')} 」 "||"ᴀᴜᴅɪᴏ 」 "]}{stream.audioChannels::first::=7.1["🔊 "||""]}{stream.audioChannels::first::=5.1["🔉 "||""]}{stream.audioChannels::first::=2.0["🔈 "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]}{stream.dubbed::istrue["  🎙️ DUB"||""]}{stream.subbed::istrue["  📝 SUB"||""]}{tools.newLine}「 {stream.seasonPack::istrue["📦 PACK → "||""]}{stream.size::exists["{stream.size::sbytes} 」 "||"? 」 "]}{stream.folderSize::exists["「 📁 {stream.folderSize::sbytes} 」 "||""]}{stream.seeders::exists["「 🌱 {stream.seeders} 」 "||""]}{stream.repack::istrue["「 🛠️ REPACK 」 "||""]}{stream.freeleech::istrue["「 🆓 FREE 」 "||""]}{stream.age::exists["「 ⏱️ {stream.age::smallcaps} 」 "||""]}{stream.indexer::exists["「 🔍 {stream.indexer::truncate(12)::smallcaps} 」 "||""]}`
+  },
+  {
+    id: 'minimal', label: 'Minimal', badge: 'Clean', bc: '#059669',
+    desc: '3-line · compact · essentials only',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg',
+    name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')}  "||"⚪ ?  "]}{service.cached::istrue["⚡ "||"⏳ "]}{service.shortName::exists["{service.shortName::upper}  "||"P2P  "]}{stream.audioTags::exists["{stream.audioTags::first::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD')::replace('EAC3','🎶 DD+')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('FLAC','💿 FLAC')::replace('AAC','🎧 AAC')}  "||""]}{stream.title::exists["{stream.title::upper}"||""]}{stream.formattedSeasons::exists[" {stream.formattedSeasons::upper}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes::upper}"||""]}`,
+    d: `{service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}{stream.nSeScore::>=75["💎 ELITE  "||""]}{stream.nSeScore::>=50["✦ QUALITY  "||""]}{stream.seadexBest::istrue["⭐ BEST  "||""]}{stream.regexMatched::exists["🎯 {stream.regexMatched::truncate(10)::smallcaps}  "||""]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]}{stream.releaseGroup::exists["🏷️ {stream.releaseGroup::smallcaps}"||""]} {tools.newLine}{stream.quality::exists["{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('BLURAY','💿 BLURAY')}  "||""]}{stream.visualTags::~(?i)(DV|HDR|HLG)["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')}  "||""]}{stream.audioTags::exists["{stream.audioTags::first::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD')::replace('EAC3','🎶 DD+')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('FLAC','💿 FLAC')::replace('AAC','🎧 AAC')}  "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}{tools.newLine}{stream.seasonPack::istrue["📦 PACK  "||""]}{stream.size::exists["{stream.size::sbytes}  "||""]}{stream.bitrate::exists["{stream.bitrate::sbitrate::smallcaps}  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.age::exists["⏱️ {stream.age::smallcaps}  "||""]}{stream.indexer::exists["🔍 {stream.indexer::truncate(12)::smallcaps}"||""]}`
+  },
+  {
+    id: 'prime', label: 'Prime', badge: 'Classic', bc: '#d97706',
+    desc: '4-line · monitor emoji · plain audio labels',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg',
+    name: `{stream.resolution::exists["🖥️ {stream.resolution::upper}  "||"📺 HD  "]}{service.shortName::exists["⚡ {service.shortName::upper}  "||"📡 P2P  "]}{stream.proxied::istrue["🕵️  "||""]}{stream.library::istrue["🗄️  "||""]}{stream.title::exists["{stream.title::upper}"||""]}{stream.formattedSeasons::exists[" {stream.formattedSeasons::upper}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes::upper}"||""]}`,
+    d: ` {service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}{stream.nSeScore::>=75["💎 ELITE  "||""]}{stream.seadexBest::istrue["⭐ BEST  "||""]}{stream.seadex::istrue["✅ SEADEX  "||""]}{stream.regexMatched::exists["🎯 {stream.regexMatched::truncate(12)::smallcaps}  "||""]}{stream.seMatched::exists["🧲 {stream.seMatched::truncate(12)::smallcaps}  "||""]}{stream.releaseGroup::exists["🏷️ {stream.releaseGroup::smallcaps}  "||""]}\n 🎬 {stream.quality::exists["{stream.quality::upper}  "||""]}{stream.encode::exists["{stream.encode::smallcaps}  "||""]}{stream.container::exists["{stream.container::smallcaps}  "||""]}{stream.hasChapters::istrue["📖  "||""]}{stream.visualTags::exists["{stream.visualTags::join(' ')::upper}  "||""]}{stream.bitrate::exists["{stream.bitrate::sbitrate::smallcaps}  "||""]}{stream.network::exists["🍿 {stream.network::upper}  "||""]}{stream.editions::exists["✂️ {stream.editions::join(' ')::upper}  "||""]}\n 🎛️ {stream.audioTags::exists["{stream.audioTags::join(' ')::upper}  "||"ᴀᴜᴅɪᴏ  "]}{stream.audioChannels::first::=2.0["🔈 "||""]}{stream.audioChannels::first::=5.1["🔉 "||""]}{stream.audioChannels::first::=7.1["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]}{stream.dubbed::istrue["  🎙️ DUB"||""]}{stream.subbed::istrue["  📝 SUB"||""]}\n 💾 {stream.size::exists["{stream.size::sbytes}  "||""]}{stream.folderSize::exists["📦 {stream.folderSize::sbytes}  "||""]}{stream.seasonPack::istrue["🗂️ PACK  "||""]}{stream.repack::istrue["🛠️ REPACK  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.freeleech::istrue["🆓 FREE  "||""]}{stream.age::exists["📅 {stream.age::smallcaps}  "||""]}{stream.indexer::exists["🔍 {stream.indexer::truncate(12)::smallcaps}  "||""]}🔌 {stream.type::exists["{stream.type::smallcaps}"||""]}`
+  },
+  {
+    id: 'tv', label: 'TV', badge: 'Compact', bc: '#dc2626',
+    desc: '3-line · TV-optimised · uppercase · no smallcaps',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg',
+    name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🔴 4K')::replace('1440p','🟣 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::replace('Unknown','📺 HD')}  "||"📺 HD  "]{service.cached::istrue["⚡ "||"⏳ "]}{service.shortName::exists["{service.shortName::upper}  "||"P2P  "]}{stream.library::istrue["📚  "||""]} {stream.title::exists["{stream.title::upper}"||""]} {stream.formattedSeasons::exists["{stream.formattedSeasons::upper}"||""]} {stream.formattedEpisodes::exists["{stream.formattedEpisodes::upper}"||""]}`,
+    d: ` {service.cached::istrue["🚀 INSTANT  "||"⚠️ UNCACHED  "]}{stream.nSeScore::>=75["💎 ELITE  "||""]} {stream.seadexBest::istrue["⭐ BEST  "||""]} {stream.seadex::istrue["✅ SEADEX  "||""]} {stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]} {stream.filename::~(?i)IMAX["🎞️ IMAX  "||""]} \n 🎬 {stream.quality::exists["{stream.quality::upper}  "||""]} {stream.encode::exists["{stream.encode::upper}  "||""]} {stream.visualTags::exists["{stream.visualTags::join(' ')::upper}  "||"SDR  "]} {stream.bitrate::exists["{stream.bitrate::sbitrate::upper}  "||""]} {stream.size::exists["{stream.size::sbytes}"||""]} \n 🔊 {stream.audioTags::exists["{stream.audioTags::join(' ')::upper}  "||"AUDIO  "]}{stream.audioChannels::first::=2.0["🔈 "||""]} {stream.audioChannels::first::=5.1["🔉 "||""]} {stream.audioChannels::first::=7.1["🔊 "||""]} {stream.audioChannels::exists["{stream.audioChannels::first}  "||""]} 🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]} {stream.dubbed::istrue["  🎙️ DUB"||""]} {stream.subbed::istrue["  📝 SUB"||""]}\n 🔌 {stream.type::exists["{stream.type::upper}  "||""]} {stream.seeders::exists["🌱 {stream.seeders}  "||""]} {stream.repack::istrue["🛠️ REPACK  "||""]} {stream.age::exists["📅 {stream.age::upper}  "||""]} {stream.indexer::exists["🔍 {stream.indexer::truncate(15)::upper}"||""]}`
+  }
+];
 
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'hero',
@@ -268,6 +365,7 @@ const DEFS = [
       { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
     ]
   },
+  { id:'formatter', title:'Stream Layout', desc:'Pick how your streams are displayed in Stremio. Each card shows a real preview of that style.', key:'formatter', layout:'formatter-picker', cols:'c1', opts:[] },
   { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored only in the downloaded JSON file and are never sent to any server.', key:null, cols:'c1', opts:[] },
   { id:'review', title:'Review & Download', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
 ];
@@ -295,6 +393,7 @@ function clearState() {
 
 /* RENDERING */
 function label(key, val) {
+  if (key === 'formatter') { const f = FORMATTERS.find(x => x.id === val); return f ? f.label : val || ''; }
   const d = DEFS.find(x => x.key === key);
   if (!d) return val || '';
   const o = d.opts.find(x => x.v === val);
@@ -307,6 +406,18 @@ function renderOpts(def) {
   const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
   const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
+  if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:10px">' +
+    FORMATTERS.map(f => {
+      const on = S.formatter === f.id;
+      return `<div data-action="set-formatter" data-val="${f.id}" style="border:2px solid ${on?'#00d4ff':'#30363d'};border-radius:12px;background:${on?'#00131c':'#0d1117'};cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s;box-shadow:${on?'0 0 0 3px rgba(0,212,255,.15)':'none'}">` +
+        `<img src="${f.img}" alt="${f.label} preview" style="width:100%;display:block;border-bottom:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'">` +
+        `<div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">` +
+        `<span class="fmt-lbl" style="font-weight:800;font-size:1rem;color:${on?'#00d4ff':'#e6edf3'};min-width:64px">${f.label}</span>` +
+        `<span style="font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:5px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
+        `<span style="color:#6b7280;font-size:.85rem">${f.desc}</span>` +
+        `</div></div>`;
+    }).join('') +
+  '</div>';
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'hero') {
@@ -319,11 +430,25 @@ function renderOpts(def) {
   return `<div class="opts ${def.cols}">${def.opts.map(o => std(o)).join('')}</div>`;
 }
 
+function renderP2pToggle() {
+  const on = S.p2pEnabled !== false;
+  return `<div style="margin-top:16px;padding-top:14px;border-top:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <div>
+      <div style="font-weight:700;font-size:.95rem;color:#e6edf3">Include P2P Streams</div>
+      <div style="color:#6b7280;font-size:.8rem;margin-top:3px;line-height:1.4">Show torrents alongside cached streams. Disable for cached-only results.</div>
+    </div>
+    <label class="toggle-sw">
+      <input type="checkbox" data-action="toggle-p2p"${on ? ' checked' : ''}>
+      <span class="toggle-track"></span>
+    </label>
+  </div>`;
+}
+
 function renderProgress() {
   const pct = ((step - 1) / (STEPS - 1)) * 100;
   document.getElementById('pFill').style.width = pct + '%';
   const def = DEFS[step - 1];
-  const titles = ['Service','Device','Resolution','Audio','Content','APIs','Review'];
+  const titles = ['Service','Device','Resolution','Audio','Content','Layout','APIs','Review'];
   document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS} · ${titles[step-1] || ''}`;
 }
 
@@ -341,7 +466,7 @@ function render() {
         <h2>Your Configuration</h2>
         <p class="desc">Review your choices, optionally name your template, then download.</p>
         <div class="summary">
-          ${['service','device','resolution','audio','content'].map(k => {
+          ${['service','device','resolution','audio','content','formatter'].map(k => {
             const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
             return `<div class="sum-item">
               <div class="sum-lbl">${k}</div>
@@ -371,7 +496,7 @@ function render() {
         </button>
         <div id="importUrlResult"></div>
         <div class="aio-section">
-          <h3>Install to Stremio</h3>
+          <h3>Get Manifest URL</h3>
           <div class="aio-fields" style="margin-top:12px">
             <div class="name-row" style="margin-bottom:0">
               <label>AIOStreams Host</label>
@@ -414,9 +539,9 @@ function render() {
                 value="${S.instanceUuid}" data-action="update-uuid" maxlength="36" style="font-family:monospace;font-size:.88rem">
             </div>
           </div>
-          <button class="btn-aio" id="btnAio" data-action="install-stremio" style="margin-top:14px">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Install to Stremio
+          <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Generate Manifest
           </button>
           <div id="aioResult"></div>
           <div style="margin-top:16px;padding-top:14px;border-top:1px solid #21262d">
@@ -477,6 +602,7 @@ function render() {
         <p class="desc">${def.desc}</p>
         ${renderOpts(def)}
         ${def.id === 'service' ? '<div id="multiPanel"></div>' : ''}
+        ${def.id === 'content' ? renderP2pToggle() : ''}
       </div>`;
     nav.style.display = 'flex';
     document.getElementById('btnBack').style.visibility = step > 1 ? 'visible' : 'hidden';
@@ -546,11 +672,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = e.target.dataset.url || e.target.closest('[data-url]')?.dataset.url;
       navigator.clipboard.writeText(url).then(() => showToast('Manifest URL copied'));
     }
+    if (action === 'copy-wuplay') {
+      const url = e.target.dataset.url || e.target.closest('[data-action="copy-wuplay"]')?.dataset.url;
+      navigator.clipboard.writeText(url).then(() => showToast('Copied! Paste into WuPlay → Addons → Add Addon'));
+    }
     if (action === 'set-size-limit') {
       S.sizeLimit = (e.target.closest('[data-action]') || e.target).dataset.val;
       saveState();
       document.querySelectorAll('[data-action="set-size-limit"]').forEach(b => {
         b.classList.toggle('size-btn-active', b.dataset.val === S.sizeLimit);
+      });
+    }
+    if (action === 'set-formatter') {
+      S.formatter = (e.target.closest('[data-action="set-formatter"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-formatter"]').forEach(card => {
+        const on = card.dataset.val === S.formatter;
+        card.style.borderColor = on ? '#00d4ff' : '#30363d';
+        card.style.background  = on ? '#00131c' : '#0d1117';
+        const lbl = card.querySelector('.fmt-lbl');
+        if (lbl) lbl.style.color = on ? '#00d4ff' : '#e6edf3';
       });
     }
   });
@@ -562,6 +703,10 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       syncNext();
       if (e.target.dataset.key === 'service') updateMultiPanel();
+    }
+    if (e.target.dataset.action === 'toggle-p2p') {
+      S.p2pEnabled = e.target.checked;
+      saveState();
     }
     if (e.target.dataset.action === 'toggle-multi') {
       const val = e.target.value;
@@ -619,6 +764,7 @@ function insights() {
   else if (cnt === 'live') pts.push('<b>Anime scrapers off</b> — leaner fetch stack for Movies &amp; TV');
   if (svc === 'hybrid') pts.push('<b>TorBox + Real-Debrid fallback</b> — widest cache coverage');
   else if (svc === 'torbox-pro') pts.push('<b>Full scraper stack</b> — Meteor · Comet · MediaFusion · HdHub · Zilean');
+  if (!S.p2pEnabled) pts.push('<b>P2P excluded</b> — cached debrid streams only, no torrent seeders');
   if (S.sizeLimit !== 'unlimited') pts.push('<b>Size limit: max ' + S.sizeLimit + 'GB</b> — streams over ' + S.sizeLimit + 'GB excluded from results');
   pts.push('<b>Per-Addon Flood Guard</b> — no single scraper can flood results');
   pts.push('<b>REPACK / PROPER priority</b> — fixed releases ranked above originals');
@@ -633,6 +779,21 @@ function insightsHtml() {
 
 function sizeLimitHtml() {
   return '<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Max File Size</span><span style="color:#4b5563;font-size:.72rem">Unlimited preserves REMUXes</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">' + ['10','20','30','50','unlimited'].map(v => '<button type="button" data-action="set-size-limit" data-val="' + v + '" class="size-btn' + (S.sizeLimit === v ? ' size-btn-active' : '') + '">' + (v === 'unlimited' ? '♾ Unlimited' : v + 'GB') + '</button>').join('') + '</div></div>';
+}
+
+function formatterPickerHtml() {
+  return '<div style="margin-bottom:16px"><div style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Stream Layout</div><div style="display:flex;flex-direction:column;gap:8px">' +
+    FORMATTERS.map(f => {
+      const on = S.formatter === f.id;
+      return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'#00d4ff':'#30363d'};border-radius:10px;background:${on?'#00131c':'#0d1117'};cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s">` +
+        `<img src="${f.img}" alt="${f.label} preview" style="width:100%;display:block;border-bottom:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'">` +
+        `<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">` +
+        `<span class="fmt-lbl" style="font-weight:700;font-size:.85rem;color:${on?'#00d4ff':'#e6edf3'};min-width:52px">${f.label}</span>` +
+        `<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
+        `<span style="color:#6b7280;font-size:.77rem">${f.desc}</span>` +
+        `</div></div>`;
+    }).join('') +
+  '</div></div>';
 }
 
 function getDebridInputs() {
@@ -762,6 +923,7 @@ function eses() {
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
   if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
   out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" }, { enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
+  if (!S.p2pEnabled) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
   if (S.sizeLimit !== 'unlimited') {
     const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
     out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
@@ -808,7 +970,7 @@ function build() {
       deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour:'aggressive', keys:['filename','infoHash','smartDetect'], cached:'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding:10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
       dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
       groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid'), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
-      formatter: { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name:"{stream.resolution::exists[\"{stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::replace('360p','⚫ 360P')}  \"||\"📺 HD  \"]}{service.shortName::exists[\"⚡ {service.shortName::upper}  \"||\"📡 P2P  \"]}{stream.library::istrue[\"🗄️  \"||\"\"]}{stream.proxied::istrue[\"🕵️  \"||\"\"]}{stream.visualTags::~(?i)(DV|HDR|HLG)[\"{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','')::replace('10BIT','')::replace('10bit','')::replace('STANDARD','')}  \"||\"\"]}{stream.title::exists[\"{stream.title::upper}\"||\"\"]}{stream.formattedSeasons::exists[\" {stream.formattedSeasons::upper}\"||\"\"]}{stream.formattedEpisodes::exists[\" {stream.formattedEpisodes::upper}\"||\"\"]}", description:" {service.cached::istrue[\"🚀 INSTANT  \"||\"\"]}{service.cached::isfalse[\"⚠️ UNCACHED  \"||\"\"]}{stream.nSeScore::>=75[\"💎 {stream.nSeScore}  \"||\"\"]}{stream.seadexBest::istrue[\"⭐ BEST  \"||\"\"]}{stream.seadex::istrue[\"✅ SEADEX  \"||\"\"]}{stream.regexMatched::exists[\"🎯 {stream.regexMatched::truncate(12)::smallcaps}  \"||\"\"]}{stream.seMatched::exists[\"🧲 {stream.seMatched::truncate(12)::smallcaps}  \"||\"\"]}{stream.releaseGroup::exists[\"🏷️ {stream.releaseGroup::smallcaps}  \"||\"\"]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)[\"👑 PREMIER  \"||\"\"]}{stream.filename::~(?i)IMAX[\"🎞️ IMAX  \"||\"\"]}{tools.newLine} 🎬 {stream.quality::exists[\"{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('BLURAY','💿 BLURAY')::replace('BLU-RAY REMUX','💎 REMUX')::replace('BLU-RAY','💿 BLURAY')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('HDTV','🎞️ HDTV')::replace('HDRIP','🎞️ HDRIP')}  \"||\"\"]}{stream.encode::exists[\"{stream.encode::smallcaps}  \"||\"\"]}{stream.container::exists[\"{stream.container::smallcaps}  \"||\"\"]}{stream.hasChapters::istrue[\"📖  \"||\"\"]}{stream.visualTags::exists[\"{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','☀️ SDR')::replace('10BIT','🎨 10ʙɪᴛ')::replace('10bit','🎨 10ʙɪᴛ')::replace('STANDARD','☀️ SDR')}  \"||\"☀️ SDR  \"]}{stream.bitrate::exists[\"{stream.bitrate::sbitrate::smallcaps}  \"||\"\"]}{stream.network::exists[\"🍿 {stream.network::upper}  \"||\"\"]}{stream.upscaled::istrue[\"🔬 UPSCALED  \"||\"\"]}{stream.unrated::istrue[\"🚫 UNRATED  \"||\"\"]}{stream.uncensored::istrue[\"🔞  \"||\"\"]}{stream.editions::exists[\"✂️ {stream.editions::join(' ')::upper}  \"||\"\"]}{tools.newLine} 🎛️ {stream.audioTags::exists[\"{stream.audioTags::join(' ')::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD MA')::replace('DTS-X','🎵 DTS-X')::replace('EAC3','🎶 EAC3')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('AAC','🎧 AAC')::replace('FLAC','💿 FLAC')::replace('AC3','🎵 AC3')}  \"||\"ᴀᴜᴅɪᴏ  \"]}{stream.audioChannels::first::=2.0[\"🔈 \"||\"\"]}{stream.audioChannels::first::=5.1[\"🔉 \"||\"\"]}{stream.audioChannels::first::=7.1[\"🔊 \"||\"\"]}{stream.audioChannels::exists[\"{stream.audioChannels::first}  \"||\"\"]}🌍 {stream.uLanguageEmojis::exists[\"{stream.uLanguageEmojis::join(' ')}\"||\"MULTI\"]}{stream.dubbed::istrue[\"  🎙️ DUB\"||\"\"]}{stream.uSubtitleEmojis::exists[\"  📝 {stream.uSubtitleEmojis::slice(0,3)::join(' ')}\"||\"\"]}{tools.newLine} 💾 {stream.size::exists[\"{stream.size::sbytes}  \"||\"\"]}{stream.folderSize::exists[\"📦 {stream.folderSize::sbytes}  \"||\"\"]}{stream.seasonPack::istrue[\"🗂️ PACK  \"||\"\"]}{stream.repack::istrue[\"🛠️ REPACK  \"||\"\"]}{stream.seeders::exists[\"🌱 {stream.seeders}  \"||\"\"]}{stream.freeleech::istrue[\"🆓 FREE  \"||\"\"]}{stream.age::exists[\"⏱️ {stream.age::smallcaps}  \"||\"\"]}{stream.indexer::exists[\"🔍 {stream.indexer::truncate(12)::smallcaps}  \"||\"\"]}🔌 {stream.type::exists[\"{stream.type::smallcaps}\"||\"\"]} "} } } }
+      formatter: (function(){ const _f = FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })()
     }
   };
 }
@@ -817,6 +979,140 @@ function generate() {
   const json = JSON.stringify(build(), null, 2), blob = new Blob([json], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
   a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+function showManifestModal(manifestUrl, password, hostLabel) {
+  const ex = document.getElementById('manifestModal');
+  if (ex) ex.remove();
+
+  const FMTS = [
+    { key:'app',    label:'Stremio App', getUrl: u => u.replace(/^https?:\/\//, 'stremio://'), action:'link' },
+    { key:'web',    label:'Web',         getUrl: u => `https://web.stremio.com/#/addons?addon=${encodeURIComponent(u)}`, action:'link' },
+    { key:'wuplay', label:'WuPlay',      getUrl: u => u, action:'copy' },
+    { key:'nuvio',  label:'Nuvio',       getUrl: u => u, action:'copy' },
+  ];
+  const qrSrc = u => `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=00d4ff&bgcolor=0d1117&qzone=2&data=${encodeURIComponent(u)}`;
+  const esc  = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+  // Extract password from AIOStreams URL format if not provided
+  if (!password) {
+    const m = manifestUrl.match(/\/stremio\/[^\/]+\/([^\/]+)\/manifest\.json/);
+    if (m) try { password = decodeURIComponent(m[1]); } catch(e) {}
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'manifestModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Manifest Ready">
+      <button class="modal-close" id="mClose" aria-label="Close">×</button>
+      <div class="modal-success-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="modal-title">Manifest Ready 🎉</div>
+      <div class="modal-sub">${hostLabel ? `<span style="color:#3fb950">${esc(hostLabel)}</span> · ` : ''}Your config is live — install or copy below</div>
+      <div class="fmt-tabs" id="mFmtTabs">
+        ${FMTS.map((f,i) => `<button class="fmt-tab${i===0?' active':''}" data-fi="${i}">${f.label}</button>`).join('')}
+      </div>
+      <div class="copy-field">
+        <div style="flex:1;min-width:0">
+          <div class="copy-field-label" id="mUrlLabel">Manifest URL</div>
+          <div class="copy-field-val" id="mUrlVal">${esc(FMTS[0].getUrl(manifestUrl))}</div>
+        </div>
+        <button class="copy-btn" id="mCopyUrl">Copy</button>
+      </div>
+      ${password ? `<div class="copy-field">
+        <div style="flex:1;min-width:0">
+          <div class="copy-field-label">Password</div>
+          <div class="copy-field-val pwd-val">${esc(password)}</div>
+        </div>
+        <button class="copy-btn" id="mCopyPwd">Copy</button>
+      </div>` : ''}
+      <div class="qr-wrap">
+        <img id="mQr" src="${qrSrc(FMTS[0].getUrl(manifestUrl))}" width="140" height="140" alt="QR code" loading="lazy" onerror="this.parentElement.style.display='none'">
+      </div>
+      <div style="text-align:center;color:#4b5563;font-size:.7rem;margin-bottom:2px">Scan to install on another device</div>
+      <div class="modal-actions">
+        <a href="${esc(FMTS[0].getUrl(manifestUrl))}" id="mActionBtn" class="m-btn m-install">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install
+        </a>
+        <button class="m-btn m-done" id="mDone">Done</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const urlVal   = document.getElementById('mUrlVal');
+  const qrImg    = document.getElementById('mQr');
+  const actionBtn = document.getElementById('mActionBtn');
+  let activeFi = 0;
+
+  const BTN_CLS = ['m-install','m-web','m-wu','m-nuvio'];
+  const BTN_LABELS = [
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install`,
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web`,
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`,
+    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`,
+  ];
+
+  function switchFmt(fi) {
+    activeFi = fi;
+    const f = FMTS[fi];
+    const url = f.getUrl(manifestUrl);
+    urlVal.textContent = url;
+    if (qrImg) qrImg.src = qrSrc(url);
+    // action button
+    actionBtn.className = `m-btn ${BTN_CLS[fi]}`;
+    actionBtn.innerHTML = BTN_LABELS[fi];
+    if (f.action === 'link') {
+      actionBtn.href = url;
+      actionBtn.target = fi === 1 ? '_blank' : '';
+      actionBtn.onclick = null;
+    } else {
+      actionBtn.href = '#';
+      actionBtn.target = '';
+      actionBtn.onclick = ev => {
+        ev.preventDefault();
+        navigator.clipboard.writeText(url).then(() => showToast(`Copied! Paste into ${f.label} → Addons`));
+      };
+    }
+    document.getElementById('mUrlLabel').textContent = fi >= 2 ? 'Manifest URL (paste into app)' : 'Manifest URL';
+    document.getElementById('mCopyUrl').textContent = 'Copy';
+    document.getElementById('mCopyUrl').classList.remove('copied');
+  }
+
+  document.getElementById('mFmtTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.fmt-tab');
+    if (!btn) return;
+    document.querySelectorAll('#mFmtTabs .fmt-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    switchFmt(parseInt(btn.dataset.fi));
+  });
+
+  document.getElementById('mCopyUrl').addEventListener('click', function() {
+    navigator.clipboard.writeText(urlVal.textContent).then(() => {
+      this.textContent = '✓'; this.classList.add('copied');
+      setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2200);
+    });
+  });
+
+  if (password) {
+    document.getElementById('mCopyPwd').addEventListener('click', function() {
+      navigator.clipboard.writeText(password).then(() => {
+        this.textContent = '✓'; this.classList.add('copied');
+        setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2200);
+      });
+    });
+  }
+
+  const close = () => {
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => overlay.remove(), 160);
+  };
+  document.getElementById('mClose').addEventListener('click', close);
+  document.getElementById('mDone').addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  const escKey = e => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escKey); } };
+  document.addEventListener('keydown', escKey);
 }
 
 function showToast(msg, isError) {
@@ -842,11 +1138,17 @@ function genPwd() {
 }
 
 function onPasteManifest(val) {
-  val = (val || '').trim(); const result = document.getElementById('pasteManifestResult');
+  val = (val || '').trim();
+  const result = document.getElementById('pasteManifestResult');
   if (!val) { result.innerHTML = ''; return; }
   try { new URL(val); } catch(e) { result.innerHTML = ''; return; }
-  const desktopUrl = val.replace(/^https?:\/\//, 'stremio://'), webUrl = `https://web.stremio.com/#/addons?addon=${encodeURIComponent(val)}`, safeVal = val.replace(/"/g, '&quot;'), btnBase = 'flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:8px;font-weight:700;font-size:.85rem;text-decoration:none';
-  result.innerHTML = `<div style="margin-top:10px"><div class="manifest-url" data-action="copy-manifest" data-url="${safeVal}" title="Click to copy" style="margin-bottom:10px;font-size:.79rem">${val}</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a href="${desktopUrl}" style="${btnBase};background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Install (App)</a><a href="${webUrl}" target="_blank" style="${btnBase};background:#1a1f2e;border:1px solid #00d4ff;color:#00d4ff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Install (Web)</a></div></div>`;
+  result.innerHTML = '';
+  showManifestModal(val, null, null);
+}
+
+function wuplayBtn(manifestUrl) {
+  const safe = (manifestUrl||'').replace(/"/g,'&quot;');
+  return `<button type="button" data-action="copy-wuplay" data-url="${safe}" title="Copy manifest URL — paste into WuPlay → Addons → Add Addon" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;border:1px solid #4f46e5;background:#16103a;color:#a78bfa;transition:all .15s"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>WuPlay</button>`;
 }
 
 function instanceChips(templateUrl) {
@@ -901,41 +1203,75 @@ async function createImportUrl() {
 
 async function openInAIOStreams() {
   const HOST_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
+  const HOST_LABELS = { 'https://aiostreams.elfhosted.com':'ElfHosted', 'https://aiostreams.fortheweak.cloud':'ForthWeak', 'https://aiostreamsfortheweebsstable.midnightignite.me':"Midnight's", 'https://aiostreams.viren070.me':"Viren's", 'https://aiostreams.stremio.ru':"Kuu's", 'https://aio.atbphosting.com':'ATBP', 'https://aiostreams.12312023.xyz':"Omni's" };
   const isAuto = S.instanceHost === 'auto', isCustom = S.instanceHost === 'custom';
   const base = HOST_URLS[S.instanceHost] || (S.instanceUrl || '').trim().replace(/\/$/, '');
-  
+
   if (!isAuto && !base) { showToast('Enter your AIOStreams instance URL first', true); return; }
 
-  const result = document.getElementById('aioResult'), btn = document.getElementById('btnAio'), uuid = (S.instanceUuid || '').trim(), pwd = S.instancePassword;
+  const result = document.getElementById('aioResult'), btn = document.getElementById('btnAio');
+  const uuid = (S.instanceUuid || '').trim(), pwd = S.instancePassword;
+  const hostLabel = base ? (HOST_LABELS[base] || base.replace('https://','').split('/')[0]) : null;
 
-  if (uuid && !isAuto) {
-    const manifestUrl = pwd ? `${base}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json` : `${base}/stremio/${uuid}/manifest.json`;
-    const btnBase = 'display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;text-decoration:none';
-    result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong>Manifest URL ✓</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 10px">Click to copy — paste into any Stremio-compatible client under Add-ons.</div><div class="manifest-url" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g, '&quot;')}" title="Click to copy">${manifestUrl}</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><a href="${manifestUrl.replace(/^https?:\/\//, 'stremio://')}" style="flex:1;${btnBase};background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Install (App)</a><a href="https://web.stremio.com/#/addons?addon=${encodeURIComponent(manifestUrl)}" target="_blank" style="flex:1;${btnBase};background:#1a1f2e;border:1px solid #00d4ff;color:#00d4ff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Install (Web)</a><a href="${base}/stremio/configure" target="_blank" style="flex:1;${btnBase};background:transparent;border:1px solid #30363d;color:#8b949e">Open AIOStreams →</a></div></div>`;
-    showToast('Manifest URL ready — click to copy');
+  const setBtnLoading = () => { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Connecting…`; };
+  const resetBtn = orig => { btn.disabled = false; btn.innerHTML = orig; };
+
+  /* Auto mode — parallel host detection via Promise.any() */
+  if (isAuto && pwd) {
+    const origHtml = btn.innerHTML;
+    setBtnLoading(); result.innerHTML = '';
+    const cfg = build().config;
+    try {
+      const winner = await Promise.any(
+        Object.values(HOST_URLS).map(host =>
+          fetchWithTimeout(`${host}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
+            .then(async res => {
+              const data = await res.json().catch(()=>({}));
+              if (res.ok && data?.success !== false) return { host, uuid: data?.uuid || data?.user?.uuid || data?.id };
+              throw new Error('rejected');
+            })
+        )
+      );
+      if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); }
+      resetBtn(origHtml);
+      showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
+    } catch(e) {
+      resetBtn(origHtml);
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">CORS blocked requests or all hosts timed out. Use <strong style="color:#8b949e">Create Import URL</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+    }
     return;
   }
 
-  if (!uuid && !isCustom) {
+  /* Known host + UUID — show manifest URL directly, no API call */
+  if (uuid && !isAuto) {
+    const manifestUrl = pwd ? `${base}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json` : `${base}/stremio/${uuid}/manifest.json`;
+    showManifestModal(manifestUrl, pwd || null, hostLabel);
+    return;
+  }
+
+  /* No UUID, not auto or custom — guide to get UUID */
+  if (!uuid && !isCustom && !isAuto) {
     result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px"><strong style="color:#e6edf3">No UUID entered</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px">Sign in to your AIOStreams instance, copy your UUID from the configure page and paste it above.</div><div style="color:#4b5563;font-size:.77rem;margin:6px 0 4px">Or use <strong style="color:#8b949e">Create Import URL</strong> above — click a chip below to open AIOStreams and import in one click:</div>${instanceChips()}</div>`;
     return;
   }
 
+  /* Known host + password + no UUID — create new config via API */
   if (pwd) {
-    const origHtml = btn.innerHTML; btn.disabled = true; btn.textContent = 'Connecting…'; result.innerHTML = '';
+    const origHtml = btn.innerHTML;
+    setBtnLoading(); result.innerHTML = '';
     try {
       const res = await fetchWithTimeout(uuid ? `${base}/api/v1/user/${uuid}` : `${base}/api/v1/user`, { method: uuid ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: build().config, password: pwd }) });
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
         const outUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
-        const manifestUrl = `${base}/stremio/${outUuid}/${encodeURIComponent(pwd)}/manifest.json`;
-        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong>Config Saved ✓</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 10px">Click to copy — paste into Stremio.</div><div class="manifest-url" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g, '&quot;')}" title="Click to copy">${manifestUrl}</div></div>`;
-        showToast('Config saved — manifest ready');
-      } else throw new Error("API Error");
+        if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
+        resetBtn(origHtml);
+        showManifestModal(`${base}/stremio/${outUuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabel);
+      } else throw new Error('API Error');
     } catch(e) {
+      resetBtn(origHtml);
       result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">The API blocked the request (CORS) or timed out. Use Create Import URL or Download instead.</div></div>`;
     }
-    btn.disabled = false; btn.innerHTML = origHtml;
     return;
   }
 
