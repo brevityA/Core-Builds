@@ -103,15 +103,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .size-btn-active{border-color:#00d4ff!important;background:#00131c!important;color:#00d4ff!important}
 /* List layout */
 .opts.list{grid-template-columns:1fr}
-.opts.list .opt label{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
+.opts.list .opt label{flex-direction:row;align-items:center;gap:14px;padding:13px 16px;border-color:rgba(255,255,255,.1)}
 .opts.list .opt-icon{margin-bottom:0}
-.opts.list .opt-icon svg{width:28px;height:28px}
+.opts.list .opt-icon svg{width:28px;height:28px;filter:drop-shadow(0 0 5px rgba(255,255,255,.12))}
+.opts.list .opt input:checked+label .opt-icon svg{filter:drop-shadow(0 0 10px rgba(0,212,255,.4))}
 /* Pill layout */
 .opts.pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:transparent;border:none;padding:0}
 .opts.pills .opt{flex:1}
-.opts.pills .opt label{flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.07);background:rgba(13,17,23,.7);color:#6b7280;height:auto;text-align:center}
-.opts.pills .opt label:hover{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.03);color:#e6edf3}
-.opts.pills .opt input:checked+label{background:rgba(0,212,255,.07);color:#00d4ff;border-color:rgba(0,212,255,.4);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 16px rgba(0,150,180,.1)}
+.opts.pills .opt label{flex-direction:column;align-items:center;gap:8px;padding:18px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(8,12,18,.9);color:#6b7280;height:auto;text-align:center}
+.opts.pills .opt label:hover{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.04);color:#e6edf3}
+.opts.pills .opt input:checked+label{background:rgba(0,212,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.4);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 20px rgba(0,150,180,.12)}
+.opts.pills .opt-icon svg{filter:drop-shadow(0 0 6px rgba(255,255,255,.1))}
+.opts.pills .opt input:checked+label .opt-icon svg{filter:drop-shadow(0 0 12px rgba(0,212,255,.35))}
 .opts.pills .opt-icon{margin-bottom:0}
 .opts.pills .opt-icon svg{width:30px;height:30px}
 .opts.pills .opt-body{align-items:center}
@@ -677,8 +680,10 @@ function render() {
 
   if (step === 0) {
     main.innerHTML = splashHtml();
+    main.style.justifyContent = 'center';
     return;
   }
+  main.style.justifyContent = '';
 
   const def  = DEFS[step - 1];
 
@@ -803,10 +808,25 @@ function render() {
 
   } else if (def.id === 'apis') {
     const debridInputs = getDebridInputs();
+    const ringC = 131.9, ringPct = (step - 1) / (STEPS - 1);
     main.innerHTML = `
       <div class="card">
-        <h2>API Keys <span style="color:#8b949e;font-size:.85rem;font-weight:400">(Optional)</span></h2>
-        <p class="desc">${def.desc}</p>
+        <div class="srh">
+          <div class="srh-ring">
+            <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
+              <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
+                stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC*(1-ringPct)).toFixed(1)}"
+                stroke-linecap="round" transform="rotate(-90 26 26)"/>
+            </svg>
+            <div class="srh-num">${step}</div>
+          </div>
+          <div>
+            <div class="srh-title">${def.title} <span style="font-size:.72rem;font-weight:600;color:#374151;letter-spacing:.04em">OPTIONAL</span></div>
+            <div class="srh-sub">${def.desc}</div>
+          </div>
+        </div>
         ${debridInputs.length ? `
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
         ${debridInputs.map(inp => `
@@ -885,6 +905,8 @@ function syncNext() {
     btn.innerHTML = `<span style="flex:1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
   } else if (val) {
     btn.innerHTML = `<div style="flex:1"><div class="cta-step-lbl">${def.title}</div><div class="cta-step-val">${val}</div></div><span class="cta-arr">→</span>`;
+  } else if (!def.key) {
+    btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
   } else {
     btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;opacity:.5">Select one to continue</span><span class="cta-arr" style="opacity:.3">→</span>`;
   }
