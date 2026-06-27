@@ -152,6 +152,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .hero-sub .opt-icon svg{width:28px;height:28px}
   .opts.list .opt-icon svg{width:32px;height:32px}
 }
+/* Animated logo */
+@keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
+@keyframes coreGlowPulse{0%,100%{transform:scale(1);opacity:.38}50%{transform:scale(1.24);opacity:.84}}
+@keyframes coreRingOut{0%{transform:scale(.5);opacity:.7}100%{transform:scale(2);opacity:0}}
+@keyframes hexBreath{0%,100%{opacity:.28}50%{opacity:.5}}
+@keyframes coreTextPulse{0%,100%{text-shadow:none}50%{text-shadow:0 0 14px rgba(255,255,255,.55),0 0 28px rgba(255,255,255,.18)}}
+.diamond-core{transform-box:fill-box;transform-origin:center;animation:corePulse 2.6s ease-in-out infinite}
+.diamond-glow{transform-box:fill-box;transform-origin:center;animation:coreGlowPulse 2.6s ease-in-out infinite}
+.core-ring{transform-box:fill-box;transform-origin:center;fill:none;stroke-width:5;animation:coreRingOut 2.6s ease-out infinite}
+.core-ring-2{animation-delay:1.3s}
+.hex-glow-layer{animation:hexBreath 2.6s ease-in-out infinite}
+.hdr-core{animation:coreTextPulse 2.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.diamond-core,.diamond-glow,.core-ring,.hex-glow-layer,.hdr-core{animation:none}}
 </style>
 </head>
 <body>
@@ -170,10 +183,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <circle cx="256" cy="256" r="248" fill="#080c10"/>
         <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.05" filter="url(#hf3)"/>
         <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.09" filter="url(#hf3)"/>
-        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#hf1)"/>
+        <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#hf1)"/>
         <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#hg1)" stroke-width="22" stroke-linejoin="round"/>
-        <polygon points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.4" filter="url(#hf2)"/>
-        <polygon points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.95"/>
+        <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.4" filter="url(#hf2)"/>
+        <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.95"/>
+        <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#hg2)"/>
+        <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#hg2)"/>
       </svg>
       <div class="hdr-divider"></div>
       <div class="hdr-text">
