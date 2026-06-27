@@ -338,7 +338,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 7;
 let step = 0;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const FORMATTERS = [
   {
@@ -624,6 +624,26 @@ function renderP2pToggle() {
       <input type="checkbox" data-action="toggle-p2p"${on ? ' checked' : ''}>
       <span class="toggle-track"></span>
     </label>
+  </div>`;
+}
+
+function renderMatchMode() {
+  const modes = [
+    { v:'relaxed',  label:'Relaxed',  desc:'More results, conservative dedup' },
+    { v:'balanced', label:'Balanced', desc:'Smart dedup, recommended default' },
+    { v:'strict',   label:'Strict',   desc:'Aggressive dedup, quality-first sort' },
+  ];
+  const cur = S.matchMode || 'balanced';
+  const pills = modes.map(m => {
+    const on = cur === m.v;
+    return `<button data-action="set-match-mode" data-val="${m.v}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.73rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
+      <div>${m.label}</div>
+      <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
+    </button>`;
+  }).join('');
+  return `<div style="margin-top:10px;background:#0d1117;border:1.5px solid #30363d;border-radius:10px;padding:14px 16px">
+    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase;margin-bottom:10px">Match Aggressiveness</div>
+    <div style="display:flex;gap:6px">${pills}</div>
   </div>`;
 }
 
@@ -922,7 +942,7 @@ function render() {
         </div>
         ${renderOpts(def)}
         ${def.id === 'service' ? '<div id="multiPanel"></div>' : ''}
-        ${def.id === 'content' ? renderP2pToggle() : ''}
+        ${def.id === 'content' ? renderP2pToggle() + renderMatchMode() : ''}
       </div>`;
     nav.style.display = 'flex';
     document.getElementById('btnBack').style.visibility = step > 1 ? 'visible' : 'hidden';
@@ -1018,6 +1038,19 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-size-limit"]').forEach(b => {
         b.classList.toggle('size-btn-active', b.dataset.val === S.sizeLimit);
+      });
+    }
+    if (action === 'set-match-mode') {
+      S.matchMode = (e.target.closest('[data-action="set-match-mode"]') || e.target).dataset.val;
+      if (S.matchMode === 'strict') S.qualityFirst = true;
+      else S.qualityFirst = false;
+      saveState();
+      document.querySelectorAll('[data-action="set-match-mode"]').forEach(btn => {
+        const on = btn.dataset.val === S.matchMode;
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.07)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
+        btn.style.fontWeight  = on ? '700' : '500';
       });
     }
     if (action === 'set-audio') {
@@ -1330,7 +1363,7 @@ function build() {
       maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
       excludedStreamExpressions: eses(), includedStreamExpressions: [{ enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" }], preferredStreamExpressions: pses(),
       sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
-      deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour:'aggressive', keys:['filename','infoHash','smartDetect'], cached:'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding:10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
+      deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
       dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
       groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid'), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
       formatter: (function(){ const _f = FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })()
