@@ -337,6 +337,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <script>
 const STEPS = 6;
+const CONFIGURATOR_VERSION = '1.3';
 let step = 0;
 let showAdvanced = false;
 const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
@@ -753,7 +754,7 @@ function renderProgress() {
   }).join('');
 
   const strip = document.getElementById('stepStrip');
-  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Reset all choices">↺ Reset</button></div>`;
+  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<a class="ver-badge" href="https://github.com/brevityA/Core-Builds/blob/main/configurator/index.html" target="_blank" rel="noopener" title="Configurator version">v${CONFIGURATOR_VERSION}</a><button class="btn-reset-strip" data-action="reset-state" title="Reset all choices">↺ Reset</button></div>`;
 
   // Breadcrumb chips — show completed selections
   const chips = keys.slice(0, step - 1).map((k, i) => {
