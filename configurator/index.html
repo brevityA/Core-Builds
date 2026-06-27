@@ -863,16 +863,15 @@ function render() {
             <div class="srh-num">${step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title} <span style="font-size:.72rem;font-weight:600;color:#374151;letter-spacing:.04em">OPTIONAL</span></div>
+            <div class="srh-title">${def.title}</div>
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
-        <div style="background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
-          <span style="font-size:.75rem;color:#4b8fa8;line-height:1.4;flex:1">All keys are optional — they're baked into your downloaded template file and never sent to any server.</span>
-          <button type="button" data-action="nav-next" style="font-size:.75rem;font-weight:700;color:#00d4ff;background:none;border:none;cursor:pointer;white-space:nowrap;padding:0">Skip →</button>
+        <div style="background:rgba(13,17,23,.7);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;margin-bottom:18px">
+          <span style="font-size:.75rem;color:#6b7280;line-height:1.5">Keys are baked into the template file and never sent to any server. Your debrid key is needed to use the service — enter it here or in AIOStreams after import.</span>
         </div>
         ${debridInputs.length ? `
-        <div style="color:#8b949e;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:700">Debrid API Key</div>
+        <div style="color:#8b949e;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:700">Debrid API Key <span style="color:#dc2626;margin-left:2px">✱</span></div>
         ${debridInputs.map(inp => `
         <div style="background:rgba(13,17,23,.8);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:14px 16px;margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
