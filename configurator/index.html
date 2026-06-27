@@ -805,7 +805,10 @@ function splashHtml() {
       <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
     </div>
     <button class="splash-cta" data-action="start-setup">Start Setup →</button>
-    <button data-action="quick-start" style="width:100%;max-width:310px;margin-top:10px;padding:12px 20px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.01em" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start — 4K · Lossless Audio</button>
+    <div style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:10px">
+      <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
+      <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
+    </div>
     <div class="splash-paste" data-action="paste-manifest-splash">Already have a manifest? Paste it</div>
   </div>`;
 }
@@ -1038,7 +1041,7 @@ function render() {
             <div class="srh-num">${step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${step===1&&S.resolution==='4k'&&S.audio==='lossless'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}
+            <div class="srh-title">${def.title}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -1118,7 +1121,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (step > 0) { document.getElementById('main').classList.add('nav-back'); step--; saveState(); render(); window.scrollTo(0,0); }
     }
     if (action === 'quick-start') {
-      Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true });
+      const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
+      if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true });
+      else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true });
       saveState(); document.getElementById('main').classList.remove('nav-back');
       step = 1; render(); window.scrollTo(0,0);
     }
