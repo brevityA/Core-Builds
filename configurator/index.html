@@ -150,6 +150,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-list-row .opt-desc{font-size:.69rem!important;margin-top:1px!important}
 .svc-list-arr{color:#374151;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
 .svc-list-row input:checked+label .svc-list-arr{color:#00d4ff}
+.adv-section{margin-top:10px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(13,17,23,.5);overflow:hidden}
+.adv-summary{display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;list-style:none;font-size:.82rem;font-weight:700;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;transition:color .15s;user-select:none}
+.adv-summary::-webkit-details-marker{display:none}
+.adv-summary:hover{color:#e6edf3}
+details[open] .adv-summary{color:#e6edf3;border-bottom:1px solid rgba(255,255,255,.07)}
+.adv-badge{font-size:.65rem;font-weight:700;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.22);color:#00d4ff;border-radius:20px;padding:2px 8px;margin-left:4px;text-transform:none;letter-spacing:.02em}
+.adv-arr{margin-left:auto;font-size:.85rem;transition:transform .2s;color:#374151}
+details[open] .adv-arr{transform:rotate(90deg);color:#00d4ff}
+.adv-body{padding:12px 12px 12px}
 @media(min-width:720px){
   .wrap{max-width:980px}
   .card{padding:36px}
@@ -333,7 +342,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 <script>
-const STEPS = 9;
+const STEPS = 7;
 let step = 0;
 const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
@@ -388,18 +397,6 @@ const DEFS = [
       { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
     ]
   },
-  { id:'host', title:'AIOStreams Host', desc:'Which instance will you install your template to?', key:'instanceHost', cols:'c3d', layout:'svc-list', noHero:true,
-    opts:[
-      { v:'elfhosted',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#00d4ff" stroke-width="1.5" fill="#001a22"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#00d4ff" stroke-width="1.5" fill="#001a22"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#00d4ff" stroke-width="1.5" fill="#001a22"/><circle cx="33" cy="12.5" r="2" fill="#00d4ff"/><circle cx="33" cy="23.5" r="2" fill="#00d4ff"/><circle cx="33" cy="34.5" r="2" fill="#00d4ff"/></svg>',  name:'ElfHosted',   desc:'aiostreams.elfhosted.com · most popular' },
-      { v:'fortheweak', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#a855f7" stroke-width="1.5" fill="#14012a"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#a855f7" stroke-width="1.5" fill="#14012a"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#a855f7" stroke-width="1.5" fill="#14012a"/><circle cx="33" cy="12.5" r="2" fill="#a855f7"/><circle cx="33" cy="23.5" r="2" fill="#a855f7"/><circle cx="33" cy="34.5" r="2" fill="#a855f7"/></svg>', name:'ForthWeak',    desc:'aiostreams.fortheweak.cloud' },
-      { v:'midnight',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#6366f1" stroke-width="1.5" fill="#0a0b1f"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#6366f1" stroke-width="1.5" fill="#0a0b1f"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#6366f1" stroke-width="1.5" fill="#0a0b1f"/><circle cx="33" cy="12.5" r="2" fill="#6366f1"/><circle cx="33" cy="23.5" r="2" fill="#6366f1"/><circle cx="33" cy="34.5" r="2" fill="#6366f1"/></svg>', name:"Midnight's",   desc:'midnightignite.me' },
-      { v:'viren',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#10b981" stroke-width="1.5" fill="#001a10"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#10b981" stroke-width="1.5" fill="#001a10"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#10b981" stroke-width="1.5" fill="#001a10"/><circle cx="33" cy="12.5" r="2" fill="#10b981"/><circle cx="33" cy="23.5" r="2" fill="#10b981"/><circle cx="33" cy="34.5" r="2" fill="#10b981"/></svg>', name:"Viren's",      desc:'aiostreams.viren070.me' },
-      { v:'kuu',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#f59e0b" stroke-width="1.5" fill="#1a1000"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#f59e0b" stroke-width="1.5" fill="#1a1000"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#f59e0b" stroke-width="1.5" fill="#1a1000"/><circle cx="33" cy="12.5" r="2" fill="#f59e0b"/><circle cx="33" cy="23.5" r="2" fill="#f59e0b"/><circle cx="33" cy="34.5" r="2" fill="#f59e0b"/></svg>', name:"Kuu's",        desc:'aiostreams.stremio.ru' },
-      { v:'atbp',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#0284c7" stroke-width="1.5" fill="#001428"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#0284c7" stroke-width="1.5" fill="#001428"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#0284c7" stroke-width="1.5" fill="#001428"/><circle cx="33" cy="12.5" r="2" fill="#0284c7"/><circle cx="33" cy="23.5" r="2" fill="#0284c7"/><circle cx="33" cy="34.5" r="2" fill="#0284c7"/></svg>', name:'ATBP',          desc:'aio.atbphosting.com' },
-      { v:'omni',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#ec4899" stroke-width="1.5" fill="#1a0010"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#ec4899" stroke-width="1.5" fill="#1a0010"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#ec4899" stroke-width="1.5" fill="#1a0010"/><circle cx="33" cy="12.5" r="2" fill="#ec4899"/><circle cx="33" cy="23.5" r="2" fill="#ec4899"/><circle cx="33" cy="34.5" r="2" fill="#ec4899"/></svg>', name:"Omni's",       desc:'aiostreams.12312023.xyz' },
-      { v:'custom',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="9" rx="2" stroke="#6b7280" stroke-width="1.5" fill="#111"/><rect x="6" y="19" width="32" height="9" rx="2" stroke="#6b7280" stroke-width="1.5" fill="#111"/><rect x="6" y="30" width="32" height="9" rx="2" stroke="#6b7280" stroke-width="1.5" fill="#111"/><circle cx="33" cy="12.5" r="2" fill="#6b7280"/><circle cx="33" cy="23.5" r="2" fill="#6b7280"/><circle cx="33" cy="34.5" r="2" fill="#6b7280"/><line x1="22" y1="3" x2="22" y2="6" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"/><line x1="22" y1="38" x2="22" y2="41" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Self-Hosted',   desc:'Custom URL — set it in the APIs step' },
-    ]
-  },
   { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c4d', layout:'list',
     opts:[
       { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="13" width="38" height="22" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="7" y="16" width="30" height="15" fill="#1a0a3a"/><line x1="15" y1="35" x2="12" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="29" y1="35" x2="32" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="42" x2="34" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="12" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="13" x2="32" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>', name:'Standard TV',          desc:'Broadest compatibility · no restrictions' },
@@ -418,15 +415,13 @@ const DEFS = [
       { v:'4k',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 40,16 22,42 4,16" stroke="#7c3aed" stroke-width="2" fill="#1a0a3a"/><polygon points="22,3 40,16 22,16 4,16" fill="#7c3aed" opacity="0.4"/><text x="22" y="34" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="800" font-family="system-ui,sans-serif">4K</text></svg>', name:'4K HDR',        desc:'2160p first · 1080p fallback · for 4K displays' },
       { v:'1080p',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="8" width="38" height="24" rx="3" stroke="#3b82f6" stroke-width="2" fill="#0a1428"/><text x="22" y="25" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="800" font-family="system-ui,sans-serif">1080p</text><rect x="17" y="32" width="10" height="4" rx="1" fill="#3b82f6"/><line x1="13" y1="40" x2="31" y2="40" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/></svg>', name:'1080p',          desc:'Hard lock · 2160p excluded · bandwidth-friendly' },
       { v:'ultrawide', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="11" width="40" height="22" rx="2" stroke="#8b5cf6" stroke-width="2" fill="#0e0a1f"/><text x="22" y="26" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="700" font-family="system-ui,sans-serif">21 : 9</text><rect x="17" y="33" width="10" height="4" rx="1" fill="#8b5cf6"/><line x1="12" y1="41" x2="32" y2="41" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>', name:'Ultrawide',      desc:'1080p → 1440p → 4K tiers · pair with Windows PC device' },
-    ]
-  },
-  { id:'audio', title:'Audio', desc:'What formats does your audio setup support?', key:'audio', cols:'c3d', layout:'svc-list', noHero:true,
-    opts:[
+    ],
+    advanced:{ id:'audio', key:'audio', title:'Audio', opts:[
       { v:'lossless', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless',   desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
       { v:'standard', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos',     desc:'Soundbar or smart TV · Dolby Digital Plus' },
       { v:'limited',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto',             desc:'Let device profile decide · safe default' },
       { v:'dolby',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only',     desc:'Atmos · TrueHD · DD+ · no DTS — Bose / Dolby soundbars' },
-    ]
+    ]}
   },
   { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? Skip — it covers everything.', key:'content', cols:'c4d', layout:'svc-list', noHero:true,
     opts:[
@@ -465,7 +460,8 @@ function clearState() {
 /* RENDERING */
 function label(key, val) {
   if (key === 'formatter') { const f = FORMATTERS.find(x => x.id === val); return f ? f.label : val || ''; }
-  const d = DEFS.find(x => x.key === key);
+  let d = DEFS.find(x => x.key === key);
+  if (!d) { for (const def of DEFS) { if (def.advanced && def.advanced.key === key) { d = def.advanced; break; } } }
   if (!d) return val || '';
   const o = d.opts.find(x => x.v === val);
   return o ? o.name : val || '';
@@ -502,7 +498,23 @@ function renderOpts(def) {
         <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc.replace(/<[^>]*>/g,'')}</div></div>
         <span class="svc-list-arr">›</span>
       </label></div>`).join('');
-      return `<div class="svc-list">${allRows}</div>`;
+      let advHtml = '';
+      if (def.advanced) {
+        const adv = def.advanced;
+        const advInp = (o) => `<input type="radio" name="${adv.id}" id="adv_${o.v}" value="${o.v}" ${S[adv.key]===o.v?'checked':''} data-action="update-radio" data-key="${adv.key}">`;
+        const advRows = adv.opts.map(o => `<div class="svc-list-row opt">${advInp(o)}<label for="adv_${o.v}">
+          <div class="opt-icon">${o.icon}</div>
+          <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc.replace(/<[^>]*>/g,'')}</div></div>
+          <span class="svc-list-arr">›</span>
+        </label></div>`).join('');
+        const selAdv = S[adv.key] ? adv.opts.find(x => x.v === S[adv.key]) : null;
+        const badge = selAdv ? `<span class="adv-badge">${selAdv.name}</span>` : '';
+        advHtml = `<details class="adv-section">
+          <summary class="adv-summary">Audio${badge}<span class="adv-arr">›</span></summary>
+          <div class="adv-body"><div class="svc-list">${advRows}</div></div>
+        </details>`;
+      }
+      return `<div class="svc-list">${allRows}</div>${advHtml}`;
     }
     const SVC_TAGS = {
       'torbox-pro': ['4K Apex','Stream','Flash','Speed','Anime'],
