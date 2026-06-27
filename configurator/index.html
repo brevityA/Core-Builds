@@ -340,7 +340,7 @@ const STEPS = 6;
 const CONFIGURATOR_VERSION = '1.3';
 let step = 0;
 let showAdvanced = false;
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
 
 const FORMATTERS = [
   {
@@ -1115,21 +1115,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'nav-next') {
       if (DEFS[step-1].key && !S[DEFS[step-1].key]) return;
       if (S.service === 'multi' && step === 1 && S.multiServices.length === 0) return;
-      if (step < STEPS) { document.getElementById('main').classList.remove('nav-back'); step++; saveState(); render(); window.scrollTo(0,0); }
+      if (step < STEPS) {
+        document.getElementById('main').classList.remove('nav-back');
+        step = (step === 1 && S.quickStart) ? 5 : step + 1;
+        saveState(); render(); window.scrollTo(0,0);
+      }
     }
     if (action === 'nav-back') {
-      if (step > 0) { document.getElementById('main').classList.add('nav-back'); step--; saveState(); render(); window.scrollTo(0,0); }
+      if (step > 0) {
+        document.getElementById('main').classList.add('nav-back');
+        step = (step === 5 && S.quickStart) ? 1 : step - 1;
+        saveState(); render(); window.scrollTo(0,0);
+      }
     }
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
-      if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true });
-      else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true });
+      if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
+      else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
       saveState(); document.getElementById('main').classList.remove('nav-back');
       step = 1; render(); window.scrollTo(0,0);
     }
     if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
     if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
-    if (action === 'start-setup') { document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { showAdvanced = false; clearState(); }
     if (action === 'generate-dl') generate();
