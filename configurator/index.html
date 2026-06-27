@@ -9,7 +9,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#e6edf3;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
 .wrap{width:100%;max-width:700px;flex:1;display:flex;flex-direction:column}
-.hdr{margin-bottom:22px}
+.hdr{margin-bottom:8px}
 .hdr-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#080c10 0%,#0a1018 100%);border:1px solid #1a2535;border-radius:16px;padding:16px 20px;margin-bottom:16px;position:relative;overflow:hidden}
 .hdr-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,212,255,.06) 0%,transparent 60%);pointer-events:none}
 .hdr-icon{width:46px;height:46px;flex-shrink:0;position:relative;z-index:1;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
@@ -300,33 +300,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div id="toast" class="toast"></div>
 <div class="wrap">
   <header class="hdr">
-    <div class="hdr-banner">
-      <svg class="hdr-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-        <defs>
-          <linearGradient id="hg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
-          <linearGradient id="hg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
-          <filter id="hf1"><feGaussianBlur stdDeviation="10" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
-          <filter id="hf2"><feGaussianBlur stdDeviation="14" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
-          <filter id="hf3"><feGaussianBlur stdDeviation="24"/></filter>
-        </defs>
-        <circle cx="256" cy="256" r="248" fill="#080c10"/>
-        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.05" filter="url(#hf3)"/>
-        <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.09" filter="url(#hf3)"/>
-        <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="30" stroke-linejoin="round" opacity="0.3" filter="url(#hf1)"/>
-        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#hg1)" stroke-width="22" stroke-linejoin="round"/>
-        <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.4" filter="url(#hf2)"/>
-        <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#hg2)" opacity="0.95"/>
-        <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#hg2)"/>
-        <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#hg2)"/>
-      </svg>
-      <div class="hdr-divider"></div>
-      <div class="hdr-text">
-        <div class="hdr-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
-        <div class="hdr-underline"></div>
-        <div class="hdr-by">BY BREVITY</div>
-        <div class="hdr-sub">Template Configurator — AIOStreams &nbsp;<a href="https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md" target="_blank" class="ver-badge" title="View changelog">v1.0.0</a></div>
-      </div>
-    </div>
     <div class="prog-wrap">
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
