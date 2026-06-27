@@ -10,17 +10,17 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#e6edf3;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
 .wrap{width:100%;max-width:700px;flex:1;display:flex;flex-direction:column}
 .hdr{margin-bottom:22px}
-.hdr-banner{display:flex;align-items:center;gap:16px;background:#080c10;border:1px solid #162030;border-radius:14px;padding:18px 22px;margin-bottom:16px;position:relative;overflow:hidden}
-.hdr-banner::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.035) 1px,transparent 1px);background-size:56px 56px;pointer-events:none}
-.hdr-icon{width:52px;height:52px;flex-shrink:0;position:relative;z-index:1;filter:drop-shadow(0 0 10px rgba(0,212,255,.35))}
-.hdr-divider{width:1.5px;height:52px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.6),transparent);flex-shrink:0;position:relative;z-index:1}
-.hdr-text{position:relative;z-index:1}
-.hdr-title{font-size:1.7rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:3px}
+.hdr-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#080c10 0%,#0a1018 100%);border:1px solid #1a2535;border-radius:16px;padding:16px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.hdr-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,212,255,.06) 0%,transparent 60%);pointer-events:none}
+.hdr-icon{width:46px;height:46px;flex-shrink:0;position:relative;z-index:1;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
+.hdr-divider{width:1px;height:44px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.5),transparent);flex-shrink:0;position:relative;z-index:1}
+.hdr-text{position:relative;z-index:1;display:flex;flex-direction:column;gap:1px}
+.hdr-title{font-size:1.55rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:2px}
 .hdr-core{color:#fff}
 .hdr-builds{color:#00d4ff}
-.hdr-underline{height:2px;width:110px;background:rgba(0,212,255,.45);border-radius:1px;margin-bottom:5px}
-.hdr-by{font-size:.68rem;letter-spacing:.14em;color:#7eeeff;opacity:.7;margin-bottom:4px}
-.hdr-sub{font-size:.82rem;color:#8b949e}
+.hdr-underline{height:1.5px;width:96px;background:linear-gradient(90deg,rgba(0,212,255,.55),transparent);border-radius:1px;margin-bottom:3px}
+.hdr-by{font-size:.63rem;letter-spacing:.16em;color:#4b8fa8;margin-bottom:2px}
+.hdr-sub{font-size:.78rem;color:#6b7280;line-height:1.3}
 .prog-wrap{margin:0 0 6px}
 .prog-track{background:#21262d;border-radius:4px;height:5px;overflow:hidden}
 .prog-fill{background:linear-gradient(90deg,#0891b2,#00d4ff);height:100%;transition:width .35s ease;border-radius:4px}
@@ -168,8 +168,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .toggle-sw input:checked~.toggle-track{background:#00d4ff}
 .toggle-sw input:checked~.toggle-track::before{transform:translateX(20px);background:#fff}
 /* Version badge */
-.ver-badge{font-size:.67rem;font-weight:700;padding:2px 8px;border-radius:4px;background:#003344;color:#00d4ff;text-decoration:none;letter-spacing:.04em;vertical-align:middle;transition:background .15s}
-.ver-badge:hover{background:#004d66;color:#7eeeff}
+.ver-badge{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;background:#00131c;border:1px solid #005c7a;color:#00d4ff;text-decoration:none;letter-spacing:.04em;vertical-align:middle;transition:all .15s}
+.ver-badge:hover{background:#002a40;border-color:#00d4ff;color:#7eeeff}
 /* Manifest modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px);animation:fadeIn .18s ease}
 .modal-box{background:#161b22;border:1px solid #30363d;border-radius:16px;padding:24px 22px;max-width:460px;width:100%;position:relative;animation:slideUp .22s ease;max-height:90dvh;overflow-y:auto}
@@ -211,6 +211,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .dot-spin span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:currentColor;animation:dotPulse 1.2s ease-in-out infinite}
 .dot-spin span:nth-child(2){animation-delay:.2s}
 .dot-spin span:nth-child(3){animation-delay:.4s}
+/* Duck-style preference toggle cards */
+.pref-section{margin-bottom:20px}
+.pref-section-label{font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.pref-card{background:#0d1117;border:1.5px solid #30363d;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;margin-bottom:8px}
+.pref-card:last-child{margin-bottom:0}
+.pref-card:hover{border-color:#005c7a}
+.pref-card.pref-on{border-color:#00d4ff;background:#00131c}
+.pref-body-inner{flex:1;min-width:0}
+.pref-title{font-weight:700;font-size:.9rem;color:#e6edf3;line-height:1.3}
+.pref-desc{color:#6b7280;font-size:.78rem;margin-top:2px;line-height:1.4}
+.pref-circle{width:22px;height:22px;border-radius:50%;border:2px solid #374151;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent}
+.pref-card.pref-on .pref-circle{background:#00d4ff;border-color:#00d4ff}
+/* Formatter live preview card */
+.fmt-live-preview{background:#111827;border:1px solid #1e2837;border-radius:8px;padding:11px 13px;margin-top:10px;display:flex;gap:10px;align-items:flex-start}
+.fmt-live-poster{width:36px;height:52px;border-radius:4px;background:#1e2837;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.fmt-live-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.fmt-live-n{font-size:.73rem;color:#e2e8f0;line-height:1.55;word-break:break-word}
+.fmt-live-d{font-size:.7rem;color:#6b7280;line-height:1.55;word-break:break-word}
 /* Animated logo */
 @keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
 @keyframes coreGlowPulse{0%,100%{transform:scale(1);opacity:.38}50%{transform:scale(1.24);opacity:.84}}
@@ -276,7 +294,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 const STEPS = 8;
 let step = 1;
-const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
+const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
 const FORMATTERS = [
   {
@@ -415,7 +433,7 @@ function renderOpts(def) {
         `<span class="fmt-lbl" style="font-weight:800;font-size:1rem;color:${on?'#00d4ff':'#e6edf3'};min-width:64px">${f.label}</span>` +
         `<span style="font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:5px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
         `<span style="color:#6b7280;font-size:.85rem">${f.desc}</span>` +
-        `</div></div>`;
+        `</div><div class="fmt-preview-wrap" style="display:${on?'block':'none'};padding:0 14px 14px"><div style="color:#4b5563;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">Stream Preview</div>${fmtPreviewHtml(f.id)}</div></div>`;
     }).join('') +
   '</div>';
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
@@ -428,6 +446,57 @@ function renderOpts(def) {
     </div>`;
   }
   return `<div class="opts ${def.cols}">${def.opts.map(o => std(o)).join('')}</div>`;
+}
+
+const FMT_PREVIEWS = {
+  'apex-v2': {
+    n:'🟣 4K  ⚡ TORBOX  🌟 HDR¹⁰  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  🏷️ FraMeSToR  👑 PREMIER','🎬 💎 REMUX  x265  38.4 Mbps  🌟 HDR¹⁰','🎛️ 💎 TRUEHD  🔮 ATMOS  🔊 7.1  🌍 🇬🇧','45.2 GB  🌱 1 247  ⏱️ 3d  🔌 cached']
+  },
+  'sigma': {
+    n:'✦ Frankenstein 「 TORBOX 」 「 🟣 4K 」 「 💎 REMUX 」',
+    d:['『 💎 ELITE 』 『 🚀 INSTANT 』 『 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 』','「 🎬 💎 REMUX 」 「 ʜᴇᴠᴄ 」 「 38.4 Mbs 」','「 🎛️ 💎 ᴛʀᴜᴇʜᴅ 」 「 7.1 」 🌍 🇬🇧','「 45.2 GB 」 「 🌱 1 247 」']
+  },
+  'minimal': {
+    n:'🟣 4K  ⚡ TORBOX  💎 TRUEHD  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  🏷️ FraMeSToR','🎬 💎 REMUX  🌟 HDR¹⁰  💎 TRUEHD  7.1','45.2 GB  38.4 Mbps  🌱 1 247  ⏱️ 3d']
+  },
+  'prime': {
+    n:'🖥️ 2160P  ⚡ TORBOX  FRANKENSTEIN',
+    d:['💎 ELITE  🏷️ FraMeSToR  👑 PREMIER','🎬 BLURAY REMUX  X265  🌟 HDR10+  38.4 Mbps','🎛️ TRUEHD  ATMOS  7.1  🌍 🇬🇧','💾 45.2 GB  🌱 1 247  📅 3d  🔌 Cached']
+  },
+  'tv': {
+    n:'🔴 4K  ⚡ TORBOX  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  👑 PREMIER','🎬 BLURAY REMUX  HEVC  HDR10+  38.4 MBPS  45.2 GB','🔊 TRUEHD  ATMOS  7.1  🌍 🇬🇧','🔌 CACHED  🌱 1 247  📅 3D']
+  }
+};
+
+function fmtPreviewHtml(fmtId) {
+  const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['apex-v2'];
+  return `<div class="fmt-live-preview">
+    <div class="fmt-live-poster">🎬</div>
+    <div class="fmt-live-lines">
+      <div class="fmt-live-n">${p.n}</div>
+      ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function videoPrefHtml() {
+  const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const card = (key, title, desc) => {
+    const on = !!S[key];
+    return `<div class="pref-card${on?' pref-on':''}" data-action="toggle-pref" data-key="${key}">
+      <div class="pref-body-inner"><div class="pref-title">${title}</div><div class="pref-desc">${desc}</div></div>
+      <div class="pref-circle">${on?chk:''}</div>
+    </div>`;
+  };
+  return `<div class="pref-section">
+    <div class="pref-section-label">Video Preferences</div>
+    ${card('qualityFirst','Prioritize Quality over Resolution','Sorts by source quality (e.g. REMUX) before resolution.')}
+    ${card('exclude4K','Exclude 4K / UHD','Removes 2160p content. Good for bandwidth saving.')}
+    ${card('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
+  </div>`;
 }
 
 function renderP2pToggle() {
@@ -487,6 +556,7 @@ function render() {
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
             value="${S.name}" data-action="update-name" maxlength="60">
         </div>
+        ${videoPrefHtml()}
         ${insightsHtml()}
         ${sizeLimitHtml()}
         <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
@@ -676,6 +746,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = e.target.dataset.url || e.target.closest('[data-action="copy-wuplay"]')?.dataset.url;
       navigator.clipboard.writeText(url).then(() => showToast('Copied! Paste into WuPlay → Addons → Add Addon'));
     }
+    if (action === 'toggle-pref') {
+      const key = (e.target.closest('[data-action="toggle-pref"]') || e.target).dataset.key;
+      if (key && key in S) { S[key] = !S[key]; saveState(); render(); }
+    }
     if (action === 'set-size-limit') {
       S.sizeLimit = (e.target.closest('[data-action]') || e.target).dataset.val;
       saveState();
@@ -690,8 +764,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const on = card.dataset.val === S.formatter;
         card.style.borderColor = on ? '#00d4ff' : '#30363d';
         card.style.background  = on ? '#00131c' : '#0d1117';
+        card.style.boxShadow   = on ? '0 0 0 3px rgba(0,212,255,.15)' : 'none';
         const lbl = card.querySelector('.fmt-lbl');
         if (lbl) lbl.style.color = on ? '#00d4ff' : '#e6edf3';
+        const pw = card.querySelector('.fmt-preview-wrap');
+        if (pw) pw.style.display = on ? 'block' : 'none';
       });
     }
   });
@@ -765,6 +842,9 @@ function insights() {
   if (svc === 'hybrid') pts.push('<b>TorBox + Real-Debrid fallback</b> — widest cache coverage');
   else if (svc === 'torbox-pro') pts.push('<b>Full scraper stack</b> — Meteor · Comet · MediaFusion · HdHub · Zilean');
   if (!S.p2pEnabled) pts.push('<b>P2P excluded</b> — cached debrid streams only, no torrent seeders');
+  if (S.qualityFirst) pts.push('<b>Quality over resolution</b> — REMUX ranked above resolution in sort order');
+  if (S.exclude4K) pts.push('<b>4K / UHD excluded</b> — 1080p and below only');
+  if (S.excludeDV) pts.push('<b>Dolby Vision excluded</b> — DV streams removed, prevents tint on unsupported screens');
   if (S.sizeLimit !== 'unlimited') pts.push('<b>Size limit: max ' + S.sizeLimit + 'GB</b> — streams over ' + S.sizeLimit + 'GB excluded from results');
   pts.push('<b>Per-Addon Flood Guard</b> — no single scraper can flood results');
   pts.push('<b>REPACK / PROPER priority</b> — fixed releases ranked above originals');
@@ -924,6 +1004,8 @@ function eses() {
   if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
   out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" }, { enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
   if (!S.p2pEnabled) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
+  if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
+  if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
   if (S.sizeLimit !== 'unlimited') {
     const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
     out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
@@ -966,7 +1048,7 @@ function build() {
       tmdbAccessToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '', usePosterRedirectApi: true, usePosterServiceForMeta: true,
       maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
       excludedStreamExpressions: eses(), includedStreamExpressions: [{ enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" }], preferredStreamExpressions: pses(),
-      sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'},{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
+      sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
       deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour:'aggressive', keys:['filename','infoHash','smartDetect'], cached:'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding:10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
       dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
       groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid'), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
