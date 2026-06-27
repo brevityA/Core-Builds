@@ -36,20 +36,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .card .desc{color:#8b949e;font-size:.88rem;margin-bottom:20px;line-height:1.5}
 .opts{display:grid;gap:10px}
 .opts.c2{grid-template-columns:1fr 1fr}
-.opts.c3{grid-template-columns:1fr 1fr 1fr}
+.opts.c3{grid-template-columns:1fr 1fr}
 .opts.c1{grid-template-columns:1fr}
 .opts.c4d{grid-template-columns:1fr 1fr}
 .opts.c3d{grid-template-columns:1fr}
 .opts.c2d{grid-template-columns:1fr}
 .opt input{display:none}
-.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
+.opt label{display:flex;flex-direction:column;background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:15px 13px;cursor:pointer;transition:border-color .15s,background .15s;height:100%;user-select:none}
 .opt input:checked+label{border-color:#00d4ff;background:#00131c;box-shadow:0 0 0 3px rgba(0,212,255,.15)}
 .opt label:hover{border-color:#005c7a}
 .opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
-.opt-icon svg{width:36px;height:36px}
+.opt-icon svg{width:42px;height:42px}
 .opt-body{display:flex;flex-direction:column;flex:1;min-width:0}
-.opt-name{font-weight:700;font-size:.88rem;line-height:1.25}
-.opt-desc{color:#8b949e;font-size:.76rem;margin-top:3px;line-height:1.4}
+.opt-name{font-weight:700;font-size:1rem;line-height:1.25}
+.opt-desc{color:#8b949e;font-size:.84rem;margin-top:4px;line-height:1.45}
 .opts.c3d .opt label,.opts.c2d .opt label{flex-direction:row;align-items:center;gap:12px;padding:14px}
 .opts.c3d .opt-icon,.opts.c2d .opt-icon{margin-bottom:0}
 .opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:30px;height:30px}
@@ -102,16 +102,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opts.list .opt-icon{margin-bottom:0}
 .opts.list .opt-icon svg{width:28px;height:28px}
 /* Pill layout */
-.opts.pills{display:flex;gap:4px;background:#161b22;border:1px solid #30363d;border-radius:11px;padding:4px}
+.opts.pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:transparent;border:none;padding:0}
 .opts.pills .opt{flex:1}
-.opts.pills .opt label{flex-direction:column;align-items:center;gap:5px;padding:12px 6px;border-radius:8px;border:2px solid transparent;background:transparent;color:#8b949e;height:auto;text-align:center}
-.opts.pills .opt label:hover{border-color:transparent;background:#21262d;color:#e6edf3}
-.opts.pills .opt input:checked+label{background:#00d4ff;color:#000;border-color:transparent;box-shadow:none}
+.opts.pills .opt label{flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border-radius:10px;border:2px solid #30363d;background:#0d1117;color:#8b949e;height:auto;text-align:center}
+.opts.pills .opt label:hover{border-color:#005c7a;background:#0d1117;color:#e6edf3}
+.opts.pills .opt input:checked+label{background:#00131c;color:#00d4ff;border-color:#00d4ff;box-shadow:0 0 0 3px rgba(0,212,255,.12)}
 .opts.pills .opt-icon{margin-bottom:0}
-.opts.pills .opt-icon svg{width:22px;height:22px}
+.opts.pills .opt-icon svg{width:30px;height:30px}
 .opts.pills .opt-body{align-items:center}
-.opts.pills .opt-name{font-size:.82rem;text-align:center}
-.opts.pills .opt-desc{font-size:.68rem;margin-top:1px;opacity:.85;text-align:center}
+.opts.pills .opt-name{font-size:.97rem;text-align:center}
+.opts.pills .opt-desc{font-size:.8rem;margin-top:3px;opacity:.85;text-align:center}
 /* Hero layout */
 .hero-wrap{display:flex;flex-direction:column;gap:8px}
 .hero-hero .opt label{flex-direction:row;align-items:flex-start;gap:16px;padding:18px;border-radius:12px}
@@ -135,22 +135,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .hdr-divider{height:64px}
   .hdr-title{font-size:2.1rem}
   .hdr-underline{width:136px}
-  .opts{gap:12px}
+  .opts{gap:14px}
   .opts.c4d{grid-template-columns:repeat(4,1fr)}
+  .opts.c3{grid-template-columns:repeat(3,1fr)}
   .opts.c3d{grid-template-columns:repeat(3,1fr)}
   .opts.c2d{grid-template-columns:repeat(2,1fr)}
-  .opt-icon svg{width:44px;height:44px}
-  .opt-name{font-size:.93rem}
-  .opt-desc{font-size:.82rem}
+  .opts.pills{grid-template-columns:repeat(4,1fr);gap:10px}
+  .opts.pills .opt label{padding:18px 12px}
+  .opts.pills .opt-icon svg{width:34px;height:34px}
+  .opts.pills .opt-name{font-size:1rem}
+  .opts.pills .opt-desc{font-size:.82rem}
+  .opt-icon svg{width:48px;height:48px}
+  .opt-name{font-size:1.05rem}
+  .opt-desc{font-size:.88rem}
+  .opt label{padding:18px 16px}
   .opts.c3d .opt label,.opts.c2d .opt label{align-items:flex-start;padding:18px}
   .opts.c3d .opt-icon svg,.opts.c2d .opt-icon svg{width:34px;height:34px}
-  .opts.c4d .opt label{padding:16px}
+  .opts.c4d .opt label{padding:18px 14px}
   .summary{grid-template-columns:repeat(3,1fr)}
   .nav{max-width:480px}
   .btn-dl,.btn-aio{max-width:480px}
   .hero-sub{grid-template-columns:repeat(4,1fr)}
   .hero-sub .opt-icon svg{width:28px;height:28px}
-  .opts.list .opt-icon svg{width:32px;height:32px}
+  .opts.list .opt-icon svg{width:34px;height:34px}
+  .opts.list .opt label{padding:16px 18px}
 }
 /* Animated logo */
 @keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
@@ -215,7 +223,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 <script>
-const STEPS = 7;
+const STEPS = 8;
 let step = 1;
 const S = { service:null, device:null, resolution:null, audio:null, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'' };
 
@@ -306,6 +314,7 @@ const DEFS = [
       { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
     ]
   },
+  { id:'formatter', title:'Stream Layout', desc:'Pick how your streams are displayed in Stremio. Each card shows a real preview of that style.', key:'formatter', layout:'formatter-picker', cols:'c1', opts:[] },
   { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored only in the downloaded JSON file and are never sent to any server.', key:null, cols:'c1', opts:[] },
   { id:'review', title:'Review & Download', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
 ];
@@ -333,6 +342,7 @@ function clearState() {
 
 /* RENDERING */
 function label(key, val) {
+  if (key === 'formatter') { const f = FORMATTERS.find(x => x.id === val); return f ? f.label : val || ''; }
   const d = DEFS.find(x => x.key === key);
   if (!d) return val || '';
   const o = d.opts.find(x => x.v === val);
@@ -345,6 +355,18 @@ function renderOpts(def) {
   const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
   const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
+  if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:10px">' +
+    FORMATTERS.map(f => {
+      const on = S.formatter === f.id;
+      return `<div data-action="set-formatter" data-val="${f.id}" style="border:2px solid ${on?'#00d4ff':'#30363d'};border-radius:12px;background:${on?'#00131c':'#0d1117'};cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s;box-shadow:${on?'0 0 0 3px rgba(0,212,255,.15)':'none'}">` +
+        `<img src="${f.img}" alt="${f.label} preview" style="width:100%;display:block;border-bottom:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'">` +
+        `<div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">` +
+        `<span class="fmt-lbl" style="font-weight:800;font-size:1rem;color:${on?'#00d4ff':'#e6edf3'};min-width:64px">${f.label}</span>` +
+        `<span style="font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:5px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
+        `<span style="color:#6b7280;font-size:.85rem">${f.desc}</span>` +
+        `</div></div>`;
+    }).join('') +
+  '</div>';
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'hero') {
@@ -361,7 +383,7 @@ function renderProgress() {
   const pct = ((step - 1) / (STEPS - 1)) * 100;
   document.getElementById('pFill').style.width = pct + '%';
   const def = DEFS[step - 1];
-  const titles = ['Service','Device','Resolution','Audio','Content','APIs','Review'];
+  const titles = ['Service','Device','Resolution','Audio','Content','Layout','APIs','Review'];
   document.getElementById('pLabel').textContent = `Step ${step} of ${STEPS} · ${titles[step-1] || ''}`;
 }
 
@@ -379,7 +401,7 @@ function render() {
         <h2>Your Configuration</h2>
         <p class="desc">Review your choices, optionally name your template, then download.</p>
         <div class="summary">
-          ${['service','device','resolution','audio','content'].map(k => {
+          ${['service','device','resolution','audio','content','formatter'].map(k => {
             const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
             return `<div class="sum-item">
               <div class="sum-lbl">${k}</div>
@@ -400,7 +422,6 @@ function render() {
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
             value="${S.name}" data-action="update-name" maxlength="60">
         </div>
-        ${formatterPickerHtml()}
         ${insightsHtml()}
         ${sizeLimitHtml()}
         <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
