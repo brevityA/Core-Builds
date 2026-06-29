@@ -1511,14 +1511,14 @@ function formatterPickerHtml() {
 function getDebridInputs() {
   const svc = S.service;
   const defs = {
-    torbox:       { label:'TorBox API Key',        placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', url:'https://torbox.app/settings' },
-    realdebrid:   { label:'Real-Debrid API Key',   placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',      url:'https://real-debrid.com/apitoken' },
-    alldebrid:    { label:'AllDebrid API Key',      placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://alldebrid.com/apikeys' },
-    premiumize:   { label:'Premiumize API Key',     placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://www.premiumize.me/account' },
-    debridlink:   { label:'Debrid-Link API Key',    placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://debrid-link.com/webapp#/account/api' },
-    offcloud:     { label:'Offcloud API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://offcloud.com/#/account/api' },
-    easynews:     { label:'EasyNews Username',      placeholder:'your-username',                        url:'https://www.easynews.com/account' },
-    easynewsPass: { label:'EasyNews Password',      placeholder:'your-password',                        url:'https://www.easynews.com/account' },
+    torbox:       { label:'TorBox API Key',       placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', url:'https://torbox.app/settings' },
+    realdebrid:   { label:'Real-Debrid API Key',  placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',      url:'https://real-debrid.com/apitoken' },
+    alldebrid:    { label:'AllDebrid API Key',     placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://alldebrid.com/apikeys' },
+    premiumize:   { label:'Premiumize API Key',    placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://www.premiumize.me/account' },
+    debridlink:   { label:'Debrid-Link API Key',   placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://debrid-link.com/webapp#/account/api' },
+    offcloud:     { label:'Offcloud API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://offcloud.com/#/account/api' },
+    easynews:     { label:'EasyNews Username',     placeholder:'your-username',                        url:'https://www.easynews.com/account' },
+    easynewsPass: { label:'EasyNews Password',     placeholder:'your-password',                        url:'https://www.easynews.com/account' },
   };
   const ids = [];
   if (svc==='torbox-pro'||svc==='torbox-ess'||svc==='hybrid') ids.push('torbox');
@@ -1541,7 +1541,7 @@ function defaultName() {
   const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
   const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid' }[svc] || '';
   if (svc === 'multi') {
-    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL'};
+    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC'};
     return `Core Builds${suffix} Multi (${S.multiServices.map(s => abbr[s] || s).join('+')})`.trim();
   }
   return `Core Builds${suffix}${svcLabel ? ' · ' + svcLabel : ''}`.trim();
@@ -1562,8 +1562,8 @@ function presets() {
   const storeSlot = isMulti ? S.multiServices.map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews || isHttp ? []
-    : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:isP2P, useMultipleInstances:false }, resources:['stream'] }];
+    : isP2P || isEasynews ? []
+    : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
     { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
@@ -1577,14 +1577,14 @@ function presets() {
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] }, resources:['stream'] },
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true }, resources:['stream'] },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] }, resources:['stream'] },
-    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews && !isHttp, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
+    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:true, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
   ];
-  if (!useStore && !isP2P && !isEasynews && !isHttp) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  if (!useStore && !isP2P && !isEasynews) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
   return list;
 }
 
