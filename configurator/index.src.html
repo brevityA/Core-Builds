@@ -551,6 +551,7 @@ const DEFS = [
       { v:'easynews',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#0ea5e9" stroke-width="2" fill="#001a2e"/><text x="22" y="26" text-anchor="middle" fill="#0ea5e9" font-size="14" font-weight="900" font-family="system-ui,sans-serif">EN</text><line x1="13" y1="29" x2="31" y2="29" stroke="#0ea5e9" stroke-width="1.2" opacity="0.5"/></svg>', name:'EasyNews', desc:'Usenet — username &amp; password<br><span style="color:#0ea5e9;font-size:.8em">e.g. Speed EasyNews · Speed 4K+</span>' },
       { v:'offcloud',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#06b6d4" stroke-width="2" fill="#001a1f"/><path d="M14 25 Q14 20 19 19 Q19 14 25 14 Q31 14 31 20 Q34 21 34 25 Q34 29 29 29 L16 29 Q14 29 14 25Z" fill="none" stroke="#06b6d4" stroke-width="1.5"/><path d="M19 29 L19 33 M25 29 L25 33 M22 29 L22 34" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Offcloud', desc:'Cloud debrid — API key required<br><span style="color:#06b6d4;font-size:.8em">torrent + HTTP download caching</span>' },
       { v:'p2p',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#8b5cf6" stroke-width="2" fill="#120a2e"/><circle cx="15" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="29" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><line x1="19.5" y1="22" x2="24.5" y2="22" stroke="#8b5cf6" stroke-width="1.5"/><path d="M27 18 L33 15 M27 26 L33 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/><path d="M17 18 L11 15 M17 26 L11 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>', name:'P2P Free', desc:'No subscription — torrents only<br><span style="color:#8b5cf6;font-size:.8em">free · no API key needed</span>' },
+      { v:'http',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#f472b6" stroke-width="2" fill="#1f0a14"/><rect x="12" y="17" width="20" height="12" rx="2" fill="none" stroke="#f472b6" stroke-width="1.5"/><path d="M16 21 L20 24 L16 27" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="27" x2="27" y2="27" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'HTTP Streams', desc:'Streaming sites — no debrid, no torrents<br><span style="color:#f472b6;font-size:.8em">WebStreamr · Nuvio · Flix-Streams</span>' },
       { v:'hybrid',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><clipPath id="hybL"><rect x="0" y="0" width="22" height="44"/></clipPath><clipPath id="hybR"><rect x="22" y="0" width="22" height="44"/></clipPath></defs><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#051408" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="none" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#1a0000" clip-path="url(#hybR)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="none" clip-path="url(#hybR)"/><line x1="22" y1="4" x2="22" y2="40" stroke="#333" stroke-width="0.5"/><polygon points="13,16 19,19 13,22 7,19" fill="#1a5c2a"/><polygon points="7,19 7,26 13,29 13,22" fill="#166534"/><polygon points="13,22 19,19 19,26 13,29" fill="#15803d"/><path d="M31 15 L25 24 L28 24 L26 30 L33 21 L30 21 Z" fill="#dc2626"/></svg>', name:'Hybrid', desc:'TorBox Pro + Real-Debrid fallback<br><span style="color:#8b949e;font-size:.8em">e.g. 4K Hybrid · Core Nexus Hybrid</span>' },
       { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
     ]
@@ -700,6 +701,7 @@ function renderOpts(def) {
       'easynews':   'Usenet · username + password',
       'offcloud':   'Cloud debrid · API key required',
       'p2p':        'No subscription · P2P torrents only',
+      'http':       'Streaming sites · no debrid · no torrents',
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
       'multi':      'Mix two or more services',
     };
@@ -1537,7 +1539,7 @@ function defaultName() {
   const res = S.resolution, svc = S.service;
   const is4k = res === '4k', isUW = res === 'ultrawide';
   const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
-  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'hybrid':'Hybrid' }[svc] || '';
+  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid' }[svc] || '';
   if (svc === 'multi') {
     const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL'};
     return `Core Builds${suffix} Multi (${S.multiServices.map(s => abbr[s] || s).join('+')})`.trim();
@@ -1547,13 +1549,20 @@ function defaultName() {
 
 function presets() {
   const svc = S.service;
-  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews';
+  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http';
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(svc) || isMulti;
+  if (isHttp) return [
+    { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+    { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
+    { type:'nuvio-streams', instanceId:'nvs-1', enabled:true, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
+    { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
+    { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
+  ];
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','hybrid':'StremThru RD'};
   const storeSlot = isMulti ? S.multiServices.map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews ? []
+    : isP2P || isEasynews || isHttp ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:isP2P, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
@@ -1568,14 +1577,14 @@ function presets() {
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] }, resources:['stream'] },
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true }, resources:['stream'] },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] }, resources:['stream'] },
-    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
+    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews && !isHttp, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:true, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
   ];
-  if (!useStore && !isP2P && !isEasynews) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  if (!useStore && !isP2P && !isEasynews && !isHttp) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
   return list;
 }
 
