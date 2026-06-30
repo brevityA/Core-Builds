@@ -324,7 +324,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
 .splash-paste:hover{color:#6b7280}
 /* ── Theme toggle ─────────────────────────────────────── */
-#themeToggle{position:fixed;top:14px;right:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
+#themeToggle{position:fixed;top:14px;left:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
 #themeToggle:hover{background:rgba(255,255,255,.12);color:#e6edf3;border-color:rgba(255,255,255,.2)}
 #themeToggle::before{content:'☀';margin-right:4px}
 [data-theme="light"] #themeToggle::before{content:'🌙'}
@@ -422,10 +422,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] #themeToggle{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#57606a}
 [data-theme="light"] #themeToggle:hover{background:rgba(0,0,0,.09);color:#1c2128;border-color:rgba(0,0,0,.2)}
 [data-theme="light"] [data-action="set-formatter"]{background:#f6f8fa!important;border-color:#d0d7de!important}
+[data-theme="light"] [data-action="set-formatter"][data-active="true"]{background:rgba(9,105,218,.07)!important;border-color:rgba(9,105,218,.45)!important}
 [data-theme="light"] [data-action="set-audio"]{background:#f6f8fa!important;border-color:#d0d7de!important}
+[data-theme="light"] [data-action="set-audio"][data-active="true"]{background:rgba(9,105,218,.07)!important;border-color:rgba(9,105,218,.45)!important}
+[data-theme="light"] [data-action="set-audio"][data-active="true"] .opt-name,[data-theme="light"] [data-action="set-audio"][data-active="true"] .fmt-lbl{color:#0969da!important}
 [data-theme="light"] [data-action="set-match-mode"]{background:#f6f8fa!important;border-color:#d0d7de!important;color:#57606a!important}
+[data-theme="light"] [data-action="set-match-mode"][data-active="true"]{background:rgba(9,105,218,.1)!important;border-color:rgba(9,105,218,.45)!important;color:#0969da!important}
+[data-theme="light"] .continue-banner{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.22)!important}
+[data-theme="light"] .splash-cta-continue{background:rgba(9,105,218,.12)!important;border-color:rgba(9,105,218,.4)!important;color:#0969da!important}
+[data-theme="light"] .splash-cta-discard{border-color:#d0d7de!important;color:#8c959f!important}
 </style>
-<script>function _0x3f1f(_0x2ebfbb,_0x9bcf25){_0x2ebfbb=_0x2ebfbb-(0xd*-0x22a+-0x1581+-0x737*-0x7);var _0x87259f=_0x440e();var _0x5a1915=_0x87259f[_0x2ebfbb];if(_0x3f1f['AaYxeJ']===undefined){var _0x16b5a4=function(_0x30a4fe){var _0x2411db='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0x35dd4f='',_0x3c299a='';for(var _0x439e1e=-0x133*0x15+-0xb84+0x24b3,_0x3e2b69,_0x426471,_0x215fc4=0xac0+0x1*0x93a+0x9fd*-0x2;_0x426471=_0x30a4fe['charAt'](_0x215fc4++);~_0x426471&&(_0x3e2b69=_0x439e1e%(-0xf0*0x23+-0x54b*-0x2+0x163e)?_0x3e2b69*(0x825+-0xa53+-0x26e*-0x1)+_0x426471:_0x426471,_0x439e1e++%(-0x1e71+-0x1*-0xe57+0x101e))?_0x35dd4f+=String['fromCharCode'](0x5d9+-0x61*0x5e+0xb*0x2cc&_0x3e2b69>>(-(0x204*-0x4+-0x23dd+-0x1*-0x2bef)*_0x439e1e&0x3b*0x49+0x10c3+0x1*-0x2190)):-0x5d4+-0x1dfc+0x11e8*0x2){_0x426471=_0x2411db['indexOf'](_0x426471);}for(var _0xf23bdc=0xf06*0x2+-0x37b*0x8+-0x234,_0x2d4201=_0x35dd4f['length'];_0xf23bdc<_0x2d4201;_0xf23bdc++){_0x3c299a+='%'+('00'+_0x35dd4f['charCodeAt'](_0xf23bdc)['toString'](0x1f46+-0x3*0x8b+-0x1d95))['slice'](-(-0xa45+-0x1662+0x20a9));}return decodeURIComponent(_0x3c299a);};_0x3f1f['gDDNRv']=_0x16b5a4,_0x3f1f['VcEZnH']={},_0x3f1f['AaYxeJ']=!![];}var _0xc6d274=_0x87259f[-0x6d*0x3+0xc*-0xce+0xaef],_0x3bf234=_0x2ebfbb+_0xc6d274,_0x2fd4dc=_0x3f1f['VcEZnH'][_0x3bf234];return!_0x2fd4dc?(_0x5a1915=_0x3f1f['gDDNRv'](_0x5a1915),_0x3f1f['VcEZnH'][_0x3bf234]=_0x5a1915):_0x5a1915=_0x2fd4dc,_0x5a1915;}var _0x10a525=_0x3f1f;function _0x440e(){var _0x1db550=['ndHKC1v5AeS','zg9JDw1LBNrfBgvTzw50','mty0mJDUCuLHzKO','z2v0sxrLBq','y2juAgvTzq','nta0mtG5Eu5RwKH1','mZm5mtCXwfrOtvDl','ntqWnteZB2v0Bg5I','ota0mdLkChPMzvG','mZeWExP0q2Dx','mZm3otm5oef3z3LVsG','nNfoBMreyW','Bwf0y2HnzwrPyq','zgfYAW','nZiXmZu1teXqsMHl','ngnivNztEG','zgf0ys10AgvTzq','khbYzwzLCNmTy29SB3iTC2nOzw1LoMrHCMSP','Bwf0y2HLCW'];_0x440e=function(){return _0x1db550;};return _0x440e();}(function(_0x22638e,_0x4ad0e6){var _0x135aec={_0x4cb7c6:0xed,_0x1ceee9:0xdf,_0x28e37b:0xee,_0x50615a:0xef},_0x1813bf=_0x3f1f,_0x3bc268=_0x22638e();while(!![]){try{var _0x25b2f8=parseInt(_0x1813bf(0xea))/(-0x1477+-0x1ce4+-0x12*-0x2be)*(-parseInt(_0x1813bf(0xe0))/(0x50f+0xc*0xda+-0xf45))+parseInt(_0x1813bf(_0x135aec._0x4cb7c6))/(-0x1aab+-0x5*0x66+-0x4*-0x72b)+parseInt(_0x1813bf(0xe4))/(-0x11*-0x141+0xabf+-0x200c)*(parseInt(_0x1813bf(0xe3))/(0xd24+-0x199*0xd+0x7a6))+-parseInt(_0x1813bf(_0x135aec._0x1ceee9))/(-0x2*0x13+0x1fc*-0xa+0x1404)+-parseInt(_0x1813bf(_0x135aec._0x28e37b))/(-0x115+-0xa*0x2fb+0x1*0x1eea)*(-parseInt(_0x1813bf(0xe8))/(-0x1b3c+0x9*0x11a+-0x1*-0x115a))+parseInt(_0x1813bf(_0x135aec._0x50615a))/(-0x237e+-0x140c+0x3793)+-parseInt(_0x1813bf(0xde))/(-0x1cd*0xf+0x11f8+-0x307*-0x3)*(-parseInt(_0x1813bf(0xf0))/(-0x609+-0xac9+-0x10dd*-0x1));if(_0x25b2f8===_0x4ad0e6)break;else _0x3bc268['push'](_0x3bc268['shift']());}catch(_0x27399a){_0x3bc268['push'](_0x3bc268['shift']());}}}(_0x440e,-0x34c1b+0x3*-0x6bd9+0x3a*0x28b3));try{document[_0x10a525(0xe9)]['setAttribute'](_0x10a525(0xe5),localStorage[_0x10a525(0xeb)](_0x10a525(0xec))||(window[_0x10a525(0xe1)](_0x10a525(0xe6))[_0x10a525(0xe7)]?_0x10a525(0xe2):'light'));}catch(_0x1364a0){}</script>
+<script>function _0x590b(_0xc5fb5c,_0x2b3c22){_0xc5fb5c=_0xc5fb5c-(0x12a0*0x2+0x2121+-0x446d);var _0xa5edc1=_0x4744();var _0x4ab9ed=_0xa5edc1[_0xc5fb5c];if(_0x590b['wsWNYr']===undefined){var _0x496432=function(_0xf31427){var _0x207e22='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0x57643b='',_0x5ca15a='';for(var _0x398964=-0xbfc+-0x1*0xac9+0x16c5,_0x5c08e4,_0x26fb61,_0x19d6e5=0xcbf*0x1+0xad3+-0xbc9*0x2;_0x26fb61=_0xf31427['charAt'](_0x19d6e5++);~_0x26fb61&&(_0x5c08e4=_0x398964%(0xe85+0xe74*0x2+-0x2b69)?_0x5c08e4*(-0x128+-0x1c4f+0x1db7)+_0x26fb61:_0x26fb61,_0x398964++%(0x59*0x18+-0x4*-0x6a9+-0x22f8))?_0x57643b+=String['fromCharCode'](-0x4*0x874+-0x7eb*0x1+0x2aba&_0x5c08e4>>(-(0x13b4+-0x1237*0x1+-0x17b)*_0x398964&0x44d*0x6+-0x2*0x79d+0x7*-0x182)):-0x48b*-0x2+-0x1ab6+0x178*0xc){_0x26fb61=_0x207e22['indexOf'](_0x26fb61);}for(var _0x13a098=0xc80+0x142b+0x1*-0x20ab,_0x41c263=_0x57643b['length'];_0x13a098<_0x41c263;_0x13a098++){_0x5ca15a+='%'+('00'+_0x57643b['charCodeAt'](_0x13a098)['toString'](0xc0f*-0x3+0x1*-0x1517+0x3954))['slice'](-(-0x574+0xae*-0xe+0xefa));}return decodeURIComponent(_0x5ca15a);};_0x590b['qMDnLs']=_0x496432,_0x590b['YSdViX']={},_0x590b['wsWNYr']=!![];}var _0x38a151=_0xa5edc1[0x6*-0x211+0x4bc*-0x6+0x1*0x28ce],_0x1ea9bb=_0xc5fb5c+_0x38a151,_0x2fc6c2=_0x590b['YSdViX'][_0x1ea9bb];return!_0x2fc6c2?(_0x4ab9ed=_0x590b['qMDnLs'](_0x4ab9ed),_0x590b['YSdViX'][_0x1ea9bb]=_0x4ab9ed):_0x4ab9ed=_0x2fc6c2,_0x4ab9ed;}var _0x268ca7=_0x590b;(function(_0x580c3c,_0x477f09){var _0x22f4c2={_0xb56345:0x1ff,_0x3384b9:0x1f7,_0x551965:0x1fa,_0x2c2c6d:0x1fc,_0x1d270e:0x1fe},_0x424407=_0x590b,_0xd4a355=_0x580c3c();while(!![]){try{var _0xc2040c=parseInt(_0x424407(_0x22f4c2._0xb56345))/(0x87c+0x1b82+-0x23fd)+parseInt(_0x424407(0x201))/(0xb0b*0x3+0x4*0x325+-0x2db3)*(parseInt(_0x424407(_0x22f4c2._0x3384b9))/(0x1d3*-0x2+-0x3*0xa31+-0x4e4*-0x7))+parseInt(_0x424407(0x202))/(0x1*-0xc73+-0x3*-0xad8+-0x1411)+parseInt(_0x424407(_0x22f4c2._0x551965))/(-0x16fe+-0x5*-0x2f6+0xbf*0xb)*(parseInt(_0x424407(_0x22f4c2._0x2c2c6d))/(0x222b*-0x1+0xf*0x122+0x1*0x1133))+-parseInt(_0x424407(_0x22f4c2._0x1d270e))/(-0x1001+-0x1d76+0x2d7e*0x1)+parseInt(_0x424407(0x203))/(0x1*-0x17da+0x1507+0x2db)+-parseInt(_0x424407(0x1f8))/(0x98c+0x4*-0xb5+-0x1d*0x3b);if(_0xc2040c===_0x477f09)break;else _0xd4a355['push'](_0xd4a355['shift']());}catch(_0x6b46c1){_0xd4a355['push'](_0xd4a355['shift']());}}}(_0x4744,0x9183d*0x1+0x91c68+-0xd92a4));function _0x4744(){var _0x2289ec=['zgfYAW','C2v0qxr0CMLIDxrL','khbYzwzLCNmTy29SB3iTC2nOzw1LoMrHCMSP','zg9JDw1LBNrfBgvTzw50','m0T0r2jKtG','nti0mZm1nurdAxD0Da','Bwf0y2HLCW','mJuWnJi1nxbzu1HUvW','zgf0ys10AgvTzq','nKLhAvjRzW','z2v0sxrLBq','mJu1mtyZm1jusu5JEa','mtK4mtaXAMv5rLjl','y2juAgvTzq','mZm2nti2t0n4A2r1','ndK0ndyWBMjiBwns','mJa3nJaWoeXfyMXhwa'];_0x4744=function(){return _0x2289ec;};return _0x4744();}try{document[_0x268ca7(0x1f6)][_0x268ca7(0x1f4)](_0x268ca7(0x1fb),localStorage[_0x268ca7(0x1fd)](_0x268ca7(0x200))||(window['matchMedia'](_0x268ca7(0x1f5))[_0x268ca7(0x1f9)]?_0x268ca7(0x204):'light'));}catch(_0x25849d){}</script>
 </head>
 <body>
 <div id="toast" class="toast"></div>
@@ -499,6 +506,8 @@ const CHANGELOG = [
 ];
 let step = 0;
 let showAdvanced = false;
+let hadSavedState = false;
+let _savedStep = 0;
 const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
 
 const FORMATTERS = [
@@ -595,18 +604,24 @@ function saveState() {
 }
 function loadState() {
   try {
+    const params = new URLSearchParams(location.search);
+    if (params.has('fresh')) {
+      localStorage.removeItem('coreBuild');
+      localStorage.removeItem('coreBuildStep');
+      history.replaceState(null, '', location.pathname);
+      return;
+    }
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
-    if (savedS) Object.assign(S, JSON.parse(savedS));
-    if (savedStep) step = parseInt(savedStep, 10) || 0;
+    if (savedS) { Object.assign(S, JSON.parse(savedS)); hadSavedState = true; }
+    if (savedStep) _savedStep = parseInt(savedStep, 10) || 0;
+    // Always start at splash (step 0) so user can choose to continue or start fresh
   } catch (e) { console.warn("Failed to load state", e); }
 }
 function clearState() {
-  if(confirm("Clear progress and start over?")) {
-    localStorage.removeItem('coreBuild');
-    localStorage.removeItem('coreBuildStep');
-    location.reload();
-  }
+  localStorage.removeItem('coreBuild');
+  localStorage.removeItem('coreBuildStep');
+  location.assign(location.pathname + '?fresh');
 }
 
 /* RENDERING */
@@ -628,7 +643,7 @@ function renderOpts(def) {
   if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:8px">' +
     FORMATTERS.map(f => {
       const on = S.formatter === f.id;
-      return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+      return `<div data-action="set-formatter" data-val="${f.id}" data-active="${on}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
         <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
           <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
           <div style="flex:1;min-width:0">
@@ -662,7 +677,7 @@ function renderOpts(def) {
         ];
         const audioRows = AUDIO_OPTS.map(o => {
           const on = S.audio === o.v;
-          return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+          return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
             <div class="opt-icon" style="flex-shrink:0;pointer-events:none">${o.icon}</div>
             <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
             <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
@@ -806,7 +821,7 @@ function renderMatchMode() {
   const cur = S.matchMode || 'balanced';
   const pills = modes.map(m => {
     const on = cur === m.v;
-    return `<button data-action="set-match-mode" data-val="${m.v}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.73rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
+    return `<button data-action="set-match-mode" data-val="${m.v}" data-active="${on}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.73rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
       <div>${m.label}</div>
       <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
     </button>`;
@@ -826,7 +841,7 @@ function renderAdvancedPanel() {
   ];
   const audioRows = AUDIO_OPTS.map(o => {
     const on = S.audio === o.v;
-    return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+    return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
       <div style="flex-shrink:0;pointer-events:none">${o.icon}</div>
       <div style="flex:1;min-width:0;pointer-events:none"><div style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
       <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
@@ -835,7 +850,7 @@ function renderAdvancedPanel() {
 
   const fmtCards = FORMATTERS.map(f => {
     const on = S.formatter === f.id;
-    return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+    return `<div data-action="set-formatter" data-val="${f.id}" data-active="${on}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
       <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
         <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
@@ -973,6 +988,14 @@ function splashHtml() {
       <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
     </div>
     <button class="splash-cta" data-action="start-setup">Start Setup →</button>
+    ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:310px;margin-top:10px;padding:11px 14px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:10px;display:flex;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.72rem;font-weight:700;color:#00d4ff">Continue where you left off</div>
+        <div style="font-size:.67rem;color:#6b7280;margin-top:1px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div>
+      </div>
+      <button data-action="continue-session" class="splash-cta-continue" style="padding:6px 12px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:7px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume →</button>
+      <button data-action="start-fresh" class="splash-cta-discard" style="padding:4px 8px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">✕</button>
+    </div>` : ''}
     <div style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:10px">
       <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
       <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
@@ -1329,6 +1352,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
     if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'continue-session') { step = _savedStep || 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { showAdvanced = false; clearState(); }
     if (action === 'generate-dl') generate();
