@@ -1278,21 +1278,34 @@ function render() {
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
-        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Language Preferences</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;margin-bottom:12px">
-          ${LANG_OPTS.map(l => `
-          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 9px;border-radius:8px;border:1px solid ${S.langs.includes(l.v)?'rgba(0,212,255,.4)':'rgba(255,255,255,.06)'};background:${S.langs.includes(l.v)?'rgba(0,212,255,.07)':'transparent'};transition:all .15s">
-            <input type="checkbox" value="${l.v}" ${S.langs.includes(l.v)?'checked':''} data-action="toggle-lang" style="accent-color:#00d4ff;flex-shrink:0">
-            <span style="font-size:.77rem;color:${S.langs.includes(l.v)?'#e6edf3':'#8b949e'};font-weight:${S.langs.includes(l.v)?'600':'400'}">${l.v}</span>
-          </label>`).join('')}
-        </div>
-        <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:10px 12px;border-radius:9px;border:1px solid ${S.langExclusive?'rgba(0,212,255,.35)':'rgba(255,255,255,.06)'};background:${S.langExclusive?'rgba(0,212,255,.06)':'transparent'};margin-bottom:18px;transition:all .15s">
-          <input type="checkbox" ${S.langExclusive?'checked':''} data-action="toggle-lang-exclusive" style="accent-color:#00d4ff;flex-shrink:0">
-          <div>
-            <div style="font-size:.8rem;font-weight:700;color:${S.langExclusive?'#e6edf3':'#8b949e'}">Exclusive mode</div>
-            <div style="font-size:.68rem;color:#4b5563;margin-top:1px">Only include streams in selected languages — Multi, Dubbed &amp; Original always pass</div>
+        <details id="langDetails" style="margin-bottom:16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
+          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.03);user-select:none" onclick="this.parentElement.querySelector('.lang-chevron').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:.74rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Language Preferences</span>
+              <span style="font-size:.7rem;color:#00d4ff;font-weight:600">${(S.langs||['English']).join(' · ')}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              ${S.langExclusive ? `<span style="font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(0,212,255,.12);color:#00d4ff;border:1px solid rgba(0,212,255,.25)">EXCLUSIVE</span>` : ''}
+              <span class="lang-chevron" style="font-size:.7rem;color:#374151;transition:transform .2s;transform:rotate(0deg)">›</span>
+            </div>
+          </summary>
+          <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.05)">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px 6px;margin-bottom:12px">
+              ${LANG_OPTS.map(l => `
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 9px;border-radius:8px;border:1px solid ${S.langs.includes(l.v)?'rgba(0,212,255,.4)':'rgba(255,255,255,.06)'};background:${S.langs.includes(l.v)?'rgba(0,212,255,.07)':'transparent'};transition:all .15s">
+                <input type="checkbox" value="${l.v}" ${S.langs.includes(l.v)?'checked':''} data-action="toggle-lang" style="accent-color:#00d4ff;flex-shrink:0">
+                <span style="font-size:.75rem;color:${S.langs.includes(l.v)?'#e6edf3':'#8b949e'};font-weight:${S.langs.includes(l.v)?'600':'400'}">${l.v}</span>
+              </label>`).join('')}
+            </div>
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 11px;border-radius:8px;border:1px solid ${S.langExclusive?'rgba(0,212,255,.35)':'rgba(255,255,255,.06)'};background:${S.langExclusive?'rgba(0,212,255,.06)':'transparent'};transition:all .15s">
+              <input type="checkbox" ${S.langExclusive?'checked':''} data-action="toggle-lang-exclusive" style="accent-color:#00d4ff;flex-shrink:0">
+              <div>
+                <div style="font-size:.79rem;font-weight:700;color:${S.langExclusive?'#e6edf3':'#8b949e'}">Exclusive mode</div>
+                <div style="font-size:.67rem;color:#4b5563;margin-top:1px">Only include streams in selected languages — Multi, Dubbed &amp; Original always pass</div>
+              </div>
+            </label>
           </div>
-        </label>
+        </details>
         ${debridInputs.length ? `
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
         ${debridInputs.map(inp => `
@@ -1557,11 +1570,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const i = S.langs.indexOf(v);
       if (i >= 0) { if (S.langs.length > 1) S.langs.splice(i, 1); }
       else S.langs.push(v);
-      saveState(); render();
+      saveState();
+      const wasOpen = document.getElementById('langDetails')?.open;
+      render();
+      if (wasOpen) { const d = document.getElementById('langDetails'); if (d) d.open = true; }
     }
     if (e.target.dataset.action === 'toggle-lang-exclusive') {
       S.langExclusive = e.target.checked;
-      saveState(); render();
+      saveState();
+      const wasOpen = document.getElementById('langDetails')?.open;
+      render();
+      if (wasOpen) { const d = document.getElementById('langDetails'); if (d) d.open = true; }
     }
     if (e.target.dataset.action === 'update-host') {
       S.instanceHost = e.target.value;
