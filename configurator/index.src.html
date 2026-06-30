@@ -490,8 +490,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '1.6';
+const CONFIGURATOR_VERSION = '1.7';
 const CHANGELOG = [
+  { v:'1.7', date:'Jun 30 2026', items:[
+    'Multi-select services — pick multiple debrid services, each gets its own API key field',
+    'Other Services drawer — Debrid.io, P2P Free, HTTP Streams, NZBGeek in a collapsible menu',
+    'Stream Availability picker — Mixed / Cached Only / Uncached on Content step',
+    'Language Preferences — 16-language dropdown with Exclusive mode (ISE + PSE)',
+    'Nuvio install tab — opens nuvio.tv/account?tab=addons and copies manifest URL',
+    '"What to do next" guide on Review step — Download → Import → Install walkthrough',
+    'Raw Torrents toggle renamed from "P2P Streams" — now off by default for debrid users',
+    'Responsive UX — mobile grid breakpoints (≤480px) and touch tap-target sizing',
+    'Fresh start button — instant session wipe without confirmation dialog',
+  ]},
   { v:'1.6', date:'Jun 27 2026', items:[
     'Light / dark mode toggle — top-right button, persists across sessions',
     'TorBox Pro collapses to same size as other options; expands only when selected',
