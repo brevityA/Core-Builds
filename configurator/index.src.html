@@ -1394,7 +1394,7 @@ function render() {
           </div>
         </div>
         ${renderOpts(def)}
-        ${def.id === 'content' ? renderCacheMode() + renderP2pToggle() + renderMatchMode() : ''}
+        ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
         ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Advanced Options</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
