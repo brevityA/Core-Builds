@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.0.5 (2026-06-30)
+
+### Added
+- **Debrid.io service option** (`configurator`) — "Other Services" collapsible dropdown added below the main service list on step 1. Contains Debrid.io as a selectable service; generates a native `debridio` scraper preset with an optional API key baked in. The dropdown highlights in cyan and shows "Debrid.io ✓" when selected.
+- **EasyNews in multi-debrid** (`configurator`) — EasyNews can now be combined with other debrid services in Multi mode. Username and password collected alongside other credentials; EasyNews++ and EasyNews Search presets injected separately (not wrapped in a `stremthruStore` slot). Multi name abbreviation: `EN` (e.g. `Core Builds Multi (RD+EN)`).
+- **NZBGeek API key field** (`configurator`) — always-visible optional field in the APIs step. When filled, generates a `newznab` preset pointing at `api.nzbgeek.info`. Pairs with Meteor's `customSearchEngines: true` for full Usenet indexer coverage.
+- **Fresh start UX** (`configurator`) — `?fresh` URL param clears localStorage and resets to a clean session. The splash screen always shows first (saved step no longer auto-restored). A "Continue where you left off" banner appears on the splash when a prior session exists, showing the saved step number and service name with Resume and Discard buttons.
+- **Offcloud and P2P Free as standalone services** (`configurator`) — Offcloud (cloud debrid) and P2P Free (no subscription) added as first-class service options.
+
+### Changed
+- **Mode toggle moved to left side** (`configurator`) — the light/dark theme button is now fixed top-left, no longer overlapping the Reset button.
+- **Light mode active button highlights** (`configurator`) — selected match mode, audio, and formatter options now render GitHub-blue (`rgba(9,105,218,…)`) background and border in light mode. Previously invisible against the light background. Implemented via `data-active` HTML attributes.
+- **Reset clears without confirmation dialog** (`configurator`) — `clearState()` now navigates to `?fresh` instead of showing a `confirm()` dialog followed by `location.reload()`.
+
+---
+
 ## 3.0.4 (2026-06-26)
 
 ### Changed
