@@ -430,6 +430,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] [data-action="set-audio"][data-active="true"] .opt-name,[data-theme="light"] [data-action="set-audio"][data-active="true"] .fmt-lbl{color:#0969da!important}
 [data-theme="light"] [data-action="set-match-mode"]{background:#f6f8fa!important;border-color:#d0d7de!important;color:#57606a!important}
 [data-theme="light"] [data-action="set-match-mode"][data-active="true"]{background:rgba(9,105,218,.1)!important;border-color:rgba(9,105,218,.45)!important;color:#0969da!important}
+[data-theme="light"] [data-action="set-cache-mode"]{background:#f6f8fa!important;border-color:#d0d7de!important;color:#57606a!important}
+[data-theme="light"] [data-action="set-cache-mode"][data-active="true"]{background:rgba(9,105,218,.1)!important;border-color:rgba(9,105,218,.45)!important;color:#0969da!important}
 [data-theme="light"] .continue-banner{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.22)!important}
 [data-theme="light"] .splash-cta-continue{background:rgba(9,105,218,.12)!important;border-color:rgba(9,105,218,.4)!important;color:#0969da!important}
 [data-theme="light"] .splash-cta-discard{border-color:#d0d7de!important;color:#8c959f!important}
@@ -510,7 +512,7 @@ let step = 0;
 let showAdvanced = false;
 let hadSavedState = false;
 let _savedStep = 0;
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false, langs: ['English'], langExclusive: false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed' };
 
 const FORMATTERS = [
   {
@@ -861,6 +863,26 @@ function renderMatchMode() {
   }).join('');
   return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
     <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase">Match Aggressiveness</div>
+    <div style="display:flex;gap:6px">${pills}</div>
+  </div>`;
+}
+
+function renderCacheMode() {
+  const modes = [
+    { v:'mixed',   label:'Mixed',       desc:'Cached + uncached, cached first' },
+    { v:'cached',  label:'Cached Only', desc:'Instant play — cached debrid only' },
+    { v:'uncached',label:'Uncached',    desc:'Show uncached downloads only' },
+  ];
+  const cur = S.cacheMode || 'mixed';
+  const pills = modes.map(m => {
+    const on = cur === m.v;
+    return `<button data-action="set-cache-mode" data-val="${m.v}" data-active="${on}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.73rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
+      <div>${m.label}</div>
+      <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
+    </button>`;
+  }).join('');
+  return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
+    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase">Stream Availability</div>
     <div style="display:flex;gap:6px">${pills}</div>
   </div>`;
 }
@@ -1328,7 +1350,7 @@ function render() {
           </div>
         </div>
         ${renderOpts(def)}
-        ${def.id === 'content' ? renderP2pToggle() + renderMatchMode() : ''}
+        ${def.id === 'content' ? renderCacheMode() + renderP2pToggle() + renderMatchMode() : ''}
         ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Advanced Options</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
@@ -1446,6 +1468,17 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-size-limit"]').forEach(b => {
         b.classList.toggle('size-btn-active', b.dataset.val === S.sizeLimit);
+      });
+    }
+    if (action === 'set-cache-mode') {
+      S.cacheMode = (e.target.closest('[data-action="set-cache-mode"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-cache-mode"]').forEach(btn => {
+        const on = btn.dataset.val === S.cacheMode;
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.07)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
+        btn.style.fontWeight  = on ? '700' : '500';
       });
     }
     if (action === 'set-match-mode') {
@@ -1777,7 +1810,8 @@ function eses() {
   out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
   if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
-  out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" }, { enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
+  if (S.cacheMode !== 'uncached') out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" });
+  if (S.cacheMode !== 'cached') out.push({ enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
   if (!S.p2pEnabled) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
   if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
   if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
@@ -1820,7 +1854,7 @@ function build() {
       excludedLanguages: [], includedLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
       excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes, excludedAudioTags: ac.excludedAudioTags, preferredAudioTags: ac.preferredAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
       enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
-      excludeCached: false, excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [], excludeUncached: false, excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
+      excludeCached: S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [], excludeUncached: S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
       checkOwned: false, externalDownloads: false, autoRemoveDownloads: false, excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
       syncedExcludedRegexUrls: ['https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json'], syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'], rankedRegexPatterns: [], preferredRegexPatterns: [], excludedRegexPatterns: [],
       addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'}, mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
