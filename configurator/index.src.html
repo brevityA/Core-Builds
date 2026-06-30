@@ -194,6 +194,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .opts.list .opt-icon svg{width:34px;height:34px}
   .opts.list .opt label{padding:16px 18px}
 }
+/* Small screens */
+@media(max-width:480px){
+  .card{padding:18px 16px}
+  .opts.c4d{grid-template-columns:1fr 1fr}
+  .opts.c3{grid-template-columns:1fr 1fr}
+  .opts.c3d{grid-template-columns:1fr 1fr}
+  .hdr-banner{padding:14px 16px;gap:12px}
+  .hdr-title{font-size:1.3rem}
+  .hdr-underline{width:90px}
+  .hdr-icon{width:44px;height:44px}
+  .hdr-divider{height:44px}
+  .srh-title{font-size:1rem}
+  .summary{grid-template-columns:1fr 1fr}
+  .receipt-hdr-name{font-size:.95rem}
+  .fmt-tab{font-size:.68rem;padding:7px 8px}
+  .modal-box{padding:22px 18px}
+}
+/* Touch devices — larger tap targets */
+@media(pointer:coarse){
+  .toggle-sw{width:50px;height:28px}
+  .toggle-track::before{height:22px;width:22px}
+  .toggle-sw input:checked~.toggle-track::before{transform:translateX(22px)}
+  .pref-card{padding:14px 16px;min-height:56px}
+  .fmt-tab{padding:10px 8px}
+  [data-action="set-match-mode"],[data-action="set-cache-mode"]{padding:11px 4px}
+  .name-input{padding:14px 16px;font-size:1rem}
+  .btn-dl{padding:18px}
+  .btn-aio{padding:16px}
+  .svc-list-row label{padding:14px 16px!important;min-height:52px}
+  .copy-btn{padding:10px 14px;min-height:44px}
+}
 /* Toggle switch */
 .toggle-sw{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
 .toggle-sw input{opacity:0;width:0;height:0;position:absolute}
