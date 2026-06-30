@@ -510,7 +510,7 @@ let step = 0;
 let showAdvanced = false;
 let hadSavedState = false;
 let _savedStep = 0;
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false, langs: ['English'], langExclusive: false };
 
 const FORMATTERS = [
   {
@@ -548,6 +548,13 @@ const FORMATTERS = [
     name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🔴 4K')::replace('1440p','🟣 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::replace('Unknown','📺 HD')}  "||"📺 HD  "]{service.cached::istrue["⚡ "||"⏳ "]}{service.shortName::exists["{service.shortName::upper}  "||"P2P  "]}{stream.library::istrue["📚  "||""]} {stream.title::exists["{stream.title::upper}"||""]} {stream.formattedSeasons::exists["{stream.formattedSeasons::upper}"||""]} {stream.formattedEpisodes::exists["{stream.formattedEpisodes::upper}"||""]}`,
     d: ` {service.cached::istrue["🚀 INSTANT  "||"⚠️ UNCACHED  "]}{stream.nSeScore::>=75["💎 ELITE  "||""]} {stream.seadexBest::istrue["⭐ BEST  "||""]} {stream.seadex::istrue["✅ SEADEX  "||""]} {stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]} {stream.filename::~(?i)IMAX["🎞️ IMAX  "||""]} \n 🎬 {stream.quality::exists["{stream.quality::upper}  "||""]} {stream.encode::exists["{stream.encode::upper}  "||""]} {stream.visualTags::exists["{stream.visualTags::join(' ')::upper}  "||"SDR  "]} {stream.bitrate::exists["{stream.bitrate::sbitrate::upper}  "||""]} {stream.size::exists["{stream.size::sbytes}"||""]} \n 🔊 {stream.audioTags::exists["{stream.audioTags::join(' ')::upper}  "||"AUDIO  "]}{stream.audioChannels::first::=2.0["🔈 "||""]} {stream.audioChannels::first::=5.1["🔉 "||""]} {stream.audioChannels::first::=7.1["🔊 "||""]} {stream.audioChannels::exists["{stream.audioChannels::first}  "||""]} 🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]} {stream.dubbed::istrue["  🎙️ DUB"||""]} {stream.subbed::istrue["  📝 SUB"||""]}\n 🔌 {stream.type::exists["{stream.type::upper}  "||""]} {stream.seeders::exists["🌱 {stream.seeders}  "||""]} {stream.repack::istrue["🛠️ REPACK  "||""]} {stream.age::exists["📅 {stream.age::upper}  "||""]} {stream.indexer::exists["🔍 {stream.indexer::truncate(15)::upper}"||""]}`
   }
+];
+
+const LANG_OPTS = [
+  {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
+  {v:'Portuguese'},{v:'Japanese'},{v:'Korean'},{v:'Chinese (Simplified)'},
+  {v:'Chinese (Traditional)'},{v:'Arabic'},{v:'Hindi'},{v:'Russian'},
+  {v:'Dutch'},{v:'Polish'},{v:'Turkish'}
 ];
 
 const DEFS = [
@@ -1249,6 +1256,21 @@ function render() {
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
+        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Language Preferences</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;margin-bottom:12px">
+          ${LANG_OPTS.map(l => `
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 9px;border-radius:8px;border:1px solid ${S.langs.includes(l.v)?'rgba(0,212,255,.4)':'rgba(255,255,255,.06)'};background:${S.langs.includes(l.v)?'rgba(0,212,255,.07)':'transparent'};transition:all .15s">
+            <input type="checkbox" value="${l.v}" ${S.langs.includes(l.v)?'checked':''} data-action="toggle-lang" style="accent-color:#00d4ff;flex-shrink:0">
+            <span style="font-size:.77rem;color:${S.langs.includes(l.v)?'#e6edf3':'#8b949e'};font-weight:${S.langs.includes(l.v)?'600':'400'}">${l.v}</span>
+          </label>`).join('')}
+        </div>
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:10px 12px;border-radius:9px;border:1px solid ${S.langExclusive?'rgba(0,212,255,.35)':'rgba(255,255,255,.06)'};background:${S.langExclusive?'rgba(0,212,255,.06)':'transparent'};margin-bottom:18px;transition:all .15s">
+          <input type="checkbox" ${S.langExclusive?'checked':''} data-action="toggle-lang-exclusive" style="accent-color:#00d4ff;flex-shrink:0">
+          <div>
+            <div style="font-size:.8rem;font-weight:700;color:${S.langExclusive?'#e6edf3':'#8b949e'}">Exclusive mode</div>
+            <div style="font-size:.68rem;color:#4b5563;margin-top:1px">Only include streams in selected languages — Multi, Dubbed &amp; Original always pass</div>
+          </div>
+        </label>
         ${debridInputs.length ? `
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
         ${debridInputs.map(inp => `
@@ -1496,6 +1518,17 @@ document.addEventListener('DOMContentLoaded', () => {
       S.service = deriveService();
       saveState();
       syncNext();
+    }
+    if (e.target.dataset.action === 'toggle-lang') {
+      const v = e.target.value;
+      const i = S.langs.indexOf(v);
+      if (i >= 0) { if (S.langs.length > 1) S.langs.splice(i, 1); }
+      else S.langs.push(v);
+      saveState(); render();
+    }
+    if (e.target.dataset.action === 'toggle-lang-exclusive') {
+      S.langExclusive = e.target.checked;
+      saveState(); render();
     }
     if (e.target.dataset.action === 'update-host') {
       S.instanceHost = e.target.value;
@@ -1760,6 +1793,10 @@ function pses() {
   const audPinnArr = (S.audio === 'limited' || ['samsung','firestick-hd','firestick-4kmax'].includes(dev)) ? [] : S.audio === 'dolby' ? [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos')" }] : [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" }];
   const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" }, pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" }, seasonPSE = { enabled:true, expression:"/* ongoingSeasonPack */ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired < -1 or daysUntilNextEpisode >= 0)) ? seasonPack(streams,'onlySeasons') : []" };
 
+  if (S.langs && S.langs.length) {
+    out.push({ enabled:true, expression:`/* Language Preference — ${(S.langs||['English']).join('/')} */ language(streams,${(S.langs||['English']).map(l=>`'${l}'`).join(',')})` });
+  }
+
   if (res === '4k') {
     out.push({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" }, pin1080Elite, pinLQ, seasonPSE);
     if (dv) out.push({ enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" });
@@ -1780,7 +1817,7 @@ function build() {
       trusted: false, showChanges: true, addonName: name, addonLogo: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg', addonDescription: name, presets: presets(), services: services(),
       excludedResolutions: rc.excludedResolutions, includedResolutions: rc.includedResolutions, requiredResolutions: rc.requiredResolutions, preferredResolutions: rc.preferredResolutions,
       excludedQualities: [], includedQualities: [], requiredQualities: [], preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','SCR','TC','TS','CAM','Unknown'],
-      excludedLanguages: [], includedLanguages: ['English','Original','Dual Audio','Multi','Dubbed','Unknown'],
+      excludedLanguages: [], includedLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
       excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes, excludedAudioTags: ac.excludedAudioTags, preferredAudioTags: ac.preferredAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
       enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
       excludeCached: false, excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [], excludeUncached: false, excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
@@ -1791,7 +1828,13 @@ function build() {
       ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
       usePosterRedirectApi: true, usePosterServiceForMeta: true,
       maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
-      excludedStreamExpressions: eses(), includedStreamExpressions: [{ enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" }], preferredStreamExpressions: pses(),
+      excludedStreamExpressions: eses(), includedStreamExpressions: [
+        { enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" },
+        ...(S.langExclusive && S.langs && S.langs.length ? [{
+          enabled: true,
+          expression: `/* Language Exclusive — only ${(S.langs||['English']).join('/')} */ language(streams,${[...new Set([...(S.langs||['English']),'Original','Multi','Dual Audio','Dubbed','Unknown'])].map(l=>`'${l}'`).join(',')})`
+        }] : [])
+      ], preferredStreamExpressions: pses(),
       sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
       deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
       dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
