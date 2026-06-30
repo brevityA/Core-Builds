@@ -508,7 +508,7 @@ let step = 0;
 let showAdvanced = false;
 let hadSavedState = false;
 let _savedStep = 0;
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
 
 const FORMATTERS = [
   {
@@ -563,6 +563,7 @@ const DEFS = [
       { v:'http',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#f472b6" stroke-width="2" fill="#1f0a14"/><rect x="12" y="17" width="20" height="12" rx="2" fill="none" stroke="#f472b6" stroke-width="1.5"/><path d="M16 21 L20 24 L16 27" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="27" x2="27" y2="27" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'HTTP Streams', desc:'Streaming sites — no debrid, no torrents<br><span style="color:#f472b6;font-size:.8em">WebStreamr · Nuvio · Flix-Streams</span>' },
       { v:'hybrid',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><clipPath id="hybL"><rect x="0" y="0" width="22" height="44"/></clipPath><clipPath id="hybR"><rect x="22" y="0" width="22" height="44"/></clipPath></defs><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#051408" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="none" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#1a0000" clip-path="url(#hybR)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="none" clip-path="url(#hybR)"/><line x1="22" y1="4" x2="22" y2="40" stroke="#333" stroke-width="0.5"/><polygon points="13,16 19,19 13,22 7,19" fill="#1a5c2a"/><polygon points="7,19 7,26 13,29 13,22" fill="#166534"/><polygon points="13,22 19,19 19,26 13,29" fill="#15803d"/><path d="M31 15 L25 24 L28 24 L26 30 L33 21 L30 21 Z" fill="#dc2626"/></svg>', name:'Hybrid', desc:'TorBox Pro + Real-Debrid fallback<br><span style="color:#8b949e;font-size:.8em">e.g. 4K Hybrid · Core Nexus Hybrid</span>' },
       { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
+      { v:'debridio',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#14b8a6" stroke-width="2" fill="#001a17"/><circle cx="22" cy="15" r="3.5" fill="none" stroke="#14b8a6" stroke-width="1.5"/><line x1="22" y1="18.5" x2="22" y2="22" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round"/><path d="M15 27 Q15 23 22 22 Q29 23 29 27" fill="none" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round"/><text x="22" y="36" text-anchor="middle" fill="#14b8a6" font-size="6.5" font-weight="800" font-family="system-ui,sans-serif">DEBRID.IO</text></svg>', name:'Debrid.io', desc:'Debrid.io scraper · API key required<br><span style="color:#14b8a6;font-size:.8em">search + caching via Debrid.io</span>' },
     ]
   },
   { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'svc-list', noHero:true,
@@ -719,6 +720,7 @@ function renderOpts(def) {
       'http':       'Streaming sites · no debrid · no torrents',
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
       'multi':      'Mix two or more services',
+      'debridio':   'Debrid.io scraper · API key required',
     };
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
@@ -730,12 +732,18 @@ function renderOpts(def) {
         ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
       </div>
     </label></div>`;
-    const rowsHtml = def.opts.slice(1).map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+    const OTHER_SVC_IDS = ['debridio'];
+    const mainOpts = def.opts.slice(1).filter(o => !OTHER_SVC_IDS.includes(o.v));
+    const otherOpts = def.opts.filter(o => OTHER_SVC_IDS.includes(o.v));
+    const rowsHtml = mainOpts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
       <div class="opt-icon">${o.icon}</div>
       <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
       <span class="svc-list-arr">›</span>
     </label></div>`).join('');
-    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>`;
+    const isOtherSelected = otherOpts.some(o => S.service === o.v);
+    const selectedOtherName = isOtherSelected ? (otherOpts.find(o => S.service === o.v)?.name || '') : '';
+    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(255,255,255,.07)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#4b5563'};letter-spacing:.04em;text-transform:uppercase">Other Services</span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#374151'};font-weight:600">${selectedOtherName ? selectedOtherName + ' ✓' : 'Show more ›'}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
+    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>${otherHtml}`;
   }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
@@ -1546,6 +1554,7 @@ function getDebridInputs() {
     easynews:     { label:'EasyNews Username',     placeholder:'your-username',                        url:'https://www.easynews.com/account' },
     easynewsPass: { label:'EasyNews Password',     placeholder:'your-password',                        url:'https://www.easynews.com/account' },
     nzbgeek:      { label:'NZBGeek API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbgeek.info/dashboard.php?call=profile' },
+    debridio:     { label:'Debrid.io API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debrid.io/' },
   };
   const ids = [];
   if (svc==='torbox-pro'||svc==='torbox-ess'||svc==='hybrid') ids.push('torbox');
@@ -1555,6 +1564,7 @@ function getDebridInputs() {
   if (svc==='debridlink') ids.push('debridlink');
   if (svc==='offcloud')   ids.push('offcloud');
   if (svc==='easynews')   ids.push('easynews', 'easynewsPass');
+  if (svc==='debridio')   ids.push('debridio');
   if (svc==='multi') S.multiServices.forEach(s => { if (s==='easynews') { ids.push('easynews','easynewsPass'); } else { ids.push(s); } });
   ids.push('nzbgeek');
   return ids.map(id => ({id, ...defs[id]})).filter(d => d.label);
@@ -1567,7 +1577,7 @@ function defaultName() {
   const res = S.resolution, svc = S.service;
   const is4k = res === '4k', isUW = res === 'ultrawide';
   const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
-  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid' }[svc] || '';
+  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid', 'debridio':'Debrid.io' }[svc] || '';
   if (svc === 'multi') {
     const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN'};
     return `Core Builds${suffix} Multi (${S.multiServices.map(s => abbr[s] || s).join('+')})`.trim();
@@ -1577,7 +1587,7 @@ function defaultName() {
 
 function presets() {
   const svc = S.service;
-  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http';
+  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio';
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(s)));
   if (isHttp) return [
@@ -1593,7 +1603,7 @@ function presets() {
     ? S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews ? []
+    : isP2P || isEasynews || isDebridio ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
@@ -1608,17 +1618,20 @@ function presets() {
     ...(S.creds.nzbgeek ? [
       { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', timeout:6000, url:'https://api.nzbgeek.info', apiKey:S.creds.nzbgeek } },
     ] : []),
+    ...(isDebridio ? [
+      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debrid.io', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
+    ] : []),
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] }, resources:['stream'] },
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true }, resources:['stream'] },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] }, resources:['stream'] },
-    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews && !multiHasEasynews, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
+    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:true, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
   ];
-  if (!useStore && !isP2P && !isEasynews && !multiHasEasynews) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
   return list;
 }
 
