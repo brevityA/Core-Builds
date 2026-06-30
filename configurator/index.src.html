@@ -324,7 +324,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
 .splash-paste:hover{color:#6b7280}
 /* ── Theme toggle ─────────────────────────────────────── */
-#themeToggle{position:fixed;top:14px;right:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
+#themeToggle{position:fixed;top:14px;left:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
 #themeToggle:hover{background:rgba(255,255,255,.12);color:#e6edf3;border-color:rgba(255,255,255,.2)}
 #themeToggle::before{content:'☀';margin-right:4px}
 [data-theme="light"] #themeToggle::before{content:'🌙'}
@@ -422,8 +422,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] #themeToggle{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#57606a}
 [data-theme="light"] #themeToggle:hover{background:rgba(0,0,0,.09);color:#1c2128;border-color:rgba(0,0,0,.2)}
 [data-theme="light"] [data-action="set-formatter"]{background:#f6f8fa!important;border-color:#d0d7de!important}
+[data-theme="light"] [data-action="set-formatter"][data-active="true"]{background:rgba(9,105,218,.07)!important;border-color:rgba(9,105,218,.45)!important}
 [data-theme="light"] [data-action="set-audio"]{background:#f6f8fa!important;border-color:#d0d7de!important}
+[data-theme="light"] [data-action="set-audio"][data-active="true"]{background:rgba(9,105,218,.07)!important;border-color:rgba(9,105,218,.45)!important}
+[data-theme="light"] [data-action="set-audio"][data-active="true"] .opt-name,[data-theme="light"] [data-action="set-audio"][data-active="true"] .fmt-lbl{color:#0969da!important}
 [data-theme="light"] [data-action="set-match-mode"]{background:#f6f8fa!important;border-color:#d0d7de!important;color:#57606a!important}
+[data-theme="light"] [data-action="set-match-mode"][data-active="true"]{background:rgba(9,105,218,.1)!important;border-color:rgba(9,105,218,.45)!important;color:#0969da!important}
+[data-theme="light"] .continue-banner{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.22)!important}
+[data-theme="light"] .splash-cta-continue{background:rgba(9,105,218,.12)!important;border-color:rgba(9,105,218,.4)!important;color:#0969da!important}
+[data-theme="light"] .splash-cta-discard{border-color:#d0d7de!important;color:#8c959f!important}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -499,7 +506,9 @@ const CHANGELOG = [
 ];
 let step = 0;
 let showAdvanced = false;
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
+let hadSavedState = false;
+let _savedStep = 0;
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:true, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false };
 
 const FORMATTERS = [
   {
@@ -554,6 +563,7 @@ const DEFS = [
       { v:'http',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#f472b6" stroke-width="2" fill="#1f0a14"/><rect x="12" y="17" width="20" height="12" rx="2" fill="none" stroke="#f472b6" stroke-width="1.5"/><path d="M16 21 L20 24 L16 27" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="27" x2="27" y2="27" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'HTTP Streams', desc:'Streaming sites — no debrid, no torrents<br><span style="color:#f472b6;font-size:.8em">WebStreamr · Nuvio · Flix-Streams</span>' },
       { v:'hybrid',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><clipPath id="hybL"><rect x="0" y="0" width="22" height="44"/></clipPath><clipPath id="hybR"><rect x="22" y="0" width="22" height="44"/></clipPath></defs><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#051408" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="none" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#1a0000" clip-path="url(#hybR)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="none" clip-path="url(#hybR)"/><line x1="22" y1="4" x2="22" y2="40" stroke="#333" stroke-width="0.5"/><polygon points="13,16 19,19 13,22 7,19" fill="#1a5c2a"/><polygon points="7,19 7,26 13,29 13,22" fill="#166534"/><polygon points="13,22 19,19 19,26 13,29" fill="#15803d"/><path d="M31 15 L25 24 L28 24 L26 30 L33 21 L30 21 Z" fill="#dc2626"/></svg>', name:'Hybrid', desc:'TorBox Pro + Real-Debrid fallback<br><span style="color:#8b949e;font-size:.8em">e.g. 4K Hybrid · Core Nexus Hybrid</span>' },
       { v:'multi',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#9333ea" stroke-width="2" fill="#0f0a1f"/><circle cx="15" cy="18" r="5" fill="#ea580c" opacity="0.9"/><circle cx="29" cy="18" r="5" fill="#dc2626" opacity="0.9"/><circle cx="15" cy="29" r="5" fill="#d97706" opacity="0.9"/><circle cx="29" cy="29" r="5" fill="#0284c7" opacity="0.9"/></svg>', name:'Multi-Debrid', desc:'Mix two or more services<br><span style="color:#9333ea;font-size:.8em">e.g. AD + RD · RD + PM</span>' },
+      { v:'debridio',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#14b8a6" stroke-width="2" fill="#001a17"/><circle cx="22" cy="15" r="3.5" fill="none" stroke="#14b8a6" stroke-width="1.5"/><line x1="22" y1="18.5" x2="22" y2="22" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round"/><path d="M15 27 Q15 23 22 22 Q29 23 29 27" fill="none" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round"/><text x="22" y="36" text-anchor="middle" fill="#14b8a6" font-size="6.5" font-weight="800" font-family="system-ui,sans-serif">DEBRID.IO</text></svg>', name:'Debrid.io', desc:'Debrid.io scraper · API key required<br><span style="color:#14b8a6;font-size:.8em">search + caching via Debrid.io</span>' },
     ]
   },
   { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'svc-list', noHero:true,
@@ -595,18 +605,24 @@ function saveState() {
 }
 function loadState() {
   try {
+    const params = new URLSearchParams(location.search);
+    if (params.has('fresh')) {
+      localStorage.removeItem('coreBuild');
+      localStorage.removeItem('coreBuildStep');
+      history.replaceState(null, '', location.pathname);
+      return;
+    }
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
-    if (savedS) Object.assign(S, JSON.parse(savedS));
-    if (savedStep) step = parseInt(savedStep, 10) || 0;
+    if (savedS) { Object.assign(S, JSON.parse(savedS)); hadSavedState = true; }
+    if (savedStep) _savedStep = parseInt(savedStep, 10) || 0;
+    // Always start at splash (step 0) so user can choose to continue or start fresh
   } catch (e) { console.warn("Failed to load state", e); }
 }
 function clearState() {
-  if(confirm("Clear progress and start over?")) {
-    localStorage.removeItem('coreBuild');
-    localStorage.removeItem('coreBuildStep');
-    location.reload();
-  }
+  localStorage.removeItem('coreBuild');
+  localStorage.removeItem('coreBuildStep');
+  location.assign(location.pathname + '?fresh');
 }
 
 /* RENDERING */
@@ -628,7 +644,7 @@ function renderOpts(def) {
   if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:8px">' +
     FORMATTERS.map(f => {
       const on = S.formatter === f.id;
-      return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+      return `<div data-action="set-formatter" data-val="${f.id}" data-active="${on}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
         <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
           <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
           <div style="flex:1;min-width:0">
@@ -662,7 +678,7 @@ function renderOpts(def) {
         ];
         const audioRows = AUDIO_OPTS.map(o => {
           const on = S.audio === o.v;
-          return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+          return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
             <div class="opt-icon" style="flex-shrink:0;pointer-events:none">${o.icon}</div>
             <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
             <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
@@ -704,6 +720,7 @@ function renderOpts(def) {
       'http':       'Streaming sites · no debrid · no torrents',
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
       'multi':      'Mix two or more services',
+      'debridio':   'Debrid.io scraper · API key required',
     };
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
@@ -715,12 +732,18 @@ function renderOpts(def) {
         ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
       </div>
     </label></div>`;
-    const rowsHtml = def.opts.slice(1).map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+    const OTHER_SVC_IDS = ['debridio'];
+    const mainOpts = def.opts.slice(1).filter(o => !OTHER_SVC_IDS.includes(o.v));
+    const otherOpts = def.opts.filter(o => OTHER_SVC_IDS.includes(o.v));
+    const rowsHtml = mainOpts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
       <div class="opt-icon">${o.icon}</div>
       <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
       <span class="svc-list-arr">›</span>
     </label></div>`).join('');
-    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>`;
+    const isOtherSelected = otherOpts.some(o => S.service === o.v);
+    const selectedOtherName = isOtherSelected ? (otherOpts.find(o => S.service === o.v)?.name || '') : '';
+    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(255,255,255,.07)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#4b5563'};letter-spacing:.04em;text-transform:uppercase">Other Services</span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#374151'};font-weight:600">${selectedOtherName ? selectedOtherName + ' ✓' : 'Show more ›'}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
+    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>${otherHtml}`;
   }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
@@ -806,7 +829,7 @@ function renderMatchMode() {
   const cur = S.matchMode || 'balanced';
   const pills = modes.map(m => {
     const on = cur === m.v;
-    return `<button data-action="set-match-mode" data-val="${m.v}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.73rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
+    return `<button data-action="set-match-mode" data-val="${m.v}" data-active="${on}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.73rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
       <div>${m.label}</div>
       <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
     </button>`;
@@ -826,7 +849,7 @@ function renderAdvancedPanel() {
   ];
   const audioRows = AUDIO_OPTS.map(o => {
     const on = S.audio === o.v;
-    return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+    return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
       <div style="flex-shrink:0;pointer-events:none">${o.icon}</div>
       <div style="flex:1;min-width:0;pointer-events:none"><div style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
       <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
@@ -835,7 +858,7 @@ function renderAdvancedPanel() {
 
   const fmtCards = FORMATTERS.map(f => {
     const on = S.formatter === f.id;
-    return `<div data-action="set-formatter" data-val="${f.id}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
+    return `<div data-action="set-formatter" data-val="${f.id}" data-active="${on}" style="border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.1)'};border-radius:12px;background:${on?'rgba(0,212,255,.07)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden">
       <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
         <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
@@ -973,6 +996,14 @@ function splashHtml() {
       <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
     </div>
     <button class="splash-cta" data-action="start-setup">Start Setup →</button>
+    ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:310px;margin-top:10px;padding:11px 14px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:10px;display:flex;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.72rem;font-weight:700;color:#00d4ff">Continue where you left off</div>
+        <div style="font-size:.67rem;color:#6b7280;margin-top:1px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div>
+      </div>
+      <button data-action="continue-session" class="splash-cta-continue" style="padding:6px 12px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:7px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume →</button>
+      <button data-action="start-fresh" class="splash-cta-discard" style="padding:4px 8px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">✕</button>
+    </div>` : ''}
     <div style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:10px">
       <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
       <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
@@ -1277,6 +1308,7 @@ function updateMultiPanel() {
     { v:'premiumize', label:'Premiumize',  color:'#d97706' },
     { v:'debridlink', label:'Debrid-Link', color:'#0284c7' },
     { v:'offcloud',   label:'Offcloud',    color:'#06b6d4' },
+    { v:'easynews',   label:'EasyNews',    color:'#0ea5e9' },
   ];
   panel.innerHTML = `
     <div style="border-top:1px solid #30363d;padding-top:14px;margin-top:4px">
@@ -1328,6 +1360,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
     if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'continue-session') { step = _savedStep || 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { showAdvanced = false; clearState(); }
     if (action === 'generate-dl') generate();
@@ -1519,6 +1553,8 @@ function getDebridInputs() {
     offcloud:     { label:'Offcloud API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://offcloud.com/#/account/api' },
     easynews:     { label:'EasyNews Username',     placeholder:'your-username',                        url:'https://www.easynews.com/account' },
     easynewsPass: { label:'EasyNews Password',     placeholder:'your-password',                        url:'https://www.easynews.com/account' },
+    nzbgeek:      { label:'NZBGeek API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbgeek.info/dashboard.php?call=profile' },
+    debridio:     { label:'Debrid.io API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debrid.io/' },
   };
   const ids = [];
   if (svc==='torbox-pro'||svc==='torbox-ess'||svc==='hybrid') ids.push('torbox');
@@ -1528,8 +1564,10 @@ function getDebridInputs() {
   if (svc==='debridlink') ids.push('debridlink');
   if (svc==='offcloud')   ids.push('offcloud');
   if (svc==='easynews')   ids.push('easynews', 'easynewsPass');
-  if (svc==='multi') S.multiServices.forEach(s => ids.push(s));
-  return ids.map(id => ({id, ...defs[id]}));
+  if (svc==='debridio')   ids.push('debridio');
+  if (svc==='multi') S.multiServices.forEach(s => { if (s==='easynews') { ids.push('easynews','easynewsPass'); } else { ids.push(s); } });
+  ids.push('nzbgeek');
+  return ids.map(id => ({id, ...defs[id]})).filter(d => d.label);
 }
 
 function ruid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); }); }
@@ -1539,9 +1577,9 @@ function defaultName() {
   const res = S.resolution, svc = S.service;
   const is4k = res === '4k', isUW = res === 'ultrawide';
   const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
-  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid' }[svc] || '';
+  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid', 'debridio':'Debrid.io' }[svc] || '';
   if (svc === 'multi') {
-    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC'};
+    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN'};
     return `Core Builds${suffix} Multi (${S.multiServices.map(s => abbr[s] || s).join('+')})`.trim();
   }
   return `Core Builds${suffix}${svcLabel ? ' · ' + svcLabel : ''}`.trim();
@@ -1549,8 +1587,9 @@ function defaultName() {
 
 function presets() {
   const svc = S.service;
-  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http';
-  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(svc) || isMulti;
+  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio';
+  const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
+  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(s)));
   if (isHttp) return [
     { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
     { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
@@ -1559,10 +1598,12 @@ function presets() {
     { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
   ];
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','hybrid':'StremThru RD'};
-  const storeSlot = isMulti ? S.multiServices.map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))
+  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'];
+  const storeSlot = isMulti
+    ? S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews ? []
+    : isP2P || isEasynews || isDebridio ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
@@ -1570,21 +1611,27 @@ function presets() {
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] }, resources:['stream'] },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
     ...storeSlot,
-    ...(isEasynews ? [
+    ...(isEasynews || multiHasEasynews ? [
       { type:'easynews-plus-plus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000 }, resources:['stream'] },
+    ] : []),
+    ...(S.creds.nzbgeek ? [
+      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', timeout:6000, url:'https://api.nzbgeek.info', apiKey:S.creds.nzbgeek } },
+    ] : []),
+    ...(isDebridio ? [
+      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debrid.io', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] }, resources:['stream'] },
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true }, resources:['stream'] },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] }, resources:['stream'] },
-    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
+    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:true, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
   ];
-  if (!useStore && !isP2P && !isEasynews) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
   return list;
 }
 
@@ -1598,7 +1645,7 @@ function services() {
     {id:'debridlink', enabled: svc==='debridlink' || (isMulti && m.includes('debridlink')), credentials:cred('debridlink')},
     {id:'torbox', enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid', credentials:cred('torbox')},
     {id:'offcloud', enabled: svc==='offcloud' || (isMulti && m.includes('offcloud')), credentials:cred('offcloud')},
-    {id:'easynews', enabled: svc==='easynews', credentials: svc==='easynews' && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
+    {id:'easynews', enabled: svc==='easynews' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || (isMulti && m.includes('easynews'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
     {id:'putio', enabled: false, credentials:{}},
     {id:'easydebrid', enabled: false, credentials:{}}, {id:'pikpak', enabled: false, credentials:{}}, {id:'seedr', enabled: false, credentials:{}}, {id:'debrider', enabled: false, credentials:{}}
   ];
