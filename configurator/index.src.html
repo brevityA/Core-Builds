@@ -616,7 +616,7 @@ function loadState() {
     }
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
-    if (savedS) { Object.assign(S, JSON.parse(savedS)); hadSavedState = true; }
+    if (savedS) { Object.assign(S, JSON.parse(savedS)); hadSavedState = true; S.service = deriveService(); }
     if (savedStep) _savedStep = parseInt(savedStep, 10) || 0;
     // Always start at splash (step 0) so user can choose to continue or start fresh
   } catch (e) { console.warn("Failed to load state", e); }
@@ -1581,7 +1581,7 @@ function formatterPickerHtml() {
 }
 
 function getDebridInputs() {
-  const svc = S.service;
+  const m = S.multiServices;
   const defs = {
     torbox:       { label:'TorBox API Key',       placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', url:'https://torbox.app/settings' },
     realdebrid:   { label:'Real-Debrid API Key',  placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',      url:'https://real-debrid.com/apitoken' },
@@ -1595,17 +1595,15 @@ function getDebridInputs() {
     debridio:     { label:'Debrid.io API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debrid.io/' },
   };
   const ids = [];
-  if (svc==='torbox-pro'||svc==='torbox-ess'||svc==='hybrid') ids.push('torbox');
-  if (svc==='realdebrid'||svc==='hybrid') ids.push('realdebrid');
-  if (svc==='alldebrid')  ids.push('alldebrid');
-  if (svc==='premiumize') ids.push('premiumize');
-  if (svc==='debridlink') ids.push('debridlink');
-  if (svc==='offcloud')   ids.push('offcloud');
-  if (svc==='easynews')   ids.push('easynews', 'easynewsPass');
-  if (svc==='debridio')   ids.push('debridio');
-  const NO_CRED = ['p2p','http','nzbgeek'];
-  if (svc==='multi') S.multiServices.forEach(s => { if (NO_CRED.includes(s)) return; if (s==='easynews') { ids.push('easynews','easynewsPass'); } else { ids.push(s); } });
-  if (S.multiServices.includes('nzbgeek')) ids.push('nzbgeek');
+  if (m.includes('torbox-pro')||m.includes('torbox-ess')||m.includes('hybrid')) ids.push('torbox');
+  if (m.includes('realdebrid')||m.includes('hybrid')) ids.push('realdebrid');
+  if (m.includes('alldebrid'))  ids.push('alldebrid');
+  if (m.includes('premiumize')) ids.push('premiumize');
+  if (m.includes('debridlink')) ids.push('debridlink');
+  if (m.includes('offcloud'))   ids.push('offcloud');
+  if (m.includes('easynews'))   { ids.push('easynews'); ids.push('easynewsPass'); }
+  if (m.includes('debridio'))   ids.push('debridio');
+  if (m.includes('nzbgeek'))    ids.push('nzbgeek');
   return ids.map(id => ({id, ...defs[id]})).filter(d => d.label);
 }
 
