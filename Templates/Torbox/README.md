@@ -126,6 +126,18 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 
 ## 📋 All Templates
 
+### 🧩 Base Template
+
+| Template | Version | Import URL |
+|---|---|---|
+| **Core Builds Base — TorBox** | v1.0.0 | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Base/core-nexus-base-torbox.json` |
+
+> **What is the Base Template?** A shared parent config holding all 84 common fields (13 presets, formatter, sort criteria, deduplicator, proxy, regex URLs). Import it once, then enter its UUID in the [Configurator](https://brevitya.github.io/Core-Builds/) to generate lightweight child templates (~44 KB vs ~65 KB standalone) that inherit updates automatically. See [Base Config guide](#-base-config-parentconfig) below.
+
+---
+
+### 📋 All Active Templates
+
 | Template | Plan | Res | Import URL |
 |---|---|---|---|
 | **Core Nexus 4K Apex** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
@@ -169,6 +181,21 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 3. Enter your **TorBox API key** in Services
 4. Enter your **TMDB Access Token** (recommended — improves title matching)
 5. Save → copy manifest URL → install in Stremio or WuPlay
+
+---
+
+## 🧩 Base Config (parentConfig)
+
+> **Optional — for Configurator users who want automatic updates and smaller template files.**
+
+Import `Core Builds Base — TorBox` once. It holds all 84 shared fields — 13 presets, formatter, sort criteria, deduplicator, proxy, regex URLs, and category colours. Then open the [Configurator](https://brevitya.github.io/Core-Builds/), enter your base UUID in the **Base Config** panel on the Review step, and generate a child template.
+
+**What changes:**
+- Child template: ~44 KB instead of ~65 KB; 24 config keys instead of 111
+- When the base is updated, all child templates inherit the change automatically — no re-import needed
+- Leaving the UUID blank generates a fully standalone template as before
+
+**Full setup guide:** [Guides/README.md — Section 2b](../Guides/README.md#2b--base-config-parentconfig)
 
 ---
 

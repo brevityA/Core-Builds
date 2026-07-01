@@ -90,6 +90,7 @@ That's it. You're watching in under 5 minutes.
 
 1. [Which Template Should I Use?](#1--which-template-should-i-use)
 2. [Importing a Template](#2--importing-a-template)
+2b. [Base Config (parentConfig)](#2b--base-config-parentconfig)
 3. [Using a Different Debrid Service](#3--using-a-different-debrid-service)
 4. [Formatters](#4--formatters)
 5. [Device Profiles](#5--device-profiles)
@@ -393,6 +394,83 @@ Both accounts use the same debrid credentials. Addons sync per-account.
 See [DEVICE_PROFILES.md](DEVICE_PROFILES.md) for full setup.
 
 ---
+
+## 2b — Base Config (parentConfig)
+
+> **Optional — for users who want automatic updates and smaller template files.**
+
+AIOStreams v2.28+ supports a parent/child config system. A "parent" config lives in your instance and holds all the shared settings. Every child template you generate inherits from it automatically — when the parent is updated (new preset defaults, formatter changes, sort tweaks), your instance picks it up without you re-importing anything.
+
+### What the Base Config holds
+
+`Core Builds Base — TorBox` contains all 84 fields that are identical across every TorBox template:
+
+| Category | Contents |
+|---|---|
+| **Presets** | Library, Zilean, SeaDex, StremThru Torz, Meteor, Comet, MediaFusion, HdHub, EZTV, Torrent Galaxy, Knaben, AIOSubtitle, TorBox Search — all 13, pre-tuned |
+| **Formatter** | Full tamtaro Core Syntax formatter with all definitions |
+| **Sort criteria** | 12-key sort order (cached → expression score → seeders → bitrate → …) |
+| **Deduplicator** | Smart dedup with seeder/age tiebreakers |
+| **Proxy** | MediaFlow proxy config |
+| **Regex URLs** | Vidhin05 + Tamtaro synced regex files |
+| **Category colours** | Addon category colour map (Mix/Debrid/Usenet/HTTP/P2P/Subs) |
+| **Misc** | RPDB poster service, TMDB integration defaults, autoPlay, enhanceResults |
+
+Your generated child template keeps only what's unique to it: resolution settings, stream expressions (ESEs/ISEs/PSEs), encode preferences, visual tags, and branding.
+
+**Result:** child templates are ~44 KB instead of ~65 KB, with 24 config keys instead of 111.
+
+---
+
+### How to set it up
+
+**Step 1 — Import the Base Template**
+
+In AIOStreams → Import Config, paste this URL:
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Base/core-nexus-base-torbox.json
+```
+
+Save it. AIOStreams will assign it a UUID — find it in Settings → your config URL or the AIOStreams configure page.
+
+**Step 2 — Copy your Base UUID**
+
+Your UUID looks like `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Copy it from the AIOStreams URL or settings page.
+
+**Step 3 — Generate your child template**
+
+Open the [Core Builds Configurator](https://brevitya.github.io/Core-Builds/) and run through the wizard as normal. On the **Review** step, expand the **Base Config** panel (purple section) and paste your UUID. Enter your base password if you set one.
+
+Click **Generate Manifest** — the downloaded JSON will contain a `parentConfig` block pointing at your base instead of duplicating all the shared fields.
+
+**Step 4 — Import the child template**
+
+Import the generated child JSON into AIOStreams as you normally would. AIOStreams merges parent + child on every load — your presets, formatter, and sort order come from the parent; your filters and expressions come from the child.
+
+---
+
+### Merge behaviour
+
+| Section | Strategy | What it means |
+|---|---|---|
+| Presets | `extend` | Child presets are added on top of parent's 13 |
+| Services | `inherit` | Parent service config used; enter credentials after import as usual |
+| Filters (ESEs/ISEs/PSEs) | `override` | Child expressions take full effect |
+| Sorting | `inherit` | Parent sort criteria used |
+| Formatter | `inherit` | Parent tamtaro formatter used |
+| Branding | `override` | Child name/logo/description used |
+| Proxy | `inherit` | Parent MediaFlow proxy config used |
+
+---
+
+### Do I need to use the Base Config?
+
+No. Leaving the UUID blank in the configurator generates a fully standalone template — same output as always. The Base Config is optional and designed for users who want:
+
+- Automatic propagation of preset / formatter updates without re-importing their custom template
+- Smaller template files
+- A single place to manage shared config across multiple custom builds
 
 ---
 
