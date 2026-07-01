@@ -17,11 +17,40 @@ mode: "wide"
 
 <div style={{ maxWidth: '680px', margin: '0 auto', padding: '16px 24px 0', textAlign: 'center' }}>
 
-  <img
-    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/docs/logo/banner_square_transparent.svg"
-    alt="Core Builds"
-    style={{ width: '320px', height: '320px', display: 'block', margin: '0 auto 24px' }}
-  />
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="220" height="220" style={{ display:'block', margin:'0 auto 24px', overflow:'visible' }} aria-label="Core Builds logo">
+    <defs>
+      <linearGradient id="dsg1" x1="50%" y1="0%" x2="50%" y2="100%">
+        <stop offset="0%" stopColor="#00e5ff"/>
+        <stop offset="100%" stopColor="#4facfe"/>
+      </linearGradient>
+      <linearGradient id="dsg2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#4facfe"/>
+        <stop offset="50%" stopColor="#c060c0"/>
+        <stop offset="100%" stopColor="#ff4b2b"/>
+      </linearGradient>
+      <radialGradient id="dsrmask" cx="50%" cy="50%" r="50%">
+        <stop offset="20%" stopColor="white" stopOpacity="1"/>
+        <stop offset="70%" stopColor="white" stopOpacity="0.6"/>
+        <stop offset="100%" stopColor="white" stopOpacity="0"/>
+      </radialGradient>
+      <mask id="dsm"><rect width="512" height="512" fill="url(#dsrmask)"/></mask>
+      <filter id="dsf1"><feGaussianBlur stdDeviation="32"/></filter>
+      <filter id="dsf2"><feGaussianBlur stdDeviation="16" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+      <filter id="dsf3"><feGaussianBlur stdDeviation="60"/></filter>
+      <filter id="dsf4"><feGaussianBlur stdDeviation="6" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+    </defs>
+    <g mask="url(#dsm)">
+      <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.14" filter="url(#dsf3)"/>
+      <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.22" filter="url(#dsf3)"/>
+      <polygon className="cb-hex-breath" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" strokeWidth="52" strokeLinejoin="round" opacity="0.18" filter="url(#dsf1)"/>
+      <polygon className="cb-hex-breath" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" strokeWidth="18" strokeLinejoin="round" opacity="0.28" filter="url(#dsf4)"/>
+      <polygon className="cb-hex-breath" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#dsg1)" strokeWidth="14" strokeLinejoin="round" opacity="0.82"/>
+      <polygon className="cb-diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#dsg2)" opacity="0.3" filter="url(#dsf2)"/>
+      <polygon className="cb-diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#dsg2)" opacity="0.85"/>
+      <circle className="cb-core-ring"   cx="256" cy="256" r="90" stroke="url(#dsg2)"/>
+      <circle className="cb-core-ring cb-core-ring-2" cx="256" cy="256" r="90" stroke="url(#dsg2)"/>
+    </g>
+  </svg>
 
   <div style={{ display: 'inline-block', background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.35)', color: '#00d4ff', padding: '4px 14px', borderRadius: '999px', fontSize: '13px', fontWeight: '500', marginBottom: '20px', letterSpacing: '0.01em' }}>
     AIOStreams Templates
