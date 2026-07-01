@@ -41,6 +41,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes bubPulse{0%,100%{box-shadow:0 0 10px rgba(0,212,255,.7)}50%{box-shadow:0 0 20px rgba(0,212,255,1),0 0 36px rgba(0,212,255,.35)}}
 @keyframes manifestPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.28),inset 0 1px 0 rgba(255,255,255,.15)}50%{box-shadow:0 4px 36px rgba(0,212,255,.55),inset 0 1px 0 rgba(255,255,255,.2)}}
 @keyframes dlPulse{0%,100%{box-shadow:0 4px 18px rgba(16,185,129,.28)}50%{box-shadow:0 4px 30px rgba(16,185,129,.52)}}
+@keyframes btnFlash{0%{box-shadow:0 0 0 3px rgba(0,212,255,.75),0 0 32px rgba(0,212,255,.45),inset 0 1px 0 rgba(0,212,255,.3)}60%{box-shadow:0 0 0 2px rgba(0,212,255,.3),0 0 18px rgba(0,180,220,.18)}100%{box-shadow:0 4px 18px rgba(0,180,220,.18)}}
+@keyframes btnHoverPulse{0%,100%{box-shadow:0 4px 22px rgba(0,180,220,.22),inset 0 1px 0 rgba(255,255,255,.1)}50%{box-shadow:0 6px 36px rgba(0,212,255,.48),inset 0 1px 0 rgba(255,255,255,.18)}}
+.btn-flash{animation:btnFlash .42s cubic-bezier(.4,0,.2,1) both!important}
 .card h2{font-size:1.15rem;font-weight:800;margin-bottom:5px;color:#e6edf3;text-shadow:0 0 18px rgba(0,212,255,.12)}
 .card .desc{color:#8b949e;font-size:.88rem;margin-bottom:20px;line-height:1.5}
 .opts{display:grid;gap:10px}
@@ -76,9 +79,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn{border:none;cursor:pointer;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
 .btn-back{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)!important;color:#6b7280;font-size:.84rem;font-weight:700;padding:11px 18px;border-radius:11px;align-self:stretch;transition:all .15s;text-align:center;letter-spacing:.01em}
-.btn-back:hover{background:rgba(255,255,255,.08);color:#9ca3af;border-color:rgba(255,255,255,.18)!important}
+.btn-back:hover{background:rgba(255,255,255,.08);color:#9ca3af;border-color:rgba(255,255,255,.18)!important;animation:hoverPulse 1.6s ease-in-out infinite}
 .btn-next{width:100%;background:linear-gradient(135deg,#0077a0 0%,#004d72 100%);color:#fff;border-radius:13px;padding:14px 18px;font-size:.95rem;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 24px rgba(0,180,220,.28),inset 0 1px 0 rgba(255,255,255,.1);text-align:left;transition:box-shadow .2s,transform .15s}
-.btn-next:hover:not(:disabled){box-shadow:0 6px 32px rgba(0,200,240,.42),inset 0 1px 0 rgba(255,255,255,.14);transform:translateY(-1px)}
+.btn-next:hover:not(:disabled){transform:translateY(-1px);animation:btnHoverPulse 1.6s ease-in-out infinite}
 .btn-next:disabled{background:#111820;border:1px solid #1e2a35;color:#374151;box-shadow:none;cursor:not-allowed}
 .cta-step-lbl{font-size:.62rem;font-weight:600;opacity:.6;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
 .cta-step-val{font-size:.95rem;font-weight:800;line-height:1}
@@ -87,7 +90,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-dl:active{transform:scale(.98);animation:none}
 .btn-dl:hover{opacity:1;box-shadow:0 6px 30px rgba(16,185,129,.55);transform:translateY(-1px);animation:none}
 .btn-aio{width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;cursor:pointer;background:transparent;color:#00d4ff;margin-top:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-aio:hover{background:#00131c;border-color:#00d4ff}
+.btn-aio:hover{background:#00131c;border-color:#00d4ff;animation:hoverPulse 1.6s ease-in-out infinite}
 .btn-aio:active{transform:scale(.98)}
 .aio-section{margin-top:20px;border-top:1px solid #21262d;padding-top:18px}
 .aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
@@ -357,7 +360,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-chip-svc{border:1px solid rgba(0,212,255,.22);color:#67e8f9;background:rgba(0,212,255,.06)}
 .splash-chip-feat{border:1px solid #1e2a35;color:#4b5563;background:transparent}
 .splash-cta{margin-top:24px;width:100%;max-width:310px;padding:15px 24px;font-size:1rem;font-weight:800;border:none;border-radius:12px;background:linear-gradient(135deg,#0096b4 0%,#006a9a 100%);color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(0,150,180,.3);transition:all .2s;letter-spacing:.01em}
-.splash-cta:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(0,150,180,.45)}
+.splash-cta:hover{transform:translateY(-1px);animation:btnHoverPulse 1.6s ease-in-out infinite}
 .splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
 .splash-paste:hover{color:#6b7280}
 /* ── Theme toggle ─────────────────────────────────────── */
@@ -1728,6 +1731,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle all clicks
   document.addEventListener('click', (e) => {
+    const flashBtn = e.target.closest('button:not(:disabled):not(.btn-manifest):not(.btn-dl)');
+    if (flashBtn) {
+      flashBtn.classList.remove('btn-flash');
+      void flashBtn.offsetWidth;
+      flashBtn.classList.add('btn-flash');
+      flashBtn.addEventListener('animationend', () => flashBtn.classList.remove('btn-flash'), {once:true});
+    }
     const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
     if(!action) return;
 

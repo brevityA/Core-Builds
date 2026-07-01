@@ -41,6 +41,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes bubPulse{0%,100%{box-shadow:0 0 10px rgba(0,212,255,.7)}50%{box-shadow:0 0 20px rgba(0,212,255,1),0 0 36px rgba(0,212,255,.35)}}
 @keyframes manifestPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.28),inset 0 1px 0 rgba(255,255,255,.15)}50%{box-shadow:0 4px 36px rgba(0,212,255,.55),inset 0 1px 0 rgba(255,255,255,.2)}}
 @keyframes dlPulse{0%,100%{box-shadow:0 4px 18px rgba(16,185,129,.28)}50%{box-shadow:0 4px 30px rgba(16,185,129,.52)}}
+@keyframes btnFlash{0%{box-shadow:0 0 0 3px rgba(0,212,255,.75),0 0 32px rgba(0,212,255,.45),inset 0 1px 0 rgba(0,212,255,.3)}60%{box-shadow:0 0 0 2px rgba(0,212,255,.3),0 0 18px rgba(0,180,220,.18)}100%{box-shadow:0 4px 18px rgba(0,180,220,.18)}}
+@keyframes btnHoverPulse{0%,100%{box-shadow:0 4px 22px rgba(0,180,220,.22),inset 0 1px 0 rgba(255,255,255,.1)}50%{box-shadow:0 6px 36px rgba(0,212,255,.48),inset 0 1px 0 rgba(255,255,255,.18)}}
+.btn-flash{animation:btnFlash .42s cubic-bezier(.4,0,.2,1) both!important}
 .card h2{font-size:1.15rem;font-weight:800;margin-bottom:5px;color:#e6edf3;text-shadow:0 0 18px rgba(0,212,255,.12)}
 .card .desc{color:#8b949e;font-size:.88rem;margin-bottom:20px;line-height:1.5}
 .opts{display:grid;gap:10px}
@@ -76,9 +79,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn{border:none;cursor:pointer;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
 .btn-back{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)!important;color:#6b7280;font-size:.84rem;font-weight:700;padding:11px 18px;border-radius:11px;align-self:stretch;transition:all .15s;text-align:center;letter-spacing:.01em}
-.btn-back:hover{background:rgba(255,255,255,.08);color:#9ca3af;border-color:rgba(255,255,255,.18)!important}
+.btn-back:hover{background:rgba(255,255,255,.08);color:#9ca3af;border-color:rgba(255,255,255,.18)!important;animation:hoverPulse 1.6s ease-in-out infinite}
 .btn-next{width:100%;background:linear-gradient(135deg,#0077a0 0%,#004d72 100%);color:#fff;border-radius:13px;padding:14px 18px;font-size:.95rem;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 24px rgba(0,180,220,.28),inset 0 1px 0 rgba(255,255,255,.1);text-align:left;transition:box-shadow .2s,transform .15s}
-.btn-next:hover:not(:disabled){box-shadow:0 6px 32px rgba(0,200,240,.42),inset 0 1px 0 rgba(255,255,255,.14);transform:translateY(-1px)}
+.btn-next:hover:not(:disabled){transform:translateY(-1px);animation:btnHoverPulse 1.6s ease-in-out infinite}
 .btn-next:disabled{background:#111820;border:1px solid #1e2a35;color:#374151;box-shadow:none;cursor:not-allowed}
 .cta-step-lbl{font-size:.62rem;font-weight:600;opacity:.6;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
 .cta-step-val{font-size:.95rem;font-weight:800;line-height:1}
@@ -87,7 +90,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-dl:active{transform:scale(.98);animation:none}
 .btn-dl:hover{opacity:1;box-shadow:0 6px 30px rgba(16,185,129,.55);transform:translateY(-1px);animation:none}
 .btn-aio{width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;cursor:pointer;background:transparent;color:#00d4ff;margin-top:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-aio:hover{background:#00131c;border-color:#00d4ff}
+.btn-aio:hover{background:#00131c;border-color:#00d4ff;animation:hoverPulse 1.6s ease-in-out infinite}
 .btn-aio:active{transform:scale(.98)}
 .aio-section{margin-top:20px;border-top:1px solid #21262d;padding-top:18px}
 .aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
@@ -357,7 +360,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-chip-svc{border:1px solid rgba(0,212,255,.22);color:#67e8f9;background:rgba(0,212,255,.06)}
 .splash-chip-feat{border:1px solid #1e2a35;color:#4b5563;background:transparent}
 .splash-cta{margin-top:24px;width:100%;max-width:310px;padding:15px 24px;font-size:1rem;font-weight:800;border:none;border-radius:12px;background:linear-gradient(135deg,#0096b4 0%,#006a9a 100%);color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(0,150,180,.3);transition:all .2s;letter-spacing:.01em}
-.splash-cta:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(0,150,180,.45)}
+.splash-cta:hover{transform:translateY(-1px);animation:btnHoverPulse 1.6s ease-in-out infinite}
 .splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
 .splash-paste:hover{color:#6b7280}
 /* ── Theme toggle ─────────────────────────────────────── */
@@ -504,7 +507,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes cbLoad{0%{opacity:0}10%{opacity:1}75%{opacity:1}100%{opacity:0}}
 @keyframes cbIconPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 </style>
-<script>var _0x512333=_0x1c6b;function _0x1c6b(_0x2cca70,_0x483c54){_0x2cca70=_0x2cca70-(-0x1390+0x1d55+0x1*-0x889);var _0x411360=_0xa4f5();var _0x1e3cdb=_0x411360[_0x2cca70];if(_0x1c6b['dTQrIC']===undefined){var _0x51a826=function(_0x403c58){var _0x409e91='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0x282364='',_0x5a6872='';for(var _0x47b222=0x13f7*0x1+-0x157e+0x17*0x11,_0x1a2185,_0x3fac0f,_0x3be44a=-0x8b*0x13+0x5*0x60d+-0x1*0x13f0;_0x3fac0f=_0x403c58['charAt'](_0x3be44a++);~_0x3fac0f&&(_0x1a2185=_0x47b222%(-0x12a1+0xdd*-0x13+0x1*0x230c)?_0x1a2185*(0xf*0xc7+-0x9f6+-0x35*0x7)+_0x3fac0f:_0x3fac0f,_0x47b222++%(0x1b82+-0x383*0xb+-0xb23*-0x1))?_0x282364+=String['fromCharCode'](0x16f3+0xa7*-0x3a+0xfe2&_0x1a2185>>(-(0x7*0x4f+-0x956*0x1+-0x1*-0x72f)*_0x47b222&0x15*-0x174+0xbc2+-0x964*-0x2)):0xf91+-0xa61*-0x3+-0x2eb4){_0x3fac0f=_0x409e91['indexOf'](_0x3fac0f);}for(var _0x1552ec=0xb8b+0x1c4+-0xd4f,_0x4854cd=_0x282364['length'];_0x1552ec<_0x4854cd;_0x1552ec++){_0x5a6872+='%'+('00'+_0x282364['charCodeAt'](_0x1552ec)['toString'](0x79b+0x6*0x38a+-0x1cc7))['slice'](-(-0x1779+-0x1*-0xabd+0xcbe));}return decodeURIComponent(_0x5a6872);};_0x1c6b['cYnYiA']=_0x51a826,_0x1c6b['Vthmsa']={},_0x1c6b['dTQrIC']=!![];}var _0x4b91f2=_0x411360[-0x14*0x114+-0x18f8+0x2e88],_0x5075cf=_0x2cca70+_0x4b91f2,_0x4a7f4f=_0x1c6b['Vthmsa'][_0x5075cf];return!_0x4a7f4f?(_0x1e3cdb=_0x1c6b['cYnYiA'](_0x1e3cdb),_0x1c6b['Vthmsa'][_0x5075cf]=_0x1e3cdb):_0x1e3cdb=_0x4a7f4f,_0x1e3cdb;}(function(_0x1982f4,_0x5a47b1){var _0x3edd83={_0x21c43a:0x13e,_0x430919:0x146,_0x29a03c:0x147,_0x3815fb:0x148},_0x2c9f19=_0x1c6b,_0x5632db=_0x1982f4();while(!![]){try{var _0x383fa5=parseInt(_0x2c9f19(_0x3edd83._0x21c43a))/(0x26d4+-0xaf2+-0x1be1)*(parseInt(_0x2c9f19(0x141))/(0x141d+0x209*0x7+0x112d*-0x2))+-parseInt(_0x2c9f19(0x13c))/(0xd8f+0x43*0x35+-0x1b6b)+parseInt(_0x2c9f19(0x13d))/(0xd19+-0xa*-0x100+0x1715*-0x1)+parseInt(_0x2c9f19(_0x3edd83._0x430919))/(-0x857+-0x120*-0xd+-0x322*0x2)+-parseInt(_0x2c9f19(_0x3edd83._0x29a03c))/(0x89e+0x11+0x8a9*-0x1)+parseInt(_0x2c9f19(0x14a))/(0x1*-0x243+0x555+-0x30b)*(parseInt(_0x2c9f19(0x14d))/(-0x9*-0x178+0x683+-0x13b3))+parseInt(_0x2c9f19(_0x3edd83._0x3815fb))/(0x2*0x241+-0x7*-0x4eb+-0x2*0x1373)*(-parseInt(_0x2c9f19(0x13f))/(0x134c+0x1f01*-0x1+0x61*0x1f));if(_0x383fa5===_0x5a47b1)break;else _0x5632db['push'](_0x5632db['shift']());}catch(_0x24a669){_0x5632db['push'](_0x5632db['shift']());}}}(_0xa4f5,-0x3eb*0x551+-0x163b32+-0x10c1*-0x371));try{document[_0x512333(0x14b)][_0x512333(0x145)](_0x512333(0x144),localStorage['getItem'](_0x512333(0x142))||(window[_0x512333(0x14c)](_0x512333(0x143))[_0x512333(0x149)]?'dark':_0x512333(0x140)));}catch(_0x19a5e4){}function _0xa4f5(){var _0x4a6745=['owHqr2TRsa','Bwf0y2HLCW','mtaXodvvALnRB0G','zg9JDw1LBNrfBgvTzw50','Bwf0y2HnzwrPyq','mJK3nKjWEgTgtW','mtuXntu3nKTQugfYsq','ntKYnJq5mK9HqNrpsG','neH0rK11vq','nJG0odu0mgLhB21SAG','BgLNAhq','ndKYnJC2BvnHD0TL','y2juAgvTzq','khbYzwzLCNmTy29SB3iTC2nOzw1LoMrHCMSP','zgf0ys10AgvTzq','C2v0qxr0CMLIDxrL','nti1mte1rMjyDMzi','ntC5otC5mKviBuzNsW'];_0xa4f5=function(){return _0x4a6745;};return _0xa4f5();}</script>
+<script>var _0x47f04b=_0x3176;(function(_0x570b3b,_0x5a8ccf){var _0x42cd74={_0x4cdc62:0x12a,_0x1cdca3:0x12c,_0x3b5175:0x123,_0x3b309b:0x121},_0x160a12=_0x3176,_0x9386eb=_0x570b3b();while(!![]){try{var _0x474f24=parseInt(_0x160a12(0x11e))/(0x4d7+-0x591+0xbb)+parseInt(_0x160a12(0x126))/(-0x24af*-0x1+0x1*0xce5+-0xeb*0x36)*(-parseInt(_0x160a12(_0x42cd74._0x4cdc62))/(-0x3f*-0x37+0x156b*0x1+-0x22f1))+-parseInt(_0x160a12(0x12e))/(0x3b7+-0x11a*-0xe+0x1*-0x131f)+parseInt(_0x160a12(_0x42cd74._0x1cdca3))/(0x216*0x6+0x1*-0x24cb+0x184c*0x1)+parseInt(_0x160a12(_0x42cd74._0x3b5175))/(-0x246*0xe+0x1e93+0x147)+-parseInt(_0x160a12(0x129))/(0x2506+0x1d7b+-0x427a)*(parseInt(_0x160a12(_0x42cd74._0x3b309b))/(0x190f*-0x1+0x1ad0+0x1b9*-0x1))+parseInt(_0x160a12(0x122))/(0x8b4+-0x1*0xdab+0x500);if(_0x474f24===_0x5a8ccf)break;else _0x9386eb['push'](_0x9386eb['shift']());}catch(_0x2b3f43){_0x9386eb['push'](_0x9386eb['shift']());}}}(_0x5989,-0x351e1+0x4d12f+-0x17*-0x4198));function _0x3176(_0x49845b,_0x1483e0){_0x49845b=_0x49845b-(0x1*-0x135f+0x15e5+-0x168*0x1);var _0x4035a2=_0x5989();var _0x49d4a4=_0x4035a2[_0x49845b];if(_0x3176['SeSrdr']===undefined){var _0x422bd1=function(_0x4baeaf){var _0x3438a4='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0x428335='',_0x2d2f='';for(var _0x41444d=-0x1*-0x1ff7+0xa70+-0x87b*0x5,_0xf9e9cf,_0x455c9f,_0x332b37=-0x3a*0x90+0xbbb+0x6f7*0x3;_0x455c9f=_0x4baeaf['charAt'](_0x332b37++);~_0x455c9f&&(_0xf9e9cf=_0x41444d%(-0x1eed+-0x26d*0x3+0x2638)?_0xf9e9cf*(-0x1546+-0x365*-0x7+-0x23d)+_0x455c9f:_0x455c9f,_0x41444d++%(0x1c67*-0x1+0xa9*-0x22+-0x1*-0x32dd))?_0x428335+=String['fromCharCode'](-0x3b4+0x181d+-0x136a&_0xf9e9cf>>(-(0x2*0xfa3+-0x184d*-0x1+-0x3791)*_0x41444d&0x1349+-0xf20+0x423*-0x1)):-0x9*0x2c7+-0x1da5*0x1+0x36a4){_0x455c9f=_0x3438a4['indexOf'](_0x455c9f);}for(var _0x3ef6b5=0x1679+-0x24da+-0x1*-0xe61,_0x2c81d2=_0x428335['length'];_0x3ef6b5<_0x2c81d2;_0x3ef6b5++){_0x2d2f+='%'+('00'+_0x428335['charCodeAt'](_0x3ef6b5)['toString'](-0x2143+-0x13d8+0x1*0x352b))['slice'](-(-0x42a+-0x2*-0x10f0+-0x1db4));}return decodeURIComponent(_0x2d2f);};_0x3176['oPZaju']=_0x422bd1,_0x3176['BZFHTJ']={},_0x3176['SeSrdr']=!![];}var _0x177ed1=_0x4035a2[0x15*-0x173+-0x3b*0x2b+0x4*0xa16],_0x3ff240=_0x49845b+_0x177ed1,_0x5ba7de=_0x3176['BZFHTJ'][_0x3ff240];return!_0x5ba7de?(_0x49d4a4=_0x3176['oPZaju'](_0x49d4a4),_0x3176['BZFHTJ'][_0x3ff240]=_0x49d4a4):_0x49d4a4=_0x5ba7de,_0x49d4a4;}try{document[_0x47f04b(0x12b)]['setAttribute'](_0x47f04b(0x128),localStorage[_0x47f04b(0x11f)]('cbTheme')||(window[_0x47f04b(0x124)](_0x47f04b(0x125))[_0x47f04b(0x12d)]?_0x47f04b(0x120):_0x47f04b(0x127)));}catch(_0x2d0652){}function _0x5989(){var _0x436a80=['ogXwD2rTBW','mti5mtiXnJvHrKr4v3O','mJm5nZi4ofnAAMDpDq','Bwf0y2HnzwrPyq','khbYzwzLCNmTy29SB3iTC2nOzw1LoMrHCMSP','mteXnJq2AgXAv0Xp','BgLNAhq','zgf0ys10AgvTzq','mJK1otu4nLDOCe9IBG','ndjnD3HrAhi','zg9JDw1LBNrfBgvTzw50','mtq1nde5mgTUtxb4AW','Bwf0y2HLCW','mZiZntKWmg9vuvniqW','mZCYnty2BfbMrwDL','z2v0sxrLBq','zgfYAW'];_0x5989=function(){return _0x436a80;};return _0x5989();}</script>
 </head>
 <body>
 <div id="cb-loader">
@@ -1728,6 +1731,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle all clicks
   document.addEventListener('click', (e) => {
+    const flashBtn = e.target.closest('button:not(:disabled):not(.btn-manifest):not(.btn-dl)');
+    if (flashBtn) {
+      flashBtn.classList.remove('btn-flash');
+      void flashBtn.offsetWidth;
+      flashBtn.classList.add('btn-flash');
+      flashBtn.addEventListener('animationend', () => flashBtn.classList.remove('btn-flash'), {once:true});
+    }
     const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
     if(!action) return;
 
