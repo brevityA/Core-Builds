@@ -1122,6 +1122,15 @@ function renderProgress() {
 }
 
 function splashHtml() {
+  const _lt = document.documentElement.getAttribute('data-theme') === 'light';
+  const _clrCurrent = _lt ? '#0369a1' : '#67e8f9';
+  const _clrOlder   = _lt ? '#57606a' : '#4b5563';
+  const _clrDate    = _lt ? '#444c56' : '#374151';
+  const _badgeColor = _lt ? '#0369a1' : '#00d4ff';
+  const _badgeBg    = _lt ? 'rgba(3,105,161,.08)' : 'rgba(0,212,255,.08)';
+  const _badgeBdr   = _lt ? 'rgba(3,105,161,.25)' : 'rgba(0,212,255,.18)';
+  const _oldBg      = _lt ? 'rgba(0,0,0,.04)' : 'rgba(255,255,255,.03)';
+  const _oldBdr     = _lt ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.06)';
   return `<div class="card splash">
     <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
       <defs>
@@ -1190,20 +1199,20 @@ function splashHtml() {
       </div>
     </div>
     <details style="width:100%;max-width:310px;margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
-      <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:#4b5563;letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
+      <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:${_clrOlder};letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
         What's new
-        <span style="color:#00d4ff;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
+        <span style="color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeBdr};border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
         <span style="margin-left:auto;font-size:.75rem;opacity:.4">▾</span>
       </summary>
       <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px">
         ${CHANGELOG.map((entry, i) => `
         <div>
           <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
-            <span style="font-size:.63rem;font-weight:800;color:${i===0?'#00d4ff':'#4b5563'};background:${i===0?'rgba(0,212,255,.08)':'rgba(255,255,255,.03)'};border:1px solid ${i===0?'rgba(0,212,255,.18)':'rgba(255,255,255,.06)'};border-radius:4px;padding:1px 6px">v${entry.v}</span>
-            <span style="font-size:.61rem;color:#374151">${entry.date}</span>
+            <span style="font-size:.63rem;font-weight:800;color:${i===0?_badgeColor:_clrOlder};background:${i===0?_badgeBg:_oldBg};border:1px solid ${i===0?_badgeBdr:_oldBdr};border-radius:4px;padding:1px 6px">v${entry.v}</span>
+            <span style="font-size:.61rem;color:${_clrDate}">${entry.date}</span>
           </div>
           <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px;text-align:left">
-            ${entry.items.map(it => `<li style="font-size:.7rem;color:${i===0?'#67e8f9':'#4b5563'};line-height:1.4">${it}</li>`).join('')}
+            ${entry.items.map(it => `<li style="font-size:.7rem;color:${i===0?_clrCurrent:_clrOlder};line-height:1.4">${it}</li>`).join('')}
           </ul>
         </div>`).join('')}
       </div>
