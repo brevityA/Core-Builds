@@ -280,6 +280,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-manifest:hover{opacity:1;box-shadow:0 6px 36px rgba(0,212,255,.6),inset 0 1px 0 rgba(255,255,255,.25);transform:translateY(-2px);animation:none}
 .btn-manifest:active{transform:scale(.98);animation:none}
 .btn-manifest:disabled{opacity:.38;cursor:not-allowed;animation:none}
+/* API Reminder modal */
+@keyframes reminderIn{0%{opacity:0;transform:translateY(32px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes overlayIn{0%{opacity:0}100%{opacity:1}}
+#apiReminder{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:overlayIn .22s ease both;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#apiReminder.hidden{display:none}
+#apiReminderCard{background:linear-gradient(160deg,#0a1520 0%,#060d14 100%);border:1px solid rgba(0,212,255,.35);border-radius:18px;width:100%;max-width:400px;padding:28px 24px 22px;box-shadow:0 0 0 1px rgba(0,212,255,.12),0 24px 80px rgba(0,0,0,.7),0 0 60px rgba(0,212,255,.06);animation:reminderIn .3s cubic-bezier(.34,1.12,.64,1) both}
+#apiReminderCard .rem-icon{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,158,11,.08));border:1.5px solid rgba(251,191,36,.35);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 24px rgba(251,191,36,.12)}
+#apiReminderCard .rem-title{font-size:1.12rem;font-weight:900;color:#e6edf3;text-align:center;margin-bottom:5px}
+#apiReminderCard .rem-sub{font-size:.82rem;color:#6b7280;text-align:center;margin-bottom:20px;line-height:1.5}
+#apiReminderCard .rem-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+#apiReminderCard .rem-field-lbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+#apiReminderCard .rem-field-name{font-size:.75rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+#apiReminderCard .rem-field-link{font-size:.73rem;color:#00d4ff;text-decoration:none;font-weight:700}
+#apiReminderCard .rem-input{width:100%;background:#0d1117;border:1.5px solid #30363d;border-radius:9px;color:#e6edf3;padding:11px 14px;font-size:.9rem;outline:none;transition:border-color .15s;font-family:monospace}
+#apiReminderCard .rem-input:focus{border-color:rgba(0,212,255,.55);box-shadow:0 0 0 3px rgba(0,212,255,.08)}
+#apiReminderCard .rem-actions{display:flex;flex-direction:column;gap:8px}
+#apiReminderCard .rem-save{width:100%;padding:13px;font-size:.95rem;font-weight:800;border:none;border-radius:11px;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#000;cursor:pointer;transition:all .15s}
+#apiReminderCard .rem-save:hover{box-shadow:0 4px 24px rgba(0,212,255,.4);transform:translateY(-1px)}
+#apiReminderCard .rem-skip{background:transparent;border:none;color:#4b5563;font-size:.8rem;cursor:pointer;padding:6px;text-align:center;width:100%;transition:color .15s}
+#apiReminderCard .rem-skip:hover{color:#9ca3af}
 /* Connecting dots animation */
 @keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 .dot-spin span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:currentColor;animation:dotPulse 1.2s ease-in-out infinite}
@@ -507,7 +527,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes cbLoad{0%{opacity:0}10%{opacity:1}75%{opacity:1}100%{opacity:0}}
 @keyframes cbIconPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 </style>
-<script>var _0x47f04b=_0x3176;(function(_0x570b3b,_0x5a8ccf){var _0x42cd74={_0x4cdc62:0x12a,_0x1cdca3:0x12c,_0x3b5175:0x123,_0x3b309b:0x121},_0x160a12=_0x3176,_0x9386eb=_0x570b3b();while(!![]){try{var _0x474f24=parseInt(_0x160a12(0x11e))/(0x4d7+-0x591+0xbb)+parseInt(_0x160a12(0x126))/(-0x24af*-0x1+0x1*0xce5+-0xeb*0x36)*(-parseInt(_0x160a12(_0x42cd74._0x4cdc62))/(-0x3f*-0x37+0x156b*0x1+-0x22f1))+-parseInt(_0x160a12(0x12e))/(0x3b7+-0x11a*-0xe+0x1*-0x131f)+parseInt(_0x160a12(_0x42cd74._0x1cdca3))/(0x216*0x6+0x1*-0x24cb+0x184c*0x1)+parseInt(_0x160a12(_0x42cd74._0x3b5175))/(-0x246*0xe+0x1e93+0x147)+-parseInt(_0x160a12(0x129))/(0x2506+0x1d7b+-0x427a)*(parseInt(_0x160a12(_0x42cd74._0x3b309b))/(0x190f*-0x1+0x1ad0+0x1b9*-0x1))+parseInt(_0x160a12(0x122))/(0x8b4+-0x1*0xdab+0x500);if(_0x474f24===_0x5a8ccf)break;else _0x9386eb['push'](_0x9386eb['shift']());}catch(_0x2b3f43){_0x9386eb['push'](_0x9386eb['shift']());}}}(_0x5989,-0x351e1+0x4d12f+-0x17*-0x4198));function _0x3176(_0x49845b,_0x1483e0){_0x49845b=_0x49845b-(0x1*-0x135f+0x15e5+-0x168*0x1);var _0x4035a2=_0x5989();var _0x49d4a4=_0x4035a2[_0x49845b];if(_0x3176['SeSrdr']===undefined){var _0x422bd1=function(_0x4baeaf){var _0x3438a4='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0x428335='',_0x2d2f='';for(var _0x41444d=-0x1*-0x1ff7+0xa70+-0x87b*0x5,_0xf9e9cf,_0x455c9f,_0x332b37=-0x3a*0x90+0xbbb+0x6f7*0x3;_0x455c9f=_0x4baeaf['charAt'](_0x332b37++);~_0x455c9f&&(_0xf9e9cf=_0x41444d%(-0x1eed+-0x26d*0x3+0x2638)?_0xf9e9cf*(-0x1546+-0x365*-0x7+-0x23d)+_0x455c9f:_0x455c9f,_0x41444d++%(0x1c67*-0x1+0xa9*-0x22+-0x1*-0x32dd))?_0x428335+=String['fromCharCode'](-0x3b4+0x181d+-0x136a&_0xf9e9cf>>(-(0x2*0xfa3+-0x184d*-0x1+-0x3791)*_0x41444d&0x1349+-0xf20+0x423*-0x1)):-0x9*0x2c7+-0x1da5*0x1+0x36a4){_0x455c9f=_0x3438a4['indexOf'](_0x455c9f);}for(var _0x3ef6b5=0x1679+-0x24da+-0x1*-0xe61,_0x2c81d2=_0x428335['length'];_0x3ef6b5<_0x2c81d2;_0x3ef6b5++){_0x2d2f+='%'+('00'+_0x428335['charCodeAt'](_0x3ef6b5)['toString'](-0x2143+-0x13d8+0x1*0x352b))['slice'](-(-0x42a+-0x2*-0x10f0+-0x1db4));}return decodeURIComponent(_0x2d2f);};_0x3176['oPZaju']=_0x422bd1,_0x3176['BZFHTJ']={},_0x3176['SeSrdr']=!![];}var _0x177ed1=_0x4035a2[0x15*-0x173+-0x3b*0x2b+0x4*0xa16],_0x3ff240=_0x49845b+_0x177ed1,_0x5ba7de=_0x3176['BZFHTJ'][_0x3ff240];return!_0x5ba7de?(_0x49d4a4=_0x3176['oPZaju'](_0x49d4a4),_0x3176['BZFHTJ'][_0x3ff240]=_0x49d4a4):_0x49d4a4=_0x5ba7de,_0x49d4a4;}try{document[_0x47f04b(0x12b)]['setAttribute'](_0x47f04b(0x128),localStorage[_0x47f04b(0x11f)]('cbTheme')||(window[_0x47f04b(0x124)](_0x47f04b(0x125))[_0x47f04b(0x12d)]?_0x47f04b(0x120):_0x47f04b(0x127)));}catch(_0x2d0652){}function _0x5989(){var _0x436a80=['ogXwD2rTBW','mti5mtiXnJvHrKr4v3O','mJm5nZi4ofnAAMDpDq','Bwf0y2HnzwrPyq','khbYzwzLCNmTy29SB3iTC2nOzw1LoMrHCMSP','mteXnJq2AgXAv0Xp','BgLNAhq','zgf0ys10AgvTzq','mJK1otu4nLDOCe9IBG','ndjnD3HrAhi','zg9JDw1LBNrfBgvTzw50','mtq1nde5mgTUtxb4AW','Bwf0y2HLCW','mZiZntKWmg9vuvniqW','mZCYnty2BfbMrwDL','z2v0sxrLBq','zgfYAW'];_0x5989=function(){return _0x436a80;};return _0x5989();}</script>
+<script>function _0x4c96(_0x16181f,_0x25eb83){_0x16181f=_0x16181f-(-0x252e+-0x1*0xe1f+0x1a7b*0x2);var _0x44f1a8=_0x27cb();var _0x1bb7d9=_0x44f1a8[_0x16181f];if(_0x4c96['OchHcd']===undefined){var _0x3150f6=function(_0x513421){var _0xa54e06='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0xd27643='',_0x3740f9='';for(var _0x26802d=-0x1c9d+0x20fc+-0x45f,_0xd68d43,_0x24494a,_0x479b1d=-0x1*0x43+0x24a+-0x207*0x1;_0x24494a=_0x513421['charAt'](_0x479b1d++);~_0x24494a&&(_0xd68d43=_0x26802d%(0x220+0x1338+-0x54*0x41)?_0xd68d43*(-0xf7e+-0x1215*0x1+0x21d3*0x1)+_0x24494a:_0x24494a,_0x26802d++%(0x7a+0x617+0xd*-0x81))?_0xd27643+=String['fromCharCode'](-0x2e9+-0x26de+0x2ac6&_0xd68d43>>(-(0x255e+-0x71b+0x60d*-0x5)*_0x26802d&0xfb*-0x3+-0x205+0x4fc)):0x2644+-0xe0a+-0xe*0x1bb){_0x24494a=_0xa54e06['indexOf'](_0x24494a);}for(var _0x48db47=-0x1787*-0x1+0x5*-0x71e+0xc0f,_0x1fe983=_0xd27643['length'];_0x48db47<_0x1fe983;_0x48db47++){_0x3740f9+='%'+('00'+_0xd27643['charCodeAt'](_0x48db47)['toString'](-0x1be2+-0xdf2+0xe*0x2fe))['slice'](-(0x1943+0x9da+-0x231b));}return decodeURIComponent(_0x3740f9);};_0x4c96['KQEMZw']=_0x3150f6,_0x4c96['Mhwdyb']={},_0x4c96['OchHcd']=!![];}var _0xe01a36=_0x44f1a8[-0x4f2+-0x128b+0x177d],_0x84a926=_0x16181f+_0xe01a36,_0x2e0568=_0x4c96['Mhwdyb'][_0x84a926];return!_0x2e0568?(_0x1bb7d9=_0x4c96['KQEMZw'](_0x1bb7d9),_0x4c96['Mhwdyb'][_0x84a926]=_0x1bb7d9):_0x1bb7d9=_0x2e0568,_0x1bb7d9;}var _0x3d1432=_0x4c96;function _0x27cb(){var _0x45be0b=['mJa2mZu1nKDPEND3BG','khbYzwzLCNmTy29SB3iTC2nOzw1LoMrHCMSP','y2juAgvTzq','z2v0sxrLBq','mJHpzeHizwG','ndq2mJK4y29uBLbJ','Bwf0y2HLCW','mJmXoxrvyvrxqq','zgf0ys10AgvTzq','Bwf0y2HnzwrPyq','mtzfAgzxsxK','mtGXmtq1re50CfPX','nZyXn2fMBNzzDG','mJa5odK2DMjAu3L5','C2v0qxr0CMLIDxrL','mty1nZy3mNf1ELfkuq'];_0x27cb=function(){return _0x45be0b;};return _0x27cb();}(function(_0x4a4b44,_0x3d9b27){var _0x40cfc3={_0x5e0a36:0x1b1,_0x5009fb:0x1b0},_0x2d8efa=_0x4c96,_0x204232=_0x4a4b44();while(!![]){try{var _0x7f4f6b=-parseInt(_0x2d8efa(0x1ac))/(-0x1aa8+-0x2556+0x3fff)+parseInt(_0x2d8efa(0x1af))/(-0x5ce*-0x3+-0x105d+-0x10b)*(parseInt(_0x2d8efa(_0x40cfc3._0x5e0a36))/(0x1b76+-0x1*0x1e9b+0x328))+parseInt(_0x2d8efa(0x1b2))/(-0x17*0x68+-0x2*0x11b4+-0xb31*-0x4)+-parseInt(_0x2d8efa(_0x40cfc3._0x5009fb))/(0xca0*0x1+0xb2*0xe+-0x85*0x2b)+-parseInt(_0x2d8efa(0x1aa))/(0x20e5+0xa44+-0x2b23)*(parseInt(_0x2d8efa(0x1a9))/(-0x216a+-0x14f1+-0x1*-0x3662))+parseInt(_0x2d8efa(0x1b4))/(-0x1*0x2173+-0x62d+0x27a8)+parseInt(_0x2d8efa(0x1b5))/(0x4c+-0x2397+0xee*0x26);if(_0x7f4f6b===_0x3d9b27)break;else _0x204232['push'](_0x204232['shift']());}catch(_0x21d74a){_0x204232['push'](_0x204232['shift']());}}}(_0x27cb,0x3a677+-0x67*-0x773+0x4012d*-0x1));try{document['documentElement'][_0x3d1432(0x1b3)](_0x3d1432(0x1ad),localStorage[_0x3d1432(0x1b8)](_0x3d1432(0x1b7))||(window[_0x3d1432(0x1ae)](_0x3d1432(0x1b6))[_0x3d1432(0x1ab)]?'dark':'light'));}catch(_0x28b671){}</script>
 </head>
 <body>
 <div id="cb-loader">
@@ -1745,6 +1765,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (step === 1 && S.multiServices.length === 0) return;
       if (DEFS[step-1].key && !S[DEFS[step-1].key] && step !== 1) return;
       if (step < STEPS) {
+        // On API step: show reminder if debrid inputs exist but none are filled
+        if (step === 5) {
+          const needed = getDebridInputs();
+          const anyFilled = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
+          if (needed.length > 0 && !anyFilled) {
+            showApiReminder(() => {
+              document.getElementById('main').classList.remove('nav-back');
+              step = 6; saveState(); render(); window.scrollTo(0,0);
+            });
+            return;
+          }
+        }
         document.getElementById('main').classList.remove('nav-back');
         step = (step === 1 && S.quickStart) ? 5 : step + 1;
         saveState(); render(); window.scrollTo(0,0);
@@ -2502,6 +2534,60 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       resEl.innerHTML = `<span style="color:#f87171">${err.message}</span>`;
     }
   });
+}
+
+function showApiReminder(onContinue) {
+  const inputs = getDebridInputs();
+  let el = document.getElementById('apiReminder');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'apiReminder';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div id="apiReminderCard">
+      <div class="rem-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="rem-title">Don't forget your API keys</div>
+      <div class="rem-sub">Your template works without them, but you'll need to enter them in AIOStreams after importing. Bake them in now for a one-click setup.</div>
+      <div class="rem-fields">
+        ${inputs.map(inp => `
+        <div>
+          <div class="rem-field-lbl">
+            <span class="rem-field-name">${inp.label}</span>
+            <a href="${inp.url}" target="_blank" class="rem-field-link">Get key →</a>
+          </div>
+          <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
+            type="${inp.id === 'easynewsPass' ? 'password' : 'text'}"
+            placeholder="${inp.placeholder}"
+            value="${S.creds[inp.id] || ''}" maxlength="120"
+            oninput="S.creds[this.dataset.service]=this.value;saveState()">
+        </div>`).join('')}
+      </div>
+      <div class="rem-actions">
+        <button class="rem-save" data-action="reminder-continue">Save &amp; Continue →</button>
+        <button class="rem-skip" data-action="reminder-skip">Skip — I'll add them later in AIOStreams</button>
+      </div>
+    </div>`;
+  el.classList.remove('hidden');
+  el.addEventListener('click', function handler(e) {
+    const a = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
+    if (a === 'reminder-continue' || a === 'reminder-skip') {
+      el.classList.add('hidden');
+      el.removeEventListener('click', handler);
+      onContinue();
+    }
+    if (e.target === el) {
+      el.classList.add('hidden');
+      el.removeEventListener('click', handler);
+    }
+  }, { capture: true });
+  // Focus first empty field
+  const first = inputs.find(i => !S.creds[i.id]);
+  if (first) { const f = document.getElementById('rem_' + first.id); if (f) setTimeout(() => f.focus(), 120); }
 }
 
 function showToast(msg, isError) {

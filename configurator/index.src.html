@@ -280,6 +280,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-manifest:hover{opacity:1;box-shadow:0 6px 36px rgba(0,212,255,.6),inset 0 1px 0 rgba(255,255,255,.25);transform:translateY(-2px);animation:none}
 .btn-manifest:active{transform:scale(.98);animation:none}
 .btn-manifest:disabled{opacity:.38;cursor:not-allowed;animation:none}
+/* API Reminder modal */
+@keyframes reminderIn{0%{opacity:0;transform:translateY(32px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes overlayIn{0%{opacity:0}100%{opacity:1}}
+#apiReminder{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:overlayIn .22s ease both;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#apiReminder.hidden{display:none}
+#apiReminderCard{background:linear-gradient(160deg,#0a1520 0%,#060d14 100%);border:1px solid rgba(0,212,255,.35);border-radius:18px;width:100%;max-width:400px;padding:28px 24px 22px;box-shadow:0 0 0 1px rgba(0,212,255,.12),0 24px 80px rgba(0,0,0,.7),0 0 60px rgba(0,212,255,.06);animation:reminderIn .3s cubic-bezier(.34,1.12,.64,1) both}
+#apiReminderCard .rem-icon{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,158,11,.08));border:1.5px solid rgba(251,191,36,.35);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 24px rgba(251,191,36,.12)}
+#apiReminderCard .rem-title{font-size:1.12rem;font-weight:900;color:#e6edf3;text-align:center;margin-bottom:5px}
+#apiReminderCard .rem-sub{font-size:.82rem;color:#6b7280;text-align:center;margin-bottom:20px;line-height:1.5}
+#apiReminderCard .rem-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+#apiReminderCard .rem-field-lbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+#apiReminderCard .rem-field-name{font-size:.75rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+#apiReminderCard .rem-field-link{font-size:.73rem;color:#00d4ff;text-decoration:none;font-weight:700}
+#apiReminderCard .rem-input{width:100%;background:#0d1117;border:1.5px solid #30363d;border-radius:9px;color:#e6edf3;padding:11px 14px;font-size:.9rem;outline:none;transition:border-color .15s;font-family:monospace}
+#apiReminderCard .rem-input:focus{border-color:rgba(0,212,255,.55);box-shadow:0 0 0 3px rgba(0,212,255,.08)}
+#apiReminderCard .rem-actions{display:flex;flex-direction:column;gap:8px}
+#apiReminderCard .rem-save{width:100%;padding:13px;font-size:.95rem;font-weight:800;border:none;border-radius:11px;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#000;cursor:pointer;transition:all .15s}
+#apiReminderCard .rem-save:hover{box-shadow:0 4px 24px rgba(0,212,255,.4);transform:translateY(-1px)}
+#apiReminderCard .rem-skip{background:transparent;border:none;color:#4b5563;font-size:.8rem;cursor:pointer;padding:6px;text-align:center;width:100%;transition:color .15s}
+#apiReminderCard .rem-skip:hover{color:#9ca3af}
 /* Connecting dots animation */
 @keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 .dot-spin span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:currentColor;animation:dotPulse 1.2s ease-in-out infinite}
@@ -1745,6 +1765,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (step === 1 && S.multiServices.length === 0) return;
       if (DEFS[step-1].key && !S[DEFS[step-1].key] && step !== 1) return;
       if (step < STEPS) {
+        // On API step: show reminder if debrid inputs exist but none are filled
+        if (step === 5) {
+          const needed = getDebridInputs();
+          const anyFilled = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
+          if (needed.length > 0 && !anyFilled) {
+            showApiReminder(() => {
+              document.getElementById('main').classList.remove('nav-back');
+              step = 6; saveState(); render(); window.scrollTo(0,0);
+            });
+            return;
+          }
+        }
         document.getElementById('main').classList.remove('nav-back');
         step = (step === 1 && S.quickStart) ? 5 : step + 1;
         saveState(); render(); window.scrollTo(0,0);
@@ -2502,6 +2534,60 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       resEl.innerHTML = `<span style="color:#f87171">${err.message}</span>`;
     }
   });
+}
+
+function showApiReminder(onContinue) {
+  const inputs = getDebridInputs();
+  let el = document.getElementById('apiReminder');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'apiReminder';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div id="apiReminderCard">
+      <div class="rem-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="rem-title">Don't forget your API keys</div>
+      <div class="rem-sub">Your template works without them, but you'll need to enter them in AIOStreams after importing. Bake them in now for a one-click setup.</div>
+      <div class="rem-fields">
+        ${inputs.map(inp => `
+        <div>
+          <div class="rem-field-lbl">
+            <span class="rem-field-name">${inp.label}</span>
+            <a href="${inp.url}" target="_blank" class="rem-field-link">Get key →</a>
+          </div>
+          <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
+            type="${inp.id === 'easynewsPass' ? 'password' : 'text'}"
+            placeholder="${inp.placeholder}"
+            value="${S.creds[inp.id] || ''}" maxlength="120"
+            oninput="S.creds[this.dataset.service]=this.value;saveState()">
+        </div>`).join('')}
+      </div>
+      <div class="rem-actions">
+        <button class="rem-save" data-action="reminder-continue">Save &amp; Continue →</button>
+        <button class="rem-skip" data-action="reminder-skip">Skip — I'll add them later in AIOStreams</button>
+      </div>
+    </div>`;
+  el.classList.remove('hidden');
+  el.addEventListener('click', function handler(e) {
+    const a = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
+    if (a === 'reminder-continue' || a === 'reminder-skip') {
+      el.classList.add('hidden');
+      el.removeEventListener('click', handler);
+      onContinue();
+    }
+    if (e.target === el) {
+      el.classList.add('hidden');
+      el.removeEventListener('click', handler);
+    }
+  }, { capture: true });
+  // Focus first empty field
+  const first = inputs.find(i => !S.creds[i.id]);
+  if (first) { const f = document.getElementById('rem_' + first.id); if (f) setTimeout(() => f.focus(), 120); }
 }
 
 function showToast(msg, isError) {
