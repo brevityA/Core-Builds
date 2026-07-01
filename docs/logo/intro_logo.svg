@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <style>
+    @keyframes hexBreath { 0%,100%{ opacity:.55 } 50%{ opacity:.95 } }
+    @keyframes corePulse { 0%,100%{ transform:scale(1); opacity:.88 } 50%{ transform:scale(1.07); opacity:1 } }
+    @keyframes coreGlow  { 0%,100%{ transform:scale(1); opacity:.32 } 50%{ transform:scale(1.26); opacity:.82 } }
+    @keyframes ringOut   { 0%{ transform:scale(.5); opacity:.72 } 100%{ transform:scale(2.1); opacity:0 } }
+    @media (prefers-reduced-motion: reduce) {
+      .hex, .core, .glow, .ring { animation: none }
+    }
+    .hex  { animation: hexBreath 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .core { animation: corePulse 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .glow { animation: coreGlow  2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .ring { animation: ringOut   2.6s ease-out   infinite; transform-box: fill-box; transform-origin: center; fill: none; stroke-width: 5; }
+    .ring2 { animation-delay: 1.3s; }
+  </style>
+
+  <!-- hex background fill -->
+  <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.07"/>
+
+  <!-- hex glow layers -->
+  <polygon class="hex" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="32" stroke-linejoin="round" opacity="0.11"/>
+  <polygon class="hex" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="16" stroke-linejoin="round" opacity="0.20"/>
+
+  <!-- hex outline -->
+  <polygon class="hex" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="13" stroke-linejoin="round" opacity="0.92"/>
+
+  <!-- diamond glow -->
+  <polygon class="glow" points="256,166 346,256 256,346 166,256" fill="#a855f7" opacity="0.40"/>
+
+  <!-- diamond core -->
+  <polygon class="core" points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.90"/>
+
+  <!-- rings -->
+  <circle class="ring"       cx="256" cy="256" r="90" stroke="#a855f7"/>
+  <circle class="ring ring2" cx="256" cy="256" r="90" stroke="#ff4b2b"/>
+</svg>
