@@ -1108,10 +1108,10 @@ function splashHtml() {
         <div>
           <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
             <span style="font-size:.63rem;font-weight:800;color:${i===0?'#00d4ff':'#4b5563'};background:${i===0?'rgba(0,212,255,.08)':'rgba(255,255,255,.03)'};border:1px solid ${i===0?'rgba(0,212,255,.18)':'rgba(255,255,255,.06)'};border-radius:4px;padding:1px 6px">v${entry.v}</span>
-            <span style="font-size:.61rem;color:#2d333b">${entry.date}</span>
+            <span style="font-size:.61rem;color:#374151">${entry.date}</span>
           </div>
           <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px;text-align:left">
-            ${entry.items.map(it => `<li style="font-size:.7rem;color:${i===0?'#6b7280':'#2d333b'};line-height:1.4">${it}</li>`).join('')}
+            ${entry.items.map(it => `<li style="font-size:.7rem;color:${i===0?'#67e8f9':'#4b5563'};line-height:1.4">${it}</li>`).join('')}
           </ul>
         </div>`).join('')}
       </div>
