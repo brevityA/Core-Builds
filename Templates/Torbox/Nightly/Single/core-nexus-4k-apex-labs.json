@@ -183,9 +183,7 @@
         "pattern": "/\\b(FraMeSToR)\\b/"
       }
     ],
-    "syncedPreferredStreamExpressionUrls": [],
     "syncedExcludedStreamExpressionUrls": [],
-    "syncedIncludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1989,9 +1987,6 @@
       "Subs": "purple"
     },
     "mergedCatalogs": [],
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
-    ],
     "seadexBestOnly": false,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",

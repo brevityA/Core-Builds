@@ -550,13 +550,6 @@
       }
     ],
     "syncedExcludedStreamExpressionUrls": [],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
-    "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
-    ],
-    "syncedExcludedRegexUrls": [],
     "resultLimits": {
       "global": 30,
       "resolution": 12,

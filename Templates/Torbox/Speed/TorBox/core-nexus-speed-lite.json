@@ -190,13 +190,7 @@
         "pattern": "/\\b(BHDStudio)\\b/i"
       }
     ],
-    "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
-    ],
     "syncedExcludedStreamExpressionUrls": [],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1784,9 +1778,6 @@
     "excludedStreamSources": [
       "YouTube",
       "AI Enhanced"
-    ],
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
     ],
     "addonCategoryColors": {
       "Mix": "indigo",
