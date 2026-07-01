@@ -17,11 +17,40 @@ mode: "wide"
 
 <div style={{ maxWidth: '680px', margin: '0 auto', padding: '16px 24px 0', textAlign: 'center' }}>
 
-  <img
-    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/docs/logo/banner_square_transparent.svg"
-    alt="Core Builds"
-    style={{ width: '320px', height: '320px', display: 'block', margin: '0 auto 24px' }}
-  />
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="220" height="220" style={{ display:'block', margin:'0 auto 24px', overflow:'visible' }} aria-label="Core Builds logo">
+    <defs>
+      <linearGradient id="dsg1" x1="50%" y1="0%" x2="50%" y2="100%">
+        <stop offset="0%" stopColor="#00e5ff"/>
+        <stop offset="100%" stopColor="#4facfe"/>
+      </linearGradient>
+      <linearGradient id="dsg2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#4facfe"/>
+        <stop offset="50%" stopColor="#c060c0"/>
+        <stop offset="100%" stopColor="#ff4b2b"/>
+      </linearGradient>
+      <radialGradient id="dsrmask" cx="50%" cy="50%" r="50%">
+        <stop offset="20%" stopColor="white" stopOpacity="1"/>
+        <stop offset="70%" stopColor="white" stopOpacity="0.6"/>
+        <stop offset="100%" stopColor="white" stopOpacity="0"/>
+      </radialGradient>
+      <mask id="dsm"><rect width="512" height="512" fill="url(#dsrmask)"/></mask>
+      <filter id="dsf1"><feGaussianBlur stdDeviation="32"/></filter>
+      <filter id="dsf2"><feGaussianBlur stdDeviation="16" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+      <filter id="dsf3"><feGaussianBlur stdDeviation="60"/></filter>
+      <filter id="dsf4"><feGaussianBlur stdDeviation="6" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+    </defs>
+    <g mask="url(#dsm)">
+      <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.14" filter="url(#dsf3)"/>
+      <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.22" filter="url(#dsf3)"/>
+      <polygon className="cb-hex-breath" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" strokeWidth="52" strokeLinejoin="round" opacity="0.18" filter="url(#dsf1)"/>
+      <polygon className="cb-hex-breath" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" strokeWidth="18" strokeLinejoin="round" opacity="0.28" filter="url(#dsf4)"/>
+      <polygon className="cb-hex-breath" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#dsg1)" strokeWidth="14" strokeLinejoin="round" opacity="0.82"/>
+      <polygon className="cb-diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#dsg2)" opacity="0.3" filter="url(#dsf2)"/>
+      <polygon className="cb-diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#dsg2)" opacity="0.85"/>
+      <circle className="cb-core-ring"   cx="256" cy="256" r="90" stroke="url(#dsg2)"/>
+      <circle className="cb-core-ring cb-core-ring-2" cx="256" cy="256" r="90" stroke="url(#dsg2)"/>
+    </g>
+  </svg>
 
   <div style={{ display: 'inline-block', background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.35)', color: '#00d4ff', padding: '4px 14px', borderRadius: '999px', fontSize: '13px', fontWeight: '500', marginBottom: '20px', letterSpacing: '0.01em' }}>
     AIOStreams Templates
@@ -41,13 +70,13 @@ mode: "wide"
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
       Get Started
     </a>
-    <a href="https://github.com/brevityA/Core-Builds" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#94a3b8', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>GitHub</a>
-    <a href="/template-directory" style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#94a3b8', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>Templates</a>
-    <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'transparent', color: '#94a3b8', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>
+    <a href="https://github.com/brevityA/Core-Builds" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(0,212,255,.04)', color: '#8b949e', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid rgba(0,212,255,.18)' }}>GitHub</a>
+    <a href="/template-directory" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(0,212,255,.04)', color: '#8b949e', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid rgba(0,212,255,.18)' }}>Templates</a>
+    <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0,212,255,.04)', color: '#8b949e', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid rgba(0,212,255,.18)' }}>
       <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M10 0C4.478 0 0 4.478 0 10s4.478 10 10 10 10-4.478 10-10S15.522 0 10 0zm5.93 10a1.563 1.563 0 0 1-1.563 1.563c-.375 0-.72-.133-.984-.352-.973.642-2.3 1.06-3.773 1.113l.641 3.009 2.098-.448a1.094 1.094 0 1 1 1.063 1.348 1.09 1.09 0 0 1-1.034-.74l-2.344.5a.313.313 0 0 1-.37-.234l-.715-3.36c-1.496-.043-2.847-.46-3.832-1.109a1.563 1.563 0 1 1-1.707-2.543 1.55 1.55 0 0 1 .098-.535 3.594 3.594 0 0 1-.024-.41c0-1.84 1.965-3.34 4.375-3.34.918 0 1.766.234 2.46.629a1.094 1.094 0 1 1 1.434 1.644c.168.332.262.703.262 1.094v.004a3.67 3.67 0 0 1-.02.367 1.563 1.563 0 0 1 .938 2.4zm-8.243-1.03a1.094 1.094 0 1 0 2.188 0 1.094 1.094 0 0 0-2.188 0zm4.02 2.886c-.52.52-1.512.558-1.707.558s-1.191-.039-1.707-.558a.235.235 0 0 0-.332.332c.664.664 1.848.715 2.04.715.19 0 1.374-.05 2.038-.715a.234.234 0 0 0-.332-.332zm-.332-1.792a1.094 1.094 0 1 0 2.188 0 1.094 1.094 0 0 0-2.188 0z"/></svg>
       Reddit
     </a>
-    <a href="https://ko-fi.com/branding_brevity" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'transparent', color: '#94a3b8', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid #334155' }}>
+    <a href="https://ko-fi.com/branding_brevity" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0,212,255,.04)', color: '#8b949e', padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', border: '1px solid rgba(0,212,255,.18)' }}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/></svg>
       Ko-fi
     </a>
@@ -175,9 +204,9 @@ mode: "wide"
     </Card>
   </CardGroup>
 
-  <div style={{ marginTop: '56px', paddingTop: '24px', borderTop: '1px solid #1e293b' }}>
+  <div style={{ marginTop: '56px', paddingTop: '24px', borderTop: '1px solid rgba(0,212,255,.1)' }}>
     <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.7', margin: 0 }}>
-      Core Builds is a one-person project. Templates, documentation, and the test suite are built with significant AI assistance (<a href="https://claude.ai/code" target="_blank" style={{ color: '#60a5fa', textDecoration: 'none' }}>Claude Code</a>), reviewed and directed by the project maintainer. All changes are open source on <a href="https://github.com/brevityA/Core-Builds" target="_blank" style={{ color: '#60a5fa', textDecoration: 'none' }}>GitHub</a>.
+      Core Builds is a one-person project. Templates, documentation, and the test suite are built with significant AI assistance (<a href="https://claude.ai/code" target="_blank" style={{ color: '#00d4ff', textDecoration: 'none' }}>Claude Code</a>), reviewed and directed by the project maintainer. All changes are open source on <a href="https://github.com/brevityA/Core-Builds" target="_blank" style={{ color: '#00d4ff', textDecoration: 'none' }}>GitHub</a>.
     </p>
   </div>
 

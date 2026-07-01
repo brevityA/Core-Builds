@@ -16,6 +16,22 @@ body:has(img[src*="banner_square_transparent"]) [class*="ArticleHeader" i] {
   overflow: hidden !important;
 }
 
+/* ── Animated logo keyframes ─────────────────────────────────────────── */
+@keyframes cb-corePulse    { 0%,100%{ transform:scale(1);    opacity:.95 } 50%{ transform:scale(1.07); opacity:1   } }
+@keyframes cb-coreGlowPulse{ 0%,100%{ transform:scale(1);    opacity:.38 } 50%{ transform:scale(1.24); opacity:.84 } }
+@keyframes cb-coreRingOut  { 0%{ transform:scale(.5); opacity:.7 } 100%{ transform:scale(2); opacity:0 } }
+@keyframes cb-hexBreath    { 0%,100%{ opacity:.55 } 50%{ opacity:.95 } }
+
+.cb-diamond-core  { transform-box:fill-box; transform-origin:center; animation:cb-corePulse     2.6s ease-in-out infinite }
+.cb-diamond-glow  { transform-box:fill-box; transform-origin:center; animation:cb-coreGlowPulse 2.6s ease-in-out infinite }
+.cb-core-ring     { transform-box:fill-box; transform-origin:center; fill:none; stroke-width:5; animation:cb-coreRingOut  2.6s ease-out   infinite }
+.cb-core-ring-2   { animation-delay:1.3s }
+.cb-hex-breath    { animation:cb-hexBreath 2.6s ease-in-out infinite }
+
+@media(prefers-reduced-motion:reduce){
+  .cb-diamond-core,.cb-diamond-glow,.cb-core-ring,.cb-hex-breath{ animation:none }
+}
+
 /* ── Configurator-matching cyan accent theme ─────────────────────────── */
 
 /* Sidebar active link */
