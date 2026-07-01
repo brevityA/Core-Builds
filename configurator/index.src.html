@@ -486,15 +486,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .host-cfg-link:hover{color:#00d4ff;text-shadow:0 0 10px rgba(0,212,255,.4)}
 [data-theme="light"] .host-cfg-link{color:#0e7490}
 [data-theme="light"] .host-cfg-link:hover{color:#0c4a6e;text-shadow:none}
-#cb-loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0d1117;animation:cbLoad 2s cubic-bezier(.4,0,.2,1) forwards;pointer-events:none}
+#cb-loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0d1117;animation:cbLoad 3s cubic-bezier(.4,0,.2,1) forwards;pointer-events:none}
 [data-theme="light"] #cb-loader{background:#e8eef4}
-#cb-loader-icon{width:90px;height:90px;animation:cbIconPop .6s cubic-bezier(.34,1.56,.64,1) .1s both}
+#cb-loader-icon{width:112px;height:112px;animation:cbIconPop .7s cubic-bezier(.34,1.56,.64,1) .15s both}
 #cb-loader-title{font-family:system-ui,-apple-system,sans-serif;font-size:1.55rem;font-weight:900;letter-spacing:-.03em;color:#e6edf3;line-height:1}
 [data-theme="light"] #cb-loader-title{color:#1c2128}
-#cb-loader-title span{color:#00d4ff}
+#cb-loader-title span{color:#00b8cc}
 #cb-loader-sub{font-size:.62rem;font-weight:700;letter-spacing:.18em;color:#374151;text-transform:uppercase}
 [data-theme="light"] #cb-loader-sub{color:#8c959f}
-@keyframes cbLoad{0%{opacity:0}12%{opacity:1}72%{opacity:1}100%{opacity:0}}
+@keyframes cbLoad{0%{opacity:0}10%{opacity:1}75%{opacity:1}100%{opacity:0}}
 @keyframes cbIconPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
@@ -503,16 +503,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div id="cb-loader">
   <svg id="cb-loader-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
     <defs>
-      <linearGradient id="lg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
-      <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
+      <linearGradient id="lg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00c4d9"/><stop offset="100%" stop-color="#4090d4"/></linearGradient>
+      <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4090d4"/><stop offset="50%" stop-color="#8a4890"/><stop offset="100%" stop-color="#c03a20"/></linearGradient>
       <filter id="lf1"><feGaussianBlur stdDeviation="10" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
-      <filter id="lf2"><feGaussianBlur stdDeviation="18"/></filter>
+      <filter id="lf2"><feGaussianBlur stdDeviation="14" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+      <filter id="lf3"><feGaussianBlur stdDeviation="24"/></filter>
     </defs>
-    <polygon points="256,30 450,140 450,372 256,482 62,372 62,140" fill="#0d1623" stroke="url(#lg1)" stroke-width="8" filter="url(#lf1)"/>
-    <polygon points="256,60 420,155 420,357 256,452 92,357 92,155" fill="none" stroke="url(#lg2)" stroke-width="3" opacity=".6"/>
-    <polygon points="256,70 210,96 210,148 256,174 302,148 302,96" fill="url(#lg2)" opacity=".9" filter="url(#lf2)"/>
-    <polygon points="256,80 216,103 216,149 256,172 296,149 296,103" fill="url(#lg1)"/>
-    <text x="256" y="320" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="130" fill="url(#lg1)" opacity=".15" letter-spacing="-4">CB</text>
+    <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00c4d9" opacity="0.04" filter="url(#lf3)"/>
+    <polygon points="256,166 346,256 256,346 166,256" fill="#8a4890" opacity="0.07" filter="url(#lf3)"/>
+    <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00c4d9" stroke-width="28" stroke-linejoin="round" opacity="0.25" filter="url(#lf1)"/>
+    <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#lg1)" stroke-width="16" stroke-linejoin="round" opacity=".75"/>
+    <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#lg2)" opacity="0.35" filter="url(#lf2)"/>
+    <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#lg2)" opacity="0.85"/>
+    <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#lg2)"/>
+    <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#lg2)"/>
   </svg>
   <div id="cb-loader-title">CORE <span>BUILDS</span></div>
   <div id="cb-loader-sub">by Brevity</div>
