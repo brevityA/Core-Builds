@@ -158,7 +158,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-list-row .opt-icon svg{width:28px!important;height:28px!important}
 .svc-list-row .opt-name{font-size:.86rem!important}
 .svc-list-row .opt-desc{font-size:.69rem!important;margin-top:1px!important}
-.svc-list-arr{color:#374151;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
+.svc-list-arr{color:#6b7280;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
 .svc-list-row input:checked+label .svc-list-arr{color:#00d4ff}
 @media(min-width:720px){
   .wrap{max-width:980px}
@@ -311,7 +311,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .srh-ring{position:relative;width:52px;height:52px;flex-shrink:0}
 .srh-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:900;color:#00d4ff}
 .srh-title{font-size:1.15rem;font-weight:900;letter-spacing:-.02em;line-height:1.1;color:#e6edf3}
-.srh-sub{font-size:.75rem;color:#3d6880;margin-top:4px;line-height:1.4}
+.srh-sub{font-size:.75rem;color:#6b8ca5;margin-top:4px;line-height:1.4}
 .step-strip{display:flex;align-items:center;padding:10px 0 6px;position:relative}
 .step-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0}
 .step-unit:not(:first-child)::before{content:'';position:absolute;top:50%;transform:translateY(-50%);right:50%;width:100%;height:1px;background:#2d333b;z-index:0;transition:background .3s}
@@ -408,7 +408,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .srh-sub{color:#57606a}
 [data-theme="light"] .splash-by{color:#8c959f}
 [data-theme="light"] .splash-tagline{color:#57606a}
-[data-theme="light"] .splash-chip-feat{color:#57606a}
+[data-theme="light"] .splash-chip-feat{color:#57606a;border-color:#d0d7de;background:rgba(0,0,0,.03)}
+[data-theme="light"] .splash-chip-svc{color:#0e7490;border-color:rgba(14,116,144,.4);background:rgba(14,116,144,.07)}
+[data-theme="light"] .svc-list-arr{color:#9ca3af}
+[data-theme="light"] .splash-paste{color:#0e7490}
+[data-theme="light"] .splash-paste:hover{color:#0c4a6e}
 [data-theme="light"] .step-pending .step-bub{background:#d0d7de}
 [data-theme="light"] .step-unit:not(:first-child)::before{background:#d0d7de}
 [data-theme="light"] .btn-reset-strip{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.09)!important;color:#8c959f}
@@ -1584,7 +1588,8 @@ function syncNext() {
   } else if (!def.key) {
     btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
   } else {
-    btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;opacity:.5">Select one to continue</span><span class="cta-arr" style="opacity:.3">→</span>`;
+    const _ph = document.documentElement.getAttribute('data-theme')==='light';
+    btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;color:${_ph?'#9ca3af':'#4b5563'}">Select one to continue</span><span class="cta-arr" style="color:${_ph?'#9ca3af':'#374151'}">→</span>`;
   }
 }
 
