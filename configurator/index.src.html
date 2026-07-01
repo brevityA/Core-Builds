@@ -474,6 +474,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .community-link:hover{color:#00d4ff;text-shadow:0 0 12px rgba(0,212,255,.5)}
 [data-theme="light"] .community-link{color:#0e7490}
 [data-theme="light"] .community-link:hover{color:#0c4a6e;text-shadow:none}
+.host-cfg-link{display:inline-flex;align-items:center;gap:4px;font-size:.74rem;color:#67e8f9;text-decoration:none;font-weight:600;transition:color .15s,text-shadow .15s}
+.host-cfg-link:hover{color:#00d4ff;text-shadow:0 0 10px rgba(0,212,255,.4)}
+[data-theme="light"] .host-cfg-link{color:#0e7490}
+[data-theme="light"] .host-cfg-link:hover{color:#0c4a6e;text-shadow:none}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -730,7 +734,7 @@ function loadState() {
         S.service = deriveService();
         history.replaceState(null, '', location.pathname);
         return;
-      } catch(e) { console.warn('Failed to load shared config', e); }
+      } catch(e) { console.warn('Failed to load shared config', e); history.replaceState(null, '', location.pathname); setTimeout(() => showToast('Share link could not be loaded — it may be corrupted or from an older version', true), 300); }
     }
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
@@ -1326,7 +1330,7 @@ function render() {
               <select class="name-input" id="aioHost" data-action="update-host" style="cursor:pointer;color-scheme:dark">
                 <option value="auto"       ${S.instanceHost==='auto'?'selected':''}>Auto (tries all public hosts)</option>
                 <option value="elfhosted"  ${S.instanceHost==='elfhosted'||S.instanceHost===''?'selected':''}>ElfHosted — aiostreams.elfhosted.com</option>
-                <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthewWeak — aiostreams.fortheweak.cloud</option>
+                <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthWeak — aiostreams.fortheweak.cloud</option>
                 <option value="midnight"   ${S.instanceHost==='midnight'?'selected':''}>Midnight's — midnightignite.me</option>
                 <option value="viren"      ${S.instanceHost==='viren'?'selected':''}>Viren's — aiostreams.viren070.me</option>
                 <option value="kuu"        ${S.instanceHost==='kuu'?'selected':''}>Kuu's — aiostreams.stremio.ru</option>
@@ -1357,7 +1361,7 @@ function render() {
               </div>
             </div>
             <div id="hostConfigLinkRow" style="margin-top:-4px;margin-bottom:2px;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
-              <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:.74rem;color:#67e8f9;text-decoration:none;font-weight:600;transition:color .15s,text-shadow .15s" onmouseover="this.style.color='#00d4ff';this.style.textShadow='0 0 10px rgba(0,212,255,.4)'" onmouseout="this.style.color='#67e8f9';this.style.textShadow=''">
+              <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener" class="host-cfg-link">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 Open configure page
               </a>
@@ -1826,7 +1830,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cfgLink && HOST_BASE_URLS[val]) cfgLink.href = HOST_BASE_URLS[val] + '/configure';
       if (val === 'custom') { S.instanceUrl = ''; document.getElementById('aioUrl').value = ''; }
       document.getElementById('aioResult').innerHTML = '';
-      if (showUuid) updateUuidValidation(S.instanceUuid);
+      if (showUuid) updateUuidValidation(S.instanceUuid); else updateUuidValidation('');
     }
   });
 
@@ -2368,13 +2372,14 @@ function extractManifestParts(val) {
     const u = new URL(val);
     const parts = u.pathname.split('/').filter(Boolean);
     const stremioIdx = parts.indexOf('stremio');
-    if (stremioIdx === -1 || parts.length < stremioIdx + 3) return null;
+    if (stremioIdx === -1 || parts.length < stremioIdx + 2) return null;
     const uuid = parts[stremioIdx + 1];
-    const password = decodeURIComponent(parts[stremioIdx + 2]);
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid)) return null;
+    const rawPwd = parts.length > stremioIdx + 2 ? parts[stremioIdx + 2] : '';
+    const password = (rawPwd && rawPwd !== 'manifest.json') ? decodeURIComponent(rawPwd) : '';
     const origin = u.origin;
     const hostKey = Object.keys(HOST_BASE_URLS).find(k => HOST_BASE_URLS[k] === origin) || null;
-    return { uuid, password: password !== 'manifest.json' ? password : '', hostKey };
+    return { uuid, password, hostKey };
   } catch(e) { return null; }
 }
 
