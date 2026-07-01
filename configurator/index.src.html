@@ -316,10 +316,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .step-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0}
 .step-unit:not(:first-child)::before{content:'';position:absolute;top:50%;transform:translateY(-50%);right:50%;width:100%;height:1px;background:#2d333b;z-index:0;transition:background .3s}
 .step-unit.done::before{background:rgba(0,212,255,.4)}
-.step-bub{width:10px;height:10px;border-radius:50%;position:relative;z-index:1;flex-shrink:0;transition:all .25s}
+.step-bub{width:10px;height:10px;border-radius:50%;position:relative;z-index:1;flex-shrink:0;transition:all .25s;display:grid;place-items:center;font-size:0;color:transparent}
 .step-pending .step-bub{background:#2d333b}
 .step-active .step-bub{background:#00d4ff;box-shadow:0 0 10px rgba(0,212,255,.7);transform:scale(1.4)}
-.step-done .step-bub{background:#00d4ff;opacity:.45}
+.step-done .step-bub{width:14px;height:14px;background:#00d4ff;font-size:8px;color:#001a24;font-weight:900;line-height:1}
 .step-lbl{font-size:.52rem;font-weight:600;color:#374151;margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:36px}
 .step-active .step-lbl{color:#00d4ff;font-weight:700}
 .step-done .step-lbl{color:#4b7c93}
@@ -490,8 +490,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '1.8';
+const CONFIGURATOR_VERSION = '1.9';
 const CHANGELOG = [
+  { v:'1.9', date:'Jul 1 2026', items:[
+    'Step dots show ✓ for completed steps — progress ring fills as you advance',
+    'Back button names the destination — "← Resolution" instead of "← Back"',
+    'Skip buttons on Device and Content steps — go straight to default without choosing',
+    'Next button shows the upcoming step — "Next: APIs" instead of showing current pick',
+    'Audio auto-set toast — device selection now shows what audio profile was applied',
+    'Keyboard navigation — Enter to advance, Escape to go back (outside input fields)',
+    'Receipt highlights non-defaults in cyan — Lossless audio, specific content type, custom formatter',
+    'Cache Mode and Languages now visible in the Review receipt when non-default',
+    'Service count badge — shows "3 selected" when multi-service is active',
+    'Formatter picker on Review step — expand the Stream Formatter section to change without going back',
+  ]},
   { v:'1.8', date:'Jul 1 2026', items:[
     'Duplicate API key fix — TorBox field no longer doubled when TorBox Pro + Hybrid both selected',
     'Resolution auto-detect — 4K pre-selected on first visit if a 4K display is detected',
@@ -1035,7 +1047,7 @@ function renderProgress() {
     const n = i + 1;
     const state = n < step ? 'done' : n === step ? 'active' : 'pending';
     const tipName = DEFS[i] ? DEFS[i].title : (n === STEPS ? 'Review' : `Step ${n}`);
-    return `<div class="step-unit ${state}" title="${tipName}"><div class="step-bub"></div></div>`;
+    return `<div class="step-unit ${state}" title="${tipName}"><div class="step-bub">${state==='done'?'✓':''}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
@@ -1170,16 +1182,19 @@ function render() {
           ].map(({k, ico}) => {
             const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
             const val = label(k, S[k]) || '—';
+            const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && S.resolution==='4k') || (k==='formatter' && S.formatter!=='apex-v2');
             return `<div class="receipt-row">
               <div class="receipt-row-left">
                 <span class="receipt-row-ico">${ico}</span>
                 <span class="receipt-row-lbl">${k}</span>
               </div>
-              <div class="receipt-row-val${k==='service'?' hl':''}">
-                ${val}${audioOverride ? ' <span style="color:#f59e0b;font-size:.7rem">⚠ DD+</span>' : ''}
+              <div class="receipt-row-val${isNonDefault?' hl':''}">
+                ${val}${audioOverride ? ' <span style="color:#f59e0b;font-size:.7rem">⚠ capped</span>' : ''}
               </div>
             </div>`;
           }).join('')}
+          ${S.cacheMode !== 'mixed' ? `<div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">📡</span><span class="receipt-row-lbl">cache</span></div><div class="receipt-row-val hl">${S.cacheMode === 'cached' ? 'Cached Only' : 'Uncached Only'}</div></div>` : ''}
+          ${S.langs && (S.langs.length > 1 || !S.langs.includes('English') || S.langExclusive) ? `<div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">🌐</span><span class="receipt-row-lbl">languages</span></div><div class="receipt-row-val hl">${S.langs.slice(0,3).join(', ')}${S.langs.length>3?` +${S.langs.length-3}`:''}${S.langExclusive?' · Exclusive':''}</div></div>` : ''}
           ${hasApis ? `<div class="receipt-row">
             <div class="receipt-row-left">
               <span class="receipt-row-ico">🔑</span>
@@ -1199,6 +1214,12 @@ function render() {
         </div>
         ${insightsHtml()}
         ${sizeLimitHtml()}
+        <details id="fmtPickerDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
+          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
+            <span style="display:flex;align-items:center;gap:8px"><span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span style="font-size:.7rem;color:#374151">›</span>
+          </summary>
+          <div style="padding:12px 14px">${formatterPickerHtml()}</div>
+        </details>
         <details id="jsonPreviewDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
             <span>Preview JSON</span><span style="font-size:.7rem;color:#374151">›</span>
@@ -1406,17 +1427,24 @@ function render() {
             <div class="srh-num">${step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}
+            <div class="srh-title">${def.title}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
         ${renderOpts(def)}
+        ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#4b5563;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
+        ${def.id === 'content' ? `<button data-action="skip-content" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#4b5563;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use Everything (safe default) →</button>` : ''}
         ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Advanced Options</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
-    document.getElementById('btnBack').style.visibility = step > 1 ? 'visible' : 'hidden';
+    const btnBack = document.getElementById('btnBack');
+    btnBack.style.visibility = step > 1 ? 'visible' : 'hidden';
+    if (step > 1) {
+      const prevTitle = step === 2 ? 'Service' : (DEFS[step-2]?.title || 'Back');
+      btnBack.innerHTML = `← ${prevTitle}`;
+    }
     syncNext();
   }
 }
@@ -1429,11 +1457,12 @@ function syncNext() {
   if (step === 1) ok = S.multiServices.length > 0;
   if (!btn) return;
   btn.disabled = !ok;
-  const val = def.key && S[def.key] ? label(def.key, S[def.key]) : null;
+  const nextDef = step < STEPS ? DEFS[step] : null;
+  const nextLabel = nextDef ? nextDef.title : null;
   if (step === STEPS) {
     btn.innerHTML = `<span style="flex:1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
-  } else if (val) {
-    btn.innerHTML = `<div style="flex:1"><div class="cta-step-lbl">${def.title}</div><div class="cta-step-val">${val}</div></div><span class="cta-arr">→</span>`;
+  } else if (ok && nextLabel) {
+    btn.innerHTML = `<div style="flex:1"><div class="cta-step-lbl" style="font-size:.64rem;font-weight:700;color:#374151;letter-spacing:.07em;text-transform:uppercase;margin-bottom:1px">Next</div><div class="cta-step-val" style="font-size:.9rem;font-weight:800">${nextLabel}</div></div><span class="cta-arr">→</span>`;
   } else if (!def.key) {
     btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
   } else {
@@ -1479,6 +1508,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   render();
 
+  // Keyboard shortcuts: Enter = next, Escape = back
+  document.addEventListener('keydown', (e) => {
+    if (step === 0) return;
+    const tag = document.activeElement?.tagName;
+    const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable;
+    if (e.key === 'Enter' && !inInput && !e.shiftKey) {
+      const btn = document.getElementById('btnNext');
+      if (btn && !btn.disabled && btn.style.display !== 'none') btn.click();
+    }
+    if (e.key === 'Escape' && !inInput) {
+      const btn = document.getElementById('btnBack');
+      if (btn && btn.style.visibility !== 'hidden') btn.click();
+    }
+  });
+
   // Handle all clicks
   document.addEventListener('click', (e) => {
     const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
@@ -1499,6 +1543,16 @@ document.addEventListener('DOMContentLoaded', () => {
         step = (step === 5 && S.quickStart) ? 1 : step - 1;
         saveState(); render(); window.scrollTo(0,0);
       }
+    }
+    if (action === 'skip-device') {
+      S.device = 'generic';
+      document.getElementById('main').classList.remove('nav-back');
+      step++; saveState(); render(); window.scrollTo(0,0);
+    }
+    if (action === 'skip-content') {
+      S.content = 'all';
+      document.getElementById('main').classList.remove('nav-back');
+      step++; saveState(); render(); window.scrollTo(0,0);
     }
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
@@ -1602,7 +1656,12 @@ document.addEventListener('DOMContentLoaded', () => {
       S[e.target.dataset.key] = e.target.value;
       if (e.target.dataset.key === 'device') {
         const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
-        if (DEV_AUDIO[e.target.value]) S.audio = DEV_AUDIO[e.target.value];
+        const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
+        const newAudio = DEV_AUDIO[e.target.value];
+        if (newAudio && newAudio !== S.audio) {
+          S.audio = newAudio;
+          showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}`);
+        }
       }
       saveState();
       syncNext();
