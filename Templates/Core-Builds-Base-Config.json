@@ -1134,16 +1134,16 @@
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
     "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Tamtaro-synced-excluded-regex.json"
+      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
     ],
     "syncedRankedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
     ],
     "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Tamtaro-synced-ISEs.json"
+      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
     ],
     "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/Tamtaro-synced-PSEs.json"
+      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
     ],
     "syncedExcludedStreamExpressionUrls": [],
     "excludedRegexPatterns": [
