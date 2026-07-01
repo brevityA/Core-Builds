@@ -24,16 +24,16 @@
 
 <p align="center">
   <a href="https://github.com/brevityA/Core-Builds/discussions">
-    <img src="https://img.shields.io/badge/DISCUSSIONS-Community-7c3aed?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Discussions"/>
+    <img src="https://img.shields.io/badge/DISCUSSIONS-Community-00d4ff?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Discussions"/>
   </a>
   <a href="https://www.reddit.com/r/CoreBuilds/">
     <img src="https://img.shields.io/badge/REDDIT-r%2FCoreBuilds-FF4500?style=for-the-badge&logo=reddit&logoColor=white&labelColor=1a1f27" alt="Reddit"/>
   </a>
-  <a href="https://github.com/brevityA/Core-Builds/blob/main/ROADMAP.md">
-    <img src="https://img.shields.io/badge/ROADMAP-What's_Next-0ea5e9?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1f27" alt="Roadmap"/>
+  <a href="https://core-builds.mintlify.app/roadmap">
+    <img src="https://img.shields.io/badge/ROADMAP-What's_Next-00d4ff?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Roadmap"/>
   </a>
   <a href="https://core-builds.mintlify.app">
-    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-3B82F6?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
+    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-00d4ff?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
   </a>
 </p>
 
@@ -248,15 +248,19 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ---
 
-## 📖 Wiki
+## 📖 Documentation
+
+Full docs at **[core-builds.mintlify.app](https://core-builds.mintlify.app)**
 
 | Guide | Link |
 |---|---|
-| Import a template | [Wiki → Importing a Template](https://github.com/brevityA/Core-Builds/wiki/Importing-a-Template) |
-| Formatters | [Wiki → Formatters](https://github.com/brevityA/Core-Builds/wiki/Formatters) |
-| Filtering | [Wiki → Expression Rules](https://github.com/brevityA/Core-Builds/blob/main/Guides/EXPRESSION_RULES.md) |
-| Device profiles | [Wiki → Device Profiles](https://github.com/brevityA/Core-Builds/wiki/Device-Profiles) |
-| Troubleshooting | [Wiki → Troubleshooting and FAQ](https://github.com/brevityA/Core-Builds/wiki/Troubleshooting-and-FAQ) |
+| Quick Start | [Docs → Quick Start](https://core-builds.mintlify.app/quick-start) |
+| Import a template | [Docs → Importing a Template](https://core-builds.mintlify.app/importing) |
+| Which template? | [Docs → Which Template?](https://core-builds.mintlify.app/which-template) |
+| Formatters | [Docs → Formatters](https://core-builds.mintlify.app/formatters) |
+| Device profiles | [Docs → Device Profiles](https://core-builds.mintlify.app/device-profiles) |
+| Troubleshooting | [Docs → Troubleshooting](https://core-builds.mintlify.app/troubleshooting) |
+| FAQ | [Docs → FAQ](https://core-builds.mintlify.app/faq) |
 
 ---
 
@@ -282,7 +286,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ## 📜 Version
 
-Current: **`v2.8.3`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
+Current: **`v3.0.2`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
 
 ---
 
