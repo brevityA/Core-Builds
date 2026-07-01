@@ -466,10 +466,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .continue-banner{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.22)!important}
 [data-theme="light"] .splash-cta-continue{background:rgba(9,105,218,.12)!important;border-color:rgba(9,105,218,.4)!important;color:#0969da!important}
 [data-theme="light"] .splash-cta-discard{border-color:#d0d7de!important;color:#8c959f!important}
-.splash-link{display:flex;align-items:center;gap:4px;font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s}
-.splash-link:hover{color:#e6edf3}
-[data-theme="light"] .splash-link{color:#8c959f}
-[data-theme="light"] .splash-link:hover{color:#1c2128}
+.splash-link{display:flex;align-items:center;gap:4px;font-size:.71rem;font-weight:600;color:#67e8f9;text-decoration:none;transition:color .15s,text-shadow .15s}
+.splash-link:hover{color:#00d4ff;text-shadow:0 0 12px rgba(0,212,255,.5)}
+[data-theme="light"] .splash-link{color:#0e7490}
+[data-theme="light"] .splash-link:hover{color:#0c4a6e;text-shadow:none}
+.community-link{font-size:.73rem;font-weight:600;color:#67e8f9;text-decoration:none;transition:color .15s,text-shadow .15s;display:flex;align-items:center;gap:5px}
+.community-link:hover{color:#00d4ff;text-shadow:0 0 12px rgba(0,212,255,.5)}
+[data-theme="light"] .community-link{color:#0e7490}
+[data-theme="light"] .community-link:hover{color:#0c4a6e;text-shadow:none}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -494,8 +498,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.1';
+const CONFIGURATOR_VERSION = '2.2';
 const CHANGELOG = [
+  { v:'2.2', date:'Jul 1 2026', items:[
+    'UUID section — "Open configure page" link per host, directly below the host selector',
+    'UUID validation — real-time format check with green ✓ / red error feedback as you type',
+    'Smart paste in UUID field — paste a full manifest URL and UUID, host, and password are auto-filled',
+    'Manifest paste auto-fill — "Already have a manifest?" also populates UUID/host/password in the Generate section',
+  ]},
   { v:'2.1', date:'Jul 1 2026', items:[
     'Community links on splash — GitHub, Reddit, and Browse Templates for users who want a pre-built template without the wizard',
     'Share Config — encode your exact wizard settings into a URL and copy it to share with others',
@@ -590,6 +600,8 @@ let step = 0;
 let showAdvanced = false;
 let hadSavedState = false;
 let _savedStep = 0;
+let pasteMode = false;
+const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
 const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed' };
 
 const FORMATTERS = [
@@ -1152,17 +1164,15 @@ function splashHtml() {
       <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
       <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
     </div>
-    <div style="display:flex;justify-content:center;align-items:center;gap:12px;width:100%;max-width:310px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.05)">
+    <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px;width:100%;max-width:310px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.05)">
       <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-link">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
         GitHub
       </a>
-      <span style="color:#21262d">·</span>
       <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-link">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
         Reddit
       </a>
-      <span style="color:#21262d">·</span>
       <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="splash-link">
         Browse Templates
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -1346,10 +1356,17 @@ function render() {
                 </button>
               </div>
             </div>
+            <div id="hostConfigLinkRow" style="margin-top:-4px;margin-bottom:2px;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+              <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:.74rem;color:#67e8f9;text-decoration:none;font-weight:600;transition:color .15s,text-shadow .15s" onmouseover="this.style.color='#00d4ff';this.style.textShadow='0 0 10px rgba(0,212,255,.4)'" onmouseout="this.style.color='#67e8f9';this.style.textShadow=''">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Open configure page
+              </a>
+            </div>
             <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
-              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">— find it on your instance's configure page</span></label>
-              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                value="${S.instanceUuid}" data-action="update-uuid" maxlength="36" style="font-family:monospace;font-size:.88rem">
+              <label>UUID</label>
+              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
+                value="${S.instanceUuid}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
+              <div id="uuidStatus" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
             </div>
           </div>
           <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
@@ -1357,7 +1374,7 @@ function render() {
             Generate Manifest
           </button>
           <div id="aioResult"></div>
-          <details style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px">
+          <details id="pasteManifestDetails" style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px" ${pasteMode ? 'open' : ''}>
             <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
               <span>Already have a manifest URL?</span>
               <span style="font-size:.75rem;color:#374151">›</span>
@@ -1373,18 +1390,16 @@ function render() {
         </div>
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);text-align:center">
           <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase;margin-bottom:11px">More from Core Builds</div>
-          <div style="display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
-            <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">
+          <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 16px">
+            <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
             </a>
-            <span style="color:#21262d">·</span>
-            <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">
+            <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
               GitHub
             </a>
-            <span style="color:#21262d">·</span>
-            <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">
+            <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
               Reddit
             </a>
@@ -1394,6 +1409,16 @@ function render() {
     nav.style.display = 'flex';
     document.getElementById('btnBack').style.visibility = 'visible';
     document.getElementById('btnNext').style.display = 'none';
+    if (pasteMode) {
+      pasteMode = false;
+      setTimeout(() => {
+        const details = document.getElementById('pasteManifestDetails');
+        const input = document.getElementById('pasteManifest');
+        if (details) details.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (input) setTimeout(() => input.focus(), 300);
+      }, 100);
+    }
+    updateUuidValidation(S.instanceUuid);
     const jpd = document.getElementById('jsonPreviewDetails');
     if (jpd) jpd.addEventListener('toggle', () => {
       const pre = document.getElementById('jsonPreview');
@@ -1643,7 +1668,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'continue-session') { step = _savedStep || 1; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'start-fresh') { clearState(); }
-    if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { showAdvanced = false; clearState(); }
     if (action === 'share-config') shareConfig();
     if (action === 'generate-dl') generate();
@@ -1792,10 +1817,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = S.instanceHost;
       const urlRow  = document.getElementById('aioUrlRow');
       const uuidRow = document.getElementById('aioUuidRow');
+      const cfgLinkRow = document.getElementById('hostConfigLinkRow');
+      const cfgLink = document.getElementById('hostConfigLink');
+      const showUuid = (val !== 'custom' && val !== 'auto');
       if (urlRow)  urlRow.style.display  = (val === 'custom') ? '' : 'none';
-      if (uuidRow) uuidRow.style.display = (val !== 'custom' && val !== 'auto') ? '' : 'none';
+      if (uuidRow) uuidRow.style.display = showUuid ? '' : 'none';
+      if (cfgLinkRow) cfgLinkRow.style.display = showUuid ? '' : 'none';
+      if (cfgLink && HOST_BASE_URLS[val]) cfgLink.href = HOST_BASE_URLS[val] + '/configure';
       if (val === 'custom') { S.instanceUrl = ''; document.getElementById('aioUrl').value = ''; }
       document.getElementById('aioResult').innerHTML = '';
+      if (showUuid) updateUuidValidation(S.instanceUuid);
     }
   });
 
@@ -1807,7 +1838,18 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (a === 'update-tmdb-key') S.tmdbApiKey = e.target.value;
     else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
     else if (a === 'update-pwd') S.instancePassword = e.target.value;
-    else if (a === 'update-uuid') S.instanceUuid = e.target.value.trim();
+    else if (a === 'update-uuid') {
+      const raw = e.target.value.trim();
+      const extracted = extractManifestParts(raw);
+      if (extracted) {
+        S.instanceUuid = extracted.uuid;
+        if (extracted.hostKey) { S.instanceHost = extracted.hostKey; const sel = document.getElementById('aioHost'); if(sel) sel.value = extracted.hostKey; const uuidRow=document.getElementById('aioUuidRow'),cfgLinkRow=document.getElementById('hostConfigLinkRow'),cfgLink=document.getElementById('hostConfigLink'); if(uuidRow)uuidRow.style.display=''; if(cfgLinkRow)cfgLinkRow.style.display=''; if(cfgLink&&HOST_BASE_URLS[extracted.hostKey])cfgLink.href=HOST_BASE_URLS[extracted.hostKey]+'/configure'; }
+        if (extracted.password && !S.instancePassword) { S.instancePassword = extracted.password; const pe=document.getElementById('aioPwd'); if(pe)pe.value=extracted.password; }
+        e.target.value = extracted.uuid;
+        showToast('Manifest URL detected — fields auto-filled');
+      } else { S.instanceUuid = raw; }
+      updateUuidValidation(S.instanceUuid);
+    }
     else if (a === 'paste-manifest') onPasteManifest(e.target.value);
     
     if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid'].includes(a)){
@@ -2177,12 +2219,10 @@ function showManifestModal(manifestUrl, password, hostLabel) {
           <div id="stremioInstallResult" style="font-size:.75rem"></div>
         </div>
       </details>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;gap:14px">
-        <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" style="font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">Browse Templates →</a>
-        <span style="color:#21262d">·</span>
-        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" style="font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">Reddit</a>
-        <span style="color:#21262d">·</span>
-        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" style="font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">GitHub</a>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px">
+        <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="community-link">Browse Templates →</a>
+        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">Reddit</a>
+        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">GitHub</a>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -2322,12 +2362,50 @@ function genPwd() {
   setTimeout(() => { const e = document.getElementById('aioPwd'); if (e) e.type = 'password'; }, 5000);
 }
 
+function extractManifestParts(val) {
+  if (!val || !val.includes('/stremio/')) return null;
+  try {
+    const u = new URL(val);
+    const parts = u.pathname.split('/').filter(Boolean);
+    const stremioIdx = parts.indexOf('stremio');
+    if (stremioIdx === -1 || parts.length < stremioIdx + 3) return null;
+    const uuid = parts[stremioIdx + 1];
+    const password = decodeURIComponent(parts[stremioIdx + 2]);
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid)) return null;
+    const origin = u.origin;
+    const hostKey = Object.keys(HOST_BASE_URLS).find(k => HOST_BASE_URLS[k] === origin) || null;
+    return { uuid, password: password !== 'manifest.json' ? password : '', hostKey };
+  } catch(e) { return null; }
+}
+
+function validateUuid(val) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val || '');
+}
+
+function updateUuidValidation(val) {
+  const input = document.getElementById('aioUuid');
+  const status = document.getElementById('uuidStatus');
+  if (!input || !status) return;
+  if (!val) { input.style.borderColor = ''; status.innerHTML = ''; return; }
+  const ok = validateUuid(val);
+  input.style.borderColor = ok ? '#22c55e' : '#f87171';
+  status.innerHTML = ok
+    ? '<span style="color:#22c55e;font-weight:700">✓ Valid UUID — Saved</span>'
+    : '<span style="color:#f87171">Invalid format — must be xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>';
+}
+
 function onPasteManifest(val) {
   val = (val || '').trim();
   const result = document.getElementById('pasteManifestResult');
   if (!val) { result.innerHTML = ''; return; }
   try { new URL(val); } catch(e) { result.innerHTML = ''; return; }
   result.innerHTML = '';
+  const extracted = extractManifestParts(val);
+  if (extracted) {
+    if (extracted.uuid && !S.instanceUuid) { S.instanceUuid = extracted.uuid; saveState(); const uel=document.getElementById('aioUuid'); if(uel)uel.value=extracted.uuid; updateUuidValidation(extracted.uuid); }
+    if (extracted.hostKey && S.instanceHost !== extracted.hostKey) { S.instanceHost = extracted.hostKey; saveState(); const sel=document.getElementById('aioHost'); if(sel)sel.value=extracted.hostKey; const uuidRow=document.getElementById('aioUuidRow'),cfgLinkRow=document.getElementById('hostConfigLinkRow'),cfgLink=document.getElementById('hostConfigLink'); if(uuidRow)uuidRow.style.display=''; if(cfgLinkRow)cfgLinkRow.style.display=''; if(cfgLink&&HOST_BASE_URLS[extracted.hostKey])cfgLink.href=HOST_BASE_URLS[extracted.hostKey]+'/configure'; }
+    if (extracted.password && !S.instancePassword) { S.instancePassword = extracted.password; saveState(); const pe=document.getElementById('aioPwd'); if(pe)pe.value=extracted.password; }
+  }
   showManifestModal(val, null, null);
 }
 
@@ -2385,7 +2463,7 @@ async function createImportUrl() {
 }
 
 async function openInAIOStreams() {
-  const HOST_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
+  const HOST_URLS = HOST_BASE_URLS;
   const HOST_LABELS = { 'https://aiostreams.elfhosted.com':'ElfHosted', 'https://aiostreams.fortheweak.cloud':'ForthWeak', 'https://aiostreamsfortheweebsstable.midnightignite.me':"Midnight's", 'https://aiostreams.viren070.me':"Viren's", 'https://aiostreams.stremio.ru':"Kuu's", 'https://aio.atbphosting.com':'ATBP', 'https://aiostreams.12312023.xyz':"Omni's" };
   const isAuto = S.instanceHost === 'auto', isCustom = S.instanceHost === 'custom';
   const base = HOST_URLS[S.instanceHost] || (S.instanceUrl || '').trim().replace(/\/$/, '');
