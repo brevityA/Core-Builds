@@ -240,7 +240,7 @@ Full `{name, pattern, score}` entries on all active non-Anime templates.
 Points to Vidhin05's file on all non-Hybrid templates. Supplements ranked patterns with Vidhin05's 174-pattern set at score 0; our inline entries override scoring by name.
 
 ### `syncedExcludedRegexUrls`
-Points to our mirrored copy of Tamtaro's excluded regex file at `Filtering/Tamtaro-synced-excluded-regex.json` (brevityA/Core-Builds). Tamtaro renamed their GitHub to `Tam-Taro`; elfhosted's allowlist blocked the new URL, so all three Tamtaro files are now mirrored in our repo (which is already on elfhosted's allowlist). Same pattern applies to `syncedIncludedStreamExpressionUrls` (ISEs) and `syncedPreferredStreamExpressionUrls` (PSEs).
+Points to Tamtaro's excluded regex file at `Tam-Taro/SEL-Filtering-and-Sorting` on all active templates. **Note:** Tamtaro renamed their GitHub account from `Tamtaro` → `Tam-Taro`; the old URL 404s. The new `Tam-Taro` URL works (200) but elfhosted's allowlist has not been updated — users on elfhosted get "Forbidden URL" errors on import until elfhosted ships an allowlist update. Same applies to `syncedIncludedStreamExpressionUrls` (ISEs) and `syncedPreferredStreamExpressionUrls` (PSEs).
 
 ---
 
