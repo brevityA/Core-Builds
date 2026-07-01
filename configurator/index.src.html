@@ -648,7 +648,7 @@ let hadSavedState = false;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed' };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed' };
 
 const FORMATTERS = [
   {
@@ -1429,6 +1429,35 @@ function render() {
               <div id="uuidStatus" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
             </div>
           </div>
+          <details id="baseConfigDetails" style="margin-top:12px;border:1px solid rgba(168,85,247,.18);border-radius:10px;padding:10px 13px;background:rgba(168,85,247,.04)">
+            <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;outline:none">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              <span style="font-size:.74rem;font-weight:700;color:#a855f7;letter-spacing:.03em">Base Config</span>
+              <span style="font-size:.65rem;color:#6b7280;margin-left:2px">${S.baseUuid ? '· active' : '· optional'}</span>
+              <span style="margin-left:auto;font-size:.72rem;color:#6b7280">›</span>
+            </summary>
+            <div style="margin-top:10px">
+              <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:10px">
+                If you've imported <strong style="color:#a855f7">Core Builds Base — TorBox</strong>, enter its UUID here.
+                Your generated template will inherit all shared config from the parent — smaller JSON, instant propagation of base updates.
+              </div>
+              <div class="name-row" style="margin-bottom:6px">
+                <label style="color:#a855f7">Base UUID</label>
+                <input class="name-input" id="baseUuidInput" type="text"
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                  value="${S.baseUuid}" data-action="update-base-uuid" maxlength="36"
+                  style="font-family:monospace;font-size:.85rem;border-color:${S.baseUuid ? 'rgba(168,85,247,.5)' : ''}">
+              </div>
+              <div class="name-row" style="margin-bottom:0">
+                <label style="color:#a855f7">Base Password</label>
+                <input class="name-input" id="basePwdInput" type="password"
+                  placeholder="leave blank if none"
+                  value="${S.basePassword}" data-action="update-base-pwd" maxlength="200"
+                  autocomplete="new-password">
+              </div>
+              ${S.baseUuid ? `<div style="font-size:.7rem;color:#a855f7;margin-top:8px;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generated template will use parentConfig — formatter, sort, presets inherited from base.</div>` : ''}
+            </div>
+          </details>
           <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             Generate Manifest
@@ -1900,6 +1929,8 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (a === 'update-tmdb-key') S.tmdbApiKey = e.target.value;
     else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
     else if (a === 'update-pwd') S.instancePassword = e.target.value;
+    else if (a === 'update-base-uuid') { S.baseUuid = e.target.value.trim(); e.target.style.borderColor = S.baseUuid ? 'rgba(168,85,247,.5)' : ''; }
+    else if (a === 'update-base-pwd') S.basePassword = e.target.value;
     else if (a === 'update-uuid') {
       const raw = e.target.value.trim();
       const extracted = extractManifestParts(raw);
@@ -2174,37 +2205,80 @@ function pses() {
 
 function build() {
   const name = (S.name.trim() || defaultName()), rc = resolutionCfg(), ec = encodeCfg(), ac = audioCfg();
-  return {
-    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: 'Debrid', serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
-    config: {
-      trusted: false, showChanges: true, addonName: name, addonLogo: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg', addonDescription: name, presets: presets(), services: services(),
-      excludedResolutions: rc.excludedResolutions, includedResolutions: rc.includedResolutions, requiredResolutions: rc.requiredResolutions, preferredResolutions: rc.preferredResolutions,
-      excludedQualities: [], includedQualities: [], requiredQualities: [], preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','SCR','TC','TS','CAM','Unknown'],
-      excludedLanguages: [], includedLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
-      excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes, excludedAudioTags: ac.excludedAudioTags, preferredAudioTags: ac.preferredAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
-      enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
-      excludeCached: S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [], excludeUncached: S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
-      checkOwned: false, externalDownloads: false, autoRemoveDownloads: false, excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
-      syncedExcludedRegexUrls: ['https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json'], syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'], rankedRegexPatterns: [], preferredRegexPatterns: [], excludedRegexPatterns: [],
-      addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'}, mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
-      ...(S.tmdbToken ? { tmdbAccessToken: S.tmdbToken } : {}),
-      ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
-      usePosterRedirectApi: true, usePosterServiceForMeta: true,
-      maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
-      excludedStreamExpressions: eses(), includedStreamExpressions: [
-        { enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" },
-        ...(S.langExclusive && S.langs && S.langs.length ? [{
-          enabled: true,
-          expression: `/* Language Exclusive — only ${(S.langs||['English']).join('/')} */ language(streams,${[...new Set([...(S.langs||['English']),'Original','Multi','Dual Audio','Dubbed','Unknown'])].map(l=>`'${l}'`).join(',')})`
-        }] : [])
-      ], preferredStreamExpressions: pses(),
-      sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
-      deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
-      dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
-      groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid' || (S.service === 'multi' && S.multiServices.includes('torbox-pro'))), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
-      formatter: (function(){ const _f = FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })()
-    }
+  const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
+
+  // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
+  const standaloneOnly = useBase ? {} : {
+    preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','SCR','TC','TS','CAM','Unknown'],
+    excludedLanguages: [], includedLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
+    preferredAudioTags: ac.preferredAudioTags,
+    syncedExcludedRegexUrls: ['https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json'],
+    syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
+    rankedRegexPatterns: [], excludedRegexPatterns: [],
+    addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
+    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
+    usePosterRedirectApi: true, usePosterServiceForMeta: true,
+    ...(S.tmdbToken ? { tmdbAccessToken: S.tmdbToken } : {}),
+    ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
+    sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
+    deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
+    formatter: (function(){ const _f = FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
+    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
+    checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
+    presets: presets(), services: services(),
   };
+
+  const cfg = {
+    trusted: false, showChanges: true,
+    addonName: name, addonLogo: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg', addonDescription: name,
+    ...standaloneOnly,
+    excludedResolutions: rc.excludedResolutions, includedResolutions: rc.includedResolutions, requiredResolutions: rc.requiredResolutions, preferredResolutions: rc.preferredResolutions,
+    excludedQualities: [], includedQualities: [], requiredQualities: [],
+    excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes,
+    excludedAudioTags: ac.excludedAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
+    enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
+    excludeCached: S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
+    excludeUncached: S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
+    excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
+    preferredRegexPatterns: [],
+    maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
+    excludedStreamExpressions: eses(),
+    includedStreamExpressions: [
+      { enabled:true, expression:"/* REPACK / PROPER */ keyword(streams,'filename','REPACK','PROPER','REPACK2','PROPER2')" },
+      ...(S.langExclusive && S.langs && S.langs.length ? [{
+        enabled: true,
+        expression: `/* Language Exclusive — only ${(S.langs||['English']).join('/')} */ language(streams,${[...new Set([...(S.langs||['English']),'Original','Multi','Dual Audio','Dubbed','Unknown'])].map(l=>`'${l}'`).join(',')})`
+      }] : [])
+    ],
+    preferredStreamExpressions: pses(),
+    dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
+    groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid' || (S.service === 'multi' && S.multiServices.includes('torbox-pro'))), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
+  };
+
+  const result = {
+    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: 'Debrid', serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
+    config: cfg
+  };
+
+  if (useBase) {
+    result.parentConfig = {
+      uuid: S.baseUuid.trim(),
+      password: S.basePassword || '',
+      mergeStrategies: {
+        presets: 'extend',
+        services: 'inherit',
+        filters: 'override',
+        sorting: 'inherit',
+        formatter: 'inherit',
+        branding: 'override',
+        proxy: 'inherit',
+        metadata: 'inherit',
+        misc: 'inherit'
+      }
+    };
+  }
+
+  return result;
 }
 
 function generate() {
