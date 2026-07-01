@@ -498,8 +498,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.1';
+const CONFIGURATOR_VERSION = '2.2';
 const CHANGELOG = [
+  { v:'2.2', date:'Jul 1 2026', items:[
+    'UUID section — "Open configure page" link per host, directly below the host selector',
+    'UUID validation — real-time format check with green ✓ / red error feedback as you type',
+    'Smart paste in UUID field — paste a full manifest URL and UUID, host, and password are auto-filled',
+    'Manifest paste auto-fill — "Already have a manifest?" also populates UUID/host/password in the Generate section',
+  ]},
   { v:'2.1', date:'Jul 1 2026', items:[
     'Community links on splash — GitHub, Reddit, and Browse Templates for users who want a pre-built template without the wizard',
     'Share Config — encode your exact wizard settings into a URL and copy it to share with others',
@@ -595,6 +601,7 @@ let showAdvanced = false;
 let hadSavedState = false;
 let _savedStep = 0;
 let pasteMode = false;
+const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
 const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed' };
 
 const FORMATTERS = [
@@ -1349,10 +1356,17 @@ function render() {
                 </button>
               </div>
             </div>
+            <div id="hostConfigLinkRow" style="margin-top:-4px;margin-bottom:2px;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+              <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:.74rem;color:#67e8f9;text-decoration:none;font-weight:600;transition:color .15s,text-shadow .15s" onmouseover="this.style.color='#00d4ff';this.style.textShadow='0 0 10px rgba(0,212,255,.4)'" onmouseout="this.style.color='#67e8f9';this.style.textShadow=''">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Open configure page
+              </a>
+            </div>
             <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
-              <label>UUID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#4b5563">— find it on your instance's configure page</span></label>
-              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                value="${S.instanceUuid}" data-action="update-uuid" maxlength="36" style="font-family:monospace;font-size:.88rem">
+              <label>UUID</label>
+              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
+                value="${S.instanceUuid}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
+              <div id="uuidStatus" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
             </div>
           </div>
           <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
@@ -1404,6 +1418,7 @@ function render() {
         if (input) setTimeout(() => input.focus(), 300);
       }, 100);
     }
+    updateUuidValidation(S.instanceUuid);
     const jpd = document.getElementById('jsonPreviewDetails');
     if (jpd) jpd.addEventListener('toggle', () => {
       const pre = document.getElementById('jsonPreview');
@@ -1802,10 +1817,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = S.instanceHost;
       const urlRow  = document.getElementById('aioUrlRow');
       const uuidRow = document.getElementById('aioUuidRow');
+      const cfgLinkRow = document.getElementById('hostConfigLinkRow');
+      const cfgLink = document.getElementById('hostConfigLink');
+      const showUuid = (val !== 'custom' && val !== 'auto');
       if (urlRow)  urlRow.style.display  = (val === 'custom') ? '' : 'none';
-      if (uuidRow) uuidRow.style.display = (val !== 'custom' && val !== 'auto') ? '' : 'none';
+      if (uuidRow) uuidRow.style.display = showUuid ? '' : 'none';
+      if (cfgLinkRow) cfgLinkRow.style.display = showUuid ? '' : 'none';
+      if (cfgLink && HOST_BASE_URLS[val]) cfgLink.href = HOST_BASE_URLS[val] + '/configure';
       if (val === 'custom') { S.instanceUrl = ''; document.getElementById('aioUrl').value = ''; }
       document.getElementById('aioResult').innerHTML = '';
+      if (showUuid) updateUuidValidation(S.instanceUuid);
     }
   });
 
@@ -1817,7 +1838,18 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (a === 'update-tmdb-key') S.tmdbApiKey = e.target.value;
     else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
     else if (a === 'update-pwd') S.instancePassword = e.target.value;
-    else if (a === 'update-uuid') S.instanceUuid = e.target.value.trim();
+    else if (a === 'update-uuid') {
+      const raw = e.target.value.trim();
+      const extracted = extractManifestParts(raw);
+      if (extracted) {
+        S.instanceUuid = extracted.uuid;
+        if (extracted.hostKey) { S.instanceHost = extracted.hostKey; const sel = document.getElementById('aioHost'); if(sel) sel.value = extracted.hostKey; const uuidRow=document.getElementById('aioUuidRow'),cfgLinkRow=document.getElementById('hostConfigLinkRow'),cfgLink=document.getElementById('hostConfigLink'); if(uuidRow)uuidRow.style.display=''; if(cfgLinkRow)cfgLinkRow.style.display=''; if(cfgLink&&HOST_BASE_URLS[extracted.hostKey])cfgLink.href=HOST_BASE_URLS[extracted.hostKey]+'/configure'; }
+        if (extracted.password && !S.instancePassword) { S.instancePassword = extracted.password; const pe=document.getElementById('aioPwd'); if(pe)pe.value=extracted.password; }
+        e.target.value = extracted.uuid;
+        showToast('Manifest URL detected — fields auto-filled');
+      } else { S.instanceUuid = raw; }
+      updateUuidValidation(S.instanceUuid);
+    }
     else if (a === 'paste-manifest') onPasteManifest(e.target.value);
     
     if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid'].includes(a)){
@@ -2330,12 +2362,50 @@ function genPwd() {
   setTimeout(() => { const e = document.getElementById('aioPwd'); if (e) e.type = 'password'; }, 5000);
 }
 
+function extractManifestParts(val) {
+  if (!val || !val.includes('/stremio/')) return null;
+  try {
+    const u = new URL(val);
+    const parts = u.pathname.split('/').filter(Boolean);
+    const stremioIdx = parts.indexOf('stremio');
+    if (stremioIdx === -1 || parts.length < stremioIdx + 3) return null;
+    const uuid = parts[stremioIdx + 1];
+    const password = decodeURIComponent(parts[stremioIdx + 2]);
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid)) return null;
+    const origin = u.origin;
+    const hostKey = Object.keys(HOST_BASE_URLS).find(k => HOST_BASE_URLS[k] === origin) || null;
+    return { uuid, password: password !== 'manifest.json' ? password : '', hostKey };
+  } catch(e) { return null; }
+}
+
+function validateUuid(val) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val || '');
+}
+
+function updateUuidValidation(val) {
+  const input = document.getElementById('aioUuid');
+  const status = document.getElementById('uuidStatus');
+  if (!input || !status) return;
+  if (!val) { input.style.borderColor = ''; status.innerHTML = ''; return; }
+  const ok = validateUuid(val);
+  input.style.borderColor = ok ? '#22c55e' : '#f87171';
+  status.innerHTML = ok
+    ? '<span style="color:#22c55e;font-weight:700">✓ Valid UUID — Saved</span>'
+    : '<span style="color:#f87171">Invalid format — must be xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>';
+}
+
 function onPasteManifest(val) {
   val = (val || '').trim();
   const result = document.getElementById('pasteManifestResult');
   if (!val) { result.innerHTML = ''; return; }
   try { new URL(val); } catch(e) { result.innerHTML = ''; return; }
   result.innerHTML = '';
+  const extracted = extractManifestParts(val);
+  if (extracted) {
+    if (extracted.uuid && !S.instanceUuid) { S.instanceUuid = extracted.uuid; saveState(); const uel=document.getElementById('aioUuid'); if(uel)uel.value=extracted.uuid; updateUuidValidation(extracted.uuid); }
+    if (extracted.hostKey && S.instanceHost !== extracted.hostKey) { S.instanceHost = extracted.hostKey; saveState(); const sel=document.getElementById('aioHost'); if(sel)sel.value=extracted.hostKey; const uuidRow=document.getElementById('aioUuidRow'),cfgLinkRow=document.getElementById('hostConfigLinkRow'),cfgLink=document.getElementById('hostConfigLink'); if(uuidRow)uuidRow.style.display=''; if(cfgLinkRow)cfgLinkRow.style.display=''; if(cfgLink&&HOST_BASE_URLS[extracted.hostKey])cfgLink.href=HOST_BASE_URLS[extracted.hostKey]+'/configure'; }
+    if (extracted.password && !S.instancePassword) { S.instancePassword = extracted.password; saveState(); const pe=document.getElementById('aioPwd'); if(pe)pe.value=extracted.password; }
+  }
   showManifestModal(val, null, null);
 }
 
@@ -2393,7 +2463,7 @@ async function createImportUrl() {
 }
 
 async function openInAIOStreams() {
-  const HOST_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
+  const HOST_URLS = HOST_BASE_URLS;
   const HOST_LABELS = { 'https://aiostreams.elfhosted.com':'ElfHosted', 'https://aiostreams.fortheweak.cloud':'ForthWeak', 'https://aiostreamsfortheweebsstable.midnightignite.me':"Midnight's", 'https://aiostreams.viren070.me':"Viren's", 'https://aiostreams.stremio.ru':"Kuu's", 'https://aio.atbphosting.com':'ATBP', 'https://aiostreams.12312023.xyz':"Omni's" };
   const isAuto = S.instanceHost === 'auto', isCustom = S.instanceHost === 'custom';
   const base = HOST_URLS[S.instanceHost] || (S.instanceUrl || '').trim().replace(/\/$/, '');
