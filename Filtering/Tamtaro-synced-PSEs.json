@@ -1,0 +1,26 @@
+[
+  {
+    "expression": "/*Part of Tamtaro SEL Setup*/[]",
+    "enabled": true
+  },
+  {
+    "expression": "/*PSE v1.2.1 [git.tamtaro.de]*/[]",
+    "enabled": true
+  },
+  {
+    "expression": "/*Tier 1 Cached*/ cached(merge(library(streams),seadex(streams),type(streams,'debrid'),type(service(streams,'torbox'),'usenet'),message(type(streams,'usenet','stremio-usenet'),'includes','✅','🧝','💚')))",
+    "enabled": true
+  },
+  {
+    "expression": "/*Tier 2 Cached*/ merge(cached(type(streams, 'usenet')), type(streams, 'stremio-usenet', 'http', 'p2p'))",
+    "enabled": true
+  },
+  {
+    "expression": "/*Tier 3 Uncached*/uncached(type(streams,'usenet'))",
+    "enabled": true
+  },
+  {
+    "expression": "/*Tier 4 Uncached*/uncached(type(streams,'debrid'))",
+    "enabled": true
+  }
+]

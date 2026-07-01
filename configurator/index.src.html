@@ -490,8 +490,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '1.9';
+const CONFIGURATOR_VERSION = '2.0';
 const CHANGELOG = [
+  { v:'2.0', date:'Jul 1 2026', items:[
+    'Fix: keyboard Enter/Escape now disabled when manifest or advanced modal is open',
+    'Fix: Skip buttons on Device/Content steps now respect Quick Start flow',
+    'Fix: groups (dynamic addon fetching) now enabled for multi-service configs that include TorBox Pro',
+    'Fix: formatter picker on Review step now updates receipt row and summary label in-place without full re-render',
+  ]},
   { v:'1.9', date:'Jul 1 2026', items:[
     'Step dots show ✓ for completed steps — progress ring fills as you advance',
     'Back button names the destination — "← Resolution" instead of "← Back"',
@@ -1511,9 +1517,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Keyboard shortcuts: Enter = next, Escape = back
   document.addEventListener('keydown', (e) => {
     if (step === 0) return;
+    if (document.getElementById('manifestModal') || document.getElementById('advModal')) return;
     const tag = document.activeElement?.tagName;
     const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable;
     if (e.key === 'Enter' && !inInput && !e.shiftKey) {
+      e.preventDefault();
       const btn = document.getElementById('btnNext');
       if (btn && !btn.disabled && btn.style.display !== 'none') btn.click();
     }
@@ -1547,12 +1555,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'skip-device') {
       S.device = 'generic';
       document.getElementById('main').classList.remove('nav-back');
-      step++; saveState(); render(); window.scrollTo(0,0);
+      step = (step === 1 && S.quickStart) ? 5 : step + 1;
+      saveState(); render(); window.scrollTo(0,0);
     }
     if (action === 'skip-content') {
       S.content = 'all';
       document.getElementById('main').classList.remove('nav-back');
-      step++; saveState(); render(); window.scrollTo(0,0);
+      step = (step === 1 && S.quickStart) ? 5 : step + 1;
+      saveState(); render(); window.scrollTo(0,0);
     }
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
@@ -1646,6 +1656,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pw) pw.style.display = on ? '' : 'none';
         const arr = card.querySelector('[style*="flex-shrink:0"]');
         if (arr && (arr.textContent === '✓' || arr.textContent === '›')) arr.textContent = on ? '✓' : '›';
+      });
+      // Update the receipt row and summary label in-place when on Review step
+      const fmtLbl = label('formatter', S.formatter);
+      const fmtSummary = document.querySelector('#fmtPickerDetails > summary span:first-child');
+      if (fmtSummary) fmtSummary.innerHTML = `<span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${fmtLbl}</span>`;
+      const receiptRows = document.querySelectorAll('.receipt-row');
+      receiptRows.forEach(row => {
+        const lbl2 = row.querySelector('.receipt-row-lbl');
+        if (lbl2 && lbl2.textContent.trim() === 'formatter') {
+          const val = row.querySelector('.receipt-row-val');
+          if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'apex-v2' ? ' hl' : ''}`; }
+        }
       });
     }
   });
@@ -2007,7 +2029,7 @@ function build() {
       sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
       deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
       dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
-      groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid'), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
+      groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid' || (S.service === 'multi' && S.multiServices.includes('torbox-pro'))), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
       formatter: (function(){ const _f = FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })()
     }
   };
