@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.1.0 (2026-07-01)
+
+### Added
+- **Base Config (parentConfig support)** (`configurator`) — new purple "Base Config" collapsible panel on the Review step. Enter the UUID (and optional password) of your imported `Core Builds Base — TorBox` config. When a valid UUID is provided, the generated template is wrapped in a `parentConfig` block and all shared fields are stripped from the child — reducing output size from ~65 KB to ~44 KB (111 → 24 config keys). The parent supplies formatter, sort criteria, presets, deduplicator, proxy, regex URLs, and category colours; the child retains only resolution, expressions, encodes, visual tags, and branding. Leaving the UUID blank generates a fully standalone template as before — no behaviour change for existing users.
+- **`Templates/Base/core-nexus-base-torbox.json`** (v1.0.0) — new shared base template holding all 84 common fields across TorBox Pro templates. 13 presets: Library, Zilean, SeaDex, StremThru Torz, Meteor, Comet, MediaFusion, HdHub, EZTV, Torrent Galaxy, Knaben, AIOSubtitle, TorBox Search. Full tamtaro formatter, 12-key sort criteria, deduplicator with tiebreakers, autoPlay, MediaFlow proxy, Vidhin05 + Tamtaro regex URLs, and addon category colour map. Import once — all configurator-generated child templates inherit it automatically.
+- **Configurator version badge** (`configurator`) — `v2.2` badge displayed next to "By Brevity" on the splash screen and in the top-right corner of the header on all wizard steps.
+
+### Changed
+- **`parentConfig` merge strategies** — `presets: extend` (child presets added on top of parent's 13), `services: inherit`, `filters: override` (child ESEs/ISEs/PSEs take full effect), `sorting: inherit`, `formatter: inherit`, `branding: override`, `proxy: inherit`, `metadata: inherit`, `misc: inherit`.
+
+---
+
 ## 3.0.5 (2026-06-30)
 
 ### Added
