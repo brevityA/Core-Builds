@@ -470,6 +470,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-link:hover{color:#00d4ff;text-shadow:0 0 12px rgba(0,212,255,.5)}
 [data-theme="light"] .splash-link{color:#0e7490}
 [data-theme="light"] .splash-link:hover{color:#0c4a6e;text-shadow:none}
+.splash-pill-wrap{background:rgba(103,232,249,.04);border:1px solid rgba(103,232,249,.13)}
+[data-theme="light"] .splash-pill-wrap{background:rgba(14,116,144,.04);border-color:rgba(14,116,144,.18)}
+.splash-pill{background:rgba(103,232,249,.07);border:1px solid rgba(103,232,249,.18)}
+[data-theme="light"] .splash-pill{background:rgba(14,116,144,.06);border-color:rgba(14,116,144,.22)}
 .community-link{font-size:.73rem;font-weight:600;color:#67e8f9;text-decoration:none;transition:color .15s,text-shadow .15s;display:flex;align-items:center;gap:5px}
 .community-link:hover{color:#00d4ff;text-shadow:0 0 12px rgba(0,212,255,.5)}
 [data-theme="light"] .community-link{color:#0e7490}
@@ -1168,19 +1172,22 @@ function splashHtml() {
       <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
       <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
     </div>
-    <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px;width:100%;max-width:310px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.05)">
-      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
-        GitHub
-      </a>
-      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
-        Reddit
-      </a>
-      <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="splash-link">
-        Browse Templates
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </a>
+    <div class="splash-pill-wrap" style="width:100%;max-width:310px;margin-top:16px;border-radius:12px;padding:11px 14px">
+      <div style="font-size:.63rem;font-weight:700;color:#4b5563;letter-spacing:.08em;text-transform:uppercase;text-align:center;margin-bottom:10px">Skip the wizard</div>
+      <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:7px">
+        <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Browse Templates
+        </a>
+        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </a>
+        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+          Reddit
+        </a>
+      </div>
     </div>
     <details style="width:100%;max-width:310px;margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
       <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:#4b5563;letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
