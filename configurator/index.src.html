@@ -490,8 +490,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '1.7';
+const CONFIGURATOR_VERSION = '1.8';
 const CHANGELOG = [
+  { v:'1.8', date:'Jul 1 2026', items:[
+    'Duplicate API key fix — TorBox field no longer doubled when TorBox Pro + Hybrid both selected',
+    'Resolution auto-detect — 4K pre-selected on first visit if a 4K display is detected',
+    'Template name auto-fill — Review step pre-populates name field with generated default',
+    'Changelog readability — current version items rendered in cyan; dates and older items visible in dark mode',
+  ]},
   { v:'1.7', date:'Jul 1 2026', items:[
     'Multi-select services — pick multiple debrid services, each gets its own API key field',
     'Other Services drawer — Debrid.io, P2P Free, HTTP Streams, NZBGeek in a collapsible menu',
@@ -1141,7 +1147,8 @@ function render() {
   const def  = DEFS[step - 1];
 
   if (step === STEPS) {
-    const auto = defaultName();
+    if (!S.name) { S.name = defaultName(); saveState(); }
+    const auto = S.name;
     const hasApis = S.tmdbToken || S.tmdbApiKey || Object.values(S.creds).some(v=>v);
     main.innerHTML = `
       <div class="card">
@@ -1464,6 +1471,12 @@ function updateMultiPanel() {
 /* DELEGATED EVENTS */
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  if (!hadSavedState && S.resolution === null) {
+    try {
+      const px = (screen.width || 0) * (window.devicePixelRatio || 1);
+      if (px >= 3840) S.resolution = '4k';
+    } catch(e) {}
+  }
   render();
 
   // Handle all clicks
@@ -1731,7 +1744,7 @@ function getDebridInputs() {
   if (m.includes('easynews'))   { ids.push('easynews'); ids.push('easynewsPass'); }
   if (m.includes('debridio'))   ids.push('debridio');
   if (m.includes('nzbgeek'))    ids.push('nzbgeek');
-  return ids.map(id => ({id, ...defs[id]})).filter(d => d.label);
+  return [...new Set(ids)].map(id => ({id, ...defs[id]})).filter(d => d.label);
 }
 
 function ruid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); }); }
