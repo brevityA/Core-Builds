@@ -5,7 +5,7 @@
     "description": "Speed-optimised 4K build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Lite: hard kills only, quality gates removed. Exits as soon as 3 cached 4K streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.6",
+    "version": "2.9.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
