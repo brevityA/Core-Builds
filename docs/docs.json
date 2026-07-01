@@ -9,9 +9,9 @@
   },
   "favicon": "/logo/core_icon.svg",
   "colors": {
-    "primary": "#3B82F6",
-    "light": "#93C5FD",
-    "dark": "#1D4ED8"
+    "primary": "#00d4ff",
+    "light": "#67e8f9",
+    "dark": "#0096b4"
   },
   "topbarLinks": [
     {

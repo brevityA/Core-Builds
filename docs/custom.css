@@ -15,3 +15,69 @@ body:has(img[src*="banner_square_transparent"]) [class*="ArticleHeader" i] {
   padding: 0 !important;
   overflow: hidden !important;
 }
+
+/* ── Configurator-matching cyan accent theme ─────────────────────────── */
+
+/* Sidebar active link */
+[class*="sidebar" i] a[aria-current="page"],
+[class*="nav" i] a[aria-current="page"] {
+  color: #00d4ff !important;
+  background: rgba(0, 212, 255, 0.08) !important;
+  border-left-color: #00d4ff !important;
+}
+
+/* Inline code */
+code:not([class*="language"]) {
+  background: rgba(0, 212, 255, 0.08) !important;
+  border: 1px solid rgba(0, 212, 255, 0.18) !important;
+  color: #00d4ff !important;
+  border-radius: 4px !important;
+}
+
+/* Links */
+article a:not([class]) {
+  color: #00d4ff !important;
+  text-decoration: none;
+}
+article a:not([class]):hover {
+  color: #67e8f9 !important;
+  text-decoration: underline;
+}
+
+/* Card hover border glow */
+[class*="Card" i]:hover,
+[class*="card" i]:hover {
+  border-color: rgba(0, 212, 255, 0.35) !important;
+  box-shadow: 0 4px 24px rgba(0, 180, 220, 0.12) !important;
+}
+
+/* Tip / callout icon colour override */
+[class*="tip" i] [class*="icon" i],
+[class*="info" i] [class*="icon" i] {
+  color: #00d4ff !important;
+}
+
+/* Search highlight */
+mark, [class*="highlight" i] {
+  background: rgba(0, 212, 255, 0.18) !important;
+  color: #e6edf3 !important;
+  border-radius: 2px;
+}
+
+/* Top CTA button */
+[class*="topbar" i] a[class*="cta" i],
+[class*="TopbarCta" i] {
+  background: linear-gradient(135deg, #0096b4, #00d4ff) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+  border: none !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.25) !important;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.45) !important;
+}
