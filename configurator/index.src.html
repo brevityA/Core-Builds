@@ -466,6 +466,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .continue-banner{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.22)!important}
 [data-theme="light"] .splash-cta-continue{background:rgba(9,105,218,.12)!important;border-color:rgba(9,105,218,.4)!important;color:#0969da!important}
 [data-theme="light"] .splash-cta-discard{border-color:#d0d7de!important;color:#8c959f!important}
+.splash-link{display:flex;align-items:center;gap:4px;font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s}
+.splash-link:hover{color:#e6edf3}
+[data-theme="light"] .splash-link{color:#8c959f}
+[data-theme="light"] .splash-link:hover{color:#1c2128}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -490,8 +494,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.0';
+const CONFIGURATOR_VERSION = '2.1';
 const CHANGELOG = [
+  { v:'2.1', date:'Jul 1 2026', items:[
+    'Community links on splash — GitHub, Reddit, and Browse Templates for users who want a pre-built template without the wizard',
+    'Share Config — encode your exact wizard settings into a URL and copy it to share with others',
+    'Copy button next to Import URL — explicit copy button on the inline URL after "Create Import URL"',
+    '"More from Core Builds" section on Review step — GitHub, Reddit, and template browser links after generation',
+    'Manifest modal — Explore More row at the bottom with Browse Templates and Reddit links',
+    '"↺ Start Over" renamed from "↺ Reset" for clarity',
+  ]},
   { v:'2.0', date:'Jul 1 2026', items:[
     'Fix: keyboard Enter/Escape now disabled when manifest or advanced modal is open',
     'Fix: Skip buttons on Device/Content steps now respect Quick Start flow',
@@ -680,14 +692,33 @@ function saveState() {
   localStorage.setItem('coreBuild', JSON.stringify(S));
   localStorage.setItem('coreBuildStep', step);
 }
+function shareConfig() {
+  try {
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+    const url = location.origin + location.pathname + '#cfg=' + encoded;
+    navigator.clipboard.writeText(url).then(() => showToast('Share link copied — anyone with this link gets your exact settings'));
+  } catch(e) { showToast('Failed to copy share link', true); }
+}
+
 function loadState() {
   try {
     const params = new URLSearchParams(location.search);
     if (params.has('fresh')) {
       localStorage.removeItem('coreBuild');
       localStorage.removeItem('coreBuildStep');
-      history.replaceState(null, '', location.pathname);
+      history.replaceState(null, '', location.pathname + location.hash);
       return;
+    }
+    const hash = location.hash;
+    if (hash.startsWith('#cfg=')) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(5)))));
+        Object.assign(S, decoded);
+        hadSavedState = true;
+        S.service = deriveService();
+        history.replaceState(null, '', location.pathname);
+        return;
+      } catch(e) { console.warn('Failed to load shared config', e); }
     }
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
@@ -1057,7 +1088,7 @@ function renderProgress() {
   }).join('');
 
   const strip = document.getElementById('stepStrip');
-  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Reset all choices">↺ Reset</button></div>`;
+  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Start over from scratch">↺ Start Over</button></div>`;
 
   // Breadcrumb chips — show completed selections
   const chips = keys.slice(0, step - 1).map((k, i) => {
@@ -1121,7 +1152,23 @@ function splashHtml() {
       <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
       <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
     </div>
-    <details style="width:100%;max-width:310px;margin-top:18px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
+    <div style="display:flex;justify-content:center;align-items:center;gap:12px;width:100%;max-width:310px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.05)">
+      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        GitHub
+      </a>
+      <span style="color:#21262d">·</span>
+      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+        Reddit
+      </a>
+      <span style="color:#21262d">·</span>
+      <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="splash-link">
+        Browse Templates
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+    <details style="width:100%;max-width:310px;margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
       <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:#4b5563;letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
         What's new
         <span style="color:#00d4ff;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
@@ -1255,6 +1302,7 @@ function render() {
           </div>
         </div>
         <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
+        <button data-action="share-config" style="width:100%;margin-top:8px;padding:11px;font-size:.8rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share This Config</button>
         <button class="btn-aio" data-action="create-import" id="btnImport" style="margin-top:10px">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           Create Import URL
@@ -1322,6 +1370,25 @@ function render() {
               <div id="pasteManifestResult"></div>
             </div>
           </details>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);text-align:center">
+          <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase;margin-bottom:11px">More from Core Builds</div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
+            <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Browse Templates
+            </a>
+            <span style="color:#21262d">·</span>
+            <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              GitHub
+            </a>
+            <span style="color:#21262d">·</span>
+            <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+              Reddit
+            </a>
+          </div>
         </div>
       </div>`;
     nav.style.display = 'flex';
@@ -1578,6 +1645,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { showAdvanced = false; clearState(); }
+    if (action === 'share-config') shareConfig();
     if (action === 'generate-dl') generate();
     if (action === 'create-import') createImportUrl();
     if (action === 'gen-pwd') genPwd();
@@ -2109,6 +2177,13 @@ function showManifestModal(manifestUrl, password, hostLabel) {
           <div id="stremioInstallResult" style="font-size:.75rem"></div>
         </div>
       </details>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;gap:14px">
+        <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" style="font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">Browse Templates →</a>
+        <span style="color:#21262d">·</span>
+        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" style="font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">Reddit</a>
+        <span style="color:#21262d">·</span>
+        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" style="font-size:.71rem;font-weight:600;color:#4b5563;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#4b5563'">GitHub</a>
+      </div>
     </div>`;
   document.body.appendChild(overlay);
 
@@ -2301,7 +2376,7 @@ async function createImportUrl() {
 
   if (url) {
     navigator.clipboard.writeText(url).catch(()=>{});
-    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Click your instance to auto-import</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Opens AIOStreams with your template pre-loaded. Debrid credentials stripped for security — TMDB keys are included.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 3px">Or copy the URL to import manually:</div><div class="manifest-url" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div></div>`;
+    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Click your instance to auto-import</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Opens AIOStreams with your template pre-loaded. Debrid credentials stripped for security — TMDB keys are included.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy the URL to import manually:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy</button></div></div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
     result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">Your browser's security blocked the cross-origin request. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
