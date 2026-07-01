@@ -1519,9 +1519,12 @@ function render() {
           </details>
         </div>
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);text-align:center">
-          <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase;margin-bottom:11px">More from Core Builds</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+            <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase">More from Core Builds</div>
+            <button data-action="start-setup" style="font-size:.65rem;font-weight:700;color:#4b5563;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
+          </div>
           <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 16px">
-            <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="community-link">
+            <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
             </a>
@@ -1537,7 +1540,9 @@ function render() {
         </div>
       </div>`;
     nav.style.display = 'flex';
-    document.getElementById('btnBack').style.visibility = 'visible';
+    const _rb = document.getElementById('btnBack');
+    _rb.style.visibility = 'visible';
+    _rb.innerHTML = '← Edit Config';
     document.getElementById('btnNext').style.display = 'none';
     if (pasteMode) {
       pasteMode = false;
@@ -1612,8 +1617,15 @@ function render() {
             <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
             <a href="${inp.url}" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
           </div>
-          <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="text" placeholder="${inp.placeholder}"
-            value="${S.creds[inp.id] || ''}" maxlength="120">
+          <div style="position:relative;display:flex;align-items:center">
+            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
+              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:38px">
+            <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
+              style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
+              onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>`).join('')}
         <div style="border-top:1px solid #21262d;margin:18px 0 14px"></div>
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Metadata &amp; Posters</div>
@@ -1623,16 +1635,30 @@ function render() {
             <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token (v4)</span>
             <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
           </div>
-          <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="text" placeholder="eyJhbGciOiJSUzI1NiJ9…"
-            value="${S.tmdbToken}" maxlength="400">
+          <div style="position:relative;display:flex;align-items:center">
+            <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+              value="${S.tmdbToken}" maxlength="400" style="padding-right:38px">
+            <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
+              style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
+              onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
         <div class="name-row">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key (v3)</span>
             <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.75rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
           </div>
-          <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="text" placeholder="abc123def456…"
-            value="${S.tmdbApiKey}" maxlength="60">
+          <div style="position:relative;display:flex;align-items:center">
+            <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+              value="${S.tmdbApiKey}" maxlength="60" style="padding-right:38px">
+            <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
+              style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
+              onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
       </div>`;
     nav.style.display = 'flex';
@@ -1832,6 +1858,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'create-import') createImportUrl();
     if (action === 'gen-pwd') genPwd();
     if (action === 'toggle-pwd') togglePwd();
+    if (action === 'toggle-cred-vis') {
+      const inp = document.getElementById(e.target.closest('[data-target]').dataset.target);
+      if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
     if (action === 'install-stremio') openInAIOStreams();
     if (action === 'copy-manifest') {
       const url = e.target.dataset.url || e.target.closest('[data-url]')?.dataset.url;
@@ -2351,6 +2381,13 @@ function generate() {
   const json = JSON.stringify(build(), null, 2), blob = new Blob([json], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
   a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 100);
+  const dlBtn = document.querySelector('.btn-dl');
+  if (dlBtn) {
+    const orig = dlBtn.innerHTML;
+    dlBtn.innerHTML = '✓ Downloaded!';
+    dlBtn.style.background = 'linear-gradient(135deg,#065f46,#059669)';
+    setTimeout(() => { dlBtn.innerHTML = orig; dlBtn.style.background = ''; }, 2200);
+  }
 }
 
 function showManifestModal(manifestUrl, password, hostLabel) {
@@ -2422,7 +2459,7 @@ function showManifestModal(manifestUrl, password, hostLabel) {
         </div>
       </details>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px">
-        <a href="https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox" target="_blank" rel="noopener" class="community-link">Browse Templates →</a>
+        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="community-link">Browse Templates →</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">Reddit</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">GitHub</a>
       </div>
@@ -2566,11 +2603,18 @@ function showApiReminder(onContinue) {
             <span class="rem-field-name">${inp.label}</span>
             <a href="${inp.url}" target="_blank" class="rem-field-link">Get key →</a>
           </div>
-          <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
-            type="${inp.id === 'easynewsPass' ? 'password' : 'text'}"
-            placeholder="${inp.placeholder}"
-            value="${S.creds[inp.id] || ''}" maxlength="120"
-            oninput="S.creds[this.dataset.service]=this.value;saveState()">
+          <div style="position:relative;display:flex;align-items:center">
+            <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
+              type="password"
+              placeholder="${inp.placeholder}"
+              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:40px"
+              oninput="S.creds[this.dataset.service]=this.value;saveState()">
+            <button type="button" data-action="toggle-cred-vis" data-target="rem_${inp.id}" title="Show / hide"
+              style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
+              onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>`).join('')}
       </div>
       <div class="rem-actions">
@@ -2711,7 +2755,28 @@ async function createImportUrl() {
 
   if (url) {
     navigator.clipboard.writeText(url).catch(()=>{});
-    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Click your instance to auto-import</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Opens AIOStreams with your template pre-loaded. Debrid credentials stripped for security — TMDB keys are included.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy the URL to import manually:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy</button></div></div>`;
+
+    // Build credential reminder block — keys were stripped from import URL
+    const credInputs = getDebridInputs().filter(i => S.creds[i.id] && S.creds[i.id].trim());
+    let credBlock = '';
+    if (credInputs.length) {
+      const rows = credInputs.map(inp => {
+        const val = (S.creds[inp.id] || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
+        return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px">
+          <span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span>
+          <div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div>
+          <button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.63rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.18)'" onmouseout="this.style.background='rgba(0,212,255,.08)'">Copy</button>
+        </div>`;
+      }).join('');
+      credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)">
+        <div style="font-size:.64rem;font-weight:700;color:#78716c;letter-spacing:.06em;margin-bottom:3px">CREDENTIALS TO ENTER IN AIOSTREAMS AFTER IMPORT</div>
+        <div style="font-size:.62rem;color:#4b5563;margin-bottom:7px">Enter these in AIOStreams → Services once your template has loaded.</div>
+        ${rows}
+      </div>`;
+    }
+
+    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Click your instance to auto-import</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Opens AIOStreams with your template pre-loaded. Debrid credentials stripped for security — TMDB keys are included.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy the URL to import manually:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy</button></div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
     result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">Your browser's security blocked the cross-origin request. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
