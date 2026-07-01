@@ -158,7 +158,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-list-row .opt-icon svg{width:28px!important;height:28px!important}
 .svc-list-row .opt-name{font-size:.86rem!important}
 .svc-list-row .opt-desc{font-size:.69rem!important;margin-top:1px!important}
-.svc-list-arr{color:#374151;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
+.svc-list-arr{color:#6b7280;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
 .svc-list-row input:checked+label .svc-list-arr{color:#00d4ff}
 @media(min-width:720px){
   .wrap{max-width:980px}
@@ -311,7 +311,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .srh-ring{position:relative;width:52px;height:52px;flex-shrink:0}
 .srh-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:900;color:#00d4ff}
 .srh-title{font-size:1.15rem;font-weight:900;letter-spacing:-.02em;line-height:1.1;color:#e6edf3}
-.srh-sub{font-size:.75rem;color:#3d6880;margin-top:4px;line-height:1.4}
+.srh-sub{font-size:.75rem;color:#6b8ca5;margin-top:4px;line-height:1.4}
 .step-strip{display:flex;align-items:center;padding:10px 0 6px;position:relative}
 .step-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0}
 .step-unit:not(:first-child)::before{content:'';position:absolute;top:50%;transform:translateY(-50%);right:50%;width:100%;height:1px;background:#2d333b;z-index:0;transition:background .3s}
@@ -408,7 +408,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .srh-sub{color:#57606a}
 [data-theme="light"] .splash-by{color:#8c959f}
 [data-theme="light"] .splash-tagline{color:#57606a}
-[data-theme="light"] .splash-chip-feat{color:#57606a}
+[data-theme="light"] .splash-chip-feat{color:#57606a;border-color:#d0d7de;background:rgba(0,0,0,.03)}
+[data-theme="light"] .splash-chip-svc{color:#0e7490;border-color:rgba(14,116,144,.4);background:rgba(14,116,144,.07)}
+[data-theme="light"] .svc-list-arr{color:#9ca3af}
+[data-theme="light"] .splash-paste{color:#0e7490}
+[data-theme="light"] .splash-paste:hover{color:#0c4a6e}
 [data-theme="light"] .step-pending .step-bub{background:#d0d7de}
 [data-theme="light"] .step-unit:not(:first-child)::before{background:#d0d7de}
 [data-theme="light"] .btn-reset-strip{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.09)!important;color:#8c959f}
@@ -482,10 +486,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .host-cfg-link:hover{color:#00d4ff;text-shadow:0 0 10px rgba(0,212,255,.4)}
 [data-theme="light"] .host-cfg-link{color:#0e7490}
 [data-theme="light"] .host-cfg-link:hover{color:#0c4a6e;text-shadow:none}
+#cb-loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0d1117;animation:cbLoad 2s cubic-bezier(.4,0,.2,1) forwards;pointer-events:none}
+[data-theme="light"] #cb-loader{background:#e8eef4}
+#cb-loader-icon{width:90px;height:90px;animation:cbIconPop .6s cubic-bezier(.34,1.56,.64,1) .1s both}
+#cb-loader-title{font-family:system-ui,-apple-system,sans-serif;font-size:1.55rem;font-weight:900;letter-spacing:-.03em;color:#e6edf3;line-height:1}
+[data-theme="light"] #cb-loader-title{color:#1c2128}
+#cb-loader-title span{color:#00d4ff}
+#cb-loader-sub{font-size:.62rem;font-weight:700;letter-spacing:.18em;color:#374151;text-transform:uppercase}
+[data-theme="light"] #cb-loader-sub{color:#8c959f}
+@keyframes cbLoad{0%{opacity:0}12%{opacity:1}72%{opacity:1}100%{opacity:0}}
+@keyframes cbIconPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
 <body>
+<div id="cb-loader">
+  <svg id="cb-loader-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <defs>
+      <linearGradient id="lg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
+      <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
+      <filter id="lf1"><feGaussianBlur stdDeviation="10" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+      <filter id="lf2"><feGaussianBlur stdDeviation="18"/></filter>
+    </defs>
+    <polygon points="256,30 450,140 450,372 256,482 62,372 62,140" fill="#0d1623" stroke="url(#lg1)" stroke-width="8" filter="url(#lf1)"/>
+    <polygon points="256,60 420,155 420,357 256,452 92,357 92,155" fill="none" stroke="url(#lg2)" stroke-width="3" opacity=".6"/>
+    <polygon points="256,70 210,96 210,148 256,174 302,148 302,96" fill="url(#lg2)" opacity=".9" filter="url(#lf2)"/>
+    <polygon points="256,80 216,103 216,149 256,172 296,149 296,103" fill="url(#lg1)"/>
+    <text x="256" y="320" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="130" fill="url(#lg1)" opacity=".15" letter-spacing="-4">CB</text>
+  </svg>
+  <div id="cb-loader-title">CORE <span>BUILDS</span></div>
+  <div id="cb-loader-sub">by Brevity</div>
+</div>
 <div id="toast" class="toast"></div>
 <div class="wrap">
   <header class="hdr">
@@ -1584,7 +1615,8 @@ function syncNext() {
   } else if (!def.key) {
     btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
   } else {
-    btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;opacity:.5">Select one to continue</span><span class="cta-arr" style="opacity:.3">→</span>`;
+    const _ph = document.documentElement.getAttribute('data-theme')==='light';
+    btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;color:${_ph?'#9ca3af':'#4b5563'}">Select one to continue</span><span class="cta-arr" style="color:${_ph?'#9ca3af':'#374151'}">→</span>`;
   }
 }
 
@@ -1616,6 +1648,7 @@ function updateMultiPanel() {
 }
 
 /* DELEGATED EVENTS */
+{ const l = document.getElementById('cb-loader'); if (l) l.addEventListener('animationend', () => l.remove()); }
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   if (!hadSavedState && S.resolution === null) {
