@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. 1080p build. Template directives: TorBox Search and exit thresholds configurable at import.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.13",
+    "version": "0.1.14",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

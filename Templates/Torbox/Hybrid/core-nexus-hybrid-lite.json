@@ -5,7 +5,7 @@
     "description": "A 1080p SDR hybrid build for TorBox users who also run a Usenet indexer. Combines TorBox's Usenet and torrent cache with NZBGeek for maximum source diversity. Unlike other builds, shows both cached and uncached streams — uncached streams are downloaded by TorBox before playback begins. Targets 1080p and 720p only — 4K and HDR are excluded. Blocks BluRay and Remux for low-end hardware compatibility. File range 1 GB–60 GB, 1080p capped at 25 GB. NZBGeek API key required — enter your key in the NZBGeek preset before saving. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.10",
+    "version": "2.9.11",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

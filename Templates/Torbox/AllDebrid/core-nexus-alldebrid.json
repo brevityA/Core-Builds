@@ -5,7 +5,7 @@
     "description": "Core Nexus 1080p for AllDebrid. WEB-DL / Remux quality tiers · HDR preferred · TrueHD/Atmos. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.17",
+    "version": "0.1.18",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
