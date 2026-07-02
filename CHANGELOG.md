@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.3 (2026-07-02)
+
+### Changed
+- **Configurator v2.9** — Easy Setup one-click button now opens AIOStreams directly via `?template=URL` deep link instead of calling the API. Template is uploaded to paste.rs (credentials stripped), then AIOStreams fetches it client-side — no CORS issues, works on every public instance. Popup-blocked users get fallback instance chips.
+- **Configurator v2.9** — Addon groups replaced by dynamic addon fetching in configurator-generated templates. `groups` is now always `{ enabled: false, groupings: [] }` — eliminates the validation surface that caused "Every group must have at least one addon" errors. Dynamic exit (`totalTimeTaken > 5000` or cached stream count threshold) handles early stopping naturally.
+
 ## 3.2.2 (2026-07-02)
 
 ### Fixed
