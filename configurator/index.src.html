@@ -573,6 +573,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .device-help{color:#57606a;border-color:rgba(0,0,0,.12)}
 [data-theme="light"] .device-help b{color:#1f2328}
 [data-theme="light"] .help-btn{border-color:rgba(0,0,0,.15);background:rgba(0,0,0,.03);color:#8c959f}
+.step-unit.done{cursor:pointer}
+.step-unit.done:hover .step-bub{box-shadow:0 0 10px rgba(0,212,255,.8);transform:scale(1.3)}
+.step-unit.done:hover .step-lbl{color:#00d4ff}
+.receipt-row[data-action]{cursor:pointer;transition:background .15s}
+.receipt-row[data-action]:hover{background:rgba(0,212,255,.05)}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -604,7 +610,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div id="cb-loader-title">CORE <span>BUILDS</span></div>
   <div id="cb-loader-sub">by Brevity</div>
 </div>
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div class="wrap">
   <header class="hdr">
     <div class="prog-wrap">
@@ -628,11 +634,20 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.5';
+const CONFIGURATOR_VERSION = '2.6';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.6', date:'Jul 2 2026', items:[
+    'Browser Back button now steps back through the wizard instead of leaving the page',
+    'Step dots and Review receipt rows are clickable — jump straight to any completed step',
+    'Copy JSON button on Preview JSON — paste directly into AIOStreams → Import, nothing uploaded anywhere',
+    'Wrong-field detection — warns when a TorBox-style key lands in another service field (and vice versa)',
+    'Audio profiles got ? explainers — what eARC, DD+, and DTS exclusion actually mean',
+    'Accessibility: toasts and key-test results announced to screen readers; animations disabled under reduced-motion',
+    'Build note: the app script ships readable by design — the source is public on GitHub',
+  ]},
   { v:'2.5', date:'Jul 2 2026', items:[
     'QR codes now generated locally in your browser — manifest URLs (with your UUID and password) are no longer sent to an external QR service',
     'Test buttons on API keys — verify TorBox / Real-Debrid / AllDebrid / Premiumize / Debrid-Link keys before generating',
@@ -802,6 +817,13 @@ const FORMATTERS = [
   }
 ];
 
+const AUDIO_HELP = {
+  lossless: '<b>TrueHD / DTS-HD MA / FLAC</b>: full-quality studio audio. These tracks only work when your TV or player passes them to a receiver or soundbar over <b>eARC</b> (a newer HDMI audio channel). Without eARC you may get silence on these streams.',
+  standard: '<b>DD+ (Dolby Digital Plus)</b>: compressed surround that virtually every soundbar and smart TV supports. <b>Atmos</b> over DD+ works on most Dolby soundbars. The safe pick for TV speakers and soundbars.',
+  limited:  'Follows your device profile. If you picked Samsung or Fire Stick, lossless audio is already excluded automatically — this option simply lets the device choice decide.',
+  dolby:    'Excludes every <b>DTS</b> variant. For Dolby-only hardware (Bose, Sonos, most LG and Samsung soundbars) where DTS tracks play as silence or fall back to stereo.',
+};
+
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
   {v:'Portuguese'},{v:'Japanese'},{v:'Korean'},{v:'Chinese (Simplified)'},
@@ -952,6 +974,8 @@ function clearState() {
   location.assign(location.pathname + '?fresh');
 }
 
+function pushStep() { try { history.pushState({ step: step }, ''); } catch(e) {} }
+
 function deriveService() {
   const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'];
   const primary = S.multiServices.filter(s => PRIMARY.includes(s));
@@ -1023,8 +1047,9 @@ function renderOpts(def) {
           return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
             <div class="opt-icon" style="flex-shrink:0;pointer-events:none">${o.icon}</div>
             <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
+            <button type="button" class="help-btn" data-action="toggle-help-target" data-target="audiohelp_res_${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>
             <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
-          </div>`;
+          </div><div class="device-help" id="audiohelp_res_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
         }).join('');
         const curAudioLabel = AUDIO_OPTS.find(o => o.v === S.audio)?.name || 'Auto';
         const advOpen = !!S.audio && S.audio !== 'limited';
@@ -1216,8 +1241,9 @@ function renderAdvancedPanel() {
     return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
       <div style="flex-shrink:0;pointer-events:none">${o.icon}</div>
       <div style="flex:1;min-width:0;pointer-events:none"><div style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
+      <button type="button" class="help-btn" data-action="toggle-help-target" data-target="audiohelp_adv_${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>
       <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
-    </div>`;
+    </div><div class="device-help" id="audiohelp_adv_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
   }).join('');
 
   const fmtCards = FORMATTERS.map(f => {
@@ -1307,7 +1333,8 @@ function renderProgress() {
     const n = i + 1;
     const state = n < step ? 'done' : n === step ? 'active' : 'pending';
     const tipName = DEFS[i] ? DEFS[i].title : (n === STEPS ? 'Review' : `Step ${n}`);
-    return `<div class="step-unit ${state}" title="${tipName}"><div class="step-bub">${state==='done'?'✓':''}</div><div class="step-lbl">${tipName}</div></div>`;
+    const clickable = state === 'done' ? ` data-action="jump-step" data-step="${n}" role="button" tabindex="0" aria-label="Go back to ${tipName}"` : '';
+    return `<div class="step-unit ${state}" title="${tipName}"${clickable}><div class="step-bub">${state==='done'?'✓':''}</div><div class="step-lbl">${tipName}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
@@ -1476,10 +1503,12 @@ function render() {
             {k:'content',    ico:'🎬'},
             {k:'formatter',  ico:'🎨'},
           ].map(({k, ico}) => {
+            const JUMP = { service:1, device:2, resolution:3, audio:3, content:4 };
+            const jumpAttr = JUMP[k] ? ` data-action="jump-step" data-step="${JUMP[k]}" title="Click to change"` : (k === 'formatter' ? ` data-action="open-fmt-picker" title="Click to change"` : '');
             const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
             const val = label(k, S[k]) || '—';
             const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && S.resolution==='4k') || (k==='formatter' && S.formatter!=='apex-v2');
-            return `<div class="receipt-row">
+            return `<div class="receipt-row"${jumpAttr}>
               <div class="receipt-row-left">
                 <span class="receipt-row-ico">${ico}</span>
                 <span class="receipt-row-lbl">${k}</span>
@@ -1519,7 +1548,7 @@ function render() {
         </details>
         <details id="jsonPreviewDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
-            <span>Preview JSON</span><span style="font-size:.7rem;color:#374151">›</span>
+            <span>Preview JSON</span><span style="display:flex;align-items:center;gap:10px"><button type="button" data-action="copy-json" style="font-size:.74rem;font-weight:700;color:#00d4ff;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);border-radius:6px;padding:3px 11px;cursor:pointer;text-transform:none;letter-spacing:0">Copy JSON</button><span style="font-size:.7rem;color:#374151">›</span></span>
           </summary>
           <pre id="jsonPreview" style="margin:0;padding:12px 16px;background:#0d1117;overflow-x:auto;font-size:.68rem;color:#8b949e;font-family:monospace;line-height:1.5;max-height:260px;overflow-y:auto"></pre>
         </details>
@@ -1756,7 +1785,7 @@ function render() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
-          <span class="cred-status" id="credStatus_${inp.id}"></span>
+          <span class="cred-status" id="credStatus_${inp.id}" role="status" aria-live="polite"></span>
         </div>`).join('')}
         <div style="border-top:1px solid #21262d;margin:18px 0 14px"></div>
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Metadata &amp; Posters</div>
@@ -1871,6 +1900,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e) {}
   }
   render();
+  try { history.replaceState({ step: step }, ''); } catch(e) {}
+  window.addEventListener('popstate', (e) => {
+    const m = document.getElementById('manifestModal'); if (m) m.remove();
+    showAdvanced = false;
+    step = (e.state && typeof e.state.step === 'number') ? e.state.step : 0;
+    saveState(); render(); window.scrollTo(0, 0);
+  });
 
   // Keyboard shortcuts: Enter = next, Escape = back
   document.addEventListener('keydown', (e) => {
@@ -1882,6 +1918,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable;
     if (e.key === 'Enter' && !inInput && !e.shiftKey) {
       e.preventDefault();
+      const ae = document.activeElement;
+      if (ae && ae.dataset && ae.dataset.action) { ae.click(); return; }
       const btn = document.getElementById('btnNext');
       if (btn && !btn.disabled && btn.style.display !== 'none') btn.click();
     }
@@ -1914,56 +1952,75 @@ document.addEventListener('DOMContentLoaded', () => {
           if (needed.length > 0 && !anyFilled) {
             showApiReminder(() => {
               document.getElementById('main').classList.remove('nav-back');
-              step = 6; saveState(); render(); window.scrollTo(0,0);
+              step = 6; pushStep(); saveState(); render(); window.scrollTo(0,0);
             });
             return;
           }
         }
         document.getElementById('main').classList.remove('nav-back');
         step = (step === 1 && S.quickStart) ? 5 : step + 1;
-        saveState(); render(); window.scrollTo(0,0);
+        pushStep(); saveState(); render(); window.scrollTo(0,0);
       }
     }
     if (action === 'nav-back') {
       if (step > 0) {
         document.getElementById('main').classList.add('nav-back');
         step = (step === 5 && S.quickStart) ? 1 : step - 1;
-        saveState(); render(); window.scrollTo(0,0);
+        pushStep(); saveState(); render(); window.scrollTo(0,0);
       }
     }
     if (action === 'skip-device') {
       S.device = 'generic';
       document.getElementById('main').classList.remove('nav-back');
       step = (step === 1 && S.quickStart) ? 5 : step + 1;
-      saveState(); render(); window.scrollTo(0,0);
+      pushStep(); saveState(); render(); window.scrollTo(0,0);
     }
     if (action === 'skip-content') {
       S.content = 'all';
       document.getElementById('main').classList.remove('nav-back');
       step = (step === 1 && S.quickStart) ? 5 : step + 1;
-      saveState(); render(); window.scrollTo(0,0);
+      pushStep(); saveState(); render(); window.scrollTo(0,0);
     }
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
       if (preset === 'p2p') {
         Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
-        step = 5; render(); window.scrollTo(0,0);
+        step = 5; pushStep(); render(); window.scrollTo(0,0);
       } else {
         if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:false, quickStart:true });
         else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:false, quickStart:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
-        step = 1; render(); window.scrollTo(0,0);
+        step = 1; pushStep(); render(); window.scrollTo(0,0);
       }
+    }
+    if (action === 'jump-step') {
+      const n = parseInt((e.target.closest('[data-step]') || e.target).dataset.step, 10);
+      if (n >= 1 && n < step) {
+        document.getElementById('main').classList.add('nav-back');
+        step = n; pushStep(); saveState(); render(); window.scrollTo(0,0);
+      }
+    }
+    if (action === 'open-fmt-picker') {
+      const d = document.getElementById('fmtPickerDetails');
+      if (d) { d.open = true; d.scrollIntoView({ behavior:'smooth', block:'center' }); }
     }
     if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
     if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
-    if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'continue-session') { step = _savedStep || 1; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'start-fresh') { clearState(); }
-    if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
     if (action === 'share-config') shareConfig();
+    if (action === 'copy-json') {
+      e.preventDefault();
+      if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); }
+      else {
+        navigator.clipboard.writeText(JSON.stringify(build(), null, 2)).then(() => showToast('Template JSON copied — paste it into AIOStreams → Import'));
+        saveLastGen();
+      }
+    }
     if (action === 'generate-dl') generate();
     if (action === 'create-import') createImportUrl();
     if (action === 'gen-pwd') genPwd();
@@ -1980,6 +2037,12 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const v = (e.target.closest('[data-v]') || e.target).dataset.v;
       const h = document.getElementById('help_' + v);
+      if (h) h.style.display = h.style.display === 'block' ? 'none' : 'block';
+    }
+    if (action === 'toggle-help-target') {
+      e.preventDefault();
+      const t = (e.target.closest('[data-target]') || e.target).dataset.target;
+      const h = document.getElementById(t);
       if (h) h.style.display = h.style.display === 'block' ? 'none' : 'block';
     }
     if (action === 'install-stremio') openInAIOStreams();
@@ -2139,7 +2202,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('input', (e) => {
     const a = e.target.dataset.action;
     if (a === 'update-name') S.name = e.target.value;
-    else if (a === 'update-cred') S.creds[e.target.dataset.service] = e.target.value;
+    else if (a === 'update-cred') {
+      S.creds[e.target.dataset.service] = e.target.value;
+      const st = document.getElementById('credStatus_' + e.target.dataset.service);
+      if (st) st.innerHTML = credHint(e.target.dataset.service, e.target.value);
+    }
     else if (a === 'update-tmdb') S.tmdbToken = e.target.value;
     else if (a === 'update-tmdb-key') S.tmdbApiKey = e.target.value;
     else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
@@ -2876,6 +2943,15 @@ const CRED_TESTS = {
   premiumize:  k => fetchWithTimeout('https://www.premiumize.me/api/account/info?apikey=' + encodeURIComponent(k), {}, 6000).then(r => r.json()).then(d => !!d && d.status === 'success'),
   debridlink:  k => fetchWithTimeout('https://debrid-link.com/api/v2/account/infos', { headers: { Authorization: 'Bearer ' + k } }, 6000).then(r => r.ok),
 };
+function credHint(id, val) {
+  const v = (val || '').trim();
+  if (!v) return '';
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+  if (id !== 'torbox' && isUuid) return '<span style="color:#f59e0b">⚠ This looks like a TorBox API key — is it in the right field?</span>';
+  if (id === 'torbox' && !isUuid && v.length >= 16) return '<span style="color:#f59e0b">⚠ TorBox keys look like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx — this does not match.</span>';
+  return '';
+}
+
 async function testCred(id, btn) {
   const key = (S.creds[id] || '').trim();
   const status = document.getElementById('credStatus_' + id);
