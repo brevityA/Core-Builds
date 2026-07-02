@@ -634,11 +634,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.7';
+const CONFIGURATOR_VERSION = '2.7.1';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.7.1', date:'Jul 2 2026', items:[
+    'TMDB fields renamed to match AIOStreams exactly — "TMDB Read Access Token" and "TMDB API Key" (version suffixes dropped)',
+    'Helper text under each TMDB field mirrors AIOStreams: the long eyJ… token vs the 32-character key',
+    'Swap detection — pasting the API Key into the Token field (or vice versa) shows an inline warning as you type',
+  ]},
   { v:'2.7', date:'Jul 2 2026', items:[
     'Easy Setup — the new default path: pick your service, device, and resolution (each advances automatically), add your key, then one Create &amp; Install button. No UUIDs, no import URLs, no manifest juggling',
     'One-click finish — your config is created on a public AIOStreams host with an auto-generated password and the Stremio install button appears immediately',
@@ -1809,7 +1814,7 @@ function render() {
         ` : ''}
         <div class="name-row" style="margin-bottom:14px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token (v4)</span>
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token</span>
             <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
           </div>
           <div style="position:relative;display:flex;align-items:center">
@@ -1821,10 +1826,12 @@ function render() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
+          <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">long</strong> token starting with <code style="color:#8b949e;font-family:monospace">eyJ</code> — not the 32-character API Key.</div>
+          <span class="cred-status" id="tmdbStatus" role="status" aria-live="polite"></span>
         </div>
         <div class="name-row">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key (v3)</span>
+            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key</span>
             <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
           </div>
           <div style="position:relative;display:flex;align-items:center">
@@ -1836,6 +1843,8 @@ function render() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
+          <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">32-character</strong> key — not the Read Access Token.</div>
+          <span class="cred-status" id="tmdbKeyStatus" role="status" aria-live="polite"></span>
         </div>
       </div>`;
     nav.style.display = 'flex';
@@ -2236,8 +2245,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const st = document.getElementById('credStatus_' + e.target.dataset.service);
       if (st) st.innerHTML = credHint(e.target.dataset.service, e.target.value);
     }
-    else if (a === 'update-tmdb') S.tmdbToken = e.target.value;
-    else if (a === 'update-tmdb-key') S.tmdbApiKey = e.target.value;
+    else if (a === 'update-tmdb') {
+      S.tmdbToken = e.target.value;
+      const st = document.getElementById('tmdbStatus');
+      if (st) st.innerHTML = tmdbHint('token', e.target.value);
+    }
+    else if (a === 'update-tmdb-key') {
+      S.tmdbApiKey = e.target.value;
+      const st = document.getElementById('tmdbKeyStatus');
+      if (st) st.innerHTML = tmdbHint('key', e.target.value);
+    }
     else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
     else if (a === 'update-pwd') S.instancePassword = e.target.value;
     else if (a === 'update-base-uuid') { S.baseUuid = e.target.value.trim(); e.target.style.borderColor = S.baseUuid ? 'rgba(168,85,247,.5)' : ''; }
@@ -3012,6 +3029,18 @@ const CRED_TESTS = {
   premiumize:  k => fetchWithTimeout('https://www.premiumize.me/api/account/info?apikey=' + encodeURIComponent(k), {}, 6000).then(r => r.json()).then(d => !!d && d.status === 'success'),
   debridlink:  k => fetchWithTimeout('https://debrid-link.com/api/v2/account/infos', { headers: { Authorization: 'Bearer ' + k } }, 6000).then(r => r.ok),
 };
+function tmdbHint(field, val) {
+  const v = (val || '').trim();
+  if (!v) return '';
+  const looksToken = v.startsWith('eyJ');
+  const looksKey = /^[a-f0-9]{32}$/i.test(v);
+  if (field === 'token' && looksKey) return '<span style="color:#f59e0b">⚠ That is the 32-character API Key — this field wants the long Read Access Token (starts with eyJ).</span>';
+  if (field === 'token' && !looksToken && v.length >= 20) return '<span style="color:#f59e0b">⚠ Read Access Tokens start with eyJ — this does not look like one.</span>';
+  if (field === 'key' && looksToken) return '<span style="color:#f59e0b">⚠ That is the Read Access Token — this field wants the 32-character API Key.</span>';
+  if (field === 'key' && !looksKey && v.length >= 24) return '<span style="color:#f59e0b">⚠ API Keys are exactly 32 characters (letters and numbers) — this does not look like one.</span>';
+  return '';
+}
+
 function credHint(id, val) {
   const v = (val || '').trim();
   if (!v) return '';
