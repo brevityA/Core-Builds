@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.1 (2026-07-02)
+
+### Changed
+- **Older-Show Pack Pass** (all 36 standard templates + shared `Filtering/core-builds-eses.json`) — refines the v3.2.0 Hard Season Pack Kill to eliminate its starvation trade-off. Packs are still killed whenever single episodes exist: recent/ongoing shows (last aired < 2 years ago) need just 1 single, any show with 3+ singles keeps the hard kill. But an ended show (2y+ since last airing) with fewer than 3 single-episode sources now keeps its season packs instead of returning zero results. Missing air-date metadata falls back to the 3-singles rule. Anime remains exempt throughout.
+
 ## 3.2.0 (2026-07-02)
 
 ### Added

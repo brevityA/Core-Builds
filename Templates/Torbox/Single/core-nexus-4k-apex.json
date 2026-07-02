@@ -5,7 +5,7 @@
     "description": "Adaptive flagship build. Ranked-pool-relative bitrate PSEs using Tukey IQR outlier detection: ≥4 ranked streams → Q1−1.5×IQR to Q3+1.5×IQR window; 1–3 ranked → 80%–120% of min/max; 0 ranked → pow(0.95, daysSinceRelease) decay median cluster. HDR and SDR evaluated separately in the WEB-DL tier. Full ESE stack: REPACK passthrough, per-addon flood guard, Usenet propagation guard, codec efficiency booster, DV-Only Kill, audio pinnacle, and more.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -321,7 +321,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Hard Season Pack Kill — episode requests never return packs (anime exempt) */ (queryType=='series' and not isAnime) ? seasonPack(streams) : []",
+        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass — packs killed when singles exist; ended shows (2y+) with under 3 singles keep packs (anime exempt) */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []",
         "enabled": true
       },
       {

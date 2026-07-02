@@ -5,7 +5,7 @@
     "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, TorBox Search, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.0",
+    "version": "2.10.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1657,7 +1657,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Hard Season Pack Kill — episode requests never return packs (anime exempt) */ (queryType=='series' and not isAnime) ? seasonPack(streams) : []",
+        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass — packs killed when singles exist; ended shows (2y+) with under 3 singles keep packs (anime exempt) */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []",
         "enabled": true
       },
       {
