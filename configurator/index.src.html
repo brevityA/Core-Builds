@@ -564,7 +564,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
     </div>
-    <span style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;user-select:none;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07)">v2.2</span>
+    <span id="hdrVersionBadge" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;user-select:none;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07)">v2.2</span>
   </header>
   
   <div id="main"></div>
@@ -578,8 +578,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.2';
+const CONFIGURATOR_VERSION = '2.3';
 const CHANGELOG = [
+  { v:'2.3', date:'Jul 2 2026', items:[
+    'Security: Share Config links now contain only wizard selections — API keys, tokens, UUIDs, and passwords are never included',
+    'Security: shared-link configs are validated and sanitized on load',
+    'Security: Import URL now also strips NZBGeek / Debrid.io preset keys and Base Config password before upload',
+    'Fix: selecting P2P Free auto-enables raw torrents — P2P templates no longer filter out every stream',
+    'Fix: P2P Quick Start generated TorBox presets — now produces a proper P2P template',
+    'Fix: size-limit pickers in Advanced and Review now use the same values (no more "10GBGB")',
+    'Fix: JSON preview refreshes every time it is opened',
+    'Fix: Auto host mode updates your existing config instead of creating a new one on every click',
+    'Fix: keyboard shortcuts disabled while the API-key reminder is open',
+    'Fix: Generate & Import blocked with a clear message until a service is selected',
+    'Version badge rendered from one constant — header, splash, and changelog always match',
+    'Manifest modal: focus trap and focus on open for keyboard users',
+  ]},
   { v:'2.2', date:'Jul 1 2026', items:[
     'UUID section — "Open configure page" link per host, directly below the host selector',
     'UUID validation — real-time format check with green ✓ / red error feedback as you type',
@@ -771,7 +785,7 @@ const DEFS = [
     opts:[
       { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><text x="22" y="29" text-anchor="middle" fill="#94a3b8" font-size="22" font-weight="900" font-family="system-ui,sans-serif">?</text></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
       { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Movies & TV',      desc:'Films &amp; series · no anime scrapers' },
-      { v:'mixed', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="15" width="18" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/><rect x="3" y="8" width="18" height="9" rx="2" fill="#ef4444"/><line x1="9" y1="8" x2="6" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="8" x2="12" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="8" x2="18" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="4" fill="#f9a8d4"/><circle cx="39" cy="19" r="4" fill="#f9a8d4"/><circle cx="37" cy="27" r="4" fill="#f9a8d4"/><circle cx="27" cy="27" r="4" fill="#f9a8d4"/><circle cx="25" cy="19" r="4" fill="#f9a8d4"/><circle cx="33" cy="22" r="5" fill="#fce7f3"/></svg>', name:'Live + Anime',     desc:'Standard + SeaDex best releases' },
+      { v:'mixed', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="15" width="18" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/><rect x="3" y="8" width="18" height="9" rx="2" fill="#ef4444"/><line x1="9" y1="8" x2="6" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="8" x2="12" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="8" x2="18" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="4" fill="#f9a8d4"/><circle cx="39" cy="19" r="4" fill="#f9a8d4"/><circle cx="37" cy="27" r="4" fill="#f9a8d4"/><circle cx="27" cy="27" r="4" fill="#f9a8d4"/><circle cx="25" cy="19" r="4" fill="#f9a8d4"/><circle cx="33" cy="22" r="5" fill="#fce7f3"/></svg>', name:'Movies + Anime',   desc:'Movies &amp; TV + SeaDex anime releases' },
       { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
     ]
   },
@@ -784,12 +798,38 @@ function saveState() {
   localStorage.setItem('coreBuild', JSON.stringify(S));
   localStorage.setItem('coreBuildStep', step);
 }
+// Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','instanceHost'];
 function shareConfig() {
   try {
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+    const pub = {};
+    SHARE_KEYS.forEach(k => { pub[k] = S[k]; });
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(pub))));
     const url = location.origin + location.pathname + '#cfg=' + encoded;
-    navigator.clipboard.writeText(url).then(() => showToast('Share link copied — anyone with this link gets your exact settings'));
+    navigator.clipboard.writeText(url).then(() => showToast('Share link copied — settings only, no API keys or passwords included'));
   } catch(e) { showToast('Failed to copy share link', true); }
+}
+
+function sanitizeSharedConfig(d) {
+  if (!d || typeof d !== 'object') return {};
+  const optVals = key => { const def = DEFS.find(x => x.key === key); return def ? def.opts.map(o => o.v) : []; };
+  const SVC_IDS = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','p2p','http','nzbgeek'];
+  const out = {};
+  const pick = (k, ok) => { if (k in d && ok(d[k])) out[k] = d[k]; };
+  pick('device',       v => optVals('device').includes(v));
+  pick('resolution',   v => optVals('resolution').includes(v));
+  pick('content',      v => optVals('content').includes(v));
+  pick('audio',        v => ['lossless','standard','limited','dolby'].includes(v));
+  pick('formatter',    v => FORMATTERS.some(f => f.id === v));
+  pick('matchMode',    v => ['relaxed','balanced','strict'].includes(v));
+  pick('cacheMode',    v => ['mixed','cached','uncached'].includes(v));
+  pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
+  pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
+  ['p2pEnabled','qualityFirst','exclude4K','excludeDV','quickStart','langExclusive'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
+  if (Array.isArray(d.langs)) { const l = d.langs.filter(v => LANG_OPTS.some(o => o.v === v)); if (l.length) out.langs = l; }
+  if (typeof d.name === 'string') out.name = d.name.replace(/[<>"'&`]/g, '').slice(0, 60);
+  return out;
 }
 
 function loadState() {
@@ -805,7 +845,7 @@ function loadState() {
     if (hash.startsWith('#cfg=')) {
       try {
         const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(5)))));
-        Object.assign(S, decoded);
+        Object.assign(S, sanitizeSharedConfig(decoded));
         hadSavedState = true;
         S.service = deriveService();
         history.replaceState(null, '', location.pathname);
@@ -858,7 +898,7 @@ function renderOpts(def) {
   if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:8px">' +
     FORMATTERS.map(f => {
       const on = S.formatter === f.id;
-      return `<div data-action="set-formatter" data-val="${f.id}" data-active="${on}" style="border:1.5px solid ${on?'rgba(0,212,255,.65)':'rgba(255,255,255,.13)'};border-radius:12px;background:${on?'rgba(0,212,255,.1)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;overflow:hidden;${on?'box-shadow:0 0 0 1px rgba(0,212,255,.22),0 4px 22px rgba(0,180,220,.2);':''}"
+      return `<div data-action="set-formatter" data-val="${f.id}" data-active="${on}" style="border:1.5px solid ${on?'rgba(0,212,255,.65)':'rgba(255,255,255,.13)'};border-radius:12px;background:${on?'rgba(0,212,255,.1)':'rgba(8,12,18,.9)'};cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;overflow:hidden;${on?'box-shadow:0 0 0 1px rgba(0,212,255,.22),0 4px 22px rgba(0,180,220,.2);':''}">
         <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
           <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
           <div style="flex:1;min-width:0">
@@ -1108,10 +1148,10 @@ function renderAdvancedPanel() {
     </div>`;
   }).join('');
 
-  const sizeOpts = ['10GB','20GB','30GB','50GB','unlimited'];
+  const sizeOpts = ['10','20','30','50','unlimited'];
   const sizePills = sizeOpts.map(v => {
     const on = (S.sizeLimit || 'unlimited') === v;
-    const lbl = v === 'unlimited' ? 'Unlimited' : v;
+    const lbl = v === 'unlimited' ? 'Unlimited' : v + 'GB';
     return `<button data-action="set-size-limit" data-val="${v}" class="size-btn${on?' size-btn-active':''}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.72rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s">${lbl}</button>`;
   }).join('');
 
@@ -1161,13 +1201,16 @@ function renderAdvancedPanel() {
 function renderProgress() {
   const progWrap = document.querySelector('.prog-wrap');
   const nav = document.getElementById('nav');
+  const hdrBadge = document.getElementById('hdrVersionBadge');
   if (step === 0) {
     if (progWrap) progWrap.style.display = 'none';
     if (nav) nav.style.display = 'none';
+    if (hdrBadge) hdrBadge.style.display = 'none';
     return;
   }
   if (progWrap) progWrap.style.display = '';
   if (nav) nav.style.display = '';
+  if (hdrBadge) hdrBadge.style.display = '';
 
   const keys  = ['service','device','resolution','audio','content',null];
 
@@ -1176,7 +1219,7 @@ function renderProgress() {
     const n = i + 1;
     const state = n < step ? 'done' : n === step ? 'active' : 'pending';
     const tipName = DEFS[i] ? DEFS[i].title : (n === STEPS ? 'Review' : `Step ${n}`);
-    return `<div class="step-unit ${state}" title="${tipName}"><div class="step-bub">${state==='done'?'✓':''}</div></div>`;
+    return `<div class="step-unit ${state}" title="${tipName}"><div class="step-bub">${state==='done'?'✓':''}</div><div class="step-lbl">${tipName}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
@@ -1228,7 +1271,7 @@ function splashHtml() {
       </g>
     </svg>
     <div class="splash-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
-    <div class="splash-by">By Brevity <span style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08)">v2.2</span></div>
+    <div class="splash-by">By Brevity <span style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08)">v${CONFIGURATOR_VERSION}</span></div>
     <div class="splash-tagline">Build your perfect AIOStreams template in 2 minutes. No manual JSON editing.</div>
     <div class="splash-chips">
       <span class="splash-chip splash-chip-svc">TorBox Pro</span>
@@ -1396,7 +1439,7 @@ function render() {
             <div style="display:flex;flex-direction:column;gap:5px">
               <div class="step-num" style="width:22px;height:22px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.64rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">1</div>
               <div style="font-size:.74rem;font-weight:700;color:#e6edf3">Load into AIOStreams</div>
-              <div style="font-size:.65rem;color:#6b7280;line-height:1.45">Click <strong style="color:#8b949e">Import to AIOStreams</strong> below and tap your instance — or download the JSON and upload it manually. Re-enter your debrid key when prompted.</div>
+              <div style="font-size:.65rem;color:#6b7280;line-height:1.45">Click <strong style="color:#8b949e">Import to AIOStreams</strong> below and tap your instance — or download the JSON and upload it manually. Then go to <strong style="color:#8b949e">AIOStreams → Services</strong> and re-enter your debrid keys.</div>
             </div>
             <div style="color:#30363d;font-size:.9rem;padding-top:4px;text-align:center">›</div>
             <div style="display:flex;flex-direction:column;gap:5px">
@@ -1551,8 +1594,8 @@ function render() {
     const jpd = document.getElementById('jsonPreviewDetails');
     if (jpd) jpd.addEventListener('toggle', () => {
       const pre = document.getElementById('jsonPreview');
-      if (jpd.open && pre && !pre.textContent) pre.textContent = JSON.stringify(build(), null, 2);
-    }, { once: true });
+      if (jpd.open && pre) pre.textContent = JSON.stringify(build(), null, 2);
+    });
 
   } else if (def.id === 'apis') {
     const debridInputs = getDebridInputs();
@@ -1700,10 +1743,10 @@ function render() {
 function syncNext() {
   const def = DEFS[step - 1];
   const btn = document.getElementById('btnNext');
+  if (!btn) return;
   btn.style.display = '';
   let ok = !def.key || !!S[def.key];
   if (step === 1) ok = S.multiServices.length > 0;
-  if (!btn) return;
   btn.disabled = !ok;
   const nextDef = step < STEPS ? DEFS[step] : null;
   const nextLabel = nextDef ? nextDef.title : null;
@@ -1719,37 +1762,14 @@ function syncNext() {
   }
 }
 
-function updateMultiPanel() {
-  const panel = document.getElementById('multiPanel');
-  if (!panel) return;
-  if (S.service !== 'multi') { panel.style.display = 'none'; syncNext(); return; }
-  panel.style.display = '';
-  const multiOpts = [
-    { v:'alldebrid',  label:'AllDebrid',   color:'#ea580c' },
-    { v:'realdebrid', label:'Real-Debrid', color:'#dc2626' },
-    { v:'premiumize', label:'Premiumize',  color:'#d97706' },
-    { v:'debridlink', label:'Debrid-Link', color:'#0284c7' },
-    { v:'offcloud',   label:'Offcloud',    color:'#06b6d4' },
-    { v:'easynews',   label:'EasyNews',    color:'#0ea5e9' },
-  ];
-  panel.innerHTML = `
-    <div style="border-top:1px solid #30363d;padding-top:14px;margin-top:4px">
-      <div style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Select your services</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${multiOpts.map(m => `
-          <label style="display:flex;align-items:center;gap:10px;background:#0d1117;border:2px solid ${S.multiServices.includes(m.v) ? m.color : '#30363d'};border-radius:8px;padding:12px;cursor:pointer;user-select:none;transition:border-color .15s">
-            <input type="checkbox" data-action="toggle-multi" value="${m.v}" ${S.multiServices.includes(m.v) ? 'checked' : ''}>
-            <span style="font-weight:700;font-size:.9rem;color:${S.multiServices.includes(m.v) ? m.color : '#e6edf3'}">${m.label}</span>
-          </label>`).join('')}
-      </div>
-    </div>`;
-  syncNext();
-}
-
 /* DELEGATED EVENTS */
 { const l = document.getElementById('cb-loader'); if (l) l.addEventListener('animationend', () => l.remove()); }
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  // Migrate legacy '10GB'-style size limits saved by older versions
+  if (typeof S.sizeLimit === 'string' && /^\d+GB$/.test(S.sizeLimit)) S.sizeLimit = S.sizeLimit.replace(/GB$/, '');
+  const hb = document.getElementById('hdrVersionBadge');
+  if (hb) hb.textContent = 'v' + CONFIGURATOR_VERSION;
   if (!hadSavedState && S.resolution === null) {
     try {
       const px = (screen.width || 0) * (window.devicePixelRatio || 1);
@@ -1762,6 +1782,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (step === 0) return;
     if (document.getElementById('manifestModal') || document.getElementById('advModal')) return;
+    const rem = document.getElementById('apiReminder');
+    if (rem && !rem.classList.contains('hidden')) return;
     const tag = document.activeElement?.tagName;
     const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable;
     if (e.key === 'Enter' && !inInput && !e.shiftKey) {
@@ -1830,7 +1852,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
       if (preset === 'p2p') {
-        Object.assign(S, { service:null, multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
+        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 5; render(); window.scrollTo(0,0);
       } else {
@@ -1846,7 +1868,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'continue-session') { step = _savedStep || 1; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'reset-state') { showAdvanced = false; clearState(); }
+    if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
     if (action === 'share-config') shareConfig();
     if (action === 'generate-dl') generate();
     if (action === 'create-import') createImportUrl();
@@ -1972,6 +1994,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (i >= 0) S.multiServices.splice(i, 1);
       else S.multiServices.push(val);
       S.service = deriveService();
+      if (val === 'p2p' && S.multiServices.includes('p2p') && !S.p2pEnabled) {
+        S.p2pEnabled = true;
+        showToast('Raw torrents enabled — required for P2P streams');
+      }
       saveState();
       syncNext();
     }
@@ -2005,7 +2031,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (uuidRow) uuidRow.style.display = showUuid ? '' : 'none';
       if (cfgLinkRow) cfgLinkRow.style.display = showUuid ? '' : 'none';
       if (cfgLink && HOST_BASE_URLS[val]) cfgLink.href = HOST_BASE_URLS[val] + '/configure';
-      if (val === 'custom') { S.instanceUrl = ''; document.getElementById('aioUrl').value = ''; }
+      if (val === 'custom') { const u = document.getElementById('aioUrl'); if (u) u.value = S.instanceUrl || ''; }
       document.getElementById('aioResult').innerHTML = '';
       if (showUuid) updateUuidValidation(S.instanceUuid); else updateUuidValidation('');
     }
@@ -2121,7 +2147,6 @@ function getDebridInputs() {
   return [...new Set(ids)].map(id => ({id, ...defs[id]})).filter(d => d.label);
 }
 
-function ruid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); }); }
 function sid() { return Math.random().toString(36).substring(2,8); }
 
 function defaultName() {
@@ -2262,7 +2287,7 @@ function eses() {
   if (S.cacheMode !== 'cached') out.push({ enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
   if (S.cacheMode === 'cached')   out.push({ enabled:true, expression:"/* Cached Only — hard kill uncached */ uncached(streams)" });
   if (S.cacheMode === 'uncached') out.push({ enabled:true, expression:"/* Uncached Only — hard kill cached */ cached(streams)" });
-  if (!S.p2pEnabled) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
+  if (!S.p2pEnabled && !S.multiServices.includes('p2p')) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
   if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
   if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
   if (S.sizeLimit !== 'unlimited') {
@@ -2372,6 +2397,7 @@ function build() {
 }
 
 function generate() {
+  if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); return; }
   const json = JSON.stringify(build(), null, 2), blob = new Blob([json], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
   a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 100);
@@ -2538,6 +2564,16 @@ function showManifestModal(manifestUrl, password, hostLabel) {
   overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   const escKey = e => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escKey); } };
   document.addEventListener('keydown', escKey);
+  // Keep Tab focus inside the dialog
+  overlay.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const f = overlay.querySelectorAll('button:not(:disabled), a[href], input, summary, [tabindex]:not([tabindex="-1"])');
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  setTimeout(() => { const c = document.getElementById('mClose'); if (c) c.focus(); }, 50);
 
   document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
     const email    = document.getElementById('stremioEmail').value.trim();
@@ -2567,7 +2603,7 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       btn.textContent = '✓ Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
       resEl.innerHTML = already ? `<span style="color:#f59e0b">Already in your library.</span>` : `<span style="color:#3fb950">Done — reopen Stremio to see it.</span>`;
     } catch(err) {
-      btn.disabled = false; btn.textContent = '📥 Log in &amp; Install';
+      btn.disabled = false; btn.textContent = '📥 Log in & Install';
       resEl.innerHTML = `<span style="color:#f87171">${err.message}</span>`;
     }
   });
@@ -2601,8 +2637,7 @@ function showApiReminder(onContinue) {
             <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
               type="password"
               placeholder="${inp.placeholder}"
-              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:40px"
-              oninput="S.creds[this.dataset.service]=this.value;saveState()">
+              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:40px">
             <button type="button" data-action="toggle-cred-vis" data-target="rem_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
               onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -2617,18 +2652,23 @@ function showApiReminder(onContinue) {
       </div>
     </div>`;
   el.classList.remove('hidden');
-  el.addEventListener('click', function handler(e) {
+  if (el._remHandler) el.removeEventListener('click', el._remHandler, true);
+  const handler = (e) => {
     const a = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
     if (a === 'reminder-continue' || a === 'reminder-skip') {
       el.classList.add('hidden');
-      el.removeEventListener('click', handler);
+      el.removeEventListener('click', handler, true);
+      el._remHandler = null;
       onContinue();
     }
     if (e.target === el) {
       el.classList.add('hidden');
-      el.removeEventListener('click', handler);
+      el.removeEventListener('click', handler, true);
+      el._remHandler = null;
     }
-  }, { capture: true });
+  };
+  el._remHandler = handler;
+  el.addEventListener('click', handler, true);
   // Focus first empty field
   const first = inputs.find(i => !S.creds[i.id]);
   if (first) { const f = document.getElementById('rem_' + first.id); if (f) setTimeout(() => f.focus(), 120); }
@@ -2717,18 +2757,23 @@ function instanceChips(templateUrl) {
 async function fetchWithTimeout(url, options = {}, timeout = 6000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
-  const response = await fetch(url, { ...options, signal: controller.signal });
-  clearTimeout(id);
-  return response;
+  try { return await fetch(url, { ...options, signal: controller.signal }); }
+  finally { clearTimeout(id); }
 }
 
 async function createImportUrl() {
+  if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); return; }
   const btn = document.getElementById('btnImport'), result = document.getElementById('importUrlResult'), origHtml = btn.innerHTML;
   btn.disabled = true; btn.textContent = 'Creating…'; result.innerHTML = '';
   const tmpl = build();
   if (tmpl.config) {
     if (tmpl.config.services) tmpl.config.services = tmpl.config.services.map(s => ({ ...s, credentials: {} }));
+    if (Array.isArray(tmpl.config.presets)) tmpl.config.presets = tmpl.config.presets.map(p => {
+      if (p.options && p.options.apiKey) { const { apiKey, ...rest } = p.options; return { ...p, options: rest }; }
+      return p;
+    });
   }
+  if (tmpl.parentConfig) tmpl.parentConfig = { ...tmpl.parentConfig, password: '' };
   const json = JSON.stringify(tmpl, null, 2);
   let url = null;
   
@@ -2773,7 +2818,7 @@ async function createImportUrl() {
     result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">This is <em>not</em> a Stremio link — it loads your settings into AIOStreams so you can get a manifest. Debrid credentials are stripped; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
-    result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">Your browser's security blocked the cross-origin request. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
+    result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">The upload failed — CORS block, rate limit, or paste.rs downtime. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
     showToast('Paste service unreachable', true);
   }
 }
@@ -2798,23 +2843,31 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     const cfg = build().config;
+    const existingUuid = validateUuid(uuid) ? uuid : null;
+    const attempt = (id) => Promise.any(
+      Object.values(HOST_URLS).map(host =>
+        fetchWithTimeout(id ? `${host}/api/v1/user/${id}` : `${host}/api/v1/user`, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
+          .then(async res => {
+            const data = await res.json().catch(()=>({}));
+            if (res.ok && data?.success !== false) return { host, uuid: id || data?.uuid || data?.user?.uuid || data?.id };
+            throw new Error('rejected');
+          })
+      )
+    );
     try {
-      const winner = await Promise.any(
-        Object.values(HOST_URLS).map(host =>
-          fetchWithTimeout(`${host}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
-            .then(async res => {
-              const data = await res.json().catch(()=>({}));
-              if (res.ok && data?.success !== false) return { host, uuid: data?.uuid || data?.user?.uuid || data?.id };
-              throw new Error('rejected');
-            })
-        )
-      );
+      let winner;
+      try { winner = await attempt(existingUuid); }
+      catch(err) {
+        // Saved UUID not accepted anywhere (deleted or different password) — create fresh
+        if (existingUuid) winner = await attempt(null);
+        else throw err;
+      }
       if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); }
       resetBtn(origHtml);
       showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
     } catch(e) {
       resetBtn(origHtml);
-      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">CORS blocked requests or all hosts timed out. Use <strong style="color:#8b949e">Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">All hosts timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
     }
     return;
   }
@@ -2837,17 +2890,17 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     try {
-      const res = await fetchWithTimeout(uuid ? `${base}/api/v1/user/${uuid}` : `${base}/api/v1/user`, { method: uuid ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: build().config, password: pwd }) });
+      const res = await fetchWithTimeout(`${base}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: build().config, password: pwd }) });
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
-        const outUuid = uuid || data?.uuid || data?.user?.uuid || data?.id;
+        const outUuid = data?.uuid || data?.user?.uuid || data?.id;
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         resetBtn(origHtml);
         showManifestModal(`${base}/stremio/${outUuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');
     } catch(e) {
       resetBtn(origHtml);
-      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">The API blocked the request (CORS) or timed out. Use Import to AIOStreams or Download instead.</div></div>`;
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Host timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
     }
     return;
   }
