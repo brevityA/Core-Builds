@@ -1391,24 +1391,18 @@ function render() {
           <pre id="jsonPreview" style="margin:0;padding:12px 16px;background:#0d1117;overflow-x:auto;font-size:.68rem;color:#8b949e;font-family:monospace;line-height:1.5;max-height:260px;overflow-y:auto"></pre>
         </details>
         <div class="what-next" style="margin:14px 0 12px;padding:14px 16px;background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:12px">
-          <div style="font-size:.64rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">What to do next</div>
-          <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:start;gap:6px">
+          <div style="font-size:.64rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">Two steps to finish</div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:6px">
             <div style="display:flex;flex-direction:column;gap:5px">
               <div class="step-num" style="width:22px;height:22px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.64rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">1</div>
-              <div style="font-size:.74rem;font-weight:700;color:#e6edf3">Download</div>
-              <div style="font-size:.65rem;color:#6b7280;line-height:1.45">Click "Generate &amp; Download" below — saves a <code style="font-size:.63rem;background:rgba(255,255,255,.06);border-radius:3px;padding:0 3px">.json</code> file to your device</div>
+              <div style="font-size:.74rem;font-weight:700;color:#e6edf3">Load into AIOStreams</div>
+              <div style="font-size:.65rem;color:#6b7280;line-height:1.45">Click <strong style="color:#8b949e">Import to AIOStreams</strong> below and tap your instance — or download the JSON and upload it manually. Re-enter your debrid key when prompted.</div>
             </div>
             <div style="color:#30363d;font-size:.9rem;padding-top:4px;text-align:center">›</div>
             <div style="display:flex;flex-direction:column;gap:5px">
               <div class="step-num" style="width:22px;height:22px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.64rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">2</div>
-              <div style="font-size:.74rem;font-weight:700;color:#e6edf3">Import</div>
-              <div style="font-size:.65rem;color:#6b7280;line-height:1.45">On your AIOStreams configure page → click <strong style="color:#8b949e">Import</strong> → paste the Import URL <em>or</em> upload the JSON</div>
-            </div>
-            <div style="color:#30363d;font-size:.9rem;padding-top:4px;text-align:center">›</div>
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <div class="step-num" style="width:22px;height:22px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.64rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">3</div>
-              <div style="font-size:.74rem;font-weight:700;color:#e6edf3">Install</div>
-              <div style="font-size:.65rem;color:#6b7280;line-height:1.45">Use the <strong style="color:#8b949e">Generate Manifest</strong> section below — then add the manifest URL to Stremio → Addons</div>
+              <div style="font-size:.74rem;font-weight:700;color:#e6edf3">Install in Stremio</div>
+              <div style="font-size:.65rem;color:#6b7280;line-height:1.45">Fill in your UUID + password in the <strong style="color:#8b949e">Get Install Link</strong> section below → click the button → tap <strong style="color:#8b949e">Install</strong> in the popup.</div>
             </div>
           </div>
         </div>
@@ -1416,11 +1410,11 @@ function render() {
         <button data-action="share-config" style="width:100%;margin-top:8px;padding:11px;font-size:.8rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share This Config</button>
         <button class="btn-aio" data-action="create-import" id="btnImport" style="margin-top:10px">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          Create Import URL
+          Step 1 — Import to AIOStreams
         </button>
         <div id="importUrlResult"></div>
         <div class="aio-section">
-          <h3>Get Manifest URL</h3>
+          <h3>Step 2 — Get Stremio Install Link</h3>
           <div class="aio-fields" style="margin-top:12px">
             <div class="name-row" style="margin-bottom:0">
               <label>AIOStreams Host</label>
@@ -1501,7 +1495,7 @@ function render() {
           </details>
           <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Generate Manifest
+            Get Install Link
           </button>
           <div id="aioResult"></div>
           <details id="pasteManifestDetails" style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px" ${pasteMode ? 'open' : ''}>
@@ -2770,13 +2764,13 @@ async function createImportUrl() {
         </div>`;
       }).join('');
       credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)">
-        <div style="font-size:.64rem;font-weight:700;color:#78716c;letter-spacing:.06em;margin-bottom:3px">CREDENTIALS TO ENTER IN AIOSTREAMS AFTER IMPORT</div>
-        <div style="font-size:.62rem;color:#4b5563;margin-bottom:7px">Enter these in AIOStreams → Services once your template has loaded.</div>
+        <div style="font-size:.64rem;font-weight:700;color:#78716c;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div>
+        <div style="font-size:.62rem;color:#4b5563;margin-bottom:7px">Your debrid credentials were stripped from the import URL. Once AIOStreams has loaded your template, go to Services and paste each key back in.</div>
         ${rows}
       </div>`;
     }
 
-    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Click your instance to auto-import</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">Opens AIOStreams with your template pre-loaded. Debrid credentials stripped for security — TMDB keys are included.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy the URL to import manually:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy</button></div>${credBlock}</div>`;
+    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px">This is <em>not</em> a Stremio link — it loads your settings into AIOStreams so you can get a manifest. Debrid credentials are stripped; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
     result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">Your browser's security blocked the cross-origin request. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
@@ -2820,7 +2814,7 @@ async function openInAIOStreams() {
       showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
     } catch(e) {
       resetBtn(origHtml);
-      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">CORS blocked requests or all hosts timed out. Use <strong style="color:#8b949e">Create Import URL</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">CORS blocked requests or all hosts timed out. Use <strong style="color:#8b949e">Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
     }
     return;
   }
@@ -2834,7 +2828,7 @@ async function openInAIOStreams() {
 
   /* No UUID, not auto or custom — guide to get UUID */
   if (!uuid && !isCustom && !isAuto) {
-    result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px"><strong style="color:#e6edf3">No UUID entered</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px">Sign in to your AIOStreams instance, copy your UUID from the configure page and paste it above.</div><div style="color:#4b5563;font-size:.77rem;margin:6px 0 4px">Or use <strong style="color:#8b949e">Create Import URL</strong> above — click a chip below to open AIOStreams and import in one click:</div>${instanceChips()}</div>`;
+    result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px"><strong style="color:#e6edf3">No UUID entered</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px">Sign in to your AIOStreams instance, copy your UUID from the configure page and paste it above.</div><div style="color:#4b5563;font-size:.77rem;margin:6px 0 4px">Or use <strong style="color:#8b949e">Import to AIOStreams</strong> above — click a chip below to open AIOStreams and import in one click:</div>${instanceChips()}</div>`;
     return;
   }
 
@@ -2853,12 +2847,12 @@ async function openInAIOStreams() {
       } else throw new Error('API Error');
     } catch(e) {
       resetBtn(origHtml);
-      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">The API blocked the request (CORS) or timed out. Use Create Import URL or Download instead.</div></div>`;
+      result.innerHTML = `<div class="import-success" style="border-color:#4b1a1a;background:#1a0606;margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">The API blocked the request (CORS) or timed out. Use Import to AIOStreams or Download instead.</div></div>`;
     }
     return;
   }
 
-  result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px"><strong style="color:#e6edf3">Enter a password to proceed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Set a password above to generate or save your config. Or use <strong style="color:#8b949e">Create Import URL</strong> above.</div></div>`;
+  result.innerHTML = `<div class="import-success" style="border-color:#374151;background:#111827;margin-top:12px"><strong style="color:#e6edf3">Enter a password to proceed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Set a password above to generate or save your config. Or use <strong style="color:#8b949e">Import to AIOStreams</strong> above.</div></div>`;
 }
 </script>
 </body>
