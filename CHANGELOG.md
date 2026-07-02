@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.2 (2026-07-02)
+
+### Fixed
+- **Configurator v2.8.1** — `groups.groupings` now omitted when groups are disabled, fixing "Every group must have at least one addon" validation error on non-TorBox-Pro services and when using parent/base configs
+- **Configurator v2.8.1** — Easy Setup CORS fallback: when one-click creation fails (all hosts unreachable), automatically creates an import URL and shows instance chips with a 3-step guide instead of a dead-end error
+
 ## 3.2.1 (2026-07-02)
 
 ### Changed
@@ -8,7 +14,7 @@
 ## 3.2.0 (2026-07-02)
 
 ### Added
-- **Override scoring restored fleet-wide** (36 active templates + both Base configs) — the inline `rankedRegexPatterns` layer was silently lost in the v2.8.x template slimming, leaving `regexScore` a no-op across the fleet (all 174 synced Vidhin05 entries carry score 0). Restored from `Filtering/ranked-regex-patterns.json` filtered for host compatibility: 100 entries on 4K templates, 96 on 1080p (UHD-specific names dropped), every pattern string verbatim-matched against current Vidhin05 (elfhosted requirement), fortheweak-removed names and drifted Anime BD patterns excluded. Anime templates keep `[]`.
+- **Override scoring restored fleet-wide** (36 active templates + both Base configs) — the inline `rankedRegexPatterns` layer was silently lost in the v2.8.x template slimming, leaving `regexScore` a no-op across the fleet (all 174 synced Vidhin05 entries carry score 0). Restored via `syncedRankedRegexUrls` pointing to `Filtering/ranked-regex-patterns.json` — 149 scored patterns with a 10-tier system, every pattern string verbatim-matched against current Vidhin05 (elfhosted requirement), fortheweak-removed names and drifted Anime BD patterns excluded. Anime templates keep `[]`.
 - **LABS: `rseMatched()` tier strategy** — ranked patterns now double as named matchers (score-independent, elfhosted-safe): `S+ Tier` micro-PSEs rank T1-matched remuxes above generic remuxes, `T1 Pattern Pin` pins pattern-verified elites beyond hand-listed groups, and `Bad 4k/1080P Bluray` kills are tier-guarded (spare encodes matching UHD Bluray T1–T3 / Remux T1/T2).
 - **LABS: Adaptive Seeder Guard** — median-based fence kills bottom-quartile-seeded uncached torrents, only on titles ≤1 year old with deep pools (>10 streams ≥3 seeders); catalog titles exempt.
 - **LABS: p10–p90 fences** (4K Apex Labs) — S-Tier 4K/1080p Remux tiers now use percentile(10)/percentile(90) windows at ≥8 peers, Tukey at 4–7, min/max at 1–3.

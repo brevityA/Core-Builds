@@ -220,11 +220,12 @@ Full `{name, pattern}` entries on all active non-Anime templates.
 - All `pattern` strings exactly match Vidhin05's entries.
 
 ### `rankedRegexPatterns` (restored v3.2.0)
-Full `{name, pattern, score}` entries on all active non-Anime templates, sourced from `Filtering/ranked-regex-patterns.json` filtered for host compatibility:
+Full `{name, pattern, score}` inline override entries on all active non-Anime templates. Sourced from `Filtering/ranked-regex-patterns.json`, filtered for host compatibility. These override Vidhin05's synced zero-score entries by name matching — AIOStreams shows them as `regexOverrides` in the config diff.
 - **4K templates:** 100 entries (score tiers +100/+80/+60/+40/+20/−25/−50/−75/−200)
 - **1080p templates:** 96 entries — same set minus the 4 UHD Bluray-specific names
 - Every `pattern` string is an EXACT verbatim copy of a current Vidhin05 entry (elfhosted whitelist requirement); score-0 entries and the 11 fortheweak-removed names are excluded; `Anime BD T1/T2/T3` excluded (pattern drift vs current Vidhin05)
 - **Anime templates:** `[]`
+- **Why inline:** elfhosted/fortheweak whitelist specific URLs for `syncedRankedRegexUrls` — our GitHub raw URL cannot be whitelisted, so the scored file must be delivered inline
 - **History:** the override layer was silently lost during the v2.8.x slimming — between then and v3.2.0, `regexScore` in sortCriteria was a fleet-wide no-op (all 174 synced Vidhin05 entries carry score 0)
 
 ### `rseMatched()` tier strategy (LABS, v3.2.0)
@@ -245,7 +246,7 @@ Ranked regex entries double as **named matchers** via `rseMatched(streams, ...na
 - Hebrew/EZTV (Radarr), Hebrew/EZTV (Sonarr) — plain ✓
 
 ### `syncedRankedRegexUrls`
-Points to Vidhin05's file on all non-Hybrid templates. Supplements ranked patterns with Vidhin05's 174-pattern set at score 0; our inline entries override scoring by name.
+Points to Vidhin05's file on all non-Hybrid templates. Supplements ranked patterns with Vidhin05's 174-pattern set at score 0; our inline `rankedRegexPatterns` entries override scoring by name. Hybrid templates now also carry the Vidhin05 URL (added v3.2.0).
 
 ### `syncedExcludedRegexUrls`
 Points to Tamtaro's excluded regex file at `Tam-Taro/SEL-Filtering-and-Sorting` on all active templates. **Note:** Tamtaro renamed their GitHub account from `Tamtaro` → `Tam-Taro`; the old URL 404s. The new `Tam-Taro` URL works (200) but elfhosted's allowlist has not been updated — users on elfhosted get "Forbidden URL" errors on import until elfhosted ships an allowlist update. Same applies to `syncedIncludedStreamExpressionUrls` (ISEs) and `syncedPreferredStreamExpressionUrls` (PSEs).
