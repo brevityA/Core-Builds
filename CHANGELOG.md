@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.2.0 (2026-07-02)
+
+### Added
+- **Override scoring restored fleet-wide** (36 active templates + both Base configs) — the inline `rankedRegexPatterns` layer was silently lost in the v2.8.x template slimming, leaving `regexScore` a no-op across the fleet (all 174 synced Vidhin05 entries carry score 0). Restored from `Filtering/ranked-regex-patterns.json` filtered for host compatibility: 100 entries on 4K templates, 96 on 1080p (UHD-specific names dropped), every pattern string verbatim-matched against current Vidhin05 (elfhosted requirement), fortheweak-removed names and drifted Anime BD patterns excluded. Anime templates keep `[]`.
+- **LABS: `rseMatched()` tier strategy** — ranked patterns now double as named matchers (score-independent, elfhosted-safe): `S+ Tier` micro-PSEs rank T1-matched remuxes above generic remuxes, `T1 Pattern Pin` pins pattern-verified elites beyond hand-listed groups, and `Bad 4k/1080P Bluray` kills are tier-guarded (spare encodes matching UHD Bluray T1–T3 / Remux T1/T2).
+- **LABS: Adaptive Seeder Guard** — median-based fence kills bottom-quartile-seeded uncached torrents, only on titles ≤1 year old with deep pools (>10 streams ≥3 seeders); catalog titles exempt.
+- **LABS: p10–p90 fences** (4K Apex Labs) — S-Tier 4K/1080p Remux tiers now use percentile(10)/percentile(90) windows at ≥8 peers, Tukey at 4–7, min/max at 1–3.
+- **LABS: Unknown Resolution/Quality kills** — `Unknown`-tagged streams dropped only when 5+ known-good alternatives exist.
+- **LABS: animation-exempt bitrate floors** — `isAnime or 'Animation' in genres` bypasses the REMUX bitrate floors (animation legitimately encodes ~50% smaller).
+
+### Changed
+- **Hard Season Pack Kill** (all standard templates — active + labs + Base; Anime templates exempt) — replaces the conditional `latestSeason >= 3` kill from v3.1.1: episode requests on non-anime series now never return season packs. Anime queries are exempt via `not isAnime` even on general templates (SeaDex batches preserved). Trade-off: shows whose only sources are packs return no episode results — deliberate.
+
+### Fixed
+- **Samsung RU7100** (v0.3.0) — the four Tamtaro-derived ESEs (`Bad 4k Anime`, `Upscaled 4k`, `Bad 4k/1080P Bluray`) referenced regex tier names from Tamtaro's German setup (`DE Bluray T1`, `BD T1`…) that don't exist in our Vidhin05 sync, so their protective guards never matched and the kills fired unconditionally. Rewritten with correct Vidhin05 names.
+- **Base TorBox template** (v1.1.0) — `preferredEncodes` used invalid values (`H.265`, `H.264`, `MPEG-2`, `MPEG-4`); replaced with schema-valid `HEVC/AV1/AVC/Unknown`. Validator now passes with zero errors.
+
 ## 3.1.1 (2026-07-02)
 
 ### Changed
