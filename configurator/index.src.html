@@ -634,11 +634,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.8';
+const CONFIGURATOR_VERSION = '2.8.1';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.8.1', date:'Jul 2 2026', items:[
+    'Fix: "Every group must have at least one addon" error — addon group references now omitted when groups are disabled',
+    'Fix: configs generated with a parent/base config no longer include orphaned group addon references',
+    'Generated configs now include Core Builds scored regex overrides via synced URL — release-group ranking works out of the box',
+  ]},
   { v:'2.8', date:'Jul 2 2026', items:[
     'Quick Start presets return as Easy Setup accelerators — 4K · Lossless and 1080p · DD+ pre-answer the resolution question',
     'Presets now ask for your device (the old presets skipped it, which broke Samsung and Fire Stick playback profiles) and end on the one-click install',
@@ -2549,6 +2554,7 @@ function pses() {
 function build() {
   const name = (S.name.trim() || defaultName()), rc = resolutionCfg(), ec = encodeCfg(), ac = audioCfg();
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
+  const useGroups = S.service === 'torbox-pro' || S.service === 'hybrid' || (S.service === 'multi' && S.multiServices.includes('torbox-pro'));
 
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
@@ -2556,7 +2562,7 @@ function build() {
     excludedLanguages: [], includedLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
     preferredAudioTags: ac.preferredAudioTags,
     syncedExcludedRegexUrls: ['https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json'],
-    syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
+    syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json','https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/ranked-regex-patterns.json'],
     rankedRegexPatterns: [], excludedRegexPatterns: [],
     addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
     mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
@@ -2595,7 +2601,7 @@ function build() {
     ],
     preferredStreamExpressions: pses(),
     dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
-    groups: { enabled: (S.service === 'torbox-pro' || S.service === 'hybrid' || (S.service === 'multi' && S.multiServices.includes('torbox-pro'))), groupings:[{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] },
+    groups: { enabled: useGroups, groupings: useGroups ? [{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] : [] },
   };
 
   const result = {
@@ -3087,10 +3093,7 @@ async function fetchWithTimeout(url, options = {}, timeout = 6000) {
   finally { clearTimeout(id); }
 }
 
-async function createImportUrl() {
-  if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); return; }
-  const btn = document.getElementById('btnImport'), result = document.getElementById('importUrlResult'), origHtml = btn.innerHTML;
-  btn.disabled = true; btn.textContent = 'Creating…'; result.innerHTML = '';
+async function uploadTemplateForImport() {
   const tmpl = build();
   if (tmpl.config) {
     if (tmpl.config.services) tmpl.config.services = tmpl.config.services.map(s => ({ ...s, credentials: {} }));
@@ -3102,20 +3105,24 @@ async function createImportUrl() {
   if (tmpl.parentConfig) tmpl.parentConfig = { ...tmpl.parentConfig, password: '' };
   const json = JSON.stringify(tmpl, null, 2);
   let url = null;
-  
-  // Paste API with Timeout
   try {
     const r = await fetchWithTimeout('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:json }, 5000);
     if (r.ok) url = (await r.text()).trim();
   } catch(e) { console.warn("paste.rs failed/timed out", e); }
-
   if (!url) {
     try {
       const r = await fetchWithTimeout('https://dpaste.com/api/v2/', { method:'POST', body:new URLSearchParams({ content:json, syntax:'json', expiry_days:'365' }) }, 5000);
       if (r.ok) { const t=(await r.text()).trim().replace(/"/g,''); url = t.startsWith('http') ? t+'.txt' : null; }
     } catch(e) { console.warn("dpaste failed/timed out", e); }
   }
+  return url;
+}
 
+async function createImportUrl() {
+  if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); return; }
+  const btn = document.getElementById('btnImport'), result = document.getElementById('importUrlResult'), origHtml = btn.innerHTML;
+  btn.disabled = true; btn.textContent = 'Creating…'; result.innerHTML = '';
+  const url = await uploadTemplateForImport();
   btn.disabled = false; btn.innerHTML = origHtml;
 
   if (url) {
@@ -3193,8 +3200,31 @@ async function openInAIOStreams() {
       resetBtn(origHtml);
       showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
     } catch(e) {
-      resetBtn(origHtml);
-      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">All hosts timed out or refused the connection (CORS, rate limit, or downtime). ${S.simpleMode ? 'Try again in a minute, or use the manual options.' : 'Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.'}</div>${S.simpleMode ? '<button data-action="show-full-review" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Show manual setup options →</button>' : ''}</div>`;
+      if (S.simpleMode) {
+        btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
+        const importUrl = await uploadTemplateForImport();
+        resetBtn(origHtml);
+        if (importUrl) {
+          saveLastGen();
+          const credInputs = getDebridInputs().filter(i => S.creds[i.id] && S.creds[i.id].trim());
+          let credBlock = '';
+          if (credInputs.length) {
+            const rows = credInputs.map(inp => {
+              const val = (S.creds[inp.id] || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+              const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
+              return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
+            }).join('');
+            credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
+          }
+          result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">One-click wasn't available — here's the quick import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+          showToast('Tap an instance chip to import your template');
+        } else {
+          result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Couldn't connect directly or create an import link. Try again in a minute, or use the manual options.</div><button data-action="show-full-review" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Show manual setup options →</button></div>`;
+        }
+      } else {
+        resetBtn(origHtml);
+        result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">All hosts timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+      }
     }
     return;
   }
