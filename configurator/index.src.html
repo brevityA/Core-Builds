@@ -634,11 +634,18 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.6';
+const CONFIGURATOR_VERSION = '2.7';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.7', date:'Jul 2 2026', items:[
+    'Easy Setup — the new default path: pick your service, device, and resolution (each advances automatically), add your key, then one Create &amp; Install button. No UUIDs, no import URLs, no manifest juggling',
+    'One-click finish — your config is created on a public AIOStreams host with an auto-generated password and the Stremio install button appears immediately',
+    'Content type, audio profile, formatter, and sorting use safe defaults in Easy Setup — switch any time via "Show all options"',
+    'Custom Setup unchanged — the full wizard with review, import URLs, Base Config, and every knob',
+    'Splash simplified — two clear paths (Easy / Custom) plus the free P2P setup',
+  ]},
   { v:'2.6', date:'Jul 2 2026', items:[
     'Browser Back button now steps back through the wizard instead of leaving the page',
     'Step dots and Review receipt rows are clickable — jump straight to any completed step',
@@ -777,7 +784,7 @@ let hadSavedState = false;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', telemetryOk: false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', telemetryOk: false, simpleMode: false };
 
 const FORMATTERS = [
   {
@@ -887,7 +894,7 @@ function saveState() {
   localStorage.setItem('coreBuildStep', step);
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','instanceHost'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','instanceHost','simpleMode'];
 function shareConfig() {
   try {
     const pub = {};
@@ -913,7 +920,7 @@ function sanitizeSharedConfig(d) {
   pick('cacheMode',    v => ['mixed','cached','uncached'].includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','exclude4K','excludeDV','quickStart','langExclusive'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','exclude4K','excludeDV','quickStart','langExclusive','simpleMode'].forEach(k => pick(k, v => typeof v === 'boolean'));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
   if (Array.isArray(d.langs)) { const l = d.langs.filter(v => LANG_OPTS.some(o => o.v === v)); if (l.length) out.langs = l; }
   if (typeof d.name === 'string') out.name = d.name.replace(/[<>"'&`]/g, '').slice(0, 60);
@@ -1036,6 +1043,7 @@ function renderOpts(def) {
         <span class="svc-list-arr">›</span>
       </label>${o.help ? `<div class="device-help" id="help_${o.v}">${o.help}</div>` : ''}</div>`).join('');
       if (def.id === 'resolution') {
+        if (S.simpleMode) return `<div class="svc-list">${rows}</div>`;
         const AUDIO_OPTS = [
           { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
           { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
@@ -1403,7 +1411,8 @@ function splashHtml() {
       <span class="splash-chip splash-chip-feat">Anime Ready</span>
       <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
     </div>
-    <button class="splash-cta" data-action="start-setup">Start Setup →</button>
+    <button class="splash-cta" data-action="easy-start">⚡ Easy Setup<br><span style="font-size:.74rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
+    <button data-action="custom-start" style="width:100%;max-width:310px;margin-top:8px;padding:11px 24px;font-size:.86rem;font-weight:700;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.03);color:#8b949e;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.07)'" onmouseout="this.style.background='rgba(255,255,255,.03)'">Custom Setup — full control</button>
     ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:310px;margin-top:10px;padding:11px 14px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:10px;display:flex;align-items:center;gap:10px">
       <div style="flex:1;min-width:0">
         <div style="font-size:.72rem;font-weight:700;color:#00d4ff">Continue where you left off</div>
@@ -1413,13 +1422,10 @@ function splashHtml() {
       <button data-action="continue-session" class="splash-cta-continue" style="padding:6px 12px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:7px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume →</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:4px 8px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">✕</button>
     </div>` : ''}
-    <div style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:10px">
-      <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(0,212,255,.06);border:1.5px solid rgba(0,212,255,.2);border-radius:12px;color:#00d4ff;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">4K · Lossless</span></button>
-      <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.2);border-radius:12px;color:#60a5fa;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.12)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ Quick Start<br><span style="font-size:.68rem;opacity:.8">1080p · DD+</span></button>
-    </div>
+    
     <button data-action="quick-start" data-preset="p2p" style="width:100%;max-width:310px;margin-top:8px;padding:11px 14px;background:rgba(139,92,246,.06);border:1.5px solid rgba(139,92,246,.22);border-radius:12px;color:#a78bfa;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px" onmouseover="this.style.background='rgba(139,92,246,.13)';this.style.borderColor='rgba(139,92,246,.45)'" onmouseout="this.style.background='rgba(139,92,246,.06)';this.style.borderColor='rgba(139,92,246,.22)'">
       <svg width="15" height="15" viewBox="0 0 44 44" fill="none" style="flex-shrink:0"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#8b5cf6" stroke-width="2" fill="none"/><circle cx="15" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="29" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><line x1="19.5" y1="22" x2="24.5" y2="22" stroke="#8b5cf6" stroke-width="1.5"/><path d="M27 18 L33 15 M27 26 L33 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/><path d="M17 18 L11 15 M17 26 L11 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/></svg>
-      <span style="line-height:1.3">Free / P2P Quick Start<br><span style="font-size:.67rem;opacity:.75;font-weight:600">No subscription · torrents only</span></span>
+      <span style="line-height:1.3">No subscription? Free P2P Setup<br><span style="font-size:.67rem;opacity:.75;font-weight:600">Torrents only · one-click install</span></span>
     </button>
     <div class="splash-pill-wrap" style="width:100%;max-width:310px;margin-top:16px;border-radius:12px;padding:11px 14px">
       <div style="font-size:.63rem;font-weight:700;color:#4b5563;letter-spacing:.08em;text-transform:uppercase;text-align:center;margin-bottom:10px">Skip the wizard</div>
@@ -1480,6 +1486,17 @@ function render() {
   }
 
   const def  = DEFS[step - 1];
+
+  if (step === STEPS && S.simpleMode) {
+    if (!S.name) { S.name = defaultName(); saveState(); }
+    main.innerHTML = simpleFinishHtml();
+    nav.style.display = 'flex';
+    const _sb = document.getElementById('btnBack');
+    _sb.style.visibility = 'visible';
+    _sb.innerHTML = '← Edit answers';
+    document.getElementById('btnNext').style.display = 'none';
+    return;
+  }
 
   if (step === STEPS) {
     if (!S.name) { S.name = defaultName(); saveState(); }
@@ -1871,7 +1888,7 @@ function syncNext() {
   let ok = !def.key || !!S[def.key];
   if (step === 1) ok = S.multiServices.length > 0;
   btn.disabled = !ok;
-  const nextDef = step < STEPS ? DEFS[step] : null;
+  const nextDef = step < STEPS ? DEFS[(S.simpleMode && step === 3) ? 4 : step] : null;
   const nextLabel = nextDef ? nextDef.title : null;
   if (step === STEPS) {
     btn.innerHTML = `<span style="flex:1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
@@ -1958,14 +1975,15 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         document.getElementById('main').classList.remove('nav-back');
-        step = (step === 1 && S.quickStart) ? 5 : step + 1;
+        step = (step === 1 && S.quickStart) ? 5 : ((S.simpleMode && step === 3) ? 5 : step + 1);
+        if (S.simpleMode && !S.content) S.content = 'all';
         pushStep(); saveState(); render(); window.scrollTo(0,0);
       }
     }
     if (action === 'nav-back') {
       if (step > 0) {
         document.getElementById('main').classList.add('nav-back');
-        step = (step === 5 && S.quickStart) ? 1 : step - 1;
+        step = (step === 5 && S.quickStart) ? 1 : ((S.simpleMode && step === 5) ? 3 : step - 1);
         pushStep(); saveState(); render(); window.scrollTo(0,0);
       }
     }
@@ -1984,7 +2002,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
       if (preset === 'p2p') {
-        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true });
+        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true, simpleMode:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 5; pushStep(); render(); window.scrollTo(0,0);
       } else {
@@ -2008,9 +2026,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
     if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'show-full-review') { S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'simple-install') simpleInstall();
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'start-fresh') { clearState(); }
-    if (action === 'paste-manifest-splash') { document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
     if (action === 'share-config') shareConfig();
     if (action === 'copy-json') {
@@ -2141,6 +2163,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       syncNext();
+      if (S.simpleMode && (step === 2 || step === 3)) {
+        setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled) b.click(); }, 350);
+      }
     }
     if (e.target.dataset.action === 'toggle-telemetry') {
       S.telemetryOk = e.target.checked;
@@ -2154,6 +2179,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = e.target.value;
       const i = S.multiServices.indexOf(val);
       if (i >= 0) S.multiServices.splice(i, 1);
+      else if (S.simpleMode) S.multiServices = [val];
       else S.multiServices.push(val);
       S.service = deriveService();
       if (val === 'p2p' && S.multiServices.includes('p2p') && !S.p2pEnabled) {
@@ -2162,6 +2188,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       syncNext();
+      if (S.simpleMode && e.target.checked && S.multiServices.length) {
+        setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled && step === 1) b.click(); }, 350);
+      }
     }
     if (e.target.dataset.action === 'toggle-lang') {
       const v = e.target.value;
@@ -2868,10 +2897,50 @@ function togglePwd() {
   if (eye) eye.style.color = show ? '#00d4ff' : '#4b5563';
 }
 
-function genPwd() {
+function makePwd() {
   const PWD_WORDS = ['Blue','Red','Dark','Bright','Swift','Deep','High','Storm','Wild','Sharp','Iron','Gold','Stone','Silver','Flash','Frost','Fire','Wind','Thunder','Star','River','Forest','Ocean','Mountain','Canyon','Desert','Arctic','Ember','Shadow','Crystal','Falcon','Tiger','Wolf','Eagle','Phoenix','Dragon','Hawk','Raven','Cobra','Viper'];
   const arr = new Uint8Array(4); crypto.getRandomValues(arr);
-  const pwd = `${PWD_WORDS[arr[0] % PWD_WORDS.length]}${PWD_WORDS[arr[1] % PWD_WORDS.length]}${PWD_WORDS[arr[2] % PWD_WORDS.length]}${String(100 + (arr[3] % 900))}`;
+  return `${PWD_WORDS[arr[0] % PWD_WORDS.length]}${PWD_WORDS[arr[1] % PWD_WORDS.length]}${PWD_WORDS[arr[2] % PWD_WORDS.length]}${String(100 + (arr[3] % 900))}`;
+}
+
+function simpleFinishHtml() {
+  const needed = getDebridInputs();
+  const missingKeys = needed.length > 0 && !needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
+  const bits = [['🔌', label('service', S.service)], ['📺', label('device', S.device)], ['🖥️', label('resolution', S.resolution)], ['🔊', label('audio', S.audio)]].filter(b => b[1]);
+  return `
+    <div class="card">
+      <div style="text-align:center;padding:6px 0 2px">
+        <div style="font-size:2rem;line-height:1">🎉</div>
+        <div style="font-size:1.25rem;font-weight:900;color:#e6edf3;margin-top:8px" class="wn-title">Almost done — one click left</div>
+        <div style="font-size:.86rem;color:#8b949e;margin-top:6px;line-height:1.5">We will set your template up on a public AIOStreams server and hand you the Stremio install button.</div>
+      </div>
+      <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:16px 0">
+        ${bits.map(([i2, t]) => `<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.16);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:#9ca3af">${i2} ${t}</span>`).join('')}
+      </div>
+      ${missingKeys ? `<div style="text-align:center;font-size:.79rem;color:#fbbf24;margin-bottom:12px">⚠ No API key entered — streams will not load until you add one. <button data-action="jump-step" data-step="5" style="background:none;border:none;color:#00d4ff;font-weight:700;cursor:pointer;font-size:.79rem;text-decoration:underline;padding:0">Add it now</button></div>` : ''}
+      <div class="name-row">
+        <label>Template name (optional)</label>
+        <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
+      </div>
+      <button class="btn-manifest" id="btnAio" data-action="simple-install">🚀 Create &amp; Install in Stremio</button>
+      <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">A password is generated automatically to protect your config. Your keys go only to the AIOStreams server that serves your streams — never anywhere else.</div>
+      <div id="aioResult"></div>
+      <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
+        <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">⬇ Download JSON instead</button>
+        <button data-action="show-full-review" style="background:none;border:none;color:#6b7280;font-size:.8rem;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Show all options →</button>
+      </div>
+    </div>`;
+}
+
+function simpleInstall() {
+  if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
+  if (!S.instancePassword) { S.instancePassword = makePwd(); saveState(); }
+  S.instanceHost = 'auto'; saveState();
+  openInAIOStreams();
+}
+
+function genPwd() {
+  const pwd = makePwd();
   S.instancePassword = pwd; saveState();
   const el = document.getElementById('aioPwd'); if (el) { el.value = pwd; el.type = 'text'; }
   showToast('Password generated — copy it now');
@@ -3085,7 +3154,7 @@ async function openInAIOStreams() {
       showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
     } catch(e) {
       resetBtn(origHtml);
-      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">All hosts timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">All hosts timed out or refused the connection (CORS, rate limit, or downtime). ${S.simpleMode ? 'Try again in a minute, or use the manual options.' : 'Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.'}</div>${S.simpleMode ? '<button data-action="show-full-review" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Show manual setup options →</button>' : ''}</div>`;
     }
     return;
   }
