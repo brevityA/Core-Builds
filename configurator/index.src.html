@@ -634,11 +634,17 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.8.1';
+const CONFIGURATOR_VERSION = '2.9';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.9', date:'Jul 2 2026', items:[
+    'One-click Easy Setup — "Create &amp; Install" now opens AIOStreams with your template pre-loaded via deep link. No CORS issues, works on every public instance',
+    'Template uploaded to paste.rs, then AIOStreams fetches it directly — your credentials stay out of the link',
+    'Fallback instance chips shown if the auto-open is blocked by a popup blocker',
+    'Addon groups replaced by dynamic addon fetching — simpler config, no more "Every group must have at least one addon" errors. Dynamic exit stops scraping when enough cached streams are found',
+  ]},
   { v:'2.8.1', date:'Jul 2 2026', items:[
     'Fix: "Every group must have at least one addon" error — addon group references now omitted when groups are disabled',
     'Fix: configs generated with a parent/base config no longer include orphaned group addon references',
@@ -2553,7 +2559,6 @@ function pses() {
 function build() {
   const name = (S.name.trim() || defaultName()), rc = resolutionCfg(), ec = encodeCfg(), ac = audioCfg();
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
-  const useGroups = S.service === 'torbox-pro' || S.service === 'hybrid' || (S.service === 'multi' && S.multiServices.includes('torbox-pro'));
 
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
@@ -2600,7 +2605,7 @@ function build() {
     ],
     preferredStreamExpressions: pses(),
     dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
-    groups: { enabled: useGroups, groupings: useGroups ? [{ addons:['nx-fix-02','nx-fix-01'], condition:"count(cached(previousStreams))<3" }] : [] },
+    groups: { enabled:false, groupings:[] },
   };
 
   const result = {
@@ -2956,7 +2961,7 @@ function simpleFinishHtml() {
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
       </div>
       <button class="btn-manifest" id="btnAio" data-action="simple-install">🚀 Create &amp; Install in Stremio</button>
-      <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">A password is generated automatically to protect your config. Your keys go only to the AIOStreams server that serves your streams — never anywhere else.</div>
+      <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">We'll open AIOStreams with your template pre-loaded. Set a password, save, and copy your manifest URL. Your keys are stripped from the link — you re-enter them in AIOStreams.</div>
       <div id="aioResult"></div>
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
         <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">⬇ Download JSON instead</button>
@@ -2965,11 +2970,31 @@ function simpleFinishHtml() {
     </div>`;
 }
 
-function simpleInstall() {
+async function simpleInstall() {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
-  if (!S.instancePassword) { S.instancePassword = makePwd(); saveState(); }
-  S.instanceHost = 'auto'; saveState();
-  openInAIOStreams();
+  const btn = document.getElementById('btnAio'), result = document.getElementById('aioResult');
+  const origHtml = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating template…`;
+  result.innerHTML = '';
+  const url = await uploadTemplateForImport();
+  btn.disabled = false; btn.innerHTML = origHtml;
+  if (!url) { showToast('Upload failed — try again in a moment', true); return; }
+  saveLastGen();
+  const hosts = [['ElfHosted','https://aiostreams.elfhosted.com'],['ForthWeak','https://aiostreams.fortheweak.cloud'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me'],["Viren's",'https://aiostreams.viren070.me'],["Kuu's",'https://aiostreams.stremio.ru'],['ATBP','https://aio.atbphosting.com'],["Omni's",'https://aiostreams.12312023.xyz']];
+  const deepLink = `${hosts[0][1]}/stremio/configure?template=${encodeURIComponent(url)}`;
+  window.open(deepLink, '_blank');
+  const credInputs = getDebridInputs().filter(i => S.creds[i.id] && S.creds[i.id].trim());
+  let credBlock = '';
+  if (credInputs.length) {
+    const rows = credInputs.map(inp => {
+      const val = (S.creds[inp.id] || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+      const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
+      return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
+    }).join('');
+    credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the template</strong>. After it loads, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
+  }
+  result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">AIOStreams should have opened in a new tab.</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Your template loads automatically<br><strong style="color:#e6edf3">2.</strong> Set a password and click Save<br><strong style="color:#e6edf3">3.</strong> Copy your manifest URL to add to Stremio</div><div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Popup blocked? Tap an instance below instead:</div>${instanceChips(url)}${credBlock}</div>`;
+  showToast('AIOStreams opened — set a password and save');
 }
 
 function genPwd() {
