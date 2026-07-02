@@ -2,12 +2,8 @@
 
 ## 3.2.2 (2026-07-02)
 
-### Changed
-- **Override scoring moved to synced URL** (36 active templates + Base config) — inline `rankedRegexPatterns` entries (100 per 4K, 96 per 1080p — ~40 KB bloat per template) replaced with a single `syncedRankedRegexUrls` entry pointing to `Filtering/ranked-regex-patterns.json`. AIOStreams' override mechanism applies our 149 scored patterns on top of Vidhin05's zero-score base. Templates now carry `rankedRegexPatterns: []` — same scoring result, ~17,800 fewer lines across the fleet.
-
 ### Fixed
 - **Configurator v2.8.1** — `groups.groupings` now omitted when groups are disabled, fixing "Every group must have at least one addon" validation error on non-TorBox-Pro services and when using parent/base configs
-- **Configurator v2.8.1** — generated configs now include the Core Builds scored regex file in `syncedRankedRegexUrls`, so release-group ranking works out of the box
 - **Configurator v2.8.1** — Easy Setup CORS fallback: when one-click creation fails (all hosts unreachable), automatically creates an import URL and shows instance chips with a 3-step guide instead of a dead-end error
 
 ## 3.2.1 (2026-07-02)

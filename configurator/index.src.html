@@ -642,7 +642,6 @@ const CHANGELOG = [
   { v:'2.8.1', date:'Jul 2 2026', items:[
     'Fix: "Every group must have at least one addon" error — addon group references now omitted when groups are disabled',
     'Fix: configs generated with a parent/base config no longer include orphaned group addon references',
-    'Generated configs now include Core Builds scored regex overrides via synced URL — release-group ranking works out of the box',
   ]},
   { v:'2.8', date:'Jul 2 2026', items:[
     'Quick Start presets return as Easy Setup accelerators — 4K · Lossless and 1080p · DD+ pre-answer the resolution question',
@@ -2562,7 +2561,7 @@ function build() {
     excludedLanguages: [], includedLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
     preferredAudioTags: ac.preferredAudioTags,
     syncedExcludedRegexUrls: ['https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json'],
-    syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json','https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/ranked-regex-patterns.json'],
+    syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
     rankedRegexPatterns: [], excludedRegexPatterns: [],
     addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
     mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
