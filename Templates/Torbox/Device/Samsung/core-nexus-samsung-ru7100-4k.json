@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung RU7100 (UA65RU7100W) and compatible TVs. Native video containers: MKV, MP4, AVI, MOV, FLV, ASF, 3GP, VOB. Native audio: FLAC, AAC, MP3, M4A, WMA, WAV. No AV1 or Dolby Vision — DV streams excluded. HDR10+, HDR10, HLG priority. HEVC/AVC encodes only. Audio prioritises FLAC and AAC for native playback; Atmos/TrueHD/DTS ranked lower (passthrough/transcode). Full Core Builds expression layer: IQR Apex PSEs · REPACK/PROPER Passthrough · Per-Addon Flood Guard · Usenet Propagation Guard · AI Upscale Exclusion · Codec Efficiency Booster · Audio Pinnacle (native-first) · HDR Priority (no DV) · Ranked regex pool · Full CB ESE stack.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.21",
+    "version": "0.2.22",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -325,7 +325,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams, seasonPack(streams))) >= 10 ? seasonPack(streams) : []",
+        "expression": "/* CB | Kill Season Packs When Episodes Exist */ (latestSeason >= 3 and count(negate(streams, seasonPack(streams))) >= 10) ? seasonPack(streams) : []",
         "enabled": true
       },
       {

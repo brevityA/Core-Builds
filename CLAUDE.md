@@ -256,7 +256,7 @@ Points to Tamtaro's excluded regex file at `Tam-Taro/SEL-Filtering-and-Sorting` 
 
 **Array ops:** `count`, `negate`, `merge`, `slice`, `perGroup`, `pin`
 
-**Math:** `pow`, `sqrt`, `random` (from expr-eval)
+**Math:** `pow`, `sqrt`, `floor`, `ceil`, `round`, `trunc`, `random` (from expr-eval)
 
 ### Key function details
 

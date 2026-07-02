@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.1.1 (2026-07-02)
+
+### Changed
+- **`latestSeason` guard on Kill Season Packs ESE** (all 44 active templates + shared `Filtering/core-builds-eses.json`) — the `Kill Season Packs When Episodes Exist` ESE previously fired whenever 3+ episode-level streams existed, regardless of how many seasons the show has. For a show in its first or second season, killing the season pack was often counterproductive — the pack *is* the full show and may be the best result. The guard `latestSeason >= 3` now allows season packs through for shows with ≤2 seasons, and keeps the episode-preference kill active only for long-running series (3+ seasons). Samsung and Apple TV templates, which use a `>= 10` episode threshold, received the same guard. Behaviour for movies is unchanged (season packs don't exist for movies so `seasonPack()` returns `[]` regardless).
+
+### Reference
+- **CLAUDE.md** — `floor`, `ceil`, `round`, `trunc` added to the confirmed available SEL Math functions list (from expr-eval).
+
+---
+
 ## 3.1.0 (2026-07-01)
 
 ### Added
