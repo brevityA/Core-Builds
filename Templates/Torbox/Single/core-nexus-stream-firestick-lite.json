@@ -5,7 +5,7 @@
     "description": "Firestick and budget Android TV optimised build. Hard SDR-only enforcement — excludes Dolby Vision, HDR10+, HDR10, HLG, and 10-bit content. AV1 excluded. TrueHD/Atmos/lossless audio excluded. 1080p + 720p · WEB-DL/WEBRip · TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.7",
+    "version": "2.9.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -286,7 +286,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams, seasonPack(streams))) >= 3 ? seasonPack(streams) : []",
+        "expression": "/* CB | Kill Season Packs When Episodes Exist */ (latestSeason >= 3 and count(negate(streams, seasonPack(streams))) >= 3) ? seasonPack(streams) : []",
         "enabled": true
       },
       {

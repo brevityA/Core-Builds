@@ -5,7 +5,7 @@
     "description": "TorBox-native build of Core Nexus 4K Apex. Uses only TorBox's own search and Usenet — no third-party indexers. Identical adaptive ranked-pool bitrate PSEs and full ESE stack. Simpler, faster to load, fewer moving parts.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.11.1",
+    "version": "2.11.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -324,7 +324,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams, seasonPack(streams))) >= 3 ? seasonPack(streams) : []",
+        "expression": "/* CB | Kill Season Packs When Episodes Exist */ (latestSeason >= 3 and count(negate(streams, seasonPack(streams))) >= 3) ? seasonPack(streams) : []",
         "enabled": true
       },
       {

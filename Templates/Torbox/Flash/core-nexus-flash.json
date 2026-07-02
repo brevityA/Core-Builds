@@ -5,7 +5,7 @@
     "description": "Single-click instant play. Only cached streams appear — zero uncached results. Derived from Speed but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 1080p · TorBox Essential · Library, TorBox Search, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.9.7",
+    "version": "2.9.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1606,7 +1606,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams, seasonPack(streams))) >= 3 ? seasonPack(streams) : []",
+        "expression": "/* CB | Kill Season Packs When Episodes Exist */ (latestSeason >= 3 and count(negate(streams, seasonPack(streams))) >= 3) ? seasonPack(streams) : []",
         "enabled": true
       },
       {
