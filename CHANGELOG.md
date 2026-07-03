@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.5 (2026-07-03)
+
+### Added
+- **Template collection file** (`core-builds-template-collection.json`) — operator-facing template catalog for AIOStreams `TEMPLATE_URLS`. Contains 3 representative templates (4K Apex, Stream, Anime 4K) with all Core Builds synced URLs declared. When an instance operator adds this URL to their `TEMPLATE_URLS` env var, AIOStreams' `registerTrustedAccess()` auto-whitelists all Core Builds URLs — our ranked regex patterns file, ESEs, ISEs, and PSEs. This eliminates the need for operators to manually add URLs to `WHITELISTED_REGEX_PATTERNS_URLS` or `WHITELISTED_SEL_URLS`. Modelled after Tam-Taro's approach.
+
+### Changed
+- **Configurator v2.10** — Easy Setup now attempts direct API creation via `Promise.any()` across all 7 public AIOStreams hosts. If any host allows CORS, the manifest modal opens instantly with zero redirects. When CORS blocks all hosts (current production behavior), falls back gracefully to the enhanced paste-back flow: auto-generates a memorable password (displayed with copy button), opens AIOStreams via `?template=` deep link, and presents a manifest URL paste field. When the user returns and pastes their manifest URL, it's validated via `extractManifestParts()` and instantly opens the full Stremio install modal (App/Web/WuPlay/Nuvio tabs, QR code, copy buttons). A `visibilitychange` listener detects tab return and focuses the paste field. Credential reminder and instance chips remain as fallback. Future-proofed: when AIOStreams instances add CORS headers, the direct path activates automatically with no configurator update needed.
+
 ## 3.2.4 (2026-07-03)
 
 ### Changed

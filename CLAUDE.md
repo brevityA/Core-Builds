@@ -36,9 +36,10 @@ Templates/Personal/ → Personal/experimental templates (core-cipher) — do not
 Templates/Deprecated/ → Retired non-Torbox templates
 Community-Templates/ → Community-contributed templates (MightyIcyy, RB3)
 Formatters/         → 14 custom stream layout formatters
-Filtering/          → Shared filter expression files (ESEs, ISEs, PSEs)
+Filtering/          → Shared filter expression files (ESEs, ISEs, PSEs, ranked regex)
 Regex/              → Excluded regex pattern lists
 Assets/             → Banners, icons, formatter preview images
+core-builds-template-collection.json → Operator template catalog for TEMPLATE_URLS
 Guides/             → Import guide, troubleshooting, device profiles, FAQ
 tests/              → pytest test suite (template validation, integration)
 .github/            → Workflows, issue templates, discussion templates
@@ -250,6 +251,38 @@ Points to Vidhin05's file on all non-Hybrid templates. Supplements ranked patter
 
 ### `syncedExcludedRegexUrls`
 Points to Tamtaro's excluded regex file at `Tam-Taro/SEL-Filtering-and-Sorting` on all active templates. **Note:** Tamtaro renamed their GitHub account from `Tamtaro` → `Tam-Taro`; the old URL 404s. The new `Tam-Taro` URL works (200) but elfhosted's allowlist has not been updated — users on elfhosted get "Forbidden URL" errors on import until elfhosted ships an allowlist update. Same applies to `syncedIncludedStreamExpressionUrls` (ISEs) and `syncedPreferredStreamExpressionUrls` (PSEs).
+
+---
+
+## Template Collection & Trusted Access (v3.2.5)
+
+### How AIOStreams whitelists synced URLs
+
+AIOStreams uses `registerTrustedAccess()` (`packages/core/src/utils/templates.ts`) to auto-whitelist synced URLs. When an operator adds a template URL to their `TEMPLATE_URLS` env var, AIOStreams fetches the template at startup and whitelists all `synced*Urls` and inline regex patterns found inside it. This is how Tam-Taro gets their URLs whitelisted — operators add their template collection to `TEMPLATE_URLS`.
+
+### Core Builds template collection
+
+`core-builds-template-collection.json` at repo root. Contains 3 representative templates (4K Apex, Stream, Anime 4K) with all Core Builds synced URLs declared.
+
+**Operator setup:** Add to `TEMPLATE_URLS`:
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-builds-template-collection.json
+```
+
+**URLs auto-whitelisted when added:**
+- `Filtering/ranked-regex-patterns.json` — 149 scored regex patterns (via `syncedRankedRegexUrls`)
+- `Filtering/core-builds-eses.json` — shared ESEs (via `syncedExcludedStreamExpressionUrls`)
+- `Filtering/core-builds-ises.json` — shared ISEs (via `syncedIncludedStreamExpressionUrls`)
+- `Filtering/core-builds-pses.json` — shared PSEs (via `syncedPreferredStreamExpressionUrls`)
+- Vidhin05's `regexes.json` (via `syncedRankedRegexUrls`, already whitelisted on most instances)
+
+### AIOStreams trust mechanisms (3 levels)
+
+1. **`TEMPLATE_URLS`** (template-level) — operator adds template URL → all synced URLs inside auto-whitelisted. This is what `core-builds-template-collection.json` targets.
+2. **`TRUSTED_UUIDS`** (user-level) — operator adds user UUIDs → those users bypass all URL whitelists. Trust inherited by parent→child configs.
+3. **Explicit whitelists** (URL-level) — `WHITELISTED_REGEX_PATTERNS_URLS`, `WHITELISTED_SEL_URLS` env vars for manual URL-by-URL allowlisting.
+
+Access controlled by `REGEX_FILTER_ACCESS` (`none`/`trusted`/`all`, default `trusted`) and `SEL_SYNC_ACCESS` (`trusted`/`all`, default `trusted`).
 
 ---
 
