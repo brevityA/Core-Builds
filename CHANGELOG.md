@@ -3,7 +3,7 @@
 ## 3.2.5 (2026-07-03)
 
 ### Changed
-- **Configurator v2.10** — Enhanced Easy Setup finish step with manifest paste-back flow. After opening AIOStreams, the configurator now auto-generates a password (displayed with copy button), shows numbered steps, and presents a manifest URL paste field. When the user returns and pastes their manifest URL, it's validated via `extractManifestParts()` and instantly opens the full Stremio install modal (App/Web/WuPlay/Nuvio tabs, QR code, copy buttons). A `visibilitychange` listener detects tab return and focuses the paste field with a prompt. Credential reminder and instance chips remain as fallback.
+- **Configurator v2.10** — Easy Setup now attempts direct API creation via `Promise.any()` across all 7 public AIOStreams hosts. If any host allows CORS, the manifest modal opens instantly with zero redirects. When CORS blocks all hosts (current production behavior), falls back gracefully to the enhanced paste-back flow: auto-generates a memorable password (displayed with copy button), opens AIOStreams via `?template=` deep link, and presents a manifest URL paste field. When the user returns and pastes their manifest URL, it's validated via `extractManifestParts()` and instantly opens the full Stremio install modal (App/Web/WuPlay/Nuvio tabs, QR code, copy buttons). A `visibilitychange` listener detects tab return and focuses the paste field. Credential reminder and instance chips remain as fallback. Future-proofed: when AIOStreams instances add CORS headers, the direct path activates automatically with no configurator update needed.
 
 ## 3.2.4 (2026-07-03)
 

@@ -2977,11 +2977,38 @@ async function simpleInstall() {
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating template…`;
   result.innerHTML = '';
   const pwd = makePwd();
+  const cfg = build().config;
+  const hosts = [['ElfHosted','https://aiostreams.elfhosted.com'],['ForthWeak','https://aiostreams.fortheweak.cloud'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me'],["Viren's",'https://aiostreams.viren070.me'],["Kuu's",'https://aiostreams.stremio.ru'],['ATBP','https://aio.atbphosting.com'],["Omni's",'https://aiostreams.12312023.xyz']];
+  const hostLabels = {};
+  hosts.forEach(([n, u]) => { hostLabels[u] = n; });
+
+  // Option A: try direct API creation across all hosts
+  let directSuccess = false;
+  try {
+    const winner = await Promise.any(
+      hosts.map(([, host]) =>
+        fetchWithTimeout(`${host}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
+          .then(async res => {
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data?.success !== false) return { host, uuid: data?.uuid || data?.user?.uuid || data?.id };
+            throw new Error('rejected');
+          })
+      )
+    );
+    if (winner.uuid) { S.instanceUuid = winner.uuid; S.instancePassword = pwd; saveState(); }
+    btn.disabled = false; btn.innerHTML = origHtml;
+    saveLastGen();
+    directSuccess = true;
+    showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabels[winner.host] || winner.host.replace('https://','').split('/')[0]);
+    return;
+  } catch(e) { /* CORS blocked all hosts — fall through to Option C */ }
+
+  // Option C fallback: upload template and open AIOStreams via deep link
+  btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Uploading template…`;
   const url = await uploadTemplateForImport();
   btn.disabled = false; btn.innerHTML = origHtml;
   if (!url) { showToast('Upload failed — try again in a moment', true); return; }
   saveLastGen();
-  const hosts = [['ElfHosted','https://aiostreams.elfhosted.com'],['ForthWeak','https://aiostreams.fortheweak.cloud'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me'],["Viren's",'https://aiostreams.viren070.me'],["Kuu's",'https://aiostreams.stremio.ru'],['ATBP','https://aio.atbphosting.com'],["Omni's",'https://aiostreams.12312023.xyz']];
   const deepLink = `${hosts[0][1]}/stremio/configure?template=${encodeURIComponent(url)}`;
   window.open(deepLink, '_blank');
 
