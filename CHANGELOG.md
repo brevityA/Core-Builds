@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.2.4 (2026-07-03)
+
+### Changed
+- **Sort criteria overhaul** (all 42 templates) — rebuilt the sort pipeline based on AIOStreams' stable multi-key sort architecture (position 1 = primary, subsequent keys only break ties). Key position now reflects actual impact instead of legacy ordering.
+- **`seadex` added** — SeaDex curated-release signal inserted at position 4 (after `streamExpressionScore`) for all templates. For Anime templates, promoted to position 2 (right after `cached`) following Tam-Taro's recommendation — SeaDex is the strongest anime quality signal.
+- **`regexScore` promoted** — moved from position 11 (effectively dead — ties rarely survive 10 prior comparisons) to position 7 (after `quality`), where release-group quality scoring actually influences results.
+- **`visualTag` promoted in 4K global sort** — moved above `audioTag`/`audioChannel`/`language` for 4K templates. HDR10+/DV/HDR10 format is a primary quality differentiator at 4K; at 1080p the original position is retained since HDR is rare.
+- **`bitrate` added as tiebreaker** — estimated bitrate sort key appended after `seeders`, giving a fine-grained quality differentiation when all other criteria tie.
+- **`service` added to Hybrid templates** — debrid service priority sort key (after `seadex`) gives built-in TorBox-first tiebreaking alongside the existing PSE-level TorBox-priority twins.
+- **Uncached sort sections** — new `uncachedMovies` and `uncachedSeries` sort sections promote `seeders` above audio/language criteria. When a stream isn't cached, seeder count directly affects download speed and reliability.
+- Sort criteria count: 14 → 16 keys (standard), 17 keys (Hybrid). Sections: 5 → 7 per template (added `uncachedSeries`).
+
 ## 3.2.3 (2026-07-02)
 
 ### Changed

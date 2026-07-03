@@ -5,7 +5,7 @@
     "description": "Nightly Labs build of Anime 4K. Tests SeaDex-aware conditional PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, and anime elite group pins. Not a daily driver — report regressions before these features graduate to stable.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
@@ -822,6 +822,10 @@
           "direction": "desc"
         },
         {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
           "key": "streamExpressionMatched",
           "direction": "desc"
         },
@@ -838,6 +842,14 @@
           "direction": "desc"
         },
         {
+          "key": "regexScore",
+          "direction": "desc"
+        },
+        {
+          "key": "visualTag",
+          "direction": "desc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -850,15 +862,7 @@
           "direction": "desc"
         },
         {
-          "key": "visualTag",
-          "direction": "desc"
-        },
-        {
           "key": "encode",
-          "direction": "desc"
-        },
-        {
-          "key": "regexScore",
           "direction": "desc"
         },
         {
@@ -867,6 +871,10 @@
         },
         {
           "key": "seeders",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
           "direction": "desc"
         },
         {
@@ -880,6 +888,10 @@
           "direction": "desc"
         },
         {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
           "key": "streamExpressionMatched",
           "direction": "desc"
         },
@@ -925,6 +937,10 @@
         },
         {
           "key": "seeders",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
           "direction": "desc"
         },
         {
@@ -938,6 +954,10 @@
           "direction": "desc"
         },
         {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
           "key": "streamExpressionMatched",
           "direction": "desc"
         },
@@ -983,6 +1003,10 @@
         },
         {
           "key": "seeders",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
           "direction": "desc"
         },
         {
@@ -996,61 +1020,7 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
-          "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "regexScore",
-          "direction": "desc"
-        },
-        {
-          "key": "visualTag",
-          "direction": "desc"
-        },
-        {
-          "key": "encode",
-          "direction": "desc"
-        },
-        {
-          "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
-          "direction": "desc"
-        },
-        {
-          "key": "language",
-          "direction": "desc"
-        },
-        {
-          "key": "seeders",
-          "direction": "desc"
-        },
-        {
-          "key": "size",
-          "direction": "desc"
-        }
-      ],
-      "cached": [
-        {
-          "key": "cached",
+          "key": "seadex",
           "direction": "desc"
         },
         {
@@ -1102,61 +1072,7 @@
           "direction": "desc"
         },
         {
-          "key": "size",
-          "direction": "desc"
-        }
-      ],
-      "uncached": [
-        {
-          "key": "cached",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
-          "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "regexScore",
-          "direction": "desc"
-        },
-        {
-          "key": "visualTag",
-          "direction": "desc"
-        },
-        {
-          "key": "encode",
-          "direction": "desc"
-        },
-        {
-          "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
-          "direction": "desc"
-        },
-        {
-          "key": "language",
-          "direction": "desc"
-        },
-        {
-          "key": "seeders",
+          "key": "bitrate",
           "direction": "desc"
         },
         {
@@ -1170,6 +1086,10 @@
           "direction": "desc"
         },
         {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
           "key": "streamExpressionMatched",
           "direction": "desc"
         },
@@ -1215,6 +1135,10 @@
         },
         {
           "key": "seeders",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
           "direction": "desc"
         },
         {
@@ -1228,61 +1152,7 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
-          "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "regexScore",
-          "direction": "desc"
-        },
-        {
-          "key": "visualTag",
-          "direction": "desc"
-        },
-        {
-          "key": "encode",
-          "direction": "desc"
-        },
-        {
-          "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
-          "direction": "desc"
-        },
-        {
-          "key": "language",
-          "direction": "desc"
-        },
-        {
-          "key": "seeders",
-          "direction": "desc"
-        },
-        {
-          "key": "size",
-          "direction": "desc"
-        }
-      ],
-      "cachedSeries": [
-        {
-          "key": "cached",
+          "key": "seadex",
           "direction": "desc"
         },
         {
@@ -1318,6 +1188,10 @@
           "direction": "desc"
         },
         {
+          "key": "seeders",
+          "direction": "desc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -1330,7 +1204,7 @@
           "direction": "desc"
         },
         {
-          "key": "seeders",
+          "key": "bitrate",
           "direction": "desc"
         },
         {
@@ -1344,61 +1218,7 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
-          "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "regexScore",
-          "direction": "desc"
-        },
-        {
-          "key": "visualTag",
-          "direction": "desc"
-        },
-        {
-          "key": "encode",
-          "direction": "desc"
-        },
-        {
-          "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
-          "direction": "desc"
-        },
-        {
-          "key": "language",
-          "direction": "desc"
-        },
-        {
-          "key": "seeders",
-          "direction": "desc"
-        },
-        {
-          "key": "size",
-          "direction": "desc"
-        }
-      ],
-      "cachedAnime": [
-        {
-          "key": "cached",
+          "key": "seadex",
           "direction": "desc"
         },
         {
@@ -1434,61 +1254,7 @@
           "direction": "desc"
         },
         {
-          "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
-          "direction": "desc"
-        },
-        {
-          "key": "language",
-          "direction": "desc"
-        },
-        {
           "key": "seeders",
-          "direction": "desc"
-        },
-        {
-          "key": "size",
-          "direction": "desc"
-        }
-      ],
-      "uncachedAnime": [
-        {
-          "key": "cached",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
-          "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "regexScore",
-          "direction": "desc"
-        },
-        {
-          "key": "visualTag",
-          "direction": "desc"
-        },
-        {
-          "key": "encode",
           "direction": "desc"
         },
         {
@@ -1504,7 +1270,7 @@
           "direction": "desc"
         },
         {
-          "key": "seeders",
+          "key": "bitrate",
           "direction": "desc"
         },
         {
