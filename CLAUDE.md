@@ -270,7 +270,7 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-buil
 ```
 
 **URLs auto-whitelisted when added:**
-- `Filtering/ranked-regex-patterns.json` — 149 scored regex patterns (via `syncedRankedRegexUrls`)
+- `Filtering/ranked-regex-patterns.json` — 100 scored regex patterns (via `syncedRankedRegexUrls`)
 - `Filtering/core-builds-eses.json` — shared ESEs (via `syncedExcludedStreamExpressionUrls`)
 - `Filtering/core-builds-ises.json` — shared ISEs (via `syncedIncludedStreamExpressionUrls`)
 - `Filtering/core-builds-pses.json` — shared PSEs (via `syncedPreferredStreamExpressionUrls`)
