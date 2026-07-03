@@ -412,7 +412,13 @@
       }
     ],
     "rankedRegexPatterns": [],
-    "regexOverrides": [],
+    "regexOverrides": [
+      {
+        "name": "SDR",
+        "pattern": "/\\bSDR\\b/i",
+        "score": 0
+      }
+    ],
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": false,
