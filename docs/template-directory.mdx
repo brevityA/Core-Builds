@@ -1,6 +1,6 @@
 ---
 title: "Template Directory"
-description: "Every active template with import URLs, versions, and plan requirements. Current version: v3.0.2"
+description: "Every active template with import URLs, versions, and plan requirements. Current version: v3.2.4"
 ---
 
 <Frame>
@@ -27,8 +27,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### 4K Apex — v0.6.0
-    Flagship 4K. IQR Tukey fence adaptive bitrate filtering, DV/HDR priority, TorBox Usenet.
+    ### 4K Apex — v0.7.5
+    Flagship 4K. IQR Tukey fence adaptive bitrate filtering, DV/HDR priority, TorBox Usenet, Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json" />
@@ -40,8 +40,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### 4K Apex (TorBox-only) — v2.11.0
-    Cached-only Apex variant. No external scrapers — instant results from TorBox cache only.
+    ### 4K Apex (TorBox-only) — v2.12.4
+    Cached-only Apex variant. No external scrapers — instant results from TorBox cache only. Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json" />
@@ -53,8 +53,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### 4K Hybrid — v2.11.0
-    TorBox Pro + Usenet indexer (NZBGeek included, disabled by default). Full 4K with TorBox-priority PSEs. Enable the Newznab preset after import — see the [importing guide](/importing) for shared-hosting notes.
+    ### 4K Hybrid — v2.12.4
+    TorBox Pro + Usenet indexer (NZBGeek included, disabled by default). Full 4K with TorBox-priority PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached. Enable the Newznab preset after import — see the [importing guide](/importing) for shared-hosting notes.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json" />
@@ -66,8 +66,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Samsung TV 4K — v0.2.18
-    AV1/VC-1/DV hard-excluded for Tizen. HDR10+ preferred. Simple quality-tier PSEs.
+    ### Samsung TV 4K — v0.3.4
+    AV1/VC-1/DV hard-excluded for Tizen. HDR10+ preferred. REPACK ISE, booster PSEs.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json" />
@@ -79,7 +79,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Samsung RU7100 4K — v0.2.20
+    ### Samsung RU7100 4K — v0.3.4
     RU7100 and compatible 2019–2022 Tizen TVs. Full APEX IQR Tukey fence PSE stack — more aggressive filtering than Samsung TV 4K. AV1/VC-1/DV hard-excluded, FLAC/AAC native audio, HDR10+/HDR10/HLG.
 
     <CardGroup cols={2}>
@@ -92,8 +92,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Windows Ultrawide — v0.1.0
-    Windows PC / ultrawide monitor. 1080p primary (S/A/B/C tiers) with 1440p and 4K fallback. Full lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC). HDR-first visual tag ordering. AV1 and HEVC preferred; VC-1 excluded. No resolution lock — 1440p and 4K shown when 1080p not available.
+    ### Windows Ultrawide — v0.2.4
+    Windows PC / ultrawide monitor. 1080p primary (S/A/B/C tiers) with 1440p and 4K fallback. Full lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC). HDR-first visual tag ordering. AV1 and HEVC preferred; VC-1 excluded. 14-PSE stack.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json" />
@@ -105,8 +105,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="1080p">
-    ### Stream — v2.9.9
-    1080p WEB-DL only. BluRay and Remux excluded.
+    ### Stream — v2.10.4
+    1080p streaming quality, 720p fallback.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json" />
@@ -118,7 +118,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Stream (Fire Stick) — v2.9.8
+    ### Stream (Fire Stick) — v2.10.4
     1080p SDR, tuned for Fire Stick and low-RAM devices.
 
     <CardGroup cols={2}>
@@ -131,8 +131,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Samsung TV — v0.2.18
-    1080p, AV1/VC-1/DV hard-excluded for Tizen.
+    ### Samsung TV — v0.3.4
+    1080p, AV1/VC-1/DV hard-excluded for Tizen. REPACK ISE, booster PSEs.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json" />
@@ -144,8 +144,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Hybrid — v2.9.10
-    TorBox + Usenet indexer (NZBGeek included, disabled by default), 1080p. Enable the Newznab preset after import — see the [importing guide](/importing) for shared-hosting notes.
+    ### Hybrid — v2.10.4
+    TorBox + Usenet indexer (NZBGeek included, disabled by default), 1080p. TorBox-priority twin PSEs (IQR). Enable the Newznab preset after import — see the [importing guide](/importing) for shared-hosting notes.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json" />
@@ -157,7 +157,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="Lite">
-    ### Stream Lite — v2.9.6
+    ### Stream Lite — v2.10.4
     Reduced ESE set. Faster, lighter on the host.
 
     <CardGroup cols={2}>
@@ -170,7 +170,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Stream (Fire Stick) Lite — v2.9.6
+    ### Stream (Fire Stick) Lite — v2.10.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json" />
@@ -182,7 +182,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Hybrid Lite — v2.9.10
+    ### Hybrid Lite — v2.10.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json" />
@@ -200,8 +200,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### 4K Essential — v2.11.0
-    Full 4K on Essential plan. IQR PSEs, no Usenet.
+    ### 4K Essential — v2.12.4
+    Full 4K on Essential plan. IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json" />
@@ -213,7 +213,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Flash 4K — v2.9.5
+    ### Flash 4K — v2.10.4
     Cached-only instant play. Returns nothing if title isn't cached.
 
     <CardGroup cols={2}>
@@ -226,7 +226,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Speed 4K — v2.9.6
+    ### Speed 4K — v2.10.4
     Fast cached 4K. Exits at 3 cached results or timeout.
 
     <CardGroup cols={2}>
@@ -239,7 +239,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="1080p">
-    ### Essential — v2.9.8
+    ### Essential — v2.10.4
     Standard 1080p for Essential subscribers.
 
     <CardGroup cols={2}>
@@ -252,7 +252,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Flash — v2.9.6
+    ### Flash — v2.10.4
     Cached-only instant 1080p play.
 
     <CardGroup cols={2}>
@@ -265,7 +265,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Speed — v2.9.6
+    ### Speed — v2.10.4
     Fast cached 1080p. Exits at 3 cached results or timeout.
 
     <CardGroup cols={2}>
@@ -278,7 +278,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="Lite">
-    ### 4K Essential Lite — v2.9.6
+    ### 4K Essential Lite — v2.10.4
     CB-style PSEs — simpler scoring, lower CPU overhead.
 
     <CardGroup cols={2}>
@@ -291,7 +291,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Speed 4K Lite — v2.9.6
+    ### Speed 4K Lite — v2.10.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json" />
@@ -303,7 +303,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Essential Lite — v2.9.6
+    ### Essential Lite — v2.10.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json" />
@@ -315,7 +315,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Speed Lite — v2.9.6
+    ### Speed Lite — v2.10.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json" />
@@ -333,7 +333,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### 4K AllDebrid — v0.3.1
+    ### 4K AllDebrid — v0.4.4
+    Full 4K with IQR Tukey fence PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
@@ -345,7 +346,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="1080p">
-    ### AllDebrid — v0.1.17
+    ### AllDebrid — v0.2.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
@@ -357,7 +358,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="Lite">
-    ### 4K AllDebrid Lite — v0.1.15
+    ### 4K AllDebrid Lite — v0.2.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json" />
@@ -369,7 +370,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### AllDebrid Lite — v0.1.16
+    ### AllDebrid Lite — v0.2.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json" />
@@ -387,7 +388,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### Speed 4K+ — v2.9.6
+    ### Speed 4K+ — v2.10.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
@@ -399,7 +400,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="1080p">
-    ### Speed EasyNews — v2.9.7
+    ### Speed EasyNews — v2.10.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
@@ -417,7 +418,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### Anime 4K — v2.8.8
+    ### Anime 4K — v2.8.11
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json" />
@@ -429,7 +430,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="1080p">
-    ### Anime — v2.8.8
+    ### Anime — v2.8.11
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json" />
@@ -441,7 +442,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Anime Dub — v2.8.8
+    ### Anime Dub — v2.8.11
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json" />
@@ -453,7 +454,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="Lite">
-    ### Anime 4K Lite — v2.8.6
+    ### Anime 4K Lite — v2.8.9
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json" />
@@ -465,7 +466,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Anime Lite — v2.8.6
+    ### Anime Lite — v2.8.9
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json" />
@@ -477,7 +478,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Anime Dub Lite — v2.8.6
+    ### Anime Dub Lite — v2.8.9
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json" />
@@ -499,8 +500,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="Nightly">
-    ### Apple TV 4K — v0.1.13
-    DV Profile 5/8 prioritised. AV1 hard-excluded for tvOS compatibility.
+    ### Apple TV 4K — v0.2.4
+    DV Profile 5/8 prioritised. AV1 hard-excluded for tvOS compatibility. SeaDex ISE, REPACK ISE.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
@@ -512,8 +513,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
   </Tab>
 
   <Tab title="Labs">
-    ### 4K Apex Labs — v0.9.0
-    Full Apex PSE stack with all LABS features enabled: Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins.
+    ### 4K Apex Labs — v0.11.4
+    Full Apex PSE stack with all LABS features enabled: Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K + 1080p REMUX).
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
@@ -525,8 +526,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Stream Labs — v0.6.7
-    1080p with perGroup() dedup prototypes and dynamic addon fetching.
+    ### Stream Labs — v0.8.4
+    1080p with perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs. Most ESEs in fleet (42).
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
@@ -538,8 +539,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### All-Rounder Labs — v0.1.2
-    Single template for live-action TV, movies, and anime. Uses `isAnime` + `hasSeaDex` conditional PSEs to switch quality tiers dynamically. Includes SeaDex, AnimeTosho, and NekoBT alongside standard scrapers.
+    ### All-Rounder Labs — v0.2.4
+    Single template for live-action TV, movies, and anime. Uses `isAnime` + `hasSeaDex` conditional PSEs to switch quality tiers dynamically. Includes SeaDex, AnimeTosho, and NekoBT alongside standard scrapers. All LABS features.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
@@ -551,8 +552,8 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Anime 4K Labs — v0.1.0
-    Anime 4K with `hasSeaDex` conditional PSEs, SeaDex Best pin, anime group pins (SubsPlease, Erai-raws, VCB-Studio), Score IQR Guard, and Indexer Diversity.
+    ### Anime 4K Labs — v0.1.3
+    Anime 4K with `hasSeaDex` conditional PSEs, SeaDex Best pin, anime group pins (SubsPlease, Erai-raws, VCB-Studio), Score IQR Guard, perGroup() dedup, and Indexer Diversity.
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
@@ -564,7 +565,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### Essential Labs — v0.1.13
+    ### Essential Labs — v0.2.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
@@ -576,7 +577,7 @@ All templates require **AIOStreams v2.30+**. Each section has a **Lite** tab for
 
     ---
 
-    ### 4K Essential Labs — v0.2.4
+    ### 4K Essential Labs — v0.3.4
 
     <CardGroup cols={2}>
       <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />

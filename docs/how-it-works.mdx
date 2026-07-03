@@ -17,12 +17,12 @@ When you hit play in Stremio, a lot happens in under a second.
     Without Core Builds, this already produces 50–200+ results in no particular order.
   </Step>
   <Step title="ESEs remove junk">
-    **Excluded Stream Expressions** run first. Streams matching any ESE are removed entirely before ranking starts. Core Builds standard ESEs kill: CAM recordings, YouTube rips, 3D streams, sub-720p resolutions, season packs on episode queries, bad NZBs, and more.
+    **Excluded Stream Expressions** run first. Streams matching any ESE are removed entirely before ranking starts. Core Builds standard ESEs kill: CAM recordings, YouTube rips, 3D streams, sub-720p resolutions, season packs on episode queries, bad NZBs, foreign-language-only streams, bad dual audio groups, low-seeder torrents, and more.
 
-    Standard: 24 ESEs. Lite: 12 (hard kills only — no quality gates).
+    Standard: 27–31 ESEs. Lite: 13–17 (hard kills only — no quality gates).
   </Step>
   <Step title="ISEs boost priority streams">
-    **Included Stream Expressions** pin certain streams to the top of the sorted list regardless of ranking. Core Builds ISEs boost: streams from your library (continue watching), cached streams, and English-language streams.
+    **Included Stream Expressions** pin certain streams to the top of the sorted list regardless of ranking. Core Builds ISEs boost: streams from your library (continue watching), cached streams, REPACK/PROPER releases, and SeaDex-verified anime.
   </Step>
   <Step title="PSEs score everything else">
     **Preferred Stream Expressions** assign a score to each remaining stream. Core Builds uses IQR Tukey fence PSEs — they compare each stream's bitrate against the statistical distribution of all streams for that title, then rank within the "normal" window highest.
@@ -51,10 +51,10 @@ Vanilla AIOStreams with default settings returns raw, unsorted results. Core Bui
     Bitrate-based ranking using real statistics across all streams for a title — not hardcoded cutoffs. Adapts to thin libraries and new releases via the pow() decay window.
   </Card>
   <Card title="Core Builds Expression Layer" icon="filter">
-    24 ESEs remove junk before ranking ever starts. 3 ISEs pin library, cached, and English streams to the top. IQR Tukey fence PSEs score everything else by bitrate percentile against real peers.
+    Up to 31 ESEs remove junk before ranking ever starts. 5 ISEs pin library, cached, REPACK, and SeaDex streams to the top. IQR Tukey fence PSEs score everything else by bitrate percentile against real peers.
   </Card>
   <Card title="Release Group Scoring" icon="star">
-    37 inline ranked patterns per template (score range −200 to +100) plus 174 additional patterns synced from Vidhin05's release database. Elite groups (FraMeSToR, FLUX, BHDStudio) surface above generic encodes automatically.
+    107 inline ranked patterns per template (score range −200 to +100) across 10 tiers, plus 174 additional patterns synced from Vidhin05's release database. Elite groups (FraMeSToR, FLUX, BHDStudio) surface above generic encodes automatically.
   </Card>
   <Card title="Device Profiles" icon="tv">
     Samsung TV, Apple TV, Fire Stick templates hard-exclude codecs and HDR formats the device can't play — no more silent playback failures from AV1 or DV on unsupported hardware.
@@ -73,9 +73,9 @@ Vanilla AIOStreams with default settings returns raw, unsorted results. Core Bui
 
 | Type | Role | Count (Standard) | Count (Lite) |
 |---|---|---|---|
-| ESE | Remove — stream is excluded from results | 24 | 12 |
-| ISE | Boost — stream jumps to top regardless of score | 3 | 3 |
-| PSE | Rank — stream gets a quality score | varies by template | varies by template |
+| ESE | Remove — stream is excluded from results | 27–31 | 13–17 |
+| ISE | Boost — stream jumps to top regardless of score | 5–7 | 5–7 |
+| PSE | Rank — stream gets a quality score | 10–24 | 10–16 |
 
 ESEs run first, then ISEs, then PSEs. A stream matched by an ESE never reaches PSE scoring.
 
@@ -83,7 +83,7 @@ ESEs run first, then ISEs, then PSEs. A stream matched by an ESE never reaches P
 
 ## Why Lite Returns More Results
 
-Lite templates remove the quality-gate ESEs (low bitrate, low seeders, upscaled 4K, bad BluRay encodes). Only hard kills remain (CAM, YouTube, 3D, sub-720p). More results come through — but without quality filtering, some bad encodes will appear.
+Lite templates remove the quality-gate ESEs (low bitrate, low seeders, upscaled 4K, bad BluRay encodes, bad dual audio, indexer diversity caps). Only hard kills remain (CAM, YouTube, season packs, foreign language, bad NZBs). More results come through — but without quality filtering, some bad encodes will appear.
 
 Use Lite when: your library is thin, you're on a shared host, or you're debugging why a specific title returns no results on the standard template.
 

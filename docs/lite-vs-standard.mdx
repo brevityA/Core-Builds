@@ -16,19 +16,24 @@ Standard templates include a set of quality-gate ESEs that Lite drops. These are
 
 | ESE removed in Lite | What it does in Standard |
 |---|---|
-| Low Bitrate Kill | Excludes streams below a minimum bitrate threshold |
-| Low Seeders Kill | Excludes P2P streams with very few seeders |
-| Upscaled 4K Kill | Excludes 1080p content AI-upscaled to 4K |
-| Bad 4K Bluray Kill | Excludes 4K Blu-ray encodes from known poor-quality groups |
-| Bad 1080p Bluray Kill | Same for 1080p |
+| G's Low Bitrate | Excludes streams below a live-computed bitrate floor for that title |
+| Low Seeders | Excludes torrents with fewer than 3 seeders |
+| Upscaled 4K | Excludes AI-upscaled 4K that isn't native UHD |
+| Bad 4K BluRay | Excludes 4K Blu-ray encodes from known poor-quality groups |
+| Bad 1080p BluRay | Same for 1080p |
+| Bad Dual Audio Groups | Excludes groups known for poor dual-audio encodes |
+| Indexer Diversity | Caps results per scraper to prevent one addon flooding the list |
+| Low SEL Score | Removes streams that scored in the bottom tier across all expressions |
+| Extra SeaDex | Hides excess SeaDex results beyond the best alternative |
 | Extra Cached HQ / LQ limits | Caps the number of cached results per quality tier |
 | Extra Uncached limit | Caps uncached results |
+| Per-Addon Flood Guard | Caps each scraper at its individual flood limit |
 
 ---
 
 ## What Lite keeps
 
-All hard kills remain active in Lite: CAM/SCR exclusion, YouTube and external stream blocking, 3D content blocking, resolution enforcement (1080p templates still block 4K), and all regex score filtering.
+All hard kills remain active in Lite: CAM/SCR exclusion, YouTube and external stream blocking, foreign language filtering, season pack management, resolution enforcement (1080p templates still block 4K), bad NZB filtering, and all regex score filtering.
 
 <Note>
   Lite is not a lower-quality mode — it is a less restrictive filter mode. The regex scoring, sort order, and PSE ranking logic are identical to Standard.

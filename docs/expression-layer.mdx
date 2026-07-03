@@ -1,9 +1,11 @@
 ---
 title: "Expression Layer"
-description: "How Core Builds PSEs, ESEs, and ISEs work — the IQR Tukey fence, pow() decay, and the full quality stack."
+description: "How Core Builds PSEs, ESEs, and ISEs work — the IQR Tukey fence, pow() decay, pin() expressions, sort architecture, and the full quality stack."
 ---
 
 The Core Builds Expression Layer is the set of Stream Expressions (SEL) deployed across all active templates. It is what separates Core Builds from a default AIOStreams install.
+
+The fleet currently deploys **254 unique expressions** across **42 active templates** — 83 unique ESEs, 163 unique PSEs, and 8 unique ISEs. Standard templates run 27–31 ESEs; Lite variants run 13–17 (hard kills only — quality gates removed).
 
 ## Expression Types
 
@@ -19,35 +21,38 @@ A stream matched by an ESE never reaches PSE scoring. ISE-matched streams jump t
 
 ## ESEs — The Kill Stack
 
-Standard templates run **25–26 ESEs** depending on template type. Lite templates run 12 (hard kills only — quality gates removed).
+Standard templates run **27–31 ESEs** depending on template type. Lite templates run **13–17** (hard kills only — quality gates removed). The Stream Labs Nightly template runs the most at 42 ESEs.
 
-### Infrastructure ESEs (all templates)
+### Universal ESEs (all 42 templates)
 
-These run first and manage result counts, addon fairness, and platform-specific guards:
+These run on every template in the fleet:
 
 | ESE | What it does |
 |---|---|
-| Per-Addon Flood Guard | Caps each scraper at its flood limit — Meteor ≤5, Comet RD ≤5, MediaFusion ≤4, EZTV/HdHub ≤3, Knaben/TorrentGalaxy ≤1. Prevents one noisy scraper from flooding the list. |
-| Usenet Propagation Guard | Suppresses Usenet NZBs younger than 2 hours when propagated alternatives exist — avoids corrupt early-propagation grabs. |
-| AI Upscale Exclusion | Removes AI-upscaled streams from non-library, non-SeaDex results. |
-| RD Copyright (per DMM) | Hides Real-Debrid copyright-blocked streams (WEB-DL/WEBRip flagged by RD's May 2026 filter). |
-| Extra Cached / Uncached limit ESEs | Three ESEs that cap how many cached HQ, cached LQ, and uncached streams can appear in the final list. |
-| Final Limit (All) | Hard cap on total results after all other ESEs have run. |
+| Bad NZBs | Removes malformed, sample, or incomplete Usenet NZBs — catches release groups flagged as "sample" and streams with 🚫 messages. |
+| Hard CAM Kill | Removes camera recordings: CAM, SCR, TS (Telesync), TC, and HC HD-Rip quality levels. |
+| ongoingSeasonPack | On ongoing series, kills season packs when individual episode streams exist — prevents downloading entire seasons mid-air. Uses `daysSinceLastAired` and `daysUntilNextEpisode` to detect airing status. |
 
-### Hard Kills (both Standard and Lite)
+### Near-Universal ESEs (30–41 templates)
 
-These always run — they remove streams that are broken, unwatchable, or structurally wrong regardless of library size:
+These run on almost all templates — some are omitted on Anime or Lite variants:
 
-| ESE | What it kills |
-|---|---|
-| Hard CAM Kill | Camera recordings, TS (Telesync), TC, SCR |
-| Hard External Kill | YouTube rips and all external-type streams |
-| Hard Resolution Kill (1080p templates) | 2160p and 1440p — prevents 4K leaking into 1080p-only templates. Does not kill 720p on templates with a 720p fallback tier. |
-| Sub-720p Kill | 144p, 240p, 360p resolutions |
-| ongoingSeasonPack | On ongoing series, kills season packs when individual episode streams exist |
-| Kill Multi-Episode When Singles Exist | Removes multi-episode files on single-episode queries when per-episode streams are available |
-| Kill Season Packs When Episodes Exist | Removes full season packs on episode queries when individual episode results are available |
-| Kill Ambiguous Packs When Non-Pack Exist | Removes packs with ambiguous season/episode metadata when clean single-episode results exist |
+| ESE | What it does | Coverage |
+|---|---|---|
+| RD Copyright (per DMM) | Hides Real-Debrid copyright-blocked streams (WEB-DL/WEBRip flagged by RD's filter). | 40/42 |
+| Kill Ambiguous Packs | Removes packs with ambiguous season/episode metadata when clean single-episode results exist. | 39/42 |
+| Kill Multi-Episode | Removes multi-episode files on single-episode queries when per-episode streams are available. | 36/42 |
+| AI Upscale Exclusion | Removes AI-upscaled streams from non-library, non-SeaDex results. | 35/42 |
+| Foreign Language Kill | Removes non-English foreign-language-only streams on movie/series queries. Anime queries are exempt. | 35/42 |
+| Hard Season Pack Kill | Kills season packs when singles exist; ended shows (2yr+) with under 3 singles keep packs. Anime exempt. | 35/42 |
+| Usenet Propagation Guard | Suppresses Usenet NZBs younger than 2 hours when propagated alternatives exist — avoids corrupt early-propagation grabs. | 35/42 |
+| Hard External Kill | Removes YouTube rips and all external-type streams. | 34/42 |
+| Extra SeaDex | Hides excess SeaDex results beyond the best when better-ranked alternatives are available. | 33/42 |
+| Final Limit (All) | Hard cap on total results after all other ESEs have run. | 31/42 |
+| G's Low Bitrate | Streams with bitrate below the statistical floor for that title — uses live computed thresholds. | 31/42 |
+| Low Seeders | Removes torrents with fewer than 3 seeders. | 31/42 |
+| Bad 4K Anime | 4K anime where a better-quality SeaDex result exists. | 30/42 |
+| Upscaled 4K | AI-upscaled 4K that isn't native UHD — exempts WEB-DL/WEBRip for theatrical releases without a Blu-ray. | 30/42 |
 
 ### Quality Gates (Standard only)
 
@@ -55,15 +60,39 @@ These run only on standard templates — they can filter legitimate content on t
 
 | ESE | What it gates |
 |---|---|
-| Low Bitrate (G's) | Streams with bitrate below the statistical floor for that title |
-| Low Seeders | Torrents with fewer than 3 seeders |
-| Bad 4K Anime | 4K anime where a better-quality SeaDex result exists |
-| Upscaled 4K | AI-upscaled 4K that isn't native UHD — exempts WEB-DL/WEBRip for theatrical releases without a Blu-ray |
-| Bad 4K BluRay | 4K BluRay releases from known low-quality groups |
-| Bad 1080p BluRay | 1080p BluRay from low-quality groups when better sources exist |
-| Bad NZBs | Malformed, sample, or incomplete Usenet NZBs |
-| Extra SeaDex | Hides excess SeaDex results beyond the best when better-ranked alternatives are available |
-| Low SEL Score | Removes streams that scored in the bottom tier across all stream expressions |
+| Bad Dual Audio Groups | Removes release groups known for poor dual-audio encodes — mislabelled or badly synced audio tracks. |
+| Indexer Diversity | Caps results per scraper/indexer to prevent any single addon from flooding the list. |
+| Low SEL Score | Removes streams that scored in the bottom tier across all stream expressions — the final quality floor. |
+| Bad 4K BluRay | 4K BluRay releases from known low-quality groups. |
+| Bad 1080p BluRay | 1080p BluRay from low-quality groups when better sources exist. |
+| Extra Cached (HQ / LQ) | Caps how many cached HQ and LQ streams appear in the final list. |
+| Extra Uncached (All) | Caps uncached stream count. |
+| Per-Addon Flood Guard | Caps each scraper at its flood limit — Meteor ≤5, Comet RD ≤5, MediaFusion ≤4, EZTV/HdHub ≤3, Knaben/TorrentGalaxy ≤1. |
+
+### Specialized ESEs (device and resolution)
+
+| ESE | What it does | Templates |
+|---|---|---|
+| Hard Resolution Kill (1080p) | Removes 2160p and 1440p from 1080p-only templates — prevents 4K leaking through. Does not kill 720p on templates with a 720p fallback tier. | 13 |
+| DV-Only Kill | Removes Dolby Vision-only streams for devices without DV support (Samsung TVs, Apple TV Nightly). | 9 |
+| 3D Content Kill | Removes 3D content — not playable on most modern setups. | 8 |
+| Hard YouTube Kill | Removes YouTube source streams entirely. | 8 |
+| Kill Season Packs | Removes full season packs on episode queries when individual episode results are available. | 7 |
+
+### LABS ESEs (Nightly only)
+
+These are experimental and only appear on Nightly/Labs templates:
+
+| ESE | What it does | Templates |
+|---|---|---|
+| Score IQR Guard | Adaptive low-score filter using IQR fence on seScore — kills bottom-quartile streams when 8+ exist. | 5 |
+| Adaptive Seeder Guard | Kills bottom-quartile-seeded uncached torrents on fresh titles (deep pools only); catalog titles 1yr+ exempt. | 5 |
+| Unknown Quality/Resolution Kill | Removes streams with unknown quality or resolution only when 5+ known-quality alternatives exist. | 5 |
+| Bitrate Floor (4K/1080p REMUX) | Rejects REMUX streams below expected bitrate floor — animation exempt. A 1080p AV1 variant kills fake AV1 REMUXes (AV1 never appears on a Blu-ray disc). | 2–3 |
+| perGroup() Extra Cached/Uncached | Replaces 20–35 clause merge/slice limits with a single `perGroup()` call — caps per resolution per quality band. | 2–5 |
+| perGroup() Indexer Diversity | Caps 2 results per scraper using `perGroup()` — replaces multi-addon flood guard clauses. | 2–5 |
+| Bad Dual Audio (releaseGroup) | Uses native `releaseGroup()` instead of -50 regex scoring for dual audio group kills. | 2–3 |
+| x264 Hard Exclude | Native `encode()` exclusion replaces regex score -25 — more reliable than pattern matching. | 2 |
 
 <Tip>
   If the standard template returns very few results, switch to the Lite variant. If Lite returns results, one of the quality gate ESEs is filtering your content — most commonly the bitrate floor or low-seeder kill.
@@ -75,20 +104,58 @@ These run only on standard templates — they can filter legitimate content on t
 
 ISEs run after ESEs and before PSEs. Matched streams jump ahead of all ranked results regardless of their PSE score.
 
-| ISE | What it boosts |
-|---|---|
-| Library | Streams from your AIOStreams library (continue watching) |
-| digitalRelease Bypass | Passes through streams on movie/anime.movie queries to prevent premature ESE filtering on digital release day |
-| Cached First | All cached debrid/Usenet streams above uncached |
-| REPACK/PROPER Passthrough | Pins REPACK and PROPER releases above the result limit so patched encodes always surface |
+| ISE | What it boosts | Coverage |
+|---|---|---|
+| Cached First | All cached debrid/Usenet streams above uncached — ensures instant-play results rank first. | 42/42 |
+| Library | Streams from your AIOStreams library (continue watching). | 42/42 |
+| REPACK/PROPER Passthrough | Pins REPACK and PROPER releases above the result limit so patched encodes always surface. | 42/42 |
+| digitalRelease Bypass | Passes through streams on movie/anime.movie queries to prevent premature ESE filtering on digital release day. | 42/42 |
+| SeaDex | SeaDex-verified anime releases jump to top — highest trust for anime quality. | 14/42 |
 
 ---
 
-## PSEs — The IQR Tukey Fence
+## PSEs — The Ranking Engine
 
-The flagship Core Builds ranking system. Rather than fixed bitrate cutoffs (which break on thin libraries and new releases), PSEs use live statistics computed from the actual pool of streams returned for each query.
+PSEs are the heart of Core Builds ranking. They use a **tiered architecture** — streams are matched against quality tiers from S (best) to E (fallback). The first PSE to match a stream determines its rank position. Two systems exist:
 
-### Three-tier adaptive logic
+- **CB-style PSEs** — simple resolution + quality filters. Used on standard/lite/speed templates.
+- **IQR Tukey fence PSEs** — statistical bitrate analysis with adaptive windows. Used on flagship templates (Apex, Essential 4K, Hybrid 4K, AllDebrid 4K).
+
+### Tier Architecture
+
+#### 4K Quality Tiers (IQR templates)
+
+| Tier | Quality | Method |
+|---|---|---|
+| **S** | BluRay REMUX | IQR fence on ranked bitrate pool, size floor 15GB |
+| **A** | WEB-DL HDR | IQR Tukey fence with pow(0.95) age-decay window |
+| **B** | WEB-DL SDR | IQR Tukey fence with pow(0.95) age-decay |
+| **C** | WEBRip HDR | IQR Tukey fence with pow(0.95) age-decay |
+| **D** | WEBRip SDR | IQR with min/max fallback only (no pow() decay) |
+| **E** | Any 2160p | Catches everything that passed ESEs but didn't match S–D |
+
+#### 1080p Quality Tiers
+
+| Tier | Quality |
+|---|---|
+| **S** | BluRay REMUX (IQR variant: ranked bitrate pool, size floor 8GB) |
+| **A** | WEB-DL 1080p (IQR variant: Tukey fence + pow(0.95) age-decay) |
+| **B** | WEBRip or BluRay encode |
+| **C** | Any 1080p (safety net) |
+
+#### Anime Quality Tiers
+
+| Tier | Quality |
+|---|---|
+| **S** | 1080p WEB-DL with FLAC audio |
+| **A** | 1080p WEB-DL with AAC audio |
+| **B** | 1080p WEBRip |
+| **C** | 1080p BluRay REMUX |
+| **D** | Any 1080p fallback |
+
+### Three-tier adaptive logic (IQR Tukey fence)
+
+Rather than fixed bitrate cutoffs (which break on thin libraries and new releases), IQR PSEs use live statistics computed from the actual pool of streams returned for each query.
 
 **Tier 1 — IQR Tukey fence (≥4 peers)**
 
@@ -140,22 +207,43 @@ bitrate(STREAMS,
 
 On release day, a wide window accepts most encodes — you want something to play. Over 90 days, the window converges on the median as more encodes appear and the statistical picture stabilises. This replaces the old hard 60-day cliff that caused all streams to drop in rank exactly on day 61.
 
-### Additional PSE tiers
+### Booster PSEs
 
-After the IQR quality tiers, three further PSEs run across all templates:
+After the quality tiers, these additional PSEs run across most templates:
 
-| PSE | What it boosts |
-|---|---|
-| Codec Efficiency Booster | Surfaces HEVC/x265 encodes ahead of AVC/x264 at equivalent quality |
-| Audio Pinnacle | Promotes lossless and object-based audio: Atmos/TrueHD → DTS-HD MA/DTS:X → EAC3/DD+ |
-| HDR/DV Priority | Within 4K results, surfaces DV/HDR10+/HDR10 ahead of SDR |
-| Boost Cached Usenet | Catches any cached TorBox Usenet NZBs that slipped outside the IQR window and promotes them above uncached results |
+| PSE | What it boosts | Coverage |
+|---|---|---|
+| Audio Pinnacle | Promotes lossless and object-based audio: Atmos/TrueHD → DTS-HD MA/DTS:X → EAC3/DD+ | 40/42 |
+| HDR/DV Priority | Within 4K results, surfaces DV/HDR10+/HDR10 ahead of SDR. Samsung variant excludes DV. | 40/42 |
+| Codec Efficiency Booster | Surfaces HEVC/x265 encodes ahead of AVC/x264 at equivalent quality | 39/42 |
+| Boost Cached Usenet | Catches cached TorBox Usenet NZBs that slipped outside the IQR window and promotes them above uncached results | 35/42 |
+
+### 720p Fallback PSEs
+
+On 1080p templates with a 720p fallback tier, two PSEs catch lower-resolution content:
+
+| PSE | What it does | Coverage |
+|---|---|---|
+| 720p Fallback \| WEB-DL | Ranks 720p WEB-DL as the preferred fallback quality | 14/42 |
+| 720p Fallback \| Any | Catches any remaining 720p content | 14/42 |
+
+### Pin Expressions
+
+`pin()` is a side-effect function — it registers streams for reordering after PSE scoring completes. Elite group pins float specific release groups to the top; LQ group pins sink poor groups to the bottom.
+
+| PSE | What it does | Coverage |
+|---|---|---|
+| Elite 4K Remux pin | Pins top-tier 4K REMUX groups (FraMeSToR, SURCODE, EPSiLON, etc.) to the top | 5/42 |
+| Elite 1080p Remux pin | Same for 1080p elite groups | 5/42 |
+| IMAX pin | Pins IMAX-tagged streams to top — IMAX versions have unique framing and audio | 5/42 |
+| LQ group pin bottom | Pins known low-quality release groups to the bottom | 5/42 |
+| T1 Pattern Pin (LABS) | Uses `rseMatched()` to pin Vidhin05 T1-matched releases beyond hand-listed groups | 2/42 |
 
 ---
 
 ## Hybrid TorBox-Priority PSEs
 
-The 4K Hybrid template (and 4K Apex variants) adds a TorBox-cached twin PSE before each IQR tier:
+The 4K Hybrid template adds a TorBox-cached twin PSE before each IQR tier:
 
 ```
 service(
@@ -166,11 +254,45 @@ service(
 
 This returns only TorBox-cached streams that match the IQR window. If no TorBox streams match, it returns `[]` and the all-service PSE runs as a fallback. Result: TorBox cache is always preferred over RD/other services when quality is equivalent.
 
+The 4K Hybrid template runs the most PSEs in the fleet (24) because each quality tier has both a TorBox-priority twin and an all-service fallback.
+
+---
+
+## Execution Flow
+
+The full pipeline from raw scraped streams to the final ranked list:
+
+1. **ESEs execute first** — each ESE returns streams to exclude. Matched streams are permanently removed. Infrastructure ESEs (flood guards, limits) run before quality gates (bitrate floors, seeder kills). Lite templates skip quality gates.
+2. **ISEs execute second** — matched streams jump to the top regardless of PSE score. Library, REPACK, cached-first, and digitalRelease streams always surface.
+3. **PSEs execute third** — each PSE returns matched streams. The first PSE to match a stream determines its tier position. Higher tiers (S) rank above lower tiers (E).
+4. **pin() side-effects apply** — after scoring, `pin()` calls registered during PSE evaluation reorder specific streams. Elite pins float to top; LQ pins sink to bottom.
+5. **Sort chain applies** — the 16-key stable sort breaks ties across all remaining dimensions. Per-type overrides (movies, anime, uncached) adjust key priorities.
+
+---
+
+## Sort Architecture
+
+AIOStreams uses a **stable multi-key sort** — position 1 is the primary sort; each subsequent key only breaks ties from prior comparisons. Core Builds templates use **16 sort keys** across **7 sort sections**: global, movies, series, anime, cachedMovies, uncachedMovies, uncachedSeries.
+
+### 4K Global Sort Chain (16 keys)
+
+`cached → seMatched → seScore → seadex → resolution → quality → regexScore → visualTag → audioTag → audioChannel → language → encode → library → seeders → bitrate → size`
+
+### Key Differences by Section
+
+| Section | Key Change vs Global |
+|---|---|
+| 1080p Global | visualTag moved from pos 8 → 10 (HDR less relevant at 1080p) |
+| Movies / Series | library promoted to pos 5 (continue watching priority) |
+| Anime | seadex promoted to pos 2, before seMatched/seScore |
+| Uncached (Movies/Series) | seeders promoted to pos 11 (health signal for uncached) |
+| Hybrid | 17 keys: service added after seadex (TorBox-first provider priority) |
+
 ---
 
 ## Release Group Scoring
 
-Two systems work together: `preferredRegexPatterns` for top-tier boosts and `regexOverrides` for the full scoring ladder.
+Two systems work together: `preferredRegexPatterns` for top-tier boosts and `rankedRegexPatterns` for the full scoring ladder.
 
 ### `preferredRegexPatterns`
 
@@ -182,18 +304,45 @@ Template-specific patterns with a strong positive boost. Score range: 70–100.
 | 1080p | 5 | Web T1, 126811, FLUX, SiC, BHDStudio |
 | Anime | 0 | SeaDex/AnimeTosho handle quality |
 
-### `regexOverrides`
+### `rankedRegexPatterns`
 
-48 inline scoring overrides applied on top of the Vidhin05 synced pattern set (`syncedRankedRegexUrls`). Vidhin05 provides 174 patterns as a base; the overrides reassign scores for groups Core Builds cares about. Score range: −200 to +100.
+107 inline scoring patterns sourced from `Filtering/ranked-regex-patterns.json` and applied on all non-Anime templates. These override Vidhin05's synced zero-score entries by name matching — AIOStreams shows them as `regexOverrides` in the config diff.
 
-| Tier | Score | Examples |
-|---|---|---|
-| S | +100 | FraMeSToR, SURCODE, EPSiLON |
-| A | +80 | KRaLiMaRKo, HONE, 126811, FLUX |
-| B | +60 | DON, NCmt, BHDStudio |
-| Penalised | −50 | Known upscale groups |
-| Bad | −75 | Consistently poor encode groups |
-| Blacklist | −200 | Scene groups releasing defective content |
+| Tier | Score | Count | Examples |
+|---|---|---|---|
+| S | +100 | 3 | FraMeSToR, SURCODE, EPSiLON |
+| A | +80 | 8 | KRaLiMaRKo, HONE, 126811, FLUX, W4NK3R |
+| B | +60 | 14 | DON, NCmt, BHDStudio |
+| C | +40 | 24 | Various mid-tier groups |
+| D | +20 | 32 | Broad quality groups |
+| Penalty | −25 | 8 | Known upscale/x264 groups |
+| Bad | −50 | 8 | Consistently poor encode groups |
+| Very Bad | −75 | 4 | Very poor quality groups |
+| Blacklist | −200 | 6 | Scene groups releasing defective content |
+
+4K templates carry 107 patterns (including UHD Bluray-specific entries). 1080p templates carry 103. Anime templates carry 0 — SeaDex handles quality selection.
+
+Every `pattern` string is an exact verbatim copy of a current Vidhin05 entry (elfhosted whitelist requirement).
+
+### `syncedRankedRegexUrls`
+
+Points to Vidhin05's file on all non-Anime templates. Supplements ranked patterns with Vidhin05's 174-pattern set at score 0; the inline `rankedRegexPatterns` entries override scoring by name.
+
+---
+
+## Dynamic Addon Fetching
+
+All 42 templates use **dynamic addon fetching (DAF)** — adaptive exit conditions that control when AIOStreams stops waiting for scrapers. Instead of a fixed timeout, templates exit when enough cached results are available.
+
+| Template type | Exit condition |
+|---|---|
+| 4K (Apex, Essential, Hybrid) | `count(cached(resolution(totalStreams, "2160p"))) >= 10 or totalTimeTaken > 5000` |
+| 4K (AllDebrid) | `count(cached(resolution(totalStreams, "2160p"))) >= 10 or count(totalStreams) >= 45` |
+| 1080p (Standard) | `count(cached(resolution(totalStreams, "1080p"))) >= 15` |
+| Anime 4K | `count(cached(resolution(totalStreams, "2160p"))) >= 6` |
+| Anime 1080p | `count(cached(resolution(totalStreams, "1080p"))) >= 12` |
+
+Templates with addon groups define `count(cached(previousStreams)) < 3` conditions that let slow scrapers run longer when cached results are scarce, then cut them short once enough results exist.
 
 ---
 

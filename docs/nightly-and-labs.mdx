@@ -15,7 +15,7 @@ description: "Experimental templates testing new features before stable promotio
 
 ### Nightly Apple TV 4K
 
-v0.1.9 — Device profile for Apple TV 4K (3rd gen) via Infuse. DV Profile 5/8 prioritised, DD+ Atmos, AV1 hard-excluded (no A15 hardware decoder).
+v0.2.4 — Device profile for Apple TV 4K (3rd gen) via Infuse. DV Profile 5/8 prioritised, DD+ Atmos, AV1 hard-excluded (no A15 hardware decoder). SeaDex ISE, REPACK ISE, 7-section split sort.
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
@@ -38,12 +38,15 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
   **Calling for import testers.** Labs templates need real-world import data to establish what errors AIOStreams is generating. Try importing any Labs template, screenshot or copy the exact error text, and drop it in the community thread. Host, template name, and error message are all useful.
 </Info>
 
-### 4K Apex Labs (v0.8.6)
+### 4K Apex Labs (v0.11.4)
 
 Experimental Apex variant testing:
-- `dynamicAddonFetching` exit conditions (exit at 5+ cached 4K or 6s)
-- Template directives for per-scraper toggles configurable at import
-- Hybrid regex+SEL architecture — elite groups via `releaseGroup()` pin, x264/IMAX via native `encode()`/`visualTag()`
+- Score IQR Guard — adaptive low-score filter using IQR fence on seScore
+- `perGroup()` dedup — per-resolution per-quality caps replacing 20–35 clause merge/slice
+- Indexer Diversity — `perGroup()` caps 2 per scraper
+- Bad Dual Audio Groups — native `releaseGroup()` replaces -50 regex scoring
+- Elite group pins via `releaseGroup()`, IMAX via native `visualTag()`
+- Bitrate Floor ESEs for 4K and 1080p REMUX (animation-exempt)
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
@@ -56,9 +59,9 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
 
 ---
 
-### Stream Labs (v0.6.7)
+### Stream Labs (v0.8.4)
 
-1080p variant of 4K Apex Labs. Same hybrid architecture, exit at 5+ cached 1080p or 5s.
+1080p with perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor). Most ESEs in fleet (42).
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
@@ -71,9 +74,9 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
 
 ---
 
-### Essential Labs (v0.1.7)
+### Essential Labs (v0.2.4)
 
-TorBox debrid-only 1080p — no external scrapers. Library + TorBox Search only. Tests template directives for TorBox Search toggle and exit thresholds. Fast and lightweight.
+Essential 1080p experimental — perGroup() Extra Cached, configurable DAF thresholds at import. Tests new ESE architectures before stable promotion.
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
@@ -86,9 +89,9 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
 
 ---
 
-### 4K Essential Labs (v0.1.7)
+### 4K Essential Labs (v0.3.4)
 
-Same as Essential Labs but 4K. TorBox debrid-only, no external scrapers.
+Essential 4K experimental — Bitrate Floor ESEs (4K + 1080p REMUX), perGroup() Extra Cached, configurable DAF thresholds at import.
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
