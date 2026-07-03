@@ -2414,7 +2414,6 @@ function presets() {
   const isNzbgeek = S.multiServices.includes('nzbgeek');
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(s)));
   if (isHttp) return [
-    { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
     { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:true, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
@@ -2430,7 +2429,7 @@ function presets() {
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
-    { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+    { type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] }, resources:['stream'] },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
     ...storeSlot,
