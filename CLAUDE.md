@@ -222,9 +222,10 @@ Full `{name, pattern}` entries on all active non-Anime templates.
 
 ### `rankedRegexPatterns` (restored v3.2.0)
 Full `{name, pattern, score}` inline override entries on all active non-Anime templates. Sourced from `Filtering/ranked-regex-patterns.json`, filtered for host compatibility. These override Vidhin05's synced zero-score entries by name matching — AIOStreams shows them as `regexOverrides` in the config diff.
-- **4K templates:** 100 entries (score tiers +100/+80/+60/+40/+20/−25/−50/−75/−200)
-- **1080p templates:** 96 entries — same set minus the 4 UHD Bluray-specific names
-- Every `pattern` string is an EXACT verbatim copy of a current Vidhin05 entry (elfhosted whitelist requirement); score-0 entries and the 11 fortheweak-removed names are excluded; `Anime BD T1/T2/T3` excluded (pattern drift vs current Vidhin05)
+- **4K templates:** 107 entries (score tiers +100/+80/+60/+40/+20/−25/−50/−75/−200)
+- **1080p templates:** 103 entries — same set minus the 4 UHD Bluray-specific names
+- Every `pattern` string is an EXACT verbatim copy of a current Vidhin05 entry (elfhosted whitelist requirement); score-0 entries and the 11 fortheweak-removed names are excluded
+- **v3.2.6 additions:** Anime BD T1/T2/T3 (main group lists — fills the gap where only `[B]` sub-variants were scored), `v0` (-25 pre-release penalty), `DV (Disk)` (+40 FraMeSToR DV provenance), `x266` (+20 VVC codec boost), `Uncensored` (+20 Uncut/AT-X)
 - **Anime templates:** `[]`
 - **Why inline:** elfhosted/fortheweak whitelist specific URLs for `syncedRankedRegexUrls` — our GitHub raw URL cannot be whitelisted, so the scored file must be delivered inline
 - **History:** the override layer was silently lost during the v2.8.x slimming — between then and v3.2.0, `regexScore` in sortCriteria was a fleet-wide no-op (all 174 synced Vidhin05 entries carry score 0)
@@ -270,7 +271,7 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-buil
 ```
 
 **URLs auto-whitelisted when added:**
-- `Filtering/ranked-regex-patterns.json` — 149 scored regex patterns (via `syncedRankedRegexUrls`)
+- `Filtering/ranked-regex-patterns.json` — 100 scored regex patterns (via `syncedRankedRegexUrls`)
 - `Filtering/core-builds-eses.json` — shared ESEs (via `syncedExcludedStreamExpressionUrls`)
 - `Filtering/core-builds-ises.json` — shared ISEs (via `syncedIncludedStreamExpressionUrls`)
 - `Filtering/core-builds-pses.json` — shared PSEs (via `syncedPreferredStreamExpressionUrls`)
