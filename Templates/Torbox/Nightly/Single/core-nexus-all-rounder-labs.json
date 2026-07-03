@@ -104,7 +104,8 @@
       "Unknown"
     ],
     "excludedLanguages": [],
-    "includedLanguages": [
+    "includedLanguages": [],
+    "requiredLanguages": [
       "English",
       "Japanese",
       "Dual Audio",
@@ -112,7 +113,6 @@
       "Original",
       "Unknown"
     ],
-    "requiredLanguages": [],
     "preferredLanguages": [
       "Dual Audio",
       "Japanese",

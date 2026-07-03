@@ -2567,7 +2567,7 @@ function build() {
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
     preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','SCR','TC','TS','CAM','Unknown'],
-    excludedLanguages: [], includedLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
+    excludedLanguages: [], includedLanguages: [], requiredLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
     preferredAudioTags: ac.preferredAudioTags,
     syncedExcludedRegexUrls: ['https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json'],
     syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
@@ -2982,9 +2982,10 @@ async function simpleInstall() {
   result.innerHTML = '';
   const pwd = makePwd();
   const cfg = build().config;
-  const hosts = [['ElfHosted','https://aiostreams.elfhosted.com'],['ForthWeak','https://aiostreams.fortheweak.cloud'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me'],["Viren's",'https://aiostreams.viren070.me'],["Kuu's",'https://aiostreams.stremio.ru'],['ATBP','https://aio.atbphosting.com'],["Omni's",'https://aiostreams.12312023.xyz']];
+  const _allHosts = [['ElfHosted','https://aiostreams.elfhosted.com'],['ForthWeak','https://aiostreams.fortheweak.cloud'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me'],["Viren's",'https://aiostreams.viren070.me'],["Kuu's",'https://aiostreams.stremio.ru'],['ATBP','https://aio.atbphosting.com'],["Omni's",'https://aiostreams.12312023.xyz']];
+  const hosts = (S.service === 'p2p' || S.service === 'http') ? _allHosts.filter(([n]) => n !== 'ElfHosted') : _allHosts;
   const hostLabels = {};
-  hosts.forEach(([n, u]) => { hostLabels[u] = n; });
+  _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
   // Option A: try direct API creation across all hosts
   let directSuccess = false;
@@ -3156,7 +3157,8 @@ function wuplayBtn(manifestUrl) {
 }
 
 function instanceChips(templateUrl) {
-  const hosts = [['ElfHosted','https://aiostreams.elfhosted.com/stremio/configure'],['ForthWeak','https://aiostreams.fortheweak.cloud/stremio/configure'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure'],["Viren's",'https://aiostreams.viren070.me/stremio/configure'],["Kuu's",'https://aiostreams.stremio.ru/stremio/configure'],['ATBP','https://aio.atbphosting.com/stremio/configure'],["Omni's",'https://aiostreams.12312023.xyz/stremio/configure']];
+  const _all = [['ElfHosted','https://aiostreams.elfhosted.com/stremio/configure'],['ForthWeak','https://aiostreams.fortheweak.cloud/stremio/configure'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure'],["Viren's",'https://aiostreams.viren070.me/stremio/configure'],["Kuu's",'https://aiostreams.stremio.ru/stremio/configure'],['ATBP','https://aio.atbphosting.com/stremio/configure'],["Omni's",'https://aiostreams.12312023.xyz/stremio/configure']];
+  const hosts = (S.service === 'p2p' || S.service === 'http') ? _all.filter(([n]) => n !== 'ElfHosted') : _all;
   return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}${templateUrl?`?template=${encodeURIComponent(templateUrl)}`:''}" target="_blank" class="inst-chip ${templateUrl?'inst-chip-import':''}">${templateUrl?'▶ ':''}${n}</a>`).join('')}</div>`;
 }
 

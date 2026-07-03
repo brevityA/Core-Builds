@@ -1135,7 +1135,8 @@
     "includedQualities": [],
     "requiredQualities": [],
     "excludedLanguages": [],
-    "includedLanguages": [
+    "includedLanguages": [],
+    "requiredLanguages": [
       "English",
       "Original",
       "Dual Audio",
@@ -1143,7 +1144,6 @@
       "Dubbed",
       "Unknown"
     ],
-    "requiredLanguages": [],
     "preferredLanguages": [
       "English",
       "Original",
