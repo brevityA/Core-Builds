@@ -271,10 +271,10 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-buil
 ```
 
 **URLs auto-whitelisted when added:**
-- `Filtering/ranked-regex-patterns.json` — 100 scored regex patterns (via `syncedRankedRegexUrls`)
-- `Filtering/core-builds-eses.json` — shared ESEs (via `syncedExcludedStreamExpressionUrls`)
-- `Filtering/core-builds-ises.json` — shared ISEs (via `syncedIncludedStreamExpressionUrls`)
-- `Filtering/core-builds-pses.json` — shared PSEs (via `syncedPreferredStreamExpressionUrls`)
+- `Filtering/ranked-regex-patterns.json` — 107 scored regex patterns (via `syncedRankedRegexUrls`)
+- `Filtering/core-builds-eses.json` — 83 ESEs, full fleet superset (via `syncedExcludedStreamExpressionUrls`)
+- `Filtering/core-builds-ises.json` — 8 ISEs (via `syncedIncludedStreamExpressionUrls`)
+- `Filtering/core-builds-pses.json` — 163 PSEs, all architectures (via `syncedPreferredStreamExpressionUrls`)
 - Vidhin05's `regexes.json` (via `syncedRankedRegexUrls`, already whitelisted on most instances)
 
 ### AIOStreams trust mechanisms (3 levels)

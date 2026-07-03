@@ -14,11 +14,12 @@ A standalone quality scoring and filtering layer for AIOStreams — built around
 
 ## Files
 
-| File | Synced URL Field | Purpose |
-|---|---|---|
-| `core-builds-eses.json` | `syncedExcludedStreamExpressionUrls` | Blocks CAM, YouTube, AI Enhanced, 3D, season packs |
-| `core-builds-pses.json` | `syncedPreferredStreamExpressionUrls` | Scores streams into quality tiers (S → D) |
-| `core-builds-ises.json` | `syncedIncludedStreamExpressionUrls` | Prioritises cached + English streams |
+| File | Synced URL Field | Count | Purpose |
+|---|---|---|---|
+| `core-builds-eses.json` | `syncedExcludedStreamExpressionUrls` | 83 | Full fleet ESE superset — hard kills, quality gates, flood guards, and LABS expressions |
+| `core-builds-pses.json` | `syncedPreferredStreamExpressionUrls` | 163 | All quality tiers — CB static, IQR Tukey fence, Hybrid TorBox-priority, pins, boosters, anime |
+| `core-builds-ises.json` | `syncedIncludedStreamExpressionUrls` | 8 | Cached passthrough, Library, REPACK/PROPER, SeaDex, English language, digitalRelease bypass |
+| `ranked-regex-patterns.json` | `syncedRankedRegexUrls` | 107 | Release group scoring — 10-tier system (+100 to −200) |
 
 ### Raw URLs
 
@@ -26,60 +27,71 @@ A standalone quality scoring and filtering layer for AIOStreams — built around
 https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/core-builds-eses.json
 https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/core-builds-pses.json
 https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/core-builds-ises.json
+https://raw.githubusercontent.com/brevityA/Core-Builds/main/Filtering/ranked-regex-patterns.json
 ```
 
 ---
 
-## Scoring Tiers (PSEs)
+## PSE Architecture
 
-Streams are matched against tiers in order — a stream lands in the highest tier it qualifies for.
+Templates use one of three PSE architectures, all included in the shared file:
 
-### 4K Tiers
+### IQR Tukey Fence (4K Apex, 4K Hybrid, 4K Essential, 4K AllDebrid)
+Three-tier adaptive bitrate ranking:
+- **≥4 peers** → IQR Tukey fence (Q1−1.5×IQR to Q3+1.5×IQR)
+- **1–3 peers** → min/max ±20% window
+- **0 peers** → pow(0.95, daysSinceRelease) exponential decay
 
-| Tier | Label | Criteria |
-|---|---|---|
-| S | Perfect 4K | BluRay REMUX + DV/HDR+DV + Atmos/TrueHD/DTS:X |
-| S | Premium 4K | BluRay REMUX + HDR10+/HDR + Atmos/TrueHD/DTS:X |
-| A | Great 4K | WEB-DL + DV/HDR+DV + Atmos/TrueHD/DTS:X |
-| A | Good 4K | WEB-DL + HDR10+/HDR + DD+/Atmos |
-| B | Solid 4K | WEB-DL + any HDR tag |
-| C | Decent 4K | WEBRip + HDR |
-| D | Base 4K | Any 2160p |
+### CB Static Tiers (Stream, Essential, Speed, Flash, Device)
+Fixed quality+resolution matching into S/A/B/C/D tiers with 720p fallback.
 
-### 1080p Tiers
-
-| Tier | Label | Criteria |
-|---|---|---|
-| S | Perfect 1080p | BluRay REMUX + Atmos/TrueHD/DD+ |
-| A | Great 1080p | WEB-DL + Atmos/TrueHD/DD+/DTS |
-| B | Good 1080p | WEB-DL + DD/AAC |
-| C | Solid 1080p | WEBRip or BluRay |
-| D | Base 1080p | Any 1080p |
-
-### Fallback
-| | 720p WEB-DL/WEBRip/BluRay |
-| | Any 720p |
+### Hybrid TorBox-Priority (4K Hybrid, Hybrid)
+Each IQR tier has a TorBox-only twin PSE before it — `service(tier, 'torbox')`.
 
 ---
 
-## ESEs (What Gets Blocked)
+## ESE Categories (83 total)
 
-| Rule | What it removes |
+| Category | Count | Examples |
+|---|---|---|
+| Universal hard kills | 5 | CAM, External, Season Pack, Multi-Episode, Ambiguous Pack |
+| Quality gates | 12 | Low Bitrate, Low Seeders, Upscaled 4K, Bad BluRay, Bad Dual Audio |
+| Result management | 7 | Extra Cached HQ/LQ, Extra Uncached, Final Limit, Indexer Diversity, Flood Guard |
+| Adaptive guards | 4 | Score IQR Guard, Usenet Propagation, Bad NZBs, RD Copyright |
+| Device-specific | 2 | DV-Only Kill, No Sootio Library |
+| LABS experimental | 15 | perGroup() dedup, tier-guarded kills, Bitrate Floor, Adaptive Seeder Guard |
+| Synced external | 2 | Tamtaro SEL Setup, Standard ESE |
+| Other | 36 | Resolution kills, foreign language, AI upscale, 3D, YouTube, anime-specific |
+
+---
+
+## ISE List (8 total)
+
+| Expression | Purpose |
 |---|---|
-| Hard CAM Kill | CAM, SCR, TS, TC, HC HD-Rip quality streams |
-| Hard YouTube Kill | YouTube streams, external links, youtube keywords |
-| AI Enhanced Kill | Streams tagged as AI Enhanced |
-| 3D Content Kill | 3D, H-OU, H-SBS visual tags |
-| Season Pack Guard | Season packs when 3+ episode streams exist |
-| Ambiguous Pack Guard | Ambiguous packs when non-pack streams exist |
+| Cached passthrough | Pin cached streams to top |
+| Library | Continue-watching priority |
+| REPACK/PROPER | Pin repacks above originals |
+| digitalRelease Bypass | Allow digital releases through ESE gates |
+| English Language | English audio priority |
+| SeaDex (×2 variants) | Best-release anime pins |
+| Tamtaro ISE (synced) | External ISE set |
 
 ---
 
-## Philosophy
+## Ranked Regex (107 patterns)
 
-**Core Builds never hard-blocks based on audio tag, encode, or quality enum.** Instead:
-- Every stream is ranked into a tier based on the combination of quality signals
-- The worst streams land in tier D but still appear — they don't disappear silently
-- Only absolute trash (CAM, YouTube, 3D, AI) gets hard-removed
+10-tier score system from elite (+100) to hard-kill (−200):
 
-This means new AIOStreams enum values never break the filter.
+| Score | Tier | Example Groups |
+|---|---|---|
+| +100 | Elite | FraMeSToR, BHDStudio, FLUX |
+| +80 | Premium | DON, CtrlHD, SiC |
+| +60 | High | EbP, W4NK3R, hallowed |
+| +40 | Good | REMUX groups, BD specialists |
+| +20 | Decent | Mainstream quality groups |
+| 0 | Neutral | (Vidhin05 baseline — not included in scored file) |
+| −25 | Below avg | x264, pre-release, known mediocre |
+| −50 | Low | Bad dual audio, poor encoders |
+| −75 | Very low | Known bad groups |
+| −200 | Hard kill | Upscale/spam groups |

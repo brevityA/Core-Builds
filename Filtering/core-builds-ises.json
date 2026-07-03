@@ -1,10 +1,34 @@
 [
   {
-    "expression": "/* CB | English Language */ language(streams, 'English', 'Original', 'Dual Audio', 'Multi', 'Dubbed')",
+    "expression": "/*0Cached*/ count(merge(cached(streams), type(streams, 'p2p','http','usenet','stremio-usenet')))==0?passthrough(streams,'title'):[]",
+    "enabled": true
+  },
+  {
+    "expression": "/*ISE v1.2.3* [git.tamtaro.de]*/[]",
+    "enabled": true
+  },
+  {
+    "expression": "/*Library*/count(streams)==count(library(streams))?library(streams):[]",
+    "enabled": true
+  },
+  {
+    "expression": "/*Part of Tamtaro SEL Setup*/[]",
     "enabled": true
   },
   {
     "expression": "/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'))>0?passthrough(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'),'excluded','limit'):[]",
+    "enabled": true
+  },
+  {
+    "expression": "/*digitalRelease Bypass*/queryType=='movie' or queryType=='anime.movie'? (count(passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease')) > 15 ? passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease') : passthrough(streams,'digitalRelease')) : []",
+    "enabled": true
+  },
+  {
+    "expression": "/*SeaDex*/merge(count(addon(cached(streams),'SeaDex'))>0?passthrough(addon(streams,'SeaDex'),'title','year'):passthrough(seadex(streams),'title','year'),queryType=='anime.movie'?passthrough(seadex(streams),'episode'):[])",
+    "enabled": false
+  },
+  {
+    "expression": "/*SeaDex*/merge(count(addon(cached(streams),'SeaDex'))>0?passthrough(addon(streams,'SeaDex'),'title'):[],count(addon(cached(streams),'SeaDex'))==0 and count(addon(streams,'SeaDex'))>0?addon(streams,'SeaDex'):[])",
     "enabled": true
   }
 ]
