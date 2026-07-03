@@ -5,7 +5,7 @@
     "description": "Personal 1080p SDR all-rounder. TorBox Pro · Comet · Meteor · Debridio · SeaDex · NZBGeek · EZTV. WEB-DL preferred · DD+/AAC · SDR · HEVC/AV1/AVC · Tamtaro SEL. Hotack L007CM Full HD Projector.",
     "source": "external",
     "author": "Personal",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -178,7 +178,8 @@
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
     ],
     "syncedRankedRegexUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
+      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json",
+      "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/ranked-regex-patterns.json"
     ],
     "syncedPreferredStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
@@ -411,7 +412,13 @@
       }
     ],
     "rankedRegexPatterns": [],
-    "regexOverrides": [],
+    "regexOverrides": [
+      {
+        "name": "SDR",
+        "pattern": "/\\bSDR\\b/i",
+        "score": 0
+      }
+    ],
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": false,
@@ -433,54 +440,122 @@
     },
     "sortCriteria": {
       "global": [
-        {
-          "key": "cached",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "language",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
-          "direction": "desc"
-        },
-        {
-          "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
-          "key": "bitrate",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "regexScore",
-          "direction": "desc"
-        },
-        {
-          "key": "seeders",
-          "direction": "desc"
-        },
-        {
-          "key": "size",
-          "direction": "desc"
-        }
+        { "key": "cached", "direction": "desc" },
+        { "key": "streamExpressionMatched", "direction": "desc" },
+        { "key": "streamExpressionScore", "direction": "desc" },
+        { "key": "seadex", "direction": "desc" },
+        { "key": "resolution", "direction": "desc" },
+        { "key": "quality", "direction": "desc" },
+        { "key": "regexScore", "direction": "desc" },
+        { "key": "audioTag", "direction": "desc" },
+        { "key": "audioChannel", "direction": "desc" },
+        { "key": "language", "direction": "desc" },
+        { "key": "encode", "direction": "desc" },
+        { "key": "library", "direction": "desc" },
+        { "key": "seeders", "direction": "desc" },
+        { "key": "bitrate", "direction": "desc" },
+        { "key": "size", "direction": "desc" }
+      ],
+      "movies": [
+        { "key": "cached", "direction": "desc" },
+        { "key": "streamExpressionMatched", "direction": "desc" },
+        { "key": "streamExpressionScore", "direction": "desc" },
+        { "key": "seadex", "direction": "desc" },
+        { "key": "library", "direction": "desc" },
+        { "key": "resolution", "direction": "desc" },
+        { "key": "quality", "direction": "desc" },
+        { "key": "regexScore", "direction": "desc" },
+        { "key": "encode", "direction": "desc" },
+        { "key": "audioTag", "direction": "desc" },
+        { "key": "audioChannel", "direction": "desc" },
+        { "key": "language", "direction": "desc" },
+        { "key": "seeders", "direction": "desc" },
+        { "key": "bitrate", "direction": "desc" },
+        { "key": "size", "direction": "desc" }
+      ],
+      "series": [
+        { "key": "cached", "direction": "desc" },
+        { "key": "streamExpressionMatched", "direction": "desc" },
+        { "key": "streamExpressionScore", "direction": "desc" },
+        { "key": "seadex", "direction": "desc" },
+        { "key": "library", "direction": "desc" },
+        { "key": "resolution", "direction": "desc" },
+        { "key": "quality", "direction": "desc" },
+        { "key": "regexScore", "direction": "desc" },
+        { "key": "encode", "direction": "desc" },
+        { "key": "audioTag", "direction": "desc" },
+        { "key": "audioChannel", "direction": "desc" },
+        { "key": "language", "direction": "desc" },
+        { "key": "seeders", "direction": "desc" },
+        { "key": "bitrate", "direction": "desc" },
+        { "key": "size", "direction": "desc" }
+      ],
+      "cachedMovies": [
+        { "key": "cached", "direction": "desc" },
+        { "key": "streamExpressionMatched", "direction": "desc" },
+        { "key": "streamExpressionScore", "direction": "desc" },
+        { "key": "seadex", "direction": "desc" },
+        { "key": "library", "direction": "desc" },
+        { "key": "resolution", "direction": "desc" },
+        { "key": "quality", "direction": "desc" },
+        { "key": "regexScore", "direction": "desc" },
+        { "key": "encode", "direction": "desc" },
+        { "key": "audioTag", "direction": "desc" },
+        { "key": "audioChannel", "direction": "desc" },
+        { "key": "language", "direction": "desc" },
+        { "key": "bitrate", "direction": "desc" },
+        { "key": "size", "direction": "desc" }
+      ],
+      "uncachedMovies": [
+        { "key": "cached", "direction": "desc" },
+        { "key": "streamExpressionMatched", "direction": "desc" },
+        { "key": "streamExpressionScore", "direction": "desc" },
+        { "key": "seadex", "direction": "desc" },
+        { "key": "library", "direction": "desc" },
+        { "key": "resolution", "direction": "desc" },
+        { "key": "quality", "direction": "desc" },
+        { "key": "regexScore", "direction": "desc" },
+        { "key": "encode", "direction": "desc" },
+        { "key": "seeders", "direction": "desc" },
+        { "key": "audioTag", "direction": "desc" },
+        { "key": "audioChannel", "direction": "desc" },
+        { "key": "language", "direction": "desc" },
+        { "key": "bitrate", "direction": "desc" },
+        { "key": "size", "direction": "desc" }
+      ],
+      "uncachedSeries": [
+        { "key": "cached", "direction": "desc" },
+        { "key": "streamExpressionMatched", "direction": "desc" },
+        { "key": "streamExpressionScore", "direction": "desc" },
+        { "key": "seadex", "direction": "desc" },
+        { "key": "library", "direction": "desc" },
+        { "key": "resolution", "direction": "desc" },
+        { "key": "quality", "direction": "desc" },
+        { "key": "regexScore", "direction": "desc" },
+        { "key": "encode", "direction": "desc" },
+        { "key": "seeders", "direction": "desc" },
+        { "key": "audioTag", "direction": "desc" },
+        { "key": "audioChannel", "direction": "desc" },
+        { "key": "language", "direction": "desc" },
+        { "key": "bitrate", "direction": "desc" },
+        { "key": "size", "direction": "desc" }
+      ],
+      "anime": [
+        { "key": "cached", "direction": "desc" },
+        { "key": "seadex", "direction": "desc" },
+        { "key": "streamExpressionMatched", "direction": "desc" },
+        { "key": "streamExpressionScore", "direction": "desc" },
+        { "key": "library", "direction": "desc" },
+        { "key": "resolution", "direction": "desc" },
+        { "key": "quality", "direction": "desc" },
+        { "key": "regexScore", "direction": "desc" },
+        { "key": "encode", "direction": "desc" },
+        { "key": "audioTag", "direction": "desc" },
+        { "key": "audioChannel", "direction": "desc" },
+        { "key": "language", "direction": "desc" },
+        { "key": "seeders", "direction": "desc" },
+        { "key": "bitrate", "direction": "desc" },
+        { "key": "size", "direction": "desc" }
       ]
     },
     "rpdbApiKey": "<template_placeholder>",

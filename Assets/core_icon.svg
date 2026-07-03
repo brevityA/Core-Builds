@@ -6,8 +6,8 @@
     </linearGradient>
     <linearGradient id="diamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4facfe"/>
-      <stop offset="50%" stop-color="#c060c0"/>
-      <stop offset="100%" stop-color="#ff4b2b"/>
+      <stop offset="50%" stop-color="#8a4890"/>
+      <stop offset="100%" stop-color="#c03a20"/>
     </linearGradient>
     <filter id="hexGlow">
       <feGaussianBlur stdDeviation="10" result="blur"/>
@@ -28,7 +28,7 @@
   <polygon points="256,41 442,149 442,363 256,471 70,363 70,149"
     fill="#00e5ff" opacity="0.04" filter="url(#softGlow)"/>
   <polygon points="256,166 346,256 256,346 166,256"
-    fill="#c060c0" opacity="0.08" filter="url(#softGlow)"/>
+    fill="#8a4890" opacity="0.08" filter="url(#softGlow)"/>
 
   <!-- Hex glow layer -->
   <polygon points="256,41 442,149 442,363 256,471 70,363 70,149"
