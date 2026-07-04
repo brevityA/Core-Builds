@@ -666,11 +666,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.13';
+const CONFIGURATOR_VERSION = '2.14';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.14', date:'Jul 4 2026', items:[
+    'StreamNZB added to Other Services — self-hosted Usenet indexer + streamer',
+    'StreamNZB manifest URL input on API step, stripped from import URLs for security',
+  ]},
   { v:'2.13', date:'Jul 4 2026', items:[
     'TMDB keys now optional — collapsed by default under "TMDB Keys (optional)" on the API step',
     'TMDB section auto-opens if keys are already saved; shows green SET badge when configured',
@@ -929,6 +933,7 @@ const DEFS = [
       { v:'p2p',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#8b5cf6" stroke-width="2" fill="#120a2e"/><circle cx="15" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="29" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><line x1="19.5" y1="22" x2="24.5" y2="22" stroke="#8b5cf6" stroke-width="1.5"/><path d="M27 18 L33 15 M27 26 L33 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/><path d="M17 18 L11 15 M17 26 L11 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>', name:'P2P Free', desc:'No subscription — torrents only<br><span style="color:#8b5cf6;font-size:.8em">free · no API key needed</span>' },
       { v:'http',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#f472b6" stroke-width="2" fill="#1f0a14"/><rect x="12" y="17" width="20" height="12" rx="2" fill="none" stroke="#f472b6" stroke-width="1.5"/><path d="M16 21 L20 24 L16 27" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="27" x2="27" y2="27" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'HTTP Streams', desc:'Streaming sites — no debrid, no torrents<br><span style="color:#f472b6;font-size:.8em">WebStreamr · Nuvio · Flix-Streams</span>' },
       { v:'nzbgeek', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="#0a1f0a"/><text x="22" y="20" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="900" font-family="system-ui,sans-serif">NZB</text><line x1="13" y1="24" x2="31" y2="24" stroke="#22c55e" stroke-width="1" opacity="0.5"/><text x="22" y="33" text-anchor="middle" fill="#22c55e" font-size="7.5" font-weight="700" font-family="system-ui,sans-serif">GEEK</text></svg>', name:'NZBGeek', desc:'Usenet indexer · API key required<br><span style="color:#22c55e;font-size:.8em">pairs with Meteor for Usenet coverage</span>' },
+      { v:'streamnzb', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#f59e0b" stroke-width="2" fill="#1a1200"/><text x="22" y="18" text-anchor="middle" fill="#f59e0b" font-size="7" font-weight="900" font-family="system-ui,sans-serif">STREAM</text><line x1="13" y1="21" x2="31" y2="21" stroke="#f59e0b" stroke-width="1" opacity="0.5"/><text x="22" y="32" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="900" font-family="system-ui,sans-serif">NZB</text></svg>', name:'StreamNZB', desc:'Usenet streaming · manifest URL required<br><span style="color:#f59e0b;font-size:.8em">self-hosted Usenet indexer + streamer</span>' },
     ]
   },
   { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'svc-list', noHero:true,
@@ -983,7 +988,7 @@ function shareConfig() {
 function sanitizeSharedConfig(d) {
   if (!d || typeof d !== 'object') return {};
   const optVals = key => { const def = DEFS.find(x => x.key === key); return def ? def.opts.map(o => o.v) : []; };
-  const SVC_IDS = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','p2p','http','nzbgeek'];
+  const SVC_IDS = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','p2p','http','nzbgeek','streamnzb'];
   const out = {};
   const pick = (k, ok) => { if (k in d && ok(d[k])) out[k] = d[k]; };
   pick('device',       v => optVals('device').includes(v));
@@ -1171,6 +1176,7 @@ function renderOpts(def) {
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
       'debridio':   'Debrid.io scraper · API key required',
       'nzbgeek':    'Usenet indexer · API key required',
+      'streamnzb':  'Usenet streaming · manifest URL',
     };
     const chk = (o) => `<input type="checkbox" id="o_${o.v}" value="${o.v}" ${S.multiServices.includes(o.v)?'checked':''} data-action="toggle-service">`;
     const hero = def.opts[0];
@@ -1183,7 +1189,7 @@ function renderOpts(def) {
         ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
       </div>
     </label></div>`;
-    const OTHER_SVC_IDS = ['debridio', 'p2p', 'http', 'nzbgeek'];
+    const OTHER_SVC_IDS = ['debridio', 'p2p', 'http', 'nzbgeek', 'streamnzb'];
     const mainOpts = def.opts.slice(1).filter(o => !OTHER_SVC_IDS.includes(o.v));
     const otherOpts = def.opts.filter(o => OTHER_SVC_IDS.includes(o.v));
     const rowsHtml = mainOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}">
@@ -1871,7 +1877,7 @@ function render() {
             <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
             <span style="display:flex;align-items:center">
               <button type="button" class="test-key-btn" data-action="test-cred" data-service="${inp.id}">Test</button>
-              <a href="${inp.url}" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+              ${inp.url ? `<a href="${inp.url}" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
             </span>
           </div>
           <div style="position:relative;display:flex;align-items:center">
@@ -2442,6 +2448,7 @@ function getDebridInputs() {
     easynewsPass: { label:'EasyNews Password',     placeholder:'your-password',                        url:'https://www.easynews.com/account' },
     nzbgeek:      { label:'NZBGeek API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbgeek.info/dashboard.php?call=profile' },
     debridio:     { label:'Debrid.io API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debrid.io/' },
+    streamnzb:    { label:'StreamNZB Manifest URL', placeholder:'https://your-streamnzb-instance/manifest.json', url:'' },
   };
   const ids = [];
   if (m.includes('torbox-pro')||m.includes('torbox-ess')||m.includes('hybrid')) ids.push('torbox');
@@ -2453,6 +2460,7 @@ function getDebridInputs() {
   if (m.includes('easynews'))   { ids.push('easynews'); ids.push('easynewsPass'); }
   if (m.includes('debridio'))   ids.push('debridio');
   if (m.includes('nzbgeek'))    ids.push('nzbgeek');
+  if (m.includes('streamnzb'))  ids.push('streamnzb');
   return [...new Set(ids)].map(id => ({id, ...defs[id]})).filter(d => d.label);
 }
 
@@ -2464,7 +2472,7 @@ function defaultName() {
   const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
   const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid', 'debridio':'Debrid.io' }[svc] || '';
   if (svc === 'multi') {
-    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN','torbox-pro':'TB','torbox-ess':'TB-Ess','hybrid':'HYB','debridio':'DIO','p2p':'P2P','http':'HTTP','nzbgeek':'NZB'};
+    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN','torbox-pro':'TB','torbox-ess':'TB-Ess','hybrid':'HYB','debridio':'DIO','p2p':'P2P','http':'HTTP','nzbgeek':'NZB','streamnzb':'SNZB'};
     const PRIMARY_ABBR = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'];
     const mainSvcs = S.multiServices.filter(s => PRIMARY_ABBR.includes(s));
     return `Core Builds${suffix} Multi (${mainSvcs.map(s => abbr[s] || s).join('+')})`.trim();
@@ -2478,6 +2486,7 @@ function presets() {
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
   const hasExtraHttp = S.multiServices.includes('http') && !isHttp;
   const isNzbgeek = S.multiServices.includes('nzbgeek');
+  const isStreamnzb = S.multiServices.includes('streamnzb');
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(s)));
   if (isHttp) return [
     { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
@@ -2505,6 +2514,9 @@ function presets() {
     ] : []),
     ...(isNzbgeek && S.creds.nzbgeek ? [
       { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', timeout:6000, url:'https://api.nzbgeek.info', apiKey:S.creds.nzbgeek } },
+    ] : []),
+    ...(isStreamnzb ? [
+      { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
     ...(isDebridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debrid.io', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
@@ -3288,6 +3300,7 @@ async function uploadTemplateForImport() {
     if (tmpl.config.services) tmpl.config.services = tmpl.config.services.map(s => ({ ...s, credentials: {} }));
     if (Array.isArray(tmpl.config.presets)) tmpl.config.presets = tmpl.config.presets.map(p => {
       if (p.options && p.options.apiKey) { const { apiKey, ...rest } = p.options; return { ...p, options: rest }; }
+      if (p.type === 'streamnzb' && p.options && p.options.url) { return { ...p, options: { ...p.options, url: '' } }; }
       return p;
     });
   }
