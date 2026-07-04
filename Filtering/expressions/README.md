@@ -2,7 +2,7 @@
 
 Individual expression files split by category — use only the ones you need.
 
-> These are the same expressions from the combined files (`core-builds-eses.json`, `core-builds-ises.json`, `core-builds-pses.json`) split into standalone modules. No duplicates between files.
+> These are the same expressions from the combined files (`core-builds-eses.json`, `core-builds-ises.json`, `core-builds-pses.json`) split into standalone modules. No duplicates between category files. The flagship file (`apex-flagship.json`) intentionally overlaps with category files — it collects all Apex-specific expressions into one import.
 
 ---
 
@@ -36,6 +36,14 @@ Individual expression files split by category — use only the ones you need.
 | `device-pses.json` | 13 | Samsung, Ultrawide, Apple TV device PSEs |
 | `labs-pses.json` | 23 | Experimental: S+ tier, pattern-verified, perGroup |
 
+## Flagship Bundle
+
+| File | ESEs | PSEs | Use Case |
+|---|---|---|---|
+| `apex-flagship.json` | 4 | 16 | All Apex-specific expressions in one file: Score IQR Guard, perGroup dedup, IQR Tukey fence bitrate PSEs, APEX static tiers, elite group pins |
+
+> `apex-flagship.json` is a structured JSON with `eses` and `pses` keys. It overlaps with `advanced-eses.json`, `iqr-pses.json`, `cb-static-pses.json`, and `pins-pses.json` by design — use it *instead of* those files for an Apex-only setup.
+
 ---
 
 ## Recommended Combinations
@@ -43,7 +51,10 @@ Individual expression files split by category — use only the ones you need.
 **Basic setup (any debrid):**
 `core-eses.json` + `core-ises.json` + `cb-static-pses.json` + `universal-pses.json`
 
-**4K flagship:**
+**4K Apex (flagship bundle):**
+`core-eses.json` + `advanced-eses.json` + `core-ises.json` + `apex-flagship.json` + `universal-pses.json`
+
+**4K flagship (by category):**
 `core-eses.json` + `advanced-eses.json` + `core-ises.json` + `iqr-pses.json` + `universal-pses.json` + `pins-pses.json`
 
 **Anime:**
