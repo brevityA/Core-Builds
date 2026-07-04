@@ -86,9 +86,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .cta-step-lbl{font-size:.62rem;font-weight:600;opacity:.6;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
 .cta-step-val{font-size:.95rem;font-weight:800;line-height:1}
 .cta-arr{font-size:1.15rem;opacity:.75;flex-shrink:0}
-.btn-dl{width:100%;padding:16px;font-size:1.16rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff;margin-top:16px;transition:box-shadow .2s,transform .1s,opacity .15s;box-shadow:0 4px 18px rgba(16,185,129,.28);animation:dlPulse 2.2s ease-in-out infinite}
-.btn-dl:active{transform:scale(.98);animation:none}
-.btn-dl:hover{opacity:1;box-shadow:0 6px 30px rgba(16,185,129,.55);transform:translateY(-1px);animation:none}
+.btn-dl{width:100%;padding:16px;font-size:1.16rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff;margin-top:16px;transition:box-shadow .2s,transform .1s,opacity .15s;box-shadow:0 4px 18px rgba(16,185,129,.28)}
+.btn-dl:active{transform:scale(.98)}
+.btn-dl:hover{opacity:1;box-shadow:0 6px 30px rgba(16,185,129,.55);transform:translateY(-1px)}
 .btn-aio{width:100%;padding:14px;font-size:1.08rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;cursor:pointer;background:transparent;color:#00d4ff;margin-top:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-aio:hover{background:#00131c;border-color:#00d4ff;animation:hoverPulse 1.6s ease-in-out infinite}
 .btn-aio:active{transform:scale(.98)}
@@ -276,10 +276,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .m-done{background:#21262d;color:#8b949e}
 .m-done:hover{color:#e6edf3}
 /* Manifest primary button */
-.btn-manifest{width:100%;padding:15px;font-size:1.13rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#000;transition:box-shadow .2s,transform .15s,opacity .15s;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px;animation:manifestPulse 2s ease-in-out infinite}
-.btn-manifest:hover{opacity:1;box-shadow:0 6px 36px rgba(0,212,255,.6),inset 0 1px 0 rgba(255,255,255,.25);transform:translateY(-2px);animation:none}
-.btn-manifest:active{transform:scale(.98);animation:none}
-.btn-manifest:disabled{opacity:.38;cursor:not-allowed;animation:none}
+.btn-manifest{width:100%;padding:15px;font-size:1.13rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#000;transition:box-shadow .2s,transform .15s,opacity .15s;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px;box-shadow:0 4px 20px rgba(0,212,255,.28),inset 0 1px 0 rgba(255,255,255,.15)}
+.btn-manifest:hover{opacity:1;box-shadow:0 6px 36px rgba(0,212,255,.6),inset 0 1px 0 rgba(255,255,255,.25);transform:translateY(-2px)}
+.btn-manifest:active{transform:scale(.98)}
+.btn-manifest:disabled{opacity:.38;cursor:not-allowed}
 /* API Reminder modal */
 @keyframes reminderIn{0%{opacity:0;transform:translateY(32px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes overlayIn{0%{opacity:0}100%{opacity:1}}
@@ -349,7 +349,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .step-pending .step-bub{background:#2d333b}
 .step-active .step-bub{background:#00d4ff;box-shadow:0 0 10px rgba(0,212,255,.7);transform:scale(1.5);animation:bubPulse 1.8s ease-in-out infinite}
 .step-done .step-bub{width:14px;height:14px;background:#00d4ff;font-size:8px;color:#001a24;font-weight:900;line-height:1;box-shadow:0 0 7px rgba(0,212,255,.55)}
-.step-lbl{font-size:.52rem;font-weight:600;color:#374151;margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:36px}
+.step-lbl{font-size:.62rem;font-weight:600;color:#374151;margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56px}
 .step-active .step-lbl{color:#00d4ff;font-weight:700}
 .step-done .step-lbl{color:#4b7c93}
 .btn-reset-strip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)!important;color:#4b5563;font-size:.68rem;font-weight:700;cursor:pointer;padding:4px 10px;border-radius:20px;transition:all .15s;flex-shrink:0;align-self:center;letter-spacing:.05em;text-transform:uppercase;line-height:1.4}
@@ -383,6 +383,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-cta:hover{transform:translateY(-1px);animation:btnHoverPulse 1.6s ease-in-out infinite}
 .splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
 .splash-paste:hover{color:#6b7280}
+.splash-preset-btn{flex:1;padding:12px 10px;border-radius:12px;font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35;border-width:1.5px;border-style:solid}
+.splash-preset-btn span{font-size:.68rem;opacity:.78;font-weight:600}
+.splash-preset-btn:hover{filter:brightness(1.2)}
+.splash-preset-4k{background:rgba(124,58,237,.06);border-color:rgba(124,58,237,.25);color:#a78bfa}
+.splash-preset-4k:hover{background:rgba(124,58,237,.13)}
+.splash-preset-1080p{background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.22);color:#60a5fa}
+.splash-preset-1080p:hover{background:rgba(59,130,246,.13)}
+.splash-preset-free{background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.22);color:#a78bfa}
+.splash-preset-free:hover{background:rgba(139,92,246,.13)}
+.splash-custom-btn{width:100%;max-width:310px;margin-top:8px;padding:11px 24px;font-size:.86rem;font-weight:700;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.03);color:#8b949e;cursor:pointer;transition:all .2s}
+.splash-custom-btn:hover{background:rgba(255,255,255,.07);color:#c9d1d9}
+.splash-more{width:100%;max-width:310px}
+.splash-more-summary{list-style:none;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.7rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;user-select:none;outline:none;justify-content:center;padding:4px 0}
+.splash-more-summary:hover{color:#6b7280}
 /* ── Theme toggle ─────────────────────────────────────── */
 #themeToggle{position:fixed;top:14px;left:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
 #themeToggle:hover{background:rgba(255,255,255,.12);color:#e6edf3;border-color:rgba(255,255,255,.2)}
@@ -443,6 +457,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .svc-list-arr{color:#9ca3af}
 [data-theme="light"] .splash-paste{color:#0e7490}
 [data-theme="light"] .splash-paste:hover{color:#0c4a6e}
+[data-theme="light"] .splash-preset-4k{background:rgba(124,58,237,.06);border-color:rgba(124,58,237,.25);color:#7c3aed}
+[data-theme="light"] .splash-preset-1080p{background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.22);color:#2563eb}
+[data-theme="light"] .splash-preset-free{background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.22);color:#7c3aed}
+[data-theme="light"] .splash-custom-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.12);color:#57606a}
+[data-theme="light"] .splash-custom-btn:hover{background:rgba(0,0,0,.06);color:#1c2128}
+[data-theme="light"] .splash-more-summary{color:#8c959f}
+[data-theme="light"] .splash-more-summary:hover{color:#57606a}
 [data-theme="light"] .step-pending .step-bub{background:#d0d7de}
 [data-theme="light"] .step-unit:not(:first-child)::before{background:#d0d7de}
 [data-theme="light"] .btn-reset-strip{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.09)!important;color:#8c959f}
@@ -634,11 +655,21 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.10';
+const CONFIGURATOR_VERSION = '2.11';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.11', date:'Jul 4 2026', items:[
+    'Splash redesign — cleaner layout: Easy Setup + presets top, free/P2P/community links tucked under "More options" collapsible',
+    'Resume banner promoted above CTAs — returning users see it first',
+    'Step dot labels enlarged and widened — readable on mobile without truncation',
+    'Button animations calmed — download and install buttons no longer pulse infinitely, hover-only effects',
+    'Preset buttons use proper CSS classes — consistent hover states in both themes',
+    'requiredLanguages fix — all 35 non-Anime templates now use requiredLanguages instead of includedLanguages (size limits and cached-only actually work)',
+    'Free Streaming fix — Library preset removed from HTTP/P2P configs (no more "requires at least one usable service" error)',
+    'ElfHosted excluded from P2P/HTTP install targets — ElfHosted does not support debrid-free modes',
+  ]},
   { v:'2.9', date:'Jul 2 2026', items:[
     'One-click Easy Setup — "Create &amp; Install" now opens AIOStreams with your template pre-loaded via deep link. No CORS issues, works on every public instance',
     'Template uploaded to paste.rs, then AIOStreams fetches it directly — your credentials stay out of the link',
@@ -1417,60 +1448,51 @@ function splashHtml() {
     <div class="splash-by">By Brevity <span style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08)">v${CONFIGURATOR_VERSION}</span></div>
     <div class="splash-tagline">Build your perfect AIOStreams template in 2 minutes. No manual JSON editing.</div>
     <div class="splash-chips">
-      <span class="splash-chip splash-chip-svc">TorBox Pro</span>
-      <span class="splash-chip splash-chip-svc">TorBox Essential</span>
+      <span class="splash-chip splash-chip-svc">TorBox</span>
       <span class="splash-chip splash-chip-svc">AllDebrid</span>
       <span class="splash-chip splash-chip-svc">Real-Debrid</span>
       <span class="splash-chip splash-chip-svc">EasyNews</span>
       <span class="splash-chip splash-chip-svc">Hybrid</span>
+      <span class="splash-chip splash-chip-feat">Free P2P/HTTP</span>
     </div>
-    <div class="splash-chips">
-      <span class="splash-chip splash-chip-feat">5 Formatters</span>
-      <span class="splash-chip splash-chip-feat">Smart Sorting</span>
-      <span class="splash-chip splash-chip-feat">Video Prefs</span>
-      <span class="splash-chip splash-chip-feat">Anime Ready</span>
-      <span class="splash-chip splash-chip-feat">Multi-Debrid</span>
-    </div>
-    <button class="splash-cta" data-action="easy-start">⚡ Easy Setup<br><span style="font-size:.74rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
-    <button data-action="custom-start" style="width:100%;max-width:310px;margin-top:8px;padding:11px 24px;font-size:.86rem;font-weight:700;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.03);color:#8b949e;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.07)'" onmouseout="this.style.background='rgba(255,255,255,.03)'">Custom Setup — full control</button>
-    <div style="width:100%;max-width:310px;margin-top:12px;font-size:.63rem;font-weight:700;color:#4b5563;letter-spacing:.08em;text-transform:uppercase;text-align:center">Or start from a preset</div>
-    <div style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:8px">
-      <button data-action="quick-start" data-preset="4k" style="flex:1;padding:12px 10px;background:rgba(124,58,237,.06);border:1.5px solid rgba(124,58,237,.25);border-radius:12px;color:#a78bfa;font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(124,58,237,.13)'" onmouseout="this.style.background='rgba(124,58,237,.06)'">⚡ 4K Preset<br><span style="font-size:.68rem;opacity:.8;font-weight:600">Lossless audio · big screen</span></button>
-      <button data-action="quick-start" data-preset="1080p" style="flex:1;padding:12px 10px;background:rgba(59,130,246,.06);border:1.5px solid rgba(59,130,246,.22);border-radius:12px;color:#60a5fa;font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(59,130,246,.13)'" onmouseout="this.style.background='rgba(59,130,246,.06)'">⚡ 1080p Preset<br><span style="font-size:.68rem;opacity:.8;font-weight:600">DD+ · everyday streaming</span></button>
-    </div>
-    <div style="width:100%;max-width:310px;margin-top:6px;font-size:.66rem;color:#4b5563;text-align:center;line-height:1.4">Presets pre-answer the resolution question — you still pick your service and device, then one-click install.</div>
-    ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:310px;margin-top:10px;padding:11px 14px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:10px;display:flex;align-items:center;gap:10px">
+    ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:340px;margin-top:18px;padding:12px 16px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:12px;display:flex;align-items:center;gap:10px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:.72rem;font-weight:700;color:#00d4ff">Continue where you left off</div>
-        <div style="font-size:.67rem;color:#6b7280;margin-top:1px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div>
-        ${(() => { const d = lastGenDiff(); return d.length ? `<div style="font-size:.66rem;color:#f59e0b;margin-top:3px;line-height:1.4">Changed since last download — ${d.slice(0,2).join(' · ')}${d.length > 2 ? ` +${d.length - 2} more` : ''}</div>` : ''; })()}
+        <div style="font-size:.76rem;font-weight:700;color:#00d4ff">Continue where you left off</div>
+        <div style="font-size:.7rem;color:#6b7280;margin-top:2px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div>
+        ${(() => { const d = lastGenDiff(); return d.length ? `<div style="font-size:.68rem;color:#f59e0b;margin-top:3px;line-height:1.4">Changed since last download — ${d.slice(0,2).join(' · ')}${d.length > 2 ? ` +${d.length - 2} more` : ''}</div>` : ''; })()}
       </div>
-      <button data-action="continue-session" class="splash-cta-continue" style="padding:6px 12px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:7px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume →</button>
-      <button data-action="start-fresh" class="splash-cta-discard" style="padding:4px 8px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">✕</button>
+      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume</button>
+      <button data-action="start-fresh" class="splash-cta-discard" style="padding:5px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">&#10005;</button>
     </div>` : ''}
-    
-    <div style="width:100%;max-width:310px;margin-top:8px;font-size:.63rem;font-weight:700;color:#4b5563;letter-spacing:.08em;text-transform:uppercase;text-align:center">No subscription? Try free</div>
-    <div style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:8px">
-      <button data-action="quick-start" data-preset="http" style="flex:1;padding:11px 10px;background:rgba(244,114,182,.06);border:1.5px solid rgba(244,114,182,.22);border-radius:12px;color:#f9a8d4;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(244,114,182,.13)'" onmouseout="this.style.background='rgba(244,114,182,.06)'">📺 Free Streaming<br><span style="font-size:.66rem;opacity:.75;font-weight:600">No account needed</span></button>
-      <button data-action="quick-start" data-preset="p2p" style="flex:1;padding:11px 10px;background:rgba(139,92,246,.06);border:1.5px solid rgba(139,92,246,.22);border-radius:12px;color:#a78bfa;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35" onmouseover="this.style.background='rgba(139,92,246,.13)'" onmouseout="this.style.background='rgba(139,92,246,.06)'">🔗 Free P2P<br><span style="font-size:.66rem;opacity:.75;font-weight:600">Torrents · no debrid</span></button>
+    <button class="splash-cta" data-action="easy-start" style="margin-top:${hadSavedState && _savedStep > 0 ? '12' : '24'}px">Easy Setup<br><span style="font-size:.76rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
+    <div class="splash-secondary-row" style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:8px">
+      <button data-action="quick-start" data-preset="4k" class="splash-preset-btn splash-preset-4k">4K Preset<br><span>Lossless audio</span></button>
+      <button data-action="quick-start" data-preset="1080p" class="splash-preset-btn splash-preset-1080p">1080p Preset<br><span>DD+ streaming</span></button>
     </div>
-    <div class="splash-pill-wrap" style="width:100%;max-width:310px;margin-top:16px;border-radius:12px;padding:11px 14px">
-      <div style="font-size:.63rem;font-weight:700;color:#4b5563;letter-spacing:.08em;text-transform:uppercase;text-align:center;margin-bottom:10px">Skip the wizard</div>
-      <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:7px">
-        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Browse Templates
-        </a>
-        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          GitHub
-        </a>
-        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
-          Reddit
-        </a>
+    <button data-action="custom-start" class="splash-custom-btn">Custom Setup — full control</button>
+    <details class="splash-more" style="width:100%;max-width:310px;margin-top:14px">
+      <summary class="splash-more-summary">More options <span style="margin-left:auto;font-size:.72rem;opacity:.5">&#9662;</span></summary>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
+        <div style="display:flex;gap:8px">
+          <button data-action="quick-start" data-preset="http" class="splash-preset-btn splash-preset-free">Free Streaming<br><span>No account needed</span></button>
+          <button data-action="quick-start" data-preset="p2p" class="splash-preset-btn splash-preset-free">Free P2P<br><span>Torrents, no debrid</span></button>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:7px;margin-top:6px">
+          <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Browse Templates
+          </a>
+          <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            GitHub
+          </a>
+          <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+            Reddit
+          </a>
+        </div>
       </div>
-    </div>
+    </details>
     <details style="width:100%;max-width:310px;margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
       <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:${_clrOlder};letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
         What's new
