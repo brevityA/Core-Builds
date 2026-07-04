@@ -1,0 +1,190 @@
+[
+  {
+    "expression": "/*Bad 1080P Bluray — tier-guarded (LABS)*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'1080p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'1080p'))) == 0 and count(rseMatched(quality(resolution(streams,'1080p'),'Bluray'),'Radarr HD Bluray T1','Sonarr HD Bluray T1','Radarr HD Bluray T2','Sonarr HD Bluray T2','Radarr Remux T1','Sonarr Remux T1')) == 0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/*Bad 4k Bluray — tier-guarded (LABS)*/(queryType=='movie' or queryType=='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'2160p'))) == 0 and count(rseMatched(resolution(streams,'2160p'),'Radarr UHD Bluray T1','Radarr UHD Bluray T2','Radarr UHD Bluray T3','Radarr Remux T1','Sonarr Remux T1','Radarr Remux T2','Sonarr Remux T2')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')) : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS | Adaptive Seeder Guard — kills bottom-quartile-seeded uncached torrents on fresh titles (deep pools only); catalog titles over 1y exempt */ (daysSinceRelease >= 0 and daysSinceRelease <= 365 and count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),3)) > 10) ? seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(2,floor(q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')) * 0.25))) : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS | Unknown Quality Kill — only when 5+ known-quality streams exist */ count(quality(merge(type(streams,'p2p','http','usenet','stremio-usenet'),cached(type(streams,'debrid'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV')) > 5 ? negate(merge(library(streams),seadex(streams)),quality(type(streams,'p2p','http','usenet','stremio-usenet','debrid'),'Unknown')) : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS | Unknown Resolution Kill — only when 5+ known-resolution streams exist */ count(resolution(merge(type(streams,'p2p','http','usenet','stremio-usenet'),cached(type(streams,'debrid'))),'2160p','1440p','1080p','720p','576p','480p')) > 5 ? negate(merge(library(streams),seadex(streams)),resolution(type(streams,'p2p','http','usenet','stremio-usenet','debrid'),'Unknown')) : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.6.0 | Bad Dual Audio Groups — releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.6.0 | x264 Hard Exclude — native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.8.0 | Extra Cached HQ — perGroup() replaces 20-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.8.0 | Extra Cached LQ — perGroup() replaces 15-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.8.0 | Extra Uncached — perGroup() replaces 35-clause merge/slice */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.8.0 | Indexer Diversity — perGroup() caps 2 per scraper, prevents any one addon flooding results */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 20 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.8.0 | Score IQR Guard — adaptive low-score filter using values(seScore) IQR fence */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Extra Cached HQ — perGroup() replaces 20-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Extra Cached LQ — perGroup() replaces 15-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Extra Uncached — perGroup() replaces 35-clause merge/slice */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Indexer Diversity — caps 2 per scraper, prevents SeaDex/AnimeTosho flooding */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 15 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Score IQR Guard — adaptive low-score filter using IQR fence on seScore */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | Bad Dual Audio Groups — releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | Extra Cached HQ — perGroup() replaces 20-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | Extra Cached LQ — perGroup() replaces 15-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | Extra Uncached — perGroup() replaces 35-clause merge/slice */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | Indexer Diversity — perGroup() caps 2 per scraper, prevents any one addon flooding results */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 20 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | Score IQR Guard — adaptive low-score filter using values(seScore) IQR fence */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  }
+]

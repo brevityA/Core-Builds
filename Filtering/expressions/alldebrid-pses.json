@@ -1,0 +1,126 @@
+[
+  {
+    "expression": "/* ALLDEBRID 720p Fallback | Any */ resolution(streams, '720p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite",
+      "AllDebrid",
+      "AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID 720p Fallback | WEB-DL */ resolution(quality(streams, 'WEB-DL', 'WEBRip'), '720p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite",
+      "AllDebrid",
+      "AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID A-Tier 1080p | WEB-DL */ resolution(quality(streams, 'WEB-DL'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite",
+      "AllDebrid",
+      "AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams, 'WEBRip', 'BluRay'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite",
+      "AllDebrid",
+      "AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID C-Tier 1080p | Any 1080p */ resolution(streams, '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite",
+      "AllDebrid",
+      "AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID S-Tier 1080p | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite",
+      "AllDebrid",
+      "AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID 720p | Any */ resolution(streams,'720p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID A-Tier 4K | WEB-DL HDR */ resolution(visualTag(quality(streams, 'WEB-DL'), 'HDR+DV', 'DV', 'HDR10+', 'HDR10', 'HDR'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID B-Tier 4K | WEB-DL SDR */ resolution(quality(streams, 'WEB-DL'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID C-Tier 4K | WEBRip */ resolution(quality(streams, 'WEBRip'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID D-Tier 4K | Any 2160p */ resolution(streams, '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid"
+    ]
+  },
+  {
+    "expression": "/* ALLDEBRID S-Tier 4K | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite"
+    ]
+  }
+]

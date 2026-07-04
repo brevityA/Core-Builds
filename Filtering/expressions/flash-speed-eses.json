@@ -1,0 +1,20 @@
+[
+  {
+    "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+    "enabled": true,
+    "templates": [
+      "Flash",
+      "Flash 4K",
+      "Speed 4K+",
+      "Speed EasyNews"
+    ]
+  },
+  {
+    "expression": "(daysSinceRelease > 3 or daysSinceRelease < 0) ? uncached(streams) : []",
+    "enabled": true,
+    "templates": [
+      "Flash",
+      "Flash 4K"
+    ]
+  }
+]
