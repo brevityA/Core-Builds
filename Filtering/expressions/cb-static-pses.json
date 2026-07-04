@@ -1,0 +1,438 @@
+[
+  {
+    "expression": "/* CB A-Tier 1080p | WEB-DL */ resolution(quality(streams, 'WEB-DL'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid Lite",
+      "Samsung TV",
+      "Speed",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite"
+    ]
+  },
+  {
+    "expression": "/* CB B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams, 'WEBRip', 'BluRay'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid Lite",
+      "Samsung TV",
+      "Speed",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite"
+    ]
+  },
+  {
+    "expression": "/* CB C-Tier 1080p | Any 1080p */ resolution(streams, '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid Lite",
+      "Samsung TV",
+      "Speed",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite"
+    ]
+  },
+  {
+    "expression": "/* CB S-Tier 1080p | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid Lite",
+      "Samsung TV",
+      "Speed",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite"
+    ]
+  },
+  {
+    "expression": "/* CB 720p Fallback | Any */ resolution(streams, '720p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Hybrid Lite",
+      "Samsung TV",
+      "Speed",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite"
+    ]
+  },
+  {
+    "expression": "/* CB 720p Fallback | WEB-DL */ resolution(quality(streams, 'WEB-DL', 'WEBRip'), '720p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Hybrid Lite",
+      "Samsung TV",
+      "Speed",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite"
+    ]
+  },
+  {
+    "expression": "/* A-Tier 1080p | WEB-DL */ resolution(quality(streams, 'WEB-DL'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream",
+      "Stream Labs",
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* APEX 720p | Any */ resolution(streams,'720p')",
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "Samsung RU7100 4K"
+    ]
+  },
+  {
+    "expression": "/* APEX 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "Samsung RU7100 4K"
+    ]
+  },
+  {
+    "expression": "/* APEX B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "Samsung RU7100 4K"
+    ]
+  },
+  {
+    "expression": "/* APEX C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "Samsung RU7100 4K"
+    ]
+  },
+  {
+    "expression": "/* APEX E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "Samsung RU7100 4K"
+    ]
+  },
+  {
+    "expression": "/* B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams, 'WEBRip', 'BluRay'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream",
+      "Stream Labs",
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* ESSENTIAL 720p | Any */ resolution(streams,'720p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential",
+      "4K Essential Labs",
+      "Speed 4K",
+      "Speed 4K Lite"
+    ]
+  },
+  {
+    "expression": "/* ESSENTIAL 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential",
+      "4K Essential Labs",
+      "Speed 4K",
+      "Speed 4K Lite"
+    ]
+  },
+  {
+    "expression": "/* ESSENTIAL B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential",
+      "4K Essential Labs",
+      "Speed 4K",
+      "Speed 4K Lite"
+    ]
+  },
+  {
+    "expression": "/* ESSENTIAL C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential",
+      "4K Essential Labs",
+      "Speed 4K",
+      "Speed 4K Lite"
+    ]
+  },
+  {
+    "expression": "/* ESSENTIAL E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential",
+      "4K Essential Labs",
+      "Speed 4K",
+      "Speed 4K Lite"
+    ]
+  },
+  {
+    "expression": "/* S-Tier 1080p | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream",
+      "Stream Labs",
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* C-Tier 1080p | Any 1080p */ resolution(streams, '1080p')",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* CB A-Tier 4K | WEB-DL HDR */ resolution(visualTag(quality(streams, 'WEB-DL'), 'HDR+DV', 'DV', 'HDR10+', 'HDR10', 'HDR'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Flash 4K",
+      "Speed 4K+"
+    ]
+  },
+  {
+    "expression": "/* CB B-Tier 4K | WEB-DL SDR */ resolution(quality(streams, 'WEB-DL'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Flash 4K",
+      "Speed 4K+"
+    ]
+  },
+  {
+    "expression": "/* CB C-Tier 4K | WEBRip */ resolution(quality(streams, 'WEBRip'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Flash 4K",
+      "Speed 4K+"
+    ]
+  },
+  {
+    "expression": "/* CB D-Tier 4K | Any 2160p */ resolution(streams, '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Flash 4K",
+      "Speed 4K+"
+    ]
+  },
+  {
+    "expression": "/* CB S-Tier 4K | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Essential Lite",
+      "Flash 4K",
+      "Speed 4K+"
+    ]
+  },
+  {
+    "expression": "/* CB A-Tier 720p | WEBRip or BluRay */ resolution(quality(streams, 'WEBRip', 'BluRay'), '720p')",
+    "enabled": true,
+    "templates": [
+      "Flash",
+      "Flash 4K"
+    ]
+  },
+  {
+    "expression": "/* CB B-Tier 720p | Any 720p */ resolution(streams, '720p')",
+    "enabled": true,
+    "templates": [
+      "Flash",
+      "Flash 4K"
+    ]
+  },
+  {
+    "expression": "/* CB Dub A-Tier | Dubbed + Dual Audio 1080p Any */ language(resolution(streams, '1080p'), 'Dubbed', 'Dual Audio')",
+    "enabled": true,
+    "templates": [
+      "Anime Dub",
+      "Anime Dub Lite"
+    ]
+  },
+  {
+    "expression": "/* CB Dub S-Tier | Dubbed + Dual Audio 1080p WEB-DL */ language(resolution(quality(streams, 'WEB-DL'), '1080p'), 'Dubbed', 'Dual Audio')",
+    "enabled": true,
+    "templates": [
+      "Anime Dub",
+      "Anime Dub Lite"
+    ]
+  },
+  {
+    "expression": "/* CB S-Tier 720p | WEB-DL */ resolution(quality(streams, 'WEB-DL'), '720p')",
+    "enabled": true,
+    "templates": [
+      "Flash",
+      "Flash 4K"
+    ]
+  },
+  {
+    "expression": "/* HYBRID 720p | Any */ resolution(streams,'720p')",
+    "enabled": true,
+    "templates": [
+      "4K Hybrid",
+      "Hybrid"
+    ]
+  },
+  {
+    "expression": "/* HYBRID 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
+    "enabled": true,
+    "templates": [
+      "4K Hybrid",
+      "Hybrid"
+    ]
+  },
+  {
+    "expression": "/* HYBRID B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Hybrid",
+      "Hybrid"
+    ]
+  },
+  {
+    "expression": "/* HYBRID C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
+    "enabled": true,
+    "templates": [
+      "4K Hybrid",
+      "Hybrid"
+    ]
+  },
+  {
+    "expression": "/*APEX A-Tier 1080p WEB-DL — ranked floor + new-release median fallback (<60d)*/ count(resolution(quality(streams,'WEB-DL'),'1080p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),min(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))*0.85):((count(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+    "enabled": true,
+    "templates": [
+      "4K Apex (TorBox)"
+    ]
+  },
+  {
+    "expression": "/*APEX A-Tier 4K WEB-DL HDR — ranked floor + new-release median fallback (<60d)*/ count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.85):((count(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+    "enabled": true,
+    "templates": [
+      "4K Apex (TorBox)"
+    ]
+  },
+  {
+    "expression": "/*APEX B-Tier 4K WEB-DL SDR — ranked floor + new-release median fallback (<60d)*/ count(resolution(quality(streams,'WEB-DL'),'2160p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),min(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))*0.85):((count(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+    "enabled": true,
+    "templates": [
+      "4K Apex (TorBox)"
+    ]
+  },
+  {
+    "expression": "/*APEX C-Tier 4K WEBRip HDR — ranked floor + new-release median fallback (<60d)*/ count(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.85):((count(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+    "enabled": true,
+    "templates": [
+      "4K Apex (TorBox)"
+    ]
+  },
+  {
+    "expression": "/*APEX D-Tier 4K WEBRip SDR — ranked floor*/ count(resolution(quality(streams,'WEBRip'),'2160p'))>0?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),min(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))*0.85):[]",
+    "enabled": true,
+    "templates": [
+      "4K Apex (TorBox)"
+    ]
+  },
+  {
+    "expression": "/*APEX S-Tier 1080p Remux — ranked-pool floor (85% min ranked bitrate)*/ count(resolution(quality(streams,'BluRay REMUX'),'1080p'))>0?bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),min(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))*0.85):[]",
+    "enabled": true,
+    "templates": [
+      "4K Apex (TorBox)"
+    ]
+  },
+  {
+    "expression": "/*APEX S-Tier 4K Remux — ranked-pool floor (85% min ranked bitrate)*/ count(resolution(quality(streams,'BluRay REMUX'),'2160p'))>0?bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),min(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))*0.85):[]",
+    "enabled": true,
+    "templates": [
+      "4K Apex (TorBox)"
+    ]
+  },
+  {
+    "expression": "/* HYBRID E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
+    "enabled": true,
+    "templates": [
+      "4K Hybrid"
+    ]
+  }
+]

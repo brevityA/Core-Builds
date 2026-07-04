@@ -1,0 +1,99 @@
+[
+  {
+    "expression": "/* CB 1080p Fallback | Any */ resolution(streams, '1080p')",
+    "enabled": true,
+    "templates": [
+      "Apple TV 4K",
+      "Samsung TV 4K"
+    ]
+  },
+  {
+    "expression": "/* CB 1080p Fallback | WEB-DL */ resolution(quality(streams, 'WEB-DL', 'WEBRip'), '1080p')",
+    "enabled": true,
+    "templates": [
+      "Apple TV 4K",
+      "Samsung TV 4K"
+    ]
+  },
+  {
+    "expression": "/* CB A-Tier 2160p | WEB-DL */ resolution(quality(streams, 'WEB-DL'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "Apple TV 4K",
+      "Samsung TV 4K"
+    ]
+  },
+  {
+    "expression": "/* CB B-Tier 2160p | WEBRip or BluRay */ resolution(quality(streams, 'WEBRip', 'BluRay'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "Apple TV 4K",
+      "Samsung TV 4K"
+    ]
+  },
+  {
+    "expression": "/* CB C-Tier 2160p | Any 2160p */ resolution(streams, '2160p')",
+    "enabled": true,
+    "templates": [
+      "Apple TV 4K",
+      "Samsung TV 4K"
+    ]
+  },
+  {
+    "expression": "/* CB S-Tier 2160p | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "Apple TV 4K",
+      "Samsung TV 4K"
+    ]
+  },
+  {
+    "expression": "/* 1440p | Any quality */ resolution(quality(streams, 'BluRay REMUX', 'BluRay', 'WEB-DL', 'WEBRip'), '1440p')",
+    "enabled": true,
+    "templates": [
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* 4K Fallback | Any 4K */ resolution(streams, '2160p')",
+    "enabled": true,
+    "templates": [
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* 4K Fallback | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* 4K Fallback | WEB-DL HDR */ resolution(visualTag(quality(streams, 'WEB-DL'), 'DV', 'HDR10+', 'HDR10', 'HDR'), '2160p')",
+    "enabled": true,
+    "templates": [
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* 720p Fallback | Any */ resolution(streams, '720p')",
+    "enabled": true,
+    "templates": [
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* 720p Fallback | WEB-DL or WEBRip */ resolution(quality(streams, 'WEB-DL', 'WEBRip'), '720p')",
+    "enabled": true,
+    "templates": [
+      "Ultrawide"
+    ]
+  },
+  {
+    "expression": "/* C-Tier 1080p | Any */ resolution(streams, '1080p')",
+    "enabled": true,
+    "templates": [
+      "Ultrawide"
+    ]
+  }
+]

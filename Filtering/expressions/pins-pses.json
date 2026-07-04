@@ -1,0 +1,46 @@
+[
+  {
+    "expression": "/* Elite 1080p Remux pin */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
+  },
+  {
+    "expression": "/* Elite 4K Remux pin */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
+  },
+  {
+    "expression": "/* IMAX pin */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
+  },
+  {
+    "expression": "/* LQ group pin bottom */ pin(releaseGroup(streams, 'YIFY', 'RARBG', 'EVO', 'YTS', 'PSA', 'MeGusta', 'Tigole'), 'bottom')",
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
+  }
+]

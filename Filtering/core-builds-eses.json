@@ -1,334 +1,1584 @@
 [
   {
     "expression": "/*Bad NZBs*/ merge(releaseGroup(type(streams,'usenet','stremio-usenet'),'sample'),message(type(streams,'usenet','stremio-usenet'),'includes','\ud83d\udeab'))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* CB | Hard CAM Kill */ quality(streams, 'CAM', 'SCR', 'TS', 'TC', 'HC HD-Rip')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Part of Tamtaro SEL Setup*/[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Standard ESE v1.2.8 [git.tamtaro.de]*/[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*ongoingSeasonPack*/((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*AI Upscale Exclusion*/ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','aiupscale','upscaled','neural','enhancedai')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* CB | Foreign Language Kill (movies/series only \u2014 anime exempt) */ (queryType == 'movie' or queryType == 'series') ? negate(merge(library(streams), seadex(streams), language(streams, 'English', 'Original', 'Multi', 'Dual Audio', 'Dubbed', 'Unknown')), streams) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass \u2014 packs killed when singles exist; ended shows (2y+) with under 3 singles keep packs (anime exempt) */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Extra SeaDex*/count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1?merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Final Limit (All)*/ merge(count(quality(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip'))>12? quality(negate(merge(library(streams), seadex(streams)),streams),'HDRip','HC HD-Rip','DVDRip','HDTV','CAM','TS','TC','SCR'):count(quality(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV'))>12? quality(streams,'CAM','TS','TC','SCR'):[], count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>15? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>12? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'),3))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>12? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>9? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'), 3))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>6? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),6))): count(resolution(negate(merge(library(streams), seadex(streams)), merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>3? negate(merge(library(streams), seadex(streams)),merge(slice(type(uncached(streams),'debrid'), 6), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),-1))):[])",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*G's Low Bitrate*/negate((isAnime or 'Animation' in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))),cached(streams))>10?(isAnime or 'Animation'in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Low Seeders*/count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))<=5 ?[]:count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'))))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1,q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),q1(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'))))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1, q1(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')), percentile(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'),10)))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1,percentile(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'),10))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))>5? negate(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),1), merge(type(streams,'p2p'),type(uncached(streams),'debrid'))):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Bad 4k Anime*/ (isAnime and originalLanguage == 'Japanese' and count(quality(resolution(cached(streams), '2160p'), 'Bluray REMUX')) == 0 and count(seadex(resolution(streams, '2160p'))) == 0)? negate(merge(library(streams), seadex(streams)), resolution(streams, '2160p')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* Bad Dual Audio Groups */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Essential",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/* Indexer Diversity */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 20 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Essential Lite",
+      "4K Hybrid",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Essential",
+      "Essential Lite",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Hybrid Lite",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Essential Labs",
+      "4K Hybrid",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Essential Labs",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Bad 4k Bluray*/(queryType=='movie' or queryType =='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'2160p'))) == 0? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')):[]",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Extra Cached (HQ)*/ merge( slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'Unknown'), 3))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Extra Cached (LQ)*/ merge( slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'DVDRip','HC HD-Rip'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'DVDRip','HC HD-Rip'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'DVDRip','HC HD-Rip'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'TC','SCR'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'TC','SCR'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS','TC','SCR'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS','TC','SCR'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS','TC','SCR'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'Unknown'), 3))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Extra Uncached (All)*/ merge( slice(resolution(quality(uncached(streams),'Bluray REMUX'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'1080p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'720p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'576p','480p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'1080p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'720p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'576p','480p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'1080p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'720p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'1080p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'720p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'1080p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'720p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'1080p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'720p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'1080p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'720p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'Unknown'), 3))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Anime",
+      "Anime 4K",
+      "Anime Dub",
+      "Apple TV 4K",
+      "Essential",
+      "Flash",
+      "Flash 4K",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed",
+      "Speed 4K",
+      "Speed 4K+",
+      "Speed EasyNews",
+      "Stream",
+      "Stream Firestick",
+      "Stream Labs",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Apex Labs",
+      "4K Essential",
+      "4K Hybrid",
+      "AllDebrid",
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub",
+      "Essential",
+      "Hybrid",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Stream",
+      "Stream Firestick",
+      "Ultrawide"
+    ]
   },
   {
     "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid Lite",
+      "4K Essential Lite",
+      "All-Rounder Labs",
+      "AllDebrid Lite",
+      "Anime 4K Lite",
+      "Anime Dub Lite",
+      "Anime Lite",
+      "Essential Lite",
+      "Hybrid Lite",
+      "Speed",
+      "Speed 4K",
+      "Stream Firestick Lite",
+      "Stream Labs",
+      "Stream Lite"
+    ]
   },
   {
     "expression": "/* Hard Resolution Kill \u2014 1080p-only */ resolution(streams, '2160p', '1440p', '720p', '576p', '480p')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Essential",
+      "Essential Lite",
+      "Flash",
+      "Hybrid",
+      "Hybrid Lite",
+      "Speed",
+      "Speed EasyNews",
+      "Speed Lite",
+      "Stream Firestick",
+      "Stream Firestick Lite",
+      "Stream Lite"
+    ]
   },
   {
     "expression": "/* DV-Only Kill \u2014 enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Samsung RU7100 4K",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Speed 4K",
+      "Speed 4K Lite",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "4K Apex Labs",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* CB | 3D Content Kill */ visualTag(streams, '3D', 'H-OU', 'H-SBS')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* CB | Hard YouTube Kill */ type(streams, 'youtube', 'external')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K AllDebrid Lite",
+      "All-Rounder Labs",
+      "AllDebrid",
+      "AllDebrid Lite",
+      "Samsung TV",
+      "Samsung TV 4K",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* CB | Kill Season Packs When Episodes Exist */ (latestSeason >= 3 and count(negate(streams, seasonPack(streams))) >= 3) ? seasonPack(streams) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime 4K Lite",
+      "Anime Dub",
+      "Anime Dub Lite",
+      "Anime Lite"
+    ]
   },
   {
     "expression": "/*Bad 1080P Bluray \u2014 tier-guarded (LABS)*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'1080p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'1080p'))) == 0 and count(rseMatched(quality(resolution(streams,'1080p'),'Bluray'),'Radarr HD Bluray T1','Sonarr HD Bluray T1','Radarr HD Bluray T2','Sonarr HD Bluray T2','Radarr Remux T1','Sonarr Remux T1')) == 0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/*Bad 4k Bluray \u2014 tier-guarded (LABS)*/(queryType=='movie' or queryType=='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'2160p'))) == 0 and count(rseMatched(resolution(streams,'2160p'),'Radarr UHD Bluray T1','Radarr UHD Bluray T2','Radarr UHD Bluray T3','Radarr Remux T1','Sonarr Remux T1','Radarr Remux T2','Sonarr Remux T2')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
   },
   {
     "expression": "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
   },
   {
     "expression": "/* Extra Uncached */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
   },
   {
     "expression": "/* LABS | Adaptive Seeder Guard \u2014 kills bottom-quartile-seeded uncached torrents on fresh titles (deep pools only); catalog titles over 1y exempt */ (daysSinceRelease >= 0 and daysSinceRelease <= 365 and count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),3)) > 10) ? seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(2,floor(q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')) * 0.25))) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS | Unknown Quality Kill \u2014 only when 5+ known-quality streams exist */ count(quality(merge(type(streams,'p2p','http','usenet','stremio-usenet'),cached(type(streams,'debrid'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV')) > 5 ? negate(merge(library(streams),seadex(streams)),quality(type(streams,'p2p','http','usenet','stremio-usenet','debrid'),'Unknown')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS | Unknown Resolution Kill \u2014 only when 5+ known-resolution streams exist */ count(resolution(merge(type(streams,'p2p','http','usenet','stremio-usenet'),cached(type(streams,'debrid'))),'2160p','1440p','1080p','720p','576p','480p')) > 5 ? negate(merge(library(streams),seadex(streams)),resolution(type(streams,'p2p','http','usenet','stremio-usenet','debrid'),'Unknown')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "All-Rounder Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* Score IQR Guard */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K AllDebrid",
+      "4K Apex",
+      "4K Apex (TorBox)",
+      "4K Essential",
+      "4K Hybrid"
+    ]
   },
   {
     "expression": "/* CB | Non-Anime Query Guard */ (queryType == 'movie' or queryType == 'series') and not isAnime ? streams : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Anime",
+      "Anime 4K",
+      "Anime 4K Labs",
+      "Anime Dub"
+    ]
   },
   {
     "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Flash",
+      "Flash 4K",
+      "Speed 4K+",
+      "Speed EasyNews"
+    ]
   },
   {
     "expression": "/*Unknown Quality*/ count(quality(merge(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet'), cached(type(streams, 'debrid'))), 'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV')) > 5 ? negate(merge(library(streams), seadex(streams)), quality(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet', 'debrid'), 'Unknown')): []",
-    "enabled": false
+    "enabled": false,
+    "templates": [
+      "4K Essential Labs",
+      "Speed 4K",
+      "Speed 4K Lite"
+    ]
   },
   {
     "expression": "/*Unknown Resolution*/ count(resolution(merge(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet'), cached(type(streams, 'debrid'))), '2160p', '1440p', '1080p','720p','576p','480p')) > 5 ? negate(merge(library(streams), seadex(streams)), resolution(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet', 'debrid'), 'Unknown')): []",
-    "enabled": false
+    "enabled": false,
+    "templates": [
+      "4K Essential Labs",
+      "Speed 4K",
+      "Speed 4K Lite"
+    ]
   },
   {
     "expression": "(daysSinceRelease > 3 or daysSinceRelease < 0) ? uncached(streams) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Flash",
+      "Flash 4K"
+    ]
   },
   {
     "expression": "/*Bitrate Floor \u2014 1080p REMUX \u2014 animation-exempt*/ (isAnime or 'Animation' in genres) ? [] : (count(resolution(quality(negate(merge(library(streams), seadex(streams)), streams), 'BluRay REMUX'), '1080p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, max(10, q1(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '1080p')), 'bitrate')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '1080p')), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, 10)))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs"
+    ]
   },
   {
     "expression": "/*Bitrate Floor \u2014 4K REMUX \u2014 animation-exempt*/ (isAnime or 'Animation' in genres) ? [] : (count(resolution(quality(negate(merge(library(streams), seadex(streams)), streams), 'BluRay REMUX'), '2160p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, max(25, q1(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '2160p')), 'bitrate')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '2160p')), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, 25)))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs"
+    ]
   },
   {
     "expression": "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'Bluray REMUX','Bluray','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'Bluray REMUX','Bluray','WEB-DL','WEBRip')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Essential Labs",
+      "Essential Labs"
+    ]
   },
   {
     "expression": "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Essential Labs",
+      "Essential Labs"
+    ]
   },
   {
     "expression": "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Essential Labs",
+      "Essential Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.6.0 | Bad Dual Audio Groups \u2014 releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
-    "enabled": false
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.6.0 | x264 Hard Exclude \u2014 native encode() replaces regex score -25 */ negate(encode(streams, 'x264', 'h.264'))",
-    "enabled": false
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.8.0 | Extra Cached HQ \u2014 perGroup() replaces 20-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.8.0 | Extra Cached LQ \u2014 perGroup() replaces 15-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.8.0 | Extra Uncached \u2014 perGroup() replaces 35-clause merge/slice */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.8.0 | Indexer Diversity \u2014 perGroup() caps 2 per scraper, prevents any one addon flooding results */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 20 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
-    "enabled": false
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.8.0 | Score IQR Guard \u2014 adaptive low-score filter using values(seScore) IQR fence */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
-    "enabled": false
+    "enabled": false,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'StremThru Torz'),10),slice(addon(negate(merge(library(streams),seadex(streams)),streams),'TorBox Search'),5))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Essential Labs",
+      "Essential Labs"
+    ]
   },
   {
     "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264', 'yts', 'rarbg'), 'realdebrid')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Hybrid",
+      "Hybrid Lite"
+    ]
   },
   {
     "expression": "/*Bad 1080P Bluray \u2014 tier-guarded*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(rseMatched(resolution(quality(streams, 'Bluray'), '1080p'), 'Radarr HD Bluray T1', 'Sonarr HD Bluray T1', 'Radarr HD Bluray T2', 'Sonarr HD Bluray T2', 'Radarr Remux T1', 'Sonarr Remux T1')) == 0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Samsung RU7100 4K"
+    ]
   },
   {
     "expression": "/*Bad 4k Anime \u2014 tier-guarded*/ (isAnime and originalLanguage == 'Japanese' and count(quality(resolution(cached(streams), '2160p'), 'Bluray REMUX')) == 0 and count(seadex(resolution(streams, '2160p'))) == 0 and count(rseMatched(resolution(streams, '2160p'), 'Anime BD T1', 'Anime BD T2', 'Anime BD T3', 'Anime BD T4', 'Anime BD T5', 'Anime BD T6', 'Anime BD T7', 'Anime BD T8', 'Anime Web T1', 'Anime Web T2', 'Radarr Remux T1', 'Sonarr Remux T1')) == 0) ? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Samsung RU7100 4K"
+    ]
   },
   {
     "expression": "/*Bad 4k Bluray \u2014 tier-guarded*/(queryType=='movie' or queryType =='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(rseMatched(resolution(streams, '2160p'), 'Radarr UHD Bluray T1', 'Radarr UHD Bluray T2', 'Radarr UHD Bluray T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'Radarr Remux T2', 'Sonarr Remux T2')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Samsung RU7100 4K"
+    ]
   },
   {
     "expression": "/*Bitrate Floor \u2014 1080p REMUX AV1 kill (AV1 never appears on a Blu-ray disc) \u2014 animation-exempt*/ (isAnime or 'Animation' in genres) ? [] : (negate(merge(library(streams), seadex(streams)), encode(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 'AV1')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/*Bitrate Floor \u2014 1080p REMUX \u2014 animation-exempt*/ (isAnime or 'Animation' in genres) ? [] : (negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, 8)))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* Hard Resolution Kill \u2014 Stream is 1080p-only */ resolution(streams, '2160p', '1440p')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Essential Labs"
+    ]
   },
   {
     "expression": "/* Hard Resolution Kill \u2014 Stream is 1080p-only */ resolution(streams, '2160p', '1440p', '576p', '480p')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Stream Labs"
+    ]
   },
   {
     "expression": "/* Hard Resolution Kill \u2014 Stream is 1080p-only */ resolution(streams, '2160p', '1440p', '720p', '576p', '480p')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Stream"
+    ]
   },
   {
     "expression": "/* LABS v0.1.0 | Extra Cached HQ \u2014 perGroup() replaces 20-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.1.0 | Extra Cached LQ \u2014 perGroup() replaces 15-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.1.0 | Extra Uncached \u2014 perGroup() replaces 35-clause merge/slice */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.1.0 | Indexer Diversity \u2014 caps 2 per scraper, prevents SeaDex/AnimeTosho flooding */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 15 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.1.0 | Score IQR Guard \u2014 adaptive low-score filter using IQR fence on seScore */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.9.0 | Bad Dual Audio Groups \u2014 releaseGroup() ESE replaces -50 regex scoring */ releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', 'Cory', 'EXTREME', 'FF', 'FOXX', 'G4RiS', 'GUEIRA', 'LCD', 'N3G4N', 'PD', 'PTHome', 'RiPER', 'RK', 'SiGLA', 'Tars', 'TM', 'tokar86a', 'TURG', 'vnlls', 'WTV', 'Yatogam1', 'YusukeFLA', 'ZigZag', 'ZNM')",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.9.0 | Extra Cached HQ \u2014 perGroup() replaces 20-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.9.0 | Extra Cached LQ \u2014 perGroup() replaces 15-clause merge/slice */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 3), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.9.0 | Extra Uncached \u2014 perGroup() replaces 35-clause merge/slice */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.9.0 | Indexer Diversity \u2014 perGroup() caps 2 per scraper, prevents any one addon flooding results */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 20 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
   },
   {
     "expression": "/* LABS v0.9.0 | Score IQR Guard \u2014 adaptive low-score filter using values(seScore) IQR fence */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
   },
   {
     "expression": "/*Upscaled 4k \u2014 tier-guarded*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(rseMatched(resolution(streams, '2160p'), 'Radarr UHD Bluray T1', 'Radarr UHD Bluray T2', 'Radarr UHD Bluray T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'Web T1', 'Radarr Web T2', 'Sonarr Web T2')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'WEBRip','HDTV','HDRip'),'2160p')) : []",
-    "enabled": true
+    "enabled": true,
+    "templates": [
+      "Samsung RU7100 4K"
+    ]
   }
 ]

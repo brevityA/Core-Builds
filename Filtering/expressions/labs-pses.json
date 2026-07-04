@@ -1,0 +1,171 @@
+[
+  {
+    "expression": "/* LABS S+ Tier | T1-matched 1080p Remux — pattern-verified elite above generic remux */ rseMatched(quality(resolution(streams,'1080p'),'Bluray REMUX'),'Radarr Remux T1','Sonarr Remux T1')",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs",
+      "Essential Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS S+ Tier | T1-matched 4K Remux — pattern-verified elite above generic remux */ rseMatched(quality(resolution(streams,'2160p'),'Bluray REMUX'),'Radarr Remux T1','Sonarr Remux T1','Radarr UHD Bluray T1')",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.6.0 | Elite Group pin — releaseGroup() replaces simple regex patterns */ pin(releaseGroup(streams, 'FraMeSToR', 'TheFarm', '126811', 'FLUX', 'SiC', 'hallowed', 'BHDStudio'), 'top')",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.6.0 | IMAX pin — native visualTag() replaces regex pattern */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS | T1 Pattern Pin — Vidhin05 tier detection beyond hand-listed release groups */ pin(rseMatched(streams,'Radarr Remux T1','Sonarr Remux T1','Radarr UHD Bluray T1','Radarr UHD Bluray T2'),'top')",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs",
+      "4K Essential Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS | T1 Pattern Pin — Vidhin05 tier detection beyond hand-listed release groups */ pin(rseMatched(streams,'Radarr Remux T1','Sonarr Remux T1','Radarr HD Bluray T1','Sonarr HD Bluray T1','Web T1'),'top')",
+    "enabled": true,
+    "templates": [
+      "Essential Labs",
+      "Stream Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime A-Tier — SeaDex 1080p WEB-DL FLAC */ isAnime and hasSeaDex ? seadex(resolution(audioTag(quality(streams, 'WEB-DL'), 'FLAC'), '1080p')) : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime B-Tier — 1080p WEB-DL AAC (SeaDex or non-SeaDex) */ isAnime ? resolution(audioTag(quality(streams, 'WEB-DL'), 'AAC', 'EAC3'), '1080p') : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime BD/sub-group elite pin — known reliable encode and sub groups */ pin(releaseGroup(streams, 'SubsPlease', 'Erai-raws', 'VARYG', 'Yameii', 'BlurayDesuYo', 'LYS1TH3A', 'Beatrice-Raws', 'VCB-Studio'), 'top')",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime C-Tier — 1080p WEBRip fallback */ isAnime ? resolution(quality(streams, 'WEBRip'), '1080p') : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime D-Tier — any 1080p */ isAnime ? resolution(streams, '1080p') : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime S-Tier — hasSeaDex Best 1080p */ isAnime and hasSeaDex and count(seadex(resolution(streams, '1080p'), 'best')) > 0 ? seadex(resolution(streams, '1080p'), 'best') : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime — SeaDex Best pin (all resolutions) */ isAnime and count(seadex(streams, 'best')) > 0 ? pin(seadex(streams, 'best'), 'top') : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | Anime — group pin (SubsPlease, Erai-raws, BlurayDesuYo, VCB-Studio) */ isAnime ? pin(releaseGroup(streams, 'SubsPlease', 'Erai-raws', 'VARYG', 'Yameii', 'BlurayDesuYo', 'VCB-Studio'), 'top') : []",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | SeaDex Best pin — float SeaDex Best streams to the very top */ count(seadex(streams, 'best')) > 0 ? pin(seadex(streams, 'best'), 'top') : []",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | hasSeaDex A-Tier — SeaDex Best 1080p */ hasSeaDex and count(seadex(resolution(streams, '1080p'), 'best')) > 0 ? seadex(resolution(streams, '1080p'), 'best') : []",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | hasSeaDex B-Tier — SeaDex (non-best) 1080p WEB-DL fallback */ hasSeaDex and count(seadex(streams)) > 0 ? seadex(resolution(quality(streams, 'WEB-DL'), '1080p')) : []",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.1.0 | hasSeaDex S-Tier — SeaDex Best 2160p (only fires when title has a SeaDex entry) */ hasSeaDex and count(seadex(resolution(streams, '2160p'), 'best')) > 0 ? seadex(resolution(streams, '2160p'), 'best') : []",
+    "enabled": true,
+    "templates": [
+      "Anime 4K Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | 1080p Remux elite pin — releaseGroup() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | 4K Remux elite pin — releaseGroup() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | IMAX pin */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS v0.9.0 | LQ pin bottom — releaseGroup() */ pin(releaseGroup(streams, 'YIFY', 'RARBG', 'EVO', 'YTS', 'PSA', 'MeGusta', 'Tigole'), 'bottom')",
+    "enabled": true,
+    "templates": [
+      "4K Apex Labs"
+    ]
+  },
+  {
+    "expression": "/* LABS | T1 Pattern Pin — Vidhin05 tier detection incl. anime tiers */ pin(rseMatched(streams,'Radarr Remux T1','Sonarr Remux T1','Radarr UHD Bluray T1','Anime BD T1','Anime Web T1','Web T1'),'top')",
+    "enabled": true,
+    "templates": [
+      "All-Rounder Labs"
+    ]
+  }
+]

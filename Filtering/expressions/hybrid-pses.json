@@ -1,0 +1,16 @@
+[
+  {
+    "expression": "/* HYBRID TorBox Priority — A-Tier 1080p | WEB-DL */ service(resolution(quality(streams, 'WEB-DL'), '1080p'), 'torbox')",
+    "enabled": true,
+    "templates": [
+      "Hybrid Lite"
+    ]
+  },
+  {
+    "expression": "/* HYBRID TorBox Priority — S-Tier 1080p | BluRay REMUX */ service(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 'torbox')",
+    "enabled": true,
+    "templates": [
+      "Hybrid Lite"
+    ]
+  }
+]
