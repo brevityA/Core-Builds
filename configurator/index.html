@@ -666,11 +666,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.12';
+const CONFIGURATOR_VERSION = '2.13';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.13', date:'Jul 4 2026', items:[
+    'TMDB keys now optional — collapsed by default under "TMDB Keys (optional)" on the API step',
+    'TMDB section auto-opens if keys are already saved; shows green SET badge when configured',
+    'Helper text clarifies TMDB improves poster quality but is not required',
+  ]},
   { v:'2.12', date:'Jul 4 2026', items:[
     'Review step restructured — collapsible accordion sections reduce visual density',
     'Install in Stremio section open by default with condensed what-next guide',
@@ -1881,42 +1886,54 @@ function render() {
           <span class="cred-status" id="credStatus_${inp.id}" role="status" aria-live="polite"></span>
         </div>`).join('')}
         <div style="border-top:1px solid #21262d;margin:18px 0 14px"></div>
-        <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Metadata &amp; Posters</div>
         ` : ''}
-        <div class="name-row" style="margin-bottom:14px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token</span>
-            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+        <details id="tmdbDetails" style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-top:${debridInputs.length?'0':'4'}px" ${S.tmdbToken||S.tmdbApiKey?'open':''}>
+          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
+            <span style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">TMDB Keys</span>
+              <span style="font-size:.65rem;color:#4b5563;font-weight:600">optional</span>
+              ${S.tmdbToken||S.tmdbApiKey?'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3)">SET</span>':''}
+            </span>
+            <span style="font-size:.7rem;color:#374151">›</span>
+          </summary>
+          <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.04)">
+            <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:12px">Improves poster quality and metadata. Not required — AIOStreams works fine without it.</div>
+            <div class="name-row" style="margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token</span>
+                <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+              </div>
+              <div style="position:relative;display:flex;align-items:center">
+                <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+                  value="${S.tmdbToken}" maxlength="400" style="padding-right:38px">
+                <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
+                  style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
+                  onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">long</strong> token starting with <code style="color:#8b949e;font-family:monospace">eyJ</code> — not the 32-character API Key.</div>
+              <span class="cred-status" id="tmdbStatus" role="status" aria-live="polite"></span>
+            </div>
+            <div class="name-row">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key</span>
+                <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+              </div>
+              <div style="position:relative;display:flex;align-items:center">
+                <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+                  value="${S.tmdbApiKey}" maxlength="60" style="padding-right:38px">
+                <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
+                  style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
+                  onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">32-character</strong> key — not the Read Access Token.</div>
+              <span class="cred-status" id="tmdbKeyStatus" role="status" aria-live="polite"></span>
+            </div>
           </div>
-          <div style="position:relative;display:flex;align-items:center">
-            <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
-              value="${S.tmdbToken}" maxlength="400" style="padding-right:38px">
-            <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
-              style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
-              onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-          <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">long</strong> token starting with <code style="color:#8b949e;font-family:monospace">eyJ</code> — not the 32-character API Key.</div>
-          <span class="cred-status" id="tmdbStatus" role="status" aria-live="polite"></span>
-        </div>
-        <div class="name-row">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key</span>
-            <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
-          </div>
-          <div style="position:relative;display:flex;align-items:center">
-            <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
-              value="${S.tmdbApiKey}" maxlength="60" style="padding-right:38px">
-            <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
-              style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
-              onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-          <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">32-character</strong> key — not the Read Access Token.</div>
-          <span class="cred-status" id="tmdbKeyStatus" role="status" aria-live="polite"></span>
-        </div>
+        </details>
       </div>`;
     nav.style.display = 'flex';
     document.getElementById('btnBack').style.visibility = 'visible';
