@@ -94,6 +94,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-aio:active{transform:scale(.98)}
 .aio-section{margin-top:20px;border-top:1px solid #21262d;padding-top:18px}
 .aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.rv-section{margin-top:12px;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden}
+.rv-section-hdr{list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 16px;background:rgba(255,255,255,.02);font-size:.78rem;font-weight:700;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;user-select:none;transition:background .15s}
+.rv-section-hdr:hover{background:rgba(255,255,255,.04)}
+.rv-section-hdr .rv-ico{display:flex;align-items:center;gap:8px}
+.rv-section-hdr .rv-arr{font-size:.7rem;color:#374151;transition:transform .2s}
+.rv-section[open] .rv-arr{transform:rotate(90deg)}
+.rv-section-body{padding:14px 16px;border-top:1px solid rgba(255,255,255,.04)}
 .aio-fields{display:grid;gap:10px;margin-bottom:0}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#001a24,#000e18);border:1px solid rgba(0,212,255,.4);color:#00d4ff;padding:12px 22px;border-radius:10px;font-size:.9rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,180,220,.25)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -507,6 +514,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .what-next .step-num{background:rgba(9,105,218,.12)!important;border-color:rgba(9,105,218,.35)!important;color:#0969da!important}
 [data-theme="light"] .aio-section{border-color:#d0d7de}
 [data-theme="light"] .aio-section h3{color:#57606a}
+[data-theme="light"] .rv-section{border-color:#d0d7de}
+[data-theme="light"] .rv-section-hdr{background:rgba(0,0,0,.02);color:#57606a}
+[data-theme="light"] .rv-section-hdr:hover{background:rgba(0,0,0,.04)}
+[data-theme="light"] .rv-section-body{border-color:#eaedf0}
 [data-theme="light"] #themeToggle{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#57606a}
 [data-theme="light"] #themeToggle:hover{background:rgba(0,0,0,.09);color:#1c2128;border-color:rgba(0,0,0,.2)}
 [data-theme="light"] [data-action="set-formatter"]{background:#f6f8fa!important;border-color:#d0d7de!important}
@@ -655,11 +666,19 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.11';
+const CONFIGURATOR_VERSION = '2.12';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.12', date:'Jul 4 2026', items:[
+    'Review step restructured — collapsible accordion sections reduce visual density',
+    'Install in Stremio section open by default with condensed what-next guide',
+    'Customize section (insights, telemetry, formatter, JSON preview) collapsed by default',
+    'Share + Import buttons placed side-by-side instead of stacked',
+    'Size limit control moved up directly below template name for easier access',
+    'Light/dark theme support for collapsible sections',
+  ]},
   { v:'2.11', date:'Jul 4 2026', items:[
     'Splash redesign — cleaner layout: Easy Setup + presets top, free/P2P/community links tucked under "More options" collapsible',
     'Resume banner promoted above CTAs — returning users see it first',
@@ -1603,145 +1622,153 @@ function render() {
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
             value="${S.name}" data-action="update-name" maxlength="60">
         </div>
-        ${insightsHtml()}
         ${sizeLimitHtml()}
-        ${telemetryHtml()}
-        <details id="fmtPickerDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
-          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
-            <span style="display:flex;align-items:center;gap:8px"><span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span style="font-size:.7rem;color:#374151">›</span>
-          </summary>
-          <div style="padding:12px 14px">${formatterPickerHtml()}</div>
-        </details>
-        <details id="jsonPreviewDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
-          <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
-            <span>Preview JSON</span><span style="display:flex;align-items:center;gap:10px"><button type="button" data-action="copy-json" style="font-size:.74rem;font-weight:700;color:#00d4ff;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);border-radius:6px;padding:3px 11px;cursor:pointer;text-transform:none;letter-spacing:0">Copy JSON</button><span style="font-size:.7rem;color:#374151">›</span></span>
-          </summary>
-          <pre id="jsonPreview" style="margin:0;padding:12px 16px;background:#0d1117;overflow-x:auto;font-size:.68rem;color:#8b949e;font-family:monospace;line-height:1.5;max-height:260px;overflow-y:auto"></pre>
-        </details>
-        <div class="what-next" style="margin:14px 0 12px;padding:14px 16px;background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:12px">
-          <div style="font-size:.74rem;font-weight:800;color:#00d4ff;letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">Two steps to finish</div>
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:6px">
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <div class="step-num" style="width:22px;height:22px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.64rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">1</div>
-              <div class="wn-title" style="font-size:.82rem;font-weight:800;color:#e6edf3">Load into AIOStreams</div>
-              <div class="wn-body" style="font-size:.74rem;color:#8b949e;line-height:1.5">Click <strong style="color:#e6edf3">Import to AIOStreams</strong> below and tap your instance — or download the JSON and upload it manually. Then go to <strong style="color:#fbbf24">AIOStreams → Services</strong> and <strong style="color:#fbbf24">re-enter your debrid keys</strong>.</div>
-            </div>
-            <div style="color:#30363d;font-size:.9rem;padding-top:4px;text-align:center">›</div>
-            <div style="display:flex;flex-direction:column;gap:5px">
-              <div class="step-num" style="width:22px;height:22px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.64rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">2</div>
-              <div class="wn-title" style="font-size:.82rem;font-weight:800;color:#e6edf3">Install in Stremio</div>
-              <div class="wn-body" style="font-size:.74rem;color:#8b949e;line-height:1.5">Fill in your <strong style="color:#e6edf3">UUID + password</strong> in the <strong style="color:#e6edf3">Get Install Link</strong> section below → click the button → tap <strong style="color:#e6edf3">Install</strong> in the popup.</div>
-            </div>
-          </div>
-        </div>
         <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
-        <button data-action="share-config" style="width:100%;margin-top:8px;padding:12px;font-size:.88rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share This Config</button>
-        <button class="btn-aio" data-action="create-import" id="btnImport" style="margin-top:10px">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          Step 1 — Import to AIOStreams
-        </button>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button data-action="share-config" style="flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
+          <button class="btn-aio" data-action="create-import" id="btnImport" style="flex:1;margin-top:0;padding:11px;font-size:.82rem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Import to AIOStreams
+          </button>
+        </div>
         <div id="importUrlResult"></div>
-        <div class="aio-section">
-          <h3>Step 2 — Get Stremio Install Link</h3>
-          <div class="aio-fields" style="margin-top:12px">
-            <div class="name-row" style="margin-bottom:0">
-              <label>AIOStreams Host</label>
-              <select class="name-input" id="aioHost" data-action="update-host" style="cursor:pointer;color-scheme:dark">
-                <option value="auto"       ${S.instanceHost==='auto'?'selected':''}>Auto (tries all public hosts)</option>
-                <option value="elfhosted"  ${S.instanceHost==='elfhosted'||S.instanceHost===''?'selected':''}>ElfHosted — aiostreams.elfhosted.com</option>
-                <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthWeak — aiostreams.fortheweak.cloud</option>
-                <option value="midnight"   ${S.instanceHost==='midnight'?'selected':''}>Midnight's — midnightignite.me</option>
-                <option value="viren"      ${S.instanceHost==='viren'?'selected':''}>Viren's — aiostreams.viren070.me</option>
-                <option value="kuu"        ${S.instanceHost==='kuu'?'selected':''}>Kuu's — aiostreams.stremio.ru</option>
-                <option value="atbp"       ${S.instanceHost==='atbp'?'selected':''}>ATBP — aio.atbphosting.com</option>
-                <option value="omni"       ${S.instanceHost==='omni'?'selected':''}>Omni's — aiostreams.12312023.xyz</option>
-                <option value="custom"     ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted</option>
-              </select>
-            </div>
-            <div id="aioUrlRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='custom'?'':'display:none'}">
-              <label>Instance URL</label>
-              <input class="name-input" id="aioUrl" type="url" placeholder="https://your-aiostreams.example.com"
-                value="${S.instanceHost==='custom'?S.instanceUrl:''}" data-action="update-url" maxlength="200">
-            </div>
-            <div class="name-row" style="margin-bottom:0">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">Password</span>
-                <button type="button" data-action="gen-pwd" style="font-size:.82rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
-              </div>
-              <div style="position:relative">
-                <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
-                  value="${S.instancePassword}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
-                  style="padding-right:40px">
-                <button type="button" id="pwdEye" data-action="toggle-pwd"
-                  title="Show/hide password"
-                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
+        <details class="rv-section" open>
+          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Install in Stremio</span><span class="rv-arr">›</span></summary>
+          <div class="rv-section-body">
+            <div class="what-next" style="margin:0 0 14px;padding:12px 14px;background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:10px">
+              <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:6px">
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <div class="step-num" style="width:20px;height:20px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.6rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">1</div>
+                  <div style="font-size:.76rem;font-weight:800;color:#e6edf3">Load into AIOStreams</div>
+                  <div style="font-size:.7rem;color:#8b949e;line-height:1.45">Import above, then re-enter <strong style="color:#fbbf24">debrid keys</strong> in AIOStreams Services.</div>
+                </div>
+                <div style="color:#30363d;font-size:.8rem;padding-top:2px;text-align:center">›</div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <div class="step-num" style="width:20px;height:20px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.6rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">2</div>
+                  <div style="font-size:.76rem;font-weight:800;color:#e6edf3">Install in Stremio</div>
+                  <div style="font-size:.7rem;color:#8b949e;line-height:1.45">Enter <strong style="color:#e6edf3">UUID + password</strong> below, click <strong style="color:#e6edf3">Get Install Link</strong>.</div>
+                </div>
               </div>
             </div>
-            <div id="hostConfigLinkRow" style="margin-top:-4px;margin-bottom:2px;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
-              <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener" class="host-cfg-link">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                Open configure page
-              </a>
-            </div>
-            <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
-              <label>UUID</label>
-              <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
-                value="${S.instanceUuid}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
-              <div id="uuidStatus" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
-            </div>
-          </div>
-          <details id="baseConfigDetails" style="margin-top:12px;border:1px solid rgba(168,85,247,.18);border-radius:10px;padding:10px 13px;background:rgba(168,85,247,.04)">
-            <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;outline:none">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-              <span style="font-size:.74rem;font-weight:700;color:#a855f7;letter-spacing:.03em">Base Config</span>
-              <span style="font-size:.65rem;color:#6b7280;margin-left:2px">${S.baseUuid ? '· active' : '· optional'}</span>
-              <span style="margin-left:auto;font-size:.72rem;color:#6b7280">›</span>
-            </summary>
-            <div style="margin-top:10px">
-              <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:10px">
-                If you've imported <strong style="color:#a855f7">Core Builds Base — TorBox</strong>, enter its UUID here.
-                Your generated template will inherit all shared config from the parent — smaller JSON, instant propagation of base updates.
+            <div class="aio-fields" style="display:grid;gap:10px">
+              <div class="name-row" style="margin-bottom:0">
+                <label>AIOStreams Host</label>
+                <select class="name-input" id="aioHost" data-action="update-host" style="cursor:pointer;color-scheme:dark">
+                  <option value="auto"       ${S.instanceHost==='auto'?'selected':''}>Auto (tries all public hosts)</option>
+                  <option value="elfhosted"  ${S.instanceHost==='elfhosted'||S.instanceHost===''?'selected':''}>ElfHosted — aiostreams.elfhosted.com</option>
+                  <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthWeak — aiostreams.fortheweak.cloud</option>
+                  <option value="midnight"   ${S.instanceHost==='midnight'?'selected':''}>Midnight's — midnightignite.me</option>
+                  <option value="viren"      ${S.instanceHost==='viren'?'selected':''}>Viren's — aiostreams.viren070.me</option>
+                  <option value="kuu"        ${S.instanceHost==='kuu'?'selected':''}>Kuu's — aiostreams.stremio.ru</option>
+                  <option value="atbp"       ${S.instanceHost==='atbp'?'selected':''}>ATBP — aio.atbphosting.com</option>
+                  <option value="omni"       ${S.instanceHost==='omni'?'selected':''}>Omni's — aiostreams.12312023.xyz</option>
+                  <option value="custom"     ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted</option>
+                </select>
               </div>
-              <div class="name-row" style="margin-bottom:6px">
-                <label style="color:#a855f7">Base UUID</label>
-                <input class="name-input" id="baseUuidInput" type="text"
-                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                  value="${S.baseUuid}" data-action="update-base-uuid" maxlength="36"
-                  style="font-family:monospace;font-size:.85rem;border-color:${S.baseUuid ? 'rgba(168,85,247,.5)' : ''}">
+              <div id="aioUrlRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='custom'?'':'display:none'}">
+                <label>Instance URL</label>
+                <input class="name-input" id="aioUrl" type="url" placeholder="https://your-aiostreams.example.com"
+                  value="${S.instanceHost==='custom'?S.instanceUrl:''}" data-action="update-url" maxlength="200">
               </div>
               <div class="name-row" style="margin-bottom:0">
-                <label style="color:#a855f7">Base Password</label>
-                <input class="name-input" id="basePwdInput" type="password"
-                  placeholder="leave blank if none"
-                  value="${S.basePassword}" data-action="update-base-pwd" maxlength="200"
-                  autocomplete="new-password">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                  <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">Password</span>
+                  <button type="button" data-action="gen-pwd" style="font-size:.82rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
+                </div>
+                <div style="position:relative">
+                  <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
+                    value="${S.instancePassword}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
+                    style="padding-right:40px">
+                  <button type="button" id="pwdEye" data-action="toggle-pwd"
+                    title="Show/hide password"
+                    style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
               </div>
-              ${S.baseUuid ? `<div style="font-size:.7rem;color:#a855f7;margin-top:8px;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generated template will use parentConfig — formatter, sort, presets inherited from base.</div>` : ''}
+              <div id="hostConfigLinkRow" style="margin-top:-4px;margin-bottom:2px;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+                <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener" class="host-cfg-link">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Open configure page
+                </a>
+              </div>
+              <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+                <label>UUID</label>
+                <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
+                  value="${S.instanceUuid}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
+                <div id="uuidStatus" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
+              </div>
             </div>
-          </details>
-          <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Get Install Link
-          </button>
-          <div id="aioResult"></div>
-          <details id="pasteManifestDetails" style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px" ${pasteMode ? 'open' : ''}>
-            <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
-              <span>Already have a manifest URL?</span>
-              <span style="font-size:.75rem;color:#374151">›</span>
-            </summary>
-            <div style="margin-top:10px">
-              <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
-              <input class="name-input" id="pasteManifest" type="url"
-                placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
-                data-action="paste-manifest" style="font-size:.8rem;font-family:monospace">
-              <div id="pasteManifestResult"></div>
-            </div>
-          </details>
-        </div>
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);text-align:center">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+            <details id="baseConfigDetails" style="margin-top:12px;border:1px solid rgba(168,85,247,.18);border-radius:10px;padding:10px 13px;background:rgba(168,85,247,.04)">
+              <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;outline:none">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                <span style="font-size:.74rem;font-weight:700;color:#a855f7;letter-spacing:.03em">Base Config</span>
+                <span style="font-size:.65rem;color:#6b7280;margin-left:2px">${S.baseUuid ? '· active' : '· optional'}</span>
+                <span style="margin-left:auto;font-size:.72rem;color:#6b7280">›</span>
+              </summary>
+              <div style="margin-top:10px">
+                <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:10px">
+                  If you've imported <strong style="color:#a855f7">Core Builds Base — TorBox</strong>, enter its UUID here.
+                  Your generated template will inherit all shared config from the parent — smaller JSON, instant propagation of base updates.
+                </div>
+                <div class="name-row" style="margin-bottom:6px">
+                  <label style="color:#a855f7">Base UUID</label>
+                  <input class="name-input" id="baseUuidInput" type="text"
+                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    value="${S.baseUuid}" data-action="update-base-uuid" maxlength="36"
+                    style="font-family:monospace;font-size:.85rem;border-color:${S.baseUuid ? 'rgba(168,85,247,.5)' : ''}">
+                </div>
+                <div class="name-row" style="margin-bottom:0">
+                  <label style="color:#a855f7">Base Password</label>
+                  <input class="name-input" id="basePwdInput" type="password"
+                    placeholder="leave blank if none"
+                    value="${S.basePassword}" data-action="update-base-pwd" maxlength="200"
+                    autocomplete="new-password">
+                </div>
+                ${S.baseUuid ? `<div style="font-size:.7rem;color:#a855f7;margin-top:8px;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generated template will use parentConfig — formatter, sort, presets inherited from base.</div>` : ''}
+              </div>
+            </details>
+            <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Get Install Link
+            </button>
+            <div id="aioResult"></div>
+            <details id="pasteManifestDetails" style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px" ${pasteMode ? 'open' : ''}>
+              <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
+                <span>Already have a manifest URL?</span>
+                <span style="font-size:.75rem;color:#374151">›</span>
+              </summary>
+              <div style="margin-top:10px">
+                <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
+                <input class="name-input" id="pasteManifest" type="url"
+                  placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
+                  data-action="paste-manifest" style="font-size:.8rem;font-family:monospace">
+                <div id="pasteManifestResult"></div>
+              </div>
+            </details>
+          </div>
+        </details>
+        <details class="rv-section">
+          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Customize</span><span class="rv-arr">›</span></summary>
+          <div class="rv-section-body">
+            ${insightsHtml()}
+            ${telemetryHtml()}
+            <details id="fmtPickerDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
+              <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
+                <span style="display:flex;align-items:center;gap:8px"><span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span style="font-size:.7rem;color:#374151">›</span>
+              </summary>
+              <div style="padding:12px 14px">${formatterPickerHtml()}</div>
+            </details>
+            <details id="jsonPreviewDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
+              <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
+                <span>Preview JSON</span><span style="display:flex;align-items:center;gap:10px"><button type="button" data-action="copy-json" style="font-size:.74rem;font-weight:700;color:#00d4ff;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);border-radius:6px;padding:3px 11px;cursor:pointer;text-transform:none;letter-spacing:0">Copy JSON</button><span style="font-size:.7rem;color:#374151">›</span></span>
+              </summary>
+              <pre id="jsonPreview" style="margin:0;padding:12px 16px;background:#0d1117;overflow-x:auto;font-size:.68rem;color:#8b949e;font-family:monospace;line-height:1.5;max-height:260px;overflow-y:auto"></pre>
+            </details>
+          </div>
+        </details>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);text-align:center">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase">More from Core Builds</div>
             <button data-action="start-setup" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
           </div>
