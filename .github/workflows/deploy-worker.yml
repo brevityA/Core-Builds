@@ -14,6 +14,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Debug secret visibility (temporary — prints SET/EMPTY only, never the value)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "CLOUDFLARE_API_TOKEN: EMPTY"; else echo "CLOUDFLARE_API_TOKEN: SET (len=${#CLOUDFLARE_API_TOKEN})"; fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then echo "CLOUDFLARE_ACCOUNT_ID: EMPTY"; else echo "CLOUDFLARE_ACCOUNT_ID: SET (len=${#CLOUDFLARE_ACCOUNT_ID})"; fi
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
