@@ -666,11 +666,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.14';
+const CONFIGURATOR_VERSION = '2.15';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.15', date:'Jul 5 2026', items:[
+    'Create & Install now races direct API calls against a Cloudflare Worker CORS proxy — most public AIOStreams hosts block cross-origin POST/PATCH, so the proxy (server-to-server, no CORS) usually wins where a direct call previously fell back to the manual paste-back flow',
+    'No behavior change if a host ever adds CORS headers itself — the direct attempt still wins the race',
+  ]},
   { v:'2.14', date:'Jul 4 2026', items:[
     'StreamNZB added to Other Services — self-hosted Usenet indexer + streamer',
     'StreamNZB manifest URL input on API step, stripped from import URLs for security',
@@ -863,6 +867,9 @@ let hadSavedState = false;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
+// Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
+// Set to '' to disable and fall back to direct-only fetches.
+const CORS_PROXY = 'https://core-builds-cors-proxy.brevitya.workers.dev';
 const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', telemetryOk: false, simpleMode: false };
 
 const FORMATTERS = [
@@ -3070,7 +3077,7 @@ async function simpleInstall() {
   try {
     const winner = await Promise.any(
       hosts.map(([, host]) =>
-        fetchWithTimeout(`${host}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
+        raceHostFetch(host, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
           .then(async res => {
             const data = await res.json().catch(() => ({}));
             if (res.ok && data?.success !== false) return { host, uuid: data?.uuid || data?.user?.uuid || data?.id };
@@ -3294,6 +3301,16 @@ async function fetchWithTimeout(url, options = {}, timeout = 6000) {
   finally { clearTimeout(id); }
 }
 
+// Races a direct browser fetch against the Cloudflare Worker CORS proxy for the same
+// AIOStreams host/path — most public instances don't send CORS headers, so the direct
+// attempt fails fast and the proxied one (server-to-server, no CORS) wins. Whichever
+// resolves first is used; if CORS_PROXY is unset only the direct attempt runs.
+function raceHostFetch(host, path, options, timeout) {
+  const attempts = [fetchWithTimeout(`${host}${path}`, options, timeout)];
+  if (CORS_PROXY) attempts.push(fetchWithTimeout(`${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`, options, timeout));
+  return Promise.any(attempts);
+}
+
 async function uploadTemplateForImport() {
   const tmpl = build();
   if (tmpl.config) {
@@ -3382,7 +3399,7 @@ async function openInAIOStreams() {
     const existingUuid = validateUuid(uuid) ? uuid : null;
     const attempt = (id) => Promise.any(
       Object.values(HOST_URLS).map(host =>
-        fetchWithTimeout(id ? `${host}/api/v1/user/${id}` : `${host}/api/v1/user`, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
+        raceHostFetch(host, id ? `/api/v1/user/${id}` : '/api/v1/user', { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
           .then(async res => {
             const data = await res.json().catch(()=>({}));
             if (res.ok && data?.success !== false) return { host, uuid: id || data?.uuid || data?.user?.uuid || data?.id };
