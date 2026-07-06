@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 // Build script: obfuscates configurator/index.src.html → configurator/index.html
+// Targets only the main application <script> block (the largest one).
+// Leaves the theme initializer and third-party QR library untouched.
 // Run: node configurator/build.js
 
 const fs   = require('fs');
@@ -9,13 +11,19 @@ const JavaScriptObfuscator = require('javascript-obfuscator');
 const srcPath = path.join(__dirname, 'index.src.html');
 const outPath = path.join(__dirname, 'index.html');
 
-const html  = fs.readFileSync(srcPath, 'utf8');
-const match = html.match(/<script>([\s\S]*?)<\/script>/);
-if (!match) { console.error('No <script> block found'); process.exit(1); }
+const html = fs.readFileSync(srcPath, 'utf8');
 
-const rawScript = match[1];
+const scriptBlocks = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+if (!scriptBlocks.length) { console.error('No <script> blocks found'); process.exit(1); }
 
-const result = JavaScriptObfuscator.obfuscate(rawScript, {
+let largest = scriptBlocks[0];
+for (const m of scriptBlocks) {
+  if (m[1].length > largest[1].length) largest = m;
+}
+
+console.log(`Found ${scriptBlocks.length} <script> blocks, obfuscating the largest (${largest[1].length} chars)...`);
+
+const result = JavaScriptObfuscator.obfuscate(largest[1], {
   compact:                    true,
   controlFlowFlattening:      false,
   deadCodeInjection:          false,
@@ -39,9 +47,12 @@ const result = JavaScriptObfuscator.obfuscate(rawScript, {
 });
 
 const obfuscated = html.replace(
-  /<script>([\s\S]*?)<\/script>/,
+  largest[0],
   `<script>${result.getObfuscatedCode()}</script>`
 );
 
 fs.writeFileSync(outPath, obfuscated, 'utf8');
-console.log(`Built: ${outPath} (${Math.round(fs.statSync(outPath).size / 1024)} KB)`);
+
+const srcKB = Math.round(fs.statSync(srcPath).size / 1024);
+const outKB = Math.round(fs.statSync(outPath).size / 1024);
+console.log(`Built: ${outPath} (${srcKB} KB → ${outKB} KB)`);
