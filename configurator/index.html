@@ -666,11 +666,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.16';
+const CONFIGURATOR_VERSION = '2.17';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.17', date:'Jul 6 2026', items:[
+    'Manifest modal: WuPlay and Nuvio tabs now show dedicated step-by-step setup instructions',
+    'Manifest modal: QR code hidden on WuPlay/Nuvio tabs (not applicable — paste-based install)',
+    'Manifest modal: URL label updates contextually per tab (e.g. "copy then paste in WuPlay")',
+  ]},
   { v:'2.16', date:'Jul 6 2026', items:[
     'Security: Auto host detection no longer broadcasts credentials to all hosts — probes with a lightweight GET first, then sends config only to the fastest responding host',
     'Security: All external target="_blank" links now include rel="noopener noreferrer" to prevent tabnabbing',
@@ -2802,10 +2807,14 @@ function showManifestModal(manifestUrl, password, hostLabel) {
         </div>
         <button class="copy-btn" id="mCopyPwd">Copy</button>
       </div>` : ''}
-      <div class="qr-wrap">
+      <div id="mAppHelp" style="display:none;margin:8px 0 4px;padding:10px 13px;border-radius:8px;border:1px solid rgba(79,70,229,.2);background:rgba(79,70,229,.04)">
+        <div style="font-size:.78rem;font-weight:700;color:#a78bfa;margin-bottom:6px" id="mAppHelpTitle"></div>
+        <div style="font-size:.76rem;color:#8b949e;line-height:1.55" id="mAppHelpBody"></div>
+      </div>
+      <div class="qr-wrap" id="mQrWrap">
         <img id="mQr" src="${qrSrc(FMTS[0].getUrl(manifestUrl))}" width="140" height="140" alt="QR code" loading="lazy" onerror="this.parentElement.style.display='none'">
       </div>
-      <div style="text-align:center;color:#4b5563;font-size:.7rem;margin-bottom:2px">Scan to install on another device</div>
+      <div id="mQrHint" style="text-align:center;color:#4b5563;font-size:.7rem;margin-bottom:2px">Scan to install on another device</div>
       <div class="modal-actions">
         <a href="${esc(FMTS[0].getUrl(manifestUrl))}" id="mActionBtn" class="m-btn m-install">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install
@@ -2874,6 +2883,26 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       fi === 3 ? 'Manifest URL — copy then paste in Nuvio' : 'Manifest URL';
     document.getElementById('mCopyUrl').textContent = 'Copy';
     document.getElementById('mCopyUrl').classList.remove('copied');
+    const helpEl = document.getElementById('mAppHelp');
+    const qrWrap = document.getElementById('mQrWrap');
+    const qrHint = document.getElementById('mQrHint');
+    if (fi === 2) {
+      helpEl.style.display = '';
+      document.getElementById('mAppHelpTitle').textContent = 'WuPlay Setup';
+      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Tap <strong style="color:#a78bfa">Copy</strong> above to copy the manifest URL<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open WuPlay</strong> below (or go to WuPlay → Addons)<br><strong style="color:#e6edf3">3.</strong> Tap <strong style="color:#a78bfa">Add Addon</strong> and paste the URL';
+      if (qrWrap) qrWrap.style.display = 'none';
+      if (qrHint) qrHint.style.display = 'none';
+    } else if (fi === 3) {
+      helpEl.style.display = '';
+      document.getElementById('mAppHelpTitle').textContent = 'Nuvio Setup';
+      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Tap <strong style="color:#a78bfa">Copy</strong> above to copy the manifest URL<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong style="color:#e6edf3">3.</strong> Paste the URL in the addon field';
+      if (qrWrap) qrWrap.style.display = 'none';
+      if (qrHint) qrHint.style.display = 'none';
+    } else {
+      helpEl.style.display = 'none';
+      if (qrWrap) qrWrap.style.display = '';
+      if (qrHint) qrHint.style.display = '';
+    }
   }
 
   document.getElementById('mFmtTabs').addEventListener('click', e => {
