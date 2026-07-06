@@ -102,8 +102,8 @@ class TestBuildTable:
     def test_table_strips_https_prefix_for_display(self):
         with patch("status_check.check", return_value="🟢 Online"):
             table = status_check.build_table(self.INSTANCES)
-        # The display URL omits "https://"
-        assert "example.com" in table
+        # The display URL omits "https://" while preserving full URL as href
+        assert "[example.com](https://example.com/stremio/configure)" in table
 
     def test_table_strips_stremio_configure_suffix(self):
         with patch("status_check.check", return_value="🟢 Online"):
