@@ -666,11 +666,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.15';
+const CONFIGURATOR_VERSION = '2.16';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.16', date:'Jul 6 2026', items:[
+    'Security: Auto host detection no longer broadcasts credentials to all hosts — probes with a lightweight GET first, then sends config only to the fastest responding host',
+    'Security: All external target="_blank" links now include rel="noopener noreferrer" to prevent tabnabbing',
+    'Security: Template name field sanitized on input (strips HTML-unsafe characters) — same stripping already applied on shared-link import',
+  ]},
   { v:'2.15', date:'Jul 5 2026', items:[
     'Create & Install now races direct API calls against a Cloudflare Worker CORS proxy — most public AIOStreams hosts block cross-origin POST/PATCH, so the proxy (server-to-server, no CORS) usually wins where a direct call previously fell back to the manual paste-back flow',
     'No behavior change if a host ever adds CORS headers itself — the direct attempt still wins the race',
@@ -1886,7 +1891,7 @@ function render() {
             <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
             <span style="display:flex;align-items:center">
               <button type="button" class="test-key-btn" data-action="test-cred" data-service="${inp.id}">Test</button>
-              ${inp.url ? `<a href="${inp.url}" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+              ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
             </span>
           </div>
           <div style="position:relative;display:flex;align-items:center">
@@ -1916,7 +1921,7 @@ function render() {
             <div class="name-row" style="margin-bottom:14px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
                 <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token</span>
-                <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+                <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div style="position:relative;display:flex;align-items:center">
                 <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
@@ -1933,7 +1938,7 @@ function render() {
             <div class="name-row">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
                 <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key</span>
-                <a href="https://www.themoviedb.org/settings/api" target="_blank" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+                <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div style="position:relative;display:flex;align-items:center">
                 <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
@@ -2346,7 +2351,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('input', (e) => {
     const a = e.target.dataset.action;
-    if (a === 'update-name') S.name = e.target.value;
+    if (a === 'update-name') S.name = e.target.value.replace(/[<>"'&`]/g, '');
     else if (a === 'update-cred') {
       S.creds[e.target.dataset.service] = e.target.value;
       const st = document.getElementById('credStatus_' + e.target.dataset.service);
@@ -2971,7 +2976,7 @@ function showApiReminder(onContinue) {
         <div>
           <div class="rem-field-lbl">
             <span class="rem-field-name">${inp.label}</span>
-            <a href="${inp.url}" target="_blank" class="rem-field-link">Get key →</a>
+            <a href="${inp.url}" target="_blank" rel="noopener noreferrer" class="rem-field-link">Get key →</a>
           </div>
           <div style="position:relative;display:flex;align-items:center">
             <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
@@ -3074,25 +3079,27 @@ async function simpleInstall() {
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
-  // Option A: try direct API creation across all hosts
+  // Option A: probe hosts first (lightweight GET), then POST credentials only to the winner
   let directSuccess = false;
   try {
-    const winner = await Promise.any(
+    const fastest = await Promise.any(
       hosts.map(([, host]) =>
-        raceHostFetch(host, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
-          .then(async res => {
-            const data = await res.json().catch(() => ({}));
-            if (res.ok && data?.success !== false) return { host, uuid: data?.uuid || data?.user?.uuid || data?.id };
-            throw new Error('rejected');
-          })
+        raceHostFetch(host, '/api/v1/status', { method:'GET' }, 4000)
+          .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
       )
     );
-    if (winner.uuid) { S.instanceUuid = winner.uuid; S.instancePassword = pwd; saveState(); }
-    btn.disabled = false; btn.innerHTML = origHtml;
-    saveLastGen();
-    directSuccess = true;
-    showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabels[winner.host] || winner.host.replace('https://','').split('/')[0]);
-    return;
+    const res = await raceHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data?.success !== false) {
+      const uuid = data?.uuid || data?.user?.uuid || data?.id;
+      if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); }
+      btn.disabled = false; btn.innerHTML = origHtml;
+      saveLastGen();
+      directSuccess = true;
+      showManifestModal(`${fastest}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabels[fastest] || fastest.replace('https://','').split('/')[0]);
+      return;
+    }
+    throw new Error('rejected');
   } catch(e) { /* CORS blocked all hosts — fall through to Option C */ }
 
   // Option C fallback: upload template and open AIOStreams via deep link
@@ -3246,7 +3253,7 @@ function wuplayBtn(manifestUrl) {
 function instanceChips(templateUrl) {
   const _all = [['ElfHosted','https://aiostreams.elfhosted.com/stremio/configure'],['ForthWeak','https://aiostreams.fortheweak.cloud/stremio/configure'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure'],["Viren's",'https://aiostreams.viren070.me/stremio/configure'],["Kuu's",'https://aiostreams.stremio.ru/stremio/configure'],['ATBP','https://aio.atbphosting.com/stremio/configure'],["Omni's",'https://aiostreams.12312023.xyz/stremio/configure']];
   const hosts = (S.service === 'p2p' || S.service === 'http') ? _all.filter(([n]) => n !== 'ElfHosted') : _all;
-  return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}${templateUrl?`?template=${encodeURIComponent(templateUrl)}`:''}" target="_blank" class="inst-chip ${templateUrl?'inst-chip-import':''}">${templateUrl?'▶ ':''}${n}</a>`).join('')}</div>`;
+  return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}${templateUrl?`?template=${encodeURIComponent(templateUrl)}`:''}" target="_blank" rel="noopener noreferrer" class="inst-chip ${templateUrl?'inst-chip-import':''}">${templateUrl?'▶ ':''}${n}</a>`).join('')}</div>`;
 }
 
 const CRED_TESTS = {
@@ -3393,27 +3400,31 @@ async function openInAIOStreams() {
   const setBtnLoading = () => { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Connecting…`; };
   const resetBtn = orig => { btn.disabled = false; btn.innerHTML = orig; };
 
-  /* Auto mode — parallel host detection via Promise.any() */
+  /* Auto mode — probe hosts first, then send credentials only to the winner */
   if (isAuto && pwd) {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     const cfg = build().config;
     const existingUuid = validateUuid(uuid) ? uuid : null;
-    const attempt = (id) => Promise.any(
-      Object.values(HOST_URLS).map(host =>
-        raceHostFetch(host, id ? `/api/v1/user/${id}` : '/api/v1/user', { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000)
-          .then(async res => {
-            const data = await res.json().catch(()=>({}));
-            if (res.ok && data?.success !== false) return { host, uuid: id || data?.uuid || data?.user?.uuid || data?.id };
-            throw new Error('rejected');
-          })
+    const allHosts = Object.values(HOST_URLS);
+    const fastest = await Promise.any(
+      allHosts.map(host =>
+        raceHostFetch(host, '/api/v1/status', { method:'GET' }, 4000)
+          .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
       )
-    );
+    ).catch(() => null);
+    if (!fastest) { resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
+    const attempt = async (id) => {
+      const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
+      const res = await raceHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
+      const data = await res.json().catch(()=>({}));
+      if (res.ok && data?.success !== false) return { host: fastest, uuid: id || data?.uuid || data?.user?.uuid || data?.id };
+      throw new Error('rejected');
+    };
     try {
       let winner;
       try { winner = await attempt(existingUuid); }
       catch(err) {
-        // Saved UUID not accepted anywhere (deleted or different password) — create fresh
         if (existingUuid) winner = await attempt(null);
         else throw err;
       }
