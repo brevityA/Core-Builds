@@ -13,7 +13,7 @@ const outPath = path.join(__dirname, 'index.html');
 
 const html = fs.readFileSync(srcPath, 'utf8');
 
-const scriptBlocks = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+const scriptBlocks = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\b[^>]*>/gi)];
 if (!scriptBlocks.length) { console.error('No <script> blocks found'); process.exit(1); }
 
 let largest = scriptBlocks[0];
