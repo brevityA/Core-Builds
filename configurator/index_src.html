@@ -3253,11 +3253,12 @@ async function simpleInstall(target) {
     const res = await raceHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (res.ok && data?.success !== false) {
-      const uuid = data?.uuid || data?.user?.uuid || data?.id;
+      const uuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
+      const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
       if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); }
       btn.disabled = false; btn.innerHTML = origHtml;
       saveLastGen();
-      showManifestModal(`${fastest}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabels[fastest] || fastest.replace('https://','').split('/')[0], target);
+      showManifestModal(`${fastest}/stremio/${uuid}/${epwd}/manifest.json`, pwd, hostLabels[fastest] || fastest.replace('https://','').split('/')[0], target);
       return;
     }
     throw new Error('rejected');
@@ -3503,7 +3504,7 @@ async function openInAIOStreams() {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
       const res = await raceHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
       const data = await res.json().catch(()=>({}));
-      if (res.ok && data?.success !== false) return { host: fastest, uuid: id || data?.uuid || data?.user?.uuid || data?.id };
+      if (res.ok && data?.success !== false) return { host: fastest, uuid: id || data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id, epwd: data?.data?.encryptedPassword };
       throw new Error('rejected');
     };
     try {
@@ -3514,8 +3515,9 @@ async function openInAIOStreams() {
         else throw err;
       }
       if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); }
+      const manifestPwd = winner.epwd || encodeURIComponent(pwd);
       resetBtn(origHtml);
-      showManifestModal(`${winner.host}/stremio/${winner.uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
+      showManifestModal(`${winner.host}/stremio/${winner.uuid}/${manifestPwd}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
     } catch(e) {
       if (S.simpleMode) {
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
@@ -3567,10 +3569,11 @@ async function openInAIOStreams() {
       const res = await fetchWithTimeout(`${base}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: build().config, password: pwd }) });
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
-        const outUuid = data?.uuid || data?.user?.uuid || data?.id;
+        const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
+        const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         resetBtn(origHtml);
-        showManifestModal(`${base}/stremio/${outUuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabel);
+        showManifestModal(`${base}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');
     } catch(e) {
       resetBtn(origHtml);
