@@ -307,6 +307,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 #apiReminderCard .rem-save:hover{box-shadow:0 4px 24px rgba(0,212,255,.4);transform:translateY(-1px)}
 #apiReminderCard .rem-skip{background:transparent;border:none;color:#4b5563;font-size:.8rem;cursor:pointer;padding:6px;text-align:center;width:100%;transition:color .15s}
 #apiReminderCard .rem-skip:hover{color:#9ca3af}
+#pwdPrompt{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:overlayIn .22s ease both;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#pwdPrompt.hidden{display:none}
+#pwdPromptCard{background:linear-gradient(160deg,#0a1520 0%,#060d14 100%);border:1px solid rgba(0,212,255,.35);border-radius:18px;width:100%;max-width:380px;padding:28px 24px 22px;box-shadow:0 0 0 1px rgba(0,212,255,.12),0 24px 80px rgba(0,0,0,.7),0 0 60px rgba(0,212,255,.06);animation:reminderIn .3s cubic-bezier(.34,1.12,.64,1) both}
+#pwdPromptCard .pwd-title{font-size:1.05rem;font-weight:900;color:#e6edf3;text-align:center;margin-bottom:4px}
+#pwdPromptCard .pwd-sub{font-size:.8rem;color:#6b7280;text-align:center;margin-bottom:18px;line-height:1.5}
+#pwdPromptCard .pwd-option{background:#0d1117;border:1.5px solid #30363d;border-radius:11px;padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:10px}
+#pwdPromptCard .pwd-option:hover{border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.04)}
+#pwdPromptCard .pwd-option.active{border-color:rgba(0,212,255,.6);background:rgba(0,212,255,.06)}
+#pwdPromptCard .pwd-option-label{font-size:.88rem;font-weight:700;color:#e6edf3;margin-bottom:2px}
+#pwdPromptCard .pwd-option-hint{font-size:.75rem;color:#6b7280}
+#pwdPromptCard .pwd-auto-val{font-family:monospace;font-size:.85rem;color:#00d4ff;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:7px;padding:8px 12px;margin-top:8px;word-break:break-all;user-select:all}
+#pwdPromptCard .pwd-manual-input{width:100%;background:#0d1117;border:1.5px solid #30363d;border-radius:9px;color:#e6edf3;padding:10px 14px;font-size:.88rem;outline:none;transition:border-color .15s;margin-top:8px;font-family:monospace}
+#pwdPromptCard .pwd-manual-input:focus{border-color:rgba(0,212,255,.55);box-shadow:0 0 0 3px rgba(0,212,255,.08)}
+#pwdPromptCard .pwd-go{width:100%;padding:13px;font-size:.95rem;font-weight:800;border:none;border-radius:11px;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#000;cursor:pointer;transition:all .15s;margin-top:14px}
+#pwdPromptCard .pwd-go:hover{box-shadow:0 4px 24px rgba(0,212,255,.4);transform:translateY(-1px)}
+#pwdPromptCard .pwd-go:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+#pwdPromptCard .pwd-cancel{background:transparent;border:none;color:#4b5563;font-size:.8rem;cursor:pointer;padding:6px;text-align:center;width:100%;transition:color .15s;margin-top:4px}
+#pwdPromptCard .pwd-cancel:hover{color:#9ca3af}
 /* Connecting dots animation */
 @keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 .dot-spin span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:currentColor;animation:dotPulse 1.2s ease-in-out infinite}
@@ -3230,13 +3248,59 @@ function simpleFinishHtml() {
     </div>`;
 }
 
+function promptPassword() {
+  return new Promise((resolve) => {
+    const autoPwd = makePwd();
+    const overlay = document.createElement('div');
+    overlay.id = 'pwdPrompt';
+    overlay.innerHTML = `<div id="pwdPromptCard">
+      <div class="pwd-title">🔑 Set a Password</div>
+      <div class="pwd-sub">This password protects your AIOStreams config. You'll need it to edit your settings later.</div>
+      <div class="pwd-option active" data-mode="auto">
+        <div class="pwd-option-label">Auto-generate</div>
+        <div class="pwd-option-hint">Strong random password — save it somewhere safe</div>
+        <div class="pwd-auto-val">${autoPwd}</div>
+      </div>
+      <div class="pwd-option" data-mode="manual">
+        <div class="pwd-option-label">Enter my own</div>
+        <div class="pwd-option-hint">Use a password you'll remember</div>
+        <input class="pwd-manual-input" type="text" placeholder="Type your password…" autocomplete="off" spellcheck="false" style="display:none">
+      </div>
+      <button class="pwd-go">Continue →</button>
+      <button class="pwd-cancel">Cancel</button>
+    </div>`;
+    document.body.appendChild(overlay);
+    let mode = 'auto';
+    const opts = overlay.querySelectorAll('.pwd-option');
+    const manualInput = overlay.querySelector('.pwd-manual-input');
+    const goBtn = overlay.querySelector('.pwd-go');
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        mode = opt.dataset.mode;
+        opts.forEach(o => o.classList.toggle('active', o === opt));
+        manualInput.style.display = mode === 'manual' ? '' : 'none';
+        if (mode === 'manual') { manualInput.focus(); goBtn.disabled = !manualInput.value.trim(); }
+        else goBtn.disabled = false;
+      });
+    });
+    manualInput.addEventListener('input', () => { goBtn.disabled = !manualInput.value.trim(); });
+    manualInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && manualInput.value.trim()) done(); });
+    const done = () => { overlay.remove(); resolve(mode === 'auto' ? autoPwd : manualInput.value.trim()); };
+    const cancel = () => { overlay.remove(); resolve(null); };
+    goBtn.addEventListener('click', done);
+    overlay.querySelector('.pwd-cancel').addEventListener('click', cancel);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) cancel(); });
+  });
+}
+
 async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
   const btn = document.getElementById('btnAio'), result = document.getElementById('aioResult');
+  const pwd = await promptPassword();
+  if (!pwd) return;
   const origHtml = btn.innerHTML;
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
-  const pwd = makePwd();
   const cfg = build().config;
   const _allHosts = [['ElfHosted','https://aiostreams.elfhosted.com'],['ForthWeak','https://aiostreams.fortheweak.cloud'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me'],["Viren's",'https://aiostreams.viren070.me'],["Kuu's",'https://aiostreams.stremio.ru'],['ATBP','https://aio.atbphosting.com'],["Omni's",'https://aiostreams.12312023.xyz']];
   const hosts = (S.service === 'p2p' || S.service === 'http') ? _allHosts.filter(([n]) => n !== 'ElfHosted') : _allHosts;
