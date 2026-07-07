@@ -55,7 +55,12 @@ export default {
     }
 
     const upstreamPath = url.pathname.slice('/proxy'.length);
-    const upstreamUrl = host + upstreamPath;
+    const upstreamSearch = url.searchParams.toString();
+    const upstreamUrl = new URL(host + upstreamPath);
+    if (upstreamSearch) {
+      const cleanedSearch = upstreamSearch.replace(/(^|&)host=[^&]*/, '').replace(/^&+|&+$/g, '');
+      if (cleanedSearch) upstreamUrl.search = cleanedSearch;
+    }
 
     const upstreamReq = new Request(upstreamUrl, {
       method: request.method,
