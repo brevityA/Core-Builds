@@ -2106,7 +2106,8 @@ document.addEventListener('DOMContentLoaded', () => {
       flashBtn.classList.add('btn-flash');
       flashBtn.addEventListener('animationend', () => flashBtn.classList.remove('btn-flash'), {once:true});
     }
-    const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
+    const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
+    const action = el?.dataset.action;
     if(!action) return;
 
     if (action === 'nav-next') {
