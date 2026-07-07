@@ -672,10 +672,11 @@ const CONFIGURATOR_VERSION = '2.19';
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
   { v:'2.19', date:'Jul 7 2026', items:[
-    'Manifest modal: auto-copies manifest URL to clipboard on open and tab switch — no manual Copy tap needed',
+    'API keys are now inline on the final step — no separate menu or popup reminder',
+    'One-click install: config is created and saved on AIOStreams behind the scenes with keys baked in — no manual steps',
+    'Manifest modal: auto-copies URL to clipboard on open and tab switch',
     'WuPlay / Nuvio: auto-copies manifest URL before opening the app, with toast confirmation',
-    'CORS fallback: auto-copies password to clipboard before opening AIOStreams tab',
-    'Return from AIOStreams: auto-reads clipboard to pre-fill the manifest paste field',
+    'Removed the paste-back fallback flow — everything happens via direct API',
   ]},
   { v:'2.18', date:'Jul 6 2026', items:[
     'Formatter: import your own custom formatter JSON — paste or load a file with {name, description} fields',
@@ -2038,7 +2039,7 @@ function syncNext() {
   let ok = !def.key || !!S[def.key];
   if (step === 1) ok = S.multiServices.length > 0;
   btn.disabled = !ok;
-  const nextDef = step < STEPS ? DEFS[((S.quickStart && step === 2) || (S.simpleMode && step === 3)) ? 4 : step] : null;
+  const nextDef = step < STEPS ? DEFS[((S.quickStart && step === 2) || (S.simpleMode && step === 3)) ? STEPS - 1 : step] : null;
   const nextLabel = nextDef ? nextDef.title : null;
   if (step === STEPS) {
     btn.innerHTML = `<span style="flex:1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
@@ -2112,8 +2113,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (step === 1 && S.multiServices.length === 0) return;
       if (DEFS[step-1].key && !S[DEFS[step-1].key] && step !== 1) return;
       if (step < STEPS) {
-        // On API step: show reminder if debrid inputs exist but none are filled
-        if (step === 5) {
+        // On API step: show reminder if debrid inputs exist but none are filled (custom mode only)
+        if (step === 5 && !S.simpleMode) {
           const needed = getDebridInputs();
           const anyFilled = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
           if (needed.length > 0 && !anyFilled) {
@@ -2125,7 +2126,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         document.getElementById('main').classList.remove('nav-back');
-        step = (S.quickStart && step === 2) ? 5 : ((S.simpleMode && step === 3) ? 5 : step + 1);
+        step = (S.quickStart && step === 2) ? STEPS : ((S.simpleMode && step === 3) ? STEPS : step + 1);
         if (S.simpleMode && !S.content) S.content = 'all';
         pushStep(); saveState(); render(); window.scrollTo(0,0);
       }
@@ -2133,7 +2134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'nav-back') {
       if (step > 0) {
         document.getElementById('main').classList.add('nav-back');
-        step = (step === 5 && S.quickStart) ? 2 : ((S.simpleMode && step === 5) ? 3 : step - 1);
+        step = (S.quickStart && step === STEPS) ? 2 : ((S.simpleMode && step === STEPS) ? 3 : step - 1);
         pushStep(); saveState(); render(); window.scrollTo(0,0);
       }
     }
@@ -3172,25 +3173,43 @@ function makePwd() {
 
 function simpleFinishHtml() {
   const needed = getDebridInputs();
-  const missingKeys = needed.length > 0 && !needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
+  const anyFilled = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
   const bits = [['🔌', label('service', S.service)], ['📺', label('device', S.device)], ['🖥️', label('resolution', S.resolution)], ['🔊', label('audio', S.audio)]].filter(b => b[1]);
   return `
     <div class="card">
       <div style="text-align:center;padding:6px 0 2px">
         <div style="font-size:2rem;line-height:1">🎉</div>
         <div style="font-size:1.25rem;font-weight:900;color:#e6edf3;margin-top:8px" class="wn-title">Almost done — one click left</div>
-        <div style="font-size:.86rem;color:#8b949e;margin-top:6px;line-height:1.5">We'll generate a password, open AIOStreams with your template, and give you the Stremio install button.</div>
+        <div style="font-size:.86rem;color:#8b949e;margin-top:6px;line-height:1.5">Enter your API key below, then tap create. Everything is handled behind the scenes — no extra steps.</div>
       </div>
       <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:16px 0">
         ${bits.map(([i2, t]) => `<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.16);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:#9ca3af">${i2} ${t}</span>`).join('')}
       </div>
-      ${missingKeys ? `<div style="text-align:center;font-size:.79rem;color:#fbbf24;margin-bottom:12px">⚠ No API key entered — streams will not load until you add one. <button data-action="jump-step" data-step="5" style="background:none;border:none;color:#00d4ff;font-weight:700;cursor:pointer;font-size:.79rem;text-decoration:underline;padding:0">Add it now</button></div>` : ''}
+      ${needed.length ? `<div style="margin-bottom:14px">
+        ${needed.map(inp => `
+        <div class="name-row" style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">${inp.label}</span>
+            ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+          </div>
+          <div style="position:relative;display:flex;align-items:center">
+            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
+              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:38px">
+            <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
+              style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
+              onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>`).join('')}
+        ${!anyFilled ? `<div style="font-size:.74rem;color:#fbbf24;margin-top:4px">⚠ Streams won't load without an API key</div>` : ''}
+      </div>` : ''}
       <div class="name-row">
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
       </div>
       <button class="btn-manifest" id="btnAio" data-action="simple-install">🚀 Create &amp; Install in Stremio</button>
-      <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">We'll generate a password and open AIOStreams with your template. Paste the password, save, then paste the manifest URL back here for one-click install. Keys are stripped — re-enter them in AIOStreams.</div>
+      <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Your API keys are baked directly into your config — no re-entering them later.</div>
       <div id="aioResult"></div>
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
         <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">⬇ Download JSON instead</button>
@@ -3203,7 +3222,7 @@ async function simpleInstall() {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
   const btn = document.getElementById('btnAio'), result = document.getElementById('aioResult');
   const origHtml = btn.innerHTML;
-  btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating template…`;
+  btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
   const pwd = makePwd();
   const cfg = build().config;
@@ -3212,8 +3231,6 @@ async function simpleInstall() {
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
-  // Option A: probe hosts first (lightweight GET), then POST credentials only to the winner
-  let directSuccess = false;
   try {
     const fastest = await Promise.any(
       hosts.map(([, host]) =>
@@ -3221,114 +3238,28 @@ async function simpleInstall() {
           .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
       )
     );
-    const res = await raceHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
+    const res = await raceHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (res.ok && data?.success !== false) {
       const uuid = data?.uuid || data?.user?.uuid || data?.id;
       if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); }
       btn.disabled = false; btn.innerHTML = origHtml;
       saveLastGen();
-      directSuccess = true;
       showManifestModal(`${fastest}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabels[fastest] || fastest.replace('https://','').split('/')[0]);
       return;
     }
     throw new Error('rejected');
-  } catch(e) { /* CORS blocked all hosts — fall through to Option C */ }
-
-  // Option C fallback: upload template and open AIOStreams via deep link
-  btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Uploading template…`;
-  const url = await uploadTemplateForImport();
-  btn.disabled = false; btn.innerHTML = origHtml;
-  if (!url) { showToast('Upload failed — try again in a moment', true); return; }
-  saveLastGen();
-  const deepLink = `${hosts[0][1]}/stremio/configure?template=${encodeURIComponent(url)}`;
-  // Auto-copy password before opening AIOStreams so user can paste immediately
-  navigator.clipboard.writeText(pwd).catch(() => {});
-  window.open(deepLink, '_blank');
-
-  const credInputs = getDebridInputs().filter(i => S.creds[i.id] && S.creds[i.id].trim());
-  let credBlock = '';
-  if (credInputs.length) {
-    const rows = credInputs.map(inp => {
-      const val = (S.creds[inp.id] || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-      const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
-      return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
-    }).join('');
-    credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the template</strong>. After it loads, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
-  }
-
-  const safePwd = pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-  result.innerHTML = `<div class="import-success" style="margin-top:12px">
-    <strong style="color:#e6edf3">AIOStreams opened in a new tab</strong>
-    <div style="margin:10px 0;padding:10px 12px;border-radius:8px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.14)">
-      <div style="font-size:.72rem;font-weight:800;color:#00d4ff;letter-spacing:.06em;margin-bottom:6px">🔑 YOUR PASSWORD</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <code style="flex:1;font-size:.92rem;font-weight:700;color:#e6edf3;background:rgba(0,0,0,.3);border-radius:6px;padding:8px 12px;letter-spacing:.04em;user-select:all">${safePwd}</code>
-        <button data-action="copy-manifest" data-url="${safePwd}" style="flex-shrink:0;padding:6px 14px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:6px;color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Copy</button>
+  } catch(e) {
+    btn.disabled = false; btn.innerHTML = origHtml;
+    result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
+      <strong style="color:#f87171">Could not reach any AIOStreams host</strong>
+      <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All hosts timed out or are temporarily down. Try again in a moment, or download the JSON and import it manually.</div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
+        <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Download JSON</button>
       </div>
-      <div style="font-size:.68rem;color:#6b7280;margin-top:5px">Paste this when AIOStreams asks for a password</div>
-    </div>
-    <div style="color:#8b949e;font-size:.8rem;margin:8px 0 10px;line-height:1.7">
-      <strong style="color:#e6edf3">1.</strong> Your template loads automatically<br>
-      <strong style="color:#e6edf3">2.</strong> Paste the password above and click <strong style="color:#e6edf3">Save</strong><br>
-      <strong style="color:#e6edf3">3.</strong> Copy your <strong style="color:#00d4ff">manifest URL</strong> and paste it below
-    </div>
-    <div style="margin:12px 0;padding:12px;border-radius:10px;background:rgba(63,185,80,.04);border:1px solid rgba(63,185,80,.18)">
-      <div style="font-size:.78rem;font-weight:800;color:#3fb950;margin-bottom:8px">📋 Got your manifest URL?</div>
-      <input id="simpleManifestPaste" type="url" placeholder="Paste manifest URL here…" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box;background:#0d1117;border:1.5px solid #30363d;border-radius:8px;padding:10px 12px;color:#e6edf3;font-size:.82rem;font-family:monospace;outline:none;transition:border-color .15s">
-      <div id="simpleManifestResult" style="font-size:.75rem;margin-top:4px"></div>
-    </div>
-    <div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Popup blocked? Tap an instance below instead:</div>
-    ${instanceChips(url)}
-    ${credBlock}
-  </div>`;
-  showToast('Password copied — paste it in AIOStreams and save');
-
-  const pasteInput = document.getElementById('simpleManifestPaste');
-  const pasteResult = document.getElementById('simpleManifestResult');
-  if (pasteInput) {
-    const handlePaste = () => {
-      const val = (pasteInput.value || '').trim();
-      if (!val) { pasteResult.innerHTML = ''; pasteInput.style.borderColor = '#30363d'; return; }
-      const parts = extractManifestParts(val);
-      if (parts) {
-        pasteInput.style.borderColor = '#3fb950';
-        pasteResult.innerHTML = '<span style="color:#3fb950;font-weight:700">✓ Valid manifest URL detected</span>';
-        setTimeout(() => showManifestModal(val, pwd, null), 300);
-      } else {
-        pasteInput.style.borderColor = val.includes('manifest.json') ? '#f87171' : '#30363d';
-        pasteResult.innerHTML = val.length > 10 ? '<span style="color:#6b7280">Paste a full manifest URL ending in /manifest.json</span>' : '';
-      }
-    };
-    pasteInput.addEventListener('input', handlePaste);
-    pasteInput.addEventListener('paste', () => setTimeout(handlePaste, 50));
+    </div>`;
   }
-
-  const onReturn = () => {
-    if (document.visibilityState !== 'visible') return;
-    const pi = document.getElementById('simpleManifestPaste');
-    if (!pi || pi.value.trim()) return;
-    pi.focus();
-    pi.placeholder = 'Welcome back! Paste your manifest URL here…';
-    pi.style.borderColor = '#00d4ff';
-    setTimeout(() => { if (pi && !pi.value.trim()) pi.style.borderColor = '#30363d'; }, 3000);
-    // Try auto-reading clipboard for a manifest URL
-    navigator.clipboard.readText().then(clip => {
-      if (clip && clip.includes('/stremio/') && clip.includes('manifest.json') && pi && !pi.value.trim()) {
-        pi.value = clip;
-        pi.dispatchEvent(new Event('input'));
-      }
-    }).catch(() => {});
-  };
-  document.addEventListener('visibilitychange', onReturn);
-  const cleanupReturn = () => {
-    document.removeEventListener('visibilitychange', onReturn);
-    document.removeEventListener('click', earlyCleanup);
-  };
-  const earlyCleanup = (e) => {
-    if (e.target.closest('[data-action="show-full-review"]') || e.target.closest('[data-action="generate-dl"]')) cleanupReturn();
-  };
-  document.addEventListener('click', earlyCleanup);
 }
 
 function genPwd() {
