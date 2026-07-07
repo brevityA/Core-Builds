@@ -8,7 +8,10 @@ const fs   = require('fs');
 const path = require('path');
 const JavaScriptObfuscator = require('javascript-obfuscator');
 
-const srcPath = path.join(__dirname, 'index.src.html');
+const fallbackSrc = path.join(__dirname, 'index_src.html');
+const srcPath = fs.existsSync(path.join(__dirname, 'index.src.html'))
+  ? path.join(__dirname, 'index.src.html')
+  : fallbackSrc;
 const outPath = path.join(__dirname, 'index.html');
 
 const html = fs.readFileSync(srcPath, 'utf8');
