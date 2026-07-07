@@ -666,11 +666,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.17';
+const CONFIGURATOR_VERSION = '2.18';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.18', date:'Jul 6 2026', items:[
+    'Formatter: import your own custom formatter JSON — paste or load a file with {name, description} fields',
+    'Imported formatter persists across sessions and can be replaced or cleared at any time',
+  ]},
   { v:'2.17', date:'Jul 6 2026', items:[
     'Manifest modal: WuPlay and Nuvio tabs now show dedicated step-by-step setup instructions',
     'Manifest modal: QR code hidden on WuPlay/Nuvio tabs (not applicable — paste-based install)',
@@ -1014,7 +1018,7 @@ function sanitizeSharedConfig(d) {
   pick('resolution',   v => optVals('resolution').includes(v));
   pick('content',      v => optVals('content').includes(v));
   pick('audio',        v => ['lossless','standard','limited','dolby'].includes(v));
-  pick('formatter',    v => FORMATTERS.some(f => f.id === v));
+  pick('formatter',    v => v === 'custom' || FORMATTERS.some(f => f.id === v));
   pick('matchMode',    v => ['relaxed','balanced','strict'].includes(v));
   pick('cacheMode',    v => ['mixed','cached','uncached'].includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
@@ -1094,7 +1098,7 @@ function deriveService() {
 
 /* RENDERING */
 function label(key, val) {
-  if (key === 'formatter') { const f = FORMATTERS.find(x => x.id === val); return f ? f.label : val || ''; }
+  if (key === 'formatter') { if (val === 'custom') return S.customFormatter ? (S.customFormatter.label || 'Custom') : 'Custom'; const f = FORMATTERS.find(x => x.id === val); return f ? f.label : val || ''; }
   if (key === 'audio') { const m = {lossless:'Full Lossless',standard:'DD+ / Atmos',limited:'Auto',dolby:'Dolby Only'}; return m[val] || val || ''; }
   if (key === 'service' && val === 'multi') {
     const d2 = DEFS.find(x => x.key === 'service');
@@ -1266,6 +1270,23 @@ function fmtPreviewHtml(fmtId) {
   </div>`;
 }
 
+function customFormatterCard() {
+  if (!S.customFormatter) return '';
+  const on = S.formatter === 'custom';
+  const lbl = S.customFormatter.label || 'Custom';
+  return `<div class="fmt-card" data-action="set-formatter" data-val="custom" data-active="${on}">
+    <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
+      <div style="width:10px;height:10px;border-radius:50%;background:#a78bfa;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <span class="fmt-lbl" style="font-weight:700;font-size:.9rem">${lbl.replace(/</g,'&lt;')}</span>
+        <span style="margin-left:6px;background:rgba(167,139,250,.15);border-radius:4px;padding:2px 6px;font-size:.65rem;color:#a78bfa">Imported</span>
+        <div style="color:#6b7280;font-size:.72rem;margin-top:2px">Your imported formatter · <a href="#" data-action="clear-custom-formatter" style="color:#ef4444;text-decoration:none;font-size:.7rem">Remove</a></div>
+      </div>
+      <span class="fmt-arr"></span>
+    </div>
+  </div>`;
+}
+
 function videoPrefHtml() {
   const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   const card = (key, title, desc) => {
@@ -1413,7 +1434,8 @@ function renderAdvancedPanel() {
 
       <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎨 Stream Layout (Formatter)</div>
-        <div style="display:flex;flex-direction:column;gap:8px">${fmtCards}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">${fmtCards}${customFormatterCard()}</div>
+        <button data-action="import-formatter" style="margin-top:8px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>
       </div>
 
     </div>
@@ -2272,6 +2294,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+    if (action === 'import-formatter') { showFormatterImport(); }
+    if (action === 'clear-custom-formatter') {
+      e.preventDefault();
+      delete S.customFormatter;
+      if (S.formatter === 'custom') S.formatter = 'apex-v2';
+      saveState(); render();
+    }
   });
 
   // Handle inputs and changes
@@ -2450,7 +2479,8 @@ function formatterPickerHtml() {
         `<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
         `<span style="color:#6b7280;font-size:.77rem">${f.desc}</span>` +
         `</div></div>`;
-    }).join('') +
+    }).join('') + customFormatterCard() +
+    `<button data-action="import-formatter" style="margin-top:4px;width:100%;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>` +
   '</div></div>';
 }
 
@@ -2676,7 +2706,7 @@ function build() {
     ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
     sortCriteria: { global:[{key:'cached',direction:'desc'},{key:'streamExpressionMatched',direction:'desc'},{key:'streamExpressionScore',direction:'desc'},{key:'library',direction:'desc'},...(S.qualityFirst?[{key:'quality',direction:'desc'},{key:'resolution',direction:'desc'}]:[{key:'resolution',direction:'desc'},{key:'quality',direction:'desc'}]),{key:'regexScore',direction:'desc'},{key:'visualTag',direction:'desc'},{key:'encode',direction:'desc'},{key:'audioTag',direction:'desc'},{key:'audioChannel',direction:'desc'},{key:'language',direction:'desc'},{key:'seeders',direction:'desc'},{key:'size',direction:'desc'}], movies:[], series:[], anime:[] },
     deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
-    formatter: (function(){ const _f = FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
+    formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: presets(), services: services(),
@@ -2751,6 +2781,60 @@ function generate() {
     dlBtn.style.background = 'linear-gradient(135deg,#065f46,#059669)';
     setTimeout(() => { dlBtn.innerHTML = orig; dlBtn.style.background = ''; }, 2200);
   }
+}
+
+function showFormatterImport() {
+  const ex = document.getElementById('fmtImportModal');
+  if (ex) ex.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'fmtImportModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Import Formatter" style="max-width:420px">
+      <button class="modal-close" id="fmtImClose" aria-label="Close">×</button>
+      <div class="modal-title" style="font-size:1.05rem">Import Custom Formatter</div>
+      <div class="modal-sub" style="margin-bottom:12px">Paste a formatter JSON with <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:.78rem">name</code> and <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:.78rem">description</code> fields, or load a .json file.</div>
+      <textarea id="fmtImInput" rows="6" placeholder='{"name": "...", "description": "..."}' style="width:100%;box-sizing:border-box;background:#0d1117;border:1.5px solid #30363d;border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.78rem;resize:vertical;outline:none"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <label style="flex:1;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.8rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s">
+          📂 Load File
+          <input type="file" accept=".json,application/json" id="fmtImFile" style="display:none">
+        </label>
+        <button id="fmtImApply" style="flex:2;padding:9px;border-radius:8px;border:1.5px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .15s">Apply Formatter</button>
+      </div>
+      <div id="fmtImErr" style="margin-top:8px;font-size:.76rem;color:#ef4444;display:none"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const textarea = document.getElementById('fmtImInput');
+  const errEl = document.getElementById('fmtImErr');
+
+  function parseAndApply(raw) {
+    errEl.style.display = 'none';
+    try {
+      const obj = JSON.parse(raw);
+      if (!obj.name || typeof obj.name !== 'string') { errEl.textContent = 'Missing or invalid "name" field'; errEl.style.display = ''; return; }
+      if (!obj.description || typeof obj.description !== 'string') { errEl.textContent = 'Missing or invalid "description" field'; errEl.style.display = ''; return; }
+      S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
+      S.formatter = 'custom';
+      saveState();
+      overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+      setTimeout(() => { overlay.remove(); render(); showToast('Custom formatter imported'); }, 160);
+    } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
+  }
+
+  document.getElementById('fmtImApply').addEventListener('click', () => parseAndApply(textarea.value));
+  document.getElementById('fmtImFile').addEventListener('change', function() {
+    if (!this.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = () => { textarea.value = reader.result; parseAndApply(reader.result); };
+    reader.readAsText(this.files[0]);
+  });
+  document.getElementById('fmtImClose').addEventListener('click', () => {
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => overlay.remove(), 160);
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 160); } });
 }
 
 function showManifestModal(manifestUrl, password, hostLabel) {
