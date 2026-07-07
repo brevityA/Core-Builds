@@ -14,6 +14,9 @@ on:
       - '**/*.md'
       - 'Assets/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Run pytest suite
