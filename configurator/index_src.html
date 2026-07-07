@@ -1137,7 +1137,7 @@ function renderOpts(def) {
     if (def.noHero) {
       const rows = def.opts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
         <div class="opt-icon">${o.icon}</div>
-        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc.replace(/<[^>]*>/g,'')}</div></div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${String(o.desc).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}</div></div>
         ${o.help ? `<button type="button" class="help-btn" data-action="toggle-device-help" data-v="${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>` : ''}
         <span class="svc-list-arr">›</span>
       </label>${o.help ? `<div class="device-help" id="help_${o.v}">${o.help}</div>` : ''}</div>`).join('');
