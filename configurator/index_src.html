@@ -2184,7 +2184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'show-full-review') { S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'simple-install') simpleInstall();
+    if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
@@ -2844,7 +2844,7 @@ function showFormatterImport() {
   overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 160); } });
 }
 
-function showManifestModal(manifestUrl, password, hostLabel) {
+function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const ex = document.getElementById('manifestModal');
   if (ex) ex.remove();
 
@@ -2931,8 +2931,11 @@ function showManifestModal(manifestUrl, password, hostLabel) {
     </div>`;
   document.body.appendChild(overlay);
 
+  const initFi = initialTab ? FMTS.findIndex(f => f.key === initialTab) : 0;
+  const startFi = initFi > 0 ? initFi : 0;
+
   // Auto-copy the initial manifest URL to clipboard on modal open
-  navigator.clipboard.writeText(FMTS[0].getUrl(manifestUrl)).then(() => {
+  navigator.clipboard.writeText(FMTS[startFi].getUrl(manifestUrl)).then(() => {
     showToast('Manifest URL copied to clipboard');
     const cb = document.getElementById('mCopyUrl');
     if (cb) { cb.textContent = '✓'; cb.classList.add('copied'); setTimeout(() => { cb.textContent = 'Copy'; cb.classList.remove('copied'); }, 2200); }
@@ -3052,6 +3055,10 @@ function showManifestModal(manifestUrl, password, hostLabel) {
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
+  if (startFi > 0) {
+    document.querySelectorAll('#mFmtTabs .fmt-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.fi) === startFi));
+    switchFmt(startFi);
+  }
   setTimeout(() => { const c = document.getElementById('mClose'); if (c) c.focus(); }, 50);
 
   document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
@@ -3208,7 +3215,11 @@ function simpleFinishHtml() {
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
       </div>
-      <button class="btn-manifest" id="btnAio" data-action="simple-install">🚀 Create &amp; Install in Stremio</button>
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Create &amp; Install in Stremio</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
+        <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
+      </div>
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Your API keys are baked directly into your config — no re-entering them later.</div>
       <div id="aioResult"></div>
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
@@ -3218,7 +3229,7 @@ function simpleFinishHtml() {
     </div>`;
 }
 
-async function simpleInstall() {
+async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
   const btn = document.getElementById('btnAio'), result = document.getElementById('aioResult');
   const origHtml = btn.innerHTML;
@@ -3245,7 +3256,7 @@ async function simpleInstall() {
       if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); }
       btn.disabled = false; btn.innerHTML = origHtml;
       saveLastGen();
-      showManifestModal(`${fastest}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabels[fastest] || fastest.replace('https://','').split('/')[0]);
+      showManifestModal(`${fastest}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json`, pwd, hostLabels[fastest] || fastest.replace('https://','').split('/')[0], target);
       return;
     }
     throw new Error('rejected');
