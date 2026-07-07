@@ -1710,23 +1710,21 @@ function render() {
         </div>
         <div id="importUrlResult"></div>
         <details class="rv-section" open>
-          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Install in Stremio</span><span class="rv-arr">›</span></summary>
+          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Create &amp; Install</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
-            <div class="what-next" style="margin:0 0 14px;padding:12px 14px;background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);border-radius:10px">
-              <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:6px">
-                <div style="display:flex;flex-direction:column;gap:4px">
-                  <div class="step-num" style="width:20px;height:20px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.6rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">1</div>
-                  <div style="font-size:.76rem;font-weight:800;color:#e6edf3">Load into AIOStreams</div>
-                  <div style="font-size:.7rem;color:#8b949e;line-height:1.45">Import above, then re-enter <strong style="color:#fbbf24">debrid keys</strong> in AIOStreams Services.</div>
-                </div>
-                <div style="color:#30363d;font-size:.8rem;padding-top:2px;text-align:center">›</div>
-                <div style="display:flex;flex-direction:column;gap:4px">
-                  <div class="step-num" style="width:20px;height:20px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);color:#00d4ff;font-size:.6rem;font-weight:900;display:grid;place-items:center;flex-shrink:0">2</div>
-                  <div style="font-size:.76rem;font-weight:800;color:#e6edf3">Install in Stremio</div>
-                  <div style="font-size:.7rem;color:#8b949e;line-height:1.45">Enter <strong style="color:#e6edf3">UUID + password</strong> below, click <strong style="color:#e6edf3">Get Install Link</strong>.</div>
-                </div>
-              </div>
+            <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Create &amp; Install in Stremio</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
+              <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
             </div>
+            <div id="aioResult"></div>
+            <details style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px">
+              <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
+                <span>Manual setup (existing config / self-hosted)</span>
+                <span style="font-size:.75rem;color:#374151">›</span>
+              </summary>
+              <div style="margin-top:12px">
             <div class="aio-fields" style="display:grid;gap:10px">
               <div class="name-row" style="margin-bottom:0">
                 <label>AIOStreams Host</label>
@@ -1809,7 +1807,9 @@ function render() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Get Install Link
             </button>
-            <div id="aioResult"></div>
+            <div id="manualAioResult"></div>
+              </div>
+            </details>
             <details id="pasteManifestDetails" style="margin-top:16px;border-top:1px solid #21262d;padding-top:14px" ${pasteMode ? 'open' : ''}>
               <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
                 <span>Already have a manifest URL?</span>
@@ -2404,7 +2404,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cfgLinkRow) cfgLinkRow.style.display = showUuid ? '' : 'none';
       if (cfgLink && HOST_BASE_URLS[val]) cfgLink.href = HOST_BASE_URLS[val] + '/configure';
       if (val === 'custom') { const u = document.getElementById('aioUrl'); if (u) u.value = S.instanceUrl || ''; }
-      document.getElementById('aioResult').innerHTML = '';
+      const _ar = document.getElementById('manualAioResult') || document.getElementById('aioResult');
+      if (_ar) _ar.innerHTML = '';
       if (showUuid) updateUuidValidation(S.instanceUuid); else updateUuidValidation('');
     }
   });
@@ -3295,7 +3296,7 @@ function promptPassword() {
 
 async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
-  const btn = document.getElementById('btnAio'), result = document.getElementById('aioResult');
+  const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
   const pwd = await promptPassword();
   if (!pwd) return;
   const origHtml = btn.innerHTML;
@@ -3543,7 +3544,7 @@ async function openInAIOStreams() {
 
   if (!isAuto && !base) { showToast('Enter your AIOStreams instance URL first', true); return; }
 
-  const result = document.getElementById('aioResult'), btn = document.getElementById('btnAio');
+  const result = document.getElementById('manualAioResult'), btn = document.getElementById('btnAio');
   const uuid = (S.instanceUuid || '').trim(), pwd = S.instancePassword;
   const hostLabel = base ? (HOST_LABELS[base] || base.replace('https://','').split('/')[0]) : null;
 
