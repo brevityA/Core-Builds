@@ -666,11 +666,17 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.18';
+const CONFIGURATOR_VERSION = '2.19';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.19', date:'Jul 7 2026', items:[
+    'Manifest modal: auto-copies manifest URL to clipboard on open and tab switch — no manual Copy tap needed',
+    'WuPlay / Nuvio: auto-copies manifest URL before opening the app, with toast confirmation',
+    'CORS fallback: auto-copies password to clipboard before opening AIOStreams tab',
+    'Return from AIOStreams: auto-reads clipboard to pre-fill the manifest paste field',
+  ]},
   { v:'2.18', date:'Jul 6 2026', items:[
     'Formatter: import your own custom formatter JSON — paste or load a file with {name, description} fields',
     'Imported formatter persists across sessions and can be replaced or cleared at any time',
@@ -2924,6 +2930,13 @@ function showManifestModal(manifestUrl, password, hostLabel) {
     </div>`;
   document.body.appendChild(overlay);
 
+  // Auto-copy the initial manifest URL to clipboard on modal open
+  navigator.clipboard.writeText(FMTS[0].getUrl(manifestUrl)).then(() => {
+    showToast('Manifest URL copied to clipboard');
+    const cb = document.getElementById('mCopyUrl');
+    if (cb) { cb.textContent = '✓'; cb.classList.add('copied'); setTimeout(() => { cb.textContent = 'Copy'; cb.classList.remove('copied'); }, 2200); }
+  }).catch(() => {});
+
   const urlVal   = document.getElementById('mUrlVal');
   const qrImg    = document.getElementById('mQr');
   const actionBtn = document.getElementById('mActionBtn');
@@ -2943,6 +2956,11 @@ function showManifestModal(manifestUrl, password, hostLabel) {
     const url = f.getUrl(manifestUrl);
     urlVal.textContent = url;
     if (qrImg) qrImg.src = qrSrc(url);
+    // Auto-copy URL on every tab switch
+    const copyBtn = document.getElementById('mCopyUrl');
+    navigator.clipboard.writeText(url).then(() => {
+      if (copyBtn) { copyBtn.textContent = '✓'; copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 2200); }
+    }).catch(() => {});
     // action button
     actionBtn.className = `m-btn ${BTN_CLS[fi]}`;
     actionBtn.innerHTML = BTN_LABELS[fi];
@@ -2953,7 +2971,10 @@ function showManifestModal(manifestUrl, password, hostLabel) {
     } else if (f.action === 'open') {
       actionBtn.href = f.configUrl;
       actionBtn.target = '_blank';
-      actionBtn.onclick = () => { navigator.clipboard.writeText(url).catch(() => {}); };
+      actionBtn.onclick = () => {
+        navigator.clipboard.writeText(url).catch(() => {});
+        showToast(`Manifest URL copied — opening ${f.label}…`);
+      };
     } else {
       actionBtn.href = '#';
       actionBtn.target = '';
@@ -2963,23 +2984,22 @@ function showManifestModal(manifestUrl, password, hostLabel) {
       };
     }
     document.getElementById('mUrlLabel').textContent =
-      fi === 2 ? 'Manifest URL — copy then paste in WuPlay' :
-      fi === 3 ? 'Manifest URL — copy then paste in Nuvio' : 'Manifest URL';
-    document.getElementById('mCopyUrl').textContent = 'Copy';
-    document.getElementById('mCopyUrl').classList.remove('copied');
+      fi === 2 ? 'Manifest URL — auto-copied ✓' :
+      fi === 3 ? 'Manifest URL — auto-copied ✓' : 'Manifest URL';
+    if (copyBtn) { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }
     const helpEl = document.getElementById('mAppHelp');
     const qrWrap = document.getElementById('mQrWrap');
     const qrHint = document.getElementById('mQrHint');
     if (fi === 2) {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'WuPlay Setup';
-      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Tap <strong style="color:#a78bfa">Copy</strong> above to copy the manifest URL<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open WuPlay</strong> below (or go to WuPlay → Addons)<br><strong style="color:#e6edf3">3.</strong> Tap <strong style="color:#a78bfa">Add Addon</strong> and paste the URL';
+      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Manifest URL is <strong style="color:#3fb950">already copied</strong> to your clipboard<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open WuPlay</strong> below (or go to WuPlay → Addons)<br><strong style="color:#e6edf3">3.</strong> Tap <strong style="color:#a78bfa">Add Addon</strong> and paste the URL';
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
     } else if (fi === 3) {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'Nuvio Setup';
-      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Tap <strong style="color:#a78bfa">Copy</strong> above to copy the manifest URL<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong style="color:#e6edf3">3.</strong> Paste the URL in the addon field';
+      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Manifest URL is <strong style="color:#3fb950">already copied</strong> to your clipboard<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong style="color:#e6edf3">3.</strong> Paste the URL in the addon field';
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
     } else {
@@ -3222,6 +3242,8 @@ async function simpleInstall() {
   if (!url) { showToast('Upload failed — try again in a moment', true); return; }
   saveLastGen();
   const deepLink = `${hosts[0][1]}/stremio/configure?template=${encodeURIComponent(url)}`;
+  // Auto-copy password before opening AIOStreams so user can paste immediately
+  navigator.clipboard.writeText(pwd).catch(() => {});
   window.open(deepLink, '_blank');
 
   const credInputs = getDebridInputs().filter(i => S.creds[i.id] && S.creds[i.id].trim());
@@ -3260,7 +3282,7 @@ async function simpleInstall() {
     ${instanceChips(url)}
     ${credBlock}
   </div>`;
-  showToast('AIOStreams opened — paste the password and save');
+  showToast('Password copied — paste it in AIOStreams and save');
 
   const pasteInput = document.getElementById('simpleManifestPaste');
   const pasteResult = document.getElementById('simpleManifestResult');
@@ -3290,6 +3312,13 @@ async function simpleInstall() {
     pi.placeholder = 'Welcome back! Paste your manifest URL here…';
     pi.style.borderColor = '#00d4ff';
     setTimeout(() => { if (pi && !pi.value.trim()) pi.style.borderColor = '#30363d'; }, 3000);
+    // Try auto-reading clipboard for a manifest URL
+    navigator.clipboard.readText().then(clip => {
+      if (clip && clip.includes('/stremio/') && clip.includes('manifest.json') && pi && !pi.value.trim()) {
+        pi.value = clip;
+        pi.dispatchEvent(new Event('input'));
+      }
+    }).catch(() => {});
   };
   document.addEventListener('visibilitychange', onReturn);
   const cleanupReturn = () => {
