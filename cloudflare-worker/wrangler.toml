@@ -7,6 +7,4 @@ enabled = false
 
 [[kv_namespaces]]
 binding = "TEMPLATES"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
-# Create with: wrangler kv namespace create TEMPLATES
-# Then paste the id here before deploying.
+id = "100cc344297b41c785f8c07dba85982c"
