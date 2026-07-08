@@ -2646,9 +2646,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       syncNext();
-      if (S.simpleMode && e.target.checked && S.multiServices.length === 1) {
-        setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled && step === 1) b.click(); }, 350);
-      }
     }
     if (e.target.dataset.action === 'toggle-lang') {
       const v = e.target.value;
