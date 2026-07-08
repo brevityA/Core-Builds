@@ -197,6 +197,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-list-row input:checked+label .svc-row-ck{background:#00d4ff;border-color:#00d4ff}
 .svc-list-row input:checked+label .svc-row-ck svg{opacity:1}
 .svc-empty{text-align:center;padding:24px 0;color:#3e4a5c;font-size:.76rem;display:none}
+.qs-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.qs-overlay.open{opacity:1;pointer-events:auto}
+.qs-panel{width:100%;max-width:440px;max-height:85vh;overflow-y:auto;background:#161b22;border:1px solid rgba(255,255,255,.07);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.5);transform:translateY(12px);transition:transform .25s}
+.qs-overlay.open .qs-panel{transform:translateY(0)}
+.qs-hdr{padding:16px 20px;background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(168,85,247,.04));border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
+.qs-hdr-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.qs-hdr h2{font-size:.88rem;font-weight:800;color:#e6edf3;margin:0}
+.qs-hdr p{font-size:.72rem;color:#8b949e;margin:1px 0 0}
+.qs-close{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:4px 10px;cursor:pointer;flex-shrink:0;line-height:1}
+.qs-close:hover{background:rgba(255,255,255,.1)}
+.qs-intro{margin:16px 20px 0;font-size:.74rem;color:#8b949e;line-height:1.6;padding:10px 12px;border-radius:8px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15)}
+.qs-body{padding:8px 20px 16px}
+.qs-step{display:flex;gap:14px;padding:14px 0}
+.qs-step+.qs-step{border-top:1px solid rgba(255,255,255,.06)}
+.qs-num{width:28px;height:28px;border-radius:50%;background:rgba(0,212,255,.08);border:1.5px solid rgba(0,212,255,.25);color:#00d4ff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.qs-step-title{font-size:.8rem;font-weight:700;color:#e6edf3;margin-bottom:3px}
+.qs-step-desc{font-size:.72rem;color:#8b949e;line-height:1.5}
+.qs-tip{margin-top:6px;font-size:.68rem;color:#f59e0b;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.14);border-radius:6px;padding:5px 8px;line-height:1.4}
+.qs-cta{padding:14px 20px;border-top:1px solid rgba(255,255,255,.06);text-align:center}
+.qs-cta button{padding:10px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#0096b4,#006a9a);color:#fff;font-size:.82rem;font-weight:800;cursor:pointer;transition:transform .15s}
+.qs-cta button:hover{transform:translateY(-1px)}
+.qs-help-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:#4b5563;font-size:.72rem;cursor:pointer;padding:0;margin-top:14px;transition:color .15s}
+.qs-help-btn:hover{color:#8b949e}
+.qs-help-icon{width:20px;height:20px;border-radius:50%;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:#00d4ff;font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center}
 @media(min-width:720px){
   .wrap{max-width:980px}
   .card{padding:36px}
@@ -535,6 +559,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .svc-row-ck{border-color:#d0d7de}
 [data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da;border-color:#0969da}
 [data-theme="light"] .svc-empty{color:#8c959f}
+[data-theme="light"] .qs-panel{background:#fff;border-color:#d0d7de;box-shadow:0 16px 48px rgba(0,0,0,.15)}
+[data-theme="light"] .qs-hdr{background:linear-gradient(135deg,rgba(9,105,218,.04),rgba(130,80,223,.03));border-bottom-color:#d0d7de}
+[data-theme="light"] .qs-hdr-icon{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.25)}
+[data-theme="light"] .qs-hdr h2{color:#1c2128}
+[data-theme="light"] .qs-close{background:rgba(0,0,0,.04);border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .qs-intro{background:rgba(9,105,218,.04);border-color:rgba(9,105,218,.15);color:#57606a}
+[data-theme="light"] .qs-step+.qs-step{border-color:#d0d7de}
+[data-theme="light"] .qs-num{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.25);color:#0969da}
+[data-theme="light"] .qs-step-title{color:#1c2128}
+[data-theme="light"] .qs-step-desc{color:#57606a}
+[data-theme="light"] .qs-tip{color:#9a6700;background:rgba(154,103,0,.05);border-color:rgba(154,103,0,.14)}
+[data-theme="light"] .qs-cta{border-color:#d0d7de}
 [data-theme="light"] .modal-box{background:#ffffff;border-color:#d0d7de}
 [data-theme="light"] .modal-overlay{background:rgba(0,0,0,.45)}
 [data-theme="light"] .modal-close{color:#57606a}
@@ -695,6 +731,61 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div id="cb-loader-sub">by Brevity</div>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div class="qs-overlay" id="qsOverlay" data-action="close-quickstart-overlay">
+  <div class="qs-panel" onclick="event.stopPropagation()">
+    <div class="qs-hdr">
+      <div class="qs-hdr-icon">📖</div>
+      <div><h2>Quick Start Guide</h2><p>New to Core Builds? Here's how it works</p></div>
+      <button class="qs-close" data-action="close-quickstart">&times;</button>
+    </div>
+    <div class="qs-intro">
+      Core Builds generates <strong style="color:#e6edf3">AIOStreams templates</strong> — config files that control how your streaming addon finds, filters, and sorts torrents and usenet results. Pick your service, device, and preferences, and we build the template for you.
+    </div>
+    <div class="qs-body">
+      <div class="qs-step">
+        <div class="qs-num">1</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Pick your debrid service</div>
+          <div class="qs-step-desc">TorBox, AllDebrid, Real-Debrid, EasyNews, or go free with P2P/HTTP streaming. This determines which scrapers and presets your template uses.</div>
+          <div class="qs-tip">Don't have a debrid account? Choose "Free Streaming" or "Free P2P" from the splash — no signup needed.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">2</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Choose your device</div>
+          <div class="qs-step-desc">Fire Stick, Apple TV, Samsung TV, Android, PC, etc. This sets audio codec limits, HDR handling, and resolution caps automatically.</div>
+          <div class="qs-tip">Not sure? "Generic" works for most devices — you can fine-tune later.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">3</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Set your resolution</div>
+          <div class="qs-step-desc">4K or 1080p. This controls which quality tiers, regex scoring, and bitrate filters are applied to your streams.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">4</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Add your API key <span style="font-size:.64rem;color:#4b5563;font-weight:600">(optional)</span></div>
+          <div class="qs-step-desc">Paste your debrid API key to bake it into the template. Keys are stored only in your downloaded JSON — never sent to any server.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">5</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Deploy</div>
+          <div class="qs-step-desc">One click creates your config on the fastest AIOStreams instance and opens it in Stremio, WuPlay, or Nuvio. Or export the JSON to import manually.</div>
+          <div class="qs-tip">Your template includes 14+ scrapers, smart sorting, regex scoring, and quality filters — all pre-configured based on your choices.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qs-cta">
+      <button data-action="close-quickstart">Got it — let's go</button>
+    </div>
+  </div>
+</div>
 <div class="wrap">
   <header class="hdr">
     <div class="prog-wrap">
@@ -718,11 +809,17 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.25';
+const CONFIGURATOR_VERSION = '2.26';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.26', date:'Jul 8 2026', items:[
+    'Rebrand: "Easy Setup" is now "Core Start", "Custom Setup" is now "Core Configure" — consistent Core branding throughout',
+    'Quick Start Guide — "?" help icon on the splash screen opens a 5-step walkthrough for new users',
+    '"Advanced Options" renamed to "Fine-Tune", "Create &amp; Install" renamed to "Deploy", "Review &amp; Download" renamed to "Review &amp; Deploy"',
+    '"Generate &amp; Download Template" renamed to "Export Template JSON"',
+  ]},
   { v:'2.25', date:'Jul 8 2026', items:[
     'Service picker redesigned — search filter, segmented category tabs (Debrid / Usenet / No Account), all 14 services visible',
     'Auth badges on each service row — shows what credentials you need (API key, user+pass, free) before clicking',
@@ -1093,7 +1190,7 @@ const DEFS = [
     ]
   },
   { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored <strong style="color:#3fb950">only in the downloaded JSON file</strong> and are <strong style="color:#3fb950">never sent to any server</strong>.', key:null, cols:'c1', opts:[] },
-  { id:'review', title:'Review & Download', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
+  { id:'review', title:'Review & Deploy', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
 ];
 
 /* STATE MANAGEMENT */
@@ -1541,7 +1638,7 @@ function renderAdvancedPanel() {
     <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
       <button data-action="close-advanced" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">← Back</button>
       <div>
-        <div style="font-weight:800;font-size:1rem;color:#e6edf3">Advanced Options</div>
+        <div style="font-weight:800;font-size:1rem;color:#e6edf3">Fine-Tune</div>
         <div style="font-size:.72rem;color:#4b5563;margin-top:1px">Audio · Video · Formatter</div>
       </div>
     </div>
@@ -1679,12 +1776,13 @@ function splashHtml() {
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:5px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">&#10005;</button>
     </div>
     ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:340px;margin-top:8px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">⚡ Use previous settings — go to install</button>` : ''}` : ''}
-    <button class="splash-cta" data-action="easy-start" style="margin-top:${hadSavedState && _savedStep > 0 ? '12' : '24'}px">Easy Setup<br><span style="font-size:.76rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
+    <button class="splash-cta" data-action="easy-start" style="margin-top:${hadSavedState && _savedStep > 0 ? '12' : '24'}px">Core Start<br><span style="font-size:.76rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
     <div class="splash-secondary-row" style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:8px">
       <button data-action="quick-start" data-preset="4k" class="splash-preset-btn splash-preset-4k">4K Preset<br><span>Lossless audio</span></button>
       <button data-action="quick-start" data-preset="1080p" class="splash-preset-btn splash-preset-1080p">1080p Preset<br><span>DD+ streaming</span></button>
     </div>
-    <button data-action="custom-start" class="splash-custom-btn">Custom Setup — full control</button>
+    <button data-action="custom-start" class="splash-custom-btn">Core Configure — full control</button>
+    <button class="qs-help-btn" data-action="open-quickstart"><span class="qs-help-icon">?</span> New here? Quick Start Guide</button>
     <details class="splash-more" style="width:100%;max-width:310px;margin-top:14px">
       <summary class="splash-more-summary">More options <span style="margin-left:auto;font-size:.72rem;opacity:.5">&#9662;</span></summary>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
@@ -1821,7 +1919,7 @@ function render() {
             value="${S.name}" data-action="update-name" maxlength="60">
         </div>
         ${sizeLimitHtml()}
-        <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
+        <button class="btn-dl" data-action="generate-dl">⬇ Export Template JSON</button>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button data-action="share-config" style="flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
           <button class="btn-aio" data-action="create-import" id="btnImport" style="flex:1;margin-top:0;padding:11px;font-size:.82rem">
@@ -1831,10 +1929,10 @@ function render() {
         </div>
         <div id="importUrlResult"></div>
         <details class="rv-section" open>
-          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Create &amp; Install</span><span class="rv-arr">›</span></summary>
+          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Create &amp; Install in Stremio</button>
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Deploy to Stremio</button>
             <div style="display:flex;gap:8px">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
               <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
@@ -2158,7 +2256,7 @@ function render() {
         ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
         ${def.id === 'content' ? `<button data-action="skip-content" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use Everything (safe default) →</button>` : ''}
-        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Advanced Options</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
+        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Fine-Tune</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
     const btnBack = document.getElementById('btnBack');
@@ -2232,6 +2330,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcuts: Enter = next, Escape = back
   document.addEventListener('keydown', (e) => {
+    const qsOv = document.getElementById('qsOverlay');
+    if (qsOv && qsOv.classList.contains('open')) { if (e.key === 'Escape') qsOv.classList.remove('open'); return; }
     if (step === 0) return;
     if (document.getElementById('manifestModal') || document.getElementById('advModal')) return;
     const rem = document.getElementById('apiReminder');
@@ -2350,6 +2450,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
+    if (action === 'open-quickstart') { document.getElementById('qsOverlay').classList.add('open'); }
+    if (action === 'close-quickstart' || action === 'close-quickstart-overlay') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'share-config') shareConfig();
     if (action === 'copy-json') {
       e.preventDefault();
@@ -3601,7 +3703,7 @@ function simpleFinishHtml() {
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
       </div>
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Create &amp; Install in Stremio</button>
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Deploy to Stremio</button>
       <div style="display:flex;gap:8px">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
         <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
@@ -3609,7 +3711,7 @@ function simpleFinishHtml() {
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Your API keys are baked directly into your config — no re-entering them later.</div>
       <div id="aioResult"></div>
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
-        <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">⬇ Download JSON instead</button>
+        <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">⬇ Export JSON instead</button>
         <button data-action="show-full-review" style="background:none;border:none;color:#6b7280;font-size:.8rem;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Show all options →</button>
       </div>
     </div>`;
@@ -3762,7 +3864,7 @@ async function simpleInstall(target) {
         <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All methods failed. Download the JSON and import it manually into AIOStreams.</div>
         <div style="display:flex;gap:10px;justify-content:center">
           <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
-          <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Download JSON</button>
+          <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button>
         </div>
       </div>`;
     }
