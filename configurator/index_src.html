@@ -685,11 +685,17 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.19';
+const CONFIGURATOR_VERSION = '2.20';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.20', date:'Jul 8 2026', items:[
+    'Fix: "Create & Install" was failing on all instances — AIOStreams now requires a TMDB key for title/year matching, which the configurator was enabling without one',
+    'Title matching and year matching now auto-disable when no TMDB key is provided — re-enable them in AIOStreams after adding a key',
+    'Cloudflare Worker paste endpoint deployed with KV storage — template import links now persist for 30 days',
+    'Auto-fallback flow fully operational: direct API → CF paste → instance chips',
+  ]},
   { v:'2.19', date:'Jul 7 2026', items:[
     'API keys are now inline on the final step — no separate menu or popup reminder',
     'One-click install: config is created and saved on AIOStreams behind the scenes with keys baked in — no manual steps',
