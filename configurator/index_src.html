@@ -1675,7 +1675,7 @@ function renderAdvancedPanel() {
             <span style="font-size:.65rem;color:#4b5563">${{normal:'20 results',large:'30–35 results',max:'50 results'}[S.streamPool||'normal']}</span>
           </div>
           <div style="display:flex;gap:5px">
-            ${[['normal','Normal'],['large','Large'],['max','Maximum']].map(([v,l]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+            ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
         </div>
@@ -3742,7 +3742,7 @@ function simpleFinishHtml() {
               <span style="font-size:.6rem;color:#4b5563;font-weight:600">${{normal:'20 results',large:'30–35 results',max:'50 results'}[S.streamPool||'normal']}</span>
             </div>
             <div style="display:flex;gap:6px">
-              ${[['normal','Normal'],['large','Large'],['max','Maximum']].map(([v,l]) => `<button data-action="set-simple-pool" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+              ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
           </div>
