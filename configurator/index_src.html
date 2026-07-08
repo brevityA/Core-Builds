@@ -685,11 +685,27 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.20';
+const CONFIGURATOR_VERSION = '2.22';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.22', date:'Jul 8 2026', items:[
+    'Credential Test buttons added to Easy Setup — verify your API key works before installing',
+    'Share links (#cfg=) now jump straight to review — one-tap import instead of starting from splash',
+    'Smart device detection — auto-selects your device from user agent (Fire Stick, Samsung, Apple TV, Shield)',
+    'Live credential validation in pre-flight — API keys are tested against the service before config creation',
+    'Template health check on review step — warns about missing guards, TMDB keys, and device mismatches',
+    'Post-install config summary — collapsible recap of presets, ESEs, PSEs, sort keys, and matching status',
+  ]},
+  { v:'2.21', date:'Jul 8 2026', items:[
+    'TMDB key input added to Easy Setup with live validation — green check for valid keys, warnings for mismatched fields',
+    'Pre-flight config check before "Create & Install" — warns about missing API keys, 4K on Fire Stick HD, audio mismatches',
+    '"Test streams" button in the install modal — verifies your config is working before you close',
+    'Config diff on review step — shows what changed since your last download (e.g. "Resolution: 1080p → 4K")',
+    'Service picker: "More Services" section redesigned with service names visible at a glance',
+    'Audio options show a device-recommended badge based on your selected device',
+  ]},
   { v:'2.20', date:'Jul 8 2026', items:[
     'Fix: "Create & Install" was failing on all instances — AIOStreams now requires a TMDB key for title/year matching, which the configurator was enabling without one',
     'Title matching and year matching now auto-disable when no TMDB key is provided — re-enable them in AIOStreams after adding a key',
@@ -912,6 +928,8 @@ const CHANGELOG = [
 let step = 0;
 let showAdvanced = false;
 let hadSavedState = false;
+let _sharedImport = false;
+let _detectedDevice = null;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
@@ -1104,6 +1122,7 @@ function loadState() {
         const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(5)))));
         Object.assign(S, sanitizeSharedConfig(decoded));
         hadSavedState = true;
+        _sharedImport = true;
         S.service = deriveService();
         history.replaceState(null, '', location.pathname);
         return;
@@ -1191,11 +1210,15 @@ function renderOpts(def) {
           { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
           { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
         ];
+        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        const recAudio = DEV_REC[S.device];
+        const devLabel = label('device', S.device);
         const audioRows = AUDIO_OPTS.map(o => {
           const on = S.audio === o.v;
+          const isRec = recAudio === o.v && S.device && S.device !== 'generic';
           return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
             <div class="opt-icon" style="flex-shrink:0;pointer-events:none">${o.icon}</div>
-            <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
+            <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}${isRec?' <span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3);vertical-align:middle">'+devLabel+'</span>':''}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
             <button type="button" class="help-btn" data-action="toggle-help-target" data-target="audiohelp_res_${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>
             <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
           </div><div class="device-help" id="audiohelp_res_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
@@ -1260,8 +1283,9 @@ function renderOpts(def) {
     </label></div>`).join('');
     const selectedOtherNames = otherOpts.filter(o => S.multiServices.includes(o.v)).map(o => o.name);
     const isOtherSelected = selectedOtherNames.length > 0;
-    const summaryRight = isOtherSelected ? selectedOtherNames.join(', ') + ' ✓' : 'Show more ›';
-    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(255,255,255,.07)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#4b5563'};letter-spacing:.04em;text-transform:uppercase">Other Services</span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#374151'};font-weight:600">${summaryRight}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
+    const summaryRight = isOtherSelected ? selectedOtherNames.join(', ') + ' ✓' : `${otherOpts.length} more ›`;
+    const otherHints = otherOpts.map(o => o.name).join(' · ');
+    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 14px;border-radius:10px;background:rgba(139,92,246,.04);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(139,92,246,.15)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(139,92,246,.08)'" onmouseout="this.style.background='rgba(139,92,246,.04)'"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#a78bfa'};letter-spacing:.04em;text-transform:uppercase">More Services</span><span style="font-size:.66rem;color:#4b5563;font-weight:500">${otherHints}</span></span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#a78bfa'};font-weight:600">${summaryRight}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
     return `<div class="svc-list">${heroHtml}${rowsHtml}</div>${otherHtml}`;
   }
   if (def.layout === 'hero') {
@@ -1709,6 +1733,8 @@ function render() {
             ].filter(Boolean).join(' · ')}</div>
           </div>` : ''}
         </div>
+        ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
+        ${(() => { const h = templateHealthCheck(); return h.length ? `<div style="margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15)"><div style="font-size:.68rem;font-weight:700;color:#f87171;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:#8b949e;line-height:1.6">${h.map(w=>'<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:#f87171;flex-shrink:0">⚠</span><span>'+w+'</span></div>').join('')}</div></div>` : `<div style="margin-top:6px;padding:6px 12px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12);font-size:.72rem;color:#34d399;font-weight:600">✓ Template looks good</div>`; })()}
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
@@ -2047,6 +2073,7 @@ function render() {
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
+        ${def.id === 'device' && _detectedDevice ? `<div style="margin-bottom:12px;padding:9px 14px;border-radius:10px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;gap:8px;font-size:.8rem;color:#34d399;font-weight:600"><span>🔍</span> We detected <b style="margin:0 2px">${(def.opts.find(o=>o.v===_detectedDevice)||{}).name||_detectedDevice}</b> — change below if wrong</div>` : ''}
         ${renderOpts(def)}
         ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
@@ -2099,6 +2126,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const px = (screen.width || 0) * (window.devicePixelRatio || 1);
       if (px >= 3840) S.resolution = '4k';
     } catch(e) {}
+  }
+  if (!hadSavedState && !S.device) {
+    try {
+      const ua = navigator.userAgent || '';
+      if (/Tizen/i.test(ua)) S.device = 'samsung';
+      else if (/AFTM|AFTS|AFTB|AFTT|AFTKA|Fire\s?TV/i.test(ua)) S.device = /4K|AFTKA/i.test(ua) ? 'firestick-4kmax' : 'firestick-hd';
+      else if (/AppleTV/i.test(ua)) S.device = 'appletv-new';
+      else if (/Android\s?TV|SHIELD|BRAVIA|Chromecast/i.test(ua)) S.device = 'shield';
+      if (S.device) _detectedDevice = S.device;
+    } catch(e) {}
+  }
+  if (_sharedImport) {
+    step = S.simpleMode ? STEPS + 1 : STEPS;
+    setTimeout(() => showToast('Shared config loaded — review and install'), 300);
   }
   render();
   try { history.replaceState({ step: step }, ''); } catch(e) {}
@@ -2950,6 +2991,40 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         </a>
         <button class="m-btn m-done" id="mDone">Done</button>
       </div>
+      <div style="margin-top:12px;padding:10px 13px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <div style="font-size:.72rem;font-weight:700;color:#34d399">What's next</div>
+          <button id="mTestStreams" style="font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:5px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Test streams</button>
+        </div>
+        <div style="font-size:.72rem;color:#8b949e;line-height:1.55">
+          <strong style="color:#e6edf3">1.</strong> Open Stremio and search for any movie or show<br>
+          <strong style="color:#e6edf3">2.</strong> Streams should appear with Core Builds sorting<br>
+          <strong style="color:#e6edf3">3.</strong> Save your password — you'll need it to edit settings later
+        </div>
+        <div id="mTestResult" style="margin-top:6px;font-size:.72rem"></div>
+      </div>
+      <details style="margin-top:10px;border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow:hidden">
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:8px 12px;background:rgba(255,255,255,.02);user-select:none;font-size:.72rem;font-weight:700;color:#6b7280;letter-spacing:.03em">
+          <span>📋 Config summary</span><span style="font-size:.7rem">›</span>
+        </summary>
+        <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.04);font-size:.7rem;color:#8b949e;line-height:1.7">
+          ${(() => {
+            const cfg = build().config;
+            const rows = [];
+            rows.push('<b style="color:#e6edf3">Host:</b> ' + esc(hostLabel));
+            rows.push('<b style="color:#e6edf3">Presets:</b> ' + (cfg.presets ? cfg.presets.filter(p=>p.enabled!==false).length + ' active' : 'inherited'));
+            rows.push('<b style="color:#e6edf3">ESEs:</b> ' + (cfg.excludedStreamExpressions ? cfg.excludedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b style="color:#e6edf3">ISEs:</b> ' + (cfg.includedStreamExpressions ? cfg.includedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b style="color:#e6edf3">PSEs:</b> ' + (cfg.preferredStreamExpressions ? cfg.preferredStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b style="color:#e6edf3">Sort keys:</b> ' + (cfg.sortCriteria?.global ? cfg.sortCriteria.global.length : 'inherited'));
+            rows.push('<b style="color:#e6edf3">Title matching:</b> ' + (cfg.titleMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
+            rows.push('<b style="color:#e6edf3">Year matching:</b> ' + (cfg.yearMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
+            rows.push('<b style="color:#e6edf3">Cache mode:</b> ' + (cfg.excludeUncached ? 'cached only' : cfg.excludeCached ? 'uncached only' : 'mixed'));
+            rows.push('<b style="color:#e6edf3">Max results:</b> ' + (cfg.maxResults || 'default'));
+            return rows.join('<br>');
+          })()}
+        </div>
+      </details>
       <details style="margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
         <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.03em;user-select:none">
           <span>🎮 Push to Stremio Library</span><span style="font-size:.7rem">›</span>
@@ -3099,6 +3174,30 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   }
   setTimeout(() => { const c = document.getElementById('mClose'); if (c) c.focus(); }, 50);
 
+  document.getElementById('mTestStreams').addEventListener('click', async function() {
+    const testBtn = this, resEl = document.getElementById('mTestResult');
+    testBtn.disabled = true; testBtn.textContent = 'Testing…';
+    resEl.innerHTML = '<span style="color:#8b949e">Checking catalog…</span>';
+    const baseUrl = manifestUrl.replace(/\/manifest\.json$/, '');
+    const testId = 'tt1375666';
+    try {
+      const r = await fetchWithTimeout(`${baseUrl}/stream/movie/${testId}.json`, { method:'GET' }, 10000);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const count = data?.streams?.length || 0;
+      if (count > 0) {
+        resEl.innerHTML = `<span style="color:#3fb950">✓ Found ${count} stream${count>1?'s':''} — your config is working!</span>`;
+        testBtn.textContent = '✓ Working'; testBtn.style.borderColor = 'rgba(63,185,80,.3)'; testBtn.style.color = '#3fb950';
+      } else {
+        resEl.innerHTML = `<span style="color:#f59e0b">⚠ 0 streams returned — check your API key and try again in a few minutes</span>`;
+        testBtn.disabled = false; testBtn.textContent = 'Retry';
+      }
+    } catch(e) {
+      resEl.innerHTML = `<span style="color:#f87171">Could not reach the server — it may still be processing your config</span>`;
+      testBtn.disabled = false; testBtn.textContent = 'Retry';
+    }
+  });
+
   document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
     const email    = document.getElementById('stremioEmail').value.trim();
     const password = document.getElementById('stremioPassword').value;
@@ -3235,7 +3334,10 @@ function simpleFinishHtml() {
         <div class="name-row" style="margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
             <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">${inp.label}</span>
-            ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+            <span style="display:flex;align-items:center;gap:6px">
+              <button type="button" class="test-key-btn" data-action="test-cred" data-service="${inp.id}">Test</button>
+              ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+            </span>
           </div>
           <div style="position:relative;display:flex;align-items:center">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
@@ -3246,9 +3348,57 @@ function simpleFinishHtml() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
+          <span class="cred-status" id="credStatus_${inp.id}" role="status" aria-live="polite"></span>
         </div>`).join('')}
         ${!anyFilled ? `<div style="font-size:.74rem;color:#fbbf24;margin-top:4px">⚠ Streams won't load without an API key</div>` : ''}
       </div>` : ''}
+      <details style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:14px" ${S.tmdbToken||S.tmdbApiKey?'open':''}>
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
+          <span style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">TMDB Key</span>
+            <span style="font-size:.65rem;color:#4b5563;font-weight:600">recommended</span>
+            ${S.tmdbToken||S.tmdbApiKey?'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3)">SET</span>':''}
+          </span>
+          <span style="font-size:.7rem;color:#374151">›</span>
+        </summary>
+        <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.04)">
+          <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:10px">Enables title matching &amp; better metadata. Without it, title/year matching is disabled.</div>
+          <div class="name-row" style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">Read Access Token</span>
+              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+            </div>
+            <div style="position:relative;display:flex;align-items:center">
+              <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+                value="${S.tmdbToken}" maxlength="400" style="padding-right:38px">
+              <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
+                style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
+                onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div style="font-size:.68rem;color:#6b7280;margin-top:3px">The long token starting with <code style="color:#8b949e;font-family:monospace">eyJ</code></div>
+            <span class="cred-status" id="tmdbStatus" role="status" aria-live="polite">${tmdbHint('token', S.tmdbToken)}</span>
+          </div>
+          <div class="name-row">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">API Key</span>
+              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+            </div>
+            <div style="position:relative;display:flex;align-items:center">
+              <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+                value="${S.tmdbApiKey}" maxlength="60" style="padding-right:38px">
+              <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
+                style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
+                onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div style="font-size:.68rem;color:#6b7280;margin-top:3px">The 32-character key</div>
+            <span class="cred-status" id="tmdbKeyStatus" role="status" aria-live="polite">${tmdbHint('key', S.tmdbApiKey)}</span>
+          </div>
+        </div>
+      </details>
       <div class="name-row">
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
@@ -3312,9 +3462,54 @@ function promptPassword() {
   });
 }
 
+function templateHealthCheck() {
+  const warns = [];
+  if (S.resolution === '1080p') {
+    const ec = eses();
+    const has1080pGuard = ec.some(e => e.expression && /resolution\s*\(\s*streams\s*,\s*'2160p'/.test(e.expression) && e.enabled !== false);
+    if (!has1080pGuard) warns.push('1080p template missing 2160p exclusion ESE — 4K streams may leak through');
+  }
+  if (!S.tmdbToken && !S.tmdbApiKey && !['p2p','http'].includes(S.service)) warns.push('No TMDB key — title/year matching is disabled (metadata will be less accurate)');
+  if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio on a device that doesn\'t support passthrough');
+  if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('4K resolution on Fire Stick HD — device cannot play 2160p');
+  const credInputs = getDebridInputs();
+  const filledCreds = credInputs.filter(i => S.creds[i.id] && S.creds[i.id].trim());
+  if (credInputs.length && !filledCreds.length && !['p2p','http'].includes(S.service)) warns.push('No debrid API key — streams won\'t load');
+  return warns;
+}
+
+async function preflightCheck() {
+  const warns = [];
+  const needed = getDebridInputs();
+  const hasCreds = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
+  if (needed.length && !hasCreds && !['p2p','http'].includes(S.service)) warns.push('No API key entered — streams will not load without one');
+  if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('Fire Stick HD cannot play 4K — consider 1080p resolution');
+  if (S.multiServices.includes('easynews') && !S.creds.easynews) warns.push('EasyNews selected but no username entered');
+  if (S.multiServices.includes('easynews') && !S.creds.easynewsPass) warns.push('EasyNews selected but no password entered');
+  if (S.multiServices.includes('nzbgeek') && !S.creds.nzbgeek) warns.push('NZBGeek selected but no API key entered');
+  if (S.multiServices.includes('streamnzb') && !S.creds.streamnzb) warns.push('StreamNZB selected but no manifest URL entered');
+  if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio selected but your device doesn\'t support it — streams may not play');
+  const credChecks = needed.filter(i => S.creds[i.id] && S.creds[i.id].trim() && CRED_TESTS[i.id]);
+  if (credChecks.length) {
+    const results = await Promise.allSettled(credChecks.map(i => CRED_TESTS[i.id](S.creds[i.id].trim()).catch(() => false)));
+    results.forEach((r, idx) => {
+      if (r.status === 'rejected' || r.value === false) warns.push(`${credChecks[idx].label} API key failed validation — check it's correct and not expired`);
+    });
+  }
+  return warns;
+}
+
 async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
   const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
+  const origBtnHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Checking…`; }
+  const warns = await preflightCheck();
+  if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
+  if (warns.length) {
+    const proceed = confirm('⚠ Config check:\n\n• ' + warns.join('\n• ') + '\n\nContinue anyway?');
+    if (!proceed) return;
+  }
   const pwd = await promptPassword();
   if (!pwd) return;
   const origHtml = btn.innerHTML;
@@ -3457,8 +3652,10 @@ function tmdbHint(field, val) {
   const looksKey = /^[a-f0-9]{32}$/i.test(v);
   if (field === 'token' && looksKey) return '<span style="color:#f59e0b">⚠ That is the 32-character API Key — this field wants the long Read Access Token (starts with eyJ).</span>';
   if (field === 'token' && !looksToken && v.length >= 20) return '<span style="color:#f59e0b">⚠ Read Access Tokens start with eyJ — this does not look like one.</span>';
+  if (field === 'token' && looksToken && v.length >= 100) return '<span style="color:#34d399">✓ Looks like a valid Read Access Token</span>';
   if (field === 'key' && looksToken) return '<span style="color:#f59e0b">⚠ That is the Read Access Token — this field wants the 32-character API Key.</span>';
   if (field === 'key' && !looksKey && v.length >= 24) return '<span style="color:#f59e0b">⚠ API Keys are exactly 32 characters (letters and numbers) — this does not look like one.</span>';
+  if (field === 'key' && looksKey) return '<span style="color:#34d399">✓ Looks like a valid API Key</span>';
   return '';
 }
 
