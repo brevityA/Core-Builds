@@ -463,8 +463,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-preset-1080p:hover{background:rgba(59,130,246,.13)}
 .splash-preset-free{background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.22);color:#a78bfa}
 .splash-preset-free:hover{background:rgba(139,92,246,.13)}
-.splash-custom-btn{width:100%;max-width:310px;margin-top:8px;padding:11px 24px;font-size:.86rem;font-weight:700;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.03);color:#8b949e;cursor:pointer;transition:all .2s}
-.splash-custom-btn:hover{background:rgba(255,255,255,.07);color:#c9d1d9}
+.splash-custom-btn{width:100%;max-width:310px;margin-top:8px;padding:11px 24px;font-size:.86rem;font-weight:700;border:1.5px solid rgba(0,212,255,.35);border-radius:12px;background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(168,85,247,.06));color:#7dd3fc;cursor:pointer;transition:all .2s;letter-spacing:.02em;position:relative}
+.splash-custom-btn:hover{background:linear-gradient(135deg,rgba(0,212,255,.14),rgba(168,85,247,.12));color:#00d4ff;border-color:rgba(0,212,255,.55);box-shadow:0 0 18px rgba(0,212,255,.12)}
 .splash-more{width:100%;max-width:310px}
 .splash-more-summary{list-style:none;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.7rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;user-select:none;outline:none;justify-content:center;padding:4px 0}
 .splash-more-summary:hover{color:#6b7280}
@@ -531,8 +531,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .splash-preset-4k{background:rgba(124,58,237,.06);border-color:rgba(124,58,237,.25);color:#7c3aed}
 [data-theme="light"] .splash-preset-1080p{background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.22);color:#2563eb}
 [data-theme="light"] .splash-preset-free{background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.22);color:#7c3aed}
-[data-theme="light"] .splash-custom-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.12);color:#57606a}
-[data-theme="light"] .splash-custom-btn:hover{background:rgba(0,0,0,.06);color:#1c2128}
+[data-theme="light"] .splash-custom-btn{background:linear-gradient(135deg,rgba(0,160,200,.05),rgba(124,58,237,.05));border-color:rgba(0,160,200,.35);color:#0284c7}
+[data-theme="light"] .splash-custom-btn:hover{background:linear-gradient(135deg,rgba(0,160,200,.12),rgba(124,58,237,.08));color:#0369a1;border-color:rgba(0,160,200,.5);box-shadow:0 0 16px rgba(0,160,200,.1)}
 [data-theme="light"] .splash-more-summary{color:#8c959f}
 [data-theme="light"] .splash-more-summary:hover{color:#57606a}
 [data-theme="light"] .step-pending .step-bub{background:#d0d7de}
@@ -1787,7 +1787,7 @@ function splashHtml() {
       <button data-action="quick-start" data-preset="4k" class="splash-preset-btn splash-preset-4k">4K Preset<br><span>Lossless audio</span></button>
       <button data-action="quick-start" data-preset="1080p" class="splash-preset-btn splash-preset-1080p">1080p Preset<br><span>DD+ streaming</span></button>
     </div>
-    <button data-action="custom-start" class="splash-custom-btn">Core Configure — full control</button>
+    <button data-action="custom-start" class="splash-custom-btn">Core Configure<br><span style="font-size:.74rem;font-weight:600;opacity:.8">Full control — every setting, your way</span></button>
     <button class="qs-help-btn" data-action="open-quickstart"><span class="qs-help-icon">?</span> New here? Quick Start Guide</button>
     <details class="splash-more" style="width:100%;max-width:310px;margin-top:14px">
       <summary class="splash-more-summary">More options <span style="margin-left:auto;font-size:.72rem;opacity:.5">&#9662;</span></summary>
