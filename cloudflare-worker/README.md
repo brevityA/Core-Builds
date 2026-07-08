@@ -1,21 +1,35 @@
-# CORS proxy for the configurator
+# CORS proxy + template paste for the configurator
 
 The configurator's "Create & Install" flow tries to POST a config directly to
 each public AIOStreams instance's `/api/v1/user` endpoint from the browser.
 Most of those instances don't send `Access-Control-Allow-Origin`, so the
-browser request is blocked before a response ever comes back — today the
-configurator silently falls back to a manual paste-back flow when that happens.
+browser request is blocked before a response ever comes back.
 
-`worker.js` is a small Cloudflare Worker that re-issues the same request
-server-to-server (CORS doesn't apply there) and returns the result with
-permissive CORS headers, so the browser can use it. It only forwards to the
-seven hardcoded public AIOStreams hosts in `ALLOWED_HOSTS` — nothing else, and
-nothing is logged or stored.
+`worker.js` is a Cloudflare Worker that does two things:
+
+## 1. CORS proxy (`/proxy/*`)
+
+Re-issues AIOStreams API requests server-to-server (CORS doesn't apply there)
+and returns the result with permissive CORS headers. Only forwards to the
+seven hardcoded public AIOStreams hosts in `ALLOWED_HOSTS`.
 
 The configurator races a direct browser fetch against a proxied fetch via
-`raceHostFetch()` (`configurator/index.src.html`) — whichever responds first
-wins, so this is a pure improvement: if an instance ever adds CORS headers
-itself, the direct attempt keeps winning as before.
+`raceHostFetch()` — whichever responds first wins.
+
+## 2. Template paste (`/paste`, `/t/:id`)
+
+When the direct API call fails (CORS, host down, rate limit), the configurator
+automatically uploads the template JSON to the Worker's KV store and gets back
+a short URL. Users then tap an instance chip to auto-import the template into
+AIOStreams via the `?template=URL` parameter.
+
+**Fallback chain** (configurator tries each until one succeeds):
+1. Cloudflare Worker `/paste` — your infrastructure, 30-day TTL
+2. paste.rs — public paste service
+3. dpaste.com — last resort
+
+Templates are stored in Cloudflare KV with a 30-day TTL. Nothing is logged
+or inspected. Max upload size is 512 KB.
 
 ## Deploy
 
@@ -23,6 +37,11 @@ Requires a free Cloudflare account and [wrangler](https://developers.cloudflare.
 
 ```bash
 cd cloudflare-worker
+
+# Create the KV namespace first
+npx wrangler kv namespace create TEMPLATES
+# Copy the printed id into wrangler.toml
+
 npx wrangler login
 npx wrangler deploy
 ```
@@ -36,8 +55,7 @@ The deploy output prints your Worker's URL:
 2. Rebuild the obfuscated bundle: `node configurator/build.js`.
 3. Commit both `index.src.html` and `index.html`.
 
-Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only
-(today's behavior).
+Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 
 ## CI auto-deploy (optional)
 

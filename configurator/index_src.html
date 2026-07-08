@@ -3340,15 +3340,33 @@ async function simpleInstall(target) {
     }
     throw new Error('rejected');
   } catch(e) {
+    btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
+    const importUrl = await uploadTemplateForImport();
     btn.disabled = false; btn.innerHTML = origHtml;
-    result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
-      <strong style="color:#f87171">Could not reach any AIOStreams host</strong>
-      <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All hosts timed out or are temporarily down. Try again in a moment, or download the JSON and import it manually.</div>
-      <div style="display:flex;gap:10px;justify-content:center">
-        <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
-        <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Download JSON</button>
-      </div>
-    </div>`;
+    if (importUrl) {
+      saveLastGen();
+      const credInputs = getDebridInputs().filter(i => S.creds[i.id] && S.creds[i.id].trim());
+      let credBlock = '';
+      if (credInputs.length) {
+        const rows = credInputs.map(inp => {
+          const val = (S.creds[inp.id] || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+          const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
+          return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
+        }).join('');
+        credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
+      }
+      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Direct install unavailable — tap an instance to import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+      showToast('Tap an instance chip to import your template');
+    } else {
+      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
+        <strong style="color:#f87171">Could not reach any host or paste service</strong>
+        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All methods failed. Download the JSON and import it manually into AIOStreams.</div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
+          <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Download JSON</button>
+        </div>
+      </div>`;
+    }
   }
 }
 
@@ -3494,15 +3512,23 @@ async function uploadTemplateForImport() {
     });
   }
   if (tmpl.parentConfig) tmpl.parentConfig = { ...tmpl.parentConfig, password: '' };
-  const json = JSON.stringify(tmpl, null, 2);
+  const jsonStr = JSON.stringify(tmpl, null, 2);
   let url = null;
-  try {
-    const r = await fetchWithTimeout('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:json }, 5000);
-    if (r.ok) url = (await r.text()).trim();
-  } catch(e) { console.warn("paste.rs failed/timed out", e); }
+  if (CORS_PROXY) {
+    try {
+      const r = await fetchWithTimeout(`${CORS_PROXY}/paste`, { method:'POST', headers:{'Content-Type':'application/json'}, body:jsonStr }, 5000);
+      if (r.ok) { const d = await r.json(); url = d.url || null; }
+    } catch(e) { console.warn("CF paste failed", e); }
+  }
   if (!url) {
     try {
-      const r = await fetchWithTimeout('https://dpaste.com/api/v2/', { method:'POST', body:new URLSearchParams({ content:json, syntax:'json', expiry_days:'365' }) }, 5000);
+      const r = await fetchWithTimeout('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:jsonStr }, 5000);
+      if (r.ok) url = (await r.text()).trim();
+    } catch(e) { console.warn("paste.rs failed/timed out", e); }
+  }
+  if (!url) {
+    try {
+      const r = await fetchWithTimeout('https://dpaste.com/api/v2/', { method:'POST', body:new URLSearchParams({ content:jsonStr, syntax:'json', expiry_days:'365' }) }, 5000);
       if (r.ok) { const t=(await r.text()).trim().replace(/"/g,''); url = t.startsWith('http') ? t+'.txt' : null; }
     } catch(e) { console.warn("dpaste failed/timed out", e); }
   }
@@ -3540,7 +3566,7 @@ async function createImportUrl() {
       </div>`;
     }
 
-    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong style="color:#e6edf3">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong style="color:#fbbf24">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link is hosted on paste.rs and can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong style="color:#e6edf3">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong style="color:#fbbf24">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link expires after 30 days — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
     result.innerHTML = `<div class="import-success import-error" style="margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">The upload failed — CORS block, rate limit, or paste.rs downtime. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
