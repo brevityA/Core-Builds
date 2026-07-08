@@ -1,13 +1,8 @@
-// Core Builds — CORS proxy for the configurator's "Create & Install" flow.
+// Core Builds — CORS proxy + template paste for the configurator.
 //
-// Most public AIOStreams instances don't send Access-Control-Allow-Origin, so a
-// browser POST/PATCH to their /api/v1/user endpoint fails before the configurator
-// ever sees a response. This Worker re-issues that same request server-to-server
-// (no CORS restriction applies there) and hands the result back with permissive
-// CORS headers, so the browser's Promise.any() race can pick it up.
-//
-// Nothing is logged, stored, or inspected — the request body (which may contain
-// the user's debrid credentials) is streamed through unchanged to the upstream host.
+// /proxy/* — re-issues AIOStreams API requests server-to-server to bypass CORS.
+// /paste   — stores a template JSON in KV and returns a URL that serves it back.
+//            Templates expire after 30 days. Nothing is logged or inspected.
 
 const ALLOWED_HOSTS = new Set([
   'https://aiostreams.elfhosted.com',
@@ -28,6 +23,9 @@ const CORS_HEADERS = {
   'Access-Control-Max-Age': '86400',
 };
 
+const PASTE_TTL = 30 * 24 * 60 * 60; // 30 days
+const PASTE_MAX_SIZE = 512 * 1024; // 512 KB
+
 function json(status, body) {
   return new Response(JSON.stringify(body), {
     status,
@@ -35,13 +33,50 @@ function json(status, body) {
   });
 }
 
+function randomId() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  const bytes = new Uint8Array(10);
+  crypto.getRandomValues(bytes);
+  for (const b of bytes) id += chars[b % chars.length];
+  return id;
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: CORS_HEADERS });
     }
 
     const url = new URL(request.url);
+
+    // --- Paste: store template ---
+    if (url.pathname === '/paste' && request.method === 'POST') {
+      if (!env.TEMPLATES) return json(500, { error: 'KV not configured' });
+      const body = await request.text();
+      if (!body || body.length > PASTE_MAX_SIZE) {
+        return json(400, { error: body ? 'too large' : 'empty body' });
+      }
+      try { JSON.parse(body); } catch { return json(400, { error: 'invalid JSON' }); }
+      const id = randomId();
+      await env.TEMPLATES.put(`t:${id}`, body, { expirationTtl: PASTE_TTL });
+      const pasteUrl = `${url.origin}/t/${id}`;
+      return json(200, { url: pasteUrl });
+    }
+
+    // --- Paste: retrieve template ---
+    if (url.pathname.startsWith('/t/') && request.method === 'GET') {
+      if (!env.TEMPLATES) return json(500, { error: 'KV not configured' });
+      const id = url.pathname.slice(3);
+      if (!/^[a-z0-9]{6,20}$/.test(id)) return json(400, { error: 'invalid id' });
+      const val = await env.TEMPLATES.get(`t:${id}`);
+      if (!val) return json(404, { error: 'not found or expired' });
+      return new Response(val, {
+        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+      });
+    }
+
+    // --- Proxy: forward to AIOStreams ---
     if (!url.pathname.startsWith('/proxy/')) {
       return json(404, { error: 'not found' });
     }
@@ -75,8 +110,8 @@ export default {
       return json(502, { error: 'upstream unreachable' });
     }
 
-    const body = await upstreamRes.text();
-    return new Response(body, {
+    const resBody = await upstreamRes.text();
+    return new Response(resBody, {
       status: upstreamRes.status,
       headers: {
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
