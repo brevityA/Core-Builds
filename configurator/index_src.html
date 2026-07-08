@@ -685,11 +685,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.21';
+const CONFIGURATOR_VERSION = '2.22';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.22', date:'Jul 8 2026', items:[
+    'Credential Test buttons added to Easy Setup — verify your API key works before installing',
+    'Share links (#cfg=) now jump straight to review — one-tap import instead of starting from splash',
+    'Smart device detection — auto-selects your device from user agent (Fire Stick, Samsung, Apple TV, Shield)',
+  ]},
   { v:'2.21', date:'Jul 8 2026', items:[
     'TMDB key input added to Easy Setup with live validation — green check for valid keys, warnings for mismatched fields',
     'Pre-flight config check before "Create & Install" — warns about missing API keys, 4K on Fire Stick HD, audio mismatches',
@@ -920,6 +925,8 @@ const CHANGELOG = [
 let step = 0;
 let showAdvanced = false;
 let hadSavedState = false;
+let _sharedImport = false;
+let _detectedDevice = null;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
@@ -1112,6 +1119,7 @@ function loadState() {
         const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(5)))));
         Object.assign(S, sanitizeSharedConfig(decoded));
         hadSavedState = true;
+        _sharedImport = true;
         S.service = deriveService();
         history.replaceState(null, '', location.pathname);
         return;
@@ -2061,6 +2069,7 @@ function render() {
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
+        ${def.id === 'device' && _detectedDevice ? `<div style="margin-bottom:12px;padding:9px 14px;border-radius:10px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;gap:8px;font-size:.8rem;color:#34d399;font-weight:600"><span>🔍</span> We detected <b style="margin:0 2px">${(def.opts.find(o=>o.v===_detectedDevice)||{}).name||_detectedDevice}</b> — change below if wrong</div>` : ''}
         ${renderOpts(def)}
         ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
@@ -2113,6 +2122,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const px = (screen.width || 0) * (window.devicePixelRatio || 1);
       if (px >= 3840) S.resolution = '4k';
     } catch(e) {}
+  }
+  if (!hadSavedState && !S.device) {
+    try {
+      const ua = navigator.userAgent || '';
+      if (/Tizen/i.test(ua)) S.device = 'samsung';
+      else if (/AFTM|AFTS|AFTB|AFTT|AFTKA|Fire\s?TV/i.test(ua)) S.device = /4K|AFTKA/i.test(ua) ? 'firestick-4kmax' : 'firestick-hd';
+      else if (/AppleTV/i.test(ua)) S.device = 'appletv-new';
+      else if (/Android\s?TV|SHIELD|BRAVIA|Chromecast/i.test(ua)) S.device = 'shield';
+      if (S.device) _detectedDevice = S.device;
+    } catch(e) {}
+  }
+  if (_sharedImport) {
+    step = S.simpleMode ? STEPS + 1 : STEPS;
+    setTimeout(() => showToast('Shared config loaded — review and install'), 300);
   }
   render();
   try { history.replaceState({ step: step }, ''); } catch(e) {}
@@ -3285,7 +3308,10 @@ function simpleFinishHtml() {
         <div class="name-row" style="margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
             <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">${inp.label}</span>
-            ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+            <span style="display:flex;align-items:center;gap:6px">
+              <button type="button" class="test-key-btn" data-action="test-cred" data-service="${inp.id}">Test</button>
+              ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+            </span>
           </div>
           <div style="position:relative;display:flex;align-items:center">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
@@ -3296,6 +3322,7 @@ function simpleFinishHtml() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
+          <span class="cred-status" id="credStatus_${inp.id}" role="status" aria-live="polite"></span>
         </div>`).join('')}
         ${!anyFilled ? `<div style="font-size:.74rem;color:#fbbf24;margin-top:4px">⚠ Streams won't load without an API key</div>` : ''}
       </div>` : ''}
