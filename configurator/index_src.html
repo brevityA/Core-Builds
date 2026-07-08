@@ -2638,7 +2638,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = e.target.value;
       const i = S.multiServices.indexOf(val);
       if (i >= 0) S.multiServices.splice(i, 1);
-      else if (S.simpleMode) S.multiServices = [val];
       else S.multiServices.push(val);
       S.service = deriveService();
       if (val === 'p2p' && S.multiServices.includes('p2p') && !S.p2pEnabled) {
@@ -2647,7 +2646,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       syncNext();
-      if (S.simpleMode && e.target.checked && S.multiServices.length) {
+      if (S.simpleMode && e.target.checked && S.multiServices.length === 1) {
         setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled && step === 1) b.click(); }, 350);
       }
     }
