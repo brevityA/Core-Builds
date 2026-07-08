@@ -440,34 +440,61 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .receipt-row-lbl{font-size:.74rem;color:#4b5563;font-weight:600;text-transform:capitalize}
 .receipt-row-val{font-size:.84rem;font-weight:700;color:#c9d1d9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:54%}
 .receipt-row-val.hl{color:#00d4ff}
-.card.splash{background:#0a0f16;background-image:radial-gradient(ellipse at 50% 18%,rgba(0,180,210,.13) 0%,transparent 55%),radial-gradient(ellipse at 50% 92%,rgba(120,30,180,.08) 0%,transparent 50%)}
-.splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px 36px}
-.splash-icon{width:96px;height:96px;margin-bottom:18px;filter:drop-shadow(0 0 24px rgba(0,212,255,.5))}
-.splash-title{font-size:2.15rem;font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:5px}
-.splash-by{font-size:.67rem;font-weight:700;letter-spacing:.18em;color:#374151;text-transform:uppercase;margin-bottom:13px}
-.splash-tagline{font-size:.9rem;color:#9ca3af;line-height:1.5;margin-bottom:20px;max-width:290px}
-.splash-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:7px}
-.splash-chip{font-size:.69rem;font-weight:700;padding:4px 11px;border-radius:20px;letter-spacing:.02em}
-.splash-chip-svc{border:1px solid rgba(0,212,255,.22);color:#67e8f9;background:rgba(0,212,255,.06)}
-.splash-chip-feat{border:1px solid #1e2a35;color:#4b5563;background:transparent}
-.splash-cta{margin-top:24px;width:100%;max-width:310px;padding:15px 24px;font-size:1.08rem;font-weight:800;border:1.5px solid rgba(0,212,255,.4);border-radius:12px;background:linear-gradient(135deg,#0096b4 0%,#006a9a 100%);color:#fff;cursor:pointer;box-shadow:0 4px 24px rgba(0,150,180,.35),0 0 0 1px rgba(0,212,255,.1);transition:all .2s;letter-spacing:.01em}
-.splash-cta:hover{transform:translateY(-1px);box-shadow:0 6px 32px rgba(0,150,180,.45),0 0 20px rgba(0,212,255,.15);animation:btnHoverPulse 1.6s ease-in-out infinite}
-.splash-paste{margin-top:13px;font-size:.76rem;color:#374151;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
-.splash-paste:hover{color:#6b7280}
-.splash-preset-btn{flex:1;padding:12px 10px;border-radius:12px;font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.35;border-width:1.5px;border-style:solid}
-.splash-preset-btn span{font-size:.68rem;opacity:.78;font-weight:600}
-.splash-preset-btn:hover{transform:translateY(-1px)}
-.splash-preset-4k{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(124,58,237,.04));border-color:rgba(124,58,237,.35);color:#a78bfa;box-shadow:0 2px 12px rgba(124,58,237,.12)}
-.splash-preset-4k:hover{background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(124,58,237,.08));border-color:rgba(124,58,237,.5);box-shadow:0 4px 18px rgba(124,58,237,.2)}
-.splash-preset-1080p{background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(59,130,246,.04));border-color:rgba(59,130,246,.35);color:#60a5fa;box-shadow:0 2px 12px rgba(59,130,246,.12)}
-.splash-preset-1080p:hover{background:linear-gradient(135deg,rgba(59,130,246,.16),rgba(59,130,246,.08));border-color:rgba(59,130,246,.5);box-shadow:0 4px 18px rgba(59,130,246,.2)}
-.splash-preset-free{background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(139,92,246,.04));border-color:rgba(139,92,246,.35);color:#a78bfa;box-shadow:0 2px 12px rgba(139,92,246,.1)}
-.splash-preset-free:hover{background:linear-gradient(135deg,rgba(139,92,246,.16),rgba(139,92,246,.08));border-color:rgba(139,92,246,.5);box-shadow:0 4px 18px rgba(139,92,246,.18)}
-.splash-custom-btn{width:100%;max-width:310px;margin-top:8px;padding:11px 24px;font-size:.86rem;font-weight:700;border:1.5px solid rgba(0,212,255,.35);border-radius:12px;background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(168,85,247,.06));color:#7dd3fc;cursor:pointer;transition:all .2s;letter-spacing:.02em;position:relative}
-.splash-custom-btn:hover{background:linear-gradient(135deg,rgba(0,212,255,.14),rgba(168,85,247,.12));color:#00d4ff;border-color:rgba(0,212,255,.55);box-shadow:0 0 18px rgba(0,212,255,.12)}
-.splash-more{width:100%;max-width:310px}
-.splash-more-summary{list-style:none;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.7rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;user-select:none;outline:none;justify-content:center;padding:4px 0}
-.splash-more-summary:hover{color:#6b7280}
+.card.splash{background:#0a0f16;background-image:radial-gradient(ellipse at 50% 18%,rgba(0,180,210,.13) 0%,transparent 55%),radial-gradient(ellipse at 50% 92%,rgba(120,30,180,.08) 0%,transparent 50%);position:relative;overflow:hidden}
+.splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 20px 36px;gap:24px;position:relative;z-index:1}
+.splash-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:520px;height:520px;opacity:.025;pointer-events:none;z-index:0}
+.splash-icon{width:80px;height:80px;filter:drop-shadow(0 0 24px rgba(0,212,255,.5))}
+.splash-title{font-size:2.15rem;letter-spacing:-.03em;line-height:1;margin-top:-8px}
+.splash-title-core{font-weight:800}
+.splash-title-builds{font-weight:300;color:#7a8194}
+.splash-by{font-size:.67rem;font-weight:700;letter-spacing:.18em;color:#374151;text-transform:uppercase;margin-top:-14px}
+.splash-tagline{font-size:.88rem;color:#7a8194;line-height:1.5;max-width:310px;margin-top:-12px}
+.splash-chips-section{width:100%;max-width:420px;margin-top:-8px}
+.splash-chips-label{font-size:.62rem;color:#4a4f60;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px}
+.splash-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
+.splash-chip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;padding:6px 13px;border-radius:8px;letter-spacing:.02em;cursor:pointer;transition:all .2s;user-select:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#7a8194}
+.splash-chip:hover{background:rgba(255,255,255,.07);color:#e4e7ed;border-color:rgba(255,255,255,.12)}
+.splash-chip.active{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:#00d4ff}
+.splash-chip-icon{font-size:.82rem;line-height:1}
+.splash-doors{width:100%;max-width:420px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.splash-door{background:#151923;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:24px 18px 20px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;text-align:left}
+.splash-door::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#00d4ff;opacity:0;transition:opacity .25s ease;box-shadow:0 0 12px rgba(0,200,255,.45),0 0 30px rgba(0,200,255,.12)}
+.splash-door:hover{background:#1a2332;border-color:rgba(0,212,255,.15);transform:translateY(-2px)}
+.splash-door:hover::before{opacity:1}
+.splash-door:active{transform:translateY(0)}
+.splash-door-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.1)}
+.splash-door-title{font-size:.95rem;font-weight:700;letter-spacing:-.01em}
+.splash-door-desc{font-size:.72rem;color:#7a8194;line-height:1.5}
+.splash-door-tag{display:inline-block;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:4px;width:fit-content;margin-top:auto}
+.splash-tag-guided{color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.18)}
+.splash-tag-advanced{color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.18)}
+.splash-section-hdr{width:100%;max-width:420px;display:flex;align-items:center;gap:10px;margin:-8px 0}
+.splash-section-line{flex:1;height:1px;background:rgba(255,255,255,.06)}
+.splash-section-title{font-size:.6rem;color:#4a4f60;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.splash-presets{width:100%;max-width:420px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.splash-preset-card{background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 12px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;text-align:left}
+.splash-preset-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s}
+.splash-preset-card:hover{background:#1a2332;border-color:rgba(255,255,255,.1);transform:translateY(-1px)}
+.splash-preset-card:hover::before{opacity:1}
+.splash-preset-card:active{transform:translateY(0)}
+.splash-preset-card:nth-child(1)::before{background:#a78bfa}
+.splash-preset-card:nth-child(2)::before{background:#60a5fa}
+.splash-preset-card:nth-child(3)::before{background:#34d399}
+.splash-preset-card:nth-child(4)::before{background:#fbbf24}
+.splash-preset-card:nth-child(5)::before{background:#f472b6}
+.splash-preset-card:nth-child(6)::before{background:#fb923c}
+.splash-preset-icon{font-size:1rem;margin-bottom:1px}
+.splash-preset-name{font-size:.74rem;font-weight:700;letter-spacing:-.01em}
+.splash-preset-detail{font-size:.6rem;color:#4a4f60}
+.splash-tertiary{width:100%;max-width:420px;display:flex;gap:8px}
+.splash-tertiary-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;background:transparent;border:1px solid rgba(255,255,255,.06);border-radius:10px;color:#7a8194;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none}
+.splash-tertiary-btn:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1);color:#e4e7ed}
+.splash-tertiary-icon{font-size:.82rem;opacity:.7}
+.splash-footer{font-size:.6rem;color:#4a4f60;line-height:1.6;margin-top:-8px}
+.splash-footer a{color:#00d4ff;text-decoration:none;opacity:.7}
+.splash-paste{font-size:.72rem;color:#4a4f60;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s;margin-top:-12px}
+.splash-paste:hover{color:#7a8194}
+@media(max-width:480px){.splash-doors{grid-template-columns:1fr}.splash-presets{grid-template-columns:1fr 1fr}.splash-tertiary{flex-direction:column}.splash-watermark{width:320px;height:320px}}
 /* ── Theme toggle ─────────────────────────────────────── */
 #themeToggle{position:fixed;top:14px;left:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
 #themeToggle:hover{background:rgba(255,255,255,.12);color:#e6edf3;border-color:rgba(255,255,255,.2)}
@@ -523,21 +550,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .srh-sub{color:#57606a}
 [data-theme="light"] .splash-by{color:#8c959f}
 [data-theme="light"] .splash-tagline{color:#57606a}
-[data-theme="light"] .splash-chip-feat{color:#57606a;border-color:#d0d7de;background:rgba(0,0,0,.03)}
-[data-theme="light"] .splash-chip-svc{color:#0e7490;border-color:rgba(14,116,144,.4);background:rgba(14,116,144,.07)}
+[data-theme="light"] .splash-title-builds{color:#8c959f}
+[data-theme="light"] .splash-chips-label{color:#8c959f}
+[data-theme="light"] .splash-chip{background:rgba(0,0,0,.03);border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .splash-chip:hover{background:rgba(0,0,0,.06);color:#1c2128;border-color:#afb8c1}
+[data-theme="light"] .splash-chip.active{background:rgba(14,116,144,.07);border-color:rgba(14,116,144,.4);color:#0e7490}
 [data-theme="light"] .svc-list-arr{color:#9ca3af}
 [data-theme="light"] .splash-paste{color:#0e7490}
 [data-theme="light"] .splash-paste:hover{color:#0c4a6e}
-[data-theme="light"] .splash-preset-4k{background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(124,58,237,.03));border-color:rgba(124,58,237,.3);color:#7c3aed;box-shadow:0 2px 10px rgba(124,58,237,.08)}
-[data-theme="light"] .splash-preset-4k:hover{background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(124,58,237,.06));border-color:rgba(124,58,237,.45);box-shadow:0 4px 16px rgba(124,58,237,.14)}
-[data-theme="light"] .splash-preset-1080p{background:linear-gradient(135deg,rgba(59,130,246,.07),rgba(59,130,246,.03));border-color:rgba(59,130,246,.3);color:#2563eb;box-shadow:0 2px 10px rgba(59,130,246,.08)}
-[data-theme="light"] .splash-preset-1080p:hover{background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(59,130,246,.06));border-color:rgba(59,130,246,.45);box-shadow:0 4px 16px rgba(59,130,246,.14)}
-[data-theme="light"] .splash-preset-free{background:linear-gradient(135deg,rgba(139,92,246,.07),rgba(139,92,246,.03));border-color:rgba(139,92,246,.3);color:#7c3aed;box-shadow:0 2px 10px rgba(139,92,246,.08)}
-[data-theme="light"] .splash-preset-free:hover{background:linear-gradient(135deg,rgba(139,92,246,.14),rgba(139,92,246,.06));border-color:rgba(139,92,246,.45);box-shadow:0 4px 16px rgba(139,92,246,.14)}
-[data-theme="light"] .splash-custom-btn{background:linear-gradient(135deg,rgba(0,160,200,.05),rgba(124,58,237,.05));border-color:rgba(0,160,200,.35);color:#0284c7}
-[data-theme="light"] .splash-custom-btn:hover{background:linear-gradient(135deg,rgba(0,160,200,.12),rgba(124,58,237,.08));color:#0369a1;border-color:rgba(0,160,200,.5);box-shadow:0 0 16px rgba(0,160,200,.1)}
-[data-theme="light"] .splash-more-summary{color:#8c959f}
-[data-theme="light"] .splash-more-summary:hover{color:#57606a}
+[data-theme="light"] .splash-door{background:#ffffff;border-color:#d0d7de}
+[data-theme="light"] .splash-door:hover{background:#f6f8fa;border-color:rgba(9,105,218,.3)}
+[data-theme="light"] .splash-door::before{background:#0969da}
+[data-theme="light"] .splash-door-desc{color:#57606a}
+[data-theme="light"] .splash-door-icon{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.15)}
+[data-theme="light"] .splash-section-line{background:#d0d7de}
+[data-theme="light"] .splash-section-title{color:#8c959f}
+[data-theme="light"] .splash-preset-card{background:#f6f8fa;border-color:#d0d7de}
+[data-theme="light"] .splash-preset-card:hover{background:#eaedf0;border-color:#afb8c1}
+[data-theme="light"] .splash-preset-detail{color:#8c959f}
+[data-theme="light"] .splash-tertiary-btn{border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .splash-tertiary-btn:hover{background:rgba(0,0,0,.03);border-color:#afb8c1;color:#1c2128}
+[data-theme="light"] .splash-footer{color:#8c959f}
+[data-theme="light"] .splash-watermark{opacity:.015}
 [data-theme="light"] .step-pending .step-bub{background:#d0d7de}
 [data-theme="light"] .step-unit:not(:first-child)::before{background:#d0d7de}
 [data-theme="light"] .btn-reset-strip{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.09)!important;color:#8c959f}
@@ -814,11 +848,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.28';
+const CONFIGURATOR_VERSION = '2.29';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.29', date:'Jul 8 2026', items:[
+    'Splash screen revamp — new card-based layout with two-door entry (Guided Setup / Core Configure), quick deploy preset grid, service chip selector, and hex watermark background',
+    'Neon top-edge glow on hover for all splash cards',
+  ]},
   { v:'2.28', date:'Jul 8 2026', items:[
     'Quick Start Guide fix — close button and "Got it" button now work (stopPropagation was blocking click events)',
   ]},
@@ -1746,6 +1784,11 @@ function splashHtml() {
   const _oldBg      = _lt ? 'rgba(0,0,0,.04)' : 'rgba(255,255,255,.03)';
   const _oldBdr     = _lt ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.06)';
   return `<div class="card splash">
+    <svg class="splash-watermark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M100 10 L178 55 L178 145 L100 190 L22 145 L22 55 Z" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".8"/>
+      <path d="M100 35 L155 65 L155 135 L100 165 L45 135 L45 65 Z" stroke="currentColor" stroke-width="1" fill="none" opacity=".4"/>
+      <path d="M100 60 L132 78 L132 122 L100 140 L68 122 L68 78 Z" stroke="currentColor" stroke-width=".5" fill="none" opacity=".2"/>
+    </svg>
     <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
       <defs>
         <linearGradient id="sg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
@@ -1769,18 +1812,23 @@ function splashHtml() {
         <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
       </g>
     </svg>
-    <div class="splash-title"><span class="hdr-core">CORE</span><span class="hdr-builds"> BUILDS</span></div>
+    <div class="splash-title"><span class="splash-title-core hdr-core">CORE</span><span class="splash-title-builds"> BUILDS</span></div>
     <div class="splash-by">By Brevity <span style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08)">v${CONFIGURATOR_VERSION}</span></div>
-    <div class="splash-tagline">Build your perfect AIOStreams template in 2 minutes. No manual JSON editing.</div>
-    <div class="splash-chips">
-      <span class="splash-chip splash-chip-svc">TorBox</span>
-      <span class="splash-chip splash-chip-svc">AllDebrid</span>
-      <span class="splash-chip splash-chip-svc">Real-Debrid</span>
-      <span class="splash-chip splash-chip-svc">EasyNews</span>
-      <span class="splash-chip splash-chip-svc">Hybrid</span>
-      <span class="splash-chip splash-chip-feat">Free P2P/HTTP</span>
+    <div class="splash-tagline">Build your perfect AIOStreams template. No manual JSON editing.</div>
+
+    <div class="splash-chips-section">
+      <div class="splash-chips-label">Your service</div>
+      <div class="splash-chips">
+        <span class="splash-chip active" data-svc="torbox"><span class="splash-chip-icon">⚡</span> TorBox</span>
+        <span class="splash-chip" data-svc="alldebrid"><span class="splash-chip-icon">🔷</span> AllDebrid</span>
+        <span class="splash-chip" data-svc="realdebrid"><span class="splash-chip-icon">🟢</span> Real-Debrid</span>
+        <span class="splash-chip" data-svc="easynews"><span class="splash-chip-icon">📰</span> EasyNews</span>
+        <span class="splash-chip" data-svc="hybrid"><span class="splash-chip-icon">🔀</span> Hybrid</span>
+        <span class="splash-chip" data-svc="free"><span class="splash-chip-icon">🆓</span> Free</span>
+      </div>
     </div>
-    ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:340px;margin-top:18px;padding:12px 16px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:12px;display:flex;align-items:center;gap:10px">
+
+    ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:420px;padding:12px 16px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:12px;display:flex;align-items:center;gap:10px">
       <div style="flex:1;min-width:0">
         <div style="font-size:.76rem;font-weight:700;color:#00d4ff">Continue where you left off</div>
         <div style="font-size:.7rem;color:#6b7280;margin-top:2px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div>
@@ -1789,38 +1837,75 @@ function splashHtml() {
       <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:5px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">&#10005;</button>
     </div>
-    ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:340px;margin-top:8px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">⚡ Use previous settings — go to install</button>` : ''}` : ''}
-    <button class="splash-cta" data-action="easy-start" style="margin-top:${hadSavedState && _savedStep > 0 ? '12' : '24'}px">Core Start<br><span style="font-size:.76rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
-    <div class="splash-secondary-row" style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:8px">
-      <button data-action="quick-start" data-preset="4k" class="splash-preset-btn splash-preset-4k">4K Preset<br><span>Lossless audio</span></button>
-      <button data-action="quick-start" data-preset="1080p" class="splash-preset-btn splash-preset-1080p">1080p Preset<br><span>DD+ streaming</span></button>
-    </div>
-    <button data-action="custom-start" class="splash-custom-btn">Core Configure<br><span style="font-size:.74rem;font-weight:600;opacity:.8">Full control — every setting, your way</span></button>
-    <button class="qs-help-btn" data-action="open-quickstart"><span class="qs-help-icon">?</span> New here? Quick Start Guide</button>
-    <details class="splash-more" style="width:100%;max-width:310px;margin-top:14px">
-      <summary class="splash-more-summary">More options <span style="margin-left:auto;font-size:.72rem;opacity:.5">&#9662;</span></summary>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
-        <div style="display:flex;gap:8px">
-          <button data-action="quick-start" data-preset="http" class="splash-preset-btn splash-preset-free">Free Streaming<br><span>No account needed</span></button>
-          <button data-action="quick-start" data-preset="p2p" class="splash-preset-btn splash-preset-free">Free P2P<br><span>Torrents, no debrid</span></button>
-        </div>
-        <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:7px;margin-top:6px">
-          <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            Browse Templates
-          </a>
-          <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
-            GitHub
-          </a>
-          <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-link splash-pill" style="border-radius:20px;padding:5px 11px;font-size:.76rem">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
-            Reddit
-          </a>
-        </div>
+    ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:420px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">⚡ Use previous settings — go to install</button>` : ''}` : ''}
+
+    <div class="splash-doors">
+      <div class="splash-door" data-action="easy-start">
+        <div class="splash-door-icon">🧭</div>
+        <div class="splash-door-title">Guided Setup</div>
+        <div class="splash-door-desc">Walk through device, resolution, and cache — we build the template for you.</div>
+        <div class="splash-door-tag splash-tag-guided">Core Start</div>
       </div>
-    </details>
-    <details style="width:100%;max-width:310px;margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
+      <div class="splash-door" data-action="custom-start">
+        <div class="splash-door-icon">⚙️</div>
+        <div class="splash-door-title">Core Configure</div>
+        <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
+        <div class="splash-door-tag splash-tag-advanced">Advanced</div>
+      </div>
+    </div>
+
+    <div class="splash-section-hdr">
+      <div class="splash-section-line"></div>
+      <div class="splash-section-title">Quick Deploy Presets</div>
+      <div class="splash-section-line"></div>
+    </div>
+
+    <div class="splash-presets">
+      <div class="splash-preset-card" data-action="quick-start" data-preset="4k">
+        <div class="splash-preset-icon">👑</div>
+        <div class="splash-preset-name">4K Apex</div>
+        <div class="splash-preset-detail">Flagship · IQR · Lossless</div>
+      </div>
+      <div class="splash-preset-card" data-action="quick-start" data-preset="1080p">
+        <div class="splash-preset-icon">📺</div>
+        <div class="splash-preset-name">1080p Stream</div>
+        <div class="splash-preset-detail">Balanced · DD+ audio</div>
+      </div>
+      <div class="splash-preset-card" data-action="quick-start" data-preset="http">
+        <div class="splash-preset-icon">🌐</div>
+        <div class="splash-preset-name">Free Streaming</div>
+        <div class="splash-preset-detail">No account needed</div>
+      </div>
+      <div class="splash-preset-card" data-action="quick-start" data-preset="p2p">
+        <div class="splash-preset-icon">🔗</div>
+        <div class="splash-preset-name">Free P2P</div>
+        <div class="splash-preset-detail">Torrents · No debrid</div>
+      </div>
+      <div class="splash-preset-card" data-action="open-quickstart">
+        <div class="splash-preset-icon">❓</div>
+        <div class="splash-preset-name">Quick Start</div>
+        <div class="splash-preset-detail">New here? Start here</div>
+      </div>
+      <div class="splash-preset-card" data-action="paste-manifest-splash">
+        <div class="splash-preset-icon">📋</div>
+        <div class="splash-preset-name">Paste Manifest</div>
+        <div class="splash-preset-detail">Import existing config</div>
+      </div>
+    </div>
+
+    <div class="splash-tertiary">
+      <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">
+        <span class="splash-tertiary-icon">📁</span> Browse Templates
+      </a>
+      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-tertiary-btn">
+        <span class="splash-tertiary-icon">🔗</span> GitHub
+      </a>
+      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-tertiary-btn">
+        <span class="splash-tertiary-icon">💬</span> Reddit
+      </a>
+    </div>
+
+    <details style="width:100%;max-width:420px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
       <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:${_clrOlder};letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
         What's new
         <span style="color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeBdr};border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
@@ -1839,7 +1924,8 @@ function splashHtml() {
         </div>`).join('')}
       </div>
     </details>
-    <div class="splash-paste" data-action="paste-manifest-splash" style="margin-top:16px">Already have a manifest? Paste it</div>
+
+    <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
   </div>`;
 }
 
@@ -2373,6 +2459,12 @@ document.addEventListener('DOMContentLoaded', () => {
       void flashBtn.offsetWidth;
       flashBtn.classList.add('btn-flash');
       flashBtn.addEventListener('animationend', () => flashBtn.classList.remove('btn-flash'), {once:true});
+    }
+    const svcChip = e.target.closest('.splash-chip[data-svc]');
+    if (svcChip) {
+      document.querySelectorAll('.splash-chip[data-svc]').forEach(c => c.classList.remove('active'));
+      svcChip.classList.add('active');
+      return;
     }
     const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
     const action = el?.dataset.action;
