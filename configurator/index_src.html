@@ -2772,8 +2772,8 @@ function build() {
     ],
     preferredStreamExpressions: pses(),
     dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
-    titleMatching: { enabled:true, mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
-    yearMatching: { enabled:true, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
+    titleMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
+    yearMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
     groups: { enabled:false, groupings:[] },
   };
