@@ -685,11 +685,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.22';
+const CONFIGURATOR_VERSION = '2.23';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.23', date:'Jul 8 2026', items:[
+    'Easy Setup shows "Step 1 of 3" progress indicator with proportional ring fill',
+    '"Use previous settings" button on splash — returning users skip straight to install',
+    'Fine-tune panel in Easy Setup — change formatter, dedup matching, and cache mode without leaving the flow',
+  ]},
   { v:'2.22', date:'Jul 8 2026', items:[
     'Credential Test buttons added to Easy Setup — verify your API key works before installing',
     'Share links (#cfg=) now jump straight to review — one-tap import instead of starting from splash',
@@ -1210,7 +1215,7 @@ function renderOpts(def) {
           { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
           { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
         ];
-        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
         const recAudio = DEV_REC[S.device];
         const devLabel = label('device', S.device);
         const audioRows = AUDIO_OPTS.map(o => {
@@ -1598,7 +1603,8 @@ function splashHtml() {
       </div>
       <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:5px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">&#10005;</button>
-    </div>` : ''}
+    </div>
+    ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:340px;margin-top:8px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">⚡ Use previous settings — go to install</button>` : ''}` : ''}
     <button class="splash-cta" data-action="easy-start" style="margin-top:${hadSavedState && _savedStep > 0 ? '12' : '24'}px">Easy Setup<br><span style="font-size:.76rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
     <div class="splash-secondary-row" style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:8px">
       <button data-action="quick-start" data-preset="4k" class="splash-preset-btn splash-preset-4k">4K Preset<br><span>Lossless audio</span></button>
@@ -2053,7 +2059,7 @@ function render() {
     syncNext();
   } else {
     const ringC = 131.9;
-    const ringPct = (step - 1) / (STEPS - 1);
+    const ringPct = S.simpleMode ? ((step - 1) / 2) : ((step - 1) / (STEPS - 1));
     main.innerHTML = `
       <div class="card">
         <div class="srh">
@@ -2065,10 +2071,10 @@ function render() {
                 stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC * (1 - ringPct)).toFixed(1)}"
                 stroke-linecap="round" transform="rotate(-90 26 26)"/>
             </svg>
-            <div class="srh-num">${step}</div>
+            <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${{1:1,2:2,3:3}[step]||step} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -2259,8 +2265,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'show-full-review') { S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'set-simple-fmt') { S.formatter = el.dataset.val; saveState(); render(); }
+    if (action === 'set-simple-match') { S.matchMode = el.dataset.val; saveState(); render(); }
+    if (action === 'set-simple-cache') { S.cacheMode = el.dataset.val; saveState(); render(); }
     if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'quick-reinstall') { S.simpleMode = true; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
@@ -2390,12 +2400,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action === 'update-radio') {
       S[e.target.dataset.key] = e.target.value;
       if (e.target.dataset.key === 'device') {
-        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
         const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
         const newAudio = DEV_AUDIO[e.target.value];
+        const devCantDoLossless = ['samsung','firestick-hd','firestick-4kmax'].includes(e.target.value);
         if (newAudio && newAudio !== S.audio) {
-          S.audio = newAudio;
-          showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}`);
+          if (S.quickStart && S.audio === 'lossless' && !devCantDoLossless) {
+            // Preset chose lossless and this device supports it — keep it
+          } else {
+            S.audio = newAudio;
+            showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}` + (S.quickStart && devCantDoLossless ? ' — this device can\'t do lossless' : ''));
+          }
         }
       }
       saveState();
@@ -3396,6 +3411,35 @@ function simpleFinishHtml() {
             </div>
             <div style="font-size:.68rem;color:#6b7280;margin-top:3px">The 32-character key</div>
             <span class="cred-status" id="tmdbKeyStatus" role="status" aria-live="polite">${tmdbHint('key', S.tmdbApiKey)}</span>
+          </div>
+        </div>
+      </details>
+      <details style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:14px">
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
+          <span style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">Fine-tune</span>
+            <span style="font-size:.65rem;color:#4b5563;font-weight:600">optional</span>
+          </span>
+          <span style="font-size:.7rem;color:#374151">›</span>
+        </summary>
+        <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Formatter</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.formatter===f.id?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(0,212,255,.1)':'transparent'};color:${S.formatter===f.id?'#00d4ff':'#6b7280'}">${f.label}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Dedup matching</div>
+            <div style="display:flex;gap:6px">
+              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Cache mode</div>
+            <div style="display:flex;gap:6px">
+              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+            </div>
           </div>
         </div>
       </details>
