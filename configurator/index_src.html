@@ -1455,7 +1455,7 @@ function renderOpts(def) {
       const auth = SVC_AUTH[o.v] || '';
       const cat = SVC_CAT[o.v] || 'debrid';
       const isFree = auth === 'Free';
-      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}"><${chk(o)}<label for="o_${o.v}">
+      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}">${chk(o)}<label for="o_${o.v}">
         <div class="opt-icon">${o.icon}</div>
         <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
         <span class="svc-row-auth${isFree?' free':''}">${auth}</span>
