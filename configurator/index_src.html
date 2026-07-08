@@ -176,6 +176,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-list-row .opt-desc{font-size:.69rem!important;margin-top:1px!important}
 .svc-list-arr{color:#6b7280;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
 .svc-list-row input:checked+label .svc-list-arr{color:#00d4ff}
+/* Service picker — enhanced Option I */
+.svc-search{position:relative;margin-bottom:10px}
+.svc-search input{width:100%;padding:9px 14px 9px 34px;border-radius:9px;border:1.5px solid rgba(255,255,255,.07);background:rgba(13,17,23,.7);color:#e6edf3;font-size:.76rem;font-weight:500;outline:none;transition:border-color .15s}
+.svc-search input:focus{border-color:rgba(0,212,255,.4)}
+.svc-search input::placeholder{color:#3e4a5c}
+.svc-search-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#3e4a5c;pointer-events:none}
+.svc-seg{display:flex;gap:0;margin-bottom:12px;border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,.07);background:rgba(13,17,23,.7)}
+.svc-seg-b{flex:1;padding:8px 4px;border:none;background:transparent;color:#3e4a5c;font-size:.66rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.svc-seg-b:last-child{border-right:none}
+.svc-seg-b.act{background:rgba(0,212,255,.08);color:#00d4ff}
+.svc-seg-help{display:inline;margin-left:3px;border-bottom:1px dotted;cursor:help;opacity:.5;font-weight:600;font-size:.58rem;position:relative}
+.svc-seg-help:hover{opacity:1}
+.svc-seg-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:10px 14px;border-radius:9px;background:#111520;border:1px solid rgba(255,255,255,.07);box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:20;width:220px;font-size:.64rem;color:#64748b;line-height:1.55;text-align:left;font-weight:500;white-space:normal}
+.svc-seg-help:hover .svc-seg-tip{display:block}
+.svc-row-auth{font-size:.56rem;color:#3e4a5c;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);flex-shrink:0;white-space:nowrap}
+.svc-row-auth.free{color:#22c55e;border-color:rgba(34,197,94,.15)}
+.svc-row-ck{width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.svc-row-ck svg{width:10px;height:10px;opacity:0;transition:opacity .15s}
+.svc-list-row input:checked+label .svc-row-ck{background:#00d4ff;border-color:#00d4ff}
+.svc-list-row input:checked+label .svc-row-ck svg{opacity:1}
+.svc-empty{text-align:center;padding:24px 0;color:#3e4a5c;font-size:.76rem;display:none}
+.qs-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.qs-overlay.open{opacity:1;pointer-events:auto}
+.qs-panel{width:100%;max-width:440px;max-height:85vh;overflow-y:auto;background:#161b22;border:1px solid rgba(255,255,255,.07);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.5);transform:translateY(12px);transition:transform .25s}
+.qs-overlay.open .qs-panel{transform:translateY(0)}
+.qs-hdr{padding:16px 20px;background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(168,85,247,.04));border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
+.qs-hdr-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.qs-hdr h2{font-size:.88rem;font-weight:800;color:#e6edf3;margin:0}
+.qs-hdr p{font-size:.72rem;color:#8b949e;margin:1px 0 0}
+.qs-close{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:4px 10px;cursor:pointer;flex-shrink:0;line-height:1}
+.qs-close:hover{background:rgba(255,255,255,.1)}
+.qs-intro{margin:16px 20px 0;font-size:.74rem;color:#8b949e;line-height:1.6;padding:10px 12px;border-radius:8px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15)}
+.qs-body{padding:8px 20px 16px}
+.qs-step{display:flex;gap:14px;padding:14px 0}
+.qs-step+.qs-step{border-top:1px solid rgba(255,255,255,.06)}
+.qs-num{width:28px;height:28px;border-radius:50%;background:rgba(0,212,255,.08);border:1.5px solid rgba(0,212,255,.25);color:#00d4ff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.qs-step-title{font-size:.8rem;font-weight:700;color:#e6edf3;margin-bottom:3px}
+.qs-step-desc{font-size:.72rem;color:#8b949e;line-height:1.5}
+.qs-tip{margin-top:6px;font-size:.68rem;color:#f59e0b;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.14);border-radius:6px;padding:5px 8px;line-height:1.4}
+.qs-cta{padding:14px 20px;border-top:1px solid rgba(255,255,255,.06);text-align:center}
+.qs-cta button{padding:10px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#0096b4,#006a9a);color:#fff;font-size:.82rem;font-weight:800;cursor:pointer;transition:transform .15s}
+.qs-cta button:hover{transform:translateY(-1px)}
+.qs-help-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:#4b5563;font-size:.72rem;cursor:pointer;padding:0;margin-top:14px;transition:color .15s}
+.qs-help-btn:hover{color:#8b949e}
+.qs-help-icon{width:20px;height:20px;border-radius:50%;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:#00d4ff;font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center}
 @media(min-width:720px){
   .wrap{max-width:980px}
   .card{padding:36px}
@@ -502,6 +547,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .svc-list-hero label{background:#ffffff!important;border-color:#d0d7de!important}
 [data-theme="light"] .svc-list-hero input:checked+label{background:rgba(9,105,218,.08)!important;border-color:rgba(9,105,218,.4)!important}
 [data-theme="light"] .svc-list-arr{color:#afb8c1}
+[data-theme="light"] .svc-search input{background:#fff;border-color:#d0d7de;color:#1c2128}
+[data-theme="light"] .svc-search input::placeholder{color:#8c959f}
+[data-theme="light"] .svc-search-ic{color:#8c959f}
+[data-theme="light"] .svc-seg{background:#fff;border-color:#d0d7de}
+[data-theme="light"] .svc-seg-b{color:#8c959f;border-right-color:#d0d7de}
+[data-theme="light"] .svc-seg-b.act{background:rgba(9,105,218,.07);color:#0969da}
+[data-theme="light"] .svc-seg-tip{background:#fff;border-color:#d0d7de;box-shadow:0 6px 20px rgba(0,0,0,.1);color:#57606a}
+[data-theme="light"] .svc-row-auth{background:rgba(0,0,0,.02);border-color:#d0d7de;color:#8c959f}
+[data-theme="light"] .svc-row-auth.free{color:#1a7f37;border-color:rgba(26,127,55,.2)}
+[data-theme="light"] .svc-row-ck{border-color:#d0d7de}
+[data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da;border-color:#0969da}
+[data-theme="light"] .svc-empty{color:#8c959f}
+[data-theme="light"] .qs-panel{background:#fff;border-color:#d0d7de;box-shadow:0 16px 48px rgba(0,0,0,.15)}
+[data-theme="light"] .qs-hdr{background:linear-gradient(135deg,rgba(9,105,218,.04),rgba(130,80,223,.03));border-bottom-color:#d0d7de}
+[data-theme="light"] .qs-hdr-icon{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.25)}
+[data-theme="light"] .qs-hdr h2{color:#1c2128}
+[data-theme="light"] .qs-close{background:rgba(0,0,0,.04);border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .qs-intro{background:rgba(9,105,218,.04);border-color:rgba(9,105,218,.15);color:#57606a}
+[data-theme="light"] .qs-step+.qs-step{border-color:#d0d7de}
+[data-theme="light"] .qs-num{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.25);color:#0969da}
+[data-theme="light"] .qs-step-title{color:#1c2128}
+[data-theme="light"] .qs-step-desc{color:#57606a}
+[data-theme="light"] .qs-tip{color:#9a6700;background:rgba(154,103,0,.05);border-color:rgba(154,103,0,.14)}
+[data-theme="light"] .qs-cta{border-color:#d0d7de}
 [data-theme="light"] .modal-box{background:#ffffff;border-color:#d0d7de}
 [data-theme="light"] .modal-overlay{background:rgba(0,0,0,.45)}
 [data-theme="light"] .modal-close{color:#57606a}
@@ -662,6 +731,61 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div id="cb-loader-sub">by Brevity</div>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div class="qs-overlay" id="qsOverlay" data-action="close-quickstart-overlay">
+  <div class="qs-panel" onclick="event.stopPropagation()">
+    <div class="qs-hdr">
+      <div class="qs-hdr-icon">📖</div>
+      <div><h2>Quick Start Guide</h2><p>New to Core Builds? Here's how it works</p></div>
+      <button class="qs-close" data-action="close-quickstart">&times;</button>
+    </div>
+    <div class="qs-intro">
+      Core Builds generates <strong style="color:#e6edf3">AIOStreams templates</strong> — config files that control how your streaming addon finds, filters, and sorts torrents and usenet results. Pick your service, device, and preferences, and we build the template for you.
+    </div>
+    <div class="qs-body">
+      <div class="qs-step">
+        <div class="qs-num">1</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Pick your debrid service</div>
+          <div class="qs-step-desc">TorBox, AllDebrid, Real-Debrid, EasyNews, or go free with P2P/HTTP streaming. This determines which scrapers and presets your template uses.</div>
+          <div class="qs-tip">Don't have a debrid account? Choose "Free Streaming" or "Free P2P" from the splash — no signup needed.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">2</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Choose your device</div>
+          <div class="qs-step-desc">Fire Stick, Apple TV, Samsung TV, Android, PC, etc. This sets audio codec limits, HDR handling, and resolution caps automatically.</div>
+          <div class="qs-tip">Not sure? "Generic" works for most devices — you can fine-tune later.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">3</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Set your resolution</div>
+          <div class="qs-step-desc">4K or 1080p. This controls which quality tiers, regex scoring, and bitrate filters are applied to your streams.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">4</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Add your API key <span style="font-size:.64rem;color:#4b5563;font-weight:600">(optional)</span></div>
+          <div class="qs-step-desc">Paste your debrid API key to bake it into the template. Keys are stored only in your downloaded JSON — never sent to any server.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">5</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Deploy</div>
+          <div class="qs-step-desc">One click creates your config on the fastest AIOStreams instance and opens it in Stremio, WuPlay, or Nuvio. Or export the JSON to import manually.</div>
+          <div class="qs-tip">Your template includes 14+ scrapers, smart sorting, regex scoring, and quality filters — all pre-configured based on your choices.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qs-cta">
+      <button data-action="close-quickstart">Got it — let's go</button>
+    </div>
+  </div>
+</div>
 <div class="wrap">
   <header class="hdr">
     <div class="prog-wrap">
@@ -685,11 +809,39 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.22';
+const CONFIGURATOR_VERSION = '2.27';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.27', date:'Jul 8 2026', items:[
+    'Free service fix — P2P and HTTP templates no longer include debrid-specific ESEs (cached/uncached guards, flood guard, usenet propagation)',
+    'Free service fix — PSEs stripped to resolution/codec/seeder basics for P2P, resolution-only for HTTP',
+    'Free service fix — sort criteria simplified (no cached key), DAF uses raw stream counts instead of cached() wrapper',
+    'Free service fix — excludeCached/excludeUncached disabled, metadata category set to P2P/HTTP accordingly',
+  ]},
+  { v:'2.26', date:'Jul 8 2026', items:[
+    'Rebrand: "Easy Setup" is now "Core Start", "Custom Setup" is now "Core Configure" — consistent Core branding throughout',
+    'Quick Start Guide — "?" help icon on the splash screen opens a 5-step walkthrough for new users',
+    '"Advanced Options" renamed to "Fine-Tune", "Create &amp; Install" renamed to "Deploy", "Review &amp; Download" renamed to "Review &amp; Deploy"',
+    '"Generate &amp; Download Template" renamed to "Export Template JSON"',
+  ]},
+  { v:'2.25', date:'Jul 8 2026', items:[
+    'Service picker redesigned — search filter, segmented category tabs (Debrid / Usenet / No Account), all 14 services visible',
+    'Auth badges on each service row — shows what credentials you need (API key, user+pass, free) before clicking',
+    '"What\'s debrid?" and "What\'s usenet?" hover tooltips on segment tabs for new users',
+    'Search auto-switches to All tab so results are never hidden by the active category filter',
+  ]},
+  { v:'2.24', date:'Jul 8 2026', items:[
+    'TMDB signup nudge — Easy Setup now highlights why a TMDB key matters with a step-by-step guide',
+    'Stream Pool option — Normal / Large / Maximum controls how many streams are fetched and returned',
+    'Quality Priority toggle in Fine-tune — promotes source quality (REMUX) above resolution in sort order',
+  ]},
+  { v:'2.23', date:'Jul 8 2026', items:[
+    'Easy Setup shows "Step 1 of 3" progress indicator with proportional ring fill',
+    '"Use previous settings" button on splash — returning users skip straight to install',
+    'Fine-tune panel in Easy Setup — change formatter, dedup matching, and cache mode without leaving the flow',
+  ]},
   { v:'2.22', date:'Jul 8 2026', items:[
     'Credential Test buttons added to Easy Setup — verify your API key works before installing',
     'Share links (#cfg=) now jump straight to review — one-tap import instead of starting from splash',
@@ -936,7 +1088,7 @@ const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', forthewea
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', telemetryOk: false, simpleMode: false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', telemetryOk: false, simpleMode: false };
 
 const FORMATTERS = [
   {
@@ -1044,7 +1196,7 @@ const DEFS = [
     ]
   },
   { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored <strong style="color:#3fb950">only in the downloaded JSON file</strong> and are <strong style="color:#3fb950">never sent to any server</strong>.', key:null, cols:'c1', opts:[] },
-  { id:'review', title:'Review & Download', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
+  { id:'review', title:'Review & Deploy', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
 ];
 
 /* STATE MANAGEMENT */
@@ -1053,7 +1205,7 @@ function saveState() {
   localStorage.setItem('coreBuildStep', step);
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','instanceHost','simpleMode'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode'];
 function shareConfig() {
   try {
     const pub = {};
@@ -1077,6 +1229,7 @@ function sanitizeSharedConfig(d) {
   pick('formatter',    v => v === 'custom' || FORMATTERS.some(f => f.id === v));
   pick('matchMode',    v => ['relaxed','balanced','strict'].includes(v));
   pick('cacheMode',    v => ['mixed','cached','uncached'].includes(v));
+  pick('streamPool',   v => ['normal','large','max'].includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
   ['p2pEnabled','qualityFirst','exclude4K','excludeDV','quickStart','langExclusive','simpleMode'].forEach(k => pick(k, v => typeof v === 'boolean'));
@@ -1093,8 +1246,8 @@ function lastGenDiff() {
   try {
     const last = JSON.parse(localStorage.getItem('coreBuildLastGen') || 'null');
     if (!last) return [];
-    const NICE = { sizeLimit: v => v === 'unlimited' ? 'Unlimited' : v + 'GB', cacheMode: v => ({ mixed:'Mixed', cached:'Cached Only', uncached:'Uncached' })[v] || v };
-    const KEYS = [['device','Device'],['resolution','Resolution'],['audio','Audio'],['content','Content'],['formatter','Formatter'],['sizeLimit','Size limit'],['cacheMode','Cache']];
+    const NICE = { sizeLimit: v => v === 'unlimited' ? 'Unlimited' : v + 'GB', cacheMode: v => ({ mixed:'Mixed', cached:'Cached Only', uncached:'Uncached' })[v] || v, streamPool: v => ({ normal:'Normal', large:'Large', max:'Maximum' })[v] || v };
+    const KEYS = [['device','Device'],['resolution','Resolution'],['audio','Audio'],['content','Content'],['formatter','Formatter'],['sizeLimit','Size limit'],['cacheMode','Cache'],['streamPool','Stream pool']];
     const out = [];
     KEYS.forEach(([k, lbl]) => {
       const a = last[k], b = S[k];
@@ -1210,7 +1363,7 @@ function renderOpts(def) {
           { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
           { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
         ];
-        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
         const recAudio = DEV_REC[S.device];
         const devLabel = label('device', S.device);
         const audioRows = AUDIO_OPTS.map(o => {
@@ -1253,16 +1406,29 @@ function renderOpts(def) {
       'realdebrid': 'Real-Debrid subscribers',
       'premiumize': 'Premiumize subscribers',
       'debridlink': 'Debrid-Link subscribers',
-      'easynews':   'Usenet · username + password',
-      'offcloud':   'Cloud debrid · API key required',
-      'p2p':        'No subscription · P2P torrents only',
-      'http':       'Streaming sites · no debrid · no torrents',
+      'easynews':   'Usenet streaming',
+      'offcloud':   'Cloud debrid service',
+      'p2p':        'Direct torrents · no account needed',
+      'http':       'Streaming sites · no debrid required',
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
-      'debridio':   'Debrid.io scraper · API key required',
-      'nzbgeek':    'Usenet indexer · API key required',
-      'streamnzb':  'Usenet streaming · manifest URL',
+      'debridio':   'Debrid.io scraper',
+      'nzbgeek':    'Usenet indexer',
+      'streamnzb':  'Self-hosted Usenet streaming',
+    };
+    const SVC_AUTH = {
+      'torbox-pro':'API key','torbox-ess':'API key','alldebrid':'API key','realdebrid':'API key',
+      'premiumize':'API key','debridlink':'API key','offcloud':'API key','debridio':'API key',
+      'easynews':'User + pass','nzbgeek':'API key','streamnzb':'Manifest URL',
+      'hybrid':'Both keys','p2p':'Free','http':'Free',
+    };
+    const SVC_CAT = {
+      'torbox-pro':'debrid','torbox-ess':'debrid','alldebrid':'debrid','realdebrid':'debrid',
+      'premiumize':'debrid','debridlink':'debrid','offcloud':'debrid','debridio':'debrid',
+      'hybrid':'debrid','easynews':'usenet','nzbgeek':'usenet','streamnzb':'usenet',
+      'p2p':'noaccount','http':'noaccount',
     };
     const chk = (o) => `<input type="checkbox" id="o_${o.v}" value="${o.v}" ${S.multiServices.includes(o.v)?'checked':''} data-action="toggle-service">`;
+    const ckSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
     const heroHtml = `<div class="svc-list-hero opt">${chk(hero)}<label for="o_${hero.v}">
@@ -1273,20 +1439,26 @@ function renderOpts(def) {
         ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
       </div>
     </label></div>`;
-    const OTHER_SVC_IDS = ['debridio', 'p2p', 'http', 'nzbgeek', 'streamnzb'];
-    const mainOpts = def.opts.slice(1).filter(o => !OTHER_SVC_IDS.includes(o.v));
-    const otherOpts = def.opts.filter(o => OTHER_SVC_IDS.includes(o.v));
-    const rowsHtml = mainOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}">
-      <div class="opt-icon">${o.icon}</div>
-      <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
-      <span class="svc-list-arr">›</span>
-    </label></div>`).join('');
-    const selectedOtherNames = otherOpts.filter(o => S.multiServices.includes(o.v)).map(o => o.name);
-    const isOtherSelected = selectedOtherNames.length > 0;
-    const summaryRight = isOtherSelected ? selectedOtherNames.join(', ') + ' ✓' : `${otherOpts.length} more ›`;
-    const otherHints = otherOpts.map(o => o.name).join(' · ');
-    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 14px;border-radius:10px;background:rgba(139,92,246,.04);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(139,92,246,.15)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(139,92,246,.08)'" onmouseout="this.style.background='rgba(139,92,246,.04)'"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#a78bfa'};letter-spacing:.04em;text-transform:uppercase">More Services</span><span style="font-size:.66rem;color:#4b5563;font-weight:500">${otherHints}</span></span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#a78bfa'};font-weight:600">${summaryRight}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
-    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>${otherHtml}`;
+    const searchHtml = `<div class="svc-search"><span class="svc-search-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></span><input type="text" placeholder="Filter services…" data-action="svc-filter" id="svcFilterInput"></div>`;
+    const segHtml = `<div class="svc-seg" id="svcSeg">
+      <button type="button" class="svc-seg-b act" data-action="svc-cat" data-cat="all">All</button>
+      <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="debrid">Debrid<span class="svc-seg-help">?<span class="svc-seg-tip">Debrid services cache torrents on fast servers so you stream instantly without seeding. You need a paid subscription to one of these.</span></span></button>
+      <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="usenet">Usenet<span class="svc-seg-help">?<span class="svc-seg-tip">Usenet is a paid alternative to torrents. Streams come from news servers instead of peers — often faster, with no seeding required.</span></span></button>
+      <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="noaccount">No Account</button>
+    </div>`;
+    const rowsHtml = def.opts.slice(1).map(o => {
+      const auth = SVC_AUTH[o.v] || '';
+      const cat = SVC_CAT[o.v] || 'debrid';
+      const isFree = auth === 'Free';
+      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}"><${chk(o)}<label for="o_${o.v}">
+        <div class="opt-icon">${o.icon}</div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
+        <span class="svc-row-auth${isFree?' free':''}">${auth}</span>
+        <span class="svc-row-ck">${ckSvg}</span>
+      </label></div>`;
+    }).join('');
+    const emptyHtml = '<div class="svc-empty" id="svcEmpty">No services match your search</div>';
+    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}</div>`;
   }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
@@ -1472,7 +1644,7 @@ function renderAdvancedPanel() {
     <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
       <button data-action="close-advanced" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">← Back</button>
       <div>
-        <div style="font-weight:800;font-size:1rem;color:#e6edf3">Advanced Options</div>
+        <div style="font-weight:800;font-size:1rem;color:#e6edf3">Fine-Tune</div>
         <div style="font-size:.72rem;color:#4b5563;margin-top:1px">Audio · Video · Formatter</div>
       </div>
     </div>
@@ -1492,6 +1664,16 @@ function renderAdvancedPanel() {
         ${prefCard('qualityFirst','Prioritize Quality over Resolution','Sorts by source quality (e.g. REMUX) before resolution.')}
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
+        <div style="background:#0d1117;border:1.5px solid #30363d;border-radius:10px;padding:14px 16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span>
+            <span style="font-size:.65rem;color:#4b5563">${{normal:'20 results',large:'30–35 results',max:'50 results'}[S.streamPool||'normal']}</span>
+          </div>
+          <div style="display:flex;gap:5px">
+            ${[['normal','Normal'],['large','Large'],['max','Maximum']].map(([v,l]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+          </div>
+          <div style="font-size:.65rem;color:#4b5563;margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
+        </div>
       </div>
 
       <div>
@@ -1598,13 +1780,15 @@ function splashHtml() {
       </div>
       <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:5px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">&#10005;</button>
-    </div>` : ''}
-    <button class="splash-cta" data-action="easy-start" style="margin-top:${hadSavedState && _savedStep > 0 ? '12' : '24'}px">Easy Setup<br><span style="font-size:.76rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
+    </div>
+    ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:340px;margin-top:8px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">⚡ Use previous settings — go to install</button>` : ''}` : ''}
+    <button class="splash-cta" data-action="easy-start" style="margin-top:${hadSavedState && _savedStep > 0 ? '12' : '24'}px">Core Start<br><span style="font-size:.76rem;font-weight:600;opacity:.85">3 quick questions — we handle the rest</span></button>
     <div class="splash-secondary-row" style="display:flex;gap:8px;width:100%;max-width:310px;margin-top:8px">
       <button data-action="quick-start" data-preset="4k" class="splash-preset-btn splash-preset-4k">4K Preset<br><span>Lossless audio</span></button>
       <button data-action="quick-start" data-preset="1080p" class="splash-preset-btn splash-preset-1080p">1080p Preset<br><span>DD+ streaming</span></button>
     </div>
-    <button data-action="custom-start" class="splash-custom-btn">Custom Setup — full control</button>
+    <button data-action="custom-start" class="splash-custom-btn">Core Configure — full control</button>
+    <button class="qs-help-btn" data-action="open-quickstart"><span class="qs-help-icon">?</span> New here? Quick Start Guide</button>
     <details class="splash-more" style="width:100%;max-width:310px;margin-top:14px">
       <summary class="splash-more-summary">More options <span style="margin-left:auto;font-size:.72rem;opacity:.5">&#9662;</span></summary>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
@@ -1741,7 +1925,7 @@ function render() {
             value="${S.name}" data-action="update-name" maxlength="60">
         </div>
         ${sizeLimitHtml()}
-        <button class="btn-dl" data-action="generate-dl">⬇ Generate &amp; Download Template</button>
+        <button class="btn-dl" data-action="generate-dl">⬇ Export Template JSON</button>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button data-action="share-config" style="flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
           <button class="btn-aio" data-action="create-import" id="btnImport" style="flex:1;margin-top:0;padding:11px;font-size:.82rem">
@@ -1751,10 +1935,10 @@ function render() {
         </div>
         <div id="importUrlResult"></div>
         <details class="rv-section" open>
-          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Create &amp; Install</span><span class="rv-arr">›</span></summary>
+          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Create &amp; Install in Stremio</button>
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Deploy to Stremio</button>
             <div style="display:flex;gap:8px">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
               <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
@@ -2053,7 +2237,7 @@ function render() {
     syncNext();
   } else {
     const ringC = 131.9;
-    const ringPct = (step - 1) / (STEPS - 1);
+    const ringPct = S.simpleMode ? ((step - 1) / 2) : ((step - 1) / (STEPS - 1));
     main.innerHTML = `
       <div class="card">
         <div class="srh">
@@ -2065,10 +2249,10 @@ function render() {
                 stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC * (1 - ringPct)).toFixed(1)}"
                 stroke-linecap="round" transform="rotate(-90 26 26)"/>
             </svg>
-            <div class="srh-num">${step}</div>
+            <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${{1:1,2:2,3:3}[step]||step} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -2078,7 +2262,7 @@ function render() {
         ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
         ${def.id === 'content' ? `<button data-action="skip-content" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use Everything (safe default) →</button>` : ''}
-        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Advanced Options</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
+        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Fine-Tune</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
     const btnBack = document.getElementById('btnBack');
@@ -2152,6 +2336,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcuts: Enter = next, Escape = back
   document.addEventListener('keydown', (e) => {
+    const qsOv = document.getElementById('qsOverlay');
+    if (qsOv && qsOv.classList.contains('open')) { if (e.key === 'Escape') qsOv.classList.remove('open'); return; }
     if (step === 0) return;
     if (document.getElementById('manifestModal') || document.getElementById('advModal')) return;
     const rem = document.getElementById('apiReminder');
@@ -2259,11 +2445,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'show-full-review') { S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'set-simple-fmt') { S.formatter = el.dataset.val; saveState(); render(); }
+    if (action === 'set-simple-match') { S.matchMode = el.dataset.val; saveState(); render(); }
+    if (action === 'set-simple-cache') { S.cacheMode = el.dataset.val; saveState(); render(); }
+    if (action === 'set-simple-pool') { S.streamPool = el.dataset.val; saveState(); render(); }
+    if (action === 'set-simple-quality') { S.qualityFirst = !S.qualityFirst; saveState(); render(); }
     if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'quick-reinstall') { S.simpleMode = true; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
+    if (action === 'open-quickstart') { document.getElementById('qsOverlay').classList.add('open'); }
+    if (action === 'close-quickstart' || action === 'close-quickstart-overlay') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'share-config') shareConfig();
     if (action === 'copy-json') {
       e.preventDefault();
@@ -2328,6 +2522,17 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.fontWeight  = on ? '700' : '500';
       });
     }
+    if (action === 'set-pool') {
+      S.streamPool = (e.target.closest('[data-action="set-pool"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-pool"]').forEach(btn => {
+        const on = btn.dataset.val === (S.streamPool||'normal');
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
+        btn.style.fontWeight  = on ? '700' : '500';
+      });
+    }
     if (action === 'set-match-mode') {
       S.matchMode = (e.target.closest('[data-action="set-match-mode"]') || e.target).dataset.val;
       if (S.matchMode === 'strict') S.qualityFirst = true;
@@ -2377,6 +2582,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     if (action === 'import-formatter') { showFormatterImport(); }
+    if (action === 'svc-cat') {
+      const cat = el.dataset.cat;
+      document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === cat));
+      const q = document.getElementById('svcFilterInput');
+      if (q) q.value = '';
+      filterSvcRows(cat, '');
+    }
     if (action === 'clear-custom-formatter') {
       e.preventDefault();
       delete S.customFormatter;
@@ -2390,12 +2602,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action === 'update-radio') {
       S[e.target.dataset.key] = e.target.value;
       if (e.target.dataset.key === 'device') {
-        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'standard', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
         const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
         const newAudio = DEV_AUDIO[e.target.value];
+        const devCantDoLossless = ['samsung','firestick-hd','firestick-4kmax'].includes(e.target.value);
         if (newAudio && newAudio !== S.audio) {
-          S.audio = newAudio;
-          showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}`);
+          if (S.quickStart && S.audio === 'lossless' && !devCantDoLossless) {
+            // Preset chose lossless and this device supports it — keep it
+          } else {
+            S.audio = newAudio;
+            showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}` + (S.quickStart && devCantDoLossless ? ' — this device can\'t do lossless' : ''));
+          }
         }
       }
       saveState();
@@ -2484,6 +2701,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const st = document.getElementById('tmdbKeyStatus');
       if (st) st.innerHTML = tmdbHint('key', e.target.value);
     }
+    else if (a === 'svc-filter') {
+      const q = e.target.value.toLowerCase().trim();
+      if (q) {
+        document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === 'all'));
+        filterSvcRows('all', q);
+      } else {
+        const activeCat = document.querySelector('.svc-seg-b.act');
+        filterSvcRows(activeCat ? activeCat.dataset.cat : 'all', '');
+      }
+    }
     else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
     else if (a === 'update-pwd') S.instancePassword = e.target.value;
     else if (a === 'update-base-uuid') { S.baseUuid = e.target.value.trim(); e.target.style.borderColor = S.baseUuid ? 'rgba(168,85,247,.5)' : ''; }
@@ -2531,6 +2758,7 @@ function insights() {
   if (S.exclude4K) pts.push('<b>4K / UHD excluded</b> — 1080p and below only');
   if (S.excludeDV) pts.push('<b>Dolby Vision excluded</b> — DV streams removed, prevents tint on unsupported screens');
   if (S.sizeLimit !== 'unlimited') pts.push('<b>Size limit: max ' + S.sizeLimit + 'GB</b> — streams over ' + S.sizeLimit + 'GB excluded from results');
+  if ((S.streamPool||'normal') !== 'normal') pts.push('<b>Stream pool: ' + (S.streamPool==='max'?'Maximum':'Large') + '</b> — more streams fetched for better quality picks');
   pts.push('<b>Per-Addon Flood Guard</b> — no single scraper can flood results');
   pts.push('<b>REPACK / PROPER priority</b> — fixed releases ranked above originals');
   return pts.slice(0, 6);
@@ -2688,11 +2916,33 @@ function services() {
   ];
 }
 
+function filterSvcRows(cat, q) {
+  const rows = document.querySelectorAll('#svcRows .svc-list-row');
+  let anyVis = false;
+  rows.forEach(r => {
+    const rCat = r.dataset.svcCat || '';
+    const rName = r.dataset.svcName || '';
+    const text = r.textContent.toLowerCase();
+    const catMatch = cat === 'all' || rCat === cat;
+    const searchMatch = !q || rName.includes(q) || text.includes(q);
+    const vis = catMatch && searchMatch;
+    r.style.display = vis ? '' : 'none';
+    if (vis) anyVis = true;
+  });
+  const empty = document.getElementById('svcEmpty');
+  if (empty) empty.style.display = anyVis ? 'none' : 'block';
+}
+
 function resolutionCfg() {
   const ex = ['144p','240p','360p'];
-  if (S.resolution === '4k') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','720p','Unknown'], maxResults:20, maxResultsPerResolution:8 };
-  if (S.resolution === '1080p') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:['1080p','720p'], preferredResolutions:['1080p','720p','Unknown'], maxResults:25, maxResultsPerResolution:10 };
-  return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['1080p','1440p','2160p','720p','576p','480p','Unknown'], maxResults:25, maxResultsPerResolution:10 };
+  const pool = S.streamPool || 'normal';
+  const mr4k  = pool === 'max' ? 50 : pool === 'large' ? 30 : 20;
+  const mr1k  = pool === 'max' ? 50 : pool === 'large' ? 35 : 25;
+  const pr4k  = pool === 'max' ? 20 : pool === 'large' ? 12 : 8;
+  const pr1k  = pool === 'max' ? 20 : pool === 'large' ? 15 : 10;
+  if (S.resolution === '4k') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','720p','Unknown'], maxResults:mr4k, maxResultsPerResolution:pr4k };
+  if (S.resolution === '1080p') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:['1080p','720p'], preferredResolutions:['1080p','720p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
+  return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['1080p','1440p','2160p','720p','576p','480p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
 }
 
 function encodeCfg() {
@@ -2730,6 +2980,30 @@ function visualTags() {
 
 function eses() {
   const out = [], dev = S.device, is1080= S.resolution === '1080p';
+  const isFree = S.service === 'p2p' || S.service === 'http';
+
+  if (S.service === 'http') {
+    out.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" });
+    if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
+    if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
+    if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
+    return out;
+  }
+
+  if (S.service === 'p2p') {
+    out.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
+    if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
+    if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
+    if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+    if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
+    if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
+    if (S.sizeLimit !== 'unlimited') {
+      const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
+      out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
+    }
+    return out;
+  }
+
   out.push({ enabled:true, expression: "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))" });
   if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
   out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
@@ -2756,6 +3030,22 @@ function pses() {
 
   if (S.langs && S.langs.length) {
     out.push({ enabled:true, expression:`/* Language Preference — ${(S.langs||['English']).join('/')} */ language(streams,${(S.langs||['English']).map(l=>`'${l}'`).join(',')})` });
+  }
+
+  if (S.service === 'http') {
+    out.push({ enabled:true, expression:"/* Resolution Preference */ resolution(streams,'1080p','720p','480p')" });
+    return out;
+  }
+
+  if (S.service === 'p2p') {
+    out.push(pinLQ, seasonPSE);
+    if (res === '4k') {
+      out.push({ enabled:true, expression:"/* S-Tier 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* A-Tier 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:codecExpr });
+    } else {
+      out.push({ enabled:true, expression:"/* S-Tier 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* A-Tier 720p Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:codecExpr });
+    }
+    out.push({ enabled:true, expression:"/* Seeder Priority */ seeders(streams,5,99999)" });
+    return out;
   }
 
   if (res === '4k') {
@@ -2787,7 +3077,10 @@ function build() {
     usePosterRedirectApi: true, usePosterServiceForMeta: true,
     ...(S.tmdbToken ? { tmdbAccessToken: S.tmdbToken } : {}),
     ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
-    sortCriteria: (function(){ const d='desc',qf=S.qualityFirst, rq=qf?[{key:'quality',direction:d},{key:'resolution',direction:d}]:[{key:'resolution',direction:d},{key:'quality',direction:d}]; return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedMovies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedSeries:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}] }; })(),
+    sortCriteria: (function(){ const d='desc',qf=S.qualityFirst, rq=qf?[{key:'quality',direction:d},{key:'resolution',direction:d}]:[{key:'resolution',direction:d},{key:'quality',direction:d}], isFree=S.service==='p2p'||S.service==='http';
+      if (S.service==='http') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'language',direction:d},{key:'size',direction:d}] }; }
+      if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
+      return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedMovies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedSeries:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}] }; })(),
     deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
@@ -2804,8 +3097,8 @@ function build() {
     excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes,
     excludedAudioTags: ac.excludedAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
     enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
-    excludeCached: S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
-    excludeUncached: S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
+    excludeCached: (S.service!=='p2p'&&S.service!=='http') && S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
+    excludeUncached: (S.service!=='p2p'&&S.service!=='http') && S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
     excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
     preferredRegexPatterns: [],
     maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
@@ -2818,7 +3111,10 @@ function build() {
       }] : [])
     ],
     preferredStreamExpressions: pses(),
-    dynamicAddonFetching: { enabled:true, condition: S.resolution==='4k' ? "count(cached(resolution(totalStreams,'2160p')))>=5 or totalTimeTaken>5000" : S.resolution==='ultrawide' ? "count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>5000" : "count(cached(resolution(totalStreams,'1080p')))>=15 or totalTimeTaken>5000" },
+    dynamicAddonFetching: (function(){ const pool=S.streamPool||'normal', timeout=pool==='max'?8000:pool==='large'?6000:5000, isFree=S.service==='p2p'||S.service==='http', wrap=expr=>isFree?expr:`cached(${expr})`;
+      if(S.resolution==='4k'){ const c4k=pool==='max'?15:pool==='large'?8:5; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'2160p')")})>=${c4k} or totalTimeTaken>${timeout}`}; }
+      if(S.resolution==='ultrawide'){ return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=10 or count(${wrap("resolution(totalStreams,'2160p')")})>=3 or totalTimeTaken>${timeout}`}; }
+      const c1k=pool==='max'?30:pool==='large'?20:15; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=${c1k} or totalTimeTaken>${timeout}`}; })(),
     titleMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
     yearMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
@@ -2826,7 +3122,7 @@ function build() {
   };
 
   const result = {
-    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: 'Debrid', serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
+    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: (S.service==='p2p'?'P2P':S.service==='http'?'HTTP':'Debrid'), serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
     config: cfg
   };
 
@@ -3020,7 +3316,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
             rows.push('<b style="color:#e6edf3">Title matching:</b> ' + (cfg.titleMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
             rows.push('<b style="color:#e6edf3">Year matching:</b> ' + (cfg.yearMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
             rows.push('<b style="color:#e6edf3">Cache mode:</b> ' + (cfg.excludeUncached ? 'cached only' : cfg.excludeCached ? 'uncached only' : 'mixed'));
-            rows.push('<b style="color:#e6edf3">Max results:</b> ' + (cfg.maxResults || 'default'));
+            rows.push('<b style="color:#e6edf3">Stream pool:</b> ' + ({normal:'Normal',large:'Large',max:'Maximum'}[S.streamPool||'normal']) + ' (' + (cfg.maxResults || 'default') + ' max)');
             return rows.join('<br>');
           })()}
         </div>
@@ -3352,17 +3648,27 @@ function simpleFinishHtml() {
         </div>`).join('')}
         ${!anyFilled ? `<div style="font-size:.74rem;color:#fbbf24;margin-top:4px">⚠ Streams won't load without an API key</div>` : ''}
       </div>` : ''}
-      <details style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:14px" ${S.tmdbToken||S.tmdbApiKey?'open':''}>
-        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
+      <div style="border:1px solid ${S.tmdbToken||S.tmdbApiKey?'rgba(52,211,153,.25)':'rgba(251,191,36,.25)'};border-radius:10px;overflow:hidden;margin-bottom:14px;background:${S.tmdbToken||S.tmdbApiKey?'rgba(52,211,153,.03)':'rgba(251,191,36,.03)'}">
+        <div style="padding:11px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04)">
           <span style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">TMDB Key</span>
-            <span style="font-size:.65rem;color:#4b5563;font-weight:600">recommended</span>
-            ${S.tmdbToken||S.tmdbApiKey?'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3)">SET</span>':''}
+            <span style="font-size:.75rem;font-weight:700;color:${S.tmdbToken||S.tmdbApiKey?'#34d399':'#fbbf24'};text-transform:uppercase;letter-spacing:.06em">${S.tmdbToken||S.tmdbApiKey?'✓ TMDB Connected':'⚡ TMDB Key'}</span>
+            ${S.tmdbToken||S.tmdbApiKey?'':'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">RECOMMENDED</span>'}
           </span>
-          <span style="font-size:.7rem;color:#374151">›</span>
-        </summary>
-        <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.04)">
-          <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:10px">Enables title matching &amp; better metadata. Without it, title/year matching is disabled.</div>
+        </div>
+        ${S.tmdbToken||S.tmdbApiKey ? '' : `<div style="padding:10px 14px;font-size:.72rem;color:#9ca3af;line-height:1.6;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">Without a TMDB key, two quality features are off:</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
+            <span>× <b style="color:#fbbf24">Title matching</b> — wrong movies with similar names sneak through</span>
+            <span>× <b style="color:#fbbf24">Year matching</b> — remakes and reboots mix with originals</span>
+          </div>
+          <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">How to get a free TMDB key (2 min):</div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span>1. Sign up at <a href="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer" style="color:#00d4ff;font-weight:700;text-decoration:none">themoviedb.org/signup</a></span>
+            <span>2. Go to <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="color:#00d4ff;font-weight:700;text-decoration:none">Settings → API</a> and request an API key</span>
+            <span>3. Copy either the <b>Read Access Token</b> or the <b>API Key</b> below</span>
+          </div>
+        </div>`}
+        <div style="padding:12px 14px">
           <div class="name-row" style="margin-bottom:10px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
               <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">Read Access Token</span>
@@ -3398,12 +3704,58 @@ function simpleFinishHtml() {
             <span class="cred-status" id="tmdbKeyStatus" role="status" aria-live="polite">${tmdbHint('key', S.tmdbApiKey)}</span>
           </div>
         </div>
+      </div>
+      <details style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:14px">
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
+          <span style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">Fine-tune</span>
+            <span style="font-size:.65rem;color:#4b5563;font-weight:600">optional</span>
+          </span>
+          <span style="font-size:.7rem;color:#374151">›</span>
+        </summary>
+        <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Formatter</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.formatter===f.id?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(0,212,255,.1)':'transparent'};color:${S.formatter===f.id?'#00d4ff':'#6b7280'}">${f.label}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Dedup matching</div>
+            <div style="display:flex;gap:6px">
+              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Cache mode</div>
+            <div style="display:flex;gap:6px">
+              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <span style="font-size:.72rem;font-weight:700;color:#8b949e">Stream pool</span>
+              <span style="font-size:.6rem;color:#4b5563;font-weight:600">${{normal:'20 results',large:'30–35 results',max:'50 results'}[S.streamPool||'normal']}</span>
+            </div>
+            <div style="display:flex;gap:6px">
+              ${[['normal','Normal'],['large','Large'],['max','Maximum']].map(([v,l]) => `<button data-action="set-simple-pool" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+            </div>
+            <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
+          </div>
+          <div>
+            <button data-action="set-simple-quality" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+              <span>Quality over resolution</span>
+              <span style="font-size:.8rem">${S.qualityFirst?'✓':''}</span>
+            </button>
+            <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">A 1080p REMUX ranks above a 4K WEB-DL when enabled</div>
+          </div>
+        </div>
       </details>
       <div class="name-row">
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
       </div>
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Create &amp; Install in Stremio</button>
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Deploy to Stremio</button>
       <div style="display:flex;gap:8px">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
         <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
@@ -3411,7 +3763,7 @@ function simpleFinishHtml() {
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Your API keys are baked directly into your config — no re-entering them later.</div>
       <div id="aioResult"></div>
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
-        <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">⬇ Download JSON instead</button>
+        <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">⬇ Export JSON instead</button>
         <button data-action="show-full-review" style="background:none;border:none;color:#6b7280;font-size:.8rem;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Show all options →</button>
       </div>
     </div>`;
@@ -3564,7 +3916,7 @@ async function simpleInstall(target) {
         <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All methods failed. Download the JSON and import it manually into AIOStreams.</div>
         <div style="display:flex;gap:10px;justify-content:center">
           <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
-          <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Download JSON</button>
+          <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button>
         </div>
       </div>`;
     }
