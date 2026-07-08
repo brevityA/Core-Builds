@@ -809,11 +809,17 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.26';
+const CONFIGURATOR_VERSION = '2.27';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.27', date:'Jul 8 2026', items:[
+    'Free service fix — P2P and HTTP templates no longer include debrid-specific ESEs (cached/uncached guards, flood guard, usenet propagation)',
+    'Free service fix — PSEs stripped to resolution/codec/seeder basics for P2P, resolution-only for HTTP',
+    'Free service fix — sort criteria simplified (no cached key), DAF uses raw stream counts instead of cached() wrapper',
+    'Free service fix — excludeCached/excludeUncached disabled, metadata category set to P2P/HTTP accordingly',
+  ]},
   { v:'2.26', date:'Jul 8 2026', items:[
     'Rebrand: "Easy Setup" is now "Core Start", "Custom Setup" is now "Core Configure" — consistent Core branding throughout',
     'Quick Start Guide — "?" help icon on the splash screen opens a 5-step walkthrough for new users',
@@ -2974,6 +2980,30 @@ function visualTags() {
 
 function eses() {
   const out = [], dev = S.device, is1080= S.resolution === '1080p';
+  const isFree = S.service === 'p2p' || S.service === 'http';
+
+  if (S.service === 'http') {
+    out.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" });
+    if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
+    if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
+    if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
+    return out;
+  }
+
+  if (S.service === 'p2p') {
+    out.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
+    if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
+    if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
+    if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+    if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
+    if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
+    if (S.sizeLimit !== 'unlimited') {
+      const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
+      out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
+    }
+    return out;
+  }
+
   out.push({ enabled:true, expression: "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))" });
   if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
   out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
@@ -3000,6 +3030,22 @@ function pses() {
 
   if (S.langs && S.langs.length) {
     out.push({ enabled:true, expression:`/* Language Preference — ${(S.langs||['English']).join('/')} */ language(streams,${(S.langs||['English']).map(l=>`'${l}'`).join(',')})` });
+  }
+
+  if (S.service === 'http') {
+    out.push({ enabled:true, expression:"/* Resolution Preference */ resolution(streams,'1080p','720p','480p')" });
+    return out;
+  }
+
+  if (S.service === 'p2p') {
+    out.push(pinLQ, seasonPSE);
+    if (res === '4k') {
+      out.push({ enabled:true, expression:"/* S-Tier 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* A-Tier 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:codecExpr });
+    } else {
+      out.push({ enabled:true, expression:"/* S-Tier 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* A-Tier 720p Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:codecExpr });
+    }
+    out.push({ enabled:true, expression:"/* Seeder Priority */ seeders(streams,5,99999)" });
+    return out;
   }
 
   if (res === '4k') {
@@ -3031,7 +3077,10 @@ function build() {
     usePosterRedirectApi: true, usePosterServiceForMeta: true,
     ...(S.tmdbToken ? { tmdbAccessToken: S.tmdbToken } : {}),
     ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
-    sortCriteria: (function(){ const d='desc',qf=S.qualityFirst, rq=qf?[{key:'quality',direction:d},{key:'resolution',direction:d}]:[{key:'resolution',direction:d},{key:'quality',direction:d}]; return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedMovies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedSeries:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}] }; })(),
+    sortCriteria: (function(){ const d='desc',qf=S.qualityFirst, rq=qf?[{key:'quality',direction:d},{key:'resolution',direction:d}]:[{key:'resolution',direction:d},{key:'quality',direction:d}], isFree=S.service==='p2p'||S.service==='http';
+      if (S.service==='http') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'language',direction:d},{key:'size',direction:d}] }; }
+      if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
+      return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedMovies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedSeries:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}] }; })(),
     deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
@@ -3048,8 +3097,8 @@ function build() {
     excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes,
     excludedAudioTags: ac.excludedAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
     enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
-    excludeCached: S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
-    excludeUncached: S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
+    excludeCached: (S.service!=='p2p'&&S.service!=='http') && S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
+    excludeUncached: (S.service!=='p2p'&&S.service!=='http') && S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
     excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
     preferredRegexPatterns: [],
     maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
@@ -3062,7 +3111,10 @@ function build() {
       }] : [])
     ],
     preferredStreamExpressions: pses(),
-    dynamicAddonFetching: (function(){ const pool=S.streamPool||'normal', timeout=pool==='max'?8000:pool==='large'?6000:5000; if(S.resolution==='4k'){ const c4k=pool==='max'?15:pool==='large'?8:5; return{enabled:true,condition:`count(cached(resolution(totalStreams,'2160p')))>=${c4k} or totalTimeTaken>${timeout}`}; } if(S.resolution==='ultrawide'){ return{enabled:true,condition:`count(cached(resolution(totalStreams,'1080p')))>=10 or count(cached(resolution(totalStreams,'2160p')))>=3 or totalTimeTaken>${timeout}`}; } const c1k=pool==='max'?30:pool==='large'?20:15; return{enabled:true,condition:`count(cached(resolution(totalStreams,'1080p')))>=${c1k} or totalTimeTaken>${timeout}`}; })(),
+    dynamicAddonFetching: (function(){ const pool=S.streamPool||'normal', timeout=pool==='max'?8000:pool==='large'?6000:5000, isFree=S.service==='p2p'||S.service==='http', wrap=expr=>isFree?expr:`cached(${expr})`;
+      if(S.resolution==='4k'){ const c4k=pool==='max'?15:pool==='large'?8:5; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'2160p')")})>=${c4k} or totalTimeTaken>${timeout}`}; }
+      if(S.resolution==='ultrawide'){ return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=10 or count(${wrap("resolution(totalStreams,'2160p')")})>=3 or totalTimeTaken>${timeout}`}; }
+      const c1k=pool==='max'?30:pool==='large'?20:15; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=${c1k} or totalTimeTaken>${timeout}`}; })(),
     titleMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
     yearMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
@@ -3070,7 +3122,7 @@ function build() {
   };
 
   const result = {
-    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: 'Debrid', serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
+    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: (S.service==='p2p'?'P2P':S.service==='http'?'HTTP':'Debrid'), serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
     config: cfg
   };
 
