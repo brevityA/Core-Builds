@@ -176,6 +176,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-list-row .opt-desc{font-size:.69rem!important;margin-top:1px!important}
 .svc-list-arr{color:#6b7280;font-size:.9rem;flex-shrink:0;margin-left:auto;transition:color .15s}
 .svc-list-row input:checked+label .svc-list-arr{color:#00d4ff}
+/* Service picker — enhanced Option I */
+.svc-search{position:relative;margin-bottom:10px}
+.svc-search input{width:100%;padding:9px 14px 9px 34px;border-radius:9px;border:1.5px solid rgba(255,255,255,.07);background:rgba(13,17,23,.7);color:#e6edf3;font-size:.76rem;font-weight:500;outline:none;transition:border-color .15s}
+.svc-search input:focus{border-color:rgba(0,212,255,.4)}
+.svc-search input::placeholder{color:#3e4a5c}
+.svc-search-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#3e4a5c;pointer-events:none}
+.svc-seg{display:flex;gap:0;margin-bottom:12px;border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,.07);background:rgba(13,17,23,.7)}
+.svc-seg-b{flex:1;padding:8px 4px;border:none;background:transparent;color:#3e4a5c;font-size:.66rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.svc-seg-b:last-child{border-right:none}
+.svc-seg-b.act{background:rgba(0,212,255,.08);color:#00d4ff}
+.svc-seg-help{display:inline;margin-left:3px;border-bottom:1px dotted;cursor:help;opacity:.5;font-weight:600;font-size:.58rem;position:relative}
+.svc-seg-help:hover{opacity:1}
+.svc-seg-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:10px 14px;border-radius:9px;background:#111520;border:1px solid rgba(255,255,255,.07);box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:20;width:220px;font-size:.64rem;color:#64748b;line-height:1.55;text-align:left;font-weight:500;white-space:normal}
+.svc-seg-help:hover .svc-seg-tip{display:block}
+.svc-row-auth{font-size:.56rem;color:#3e4a5c;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);flex-shrink:0;white-space:nowrap}
+.svc-row-auth.free{color:#22c55e;border-color:rgba(34,197,94,.15)}
+.svc-row-ck{width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.svc-row-ck svg{width:10px;height:10px;opacity:0;transition:opacity .15s}
+.svc-list-row input:checked+label .svc-row-ck{background:#00d4ff;border-color:#00d4ff}
+.svc-list-row input:checked+label .svc-row-ck svg{opacity:1}
+.svc-empty{text-align:center;padding:24px 0;color:#3e4a5c;font-size:.76rem;display:none}
 @media(min-width:720px){
   .wrap{max-width:980px}
   .card{padding:36px}
@@ -502,6 +523,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .svc-list-hero label{background:#ffffff!important;border-color:#d0d7de!important}
 [data-theme="light"] .svc-list-hero input:checked+label{background:rgba(9,105,218,.08)!important;border-color:rgba(9,105,218,.4)!important}
 [data-theme="light"] .svc-list-arr{color:#afb8c1}
+[data-theme="light"] .svc-search input{background:#fff;border-color:#d0d7de;color:#1c2128}
+[data-theme="light"] .svc-search input::placeholder{color:#8c959f}
+[data-theme="light"] .svc-search-ic{color:#8c959f}
+[data-theme="light"] .svc-seg{background:#fff;border-color:#d0d7de}
+[data-theme="light"] .svc-seg-b{color:#8c959f;border-right-color:#d0d7de}
+[data-theme="light"] .svc-seg-b.act{background:rgba(9,105,218,.07);color:#0969da}
+[data-theme="light"] .svc-seg-tip{background:#fff;border-color:#d0d7de;box-shadow:0 6px 20px rgba(0,0,0,.1);color:#57606a}
+[data-theme="light"] .svc-row-auth{background:rgba(0,0,0,.02);border-color:#d0d7de;color:#8c959f}
+[data-theme="light"] .svc-row-auth.free{color:#1a7f37;border-color:rgba(26,127,55,.2)}
+[data-theme="light"] .svc-row-ck{border-color:#d0d7de}
+[data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da;border-color:#0969da}
+[data-theme="light"] .svc-empty{color:#8c959f}
 [data-theme="light"] .modal-box{background:#ffffff;border-color:#d0d7de}
 [data-theme="light"] .modal-overlay{background:rgba(0,0,0,.45)}
 [data-theme="light"] .modal-close{color:#57606a}
@@ -685,11 +718,17 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.24';
+const CONFIGURATOR_VERSION = '2.25';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.25', date:'Jul 8 2026', items:[
+    'Service picker redesigned — search filter, segmented category tabs (Debrid / Usenet / No Account), all 14 services visible',
+    'Auth badges on each service row — shows what credentials you need (API key, user+pass, free) before clicking',
+    '"What\'s debrid?" and "What\'s usenet?" hover tooltips on segment tabs for new users',
+    'Search auto-switches to All tab so results are never hidden by the active category filter',
+  ]},
   { v:'2.24', date:'Jul 8 2026', items:[
     'TMDB signup nudge — Easy Setup now highlights why a TMDB key matters with a step-by-step guide',
     'Stream Pool option — Normal / Large / Maximum controls how many streams are fetched and returned',
@@ -1264,16 +1303,29 @@ function renderOpts(def) {
       'realdebrid': 'Real-Debrid subscribers',
       'premiumize': 'Premiumize subscribers',
       'debridlink': 'Debrid-Link subscribers',
-      'easynews':   'Usenet · username + password',
-      'offcloud':   'Cloud debrid · API key required',
-      'p2p':        'No subscription · P2P torrents only',
-      'http':       'Streaming sites · no debrid · no torrents',
+      'easynews':   'Usenet streaming',
+      'offcloud':   'Cloud debrid service',
+      'p2p':        'Direct torrents · no account needed',
+      'http':       'Streaming sites · no debrid required',
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
-      'debridio':   'Debrid.io scraper · API key required',
-      'nzbgeek':    'Usenet indexer · API key required',
-      'streamnzb':  'Usenet streaming · manifest URL',
+      'debridio':   'Debrid.io scraper',
+      'nzbgeek':    'Usenet indexer',
+      'streamnzb':  'Self-hosted Usenet streaming',
+    };
+    const SVC_AUTH = {
+      'torbox-pro':'API key','torbox-ess':'API key','alldebrid':'API key','realdebrid':'API key',
+      'premiumize':'API key','debridlink':'API key','offcloud':'API key','debridio':'API key',
+      'easynews':'User + pass','nzbgeek':'API key','streamnzb':'Manifest URL',
+      'hybrid':'Both keys','p2p':'Free','http':'Free',
+    };
+    const SVC_CAT = {
+      'torbox-pro':'debrid','torbox-ess':'debrid','alldebrid':'debrid','realdebrid':'debrid',
+      'premiumize':'debrid','debridlink':'debrid','offcloud':'debrid','debridio':'debrid',
+      'hybrid':'debrid','easynews':'usenet','nzbgeek':'usenet','streamnzb':'usenet',
+      'p2p':'noaccount','http':'noaccount',
     };
     const chk = (o) => `<input type="checkbox" id="o_${o.v}" value="${o.v}" ${S.multiServices.includes(o.v)?'checked':''} data-action="toggle-service">`;
+    const ckSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
     const heroHtml = `<div class="svc-list-hero opt">${chk(hero)}<label for="o_${hero.v}">
@@ -1284,20 +1336,26 @@ function renderOpts(def) {
         ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
       </div>
     </label></div>`;
-    const OTHER_SVC_IDS = ['debridio', 'p2p', 'http', 'nzbgeek', 'streamnzb'];
-    const mainOpts = def.opts.slice(1).filter(o => !OTHER_SVC_IDS.includes(o.v));
-    const otherOpts = def.opts.filter(o => OTHER_SVC_IDS.includes(o.v));
-    const rowsHtml = mainOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}">
-      <div class="opt-icon">${o.icon}</div>
-      <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
-      <span class="svc-list-arr">›</span>
-    </label></div>`).join('');
-    const selectedOtherNames = otherOpts.filter(o => S.multiServices.includes(o.v)).map(o => o.name);
-    const isOtherSelected = selectedOtherNames.length > 0;
-    const summaryRight = isOtherSelected ? selectedOtherNames.join(', ') + ' ✓' : `${otherOpts.length} more ›`;
-    const otherHints = otherOpts.map(o => o.name).join(' · ');
-    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 14px;border-radius:10px;background:rgba(139,92,246,.04);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(139,92,246,.15)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(139,92,246,.08)'" onmouseout="this.style.background='rgba(139,92,246,.04)'"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#a78bfa'};letter-spacing:.04em;text-transform:uppercase">More Services</span><span style="font-size:.66rem;color:#4b5563;font-weight:500">${otherHints}</span></span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#a78bfa'};font-weight:600">${summaryRight}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
-    return `<div class="svc-list">${heroHtml}${rowsHtml}</div>${otherHtml}`;
+    const searchHtml = `<div class="svc-search"><span class="svc-search-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></span><input type="text" placeholder="Filter services…" data-action="svc-filter" id="svcFilterInput"></div>`;
+    const segHtml = `<div class="svc-seg" id="svcSeg">
+      <button type="button" class="svc-seg-b act" data-action="svc-cat" data-cat="all">All</button>
+      <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="debrid">Debrid<span class="svc-seg-help">?<span class="svc-seg-tip">Debrid services cache torrents on fast servers so you stream instantly without seeding. You need a paid subscription to one of these.</span></span></button>
+      <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="usenet">Usenet<span class="svc-seg-help">?<span class="svc-seg-tip">Usenet is a paid alternative to torrents. Streams come from news servers instead of peers — often faster, with no seeding required.</span></span></button>
+      <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="noaccount">No Account</button>
+    </div>`;
+    const rowsHtml = def.opts.slice(1).map(o => {
+      const auth = SVC_AUTH[o.v] || '';
+      const cat = SVC_CAT[o.v] || 'debrid';
+      const isFree = auth === 'Free';
+      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}"><${chk(o)}<label for="o_${o.v}">
+        <div class="opt-icon">${o.icon}</div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
+        <span class="svc-row-auth${isFree?' free':''}">${auth}</span>
+        <span class="svc-row-ck">${ckSvg}</span>
+      </label></div>`;
+    }).join('');
+    const emptyHtml = '<div class="svc-empty" id="svcEmpty">No services match your search</div>';
+    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}</div>`;
   }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
@@ -2416,6 +2474,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     if (action === 'import-formatter') { showFormatterImport(); }
+    if (action === 'svc-cat') {
+      const cat = el.dataset.cat;
+      document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === cat));
+      const q = document.getElementById('svcFilterInput');
+      if (q) q.value = '';
+      filterSvcRows(cat, '');
+    }
     if (action === 'clear-custom-formatter') {
       e.preventDefault();
       delete S.customFormatter;
@@ -2527,6 +2592,16 @@ document.addEventListener('DOMContentLoaded', () => {
       S.tmdbApiKey = e.target.value;
       const st = document.getElementById('tmdbKeyStatus');
       if (st) st.innerHTML = tmdbHint('key', e.target.value);
+    }
+    else if (a === 'svc-filter') {
+      const q = e.target.value.toLowerCase().trim();
+      if (q) {
+        document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === 'all'));
+        filterSvcRows('all', q);
+      } else {
+        const activeCat = document.querySelector('.svc-seg-b.act');
+        filterSvcRows(activeCat ? activeCat.dataset.cat : 'all', '');
+      }
     }
     else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
     else if (a === 'update-pwd') S.instancePassword = e.target.value;
@@ -2731,6 +2806,23 @@ function services() {
     {id:'putio', enabled: false, credentials:{}},
     {id:'easydebrid', enabled: false, credentials:{}}, {id:'pikpak', enabled: false, credentials:{}}, {id:'seedr', enabled: false, credentials:{}}, {id:'debrider', enabled: false, credentials:{}}
   ];
+}
+
+function filterSvcRows(cat, q) {
+  const rows = document.querySelectorAll('#svcRows .svc-list-row');
+  let anyVis = false;
+  rows.forEach(r => {
+    const rCat = r.dataset.svcCat || '';
+    const rName = r.dataset.svcName || '';
+    const text = r.textContent.toLowerCase();
+    const catMatch = cat === 'all' || rCat === cat;
+    const searchMatch = !q || rName.includes(q) || text.includes(q);
+    const vis = catMatch && searchMatch;
+    r.style.display = vis ? '' : 'none';
+    if (vis) anyVis = true;
+  });
+  const empty = document.getElementById('svcEmpty');
+  if (empty) empty.style.display = anyVis ? 'none' : 'block';
 }
 
 function resolutionCfg() {
