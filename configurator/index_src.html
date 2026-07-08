@@ -694,6 +694,9 @@ const CHANGELOG = [
     'Credential Test buttons added to Easy Setup — verify your API key works before installing',
     'Share links (#cfg=) now jump straight to review — one-tap import instead of starting from splash',
     'Smart device detection — auto-selects your device from user agent (Fire Stick, Samsung, Apple TV, Shield)',
+    'Live credential validation in pre-flight — API keys are tested against the service before config creation',
+    'Template health check on review step — warns about missing guards, TMDB keys, and device mismatches',
+    'Post-install config summary — collapsible recap of presets, ESEs, PSEs, sort keys, and matching status',
   ]},
   { v:'2.21', date:'Jul 8 2026', items:[
     'TMDB key input added to Easy Setup with live validation — green check for valid keys, warnings for mismatched fields',
@@ -1731,6 +1734,7 @@ function render() {
           </div>` : ''}
         </div>
         ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
+        ${(() => { const h = templateHealthCheck(); return h.length ? `<div style="margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15)"><div style="font-size:.68rem;font-weight:700;color:#f87171;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:#8b949e;line-height:1.6">${h.map(w=>'<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:#f87171;flex-shrink:0">⚠</span><span>'+w+'</span></div>').join('')}</div></div>` : `<div style="margin-top:6px;padding:6px 12px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12);font-size:.72rem;color:#34d399;font-weight:600">✓ Template looks good</div>`; })()}
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
@@ -2999,6 +3003,28 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         </div>
         <div id="mTestResult" style="margin-top:6px;font-size:.72rem"></div>
       </div>
+      <details style="margin-top:10px;border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow:hidden">
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:8px 12px;background:rgba(255,255,255,.02);user-select:none;font-size:.72rem;font-weight:700;color:#6b7280;letter-spacing:.03em">
+          <span>📋 Config summary</span><span style="font-size:.7rem">›</span>
+        </summary>
+        <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.04);font-size:.7rem;color:#8b949e;line-height:1.7">
+          ${(() => {
+            const cfg = build().config;
+            const rows = [];
+            rows.push('<b style="color:#e6edf3">Host:</b> ' + esc(hostLabel));
+            rows.push('<b style="color:#e6edf3">Presets:</b> ' + (cfg.presets ? cfg.presets.filter(p=>p.enabled!==false).length + ' active' : 'inherited'));
+            rows.push('<b style="color:#e6edf3">ESEs:</b> ' + (cfg.excludedStreamExpressions ? cfg.excludedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b style="color:#e6edf3">ISEs:</b> ' + (cfg.includedStreamExpressions ? cfg.includedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b style="color:#e6edf3">PSEs:</b> ' + (cfg.preferredStreamExpressions ? cfg.preferredStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b style="color:#e6edf3">Sort keys:</b> ' + (cfg.sortCriteria?.global ? cfg.sortCriteria.global.length : 'inherited'));
+            rows.push('<b style="color:#e6edf3">Title matching:</b> ' + (cfg.titleMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
+            rows.push('<b style="color:#e6edf3">Year matching:</b> ' + (cfg.yearMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
+            rows.push('<b style="color:#e6edf3">Cache mode:</b> ' + (cfg.excludeUncached ? 'cached only' : cfg.excludeCached ? 'uncached only' : 'mixed'));
+            rows.push('<b style="color:#e6edf3">Max results:</b> ' + (cfg.maxResults || 'default'));
+            return rows.join('<br>');
+          })()}
+        </div>
+      </details>
       <details style="margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
         <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.03em;user-select:none">
           <span>🎮 Push to Stremio Library</span><span style="font-size:.7rem">›</span>
@@ -3436,7 +3462,23 @@ function promptPassword() {
   });
 }
 
-function preflightCheck() {
+function templateHealthCheck() {
+  const warns = [];
+  if (S.resolution === '1080p') {
+    const ec = eses();
+    const has1080pGuard = ec.some(e => e.expression && /resolution\s*\(\s*streams\s*,\s*'2160p'/.test(e.expression) && e.enabled !== false);
+    if (!has1080pGuard) warns.push('1080p template missing 2160p exclusion ESE — 4K streams may leak through');
+  }
+  if (!S.tmdbToken && !S.tmdbApiKey && !['p2p','http'].includes(S.service)) warns.push('No TMDB key — title/year matching is disabled (metadata will be less accurate)');
+  if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio on a device that doesn\'t support passthrough');
+  if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('4K resolution on Fire Stick HD — device cannot play 2160p');
+  const credInputs = getDebridInputs();
+  const filledCreds = credInputs.filter(i => S.creds[i.id] && S.creds[i.id].trim());
+  if (credInputs.length && !filledCreds.length && !['p2p','http'].includes(S.service)) warns.push('No debrid API key — streams won\'t load');
+  return warns;
+}
+
+async function preflightCheck() {
   const warns = [];
   const needed = getDebridInputs();
   const hasCreds = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
@@ -3447,17 +3489,27 @@ function preflightCheck() {
   if (S.multiServices.includes('nzbgeek') && !S.creds.nzbgeek) warns.push('NZBGeek selected but no API key entered');
   if (S.multiServices.includes('streamnzb') && !S.creds.streamnzb) warns.push('StreamNZB selected but no manifest URL entered');
   if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio selected but your device doesn\'t support it — streams may not play');
+  const credChecks = needed.filter(i => S.creds[i.id] && S.creds[i.id].trim() && CRED_TESTS[i.id]);
+  if (credChecks.length) {
+    const results = await Promise.allSettled(credChecks.map(i => CRED_TESTS[i.id](S.creds[i.id].trim()).catch(() => false)));
+    results.forEach((r, idx) => {
+      if (r.status === 'rejected' || r.value === false) warns.push(`${credChecks[idx].label} API key failed validation — check it's correct and not expired`);
+    });
+  }
   return warns;
 }
 
 async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
-  const warns = preflightCheck();
+  const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
+  const origBtnHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Checking…`; }
+  const warns = await preflightCheck();
+  if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
   if (warns.length) {
     const proceed = confirm('⚠ Config check:\n\n• ' + warns.join('\n• ') + '\n\nContinue anyway?');
     if (!proceed) return;
   }
-  const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
   const pwd = await promptPassword();
   if (!pwd) return;
   const origHtml = btn.innerHTML;
