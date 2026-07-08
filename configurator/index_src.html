@@ -685,11 +685,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.20';
+const CONFIGURATOR_VERSION = '2.21';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.21', date:'Jul 8 2026', items:[
+    'TMDB key input added to Easy Setup — enter your TMDB token directly from the quick finish screen',
+    'Service picker: "More Services" section now shows all available options at a glance with a more visible design',
+  ]},
   { v:'2.20', date:'Jul 8 2026', items:[
     'Fix: "Create & Install" was failing on all instances — AIOStreams now requires a TMDB key for title/year matching, which the configurator was enabling without one',
     'Title matching and year matching now auto-disable when no TMDB key is provided — re-enable them in AIOStreams after adding a key',
@@ -1260,8 +1264,9 @@ function renderOpts(def) {
     </label></div>`).join('');
     const selectedOtherNames = otherOpts.filter(o => S.multiServices.includes(o.v)).map(o => o.name);
     const isOtherSelected = selectedOtherNames.length > 0;
-    const summaryRight = isOtherSelected ? selectedOtherNames.join(', ') + ' ✓' : 'Show more ›';
-    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(255,255,255,.07)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#4b5563'};letter-spacing:.04em;text-transform:uppercase">Other Services</span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#374151'};font-weight:600">${summaryRight}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
+    const summaryRight = isOtherSelected ? selectedOtherNames.join(', ') + ' ✓' : `${otherOpts.length} more ›`;
+    const otherHints = otherOpts.map(o => o.name).join(' · ');
+    const otherHtml = otherOpts.length ? `<details class="other-svc-details"${isOtherSelected ? ' open' : ''} style="margin-top:10px"><summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 14px;border-radius:10px;background:rgba(139,92,246,.04);border:1px solid ${isOtherSelected ? 'rgba(0,212,255,.25)' : 'rgba(139,92,246,.15)'};user-select:none;transition:background .15s,border-color .15s" onmouseover="this.style.background='rgba(139,92,246,.08)'" onmouseout="this.style.background='rgba(139,92,246,.04)'"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:.78rem;font-weight:700;color:${isOtherSelected ? '#67e8f9' : '#a78bfa'};letter-spacing:.04em;text-transform:uppercase">More Services</span><span style="font-size:.66rem;color:#4b5563;font-weight:500">${otherHints}</span></span><span style="font-size:.76rem;color:${isOtherSelected ? '#00d4ff' : '#a78bfa'};font-weight:600">${summaryRight}</span></summary><div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">${otherOpts.map(o => `<div class="svc-list-row opt">${chk(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div><span class="svc-list-arr">›</span></label></div>`).join('')}</div></details>` : '';
     return `<div class="svc-list">${heroHtml}${rowsHtml}</div>${otherHtml}`;
   }
   if (def.layout === 'hero') {
@@ -3249,6 +3254,51 @@ function simpleFinishHtml() {
         </div>`).join('')}
         ${!anyFilled ? `<div style="font-size:.74rem;color:#fbbf24;margin-top:4px">⚠ Streams won't load without an API key</div>` : ''}
       </div>` : ''}
+      <details style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:14px" ${S.tmdbToken||S.tmdbApiKey?'open':''}>
+        <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
+          <span style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">TMDB Key</span>
+            <span style="font-size:.65rem;color:#4b5563;font-weight:600">recommended</span>
+            ${S.tmdbToken||S.tmdbApiKey?'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3)">SET</span>':''}
+          </span>
+          <span style="font-size:.7rem;color:#374151">›</span>
+        </summary>
+        <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.04)">
+          <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:10px">Enables title matching &amp; better metadata. Without it, title/year matching is disabled.</div>
+          <div class="name-row" style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">Read Access Token</span>
+              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+            </div>
+            <div style="position:relative;display:flex;align-items:center">
+              <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+                value="${S.tmdbToken}" maxlength="400" style="padding-right:38px">
+              <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
+                style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
+                onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div style="font-size:.68rem;color:#6b7280;margin-top:3px">The long token starting with <code style="color:#8b949e;font-family:monospace">eyJ</code></div>
+          </div>
+          <div class="name-row">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">API Key</span>
+              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
+            </div>
+            <div style="position:relative;display:flex;align-items:center">
+              <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+                value="${S.tmdbApiKey}" maxlength="60" style="padding-right:38px">
+              <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
+                style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
+                onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div style="font-size:.68rem;color:#6b7280;margin-top:3px">The 32-character key</div>
+          </div>
+        </div>
+      </details>
       <div class="name-row">
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
