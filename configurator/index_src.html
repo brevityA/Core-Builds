@@ -692,9 +692,11 @@ const USAGE_BEACON_URL = '';
 const CHANGELOG = [
   { v:'2.21', date:'Jul 8 2026', items:[
     'TMDB key input added to Easy Setup with live validation — green check for valid keys, warnings for mismatched fields',
-    'Service picker: "More Services" section now shows all available options at a glance with a more visible design',
-    'Audio options now show a device-recommended badge (e.g. "Samsung TV") based on your selected device',
-    'Post-install modal now includes "What\'s next" steps so you know exactly what to do after installing',
+    'Pre-flight config check before "Create & Install" — warns about missing API keys, 4K on Fire Stick HD, audio mismatches',
+    '"Test streams" button in the install modal — verifies your config is working before you close',
+    'Config diff on review step — shows what changed since your last download (e.g. "Resolution: 1080p → 4K")',
+    'Service picker: "More Services" section redesigned with service names visible at a glance',
+    'Audio options show a device-recommended badge based on your selected device',
   ]},
   { v:'2.20', date:'Jul 8 2026', items:[
     'Fix: "Create & Install" was failing on all instances — AIOStreams now requires a TMDB key for title/year matching, which the configurator was enabling without one',
@@ -1720,6 +1722,7 @@ function render() {
             ].filter(Boolean).join(' · ')}</div>
           </div>` : ''}
         </div>
+        ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
@@ -2962,12 +2965,16 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         <button class="m-btn m-done" id="mDone">Done</button>
       </div>
       <div style="margin-top:12px;padding:10px 13px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
-        <div style="font-size:.72rem;font-weight:700;color:#34d399;margin-bottom:5px">What's next</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <div style="font-size:.72rem;font-weight:700;color:#34d399">What's next</div>
+          <button id="mTestStreams" style="font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:5px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Test streams</button>
+        </div>
         <div style="font-size:.72rem;color:#8b949e;line-height:1.55">
           <strong style="color:#e6edf3">1.</strong> Open Stremio and search for any movie or show<br>
           <strong style="color:#e6edf3">2.</strong> Streams should appear with Core Builds sorting<br>
           <strong style="color:#e6edf3">3.</strong> Save your password — you'll need it to edit settings later
         </div>
+        <div id="mTestResult" style="margin-top:6px;font-size:.72rem"></div>
       </div>
       <details style="margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
         <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.03em;user-select:none">
@@ -3117,6 +3124,30 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     switchFmt(startFi);
   }
   setTimeout(() => { const c = document.getElementById('mClose'); if (c) c.focus(); }, 50);
+
+  document.getElementById('mTestStreams').addEventListener('click', async function() {
+    const testBtn = this, resEl = document.getElementById('mTestResult');
+    testBtn.disabled = true; testBtn.textContent = 'Testing…';
+    resEl.innerHTML = '<span style="color:#8b949e">Checking catalog…</span>';
+    const baseUrl = manifestUrl.replace(/\/manifest\.json$/, '');
+    const testId = 'tt1375666';
+    try {
+      const r = await fetchWithTimeout(`${baseUrl}/stream/movie/${testId}.json`, { method:'GET' }, 10000);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const count = data?.streams?.length || 0;
+      if (count > 0) {
+        resEl.innerHTML = `<span style="color:#3fb950">✓ Found ${count} stream${count>1?'s':''} — your config is working!</span>`;
+        testBtn.textContent = '✓ Working'; testBtn.style.borderColor = 'rgba(63,185,80,.3)'; testBtn.style.color = '#3fb950';
+      } else {
+        resEl.innerHTML = `<span style="color:#f59e0b">⚠ 0 streams returned — check your API key and try again in a few minutes</span>`;
+        testBtn.disabled = false; testBtn.textContent = 'Retry';
+      }
+    } catch(e) {
+      resEl.innerHTML = `<span style="color:#f87171">Could not reach the server — it may still be processing your config</span>`;
+      testBtn.disabled = false; testBtn.textContent = 'Retry';
+    }
+  });
 
   document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
     const email    = document.getElementById('stremioEmail').value.trim();
@@ -3378,8 +3409,27 @@ function promptPassword() {
   });
 }
 
+function preflightCheck() {
+  const warns = [];
+  const needed = getDebridInputs();
+  const hasCreds = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
+  if (needed.length && !hasCreds && !['p2p','http'].includes(S.service)) warns.push('No API key entered — streams will not load without one');
+  if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('Fire Stick HD cannot play 4K — consider 1080p resolution');
+  if (S.multiServices.includes('easynews') && !S.creds.easynews) warns.push('EasyNews selected but no username entered');
+  if (S.multiServices.includes('easynews') && !S.creds.easynewsPass) warns.push('EasyNews selected but no password entered');
+  if (S.multiServices.includes('nzbgeek') && !S.creds.nzbgeek) warns.push('NZBGeek selected but no API key entered');
+  if (S.multiServices.includes('streamnzb') && !S.creds.streamnzb) warns.push('StreamNZB selected but no manifest URL entered');
+  if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio selected but your device doesn\'t support it — streams may not play');
+  return warns;
+}
+
 async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
+  const warns = preflightCheck();
+  if (warns.length) {
+    const proceed = confirm('⚠ Config check:\n\n• ' + warns.join('\n• ') + '\n\nContinue anyway?');
+    if (!proceed) return;
+  }
   const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
   const pwd = await promptPassword();
   if (!pwd) return;
