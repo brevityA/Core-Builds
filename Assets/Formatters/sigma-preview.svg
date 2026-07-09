@@ -1,53 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="800" height="380">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" width="800" height="334">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
       .bg   { fill: #0d1117; }
       .card { fill: #161b22; stroke: #30363d; stroke-width: 1; }
-      .lbl  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; }
-      .name { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; fill: #e6edf3; }
-      .d1   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
-      .d2   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
-      .tag  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; }
+      .lbl  { font-family: 'Segoe UI', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase; }
+      .name { font-family: 'Segoe UI', sans-serif; font-size: 13.5px; font-weight: 700; fill: #e6edf3; }
+      .d1   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
+      .d2   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
     </style>
   </defs>
-
-  <rect class="bg" width="800" height="380"/>
-
-  <!-- Label -->
+  <rect class="bg" width="800" height="334"/>
   <text x="20" y="20" class="lbl">Core Nexus Sigma — Stream Preview</text>
 
-  <!-- Card 1: 4K REMUX using 「」/『』 bracket system -->
-  <rect class="card" x="16" y="30" width="768" height="158" rx="6"/>
+  <rect class="card" x="16" y="30" width="768" height="132" rx="6"/>
+  <text x="32" y="58" class="name">✦ Oppenheimer 「 TB 」 「 🟣 4K 」 「 💎 ʀᴇᴍᴜx 」 👁️ DV ✨ HDR¹⁰⁺ 「 🔮 ᴀᴛᴍᴏs 」 「 7.1 」 『 👑 ᴘʀᴇᴍɪᴇʀ 』</text>
+  <text x="32" y="79" class="d1">『 💎 ELITE 』 『 🚀 INSTANT 』 『 🎯 ʀᴀᴅᴀʀʀ ʀᴇᴍᴜx 』 『 🏷️ ᴅᴏɴ 』 『 🎞️ IMAX 』</text>
+  <text x="32" y="100" class="d2">「 🎬 💎 ʀᴇᴍᴜx 」 「 ʜᴇᴠᴄ 」 「 45.2 ᴍʙᴘs 」 「 👁️ DV ✨ HDR¹⁰⁺ 🎨 10ʙɪᴛ 」</text>
+  <text x="32" y="121" class="d2">「 🎛️ 🔮 ATMOS 💎 TRUEHD 」 🔊 7.1  🌍 🇬🇧 🇫🇷 🇩🇪  🎙️ DUB</text>
+  <text x="32" y="142" class="d2">「 📦 PACK → 25.4 ɢʙ 」 「 🌱 521 」 「 ⏱️ 2ʏ 」 「 🔍 ᴛᴏʀʀᴇɴᴛɪᴏ 」</text>
 
-  <!-- name line: title-first, bracket system -->
-  <text x="32" y="58" class="name">✦ Oppenheimer 「 TB 」 「 🟣 4K 」 「 💎 ʀᴇᴍᴜx 」 👁️ DV ✨ ʜᴅʀ¹⁰⁺ 「 🔮 ᴀᴛᴍᴏs 」 「 7.1 」 『 👑 ᴘʀᴇᴍɪᴇʀ 』</text>
+  <rect class="card" x="16" y="172" width="768" height="132" rx="6"/>
+  <text x="32" y="200" class="name">✦ The Dark Knight 「 TB 」 「 🔵 1080P 」 「 🍿 ᴡᴇʙ-ᴅʟ 」 🌟 HDR¹⁰ 「 🎶 ᴅᴅ+ 」 「 5.1 」 「 S01 」 「 E01 」</text>
+  <text x="32" y="221" class="d1">『 ✦ QUALITY 』 『 🚀 INSTANT 』 『 ✅ SEADEX 』 『 🏷️ ɴᴛʙ 』</text>
+  <text x="32" y="242" class="d2">「 🎬 🍿 ᴡᴇʙ-ᴅʟ 」 「 ʜᴇᴠᴄ 」 「 8.2 ᴍʙᴘs 」 「 🌟 HDR¹⁰ ☀️ SDR 」</text>
+  <text x="32" y="263" class="d2">「 🎛️ 🎶 EAC3 」 🔉 5.1  🌍 🇬🇧 🇫🇷</text>
+  <text x="32" y="284" class="d2">「 8.2 ɢʙ 」 「 🌱 89 」 「 ⏱️ 6ᴍ 」 「 🔍 ɴᴢʙs.ɪɴ 」</text>
 
-  <!-- desc line 1: elite badges in 『』 -->
-  <text x="32" y="80" class="d1">『 💎 ELITE 』 『 🚀 INSTANT 』 『 🎯 ʀᴇᴍᴜx 』 『 🏷️ ᴅᴏɴ 』 『 🎞️ IMAX 』</text>
-
-  <!-- desc line 2: quality info in 「」 -->
-  <text x="32" y="101" class="d2">「 🎬 💎 ʀᴇᴍᴜx 」 「 ʜᴇᴠᴄ 」 「 45.2 ᴍʙᴘs 」 「 👁️ ᴅᴠ ✨ ʜᴅʀ¹⁰⁺ 」</text>
-
-  <!-- desc line 3: audio in 「」 -->
-  <text x="32" y="122" class="d2">「 🎛️ 🔮 ATMOS 💎 TRUEHD 」 🔊 7.1  🌍 🇬🇧 🇫🇷 🇩🇪  🎙️ DUB</text>
-
-  <!-- desc line 4: size/meta in 「」 -->
-  <text x="32" y="143" class="d2">「 📦 PACK → 25.4 ɢʙ 」 「 🌱 521 」 「 ⏱️ 2ʏ 」 「 🔍 ᴛᴏʀʀᴇɴᴛɪᴏ 」</text>
-
-  <!-- Card 2: 1080P WEB-DL -->
-  <rect class="card" x="16" y="198" width="768" height="158" rx="6"/>
-
-  <text x="32" y="226" class="name">✦ The Dark Knight 「 TB 」 「 🔵 1080P 」 「 🍿 ᴡᴇʙ-ᴅʟ 」 🌟 ʜᴅʀ¹⁰ 「 🎶 ᴅᴅ+ 」 「 5.1 」</text>
-
-  <text x="32" y="248" class="d1">『 ✦ QUALITY 』 『 🚀 INSTANT 』 『 🏷️ ɴᴛʙ 』</text>
-
-  <text x="32" y="269" class="d2">「 🎬 🍿 ᴡᴇʙ-ᴅʟ 」 「 ʜᴇᴠᴄ 」 「 8.2 ᴍʙᴘs 」 「 🌟 ʜᴅʀ¹⁰ 」</text>
-
-  <text x="32" y="290" class="d2">「 🎛️ 🎶 DD+ 」 🔉 5.1  🌍 🇬🇧 🇫🇷</text>
-
-  <text x="32" y="311" class="d2">「 8.2 ɢʙ 」 「 🌱 89 」 「 ⏱️ 6ᴍ 」 「 🔍 ɴᴢʙs.ɪɴ 」</text>
-
-  <!-- footer -->
-  <text x="400" y="370" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/brevityA/Core-Builds</text>
+  <text x="400" y="326" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/brevityA/Core-Builds</text>
 </svg>

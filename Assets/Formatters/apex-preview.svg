@@ -1,60 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="800" height="380">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" width="800" height="334">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
       .bg   { fill: #0d1117; }
       .card { fill: #161b22; stroke: #30363d; stroke-width: 1; }
-      .lbl  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase; }
-      .name { font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 700; fill: #e6edf3; }
-      .d1   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
-      .d2   { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
-      .tag  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #f0883e; }
+      .lbl  { font-family: 'Segoe UI', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase; }
+      .name { font-family: 'Segoe UI', sans-serif; font-size: 13.5px; font-weight: 700; fill: #e6edf3; }
+      .d1   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
+      .d2   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
     </style>
   </defs>
-
-  <rect class="bg" width="800" height="380"/>
-
-  <!-- Label -->
+  <rect class="bg" width="800" height="334"/>
   <text x="20" y="20" class="lbl">Core Nexus Apex — Stream Preview</text>
 
-  <!-- Card 1: 4K REMUX, Instant, ELITE -->
-  <rect class="card" x="16" y="30" width="768" height="158" rx="6"/>
-
-  <!-- stream name line -->
+  <rect class="card" x="16" y="30" width="768" height="132" rx="6"/>
   <text x="32" y="58" class="name">🟣 4K  ⚡ TB  👁️ DV ✨ HDR¹⁰⁺  🔮 ATMOS  OPPENHEIMER</text>
+  <text x="32" y="79" class="d1">🚀 INSTANT  💎 ELITE  ✦ QUALITY  🎯 ʀᴀᴅᴀʀʀ ʀᴇᴍᴜx  🧲 s-ᴛɪᴇʀ  🏷️ ᴅᴏɴ  👑 PREMIER  🎞️ IMAX</text>
+  <text x="32" y="100" class="d2">🎬 💎 REMUX  ʜᴇᴠᴄ  ᴍᴋᴠ  👁️ DV ✨ HDR¹⁰⁺ 🎨 10ʙɪᴛ  45.2 ᴍʙᴘs</text>
+  <text x="32" y="121" class="d2">🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1  🌍 🇬🇧 🇫🇷 🇩🇪</text>
+  <text x="32" y="142" class="d2">📦 PACK  25.4 GB  📁 51.2 GB  🌱 521  ⏱️ 2ʏ  🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ</text>
 
-  <!-- desc line 1: badges -->
-  <text x="32" y="80" class="d1">🚀 INSTANT  💎 ELITE  🏷️ DON  👑 PREMIER  🎞️ IMAX</text>
+  <rect class="card" x="16" y="172" width="768" height="132" rx="6"/>
+  <text x="32" y="200" class="name">🔵 1080P  ⚡ TB  🌟 HDR¹⁰  🎶 DD+  THE DARK KNIGHT S01 E01</text>
+  <text x="32" y="221" class="d1">🚀 INSTANT  ✦ QUALITY  ✅ SEADEX  🏷️ ɴᴛʙ</text>
+  <text x="32" y="242" class="d2">🎬 🍿 WEB-DL  ʜᴇᴠᴄ  ᴍᴋᴠ  🌟 HDR¹⁰ ☀️ SDR  8.2 ᴍʙᴘs</text>
+  <text x="32" y="263" class="d2">🎛️ 🎶 EAC3  🔉 5.1  🌍 🇬🇧 🇫🇷</text>
+  <text x="32" y="284" class="d2">8.2 GB  🌱 89  ⏱️ 6ᴍ  🔍 ɴᴢʙs.ɪɴ  🔌 ᴅᴇʙʀɪᴅ</text>
 
-  <!-- desc line 2: quality -->
-  <text x="32" y="101" class="d2">🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV ✨ HDR¹⁰⁺  45.2 Mbps  🔬 UPSCALED</text>
-
-  <!-- desc line 3: audio -->
-  <text x="32" y="122" class="d2">🎛️ 🔮 ATMOS  💎 TRUEHD  🔊 7.1  🌍 🇬🇧 🇫🇷 🇩🇪</text>
-
-  <!-- desc line 4: meta -->
-  <text x="32" y="143" class="d2">📦 PACK  25.4 GB  🌱 521  ⏱️ 2y  🔍 torrentio  🔌 debrid</text>
-
-  <!-- right-side resolution badge -->
-  <rect x="698" y="38" width="72" height="22" rx="4" fill="#1f3d2b"/>
-  <text x="734" y="53" class="tag" text-anchor="middle">INSTANT</text>
-
-  <!-- Card 2: 1080P WEB-DL, QUALITY -->
-  <rect class="card" x="16" y="198" width="768" height="158" rx="6"/>
-
-  <text x="32" y="226" class="name">🔵 1080P  ⚡ TB  🌟 HDR  🎶 DD+  THE DARK KNIGHT</text>
-
-  <text x="32" y="248" class="d1">🚀 INSTANT  ✦ QUALITY  🏷️ NTB</text>
-
-  <text x="32" y="269" class="d2">🎬 🍿 WEB-DL  ʜᴇᴠᴄ  🌟 HDR¹⁰  8.2 Mbps</text>
-
-  <text x="32" y="290" class="d2">🎛️ 🎶 EAC3  🔊 5.1  🌍 🇬🇧 🇫🇷</text>
-
-  <text x="32" y="311" class="d2">8.2 GB  🌱 89  ⏱️ 6m  🔍 nzbs.in  🔌 debrid</text>
-
-  <rect x="698" y="206" width="72" height="22" rx="4" fill="#1a2d4a"/>
-  <text x="734" y="221" class="tag" text-anchor="middle" fill="#79c0ff">QUALITY</text>
-
-  <!-- footer -->
-  <text x="400" y="370" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/brevityA/Core-Builds</text>
+  <text x="400" y="326" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/brevityA/Core-Builds</text>
 </svg>
