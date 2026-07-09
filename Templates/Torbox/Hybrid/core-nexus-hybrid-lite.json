@@ -1809,6 +1809,10 @@
       "cached": "single_result",
       "uncached": "per_service",
       "p2p": "per_addon",
+      "tiebreakers": [
+        { "type": "torrent_seeders", "position": "after_addon" },
+        { "type": "usenet_age", "position": "after_addon" }
+      ],
       "smartDetectAttributes": [
         "size",
         "resolution",
