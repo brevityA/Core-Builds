@@ -73,6 +73,21 @@
         "id": "debrider",
         "enabled": false,
         "credentials": {}
+      },
+      {
+        "id": "nzbdav",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "altmount",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "stremthru_newz",
+        "enabled": false,
+        "credentials": {}
       }
     ],
     "presets": [
@@ -208,6 +223,16 @@
           "searchMode": "both",
           "paginate": true,
           "useMultipleInstances": false
+        }
+      },
+      {
+        "type": "davex",
+        "enabled": false,
+        "options": {
+          "name": "davex",
+          "manifestUrl": "<your_davex_manifest_url>",
+          "timeout": 5000,
+          "mediaTypes": []
         }
       },
       {

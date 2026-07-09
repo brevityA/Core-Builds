@@ -865,6 +865,11 @@ const CONFIGURATOR_VERSION = '2.29';
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.30', date:'Jul 9 2026', items:[
+    'New services — EasyDebrid, PikPak, and Seedr added to the service picker with credential fields and StremThru Store integration',
+    'AIOStreams v2.30.6 service sync — nzbdav, altmount, stremthru_newz added to generated service arrays (15 total)',
+    'Fix: EasyNews++ preset type corrected from easynews-plus-plus to easynewsPlusPlus (matching AIOStreams source)',
+  ]},
   { v:'2.29', date:'Jul 8 2026', items:[
     'Splash screen revamp — new card-based layout with two-door entry (Guided Setup / Core Configure), quick deploy preset grid, service chip selector, and hex watermark background',
     'Neon top-edge glow on hover for all cards — splash, option, step, and navigation',
@@ -1220,6 +1225,9 @@ const DEFS = [
       { v:'offcloud',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#06b6d4" stroke-width="2" fill="#001a1f"/><path d="M14 25 Q14 20 19 19 Q19 14 25 14 Q31 14 31 20 Q34 21 34 25 Q34 29 29 29 L16 29 Q14 29 14 25Z" fill="none" stroke="#06b6d4" stroke-width="1.5"/><path d="M19 29 L19 33 M25 29 L25 33 M22 29 L22 34" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Offcloud', desc:'Cloud debrid — API key required<br><span style="color:#06b6d4;font-size:.8em">torrent + HTTP download caching</span>' },
       { v:'hybrid',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><clipPath id="hybL"><rect x="0" y="0" width="22" height="44"/></clipPath><clipPath id="hybR"><rect x="22" y="0" width="22" height="44"/></clipPath></defs><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#051408" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="none" clip-path="url(#hybL)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" fill="#1a0000" clip-path="url(#hybR)"/><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="none" clip-path="url(#hybR)"/><line x1="22" y1="4" x2="22" y2="40" stroke="#333" stroke-width="0.5"/><polygon points="13,16 19,19 13,22 7,19" fill="#1a5c2a"/><polygon points="7,19 7,26 13,29 13,22" fill="#166534"/><polygon points="13,22 19,19 19,26 13,29" fill="#15803d"/><path d="M31 15 L25 24 L28 24 L26 30 L33 21 L30 21 Z" fill="#dc2626"/></svg>', name:'Hybrid', desc:'TorBox Pro + Real-Debrid fallback<br><span style="color:#8b949e;font-size:.8em">e.g. 4K Hybrid · Core Nexus Hybrid</span>' },
       { v:'debridio',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#14b8a6" stroke-width="2" fill="#001a17"/><circle cx="20" cy="17" r="5.5" fill="none" stroke="#14b8a6" stroke-width="1.8"/><line x1="24" y1="21" x2="29" y2="26" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"/><text x="22" y="36" text-anchor="middle" fill="#14b8a6" font-size="6.5" font-weight="800" font-family="system-ui,sans-serif">DEBRID.IO</text></svg>', name:'Debrid.io', desc:'Debrid.io scraper · API key required<br><span style="color:#14b8a6;font-size:.8em">search + caching via Debrid.io</span>' },
+      { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#10b981" stroke-width="2" fill="#021a10"/><text x="22" y="22" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><line x1="13" y1="28" x2="31" y2="28" stroke="#10b981" stroke-width="1" opacity="0.5"/><text x="22" y="36" text-anchor="middle" fill="#10b981" font-size="5.5" font-weight="700" font-family="system-ui,sans-serif">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">multi-debrid aggregator service</span>' },
+      { v:'pikpak',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#38bdf8" stroke-width="2" fill="#001824"/><path d="M16 16 L28 22 L16 28Z" fill="#38bdf8"/><text x="22" y="38" text-anchor="middle" fill="#38bdf8" font-size="6" font-weight="800" font-family="system-ui,sans-serif">PIKPAK</text></svg>', name:'PikPak', desc:'PikPak cloud storage · API key<br><span style="color:#38bdf8;font-size:.8em">cloud torrent + download caching</span>' },
+      { v:'seedr',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#a3e635" stroke-width="2" fill="#0a1a00"/><circle cx="22" cy="20" r="6" fill="none" stroke="#a3e635" stroke-width="1.8"/><path d="M22 14 L22 10 M19 15 L16 12 M25 15 L28 12" stroke="#a3e635" stroke-width="1.3" stroke-linecap="round"/><text x="22" y="36" text-anchor="middle" fill="#a3e635" font-size="7" font-weight="800" font-family="system-ui,sans-serif">SEEDR</text></svg>', name:'Seedr', desc:'Seedr cloud torrent · API key<br><span style="color:#a3e635;font-size:.8em">torrent to cloud streaming</span>' },
       { v:'p2p',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#8b5cf6" stroke-width="2" fill="#120a2e"/><circle cx="15" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="29" cy="22" r="4.5" fill="none" stroke="#8b5cf6" stroke-width="1.5"/><line x1="19.5" y1="22" x2="24.5" y2="22" stroke="#8b5cf6" stroke-width="1.5"/><path d="M27 18 L33 15 M27 26 L33 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/><path d="M17 18 L11 15 M17 26 L11 29" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>', name:'P2P Free', desc:'No subscription — torrents only<br><span style="color:#8b5cf6;font-size:.8em">free · no API key needed</span>' },
       { v:'http',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#f472b6" stroke-width="2" fill="#1f0a14"/><rect x="12" y="17" width="20" height="12" rx="2" fill="none" stroke="#f472b6" stroke-width="1.5"/><path d="M16 21 L20 24 L16 27" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="27" x2="27" y2="27" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'HTTP Streams', desc:'Streaming sites — no debrid, no torrents<br><span style="color:#f472b6;font-size:.8em">WebStreamr · Nuvio · Flix-Streams</span>' },
       { v:'nzbgeek', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="#0a1f0a"/><text x="22" y="20" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="900" font-family="system-ui,sans-serif">NZB</text><line x1="13" y1="24" x2="31" y2="24" stroke="#22c55e" stroke-width="1" opacity="0.5"/><text x="22" y="33" text-anchor="middle" fill="#22c55e" font-size="7.5" font-weight="700" font-family="system-ui,sans-serif">GEEK</text></svg>', name:'NZBGeek', desc:'Usenet indexer · API key required<br><span style="color:#22c55e;font-size:.8em">pairs with Meteor for Usenet coverage</span>' },
@@ -1278,7 +1286,7 @@ function shareConfig() {
 function sanitizeSharedConfig(d) {
   if (!d || typeof d !== 'object') return {};
   const optVals = key => { const def = DEFS.find(x => x.key === key); return def ? def.opts.map(o => o.v) : []; };
-  const SVC_IDS = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','p2p','http','nzbgeek','streamnzb'];
+  const SVC_IDS = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr','p2p','http','nzbgeek','streamnzb'];
   const out = {};
   const pick = (k, ok) => { if (k in d && ok(d[k])) out[k] = d[k]; };
   pick('device',       v => optVals('device').includes(v));
@@ -1356,7 +1364,7 @@ function clearState() {
 function pushStep() { try { history.pushState({ step: step }, ''); } catch(e) {} }
 
 function deriveService() {
-  const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'];
+  const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'];
   const primary = S.multiServices.filter(s => PRIMARY.includes(s));
   if (primary.length > 1) return 'multi';
   if (primary.length === 1) return primary[0];
@@ -1371,7 +1379,7 @@ function label(key, val) {
   if (key === 'audio') { const m = {lossless:'Full Lossless',standard:'DD+ / Atmos',limited:'Auto',dolby:'Dolby Only'}; return m[val] || val || ''; }
   if (key === 'service' && val === 'multi') {
     const d2 = DEFS.find(x => x.key === 'service');
-    if (d2) return S.multiServices.filter(s => ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'].includes(s)).map(s => { const o = d2.opts.find(x => x.v === s); return o ? o.name : s; }).join(' + ');
+    if (d2) return S.multiServices.filter(s => ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'].includes(s)).map(s => { const o = d2.opts.find(x => x.v === s); return o ? o.name : s; }).join(' + ');
   }
   const d = DEFS.find(x => x.key === key);
   if (!d) return val || '';
@@ -1471,18 +1479,23 @@ function renderOpts(def) {
       'http':       'Streaming sites · no debrid required',
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
       'debridio':   'Debrid.io scraper',
+      'easydebrid': 'Multi-debrid aggregator',
+      'pikpak':     'Cloud torrent + download caching',
+      'seedr':      'Cloud torrent streaming',
       'nzbgeek':    'Usenet indexer',
       'streamnzb':  'Self-hosted Usenet streaming',
     };
     const SVC_AUTH = {
       'torbox-pro':'API key','torbox-ess':'API key','alldebrid':'API key','realdebrid':'API key',
       'premiumize':'API key','debridlink':'API key','offcloud':'API key','debridio':'API key',
+      'easydebrid':'API key','pikpak':'API key','seedr':'API key',
       'easynews':'User + pass','nzbgeek':'API key','streamnzb':'Manifest URL',
       'hybrid':'Both keys','p2p':'Free','http':'Free',
     };
     const SVC_CAT = {
       'torbox-pro':'debrid','torbox-ess':'debrid','alldebrid':'debrid','realdebrid':'debrid',
       'premiumize':'debrid','debridlink':'debrid','offcloud':'debrid','debridio':'debrid',
+      'easydebrid':'debrid','pikpak':'debrid','seedr':'debrid',
       'hybrid':'debrid','easynews':'usenet','nzbgeek':'usenet','streamnzb':'usenet',
       'p2p':'noaccount','http':'noaccount',
     };
@@ -2358,7 +2371,7 @@ function render() {
             <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${{1:1,2:2,3:3}[step]||step} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${{1:1,2:2,3:3}[step]||step} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -2911,6 +2924,9 @@ function getDebridInputs() {
     easynewsPass: { label:'EasyNews Password',     placeholder:'your-password',                        url:'https://www.easynews.com/account' },
     nzbgeek:      { label:'NZBGeek API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbgeek.info/dashboard.php?call=profile' },
     debridio:     { label:'Debrid.io API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debrid.io/' },
+    easydebrid:   { label:'EasyDebrid API Key',    placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://easydebrid.com/' },
+    pikpak:       { label:'PikPak API Key',        placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://mypikpak.com/' },
+    seedr:        { label:'Seedr API Key',         placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://www.seedr.cc/' },
     streamnzb:    { label:'StreamNZB Manifest URL', placeholder:'https://your-streamnzb-instance/manifest.json', url:'' },
   };
   const ids = [];
@@ -2922,6 +2938,9 @@ function getDebridInputs() {
   if (m.includes('offcloud'))   ids.push('offcloud');
   if (m.includes('easynews'))   { ids.push('easynews'); ids.push('easynewsPass'); }
   if (m.includes('debridio'))   ids.push('debridio');
+  if (m.includes('easydebrid')) ids.push('easydebrid');
+  if (m.includes('pikpak'))     ids.push('pikpak');
+  if (m.includes('seedr'))      ids.push('seedr');
   if (m.includes('nzbgeek'))    ids.push('nzbgeek');
   if (m.includes('streamnzb'))  ids.push('streamnzb');
   return [...new Set(ids)].map(id => ({id, ...defs[id]})).filter(d => d.label);
@@ -2935,8 +2954,8 @@ function defaultName() {
   const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
   const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid', 'debridio':'Debrid.io' }[svc] || '';
   if (svc === 'multi') {
-    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN','torbox-pro':'TB','torbox-ess':'TB-Ess','hybrid':'HYB','debridio':'DIO','p2p':'P2P','http':'HTTP','nzbgeek':'NZB','streamnzb':'SNZB'};
-    const PRIMARY_ABBR = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio'];
+    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN','torbox-pro':'TB','torbox-ess':'TB-Ess','hybrid':'HYB','debridio':'DIO','easydebrid':'ED','pikpak':'PP','seedr':'SR','p2p':'P2P','http':'HTTP','nzbgeek':'NZB','streamnzb':'SNZB'};
+    const PRIMARY_ABBR = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'];
     const mainSvcs = S.multiServices.filter(s => PRIMARY_ABBR.includes(s));
     return `Core Builds${suffix} Multi (${mainSvcs.map(s => abbr[s] || s).join('+')})`.trim();
   }
@@ -2950,15 +2969,15 @@ function presets() {
   const hasExtraHttp = S.multiServices.includes('http') && !isHttp;
   const isNzbgeek = S.multiServices.includes('nzbgeek');
   const isStreamnzb = S.multiServices.includes('streamnzb');
-  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud'].includes(s)));
+  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
   if (isHttp) return [
     { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:true, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
   ];
-  const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','hybrid':'StremThru RD'};
-  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud'];
+  const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr','hybrid':'StremThru RD'};
+  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
   const storeSlot = isMulti
     ? S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
@@ -2972,7 +2991,7 @@ function presets() {
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
     ...storeSlot,
     ...(isEasynews || multiHasEasynews ? [
-      { type:'easynews-plus-plus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
+      { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000 }, resources:['stream'] },
     ] : []),
     ...(isNzbgeek && S.creds.nzbgeek ? [
@@ -3013,9 +3032,13 @@ function services() {
     {id:'debridlink', enabled: svc==='debridlink' || (isMulti && m.includes('debridlink')), credentials:cred('debridlink')},
     {id:'torbox', enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid', credentials:cred('torbox')},
     {id:'offcloud', enabled: svc==='offcloud' || (isMulti && m.includes('offcloud')), credentials:cred('offcloud')},
+    {id:'easydebrid', enabled: svc==='easydebrid' || (isMulti && m.includes('easydebrid')), credentials:cred('easydebrid')},
+    {id:'pikpak', enabled: svc==='pikpak' || (isMulti && m.includes('pikpak')), credentials:cred('pikpak')},
+    {id:'seedr', enabled: svc==='seedr' || (isMulti && m.includes('seedr')), credentials:cred('seedr')},
     {id:'easynews', enabled: svc==='easynews' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || (isMulti && m.includes('easynews'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
     {id:'putio', enabled: false, credentials:{}},
-    {id:'easydebrid', enabled: false, credentials:{}}, {id:'pikpak', enabled: false, credentials:{}}, {id:'seedr', enabled: false, credentials:{}}, {id:'debrider', enabled: false, credentials:{}}
+    {id:'debrider', enabled: false, credentials:{}},
+    {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}}
   ];
 }
 
