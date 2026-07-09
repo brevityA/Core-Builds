@@ -106,7 +106,7 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 
 ---
 
-## Active Template Inventory (as of v3.2.5)
+## Active Template Inventory (as of v3.2.6)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.7.6 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
@@ -133,8 +133,8 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Speed/TorBox/core-nexus-speed-lite.json` v2.10.5
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.5 — EasyNews 4K
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.5 — EasyNews 1080p
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.6 — EasyNews 4K, davex preset (disabled by default)
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.6 — EasyNews 1080p, davex preset (disabled by default)
 
 ### AllDebrid
 - `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.5 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
@@ -143,9 +143,9 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.5 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.12.5 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid.json` v2.10.5 — 1080p hybrid, TorBox-priority twins (IQR), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid-lite.json` v2.10.5 — TorBox-priority twins (CB-style), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-4k-hybrid.json` v2.12.6 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid.json` v2.10.6 — 1080p hybrid, TorBox-priority twins (IQR), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid-lite.json` v2.10.6 — TorBox-priority twins (CB-style), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
 
 ### Device
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.3.5 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
@@ -154,12 +154,12 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Device/Windows/core-nexus-ultrawide.json` v0.2.5 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
 
 ### Anime
-- `Anime/core-nexus-anime-4k.json` v2.8.12 — 4K anime, SeaDex + AnimeTosho
-- `Anime/core-nexus-anime-4k-lite.json` v2.8.10
-- `Anime/core-nexus-anime.json` v2.8.12 — 1080p anime
-- `Anime/core-nexus-anime-lite.json` v2.8.10
-- `Anime/core-nexus-anime-dub.json` v2.8.12 — dubbed variant
-- `Anime/core-nexus-anime-dub-lite.json` v2.8.10
+- `Anime/core-nexus-anime-4k.json` v2.8.13 — 4K anime, SeaDex + AnimeTosho, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k-lite.json` v2.8.11 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime.json` v2.8.13 — 1080p anime, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-lite.json` v2.8.11 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub.json` v2.8.13 — dubbed variant, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub-lite.json` v2.8.11 — cachedAnime/uncachedAnime sort
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.5 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE

@@ -5,7 +5,7 @@
     "description": "Dubbed-first anime build. Prioritises English dubs and Dual Audio over raw Japanese sub tracks. SeaDex best releases · Nyaa-sourced · FLAC/AAC · TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.10",
+    "version": "2.8.11",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
