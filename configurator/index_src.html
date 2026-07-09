@@ -304,7 +304,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .ver-badge:hover{background:#002a40;border-color:#00d4ff;color:#7eeeff}
 /* Manifest modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px);animation:fadeIn .18s ease}
-.modal-box{background:#151923;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px 22px;max-width:460px;width:100%;position:relative;animation:slideUp .22s ease;max-height:90dvh;overflow-y:auto}
+.modal-box{background:linear-gradient(160deg,#151923 0%,#0d1117 100%);border:1.5px solid rgba(0,212,255,.25);border-radius:18px;padding:28px 24px;max-width:460px;width:100%;position:relative;animation:slideUp .22s ease;max-height:90dvh;overflow-y:auto;box-shadow:0 0 0 1px rgba(0,212,255,.08),0 24px 80px rgba(0,0,0,.6),0 0 40px rgba(0,212,255,.04)}
 @keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:#6b7280;cursor:pointer;font-size:1.5rem;line-height:1;padding:2px 8px;border-radius:6px;transition:color .15s}
 .modal-close:hover{color:#e6edf3}
@@ -315,10 +315,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .fmt-tab{padding:6px 14px;border-radius:7px;border:1.5px solid rgba(255,255,255,.08);background:#111720;color:#7a8194;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
 .fmt-tab:hover{border-color:#005c7a;color:#e6edf3}
 .fmt-tab.active{border-color:#00d4ff;background:#00131c;color:#00d4ff}
-.copy-field{background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.copy-field-label{color:#6b7280;font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
-.copy-field-val{font-family:monospace;font-size:.74rem;color:#c9d1d9;word-break:break-all}
-.copy-field-val.pwd-val{font-size:.9rem;letter-spacing:.05em;color:#e6edf3;font-family:inherit}
+.copy-fields-card{background:#111720;border:1.5px solid rgba(0,212,255,.18);border-radius:12px;padding:2px 0;margin-bottom:12px;overflow:hidden}
+.copy-field{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.copy-field+.copy-field{border-top:1px solid rgba(255,255,255,.06)}
+.copy-field-label{color:#58a6ff;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+.copy-field-val{font-family:monospace;font-size:.78rem;color:#e6edf3;word-break:break-all;overflow:hidden;text-overflow:ellipsis}
+.copy-field-val.pwd-val{font-size:.9rem;letter-spacing:.05em;color:#e6edf3;font-family:monospace}
 .copy-btn{background:rgba(255,255,255,.06);border:none;border-radius:6px;color:#7a8194;cursor:pointer;padding:6px 11px;flex-shrink:0;font-size:.8rem;font-weight:700;transition:all .15s}
 .copy-btn:hover{background:rgba(255,255,255,.1);color:#e4e7ed}
 .copy-btn.copied{background:#061a0e;color:#3fb950}
@@ -399,6 +401,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .fmt-live-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .fmt-live-n{font-size:.73rem;color:#e2e8f0;line-height:1.55;word-break:break-word}
 .fmt-live-d{font-size:.7rem;color:#6b7280;line-height:1.55;word-break:break-word}
+/* Formatter dropdown picker */
+.fmt-select-wrap{position:relative}
+.fmt-select{width:100%;padding:11px 40px 11px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.13);background:#0d1117;color:#e6edf3;font-size:.85rem;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .2s}
+.fmt-select:focus{border-color:rgba(0,212,255,.5)}
+.fmt-select-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:#6b7280;font-size:.75rem}
+.fmt-featured{border:1.5px solid rgba(0,212,255,.35);border-radius:12px;background:rgba(0,212,255,.04);padding:14px 16px;margin-top:10px;transition:border-color .2s}
+.fmt-featured-head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.fmt-featured-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.fmt-featured-label{font-weight:700;font-size:.92rem;color:#00d4ff}
+.fmt-featured-badge{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:5px}
+.fmt-featured-desc{color:#6b7280;font-size:.72rem;margin-top:3px;line-height:1.4}
+[data-theme="light"] .fmt-select{background:#fff;border-color:#d0d7de;color:#1f2328}
+[data-theme="light"] .fmt-select:focus{border-color:#0969da}
+[data-theme="light"] .fmt-featured{border-color:rgba(9,105,218,.3);background:rgba(9,105,218,.04)}
+[data-theme="light"] .fmt-featured-label{color:#0969da}
 /* Animated logo */
 @keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
 @keyframes coreGlowPulse{0%,100%{transform:scale(1);opacity:.38}50%{transform:scale(1.24);opacity:.84}}
@@ -860,11 +877,17 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.31';
+const CONFIGURATOR_VERSION = '2.32';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const CHANGELOG = [
+  { v:'2.32', date:'Jul 9 2026', items:[
+    'Formatter picker redesigned — compact dropdown with featured card and live preview replaces stacked card list',
+    'Manifest modal polished — gradient background, cyan accent border, grouped URL/password card',
+    'Wizaardd AIOStreams instance added (forthewizards.uk)',
+    'HdHub preset disabled across all debrid templates (kept as backup)',
+  ]},
   { v:'2.31', date:'Jul 9 2026', items:[
     'All 17 formatters now show unique live previews — previously 12 of 17 fell back to the Apex V2 preview',
     'All 17 formatter entries added to the formatter picker (was 6)',
@@ -1153,7 +1176,7 @@ let _sharedImport = false;
 let _detectedDevice = null;
 let _savedStep = 0;
 let pasteMode = false;
-const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz' };
+const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz', wizaardd:'https://aiostreams-stable.forthewizards.uk' };
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
@@ -1486,25 +1509,8 @@ function renderOpts(def) {
   const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
   const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
-  if (def.layout === 'formatter-picker') return '<div style="display:flex;flex-direction:column;gap:8px">' +
-    FORMATTERS.map(f => {
-      const on = S.formatter === f.id;
-      return `<div class="fmt-card" data-action="set-formatter" data-val="${f.id}" data-active="${on}">
-        <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
-          <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0;box-shadow:0 0 8px ${f.bc}88"></div>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
-              <span class="fmt-lbl" style="font-weight:700;font-size:.9rem">${f.label}</span>
-              <span style="font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:5px;background:${f.bc}22;color:${f.bc}">${f.badge}</span>
-            </div>
-            <div style="color:#6b7280;font-size:.72rem">${f.desc}</div>
-          </div>
-          <span class="fmt-arr"></span>
-        </div>
-        <div class="fmt-preview-wrap">${fmtPreviewHtml(f.id)}</div>
-      </div>`;
-    }).join('') +
-  '</div>';
+  if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
+    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>`;
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
@@ -1717,6 +1723,53 @@ function fmtPreviewHtml(fmtId) {
   </div>`;
 }
 
+function fmtDropdownHtml() {
+  const cur = FORMATTERS.find(f => f.id === S.formatter) || FORMATTERS[0];
+  const isCustom = S.formatter === 'custom' && S.customFormatter;
+  const opts = FORMATTERS.map(f => `<option value="${f.id}"${f.id === S.formatter && !isCustom ? ' selected' : ''}>${f.label} — ${f.badge}</option>`).join('');
+  const customOpt = S.customFormatter ? `<option value="custom"${isCustom ? ' selected' : ''}>${S.customFormatter.label || 'Custom'} — Imported</option>` : '';
+  const display = isCustom ? { bc:'#a78bfa', label:S.customFormatter.label||'Custom', badge:'Imported', desc:'Your imported formatter' } : cur;
+  return `<div>
+    <div class="fmt-select-wrap">
+      <select class="fmt-select" data-action="fmt-dropdown-change">${opts}${customOpt}</select>
+      <span class="fmt-select-arrow">▾</span>
+    </div>
+    <div class="fmt-featured" id="fmtFeaturedCard">
+      <div class="fmt-featured-head">
+        <div class="fmt-featured-dot" style="background:${display.bc};box-shadow:0 0 8px ${display.bc}88"></div>
+        <span class="fmt-featured-label" id="fmtFeaturedLabel">${display.label}</span>
+        <span class="fmt-featured-badge" id="fmtFeaturedBadge" style="background:${display.bc}22;color:${display.bc}">${display.badge}</span>
+      </div>
+      <div class="fmt-featured-desc" id="fmtFeaturedDesc">${display.desc}</div>
+      <div id="fmtFeaturedPreview">${fmtPreviewHtml(isCustom ? 'apex-v2' : cur.id)}</div>
+    </div>
+  </div>`;
+}
+
+function updateFmtFeatured() {
+  const isCustom = S.formatter === 'custom' && S.customFormatter;
+  const cur = isCustom ? { bc:'#a78bfa', label:S.customFormatter.label||'Custom', badge:'Imported', desc:'Your imported formatter', id:'custom' } : (FORMATTERS.find(f => f.id === S.formatter) || FORMATTERS[0]);
+  document.querySelectorAll('#fmtFeaturedLabel').forEach(el => { el.textContent = cur.label; });
+  document.querySelectorAll('#fmtFeaturedBadge').forEach(el => { el.textContent = cur.badge; el.style.background = cur.bc + '22'; el.style.color = cur.bc; });
+  document.querySelectorAll('#fmtFeaturedDesc').forEach(el => { el.textContent = cur.desc; });
+  document.querySelectorAll('.fmt-featured-dot').forEach(el => { el.style.background = cur.bc; el.style.boxShadow = '0 0 8px ' + cur.bc + '88'; });
+  document.querySelectorAll('#fmtFeaturedPreview').forEach(el => { el.innerHTML = fmtPreviewHtml(isCustom ? 'apex-v2' : cur.id); });
+  const reviewImg = document.getElementById('fmtReviewImg');
+  if (reviewImg && !isCustom) { reviewImg.src = cur.img; reviewImg.alt = cur.label + ' preview'; }
+}
+function updateFmtReceiptRow() {
+  const fmtLbl = label('formatter', S.formatter);
+  const fmtSummary = document.querySelector('#fmtPickerDetails > summary span:first-child');
+  if (fmtSummary) fmtSummary.innerHTML = `<span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${fmtLbl}</span>`;
+  document.querySelectorAll('.receipt-row').forEach(row => {
+    const lbl2 = row.querySelector('.receipt-row-lbl');
+    if (lbl2 && lbl2.textContent.trim() === 'formatter') {
+      const val = row.querySelector('.receipt-row-val');
+      if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'apex-v2' ? ' hl' : ''}`; }
+    }
+  });
+}
+
 function customFormatterCard() {
   if (!S.customFormatter) return '';
   const on = S.formatter === 'custom';
@@ -1822,21 +1875,6 @@ function renderAdvancedPanel() {
     </div><div class="device-help" id="audiohelp_adv_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
   }).join('');
 
-  const fmtCards = FORMATTERS.map(f => {
-    const on = S.formatter === f.id;
-    return `<div class="fmt-card" data-action="set-formatter" data-val="${f.id}" data-active="${on}">
-      <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
-        <div style="width:10px;height:10px;border-radius:50%;background:${f.bc};flex-shrink:0"></div>
-        <div style="flex:1;min-width:0">
-          <span class="fmt-lbl" style="font-weight:700;font-size:.9rem">${f.label}</span>
-          <span style="margin-left:6px;background:rgba(255,255,255,.06);border-radius:4px;padding:2px 6px;font-size:.65rem;color:#6b7280">${f.badge}</span>
-          <div style="color:#6b7280;font-size:.72rem;margin-top:2px">${f.desc}</div>
-        </div>
-        <span class="fmt-arr"></span>
-      </div>
-      <div class="fmt-preview-wrap">${fmtPreviewHtml(f.id)}</div>
-    </div>`;
-  }).join('');
 
   const sizeOpts = ['10','20','30','50','unlimited'];
   const sizePills = sizeOpts.map(v => {
@@ -1891,8 +1929,8 @@ function renderAdvancedPanel() {
 
       <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎨 Stream Layout (Formatter)</div>
-        <div style="display:flex;flex-direction:column;gap:8px">${fmtCards}${customFormatterCard()}</div>
-        <button data-action="import-formatter" style="margin-top:8px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>
+        ${fmtDropdownHtml()}
+        <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>
       </div>
 
     </div>
@@ -2226,6 +2264,7 @@ function render() {
                   <option value="kuu"        ${S.instanceHost==='kuu'?'selected':''}>Kuu's — aiostreams.stremio.ru</option>
                   <option value="atbp"       ${S.instanceHost==='atbp'?'selected':''}>ATBP — aio.atbphosting.com</option>
                   <option value="omni"       ${S.instanceHost==='omni'?'selected':''}>Omni's — aiostreams.12312023.xyz</option>
+                  <option value="wizaardd"   ${S.instanceHost==='wizaardd'?'selected':''}>Wizaardd — forthewizards.uk</option>
                   <option value="custom"     ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted</option>
                 </select>
               </div>
@@ -2618,6 +2657,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Handle all clicks
+  document.addEventListener('change', (e) => {
+    if (e.target.matches('[data-action="fmt-dropdown-change"]')) {
+      S.formatter = e.target.value;
+      saveState();
+      updateFmtFeatured();
+      updateFmtReceiptRow();
+      document.querySelectorAll('[data-action="fmt-dropdown-change"]').forEach(sel => { if (sel !== e.target) sel.value = S.formatter; });
+    }
+  });
   document.addEventListener('click', (e) => {
     const flashBtn = e.target.closest('button:not(:disabled):not(.btn-manifest):not(.btn-dl)');
     if (flashBtn) {
@@ -2831,18 +2879,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('[data-action="set-formatter"]').forEach(card => {
         card.dataset.active = String(card.dataset.val === S.formatter);
       });
-      // Update the receipt row and summary label in-place when on Review step
-      const fmtLbl = label('formatter', S.formatter);
-      const fmtSummary = document.querySelector('#fmtPickerDetails > summary span:first-child');
-      if (fmtSummary) fmtSummary.innerHTML = `<span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${fmtLbl}</span>`;
-      const receiptRows = document.querySelectorAll('.receipt-row');
-      receiptRows.forEach(row => {
-        const lbl2 = row.querySelector('.receipt-row-lbl');
-        if (lbl2 && lbl2.textContent.trim() === 'formatter') {
-          const val = row.querySelector('.receipt-row-val');
-          if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'apex-v2' ? ' hl' : ''}`; }
-        }
-      });
+      updateFmtFeatured();
+      updateFmtReceiptRow();
     }
     if (action === 'import-formatter') { showFormatterImport(); }
     if (action === 'svc-cat') {
@@ -3037,19 +3075,13 @@ function sizeLimitHtml() {
 }
 
 function formatterPickerHtml() {
-  return '<div style="margin-bottom:16px"><div style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Stream Layout</div><div style="display:flex;flex-direction:column;gap:8px">' +
-    FORMATTERS.map(f => {
-      const on = S.formatter === f.id;
-      return `<div class="fmt-card" data-action="set-formatter" data-val="${f.id}" data-active="${on}" style="border-radius:10px">` +
-        `<img src="${f.img}" alt="${f.label} preview" style="width:100%;display:block;border-bottom:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'">` +
-        `<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">` +
-        `<span class="fmt-lbl" style="font-weight:700;font-size:.85rem;min-width:52px">${f.label}</span>` +
-        `<span style="font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${f.bc}22;color:${f.bc};flex-shrink:0">${f.badge}</span>` +
-        `<span style="color:#6b7280;font-size:.77rem">${f.desc}</span>` +
-        `</div></div>`;
-    }).join('') + customFormatterCard() +
-    `<button data-action="import-formatter" style="margin-top:4px;width:100%;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>` +
-  '</div></div>';
+  const cur = FORMATTERS.find(f => f.id === S.formatter) || FORMATTERS[0];
+  const isCustom = S.formatter === 'custom' && S.customFormatter;
+  return '<div style="margin-bottom:16px"><div style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Stream Layout</div>' +
+    fmtDropdownHtml() +
+    (!isCustom ? `<img src="${cur.img}" alt="${cur.label} preview" style="width:100%;display:block;border-radius:8px;margin-top:10px;border:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'" id="fmtReviewImg">` : '') +
+    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>` +
+  '</div>';
 }
 
 function getDebridInputs() {
@@ -3526,20 +3558,22 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       <div class="fmt-tabs" id="mFmtTabs">
         ${FMTS.map((f,i) => `<button class="fmt-tab${i===0?' active':''}" data-fi="${i}">${f.label}</button>`).join('')}
       </div>
-      <div class="copy-field">
-        <div style="flex:1;min-width:0">
-          <div class="copy-field-label" id="mUrlLabel">Manifest URL</div>
-          <div class="copy-field-val" id="mUrlVal">${esc(FMTS[0].getUrl(manifestUrl))}</div>
+      <div class="copy-fields-card">
+        <div class="copy-field">
+          <div style="flex:1;min-width:0">
+            <div class="copy-field-label" id="mUrlLabel">Manifest URL</div>
+            <div class="copy-field-val" id="mUrlVal">${esc(FMTS[0].getUrl(manifestUrl))}</div>
+          </div>
+          <button class="copy-btn" id="mCopyUrl">Copy</button>
         </div>
-        <button class="copy-btn" id="mCopyUrl">Copy</button>
+        ${password ? `<div class="copy-field">
+          <div style="flex:1;min-width:0">
+            <div class="copy-field-label">Password</div>
+            <div class="copy-field-val pwd-val">${esc(password)}</div>
+          </div>
+          <button class="copy-btn" id="mCopyPwd">Copy</button>
+        </div>` : ''}
       </div>
-      ${password ? `<div class="copy-field">
-        <div style="flex:1;min-width:0">
-          <div class="copy-field-label">Password</div>
-          <div class="copy-field-val pwd-val">${esc(password)}</div>
-        </div>
-        <button class="copy-btn" id="mCopyPwd">Copy</button>
-      </div>` : ''}
       <div id="mAppHelp" style="display:none;margin:8px 0 4px;padding:10px 13px;border-radius:8px;border:1px solid rgba(79,70,229,.2);background:rgba(79,70,229,.04)">
         <div style="font-size:.78rem;font-weight:700;color:#a78bfa;margin-bottom:6px" id="mAppHelpTitle"></div>
         <div style="font-size:.76rem;color:#8b949e;line-height:1.55" id="mAppHelpBody"></div>
