@@ -11,6 +11,7 @@
 ### Fixed
 - **EasyNews++ preset type** — configurator generated `easynews-plus-plus` which doesn't match AIOStreams' `easynewsPlusPlus` case in `presetManager.ts`, causing "Preset not found" errors on import. Fixed to use the correct camelCase identifier.
 - **Configurator v2.31** — formatter live previews: 12 of 17 formatters fell back to Apex V2's preview data, causing all expanded formatter cards to show identical content. Added unique preview data for all 17 formatters matching their actual DSL output. Also added all 17 formatters to the picker (was 6) and regenerated all 16 preview SVGs.
+- **Configurator v2.32** — formatter picker redesigned from 17 stacked expandable cards to a compact `<select>` dropdown with featured card showing live preview. Manifest modal polished with gradient background, cyan accent border, and grouped URL/password card. Added Wizaardd AIOStreams instance (forthewizards.uk). HdHub preset disabled across all debrid templates (kept as backup).
 
 ## 3.2.5 (2026-07-03)
 
