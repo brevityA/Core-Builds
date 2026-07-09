@@ -2061,6 +2061,24 @@
         ]
       },
       {
+        "type": "hdhub",
+        "enabled": false,
+        "instanceId": "hdhub-1",
+        "options": {
+          "name": "HdHub",
+          "timeout": 5000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ],
+          "tb_only": true
+        }
+      },
+      {
         "type": "newznab",
         "instanceId": "tb-nzb-1",
         "enabled": true,
@@ -2081,24 +2099,6 @@
           "services": [
             "torbox"
           ]
-        }
-      },
-      {
-        "type": "hdhub",
-        "enabled": true,
-        "instanceId": "hdhub-1",
-        "options": {
-          "name": "HdHub",
-          "timeout": 5000,
-          "resources": [
-            "stream"
-          ],
-          "mediaTypes": [
-            "movie",
-            "series",
-            "anime"
-          ],
-          "tb_only": true
         }
       },
       {

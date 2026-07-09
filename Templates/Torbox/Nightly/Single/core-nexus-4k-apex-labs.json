@@ -2162,7 +2162,7 @@
       },
       {
         "type": "hdhub",
-        "enabled": true,
+        "enabled": false,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",
