@@ -41,16 +41,28 @@
             "pages": [
               "introduction",
               "quick-start",
-              "master-guide",
-              "how-it-works",
               "which-template",
               "importing",
               "lite-vs-standard",
-              "instance-status",
+              "how-it-works",
+              "master-guide"
+            ]
+          },
+          {
+            "group": "Configurator",
+            "pages": [
+              "configurator",
+              "customising",
+              "aiometadata"
+            ]
+          },
+          {
+            "group": "Services & Devices",
+            "pages": [
               "debrid-comparison",
-              "aiometadata",
               "alldebrid-setup",
               "easynews-setup",
+              "device-profiles",
               "regional-content"
             ]
           },
@@ -58,23 +70,24 @@
             "group": "Templates",
             "pages": [
               "template-directory",
-              "configurator",
-              "customising",
-              "community-templates"
+              "community-templates",
+              "nightly-and-labs"
             ]
           },
           {
-            "group": "Reference",
+            "group": "Expressions & Addons",
             "pages": [
               "expression-layer",
-              "device-profiles",
-              "formatters",
-              "formatter-gallery",
+              "addon-guide",
+              "addon-reference"
+            ]
+          },
+          {
+            "group": "Formatters",
+            "pages": [
               "which-formatter",
-              "glossary",
-              "nightly-and-labs",
-              "addon-reference",
-              "addon-guide"
+              "formatters",
+              "formatter-gallery"
             ]
           },
           {
@@ -83,6 +96,8 @@
               "whats-new",
               "faq",
               "troubleshooting",
+              "instance-status",
+              "glossary",
               "changelog",
               "roadmap"
             ]
