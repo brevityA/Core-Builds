@@ -495,6 +495,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-tertiary{width:100%;max-width:420px;display:flex;gap:8px}
 .splash-tertiary-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;background:transparent;border:1px solid rgba(255,255,255,.06);border-radius:10px;color:#7a8194;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none}
 .splash-tertiary-btn:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1);color:#e4e7ed}
+.splash-tertiary-kofi{border-color:rgba(255,94,91,.15);color:#ff5e5b}
+.splash-tertiary-kofi:hover{background:rgba(255,94,91,.06);border-color:rgba(255,94,91,.3);color:#ff5e5b}
 .splash-tertiary-icon{font-size:.82rem;opacity:.7}
 .splash-footer{font-size:.6rem;color:#4a4f60;line-height:1.6;margin-top:-8px}
 .splash-footer a{color:#00d4ff;text-decoration:none;opacity:.7}
@@ -582,6 +584,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .splash-preset-detail{color:#8c959f}
 [data-theme="light"] .splash-tertiary-btn{border-color:#d0d7de;color:#57606a}
 [data-theme="light"] .splash-tertiary-btn:hover{background:rgba(0,0,0,.03);border-color:#afb8c1;color:#1c2128}
+[data-theme="light"] .splash-tertiary-kofi{border-color:rgba(255,94,91,.25);color:#e5443e}
+[data-theme="light"] .splash-tertiary-kofi:hover{background:rgba(255,94,91,.06);border-color:rgba(255,94,91,.4);color:#d63a34}
 [data-theme="light"] .splash-footer{color:#8c959f}
 [data-theme="light"] .splash-watermark{opacity:.015}
 [data-theme="light"] .step-pending .step-bub{background:#d0d7de}
@@ -1915,6 +1919,9 @@ function splashHtml() {
       </a>
       <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-tertiary-btn">
         <span class="splash-tertiary-icon">💬</span> Reddit
+      </a>
+      <a href="https://ko-fi.com/branding_brevity" target="_blank" rel="noopener" class="splash-tertiary-btn splash-tertiary-kofi">
+        <span class="splash-tertiary-icon">☕</span> Support
       </a>
     </div>
 
