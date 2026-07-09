@@ -68,14 +68,20 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 
 ## Known Preset Types
 
-Preset `type` values confirmed in AIOStreams source (as of v2.30.x):
+Preset `type` values confirmed in AIOStreams source (as of v2.30.6 — 80 presets in PRESET_LIST):
+
+**Preset categories:** `streams`, `subtitles`, `meta_catalogs`, `misc` (enum `PresetCategory`)
 
 **Debrid/service:** `stremthruTorz`, `stremthruStore`, `torbox-search`, `sootio`, `peerflix`
 - `torbox` — **DEPRECATED** (removed/disabled v2.30.2); use `torbox-search`
 
-**Scrapers:** `comet`, `mediafusion`, `jackettio`, `prowlarr`, `knaben`, `torrentio`, `debridio`, `meteor`, `torrent-galaxy`, `zilean`, `hdhub`, `eztv`, `torrents-db`, `streamfusion`, `baguettio`, `flix-streams`, `brazuca-torrents`, `yastream`, `bitmagnet`, `dmm-cast`, `torznab`, `webstreamr`, `nuvio-streams`, `ai-search`
+**Scrapers:** `comet`, `mediafusion`, `jackettio`, `prowlarr`, `jackett`, `knaben`, `torrentio`, `debridio`, `meteor`, `torrent-galaxy`, `zilean`, `hdhub`, `eztv`, `torrents-db`, `streamfusion`, `baguettio`, `flix-streams`, `brazuca-torrents`, `yastream`, `bitmagnet`, `dmm-cast`, `torznab`, `nuvio-streams`
 
-**HTTP stream / direct-play:** `webstreamr` (multi-language HTTP streams from streaming sites), `nuvio-streams` (Showbox/VidSrc/VidZee), `flix-streams` (50+ provider aggregator, paid tier)
+**HTTP stream / direct-play:** `webstreamr` (multi-language HTTP streams), `nuvio-streams` (Showbox/VidSrc/VidZee), `flix-streams` (50+ provider aggregator, paid tier), `astream` (Anime-Sama, French), `streamasia` (Asian drama/movies), `debridio-watchtower` (HTTP stream provider)
+
+**Live TV:** `usa-tv` (US channels), `argentina-tv` (Argentine channels), `debridio-tv` (live streaming channels), `debridio-ic4a` (IPTV-backed livestreams via Debridio)
+
+**Usenet:** `newznab`, `easynews`, `easynewsPlus`, `easynewsPlusPlus`, `easynews-search`, `streamnzb`, `usenet-streamer`, `nzbhydra`, `davex` (usenet via davex search profile)
 
 **Google Drive / personal media:** `stremio-gdrive` (Google Drive integration, builtin — requires OAuth setup)
 - `orion` — Orionoid aggregator; **TorBox deliberately excluded** from supported services
@@ -83,13 +89,17 @@ Preset `type` values confirmed in AIOStreams source (as of v2.30.x):
 - `mediafusion-public` — not a separate preset file; likely a config option on `mediafusion`, not a distinct type
 - `torrentio` — TorBox supported but **blocked on elfhosted public instance** by developer request; unstable hosting (March 2026 suspension)
 
-**Usenet:** `newznab`, `easynews`, `easynews-plus`, `easynews-plus-plus`, `easynews-search`, `streamnzb`, `usenet-streamer`, `nzbhydra`
-
 **Anime-specific:** `seadex`, `animetosho`, `neko-bt`, `yastream`, `astream`, `fkstream`
 
-**Subtitles:** `opensubtitles-v3-plus`, `aiosubtitle`, `subdl`, `subsource`, `subhero`
+**Catalog/meta (META_CATALOGS):** `tmdb-addon` (TMDB metadata), `streaming-catalogs` (streaming service catalogs), `anime-catalogs` (MAL/AniDB/AniList/Kitsu/etc.), `anime-kitsu` (Kitsu anime catalog), `torrent-catalogs` (top seeded torrents), `rpdb-catalogs` (RPDB release tracking), `tmdb-collections` (TMDB collections), `debridio-tmdb` (Debridio TMDB catalogs), `debridio-tvdb` (Debridio TVDB catalogs), `marvel-universe`, `star-wars-universe`, `dc-universe`, `doctor-who-universe` (franchise catalogs)
+
+**AI-powered (META_CATALOGS/MISC):** `ai-companion` (AI movie/series recommendations), `ai-search` (Gemini-powered search), `more-like-this` (recommendation engine), `content-deep-dive` (comprehensive content info, cast, reviews — MISC category)
+
+**Subtitles:** `opensubtitles`, `opensubtitles-v3-plus`, `aiosubtitle`, `subdl`, `subsource`, `subhero`
 
 **System:** `library` (continue watching / user library), `custom`, `aiostreams` (self-reference/chaining)
+
+**Supported services (15):** `realdebrid`, `alldebrid`, `premiumize`, `debridlink`, `torbox`, `offcloud`, `putio`, `easynews`, `easydebrid`, `debrider`, `pikpak`, `seedr`, `nzbdav`, `altmount`, `stremthru_newz`
 
 **Per-Addon Flood Guard caps (current — v2.9.5):**
 Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent Galaxy ≤ 1 (backup), Knaben ≤ 1 (backup), TorrentsDB ≤ 1 (backup)
