@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Standard ESE v2.0",
+    "expression": "/*Standard ESE v2.0 [git.tamtaro.de]*/[]",
+    "description": "Version marker — no-op expression"
+  },
+  {
+    "name": "G's Low Bitrate",
+    "expression": "/*G's Low Bitrate*/ count(negate((isAnime or 'Animation' in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))),cached(streams)))>10?(isAnime or 'Animation'in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))):[]",
+    "description": "count() activation threshold — only fires when 10+ cached streams exist"
+  },
+  {
+    "name": "Info & Other Unwanted",
+    "expression": "/*Info & Other Unwanted*/ merge(type(streams, 'info'), releaseGroup(type(streams,'usenet','stremio-usenet'),'sample'), type(keyword(streams, 'all', '-sample'), 'usenet', 'stremio-usenet'), message(type(streams,'usenet','stremio-usenet'),'includes','🚫'))",
+    "description": "Replaces Bad NZBs — adds info stream kill, -sample keyword filter, prohibited marker detection"
+  },
+  {
+    "name": "Protect Library",
+    "expression": "/*Protect Library*/ passthrough(negate(quality(streams, 'CAM','TS','TC','SCR'), library(streams)), 'excluded', 'required')",
+    "description": "Library-aware replacement for Hard CAM Kill — library items survive even if tagged as low quality"
+  },
+  {
+    "name": "SeaDex Duplicates",
+    "expression": "/*SeaDex Duplicates*/ merge(negate(merge(perGroup(seadex(streams, 'best'), 'releaseGroup', 1), perGroup(negate(seadex(streams,'best'),seadex(streams)), 'releaseGroup', 1)), seadex(streams)), passthrough(seadex(streams), 'excluded'))",
+    "description": "Replaces Extra SeaDex — perGroup() dedup keeps 1 per release group for best and non-best tiers"
+  },
+  {
+    "name": "Bad 4k Anime",
+    "expression": "/*Bad 4k Anime*/ (isAnime and originalLanguage == 'Japanese' and count(quality(resolution(cached(streams), '2160p'), 'Bluray REMUX')) == 0 and count(seadex(resolution(streams, '2160p'))) == 0 and count(rseMatched(resolution(cached(streams), '2160p'), 'BD T1', 'BD T2', 'BD T3', 'BD T4', 'BD T5', 'BD T6', 'BD T7', 'BD T8', 'Anime BD T1', 'Anime BD T2', 'Anime BD T3', 'Remux T1', 'Remux T2', 'Remux T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'Web T1', 'Web T2', 'Web T3', 'Web T4', 'Web T5', 'Web T6')) == 0) ? negate(merge(library(streams), seadex(streams)), resolution(streams, '2160p')) : []",
+    "description": "rseMatched tier guards — won't nuke 4K anime if BD/Remux/Web tier groups match"
+  },
+  {
+    "name": "Upscaled 4k",
+    "expression": "/*Upscaled 4k*/ (queryType=='movie' or queryType=='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(rseMatched(resolution(streams, '2160p'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'UHD Bluray T2', 'UHD Bluray T3', 'HD Bluray T1', 'HD Bluray T2', 'HD Bluray T3', 'Radarr UHD Bluray T1', 'Radarr UHD Bluray T2', 'Radarr UHD Bluray T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'DE Web T1', 'DE Web T2', 'DE Web T3', 'DE Web Scene', 'Web T1', 'Web T2', 'Web T3', 'Web Scene')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')) : []",
+    "description": "rseMatched tier guards — won't nuke 4K if Bluray/Remux/Web tiers match (DE + EN names)"
+  },
+  {
+    "name": "Bad 4k Bluray — tier-guarded",
+    "expression": "/*Bad 4k Bluray — tier-guarded*/ (queryType=='movie' or queryType=='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'2160p'))) == 0 and count(rseMatched(resolution(streams, '2160p'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'UHD Bluray T2', 'UHD Bluray T3', 'HD Bluray T1', 'HD Bluray T2', 'HD Bluray T3', 'Radarr UHD Bluray T1', 'Radarr UHD Bluray T2', 'Radarr UHD Bluray T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'Radarr Remux T2', 'Sonarr Remux T2')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')) : []",
+    "description": "rseMatched tier guards on 4K Bluray kill (DE + EN tier names)"
+  },
+  {
+    "name": "Bad 1080P Bluray — tier-guarded",
+    "expression": "/*Bad 1080P Bluray — tier-guarded*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'1080p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'1080p'))) == 0 and count(rseMatched(quality(resolution(streams,'1080p'),'Bluray'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'HD Bluray T1', 'UHD Bluray T2', 'HD Bluray T2', 'UHD Bluray T3', 'HD Bluray T3', 'Radarr HD Bluray T1', 'Sonarr HD Bluray T1', 'Radarr HD Bluray T2', 'Sonarr HD Bluray T2', 'Radarr Remux T1', 'Sonarr Remux T1')) == 0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []",
+    "description": "rseMatched tier guards on 1080P Bluray kill (DE + EN tier names)"
+  },
+  {
+    "name": "Low Quality w/ No Release Group",
+    "expression": "/*Low Quality w/ No Release Group*/ negate(merge(negate(releaseGroup(streams, '1', 'bit', '1080p'), releaseGroup(streams))), quality(merge(type(streams, 'p2p', 'usenet', 'stremio-usenet'), cached(type(streams, 'debrid'))), 'WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','CAM','TS','TC','SCR', 'Unknown'))",
+    "description": "Kills low-quality streams with no release group — catches junk/spam uploads"
+  },
+  {
+    "name": "IQR Low Seeders",
+    "expression": "/*IQR Low Seeders*/ count(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)))>=8?seeders(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),0,max(1,floor(q1(values(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),'seeders'))-1.5*iqr(values(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),'seeders'))))):count(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)))>=4?seeders(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),0,max(1,floor(min(values(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),'seeders'))*0.5))):[]",
+    "description": "CB's IQR-progressive low seeder guard — superior to Tamtaro's flat threshold"
+  }
+]
