@@ -1,58 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" width="800" height="390">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" width="800" height="334">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
       .bg   { fill: #0d1117; }
       .card { fill: #161b22; stroke: #30363d; stroke-width: 1; }
-      .lbl  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; }
-      .name { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; fill: #e6edf3; }
-      .d1   { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 500; fill: #c9d1d9; }
-      .d2   { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 400; fill: #8b949e; }
-      .tag  { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #f0883e; }
+      .lbl  { font-family: 'Segoe UI', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase; }
+      .name { font-family: 'Segoe UI', sans-serif; font-size: 13.5px; font-weight: 700; fill: #e6edf3; }
+      .d1   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
+      .d2   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
     </style>
   </defs>
+  <rect class="bg" width="800" height="334"/>
+  <text x="20" y="20" class="lbl">Core Nexus TV — Stream Preview</text>
 
-  <rect class="bg" width="800" height="390"/>
+  <rect class="card" x="16" y="30" width="768" height="132" rx="6"/>
+  <text x="32" y="58" class="name">🔴 4K  ⚡ TB  OPPENHEIMER</text>
+  <text x="32" y="79" class="d1">🚀 INSTANT  💎 ELITE  🏷️ ᴅᴏɴ  👑 PREMIER</text>
+  <text x="32" y="100" class="d2">🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV ✨ HDR¹⁰⁺  🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1</text>
+  <text x="32" y="121" class="d2">📦 PACK  25.4 GB  🌍 🇬🇧 🇫🇷 🇩🇪  🌱 521  ⏱️ 2ʏ</text>
+  <text x="32" y="142" class="d2">🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ</text>
 
-  <!-- Label -->
-  <text x="20" y="20" class="lbl">Core Nexus TV — Large Screen / 10-foot UI (UPPER CASE · coloured resolution · 4-line desc)</text>
+  <rect class="card" x="16" y="172" width="768" height="132" rx="6"/>
+  <text x="32" y="200" class="name">🔵 1080P  ⚡ TB  THE DARK KNIGHT S01 E01</text>
+  <text x="32" y="221" class="d1">🚀 INSTANT  ✅ SEADEX  🏷️ ɴᴛʙ</text>
+  <text x="32" y="242" class="d2">🎬 🍿 WEB-DL  ʜᴇᴠᴄ  🌟 HDR¹⁰  🎛️ 🎶 EAC3  🔉 5.1</text>
+  <text x="32" y="263" class="d2">8.2 GB  🌍 🇬🇧 🇫🇷  🌱 89  ⏱️ 6ᴍ</text>
+  <text x="32" y="284" class="d2">🔍 ɴᴢʙs.ɪɴ  🔌 ᴅᴇʙʀɪᴅ</text>
 
-  <!-- ── Card 1: 4K INSTANT ELITE ── -->
-  <rect class="card" x="16" y="30" width="768" height="165" rx="6"/>
-
-  <!-- Name line: 🔴 4K + ⚡ service + title -->
-  <text x="32" y="60" class="name">🔴 4K  ⚡ TORBOX  OPPENHEIMER</text>
-
-  <!-- Desc line 1: status badges — bright/prominent -->
-  <text x="32" y="83" class="d1">🚀 INSTANT  💎 ELITE  ⭐ BEST  👑 PREMIER</text>
-
-  <!-- Desc line 2: 🎬 video info — UPPER CASE, no smallcaps -->
-  <text x="32" y="106" class="d2">🎬 BLURAY REMUX  HEVC  HDR10+  45.2 MBPS  28.7 GB</text>
-
-  <!-- Desc line 3: 🔊 audio + languages -->
-  <text x="32" y="129" class="d2">🔊 ATMOS  🔊 7.1  🌍 🇬🇧</text>
-
-  <!-- Desc line 4: 🔌 type + meta -->
-  <text x="32" y="152" class="d2">🔌 DEBRID  🌱 521  📅 2YR  🔍 TORRENTIO</text>
-
-  <!-- ── Card 2: 1080P UNCACHED WEB-DL ── -->
-  <rect class="card" x="16" y="207" width="768" height="165" rx="6"/>
-
-  <!-- Name: 🔵 1080P + ⏳ uncached -->
-  <text x="32" y="237" class="name">🔵 1080P  ⏳ TORBOX  THE DARK KNIGHT  S01 E01</text>
-
-  <!-- Desc line 1: uncached warning -->
-  <text x="32" y="260" class="d1">⚠️ UNCACHED</text>
-
-  <!-- Desc line 2: 🎬 video -->
-  <text x="32" y="283" class="d2">🎬 WEB-DL  HEVC  SDR  12.4 MBPS  8.2 GB</text>
-
-  <!-- Desc line 3: 🔊 audio -->
-  <text x="32" y="306" class="d2">🔊 DD+  🔉 5.1  🌍 🇬🇧  📝 SUB</text>
-
-  <!-- Desc line 4: 🔌 meta -->
-  <text x="32" y="329" class="d2">🔌 USENET  📅 6MO  🔍 NZBGEEK</text>
-
-  <!-- Footer -->
-  <text x="400" y="382" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/brevityA/Core-Builds</text>
+  <text x="400" y="326" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/brevityA/Core-Builds</text>
 </svg>
