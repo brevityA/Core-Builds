@@ -15,7 +15,7 @@ description: "Experimental templates testing new features before stable promotio
 
 ### Nightly Apple TV 4K
 
-v0.2.4 — Device profile for Apple TV 4K (3rd gen) via Infuse. DV Profile 5/8 prioritised, DD+ Atmos, AV1 hard-excluded (no A15 hardware decoder). SeaDex ISE, REPACK ISE, 7-section split sort.
+v0.2.5 — Device profile for Apple TV 4K (3rd gen) via Infuse. DV Profile 5/8 prioritised, DD+ Atmos, AV1 hard-excluded (no A15 hardware decoder). SeaDex ISE, REPACK ISE, 7-section split sort.
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
@@ -38,9 +38,10 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
   **Calling for import testers.** Labs templates need real-world import data to establish what errors AIOStreams is generating. Try importing any Labs template, screenshot or copy the exact error text, and drop it in the community thread. Host, template name, and error message are all useful.
 </Info>
 
-### 4K Apex Labs (v0.11.4)
+### 4K Apex Labs (v0.11.6)
 
-Experimental Apex variant testing:
+Experimental Apex variant with ESE v2.0 and advanced filtering:
+- **ESE v2.0** — Protect Library, SeaDex Duplicates, rseMatched tier guards (Bad 4K Anime/Upscaled 4K/Bad 4K Bluray/Bad 1080P Bluray), Low Quality w/ No Release Group
 - Score IQR Guard — adaptive low-score filter using IQR fence on seScore
 - `perGroup()` dedup — per-resolution per-quality caps replacing 20–35 clause merge/slice
 - Indexer Diversity — `perGroup()` caps 2 per scraper
@@ -59,9 +60,9 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
 
 ---
 
-### Stream Labs (v0.8.4)
+### Stream Labs (v0.8.6)
 
-1080p with perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor). Most ESEs in fleet (42).
+1080p with ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality w/ No Release Group), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor). Most ESEs in fleet (43).
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
@@ -74,9 +75,9 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
 
 ---
 
-### Essential Labs (v0.2.4)
+### Essential Labs (v0.2.6)
 
-Essential 1080p experimental — perGroup() Extra Cached, configurable DAF thresholds at import. Tests new ESE architectures before stable promotion.
+Essential 1080p experimental with ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality w/ No Release Group). perGroup() Extra Cached, configurable DAF thresholds at import.
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
@@ -89,9 +90,9 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates
 
 ---
 
-### 4K Essential Labs (v0.3.4)
+### 4K Essential Labs (v0.3.6)
 
-Essential 4K experimental — Bitrate Floor ESEs (4K + 1080p REMUX), perGroup() Extra Cached, configurable DAF thresholds at import.
+Essential 4K experimental with ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality w/ No Release Group). Bitrate Floor ESEs (4K + 1080p REMUX), perGroup() Extra Cached, configurable DAF thresholds at import.
 
 <CardGroup cols={2}>
   <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
@@ -100,6 +101,36 @@ Essential 4K experimental — Bitrate Floor ESEs (4K + 1080p REMUX), perGroup() 
 
 ```
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json
+```
+
+---
+
+### All-Rounder Labs (v0.2.6)
+
+Mixed anime + live-action template with ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality w/ No Release Group). isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, all LABS features.
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json
+```
+
+---
+
+### Anime 4K Labs (v0.1.5)
+
+4K anime experimental with ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality w/ No Release Group). Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins.
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
+  <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
+</CardGroup>
+
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json
 ```
 
 ---

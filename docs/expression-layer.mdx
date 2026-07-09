@@ -29,7 +29,7 @@ These run on every template in the fleet:
 
 | ESE | What it does |
 |---|---|
-| Bad NZBs | Removes malformed, sample, or incomplete Usenet NZBs — catches release groups flagged as "sample" and streams with 🚫 messages. |
+| Info & Other Unwanted | Removes info-type streams, Usenet samples (via `-sample` keyword and `releaseGroup`), non-sample Usenet streams, and streams with prohibited (🚫) messages. Replaces Bad NZBs with broader coverage. |
 | Hard CAM Kill | Removes camera recordings: CAM, SCR, TS (Telesync), TC, and HC HD-Rip quality levels. |
 | ongoingSeasonPack | On ongoing series, kills season packs when individual episode streams exist — prevents downloading entire seasons mid-air. Uses `daysSinceLastAired` and `daysUntilNextEpisode` to detect airing status. |
 
@@ -88,6 +88,10 @@ These are experimental and only appear on Nightly/Labs templates:
 | Score IQR Guard | Adaptive low-score filter using IQR fence on seScore — kills bottom-quartile streams when 8+ exist. | 5 |
 | Adaptive Seeder Guard | Kills bottom-quartile-seeded uncached torrents on fresh titles (deep pools only); catalog titles 1yr+ exempt. | 5 |
 | Unknown Quality/Resolution Kill | Removes streams with unknown quality or resolution only when 5+ known-quality alternatives exist. | 5 |
+| Protect Library | Library-aware CAM/TS kill — uses `passthrough()` so library items survive even when tagged as low quality. Replaces Hard CAM Kill. | 6 |
+| SeaDex Duplicates | `perGroup()` dedup keeps 1 per release group for best and non-best SeaDex tiers. Replaces Extra SeaDex. | 6 |
+| rseMatched Tier Guards | Bad 4K Anime, Upscaled 4K, Bad 4K/1080P Bluray kills check ranked regex tiers (BD T1, Remux T1, Web T1, etc.) before firing — suppresses the kill when quality-verified groups match. | 6 |
+| Low Quality w/ No Release Group | Removes low-quality streams (WEBRip, DVDRip, HDTV, CAM, etc.) with no identifiable release group — catches junk/spam uploads. | 6 |
 | Bitrate Floor (4K/1080p REMUX) | Rejects REMUX streams below expected bitrate floor — animation exempt. A 1080p AV1 variant kills fake AV1 REMUXes (AV1 never appears on a Blu-ray disc). | 2–3 |
 | perGroup() Extra Cached/Uncached | Replaces 20–35 clause merge/slice limits with a single `perGroup()` call — caps per resolution per quality band. | 2–5 |
 | perGroup() Indexer Diversity | Caps 2 results per scraper using `perGroup()` — replaces multi-addon flood guard clauses. | 2–5 |

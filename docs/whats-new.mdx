@@ -8,6 +8,32 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## v3.2.5 — July 2026
+
+**ESE v2.0 — fleet-wide rollout.**
+Three foundational ESE improvements have been deployed across all 42 active templates:
+
+- **Info & Other Unwanted** replaces Bad NZBs — now catches info-type streams, `-sample` keyword Usenet files, and streams with prohibited markers, in addition to everything Bad NZBs already handled.
+- **G's Low Bitrate count() fix** — the bitrate floor now activates at 10+ cached streams (was incorrectly thresholding against the wrong pool).
+- **Standard ESE v2.0 version marker** — a no-op tag for tracking which ESE generation a template runs.
+
+Re-import from the [Template Directory](/template-directory) to pick up these changes.
+
+**Configurator overhauled.**
+The Template Configurator has been completely redesigned with a new splash screen, Quick Deploy presets (one-tap installs for common setups), and a guided 6-step wizard. Key validation has been removed — the old "API key failed validation" dialog was unreliable on mobile and behind CORS-restricted services. The configurator now accepts your key directly and lets AIOStreams validate it on first use. See [Configurator](/configurator) for the full walkthrough.
+
+**ESE v2.0 experimental features in LABS.**
+Six LABS templates now carry the full ESE v2.0 experimental stack — features being validated before fleet-wide promotion:
+
+- **Protect Library** — library-aware CAM/TS kill. Library items survive even when tagged as low quality (replaces Hard CAM Kill).
+- **SeaDex Duplicates** — `perGroup()` dedup keeps 1 per release group for best and non-best SeaDex tiers (replaces Extra SeaDex).
+- **rseMatched() tier guards** — Bad 4K Anime, Upscaled 4K, Bad 4K Bluray, and Bad 1080P Bluray kills now check ranked regex tiers before firing. If quality-verified groups (BD T1, Remux T1, Web T1, etc.) match, the kill is suppressed.
+- **Low Quality w/ No Release Group** — removes low-quality streams (WEBRip, DVDRip, HDTV, CAM, etc.) that have no identifiable release group — catches junk and spam uploads.
+
+See [Nightly and Labs](/nightly-and-labs) for import links.
+
+---
+
 ## v3.0.0 — June 2026
 
 **Bad dual-audio groups are now excluded from every template.**
