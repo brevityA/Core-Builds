@@ -1631,25 +1631,73 @@ function renderOpts(def) {
 }
 
 const FMT_PREVIEWS = {
+  'ultra': {
+    n:'4K · ⚡ TORBOX · REMUX · FRANKENSTEIN',
+    d:['🎥 HEVC  DV | HDR10+ | 10bit','🎧 TRUEHD  7.1  🌍 🇬🇧','💾 45.2 GB  📦 PACK  🏷 FraMeSToR ✅  🌱 1 247  📡 torrentio']
+  },
   'apex-v2': {
-    n:'🟣 4K  ⚡ TORBOX  🌟 HDR¹⁰  FRANKENSTEIN',
-    d:['🚀 INSTANT  💎 ELITE  🏷️ FraMeSToR  👑 PREMIER','🎬 💎 REMUX  x265  38.4 Mbps  🌟 HDR¹⁰','🎛️ 💎 TRUEHD  🔮 ATMOS  🔊 7.1  🌍 🇬🇧','45.2 GB  🌱 1 247  ⏱️ 3d  🔌 cached']
+    n:'🟣 4K  ⚡ TB  👁️ DV ✨ HDR¹⁰⁺  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  ✦ 94  🏷️ ᴅᴏɴ  👑 PREMIER','🎬 💎 REMUX  ʜᴇᴠᴄ  38.4 ᴍʙᴘs  👁️ DV ✨ HDR¹⁰⁺ 🎨 10ʙɪᴛ','🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1  🌍 🇬🇧  📝 🇬🇧','📦 PACK  45.2 GB  🌱 1 247  ⏱️ 3ᴅ  🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ']
   },
   'sigma': {
-    n:'✦ Frankenstein 「 TORBOX 」 「 🟣 4K 」 「 💎 REMUX 」',
-    d:['『 💎 ELITE 』 『 🚀 INSTANT 』 『 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 』','「 🎬 💎 REMUX 」 「 ʜᴇᴠᴄ 」 「 38.4 Mbs 」','「 🎛️ 💎 ᴛʀᴜᴇʜᴅ 」 「 7.1 」 🌍 🇬🇧','「 45.2 GB 」 「 🌱 1 247 」']
+    n:'✦ Frankenstein 「 TB 」 「 🟣 4K 」 「 💎 ʀᴇᴍᴜx 」 👁️ DV ✨ HDR¹⁰⁺ 「 🔮 ᴀᴛᴍᴏs 」 「 7.1 」',
+    d:['『 💎 ELITE 』 『 🚀 INSTANT 』 『 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 』 『 👑 ᴘʀᴇᴍɪᴇʀ 』','「 🎬 💎 ʀᴇᴍᴜx 」 「 ʜᴇᴠᴄ 」 「 38.4 ᴍʙᴘs 」 「 👁️ DV ✨ HDR¹⁰⁺ 🎨 10ʙɪᴛ 」','「 🎛️ 🔮 ATMOS 💎 TRUEHD 」 🔊 7.1  🌍 🇬🇧','「 📦 PACK → 45.2 ɢʙ 」 「 🌱 1 247 」 「 ⏱️ 3ᴅ 」 「 🔍 ᴛᴏʀʀᴇɴᴛɪᴏ 」']
   },
   'minimal': {
-    n:'🟣 4K  ⚡ TORBOX  💎 TRUEHD  FRANKENSTEIN',
-    d:['🚀 INSTANT  💎 ELITE  🏷️ FraMeSToR','🎬 💎 REMUX  🌟 HDR¹⁰  💎 TRUEHD  7.1','45.2 GB  38.4 Mbps  🌱 1 247  ⏱️ 3d']
+    n:'🟣 4K  ⚡ TB  🔮 ATMOS  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  ✦ QUALITY  🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ  👑 PREMIER','🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV ✨ HDR¹⁰⁺  🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1  🌍 🇬🇧','📦 PACK  45.2 GB  🌱 1 247  ⏱️ 3ᴅ  🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ']
   },
   'prime': {
-    n:'🖥️ 2160P  ⚡ TORBOX  FRANKENSTEIN',
-    d:['💎 ELITE  🏷️ FraMeSToR  👑 PREMIER','🎬 BLURAY REMUX  X265  🌟 HDR10+  38.4 Mbps','🎛️ TRUEHD  ATMOS  7.1  🌍 🇬🇧','💾 45.2 GB  🌱 1 247  📅 3d  🔌 Cached']
+    n:'🖥️ 2160P  ⚡ TB  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ  👑 PREMIER','🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV ✨ HDR¹⁰⁺ 🎨 10ʙɪᴛ  38.4 ᴍʙᴘs','🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1  🌍 🇬🇧','📦 PACK  45.2 GB  📁 92.1 GB  🌱 1 247  ⏱️ 3ᴅ  🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ']
   },
   'tv': {
-    n:'🔴 4K  ⚡ TORBOX  FRANKENSTEIN',
-    d:['🚀 INSTANT  💎 ELITE  👑 PREMIER','🎬 BLURAY REMUX  HEVC  HDR10+  38.4 MBPS  45.2 GB','🔊 TRUEHD  ATMOS  7.1  🌍 🇬🇧','🔌 CACHED  🌱 1 247  📅 3D']
+    n:'🔴 4K  ⚡ TB  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ  👑 PREMIER','🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV ✨ HDR¹⁰⁺  🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1','📦 PACK  45.2 GB  🌍 🇬🇧  🌱 1 247  ⏱️ 3ᴅ','🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ']
+  },
+  'apex': {
+    n:'🟣 4K  ⚡ TB  👁️ DV ✨ HDR¹⁰⁺  🔮 ATMOS  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  ✦ QUALITY  🎯 ʀᴀᴅᴀʀʀ ʀᴇᴍᴜx  🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ  👑 PREMIER','🎬 💎 REMUX  ʜᴇᴠᴄ  ᴍᴋᴠ  👁️ DV ✨ HDR¹⁰⁺ 🎨 10ʙɪᴛ  38.4 ᴍʙᴘs','🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1  🌍 🇬🇧','📦 PACK  45.2 GB  📁 92.1 GB  🌱 1 247  ⏱️ 3ᴅ  🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ']
+  },
+  'elite': {
+    n:'🟣 4K  ⚡ TB  👁️ DV ✨ HDR¹⁰⁺  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 94  🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ  👑 PREMIER','🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV ✨ HDR¹⁰⁺ 🎨 10ʙɪᴛ  38.4 ᴍʙᴘs','🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1  🌍 🇬🇧','💾 45.2 GB  📁 92.1 GB  📦 PACK  🌱 1 247  ⏱️ 3ᴅ  🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ']
+  },
+  'uniform': {
+    n:'🖥️ 2160P  ⚡ TB  FRANKENSTEIN',
+    d:['🚀 INSTANT  💎 ELITE  🎯 ʀᴀᴅᴀʀʀ ʀᴇᴍᴜx  🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ  👑 PREMIER','🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV ✨ HDR¹⁰⁺  38.4 ᴍʙᴘs','🎛️ 🔮 ATMOS 💎 TRUEHD  🔊 7.1  🌍 🇬🇧','📦 PACK  45.2 GB  📁 92.1 GB  🌱 1 247  ⏱️ 3ᴅ  🔍 ᴛᴏʀʀᴇɴᴛɪᴏ  🔌 ᴅᴇʙʀɪᴅ']
+  },
+  'syntax': {
+    n:'✦ Frankenstein 「 TB 」 「 4K UHD 」 「 BLURAY REMUX 」 「 ᴀᴛᴍᴏs | ᴛʀᴜᴇʜᴅ 」 「 7.1 」',
+    d:['「 ◼ ᴛᴏʀʀᴇɴᴛɪᴏ 」 「 ⬤ ᴅᴇʙʀɪᴅ 」 「 ⧗ 3ᴅ 」','「 💾 45.2 ɢʙ 」 「 📦 ᴘᴀᴄᴋ 」 「 🌱 1 247 」','「 🎥 ʜᴇᴠᴄ 」 「 👁️ ᴅᴠ 」 「 ✨ ʜᴅʀ¹⁰⁺ 」 「 🎨 10ʙɪᴛ 」','「 🎛️ 🔮 ᴀᴛᴍᴏs | 💎 ᴛʀᴜᴇʜᴅ 」 「 🔊 7.1 」 「 🌍 🇬🇧 」','「 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 」 『 👑 ᴘʀᴇᴍɪᴇʀ 』']
+  },
+  'syntax-v3': {
+    n:'✦ Frankenstein 「 TB 」 「 4K UHD 」 「 BLURAY REMUX 」 「 ᴀᴛᴍᴏs | ᴛʀᴜᴇʜᴅ 」 「 7.1 」',
+    d:['「 ◼ ᴛᴏʀʀᴇɴᴛɪᴏ 」 「 ⬤ ᴅᴇʙʀɪᴅ 」 「 ⧗ 3ᴅ 」 「 💎 94 」','「 💾 45.2 ɢʙ 」 「 📦 ᴘᴀᴄᴋ 」 「 🌱 1 247 」','「 🎥 ʜᴇᴠᴄ 」 「 👁️ ᴅᴠ 」 「 ✨ ʜᴅʀ¹⁰⁺ 」 「 🎨 10ʙɪᴛ 」 「 38.4 ᴍʙᴘs 」','「 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 」 『 👑 ᴘʀᴇᴍɪᴇʀ 』']
+  },
+  'omni-diamond': {
+    n:'⚡ [ᴛʙ] 🔹 ᴛᴏʀʀᴇɴᴛɪᴏ 🟣 4K UHD  ☀️ ✨ ᴅᴠ | ✨ ʜᴅʀ¹⁰⁺ | 🎨 10ʙɪᴛ',
+    d:['💎 ʀᴇᴍᴜx 🔹 ʜᴇᴠᴄ 🔹 38.4 ᴍʙᴘs','🔮 ᴀᴛᴍᴏs | 💎 ᴛʀᴜᴇʜᴅ 🔹 🔊 7.1 🔹 🌍 🇬🇧 🔹 📝 🇬🇧','🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 🔹 💎 ELITE 🔹 📦 ᴘᴀᴄᴋ 🔹 45.2 ɢʙ','🌱 1 247 🔹 ⏱️ 3ᴅ']
+  },
+  'zenith-diamond': {
+    n:'⚡ Iɴsᴛᴀɴᴛ • TB 🔹 🟣 4K UHD • 💎 ʀᴇᴍᴜx 🔹 ᴀᴛᴍᴏs • ᴛʀᴜᴇʜᴅ • 🔊 7.1',
+    d:['🗓️ 3ᴅ 🔹 ☁️ ᴅᴇʙʀɪᴅ 🔹 🧩 ᴛᴏʀʀᴇɴᴛɪᴏ','⚡ 38.4 ᴍʙᴘs 🔹 💾 45.2 ɢʙ 🔹 📦 ᴘᴀᴄᴋ 🔹 🌱 1 247','⚙️ ʜᴇᴠᴄ 🔹 👁️ ᴅᴠ ✨ ʜᴅʀ¹⁰⁺ 🎨 10ʙɪᴛ','🌍 🇬🇧 🔹 📝 🇬🇧 🔹 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 🔹 👑 PREMIER']
+  },
+  'auburn-tiger': {
+    n:'⚡ Iɴsᴛᴀɴᴛ 🔸 TB 🔸 🟠 4K UHD 🔸 💎 ʀᴇᴍᴜx 🔸 ⚙️ ʜᴇᴠᴄ 🔸 ᴀᴛᴍᴏs 🔸 ᴛʀᴜᴇʜᴅ 🔸 🔊 7.1',
+    d:['🗓️ 3ᴅ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 45.2 ɢʙ 🔸 📦 ᴘᴀᴄᴋ 🔸 🌱 1 247','⚡ 38.4 ᴍʙᴘs 🔸 👁️ ᴅᴠ ✨ ʜᴅʀ¹⁰⁺ 🔸 🎨 10ʙɪᴛ','🌍 🇬🇧 🔸 📝 🇬🇧 🔸 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 🔸 👑 PREMIER','🧩 ᴛᴏʀʀᴇɴᴛɪᴏ']
+  },
+  'midnight-slate': {
+    n:'✦ Frankenstein [TB] 4K UHD  REMUX  ᴀᴛᴍᴏs  ᴛʀᴜᴇʜᴅ  7.1',
+    d:['◼ ᴛᴏʀʀᴇɴᴛɪᴏ  ⬤ ᴅᴇʙʀɪᴅ  ⧗ 3ᴅ','▼ 38.4 ᴍʙᴘs  45.2 ɢʙ  ᴘᴀᴄᴋ  1 247 sᴇᴇᴅᴇʀs','ʜᴇᴠᴄ  ᴅᴠ  ʜᴅʀ¹⁰⁺  10ʙɪᴛ','ᴀᴛᴍᴏs  ᴛʀᴜᴇʜᴅ  7.1  🇬🇧','ꜰʀᴀᴍᴇsᴛᴏʀ']
+  },
+  'rb3-clean': {
+    n:'TB ⚡  𝟰𝗞 𝗨𝗛𝗗  𝘉𝘭𝘶-𝘳𝘢𝘺 𝘙𝘦𝘮𝘶𝘹',
+    d:['📁 Frankenstein (2024)','👁️ DV  ✨ HDR10+  🎨 10BIT  🎬 HEVC  ⚡ 38.4 Mbps','🔮 ATMOS  💎 TRUEHD  🔊 7.1  🌍 🇬🇧','💾 45.2 GB  📦 PACK  🌱 1 247  🏷️ FraMeSToR  ⏱️ 3d','🔍 torrentio  💎 ELITE']
+  },
+  'rb3': {
+    n:'⚡ Iɴsᴛᴀɴᴛ 🔸 TB 🔸 🟠 4K UHD 🔸 💎 ʀᴇᴍᴜx 🔸 ⚙️ ʜᴇᴠᴄ 🔸 ᴀᴛᴍᴏs 🔸 ᴛʀᴜᴇʜᴅ 🔸 🔊 7.1',
+    d:['🦅 3ᴅ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 45.2 ɢʙ 🔸 📦 ᴘᴀᴄᴋ 🔸 🌱 1 247','⚡ 38.4 ᴍʙᴘs 🔸 👁️ ᴅᴠ ✨ ʜᴅʀ¹⁰⁺ 🔸 🎨 10ʙɪᴛ','🌍 🇬🇧 🔸 📝 🇬🇧 🔸 🏷️ ꜰʀᴀᴍᴇsᴛᴏʀ 🔸 👑 PREMIER','🧩 ᴛᴏʀʀᴇɴᴛɪᴏ']
   }
 };
 
