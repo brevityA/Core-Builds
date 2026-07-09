@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.2.6 (2026-07-09)
+
+### Added
+- **Configurator v2.30** — 3 new debrid services: EasyDebrid, PikPak, Seedr (all using StremThru Store cache layer). Generated templates now include `nzbdav`, `altmount`, `stremthru_newz` service entries for full AIOStreams v2.30.6 service coverage.
+- **Dedup tiebreakers** (3 Hybrid templates) — `config.deduplicator.tiebreakers` with `position: "after_addon"` for both `torrent_seeders` and `usenet_age`. TorBox-priority addon ordering now wins dedup ties instead of raw seeder counts overriding the intended service priority.
+- **`davex` preset** (2 EasyNews templates) — usenet scraper via davex search profile adapter, disabled by default. Users with a self-hosted davex instance can enable it by setting their manifest URL.
+- **`cachedAnime` / `uncachedAnime` sort criteria** (6 Anime templates) — granular cached/uncached sort keys for anime content. `cachedAnime` mirrors the existing `anime` sort (seadex at position 2); `uncachedAnime` promotes seeders after encode for better uncached stream ranking.
+
+### Fixed
+- **EasyNews++ preset type** — configurator generated `easynews-plus-plus` which doesn't match AIOStreams' `easynewsPlusPlus` case in `presetManager.ts`, causing "Preset not found" errors on import. Fixed to use the correct camelCase identifier.
+
 ## 3.2.5 (2026-07-03)
 
 ### Added
