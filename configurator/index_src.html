@@ -1308,7 +1308,7 @@ const LANG_OPTS = [
 const DEFS = [
   { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'svc-list',
     opts:[
-      { v:'torbox-pro',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="#051408"/><polygon points="22,14 30,18 22,22 14,18" fill="#1a5c2a"/><polygon points="14,18 14,27 22,31 22,22" fill="#166534"/><polygon points="22,22 30,18 30,27 22,31" fill="#15803d"/><path d="M27 20 L22 26 L25 26 L23 31 L28 24 L25 24 Z" fill="#fde047"/></svg>', name:'TorBox Pro', desc:'Best pick — full scraper stack + HdHub<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Stream · 4K Apex</span>' },
+      { v:'torbox-pro',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#22c55e" stroke-width="2" fill="#051408"/><polygon points="22,14 30,18 22,22 14,18" fill="#1a5c2a"/><polygon points="14,18 14,27 22,31 22,22" fill="#166534"/><polygon points="22,22 30,18 30,27 22,31" fill="#15803d"/><path d="M27 20 L22 26 L25 26 L23 31 L28 24 L25 24 Z" fill="#fde047"/></svg>', name:'TorBox Pro', desc:'Best pick — full scraper stack<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Stream · 4K Apex</span>' },
       { v:'torbox-ess',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#16a34a" stroke-width="2" fill="#041008"/><polygon points="22,15 30,19 22,23 14,19" fill="#14532d"/><polygon points="14,19 14,28 22,32 22,23" fill="#166534"/><polygon points="22,23 30,19 30,28 22,32" fill="#15803d"/><path d="M18 10 L21 13 L27 7" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>', name:'TorBox Essential', desc:'Essential plan — same smart sorting<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Essential · 4K Essential</span>' },
       { v:'alldebrid',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#ea580c" stroke-width="2" fill="#1a0500"/><polygon points="19,15 25,22 19,29 13,22" fill="none" stroke="#ea580c" stroke-width="1.8"/><polygon points="25,15 31,22 25,29 19,22" fill="none" stroke="#ea580c" stroke-width="1.8"/></svg>', name:'AllDebrid', desc:'AllDebrid subscribers<br><span style="color:#ea580c;font-size:.8em">e.g. Core Nexus AllDebrid · 4K AllDebrid</span>' },
       { v:'realdebrid',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#dc2626" stroke-width="2" fill="#1a0000"/><path d="M25 13 L18 23 L22 23 L19 31 L27 21 L23 21 Z" fill="#dc2626"/></svg>', name:'Real-Debrid', desc:'Real-Debrid subscribers<br><span style="color:#dc2626;font-size:.8em">e.g. Core Nexus RD</span>' },
@@ -1560,7 +1560,7 @@ function renderOpts(def) {
       'easynews':   ['Speed EasyNews','Speed 4K+'],
     };
     const SVC_DESC = {
-      'torbox-pro': 'Full scraper stack · HdHub · best results',
+      'torbox-pro': 'Full scraper stack · best results',
       'torbox-ess': 'Same smart sorting, Essential plan',
       'alldebrid':  'AllDebrid subscribers',
       'realdebrid': 'Real-Debrid subscribers',
@@ -3009,7 +3009,7 @@ function insights() {
   else if (cnt === 'mixed') pts.push('<b>SeaDex + live-action</b> scrapers active simultaneously');
   else if (cnt === 'live') pts.push('<b>Anime scrapers off</b> — leaner fetch stack for Movies &amp; TV');
   if (svc === 'hybrid') pts.push('<b>TorBox + Real-Debrid fallback</b> — widest cache coverage');
-  else if (svc === 'torbox-pro') pts.push('<b>Full scraper stack</b> — Meteor · Comet · MediaFusion · HdHub · Zilean');
+  else if (svc === 'torbox-pro') pts.push('<b>Full scraper stack</b> — Meteor · Comet · MediaFusion · Zilean');
   if (!S.p2pEnabled) pts.push('<b>Raw torrents excluded</b> — direct P2P streams blocked; debrid results unaffected');
   if (S.qualityFirst) pts.push('<b>Quality over resolution</b> — REMUX ranked above resolution in sort order');
   if (S.exclude4K) pts.push('<b>4K / UHD excluded</b> — 1080p and below only');
@@ -3152,7 +3152,7 @@ function presets() {
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] }, resources:['stream'] },
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true }, resources:['stream'] },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] }, resources:['stream'] },
-    { type:'hdhub', instanceId:'hdhub-1', enabled:!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
+    { type:'hdhub', instanceId:'hdhub-1', enabled:false, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], tb_only:true } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
@@ -3271,7 +3271,7 @@ function eses() {
     return out;
   }
 
-  out.push({ enabled:true, expression: "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))" });
+  out.push({ enabled:true, expression: "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))" });
   if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
   out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });

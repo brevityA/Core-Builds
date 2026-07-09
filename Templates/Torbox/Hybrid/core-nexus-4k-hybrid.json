@@ -1925,8 +1925,14 @@
       "uncached": "per_service",
       "p2p": "per_addon",
       "tiebreakers": [
-        { "type": "torrent_seeders", "position": "after_addon" },
-        { "type": "usenet_age", "position": "after_addon" }
+        {
+          "type": "torrent_seeders",
+          "position": "before_addon"
+        },
+        {
+          "type": "usenet_age",
+          "position": "before_addon"
+        }
       ],
       "smartDetectAttributes": [
         "size",
@@ -1944,17 +1950,7 @@
         "releaseGroup"
       ],
       "smartDetectRounding": 10,
-      "libraryBehaviour": "prefer",
-      "tiebreakers": [
-        {
-          "type": "torrent_seeders",
-          "position": "before_addon"
-        },
-        {
-          "type": "usenet_age",
-          "position": "before_addon"
-        }
-      ]
+      "libraryBehaviour": "prefer"
     },
     "autoPlay": {
       "enabled": true,
@@ -2177,7 +2173,7 @@
       },
       {
         "type": "hdhub",
-        "enabled": true,
+        "enabled": false,
         "instanceId": "hdhub-1",
         "options": {
           "name": "HdHub",
