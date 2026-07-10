@@ -108,7 +108,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .rv-section[open] .rv-arr{transform:rotate(90deg)}
 .rv-section-body{padding:14px 16px;border-top:1px solid rgba(255,255,255,.04)}
 .aio-fields{display:grid;gap:10px;margin-bottom:0}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#151923;border:1px solid rgba(0,212,255,.3);color:#00d4ff;padding:12px 22px;border-radius:10px;font-size:.9rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,180,220,.15)}
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);background:#151923;border:1px solid rgba(0,212,255,.3);color:#00d4ff;padding:12px 22px;border-radius:10px;font-size:.9rem;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,180,220,.15)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.error{background:linear-gradient(135deg,#1a0a0a,#120000);border-color:rgba(248,113,113,.45);color:#f87171;box-shadow:0 4px 20px rgba(220,38,38,.2)}
 .import-success{background:#061a0e;border:1px solid #2ea043;border-radius:10px;padding:16px;margin-top:12px;font-size:.85rem}
@@ -506,7 +506,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-preset-card:nth-child(4)::before{background:#fbbf24}
 .splash-preset-card:nth-child(5)::before{background:#f472b6}
 .splash-preset-card:nth-child(6)::before{background:#fb923c}
-.splash-preset-icon{font-size:1rem;margin-bottom:1px}
+.splash-preset-icon{font-size:1rem;margin-bottom:1px;display:flex;align-items:center;justify-content:center}
 .splash-preset-name{font-size:.74rem;font-weight:700;letter-spacing:-.01em}
 .splash-preset-detail{font-size:.6rem;color:#4a4f60}
 .splash-tertiary{width:100%;max-width:420px;display:flex;gap:8px}
@@ -881,6 +881,24 @@ const CONFIGURATOR_VERSION = '2.32';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
+const ICO = {
+  compass:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="22" r="16" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><polygon points="22,10 26,22 22,34 18,22" fill="${c}" fill-opacity=".2" stroke="${c}" stroke-width="1.2" stroke-linejoin="round"/><circle cx="22" cy="22" r="2.5" fill="${c}" fill-opacity=".6"/></svg>`,
+  gear:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="22" r="7" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M22 8v4M22 32v4M8 22h4M32 22h4M12.3 12.3l2.8 2.8M28.9 28.9l2.8 2.8M31.7 12.3l-2.8 2.8M15.1 28.9l-2.8 2.8" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  crown:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M8 32V16l8 6 6-10 6 10 8-6v16z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1" stroke-linejoin="round"/><circle cx="22" cy="12" r="2" fill="${c}" fill-opacity=".5"/><circle cx="8" cy="16" r="1.5" fill="${c}" fill-opacity=".4"/><circle cx="36" cy="16" r="1.5" fill="${c}" fill-opacity=".4"/></svg>`,
+  tv:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><rect x="6" y="10" width="32" height="20" rx="3" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M16 34h12M22 30v4" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/><polygon points="18,17 18,25 27,21" fill="${c}" fill-opacity=".35"/></svg>`,
+  globe:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="22" r="14" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".05"/><ellipse cx="22" cy="22" rx="7" ry="14" stroke="${c}" stroke-width="1" fill="none"/><path d="M8 22h28M10 16h24M10 28h24" stroke="${c}" stroke-width="1" stroke-opacity=".4"/></svg>`,
+  link:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M18 26l-4 4a4 4 0 005.6 5.6l4-4" stroke="${c}" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M26 18l4-4a4 4 0 00-5.6-5.6l-4 4" stroke="${c}" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M17 27l10-10" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  question:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="22" r="14" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M17 18a5 5 0 019.5 1.5c0 2.5-3.5 3-3.5 6" stroke="${c}" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="22" cy="30" r="1.5" fill="${c}" fill-opacity=".6"/></svg>`,
+  clipboard:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><rect x="10" y="8" width="24" height="30" rx="3" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".05"/><rect x="16" y="5" width="12" height="6" rx="2" stroke="${c}" stroke-width="1.2" fill="${c}" fill-opacity=".1"/><path d="M16 22h12M16 27h8M16 17h10" stroke="${c}" stroke-width="1.2" stroke-linecap="round" stroke-opacity=".5"/></svg>`,
+  speaker:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M12 18v8h5l7 6V12l-7 6h-5z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".08" stroke-linejoin="round"/><path d="M28 16a6 6 0 010 12M31 13a10 10 0 010 18" stroke="${c}" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>`,
+  video:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><rect x="6" y="12" width="24" height="20" rx="3" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M30 18l8-5v18l-8-5V18z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1" stroke-linejoin="round"/></svg>`,
+  palette:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><rect x="8" y="8" width="28" height="28" rx="4" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".05"/><rect x="12" y="12" width="8" height="8" rx="2" fill="${c}" fill-opacity=".25"/><rect x="24" y="12" width="8" height="3" rx="1" fill="${c}" fill-opacity=".2"/><rect x="24" y="17" width="5" height="3" rx="1" fill="${c}" fill-opacity=".12"/><rect x="12" y="24" width="20" height="3" rx="1" fill="${c}" fill-opacity=".15"/><rect x="12" y="30" width="14" height="3" rx="1" fill="${c}" fill-opacity=".1"/></svg>`,
+  folder:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 14V34a2 2 0 002 2h28a2 2 0 002-2V18a2 2 0 00-2-2H22l-4-4H8a2 2 0 00-2 2z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M22 23v8M18 27l4 4 4-4" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  rocket:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 8c-2 4-3 10-3 14l3 6 3-6c0-4-1-10-3-14z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1" stroke-linejoin="round"/><path d="M19 22l-5 4 2 4M25 22l5 4-2 4" stroke="${c}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="18" r="2" fill="${c}" fill-opacity=".5"/><path d="M18 34h8" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  wuplay:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 6a16 16 0 010 32c-4 0-8-4-8-8s4-8 8-8c4 0 8-4 8-8s-4-8-8-8z" fill="${c}" fill-opacity=".12" stroke="${c}" stroke-width="1.5"/><polygon points="18,14 18,20 23,17" fill="${c}" fill-opacity=".7"/><polygon points="26,24 26,30 21,27" fill="${c}" fill-opacity=".7"/></svg>`,
+  nuvio:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="22" r="14" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M14 22a8 8 0 0116 0" stroke="${c}" stroke-width="1.5" fill="none"/><path d="M18 22a4 4 0 018 0" stroke="${c}" stroke-width="1.2" fill="none"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".7"/></svg>`,
+  bolt:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M24 6L12 24h8l-2 14L32 20h-8l2-14z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".12" stroke-linejoin="round"/></svg>`,
+};
 const CHANGELOG = [
   { v:'2.32', date:'Jul 9 2026', items:[
     'Formatter picker redesigned — compact dropdown with featured card and live preview replaces stacked card list',
@@ -1543,7 +1561,7 @@ function renderOpts(def) {
       `</div>`;
   }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
-    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>`;
+    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>`;
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
@@ -1935,12 +1953,12 @@ function renderAdvancedPanel() {
     <div style="padding:18px 20px;display:flex;flex-direction:column;gap:20px">
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🔊 Sound Profile</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile</div>
         <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎬 Video Preferences</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:10px">Size Limit</div>
           <div style="display:flex;gap:5px">${sizePills}</div>
@@ -1961,9 +1979,9 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎨 Stream Layout (Formatter)</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter)</div>
         ${fmtDropdownHtml()}
-        <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>
+        <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
     </div>
@@ -2075,17 +2093,17 @@ function splashHtml() {
       <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:5px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">&#10005;</button>
     </div>
-    ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:420px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">⚡ Use previous settings — go to install</button>` : ''}` : ''}
+    ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:420px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">${ICO.bolt(16,'#34d399')} Use previous settings — go to install</button>` : ''}` : ''}
 
     <div class="splash-doors">
       <div class="splash-door" data-action="easy-start">
-        <div class="splash-door-icon">🧭</div>
+        <div class="splash-door-icon">${ICO.compass(22,'#00d4ff')}</div>
         <div class="splash-door-title">Guided Setup</div>
         <div class="splash-door-desc">Walk through device, resolution, and cache — we build the template for you.</div>
         <div class="splash-door-tag splash-tag-guided">Core Start</div>
       </div>
       <div class="splash-door" data-action="custom-start">
-        <div class="splash-door-icon">⚙️</div>
+        <div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div>
         <div class="splash-door-title">Core Configure</div>
         <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
         <div class="splash-door-tag splash-tag-advanced">Advanced</div>
@@ -2100,32 +2118,32 @@ function splashHtml() {
 
     <div class="splash-presets">
       <div class="splash-preset-card" data-action="quick-start" data-preset="4k">
-        <div class="splash-preset-icon">👑</div>
+        <div class="splash-preset-icon">${ICO.crown(22,'#a78bfa')}</div>
         <div class="splash-preset-name">4K Apex</div>
         <div class="splash-preset-detail">Flagship · IQR · Lossless</div>
       </div>
       <div class="splash-preset-card" data-action="quick-start" data-preset="1080p">
-        <div class="splash-preset-icon">📺</div>
+        <div class="splash-preset-icon">${ICO.tv(22,'#00d4ff')}</div>
         <div class="splash-preset-name">1080p Stream</div>
         <div class="splash-preset-detail">Balanced · DD+ audio</div>
       </div>
       <div class="splash-preset-card" data-action="quick-start" data-preset="http">
-        <div class="splash-preset-icon">🌐</div>
+        <div class="splash-preset-icon">${ICO.globe(22,'#34d399')}</div>
         <div class="splash-preset-name">Free Streaming</div>
         <div class="splash-preset-detail">No account needed</div>
       </div>
       <div class="splash-preset-card" data-action="quick-start" data-preset="p2p">
-        <div class="splash-preset-icon">🔗</div>
+        <div class="splash-preset-icon">${ICO.link(22,'#fbbf24')}</div>
         <div class="splash-preset-name">Free P2P</div>
         <div class="splash-preset-detail">Torrents · No debrid</div>
       </div>
       <div class="splash-preset-card" data-action="open-quickstart">
-        <div class="splash-preset-icon">❓</div>
+        <div class="splash-preset-icon">${ICO.question(22,'#f472b6')}</div>
         <div class="splash-preset-name">Quick Start</div>
         <div class="splash-preset-detail">New here? Start here</div>
       </div>
       <div class="splash-preset-card" data-action="paste-manifest-splash">
-        <div class="splash-preset-icon">📋</div>
+        <div class="splash-preset-icon">${ICO.clipboard(22,'#fb923c')}</div>
         <div class="splash-preset-name">Paste Manifest</div>
         <div class="splash-preset-detail">Import existing config</div>
       </div>
@@ -2273,10 +2291,10 @@ function render() {
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Deploy to Stremio</button>
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
             <div style="display:flex;gap:8px">
-              <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
-              <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
+              <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
+              <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
             </div>
             <div id="aioResult"></div>
             <details style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
@@ -2594,7 +2612,7 @@ function render() {
         ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
         ${def.id === 'content' ? `<button data-action="skip-content" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use Everything (safe default) →</button>` : ''}
-        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:.85rem">⚙</span> Fine-Tune</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
+        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px">${ICO.gear(16,'#67e8f9')} Fine-Tune</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
     const btnBack = document.getElementById('btnBack');
@@ -3133,7 +3151,7 @@ function formatterPickerHtml() {
   return '<div style="margin-bottom:16px"><div style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Stream Layout</div>' +
     fmtDropdownHtml() +
     (!isCustom ? `<img src="${cur.img}" alt="${cur.label} preview" style="width:100%;display:block;border-radius:8px;margin-top:10px;border:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'" id="fmtReviewImg">` : '') +
-    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>` +
+    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
   '</div>';
 }
 
@@ -4062,6 +4080,7 @@ function simpleFinishHtml() {
       <details style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:14px">
         <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
           <span style="display:flex;align-items:center;gap:8px">
+            ${ICO.gear(14,'#8b949e')}
             <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">Fine-tune</span>
             <span style="font-size:.65rem;color:#4b5563;font-weight:600">optional</span>
           </span>
@@ -4109,10 +4128,10 @@ function simpleFinishHtml() {
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
       </div>
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">🚀 Deploy to Stremio</button>
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
       <div style="display:flex;gap:8px">
-        <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">📺 WuPlay</button>
-        <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">🌐 Nuvio</button>
+        <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
+        <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
       </div>
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Your API keys are baked directly into your config — no re-entering them later.</div>
       <div id="aioResult"></div>
