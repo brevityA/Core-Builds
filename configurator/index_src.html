@@ -2951,6 +2951,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.color       = on ? '#00d4ff' : '#6b7280';
         btn.style.fontWeight  = on ? '700' : '500';
       });
+      const qfCard = document.querySelector('[data-key="qualityFirst"]');
+      if (qfCard) {
+        qfCard.classList.toggle('pref-on', !!S.qualityFirst);
+        const circ = qfCard.querySelector('.pref-circle');
+        if (circ) circ.innerHTML = S.qualityFirst ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+      }
     }
     if (action === 'set-audio') {
       S.audio = (e.target.closest('[data-action="set-audio"]') || e.target).dataset.val;
@@ -3251,8 +3257,9 @@ function presets() {
   ];
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr','hybrid':'StremThru RD'};
   const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
+  const multiHasTorbox = isMulti && (S.multiServices.includes('torbox-pro') || S.multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
-    ? S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))
+    ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : isP2P || isEasynews || isDebridio ? []
@@ -3303,7 +3310,7 @@ function services() {
     {id:'alldebrid', enabled: svc==='alldebrid' || (isMulti && m.includes('alldebrid')), credentials:cred('alldebrid')},
     {id:'premiumize', enabled: svc==='premiumize' || (isMulti && m.includes('premiumize')), credentials:cred('premiumize')},
     {id:'debridlink', enabled: svc==='debridlink' || (isMulti && m.includes('debridlink')), credentials:cred('debridlink')},
-    {id:'torbox', enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid', credentials:cred('torbox')},
+    {id:'torbox', enabled: svc==='torbox-pro' || svc==='torbox-ess' || svc==='hybrid' || (isMulti && (m.includes('torbox-pro')||m.includes('torbox-ess'))), credentials:cred('torbox')},
     {id:'offcloud', enabled: svc==='offcloud' || (isMulti && m.includes('offcloud')), credentials:cred('offcloud')},
     {id:'easydebrid', enabled: svc==='easydebrid' || (isMulti && m.includes('easydebrid')), credentials:cred('easydebrid')},
     {id:'pikpak', enabled: svc==='pikpak' || (isMulti && m.includes('pikpak')), credentials:cred('pikpak')},
