@@ -877,7 +877,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.32';
+const CONFIGURATOR_VERSION = '2.33';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -918,11 +918,11 @@ const ICO = {
   confetti:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M12 36L20 12l12 24" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06" stroke-linejoin="round"/><circle cx="10" cy="10" r="2" fill="${c}" fill-opacity=".3"/><circle cx="34" cy="8" r="1.5" fill="${c}" fill-opacity=".25"/><circle cx="36" cy="18" r="2" fill="${c}" fill-opacity=".2"/><path d="M28 6l2 3M6 18l3 1M38 28l-2 2" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-opacity=".35"/></svg>`,
 };
 const CHANGELOG = [
-  { v:'2.32', date:'Jul 9 2026', items:[
-    'Formatter picker redesigned — compact dropdown with featured card and live preview replaces stacked card list',
-    'Manifest modal polished — gradient background, cyan accent border, grouped URL/password card',
-    'Wizaardd AIOStreams instance added (forthewizards.uk)',
-    'HdHub preset disabled across all debrid templates (kept as backup)',
+  { v:'2.33', date:'Jul 10 2026', items:[
+    'SVG icon system — all UI emoji replaced with crisp vector icons (30+ icons across splash, wizard, receipt, modals)',
+    'Service chips, receipt rows, manifest modal, and deploy buttons all use the new ICO helper',
+    'Formatter preview image added to Fine-Tune panel — see how each formatter looks before selecting',
+    'Changelog trimmed to latest version only with link to full history',
   ]},
   { v:'2.31', date:'Jul 9 2026', items:[
     'All 17 formatters now show unique live previews — previously 12 of 17 fell back to the Apex V2 preview',
@@ -1784,7 +1784,7 @@ const FMT_PREVIEWS = {
 function fmtPreviewHtml(fmtId) {
   const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['apex-v2'];
   return `<div class="fmt-live-preview">
-    <div class="fmt-live-poster">🎬</div>
+    <div class="fmt-live-poster">${ICO.film(16,'#6b7280')}</div>
     <div class="fmt-live-lines">
       <div class="fmt-live-n">${p.n}</div>
       ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
@@ -1825,11 +1825,13 @@ function updateFmtFeatured() {
   document.querySelectorAll('#fmtFeaturedPreview').forEach(el => { el.innerHTML = fmtPreviewHtml(isCustom ? 'apex-v2' : cur.id); });
   const reviewImg = document.getElementById('fmtReviewImg');
   if (reviewImg && !isCustom) { reviewImg.src = cur.img; reviewImg.alt = cur.label + ' preview'; }
+  const ftImg = document.getElementById('ftFmtPreviewImg');
+  if (ftImg) { if (!isCustom && cur.img) { ftImg.src = cur.img; ftImg.alt = cur.label + ' preview'; ftImg.style.display = ''; } else { ftImg.style.display = 'none'; } }
 }
 function updateFmtReceiptRow() {
   const fmtLbl = label('formatter', S.formatter);
   const fmtSummary = document.querySelector('#fmtPickerDetails > summary span:first-child');
-  if (fmtSummary) fmtSummary.innerHTML = `<span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${fmtLbl}</span>`;
+  if (fmtSummary) fmtSummary.innerHTML = `<span>${ICO.palette(14,'#8b949e')}</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${fmtLbl}</span>`;
   document.querySelectorAll('.receipt-row').forEach(row => {
     const lbl2 = row.querySelector('.receipt-row-lbl');
     if (lbl2 && lbl2.textContent.trim() === 'formatter') {
@@ -1999,6 +2001,7 @@ function renderAdvancedPanel() {
       <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter)</div>
         ${fmtDropdownHtml()}
+        ${(() => { const _fc = FORMATTERS.find(f => f.id === S.formatter); const _isC = S.formatter === 'custom' && S.customFormatter; return !_isC && _fc && _fc.img ? `<img src="${_fc.img}" alt="${_fc.label} preview" id="ftFmtPreviewImg" style="width:100%;display:block;border-radius:8px;margin-top:10px;border:1px solid #1e2837;cursor:pointer" loading="lazy" onerror="this.style.display='none'" onclick="this.style.maxHeight=this.style.maxHeight?'':'none'" title="Click to expand">` : ''; })()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
@@ -2189,16 +2192,17 @@ function splashHtml() {
         <span style="margin-left:auto;font-size:.75rem;opacity:.4">▾</span>
       </summary>
       <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px">
-        ${CHANGELOG.map((entry, i) => `
+        ${(() => { const entry = CHANGELOG[0]; return `
         <div>
           <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
-            <span style="font-size:.63rem;font-weight:800;color:${i===0?_badgeColor:_clrOlder};background:${i===0?_badgeBg:_oldBg};border:1px solid ${i===0?_badgeBdr:_oldBdr};border-radius:4px;padding:1px 6px">v${entry.v}</span>
+            <span style="font-size:.63rem;font-weight:800;color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeBdr};border-radius:4px;padding:1px 6px">v${entry.v}</span>
             <span style="font-size:.61rem;color:${_clrDate}">${entry.date}</span>
           </div>
           <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px;text-align:left">
-            ${entry.items.map(it => `<li style="font-size:.7rem;color:${i===0?_clrCurrent:_clrOlder};line-height:1.4">${it}</li>`).join('')}
+            ${entry.items.map(it => `<li style="font-size:.7rem;color:${_clrCurrent};line-height:1.4">${it}</li>`).join('')}
           </ul>
-        </div>`).join('')}
+        </div>
+        <a href="https://github.com/brevityA/Core-Builds/blob/main/Guides/CHANGELOG.md" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;font-weight:600;color:${_clrOlder};text-decoration:none;display:flex;align-items:center;gap:4px;margin-top:2px">View full changelog <span style="font-size:.6rem">→</span></a>`; })()}
       </div>
     </details>
 
@@ -2429,7 +2433,7 @@ function render() {
             ${telemetryHtml()}
             <details id="fmtPickerDetails" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
               <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 16px;background:rgba(255,255,255,.03);font-size:.76rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase;user-select:none">
-                <span style="display:flex;align-items:center;gap:8px"><span>🎨</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span style="font-size:.7rem;color:#374151">›</span>
+                <span style="display:flex;align-items:center;gap:8px"><span>${ICO.palette(14,'#8b949e')}</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span style="font-size:.7rem;color:#374151">›</span>
               </summary>
               <div style="padding:12px 14px">${formatterPickerHtml()}</div>
             </details>
