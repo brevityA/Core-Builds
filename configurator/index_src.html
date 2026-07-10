@@ -1352,7 +1352,8 @@ const DEFS = [
       { v:'streamnzb', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 38,12 38,32 22,41 6,32 6,12" stroke="#f59e0b" stroke-width="2" fill="#1a1200"/><circle cx="22" cy="19" r="2" fill="#f59e0b"/><path d="M18 16 Q22 12 26 16" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M15 13 Q22 7 29 13" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.6"/><line x1="13" y1="23" x2="31" y2="23" stroke="#f59e0b" stroke-width="1" opacity="0.5"/><text x="22" y="34" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="900" font-family="system-ui,sans-serif">NZB</text></svg>', name:'StreamNZB', desc:'Usenet streaming · manifest URL required<br><span style="color:#f59e0b;font-size:.8em">self-hosted Usenet indexer + streamer</span>' },
     ]
   },
-  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'svc-list', noHero:true,
+  { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'device-hybrid', noHero:true,
+    featured:['generic','samsung','firestick-hd','appletv-new','shield'],
     opts:[
       { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="13" width="38" height="22" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="7" y="16" width="30" height="15" fill="#1a0a3a"/><line x1="15" y1="35" x2="12" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="29" y1="35" x2="32" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="42" x2="34" y2="42" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="12" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="13" x2="32" y2="5" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>', name:'Standard TV',          desc:'Broadest compatibility · no restrictions', help:'No format restrictions — every stream type is allowed. Pick this if you are unsure of your TV specs; everything will play, though rare formats may need transcoding.' },
       { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="9" width="40" height="24" rx="2" stroke="#3d72e8" stroke-width="2"/><rect x="4" y="11" width="36" height="20" fill="#040e22"/><rect x="19" y="33" width="6" height="3" fill="#3d72e8"/><path d="M12 41 Q22 37 32 41" stroke="#3d72e8" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="8" y1="21" x2="36" y2="21" stroke="#3d72e8" stroke-width="0.5" opacity="0.5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+', help:'<b>DV-Only Kill</b>: Samsung TVs have no Dolby Vision support — DV streams without an HDR10 fallback show a purple/green tint, so they are removed. <b>AV1 / VC-1 excluded</b>: 2018–2022 Samsung models lack these video decoders. <b>HDR10+</b> is Samsung&#39;s own HDR format and is prioritised.' },
@@ -1362,7 +1363,12 @@ const DEFS = [
       { v:'windows',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="6" width="38" height="26" rx="3" stroke="#0078d4" stroke-width="2"/><rect x="7" y="9" width="30" height="20" fill="#001428"/><rect x="10" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="12" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="10" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="17" y="18" width="6" height="5" rx="0.5" fill="#0078d4"/><rect x="18" y="32" width="8" height="4" rx="1" fill="#0078d4"/><line x1="12" y1="40" x2="32" y2="40" stroke="#0078d4" stroke-width="2" stroke-linecap="round"/></svg>', name:'Windows PC',           desc:'Full lossless · AV1 · HDR-first · 7.1', help:'PCs can decode anything in software if needed, so nothing is excluded. <b>HDR-first</b>: HDR streams ranked above SDR. Full lossless audio ranked for external DACs and receivers.' },
       { v:'firestick-hd',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff6b00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff6b00"/><path d="M16 20 C16 16 14 13 16 10 C16 10 17.5 12 19 11 C19 8 21.5 5 23 3 C23 3 23 7.5 26 10 C27.5 11 27 13.5 25 15.5 C25 15.5 25 13 23 14 C23 17 21 20 16 20Z" fill="#ff6b00"/><text x="19" y="29" text-anchor="middle" fill="#ff6b00" font-size="7.5" font-weight="800" font-family="system-ui,sans-serif">HD</text></svg>', name:'Fire Stick HD',        desc:'DV-Only Kill · no AV1/lossless · HDR10/HLG', help:'The HD stick has no Dolby Vision, no AV1 decoder, and no lossless audio passthrough — those streams are removed or down-ranked so everything actually plays. <b>HDR10 / HLG</b> still work.' },
       { v:'firestick-4kmax', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="20" width="28" height="11" rx="3" fill="#1a0800" stroke="#ff8c00" stroke-width="1.5"/><rect x="33" y="22" width="7" height="7" rx="2" fill="#ff8c00"/><path d="M15 20 C15 15 13 11 16 8 C16 8 18 11 20 10 C20 6 23 2 24 1 C24 1 24 6 28 9 C30 11 29.5 14 27 17 C27 17 27 14 24 15 C24 18 22 20 15 20Z" fill="#ff8c00"/><text x="19" y="29" text-anchor="middle" fill="#ff8c00" font-size="6.5" font-weight="800" font-family="system-ui,sans-serif">4K MAX</text></svg>', name:'Fire Stick 4K Max',   desc:'DV · AV1 · VC-1 excluded · no lossless', help:'<b>DV + AV1</b> are supported on the 4K Max. <b>VC-1 excluded</b>: an old Blu-ray codec the stick struggles with. <b>No lossless</b>: Fire OS does not bitstream TrueHD or DTS-HD MA, so DD+/Atmos is the ceiling.' },
-      { v:'shield', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="4" y="21" width="29" height="11" rx="3" fill="#0d1a0a" stroke="#76b900" stroke-width="1.5"/><rect x="34" y="23" width="7" height="7" rx="2" fill="#76b900"/><path d="M22 6 L30 10 L30 19 Q30 22 22 25 Q14 22 14 19 L14 10 Z" fill="none" stroke="#76b900" stroke-width="1.5" stroke-linejoin="round"/><path d="M22 8 L28 11.5 L28 19 Q28 21 22 23.5" stroke="#76b900" stroke-width="0.5" stroke-linejoin="round" fill="#76b900" opacity="0.2"/></svg>', name:'Streaming Box', desc:'No AV1 · no HLG · Nvidia Shield / Android TV', help:'<b>No AV1</b>: the Nvidia Shield (2019) has no AV1 decoder. <b>No HLG</b>: a broadcast HDR format with known Shield playback issues. Everything else, including Dolby Vision and lossless audio, works.' },
+      { v:'shield', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="4" y="21" width="29" height="11" rx="3" fill="#0d1a0a" stroke="#76b900" stroke-width="1.5"/><rect x="34" y="23" width="7" height="7" rx="2" fill="#76b900"/><path d="M22 6 L30 10 L30 19 Q30 22 22 25 Q14 22 14 19 L14 10 Z" fill="none" stroke="#76b900" stroke-width="1.5" stroke-linejoin="round"/><path d="M22 8 L28 11.5 L28 19 Q28 21 22 23.5" stroke="#76b900" stroke-width="0.5" stroke-linejoin="round" fill="#76b900" opacity="0.2"/></svg>', name:'Nvidia Shield',          desc:'No AV1 · no HLG · DV · lossless audio', help:'<b>No AV1</b>: the Nvidia Shield (2019) has no AV1 decoder. <b>No HLG</b>: a broadcast HDR format with known Shield playback issues. Everything else, including Dolby Vision and lossless audio, works.' },
+      { v:'roku',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="10" width="28" height="24" rx="5" fill="#1a0a28" stroke="#6c3fc5" stroke-width="1.5"/><circle cx="22" cy="20" r="6" fill="#6c3fc5"/><circle cx="22" cy="20" r="2.5" fill="#1a0a28"/><rect x="16" y="30" width="5" height="2" rx="1" fill="#6c3fc5" opacity="0.6"/><rect x="23" y="30" width="5" height="2" rx="1" fill="#6c3fc5" opacity="0.6"/><text x="22" y="42" text-anchor="middle" fill="#6c3fc5" font-size="7" font-weight="800" font-family="system-ui,sans-serif">ROKU</text></svg>', name:'Roku',                   desc:'No DV · no lossless · DD+ ceiling · HDR10', help:'Roku has limited Dolby Vision support (player-dependent) so DV-Only streams are killed. No lossless audio passthrough — DD+ is the best audio. <b>AV1</b> supported on newer Roku Ultra/Plus models.' },
+      { v:'chromecast',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="20" r="12" fill="#1a1a1a" stroke="#4285f4" stroke-width="1.5"/><path d="M16 20 L20 16 L28 24 L24 28 Z" fill="#4285f4" opacity="0.8"/><circle cx="22" cy="20" r="3" fill="#34a853"/><rect x="18" y="33" width="8" height="4" rx="2" fill="#4285f4"/><text x="22" y="43" text-anchor="middle" fill="#4285f4" font-size="5" font-weight="700" font-family="system-ui,sans-serif">CC 4K</text></svg>', name:'Chromecast w/ Google TV', desc:'DV · AV1 · no lossless · DD+ · HDR10', help:'Chromecast with Google TV (4K) supports Dolby Vision and AV1. No lossless audio passthrough — DD+ Atmos is the best it handles. Older Chromecast models lack DV and AV1.' },
+      { v:'sony',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="8" width="40" height="25" rx="1" stroke="#1a75ff" stroke-width="2"/><rect x="4" y="10" width="36" height="21" fill="#000a1f"/><rect x="18" y="33" width="8" height="4" rx="1" fill="#1a75ff"/><line x1="10" y1="41" x2="34" y2="41" stroke="#1a75ff" stroke-width="2" stroke-linecap="round"/><text x="22" y="24" text-anchor="middle" fill="#1a75ff" font-size="7" font-weight="800" font-family="system-ui,sans-serif">BRAVIA</text></svg>', name:'Sony Bravia',            desc:'DV · AV1 · eARC · TrueHD · 7.1', help:'Sony Bravia XR/X series supports Dolby Vision, AV1, and lossless audio via eARC. Google TV built-in. Same unrestricted profile as LG — nothing is excluded.' },
+      { v:'ipad',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="4" width="28" height="36" rx="4" fill="#1c1c1e" stroke="#888" stroke-width="1.5"/><rect x="10" y="7" width="24" height="28" fill="#0a0a0e"/><line x1="20" y1="38" x2="24" y2="38" stroke="#555" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'iPad / iPhone',          desc:'DV · AV1 · no lossless · stereo/headphones', help:'iOS devices support Dolby Vision and AV1 natively. Audio is limited to DD+ / AAC — no lossless passthrough. Stereo / headphone output unless connected to an external DAC.' },
+      { v:'projector',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="4" y="14" width="36" height="18" rx="3" fill="#1a1a0a" stroke="#d4a017" stroke-width="1.5"/><circle cx="14" cy="23" r="5" fill="#d4a017" opacity="0.3" stroke="#d4a017" stroke-width="1"/><circle cx="14" cy="23" r="2" fill="#d4a017"/><rect x="24" y="19" width="12" height="3" rx="1" fill="#d4a017" opacity="0.4"/><rect x="24" y="24" width="8" height="3" rx="1" fill="#d4a017" opacity="0.4"/><line x1="10" y1="32" x2="10" y2="38" stroke="#d4a017" stroke-width="1.5" stroke-linecap="round"/><line x1="34" y1="32" x2="34" y2="38" stroke="#d4a017" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Projector',              desc:'HDR10 · no DV · no lossless · AV1 varies', help:'Most projectors (Epson, BenQ, XGIMI) lack Dolby Vision — DV-Only streams are killed. HDR10 is the primary HDR format. Audio depends on your receiver/soundbar. AV1 support varies by model — excluded by default for safety.' },
     ]
   },
   { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c1', layout:'svc-list', noHero:true,
@@ -1511,6 +1517,30 @@ function renderOpts(def) {
   const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
   const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
+  if (def.layout === 'device-hybrid') {
+    const featured = def.featured || [];
+    const featOpts = def.opts.filter(o => featured.includes(o.v));
+    const moreOpts = def.opts.filter(o => !featured.includes(o.v));
+    const isMore = moreOpts.some(o => o.v === S[key]);
+    const row = (o) => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+        <div class="opt-icon">${o.icon}</div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>
+        ${o.help ? `<button type="button" class="help-btn" data-action="toggle-device-help" data-v="${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>` : ''}
+        <span class="svc-list-arr">›</span>
+      </label>${o.help ? `<div class="device-help" id="help_${o.v}">${o.help}</div>` : ''}</div>`;
+    const moreSelected = isMore ? moreOpts.find(o => o.v === S[key]) : null;
+    return `<div class="svc-list">${featOpts.map(row).join('')}</div>` +
+      `<div class="dev-more-wrap" style="margin-top:10px">` +
+        `<div class="fmt-select-wrap"><select class="fmt-select" data-action="dev-more-select" data-key="${key}">` +
+          `<option value=""${!isMore?' selected':''}>More devices…</option>` +
+          moreOpts.map(o => `<option value="${o.v}"${o.v===S[key]?' selected':''}>${o.name} — ${o.desc.split('·')[0].trim()}</option>`).join('') +
+        `</select><span class="fmt-select-arrow">▾</span></div>` +
+        (moreSelected ? `<div class="dev-more-detail" style="border:1.5px solid rgba(0,212,255,.25);border-radius:10px;background:rgba(0,212,255,.04);padding:12px 14px;margin-top:8px">` +
+          `<div style="display:flex;align-items:center;gap:10px"><div style="flex-shrink:0">${moreSelected.icon}</div><div><div style="font-weight:700;font-size:.88rem;color:#00d4ff">${moreSelected.name}</div><div style="color:#6b7280;font-size:.72rem;margin-top:2px">${moreSelected.desc}</div></div></div>` +
+          (moreSelected.help ? `<div style="color:#8b949e;font-size:.74rem;margin-top:8px;line-height:1.5;border-top:1px dashed rgba(255,255,255,.08);padding-top:8px">${moreSelected.help}</div>` : '') +
+        `</div>` : '') +
+      `</div>`;
+  }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
     `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : '📂 Import Custom Formatter'}</button>`;
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
@@ -1531,7 +1561,7 @@ function renderOpts(def) {
           { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
           { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
         ];
-        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited' };
         const recAudio = DEV_REC[S.device];
         const devLabel = label('device', S.device);
         const audioRows = AUDIO_OPTS.map(o => {
@@ -2667,6 +2697,21 @@ document.addEventListener('DOMContentLoaded', () => {
       updateFmtReceiptRow();
       document.querySelectorAll('[data-action="fmt-dropdown-change"]').forEach(sel => { if (sel !== e.target) sel.value = S.formatter; });
     }
+    if (e.target.matches('[data-action="dev-more-select"]')) {
+      const val = e.target.value;
+      if (val) {
+        S.device = val;
+        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited' };
+        const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
+        const newAudio = DEV_AUDIO[val];
+        if (newAudio && newAudio !== S.audio) { S.audio = newAudio; showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}`); }
+        document.querySelectorAll('input[name="device"]').forEach(r => r.checked = false);
+        saveState();
+        renderStep();
+      } else {
+        if (S.device && !document.querySelector('input[name="device"]:checked')) renderStep();
+      }
+    }
   });
   document.addEventListener('click', (e) => {
     const flashBtn = e.target.closest('button:not(:disabled):not(.btn-manifest):not(.btn-dl)');
@@ -2905,10 +2950,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action === 'update-radio') {
       S[e.target.dataset.key] = e.target.value;
       if (e.target.dataset.key === 'device') {
-        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless' };
+        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited' };
         const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
         const newAudio = DEV_AUDIO[e.target.value];
-        const devCantDoLossless = ['samsung','firestick-hd','firestick-4kmax'].includes(e.target.value);
+        const devCantDoLossless = ['samsung','firestick-hd','firestick-4kmax','roku','chromecast','ipad','projector'].includes(e.target.value);
         if (newAudio && newAudio !== S.audio) {
           if (S.quickStart && S.audio === 'lossless' && !devCantDoLossless) {
             // Preset chose lossless and this device supports it — keep it
@@ -3041,7 +3086,11 @@ function insights() {
   else if (dev === 'appletv-old') pts.push('<b>AV1 excluded</b> — Apple TV 4K Gen 1/2 hardware limit');
   else if (dev === 'appletv-new') pts.push('<b>Full AV1 + DV</b> — optimised for Apple TV 4K Gen 3 (A15)');
   else if (dev === 'windows') pts.push('<b>Full lossless + AV1</b> — Windows PC optimised, HDR-first visual tags');
-  else if (dev === 'lgtv') pts.push('<b>Full DV + eARC + 7.1</b> — best-case LG webOS profile');
+  else if (dev === 'lgtv' || dev === 'sony') pts.push('<b>Full DV + eARC + 7.1</b> — unrestricted profile');
+  else if (dev === 'roku') pts.push('<b>DV-Only Kill</b> · AV1 allowed · DD+ ceiling · HDR10 primary');
+  else if (dev === 'chromecast') pts.push('<b>DV + AV1</b> · no lossless audio · DD+ Atmos ceiling');
+  else if (dev === 'ipad') pts.push('<b>DV + AV1</b> · stereo/headphone audio · no lossless passthrough');
+  else if (dev === 'projector') pts.push('<b>DV-Only Kill</b> · AV1 excluded · HDR10 primary · audio via receiver');
   if (aud === 'dolby') pts.push('<b>All DTS excluded</b> — safe for Bose / Dolby soundbars (Atmos · TrueHD · DD+ only)');
   else if (aud === 'lossless') pts.push('<b>Full lossless audio ranked</b> — TrueHD · Atmos · DTS-HD MA · FLAC prioritised');
   else if (aud === 'standard') pts.push('<b>DD+ / Atmos ranked</b> — soundbar and smart TV profile');
@@ -3252,14 +3301,16 @@ function encodeCfg() {
   if (dev==='firestick-4kmax') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
   if (dev==='appletv-old') return { excludedEncodes:['AV1'], preferredEncodes:['HEVC','AVC','Unknown'] };
   if (dev==='windows') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  if (dev==='roku') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  if (dev==='projector') return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
   return { excludedEncodes:[], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
 }
 
 function audioCfg() {
   const dev = S.device;
-  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick-hd' || dev==='firestick-4kmax';
+  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick-hd' || dev==='firestick-4kmax' || dev==='roku' || dev==='chromecast' || dev==='ipad' || dev==='projector';
   const dolby   = S.audio==='dolby';
-  const wide     = dev==='windows' || dev==='lgtv' || dev==='appletv-old' || dev==='appletv-new' || S.audio==='lossless' || dolby;
+  const wide     = dev==='windows' || dev==='lgtv' || dev==='appletv-old' || dev==='appletv-new' || dev==='sony' || S.audio==='lossless' || dolby;
   if (dolby) return {
     excludedAudioTags: ['DTS','DTS-HD MA','DTS:X','DTS-HD','DTS-ES'],
     preferredAudioTags: ['TrueHD','Atmos','DD+','AAC','DD'],
@@ -3270,11 +3321,13 @@ function audioCfg() {
 
 function visualTags() {
   const dev = S.device;
-  if (['appletv-old','appletv-new','lgtv'].includes(dev)) return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (['appletv-old','appletv-new','lgtv','sony'].includes(dev)) return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='samsung') return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='firestick-hd') return ['HDR10','HDR','HLG','SDR'];
-  if (dev==='firestick-4kmax') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='firestick-4kmax'||dev==='chromecast') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='shield') return ['DV','HDR+DV','HDR10+','HDR10','HDR','10bit','SDR','IMAX'];
+  if (dev==='ipad') return ['DV','HDR+DV','HDR10','HDR','10bit','SDR'];
+  if (dev==='roku'||dev==='projector') return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='windows' || S.resolution==='4k' || S.resolution==='ultrawide') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
 }
@@ -3295,7 +3348,7 @@ function eses() {
     out.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
     if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
     if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
-    if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+    if (['samsung','firestick-hd','roku','projector'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
     if (S.exclude4K) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
     if (S.sizeLimit !== 'unlimited') {
@@ -3309,7 +3362,7 @@ function eses() {
   if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
   out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
-  if (dev==='samsung'||dev==='firestick-hd') out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+  if (['samsung','firestick-hd','roku','projector'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
   if (S.cacheMode !== 'uncached') out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',3),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" });
   if (S.cacheMode !== 'cached') out.push({ enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
   if (S.cacheMode === 'cached')   out.push({ enabled:true, expression:"/* Cached Only — hard kill uncached */ uncached(streams)" });
