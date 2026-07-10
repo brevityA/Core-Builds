@@ -1177,6 +1177,8 @@ let _detectedDevice = null;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz', wizaardd:'https://aiostreams-stable.forthewizards.uk' };
+const HOST_LABEL_MAP = { elfhosted:'ElfHosted', fortheweak:'ForthWeak', midnight:"Midnight's", viren:"Viren's", kuu:"Kuu's", atbp:'ATBP', omni:"Omni's", wizaardd:'Wizaardd' };
+function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [HOST_LABEL_MAP[k]||k, u]); }
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
@@ -3188,7 +3190,7 @@ function presets() {
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
-    { type:'torrents-db', instanceId:'nx-tdb-1', enabled:true, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
+    { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
   ];
   if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
@@ -4158,7 +4160,7 @@ async function simpleInstall(target) {
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
   const cfg = build().config;
-  const _allHosts = [['ElfHosted','https://aiostreams.elfhosted.com'],['ForthWeak','https://aiostreams.fortheweak.cloud'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me'],["Viren's",'https://aiostreams.viren070.me'],["Kuu's",'https://aiostreams.stremio.ru'],['ATBP','https://aio.atbphosting.com'],["Omni's",'https://aiostreams.12312023.xyz']];
+  const _allHosts = hostEntries();
   const hosts = (S.service === 'p2p' || S.service === 'http') ? _allHosts.filter(([n]) => n !== 'ElfHosted') : _allHosts;
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
@@ -4275,7 +4277,7 @@ function wuplayBtn(manifestUrl) {
 }
 
 function instanceChips(templateUrl) {
-  const _all = [['ElfHosted','https://aiostreams.elfhosted.com/stremio/configure'],['ForthWeak','https://aiostreams.fortheweak.cloud/stremio/configure'],["Midnight's",'https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure'],["Viren's",'https://aiostreams.viren070.me/stremio/configure'],["Kuu's",'https://aiostreams.stremio.ru/stremio/configure'],['ATBP','https://aio.atbphosting.com/stremio/configure'],["Omni's",'https://aiostreams.12312023.xyz/stremio/configure']];
+  const _all = hostEntries().map(([n,u]) => [n, u + '/stremio/configure']);
   const hosts = (S.service === 'p2p' || S.service === 'http') ? _all.filter(([n]) => n !== 'ElfHosted') : _all;
   return `<div class="inst-chips">${hosts.map(([n,u])=>`<a href="${u}${templateUrl?`?template=${encodeURIComponent(templateUrl)}`:''}" target="_blank" rel="noopener noreferrer" class="inst-chip ${templateUrl?'inst-chip-import':''}">${templateUrl?'▶ ':''}${n}</a>`).join('')}</div>`;
 }
@@ -4387,7 +4389,7 @@ async function createImportUrl() {
 
 async function openInAIOStreams() {
   const HOST_URLS = HOST_BASE_URLS;
-  const HOST_LABELS = { 'https://aiostreams.elfhosted.com':'ElfHosted', 'https://aiostreams.fortheweak.cloud':'ForthWeak', 'https://aiostreamsfortheweebsstable.midnightignite.me':"Midnight's", 'https://aiostreams.viren070.me':"Viren's", 'https://aiostreams.stremio.ru':"Kuu's", 'https://aio.atbphosting.com':'ATBP', 'https://aiostreams.12312023.xyz':"Omni's" };
+  const HOST_LABELS = Object.fromEntries(Object.entries(HOST_BASE_URLS).map(([k,u]) => [u, HOST_LABEL_MAP[k]||k]));
   const isAuto = S.instanceHost === 'auto', isCustom = S.instanceHost === 'custom';
   const base = HOST_URLS[S.instanceHost] || (S.instanceUrl || '').trim().replace(/\/$/, '');
 
