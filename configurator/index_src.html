@@ -2708,9 +2708,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newAudio && newAudio !== S.audio) { S.audio = newAudio; showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}`); }
         document.querySelectorAll('input[name="device"]').forEach(r => r.checked = false);
         saveState();
-        renderStep();
+        render();
       } else {
-        if (S.device && !document.querySelector('input[name="device"]:checked')) renderStep();
+        if (S.device && !document.querySelector('input[name="device"]:checked')) render();
       }
     }
   });
