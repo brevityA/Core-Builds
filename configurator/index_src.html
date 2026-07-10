@@ -62,6 +62,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt input:checked+label::before{opacity:1}
 .opt input:checked+label::after{content:'';position:absolute;top:7px;right:7px;width:18px;height:18px;background:#00d4ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 44 44' fill='none'%3E%3Cpath d='M12 22l7 7 13-13' stroke='%230d1017' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px no-repeat;border-radius:50%;display:grid;place-items:center;box-shadow:0 0 8px rgba(0,212,255,.6);animation:tickPop .38s cubic-bezier(.34,1.56,.64,1) both}
 .opt label:hover{border-color:rgba(0,212,255,.15);background:#1a2332;transform:translateY(-1px)}
+.opt label:focus-visible{outline:2px solid #00d4ff;outline-offset:2px;border-color:rgba(0,212,255,.3)}
+.btn-next:focus-visible,.btn-back:focus-visible,.btn-dl:focus-visible,.btn-manifest:focus-visible,.m-btn:focus-visible{outline:2px solid #00d4ff;outline-offset:2px}
+.toggle-sw:focus-within{outline:2px solid #00d4ff;outline-offset:2px;border-radius:20px}
+#themeToggle:focus-visible{outline:2px solid #00d4ff;outline-offset:2px}
+.fmt-select:focus-visible{outline:2px solid #00d4ff;outline-offset:2px}
+.splash-preset:focus-visible,.splash-door:focus-visible{outline:2px solid #00d4ff;outline-offset:2px;border-radius:12px}
 .opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .opt-icon svg{width:42px;height:42px}
 .opt-body{display:flex;flex-direction:column;flex:1;min-width:0}
@@ -176,6 +182,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-hero-tags{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
 .svc-hero-tag{font-size:.6rem;font-weight:600;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;color:#9ca3af}
 .svc-list-row label{flex-direction:row!important;align-items:center!important;gap:12px!important;padding:11px 14px!important;border-radius:11px!important;border-color:rgba(255,255,255,.06)!important}
+.svc-list-row label:focus-visible,.svc-list-hero label:focus-visible{outline:2px solid #00d4ff;outline-offset:2px}
 .svc-list-row .opt-icon{margin-bottom:0!important;flex-shrink:0}
 .svc-list-row .opt-icon svg{width:28px!important;height:28px!important}
 .svc-list-row .opt-name{font-size:.86rem!important}
@@ -277,6 +284,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .receipt-hdr-name{font-size:.95rem}
   .fmt-tab{font-size:.68rem;padding:7px 8px}
   .modal-box{padding:22px 18px}
+  .opts.pills{grid-template-columns:1fr 1fr}
+  .hero-sub{grid-template-columns:1fr 1fr}
+  .pref-title{font-size:.82rem}
+  .pref-desc{font-size:.72rem}
+  .receipt-row-val{max-width:48%;font-size:.78rem}
+  .copy-field{flex-direction:column;align-items:stretch;gap:6px}
+  .copy-field-val{font-size:.72rem}
+  .btn-next{font-size:.92rem;padding:12px 14px}
+  .btn-dl{font-size:1.02rem;padding:14px}
+  .btn-manifest{font-size:1rem;padding:13px}
+  .modal-actions{flex-direction:column}
+  .m-btn{min-width:100%}
+  #themeToggle{top:10px;left:10px;padding:4px 8px;font-size:.72rem}
+  .svc-seg{flex-wrap:wrap}
+  .svc-seg-b{min-width:0;font-size:.6rem;padding:7px 2px}
+}
+/* Extra small screens (360px and below) */
+@media(max-width:360px){
+  body{padding:12px 8px 16px}
+  .card{padding:14px 12px;border-radius:10px}
+  .hdr-banner{padding:10px 12px;gap:8px;border-radius:10px}
+  .hdr-title{font-size:1.1rem}
+  .hdr-icon{width:36px;height:36px}
+  .hdr-divider{height:36px}
+  .hdr-sub{font-size:.7rem}
+  .opts.c4d,.opts.c3,.opts.c3d,.opts.c2{grid-template-columns:1fr}
+  .opts.pills{grid-template-columns:1fr}
+  .splash-title{font-size:1.6rem}
+  .splash-presets{grid-template-columns:1fr}
+  .splash-doors{grid-template-columns:1fr}
+  .splash-icon{width:56px;height:56px}
+  .opt-icon svg{width:32px;height:32px}
+  .opt-name{font-size:.88rem}
+  .opt-desc{font-size:.78rem}
+  .btn-next{font-size:.86rem;padding:10px 12px}
+  .srh-ring{width:40px;height:40px}
+  .srh-num{font-size:.95rem}
+  .summary{grid-template-columns:1fr}
 }
 /* Touch devices — larger tap targets */
 @media(pointer:coarse){
@@ -582,6 +627,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .opt label{background:#ffffff;border-color:#d0d7de}
 [data-theme="light"] .opt label::before{background:#0969da;box-shadow:0 0 10px rgba(9,105,218,.3)}
 [data-theme="light"] .opt label:hover{background:#f6f8fa;border-color:rgba(9,105,218,.3)}
+[data-theme="light"] .opt label:focus-visible{outline-color:#0969da}
+[data-theme="light"] .btn-next:focus-visible,[data-theme="light"] .btn-back:focus-visible,[data-theme="light"] .btn-dl:focus-visible,[data-theme="light"] .btn-manifest:focus-visible,[data-theme="light"] .m-btn:focus-visible{outline-color:#0969da}
+[data-theme="light"] #themeToggle:focus-visible,[data-theme="light"] .fmt-select:focus-visible{outline-color:#0969da}
+[data-theme="light"] .splash-preset:focus-visible,[data-theme="light"] .splash-door:focus-visible{outline-color:#0969da}
 [data-theme="light"] .opt input:checked+label{border-color:rgba(9,105,218,.45);background:rgba(9,105,218,.06);box-shadow:0 0 0 1px rgba(9,105,218,.12),0 4px 18px rgba(9,105,218,.1)}
 [data-theme="light"] .opt input:checked+label::after{background:#0969da;color:#fff}
 [data-theme="light"] .opt-desc{color:#57606a}
@@ -917,7 +966,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.33';
+const CONFIGURATOR_VERSION = '2.34';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -966,6 +1015,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.34', date:'Jul 10 2026', items:[
+    'Mobile responsiveness — enhanced 480px and new 360px breakpoints for small phones (single-column grids, compact buttons, scaled typography)',
+    'Keyboard navigation — arrow keys navigate option grids, visible focus rings on all interactive elements, focus trapping in modals',
+    'Accessibility — all option labels are keyboard-focusable, Escape closes modals, Tab cycling trapped within modal boundaries',
+  ]},
   { v:'2.33', date:'Jul 10 2026', items:[
     'Template Comparison Tool — side-by-side viewer comparing PSEs, ESEs, sort keys, scrapers, codecs, and more across any two templates',
     'SVG icon system — all UI emoji replaced with crisp vector icons (30+ icons across splash, wizard, receipt, modals)',
@@ -1601,14 +1655,14 @@ function renderOpts(def) {
   const key = def.key, id = def.id;
   const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} data-action="update-radio" data-key="${key}">`;
   const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
-  const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
+  const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
   if (def.layout === 'device-hybrid') {
     const featured = def.featured || [];
     const featOpts = def.opts.filter(o => featured.includes(o.v));
     const moreOpts = def.opts.filter(o => !featured.includes(o.v));
     const isMore = moreOpts.some(o => o.v === S[key]);
-    const row = (o) => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+    const row = (o) => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
         <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>
         ${o.help ? `<button type="button" class="help-btn" data-action="toggle-device-help" data-v="${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>` : ''}
@@ -1633,7 +1687,7 @@ function renderOpts(def) {
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
     if (def.noHero) {
-      const rows = def.opts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}">
+      const rows = def.opts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
         <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>
         ${o.help ? `<button type="button" class="help-btn" data-action="toggle-device-help" data-v="${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>` : ''}
@@ -1642,10 +1696,10 @@ function renderOpts(def) {
       if (def.id === 'resolution') {
         if (S.simpleMode) return `<div class="svc-list">${rows}</div>`;
         const AUDIO_OPTS = [
-          { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
-          { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
-          { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
-          { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
+          { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M34 7a16 16 0 010 30" stroke="#10b981" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
+          { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" fill="none"/><text x="40" y="14" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
+          { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M6 18v8h5l7 5V13l-7 5H6z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M24 18a4 4 0 010 8" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="none"/><circle cx="35" cy="22" r="2" stroke="#94a3b8" stroke-width="1.2" fill="none"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
+          { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="none"/><rect x="26" y="13" width="14" height="18" rx="3" stroke="#818cf8" stroke-width="1.5" fill="none"/><path d="M30 13v18" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/><path d="M36 13v18" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/><path d="M30 13a9 9 0 010 18" stroke="#818cf8" stroke-width="1.5" fill="none"/><path d="M36 13a9 9 0 000 18" stroke="#818cf8" stroke-width="1.5" fill="none"/></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
         ];
         const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited', onn:'limited' };
         const recAudio = DEV_REC[S.device];
@@ -1720,7 +1774,7 @@ function renderOpts(def) {
     const ckSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
-    const heroHtml = `<div class="svc-list-hero opt">${chk(hero)}<label for="o_${hero.v}">
+    const heroHtml = `<div class="svc-list-hero opt">${chk(hero)}<label for="o_${hero.v}" tabindex="0">
       <div class="opt-icon">${hero.icon}</div>
       <div class="opt-body">
         <div class="opt-name">${hero.name} <span class="svc-hero-badge">${ICO.star(12,'currentColor')} POPULAR</span></div>
@@ -1739,7 +1793,7 @@ function renderOpts(def) {
       const auth = SVC_AUTH[o.v] || '';
       const cat = SVC_CAT[o.v] || 'debrid';
       const isFree = auth === 'Free';
-      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}">${chk(o)}<label for="o_${o.v}">
+      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}">${chk(o)}<label for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
         <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
         <span class="svc-row-auth${isFree?' free':''}">${auth}</span>
@@ -1752,7 +1806,7 @@ function renderOpts(def) {
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
     return `<div class="hero-wrap">
-      <div class="hero-hero opt">${inp(hero)}<label for="o_${hero.v}"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">${ICO.star(11,'currentColor')} Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
+      <div class="hero-hero opt">${inp(hero)}<label for="o_${hero.v}" tabindex="0"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">${ICO.star(11,'currentColor')} Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
       <div class="hero-sub">${rest.map(o => std(o)).join('')}</div>
     </div>`;
   }
@@ -1872,10 +1926,6 @@ function updateFmtFeatured() {
   document.querySelectorAll('#fmtFeaturedDesc').forEach(el => { el.textContent = cur.desc; });
   document.querySelectorAll('.fmt-featured-dot').forEach(el => { el.style.background = cur.bc; el.style.boxShadow = '0 0 8px ' + cur.bc + '88'; });
   document.querySelectorAll('#fmtFeaturedPreview').forEach(el => { el.innerHTML = fmtPreviewHtml(isCustom ? 'apex-v2' : cur.id); });
-  const reviewImg = document.getElementById('fmtReviewImg');
-  if (reviewImg && !isCustom) { reviewImg.src = cur.img; reviewImg.alt = cur.label + ' preview'; }
-  const ftImg = document.getElementById('ftFmtPreviewImg');
-  if (ftImg) { if (!isCustom && cur.img) { ftImg.src = cur.img; ftImg.alt = cur.label + ' preview'; ftImg.style.display = ''; } else { ftImg.style.display = 'none'; } }
 }
 function updateFmtReceiptRow() {
   const fmtLbl = label('formatter', S.formatter);
@@ -1980,10 +2030,10 @@ function renderCacheMode() {
 
 function renderAdvancedPanel() {
   const AUDIO_OPTS = [
-    { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="#0a1f16"/><path d="M26 14 Q32 22 26 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M30 9 Q39 22 30 35" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><path d="M34 5 Q44 22 34 39" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
-    { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M7 17 L7 27 L13 27 L21 33 L21 11 L13 17 Z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="#1a1000"/><path d="M26 15 Q32 22 26 29" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M30 10 Q38 22 30 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><text x="38" y="15" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
-    { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 18 L5 26 L10 26 L18 31 L18 13 L10 18 Z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="#111"/><path d="M23 17 Q26 22 23 27" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="#111"/><circle cx="35" cy="22" r="2.5" fill="#94a3b8"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
-    { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M5 17 L5 27 L11 27 L19 33 L19 11 L11 17 Z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="#0f0f2a"/><path d="M22 13 Q38 13 38 22 Q38 31 22 31 L22 13 Z" fill="#818cf8" opacity="0.75"/><text x="30" y="27" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="900" font-family="system-ui,sans-serif">D</text></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
+    { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M34 7a16 16 0 010 30" stroke="#10b981" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
+    { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" fill="none"/><text x="40" y="14" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
+    { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M6 18v8h5l7 5V13l-7 5H6z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M24 18a4 4 0 010 8" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="none"/><circle cx="35" cy="22" r="2" stroke="#94a3b8" stroke-width="1.2" fill="none"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
+    { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="none"/><rect x="26" y="13" width="14" height="18" rx="3" stroke="#818cf8" stroke-width="1.5" fill="none"/><path d="M30 13v18" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/><path d="M36 13v18" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/><path d="M30 13a9 9 0 010 18" stroke="#818cf8" stroke-width="1.5" fill="none"/><path d="M36 13a9 9 0 000 18" stroke="#818cf8" stroke-width="1.5" fill="none"/></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
   ];
   const audioRows = AUDIO_OPTS.map(o => {
     const on = S.audio === o.v;
@@ -2050,7 +2100,6 @@ function renderAdvancedPanel() {
       <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter)</div>
         ${fmtDropdownHtml()}
-        ${(() => { const _fc = FORMATTERS.find(f => f.id === S.formatter); const _isC = S.formatter === 'custom' && S.customFormatter; return !_isC && _fc && _fc.img ? `<img src="${_fc.img}" alt="${_fc.label} preview" id="ftFmtPreviewImg" style="width:100%;display:block;border-radius:8px;margin-top:10px;border:1px solid #1e2837;cursor:pointer" loading="lazy" onerror="this.style.display='none'" onclick="this.style.maxHeight=this.style.maxHeight?'':'none'" title="Click to expand">` : ''; })()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
@@ -2758,16 +2807,50 @@ document.addEventListener('DOMContentLoaded', () => {
     saveState(); render(); window.scrollTo(0, 0);
   });
 
-  // Keyboard shortcuts: Enter = next, Escape = back
+  // Keyboard shortcuts: Enter = next, Escape = back, Arrows = navigate options
   document.addEventListener('keydown', (e) => {
     const qsOv = document.getElementById('qsOverlay');
     if (qsOv && qsOv.classList.contains('open')) { if (e.key === 'Escape') qsOv.classList.remove('open'); return; }
+
+    // Modal focus trap + Escape to close
+    const modal = document.getElementById('manifestModal') || document.getElementById('advModal');
+    if (modal) {
+      if (e.key === 'Escape') { modal.remove(); return; }
+      if (e.key === 'Tab') {
+        const focusable = modal.querySelectorAll('button,a,[tabindex]:not([tabindex="-1"]),input,select,textarea');
+        if (focusable.length) {
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
+      return;
+    }
+
     if (step === 0) return;
-    if (document.getElementById('manifestModal') || document.getElementById('advModal')) return;
     const rem = document.getElementById('apiReminder');
     if (rem && !rem.classList.contains('hidden')) return;
     const tag = document.activeElement?.tagName;
     const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable;
+
+    // Arrow key navigation within option grids
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key) && !inInput) {
+      const grid = document.querySelector('.opts');
+      if (!grid) return;
+      const labels = [...grid.querySelectorAll('.opt > label')];
+      if (!labels.length) return;
+      const checked = grid.querySelector('.opt input:checked');
+      let idx = checked ? labels.indexOf(checked.nextElementSibling) : -1;
+      const cols = Math.round(grid.offsetWidth / labels[0].closest('.opt').offsetWidth) || 1;
+      if (e.key === 'ArrowRight') idx = idx < labels.length - 1 ? idx + 1 : 0;
+      else if (e.key === 'ArrowLeft') idx = idx > 0 ? idx - 1 : labels.length - 1;
+      else if (e.key === 'ArrowDown') idx = (idx + cols) % labels.length;
+      else if (e.key === 'ArrowUp') idx = (idx - cols + labels.length) % labels.length;
+      e.preventDefault();
+      labels[idx].click();
+      labels[idx].focus();
+    }
+
     if (e.key === 'Enter' && !inInput && !e.shiftKey) {
       e.preventDefault();
       const ae = document.activeElement;
@@ -3238,7 +3321,6 @@ function formatterPickerHtml() {
   const isCustom = S.formatter === 'custom' && S.customFormatter;
   return '<div style="margin-bottom:16px"><div style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Stream Layout</div>' +
     fmtDropdownHtml() +
-    (!isCustom ? `<img src="${cur.img}" alt="${cur.label} preview" style="width:100%;display:block;border-radius:8px;margin-top:10px;border:1px solid #1e2837" loading="lazy" onerror="this.style.display='none'" id="fmtReviewImg">` : '') +
     `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
   '</div>';
 }
