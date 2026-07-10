@@ -60,7 +60,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt label:hover::before{opacity:1}
 .opt input:checked+label{border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.08);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 24px rgba(0,180,220,.12);animation:optSelect .55s cubic-bezier(.4,0,.2,1) both}
 .opt input:checked+label::before{opacity:1}
-.opt input:checked+label::after{content:'✓';position:absolute;top:7px;right:7px;width:18px;height:18px;background:#00d4ff;color:#0d1017;border-radius:50%;font-size:.65rem;font-weight:900;display:grid;place-items:center;box-shadow:0 0 8px rgba(0,212,255,.6);animation:tickPop .38s cubic-bezier(.34,1.56,.64,1) both}
+.opt input:checked+label::after{content:'';position:absolute;top:7px;right:7px;width:18px;height:18px;background:#00d4ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 44 44' fill='none'%3E%3Cpath d='M12 22l7 7 13-13' stroke='%230d1017' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px no-repeat;border-radius:50%;display:grid;place-items:center;box-shadow:0 0 8px rgba(0,212,255,.6);animation:tickPop .38s cubic-bezier(.34,1.56,.64,1) both}
 .opt label:hover{border-color:rgba(0,212,255,.15);background:#1a2332;transform:translateY(-1px)}
 .opt-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .opt-icon svg{width:42px;height:42px}
@@ -340,6 +340,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-manifest:hover{opacity:1;box-shadow:0 6px 36px rgba(0,212,255,.6),inset 0 1px 0 rgba(255,255,255,.25);transform:translateY(-2px)}
 .btn-manifest:active{transform:scale(.98)}
 .btn-manifest:disabled{opacity:.38;cursor:not-allowed}
+/* Compare Templates modal */
+.cmp-modal .modal-box{max-width:720px}
+.cmp-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.cmp-pick{display:flex;flex-direction:column;gap:6px}
+.cmp-pick label{font-size:.68rem;font-weight:700;color:#7a8194;text-transform:uppercase;letter-spacing:.06em}
+.cmp-pick select{width:100%;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;color:#e6edf3;padding:10px 12px;font-size:.85rem;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.cmp-pick select:focus{border-color:rgba(0,212,255,.5)}
+.cmp-divider{display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#4b5563;font-weight:800;padding:4px 0}
+.cmp-body{margin-top:14px;display:flex;flex-direction:column;gap:1px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.cmp-row{display:grid;grid-template-columns:110px 1fr 1fr;background:#111720;min-height:36px;align-items:center;font-size:.78rem}
+.cmp-row:nth-child(even){background:#0e1420}
+.cmp-row-hdr{background:rgba(0,212,255,.06)!important;font-weight:700;color:#00d4ff;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:6px 0}
+.cmp-row-hdr .cmp-label{padding:8px 12px}
+.cmp-label{padding:6px 12px;font-weight:600;color:#7a8194;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp-val{padding:6px 12px;color:#c9d1d9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp-val.hl{color:#00d4ff;font-weight:700}
+.cmp-val.diff{color:#fbbf24}
+.cmp-val.good{color:#34d399}
+.cmp-val.bad{color:#f87171}
+.cmp-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.68rem;font-weight:700;margin-right:4px}
+.cmp-badge.yes{background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)}
+.cmp-badge.no{background:rgba(107,114,128,.1);color:#6b7280;border:1px solid rgba(107,114,128,.15)}
+.cmp-empty{text-align:center;color:#4b5563;font-size:.82rem;padding:32px 16px;line-height:1.6}
+@media(max-width:580px){
+  .cmp-modal .modal-box{max-width:100%}
+  .cmp-cols{grid-template-columns:1fr}
+  .cmp-row{grid-template-columns:90px 1fr 1fr;font-size:.72rem}
+  .cmp-label,.cmp-val{padding:5px 8px}
+}
 /* API Reminder modal */
 @keyframes reminderIn{0%{opacity:0;transform:translateY(32px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes overlayIn{0%{opacity:0}100%{opacity:1}}
@@ -509,8 +538,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-preset-icon{font-size:1rem;margin-bottom:1px;display:flex;align-items:center;justify-content:center}
 .splash-preset-name{font-size:.74rem;font-weight:700;letter-spacing:-.01em}
 .splash-preset-detail{font-size:.6rem;color:#4a4f60}
-.splash-tertiary{width:100%;max-width:420px;display:flex;gap:8px}
-.splash-tertiary-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;background:transparent;border:1px solid rgba(255,255,255,.06);border-radius:10px;color:#7a8194;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none}
+.splash-tertiary{width:100%;max-width:480px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.splash-tertiary-btn{flex:1;min-width:70px;display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 10px;background:transparent;border:1px solid rgba(255,255,255,.06);border-radius:10px;color:#7a8194;font-size:.7rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none}
 .splash-tertiary-btn:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1);color:#e4e7ed}
 .splash-tertiary-kofi{border-color:rgba(255,94,91,.15);color:#ff5e5b}
 .splash-tertiary-kofi:hover{background:rgba(255,94,91,.06);border-color:rgba(255,94,91,.3);color:#ff5e5b}
@@ -523,8 +552,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 /* ── Theme toggle ─────────────────────────────────────── */
 #themeToggle{position:fixed;top:14px;left:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
 #themeToggle:hover{background:rgba(255,255,255,.12);color:#e6edf3;border-color:rgba(255,255,255,.2)}
-#themeToggle::before{content:'☀';margin-right:4px}
-[data-theme="light"] #themeToggle::before{content:'🌙'}
+#themeToggle .ico-theme{display:inline-flex;margin-right:4px;vertical-align:middle}
+#themeToggle .ico-sun{display:inline-flex}
+#themeToggle .ico-moon{display:none}
+[data-theme="light"] #themeToggle .ico-sun{display:none}
+[data-theme="light"] #themeToggle .ico-moon{display:inline-flex}
 /* ── Light theme ──────────────────────────────────────── */
 [data-theme="light"]{color-scheme:light}
 [data-theme="light"] body{background:#f6f8fa;color:#1c2128}
@@ -663,6 +695,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .notice{background:#f0fff4;border-color:#2da44e;color:#57606a}
 [data-theme="light"] .import-success{background:#f0fff4;border-color:#2da44e}
 [data-theme="light"] .inst-chip{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .cmp-pick select{background-color:#f6f8fa;border-color:#d0d7de;color:#1c2128}
+[data-theme="light"] .cmp-row{background:#f6f8fa}
+[data-theme="light"] .cmp-row:nth-child(even){background:#eaedf0}
+[data-theme="light"] .cmp-row-hdr{background:rgba(9,105,218,.06)!important;color:#0969da}
+[data-theme="light"] .cmp-label{color:#57606a}
+[data-theme="light"] .cmp-val{color:#1c2128}
+[data-theme="light"] .cmp-body{border-color:#d0d7de}
 [data-theme="light"] .inst-chip:hover{border-color:#0969da;color:#0969da}
 [data-theme="light"] .inst-chip-import{background:#ddf4ff;border-color:#0969da;color:#0969da}
 [data-theme="light"] .toast{background:linear-gradient(135deg,#e6f6ff,#f0f9ff);border-color:rgba(9,105,218,.45);color:#0969da;box-shadow:0 4px 20px rgba(9,105,218,.18)}
@@ -748,7 +787,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .fmt-arr{color:#374151;font-size:.9rem;flex-shrink:0}
 .fmt-card[data-active="true"] .fmt-arr{color:#00d4ff}
 .fmt-arr::after{content:'›'}
-.fmt-card[data-active="true"] .fmt-arr::after{content:'✓'}
+.fmt-card[data-active="true"] .fmt-arr{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 44 44' fill='none'%3E%3Cpath d='M12 22l7 7 13-13' stroke='%2300d4ff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat}
+.fmt-card[data-active="true"] .fmt-arr::after{content:''}
 [data-theme="light"] .fmt-card{background:#fff;border-color:#d0d7de}
 [data-theme="light"] .fmt-card[data-active="true"]{background:rgba(9,105,218,.06);border-color:#0969da;box-shadow:0 0 0 1px rgba(9,105,218,.2)}
 [data-theme="light"] .fmt-card .fmt-lbl{color:#1f2328}
@@ -870,7 +910,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <button class="btn btn-next" id="btnNext" data-action="nav-next">Next →</button>
   </div>
 </div>
-<button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle theme"> Mode</button>
+<button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle theme"><span class="ico-theme"><span class="ico-sun"><svg width="14" height="14" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="7" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".15"/><path d="M22 8v4M22 32v4M8 22h4M32 22h4M12.3 12.3l2.8 2.8M28.9 28.9l2.8 2.8M31.7 12.3l-2.8 2.8M15.1 28.9l-2.8 2.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="ico-moon"><svg width="14" height="14" viewBox="0 0 44 44" fill="none"><path d="M30 12a14 14 0 10-4 24 11 11 0 014-24z" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".1"/></svg></span></span> Mode</button>
 <script>/*! qrcode-generator v2.0.4 | (c) Kazuhiko Arase | MIT | github.com/kazuhikoarase/qrcode-generator */
 var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
 </script>
@@ -916,9 +956,18 @@ const ICO = {
   antenna:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 20v16" stroke="${c}" stroke-width="2" stroke-linecap="round"/><path d="M14 10l8 10 8-10" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 36h16" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="20" r="2.5" fill="${c}" fill-opacity=".4"/></svg>`,
   key:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="16" cy="20" r="8" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M22 20h14M32 20v6M36 20v4" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="20" r="3" fill="${c}" fill-opacity=".2"/></svg>`,
   confetti:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M12 36L20 12l12 24" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06" stroke-linejoin="round"/><circle cx="10" cy="10" r="2" fill="${c}" fill-opacity=".3"/><circle cx="34" cy="8" r="1.5" fill="${c}" fill-opacity=".25"/><circle cx="36" cy="18" r="2" fill="${c}" fill-opacity=".2"/><path d="M28 6l2 3M6 18l3 1M38 28l-2 2" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-opacity=".35"/></svg>`,
+  compare:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><rect x="6" y="8" width="14" height="28" rx="3" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".08"/><rect x="24" y="8" width="14" height="28" rx="3" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".08"/><path d="M10 15h6M10 20h4M10 25h5M28 15h6M28 20h4M28 25h5" stroke="${c}" stroke-width="1.3" stroke-linecap="round" stroke-opacity=".5"/><path d="M20 18l2 2 2-2M20 26l2-2 2 2" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  check:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M12 22l7 7 13-13" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  warn:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 8L6 36h32L22 8z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".08" stroke-linejoin="round"/><path d="M22 18v10" stroke="${c}" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="32" r="1.5" fill="${c}"/></svg>`,
+  star:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 6l5 10 11 1.5-8 7.5 2 11-10-5.5L12 36l2-11-8-7.5L17 16z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".2" stroke-linejoin="round"/></svg>`,
+  sun:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="22" r="7" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".15"/><path d="M22 8v4M22 32v4M8 22h4M32 22h4M12.3 12.3l2.8 2.8M28.9 28.9l2.8 2.8M31.7 12.3l-2.8 2.8M15.1 28.9l-2.8 2.8" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  moon:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M30 12a14 14 0 10-4 24 11 11 0 014-24z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/></svg>`,
+  infinity:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 22c-3-4-6-7-9-7a6 6 0 000 14c3 0 6-3 9-7 3 4 6 7 9 7a6 6 0 000-14c-3 0-6 3-9 7z" stroke="${c}" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`,
+  eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
   { v:'2.33', date:'Jul 10 2026', items:[
+    'Template Comparison Tool — side-by-side viewer comparing PSEs, ESEs, sort keys, scrapers, codecs, and more across any two templates',
     'SVG icon system — all UI emoji replaced with crisp vector icons (30+ icons across splash, wizard, receipt, modals)',
     'Service chips, receipt rows, manifest modal, and deploy buttons all use the new ICO helper',
     'Formatter preview image added to Fine-Tune panel — see how each formatter looks before selecting',
@@ -1608,7 +1657,7 @@ function renderOpts(def) {
             <div class="opt-icon" style="flex-shrink:0;pointer-events:none">${o.icon}</div>
             <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}${isRec?' <span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3);vertical-align:middle">'+devLabel+'</span>':''}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
             <button type="button" class="help-btn" data-action="toggle-help-target" data-target="audiohelp_res_${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>
-            <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
+            <span style="color:${on?'#00d4ff':'#374151'};flex-shrink:0;pointer-events:none">${on?ICO.check(14,'#00d4ff'):'<span style="font-size:.9rem">›</span>'}</span>
           </div><div class="device-help" id="audiohelp_res_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
         }).join('');
         const curAudioLabel = AUDIO_OPTS.find(o => o.v === S.audio)?.name || 'Auto';
@@ -1674,7 +1723,7 @@ function renderOpts(def) {
     const heroHtml = `<div class="svc-list-hero opt">${chk(hero)}<label for="o_${hero.v}">
       <div class="opt-icon">${hero.icon}</div>
       <div class="opt-body">
-        <div class="opt-name">${hero.name} <span class="svc-hero-badge">★ POPULAR</span></div>
+        <div class="opt-name">${hero.name} <span class="svc-hero-badge">${ICO.star(12,'currentColor')} POPULAR</span></div>
         <div class="opt-desc">${SVC_DESC[hero.v] || ''}</div>
         ${heroTags ? `<div class="svc-hero-tags">${heroTags}</div>` : ''}
       </div>
@@ -1703,7 +1752,7 @@ function renderOpts(def) {
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
     return `<div class="hero-wrap">
-      <div class="hero-hero opt">${inp(hero)}<label for="o_${hero.v}"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">★ Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
+      <div class="hero-hero opt">${inp(hero)}<label for="o_${hero.v}"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">${ICO.star(11,'currentColor')} Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
       <div class="hero-sub">${rest.map(o => std(o)).join('')}</div>
     </div>`;
   }
@@ -1942,7 +1991,7 @@ function renderAdvancedPanel() {
       <div style="flex-shrink:0;pointer-events:none">${o.icon}</div>
       <div style="flex:1;min-width:0;pointer-events:none"><div style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
       <button type="button" class="help-btn" data-action="toggle-help-target" data-target="audiohelp_adv_${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>
-      <span style="color:${on?'#00d4ff':'#374151'};font-size:.9rem;flex-shrink:0;pointer-events:none">${on?'✓':'›'}</span>
+      <span style="color:${on?'#00d4ff':'#374151'};flex-shrink:0;pointer-events:none">${on?ICO.check(14,'#00d4ff'):'<span style="font-size:.9rem">›</span>'}</span>
     </div><div class="device-help" id="audiohelp_adv_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
   }).join('');
 
@@ -2033,7 +2082,7 @@ function renderProgress() {
     const SHORT_LABELS = {0:'Service',1:'Device',2:'Resolution',3:'Content',4:'API Keys',5:'Review'};
     const shortName = SHORT_LABELS[i] || tipName;
     const clickable = state === 'done' ? ` data-action="jump-step" data-step="${n}" role="button" tabindex="0" aria-label="Go back to ${tipName}"` : '';
-    return `<div class="step-unit ${state}" title="${tipName}"${clickable}><div class="step-bub">${state==='done'?'✓':''}</div><div class="step-lbl">${shortName}</div></div>`;
+    return `<div class="step-unit ${state}" title="${tipName}"${clickable}><div class="step-bub">${state==='done'?ICO.check(12,'currentColor'):''}</div><div class="step-lbl">${shortName}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
@@ -2043,7 +2092,7 @@ function renderProgress() {
   const chips = keys.slice(0, step - 1).map((k, i) => {
     if (!k || !S[k]) return '';
     const lbl = label(k, S[k]);
-    return lbl ? `<span class="bc-chip">✓ ${lbl}</span>` : '';
+    return lbl ? `<span class="bc-chip">${ICO.check(10,'currentColor')} ${lbl}</span>` : '';
   }).filter(Boolean);
 
   const bc = document.getElementById('breadcrumbs');
@@ -2174,6 +2223,9 @@ function splashHtml() {
       <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">
         <span class="splash-tertiary-icon">${ICO.folder(16,'#a78bfa')}</span> Browse Templates
       </a>
+      <button data-action="compare-templates" class="splash-tertiary-btn">
+        <span class="splash-tertiary-icon">${ICO.compare(16,'#00d4ff')}</span> Compare
+      </button>
       <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-tertiary-btn">
         <span class="splash-tertiary-icon">${ICO.github(16,'#8b949e')}</span> GitHub
       </a>
@@ -2274,7 +2326,7 @@ function render() {
                 <span class="receipt-row-lbl">${k}</span>
               </div>
               <div class="receipt-row-val${isNonDefault?' hl':''}">
-                ${val}${audioOverride ? ' <span style="color:#f59e0b;font-size:.7rem">⚠ capped</span>' : ''}
+                ${val}${audioOverride ? ` <span style="color:#f59e0b;font-size:.7rem">${ICO.warn(11,'#f59e0b')} capped</span>` : ''}
               </div>
             </div>`;
           }).join('')}
@@ -2286,14 +2338,14 @@ function render() {
               <span class="receipt-row-lbl">API Keys</span>
             </div>
             <div class="receipt-row-val" style="color:#10b981">${[
-              Object.values(S.creds).filter(v=>v).length ? '✓ Debrid' : '',
-              S.tmdbToken ? '✓ TMDB' : '',
-              S.tmdbApiKey ? '✓ TMDB Key' : ''
+              Object.values(S.creds).filter(v=>v).length ? ICO.check(10,'#10b981')+' Debrid' : '',
+              S.tmdbToken ? ICO.check(10,'#10b981')+' TMDB' : '',
+              S.tmdbApiKey ? ICO.check(10,'#10b981')+' TMDB Key' : ''
             ].filter(Boolean).join(' · ')}</div>
           </div>` : ''}
         </div>
         ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
-        ${(() => { const h = templateHealthCheck(); return h.length ? `<div style="margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15)"><div style="font-size:.68rem;font-weight:700;color:#f87171;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:#8b949e;line-height:1.6">${h.map(w=>'<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:#f87171;flex-shrink:0">⚠</span><span>'+w+'</span></div>').join('')}</div></div>` : `<div style="margin-top:6px;padding:6px 12px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12);font-size:.72rem;color:#34d399;font-weight:600">✓ Template looks good</div>`; })()}
+        ${(() => { const h = templateHealthCheck(); return h.length ? `<div style="margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15)"><div style="font-size:.68rem;font-weight:700;color:#f87171;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:#8b949e;line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:#f87171;flex-shrink:0">${ICO.warn(12,'#f87171')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div style="margin-top:6px;padding:6px 12px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12);font-size:.72rem;color:#34d399;font-weight:600">${ICO.check(12,'#34d399')} Template looks good</div>`; })()}
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
@@ -2624,7 +2676,7 @@ function render() {
             <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${{1:1,2:2,3:3}[step]||step} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">⚡ QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${{1:1,2:2,3:3}[step]||step} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -2968,7 +3020,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nm = row.querySelector('.opt-name');
         if (nm) nm.style.color = on ? '#00d4ff' : '#e6edf3';
         const arr = row.querySelector('span:last-child');
-        if (arr) { arr.textContent = on ? '✓' : '›'; arr.style.color = on ? '#00d4ff' : '#374151'; }
+        if (arr) { arr.innerHTML = on ? ICO.check(14,'#00d4ff') : '<span style="font-size:.9rem">›</span>'; arr.style.color = on ? '#00d4ff' : '#374151'; }
       });
       const sum = document.querySelector('.adv-audio-details summary span:last-child');
       const AUDIO_LABELS = { lossless:'Full Lossless', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
@@ -2984,6 +3036,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateFmtReceiptRow();
     }
     if (action === 'import-formatter') { showFormatterImport(); }
+    if (action === 'compare-templates') { showCompareTemplates(); }
     if (action === 'svc-cat') {
       const cat = el.dataset.cat;
       document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === cat));
@@ -3168,7 +3221,7 @@ function insights() {
 function insightsHtml() {
   const pts = insights();
   if (!pts.length) return '';
-  return '<div class="insights-box"><div class="insights-hdr">Template Highlights</div><ul style="list-style:none;display:flex;flex-direction:column;gap:5px">' + pts.map(p => '<li><span style="color:#3fb950;flex-shrink:0">✓</span><span>' + p + '</span></li>').join('') + '</ul></div>';
+  return '<div class="insights-box"><div class="insights-hdr">Template Highlights</div><ul style="list-style:none;display:flex;flex-direction:column;gap:5px">' + pts.map(p => '<li><span style="color:#3fb950;flex-shrink:0">' + ICO.check(12,'#3fb950') + '</span><span>' + p + '</span></li>').join('') + '</ul></div>';
 }
 
 function telemetryHtml() {
@@ -3177,7 +3230,7 @@ function telemetryHtml() {
 }
 
 function sizeLimitHtml() {
-  return '<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Max File Size</span><span style="color:#4b5563;font-size:.72rem">Unlimited preserves REMUXes</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">' + ['10','20','30','50','unlimited'].map(v => '<button type="button" data-action="set-size-limit" data-val="' + v + '" class="size-btn' + (S.sizeLimit === v ? ' size-btn-active' : '') + '">' + (v === 'unlimited' ? '♾ Unlimited' : v + 'GB') + '</button>').join('') + '</div></div>';
+  return '<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="color:#8b949e;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Max File Size</span><span style="color:#4b5563;font-size:.72rem">Unlimited preserves REMUXes</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">' + ['10','20','30','50','unlimited'].map(v => '<button type="button" data-action="set-size-limit" data-val="' + v + '" class="size-btn' + (S.sizeLimit === v ? ' size-btn-active' : '') + '">' + (v === 'unlimited' ? ICO.infinity(12,'currentColor')+' Unlimited' : v + 'GB') + '</button>').join('') + '</div></div>';
 }
 
 function formatterPickerHtml() {
@@ -3569,10 +3622,117 @@ function generate() {
   const dlBtn = document.querySelector('.btn-dl');
   if (dlBtn) {
     const orig = dlBtn.innerHTML;
-    dlBtn.innerHTML = '✓ Downloaded!';
+    dlBtn.innerHTML = ICO.check(14,'currentColor') + ' Downloaded!';
     dlBtn.style.background = 'linear-gradient(135deg,#065f46,#059669)';
     setTimeout(() => { dlBtn.innerHTML = orig; dlBtn.style.background = ''; }, 2200);
   }
+}
+
+const CMP_TEMPLATES = [{"n":"Core Nexus 4K AllDebrid Lite","v":"0.2.5","c":"AllDebrid","r":"4K","p":15,"e":15,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K AllDebrid","v":"0.4.5","c":"AllDebrid","r":"4K","p":20,"e":28,"i":7,"iq":true,"pw":true,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus AllDebrid Lite","v":"0.2.5","c":"AllDebrid","r":"1080p","p":10,"e":28,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus AllDebrid","v":"0.2.5","c":"AllDebrid","r":"1080p","p":10,"e":28,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Anime 4K Lite","v":"2.8.11","c":"Anime","r":"4K","p":14,"e":13,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":10,"sn":["zilean","seadex","meteor","comet","mediafusion","animetosho"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime 4K","v":"2.8.13","c":"Anime","r":"4K","p":14,"e":26,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":12,"sn":["zilean","seadex","meteor","comet","mediafusion","hdhub"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime Dub Lite","v":"2.8.11","c":"Anime","r":"1080p","p":14,"e":13,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":10,"sn":["zilean","seadex","meteor","comet","mediafusion","animetosho"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime Dub","v":"2.8.13","c":"Anime","r":"1080p","p":14,"e":26,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":12,"sn":["zilean","seadex","meteor","comet","mediafusion","hdhub"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime Lite","v":"2.8.11","c":"Anime","r":"1080p","p":12,"e":13,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":10,"sn":["zilean","seadex","meteor","comet","mediafusion","animetosho"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime","v":"2.8.13","c":"Anime","r":"1080p","p":12,"e":26,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":12,"sn":["zilean","seadex","meteor","comet","mediafusion","hdhub"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Samsung RU7100 4K","v":"0.3.5","c":"Device","r":"4K","p":17,"e":29,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":10,"sn":["zilean","meteor","comet","mediafusion","newznab","eztv"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1","VC-1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Samsung TV 4K","v":"0.3.5","c":"Device","r":"4K","p":10,"e":27,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","knaben"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1","VC-1"],"df":true,"tb":false,"cm":"mixed","sx":true},{"n":"Core Nexus Samsung TV","v":"0.3.5","c":"Device","r":"1080p","p":10,"e":27,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","knaben"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1","VC-1"],"df":true,"tb":false,"cm":"mixed","sx":true},{"n":"Core Nexus Ultrawide","v":"0.2.5","c":"Device","r":"1080p","p":14,"e":28,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":5,"ea":[],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Essential Lite","v":"2.10.5","c":"Essential","r":"4K","p":15,"e":16,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Essential","v":"2.12.5","c":"Essential","r":"4K","p":20,"e":29,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Essential Lite","v":"2.10.5","c":"Essential","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Essential","v":"2.10.5","c":"Essential","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Flash 4K","v":"2.10.5","c":"Flash","r":"4K","p":16,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":5,"sn":["zilean","comet","meteor","knaben","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Flash","v":"2.10.5","c":"Flash","r":"1080p","p":11,"e":30,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":4,"sn":["zilean","comet","meteor","knaben"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Hybrid","v":"2.12.6","c":"Hybrid","r":"4K","p":24,"e":29,"i":6,"iq":true,"pw":true,"tw":true,"sk":17,"sc":10,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Hybrid Lite","v":"2.10.6","c":"Hybrid","r":"1080p","p":12,"e":17,"i":6,"iq":false,"pw":false,"tw":true,"sk":17,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Hybrid","v":"2.10.6","c":"Hybrid","r":"1080p","p":12,"e":29,"i":6,"iq":true,"pw":true,"tw":true,"sk":17,"sc":10,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Apex (TorBox)","v":"2.12.5","c":"Single","r":"4K","p":20,"e":29,"i":6,"iq":false,"pw":true,"tw":false,"sk":16,"sc":4,"sn":["zilean","newznab","torrents-db","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Apex","v":"0.7.6","c":"Single","r":"4K","p":20,"e":29,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":10,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream Firestick Lite","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream Firestick","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream Lite","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed 4K+","v":"2.10.6","c":"Speed","r":"4K","p":15,"e":28,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":6,"sn":["zilean","easynews","comet","meteor","knaben","aiosubtitle"],"sv":["torbox","easynews"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed EasyNews","v":"2.10.6","c":"Speed","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":3,"sn":["zilean","easynews","meteor"],"sv":["easynews"],"rr":103,"er":8,"pr":5,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed 4K Lite","v":"2.10.5","c":"Speed","r":"4K","p":16,"e":19,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed 4K","v":"2.10.5","c":"Speed","r":"4K","p":16,"e":31,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed Lite","v":"2.10.5","c":"Speed","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed","v":"2.10.5","c":"Speed","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true}];
+
+function showCompareTemplates() {
+  const ex = document.getElementById('cmpModal');
+  if (ex) ex.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'cmpModal';
+  overlay.className = 'modal-overlay cmp-modal';
+
+  const cats = [...new Set(CMP_TEMPLATES.map(t => t.c))];
+  const optHtml = cats.map(c => {
+    const items = CMP_TEMPLATES.filter(t => t.c === c);
+    return `<optgroup label="${c}">${items.map((t,i) => {
+      const idx = CMP_TEMPLATES.indexOf(t);
+      return `<option value="${idx}">${t.n} (v${t.v})</option>`;
+    }).join('')}</optgroup>`;
+  }).join('');
+
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Compare Templates">
+      <button class="modal-close" id="cmpClose" aria-label="Close">×</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <div style="width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.1)">${ICO.compare(20,'#00d4ff')}</div>
+        <div>
+          <div class="modal-title" style="text-align:left;margin-bottom:1px">Compare Templates</div>
+          <div style="font-size:.72rem;color:#6b7280">Side-by-side feature comparison</div>
+        </div>
+      </div>
+      <div class="cmp-cols">
+        <div class="cmp-pick">
+          <label>Template A</label>
+          <select id="cmpSelA">${optHtml}</select>
+        </div>
+        <div class="cmp-pick">
+          <label>Template B</label>
+          <select id="cmpSelB">${optHtml}</select>
+        </div>
+      </div>
+      <div id="cmpBody" class="cmp-empty">Select two different templates to compare</div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const selA = document.getElementById('cmpSelA');
+  const selB = document.getElementById('cmpSelB');
+  const body = document.getElementById('cmpBody');
+
+  selB.selectedIndex = Math.min(1, CMP_TEMPLATES.length - 1);
+
+  function yn(v) { return v ? '<span class="cmp-badge yes">Yes</span>' : '<span class="cmp-badge no">No</span>'; }
+  function diffCls(a, b) { return a !== b ? ' diff' : ''; }
+  function numCls(a, b, higherBetter) {
+    if (a === b) return '';
+    return higherBetter ? (a > b ? ' good' : ' bad') : '';
+  }
+
+  function updateComparison() {
+    const ai = parseInt(selA.value), bi = parseInt(selB.value);
+    if (ai === bi) { body.className = 'cmp-empty'; body.innerHTML = 'Select two different templates to compare'; return; }
+    const a = CMP_TEMPLATES[ai], b = CMP_TEMPLATES[bi];
+
+    const rows = [
+      { hdr: 'Overview' },
+      { l: 'Version',     a: `v${a.v}`,    b: `v${b.v}` },
+      { l: 'Category',    a: a.c,           b: b.c,          d: a.c !== b.c },
+      { l: 'Resolution',  a: a.r,           b: b.r,          d: a.r !== b.r },
+      { l: 'Cache Mode',  a: a.cm === 'mixed' ? 'Mixed' : a.cm === 'cached' ? 'Cached Only' : 'Uncached Only',
+                           b: b.cm === 'mixed' ? 'Mixed' : b.cm === 'cached' ? 'Cached Only' : 'Uncached Only', d: a.cm !== b.cm },
+      { hdr: 'Filtering & Sorting' },
+      { l: 'PSEs',        a: String(a.p),   b: String(b.p),  d: a.p !== b.p },
+      { l: 'ESEs',        a: String(a.e),   b: String(b.e),  d: a.e !== b.e },
+      { l: 'ISEs',        a: String(a.i),   b: String(b.i),  d: a.i !== b.i },
+      { l: 'IQR Tukey',   a: yn(a.iq),      b: yn(b.iq),     raw: true },
+      { l: 'pow() Decay', a: yn(a.pw),      b: yn(b.pw),     raw: true },
+      { l: 'Svc Twins',   a: yn(a.tw),      b: yn(b.tw),     raw: true },
+      { l: 'Sort Keys',   a: String(a.sk),  b: String(b.sk),  d: a.sk !== b.sk },
+      { l: 'SeaDex',      a: yn(a.sx),      b: yn(b.sx),     raw: true },
+      { hdr: 'Regex & Scoring' },
+      { l: 'Ranked',      a: String(a.rr),  b: String(b.rr),  d: a.rr !== b.rr },
+      { l: 'Excluded',    a: String(a.er),  b: String(b.er),  d: a.er !== b.er },
+      { l: 'Preferred',   a: String(a.pr),  b: String(b.pr),  d: a.pr !== b.pr },
+      { hdr: 'Scrapers & Services' },
+      { l: 'Scrapers',    a: String(a.sc),  b: String(b.sc),  d: a.sc !== b.sc },
+      { l: 'Top Sources', a: a.sn.slice(0,4).join(', '), b: b.sn.slice(0,4).join(', '), d: a.sn.join() !== b.sn.join() },
+      { l: 'Services',    a: a.sv.join(', ') || 'none', b: b.sv.join(', ') || 'none', d: a.sv.join() !== b.sv.join() },
+      { l: 'Tiebreakers', a: yn(a.tb),      b: yn(b.tb),     raw: true },
+      { hdr: 'Audio & Codec' },
+      { l: 'Excl. Audio', a: a.ea.length ? a.ea.join(', ') : 'None', b: b.ea.length ? b.ea.join(', ') : 'None', d: a.ea.join() !== b.ea.join() },
+      { l: 'Excl. Codec', a: a.ee.length ? a.ee.join(', ') : 'None', b: b.ee.length ? b.ee.join(', ') : 'None', d: a.ee.join() !== b.ee.join() },
+    ];
+
+    body.className = 'cmp-body';
+    body.innerHTML = rows.map(r => {
+      if (r.hdr) return `<div class="cmp-row cmp-row-hdr"><div class="cmp-label" style="grid-column:1/-1">${r.hdr}</div></div>`;
+      const ac = r.raw ? '' : (r.d ? ' diff' : '');
+      const bc = r.raw ? '' : (r.d ? ' diff' : '');
+      return `<div class="cmp-row"><div class="cmp-label">${r.l}</div><div class="cmp-val${ac}">${r.a}</div><div class="cmp-val${bc}">${r.b}</div></div>`;
+    }).join('');
+  }
+
+  selA.addEventListener('change', updateComparison);
+  selB.addEventListener('change', updateComparison);
+  updateComparison();
+
+  document.getElementById('cmpClose').addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
 
 function showFormatterImport() {
@@ -3759,7 +3919,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   navigator.clipboard.writeText(FMTS[startFi].getUrl(manifestUrl)).then(() => {
     showToast('Manifest URL copied to clipboard');
     const cb = document.getElementById('mCopyUrl');
-    if (cb) { cb.textContent = '✓'; cb.classList.add('copied'); setTimeout(() => { cb.textContent = 'Copy'; cb.classList.remove('copied'); }, 2200); }
+    if (cb) { cb.innerHTML = ICO.check(12,'currentColor'); cb.classList.add('copied'); setTimeout(() => { cb.textContent = 'Copy'; cb.classList.remove('copied'); }, 2200); }
   }).catch(() => {});
 
   const urlVal   = document.getElementById('mUrlVal');
@@ -3784,7 +3944,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     // Auto-copy URL on every tab switch
     const copyBtn = document.getElementById('mCopyUrl');
     navigator.clipboard.writeText(url).then(() => {
-      if (copyBtn) { copyBtn.textContent = '✓'; copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 2200); }
+      if (copyBtn) { copyBtn.innerHTML = ICO.check(12,'currentColor'); copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 2200); }
     }).catch(() => {});
     // action button
     actionBtn.className = `m-btn ${BTN_CLS[fi]}`;
@@ -3808,9 +3968,9 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         navigator.clipboard.writeText(url).then(() => showToast(`Copied! Paste into ${f.label} → Addons`));
       };
     }
-    document.getElementById('mUrlLabel').textContent =
-      fi === 2 ? 'Manifest URL — auto-copied ✓' :
-      fi === 3 ? 'Manifest URL — auto-copied ✓' : 'Manifest URL';
+    document.getElementById('mUrlLabel').innerHTML =
+      fi === 2 ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') :
+      fi === 3 ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') : 'Manifest URL';
     if (copyBtn) { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }
     const helpEl = document.getElementById('mAppHelp');
     const qrWrap = document.getElementById('mQrWrap');
@@ -3844,7 +4004,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
 
   document.getElementById('mCopyUrl').addEventListener('click', function() {
     navigator.clipboard.writeText(urlVal.textContent).then(() => {
-      this.textContent = '✓'; this.classList.add('copied');
+      this.innerHTML = ICO.check(12,'currentColor'); this.classList.add('copied');
       setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2200);
     });
   });
@@ -3852,7 +4012,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   if (password) {
     document.getElementById('mCopyPwd').addEventListener('click', function() {
       navigator.clipboard.writeText(password).then(() => {
-        this.textContent = '✓'; this.classList.add('copied');
+        this.innerHTML = ICO.check(12,'currentColor'); this.classList.add('copied');
         setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 2200);
       });
     });
@@ -3894,10 +4054,10 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       const data = await r.json();
       const count = data?.streams?.length || 0;
       if (count > 0) {
-        resEl.innerHTML = `<span style="color:#3fb950">✓ Found ${count} stream${count>1?'s':''} — your config is working!</span>`;
-        testBtn.textContent = '✓ Working'; testBtn.style.borderColor = 'rgba(63,185,80,.3)'; testBtn.style.color = '#3fb950';
+        resEl.innerHTML = `<span style="color:#3fb950">${ICO.check(12,'#3fb950')} Found ${count} stream${count>1?'s':''} — your config is working!</span>`;
+        testBtn.innerHTML = ICO.check(12,'currentColor') + ' Working'; testBtn.style.borderColor = 'rgba(63,185,80,.3)'; testBtn.style.color = '#3fb950';
       } else {
-        resEl.innerHTML = `<span style="color:#f59e0b">⚠ 0 streams returned — check your API key and try again in a few minutes</span>`;
+        resEl.innerHTML = `<span style="color:#f59e0b">${ICO.warn(12,'#f59e0b')} 0 streams returned — check your API key and try again in a few minutes</span>`;
         testBtn.disabled = false; testBtn.textContent = 'Retry';
       }
     } catch(e) {
@@ -3931,7 +4091,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         const setData = await setRes.json();
         if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
       }
-      btn.textContent = '✓ Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
+      btn.innerHTML = ICO.check(12,'currentColor') + ' Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
       resEl.innerHTML = already ? `<span style="color:#f59e0b">Already in your library.</span>` : `<span style="color:#3fb950">Done — reopen Stremio to see it.</span>`;
     } catch(err) {
       btn.disabled = false; btn.innerHTML = ICO.download(14,'#00d4ff') + ' Log in & Install';
@@ -4054,12 +4214,12 @@ function simpleFinishHtml() {
             </button>
           </div>
         </div>`).join('')}
-        ${!anyFilled ? `<div style="font-size:.74rem;color:#fbbf24;margin-top:4px">⚠ Streams won't load without an API key</div>` : ''}
+        ${!anyFilled ? `<div style="font-size:.74rem;color:#fbbf24;margin-top:4px">${ICO.warn(12,'#fbbf24')} Streams won't load without an API key</div>` : ''}
       </div>` : ''}
       <div style="border:1px solid ${S.tmdbToken||S.tmdbApiKey?'rgba(52,211,153,.25)':'rgba(251,191,36,.25)'};border-radius:10px;overflow:hidden;margin-bottom:14px;background:${S.tmdbToken||S.tmdbApiKey?'rgba(52,211,153,.03)':'rgba(251,191,36,.03)'}">
         <div style="padding:11px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04)">
           <span style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:.75rem;font-weight:700;color:${S.tmdbToken||S.tmdbApiKey?'#34d399':'#fbbf24'};text-transform:uppercase;letter-spacing:.06em">${S.tmdbToken||S.tmdbApiKey?'✓ TMDB Connected':'⚡ TMDB Key'}</span>
+            <span style="font-size:.75rem;font-weight:700;color:${S.tmdbToken||S.tmdbApiKey?'#34d399':'#fbbf24'};text-transform:uppercase;letter-spacing:.06em">${S.tmdbToken||S.tmdbApiKey?ICO.check(12,'#34d399')+' TMDB Connected':ICO.bolt(12,'#fbbf24')+' TMDB Key'}</span>
             ${S.tmdbToken||S.tmdbApiKey?'':'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">RECOMMENDED</span>'}
           </span>
         </div>
@@ -4154,7 +4314,7 @@ function simpleFinishHtml() {
           <div>
             <button data-action="set-simple-quality" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Quality over resolution</span>
-              <span style="font-size:.8rem">${S.qualityFirst?'✓':''}</span>
+              <span>${S.qualityFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">A 1080p REMUX ranks above a 4K WEB-DL when enabled</div>
           </div>
@@ -4308,7 +4468,7 @@ async function simpleInstall(target) {
           const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
           return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
         }).join('');
-        credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
+        credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
       }
       result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Direct install unavailable — tap an instance to import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
       showToast('Tap an instance chip to import your template');
@@ -4362,7 +4522,7 @@ function updateUuidValidation(val) {
   const ok = validateUuid(val);
   input.style.borderColor = ok ? '#22c55e' : '#f87171';
   status.innerHTML = ok
-    ? '<span style="color:#22c55e;font-weight:700">✓ Valid UUID — Saved</span>'
+    ? '<span style="color:#22c55e;font-weight:700">' + ICO.check(12,'#22c55e') + ' Valid UUID — Saved</span>'
     : '<span style="color:#f87171">Invalid format — must be xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>';
 }
 
@@ -4397,12 +4557,12 @@ function tmdbHint(field, val) {
   if (!v) return '';
   const looksToken = v.startsWith('eyJ');
   const looksKey = /^[a-f0-9]{32}$/i.test(v);
-  if (field === 'token' && looksKey) return '<span style="color:#f59e0b">⚠ That is the 32-character API Key — this field wants the long Read Access Token (starts with eyJ).</span>';
-  if (field === 'token' && !looksToken && v.length >= 20) return '<span style="color:#f59e0b">⚠ Read Access Tokens start with eyJ — this does not look like one.</span>';
-  if (field === 'token' && looksToken && v.length >= 100) return '<span style="color:#34d399">✓ Looks like a valid Read Access Token</span>';
-  if (field === 'key' && looksToken) return '<span style="color:#f59e0b">⚠ That is the Read Access Token — this field wants the 32-character API Key.</span>';
-  if (field === 'key' && !looksKey && v.length >= 24) return '<span style="color:#f59e0b">⚠ API Keys are exactly 32 characters (letters and numbers) — this does not look like one.</span>';
-  if (field === 'key' && looksKey) return '<span style="color:#34d399">✓ Looks like a valid API Key</span>';
+  if (field === 'token' && looksKey) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' That is the 32-character API Key — this field wants the long Read Access Token (starts with eyJ).</span>';
+  if (field === 'token' && !looksToken && v.length >= 20) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' Read Access Tokens start with eyJ — this does not look like one.</span>';
+  if (field === 'token' && looksToken && v.length >= 100) return '<span style="color:#34d399">' + ICO.check(12,'#34d399') + ' Looks like a valid Read Access Token</span>';
+  if (field === 'key' && looksToken) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' That is the Read Access Token — this field wants the 32-character API Key.</span>';
+  if (field === 'key' && !looksKey && v.length >= 24) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' API Keys are exactly 32 characters (letters and numbers) — this does not look like one.</span>';
+  if (field === 'key' && looksKey) return '<span style="color:#34d399">' + ICO.check(12,'#34d399') + ' Looks like a valid API Key</span>';
   return '';
 }
 
@@ -4483,7 +4643,7 @@ async function createImportUrl() {
         </div>`;
       }).join('');
       credBlock = `<div class="cred-remind" style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)">
-        <div class="cr-hdr" style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div>
+        <div class="cr-hdr" style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div>
         <div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your debrid credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. Once AIOStreams has loaded your template, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>
         ${rows}
       </div>`;
@@ -4559,7 +4719,7 @@ async function openInAIOStreams() {
               const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
               return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
             }).join('');
-            credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">⚠ RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
+            credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
           }
           result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">One-click wasn't available — here's the quick import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
           showToast('Tap an instance chip to import your template');
