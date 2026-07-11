@@ -2,8 +2,8 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.11.8",
-    "description": "Nightly Labs v0.9.0 — all LABS features enabled: Score IQR Guard (replaces fixed -50 gate), perGroup() Extra Cached/Uncached ESEs, Bad Dual Audio Groups, Indexer Diversity, elite group pins (4K Remux / 1080p Remux / LQ bottom). Based on 4K Apex v0.4.16.",
+    "version": "0.12.0",
+    "description": "Nightly Labs v0.12.0 — strict year+title matching with passthrough protection, SeaDex Best PSE tier, Score IQR Guard, perGroup() ESEs, Bad Dual Audio Groups, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "source": "external",
     "author": "Branding-Brevity",
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus 4K Apex Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.9.0 — LABS stack fully enabled. Score IQR Guard · perGroup() ESEs · Bad Dual Audio Groups · Indexer Diversity · Elite Group pins. Based on 4K Apex v0.4.16.",
+    "addonDescription": "Nightly Labs v0.12.0 — strict year+title matching · SeaDex Best tier · Score IQR Guard · perGroup() ESEs · Bad Dual Audio · Indexer Diversity · Elite Group pins.",
     "excludedResolutions": [
       "144p",
       "240p",
@@ -358,6 +358,10 @@
     ],
     "preferredStreamExpressions": [
       {
+        "expression": "/* LABS | SeaDex Best — promotes verified-best releases above alt-best SeaDex entries */ seadex(streams, 'best')",
+        "enabled": true
+      },
+      {
         "expression": "/* LABS v0.9.0 | 4K Remux elite pin — releaseGroup() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
         "enabled": true
       },
@@ -473,6 +477,10 @@
       },
       {
         "expression": "/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'))>0?passthrough(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'),'excluded','limit'):[]",
+        "enabled": true
+      },
+      {
+        "expression": "/* LABS | Year+Title Passthrough — strict matching enabled; protect library and SeaDex from false-positive year/title kills */ passthrough(merge(library(streams), seadex(streams)), 'year', 'title')",
         "enabled": true
       }
     ],
@@ -1881,16 +1889,16 @@
     },
     "yearMatching": {
       "enabled": true,
-      "strict": false,
+      "strict": true,
       "useInitialAirDate": true,
-      "tolerance": 2,
+      "tolerance": 1,
       "requestTypes": [],
       "addons": []
     },
     "titleMatching": {
       "enabled": true,
       "mode": "contains",
-      "similarityThreshold": 0.75,
+      "similarityThreshold": 0.85,
       "requestTypes": [],
       "addons": []
     },
