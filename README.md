@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/github/actions/workflow/status/brevityA/Core-Builds/validate.yml?style=for-the-badge&label=BUILD&logo=github&logoColor=white&labelColor=1a1f27" alt="Build Status"/>
   </a>
   <a href="https://github.com/brevityA/Core-Builds/releases/latest">
-    <img src="https://img.shields.io/badge/RELEASE-v3.0.2-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
+    <img src="https://img.shields.io/badge/RELEASE-v3.2.7-00d4ff?style=for-the-badge&labelColor=1a1f27" alt="Latest Release"/>
   </a>
 </p>
 
@@ -165,12 +165,27 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 |---|---|---|---|
 | **Core Nexus Apple TV 4K** 🌙 | Apple TV 4K / Infuse | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json` |
 | **Core Nexus Samsung RU7100 4K** | Samsung RU7100 (2019) | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
-| **Core Nexus Essential Labs** 🧪 | TorBox debrid-only 1080p | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
-| **Core Nexus 4K Essential Labs** 🧪 | TorBox debrid-only 4K | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
 
 > **Samsung TV:** DV-only streams excluded by default (Samsung TVs lack a DV licence on most models — DV-only files display as a black screen). TrueHD / DTS:X / FLAC also excluded for Tizen compatibility. DV+HDR10 dual-layer files pass through. TorBox Pro · Essential plan.
 
 > **Apple TV 4K:** Dolby Vision Profile 5/8 native via Infuse — DV streams prioritised. AV1 hard-excluded (no hardware decoder on A15). DD+ Atmos top audio. Based on Core Nexus 4K Apex · TorBox Pro.
+
+---
+
+### 🧪 Labs — Experimental Builds
+
+> Labs templates test new SEL expression architectures before promotion to stable. Currently testing v0.14.0 features: runtime-aware bitrate floors, anime language passthrough, latestSeason-aware season pack kill, subtitle preference PSE, and anime-specific sort sections.
+
+| Template | Version | Res | Import URL |
+|---|---|---|---|
+| **Core Nexus 4K Apex Labs** 🧪 | v0.14.0 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Core Nexus Stream Labs** 🧪 | v0.10.0 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **Core Nexus All-Rounder Labs** 🧪 | v0.4.0 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
+| **Core Nexus 4K Essential Labs** 🧪 | v0.5.0 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
+| **Core Nexus Essential Labs** 🧪 | v0.4.0 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
+| **Core Nexus Anime 4K Labs** 🧪 | v0.3.0 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json` |
+
+> [**Full Labs changelog & testing guide →**](https://github.com/brevityA/Core-Builds/blob/main/Guides/LABS.md)
 
 ---
 
@@ -227,7 +242,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 | **Deduplication** | filename + infoHash + smartDetect · 14 attributes · libraryBehaviour: prefer |
 | **Matching** | titleMatching contains/0.75 · yearMatching ±2yr · seasonEpisode non-strict |
 | **Auto features** | autoPlay · precacheNextEpisode · preloadStreams · dynamicAddonFetching · checkOwned |
-| **Scoring** | Inline `rankedRegexPatterns` (53 patterns, `|score|≥50`) + template-specific `preferredRegexPatterns` |
+| **Scoring** | Inline `rankedRegexPatterns` (107 patterns, 10 score tiers) + `syncedRankedRegexUrls` (Vidhin05) + template-specific `preferredRegexPatterns` |
 | **RPDB** | `t0-free-rpdb` baked in |
 | **TMDB** | `<template_placeholder>` — fill in during import for best matching |
 | **In-app updates** | `metadata.changelog` embedded — shows what changed on re-import |
@@ -238,7 +253,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 39 active templates — 33 stable (25 standard + 8 Lite) + 6 Nightly |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 46 active templates — 33 stable (25 standard + 8 Lite) + 7 Nightly + 6 Labs |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
@@ -286,7 +301,7 @@ Full docs at **[core-builds.mintlify.app](https://core-builds.mintlify.app)**
 
 ## 📜 Version
 
-Current: **`v3.0.2`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
+Current: **`v3.2.7`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
 
 ---
 

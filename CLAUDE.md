@@ -162,13 +162,13 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.11 — cachedAnime/uncachedAnime sort
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.5 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.3.6 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX), perGroup() Extra Cached, configurable daf thresholds at import
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.2.6 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, configurable daf thresholds at import
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.11.6 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX)
-- `Nightly/Single/core-nexus-stream-labs.json` v0.8.6 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor)
-- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.2.6 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, all LABS features
-- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.1.5 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.7 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.5.0 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.4.0 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.14.0 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-stream-labs.json` v0.10.0 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.0 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
+- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.0 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
 
 ---
 
