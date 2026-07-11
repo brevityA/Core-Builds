@@ -5,12 +5,13 @@
     "description": "A 1080p SDR hybrid build for TorBox users who also run a Usenet indexer. Combines TorBox's Usenet and torrent cache with NZBGeek for maximum source diversity. Unlike other builds, shows both cached and uncached streams — uncached streams are downloaded by TorBox before playback begins. Targets 1080p and 720p only — 4K and HDR are excluded. Blocks BluRay and Remux for low-end hardware compatibility. File range 1 GB–60 GB, 1080p capped at 25 GB. NZBGeek API key required — enter your key in the NZBGeek preset before saving. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.6",
+    "version": "2.10.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1706,42 +1707,42 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           60000000000
         ],
         "series": [
-          536870912,
+          209715200,
           30000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            5368709120,
+            1610612736,
             60000000000
           ],
           "series": [
-            1073741824,
+            209715200,
             30000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            536870912,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            134217728,
+            52428800,
             6000000000
           ]
         }
@@ -1810,8 +1811,14 @@
       "uncached": "per_service",
       "p2p": "per_addon",
       "tiebreakers": [
-        { "type": "torrent_seeders", "position": "after_addon" },
-        { "type": "usenet_age", "position": "after_addon" }
+        {
+          "type": "torrent_seeders",
+          "position": "before_addon"
+        },
+        {
+          "type": "usenet_age",
+          "position": "before_addon"
+        }
       ],
       "smartDetectAttributes": [
         "size",
@@ -1829,17 +1836,7 @@
         "releaseGroup"
       ],
       "smartDetectRounding": 10,
-      "libraryBehaviour": "prefer",
-      "tiebreakers": [
-        {
-          "type": "torrent_seeders",
-          "position": "before_addon"
-        },
-        {
-          "type": "usenet_age",
-          "position": "before_addon"
-        }
-      ]
+      "libraryBehaviour": "prefer"
     },
     "autoPlay": {
       "enabled": true,

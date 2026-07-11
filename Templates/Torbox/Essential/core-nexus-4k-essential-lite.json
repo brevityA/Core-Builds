@@ -5,12 +5,13 @@
     "description": "A full-featured 4K build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.5",
+    "version": "2.10.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1709,42 +1710,42 @@
     "size": {
       "global": {
         "movies": [
-          5368709120,
+          1610612736,
           150000000000
         ],
         "series": [
-          1073741824,
+          209715200,
           80000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            5368709120,
+            1610612736,
             150000000000
           ],
           "series": [
-            1073741824,
+            209715200,
             80000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             30000000000
           ],
           "series": [
-            536870912,
+            104857600,
             20000000000
           ]
         },
         "720p": {
           "movies": [
-            536870912,
+            209715200,
             12000000000
           ],
           "series": [
-            268435456,
+            52428800,
             8000000000
           ]
         }

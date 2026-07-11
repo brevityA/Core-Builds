@@ -5,12 +5,13 @@
     "description": "4K template tuned for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 is natively supported — DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. AV1 hard-excluded (no hardware decoder on the A15 chip — severe performance hit). DD+ Atmos is the native top audio format. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1627,42 +1628,42 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           60000000000
         ],
         "series": [
-          536870912,
+          209715200,
           30000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            5368709120,
+            1610612736,
             60000000000
           ],
           "series": [
-            1073741824,
+            209715200,
             30000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            536870912,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            134217728,
+            52428800,
             6000000000
           ]
         }

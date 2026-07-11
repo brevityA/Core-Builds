@@ -5,12 +5,13 @@
     "description": "A full-featured 1080p SDR build for TorBox Essential users. No Usenet access required — runs entirely on TorBox's torrent cache. Targets WEB-DL and WEBRip sources, blocks BluRay, Remux, 4K, and HDR for reliable playback on budget hardware. File range 1 GB–25 GB. Full addon stack: Comet, Meteor, Zilean, Knaben. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.5",
+    "version": "2.10.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1668,32 +1669,32 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           25000000000
         ],
         "series": [
-          536870912,
+          104857600,
           15000000000
         ]
       },
       "resolution": {
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            157286400,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            104857600,
+            52428800,
             6000000000
           ]
         }

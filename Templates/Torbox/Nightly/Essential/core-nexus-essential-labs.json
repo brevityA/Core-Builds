@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. 1080p build. Template directives: TorBox Search and exit thresholds configurable at import.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -39,7 +39,8 @@
         "name": "Early exit — max wait (ms)"
       }
     ],
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1682,32 +1683,32 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           25000000000
         ],
         "series": [
-          536870912,
+          104857600,
           15000000000
         ]
       },
       "resolution": {
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            157286400,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            104857600,
+            52428800,
             6000000000
           ]
         }

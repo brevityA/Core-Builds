@@ -5,7 +5,7 @@
     "description": "Nightly Labs build — single template for live-action TV, movies, and anime. Uses isAnime + hasSeaDex conditional PSEs to switch between anime and live-action quality tiers dynamically. Includes SeaDex, AnimeTosho, NekoBT, Meteor, Comet, MediaFusion, and all LABS features. Not a daily driver.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -49,7 +49,7 @@
         "name": "Enable SeaDex (anime quality)"
       }
     ],
-    "changelog": "v0.1.0 — Initial Labs build: isAnime/hasSeaDex conditional PSEs, anime + live-action scrapers, full LABS feature set"
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded; v0.1.0 — Initial Labs build: isAnime/hasSeaDex conditional PSEs, anime + live-action scrapers, full LABS feature set"
   },
   "config": {
     "trusted": false,
@@ -1767,42 +1767,42 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           60000000000
         ],
         "series": [
-          536870912,
+          209715200,
           30000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            5368709120,
+            1610612736,
             60000000000
           ],
           "series": [
-            1073741824,
+            209715200,
             30000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            536870912,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            134217728,
+            52428800,
             6000000000
           ]
         }

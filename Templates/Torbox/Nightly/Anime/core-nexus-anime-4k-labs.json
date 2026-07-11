@@ -5,11 +5,11 @@
     "description": "Nightly Labs build of Anime 4K. Tests SeaDex-aware conditional PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, and anime elite group pins. Not a daily driver — report regressions before these features graduate to stable.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": "v0.1.0 — Initial Labs build: SeaDex-aware PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins"
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded; v0.1.0 — Initial Labs build: SeaDex-aware PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins"
   },
   "config": {
     "addonName": "Core Nexus Anime 4K",
@@ -717,42 +717,42 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           80000000000
         ],
         "series": [
-          536870912,
+          157286400,
           40000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            2000000000,
+            1073741824,
             80000000000
           ],
           "series": [
-            800000000,
+            209715200,
             40000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            157286400,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            104857600,
+            52428800,
             6000000000
           ]
         }
