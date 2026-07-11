@@ -2,17 +2,17 @@
   "metadata": {
     "id": "core-nexus-anime-4k-labs",
     "name": "Core Nexus Anime 4K Labs",
-    "description": "Nightly Labs build of Anime 4K. Tests SeaDex-aware conditional PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, and anime elite group pins. Not a daily driver — report regressions before these features graduate to stable.",
+    "description": "Nightly Labs build of Anime 4K. Tests SeaDex-aware conditional PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins, private tracker kill, and totalCachedStreams DAF. Not a daily driver — report regressions before these features graduate to stable.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.7",
+    "version": "0.2.0",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "addonName": "Core Nexus Anime 4K",
-    "addonDescription": "Dedicated 4K anime. SeaDex best releases · Nyaa · 2160p DV/HDR first · 1080p fallback · FLAC/TrueHD · Japanese + Dub support.",
+    "addonDescription": "Dedicated 4K anime. SeaDex best releases · Nyaa · 2160p DV/HDR first · 1080p fallback · FLAC/TrueHD · Japanese + Dub support · Private tracker kill · totalCachedStreams DAF.",
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
     "tmdbApiKey": "<template_placeholder>",
@@ -535,6 +535,10 @@
       {
         "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
         "enabled": true
+      },
+      {
+        "enabled": true,
+        "expression": "/* LABS | Private Tracker Kill — removes uncached private tracker streams users can't access via debrid */ private(uncached(streams))"
       },
       {
         "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
@@ -1300,7 +1304,7 @@
     },
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 6"
+      "condition": "count(resolution(totalCachedStreams, \"2160p\")) >= 6"
     },
     "checkOwned": false,
     "digitalReleaseFilter": {
