@@ -2,8 +2,8 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.13.0",
-    "description": "Nightly Labs v0.13.0 — private tracker kill, totalCachedStreams DAF, catalog-aware Unknown kills (daysSinceEarliestAired), strict year+title matching, SeaDex Best PSE, Score IQR Guard, perGroup() ESEs, Bad Dual Audio Groups, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
+    "version": "0.14.0",
+    "description": "Nightly Labs v0.14.0 — runtime-aware bitrate floors, anime language passthrough, latestSeason pack logic, age sort key, subtitle preference PSE, cachedAnime/uncachedAnime sorts, private tracker kill, totalCachedStreams DAF, catalog-aware Unknown kills, strict year+title matching, SeaDex Best PSE, Score IQR Guard, perGroup() ESEs, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "source": "external",
     "author": "Branding-Brevity",
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus 4K Apex Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.13.0 — private tracker kill · totalCachedStreams DAF · catalog-aware Unknown kills · strict year+title matching · SeaDex Best tier · Score IQR Guard · perGroup() ESEs · Bad Dual Audio · Indexer Diversity · Elite Group pins.",
+    "addonDescription": "Nightly Labs v0.14.0 — runtime bitrate floors · anime language passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · private tracker kill · totalCachedStreams DAF · catalog Unknown kills · strict year+title · SeaDex Best · Score IQR Guard · perGroup() · Indexer Diversity · Elite pins.",
     "excludedResolutions": [
       "144p",
       "240p",
@@ -280,11 +280,11 @@
         "enabled": true
       },
       {
-        "expression": "/*Bitrate Floor — 4K REMUX — animation-exempt*/ (isAnime or 'Animation' in genres) ? [] : (count(resolution(quality(negate(merge(library(streams), seadex(streams)), streams), 'BluRay REMUX'), '2160p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, max(25, q1(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '2160p')), 'bitrate')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '2160p')), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, 25)))",
+        "expression": "/*Bitrate Floor — 4K REMUX — animation+short-content exempt*/ (isAnime or 'Animation' in genres or (runtime > 0 and runtime < 25)) ? [] : (count(resolution(quality(negate(merge(library(streams), seadex(streams)), streams), 'BluRay REMUX'), '2160p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, max(25, q1(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '2160p')), 'bitrate')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '2160p')), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 0, 25)))",
         "enabled": true
       },
       {
-        "expression": "/*Bitrate Floor — 1080p REMUX — animation-exempt*/ (isAnime or 'Animation' in genres) ? [] : (count(resolution(quality(negate(merge(library(streams), seadex(streams)), streams), 'BluRay REMUX'), '1080p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, max(10, q1(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '1080p')), 'bitrate')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '1080p')), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, 10)))",
+        "expression": "/*Bitrate Floor — 1080p REMUX — animation+short-content exempt*/ (isAnime or 'Animation' in genres or (runtime > 0 and runtime < 25)) ? [] : (count(resolution(quality(negate(merge(library(streams), seadex(streams)), streams), 'BluRay REMUX'), '1080p')) >= 4 ? negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, max(10, q1(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '1080p')), 'bitrate')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), resolution(quality(streams, 'BluRay REMUX'), '1080p')), 'bitrate'))))) : negate(merge(library(streams), seadex(streams)), bitrate(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 0, 10)))",
         "enabled": true
       },
       {
@@ -336,7 +336,7 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass — packs killed when singles exist; ended shows (2y+) with under 3 singles keep packs (anime exempt) */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []",
+        "expression": "/* LABS | Season Pack Kill — latestSeason-aware; only kills packs when viewing current/latest season; completed earlier seasons keep packs (anime exempt) */ (queryType=='series' and not isAnime and season >= latestSeason and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []",
         "enabled": true
       },
       {
@@ -442,6 +442,10 @@
         "enabled": true
       },
       {
+        "expression": "/* LABS | Subtitle Preference — prefers streams with embedded English subs */ subtitles(streams, 'English')",
+        "enabled": true
+      },
+      {
         "expression": "/*Codec Efficiency Booster*/ merge(encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'1080p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'Bluray REMUX'),'720p'),'HEVC','AV1'),encode(resolution(quality(negate(merge(library(streams),seadex(streams)),cached(streams)),'WEB-DL','WEBRip'),'720p'),'HEVC','AV1'))",
         "enabled": true
       },
@@ -486,6 +490,10 @@
       {
         "expression": "/* LABS | Year+Title Passthrough — strict matching enabled; protect library and SeaDex from false-positive year/title kills */ passthrough(merge(library(streams), seadex(streams)), 'year', 'title')",
         "enabled": true
+      },
+      {
+        "enabled": true,
+        "expression": "/* LABS | Anime Language Passthrough — protects anime from false-positive language kills on Japanese-only or untagged releases */ isAnime ? passthrough(streams, 'language') : []"
       }
     ],
     "rankedStreamExpressions": [],
@@ -1710,6 +1718,10 @@
           "direction": "desc"
         },
         {
+          "key": "age",
+          "direction": "asc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -1774,6 +1786,146 @@
         {
           "key": "seeders",
           "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "asc"
+        },
+        {
+          "key": "audioTag",
+          "direction": "desc"
+        },
+        {
+          "key": "audioChannel",
+          "direction": "desc"
+        },
+        {
+          "key": "language",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
+          "direction": "desc"
+        },
+        {
+          "key": "size",
+          "direction": "desc"
+        }
+      ],
+      "cachedAnime": [
+        {
+          "key": "cached",
+          "direction": "desc"
+        },
+        {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionMatched",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
+          "key": "library",
+          "direction": "desc"
+        },
+        {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
+          "key": "regexScore",
+          "direction": "desc"
+        },
+        {
+          "key": "visualTag",
+          "direction": "desc"
+        },
+        {
+          "key": "encode",
+          "direction": "desc"
+        },
+        {
+          "key": "audioTag",
+          "direction": "desc"
+        },
+        {
+          "key": "audioChannel",
+          "direction": "desc"
+        },
+        {
+          "key": "language",
+          "direction": "desc"
+        },
+        {
+          "key": "seeders",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
+          "direction": "desc"
+        },
+        {
+          "key": "size",
+          "direction": "desc"
+        }
+      ],
+      "uncachedAnime": [
+        {
+          "key": "cached",
+          "direction": "desc"
+        },
+        {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionMatched",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
+          "key": "library",
+          "direction": "desc"
+        },
+        {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
+          "key": "regexScore",
+          "direction": "desc"
+        },
+        {
+          "key": "visualTag",
+          "direction": "desc"
+        },
+        {
+          "key": "encode",
+          "direction": "desc"
+        },
+        {
+          "key": "seeders",
+          "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "asc"
         },
         {
           "key": "audioTag",
