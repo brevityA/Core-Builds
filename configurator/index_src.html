@@ -966,7 +966,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.36';
+const CONFIGURATOR_VERSION = '2.37';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1020,6 +1020,9 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.37', date:'Jul 11 2026', items:[
+    'Fix — excludedRegexPatterns now emitted as plain strings (was objects, causing "expected string, received object" errors)',
+  ]},
   { v:'2.36', date:'Jul 11 2026', items:[
     'Fix — Configurator-generated templates no longer cause "Invalid input error" on elfhosted/fortheweak',
     'Removed syncedExcludedRegexUrls (Tam-Taro URL blocked by host allowlists)',
@@ -3637,7 +3640,7 @@ function build() {
     preferredAudioTags: ac.preferredAudioTags,
     syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
     rankedRegexPatterns: (S.service==='p2p'||S.service==='http') ? [] : (S.resolution==='4k'||S.resolution==='ultrawide' ? [...RANKED_REGEX_COMMON,...RANKED_REGEX_UHD] : [...RANKED_REGEX_COMMON]),
-    excludedRegexPatterns: EXCLUDED_REGEX.map(p=>({pattern:p})),
+    excludedRegexPatterns: [...EXCLUDED_REGEX],
     addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
     mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
     usePosterRedirectApi: true, usePosterServiceForMeta: true,
