@@ -5,10 +5,11 @@
     "description": "Dedicated 4K anime template. SeaDex best releases · DV/HDR10+ priority · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.11",
+    "version": "2.8.12",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "addonName": "Core Nexus Anime 4K Lite",
@@ -608,42 +609,42 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           80000000000
         ],
         "series": [
-          536870912,
+          157286400,
           40000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            2000000000,
+            1073741824,
             80000000000
           ],
           "series": [
-            800000000,
+            209715200,
             40000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            157286400,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            104857600,
+            52428800,
             6000000000
           ]
         }

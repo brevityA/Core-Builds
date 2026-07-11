@@ -5,12 +5,13 @@
     "description": "Speed-optimised 1080p build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Lite: hard kills only, quality gates removed. Exits as soon as 3 cached 1080p streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.5",
+    "version": "2.10.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1668,32 +1669,32 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           25000000000
         ],
         "series": [
-          536870912,
+          104857600,
           15000000000
         ]
       },
       "resolution": {
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            157286400,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            104857600,
+            52428800,
             6000000000
           ]
         }

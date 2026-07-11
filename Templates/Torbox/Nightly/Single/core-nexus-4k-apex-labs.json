@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.11.6",
+    "version": "0.11.7",
     "description": "Nightly Labs v0.9.0 — all LABS features enabled: Score IQR Guard (replaces fixed -50 gate), perGroup() Extra Cached/Uncached ESEs, Bad Dual Audio Groups, Indexer Diversity, elite group pins (4K Remux / 1080p Remux / LQ bottom). Based on 4K Apex v0.4.16.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "source": "external",
@@ -10,7 +10,8 @@
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1809,42 +1810,42 @@
     "size": {
       "global": {
         "movies": [
-          5368709120,
+          1610612736,
           150000000000
         ],
         "series": [
-          1073741824,
+          209715200,
           80000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            5368709120,
+            1610612736,
             150000000000
           ],
           "series": [
-            1073741824,
+            209715200,
             80000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             30000000000
           ],
           "series": [
-            536870912,
+            104857600,
             20000000000
           ]
         },
         "720p": {
           "movies": [
-            536870912,
+            209715200,
             12000000000
           ],
           "series": [
-            268435456,
+            52428800,
             8000000000
           ]
         }

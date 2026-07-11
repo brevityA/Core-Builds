@@ -5,12 +5,13 @@
     "description": "Single-click instant play. Only cached streams appear — zero uncached results. Derived from Speed but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 1080p · TorBox Essential · Library, TorBox Search, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.5",
+    "version": "2.10.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "services": [
@@ -1996,7 +1997,7 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           25000000000
         ],
         "series": [
@@ -2007,21 +2008,21 @@
       "resolution": {
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            157286400,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            104857600,
+            52428800,
             6000000000
           ]
         }

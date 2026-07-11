@@ -5,12 +5,13 @@
     "description": "4K template tuned for Samsung smart TVs without native Dolby Vision support — including RU7100, RU8000, NU8000, Q60, and similar 2018–2022 models. DV-only streams are excluded (DV-Only Kill ESE); only HDR10+, HDR10, HLG, and SDR content appears. AV1 and VC-1 excluded (not supported on older Samsung hardware). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded — Samsung passes these through only via HDMI ARC/eARC to compatible receivers, which most users don't have. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded"
   },
   "config": {
     "trusted": false,
@@ -1724,42 +1725,42 @@
     "size": {
       "global": {
         "movies": [
-          1073741824,
+          524288000,
           60000000000
         ],
         "series": [
-          536870912,
+          209715200,
           30000000000
         ]
       },
       "resolution": {
         "2160p": {
           "movies": [
-            5368709120,
+            1610612736,
             60000000000
           ],
           "series": [
-            1073741824,
+            209715200,
             30000000000
           ]
         },
         "1080p": {
           "movies": [
-            1073741824,
+            524288000,
             25000000000
           ],
           "series": [
-            536870912,
+            104857600,
             15000000000
           ]
         },
         "720p": {
           "movies": [
-            268435456,
+            209715200,
             10000000000
           ],
           "series": [
-            134217728,
+            52428800,
             6000000000
           ]
         }
