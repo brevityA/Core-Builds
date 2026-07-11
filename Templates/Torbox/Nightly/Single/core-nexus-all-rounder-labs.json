@@ -48,8 +48,7 @@
         "id": "enableAnime",
         "name": "Enable SeaDex (anime quality)"
       }
-    ],
-    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded; v0.1.0 — Initial Labs build: isAnime/hasSeaDex conditional PSEs, anime + live-action scrapers, full LABS feature set"
+    ]
   },
   "config": {
     "trusted": false,

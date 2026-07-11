@@ -8,8 +8,7 @@
     "version": "0.1.6",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "changelog": "Relaxed size filter minimums — lowered global/per-resolution floors to prevent short episodes and standard WEB-DL encodes from being incorrectly excluded; v0.1.0 — Initial Labs build: SeaDex-aware PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "addonName": "Core Nexus Anime 4K",
