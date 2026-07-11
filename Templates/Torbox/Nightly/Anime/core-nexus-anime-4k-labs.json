@@ -5,7 +5,7 @@
     "description": "Nightly Labs build of Anime 4K. Tests SeaDex-aware conditional PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, and anime elite group pins. Not a daily driver — report regressions before these features graduate to stable.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"

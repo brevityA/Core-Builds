@@ -5,7 +5,7 @@
     "description": "A full-featured 4K build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.12.6",
+    "version": "2.12.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.11.7",
+    "version": "0.11.8",
     "description": "Nightly Labs v0.9.0 — all LABS features enabled: Score IQR Guard (replaces fixed -50 gate), perGroup() Extra Cached/Uncached ESEs, Bad Dual Audio Groups, Indexer Diversity, elite group pins (4K Remux / 1080p Remux / LQ bottom). Based on 4K Apex v0.4.16.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "source": "external",
