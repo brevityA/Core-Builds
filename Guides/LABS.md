@@ -4,75 +4,142 @@ Nightly / Labs templates test new ideas before they're promoted to stable. They 
 
 ---
 
-## Active Labs
+## Active Labs Templates
 
-### Hybrid Regex + SEL Architecture
-
-**Templates:** 4K Apex Labs v0.4.0 · Stream Labs v0.2.0
-
-**The idea:** Replace simple group-name regex patterns with native SEL functions (`releaseGroup()`, `encode()`, `visualTag()`). Complex multi-condition patterns (Remux T1, Bluray T1, Obfuscated, etc.) stay as regex — those can't be replicated in SEL. Only the patterns that are a single `\b(GroupName)\b` word-boundary match get replaced.
+| Template | Version | Resolution | Base |
+|---|---|---|---|
+| **4K Apex Labs** | v0.14.0 | 4K + 1080p | 4K Apex |
+| **Stream Labs** | v0.10.0 | 1080p | Stream |
+| **All-Rounder Labs** | v0.4.0 | 1080p | Stream + Anime |
+| **4K Essential Labs** | v0.5.0 | 4K + 1080p | 4K Essential |
+| **Essential Labs** | v0.4.0 | 1080p | Essential |
+| **Anime 4K Labs** | v0.3.0 | 4K + 1080p | Anime 4K |
 
 ---
 
-### What Changed vs Stable
+## v0.14.0 Features
 
-| Area | Stable | Labs |
+### 1. Runtime-Aware Bitrate Floors
+
+Bitrate Floor ESEs now check content type before firing:
+
+```js
+(isAnime or 'Animation' in genres or (runtime > 0 and runtime < 25))
+  ? []
+  : [existing bitrate floor logic]
+```
+
+**Why:** Animation and short-form content (< 25 min) legitimately encodes 50% smaller than live-action. Without this guard, the REMUX bitrate floors killed valid anime and animation encodes.
+
+**Templates:** 4K Apex Labs, Stream Labs, 4K Essential Labs (only templates with bitrate floors).
+
+---
+
+### 2. Anime Language Passthrough ISE
+
+```js
+isAnime ? passthrough(streams, 'language') : []
+```
+
+Bypasses language filtering for anime queries. Anime fansub groups use non-standard language tagging (e.g. `Japanese` vs `jpn`, dual-audio labelled as English-only) that the standard language filter rejects — causing valid anime streams to be dropped silently.
+
+**Templates:** All 6 Labs templates.
+
+---
+
+### 3. latestSeason-Aware Season Pack Kill
+
+The Season Pack Kill ESE now includes:
+
+```js
+season >= latestSeason
+```
+
+**Before:** Season packs were killed whenever episode-level streams existed, even for the current season where the pack might be the only high-quality source.
+
+**After:** Season packs for the current season (where `season >= latestSeason`) are preserved. Older-season packs continue to be killed when individual episodes exist.
+
+**Templates:** 4K Apex Labs, Stream Labs, All-Rounder Labs, 4K Essential Labs, Essential Labs (not Anime — anime templates exempt from season pack kill).
+
+---
+
+### 4. Subtitle Preference PSE
+
+```js
+subtitles(streams, 'English')
+```
+
+Inserted before the Codec Efficiency Booster PSE. Gives a scoring boost to streams with embedded English subtitles. Does not exclude streams without subs — just ranks sub-carrying streams higher when all else is equal.
+
+**Templates:** All 6 Labs templates.
+
+---
+
+### 5. Age Sort Key
+
+`age` with `direction: "asc"` added to `uncachedMovies` and `uncachedSeries` sort sections. When all other sort criteria tie, newer uncached torrents rank above older ones — more likely to have active seeders.
+
+**Templates:** All 6 Labs templates.
+
+---
+
+### 6. Cached/Uncached Anime Sort Sections
+
+Two new granular sort sections for anime content:
+
+**`cachedAnime`** (16 keys): `cached → seadex → seMatched → seScore → library → resolution → quality → regexScore → visualTag → encode → audioTag → audioChannel → language → seeders → bitrate → size`
+
+SeaDex at position 2 — the strongest anime quality signal ranks immediately after cached status.
+
+**`uncachedAnime`** (17 keys): Same structure but with seeders promoted above audio criteria and `age` (asc) appended. Newer uncached anime torrents with more seeders rank higher.
+
+**Templates:** All 6 Labs templates.
+
+---
+
+## Previous LABS Features (still active)
+
+These features were introduced in earlier Labs versions and remain active:
+
+| Feature | Version | Description |
 |---|---|---|
-| Elite groups (FraMeSToR, FLUX, SiC…) | Scored via `rankedRegexPatterns` (+80–100) | Removed from patterns → `pin(releaseGroup(streams, ...), 'top')` PSE |
-| IMAX streams | `rankedRegexPatterns` regex (+20) | `pin(visualTag(streams, 'IMAX'), 'top')` PSE — native AIOStreams field |
-| Remux pin (4K Labs only) | `keyword(..., 'releaseGroup', ...)` ESE | `releaseGroup(...)` ESE — exact-match, not substring |
-| LQ group pin (4K Labs only) | `keyword(...)` ESE bottom pin | `releaseGroup(...)` ESE bottom pin |
-| Bad Dual Audio Groups | `rankedRegexPatterns` penalty (−50) | Removed from patterns → **opt-in ESE** (disabled by default) |
-| x264 streams | `rankedRegexPatterns` penalty (−25) | Removed from patterns → **opt-in ESE** (disabled by default) |
+| **ESE v2.0** | v0.9.0 | Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter |
+| **Score IQR Guard** | v0.9.0 | Tukey lower fence on `seScore` — removes statistical outliers at ≥8 streams |
+| **perGroup() dedup** | v0.9.0 | Single-expression `perGroup(..., 'resolution', 3)` replaces 20–35 clause merge/slice |
+| **Indexer Diversity** | v0.9.0 | `perGroup(..., 'indexer', 2)` caps per-scraper results at 2 when pool > 20 |
+| **Elite group pins** | v0.9.0 | `pin(releaseGroup(...))` for top/bottom group positioning |
+| **rseMatched() tiers** | v0.9.0 | Ranked regex entries as named matchers for tier-guarded kills |
+| **Bitrate Floor ESEs** | v0.11.0 | 4K + 1080p REMUX bitrate floors (now runtime-aware in v0.14.0) |
+| **Private tracker kill** | v0.12.0 | Hard-excludes results from private trackers |
+| **totalCachedStreams DAF** | v0.12.0 | Dynamic addon fetching exits on cached stream count |
+| **Strict year+title matching** | v0.13.0 | Tighter match criteria for content identification |
+| **SeaDex Best PSE tier** | v0.13.0 | Dedicated PSE tier for SeaDex best-rated releases |
 
-**Patterns removed from `rankedRegexPatterns`:**
+---
 
-| Template | Removed patterns |
+## What to Test & Report
+
+1. **Animation/anime results** — do anime titles still surface valid REMUX streams? The runtime guard should prevent bitrate floors from killing short-form and animated content.
+
+2. **Season packs on current-season shows** — when watching a show in its latest season, do season packs still appear? On older seasons, are they still properly killed when individual episodes exist?
+
+3. **Subtitle ranking** — do streams with embedded English subs rank above equivalent streams without subs? The effect should be subtle — a tiebreaker, not a dominant sort.
+
+4. **Uncached anime** — for anime content that isn't cached, do results with more seeders and newer upload dates surface higher?
+
+5. **Language filtering on anime** — do anime streams that were previously dropped by language filters now appear? This is most visible on niche anime with non-standard language metadata.
+
+---
+
+## Import URLs
+
+| Template | Import URL |
 |---|---|
-| 4K Apex Labs | 126811, FLUX, SiC, hallowed, TheFarm, BHDStudio (+80/60), Radarr Bad Dual Groups, Sonarr Bad Dual Groups (−50) |
-| Stream Labs | FraMeSToR, TheFarm (+100/80), Radarr Bad Dual Groups, Sonarr Bad Dual Groups (−50) |
+| **4K Apex Labs** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Stream Labs** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **All-Rounder Labs** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
+| **4K Essential Labs** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
+| **Essential Labs** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
+| **Anime 4K Labs** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json` |
 
----
-
-### Opt-In ESEs
-
-Two ESEs ship disabled — enable them in AIOStreams to test:
-
-**`x264 Hard Exclude`**
-```js
-negate(encode(streams, 'x264', 'h.264'))
-```
-Replaces the `rankedRegexPatterns` −25 score penalty for x264. Uses AIOStreams' native encode detection instead of regex. Hard-excludes x264 streams rather than soft-penalising — more aggressive.
-
-**`Bad Dual Audio Groups`**
-```js
-releaseGroup(streams, 'alfaHD', 'BAT', 'BiOMA', 'BlackBit', 'BNd', ...)
-```
-Replaces the `rankedRegexPatterns` −50 score penalty for known bad dual-audio groups. Hard-excludes rather than soft-penalises.
-
-To enable: open AIOStreams → Stream Expressions → Excluded → find the LABS ESE → toggle on.
-
----
-
-### What to Test & Report
-
-1. **Do elite groups still appear at the top?** FraMeSToR, FLUX, SiC, BHDStudio etc. should rank ahead of unknown groups. If they're not floating up, the `pin()` PSE may not be evaluating before the IQR tier.
-
-2. **Is the `releaseGroup()` pin more or less reliable than the old `keyword()` pin?** The 4K Labs upgraded the Remux ESE pins from `keyword()` (substring match) to `releaseGroup()` (exact parsed field). If a group that should be pinned is no longer being caught, that's a `releaseGroup()` field-parse miss.
-
-3. **x264 Hard Exclude** — enable it and check: are x264 streams fully removed? Any false positives (streams that look like x264 in the filename but aren't)?
-
-4. **Bad Dual Audio Groups ESE** — enable it and check: are those group releases actually excluded? Or does the pattern miss releases where the group name doesn't match the parsed `releaseGroup` field exactly?
-
-5. **Size/result count** — do you get roughly the same number and quality of results as the stable template?
-
----
-
-### Why This Matters for Stable Templates
-
-If the hybrid architecture validates:
-
-- ~6 KB savings per 4K template, ~4 KB per 1080p template across 28 non-anime templates
-- Native field detection (`encode()`, `visualTag()`) is more robust than regex against edge-case filename formatting
-- `releaseGroup()` uses AIOStreams' own filename parser — same source as what populates the stream card display name
-- Simpler `rankedRegexPatterns` arrays = easier to audit and update
+Labs templates are nightly builds — they receive changes faster and without the same audit gate as stable templates.

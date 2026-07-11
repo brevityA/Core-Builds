@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.2.7 (2026-07-11)
+
+### Added
+- **LABS v0.14.0 SEL expressions** (6 Labs templates) — seven new expression features across all Labs templates:
+  - **Runtime-aware bitrate floors** — `(isAnime or 'Animation' in genres or (runtime > 0 and runtime < 25)) ? [] : [existing logic]` guard on Bitrate Floor ESEs. Animation and short-form content (< 25 min) legitimately encodes ~50% smaller; these now bypass the REMUX bitrate floors instead of being killed.
+  - **Anime language passthrough ISE** — `isAnime ? passthrough(streams, 'language') : []` bypasses language filtering for anime queries. Anime fansub groups use non-standard language tagging that the standard language filter rejects.
+  - **latestSeason-aware season pack kill** — `season >= latestSeason` guard added to the Season Pack Kill ESE. Prevents killing season packs on current-season shows where the pack is the only source.
+  - **Subtitle preference PSE** — `subtitles(streams, 'English')` inserted before Codec Efficiency Booster. Prioritises streams with embedded English subtitles.
+  - **`age` sort key** — `direction: "asc"` in `uncachedMovies` and `uncachedSeries` sort sections. Newer uncached torrents rank above older ones.
+  - **`cachedAnime` sort section** — seadex at position 2, 16 keys. Dedicated anime-optimised cached sort.
+  - **`uncachedAnime` sort section** — seadex at position 2, seeders promoted, age key, 17 keys. Anime-specific uncached sort with newer content ranked higher.
+- **LABS templates updated:** 4K Apex Labs (v0.11.6 → **v0.14.0**), Stream Labs (v0.8.6 → **v0.10.0**), All-Rounder Labs (v0.2.6 → **v0.4.0**), 4K Essential Labs (v0.3.6 → **v0.5.0**), Essential Labs (v0.2.6 → **v0.4.0**), Anime 4K Labs (v0.1.5 → **v0.3.0**).
+
+### Fixed
+- **Configurator regex allowlist** — 2 of 103 patterns in `RANKED_REGEX_COMMON` were not present in Vidhin05's 174-entry allowlist, causing "2/176 regexes not allowed" errors on self-hosted AIOStreams instances. Removed: `Radarr HD Bluray T3 [B]` (LoRD group, score 40) and `Anime LQ Groups` (score −75). Configurator now generates templates with 101 ranked regex patterns, all verified against Vidhin05.
+- **All-Rounder Labs addonName** — template had `"Core Nexus Stream Labs 🧪"` (copy-paste from Stream Labs) instead of `"Core Nexus All-Rounder Labs 🧪"`.
+
 ## 3.2.6 (2026-07-09)
 
 ### Added
