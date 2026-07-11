@@ -966,7 +966,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.34';
+const CONFIGURATOR_VERSION = '2.35';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1015,6 +1015,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.35', date:'Jul 11 2026', items:[
+    'Free tier fix — P2P and HTTP templates now skip the failed manifest API call and go straight to import flow',
+    'Free tier UI — Deploy button replaced with "Import to AIOStreams" for free services, no password prompt needed',
+    'Free tier — WuPlay/Nuvio buttons hidden for free templates (not applicable without a manifest)',
+  ]},
   { v:'2.34', date:'Jul 10 2026', items:[
     'Mobile responsiveness — enhanced 480px and new 360px breakpoints for small phones (single-column grids, compact buttons, scaled typography)',
     'Keyboard navigation — arrow keys navigate option grids, visible focus rings on all interactive elements, focus trapping in modals',
@@ -2413,13 +2418,17 @@ function render() {
         <details class="rv-section" open>
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
+            ${S.service === 'p2p' || S.service === 'http' ? `
+            <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
+            <div id="aioResult"></div>` : `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
             <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
             <div style="display:flex;gap:8px">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
               <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
             </div>
-            <div id="aioResult"></div>
+            <div id="aioResult"></div>`}
             <details style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
               <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
                 <span>Manual setup (existing config / self-hosted)</span>
@@ -4266,6 +4275,7 @@ function makePwd() {
 }
 
 function simpleFinishHtml() {
+  const isFree = S.service === 'p2p' || S.service === 'http';
   const needed = getDebridInputs();
   const anyFilled = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
   const bits = [[ICO.plug(13,'#8b949e'), label('service', S.service)], [ICO.tv(13,'#8b949e'), label('device', S.device)], [ICO.monitor(13,'#8b949e'), label('resolution', S.resolution)], [ICO.speaker(13,'#8b949e'), label('audio', S.audio)]].filter(b => b[1]);
@@ -4406,13 +4416,17 @@ function simpleFinishHtml() {
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
       </div>
+      ${isFree ? `
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
+      <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
+      <div id="aioResult"></div>` : `
       <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
       <div style="display:flex;gap:8px">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
         <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
       </div>
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Your API keys are baked directly into your config — no re-entering them later.</div>
-      <div id="aioResult"></div>
+      <div id="aioResult"></div>`}
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
         <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">${ICO.download(13,'#67e8f9')} Export JSON instead</button>
         <button data-action="show-full-review" style="background:none;border:none;color:#6b7280;font-size:.8rem;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Show all options →</button>
@@ -4497,6 +4511,7 @@ async function preflightCheck() {
 
 async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
+  const isFree = S.service === 'p2p' || S.service === 'http';
   const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
   const origBtnHtml = btn ? btn.innerHTML : '';
   if (btn) { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Checking…`; }
@@ -4506,20 +4521,33 @@ async function simpleInstall(target) {
     const proceed = confirm('⚠ Config check:\n\n• ' + warns.join('\n• ') + '\n\nContinue anyway?');
     if (!proceed) return;
   }
+  const origHtml = btn.innerHTML;
+  if (isFree) {
+    btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
+    result.innerHTML = '';
+    const importUrl = await uploadTemplateForImport();
+    btn.disabled = false; btn.innerHTML = origHtml;
+    if (importUrl) {
+      saveLastGen();
+      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Tap an instance to import your free template:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div></div>`;
+      showToast('Tap an instance chip to import your template');
+    } else {
+      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not reach any paste service</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">Download the JSON and import it manually into AIOStreams.</div><div style="display:flex;gap:10px;justify-content:center"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+    }
+    return;
+  }
   const pwd = await promptPassword();
   if (!pwd) return;
-  const origHtml = btn.innerHTML;
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
   const cfg = build().config;
   const _allHosts = hostEntries();
-  const hosts = (S.service === 'p2p' || S.service === 'http') ? _allHosts.filter(([n]) => n !== 'ElfHosted') : _allHosts;
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
   try {
     const fastest = await Promise.any(
-      hosts.map(([, host]) =>
+      _allHosts.map(([, host]) =>
         raceHostFetch(host, '/api/v1/status', { method:'GET' }, 4000)
           .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
       )
