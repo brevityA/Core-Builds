@@ -1,0 +1,109 @@
+---
+title: "WuPlay Setup"
+sidebarTitle: "WuPlay"
+description: "Use Core Builds with WuPlay — stream in your browser, cast to Chromecast, no app install required."
+---
+
+<Frame>
+  <img
+    src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/master_guide_banner.svg"
+    alt="WuPlay Setup"
+    style={{ width: '100%', display: 'block' }}
+  />
+</Frame>
+
+## What is WuPlay?
+
+WuPlay is a web-based streaming client that works with Stremio add-ons — including AIOStreams and Core Builds. No app install needed. It runs entirely in your browser and supports Chromecast for casting to TVs.
+
+**Use WuPlay when:**
+- Your device doesn't have a native Stremio app
+- You want to cast to a Chromecast or smart TV
+- You prefer streaming in a browser tab
+
+## Quick Import
+
+Already have a TorBox account and a configured AIOStreams template? Three steps:
+
+<Steps>
+  <Step title="Copy your manifest URL">
+    Open your AIOStreams instance → your manifest URL is shown at the top of the config page. Copy it.
+  </Step>
+  <Step title="Open WuPlay">
+    Go to [wuplay.app](https://wuplay.app) in your browser.
+  </Step>
+  <Step title="Add the manifest">
+    In WuPlay, go to **Add-ons** → paste your AIOStreams manifest URL → click **Install**. Browse content and streams appear just like in Stremio.
+  </Step>
+</Steps>
+
+---
+
+## Full Beginner Walkthrough
+
+### 1. Get a TorBox subscription
+
+Sign up at [torbox.app](https://torbox.app/subscription?referral=d1ccddb0-f094-45ca-b52b-942a2635855e). You need at least a **Standard** plan. Go to **Dashboard → API Keys** and copy your API key.
+
+### 2. Choose and import a template
+
+1. Go to the [Template Directory](/template-directory)
+2. Click **Import on ElfHosted** or **Import on Fortheweak** next to your chosen template
+3. AIOStreams opens with the template pre-loaded
+
+Not sure which template? See [Which Template?](/which-template). For most people: **4K Apex** (4K) or **Stream** (1080p).
+
+### 3. Configure AIOStreams
+
+In AIOStreams:
+
+1. Go to **Services** → toggle **TorBox** ON → paste your API key
+2. *(Optional)* Add a TMDB Access Token from [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
+3. Click **Save**
+
+### 4. Copy your manifest URL
+
+After saving, AIOStreams shows your **manifest URL** at the top of the page. It looks like:
+
+```
+https://aiostreams.elfhosted.com/stremio/abcdef1234/manifest.json
+```
+
+Copy this URL — you'll paste it into WuPlay.
+
+### 5. Set up WuPlay
+
+1. Go to [wuplay.app](https://wuplay.app)
+2. Navigate to **Add-ons** (or the add-on/plugin section)
+3. Paste your AIOStreams manifest URL
+4. Click **Install** or **Add**
+
+### 6. Start streaming
+
+Browse movies and shows in WuPlay. Click any title → select a stream from the list → playback starts in your browser. To cast, use the Chromecast icon in the player controls.
+
+<Tip>
+  WuPlay uses the same manifest URL as Stremio — you can use both clients with the same AIOStreams config. Changes you make in AIOStreams (re-importing a template, changing settings) apply to both.
+</Tip>
+
+---
+
+## WuPlay vs Stremio
+
+| | WuPlay | Stremio |
+|---|---|---|
+| Platform | Web browser (any device) | Desktop + mobile apps |
+| Install required | No | Yes |
+| Chromecast | Built-in cast support | Not natively supported |
+| Offline use | No | Download for offline (desktop) |
+| Library sync | No | Syncs across devices via account |
+| Best for | Casting, quick access, no-install setups | Daily use, full library management |
+
+## Troubleshooting
+
+- **No streams appearing** → Make sure your manifest URL is correct and your TorBox API key is active in AIOStreams
+- **Cast not working** → Ensure your Chromecast and browser are on the same Wi-Fi network
+- **Streams buffer or stall** → Try a [Speed](/template-directory#speed-torbox) or [Flash](/template-directory#flash) template for faster cached results
+- **Playback error** → Some codecs may not play in-browser. Try a different stream from the list — browser players handle H.264 most reliably
+
+More help: [Troubleshooting](/troubleshooting) · [FAQ](/faq)

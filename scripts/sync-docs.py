@@ -31,7 +31,7 @@ def load_template_versions():
     versions = {}
     for json_file in sorted(TEMPLATES_DIR.rglob("*.json")):
         try:
-            data = json.loads(json_file.read_text())
+            data = json.loads(json_file.read_text(encoding="utf-8"))
             version = data.get("metadata", {}).get("version")
             if version:
                 rel = str(json_file.relative_to(TEMPLATES_DIR))
@@ -49,7 +49,7 @@ class DocPatcher:
         self.changes = []  # [(file, old_line, new_line), ...]
 
     def patch_file(self, filepath, replacements):
-        """Apply a list of (pattern, replacement_fn) to a file.
+        """Apply a list of (pattern, replacement_fn[, flags]) to a file.
         replacement_fn(match) -> new string.
         """
         path = ROOT / filepath
@@ -57,17 +57,19 @@ class DocPatcher:
             print(f"  SKIP {filepath} (not found)")
             return
 
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         original = text
 
-        for pattern, repl_fn in replacements:
-            text = re.sub(pattern, repl_fn, text)
+        for entry in replacements:
+            pattern, repl_fn = entry[0], entry[1]
+            flags = entry[2] if len(entry) > 2 else 0
+            text = re.sub(pattern, repl_fn, text, flags=flags)
 
         if text != original:
             diff_lines = self._diff(original, text, filepath)
             self.changes.extend(diff_lines)
             if not self.dry_run:
-                path.write_text(text)
+                path.write_text(text, encoding="utf-8")
                 print(f"  UPDATED {filepath} ({len(diff_lines)} change(s))")
             else:
                 print(f"  WOULD UPDATE {filepath} ({len(diff_lines)} change(s))")
@@ -79,7 +81,7 @@ class DocPatcher:
         old_lines = old.splitlines()
         new_lines = new.splitlines()
         changes = []
-        for i, (o, n) in enumerate(zip(old_lines, new_lines)):
+        for o, n in zip(old_lines, new_lines, strict=False):
             if o != n:
                 changes.append((filepath, o.strip(), n.strip()))
         return changes
@@ -143,17 +145,20 @@ def patch_readme(patcher, versions, release_version):
     def replace_labs_row(match):
         prefix = match.group(1)
         name = match.group(2)
-        old_ver = match.group(3)
-        rest = match.group(4)
-        stem = labs_names.get(name, "")
-        new_ver = lookup.get(stem, old_ver)
-        return f"{prefix}{name}**{match.group(5)}| v{new_ver} |{rest}"
+        mid = match.group(3)
+        old_ver = match.group(4)
+        rest = match.group(5)
+        stem = labs_names.get(name.strip())
+        new_ver = lookup.get(stem, old_ver) if stem else old_ver
+        return f"{prefix}{name}**{mid}| v{new_ver} |{rest}"
 
     patcher.patch_file("README.md", [
         # Badge: RELEASE-vX.Y.Z-
         (r'RELEASE-v[\d.]+-', lambda m: f"RELEASE-v{release_version}-"),
         # Footer: Current: **`vX.Y.Z`**
         (r'Current: \*\*`v[\d.]+`\*\*', lambda m: f"Current: **`v{release_version}`**"),
+        # Labs table rows: | **Name** emoji | vX.Y.Z | ...
+        (r'(\| \*\*)(.+?)\*\*(.+?)\| v([\d.]+) \|(.*)', replace_labs_row),
     ])
 
 
@@ -261,7 +266,7 @@ def patch_mintlify_docs(patcher, versions, release_version):
 
     patcher.patch_file("docs/nightly-and-labs.mdx", [
         (r'### (.+?)\(v([\d.]+)\)', replace_labs_heading),
-        (r'^v([\d.]+) —(.*)$', replace_nightly_version_line),
+        (r'^v([\d.]+) —(.*)$', replace_nightly_version_line, re.MULTILINE),
     ])
 
 
@@ -298,7 +303,7 @@ def patch_labs_guide(patcher, versions, release_version):
 
 def get_release_version():
     """Read the latest release version from CHANGELOG.md."""
-    changelog = (ROOT / "CHANGELOG.md").read_text()
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     match = re.search(r'^## ([\d.]+)', changelog, re.MULTILINE)
     if match:
         return match.group(1)
