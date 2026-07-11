@@ -53,7 +53,7 @@
   "config": {
     "trusted": false,
     "showChanges": true,
-    "addonName": "Core Nexus Stream Labs \ud83e\uddea",
+    "addonName": "Core Nexus All-Rounder Labs \ud83e\uddea",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
     "addonDescription": "Nightly Labs v0.4.0 \u2014 anime lang passthrough \u00b7 latestSeason packs \u00b7 age sort \u00b7 subtitle PSE \u00b7 cachedAnime/uncachedAnime sorts \u00b7 Private Tracker Kill (uncached private streams removed), DAF totalCachedStreams fix, Unknown Resolution/Quality Kills now exempt catalog content (15y+). Report findings in the Nightly thread.",
     "appliedTemplates": [
