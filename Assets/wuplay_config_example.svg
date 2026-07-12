@@ -31,6 +31,27 @@
   <!-- Page title -->
   <text x="220" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="#e0e0f0">Configuration</text>
 
+  <!-- QR code (stylised placeholder) -->
+  <rect x="220" y="80" width="120" height="120" rx="8" fill="#2a2a3e"/>
+  <rect x="232" y="92" width="24" height="24" rx="3" fill="#c0c0d8"/>
+  <rect x="268" y="92" width="12" height="12" rx="2" fill="#c0c0d8"/>
+  <rect x="292" y="92" width="24" height="24" rx="3" fill="#c0c0d8"/>
+  <rect x="232" y="124" width="12" height="12" rx="2" fill="#c0c0d8"/>
+  <rect x="252" y="124" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="268" y="128" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="284" y="120" width="12" height="12" rx="2" fill="#c0c0d8"/>
+  <rect x="304" y="124" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="232" y="148" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="248" y="144" width="12" height="12" rx="2" fill="#c0c0d8"/>
+  <rect x="268" y="148" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="284" y="148" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="300" y="144" width="12" height="12" rx="2" fill="#c0c0d8"/>
+  <rect x="232" y="168" width="24" height="24" rx="3" fill="#c0c0d8"/>
+  <rect x="268" y="172" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="284" y="168" width="8" height="8" rx="1" fill="#c0c0d8"/>
+  <rect x="292" y="168" width="24" height="24" rx="3" fill="#c0c0d8"/>
+  <text x="280" y="212" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#8888aa" text-anchor="middle">Scan to configure</text>
+
   <!-- Profile Key section -->
   <text x="380" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#e0e0f0">Your Profile Key</text>
 

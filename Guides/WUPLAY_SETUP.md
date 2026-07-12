@@ -23,7 +23,7 @@ Already have a TorBox account and a configured AIOStreams template? Four steps:
 
 1. **Copy your manifest URL** — open your AIOStreams instance → copy the manifest URL from the top of the config page
 2. **Find your Profile Key** — in WuPlay, go to **Settings → Configuration**. Your Profile Key is displayed at the top (e.g. `a1b2c3`)
-3. **Open the WuPlay configurator** — go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) in your browser. Enter your Profile Key
+3. **Open the WuPlay configurator** — scan the **QR code** on the Configuration screen, or go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) manually and enter your Profile Key
 4. **Add the manifest** — under **Add-ons**, paste your AIOStreams manifest URL and save. It syncs to your WuPlay app automatically
 
 ---
@@ -65,7 +65,7 @@ https://aiostreams.elfhosted.com/stremio/abcdef1234/manifest.json
 
 ### 6. Find your WuPlay Profile Key
 
-Open WuPlay on your device and go to **Settings → Configuration**. Your **Profile Key** is shown at the top of the screen.
+Open WuPlay on your device and go to **Settings → Configuration**. Your **Profile Key** is shown at the top of the screen. A **QR code** is also displayed — scan it with your phone to open the WuPlay configurator directly, pre-linked to your device.
 
 ![WuPlay Configuration](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/wuplay_config_example.svg)
 
@@ -73,8 +73,7 @@ Open WuPlay on your device and go to **Settings → Configuration**. Your **Prof
 
 ### 7. Add the add-on via WuPlay configurator
 
-1. Go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) in a browser (phone or computer)
-2. Enter your **Profile Key** to connect to your WuPlay device
+1. **Scan the QR code** shown on the Configuration screen to open the configurator pre-linked to your device — or go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) manually and enter your **Profile Key**
 3. Navigate to **Add-ons**
 4. Paste your AIOStreams manifest URL
 5. Save — the add-on syncs to your WuPlay app automatically
