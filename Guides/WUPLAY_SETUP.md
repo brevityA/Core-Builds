@@ -6,7 +6,7 @@ Use Core Builds with WuPlay — a Stremio-compatible streaming client for Androi
 
 ## What is WuPlay?
 
-[WuPlay](https://wuplay.app) is a Stremio-compatible streaming client that works with all Stremio add-ons — including AIOStreams and Core Builds. Available on Android TV, Google TV, Fire Stick, and web browser. Supports Chromecast casting, Trakt integration, and configurable layouts.
+[WuPlay](https://wuplay.app) is a Stremio-compatible streaming client that works with all Stremio add-ons — including AIOStreams and Core Builds. Available on Android TV, Google TV, and Fire Stick. Supports Chromecast casting, Trakt integration, and configurable layouts.
 
 **Current version:** v0.7.3-beta
 
@@ -34,7 +34,6 @@ Already have a TorBox account and a configured AIOStreams template? Four steps:
 
 Download WuPlay using **downloader code `5781040`** on your device, or get it from:
 - **Android TV / Google TV / Fire Stick** → sideload via [WuPlay releases](https://github.com/wuplayapp/wuplay-releases)
-- **Web** → browser version at [wuplay.app](https://wuplay.app)
 
 ### 2. Get a TorBox subscription
 
@@ -92,7 +91,7 @@ Go back to WuPlay on your device. Browse movies and shows → select a title →
 
 | | WuPlay | Stremio |
 |---|---|---|
-| Platform | Android TV, Fire Stick, Chromecast, web | Desktop + mobile apps |
+| Platform | Android TV, Fire Stick, Chromecast | Desktop + mobile apps |
 | Configuration | Via [config.wuplay.app](https://config.wuplay.app/configure/) + Profile Key | In-app settings |
 | Chromecast | Built-in cast support | Not natively supported |
 | Genre browsing | Built-in genres screen (reality, anime, etc.) | Add-on dependent |
