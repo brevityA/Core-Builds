@@ -272,7 +272,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .cb-sidebar{display:none}
 .cb-sidebar.sb-hidden{display:none!important}
 @media(min-width:1200px){
-  .wrap{max-width:none;padding:0;flex-direction:row;align-items:stretch}
+  .wrap{max-width:none;padding:0;flex-direction:column;align-items:stretch}
   .cb-sidebar{display:flex;flex-direction:column;width:280px;flex-shrink:0;background:#151923;border-right:1px solid rgba(255,255,255,.06);position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto}
   .cb-sidebar .sb-brand{display:flex;align-items:center;gap:12px;padding:20px 20px 18px;border-bottom:1px solid rgba(255,255,255,.06)}
   .cb-sidebar .sb-brand-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
@@ -303,7 +303,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .cb-sidebar:not(.sb-hidden)~.wrap #main{padding:32px 48px;max-width:none;align-items:center}
   .cb-sidebar:not(.sb-hidden)~.wrap #main>.card{max-width:860px;width:100%}
   .cb-sidebar:not(.sb-hidden)~.wrap>.hdr{padding:16px 48px 0}
-  .cb-sidebar:not(.sb-hidden)~.wrap .nav{max-width:860px;padding:0 48px}
+  .cb-sidebar:not(.sb-hidden)~.wrap .nav{max-width:860px;width:100%;padding:0 48px;margin:0 auto}
   .prog-wrap{display:none}
   .card{padding:36px 40px}
   .opts.c4d{grid-template-columns:repeat(4,1fr)}
@@ -322,7 +322,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .cb-sidebar:not(.sb-hidden)~.wrap #main{padding:40px 64px}
   .cb-sidebar:not(.sb-hidden)~.wrap #main>.card{max-width:960px}
   .cb-sidebar:not(.sb-hidden)~.wrap>.hdr{padding:20px 64px 0}
-  .cb-sidebar:not(.sb-hidden)~.wrap .nav{max-width:960px;padding:0 64px}
+  .cb-sidebar:not(.sb-hidden)~.wrap .nav{max-width:960px;width:100%;padding:0 64px;margin:0 auto}
   .card{padding:40px 48px}
 }
 [data-theme="light"] .cb-sidebar{background:#ffffff;border-color:#d0d7de}
