@@ -51,6 +51,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
 | [Samsung RU7100 4K](#-core-nexus-samsung-ru7100-4k) | Pro | 4K + 1080p | Samsung RU7100 (2019) — full IQR PSE stack |
+| [Google TV Streamer 4K](#-core-nexus-google-tv-streamer-4k) | Pro | 4K + 1080p | Google TV Streamer (2024) / DV + AV1 + HDR10+ |
 | [Windows Ultrawide](#-core-nexus-ultrawide) | Pro | 1080p + 4K capable | Windows PC / ultrawide monitor — full audio, HDR-first |
 | [Apple TV 4K](#-core-nexus-apple-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Apple TV 4K / Dolby Vision |
 | [4K Hybrid](#-core-nexus-4k-hybrid) | Pro + NZBGeek | 4K + 1080p | Dual-source: TorBox + Usenet, full 4K |
@@ -92,6 +93,7 @@ TorBox Pro?
 │   └── 1080p only? → Hybrid
 ├── Want 4K? → 4K Apex
 ├── Samsung TV / no Dolby Vision? → Samsung TV · Samsung TV 4K
+├── Google TV Streamer? → Google TV Streamer 4K
 ├── Apple TV 4K (Infuse)? → Apple TV 4K (Nightly)
 ├── Windows PC / ultrawide monitor? → Ultrawide
 └── 1080p only? → Stream
@@ -153,6 +155,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Stream Labs** 🧪 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Core Nexus All-Rounder Labs** 🧪 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
 | **Core Nexus Samsung RU7100 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
+| **Core Nexus Google TV Streamer 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json` |
 | **Core Nexus Ultrawide** | TorBox Pro | 1080p + 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json` |
 | **Core Nexus Essential Labs** 🧪 | TorBox Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
 | **Core Nexus 4K Essential Labs** 🧪 | TorBox Essential | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
@@ -284,6 +287,20 @@ Full 4K template for the Samsung RU7100 (2019). Runs the complete APEX IQR PSE s
 | **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
 | **Version** | v0.3.7 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
+| **Resolution** | 2160p · 1080p fallback |
+| **Usenet** | ❌ |
+
+---
+
+### 📺 Core Nexus Google TV Streamer 4K
+
+4K template tuned for the Google TV Streamer (2024). Dolby Vision, HDR10+, HDR10, and HLG all natively supported. AV1 hardware decode enabled — no codec exclusions. Lossless audio excluded (TrueHD, DTS-HD MA, DTS:X, FLAC) — DD+ Atmos is the audio ceiling. Audio channels capped at 5.1. Based on Core Nexus 4K Apex with full IQR Tukey fence PSE stack, Score IQR Guard, elite group pins, and perGroup() Extra Cached. Audio Pinnacle PSE removed (limited audio device).
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
 
