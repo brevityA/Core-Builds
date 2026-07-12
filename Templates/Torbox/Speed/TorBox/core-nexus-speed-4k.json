@@ -1658,6 +1658,10 @@
           "direction": "desc"
         },
         {
+          "key": "age",
+          "direction": "asc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -1722,6 +1726,10 @@
         {
           "key": "seeders",
           "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "asc"
         },
         {
           "key": "audioTag",
@@ -2056,6 +2064,38 @@
             "anime"
           ]
         },
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "sootio",
+        "enabled": false,
+        "options": {
+          "name": "Sootio",
+          "timeout": 15000,
+          "resources": [
+            "stream"
+          ],
+          "httpProviders": [],
+          "mediaTypes": [],
+          "useMultipleInstances": false,
+          "url": "https://sooti.info"
+        },
+        "instanceId": "sootio-core-builds",
+        "category": "HTTP"
+      },
+      {
+        "type": "neko-bt",
+        "enabled": false,
+        "options": {
+          "name": "NekoBT",
+          "timeout": 5000,
+          "mediaTypes": [
+            "anime"
+          ]
+        },
+        "instanceId": "neko-bt-core-builds",
         "resources": [
           "stream"
         ]

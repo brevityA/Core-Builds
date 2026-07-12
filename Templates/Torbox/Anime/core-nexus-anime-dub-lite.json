@@ -5,7 +5,7 @@
     "description": "Dubbed-first anime build. Prioritises English dubs and Dual Audio over raw Japanese sub tracks. SeaDex best releases · Nyaa-sourced · FLAC/AAC · TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.13",
+    "version": "2.8.14",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -263,6 +263,23 @@
         "resources": [
           "stream"
         ]
+      },
+      {
+        "type": "sootio",
+        "enabled": false,
+        "options": {
+          "name": "Sootio",
+          "timeout": 15000,
+          "resources": [
+            "stream"
+          ],
+          "httpProviders": [],
+          "mediaTypes": [],
+          "useMultipleInstances": false,
+          "url": "https://sooti.info"
+        },
+        "instanceId": "sootio-core-builds",
+        "category": "HTTP"
       },
       {
         "type": "aiosubtitle",
@@ -1078,6 +1095,10 @@
           "direction": "desc"
         },
         {
+          "key": "age",
+          "direction": "asc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -1142,6 +1163,10 @@
         {
           "key": "seeders",
           "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "asc"
         },
         {
           "key": "audioTag",
@@ -1274,6 +1299,10 @@
         {
           "key": "seeders",
           "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "asc"
         },
         {
           "key": "audioTag",
