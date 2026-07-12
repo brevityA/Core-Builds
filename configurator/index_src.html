@@ -268,6 +268,71 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .opts.list .opt-icon svg{width:34px;height:34px}
   .opts.list .opt label{padding:16px 18px}
 }
+/* Desktop sidebar layout (1200px+) */
+.cb-sidebar{display:none}
+.cb-sidebar.sb-hidden{display:none!important}
+@media(min-width:1200px){
+  .wrap{max-width:none;padding:0;flex-direction:row;align-items:stretch}
+  .cb-sidebar{display:flex;flex-direction:column;width:280px;flex-shrink:0;background:#151923;border-right:1px solid rgba(255,255,255,.06);position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto}
+  .cb-sidebar .sb-brand{display:flex;align-items:center;gap:12px;padding:20px 20px 18px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .cb-sidebar .sb-brand-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
+  .cb-sidebar .sb-brand-text{font-size:1.1rem;font-weight:800;letter-spacing:-.01em}
+  .cb-sidebar .sb-brand-sub{font-size:.65rem;color:#4a4f60;margin-top:1px}
+  .cb-sidebar .sb-progress{padding:14px 20px 10px}
+  .cb-sidebar .sb-prog-label{font-size:.68rem;color:#4a4f60;letter-spacing:.03em}
+  .cb-sidebar .sb-prog-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-top:6px}
+  .cb-sidebar .sb-prog-fill{height:100%;background:linear-gradient(90deg,#0891b2,#00d4ff);border-radius:2px;transition:width .35s ease}
+  .cb-sidebar .sb-steps{list-style:none;padding:8px 0;flex:1}
+  .cb-sidebar .sb-step{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;transition:background .15s;position:relative}
+  .cb-sidebar .sb-step:hover{background:rgba(255,255,255,.03)}
+  .cb-sidebar .sb-step.sb-active{background:rgba(0,212,255,.06)}
+  .cb-sidebar .sb-step.sb-active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#00d4ff;border-radius:0 2px 2px 0}
+  .cb-sidebar .sb-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;border:1.5px solid rgba(255,255,255,.06);color:#4a4f60;transition:all .2s}
+  .cb-sidebar .sb-step.sb-active .sb-num{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.25);color:#00d4ff}
+  .cb-sidebar .sb-step.sb-done .sb-num{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25);color:#22c55e}
+  .cb-sidebar .sb-step-title{font-size:.82rem;font-weight:700;color:#e6edf3}
+  .cb-sidebar .sb-step.sb-active .sb-step-title{color:#00d4ff}
+  .cb-sidebar .sb-step-sub{font-size:.68rem;color:#4a4f60;margin-top:1px}
+  .cb-sidebar .sb-step.sb-done .sb-step-sub{color:#22c55e}
+  .cb-sidebar .sb-footer{padding:14px 20px;border-top:1px solid rgba(255,255,255,.06);margin-top:auto}
+  .cb-sidebar .sb-footer button{background:none;border:none;color:#8b949e;font-size:.72rem;cursor:pointer;text-decoration:underline;padding:0;transition:color .15s}
+  .cb-sidebar .sb-footer button:hover{color:#00d4ff}
+  body{padding:0}
+  .cb-sidebar:not(.sb-hidden)~.wrap{margin-left:280px}
+  .cb-sidebar:not(.sb-hidden)~.wrap #main{padding:32px 48px;max-width:none;align-items:center}
+  .cb-sidebar:not(.sb-hidden)~.wrap #main>.card{max-width:860px;width:100%}
+  .cb-sidebar:not(.sb-hidden)~.wrap>.hdr{padding:16px 48px 0}
+  .cb-sidebar:not(.sb-hidden)~.wrap .nav{max-width:860px;padding:0 48px}
+  .prog-wrap{display:none}
+  .card{padding:36px 40px}
+  .opts.c4d{grid-template-columns:repeat(4,1fr)}
+  .opts.c3{grid-template-columns:repeat(3,1fr)}
+  .opts.c3d{grid-template-columns:repeat(3,1fr)}
+  .opts.c2d{grid-template-columns:repeat(2,1fr)}
+  .opts.list .opt label{padding:14px 18px}
+  .opts.list .opt-icon svg{width:36px;height:36px}
+  .receipt-card{max-width:520px}
+  .summary{grid-template-columns:repeat(3,1fr)}
+  .btn-dl,.btn-aio,.btn-manifest{max-width:520px}
+  .cb-sidebar.sb-hidden~.wrap{margin-left:0;max-width:980px;margin-inline:auto}
+  .card.splash{max-width:860px;width:100%}
+}
+@media(min-width:1600px){
+  .cb-sidebar:not(.sb-hidden)~.wrap #main{padding:40px 64px}
+  .cb-sidebar:not(.sb-hidden)~.wrap #main>.card{max-width:960px}
+  .cb-sidebar:not(.sb-hidden)~.wrap>.hdr{padding:20px 64px 0}
+  .cb-sidebar:not(.sb-hidden)~.wrap .nav{max-width:960px;padding:0 64px}
+  .card{padding:40px 48px}
+}
+[data-theme="light"] .cb-sidebar{background:#ffffff;border-color:#d0d7de}
+[data-theme="light"] .cb-sidebar .sb-step:hover{background:rgba(0,0,0,.03)}
+[data-theme="light"] .cb-sidebar .sb-step.sb-active{background:rgba(9,105,218,.06)}
+[data-theme="light"] .cb-sidebar .sb-step.sb-active::before{background:#0969da}
+[data-theme="light"] .cb-sidebar .sb-step.sb-active .sb-num{background:rgba(9,105,218,.08);border-color:rgba(9,105,218,.25);color:#0969da}
+[data-theme="light"] .cb-sidebar .sb-step.sb-active .sb-step-title{color:#0969da}
+[data-theme="light"] .cb-sidebar .sb-step-title{color:#1c2128}
+[data-theme="light"] .cb-sidebar .sb-brand{border-color:#d0d7de}
+[data-theme="light"] .cb-sidebar .sb-footer{border-color:#d0d7de}
 /* Small screens */
 @media(max-width:480px){
   .card{padding:18px 16px}
@@ -943,6 +1008,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </div>
   </div>
 </div>
+<nav class="cb-sidebar" id="cbSidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22"><defs><linearGradient id="sbg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient><linearGradient id="sbg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient></defs><polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#sbg1)" stroke-width="22" stroke-linejoin="round"/><polygon points="256,166 346,256 256,346 166,256" fill="url(#sbg2)" opacity=".85"/></svg></div>
+    <div>
+      <div class="sb-brand-text"><span style="color:#fff">Core </span><span style="color:#00d4ff">Builds</span></div>
+      <div class="sb-brand-sub">Template Configurator</div>
+    </div>
+  </div>
+  <div class="sb-progress"><div class="sb-prog-label">Step <span id="sbStepNum">1</span> of <span id="sbStepTotal">6</span></div><div class="sb-prog-bar"><div class="sb-prog-fill" id="sbProgFill" style="width:16%"></div></div></div>
+  <ul class="sb-steps" id="sbSteps"></ul>
+  <div class="sb-footer"><button data-action="reset-state">Start over</button></div>
+</nav>
 <div class="wrap">
   <header class="hdr">
     <div class="prog-wrap">
@@ -951,9 +1028,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </div>
     <span id="hdrVersionBadge" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;user-select:none;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07)">v2.2</span>
   </header>
-  
+
   <div id="main"></div>
-  
+
   <div class="nav" id="nav">
     <button class="btn btn-back" id="btnBack" data-action="nav-back">← Back</button>
     <button class="btn btn-next" id="btnNext" data-action="nav-next">Next →</button>
@@ -2127,7 +2204,38 @@ function renderAdvancedPanel() {
   </div>`;
 }
 
+function renderSidebar() {
+  const sb = document.getElementById('cbSidebar');
+  if (!sb) return;
+  const stepsEl = document.getElementById('sbSteps');
+  const SHORT = {0:'Service',1:'Device',2:'Resolution',3:'Content',4:'API Keys',5:'Review & Deploy'};
+  const KEYS = ['service','device','resolution','audio','content',null];
+  if (step === 0) { sb.classList.add('sb-hidden'); return; }
+  sb.classList.remove('sb-hidden');
+  const items = Array.from({length: STEPS}, (_, i) => {
+    const n = i + 1;
+    const isDone = n < step;
+    const isActive = n === step;
+    const cls = isDone ? 'sb-step sb-done' : isActive ? 'sb-step sb-active' : 'sb-step';
+    const numContent = isDone ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : n;
+    const k = KEYS[i];
+    let sub = '—';
+    if (isDone && k && S[k]) { sub = label(k, S[k]) || '—'; }
+    else if (isActive) { sub = DEFS[i] ? DEFS[i].desc.replace(/<[^>]+>/g,'').slice(0,50) : ''; }
+    const clickAttr = isDone ? ` data-action="jump-step" data-step="${n}"` : '';
+    return `<li class="${cls}"${clickAttr}><div class="sb-num">${numContent}</div><div><div class="sb-step-title">${SHORT[i]}</div><div class="sb-step-sub">${sub}</div></div></li>`;
+  }).join('');
+  if (stepsEl) stepsEl.innerHTML = items;
+  const numEl = document.getElementById('sbStepNum');
+  const totalEl = document.getElementById('sbStepTotal');
+  const fillEl = document.getElementById('sbProgFill');
+  if (numEl) numEl.textContent = step;
+  if (totalEl) totalEl.textContent = STEPS;
+  if (fillEl) fillEl.style.width = Math.round((step / STEPS) * 100) + '%';
+}
+
 function renderProgress() {
+  renderSidebar();
   const progWrap = document.querySelector('.prog-wrap');
   const nav = document.getElementById('nav');
   const hdrBadge = document.getElementById('hdrVersionBadge');
