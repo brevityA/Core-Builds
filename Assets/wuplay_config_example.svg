@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" fill="none">
+  <!-- Background -->
+  <rect width="800" height="420" rx="12" fill="#1a1a2e"/>
+
+  <!-- Left sidebar -->
+  <rect x="0" y="0" width="180" height="420" rx="12" fill="#16162a"/>
+  <rect x="180" y="0" width="12" height="420" fill="#16162a"/>
+
+  <!-- Sidebar items -->
+  <text x="48" y="68" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8888aa">Playback</text>
+  <text x="48" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8888aa">Interface</text>
+  <text x="48" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8888aa">Catalogs</text>
+  <text x="48" y="188" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8888aa">Lists</text>
+
+  <!-- Selected item highlight -->
+  <rect x="8" y="207" width="164" height="40" rx="8" fill="#2a4a6e"/>
+  <text x="48" y="232" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#5cb8ff">Configuration</text>
+
+  <text x="48" y="276" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8888aa">Device</text>
+  <text x="48" y="316" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8888aa">About</text>
+
+  <!-- Sidebar icons (simple circles as placeholders) -->
+  <circle cx="28" cy="64" r="6" fill="#8888aa" opacity="0.4"/>
+  <circle cx="28" cy="104" r="6" fill="#8888aa" opacity="0.4"/>
+  <circle cx="28" cy="144" r="6" fill="#8888aa" opacity="0.4"/>
+  <circle cx="28" cy="184" r="6" fill="#8888aa" opacity="0.4"/>
+  <circle cx="28" cy="228" r="6" fill="#5cb8ff" opacity="0.6"/>
+  <circle cx="28" cy="272" r="6" fill="#8888aa" opacity="0.4"/>
+  <circle cx="28" cy="312" r="6" fill="#8888aa" opacity="0.4"/>
+
+  <!-- Page title -->
+  <text x="220" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="#e0e0f0">Configuration</text>
+
+  <!-- Profile Key section -->
+  <text x="380" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#e0e0f0">Your Profile Key</text>
+
+  <!-- Profile key box -->
+  <rect x="380" y="114" width="380" height="48" rx="8" fill="#2a2a3e"/>
+  <text x="570" y="144" font-family="'SF Mono', 'Fira Code', monospace" font-size="20" fill="#c0c0d8" text-anchor="middle" letter-spacing="6">a1b2c3</text>
+
+  <!-- Config link -->
+  <text x="380" y="190" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#8888aa">Manage add-ons and other options at:</text>
+  <text x="380" y="210" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#5cb8ff">config.wuplay.app</text>
+
+  <!-- Warning -->
+  <text x="394" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#aa8844">If you lose the profile key, you cannot recover this profile.</text>
+  <text x="382" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#ddaa33">!</text>
+
+  <!-- Divider -->
+  <line x1="220" y1="265" x2="760" y2="265" stroke="#2a2a3e" stroke-width="1"/>
+
+  <!-- Manage section -->
+  <text x="220" y="295" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8888aa">Configure via config.wuplay.app:</text>
+
+  <!-- Left column -->
+  <circle cx="232" cy="322" r="2.5" fill="#5cb8ff"/>
+  <text x="244" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#c0c0d8">Add-ons</text>
+
+  <circle cx="232" cy="350" r="2.5" fill="#5cb8ff"/>
+  <text x="244" y="354" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#c0c0d8">Catalogs</text>
+
+  <circle cx="232" cy="378" r="2.5" fill="#5cb8ff"/>
+  <text x="244" y="382" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#c0c0d8">Layout</text>
+
+  <!-- Right column -->
+  <circle cx="460" cy="322" r="2.5" fill="#5cb8ff"/>
+  <text x="472" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#c0c0d8">Trakt</text>
+
+  <circle cx="460" cy="350" r="2.5" fill="#5cb8ff"/>
+  <text x="472" y="354" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#c0c0d8">Privacy &amp; Data</text>
+
+  <circle cx="460" cy="378" r="2.5" fill="#5cb8ff"/>
+  <text x="472" y="382" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#c0c0d8">Profile Manager</text>
+
+  <!-- Annotation arrow and label -->
+  <rect x="540" y="290" width="220" height="36" rx="6" fill="#1e3a5f" stroke="#5cb8ff" stroke-width="1"/>
+  <text x="650" y="313" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#5cb8ff" text-anchor="middle">Settings → Configuration</text>
+
+  <!-- Arrow from annotation to profile key -->
+  <path d="M 650 290 L 650 168 L 762 168" stroke="#5cb8ff" stroke-width="1.5" fill="none" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#5cb8ff"/>
+    </marker>
+  </defs>
+</svg>
