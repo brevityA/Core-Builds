@@ -62,6 +62,9 @@
               "debrid-comparison",
               "alldebrid-setup",
               "easynews-setup",
+              "stremio-setup",
+              "wuplay-setup",
+              "nuvio-setup",
               "device-profiles",
               "regional-content"
             ]

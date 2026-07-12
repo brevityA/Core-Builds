@@ -174,7 +174,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 ### 🧪 Labs — Experimental Builds
 
-> Labs templates test new SEL expression architectures before promotion to stable. Currently testing v0.14.0 features: runtime-aware bitrate floors, anime language passthrough, latestSeason-aware season pack kill, subtitle preference PSE, and anime-specific sort sections.
+> Labs templates test new SEL expression architectures before promotion to stable. Currently testing v0.14.0 features: runtime-aware bitrate floors, anime language passthrough, latestSeason-aware season pack kill, subtitle preference PSE, age sort key for uncached streams, and anime-specific sort sections.
 
 | Template | Version | Res | Import URL |
 |---|---|---|---|
