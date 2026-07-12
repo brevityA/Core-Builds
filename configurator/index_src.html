@@ -283,8 +283,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .cb-sidebar .sb-prog-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-top:6px}
   .cb-sidebar .sb-prog-fill{height:100%;background:linear-gradient(90deg,#0891b2,#00d4ff);border-radius:2px;transition:width .35s ease}
   .cb-sidebar .sb-steps{list-style:none;padding:8px 0;flex:1}
-  .cb-sidebar .sb-step{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;transition:background .15s;position:relative}
-  .cb-sidebar .sb-step:hover{background:rgba(255,255,255,.03)}
+  .cb-sidebar .sb-step{display:flex;align-items:center;gap:12px;padding:10px 20px;transition:background .15s;position:relative}
+  .cb-sidebar .sb-step.sb-done{cursor:pointer}
+  .cb-sidebar .sb-step.sb-done:hover{background:rgba(255,255,255,.03)}
   .cb-sidebar .sb-step.sb-active{background:rgba(0,212,255,.06)}
   .cb-sidebar .sb-step.sb-active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#00d4ff;border-radius:0 2px 2px 0}
   .cb-sidebar .sb-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;border:1.5px solid rgba(255,255,255,.06);color:#4a4f60;transition:all .2s}
@@ -325,7 +326,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .card{padding:40px 48px}
 }
 [data-theme="light"] .cb-sidebar{background:#ffffff;border-color:#d0d7de}
-[data-theme="light"] .cb-sidebar .sb-step:hover{background:rgba(0,0,0,.03)}
+[data-theme="light"] .cb-sidebar .sb-num{border-color:#d0d7de}
+[data-theme="light"] .cb-sidebar .sb-prog-bar{background:#eaeef2}
+[data-theme="light"] .cb-sidebar .sb-step.sb-done:hover{background:rgba(0,0,0,.03)}
 [data-theme="light"] .cb-sidebar .sb-step.sb-active{background:rgba(9,105,218,.06)}
 [data-theme="light"] .cb-sidebar .sb-step.sb-active::before{background:#0969da}
 [data-theme="light"] .cb-sidebar .sb-step.sb-active .sb-num{background:rgba(9,105,218,.08);border-color:rgba(9,105,218,.25);color:#0969da}
@@ -2204,12 +2207,13 @@ function renderAdvancedPanel() {
   </div>`;
 }
 
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 function renderSidebar() {
   const sb = document.getElementById('cbSidebar');
   if (!sb) return;
   const stepsEl = document.getElementById('sbSteps');
   const SHORT = {0:'Service',1:'Device',2:'Resolution',3:'Content',4:'API Keys',5:'Review & Deploy'};
-  const KEYS = ['service','device','resolution','audio','content',null];
   if (step === 0) { sb.classList.add('sb-hidden'); return; }
   sb.classList.remove('sb-hidden');
   const items = Array.from({length: STEPS}, (_, i) => {
@@ -2218,12 +2222,12 @@ function renderSidebar() {
     const isActive = n === step;
     const cls = isDone ? 'sb-step sb-done' : isActive ? 'sb-step sb-active' : 'sb-step';
     const numContent = isDone ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : n;
-    const k = KEYS[i];
+    const k = DEFS[i] ? DEFS[i].key : null;
     let sub = '—';
     if (isDone && k && S[k]) { sub = label(k, S[k]) || '—'; }
     else if (isActive && DEFS[i]) { const t = document.createElement('div'); t.innerHTML = DEFS[i].desc; sub = (t.textContent || '').slice(0,50); }
     const clickAttr = isDone ? ` data-action="jump-step" data-step="${n}"` : '';
-    return `<li class="${cls}"${clickAttr}><div class="sb-num">${numContent}</div><div><div class="sb-step-title">${SHORT[i]}</div><div class="sb-step-sub">${sub}</div></div></li>`;
+    return `<li class="${cls}"${clickAttr}><div class="sb-num">${numContent}</div><div><div class="sb-step-title">${escH(SHORT[i])}</div><div class="sb-step-sub">${escH(sub)}</div></div></li>`;
   }).join('');
   if (stepsEl) stepsEl.innerHTML = items;
   const numEl = document.getElementById('sbStepNum');

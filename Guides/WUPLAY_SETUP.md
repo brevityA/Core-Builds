@@ -74,9 +74,9 @@ Open WuPlay on your device and go to **Settings → Configuration**. Your **Prof
 ### 7. Add the add-on via WuPlay configurator
 
 1. **Scan the QR code** shown on the Configuration screen to open the configurator pre-linked to your device — or go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) manually and enter your **Profile Key**
-3. Navigate to **Add-ons**
-4. Paste your AIOStreams manifest URL
-5. Save — the add-on syncs to your WuPlay app automatically
+2. Navigate to **Add-ons**
+3. Paste your AIOStreams manifest URL
+4. Save — the add-on syncs to your WuPlay app automatically
 
 ### 8. Start streaming
 
