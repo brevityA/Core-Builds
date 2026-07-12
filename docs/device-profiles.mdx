@@ -1,6 +1,6 @@
 ---
 title: "Device Profiles"
-description: "Template recommendations and codec constraints for Samsung TV, Apple TV, Fire Stick, Android TV, and Chromecast."
+description: "Template recommendations and codec constraints for Samsung TV, Apple TV, Fire Stick, Google TV Streamer, Android TV, and Chromecast."
 ---
 
 Device profiles document which codecs and HDR formats each platform can decode, and which Core Builds templates are tuned for them. Using the wrong template on a device that lacks hardware decoders causes silent playback failures — the stream loads but transcodes, stutters, or refuses to play.
@@ -101,9 +101,32 @@ On Fire Stick (HD) or older 4K units, use the **Lite variant** if buffering occu
 
 ---
 
-## Android TV / Google TV
+## Google TV Streamer (2024)
 
-No dedicated Core Builds template — Android TV (Shield, Chromecast with Google TV, Sony/Philips/TCL running Google TV) typically supports the full codec stack:
+**Recommended template:** [Google TV Streamer 4K](/template-directory#torbox-pro)
+
+| Feature | Support |
+|---|---|
+| Dolby Vision | Yes — natively supported |
+| AV1 | Yes — hardware decode |
+| HDR10+ | Yes |
+| HDR10 / HLG | Yes |
+| HEVC / AVC | Hardware decode |
+| TrueHD / DTS:X / DTS-HD MA / FLAC | Hard-excluded — no lossless audio passthrough |
+| DD+ Atmos | Preferred — native decode, audio ceiling |
+| Audio channels | 5.1 max |
+
+The Google TV Streamer 4K template is based on 4K Apex with full IQR Tukey fence PSE stack, but excludes lossless audio formats and caps channels at 5.1. The Audio Pinnacle PSE is removed since the device cannot benefit from lossless audio ranking.
+
+<Info>
+  The Google TV Streamer supports DV natively — no DV-Only Kill ESE is needed. DV streams are prioritised in the visual tag sort order.
+</Info>
+
+---
+
+## Android TV / Google TV (Other)
+
+For other Android TV devices (Shield, Chromecast with Google TV, Sony/Philips/TCL running Google TV) that don't have a dedicated template:
 
 | Feature | Support |
 |---|---|
@@ -158,7 +181,7 @@ Web-based streaming client. Use it for Chromecast or any device without a native
 
 <AccordionGroup>
   <Accordion title="DV-Only Kill ESE">
-    Enabled by default on Samsung templates. Removes streams where Dolby Vision is the only signal layer (no HDR10 fallback). Safe to disable if your device supports DV natively (Fire Stick 4K Max, Chromecast with Google TV, Apple TV).
+    Enabled by default on Samsung templates. Removes streams where Dolby Vision is the only signal layer (no HDR10 fallback). Safe to disable if your device supports DV natively (Fire Stick 4K Max, Google TV Streamer, Chromecast with Google TV, Apple TV).
   </Accordion>
   <Accordion title="Audio exclusions on Samsung">
     Samsung templates hard-exclude TrueHD, DTS:X, DTS-HD MA, and FLAC. Remove these from `excludedAudioTags` if your TV connects to an AVR via eARC and you want lossless passthrough.
