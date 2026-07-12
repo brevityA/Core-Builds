@@ -5,7 +5,7 @@
     "description": "Dedicated 4K anime template. SeaDex best releases · DV/HDR10+ priority · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.13",
+    "version": "2.8.14",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -263,6 +263,23 @@
         "resources": [
           "stream"
         ]
+      },
+      {
+        "type": "sootio",
+        "enabled": false,
+        "options": {
+          "name": "Sootio",
+          "timeout": 15000,
+          "resources": [
+            "stream"
+          ],
+          "httpProviders": [],
+          "mediaTypes": [],
+          "useMultipleInstances": false,
+          "url": "https://sooti.info"
+        },
+        "instanceId": "sootio-core-builds",
+        "category": "HTTP"
       },
       {
         "type": "aiosubtitle",
@@ -1087,6 +1104,10 @@
           "direction": "desc"
         },
         {
+          "key": "age",
+          "direction": "asc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -1151,6 +1172,10 @@
         {
           "key": "seeders",
           "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "asc"
         },
         {
           "key": "audioTag",
@@ -1283,6 +1308,10 @@
         {
           "key": "seeders",
           "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "asc"
         },
         {
           "key": "audioTag",
