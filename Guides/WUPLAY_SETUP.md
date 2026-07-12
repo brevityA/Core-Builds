@@ -60,7 +60,7 @@ In AIOStreams:
 
 After saving, AIOStreams shows your **manifest URL**. Copy it. It looks like:
 
-```
+```text
 https://aiostreams.elfhosted.com/stremio/abcdef1234/manifest.json
 ```
 
@@ -84,7 +84,7 @@ Open WuPlay on your device and go to **Settings → Configuration**. Your **Prof
 
 Go back to WuPlay on your device. Browse movies and shows → select a title → pick a stream. The Core Builds formatter shows resolution, codec, audio, and file size for each stream. To cast, use the Chromecast icon in the player controls.
 
-> **Tip:** WuPlay uses the same manifest URL as Stremio and Nuvio — you can use all three clients with the same AIOStreams config.
+> **Tip:** WuPlay uses the same manifest URL as Stremio and Nuvio — you can use all three clients with the same AIOStreams config. Changes you make in AIOStreams apply to all of them.
 
 ---
 
@@ -109,7 +109,7 @@ Go back to WuPlay on your device. Browse movies and shows → select a title →
 
 ## Troubleshooting
 
-- **No streams appearing** → Make sure your manifest URL is correct and your TorBox API key is active
+- **No streams appearing** → Make sure your manifest URL is correct and your TorBox API key is active in AIOStreams
 - **Add-on not syncing** → Verify your Profile Key is correct in the configurator at [config.wuplay.app](https://config.wuplay.app/configure/)
 - **Cast not working** → Ensure your Chromecast and WuPlay device are on the same Wi-Fi network
 - **Streams buffer or stall** → Try a Speed or Flash template for faster cached results
