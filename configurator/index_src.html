@@ -2221,7 +2221,7 @@ function renderSidebar() {
     const k = KEYS[i];
     let sub = '—';
     if (isDone && k && S[k]) { sub = label(k, S[k]) || '—'; }
-    else if (isActive) { sub = DEFS[i] ? DEFS[i].desc.replace(/<[^>]+>/g,'').slice(0,50) : ''; }
+    else if (isActive && DEFS[i]) { const t = document.createElement('div'); t.innerHTML = DEFS[i].desc; sub = (t.textContent || '').slice(0,50); }
     const clickAttr = isDone ? ` data-action="jump-step" data-step="${n}"` : '';
     return `<li class="${cls}"${clickAttr}><div class="sb-num">${numContent}</div><div><div class="sb-step-title">${SHORT[i]}</div><div class="sb-step-sub">${sub}</div></div></li>`;
   }).join('');
