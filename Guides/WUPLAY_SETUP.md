@@ -1,37 +1,46 @@
 # WuPlay Setup
 
-Use Core Builds with WuPlay — stream in your browser, cast to Chromecast, no app install required.
+Use Core Builds with WuPlay — a Stremio-compatible streaming client for Android TV, Chromecast, and more.
 
 ---
 
 ## What is WuPlay?
 
-WuPlay is a web-based streaming client that works with Stremio add-ons — including AIOStreams and Core Builds. No app install needed. It runs in your browser and supports Chromecast for casting to TVs.
+[WuPlay](https://wuplay.app) is a Stremio-compatible streaming client that works with all Stremio add-ons — including AIOStreams and Core Builds. Available on Android TV, Google TV, Fire Stick, and web browser. Supports Chromecast casting, Trakt integration, and configurable layouts.
+
+**Current version:** v0.7.3-beta
 
 **Use WuPlay when:**
-- Your device doesn't have a native Stremio app
-- You want to cast to a Chromecast or smart TV
-- You prefer streaming in a browser tab
+- You want a dedicated streaming app on Android TV / Fire Stick / Chromecast
+- You prefer a different UI from Stremio with built-in genre browsing and binge groups
+- You need Chromecast casting support
 
 ---
 
 ## Quick Import
 
-Already have a TorBox account and a configured AIOStreams template? Three steps:
+Already have a TorBox account and a configured AIOStreams template? Four steps:
 
 1. **Copy your manifest URL** — open your AIOStreams instance → copy the manifest URL from the top of the config page
-2. **Open WuPlay** — go to [wuplay.app](https://wuplay.app)
-3. **Add the manifest** — go to **Add-ons** → paste your manifest URL → click **Install**
+2. **Find your Profile Key** — in WuPlay, go to **Settings → Configuration**. Your Profile Key is displayed at the top (e.g. `a1b2c3`)
+3. **Open the WuPlay configurator** — go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) in your browser. Enter your Profile Key
+4. **Add the manifest** — under **Add-ons**, paste your AIOStreams manifest URL and save. It syncs to your WuPlay app automatically
 
 ---
 
 ## Full Beginner Walkthrough
 
-### 1. Get a TorBox subscription
+### 1. Install WuPlay
+
+Download WuPlay using **downloader code `5781040`** on your device, or get it from:
+- **Android TV / Google TV / Fire Stick** → sideload via [WuPlay releases](https://github.com/wuplayapp/wuplay-releases)
+- **Web** → browser version at [wuplay.app](https://wuplay.app)
+
+### 2. Get a TorBox subscription
 
 Sign up at [torbox.app](https://torbox.app/subscription?referral=d1ccddb0-f094-45ca-b52b-942a2635855e). You need at least a **Standard** plan. Go to **Dashboard → API Keys** and copy your API key.
 
-### 2. Choose and import a template
+### 3. Choose and import a template
 
 1. Go to the [Template Directory](https://core-builds.mintlify.app/template-directory)
 2. Click **Import on ElfHosted** or **Import on Fortheweak** next to your chosen template
@@ -39,7 +48,7 @@ Sign up at [torbox.app](https://torbox.app/subscription?referral=d1ccddb0-f094-4
 
 Not sure which template? See [Which Template?](https://core-builds.mintlify.app/which-template). For most people: **4K Apex** (4K) or **Stream** (1080p).
 
-### 3. Configure AIOStreams
+### 4. Configure AIOStreams
 
 In AIOStreams:
 
@@ -47,26 +56,35 @@ In AIOStreams:
 2. *(Optional)* Add a TMDB Access Token from [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
 3. Click **Save**
 
-### 4. Copy your manifest URL
+### 5. Copy your manifest URL
 
 After saving, AIOStreams shows your **manifest URL**. Copy it. It looks like:
 
-```
+```text
 https://aiostreams.elfhosted.com/stremio/abcdef1234/manifest.json
 ```
 
-### 5. Set up WuPlay
+### 6. Find your WuPlay Profile Key
 
-1. Go to [wuplay.app](https://wuplay.app)
-2. Navigate to **Add-ons**
-3. Paste your AIOStreams manifest URL
-4. Click **Install** or **Add**
+Open WuPlay on your device and go to **Settings → Configuration**. Your **Profile Key** is shown at the top of the screen.
 
-### 6. Start streaming
+![WuPlay Configuration](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/wuplay_config_example.svg)
 
-Browse movies and shows in WuPlay. Click any title → select a stream → playback starts in your browser. To cast, use the Chromecast icon in the player controls.
+> **Warning:** If you lose your Profile Key, you cannot recover your profile. Save it somewhere safe.
 
-> **Tip:** WuPlay uses the same manifest URL as Stremio — you can use both clients with the same AIOStreams config.
+### 7. Add the add-on via WuPlay configurator
+
+1. Go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) in a browser (phone or computer)
+2. Enter your **Profile Key** to connect to your WuPlay device
+3. Navigate to **Add-ons**
+4. Paste your AIOStreams manifest URL
+5. Save — the add-on syncs to your WuPlay app automatically
+
+### 8. Start streaming
+
+Go back to WuPlay on your device. Browse movies and shows → select a title → pick a stream. The Core Builds formatter shows resolution, codec, audio, and file size for each stream. To cast, use the Chromecast icon in the player controls.
+
+> **Tip:** WuPlay uses the same manifest URL as Stremio and Nuvio — you can use all three clients with the same AIOStreams config. Changes you make in AIOStreams apply to all of them.
 
 ---
 
@@ -74,18 +92,28 @@ Browse movies and shows in WuPlay. Click any title → select a stream → playb
 
 | | WuPlay | Stremio |
 |---|---|---|
-| Platform | Web browser (any device) | Desktop + mobile apps |
-| Install required | No | Yes |
+| Platform | Android TV, Fire Stick, Chromecast, web | Desktop + mobile apps |
+| Configuration | Via [config.wuplay.app](https://config.wuplay.app/configure/) + Profile Key | In-app settings |
 | Chromecast | Built-in cast support | Not natively supported |
-| Offline use | No | Download for offline (desktop) |
-| Library sync | No | Syncs across devices via account |
-| Best for | Casting, quick access, no-install | Daily use, full library management |
+| Genre browsing | Built-in genres screen (reality, anime, etc.) | Add-on dependent |
+| Trakt | Built-in integration | Via add-on |
+| Binge mode | Binge groups with auto-play | Manual next episode |
+| Best for | TV devices, casting, lean-back viewing | Desktop, mobile, full library management |
+
+## WuPlay Links
+
+- **GitHub releases** → [github.com/wuplayapp/wuplay-releases](https://github.com/wuplayapp/wuplay-releases)
+- **Downloader code** → `5781040`
+- **Discord** → [discord.gg/PvZjHVGtE9](https://discord.gg/PvZjHVGtE9)
+- **Ko-fi** → [ko-fi.com/wuplaydev](https://ko-fi.com/wuplaydev)
 
 ## Troubleshooting
 
-- **No streams appearing** → Make sure your manifest URL is correct and your TorBox API key is active
-- **Cast not working** → Ensure your Chromecast and browser are on the same Wi-Fi network
+- **No streams appearing** → Make sure your manifest URL is correct and your TorBox API key is active in AIOStreams
+- **Add-on not syncing** → Verify your Profile Key is correct in the configurator at [config.wuplay.app](https://config.wuplay.app/configure/)
+- **Cast not working** → Ensure your Chromecast and WuPlay device are on the same Wi-Fi network
 - **Streams buffer or stall** → Try a Speed or Flash template for faster cached results
-- **Playback error** → Some codecs may not play in-browser. Try a different stream — H.264 is most reliable in browsers
+- **FLAC audio issues** → WuPlay v0.7.3+ automatically transcodes FLAC tracks (ExoPlayer limitation)
+- **"No compatible streams" on resume** → Fixed in v0.7.3 — update WuPlay if you see this
 
-More help: [Troubleshooting](https://core-builds.mintlify.app/troubleshooting) · [FAQ](https://core-builds.mintlify.app/faq)
+More help: [Troubleshooting](https://core-builds.mintlify.app/troubleshooting) · [FAQ](https://core-builds.mintlify.app/faq) · [WuPlay Discord](https://discord.gg/PvZjHVGtE9)
