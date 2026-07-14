@@ -15,8 +15,8 @@ jobs:
     steps:
       - uses: actions/first-interaction@v3
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: |
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: |
             👋 Thanks for opening your first issue on Core Builds by Brevity!
 
             To help us respond quickly, please make sure you've included:
@@ -26,7 +26,7 @@ jobs:
             - Any **error messages** or screenshots
 
             Check the [Troubleshooting Guide](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#8--troubleshooting) and [FAQ](https://github.com/brevityA/Core-Builds/blob/main/Guides/README.md#9--faq) — your question may already be answered there.
-          pr-message: |
+          pr_message: |
             👋 Thanks for your first contribution to Core Builds by Brevity!
 
             Before we review, please check your PR covers the checklist in the PR template:
