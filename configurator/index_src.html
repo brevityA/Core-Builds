@@ -3650,7 +3650,7 @@ function presets() {
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000 }, resources:['stream'] },
     ] : []),
     ...(isNzbgeek && S.creds.nzbgeek ? [
-      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', timeout:6000, url:'https://api.nzbgeek.info', apiKey:S.creds.nzbgeek } },
+      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', newznabUrl:'https://api.nzbgeek.info', apiPath:'/api', apiKey:S.creds.nzbgeek, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', paginate:true, checkOwned:false, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
