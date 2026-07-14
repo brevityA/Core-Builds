@@ -1084,7 +1084,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
     </div>
-    <span id="hdrVersionBadge" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;user-select:none;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07)">v2.2</span>
+    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.2</span>
   </header>
 
   <div id="main"></div>
@@ -1101,7 +1101,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.38';
+const CONFIGURATOR_VERSION = '2.39';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1155,6 +1155,10 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.39', date:'Jul 14 2026', items:[
+    'Changelog is now its own page — click the version badge (header or splash) to open the full release history',
+    'Splash "What\'s New" section replaced with a one-click button that opens the changelog modal',
+  ]},
   { v:'2.38', date:'Jul 14 2026', items:[
     'UI refresh — calmer, Duck-inspired look: single accent, glow/pulse animations retired, flat selection states',
     'One CTA identity — Continue and Download buttons now use the cyan gradient',
@@ -2384,7 +2388,7 @@ function splashHtml() {
       </g>
     </svg>
     <div class="splash-title"><span class="splash-title-core hdr-core">CORE</span><span class="splash-title-builds"> BUILDS</span></div>
-    <div class="splash-by">By Brevity <span style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08)">v${CONFIGURATOR_VERSION}</span></div>
+    <div class="splash-by">By Brevity <span data-action="show-changelog" style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;cursor:pointer;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08);transition:all .15s" title="View changelog">v${CONFIGURATOR_VERSION}</span></div>
     <div class="splash-tagline">Build your perfect AIOStreams template. No manual JSON editing.</div>
 
     <div class="splash-chips-section">
@@ -2484,26 +2488,11 @@ function splashHtml() {
       </a>
     </div>
 
-    <details style="width:100%;max-width:420px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;text-align:left">
-      <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.68rem;font-weight:800;color:${_clrOlder};letter-spacing:.07em;text-transform:uppercase;user-select:none;outline:none">
-        What's new
-        <span style="color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeBdr};border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
-        <span style="margin-left:auto;font-size:.75rem;opacity:.4">▾</span>
-      </summary>
-      <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px">
-        ${(() => { const entry = CHANGELOG[0]; return `
-        <div>
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
-            <span style="font-size:.63rem;font-weight:800;color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeBdr};border-radius:4px;padding:1px 6px">v${entry.v}</span>
-            <span style="font-size:.61rem;color:${_clrDate}">${entry.date}</span>
-          </div>
-          <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px;text-align:left">
-            ${entry.items.map(it => `<li style="font-size:.7rem;color:${_clrCurrent};line-height:1.4">${it}</li>`).join('')}
-          </ul>
-        </div>
-        <a href="https://github.com/brevityA/Core-Builds/blob/main/Guides/CHANGELOG.md" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;font-weight:600;color:${_clrOlder};text-decoration:none;display:flex;align-items:center;gap:4px;margin-top:2px">View full changelog <span style="font-size:.6rem">→</span></a>`; })()}
-      </div>
-    </details>
+    <button data-action="show-changelog" style="width:100%;max-width:420px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;background:none;border-left:none;border-right:none;border-bottom:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:.68rem;font-weight:800;color:${_clrOlder};letter-spacing:.07em;text-transform:uppercase;transition:color .15s" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='${_clrOlder}'">
+      ${ICO.newspaper(16,_badgeColor)} What's new
+      <span style="color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeBdr};border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
+      <span style="margin-left:auto;font-size:.75rem;opacity:.4">→</span>
+    </button>
 
     <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
   </div>`;
@@ -3322,6 +3311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'import-formatter') { showFormatterImport(); }
     if (action === 'compare-templates') { showCompareTemplates(); }
+    if (action === 'show-changelog') { showChangelog(); }
     if (action === 'svc-cat') {
       const cat = el.dataset.cat;
       document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === cat));
@@ -3914,6 +3904,51 @@ function generate() {
 }
 
 const CMP_TEMPLATES = [{"n":"Core Nexus 4K AllDebrid Lite","v":"0.2.5","c":"AllDebrid","r":"4K","p":15,"e":15,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K AllDebrid","v":"0.4.5","c":"AllDebrid","r":"4K","p":20,"e":28,"i":7,"iq":true,"pw":true,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus AllDebrid Lite","v":"0.2.5","c":"AllDebrid","r":"1080p","p":10,"e":28,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus AllDebrid","v":"0.2.5","c":"AllDebrid","r":"1080p","p":10,"e":28,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Anime 4K Lite","v":"2.8.11","c":"Anime","r":"4K","p":14,"e":13,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":10,"sn":["zilean","seadex","meteor","comet","mediafusion","animetosho"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime 4K","v":"2.8.13","c":"Anime","r":"4K","p":14,"e":26,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":12,"sn":["zilean","seadex","meteor","comet","mediafusion","hdhub"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime Dub Lite","v":"2.8.11","c":"Anime","r":"1080p","p":14,"e":13,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":10,"sn":["zilean","seadex","meteor","comet","mediafusion","animetosho"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime Dub","v":"2.8.13","c":"Anime","r":"1080p","p":14,"e":26,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":12,"sn":["zilean","seadex","meteor","comet","mediafusion","hdhub"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime Lite","v":"2.8.11","c":"Anime","r":"1080p","p":12,"e":13,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":10,"sn":["zilean","seadex","meteor","comet","mediafusion","animetosho"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Anime","v":"2.8.13","c":"Anime","r":"1080p","p":12,"e":26,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":12,"sn":["zilean","seadex","meteor","comet","mediafusion","hdhub"],"sv":["torbox"],"rr":0,"er":0,"pr":0,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":false},{"n":"Core Nexus Samsung RU7100 4K","v":"0.3.5","c":"Device","r":"4K","p":17,"e":29,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":10,"sn":["zilean","meteor","comet","mediafusion","newznab","eztv"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1","VC-1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Samsung TV 4K","v":"0.3.5","c":"Device","r":"4K","p":10,"e":27,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","knaben"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1","VC-1"],"df":true,"tb":false,"cm":"mixed","sx":true},{"n":"Core Nexus Samsung TV","v":"0.3.5","c":"Device","r":"1080p","p":10,"e":27,"i":7,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","knaben"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1","VC-1"],"df":true,"tb":false,"cm":"mixed","sx":true},{"n":"Core Nexus Ultrawide","v":"0.2.5","c":"Device","r":"1080p","p":14,"e":28,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":5,"ea":[],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Essential Lite","v":"2.10.5","c":"Essential","r":"4K","p":15,"e":16,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Essential","v":"2.12.5","c":"Essential","r":"4K","p":20,"e":29,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Essential Lite","v":"2.10.5","c":"Essential","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Essential","v":"2.10.5","c":"Essential","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Flash 4K","v":"2.10.5","c":"Flash","r":"4K","p":16,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":5,"sn":["zilean","comet","meteor","knaben","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Flash","v":"2.10.5","c":"Flash","r":"1080p","p":11,"e":30,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":4,"sn":["zilean","comet","meteor","knaben"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Hybrid","v":"2.12.6","c":"Hybrid","r":"4K","p":24,"e":29,"i":6,"iq":true,"pw":true,"tw":true,"sk":17,"sc":10,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Hybrid Lite","v":"2.10.6","c":"Hybrid","r":"1080p","p":12,"e":17,"i":6,"iq":false,"pw":false,"tw":true,"sk":17,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Hybrid","v":"2.10.6","c":"Hybrid","r":"1080p","p":12,"e":29,"i":6,"iq":true,"pw":true,"tw":true,"sk":17,"sc":10,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Apex (TorBox)","v":"2.12.5","c":"Single","r":"4K","p":20,"e":29,"i":6,"iq":false,"pw":true,"tw":false,"sk":16,"sc":4,"sn":["zilean","newznab","torrents-db","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus 4K Apex","v":"0.7.6","c":"Single","r":"4K","p":20,"e":29,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":10,"sn":["zilean","meteor","comet","mediafusion","eztv","newznab"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream Firestick Lite","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream Firestick","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream Lite","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":8,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Stream","v":"2.10.5","c":"Single","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":9,"sn":["zilean","meteor","comet","mediafusion","eztv","torrent-galaxy"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed 4K+","v":"2.10.6","c":"Speed","r":"4K","p":15,"e":28,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":6,"sn":["zilean","easynews","comet","meteor","knaben","aiosubtitle"],"sv":["torbox","easynews"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed EasyNews","v":"2.10.6","c":"Speed","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":3,"sn":["zilean","easynews","meteor"],"sv":["easynews"],"rr":103,"er":8,"pr":5,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed 4K Lite","v":"2.10.5","c":"Speed","r":"4K","p":16,"e":19,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed 4K","v":"2.10.5","c":"Speed","r":"4K","p":16,"e":31,"i":6,"iq":true,"pw":true,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":107,"er":8,"pr":7,"ea":[],"ee":[],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed Lite","v":"2.10.5","c":"Speed","r":"1080p","p":10,"e":17,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true},{"n":"Core Nexus Speed","v":"2.10.5","c":"Speed","r":"1080p","p":10,"e":29,"i":6,"iq":false,"pw":false,"tw":false,"sk":16,"sc":2,"sn":["zilean","aiosubtitle"],"sv":["torbox"],"rr":103,"er":8,"pr":5,"ea":["TrueHD","DTS-HD MA","DTS:X","FLAC"],"ee":["AV1"],"df":true,"tb":true,"cm":"mixed","sx":true}];
+
+function showChangelog() {
+  const ex = document.getElementById('changelogModal');
+  if (ex) ex.remove();
+  const _lt = document.documentElement.getAttribute('data-theme')==='light';
+  const _bg = _lt ? '#ffffff' : '#0d1117';
+  const _card = _lt ? '#f6f8fa' : '#161b22';
+  const _bdr = _lt ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.06)';
+  const _txt = _lt ? '#1f2328' : '#e6edf3';
+  const _sub = _lt ? '#656d76' : '#8b949e';
+  const _dim = _lt ? '#8b949e' : '#4b5563';
+  const _acc = '#00d4ff';
+  const _accBg = _lt ? 'rgba(0,133,204,.1)' : 'rgba(0,212,255,.1)';
+  const _accBdr = _lt ? 'rgba(0,133,204,.3)' : 'rgba(0,212,255,.4)';
+  const entries = CHANGELOG.map((e, i) => `
+    <div style="padding:18px 20px;border-bottom:1px solid ${_bdr}${i===0?';background:'+_accBg:''}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="font-size:.7rem;font-weight:800;color:${_acc};background:${_accBg};border:1px solid ${_accBdr};border-radius:4px;padding:2px 8px;letter-spacing:.04em">v${e.v}</span>
+        <span style="font-size:.68rem;color:${_dim}">${e.date}</span>
+        ${i===0?'<span style="font-size:.6rem;font-weight:700;color:#10b981;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:4px;padding:1px 6px;letter-spacing:.04em;text-transform:uppercase">Latest</span>':''}
+      </div>
+      <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+        ${e.items.map(it => `<li style="font-size:.76rem;color:${i===0?_txt:_sub};line-height:1.5">${it}</li>`).join('')}
+      </ul>
+    </div>`).join('');
+  const overlay = document.createElement('div');
+  overlay.id = 'changelogModal';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:fadeIn .15s ease';
+  overlay.innerHTML = `
+    <div style="background:${_bg};border-radius:14px;border:1px solid ${_bdr};width:min(560px,92vw);max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:scaleIn .2s ease">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid ${_bdr};flex-shrink:0">
+        <span style="font-size:1rem">${ICO.newspaper(20,_acc)}</span>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:.95rem;color:${_txt}">Changelog</div>
+          <div style="font-size:.68rem;color:${_dim}">${CHANGELOG.length} releases</div>
+        </div>
+        <a href="https://github.com/brevityA/Core-Builds/blob/main/Guides/CHANGELOG.md" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;font-weight:600;color:${_acc};text-decoration:none;margin-right:8px">Full history</a>
+        <button data-action="close-changelog" style="background:rgba(255,255,255,.05);border:1px solid ${_bdr};border-radius:6px;color:${_sub};font-size:.85rem;padding:4px 10px;cursor:pointer;line-height:1">✕</button>
+      </div>
+      <div style="overflow-y:auto;flex:1">${entries}</div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  overlay.querySelector('[data-action="close-changelog"]').addEventListener('click', () => overlay.remove());
+  document.body.appendChild(overlay);
+}
 
 function showCompareTemplates() {
   const ex = document.getElementById('cmpModal');
