@@ -1101,7 +1101,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.39';
+const CONFIGURATOR_VERSION = '2.40';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1155,6 +1155,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.40', date:'Jul 14 2026', items:[
+    'Direct Install — new toggle in Deploy: enter Stremio email + password inline to push the addon straight to your library',
+    'Get Manifest URL mode preserved for manual install / WuPlay / Nuvio',
+    '"Create random account" link generates a Stremio account in one click (no email verification)',
+  ]},
   { v:'2.39', date:'Jul 14 2026', items:[
     'Changelog is now its own page — click the version badge (header or splash) to open the full release history',
     'Splash "What\'s New" section replaced with a one-click button that opens the changelog modal',
@@ -1488,7 +1493,7 @@ function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [H
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', telemetryOk: false, simpleMode: false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '' };
 
 const FORMATTERS = [
   {
@@ -2604,13 +2609,43 @@ function render() {
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
             <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
             <div id="aioResult"></div>` : `
+            <div class="install-toggle" style="display:flex;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);padding:3px;margin-bottom:14px;gap:2px">
+              <button data-action="set-install-mode" data-mode="direct" class="install-toggle-btn${S.installMode==='direct'?' active':''}" style="flex:1;padding:8px 10px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='direct'?'background:rgba(0,212,255,.12);color:#00d4ff':'background:transparent;color:#6b7280'}">${ICO.rocket(13,'currentColor')} Direct Install</button>
+              <button data-action="set-install-mode" data-mode="manifest" class="install-toggle-btn${S.installMode==='manifest'?' active':''}" style="flex:1;padding:8px 10px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='manifest'?'background:rgba(0,212,255,.12);color:#00d4ff':'background:transparent;color:#6b7280'}">${ICO.link(13,'currentColor')} Get Manifest URL</button>
+            </div>
+            ${S.installMode === 'direct' ? `
+            <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Enter your Stremio credentials to install the addon directly to your library.</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+              <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
+                value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:var(--tx);font-size:.82rem;outline:none;transition:border-color .15s"
+                onfocus="this.style.borderColor='rgba(0,212,255,.35)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+              <div style="position:relative">
+                <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
+                  value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"
+                  style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;padding-right:40px;color:var(--tx);font-size:.82rem;outline:none;transition:border-color .15s"
+                  onfocus="this.style.borderColor='rgba(0,212,255,.35)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+                <button type="button" data-action="toggle-stremio-pwd"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:-2px">
+                <button type="button" data-action="create-stremio-account" style="font-size:.74rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:600;opacity:.8;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.8'">Create random account →</button>
+                <a href="https://www.stremio.com/register" target="_blank" rel="noopener" style="font-size:.72rem;color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#8b949e'" onmouseout="this.style.color='#6b7280'">Sign up at stremio.com</a>
+              </div>
+            </div>
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
+            <div id="aioResult"></div>
+            ` : `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
             <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
             <div style="display:flex;gap:8px">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
               <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
             </div>
-            <div id="aioResult"></div>`}
+            <div id="aioResult"></div>
+            `}`}
             <details style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
               <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
                 <span>Manual setup (existing config / self-hosted)</span>
@@ -3179,6 +3214,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'set-simple-pool') { S.streamPool = el.dataset.val; saveState(); render(); }
     if (action === 'set-simple-quality') { S.qualityFirst = !S.qualityFirst; saveState(); render(); }
     if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
+    if (action === 'set-install-mode') {
+      S.installMode = el.dataset.mode;
+      saveState(); render();
+    }
+    if (action === 'toggle-stremio-pwd') {
+      const inp = document.getElementById('stremioPasswordInline');
+      if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+    if (action === 'create-stremio-account') createRandomStremioAccount();
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'quick-reinstall') { S.simpleMode = true; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
@@ -3452,8 +3496,10 @@ document.addEventListener('DOMContentLoaded', () => {
       updateUuidValidation(S.instanceUuid);
     }
     else if (a === 'paste-manifest') onPasteManifest(e.target.value);
-    
-    if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid'].includes(a)){
+    else if (a === 'update-stremio-email') S.stremioEmail = e.target.value.trim();
+    else if (a === 'update-stremio-password') S.stremioPassword = e.target.value;
+
+    if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid', 'update-stremio-email', 'update-stremio-password'].includes(a)){
       saveState();
     }
   });
@@ -4649,12 +4695,33 @@ function simpleFinishHtml() {
       <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
       <div id="aioResult"></div>` : `
+      <div class="install-toggle" style="display:flex;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);padding:3px;margin-bottom:12px;gap:2px">
+        <button data-action="set-install-mode" data-mode="direct" class="install-toggle-btn${S.installMode==='direct'?' active':''}" style="flex:1;padding:7px 8px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='direct'?'background:rgba(0,212,255,.12);color:#00d4ff':'background:transparent;color:#6b7280'}">${ICO.rocket(12,'currentColor')} Direct Install</button>
+        <button data-action="set-install-mode" data-mode="manifest" class="install-toggle-btn${S.installMode==='manifest'?' active':''}" style="flex:1;padding:7px 8px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='manifest'?'background:rgba(0,212,255,.12);color:#00d4ff':'background:transparent;color:#6b7280'}">${ICO.link(12,'currentColor')} Manifest URL</button>
+      </div>
+      ${S.installMode === 'direct' ? `
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
+        <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
+          value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"
+          style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:.8rem;outline:none">
+        <div style="position:relative">
+          <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
+            value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"
+            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;padding-right:38px;color:var(--tx);font-size:.8rem;outline:none">
+          <button type="button" data-action="toggle-stremio-pwd" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <button type="button" data-action="create-stremio-account" style="align-self:flex-start;font-size:.7rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:600;opacity:.8">Create random account →</button>
+      </div>
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
+      ` : `
       <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
       <div style="display:flex;gap:8px">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
         <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
       </div>
-      <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Your API keys are baked directly into your config — no re-entering them later.</div>
+      `}
       <div id="aioResult"></div>`}
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
         <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">${ICO.download(13,'#67e8f9')} Export JSON instead</button>
@@ -4750,6 +4817,11 @@ async function simpleInstall(target) {
     const proceed = confirm('⚠ Config check:\n\n• ' + warns.join('\n• ') + '\n\nContinue anyway?');
     if (!proceed) return;
   }
+  if (S.installMode === 'direct' && target === 'app' && !isFree) {
+    if (!S.stremioEmail || !S.stremioPassword) {
+      showToast('Enter your Stremio email and password above', true); return;
+    }
+  }
   const origHtml = btn.innerHTML;
   if (isFree) {
     btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
@@ -4787,9 +4859,29 @@ async function simpleInstall(target) {
       const uuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
       const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
       if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); }
-      btn.disabled = false; btn.innerHTML = origHtml;
+      const manifestUrl = `${fastest}/stremio/${uuid}/${epwd}/manifest.json`;
+      const hostLbl = hostLabels[fastest] || fastest.replace('https://','').split('/')[0];
       saveLastGen();
-      showManifestModal(`${fastest}/stremio/${uuid}/${epwd}/manifest.json`, pwd, hostLabels[fastest] || fastest.replace('https://','').split('/')[0], target);
+      if (S.installMode === 'direct' && target === 'app' && S.stremioEmail && S.stremioPassword) {
+        btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Pushing to Stremio…`;
+        try {
+          const installed = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
+          btn.disabled = false; btn.innerHTML = origHtml;
+          if (installed === 'already') {
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div></div>`;
+          } else {
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} Installed to Stremio!</div><div style="font-size:.78rem;color:#8b949e">Reopen Stremio and search for any movie or show — streams will appear with Core Builds sorting.</div><div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
+          }
+          showToast('Addon installed to your Stremio library');
+          return;
+        } catch(err) {
+          btn.disabled = false; btn.innerHTML = origHtml;
+          result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio login failed</div><div style="font-size:.78rem;color:#8b949e">${err.message}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
+          return;
+        }
+      }
+      btn.disabled = false; btn.innerHTML = origHtml;
+      showManifestModal(manifestUrl, pwd, hostLbl, target);
       return;
     }
     throw new Error('rejected');
@@ -4830,6 +4922,52 @@ function genPwd() {
   const el = document.getElementById('aioPwd'); if (el) { el.value = pwd; el.type = 'text'; }
   showToast('Password generated — copy it now');
   setTimeout(() => { const e = document.getElementById('aioPwd'); if (e) e.type = 'password'; }, 5000);
+}
+
+async function pushToStremio(manifestUrl, email, password) {
+  const SAPI = 'https://api.strem.io/api/';
+  const loginRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'Login', email, password, facebook:false }) });
+  const loginData = await loginRes.json();
+  const authKey = loginData?.result?.authKey;
+  if (!authKey) throw new Error(loginData?.error || 'Login failed — check your email and password.');
+  const getRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionGet', authKey, update:true }) });
+  const getData = await getRes.json();
+  if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
+  const existing = getData.result.addons;
+  if (existing.some(a => a.transportUrl === manifestUrl)) return 'already';
+  const updated = [...existing, { transportName:'http', transportUrl: manifestUrl, flags:{} }];
+  const setRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionSet', authKey, addons: updated }) });
+  const setData = await setRes.json();
+  if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
+  return 'installed';
+}
+
+async function createRandomStremioAccount() {
+  const btn = document.querySelector('[data-action="create-stremio-account"]');
+  if (btn) { btn.textContent = 'Creating…'; btn.style.pointerEvents = 'none'; }
+  try {
+    const SAPI = 'https://api.strem.io/api/';
+    const rand = Math.random().toString(36).slice(2, 10);
+    const email = `corebuilds_${rand}@stremio.com`;
+    const password = makePwd();
+    const res = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'Register', email, password, gdpr_consent:{ tos:true, privacy:true, marketing:false, from:'web' } }) });
+    const data = await res.json();
+    if (data?.result?.authKey || data?.result?.user) {
+      S.stremioEmail = email;
+      S.stremioPassword = password;
+      saveState();
+      const eI = document.getElementById('stremioEmailInline');
+      const pI = document.getElementById('stremioPasswordInline');
+      if (eI) eI.value = email;
+      if (pI) { pI.value = password; pI.type = 'text'; setTimeout(() => { if (pI) pI.type = 'password'; }, 8000); }
+      showToast('Stremio account created — credentials filled in');
+    } else {
+      throw new Error(data?.error || 'Registration failed');
+    }
+  } catch(err) {
+    showToast('Could not create account: ' + err.message, true);
+  }
+  if (btn) { btn.textContent = 'Create random account →'; btn.style.pointerEvents = ''; }
 }
 
 function extractManifestParts(val) {
