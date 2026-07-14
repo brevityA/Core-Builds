@@ -4856,7 +4856,11 @@ async function simpleInstall(target) {
     );
     const res = await raceHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
-    if (res.ok && data?.success !== false) {
+    if (!res.ok || data?.success === false) {
+      const apiMsg = data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`;
+      throw new Error(`API_ERROR:${apiMsg}`);
+    }
+    {
       const uuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
       const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
       if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); }
@@ -4885,8 +4889,15 @@ async function simpleInstall(target) {
       showManifestModal(manifestUrl, pwd, hostLbl, target);
       return;
     }
-    throw new Error('rejected');
   } catch(e) {
+    const isApiError = e.message && e.message.startsWith('API_ERROR:');
+    const apiDetail = isApiError ? e.message.slice(10) : '';
+    if (isApiError) {
+      btn.disabled = false; btn.innerHTML = origHtml;
+      const safeMsg = apiDetail.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+      result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+      return;
+    }
     btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
     const importUrl = await uploadTemplateForImport();
     btn.disabled = false; btn.innerHTML = origHtml;
@@ -4902,7 +4913,7 @@ async function simpleInstall(target) {
         }).join('');
         credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
       }
-      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Direct install unavailable — tap an instance to import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">All hosts unreachable — tap an instance to import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
       showToast('Tap an instance chip to import your template');
     } else {
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
@@ -5173,7 +5184,8 @@ async function openInAIOStreams() {
       const res = await raceHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) return { host: fastest, uuid: id || data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id, epwd: data?.data?.encryptedPassword };
-      throw new Error('rejected');
+      const apiMsg = data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`;
+      throw new Error(`API_ERROR:${apiMsg}`);
     };
     try {
       let winner;
@@ -5187,7 +5199,13 @@ async function openInAIOStreams() {
       resetBtn(origHtml);
       showManifestModal(`${winner.host}/stremio/${winner.uuid}/${manifestPwd}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
     } catch(e) {
-      if (S.simpleMode) {
+      const isApiError = e.message && e.message.startsWith('API_ERROR:');
+      const apiDetail = isApiError ? e.message.slice(10) : '';
+      if (isApiError) {
+        resetBtn(origHtml);
+        const safeMsg = apiDetail.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+      } else if (S.simpleMode) {
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
         const importUrl = await uploadTemplateForImport();
         resetBtn(origHtml);
