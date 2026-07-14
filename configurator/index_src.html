@@ -268,10 +268,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .opts.list .opt-icon svg{width:34px;height:34px}
   .opts.list .opt label{padding:16px 18px}
 }
-/* Desktop sidebar layout (1200px+) */
+/* Desktop sidebar layout (1000px+) */
 .cb-sidebar{display:none}
 .cb-sidebar.sb-hidden{display:none!important}
-@media(min-width:1200px){
+@media(min-width:1000px){
   .wrap{max-width:none;padding:0;flex-direction:column;align-items:stretch}
   .cb-sidebar{display:flex;flex-direction:column;width:280px;flex-shrink:0;background:#151923;border-right:1px solid rgba(255,255,255,.06);position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto}
   .cb-sidebar .sb-brand{display:flex;align-items:center;gap:12px;padding:20px 20px 18px;border-bottom:1px solid rgba(255,255,255,.06)}
@@ -924,6 +924,61 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .receipt-row[data-action]{cursor:pointer;transition:background .15s}
 .receipt-row[data-action]:hover{background:rgba(0,212,255,.05)}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* ===== v2.38 Nexus calm UI — Duck-inspired mix (single accent, no glow) ===== */
+/* Motion: retire pulse/glow loops (keyframes redefined to static states) */
+@keyframes optSelect{0%,100%{box-shadow:none}}
+@keyframes hoverPulse{0%,100%{box-shadow:none}}
+@keyframes bubPulse{0%,100%{box-shadow:none}}
+@keyframes manifestPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.22)}}
+@keyframes dlPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.22)}}
+@keyframes btnFlash{0%,100%{box-shadow:none}}
+@keyframes btnHoverPulse{0%,100%{box-shadow:none}}
+/* Decorative hairline glows off */
+.card::after,.opt label::before,.btn-next::before,.hdr-banner::before{display:none}
+.hdr-icon,.cb-sidebar .sb-brand-icon{filter:none}
+.opts.list .opt-icon svg,.opts.pills .opt-icon svg,
+.opts.list .opt input:checked+label .opt-icon svg,.opts.pills .opt input:checked+label .opt-icon svg{filter:none}
+/* Flat selection states */
+.opt input:checked+label{border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.07);box-shadow:none}
+.opt input:checked+label::after{box-shadow:none}
+.opts.pills .opt input:checked+label{box-shadow:none}
+.svc-list-hero input:checked+label{box-shadow:none!important}
+.bc-chip{box-shadow:none}
+.step-active .step-bub{box-shadow:none;transform:scale(1.35)}
+.step-done .step-bub{box-shadow:none}
+/* One CTA identity — cyan gradient, dark text */
+.btn-next{background:linear-gradient(135deg,#00a8d4,#00d4ff);color:#04202b;border:none;box-shadow:0 5px 22px rgba(0,212,255,.22)}
+.btn-next:hover:not(:disabled){background:linear-gradient(135deg,#00b8e6,#2adcff);border:none;box-shadow:0 7px 28px rgba(0,212,255,.32)}
+.btn-next:disabled{background:#111720;color:#4a4f60;border:1px solid rgba(255,255,255,.06);box-shadow:none}
+.btn-next .cta-step-lbl{opacity:.72}
+.btn-dl{background:linear-gradient(135deg,#00a8d4,#00d4ff);color:#04202b;box-shadow:0 5px 22px rgba(0,212,255,.22)}
+.btn-dl:hover{box-shadow:0 7px 28px rgba(0,212,255,.32)}
+.btn-manifest{box-shadow:0 4px 20px rgba(0,212,255,.2)}
+/* Multi-select rows read as switches (service picker / optional scrapers) */
+.svc-row-ck{width:36px;height:20px;border-radius:20px;background:#2a3140;border:none;position:relative;transition:background .18s}
+.svc-row-ck svg{display:none}
+.svc-row-ck::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8b94a3;transition:left .18s,background .18s}
+.svc-list-row input:checked+label .svc-row-ck{background:#00d4ff;border:none}
+.svc-list-row input:checked+label .svc-row-ck::after{left:19px;background:#08131a}
+/* Splash — Duck-style: quiet doors as full-width rows with a trailing arrow */
+.splash-doors{display:flex;flex-direction:column;gap:10px;width:100%;max-width:460px}
+.splash-door{flex-direction:row;align-items:center;gap:14px;text-align:left;padding:16px 18px;border-radius:14px;position:relative}
+.splash-door::after{content:'→';margin-left:auto;color:#4a4f60;font-size:1.05rem;flex-shrink:0;transition:color .15s,transform .15s}
+.splash-door:hover::after{color:#00d4ff;transform:translateX(2px)}
+.splash-door .splash-door-icon{margin-bottom:0}
+.splash-door-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.splash-door .splash-door-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.splash-door .splash-door-desc{margin-top:0}
+.splash-door .splash-door-tag{position:static;font-size:.56rem;flex-shrink:0}
+[data-theme="light"] .svc-row-ck{background:#d0d7de}
+[data-theme="light"] .svc-row-ck::after{background:#fff}
+[data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da}
+[data-theme="light"] .btn-next,[data-theme="light"] .btn-dl{color:#04202b}
+[data-theme="light"] .btn-next:disabled{background:#f6f8fa;color:#8c959f;border:1px solid #d0d7de}
+/* Theme toggle: dock bottom-right when the sidebar rail is visible (was overlapping the brand) */
+@media(min-width:1000px){
+  .cb-sidebar:not(.sb-hidden)~#themeToggle{top:auto;left:auto;bottom:14px;right:14px}
+}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -1046,7 +1101,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.37';
+const CONFIGURATOR_VERSION = '2.38';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1100,6 +1155,14 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.38', date:'Jul 14 2026', items:[
+    'UI refresh — calmer, Duck-inspired look: single accent, glow/pulse animations retired, flat selection states',
+    'One CTA identity — Continue and Download buttons now use the cyan gradient',
+    'Desktop sidebar now activates at 1000px (was 1200px)',
+    'Multi-select service rows use toggle switches instead of checkboxes',
+    'Splash entry cards are now full-width rows with trailing arrows',
+    'Spelling — "Debrid.io" is now "Debridio" across the service picker, API key field, and generated preset',
+  ]},
   { v:'2.37', date:'Jul 11 2026', items:[
     'Fix — excludedRegexPatterns now emitted as plain strings (was objects, causing "expected string, received object" errors)',
   ]},
@@ -1581,7 +1644,7 @@ const DEFS = [
       { v:'easynews',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="24" rx="4" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><path d="M12 18l10 6 10-6" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28l6-4M32 28l-6-4" stroke="#06b6d4" stroke-width="1.2" stroke-linecap="round"/><text x="22" y="9" text-anchor="middle" fill="#06b6d4" font-size="4" font-weight="700" letter-spacing=".3">EN</text></svg>', name:'EasyNews', desc:'Usenet — username &amp; password<br><span style="color:#0ea5e9;font-size:.8em">e.g. Speed EasyNews · Speed 4K+</span>' },
       { v:'offcloud',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M12 28a8 8 0 0114-6.5A6 6 0 0134 24a5 5 0 01-2 9.5H14a6 6 0 01-2-5.5z" stroke="#94a3b8" stroke-width="1.5" fill="#94a3b8" fill-opacity=".06"/><path d="M18 24h8M18 28h5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>', name:'Offcloud', desc:'Cloud debrid — API key required<br><span style="color:#06b6d4;font-size:.8em">torrent + HTTP download caching</span>' },
       { v:'hybrid',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="28" rx="4" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".06"/><line x1="22" y1="8" x2="22" y2="36" stroke="#333" stroke-width=".8"/><rect x="6" y="8" width="16" height="28" rx="4" stroke="#22c55e" stroke-width="1.5" fill="none"/><rect x="22" y="8" width="16" height="28" rx="4" stroke="#dc2626" stroke-width="1.5" fill="#dc2626" fill-opacity=".06"/><path d="M12 18h6M12 22h4M12 26h5" stroke="#22c55e" stroke-width="1.3" stroke-linecap="round"/><path d="M29 16l-4 7h3l-2 5 5-6h-3z" fill="#dc2626" fill-opacity=".7"/></svg>', name:'Hybrid', desc:'TorBox Pro + Real-Debrid fallback<br><span style="color:#8b949e;font-size:.8em">e.g. 4K Hybrid · Core Nexus Hybrid</span>' },
-      { v:'debridio',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#14b8a6" stroke-width="1.5" fill="#14b8a6" fill-opacity=".06"/><circle cx="19" cy="19" r="5.5" fill="none" stroke="#14b8a6" stroke-width="1.5"/><line x1="23" y1="23" x2="29" y2="29" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"/><text x="22" y="42" text-anchor="middle" fill="#14b8a6" font-size="4" font-weight="800" letter-spacing=".3">DEBRID.IO</text></svg>', name:'Debrid.io', desc:'Debrid.io scraper · API key required<br><span style="color:#14b8a6;font-size:.8em">search + caching via Debrid.io</span>' },
+      { v:'debridio',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#14b8a6" stroke-width="1.5" fill="#14b8a6" fill-opacity=".06"/><circle cx="19" cy="19" r="5.5" fill="none" stroke="#14b8a6" stroke-width="1.5"/><line x1="23" y1="23" x2="29" y2="29" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"/><text x="22" y="42" text-anchor="middle" fill="#14b8a6" font-size="4" font-weight="800" letter-spacing=".3">DEBRIDIO</text></svg>', name:'Debridio', desc:'Debridio scraper · API key required<br><span style="color:#14b8a6;font-size:.8em">search + caching via Debridio</span>' },
       { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="24" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="7" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">multi-debrid aggregator service</span>' },
       { v:'pikpak',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#38bdf8" stroke-width="1.5" fill="#38bdf8" fill-opacity=".06"/><path d="M17 16l10 6-10 6z" fill="#38bdf8" fill-opacity=".6" stroke="#38bdf8" stroke-width="1.2" stroke-linejoin="round"/><text x="22" y="7" text-anchor="middle" fill="#38bdf8" font-size="4" font-weight="800" letter-spacing=".3">PIKPAK</text></svg>', name:'PikPak', desc:'PikPak cloud storage · API key<br><span style="color:#38bdf8;font-size:.8em">cloud torrent + download caching</span>' },
       { v:'seedr',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#a3e635" stroke-width="1.5" fill="#a3e635" fill-opacity=".05"/><circle cx="22" cy="22" r="6" fill="none" stroke="#a3e635" stroke-width="1.5"/><path d="M22 16v-4M19 17l-3-3M25 17l3-3" stroke="#a3e635" stroke-width="1.3" stroke-linecap="round"/><path d="M22 28v3" stroke="#a3e635" stroke-width="1.2" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="42" text-anchor="middle" fill="#a3e635" font-size="4.5" font-weight="800" letter-spacing=".3">SEEDR</text></svg>', name:'Seedr', desc:'Seedr cloud torrent · API key<br><span style="color:#a3e635;font-size:.8em">torrent to cloud streaming</span>' },
@@ -1850,7 +1913,7 @@ function renderOpts(def) {
       'p2p':        'Direct torrents · no account needed',
       'http':       'Streaming sites · no debrid required',
       'hybrid':     'TorBox Pro + Real-Debrid fallback',
-      'debridio':   'Debrid.io scraper',
+      'debridio':   'Debridio scraper',
       'easydebrid': 'Multi-debrid aggregator',
       'pikpak':     'Cloud torrent + download caching',
       'seedr':      'Cloud torrent streaming',
@@ -2350,15 +2413,17 @@ function splashHtml() {
     <div class="splash-doors">
       <div class="splash-door" data-action="easy-start">
         <div class="splash-door-icon">${ICO.compass(22,'#00d4ff')}</div>
-        <div class="splash-door-title">Guided Setup</div>
-        <div class="splash-door-desc">Walk through device, resolution, and cache — we build the template for you.</div>
-        <div class="splash-door-tag splash-tag-guided">Core Start</div>
+        <div class="splash-door-text">
+          <div class="splash-door-title">Guided Setup <span class="splash-door-tag splash-tag-guided">Core Start</span></div>
+          <div class="splash-door-desc">Walk through device, resolution, and cache — we build the template for you.</div>
+        </div>
       </div>
       <div class="splash-door" data-action="custom-start">
         <div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div>
-        <div class="splash-door-title">Core Configure</div>
-        <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
-        <div class="splash-door-tag splash-tag-advanced">Advanced</div>
+        <div class="splash-door-text">
+          <div class="splash-door-title">Core Configure <span class="splash-door-tag splash-tag-advanced">Advanced</span></div>
+          <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
+        </div>
       </div>
     </div>
 
@@ -3475,7 +3540,7 @@ function getDebridInputs() {
     easynews:     { label:'EasyNews Username',     placeholder:'your-username',                        url:'https://www.easynews.com/account' },
     easynewsPass: { label:'EasyNews Password',     placeholder:'your-password',                        url:'https://www.easynews.com/account' },
     nzbgeek:      { label:'NZBGeek API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbgeek.info/dashboard.php?call=profile' },
-    debridio:     { label:'Debrid.io API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debrid.io/' },
+    debridio:     { label:'Debridio API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debrid.io/' },
     easydebrid:   { label:'EasyDebrid API Key',    placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://easydebrid.com/' },
     pikpak:       { label:'PikPak API Key',        placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://mypikpak.com/' },
     seedr:        { label:'Seedr API Key',         placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://www.seedr.cc/' },
@@ -3504,7 +3569,7 @@ function defaultName() {
   const res = S.resolution, svc = S.service;
   const is4k = res === '4k', isUW = res === 'ultrawide';
   const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
-  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid', 'debridio':'Debrid.io' }[svc] || '';
+  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid', 'debridio':'Debridio' }[svc] || '';
   if (svc === 'multi') {
     const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN','torbox-pro':'TB','torbox-ess':'TB-Ess','hybrid':'HYB','debridio':'DIO','easydebrid':'ED','pikpak':'PP','seedr':'SR','p2p':'P2P','http':'HTTP','nzbgeek':'NZB','streamnzb':'SNZB'};
     const PRIMARY_ABBR = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'];
@@ -3554,7 +3619,7 @@ function presets() {
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
     ...(isDebridio ? [
-      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debrid.io', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
+      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
     ...(hasExtraHttp ? [
       { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
