@@ -12,6 +12,7 @@ const ALLOWED_HOSTS = new Set([
   'https://aiostreams.stremio.ru',
   'https://aio.atbphosting.com',
   'https://aiostreams.12312023.xyz',
+  'https://aiostreams-stable.forthewizards.uk',
 ]);
 
 const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
