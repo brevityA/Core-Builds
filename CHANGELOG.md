@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.2.8 (2026-07-15)
+
+### Fixed
+- **REMUX ranking fix** (all 44 active templates) — BluRay REMUX files were consistently ranked below WEB-DL streams because three interacting factors inflated WEB-DL scores: (1) `audioTag` sort position above `encode` caused WEB-DL with Atmos to beat REMUX with DD+, (2) Audio Pinnacle bonus PSE added extra seScore to streams with premium audio tags regardless of quality tier, (3) `perGroup(streams, 'resolution', 3)` in Extra Cached ESEs randomly dropped REMUX based on addon arrival order. Reported by community member Tetelestai3-16.
+  - **Global sort reordered** — `visualTag → encode → audioTag → audioChannel → language` (was `visualTag → audioTag → audioChannel → language → encode`). Encode type (REMUX/BluRay/WEB-DL) now breaks ties before audio tag preference.
+  - **Audio Pinnacle PSE removed** — eliminated bonus seScore inflation that ranked WEB-DL with Atmos above REMUX with DD+. Audio preference is now handled purely by sort criteria position.
+  - **HDR/DV Priority PSE removed** — redundant with `visualTag` already in sort criteria. Removed to simplify PSE stack and prevent unintended score inflation.
+  - **Extra Cached perGroup increased** — `perGroup(streams, 'resolution', 3)` → `perGroup(streams, 'resolution', 5)` in Extra Cached HQ/LQ ESEs. Larger pool reduces random REMUX exclusion before PSE scoring.
+- **`deduplicator.merge` schema fix** (all 43 templates) — removed `"merge": false` boolean that newer AIOStreams versions reject ("Invalid input: expected object, received boolean"). The field defaults to off when omitted.
+- **Test Drive title rendering** — stream names containing unresolved formatter DSL (`{stream.X::operator[...]}`) are now cleaned client-side before display.
+- **Configurator v2.48** — REMUX fixes + deduplicator.merge removal + Test Drive cleanup.
+- **4K Apex bumped to v0.8.0.**
+
+### Added
+- **Xiaomi Mi Box S device profiles** (Configurator v2.48) — two new device options: **2nd Gen** (DV Profile 5, HDR10+, no AV1, no lossless, DD+ Atmos ceiling) and **3rd Gen** (same + AV1 hardware decode). Community request by Fée Deuspi.
+- **Improved addon naming** — configurator-generated templates now use "Core Nexus" branding with device name and full service names instead of abbreviations. Example: `Core Nexus 4K · Samsung TV — TorBox` instead of `Core Builds 4K Multi (TB-Ess+PM)`.
+
 ## 3.2.7 (2026-07-11)
 
 ### Added
