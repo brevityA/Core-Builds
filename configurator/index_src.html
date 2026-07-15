@@ -1101,7 +1101,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.42';
+const CONFIGURATOR_VERSION = '2.43';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1155,6 +1155,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.43', date:'Jul 15 2026', items:[
+    'Template Updater — fixed service detection: Hybrid, AllDebrid, and EasyNews templates now correctly identified via preset analysis instead of service-only checks',
+    'Template Updater — fixed resolution detection: 1080p templates with ESE-based 4K kill now correctly detected as 1080p instead of defaulting to 4K',
+    'Template Updater — fixed state bleeding: importing a second template no longer inherits stale values from the first import',
+  ]},
   { v:'2.42', date:'Jul 15 2026', items:[
     'Sort criteria — added `service` key for Hybrid configs (TorBox gets priority over RD in sort order)',
     'Sort criteria — added `age` and `subtitle` tiebreaker keys to all sort sections',
@@ -4190,16 +4195,35 @@ function showFormatterImport() {
 
 function parseTemplateToState(tpl) {
   const c = tpl.config || tpl;
-  const st = {};
+  const st = {
+    service: null, device: null, resolution: null, audio: 'limited', content: null,
+    name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v3',
+    p2pEnabled: false, qualityFirst: false, matchMode: 'balanced',
+    exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
+    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false
+  };
 
-  // Service detection from enabled services
+  const presets = c.presets || [];
+  const enabledPresets = presets.filter(p => p.enabled);
+  const presetTypes = new Set(enabledPresets.map(p => p.type));
+
+  // Service detection: use presets + services together for accuracy
   const svcs = (c.services || []).filter(s => s.enabled);
-  const svcIds = svcs.map(s => s.id);
-  const hasTB = svcIds.includes('torbox'), hasRD = svcIds.includes('realdebrid'), hasAD = svcIds.includes('alldebrid');
-  const hasEN = svcIds.includes('easynews'), hasPM = svcIds.includes('premiumize'), hasDL = svcIds.includes('debridlink');
-  const hasOC = svcIds.includes('offcloud'), hasED = svcIds.includes('easydebrid'), hasPP = svcIds.includes('pikpak'), hasSR = svcIds.includes('seedr');
+  const svcIds = new Set(svcs.map(s => s.id));
+  const hasTB = svcIds.has('torbox'), hasRD = svcIds.has('realdebrid'), hasAD = svcIds.has('alldebrid');
+  const hasEN = svcIds.has('easynews'), hasPM = svcIds.has('premiumize'), hasDL = svcIds.has('debridlink');
+  const hasOC = svcIds.has('offcloud'), hasED = svcIds.has('easydebrid'), hasPP = svcIds.has('pikpak'), hasSR = svcIds.has('seedr');
 
-  if (hasTB && hasRD) st.service = 'hybrid';
+  const hasStremthruStore = presetTypes.has('stremthruStore');
+  const hasStremthruTorz = presetTypes.has('stremthruTorz');
+  const hasEasyNewsPreset = presetTypes.has('easynews') || presetTypes.has('easynewsPlusPlus') || presetTypes.has('easynews-search') || presetTypes.has('easynewsPlus');
+  const hasSvcSortKey = ((c.sortCriteria && c.sortCriteria.global) || []).some(k => k.key === 'service');
+  const hasSvcPSEs = (c.preferredStreamExpressions || []).some(e => e.expression && /service\(/.test(e.expression));
+  const isHybrid = (hasTB && hasRD) || (hasTB && (hasSvcSortKey || hasSvcPSEs) && hasStremthruTorz);
+
+  if (isHybrid) st.service = 'hybrid';
+  else if (hasStremthruStore && hasTB) st.service = 'alldebrid';
+  else if (hasEN && hasEasyNewsPreset) st.service = 'easynews';
   else if (hasTB) st.service = 'torbox-pro';
   else if (hasRD) st.service = 'realdebrid';
   else if (hasAD) st.service = 'alldebrid';
@@ -4241,15 +4265,17 @@ function parseTemplateToState(tpl) {
   st.creds = creds;
 
   // NZBGeek from presets
-  const presets = c.presets || [];
   const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.newznabUrl||'').includes('nzbgeek'));
   if (nzbg && nzbg.options && nzbg.options.apiKey) creds.nzbgeek = nzbg.options.apiKey;
 
-  // Resolution from requiredResolutions or PSEs
+  // Resolution: check requiredResolutions, excludedResolutions, and ESEs
   const req = c.requiredResolutions || [];
   const excl = c.excludedResolutions || [];
-  if (excl.includes('2160p')) st.resolution = '1080p';
+  const eses = c.excludedStreamExpressions || [];
+  const has4kESEKill = eses.some(e => e.enabled !== false && e.expression && /^(?:\/\*[^*]*\*\/\s*)?resolution\s*\(\s*streams\s*,\s*['"]2160p/.test(e.expression.trim()));
+  if (excl.includes('2160p') || has4kESEKill) st.resolution = '1080p';
   else if (req.includes('2160p') || (c.preferredResolutions && c.preferredResolutions[0] === '2160p')) st.resolution = '4k';
+  else if (req.length > 0 && !req.includes('2160p')) st.resolution = '1080p';
   else st.resolution = '1080p';
 
   // Audio profile from excludedAudioTags
@@ -4318,9 +4344,8 @@ function parseTemplateToState(tpl) {
   }
 
   // Exclude DV/4K from ESEs
-  const eses = c.excludedStreamExpressions || [];
   st.excludeDV = eses.some(e => e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
-  st.exclude4K = eses.some(e => e.expression && /resolution.*2160p/.test(e.expression) && !/quality|bitrate/.test(e.expression));
+  st.exclude4K = has4kESEKill;
 
   return st;
 }
@@ -4367,7 +4392,14 @@ function showUpdateTemplateModal() {
       const parsed = parseTemplateToState(tpl);
       if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
 
-      // Apply parsed state
+      // Reset state then apply parsed values (prevents old state bleeding between imports)
+      S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
+      S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
+      S.formatter = 'family-v3'; S.p2pEnabled = false; S.qualityFirst = false;
+      S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
+      S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
+      S.streamPool = 'normal';
+      S.creds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''};
       Object.assign(S, parsed);
       if (parsed.creds) Object.assign(S.creds, parsed.creds);
       S.simpleMode = false;
