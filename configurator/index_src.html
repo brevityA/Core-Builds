@@ -4662,8 +4662,14 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel) {
   document.getElementById('dfCancel').addEventListener('click', () => close(onCancel));
   document.getElementById('dfApply').addEventListener('click', () => {
     const selected = new Set();
-    allCbs.forEach((cb, i) => { if (cb.checked && sections[i] && sections[i].key) selected.add(sections[i].key); });
-    close(() => onApply(selected));
+    const offered = new Set();
+    allCbs.forEach((cb, i) => {
+      if (sections[i] && sections[i].key) {
+        offered.add(sections[i].key);
+        if (cb.checked) selected.add(sections[i].key);
+      }
+    });
+    close(() => onApply(selected, offered));
   });
   overlay.addEventListener('click', e => { if (e.target === overlay) close(onCancel); });
 }
@@ -4731,7 +4737,7 @@ function showUpdateTemplateModal() {
       overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
       setTimeout(() => {
         overlay.remove();
-        showDiffModal(oldCfg, newCfg, parsed, (selectedKeys) => {
+        showDiffModal(oldCfg, newCfg, parsed, (selectedKeys, offeredKeys = new Set()) => {
           const SECTION_FIELDS = {
             pses: ['preferredStreamExpressions'],
             eses: ['excludedStreamExpressions'],
@@ -4744,12 +4750,12 @@ function showUpdateTemplateModal() {
           };
           const keep = {};
           for (const [key, fields] of Object.entries(SECTION_FIELDS)) {
-            if (!selectedKeys.has(key)) {
+            if (offeredKeys.has(key) && !selectedKeys.has(key)) {
               fields.forEach(f => { if (oldCfg[f] !== undefined) keep[f] = oldCfg[f]; });
             }
           }
           S._migrationKeep = Object.keys(keep).length ? keep : null;
-          const skipped = Object.keys(SECTION_FIELDS).filter(k => !selectedKeys.has(k)).length;
+          const skipped = Object.keys(SECTION_FIELDS).filter(k => offeredKeys.has(k) && !selectedKeys.has(k)).length;
           step = STEPS;
           pushStep(); render(); window.scrollTo(0,0);
           showToast(skipped ? 'Template upgraded — '+selectedKeys.size+' section'+(selectedKeys.size!==1?'s':'')+' applied, '+skipped+' kept from original' : 'Template upgraded — review settings and generate your new template');
