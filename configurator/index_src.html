@@ -512,7 +512,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .m-install{background:linear-gradient(135deg,#0e7490,#00d4ff);color:#000}
 .m-web{background:#1a1f2e;border:1.5px solid #00d4ff!important;color:#00d4ff}
 .m-wu{background:#16103a;border:1.5px solid #4f46e5!important;color:#a78bfa}
-.m-nuvio{background:#1a1200;border:1.5px solid #d97706!important;color:#f59e0b}
+.m-nuvio{background:rgba(168,85,247,.08);border:1.5px solid rgba(168,85,247,.35)!important;color:#c084fc}
 .m-done{background:rgba(255,255,255,.06);color:#7a8194}
 .m-done:hover{color:#e6edf3}
 /* Manifest primary button */
@@ -1219,7 +1219,7 @@ const ICO = {
   folder:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 14V34a2 2 0 002 2h28a2 2 0 002-2V18a2 2 0 00-2-2H22l-4-4H8a2 2 0 00-2 2z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M22 23v8M18 27l4 4 4-4" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   rocket:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 8c-2 4-3 10-3 14l3 6 3-6c0-4-1-10-3-14z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1" stroke-linejoin="round"/><path d="M19 22l-5 4 2 4M25 22l5 4-2 4" stroke="${c}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="18" r="2" fill="${c}" fill-opacity=".5"/><path d="M18 34h8" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   wuplay:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 6a16 16 0 010 32c-4 0-8-4-8-8s4-8 8-8c4 0 8-4 8-8s-4-8-8-8z" fill="${c}" fill-opacity=".12" stroke="${c}" stroke-width="1.5"/><polygon points="18,14 18,20 23,17" fill="${c}" fill-opacity=".7"/><polygon points="26,24 26,30 21,27" fill="${c}" fill-opacity=".7"/></svg>`,
-  nuvio:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="22" r="14" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><path d="M14 22a8 8 0 0116 0" stroke="${c}" stroke-width="1.5" fill="none"/><path d="M18 22a4 4 0 018 0" stroke="${c}" stroke-width="1.2" fill="none"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".7"/></svg>`,
+  nuvio:(s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><defs><linearGradient id="nuvG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs><path d="M10 8.5C10 5.5 12 4 14.5 5.5l20 13c2.5 1.5 2.5 5.5 0 7l-20 13C12 40 10 38.5 10 35.5z" fill="url(#nuvG)" rx="4"/><path d="M18 16l12 7.5-12 7.5z" fill="#fff" fill-opacity=".95"/></svg>`,
   bolt:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M24 6L12 24h8l-2 14L32 20h-8l2-14z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".12" stroke-linejoin="round"/></svg>`,
   github:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M22 6C13.2 6 6 13.2 6 22c0 7.1 4.6 13.1 10.9 15.2.8.1 1.1-.3 1.1-.8v-2.7c-4.4 1-5.4-2.1-5.4-2.1-.7-1.8-1.8-2.3-1.8-2.3-1.4-1 .1-1 .1-1 1.6.1 2.4 1.6 2.4 1.6 1.4 2.4 3.7 1.7 4.6 1.3.1-1 .6-1.7 1-2.1-3.5-.4-7.2-1.8-7.2-7.9 0-1.7.6-3.2 1.6-4.3-.2-.4-.7-2 .2-4.2 0 0 1.3-.4 4.4 1.6a15.3 15.3 0 018 0c3-2 4.3-1.6 4.3-1.6.9 2.2.4 3.8.2 4.2 1 1.1 1.6 2.5 1.6 4.3 0 6.1-3.7 7.5-7.2 7.9.6.5 1.1 1.5 1.1 3v4.4c0 .5.3.9 1.1.8C33.4 35.1 38 29.1 38 22c0-8.8-7.2-16-16-16z" fill="${c}"/></svg>`,
   reddit:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><circle cx="22" cy="24" r="12" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".06"/><circle cx="17" cy="22" r="2" fill="${c}" fill-opacity=".5"/><circle cx="27" cy="22" r="2" fill="${c}" fill-opacity=".5"/><path d="M17 28c2 2 8 2 10 0" stroke="${c}" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="32" cy="14" r="2.5" stroke="${c}" stroke-width="1.2" fill="${c}" fill-opacity=".15"/><path d="M26 12l4 2" stroke="${c}" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="12" r="3" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/></svg>`,
@@ -2789,7 +2789,7 @@ function render() {
             <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
             <div style="display:flex;gap:8px">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
-              <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
+              <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
             </div>
             <div id="aioResult"></div>
             `}`}
@@ -5007,7 +5007,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install`,
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web`,
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open WuPlay`,
-    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open Nuvio`,
+    `${ICO.nuvio(13)}Open Nuvio`,
   ];
 
   function switchFmt(fi) {
@@ -5428,7 +5428,7 @@ function simpleFinishHtml() {
       <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
       <div style="display:flex;gap:8px">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
-        <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:#fbbf24">${ICO.nuvio(16,'#fbbf24')} Nuvio</button>
+        <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
       </div>
       `}
       <div id="aioResult"></div>`}
