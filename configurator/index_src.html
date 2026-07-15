@@ -104,6 +104,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-aio{width:100%;padding:14px;font-size:1.08rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;cursor:pointer;background:transparent;color:#00d4ff;margin-top:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-aio:hover{background:#00131c;border-color:#00d4ff;animation:hoverPulse 1.6s ease-in-out infinite}
 .btn-aio:active{transform:scale(.98)}
+.btn-td{width:100%;padding:13px 16px;font-size:.92rem;font-weight:700;border-radius:10px;border:1.5px solid rgba(124,58,237,.35);cursor:pointer;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(167,139,250,.08));color:#a78bfa;margin-top:10px;margin-bottom:4px;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-td:hover{background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(167,139,250,.15));border-color:rgba(167,139,250,.5);box-shadow:0 4px 20px rgba(124,58,237,.2);transform:translateY(-1px)}
+.btn-td:active{transform:scale(.98)}
+.td-modal .modal-box{max-width:560px}
+.td-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.td-tile{padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);cursor:pointer;transition:all .15s;text-align:left}
+.td-tile:hover{border-color:rgba(167,139,250,.4);background:rgba(124,58,237,.06)}
+.td-tile-title{font-size:.82rem;font-weight:700;color:#e6edf3;margin-bottom:2px}
+.td-tile-meta{font-size:.68rem;color:#6b7280}
+.td-custom{display:flex;gap:8px;margin:10px 0 14px}
+.td-custom input{flex:1;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:#111720;color:#e4e7ed;font-size:.82rem;outline:none;transition:border-color .15s;font-family:monospace}
+.td-custom input:focus{border-color:rgba(167,139,250,.4)}
+.td-custom button{padding:9px 16px;border-radius:8px;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.1);color:#a78bfa;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.td-custom button:hover{background:rgba(124,58,237,.2);border-color:rgba(167,139,250,.5)}
+.td-results{margin-top:12px;max-height:55vh;overflow-y:auto;padding-right:4px}
+.td-stream{padding:10px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);margin-bottom:6px;transition:border-color .15s}
+.td-stream:hover{border-color:rgba(167,139,250,.25)}
+.td-stream-name{font-size:.78rem;font-weight:700;color:#e6edf3;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+.td-stream-desc{font-size:.72rem;color:#8b949e;line-height:1.5;margin-top:4px;white-space:pre-wrap;word-break:break-word}
+.td-loading{text-align:center;padding:30px 0;color:#6b7280;font-size:.82rem}
+.td-error{padding:12px;border-radius:8px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);font-size:.78rem;color:#f87171;margin-top:10px}
+.td-count{font-size:.72rem;color:#6b7280;margin-bottom:8px;font-weight:600}
 .aio-section{margin-top:20px;border-top:1px solid rgba(255,255,255,.06);padding-top:18px}
 .aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
 .rv-section{margin-top:12px;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden}
@@ -797,6 +819,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .modal-close{color:#57606a}
 [data-theme="light"] .modal-close:hover{color:#1c2128}
 [data-theme="light"] .modal-title{color:#1c2128}
+[data-theme="light"] .btn-td{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(167,139,250,.05));border-color:rgba(124,58,237,.25);color:#7c3aed}
+[data-theme="light"] .btn-td:hover{background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(167,139,250,.1));border-color:rgba(124,58,237,.4);box-shadow:0 4px 20px rgba(124,58,237,.12)}
+[data-theme="light"] .td-tile{border-color:#d0d7de;background:#f6f8fa}
+[data-theme="light"] .td-tile:hover{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.04)}
+[data-theme="light"] .td-tile-title{color:#1c2128}
+[data-theme="light"] .td-tile-meta{color:#57606a}
+[data-theme="light"] .td-custom input{background:#f6f8fa;border-color:#d0d7de;color:#1c2128}
+[data-theme="light"] .td-stream{border-color:#d0d7de;background:#f6f8fa}
+[data-theme="light"] .td-stream-name{color:#1c2128}
+[data-theme="light"] .td-stream-desc{color:#57606a}
 [data-theme="light"] .modal-sub{color:#57606a}
 [data-theme="light"] .fmt-tab{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
 [data-theme="light"] .fmt-tab:hover{border-color:#0969da;color:#1c2128}
@@ -1101,7 +1133,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.43';
+const CONFIGURATOR_VERSION = '2.44';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1155,6 +1187,9 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.44', date:'Jul 15 2026', items:[
+    'Test Drive — preview your streams before installing. Pick a movie or show and see exactly what your template returns, rendered with your selected formatter',
+  ]},
   { v:'2.43', date:'Jul 15 2026', items:[
     'Template Updater — fixed service detection: Hybrid, AllDebrid, and EasyNews templates now correctly identified via preset analysis instead of service-only checks',
     'Template Updater — fixed resolution detection: 1080p templates with ESE-based 4K kill now correctly detected as 1080p instead of defaulting to 4K',
@@ -2623,6 +2658,7 @@ function render() {
         </div>
         ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
         ${(() => { const h = templateHealthCheck(); return h.length ? `<div style="margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15)"><div style="font-size:.68rem;font-weight:700;color:#f87171;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:#8b949e;line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:#f87171;flex-shrink:0">${ICO.warn(12,'#f87171')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div style="margin-top:6px;padding:6px 12px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12);font-size:.72rem;color:#34d399;font-weight:600">${ICO.check(12,'#34d399')} Template looks good</div>`; })()}
+        <button class="btn-td" data-action="test-drive">${ICO.eye(15,'currentColor')} Test Drive — Preview Your Streams</button>
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
@@ -3264,6 +3300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'update-template') { showUpdateTemplateModal(); }
+    if (action === 'test-drive') { showTestDriveModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
     if (action === 'open-quickstart') { document.getElementById('qsOverlay').classList.add('open'); }
     if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
@@ -4439,6 +4476,151 @@ function showUpdateTemplateModal() {
     setTimeout(() => overlay.remove(), 160);
   });
   overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 160); } });
+}
+
+function showTestDriveModal() {
+  const hasKey = getDebridInputs().some(inp => S.creds[inp.id] && S.creds[inp.id].trim());
+  const isFree = S.service === 'p2p' || S.service === 'http';
+  if (!isFree && !hasKey) {
+    showToast('Enter your debrid API key first to test drive', true);
+    return;
+  }
+  const ex = document.getElementById('testDriveModal');
+  if (ex) ex.remove();
+
+  const PRESETS = [
+    { title:'Interstellar', id:'tt0816692', type:'movie', meta:'Movie · 4K REMUX test' },
+    { title:'Oppenheimer', id:'tt15398776', type:'movie', meta:'Movie · Recent blockbuster' },
+    { title:'Dune: Part Two', id:'tt15239678', type:'movie', meta:'Movie · 4K HDR test' },
+    { title:'Breaking Bad S1E1', id:'tt0903747:1:1', type:'series', meta:'Series · Classic TV' },
+    { title:'Demon Slayer S1E1', id:'tt9335498:1:1', type:'series', meta:'Series · Anime test' },
+    { title:'The Bear S1E1', id:'tt14452776:1:1', type:'series', meta:'Series · Recent TV' },
+  ];
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'testDriveModal';
+  overlay.className = 'modal-overlay td-modal';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Test Drive">
+      <button class="modal-close" id="tdClose" aria-label="Close">×</button>
+      <div class="modal-title">${ICO.eye(20,'#a78bfa')} Test Drive</div>
+      <div style="text-align:center;font-size:.78rem;color:#8b949e;margin-bottom:8px">Pick a title to preview what streams your config returns</div>
+      <div class="td-tiles">
+        ${PRESETS.map(p => `<div class="td-tile" data-td-id="${esc(p.id)}" data-td-type="${p.type}">
+          <div class="td-tile-title">${esc(p.title)}</div>
+          <div class="td-tile-meta">${esc(p.meta)}</div>
+        </div>`).join('')}
+      </div>
+      <div style="font-size:.72rem;color:#6b7280;font-weight:600;letter-spacing:.03em;text-transform:uppercase;margin-bottom:4px">Or enter an IMDB ID</div>
+      <div class="td-custom">
+        <input type="text" id="tdImdbInput" placeholder="tt1375666 or tt0903747:1:1" spellcheck="false">
+        <button id="tdCustomBtn">Fetch</button>
+      </div>
+      <div id="tdResults"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  async function runTestDrive(imdbId, contentType) {
+    const resultsEl = document.getElementById('tdResults');
+    resultsEl.innerHTML = '<div class="td-loading"><span class="dot-spin"><span></span><span></span><span></span></span> Uploading config & fetching streams…</div>';
+
+    try {
+      const cfg = build().config;
+      const tempPwd = makePwd();
+      const allHosts = hostEntries();
+
+      // Find fastest reachable host
+      const fastest = await Promise.any(
+        allHosts.map(([, host]) =>
+          raceHostFetch(host, '/api/v1/status', { method:'GET' }, 4000)
+            .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
+        )
+      );
+
+      // Upload config
+      const uploadRes = await raceHostFetch(fastest, '/api/v1/user', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ config:cfg, password:tempPwd })
+      }, 10000);
+      const uploadData = await uploadRes.json().catch(() => ({}));
+      if (!uploadRes.ok || uploadData?.success === false) {
+        const apiMsg = uploadData?.error?.message || uploadData?.message || uploadData?.detail || 'Upload failed';
+        throw new Error(apiMsg);
+      }
+
+      const uuid = uploadData?.data?.uuid || uploadData?.uuid || uploadData?.user?.uuid || uploadData?.id;
+      const epwd = uploadData?.data?.encryptedPassword || encodeURIComponent(tempPwd);
+      if (!uuid) throw new Error('No UUID returned from server');
+
+      // Determine type from ID format
+      if (!contentType) {
+        contentType = imdbId.includes(':') ? 'series' : 'movie';
+      }
+
+      resultsEl.innerHTML = '<div class="td-loading"><span class="dot-spin"><span></span><span></span><span></span></span> Fetching streams…</div>';
+
+      // Fetch streams
+      const streamRes = await raceHostFetch(fastest, `/stremio/${uuid}/${epwd}/stream/${contentType}/${encodeURIComponent(imdbId)}.json`, {
+        method:'GET'
+      }, 30000);
+      if (!streamRes.ok) throw new Error(`Stream fetch failed (HTTP ${streamRes.status})`);
+      const streamData = await streamRes.json();
+      const streams = streamData?.streams || [];
+
+      if (streams.length === 0) {
+        resultsEl.innerHTML = '<div class="td-error" style="text-align:center;background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.18);color:#fbbf24">No streams found for this title. This can happen if scrapers have no results or if the IMDB ID is invalid.</div>';
+        return;
+      }
+
+      resultsEl.innerHTML = `
+        <div class="td-count">${streams.length} stream${streams.length !== 1 ? 's' : ''} returned</div>
+        <div class="td-results">
+          ${streams.map(s => `<div class="td-stream">
+            <div class="td-stream-name">${esc(s.name || '')}</div>
+            ${s.description ? `<div class="td-stream-desc">${esc(s.description)}</div>` : ''}
+          </div>`).join('')}
+        </div>
+      `;
+    } catch(err) {
+      resultsEl.innerHTML = `<div class="td-error">${ICO.warn(13,'#f87171')} ${esc(err.message || 'Something went wrong')}</div>`;
+    }
+  }
+
+  // Tile clicks
+  overlay.querySelectorAll('.td-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      overlay.querySelectorAll('.td-tile').forEach(t => t.style.borderColor = '');
+      tile.style.borderColor = 'rgba(167,139,250,.5)';
+      runTestDrive(tile.dataset.tdId, tile.dataset.tdType);
+    });
+  });
+
+  // Custom IMDB input
+  document.getElementById('tdCustomBtn').addEventListener('click', () => {
+    const val = (document.getElementById('tdImdbInput').value || '').trim();
+    if (!val) { showToast('Enter an IMDB ID like tt1375666', true); return; }
+    if (!/^tt\d+/.test(val)) { showToast('IMDB ID should start with tt (e.g. tt1375666)', true); return; }
+    overlay.querySelectorAll('.td-tile').forEach(t => t.style.borderColor = '');
+    runTestDrive(val);
+  });
+  document.getElementById('tdImdbInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('tdCustomBtn').click();
+  });
+
+  // Close handlers
+  document.getElementById('tdClose').addEventListener('click', () => {
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => overlay.remove(), 160);
+  });
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+      setTimeout(() => overlay.remove(), 160);
+    }
+  });
 }
 
 function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
