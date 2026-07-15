@@ -437,11 +437,13 @@ Top-level field: `parentConfig`
 ## AIOStreams v2.31.0 Schema Notes
 
 ### `service()` SEL whitelist (v2.31.0)
+
 The `service()` function now accepts 16 services (was 15). Changes:
 - **Added:** `stremio_nntp` (native NNTP usenet), `aiostreams` (built-in usenet engine)
 - **Removed:** `putio` (still valid in presets/config, just not usable in SEL `service()` expressions)
 
 ### Newznab preset: `seasonPackStrategy` (v2.31.0)
+
 New option for Newznab/Torznab presets. Controls how series searches handle season packs:
 - `'episodeOnly'` — default, search episodes only
 - `'dynamic'` — season pack preferred
@@ -450,25 +452,30 @@ New option for Newznab/Torznab presets. Controls how series searches handle seas
 Only applies when `searchMode` is `'auto'`. Not shown in simple mode.
 
 ### Newznab preset: `searchMode` (v2.31.0)
+
 Replaces/extends old `forceQuerySearch`:
 - `'auto'` — default, AIOStreams picks the best mode
 - `'query'` — force query-based search
 - `'both'` — creates two addon instances (one per mode)
 
 ### EasyNews Search: `apiVersion` (v2.31.0)
+
 - `'3.0'` — default, 100 results/page, no rate limiting, parallel page fetching
 - `'2.0'` — legacy, up to 250 results/page but rate-limited to 2 concurrent requests
 
 ### Deduplicator: `libraryBehaviour` (v2.31.0)
+
 Controls how library items interact with deduplication:
 - `'ignore'` — default, library items treated like any other stream
 - `'prefer'` — library items preferred when deduplicating
 - `'exclusive'` — only library items survive deduplication
 
 ### Deduplicator: `merge` (v2.31.0)
+
 New boolean option. When enabled, allows adding deduplicated streams to the failover list instead of discarding them entirely.
 
 ### Formatter: `stream.preloading` (v2.31.0)
+
 New boolean field. `true` when the stream has been selected for pre-caching/preloading. Usage: `{stream.preloading::istrue["⏳ "||""]}` to show a preload indicator.
 
 ---
