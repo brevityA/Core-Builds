@@ -4483,9 +4483,9 @@ function diffConfigs(oldCfg, newCfg) {
     const oldMap = toMap(oldArr), newMap = toMap(newArr);
     const rows = [];
     for (const [name, entry] of newMap) {
-      if (!oldMap.has(name)) { rows.push({type:'add', text:esc(name) + (hasScore && entry.score != null ? ' <span style="opacity:.5">(score '+entry.score+')</span>' : '')}); }
+      if (!oldMap.has(name)) { rows.push({type:'add', text:esc(name) + (hasScore && entry.score != null ? ' <span style="opacity:.5">(score '+esc(entry.score)+')</span>' : '')}); }
       else if (hasScore && entry.score != null && oldMap.get(name).score != null && entry.score !== oldMap.get(name).score) {
-        rows.push({type:'chg', text:esc(name) + ' <span style="opacity:.5">score '+oldMap.get(name).score+' &rarr; '+entry.score+'</span>'});
+        rows.push({type:'chg', text:esc(name) + ' <span style="opacity:.5">score '+esc(oldMap.get(name).score)+' &rarr; '+esc(entry.score)+'</span>'});
       }
     }
     for (const [name] of oldMap) { if (!newMap.has(name)) rows.push({type:'rem', text:esc(name)}); }
@@ -4524,7 +4524,7 @@ function diffConfigs(oldCfg, newCfg) {
   const ddOld = oldCfg.deduplicator || {}, ddNew = newCfg.deduplicator || {};
   if (JSON.stringify(ddOld) !== JSON.stringify(ddNew)) {
     if (ddOld.multiGroupBehaviour !== ddNew.multiGroupBehaviour) miscRows.push({type:'chg', text:'Dedup mode: <span style="opacity:.5">'+esc(ddOld.multiGroupBehaviour||'(none)')+' &rarr; '+esc(ddNew.multiGroupBehaviour||'(none)')+'</span>'});
-    if (ddOld.smartDetectRounding !== ddNew.smartDetectRounding) miscRows.push({type:'chg', text:'Dedup rounding: <span style="opacity:.5">'+(ddOld.smartDetectRounding||'(none)')+' &rarr; '+(ddNew.smartDetectRounding||'(none)')+'</span>'});
+    if (ddOld.smartDetectRounding !== ddNew.smartDetectRounding) miscRows.push({type:'chg', text:'Dedup rounding: <span style="opacity:.5">'+esc(ddOld.smartDetectRounding||'(none)')+' &rarr; '+esc(ddNew.smartDetectRounding||'(none)')+'</span>'});
     if (ddOld.cached !== ddNew.cached) miscRows.push({type:'chg', text:'Dedup cached: <span style="opacity:.5">'+esc(ddOld.cached||'(none)')+' &rarr; '+esc(ddNew.cached||'(none)')+'</span>'});
     if (JSON.stringify(ddOld.tiebreakers) !== JSON.stringify(ddNew.tiebreakers)) miscRows.push({type:'add', text:'Dedup tiebreakers updated'});
     if (ddOld.libraryBehaviour !== ddNew.libraryBehaviour) miscRows.push({type:'chg', text:'Library behaviour: <span style="opacity:.5">'+esc(ddOld.libraryBehaviour||'ignore')+' &rarr; '+esc(ddNew.libraryBehaviour||'ignore')+'</span>'});
@@ -4537,7 +4537,7 @@ function diffConfigs(oldCfg, newCfg) {
   }
   const dafOld = oldCfg.dynamicAddonFetching, dafNew = newCfg.dynamicAddonFetching;
   if (dafOld && dafNew && dafOld.condition !== dafNew.condition) miscRows.push({type:'chg', text:'Dynamic addon fetching condition updated'});
-  if ((oldCfg.maxResults||20) !== (newCfg.maxResults||20)) miscRows.push({type:'chg', text:'Max results: <span style="opacity:.5">'+(oldCfg.maxResults||20)+' &rarr; '+(newCfg.maxResults||20)+'</span>'});
+  if ((oldCfg.maxResults||20) !== (newCfg.maxResults||20)) miscRows.push({type:'chg', text:'Max results: <span style="opacity:.5">'+esc(oldCfg.maxResults||20)+' &rarr; '+esc(newCfg.maxResults||20)+'</span>'});
 
   const syncFields = ['syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls'];
   const syncOld = syncFields.flatMap(f => oldCfg[f]||[]);
