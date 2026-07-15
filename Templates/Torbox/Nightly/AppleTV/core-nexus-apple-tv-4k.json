@@ -1926,8 +1926,7 @@
         "releaseGroup"
       ],
       "smartDetectRounding": 10,
-      "libraryBehaviour": "prefer",
-      "merge": false
+      "libraryBehaviour": "prefer"
     },
     "autoPlay": {
       "enabled": true,

@@ -1854,7 +1854,6 @@
       ],
       "smartDetectRounding": 10,
       "libraryBehaviour": "prefer",
-      "merge": false,
       "tiebreakers": [
         {
           "type": "torrent_seeders",

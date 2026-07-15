@@ -1195,7 +1195,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.47';
+const CONFIGURATOR_VERSION = '2.48';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1809,6 +1809,8 @@ const DEFS = [
       { v:'ipad',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg13"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#a1a1aa" flood-opacity=".3"/></filter></defs><rect x="10" y="5" width="24" height="34" rx="3.5" stroke="#a1a1aa" stroke-width="1.5" fill="none" filter="url(#dg13)"/><rect x="10" y="5" width="24" height="34" rx="3.5" fill="#00d4ff" opacity=".04"/><rect x="13" y="8" width="18" height="25" rx="1" fill="#a1a1aa" opacity=".08"/><line x1="19" y1="36" x2="25" y2="36" stroke="#a1a1aa" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="6.5" r="1" fill="#a1a1aa" opacity=".4"/></svg>', name:'iPad / iPhone',          desc:'DV · AV1 · no lossless · stereo/headphones', help:'iOS devices support Dolby Vision and AV1 natively. Audio is limited to DD+ / AAC — no lossless passthrough. Stereo / headphone output unless connected to an external DAC.' },
       { v:'projector',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg14"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#eab308" flood-opacity=".4"/></filter></defs><rect x="5" y="14" width="34" height="18" rx="3" stroke="#eab308" stroke-width="1.5" filter="url(#dg14)"/><rect x="5" y="14" width="34" height="18" rx="3" fill="#00d4ff" opacity=".05"/><circle cx="16" cy="23" r="5" stroke="#eab308" stroke-width="1.5" fill="none"/><circle cx="16" cy="23" r="2" fill="#eab308" opacity=".6"/><line x1="24" y1="20" x2="35" y2="20" stroke="#eab308" stroke-width="1.2" stroke-linecap="round" opacity=".4"/><line x1="24" y1="23.5" x2="32" y2="23.5" stroke="#eab308" stroke-width="1.2" stroke-linecap="round" opacity=".4"/><line x1="24" y1="27" x2="29" y2="27" stroke="#eab308" stroke-width="1.2" stroke-linecap="round" opacity=".4"/><line x1="11" y1="32" x2="11" y2="38" stroke="#eab308" stroke-width="1.5" stroke-linecap="round"/><line x1="33" y1="32" x2="33" y2="38" stroke="#eab308" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Projector',              desc:'HDR10 · no DV · no lossless · AV1 varies', help:'Most projectors (Epson, BenQ, XGIMI) lack Dolby Vision — DV-Only streams are killed. HDR10 is the primary HDR format. Audio depends on your receiver/soundbar. AV1 support varies by model — excluded by default for safety.' },
       { v:'onn',             icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg15"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#f59e0b" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="16" rx="2.5" stroke="#f59e0b" stroke-width="1.5" filter="url(#dg15)"/><rect x="8" y="12" width="28" height="16" rx="2.5" fill="#00d4ff" opacity=".05"/><circle cx="22" cy="20" r="4" stroke="#f59e0b" stroke-width="1.3" fill="none" filter="url(#dg15)"/><circle cx="22" cy="20" r="1.5" fill="#f59e0b" opacity=".6"/><line x1="16" y1="33" x2="28" y2="33" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="28" x2="22" y2="31" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'ONN Box',                desc:'DV · AV1 · no lossless · DD+ · HDR10', help:'Walmart ONN 4K streaming boxes run Android TV. DV and AV1 supported on 2021+ models. No lossless audio passthrough — DD+ Atmos is the ceiling. Similar profile to Chromecast with Google TV.' },
+      { v:'xiaomi',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg17"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff6900" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="18" rx="3" stroke="#ff6900" stroke-width="1.5" filter="url(#dg17)" fill="none"/><rect x="8" y="12" width="28" height="18" rx="3" fill="#00d4ff" opacity=".04"/><text x="22" y="24" text-anchor="middle" fill="#ff6900" font-size="8" font-weight="800" font-family="system-ui,sans-serif" opacity=".7">Mi</text><line x1="18" y1="33" x2="26" y2="33" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Xiaomi Mi Box S (2nd Gen)', desc:'DV Profile 5 · no AV1 · no lossless · DD+ Atmos', help:'Xiaomi Mi Box S 2nd gen — DV Profile 5, HDR10+, HDR10, HLG all supported. <b>No AV1</b>: the Amlogic S905X3 has no AV1 decoder. <b>No lossless audio</b>: DD+ Atmos is the ceiling, 5.1 channels. Handles REMUX playback well despite 2 GB RAM.' },
+      { v:'xiaomi-3rd',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg18"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff6900" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="18" rx="3" stroke="#ff6900" stroke-width="1.5" filter="url(#dg18)" fill="none"/><rect x="8" y="12" width="28" height="18" rx="3" fill="#00d4ff" opacity=".04"/><text x="22" y="24" text-anchor="middle" fill="#ff6900" font-size="8" font-weight="800" font-family="system-ui,sans-serif" opacity=".7">Mi</text><circle cx="32" cy="14" r="3" fill="#ff6900" opacity=".5"/><line x1="18" y1="33" x2="26" y2="33" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Xiaomi Mi Box S (3rd Gen)', desc:'DV Profile 5 · AV1 · no lossless · DD+ Atmos', help:'Xiaomi Mi Box S 3rd gen (2024) — same as 2nd gen but with <b>AV1 hardware decode</b>. DV Profile 5, HDR10+, HDR10, HLG. No lossless audio — DD+ Atmos ceiling. Handles REMUX well.' },
     ]
   },
   { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c1', layout:'svc-list', noHero:true,
@@ -3664,6 +3666,8 @@ function insights() {
   else if (dev === 'projector') pts.push('<b>DV-Only Kill</b> · AV1 excluded · HDR10 primary · audio via receiver');
   else if (dev === 'onn') pts.push('<b>DV + AV1</b> · no lossless audio · DD+ Atmos ceiling · HDR10');
   else if (dev === 'googletv') pts.push('<b>DV + AV1 + HDR10+</b> · no lossless audio · DD+ Atmos ceiling · 5.1ch');
+  else if (dev === 'xiaomi') pts.push('<b>DV Profile 5 + HDR10+</b> · no AV1 · no lossless audio · DD+ Atmos ceiling');
+  else if (dev === 'xiaomi-3rd') pts.push('<b>DV Profile 5 + AV1 + HDR10+</b> · no lossless audio · DD+ Atmos ceiling');
   if (aud === 'dolby') pts.push('<b>All DTS excluded</b> — safe for Bose / Dolby soundbars (Atmos · TrueHD · DD+ only)');
   else if (aud === 'lossless') pts.push('<b>Full lossless audio ranked</b> — TrueHD · Atmos · DTS-HD MA · FLAC prioritised');
   else if (aud === 'standard') pts.push('<b>DD+ / Atmos ranked</b> — soundbar and smart TV profile');
@@ -3745,17 +3749,19 @@ function getDebridInputs() {
 function sid() { return Math.random().toString(36).substring(2,8); }
 
 function defaultName() {
-  const res = S.resolution, svc = S.service;
+  const res = S.resolution, svc = S.service, dev = S.device;
   const is4k = res === '4k', isUW = res === 'ultrawide';
-  const suffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
-  const svcLabel = { 'torbox-ess':'Essential', 'alldebrid':'AllDebrid', 'realdebrid':'Real-Debrid', 'premiumize':'Premiumize', 'debridlink':'Debrid-Link', 'offcloud':'Offcloud', 'easynews':'EasyNews', 'p2p':'P2P', 'http':'HTTP Streams', 'hybrid':'Hybrid', 'debridio':'Debridio' }[svc] || '';
+  const resSuffix = is4k ? ' 4K' : isUW ? ' Ultrawide' : '';
+  const devLabel = {'samsung':'Samsung TV','xiaomi':'Xiaomi','xiaomi-3rd':'Xiaomi','firestick-hd':'Fire Stick','firestick-4kmax':'Fire Stick 4K','appletv-old':'Apple TV','appletv-new':'Apple TV','shield':'Shield','googletv':'Google TV','roku':'Roku','chromecast':'Chromecast','sony':'Sony TV','lgtv':'LG TV','ipad':'iPad','projector':'Projector','onn':'ONN'}[dev] || '';
+  const svcName = {'torbox-pro':'TorBox','torbox-ess':'TorBox Essential','alldebrid':'AllDebrid','realdebrid':'Real-Debrid','premiumize':'Premiumize','debridlink':'Debrid-Link','offcloud':'Offcloud','easynews':'EasyNews','p2p':'P2P','http':'HTTP','hybrid':'Hybrid','debridio':'Debridio'}[svc] || '';
   if (svc === 'multi') {
-    const abbr = {'alldebrid':'AD','realdebrid':'RD','premiumize':'PM','debridlink':'DL','offcloud':'OC','easynews':'EN','torbox-pro':'TB','torbox-ess':'TB-Ess','hybrid':'HYB','debridio':'DIO','easydebrid':'ED','pikpak':'PP','seedr':'SR','p2p':'P2P','http':'HTTP','nzbgeek':'NZB','streamnzb':'SNZB'};
-    const PRIMARY_ABBR = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'];
-    const mainSvcs = S.multiServices.filter(s => PRIMARY_ABBR.includes(s));
-    return `Core Builds${suffix} Multi (${mainSvcs.map(s => abbr[s] || s).join('+')})`.trim();
+    const names = {'alldebrid':'AllDebrid','realdebrid':'RD','premiumize':'Premiumize','debridlink':'DL','offcloud':'Offcloud','easynews':'EasyNews','torbox-pro':'TorBox','torbox-ess':'TB Essential','hybrid':'Hybrid','debridio':'Debridio','easydebrid':'EasyDebrid','pikpak':'PikPak','seedr':'Seedr'};
+    const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','easydebrid','pikpak','seedr'];
+    const mainSvcs = S.multiServices.filter(s => PRIMARY.includes(s));
+    const svcStr = mainSvcs.length <= 3 ? mainSvcs.map(s => names[s] || s).join(' + ') : mainSvcs.slice(0,2).map(s => names[s] || s).join(' + ') + ` +${mainSvcs.length - 2}`;
+    return `Core Nexus${resSuffix}${devLabel ? ' · ' + devLabel : ''} — ${svcStr}`.trim();
   }
-  return `Core Builds${suffix}${svcLabel ? ' · ' + svcLabel : ''}`.trim();
+  return `Core Nexus${resSuffix}${devLabel ? ' · ' + devLabel : ''}${svcName ? ' — ' + svcName : ''}`.trim();
 }
 
 function presets() {
@@ -3870,8 +3876,8 @@ function resolutionCfg() {
 
 function encodeCfg() {
   const dev = S.device;
-  if (dev==='samsung'||dev==='firestick-hd'||dev==='shield') return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
-  if (dev==='firestick-4kmax') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  if (dev==='samsung'||dev==='firestick-hd'||dev==='shield'||dev==='xiaomi') return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
+  if (dev==='firestick-4kmax'||dev==='xiaomi-3rd') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
   if (dev==='appletv-old') return { excludedEncodes:['AV1'], preferredEncodes:['HEVC','AVC','Unknown'] };
   if (dev==='windows') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
   if (dev==='roku') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
@@ -3881,7 +3887,7 @@ function encodeCfg() {
 
 function audioCfg() {
   const dev = S.device;
-  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick-hd' || dev==='firestick-4kmax' || dev==='roku' || dev==='chromecast' || dev==='ipad' || dev==='projector' || dev==='onn' || dev==='googletv';
+  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick-hd' || dev==='firestick-4kmax' || dev==='roku' || dev==='chromecast' || dev==='ipad' || dev==='projector' || dev==='onn' || dev==='googletv' || dev==='xiaomi' || dev==='xiaomi-3rd';
   const dolby   = S.audio==='dolby';
   const wide     = dev==='windows' || dev==='lgtv' || dev==='appletv-old' || dev==='appletv-new' || dev==='sony' || S.audio==='lossless' || dolby;
   if (dolby) return {
@@ -3897,7 +3903,7 @@ function visualTags() {
   if (['appletv-old','appletv-new','lgtv','sony'].includes(dev)) return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='samsung') return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='firestick-hd') return ['HDR10','HDR','HLG','SDR'];
-  if (dev==='firestick-4kmax'||dev==='chromecast'||dev==='onn'||dev==='googletv') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev==='firestick-4kmax'||dev==='chromecast'||dev==='onn'||dev==='googletv'||dev==='xiaomi'||dev==='xiaomi-3rd') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   if (dev==='shield') return ['DV','HDR+DV','HDR10+','HDR10','HDR','10bit','SDR','IMAX'];
   if (dev==='ipad') return ['DV','HDR+DV','HDR10','HDR','10bit','SDR'];
   if (dev==='roku'||dev==='projector') return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
@@ -3951,7 +3957,7 @@ function eses() {
 }
 
 function pses() {
-  const out = [], res = S.resolution, dev = S.device, dv = dev==='appletv-old' || dev==='appletv-new' || dev==='lgtv' || dev==='firestick-4kmax', codecExpr = !['samsung','firestick-hd','appletv-old'].includes(dev) ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
+  const out = [], res = S.resolution, dev = S.device, dv = dev==='appletv-old' || dev==='appletv-new' || dev==='lgtv' || dev==='firestick-4kmax', codecExpr = !['samsung','firestick-hd','appletv-old','xiaomi'].includes(dev) ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
   const audPinnArr = (S.audio === 'limited' || ['samsung','firestick-hd','firestick-4kmax','googletv'].includes(dev)) ? [] : S.audio === 'dolby' ? [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos')" }] : [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" }];
   const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" }, pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" }, seasonPSE = { enabled:true, expression:"/* ongoingSeasonPack */ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired < -1 or daysUntilNextEpisode >= 0)) ? seasonPack(streams,'onlySeasons') : []" };
 
@@ -4788,12 +4794,13 @@ function showTestDriveModal() {
         return;
       }
 
+      const cleanDSL = str => (str || '').replace(/\{stream\.\w+(::[^}]*)?\}/g, '').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
       resultsEl.innerHTML = `
         <div class="td-count">${streams.length} stream${streams.length !== 1 ? 's' : ''} returned</div>
         <div class="td-results">
           ${streams.map(s => `<div class="td-stream">
-            <div class="td-stream-name">${esc(s.name || '')}</div>
-            ${s.description ? `<div class="td-stream-desc">${esc(s.description)}</div>` : ''}
+            <div class="td-stream-name">${esc(cleanDSL(s.name))}</div>
+            ${s.description ? `<div class="td-stream-desc">${esc(cleanDSL(s.description))}</div>` : ''}
           </div>`).join('')}
         </div>
       `;
