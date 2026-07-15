@@ -1195,7 +1195,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.49';
+const CONFIGURATOR_VERSION = '2.50';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1279,6 +1279,11 @@ const CHANGELOG = [
     'Direct Install — new toggle in Deploy: enter Stremio email + password inline to push the addon straight to your library',
     'Get Manifest URL mode preserved for manual install / WuPlay / Nuvio',
     '"Create random account" link generates a Stremio account in one click (no email verification)',
+  ]},
+  { v:'2.50', date:'Jul 15 2026', items:[
+    'Selective Migration — per-section checkboxes in the diff modal let you cherry-pick which changes to apply (PSEs, ESEs, sort, regex, settings) and keep the rest from your existing config',
+    'Parent/Child Config — "Use Core Builds Base" option enables parent config inheritance; child templates only carry PSEs, branding, and template-specific filters',
+    'Base Config v1.2.0 — sort criteria synced to fleet standard (seadex, bitrate, subtitle, age keys), ESEs updated to v2.0 (Info & Other Unwanted, Foreign Language Kill)',
   ]},
   { v:'2.49', date:'Jul 15 2026', items:[
     'Template Migration Tool — "Update Existing Template" now shows a full diff of what changes before applying, with Apply & Upgrade / Cancel options',
@@ -2958,7 +2963,7 @@ function render() {
     const jpd = document.getElementById('jsonPreviewDetails');
     if (jpd) jpd.addEventListener('toggle', () => {
       const pre = document.getElementById('jsonPreview');
-      if (jpd.open && pre) pre.textContent = JSON.stringify(build(), null, 2);
+      if (jpd.open && pre) pre.textContent = JSON.stringify(buildFinal(), null, 2);
     });
 
   } else if (def.id === 'apis') {
@@ -3385,7 +3390,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); }
       else {
-        navigator.clipboard.writeText(JSON.stringify(build(), null, 2)).then(() => showToast('Template JSON copied — paste it into AIOStreams → Import'));
+        const _ct = buildFinal(); S._migrationKeep = null;
+        navigator.clipboard.writeText(JSON.stringify(_ct, null, 2)).then(() => showToast('Template JSON copied — paste it into AIOStreams → Import'));
         saveLastGen();
       }
     }
@@ -4085,9 +4091,16 @@ function build() {
   return result;
 }
 
+function buildFinal() {
+  const tpl = build();
+  if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
+  return tpl;
+}
+
 function generate() {
   if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); return; }
-  const json = JSON.stringify(build(), null, 2), blob = new Blob([json], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
+  const tpl = buildFinal(); S._migrationKeep = null;
+  const json = JSON.stringify(tpl, null, 2), blob = new Blob([json], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
   a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 100);
   saveLastGen();
@@ -4491,7 +4504,7 @@ function diffConfigs(oldCfg, newCfg) {
   const sections = [];
   const extractLabel = expr => { const m = (expr||'').match(/\/\*\s*(.+?)\s*\*\//); return m ? m[1] : expr.slice(0,60); };
 
-  function diffExprArray(oldArr, newArr, label, icon) {
+  function diffExprArray(oldArr, newArr, label, icon, key) {
     const oldLabels = (oldArr||[]).filter(e=>e.enabled!==false).map(e => extractLabel(e.expression));
     const newLabels = (newArr||[]).filter(e=>e.enabled!==false).map(e => extractLabel(e.expression));
     const added = newLabels.filter(l => !oldLabels.includes(l));
@@ -4499,10 +4512,10 @@ function diffConfigs(oldCfg, newCfg) {
     const rows = [];
     added.forEach(l => rows.push({type:'add', text:esc(l)}));
     removed.forEach(l => rows.push({type:'rem', text:esc(l)}));
-    if (rows.length) sections.push({label, icon, rows, added:added.length, removed:removed.length, changed:0});
+    if (rows.length) sections.push({label, icon, rows, added:added.length, removed:removed.length, changed:0, key});
   }
 
-  function diffRegexArray(oldArr, newArr, label, icon, hasScore) {
+  function diffRegexArray(oldArr, newArr, label, icon, hasScore, key) {
     const toMap = arr => { const m = new Map(); (arr||[]).forEach((r,i) => { const n = typeof r === 'string' ? 'Pattern #'+(i+1) : (r.name||'unnamed'); m.set(n, r); }); return m; };
     const oldMap = toMap(oldArr), newMap = toMap(newArr);
     const rows = [];
@@ -4513,7 +4526,7 @@ function diffConfigs(oldCfg, newCfg) {
       }
     }
     for (const [name] of oldMap) { if (!newMap.has(name)) rows.push({type:'rem', text:esc(name)}); }
-    if (rows.length) { const a = rows.filter(r=>r.type==='add').length, r = rows.filter(r=>r.type==='rem').length, c = rows.filter(r=>r.type==='chg').length; sections.push({label, icon, rows, added:a, removed:r, changed:c}); }
+    if (rows.length) { const a = rows.filter(r=>r.type==='add').length, r = rows.filter(r=>r.type==='rem').length, c = rows.filter(r=>r.type==='chg').length; sections.push({label, icon, rows, added:a, removed:r, changed:c, key}); }
   }
 
   function diffSortCriteria(oldSort, newSort) {
@@ -4533,15 +4546,15 @@ function diffConfigs(oldCfg, newCfg) {
         rows.push({type: removed.length && !added.length ? 'rem' : added.length ? 'add' : 'chg', text: esc(sec) + (detail ? ' <span style="opacity:.5">('+esc(detail)+')</span>' : '')});
       }
     }
-    if (rows.length) sections.push({label:'Sort Criteria', icon:ICO.shuffle(14,'#a78bfa'), rows, added:rows.filter(r=>r.type==='add').length, removed:rows.filter(r=>r.type==='rem').length, changed:rows.filter(r=>r.type==='chg').length});
+    if (rows.length) sections.push({label:'Sort Criteria', icon:ICO.shuffle(14,'#a78bfa'), rows, added:rows.filter(r=>r.type==='add').length, removed:rows.filter(r=>r.type==='rem').length, changed:rows.filter(r=>r.type==='chg').length, key:'sort'});
   }
 
-  diffExprArray(oldCfg.preferredStreamExpressions, newCfg.preferredStreamExpressions, 'PSE Tiers', ICO.crown(14,'#fbbf24'));
-  diffExprArray(oldCfg.excludedStreamExpressions, newCfg.excludedStreamExpressions, 'Excluded Stream Expressions', ICO.bolt(14,'#f87171'));
-  diffExprArray(oldCfg.includedStreamExpressions, newCfg.includedStreamExpressions, 'Included Stream Expressions', ICO.check(14,'#34d399'));
-  diffRegexArray(oldCfg.rankedRegexPatterns, newCfg.rankedRegexPatterns, 'Ranked Regex Patterns', ICO.search(14,'#a78bfa'), true);
-  diffRegexArray(oldCfg.preferredRegexPatterns, newCfg.preferredRegexPatterns, 'Preferred Regex Patterns', ICO.diamond(14,'#00d4ff'), false);
-  diffRegexArray(oldCfg.excludedRegexPatterns, newCfg.excludedRegexPatterns, 'Excluded Regex Patterns', ICO.bolt(14,'#f87171'), false);
+  diffExprArray(oldCfg.preferredStreamExpressions, newCfg.preferredStreamExpressions, 'PSE Tiers', ICO.crown(14,'#fbbf24'), 'pses');
+  diffExprArray(oldCfg.excludedStreamExpressions, newCfg.excludedStreamExpressions, 'Excluded Stream Expressions', ICO.bolt(14,'#f87171'), 'eses');
+  diffExprArray(oldCfg.includedStreamExpressions, newCfg.includedStreamExpressions, 'Included Stream Expressions', ICO.check(14,'#34d399'), 'ises');
+  diffRegexArray(oldCfg.rankedRegexPatterns, newCfg.rankedRegexPatterns, 'Ranked Regex Patterns', ICO.search(14,'#a78bfa'), true, 'ranked_regex');
+  diffRegexArray(oldCfg.preferredRegexPatterns, newCfg.preferredRegexPatterns, 'Preferred Regex Patterns', ICO.diamond(14,'#00d4ff'), false, 'pref_regex');
+  diffRegexArray(oldCfg.excludedRegexPatterns, newCfg.excludedRegexPatterns, 'Excluded Regex Patterns', ICO.bolt(14,'#f87171'), false, 'excl_regex');
   diffSortCriteria(oldCfg.sortCriteria, newCfg.sortCriteria);
 
   const miscRows = [];
@@ -4570,7 +4583,7 @@ function diffConfigs(oldCfg, newCfg) {
   addedUrls.forEach(u => miscRows.push({type:'add', text:'Synced URL: ' + esc(u.split('/').pop())}));
   removedUrls.forEach(u => miscRows.push({type:'rem', text:'Synced URL: ' + esc(u.split('/').pop())}));
 
-  if (miscRows.length) sections.push({label:'Settings & Config', icon:ICO.gear(14,'#8b949e'), rows:miscRows, added:miscRows.filter(r=>r.type==='add').length, removed:miscRows.filter(r=>r.type==='rem').length, changed:miscRows.filter(r=>r.type==='chg').length});
+  if (miscRows.length) sections.push({label:'Settings & Config', icon:ICO.gear(14,'#8b949e'), rows:miscRows, added:miscRows.filter(r=>r.type==='add').length, removed:miscRows.filter(r=>r.type==='rem').length, changed:miscRows.filter(r=>r.type==='chg').length, key:'settings'});
 
   return sections;
 }
@@ -4589,7 +4602,10 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel) {
   overlay.id = 'diffModal';
   overlay.className = 'df-overlay';
 
-  const sectionsHtml = sections.length ? sections.map(sec => {
+  const selectAllId = 'dfSelAll';
+  const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span style="font-size:.65rem;color:#4b5563">Uncheck to keep your existing values</span></div>' : '';
+
+  const sectionsHtml = sections.length ? sections.map((sec, si) => {
     const countHtml = [];
     if (sec.added) countHtml.push('<span style="color:#34d399">+'+sec.added+'</span>');
     if (sec.removed) countHtml.push('<span style="color:#f87171">-'+sec.removed+'</span>');
@@ -4599,7 +4615,8 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel) {
       const ico = r.type === 'add' ? '+' : r.type === 'rem' ? '&minus;' : '~';
       return '<div class="df-row '+cls+'"><span class="df-row-ico">'+ico+'</span><span class="df-row-txt">'+r.text+'</span></div>';
     }).join('');
-    return '<div class="df-section"><div class="df-sec-hdr" onclick="const b=this.nextElementSibling;b.style.display=b.style.display===\'none\'?\'\':\'none\'">'+sec.icon+' '+esc(sec.label)+'<span class="df-sec-count">'+countHtml.join(' ')+'</span></div><div class="df-sec-body">'+rowsHtml+'</div></div>';
+    const cbId = 'dfSec'+si;
+    return '<div class="df-section" data-sec-key="'+(sec.key||'')+'"><div class="df-sec-hdr"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;min-width:0" onclick="event.stopPropagation()"><input type="checkbox" class="df-sec-cb" id="'+cbId+'" data-sec-idx="'+si+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer;flex-shrink:0">'+sec.icon+' '+esc(sec.label)+'</label><span class="df-sec-count" style="cursor:pointer" onclick="const b=this.closest(\'.df-section\').querySelector(\'.df-sec-body\');b.style.display=b.style.display===\'none\'?\'\':\'none\'">'+countHtml.join(' ')+' <span style="font-size:.6rem;opacity:.5">&#9660;</span></span></div><div class="df-sec-body">'+rowsHtml+'</div></div>';
   }).join('') : '<div class="df-empty">'+ICO.check(18,'#34d399')+'<br>Your template is already up to date.</div>';
 
   const detected = [];
@@ -4618,15 +4635,31 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel) {
     + '<div class="df-stat"><div class="df-stat-num" style="color:#f87171">'+totalRemoved+'</div><div class="df-stat-label">Removed</div></div>'
     + '<div class="df-stat"><div class="df-stat-num" style="color:#fbbf24">'+totalChanged+'</div><div class="df-stat-label">Changed</div></div>'
     + '<div class="df-stat"><div class="df-stat-num" style="color:#00d4ff">'+totalDiffs+'</div><div class="df-stat-label">Total</div></div></div>'
-    + sectionsHtml + '</div>'
+    + selectAllHtml + sectionsHtml + '</div>'
     + '<div class="df-footer"><button class="df-btn df-btn-secondary" id="dfCancel">Cancel</button>'
     + '<button class="df-btn df-btn-primary" id="dfApply">'+(totalDiffs ? 'Apply &amp; Upgrade' : 'Continue Anyway')+'</button></div></div>';
   document.body.appendChild(overlay);
 
+  const allCbs = overlay.querySelectorAll('.df-sec-cb');
+  const selAllEl = document.getElementById(selectAllId);
+  if (selAllEl) {
+    selAllEl.addEventListener('change', () => { allCbs.forEach(cb => { cb.checked = selAllEl.checked; cb.closest('.df-section').style.opacity = cb.checked ? '1' : '.45'; }); });
+  }
+  allCbs.forEach(cb => {
+    cb.addEventListener('change', () => {
+      cb.closest('.df-section').style.opacity = cb.checked ? '1' : '.45';
+      if (selAllEl) selAllEl.checked = [...allCbs].every(c => c.checked);
+    });
+  });
+
   const close = (cb) => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => { overlay.remove(); if (cb) cb(); }, 160); };
   document.getElementById('dfClose').addEventListener('click', () => close(onCancel));
   document.getElementById('dfCancel').addEventListener('click', () => close(onCancel));
-  document.getElementById('dfApply').addEventListener('click', () => close(onApply));
+  document.getElementById('dfApply').addEventListener('click', () => {
+    const selected = new Set();
+    allCbs.forEach((cb, i) => { if (cb.checked && sections[i] && sections[i].key) selected.add(sections[i].key); });
+    close(() => onApply(selected));
+  });
   overlay.addEventListener('click', e => { if (e.target === overlay) close(onCancel); });
 }
 
@@ -4693,10 +4726,28 @@ function showUpdateTemplateModal() {
       overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
       setTimeout(() => {
         overlay.remove();
-        showDiffModal(oldCfg, newCfg, parsed, () => {
+        showDiffModal(oldCfg, newCfg, parsed, (selectedKeys) => {
+          const SECTION_FIELDS = {
+            pses: ['preferredStreamExpressions'],
+            eses: ['excludedStreamExpressions'],
+            ises: ['includedStreamExpressions'],
+            ranked_regex: ['rankedRegexPatterns'],
+            pref_regex: ['preferredRegexPatterns'],
+            excl_regex: ['excludedRegexPatterns'],
+            sort: ['sortCriteria'],
+            settings: ['deduplicator','formatter','dynamicAddonFetching','maxResults','syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls']
+          };
+          const keep = {};
+          for (const [key, fields] of Object.entries(SECTION_FIELDS)) {
+            if (!selectedKeys.has(key)) {
+              fields.forEach(f => { if (oldCfg[f] !== undefined) keep[f] = oldCfg[f]; });
+            }
+          }
+          S._migrationKeep = Object.keys(keep).length ? keep : null;
+          const skipped = Object.keys(SECTION_FIELDS).filter(k => !selectedKeys.has(k)).length;
           step = STEPS;
           pushStep(); render(); window.scrollTo(0,0);
-          showToast('Template upgraded — review settings and generate your new template');
+          showToast(skipped ? 'Template upgraded — '+selectedKeys.size+' section'+(selectedKeys.size!==1?'s':'')+' applied, '+skipped+' kept from original' : 'Template upgraded — review settings and generate your new template');
         }, () => {
           showToast('Migration cancelled — no changes applied', true);
         });
@@ -4767,7 +4818,7 @@ function showTestDriveModal() {
     resultsEl.innerHTML = '<div class="td-loading"><span class="dot-spin"><span></span><span></span><span></span></span> Uploading config & fetching streams…</div>';
 
     try {
-      const cfg = build().config;
+      const cfg = buildFinal().config;
       const tempPwd = makePwd();
       const allHosts = hostEntries();
 
@@ -4952,7 +5003,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         </summary>
         <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.04);font-size:.7rem;color:#8b949e;line-height:1.7">
           ${(() => {
-            const cfg = build().config;
+            const cfg = buildFinal().config;
             const rows = [];
             rows.push('<b style="color:#e6edf3">Host:</b> ' + esc(hostLabel));
             rows.push('<b style="color:#e6edf3">Presets:</b> ' + (cfg.presets ? cfg.presets.filter(p=>p.enabled!==false).length + ' active' : 'inherited'));
@@ -5501,7 +5552,7 @@ function templateHealthCheck() {
 }
 
 function hostCompatCheck() {
-  const cfg = build().config;
+  const cfg = buildFinal().config;
   const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
   const TAMTARO_URL_FRAGMENT = 'Tam-Taro/SEL-Filtering-and-Sorting';
   const TAMTARO_OLD_URL_FRAGMENT = 'Tamtaro/SEL-Filtering-and-Sorting';
@@ -5631,7 +5682,7 @@ async function simpleInstall(target) {
   if (!pwd) return;
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
-  const cfg = build().config;
+  const cfg = buildFinal().config;
   const _allHosts = hostEntries();
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
@@ -5867,7 +5918,7 @@ function raceHostFetch(host, path, options, timeout) {
 }
 
 async function uploadTemplateForImport() {
-  const tmpl = build();
+  const tmpl = buildFinal();
   if (tmpl.config) {
     if (tmpl.config.services) tmpl.config.services = tmpl.config.services.map(s => ({ ...s, credentials: {} }));
     if (Array.isArray(tmpl.config.presets)) tmpl.config.presets = tmpl.config.presets.map(p => {
@@ -5958,7 +6009,7 @@ async function openInAIOStreams() {
   if (isAuto && pwd) {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
-    const cfg = build().config;
+    const cfg = buildFinal().config;
     const existingUuid = validateUuid(uuid) ? uuid : null;
     const allHosts = Object.values(HOST_URLS);
     const fastest = await Promise.any(
@@ -6041,7 +6092,7 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     try {
-      const res = await fetchWithTimeout(`${base}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: build().config, password: pwd }) });
+      const res = await fetchWithTimeout(`${base}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: buildFinal().config, password: pwd }) });
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
