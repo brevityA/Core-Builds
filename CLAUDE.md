@@ -99,7 +99,10 @@ Preset `type` values confirmed in AIOStreams source (as of v2.30.6 — 80 preset
 
 **System:** `library` (continue watching / user library), `custom`, `aiostreams` (self-reference/chaining)
 
-**Supported services (15):** `realdebrid`, `alldebrid`, `premiumize`, `debridlink`, `torbox`, `offcloud`, `putio`, `easynews`, `easydebrid`, `debrider`, `pikpak`, `seedr`, `nzbdav`, `altmount`, `stremthru_newz`
+**Supported services (17):** `realdebrid`, `alldebrid`, `premiumize`, `debridlink`, `torbox`, `offcloud`, `putio`, `easynews`, `easydebrid`, `debrider`, `pikpak`, `seedr`, `nzbdav`, `altmount`, `stremthru_newz`, `stremio_nntp`, `aiostreams`
+- `stremio_nntp` — native NNTP usenet streaming (v2.31.0)
+- `aiostreams` — AIOStreams built-in usenet engine (v2.31.0)
+- `putio` — valid service for presets/config but **removed from `service()` SEL whitelist** in v2.31.0; `service(streams, 'putio')` will throw
 
 **Per-Addon Flood Guard caps (current — v2.9.5):**
 Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent Galaxy ≤ 1 (backup), Knaben ≤ 1 (backup), TorrentsDB ≤ 1 (backup)
@@ -378,6 +381,7 @@ All used via `{stream.fieldName::operator[...]}` in formatter `name`/`descriptio
 | `nRegexScore` | number | Normalised regex score |
 | `folderSeasons` | string[] | Season folders in multi-season packs |
 | `folderEpisodes` | string[] | Episode entries in folder-based releases |
+| `preloading` | boolean | `{stream.preloading::istrue["⏳ "\|\|""]}` — pre-caching/preload indicator (v2.31.0) |
 
 ### Formatter String Modifiers (appended after `::`)
 
@@ -430,6 +434,52 @@ Top-level field: `parentConfig`
 
 ---
 
+## AIOStreams v2.31.0 Schema Notes
+
+### `service()` SEL whitelist (v2.31.0)
+
+The `service()` function now accepts 16 services (was 15). Changes:
+- **Added:** `stremio_nntp` (native NNTP usenet), `aiostreams` (built-in usenet engine)
+- **Removed:** `putio` (still valid in presets/config, just not usable in SEL `service()` expressions)
+
+### Newznab preset: `seasonPackStrategy` (v2.31.0)
+
+New option for Newznab/Torznab presets. Controls how series searches handle season packs:
+- `'episodeOnly'` — default, search episodes only
+- `'dynamic'` — season pack preferred
+- `'episodeFirstSeasonPackFallback'` — try episode first, fall back to season pack
+- `'seasonPackFirstEpisodeFallback'` — try season pack first, fall back to episode
+Only applies when `searchMode` is `'auto'`. Not shown in simple mode.
+
+### Newznab preset: `searchMode` (v2.31.0)
+
+Replaces/extends old `forceQuerySearch`:
+- `'auto'` — default, AIOStreams picks the best mode
+- `'query'` — force query-based search
+- `'both'` — creates two addon instances (one per mode)
+
+### EasyNews Search: `apiVersion` (v2.31.0)
+
+- `'3.0'` — default, 100 results/page, no rate limiting, parallel page fetching
+- `'2.0'` — legacy, up to 250 results/page but rate-limited to 2 concurrent requests
+
+### Deduplicator: `libraryBehaviour` (v2.31.0)
+
+Controls how library items interact with deduplication:
+- `'ignore'` — default, library items treated like any other stream
+- `'prefer'` — library items preferred when deduplicating
+- `'exclusive'` — only library items survive deduplication
+
+### Deduplicator: `merge` (v2.31.0)
+
+New boolean option. When enabled, allows adding deduplicated streams to the failover list instead of discarding them entirely.
+
+### Formatter: `stream.preloading` (v2.31.0)
+
+New boolean field. `true` when the stream has been selected for pre-caching/preloading. Usage: `{stream.preloading::istrue["⏳ "||""]}` to show a preload indicator.
+
+---
+
 ## AIOStreams v2.30.x Schema Notes
 
 ### `config.deduplicator.tiebreakers` (v2.30.3)
@@ -455,6 +505,8 @@ Beyond `global`/`movies`/`series`/`anime`, these per-type × cached/uncached key
 AIOStreams uses a **stable multi-key sort** — position 1 is the primary sort; each subsequent key only breaks ties from prior comparisons. Keys at position 10+ rarely influence results.
 
 **Available keys (25):** `cached`, `streamExpressionMatched`, `streamExpressionScore`, `seadex`, `resolution`, `quality`, `regexScore`, `visualTag`, `audioTag`, `audioChannel`, `language`, `encode`, `library`, `seeders`, `bitrate`, `size`, `service`, `addon`, `keyword`, `streamType`, `private`, `age`, `subtitle`, `regexPatterns`, `releaseGroup`
+
+**⚠ `audioChannel` upstream bug (v2.31.0):** The key is accepted in the config schema (`SORT_CRITERIA` constant) and used by the frontend, but the sorter (`sorter.ts`) has no `case 'audioChannel':` handler — it falls through to `default: return 0`, making it a **fleet-wide no-op**. All 60+ Core Builds templates include this key at position ~10. It will start working once the upstream bug is fixed. Do NOT remove it from templates.
 
 **Core Builds uses 16 keys** (17 for Hybrid). Sections per template: `global`, `movies`, `series`, `anime`, `cachedMovies`, `uncachedMovies`, `uncachedSeries`.
 
