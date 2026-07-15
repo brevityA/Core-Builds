@@ -418,6 +418,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "movies": [
@@ -483,6 +487,10 @@
         },
         {
           "key": "size",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
           "direction": "desc"
         }
       ],
@@ -550,6 +558,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "anime": [
@@ -616,6 +628,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "cachedMovies": [
@@ -681,6 +697,10 @@
         },
         {
           "key": "size",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
           "direction": "desc"
         }
       ],
@@ -752,6 +772,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "uncachedSeries": [
@@ -822,6 +846,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ]
     },
@@ -854,6 +882,7 @@
       ],
       "smartDetectRounding": 10,
       "libraryBehaviour": "prefer",
+      "merge": false,
       "tiebreakers": [
         {
           "type": "torrent_seeders",

@@ -442,12 +442,36 @@
         {
           "key": "seeders",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
-      "series": [],
-      "anime": [],
-      "cached": [],
-      "cachedMovies": []
+      "series": [
+        {
+          "key": "subtitle",
+          "direction": "desc"
+        }
+      ],
+      "anime": [
+        {
+          "key": "subtitle",
+          "direction": "desc"
+        }
+      ],
+      "cached": [
+        {
+          "key": "subtitle",
+          "direction": "desc"
+        }
+      ],
+      "cachedMovies": [
+        {
+          "key": "subtitle",
+          "direction": "desc"
+        }
+      ]
     },
     "rpdbApiKey": "<template_placeholder>",
     "posterService": "none",
