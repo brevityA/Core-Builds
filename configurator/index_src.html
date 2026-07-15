@@ -1195,7 +1195,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.50';
+const CONFIGURATOR_VERSION = '2.51';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1279,6 +1279,10 @@ const CHANGELOG = [
     'Direct Install — new toggle in Deploy: enter Stremio email + password inline to push the addon straight to your library',
     'Get Manifest URL mode preserved for manual install / WuPlay / Nuvio',
     '"Create random account" link generates a Stremio account in one click (no email verification)',
+  ]},
+  { v:'2.51', date:'Jul 15 2026', items:[
+    'Built-in Usenet Engine — stremio_nntp and aiostreams services added to generated templates (v2.31.0); enabled automatically on private instances via Base Config inheritance',
+    'Base Config v1.3.0 — added stremio_nntp, aiostreams, nzbdav, altmount, stremthru_newz services; NZBHydra and Usenet Streamer presets (disabled by default, operator-configured)',
   ]},
   { v:'2.50', date:'Jul 15 2026', items:[
     'Selective Migration — per-section checkboxes in the diff modal let you cherry-pick which changes to apply (PSEs, ESEs, sort, regex, settings) and keep the rest from your existing config',
@@ -3851,7 +3855,8 @@ function services() {
     {id:'easynews', enabled: svc==='easynews' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || (isMulti && m.includes('easynews'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
     {id:'putio', enabled: false, credentials:{}},
     {id:'debrider', enabled: false, credentials:{}},
-    {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}}
+    {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}},
+    {id:'stremio_nntp', enabled: false, credentials:{}}, {id:'aiostreams', enabled: false, credentials:{}}
   ];
 }
 
