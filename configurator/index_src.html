@@ -126,6 +126,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .td-loading{text-align:center;padding:30px 0;color:#6b7280;font-size:.82rem}
 .td-error{padding:12px;border-radius:8px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);font-size:.78rem;color:#f87171;margin-top:10px}
 .td-count{font-size:.72rem;color:#6b7280;margin-bottom:8px;font-weight:600}
+.hc-box{margin-top:10px;border-radius:10px;border:1px solid rgba(255,255,255,.06);overflow:hidden}
+.hc-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.02);font-size:.72rem;font-weight:700;color:#8b949e;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;user-select:none;transition:background .15s}
+.hc-hdr:hover{background:rgba(255,255,255,.04)}
+.hc-hosts{padding:8px 12px 10px}
+.hc-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;margin-bottom:4px;transition:background .15s}
+.hc-row:last-child{margin-bottom:0}
+.hc-row:hover{background:rgba(255,255,255,.02)}
+.hc-badge{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.hc-badge-ok{background:#34d399;box-shadow:0 0 6px rgba(52,211,153,.4)}
+.hc-badge-warn{background:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,.4)}
+.hc-badge-err{background:#f87171;box-shadow:0 0 6px rgba(248,113,113,.4)}
+.hc-name{font-size:.76rem;font-weight:700;color:#e6edf3;min-width:90px}
+.hc-status{font-size:.70rem;color:#8b949e;flex:1}
+.hc-detail{padding:6px 12px 10px}
+.hc-issue{display:flex;align-items:baseline;gap:6px;margin-bottom:3px;font-size:.70rem;color:#8b949e;line-height:1.5}
+.hc-issue-ico{flex-shrink:0}
 .aio-section{margin-top:20px;border-top:1px solid rgba(255,255,255,.06);padding-top:18px}
 .aio-section h3{font-size:.82rem;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
 .rv-section{margin-top:12px;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden}
@@ -829,6 +845,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .td-stream{border-color:#d0d7de;background:#f6f8fa}
 [data-theme="light"] .td-stream-name{color:#1c2128}
 [data-theme="light"] .td-stream-desc{color:#57606a}
+[data-theme="light"] .hc-box{border-color:#d0d7de}
+[data-theme="light"] .hc-hdr{background:#f6f8fa;color:#57606a}
+[data-theme="light"] .hc-name{color:#1c2128}
+[data-theme="light"] .hc-status{color:#57606a}
+[data-theme="light"] .hc-issue{color:#57606a}
 [data-theme="light"] .modal-sub{color:#57606a}
 [data-theme="light"] .fmt-tab{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
 [data-theme="light"] .fmt-tab:hover{border-color:#0969da;color:#1c2128}
@@ -1133,7 +1154,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.45';
+const CONFIGURATOR_VERSION = '2.46';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1187,6 +1208,9 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.46', date:'Jul 15 2026', items:[
+    'Host Compatibility Checker — see at a glance whether your template works on ElfHosted, ForTheWeak, or self-hosted instances. Validates regex patterns, synced URLs, and SEL expressions against each host\'s known restrictions',
+  ]},
   { v:'2.45', date:'Jul 15 2026', items:[
     'Fix deduplicator.merge schema — removed boolean field that newer AIOStreams versions reject (expected object)',
   ]},
@@ -2661,6 +2685,7 @@ function render() {
         </div>
         ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
         ${(() => { const h = templateHealthCheck(); return h.length ? `<div style="margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15)"><div style="font-size:.68rem;font-weight:700;color:#f87171;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:#8b949e;line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:#f87171;flex-shrink:0">${ICO.warn(12,'#f87171')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div style="margin-top:6px;padding:6px 12px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12);font-size:.72rem;color:#34d399;font-weight:600">${ICO.check(12,'#34d399')} Template looks good</div>`; })()}
+        ${hostCompatHtml()}
         <button class="btn-td" data-action="test-drive">${ICO.eye(15,'currentColor')} Test Drive — Preview Your Streams</button>
         <div class="name-row">
           <label>Template name (optional)</label>
@@ -5260,6 +5285,87 @@ function templateHealthCheck() {
   const filledCreds = credInputs.filter(i => S.creds[i.id] && S.creds[i.id].trim());
   if (credInputs.length && !filledCreds.length && !['p2p','http'].includes(S.service)) warns.push('No debrid API key — streams won\'t load');
   return warns;
+}
+
+function hostCompatCheck() {
+  const cfg = build().config;
+  const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
+  const TAMTARO_URL_FRAGMENT = 'Tam-Taro/SEL-Filtering-and-Sorting';
+  const TAMTARO_OLD_URL_FRAGMENT = 'Tamtaro/SEL-Filtering-and-Sorting';
+  const regexFields = [
+    ...(cfg.rankedRegexPatterns||[]),
+    ...(cfg.excludedRegexPatterns||[]).map((p,i) => typeof p === 'string' ? {name:'Excluded #'+(i+1), pattern:p} : p),
+    ...(cfg.preferredRegexPatterns||[]),
+  ];
+  const syncedUrls = [
+    ...(cfg.syncedRankedRegexUrls||[]),
+    ...(cfg.syncedExcludedRegexUrls||[]),
+    ...(cfg.syncedIncludedStreamExpressionUrls||[]),
+    ...(cfg.syncedPreferredStreamExpressionUrls||[]),
+    ...(cfg.syncedExcludedStreamExpressionUrls||[]),
+  ];
+  const hosts = {
+    selfhosted: { label:'Self-Hosted', issues:[], status:'ok' },
+    elfhosted:  { label:'ElfHosted', issues:[], status:'ok' },
+    fortheweak: { label:'ForTheWeak', issues:[], status:'ok' },
+  };
+  const tamtaroUrls = syncedUrls.filter(u => u.includes(TAMTARO_URL_FRAGMENT) || u.includes(TAMTARO_OLD_URL_FRAGMENT));
+  if (tamtaroUrls.length) {
+    hosts.elfhosted.issues.push('Tam-Taro synced URL not on elfhosted allowlist — will cause "Forbidden URL" error');
+    hosts.elfhosted.status = 'err';
+  }
+  const ranked = cfg.rankedRegexPatterns||[];
+  const ftwBlocked = ranked.filter(r => FORTHEWEAK_BLOCKED.includes(r.name));
+  if (ftwBlocked.length) {
+    hosts.fortheweak.issues.push(ftwBlocked.length + ' regex pattern' + (ftwBlocked.length>1?'s':'') + ' blocked on fortheweak: ' + ftwBlocked.map(r=>r.name).slice(0,4).join(', ') + (ftwBlocked.length>4?'…':''));
+    hosts.fortheweak.status = 'err';
+  }
+  const allExprs = [
+    ...(cfg.excludedStreamExpressions||[]),
+    ...(cfg.includedStreamExpressions||[]),
+    ...(cfg.preferredStreamExpressions||[]),
+  ];
+  const hasNot = allExprs.some(e => e.expression && /\bnot\s*\(/.test(e.expression));
+  if (hasNot) {
+    hosts.elfhosted.issues.push('SEL uses not() — must use negate() instead');
+    hosts.elfhosted.status = 'err';
+    hosts.fortheweak.issues.push('SEL uses not() — must use negate() instead');
+    hosts.fortheweak.status = 'err';
+  }
+  const excluded = cfg.excludedRegexPatterns||[];
+  const inlinePatterns = excluded.filter(p => {
+    const s = typeof p === 'string' ? p : (p.pattern||'');
+    return /\(\?[=!<]/.test(s);
+  });
+  if (!cfg.syncedRankedRegexUrls || !cfg.syncedRankedRegexUrls.some(u => u.includes('Vidhin05'))) {
+    if (ranked.length) {
+      hosts.elfhosted.issues.push('No Vidhin05 synced URL — inline regex patterns may not be whitelisted');
+      if (hosts.elfhosted.status === 'ok') hosts.elfhosted.status = 'warn';
+    }
+  }
+  const customSyncUrls = syncedUrls.filter(u => !u.includes('Vidhin05') && !u.includes(TAMTARO_URL_FRAGMENT) && !u.includes(TAMTARO_OLD_URL_FRAGMENT) && !u.includes('brevityA/Core-Builds'));
+  if (customSyncUrls.length) {
+    hosts.elfhosted.issues.push(customSyncUrls.length + ' custom synced URL' + (customSyncUrls.length>1?'s':'') + ' — may not be on host allowlist');
+    if (hosts.elfhosted.status === 'ok') hosts.elfhosted.status = 'warn';
+    hosts.fortheweak.issues.push(customSyncUrls.length + ' custom synced URL' + (customSyncUrls.length>1?'s':'') + ' — may not be on host allowlist');
+    if (hosts.fortheweak.status === 'ok') hosts.fortheweak.status = 'warn';
+  }
+  return hosts;
+}
+
+function hostCompatHtml() {
+  const hosts = hostCompatCheck();
+  const order = ['selfhosted','elfhosted','fortheweak'];
+  const statusLabel = {ok:'Compatible',warn:'Possible issues',err:'Blocked'};
+  const statusColor = {ok:'#34d399',warn:'#fbbf24',err:'#f87171'};
+  const allOk = order.every(k => hosts[k].status === 'ok');
+  const rows = order.map(k => {
+    const h = hosts[k];
+    const badge = `<span class="hc-badge hc-badge-${h.status}"></span>`;
+    const issues = h.issues.length ? `<div class="hc-detail">${h.issues.map(i => `<div class="hc-issue"><span class="hc-issue-ico" style="color:${statusColor[h.status]}">${h.status==='err'?'✕':'⚠'}</span><span>${i}</span></div>`).join('')}</div>` : '';
+    return `<div class="hc-row">${badge}<span class="hc-name">${h.label}</span><span class="hc-status" style="color:${statusColor[h.status]}">${statusLabel[h.status]}</span></div>${issues}`;
+  }).join('');
+  return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}</div></div>`;
 }
 
 async function preflightCheck() {
