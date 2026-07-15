@@ -1101,7 +1101,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.40';
+const CONFIGURATOR_VERSION = '2.43';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1155,6 +1155,23 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.43', date:'Jul 15 2026', items:[
+    'Template Updater — fixed service detection: Hybrid, AllDebrid, and EasyNews templates now correctly identified via preset analysis instead of service-only checks',
+    'Template Updater — fixed resolution detection: 1080p templates with ESE-based 4K kill now correctly detected as 1080p instead of defaulting to 4K',
+    'Template Updater — fixed state bleeding: importing a second template no longer inherits stale values from the first import',
+  ]},
+  { v:'2.42', date:'Jul 15 2026', items:[
+    'Sort criteria — added `service` key for Hybrid configs (TorBox gets priority over RD in sort order)',
+    'Sort criteria — added `age` and `subtitle` tiebreaker keys to all sort sections',
+    'Sort criteria — added `cachedAnime` and `uncachedAnime` sections (seadex at position 2, anime-optimised ordering)',
+    'Deduplicator — added `merge` field (v2.31.0, defaults to off — enables failover from deduplicated streams)',
+    'EasyNews Search — added `apiVersion: 3.0` (v2.31.0, parallel page fetching, no rate limiting)',
+  ]},
+  { v:'2.41', date:'Jul 15 2026', items:[
+    'Template Updater — paste an existing template to detect your settings and rebuild with the latest configurator logic',
+    'Family Formatter v3 by RB3 is now the default formatter — human-readable layout with network source, edition badges, and preloading indicator',
+    'Fix — removed cached sort key from uncachedMovies/uncachedSeries sections (improves Usenet stream visibility)',
+  ]},
   { v:'2.40', date:'Jul 14 2026', items:[
     'Direct Install — new toggle in Deploy: enter Stremio email + password inline to push the addon straight to your library',
     'Get Manifest URL mode preserved for manual install / WuPlay / Nuvio',
@@ -1493,9 +1510,16 @@ function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [H
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'apex-v2', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '' };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '' };
 
 const FORMATTERS = [
+  {
+    id: 'family-v3', label: 'Family v3', badge: 'Default', bc: '#10b981',
+    desc: 'Human-readable · ✅ Plays Fast · network source · edition badges · by RB3',
+    img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg',
+    name: `{addon.name} | {stream.title::exists["\"{stream.title}\""||\"\"]}{stream.season::>=0[" S"||""]}{stream.season::<=9["0"||""]}{stream.season::>0["{stream.season}"||""]}{stream.episode::>=0[" • E"||""]}{stream.episode::<=9["0"||""]}{stream.episode::>0["{stream.episode}"||""]}`,
+    d: `{service.cached::istrue["✅ Plays Fast"||""]}{stream.nSeScore::exists::and::stream.nSeScore::>=75::istrue["🥇Good Stream"||""]}\n{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEB-DL::istrue["📺 From {stream.network::replace('iTunes','Apple TV')}"||\"\"]}{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEBRip::istrue["📺 From {stream.network::replace('iTunes','Apple TV')}"||\"\"]}\n{stream.resolution::exists["🖥️ {stream.resolution::replace('2160p', 'Highest Resolution 4k')::replace('1440p','High Resolution 2k')::replace('1080p','Great Resolution 1080p')::replace('720p','Decent Resolution 720p')}"||\"\"]}\n{stream.quality::exists["🎥 "||""]}{stream.quality::exists::isfalse::and::stream.encode::exists["🎞️ "||""]}{stream.quality::exists["{stream.quality}"||""]}{stream.quality::exists::istrue::and::stream.encode::exists[" • "||""]}{stream.encode::exists["{stream.encode}"||""]}\n{stream.audioChannels::exists::or::stream.audioTags::exists["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::join(', ')}"||\"\"]}{stream.audioChannels::exists::and::stream.audioTags::exists[" • "||""]}{stream.audioTags::exists["{stream.audioTags::join(', ')}"||\"\"]}\n{stream.edition::exists["⭐️ {stream.edition}"||""]}\n{stream.size::exists["💾 {stream.size::bytes}"||""]} • ☁️ {stream.preloading}\n🏞️ {service.id} • {stream.type} • 📚 {stream.library}\n🗣️ {stream.uLanguages}`
+  },
   {
     id: 'ultra', label: 'Ultra', badge: 'Flagship', bc: '#e11d48',
     desc: '3-line · clean · one topic per line · minimal',
@@ -1545,7 +1569,7 @@ const FORMATTERS = [
     d: ` {service.cached::istrue["🚀 INSTANT  "||""]}{service.cached::isfalse["⚠️ UNCACHED  "||""]}{stream.nSeScore::>=75["💎 ELITE  "||""]}{stream.nSeScore::>=50["✦ QUALITY  "||""]}{stream.seadexBest::istrue["⭐ BEST  "||""]}{stream.seadex::istrue["✅ SEADEX  "||""]}{stream.regexMatched::exists["🎯 {stream.regexMatched::truncate(12)::smallcaps}  "||""]}{stream.seMatched::exists["🧲 {stream.seMatched::truncate(12)::smallcaps}  "||""]}{stream.releaseGroup::exists["🏷️ {stream.releaseGroup::smallcaps}  "||""]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)["👑 PREMIER  "||""]}{stream.filename::~(?i)IMAX["🎞️ IMAX  "||""]}{tools.newLine} 🎬 {stream.quality::exists["{stream.quality::upper::replace('BLURAY REMUX','💎 REMUX')::replace('BLURAY','💿 BLURAY')::replace('BLU-RAY REMUX','💎 REMUX')::replace('BLU-RAY','💿 BLURAY')::replace('WEB-DL','🍿 WEB-DL')::replace('WEBRIP','📼 WEBRIP')::replace('HDTV','🎞️ HDTV')::replace('HDRIP','🎞️ HDRIP')}  "||""]}{stream.encode::exists["{stream.encode::smallcaps}  "||""]}{stream.container::exists["{stream.container::smallcaps}  "||""]}{stream.visualTags::exists["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','☀️ SDR')::replace('10BIT','🎨 10ʙɪᴛ')::replace('10bit','🎨 10ʙɪᴛ')::replace('STANDARD','☀️ SDR')}  "||"☀️ SDR  "]}{stream.bitrate::exists["{stream.bitrate::sbitrate::smallcaps}  "||""]}{stream.network::exists["🍿 {stream.network::upper}  "||""]}{stream.upscaled::istrue["🔬 UPSCALED  "||""]}{stream.unrated::istrue["🚫 UNRATED  "||""]}{stream.uncensored::istrue["🔞  "||""]}{stream.editions::exists["✂️ {stream.editions::join(' ')::upper}  "||""]}{tools.newLine} 🎛️ {stream.audioTags::exists["{stream.audioTags::join(' ')::upper::replace('ATMOS','🔮 ATMOS')::replace('TRUEHD','💎 TRUEHD')::replace('DTS-HD MA','🔷 DTS-HD MA')::replace('DTS-X','🎵 DTS-X')::replace('EAC3','🎶 EAC3')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('AAC','🎧 AAC')::replace('FLAC','💿 FLAC')::replace('AC3','🎵 AC3')}  "||"ᴀᴜᴅɪᴏ  "]}{stream.audioChannels::first::=2.0["🔈 "||""]}{stream.audioChannels::first::=5.1["🔉 "||""]}{stream.audioChannels::first::=7.1["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::first}  "||""]}🌍 {stream.uLanguageEmojis::exists["{stream.uLanguageEmojis::join(' ')}"||"MULTI"]}{stream.dubbed::istrue["  🎙️ DUB"||""]}{stream.subbed::istrue["  📝 SUB"||""]}{tools.newLine} {stream.seasonPack::istrue["📦 PACK  "||""]}{stream.size::exists["{stream.size::sbytes}  "||""]}{stream.folderSize::exists["📁 {stream.folderSize::sbytes}  "||""]}{stream.repack::istrue["🛠️ REPACK  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.freeleech::istrue["🆓 FREE  "||""]}{stream.age::exists["⏱️ {stream.age::smallcaps}  "||""]}{stream.indexer::exists["🔍 {stream.indexer::truncate(12)::smallcaps}  "||""]}🔌 {stream.type::exists["{stream.type::smallcaps}"||""]}`
   },
   {
-    id: 'elite', label: 'Elite', badge: 'Default', bc: '#2563eb',
+    id: 'elite', label: 'Elite', badge: 'Dense', bc: '#2563eb',
     desc: '4-line · emoji resolution circles · INSTANT/UNCACHED · PREMIER badges',
     img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg',
     name: `{stream.resolution::exists["{stream.resolution::replace('2160p','🟣 4K')::replace('1440p','🟡 2K')::replace('1080p','🔵 1080P')::replace('720p','🟢 720P')::replace('480p','⚫ 480P')::replace('360p','⚫ 360P')}  "||"📺 HD  "]}{service.shortName::exists["⚡ {service.shortName::upper}  "||"📡 P2P  "]}{stream.library::istrue["🗄️  "||""]}{stream.proxied::istrue["🕵️  "||""]}{stream.visualTags::~(?i)(DV|HDR|HLG)["{stream.visualTags::join(' ')::replace('DV','👁️ DV')::replace('HDR10+','✨ HDR¹⁰⁺')::replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR','🌟 HDR')::replace('SDR','')::replace('10BIT','')::replace('10bit','')::replace('STANDARD','')}  "||""]}{stream.title::exists["{stream.title::upper}"||""]}{stream.formattedSeasons::exists[" {stream.formattedSeasons::upper}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes::upper}"||""]}`,
@@ -1988,6 +2012,10 @@ function renderOpts(def) {
 }
 
 const FMT_PREVIEWS = {
+  'family-v3': {
+    n:'Torrentio | "Frankenstein" S01 • E05',
+    d:['✅ Plays Fast  🥇Good Stream','📺 From Apple TV','🖥️ Highest Resolution 4k','🎥 WEB-DL • HEVC','🔊 5.1 • Atmos, EAC3','💾 4.2 GB • ☁️ false','🏞️ torbox • debrid • 📚 false','🗣️ English']
+  },
   'ultra': {
     n:'4K · ⚡ TORBOX · REMUX · FRANKENSTEIN',
     d:['🎥 HEVC  DV | HDR10+ | 10bit','🎧 TRUEHD  7.1  🌍 🇬🇧','💾 45.2 GB  📦 PACK  🏷 FraMeSToR ✅  🌱 1 247  📡 torrentio']
@@ -2059,7 +2087,7 @@ const FMT_PREVIEWS = {
 };
 
 function fmtPreviewHtml(fmtId) {
-  const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['apex-v2'];
+  const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['family-v3'];
   return `<div class="fmt-live-preview">
     <div class="fmt-live-poster">${ICO.film(16,'#6b7280')}</div>
     <div class="fmt-live-lines">
@@ -2087,7 +2115,7 @@ function fmtDropdownHtml() {
         <span class="fmt-featured-badge" id="fmtFeaturedBadge" style="background:${display.bc}22;color:${display.bc}">${display.badge}</span>
       </div>
       <div class="fmt-featured-desc" id="fmtFeaturedDesc">${display.desc}</div>
-      <div id="fmtFeaturedPreview">${fmtPreviewHtml(isCustom ? 'apex-v2' : cur.id)}</div>
+      <div id="fmtFeaturedPreview">${fmtPreviewHtml(isCustom ? 'family-v3' : cur.id)}</div>
     </div>
   </div>`;
 }
@@ -2099,7 +2127,7 @@ function updateFmtFeatured() {
   document.querySelectorAll('#fmtFeaturedBadge').forEach(el => { el.textContent = cur.badge; el.style.background = cur.bc + '22'; el.style.color = cur.bc; });
   document.querySelectorAll('#fmtFeaturedDesc').forEach(el => { el.textContent = cur.desc; });
   document.querySelectorAll('.fmt-featured-dot').forEach(el => { el.style.background = cur.bc; el.style.boxShadow = '0 0 8px ' + cur.bc + '88'; });
-  document.querySelectorAll('#fmtFeaturedPreview').forEach(el => { el.innerHTML = fmtPreviewHtml(isCustom ? 'apex-v2' : cur.id); });
+  document.querySelectorAll('#fmtFeaturedPreview').forEach(el => { el.innerHTML = fmtPreviewHtml(isCustom ? 'family-v3' : cur.id); });
 }
 function updateFmtReceiptRow() {
   const fmtLbl = label('formatter', S.formatter);
@@ -2109,7 +2137,7 @@ function updateFmtReceiptRow() {
     const lbl2 = row.querySelector('.receipt-row-lbl');
     if (lbl2 && lbl2.textContent.trim() === 'formatter') {
       const val = row.querySelector('.receipt-row-val');
-      if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'apex-v2' ? ' hl' : ''}`; }
+      if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'family-v3' ? ' hl' : ''}`; }
     }
   });
 }
@@ -2435,6 +2463,13 @@ function splashHtml() {
           <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
         </div>
       </div>
+      <div class="splash-door" data-action="update-template">
+        <div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div>
+        <div class="splash-door-text">
+          <div class="splash-door-title">Update Template <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div>
+          <div class="splash-door-desc">Paste an existing template — we detect your settings and rebuild with the latest logic.</div>
+        </div>
+      </div>
     </div>
 
     <div class="splash-section-hdr">
@@ -2561,7 +2596,7 @@ function render() {
             const jumpAttr = JUMP[k] ? ` data-action="jump-step" data-step="${JUMP[k]}" title="Click to change"` : (k === 'formatter' ? ` data-action="open-fmt-picker" title="Click to change"` : '');
             const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
             const val = label(k, S[k]) || '—';
-            const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && S.resolution==='4k') || (k==='formatter' && S.formatter!=='apex-v2');
+            const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && S.resolution==='4k') || (k==='formatter' && S.formatter!=='family-v3');
             return `<div class="receipt-row"${jumpAttr}>
               <div class="receipt-row-left">
                 <span class="receipt-row-ico">${ico}</span>
@@ -3178,16 +3213,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
       if (preset === 'http') {
-        Object.assign(S, { service:'http', multiServices:['http'], resolution:'1080p', audio:'limited', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        Object.assign(S, { service:'http', multiServices:['http'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = STEPS; pushStep(); render(); window.scrollTo(0,0);
       } else if (preset === 'p2p') {
-        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:true, quickStart:true, simpleMode:true });
+        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:true, quickStart:true, simpleMode:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 5; pushStep(); render(); window.scrollTo(0,0);
       } else {
-        if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
-        else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'apex-v2', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 1; pushStep(); render(); window.scrollTo(0,0);
       }
@@ -3228,6 +3263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'quick-reinstall') { S.simpleMode = true; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'update-template') { showUpdateTemplateModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
     if (action === 'open-quickstart') { document.getElementById('qsOverlay').classList.add('open'); }
     if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
@@ -3367,7 +3403,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'clear-custom-formatter') {
       e.preventDefault();
       delete S.customFormatter;
-      if (S.formatter === 'custom') S.formatter = 'apex-v2';
+      if (S.formatter === 'custom') S.formatter = 'family-v3';
       saveState(); render();
     }
   });
@@ -3647,7 +3683,7 @@ function presets() {
     ...storeSlot,
     ...(isEasynews || multiHasEasynews ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
-      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000 }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
     ...(isNzbgeek && S.creds.nzbgeek ? [
       { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', newznabUrl:'https://api.nzbgeek.info', apiPath:'/api', apiKey:S.creds.nzbgeek, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } },
@@ -3789,7 +3825,7 @@ function eses() {
     return out;
   }
 
-  out.push({ enabled:true, expression: "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))" });
+  out.push({ enabled:true, expression: "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))" });
   if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
   out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
@@ -3865,9 +3901,10 @@ function build() {
     sortCriteria: (function(){ const d='desc',qf=S.qualityFirst, rq=qf?[{key:'quality',direction:d},{key:'resolution',direction:d}]:[{key:'resolution',direction:d},{key:'quality',direction:d}], isFree=S.service==='p2p'||S.service==='http';
       if (S.service==='http') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'language',direction:d},{key:'size',direction:d}] }; }
       if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
-      return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedMovies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedSeries:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}] }; })(),
-    deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
-    formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'apex-v2')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
+      const isHybrid=S.service==='hybrid'||(S.service==='multi'&&S.multiServices&&S.multiServices.includes('torbox-pro')&&S.multiServices.includes('realdebrid')), svcKey=isHybrid?[{key:'service',direction:d}]:[];
+      return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] }; })(),
+    deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', merge:false, tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
+    formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v3')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: presets(), services: services(),
@@ -4150,6 +4187,254 @@ function showFormatterImport() {
     reader.readAsText(this.files[0]);
   });
   document.getElementById('fmtImClose').addEventListener('click', () => {
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => overlay.remove(), 160);
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 160); } });
+}
+
+function parseTemplateToState(tpl) {
+  const c = tpl.config || tpl;
+  const st = {
+    service: null, device: null, resolution: null, audio: 'limited', content: null,
+    name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v3',
+    p2pEnabled: false, qualityFirst: false, matchMode: 'balanced',
+    exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
+    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false
+  };
+
+  const presets = c.presets || [];
+  const enabledPresets = presets.filter(p => p.enabled);
+  const presetTypes = new Set(enabledPresets.map(p => p.type));
+
+  // Service detection: use presets + services together for accuracy
+  const svcs = (c.services || []).filter(s => s.enabled);
+  const svcIds = new Set(svcs.map(s => s.id));
+  const hasTB = svcIds.has('torbox'), hasRD = svcIds.has('realdebrid'), hasAD = svcIds.has('alldebrid');
+  const hasEN = svcIds.has('easynews'), hasPM = svcIds.has('premiumize'), hasDL = svcIds.has('debridlink');
+  const hasOC = svcIds.has('offcloud'), hasED = svcIds.has('easydebrid'), hasPP = svcIds.has('pikpak'), hasSR = svcIds.has('seedr');
+
+  const hasStremthruStore = presetTypes.has('stremthruStore');
+  const hasStremthruTorz = presetTypes.has('stremthruTorz');
+  const hasEasyNewsPreset = presetTypes.has('easynews') || presetTypes.has('easynewsPlusPlus') || presetTypes.has('easynews-search') || presetTypes.has('easynewsPlus');
+  const hasSvcSortKey = ((c.sortCriteria && c.sortCriteria.global) || []).some(k => k.key === 'service');
+  const hasSvcPSEs = (c.preferredStreamExpressions || []).some(e => e.expression && /service\(/.test(e.expression));
+  const isHybrid = (hasTB && hasRD) || (hasTB && (hasSvcSortKey || hasSvcPSEs) && hasStremthruTorz);
+
+  if (isHybrid) st.service = 'hybrid';
+  else if (hasStremthruStore && hasTB) st.service = 'alldebrid';
+  else if (hasEN && hasEasyNewsPreset) st.service = 'easynews';
+  else if (hasTB) st.service = 'torbox-pro';
+  else if (hasRD) st.service = 'realdebrid';
+  else if (hasAD) st.service = 'alldebrid';
+  else if (hasPM) st.service = 'premiumize';
+  else if (hasDL) st.service = 'debridlink';
+  else if (hasOC) st.service = 'offcloud';
+  else if (hasED) st.service = 'easydebrid';
+  else if (hasPP) st.service = 'pikpak';
+  else if (hasSR) st.service = 'seedr';
+  else if (hasEN) st.service = 'easynews';
+
+  st.multiServices = [];
+  if (hasTB) st.multiServices.push('torbox-pro');
+  if (hasRD) st.multiServices.push('realdebrid');
+  if (hasAD) st.multiServices.push('alldebrid');
+  if (hasPM) st.multiServices.push('premiumize');
+  if (hasDL) st.multiServices.push('debridlink');
+  if (hasOC) st.multiServices.push('offcloud');
+  if (hasEN) st.multiServices.push('easynews');
+  if (hasED) st.multiServices.push('easydebrid');
+  if (hasPP) st.multiServices.push('pikpak');
+  if (hasSR) st.multiServices.push('seedr');
+
+  // Credentials
+  const creds = {};
+  svcs.forEach(s => {
+    const k = s.credentials || {};
+    if (s.id === 'torbox' && k.apiKey) creds.torbox = k.apiKey;
+    if (s.id === 'realdebrid' && k.apiKey) creds.realdebrid = k.apiKey;
+    if (s.id === 'alldebrid' && k.apiKey) creds.alldebrid = k.apiKey;
+    if (s.id === 'premiumize' && k.apiKey) creds.premiumize = k.apiKey;
+    if (s.id === 'debridlink' && k.apiKey) creds.debridlink = k.apiKey;
+    if (s.id === 'offcloud' && k.apiKey) creds.offcloud = k.apiKey;
+    if (s.id === 'easydebrid' && k.apiKey) creds.easydebrid = k.apiKey;
+    if (s.id === 'pikpak' && k.apiKey) creds.pikpak = k.apiKey;
+    if (s.id === 'seedr' && k.apiKey) creds.seedr = k.apiKey;
+    if (s.id === 'easynews') { if (k.username) creds.easynews = k.username; if (k.password) creds.easynewsPass = k.password; }
+  });
+  st.creds = creds;
+
+  // NZBGeek from presets
+  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.newznabUrl||'').includes('nzbgeek'));
+  if (nzbg && nzbg.options && nzbg.options.apiKey) creds.nzbgeek = nzbg.options.apiKey;
+
+  // Resolution: check requiredResolutions, excludedResolutions, and ESEs
+  const req = c.requiredResolutions || [];
+  const excl = c.excludedResolutions || [];
+  const eses = c.excludedStreamExpressions || [];
+  const has4kESEKill = eses.some(e => e.enabled !== false && e.expression && /^(?:\/\*[^*]*\*\/\s*)?resolution\s*\(\s*streams\s*,\s*['"]2160p/.test(e.expression.trim()));
+  if (excl.includes('2160p') || has4kESEKill) st.resolution = '1080p';
+  else if (req.includes('2160p') || (c.preferredResolutions && c.preferredResolutions[0] === '2160p')) st.resolution = '4k';
+  else if (req.length > 0 && !req.includes('2160p')) st.resolution = '1080p';
+  else st.resolution = '1080p';
+
+  // Audio profile from excludedAudioTags
+  const eat = c.excludedAudioTags || [];
+  if (eat.length === 0) st.audio = 'lossless';
+  else if (eat.some(t => t === 'TrueHD') && !eat.some(t => t === 'Atmos')) st.audio = 'limited';
+  else if (eat.some(t => t === 'DTS') && !eat.some(t => t === 'TrueHD')) st.audio = 'dolby';
+  else st.audio = 'standard';
+
+  // Formatter
+  if (c.formatter && c.formatter.definitions && c.formatter.definitions.overrides) {
+    const ov = c.formatter.definitions.overrides[Object.keys(c.formatter.definitions.overrides)[0]];
+    if (ov) {
+      const match = FORMATTERS.find(f => f.name === ov.name || f.d === ov.description);
+      if (match) st.formatter = match.id;
+      else {
+        st.formatter = 'custom';
+        st.customFormatter = { name: ov.name || '', d: ov.description || '', label: 'Imported' };
+      }
+    }
+  }
+
+  // Deduplicator → matchMode
+  if (c.deduplicator) {
+    const dd = c.deduplicator;
+    if (dd.multiGroupBehaviour === 'conservative') st.matchMode = 'relaxed';
+    else if (dd.smartDetectRounding <= 5) st.matchMode = 'strict';
+    else st.matchMode = 'balanced';
+  }
+
+  // Cache mode
+  const hasP2P = presets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type) && p.enabled);
+  st.p2pEnabled = hasP2P;
+
+  // Max results → stream pool
+  const mr = c.maxResults || 20;
+  if (mr >= 50) st.streamPool = 'max';
+  else if (mr >= 30) st.streamPool = 'large';
+  else st.streamPool = 'normal';
+
+  // Sort criteria → qualityFirst
+  const gs = (c.sortCriteria && c.sortCriteria.global) || [];
+  const qIdx = gs.findIndex(k => k.key === 'quality');
+  const rIdx = gs.findIndex(k => k.key === 'resolution');
+  st.qualityFirst = qIdx >= 0 && rIdx >= 0 && qIdx < rIdx;
+
+  // Languages
+  if (c.requiredLanguages && c.requiredLanguages.length > 0) {
+    st.langs = c.requiredLanguages.filter(l => !['Original','Dual Audio','Multi','Dubbed','Unknown'].includes(l));
+    if (st.langs.length === 0) st.langs = ['English'];
+  }
+
+  // Name from metadata
+  if (tpl.metadata && tpl.metadata.name) st.name = tpl.metadata.name;
+  else if (c.addonName) st.name = c.addonName;
+
+  // Content type from presets
+  const mTypes = presets.filter(p => p.enabled && p.options && p.options.mediaTypes);
+  if (mTypes.length > 0) {
+    const allMt = new Set();
+    mTypes.forEach(p => (p.options.mediaTypes||[]).forEach(t => allMt.add(t)));
+    if (allMt.has('movie') && allMt.has('series') && allMt.has('anime')) st.content = 'all';
+    else if (allMt.has('movie') && !allMt.has('series')) st.content = 'movies';
+    else if (allMt.has('series') && !allMt.has('movie')) st.content = 'series';
+    else st.content = 'all';
+  }
+
+  // Exclude DV/4K from ESEs
+  st.excludeDV = eses.some(e => e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
+  st.exclude4K = has4kESEKill;
+
+  return st;
+}
+
+function showUpdateTemplateModal() {
+  const ex = document.getElementById('updateTplModal');
+  if (ex) ex.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'updateTplModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Update Template" style="max-width:480px">
+      <button class="modal-close" id="updTplClose" aria-label="Close">×</button>
+      <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Template</div>
+      <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll read your settings and regenerate with the latest sort logic, regex patterns, and formatters.</div>
+      <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.72rem;color:#8b949e;line-height:1.5">
+        <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — all rebuilt with the latest configurator logic.<br>
+        <strong style="color:#00d4ff">What's preserved:</strong> Your service, credentials, resolution, audio, and content preferences are detected and kept.
+      </div>
+      <textarea id="updTplInput" rows="8" placeholder='Paste your full template JSON here...' style="width:100%;box-sizing:border-box;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.72rem;resize:vertical;outline:none;line-height:1.4"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <label style="flex:1;padding:9px;border-radius:8px;border:1.5px dashed rgba(0,212,255,.25);background:transparent;color:#00d4ff;font-size:.8rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s">
+          ${ICO.folder(14,'#00d4ff')} Load File
+          <input type="file" accept=".json,application/json" id="updTplFile" style="display:none">
+        </label>
+        <button id="updTplApply" style="flex:2;padding:9px;border-radius:8px;border:1.5px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .15s">Update & Review</button>
+      </div>
+      <div id="updTplErr" style="margin-top:8px;font-size:.76rem;color:#ef4444;display:none"></div>
+      <div id="updTplInfo" style="margin-top:8px;font-size:.76rem;color:#34d399;display:none"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const textarea = document.getElementById('updTplInput');
+  const errEl = document.getElementById('updTplErr');
+  const infoEl = document.getElementById('updTplInfo');
+
+  function parseAndApply(raw) {
+    errEl.style.display = 'none';
+    infoEl.style.display = 'none';
+    try {
+      const obj = JSON.parse(raw);
+      if (!obj.config && !obj.services && !obj.presets) { errEl.textContent = 'Not a valid AIOStreams template — missing config object'; errEl.style.display = ''; return; }
+      const tpl = obj.config ? obj : { config: obj };
+      const parsed = parseTemplateToState(tpl);
+      if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
+
+      // Reset state then apply parsed values (prevents old state bleeding between imports)
+      S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
+      S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
+      S.formatter = 'family-v3'; S.p2pEnabled = false; S.qualityFirst = false;
+      S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
+      S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
+      S.streamPool = 'normal';
+      const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''};
+      Object.assign(S, parsed);
+      S.creds = Object.assign(defaultCreds, parsed.creds || {});
+      S.simpleMode = false;
+      saveState();
+
+      const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const detected = [];
+      if (parsed.service) detected.push('Service: ' + esc(parsed.service));
+      if (parsed.resolution) detected.push('Resolution: ' + esc(parsed.resolution));
+      if (parsed.audio) detected.push('Audio: ' + esc(parsed.audio));
+      if (parsed.name) detected.push('Name: ' + esc(parsed.name));
+
+      infoEl.innerHTML = '<strong>Detected:</strong> ' + detected.join(' · ') + '<br><span style="color:#8b949e">Closing in 2s — review your settings on the next screen...</span>';
+      infoEl.style.display = '';
+
+      setTimeout(() => {
+        overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+        setTimeout(() => {
+          overlay.remove();
+          step = STEPS;
+          pushStep(); render(); window.scrollTo(0,0);
+          showToast('Template imported — review settings and regenerate with latest logic');
+        }, 160);
+      }, 2000);
+    } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
+  }
+
+  document.getElementById('updTplApply').addEventListener('click', () => parseAndApply(textarea.value));
+  document.getElementById('updTplFile').addEventListener('change', function() {
+    if (!this.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = () => { textarea.value = reader.result; parseAndApply(reader.result); };
+    reader.readAsText(this.files[0]);
+  });
+  document.getElementById('updTplClose').addEventListener('click', () => {
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
     setTimeout(() => overlay.remove(), 160);
   });

@@ -219,7 +219,7 @@
     "excludeUncachedFromStreamTypes": [],
     "excludedStreamExpressions": [
       {
-        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
         "enabled": true
       },
       {
@@ -1293,6 +1293,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "movies": [
@@ -1358,6 +1362,10 @@
         },
         {
           "key": "size",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
           "direction": "desc"
         }
       ],
@@ -1425,6 +1433,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "anime": [
@@ -1491,6 +1503,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "cachedMovies": [
@@ -1556,6 +1572,10 @@
         },
         {
           "key": "size",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
           "direction": "desc"
         }
       ],
@@ -1627,6 +1647,10 @@
         {
           "key": "size",
           "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
         }
       ],
       "uncachedSeries": [
@@ -1696,6 +1720,10 @@
         },
         {
           "key": "size",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
           "direction": "desc"
         }
       ]
@@ -1834,6 +1862,7 @@
       ],
       "smartDetectRounding": 10,
       "libraryBehaviour": "prefer",
+      "merge": false,
       "tiebreakers": [
         {
           "type": "torrent_seeders",
@@ -2027,7 +2056,7 @@
         "instanceId": "nx-fix-01",
         "enabled": true,
         "options": {
-          "name": "Comet RD",
+          "name": "Comet",
           "timeout": 7000,
           "resources": [
             "stream"

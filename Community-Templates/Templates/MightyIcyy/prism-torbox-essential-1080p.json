@@ -300,7 +300,8 @@
         "remastered"
       ],
       "smartDetectRounding": 10,
-      "libraryBehaviour": "ignore"
+      "libraryBehaviour": "ignore",
+      "merge": false
     },
     "autoPlay": {
       "enabled": true,
