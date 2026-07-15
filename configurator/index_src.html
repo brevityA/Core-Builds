@@ -1195,7 +1195,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.48';
+const CONFIGURATOR_VERSION = '2.49';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1279,6 +1279,10 @@ const CHANGELOG = [
     'Direct Install — new toggle in Deploy: enter Stremio email + password inline to push the addon straight to your library',
     'Get Manifest URL mode preserved for manual install / WuPlay / Nuvio',
     '"Create random account" link generates a Stremio account in one click (no email verification)',
+  ]},
+  { v:'2.49', date:'Jul 15 2026', items:[
+    'Template Migration Tool — "Update Existing Template" now shows a full diff of what changes before applying, with Apply & Upgrade / Cancel options',
+    'Device detection on import — Samsung, Xiaomi, Fire Stick, Apple TV, Shield, Google TV, and Windows profiles auto-detected from template signatures',
   ]},
   { v:'2.39', date:'Jul 14 2026', items:[
     'Changelog is now its own page — click the version badge (header or splash) to open the full release history',
@@ -4390,6 +4394,26 @@ function parseTemplateToState(tpl) {
   else if (req.length > 0 && !req.includes('2160p')) st.resolution = '1080p';
   else st.resolution = '1080p';
 
+  // Device detection from encode/audio/visual signature and name hints
+  const ee = new Set(c.excludedEncodes || []);
+  const pvt = c.preferredVisualTags || [];
+  const nameLC = ((tpl.metadata && tpl.metadata.name) || c.addonName || '').toLowerCase();
+  if (nameLC.includes('xiaomi') || (ee.has('AV1') && ee.has('VC-1') && pvt.includes('DV') && pvt.includes('HDR10+'))) {
+    st.device = ee.has('AV1') ? 'xiaomi' : 'xiaomi-3rd';
+  } else if (nameLC.includes('samsung') || (ee.has('AV1') && ee.has('VC-1') && pvt.includes('HDR10+') && !pvt.includes('DV'))) {
+    st.device = 'samsung';
+  } else if (nameLC.includes('fire') || nameLC.includes('firestick')) {
+    st.device = ee.has('AV1') ? 'firestick-hd' : 'firestick-4kmax';
+  } else if (nameLC.includes('apple tv')) {
+    st.device = 'appletv-new';
+  } else if (nameLC.includes('shield')) {
+    st.device = 'shield';
+  } else if (nameLC.includes('google tv') || nameLC.includes('googletv')) {
+    st.device = 'googletv';
+  } else if (nameLC.includes('ultrawide')) {
+    st.device = 'windows';
+  }
+
   // Audio profile from excludedAudioTags
   const eat = c.excludedAudioTags || [];
   if (eat.length === 0) st.audio = 'lossless';
@@ -4648,6 +4672,8 @@ function showUpdateTemplateModal() {
       const parsed = parseTemplateToState(tpl);
       if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
 
+      const oldCfg = tpl.config || tpl;
+
       // Reset state then apply parsed values (prevents old state bleeding between imports)
       S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
       S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
@@ -4661,25 +4687,20 @@ function showUpdateTemplateModal() {
       S.simpleMode = false;
       saveState();
 
-      const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      const detected = [];
-      if (parsed.service) detected.push('Service: ' + esc(parsed.service));
-      if (parsed.resolution) detected.push('Resolution: ' + esc(parsed.resolution));
-      if (parsed.audio) detected.push('Audio: ' + esc(parsed.audio));
-      if (parsed.name) detected.push('Name: ' + esc(parsed.name));
+      const newTpl = build();
+      const newCfg = newTpl.config || newTpl;
 
-      infoEl.innerHTML = '<strong>Detected:</strong> ' + detected.join(' · ') + '<br><span style="color:#8b949e">Closing in 2s — review your settings on the next screen...</span>';
-      infoEl.style.display = '';
-
+      overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
       setTimeout(() => {
-        overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
-        setTimeout(() => {
-          overlay.remove();
+        overlay.remove();
+        showDiffModal(oldCfg, newCfg, parsed, () => {
           step = STEPS;
           pushStep(); render(); window.scrollTo(0,0);
-          showToast('Template imported — review settings and regenerate with latest logic');
-        }, 160);
-      }, 2000);
+          showToast('Template upgraded — review settings and generate your new template');
+        }, () => {
+          showToast('Migration cancelled — no changes applied', true);
+        });
+      }, 160);
     } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
   }
 
