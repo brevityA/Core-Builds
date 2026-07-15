@@ -2065,7 +2065,7 @@
         "instanceId": "nx-fix-01",
         "enabled": true,
         "options": {
-          "name": "Comet RD",
+          "name": "Comet",
           "timeout": 3000,
           "resources": [
             "stream"
