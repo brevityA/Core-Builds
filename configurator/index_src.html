@@ -3390,7 +3390,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); }
       else {
-        const _ct = buildFinal(); S._migrationKeep = null;
+        const _ct = buildFinal();
         navigator.clipboard.writeText(JSON.stringify(_ct, null, 2)).then(() => showToast('Template JSON copied — paste it into AIOStreams → Import'));
         saveLastGen();
       }
