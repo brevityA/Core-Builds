@@ -1101,7 +1101,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.40';
+const CONFIGURATOR_VERSION = '2.41';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1155,6 +1155,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.41', date:'Jul 15 2026', items:[
+    'Template Updater — paste an existing template to detect your settings and rebuild with the latest configurator logic',
+    'Family Formatter v3 by RB3 is now the default formatter — human-readable layout with network source, edition badges, and preloading indicator',
+    'Fix — removed cached sort key from uncachedMovies/uncachedSeries sections (improves Usenet stream visibility)',
+  ]},
   { v:'2.40', date:'Jul 14 2026', items:[
     'Direct Install — new toggle in Deploy: enter Stremio email + password inline to push the addon straight to your library',
     'Get Manifest URL mode preserved for manual install / WuPlay / Nuvio',
@@ -2446,6 +2451,13 @@ function splashHtml() {
           <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
         </div>
       </div>
+      <div class="splash-door" data-action="update-template">
+        <div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div>
+        <div class="splash-door-text">
+          <div class="splash-door-title">Update Template <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div>
+          <div class="splash-door-desc">Paste an existing template — we detect your settings and rebuild with the latest logic.</div>
+        </div>
+      </div>
     </div>
 
     <div class="splash-section-hdr">
@@ -3239,6 +3251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'quick-reinstall') { S.simpleMode = true; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'update-template') { showUpdateTemplateModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
     if (action === 'open-quickstart') { document.getElementById('qsOverlay').classList.add('open'); }
     if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
@@ -3876,7 +3889,7 @@ function build() {
     sortCriteria: (function(){ const d='desc',qf=S.qualityFirst, rq=qf?[{key:'quality',direction:d},{key:'resolution',direction:d}]:[{key:'resolution',direction:d},{key:'quality',direction:d}], isFree=S.service==='p2p'||S.service==='http';
       if (S.service==='http') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'language',direction:d},{key:'size',direction:d}] }; }
       if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
-      return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedMovies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedSeries:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}] }; })(),
+      return { global:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'encode',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], movies:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], series:[{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], anime:[{key:'cached',direction:d},{key:'seadex',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d}] }; })(),
     deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:['filename','infoHash','smartDetect'], cached: S.matchMode === 'relaxed' ? 'per_service' : 'single_result', uncached:'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour:'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v3')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
@@ -4161,6 +4174,228 @@ function showFormatterImport() {
     reader.readAsText(this.files[0]);
   });
   document.getElementById('fmtImClose').addEventListener('click', () => {
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => overlay.remove(), 160);
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 160); } });
+}
+
+function parseTemplateToState(tpl) {
+  const c = tpl.config || tpl;
+  const st = {};
+
+  // Service detection from enabled services
+  const svcs = (c.services || []).filter(s => s.enabled);
+  const svcIds = svcs.map(s => s.id);
+  const hasTB = svcIds.includes('torbox'), hasRD = svcIds.includes('realdebrid'), hasAD = svcIds.includes('alldebrid');
+  const hasEN = svcIds.includes('easynews'), hasPM = svcIds.includes('premiumize'), hasDL = svcIds.includes('debridlink');
+  const hasOC = svcIds.includes('offcloud'), hasED = svcIds.includes('easydebrid'), hasPP = svcIds.includes('pikpak'), hasSR = svcIds.includes('seedr');
+
+  if (hasTB && hasRD) st.service = 'hybrid';
+  else if (hasTB) st.service = 'torbox-pro';
+  else if (hasRD) st.service = 'realdebrid';
+  else if (hasAD) st.service = 'alldebrid';
+  else if (hasPM) st.service = 'premiumize';
+  else if (hasDL) st.service = 'debridlink';
+  else if (hasOC) st.service = 'offcloud';
+  else if (hasED) st.service = 'easydebrid';
+  else if (hasPP) st.service = 'pikpak';
+  else if (hasSR) st.service = 'seedr';
+  else if (hasEN) st.service = 'easynews';
+
+  st.multiServices = [];
+  if (hasTB) st.multiServices.push('torbox-pro');
+  if (hasRD) st.multiServices.push('realdebrid');
+  if (hasAD) st.multiServices.push('alldebrid');
+  if (hasPM) st.multiServices.push('premiumize');
+  if (hasDL) st.multiServices.push('debridlink');
+  if (hasOC) st.multiServices.push('offcloud');
+  if (hasEN) st.multiServices.push('easynews');
+  if (hasED) st.multiServices.push('easydebrid');
+  if (hasPP) st.multiServices.push('pikpak');
+  if (hasSR) st.multiServices.push('seedr');
+
+  // Credentials
+  const creds = {};
+  svcs.forEach(s => {
+    const k = s.credentials || {};
+    if (s.id === 'torbox' && k.apiKey) creds.torbox = k.apiKey;
+    if (s.id === 'realdebrid' && k.apiKey) creds.realdebrid = k.apiKey;
+    if (s.id === 'alldebrid' && k.apiKey) creds.alldebrid = k.apiKey;
+    if (s.id === 'premiumize' && k.apiKey) creds.premiumize = k.apiKey;
+    if (s.id === 'debridlink' && k.apiKey) creds.debridlink = k.apiKey;
+    if (s.id === 'offcloud' && k.apiKey) creds.offcloud = k.apiKey;
+    if (s.id === 'easydebrid' && k.apiKey) creds.easydebrid = k.apiKey;
+    if (s.id === 'pikpak' && k.apiKey) creds.pikpak = k.apiKey;
+    if (s.id === 'seedr' && k.apiKey) creds.seedr = k.apiKey;
+    if (s.id === 'easynews') { if (k.username) creds.easynews = k.username; if (k.password) creds.easynewsPass = k.password; }
+  });
+  st.creds = creds;
+
+  // NZBGeek from presets
+  const presets = c.presets || [];
+  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.newznabUrl||'').includes('nzbgeek'));
+  if (nzbg && nzbg.options && nzbg.options.apiKey) creds.nzbgeek = nzbg.options.apiKey;
+
+  // Resolution from requiredResolutions or PSEs
+  const req = c.requiredResolutions || [];
+  const excl = c.excludedResolutions || [];
+  if (req.includes('1080p') && !req.includes('2160p')) st.resolution = '1080p';
+  else if (c.preferredResolutions && c.preferredResolutions[0] === '2160p') st.resolution = '4k';
+  else st.resolution = '1080p';
+
+  // Audio profile from excludedAudioTags
+  const eat = c.excludedAudioTags || [];
+  if (eat.length === 0) st.audio = 'lossless';
+  else if (eat.some(t => t === 'TrueHD') && !eat.some(t => t === 'Atmos')) st.audio = 'dolby';
+  else if (eat.some(t => t === 'TrueHD')) st.audio = 'limited';
+  else st.audio = 'standard';
+
+  // Formatter
+  if (c.formatter && c.formatter.definitions && c.formatter.definitions.overrides) {
+    const ov = c.formatter.definitions.overrides[Object.keys(c.formatter.definitions.overrides)[0]];
+    if (ov) {
+      const match = FORMATTERS.find(f => f.name === ov.name || f.d === ov.description);
+      if (match) st.formatter = match.id;
+      else {
+        st.formatter = 'custom';
+        st.customFormatter = { name: ov.name || '', d: ov.description || '', label: 'Imported' };
+      }
+    }
+  }
+
+  // Deduplicator → matchMode
+  if (c.deduplicator) {
+    const dd = c.deduplicator;
+    if (dd.multiGroupBehaviour === 'conservative') st.matchMode = 'relaxed';
+    else if (dd.smartDetectRounding <= 5) st.matchMode = 'strict';
+    else st.matchMode = 'balanced';
+  }
+
+  // Cache mode
+  const hasP2P = presets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type) && p.enabled);
+  const hasCached = presets.some(p => ['stremthruTorz','stremthruStore','torbox-search'].includes(p.type) && p.enabled);
+  const hasUsenet = presets.some(p => ['easynews','newznab','streamnzb','easynewsPlus','davex'].includes(p.type) && p.enabled);
+  st.p2pEnabled = hasP2P;
+
+  // Max results → stream pool
+  const mr = c.maxResults || 20;
+  if (mr >= 50) st.streamPool = 'max';
+  else if (mr >= 30) st.streamPool = 'large';
+  else st.streamPool = 'normal';
+
+  // Sort criteria → qualityFirst
+  const gs = (c.sortCriteria && c.sortCriteria.global) || [];
+  const qIdx = gs.findIndex(k => k.key === 'quality');
+  const rIdx = gs.findIndex(k => k.key === 'resolution');
+  st.qualityFirst = qIdx >= 0 && rIdx >= 0 && qIdx < rIdx;
+
+  // Languages
+  if (c.requiredLanguages && c.requiredLanguages.length > 0) {
+    st.langs = c.requiredLanguages.filter(l => !['Original','Dual Audio','Multi','Dubbed','Unknown'].includes(l));
+    if (st.langs.length === 0) st.langs = ['English'];
+  }
+
+  // Name from metadata
+  if (tpl.metadata && tpl.metadata.name) st.name = tpl.metadata.name;
+  else if (c.addonName) st.name = c.addonName;
+
+  // Content type from presets
+  const mTypes = presets.filter(p => p.enabled && p.options && p.options.mediaTypes);
+  if (mTypes.length > 0) {
+    const allMt = new Set();
+    mTypes.forEach(p => (p.options.mediaTypes||[]).forEach(t => allMt.add(t)));
+    if (allMt.has('movie') && allMt.has('series') && allMt.has('anime')) st.content = 'all';
+    else if (allMt.has('movie') && !allMt.has('series')) st.content = 'movies';
+    else if (allMt.has('series') && !allMt.has('movie')) st.content = 'series';
+    else st.content = 'all';
+  }
+
+  // Exclude DV/4K from ESEs
+  const eses = c.excludedStreamExpressions || [];
+  st.excludeDV = eses.some(e => e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
+  st.exclude4K = eses.some(e => e.expression && /resolution.*2160p/.test(e.expression) && !/quality|bitrate/.test(e.expression));
+
+  return st;
+}
+
+function showUpdateTemplateModal() {
+  const ex = document.getElementById('updateTplModal');
+  if (ex) ex.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'updateTplModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Update Template" style="max-width:480px">
+      <button class="modal-close" id="updTplClose" aria-label="Close">×</button>
+      <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Template</div>
+      <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll read your settings and regenerate with the latest sort logic, regex patterns, and formatters.</div>
+      <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.72rem;color:#8b949e;line-height:1.5">
+        <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — all rebuilt with the latest configurator logic.<br>
+        <strong style="color:#00d4ff">What's preserved:</strong> Your service, credentials, resolution, audio, and content preferences are detected and kept.
+      </div>
+      <textarea id="updTplInput" rows="8" placeholder='Paste your full template JSON here...' style="width:100%;box-sizing:border-box;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.72rem;resize:vertical;outline:none;line-height:1.4"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <label style="flex:1;padding:9px;border-radius:8px;border:1.5px dashed rgba(0,212,255,.25);background:transparent;color:#00d4ff;font-size:.8rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s">
+          ${ICO.folder(14,'#00d4ff')} Load File
+          <input type="file" accept=".json,application/json" id="updTplFile" style="display:none">
+        </label>
+        <button id="updTplApply" style="flex:2;padding:9px;border-radius:8px;border:1.5px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .15s">Update & Review</button>
+      </div>
+      <div id="updTplErr" style="margin-top:8px;font-size:.76rem;color:#ef4444;display:none"></div>
+      <div id="updTplInfo" style="margin-top:8px;font-size:.76rem;color:#34d399;display:none"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const textarea = document.getElementById('updTplInput');
+  const errEl = document.getElementById('updTplErr');
+  const infoEl = document.getElementById('updTplInfo');
+
+  function parseAndApply(raw) {
+    errEl.style.display = 'none';
+    infoEl.style.display = 'none';
+    try {
+      const obj = JSON.parse(raw);
+      if (!obj.config && !obj.services && !obj.presets) { errEl.textContent = 'Not a valid AIOStreams template — missing config object'; errEl.style.display = ''; return; }
+      const tpl = obj.config ? obj : { config: obj };
+      const parsed = parseTemplateToState(tpl);
+      if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
+
+      // Apply parsed state
+      Object.assign(S, parsed);
+      if (parsed.creds) Object.assign(S.creds, parsed.creds);
+      S.simpleMode = false;
+      saveState();
+
+      const detected = [];
+      if (parsed.service) detected.push('Service: ' + parsed.service);
+      if (parsed.resolution) detected.push('Resolution: ' + parsed.resolution);
+      if (parsed.audio) detected.push('Audio: ' + parsed.audio);
+      if (parsed.name) detected.push('Name: ' + parsed.name);
+
+      infoEl.innerHTML = '<strong>Detected:</strong> ' + detected.join(' · ') + '<br><span style="color:#8b949e">Closing in 2s — review your settings on the next screen...</span>';
+      infoEl.style.display = '';
+
+      setTimeout(() => {
+        overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+        setTimeout(() => {
+          overlay.remove();
+          step = STEPS;
+          pushStep(); render(); window.scrollTo(0,0);
+          showToast('Template imported — review settings and regenerate with latest logic');
+        }, 160);
+      }, 2000);
+    } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
+  }
+
+  document.getElementById('updTplApply').addEventListener('click', () => parseAndApply(textarea.value));
+  document.getElementById('updTplFile').addEventListener('change', function() {
+    if (!this.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = () => { textarea.value = reader.result; parseAndApply(reader.result); };
+    reader.readAsText(this.files[0]);
+  });
+  document.getElementById('updTplClose').addEventListener('click', () => {
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
     setTimeout(() => overlay.remove(), 160);
   });
