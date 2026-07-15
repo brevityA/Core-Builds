@@ -28,7 +28,8 @@ Templates/Torbox/
   Anime/            → Anime-optimised templates (Anime, Anime 4K + Lite variants)
   Hybrid/           → TorBox + RD hybrid templates (4K Hybrid, Hybrid, Hybrid Lite)
   AllDebrid/        → AllDebrid variants (4K AllDebrid, AllDebrid + Lite variants)
-  Device/Samsung/   → Samsung TV device templates (Samsung TV, Samsung TV 4K)
+  Device/Samsung/   → Samsung TV device templates (Samsung TV, Samsung TV 4K, RU7100 4K)
+  Device/Xiaomi/    → Xiaomi Android TV device templates (Xiaomi 4K)
   Device/Windows/   → Windows PC device templates (Ultrawide)
   Nightly/          → Pre-release / nightly builds (Apple TV 4K)
   Deprecated/       → Retired templates kept for reference
@@ -68,7 +69,7 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 
 ## Known Preset Types
 
-Preset `type` values confirmed in AIOStreams source (as of v2.30.6 — 80 presets in PRESET_LIST):
+Preset `type` values confirmed in AIOStreams source (as of v2.31.0+):
 
 **Preset categories:** `streams`, `subtitles`, `meta_catalogs`, `misc` (enum `PresetCategory`)
 
@@ -105,7 +106,7 @@ Preset `type` values confirmed in AIOStreams source (as of v2.30.6 — 80 preset
 - `putio` — valid service for presets/config but **removed from `service()` SEL whitelist** in v2.31.0; `service(streams, 'putio')` will throw
 
 **Per-Addon Flood Guard caps (current — v2.9.5):**
-Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent Galaxy ≤ 1 (backup), Knaben ≤ 1 (backup), TorrentsDB ≤ 1 (backup)
+Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent Galaxy ≤ 1 (backup), Knaben ≤ 1 (backup), TorrentsDB ≤ 1 (backup)
 
 ---
 
@@ -154,6 +155,7 @@ Meteor ≤ 5, Comet RD ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torren
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.3.7 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
 - `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.3.7 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
 - `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.3.7 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
+- `Device/Xiaomi/core-nexus-xiaomi-4k.json` v0.1.0 — Xiaomi Mi Box S 4K, DV Profile 5 + HDR10+ native, AV1/VC-1 excluded, lossless audio excluded (DD+ Atmos ceiling), handles REMUX
 - `Device/Windows/core-nexus-ultrawide.json` v0.2.7 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
 
 ### Anime
@@ -480,6 +482,99 @@ New boolean field. `true` when the stream has been selected for pre-caching/prel
 
 ---
 
+## AIOStreams Server-Side Features (v2.31.0+)
+
+These are server/operator features from the AIOStreams codebase — not template config fields, but important context for understanding what AIOStreams can do.
+
+### Built-in Usenet Engine
+
+AIOStreams now includes a full usenet streaming engine with:
+- **Provider management** — add NNTP providers with connection pools, test connectivity, run speed tests
+- **NZB library** — add NZBs by URL or upload, inspect/queue/stream/download, live SSE status updates
+- **Performance profiles** — configurable engine tuning
+- **Dashboard** — live stats (24h/7d/30d/all windows), active stream monitoring, provider health
+- **Blocklist integration** — library entries cross-referenced against release blocklist (wd1 fingerprint + nh1 content hash)
+- **Library statuses:** `queued`, `inspecting`, `available`, `degraded`, `failed`, `streaming`
+- **Service IDs:** `stremio_nntp` (native NNTP), `aiostreams` (built-in engine)
+
+### Release Blocklist
+
+Collaborative release filtering system:
+- **Local verdicts** — manually mark releases as blocked/allowed by key (btih, wd1 fingerprint, nh1 content hash)
+- **Remote sources** — subscribe to blocklist URLs (NDJSON format), auto-refresh on schedule
+- **Trust levels** — per-source trust (`full`, etc.), quorum voting across sources
+- **Backbone grouping** — normalize release group identifiers for cross-source matching
+- **Overrides** — local allow-overrides suppress remote block verdicts
+- **Publishing** — push blocklist artifacts (native/warden NDJSON, gzipped) to external targets on a schedule
+- **Import/export** — upload/download NDJSON blocklist files
+
+### Debrid Failover Chains
+
+Enhanced playback resolution with cascading fallbacks:
+- **Play chains** — ordered list of fallback sources (debrid + usenet + external URLs)
+- **Parallel resolution** — configurable concurrency (`parallel`), stagger delays, grace periods
+- **Distributed locks** — share one running chain across concurrent requests for the same click
+- **Proxy wrapping** — resolved CDN URLs auto-proxied when configured (fail-open on proxy error)
+- **Static error videos** — DebridError codes map to static video files (UNAVAILABLE_FOR_LEGAL_REASONS, STORE_LIMIT_EXCEEDED, PAYMENT_REQUIRED, etc.)
+- **External targets** — failover items can resolve via external URLs or internal playback targets
+
+### Anime Database & Season Selector
+
+Multi-source anime ID mapping and season/episode resolution:
+- **Data sources:** Fribb mappings, Manami DB, Kitsu↔IMDB, Extended AniTrakt (movies+TV), Anime List XML, nattadasu/animeApi
+- **Season scoring** — per-source priority: native coordinate system match (100) > cross-system (30) > synonym regex (55-60)
+- **Kitsu IMDb-cour range** — interpolation (gap between known cours, priority 65) vs extrapolation (past last cour, priority 40)
+- **Type filtering** — season-aware candidate selection: undefined→movies, 0→specials/OVA/ONA, ≥1→TV (with non-TV fallback)
+- **ID types:** `imdbId`, `thetvdbId`, `themoviedbId`, `traktId` — each has a native season source for authoritative matching
+- **Level of detail:** `none` (disabled), `required` (minimal), `full` (everything)
+
+### Key Environment Variables (operator-facing)
+
+**Auth & access:**
+- `CONFIG_ACCESS_KEY` — gate for config create/update/serve (auto-generated when `AIOSTREAMS_AUTH_REQUIRED=true`)
+- `AIOSTREAMS_AUTH_PERMISSIONS` — per-user: `admin`, `proxy`, `service`, `sabnzbd`, `none`
+- `ALIASED_CONFIGURATIONS` — URL aliases for configs (`/stremio/u/<alias>/manifest.json`)
+- `TRUSTED_IPS` — CIDR ranges for header trust
+
+**APIs:**
+- `ENABLE_SEARCH_API` — mount /api/v1/search endpoint (default: true)
+- `ENABLE_NAB_API` — mount per-user Newznab/Torznab API endpoints for Prowlarr/Sonarr/Radarr integration (default: true)
+- `PROVIDE_STREAM_DATA` — stream metadata in responses (auto-detect from User-Agent, or force true/false/IP list)
+
+**Presets:**
+- `DEFAULT_TIMEOUT` — fallback preset timeout: `7000`ms
+- Per-preset: `{PRESET}_URL` (list), `DEFAULT_{PRESET}_TIMEOUT`, `DEFAULT_{PRESET}_USER_AGENT`
+- `COMET_PUBLIC_API_TOKEN` — Comet public API tokens
+- `MEDIAFUSION_API_PASSWORD`, `MEDIAFUSION_DEFAULT_USE_CACHED_RESULTS_ONLY`
+- `DEFAULT_JACKETTIO_INDEXERS`, `DEFAULT_JACKETTIO_STREMTHRU_URL`
+
+**Proxy:**
+- `ENCRYPT_MEDIAFLOW_URLS`, `ENCRYPT_STREMTHRU_URLS` — URL encryption (default: true)
+- `DEFAULT_PROXY_*` / `FORCE_PROXY_*` — default/forced proxy configuration
+- `REQUEST_HEADER_OVERRIDES` — per-hostname/context User-Agent overrides with built-in presets (`{sabnzbd}`, `{chrome}`, etc.)
+- `ADDON_PROXY` / `ADDON_PROXY_CONFIG` — outbound proxy for addon fetching
+
+**Templates:**
+- `TEMPLATE_URLS` — remote template URLs (Core Builds collection goes here)
+- `TEMPLATE_REFRESH_INTERVAL` — refresh schedule (default: 24h)
+- `FEATURED_TEMPLATE_IDS` — up to 2 featured templates on about page
+
+**Services:**
+- `DEFAULT_SERVICE_CREDENTIALS` — pre-filled credentials per `serviceId.credentialId=value`
+- `FORCED_SERVICE_CREDENTIALS` — override user credentials, hidden from UI
+
+### Stream Types (player.ts)
+
+AIOStreams streams now have these types:
+- `http` — standard HTTP stream (debrid-resolved CDN URLs)
+- `usenet` — usenet-sourced stream (built-in engine or external)
+- `debrid` — debrid-proxied stream
+- `live` — live TV/IPTV stream
+- `info` — informational (no playback)
+- `p2p` — torrent/P2P stream (magnet link + infoHash)
+
+---
+
 ## AIOStreams v2.30.x Schema Notes
 
 ### `config.deduplicator.tiebreakers` (v2.30.3)
@@ -546,6 +641,7 @@ Active formatters: `core-nexus-apex-v2-formatter.json`, `core-nexus-elite-format
 - **ESE labels:** `/* Description */` plain English
 - **1080p templates MUST have** a hard resolution exclusion ESE: `resolution(streams, '2160p', '1440p')` to prevent 4K leaking through (PSEs rank but do not exclude)
 - **Samsung templates:** DV-Only Kill ESE enabled by default; `excludedAudioTags: ["TrueHD","DTS-HD MA","DTS:X","FLAC"]`
+- **Xiaomi templates:** DV-Only Kill disabled (DV Profile 5 native); AV1/VC-1 excluded; lossless audio excluded (DD+ Atmos ceiling); DV added to preferredVisualTags
 - **AllDebrid templates:** `stremthruStore` replaces `stremthruTorz`; no `torbox-search`
 
 ---
