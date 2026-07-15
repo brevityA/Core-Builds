@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.9 (2026-07-15)
+
+### Added
+- **Template Migration Tool** (Configurator v2.49) — "Update Existing Template" now shows a full visual diff of every change (PSEs, ESEs, sort criteria, regex patterns, settings) before applying. Users can review Added/Removed/Changed counts per section, then click "Apply & Upgrade" or cancel.
+- **Device detection on template import** (Configurator v2.49) — imported templates now auto-detect Samsung, Xiaomi (2nd/3rd Gen), Fire Stick, Apple TV, Shield, Google TV, and Windows device profiles from encode/audio/visual tag signatures and template name hints.
+
 ## 3.2.8 (2026-07-15)
 
 ### Fixed
