@@ -1174,6 +1174,10 @@
           "direction": "desc"
         },
         {
+          "key": "encode",
+          "direction": "desc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -1183,10 +1187,6 @@
         },
         {
           "key": "language",
-          "direction": "desc"
-        },
-        {
-          "key": "encode",
           "direction": "desc"
         },
         {

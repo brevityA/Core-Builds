@@ -391,18 +391,6 @@
         "enabled": true
       },
       {
-        "expression": "/*Audio Pinnacle (Samsung RU7100 — native-first)*/ merge(audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'FLAC'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'AAC'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'EAC3','DD+'),audioTag(negate(merge(library(streams),seadex(streams)),cached(streams)),'Atmos','TrueHD'))",
-        "enabled": true
-      },
-      {
-        "expression": "/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR10+/DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))",
-        "enabled": true
-      },
-      {
-        "expression": "/*HDR Priority (no DV — Samsung RU7100)*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10+','HDR10'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR','HLG'))",
-        "enabled": true
-      },
-      {
         "expression": "/*Boost Cached Usenet*/ merge(cached(merge(library(streams),seadex(streams),type(streams,'debrid','usenet','stremio-usenet'))))",
         "enabled": true
       }
@@ -1247,6 +1235,10 @@
           "direction": "desc"
         },
         {
+          "key": "encode",
+          "direction": "desc"
+        },
+        {
           "key": "audioTag",
           "direction": "desc"
         },
@@ -1256,10 +1248,6 @@
         },
         {
           "key": "language",
-          "direction": "desc"
-        },
-        {
-          "key": "encode",
           "direction": "desc"
         },
         {

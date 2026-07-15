@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.2.8 (2026-07-15)
+
+### Fixed
+- **REMUX ranking fix** (all 44 active templates) — BluRay REMUX files were consistently ranked below WEB-DL streams because three interacting factors inflated WEB-DL scores: (1) `audioTag` sort position above `encode` caused WEB-DL with Atmos to beat REMUX with DD+, (2) Audio Pinnacle bonus PSE added extra seScore to streams with premium audio tags regardless of quality tier, (3) `perGroup(streams, 'resolution', 3)` in Extra Cached ESEs randomly dropped REMUX based on addon arrival order. Reported by community member Tetelestai3-16.
+  - **Global sort reordered** — `visualTag → encode → audioTag → audioChannel → language` (was `visualTag → audioTag → audioChannel → language → encode`). Encode type (REMUX/BluRay/WEB-DL) now breaks ties before audio tag preference.
+  - **Audio Pinnacle PSE removed** — eliminated bonus seScore inflation that ranked WEB-DL with Atmos above REMUX with DD+. Audio preference is now handled purely by sort criteria position.
+  - **HDR/DV Priority PSE removed** — redundant with `visualTag` already in sort criteria. Removed to simplify PSE stack and prevent unintended score inflation.
+  - **Extra Cached perGroup increased** — `perGroup(streams, 'resolution', 3)` → `perGroup(streams, 'resolution', 5)` in Extra Cached HQ/LQ ESEs. Larger pool reduces random REMUX exclusion before PSE scoring.
+- **Configurator v2.47** — same three fixes applied to configurator-generated templates.
+- **4K Apex bumped to v0.8.0.**
+
 ## 3.2.7 (2026-07-11)
 
 ### Added
