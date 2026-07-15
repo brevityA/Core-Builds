@@ -51,6 +51,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
 | [Samsung RU7100 4K](#-core-nexus-samsung-ru7100-4k) | Pro | 4K + 1080p | Samsung RU7100 (2019) — full IQR PSE stack |
+| [Xiaomi 4K](#-core-nexus-xiaomi-4k) | Pro | 4K + 1080p | Xiaomi Mi Box S / DV P5 + HDR10+ (no AV1) |
 | [Google TV Streamer 4K](#-core-nexus-google-tv-streamer-4k) | Pro | 4K + 1080p | Google TV Streamer (2024) / DV + AV1 + HDR10+ |
 | [Windows Ultrawide](#-core-nexus-ultrawide) | Pro | 1080p + 4K capable | Windows PC / ultrawide monitor — full audio, HDR-first |
 | [Apple TV 4K](#-core-nexus-apple-tv-4k-nightly) 🌙 | Pro | 4K + 1080p | Apple TV 4K / Dolby Vision |
@@ -93,6 +94,7 @@ TorBox Pro?
 │   └── 1080p only? → Hybrid
 ├── Want 4K? → 4K Apex
 ├── Samsung TV / no Dolby Vision? → Samsung TV · Samsung TV 4K
+├── Xiaomi Mi Box S / Android TV box? → Xiaomi 4K
 ├── Google TV Streamer? → Google TV Streamer 4K
 ├── Apple TV 4K (Infuse)? → Apple TV 4K (Nightly)
 ├── Windows PC / ultrawide monitor? → Ultrawide
@@ -155,6 +157,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus Stream Labs** 🧪 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **Core Nexus All-Rounder Labs** 🧪 | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
 | **Core Nexus Samsung RU7100 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
+| **Core Nexus Xiaomi 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Xiaomi/core-nexus-xiaomi-4k.json` |
 | **Core Nexus Google TV Streamer 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json` |
 | **Core Nexus Ultrawide** | TorBox Pro | 1080p + 4K | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json` |
 | **Core Nexus Essential Labs** 🧪 | TorBox Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
@@ -287,6 +290,20 @@ Full 4K template for the Samsung RU7100 (2019). Runs the complete APEX IQR PSE s
 | **File** | `Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
 | **Version** | v0.3.7 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json` |
+| **Resolution** | 2160p · 1080p fallback |
+| **Usenet** | ❌ |
+
+---
+
+### 📺 Core Nexus Xiaomi 4K
+
+4K template for Xiaomi Mi Box S (2nd gen) and similar Xiaomi / Android TV devices. Dolby Vision Profile 5 and HDR10+ natively supported — DV-Only Kill disabled. AV1 and VC-1 hard-excluded (no hardware decode on 2nd gen; 3rd gen users can remove the AV1 exclusion). Lossless audio excluded (TrueHD, DTS-HD MA, DTS:X, FLAC) — DD+ Atmos is the audio ceiling. Handles REMUX well despite 2GB RAM. Based on Core Nexus Samsung TV 4K with DV-Only Kill removed and DV added to preferred visual tags.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Device/Xiaomi/core-nexus-xiaomi-4k.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Xiaomi/core-nexus-xiaomi-4k.json` |
 | **Resolution** | 2160p · 1080p fallback |
 | **Usenet** | ❌ |
 
