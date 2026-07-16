@@ -17,7 +17,7 @@ const outPath = path.join(__dirname, 'index.html');
 let html = fs.readFileSync(srcPath, 'utf8');
 
 // Inline external <script src="..."> references so the output is a standalone file.
-html = html.replace(/<script\s+src="([^"]+)">\s*<\/script\b[^>]*>/gi, (tag, src) => {
+html = html.replace(/<script\s+src="([^"]+)">\s*<\/script\s*>/gi, (tag, src) => {
   const filePath = path.join(__dirname, src);
   if (!fs.existsSync(filePath)) {
     console.warn(`Warning: referenced script not found: ${filePath} — leaving tag as-is`);
