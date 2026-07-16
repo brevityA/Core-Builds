@@ -44,7 +44,7 @@ description: "Quick answers to the most common Core Builds questions."
   </Accordion>
 
   <Accordion title="Only a handful of streams for older TV shows">
-    Normal for older content. Classic TV episodes under 512 MB and older encodes often have unrecognised audio or encode tags that trip size and quality filters. Templates from v2.4.6 onwards lower size minimums and add `Unknown` fallbacks. For niche or foreign content with low seeders, consider a [Speed 4K+](/master-guide) or [Hybrid](/master-guide) template that adds Usenet coverage.
+    Normal for older content. Classic TV episodes under 512 MB and older encodes often have unrecognised audio or encode tags that trip size and quality filters. Templates from v2.4.6 onwards lower size minimums and add `Unknown` fallbacks. For niche or foreign content with low seeders, consider a [Speed 4K\+](/master-guide) or [Hybrid](/master-guide) template that adds Usenet coverage.
   </Accordion>
 
   <Accordion title="Very few results on any content — even popular films">
@@ -53,6 +53,12 @@ description: "Quick answers to the most common Core Builds questions."
 
   <Accordion title="MediaFusion and HdHub appeared in my add-ons after re-importing">
     This is expected from v2.9.4 onwards. Both scrapers are now enabled out of the box — MediaFusion for regional and international content that TorBox's native scraper misses, and HdHub for additional TorBox-cached P2P sources. If you don't want either of them, go to **Addons**, find the scraper, and toggle it off. Your stream results for popular English content will be unchanged; the main impact is on non-English and niche titles where TorBox's native search returns nothing.
+  </Accordion>
+
+  <Accordion title="I'm seeing foreign language streams in my results">
+    The Foreign Language Kill ESE blocks non-English streams from movies and TV results. Fleet templates have always included it, but configurator-generated templates were missing it before v2.56.
+
+    **Fix:** If you use the configurator, regenerate your template with v2.56\+ — the Foreign Language Kill is now on by default. If you want certain non-English languages (e.g. Spanish, French), add them in the configurator's Language Preferences — they'll pass through while other languages are still blocked. Library, SeaDex, and anime content are always exempt regardless of this setting.
   </Accordion>
 
   <Accordion title="NZBGeek returns nothing (Hybrid template only)">

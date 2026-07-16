@@ -13,9 +13,11 @@ Before troubleshooting, confirm what you're running.
 
     Alternatively, check the template JSON directly: open the raw URL in a browser and look for `"version"` inside the `"metadata"` object.
   </Accordion>
+
   <Accordion title="How do I check my AIOStreams version?">
-    In AIOStreams → **About** — the AIOStreams version is shown in the footer. Core Builds templates require **v2.30+**.
+    In AIOStreams → **About** — the AIOStreams version is shown in the footer. Core Builds templates require **v2.30\+**.
   </Accordion>
+
   <Accordion title="How do I update a template?">
     Re-import the same URL — AIOStreams merges the new version over your existing config and preserves your API keys. Check for an in-app update notification first (AIOStreams will prompt you automatically when a new version is available).
   </Accordion>
@@ -31,7 +33,7 @@ Before troubleshooting, confirm what you're running.
 
     **Fix: re-import the latest template.** As of v2.9.0, all pattern strings are synced to the host allowlists. The most common cause is importing an older template that predates the v2.8.9 / v2.9.0 sync.
 
-    If you're still seeing this after re-importing v2.9.0+, paste the exact error text in the community thread — it may indicate the allowlist has been updated again.
+    If you're still seeing this after re-importing v2.9.0\+, paste the exact error text in the community thread — it may indicate the allowlist has been updated again.
   </Accordion>
 
   <Accordion title='"Forbidden URL" error on import'>
@@ -64,15 +66,14 @@ Before troubleshooting, confirm what you're running.
 <AccordionGroup>
   <Accordion title="No results / very few results">
     **Check first:**
+
     - Is the title in TorBox's cache? Search at [torbox.app](https://torbox.app)
     - Are your API keys entered? TorBox key in Services, TMDB in Settings
     - Are your scrapers enabled? Open AIOStreams → Add-ons — from v2.9.4, MediaFusion and HdHub are on by default; on older imports they may be toggled off
 
-    **If you're on a Flash or Speed template:**
-    These templates exit as soon as they find cached results. If TorBox doesn't have the title cached, Flash returns nothing. Switch to Core Nexus Essential for full coverage with uncached fallback.
+    **If you're on a Flash or Speed template:** These templates exit as soon as they find cached results. If TorBox doesn't have the title cached, Flash returns nothing. Switch to Core Nexus Essential for full coverage with uncached fallback.
 
-    **Try the Lite variant:**
-    The standard template runs quality-gate ESEs (low bitrate, low seeders, bad encodes). Lite removes those gates — hard kills stay but quality filters are gone. If Lite returns results, one of the quality gates is filtering your content.
+    **Try the Lite variant:** The standard template runs quality-gate ESEs (low bitrate, low seeders, bad encodes). Lite removes those gates — hard kills stay but quality filters are gone. If Lite returns results, one of the quality gates is filtering your content.
   </Accordion>
 
   <Accordion title="Stream returns only 1080p — no 720p results">
@@ -91,13 +92,24 @@ Before troubleshooting, confirm what you're running.
     Fixed in v2.8.3. `seadexBestOnly: true` was dropping all non-SeaDex streams on several non-Anime templates. Re-import to pick up the fix.
   </Accordion>
 
+  <Accordion title="Foreign language streams appearing in results">
+    If you're seeing Spanish, Portuguese, or other non-English streams mixed into your movie and TV results, the Foreign Language Kill ESE is missing or disabled.
+
+    **If you use a fleet template:** Re-import the latest version — the Foreign Language Kill has always been included in fleet templates.
+
+    **If you use the configurator:** Update to configurator v2.56\+. The Foreign Language Kill is now on by default. If you've already generated a template, regenerate it or manually add the ESE in AIOStreams.
+
+    **If you want some non-English languages:** Go to the configurator's Language Preferences and add the languages you want (e.g. Spanish, French). The Foreign Language Kill adapts — added languages pass through while others are still blocked. Library, SeaDex, and anime content are always exempt.
+  </Accordion>
+
   <Accordion title="Usenet results slow or not appearing">
     Fixed in v2.7.5. The newznab timeout was 3000ms — too short for TorBox Usenet. Updated to 10,000ms. Additionally `searchMode: auto` and `checkOwned: true` are now set. Re-import your template.
   </Accordion>
 
   <Accordion title="Results appear but nothing plays">
     Most common causes:
-    - **Debrid link timeout (Nuvio / AIOStreams v2.24.0+)** — If you see a visible Playback Error, the debrid link resolver timed out. Re-import the v2.9.0+ template — the `stremthruTorz`/`stremthruStore` timeout was raised to 5000ms to cover congested periods. If errors persist, check [TorBox's status page](https://torbox.app/status) for outages, or try a different stream from the list.
+
+    - **Debrid link timeout (Nuvio / AIOStreams v2.24.0\+)** — If you see a visible Playback Error, the debrid link resolver timed out. Re-import the v2.9.0\+ template — the `stremthruTorz`/`stremthruStore` timeout was raised to 5000ms to cover congested periods. If errors persist, check [TorBox's status page](https://torbox.app/status) for outages, or try a different stream from the list.
     - **Codec not supported on your device** — check the stream's codec in the formatter display. If it's AV1 on a device without hardware AV1 decode (Fire Stick 4K, older Samsung Tizen), the stream will buffer or fail. Switch to a device-specific template (Samsung TV, Fire Stick) which hard-exclude unsupported codecs.
     - **DV-only stream on a non-DV device** — the Samsung templates have a DV-Only Kill ESE enabled by default. If you're on a generic template, enable the DV-Only Kill ESE manually in AIOStreams.
     - **Bitrate too high** — very high-bitrate REMUX streams can stall on slower connections or budget hardware. Try the B-tier or lower result in the list.
@@ -117,12 +129,13 @@ Before troubleshooting, confirm what you're running.
 
   <Accordion title="Samsung TV — Dolby Vision streams still appearing">
     The DV-Only Kill ESE is enabled by default on Samsung templates. If you're still seeing DV streams:
+
     - Re-import the latest Samsung TV template
     - Check you haven't disabled the `No DV-Only` ESE in the AIOStreams expression editor
   </Accordion>
 
   <Accordion title="Fire Stick — playback stuttering or buffering">
-    Use the **Stream (Fire Stick)** template. It hard-excludes AV1 (no hardware decoder on most Fire Stick models), HDR10+, Dolby Vision, and lossless audio. If you're on a generic Stream template, these formats may be served and cause transcoding or failure.
+    Use the **Stream (Fire Stick)** template. It hard-excludes AV1 (no hardware decoder on most Fire Stick models), HDR10\+, Dolby Vision, and lossless audio. If you're on a generic Stream template, these formats may be served and cause transcoding or failure.
   </Accordion>
 
   <Accordion title="Apple TV — DV not playing in Infuse">
@@ -142,7 +155,7 @@ Before troubleshooting, confirm what you're running.
   </Accordion>
 
   <Accordion title="Which public host should I use — elfhosted or fortheweak?">
-    Both work with Core Builds v2.9.0+. The main difference is the regex whitelist — fortheweak is stricter. As of v2.9.0, all templates are verified against both allowlists.
+    Both work with Core Builds v2.9.0\+. The main difference is the regex whitelist — fortheweak is stricter. As of v2.9.0, all templates are verified against both allowlists.
 
     If you're self-hosting, no whitelist applies — all templates work as-is.
   </Accordion>

@@ -6,11 +6,14 @@ description: "Planned work, active development, and recently completed milestone
 ## Recently Completed
 
 | Version | Item |
-|---|---|
+| --- | --- |
+| v2.56 | Configurator — Resolution First toggle (4K always ranks above 1080p/720p regardless of cache status) |
+| v2.56 | Configurator — Foreign Language Kill ESE (blocks non-English streams from movies/TV; adapts to Language Preferences; Library/SeaDex/anime exempt) |
+| v2.55 | Configurator — UX overhaul (staggered splash animations, smart service pre-selection, contextual Quick Deploy presets, keyboard navigation, step dot tooltips, auto-saved indicator, prefers-reduced-motion support) |
 | v3.0.0 | Bad Dual Audio Groups ESE — 27 mislabelled dual-audio release groups excluded across all 28 stable non-Anime templates; graduated from Labs |
-| v3.0.0 | Indexer Diversity ESE — perGroup(indexer) caps 2 results per scraper when pool > 20; all 28 stable non-Anime templates; graduated from Labs |
+| v3.0.0 | Indexer Diversity ESE — perGroup(indexer) caps 2 results per scraper when pool \> 20; all 28 stable non-Anime templates; graduated from Labs |
 | v3.0.0 | Score IQR Guard ESE — Tukey lower-fence filter on seScore distribution; 4K Apex (v0.5.0), 4K Apex TorBox (v2.10.0), 4K Hybrid (v2.10.0), 4K Essential (v2.10.0), 4K AllDebrid (v0.2.0); graduated from Labs |
-| v3.0.0 | Core Builds Base Config draft — parent config with all scraper presets + universal ESE/ISE layer for AIOStreams parent/child architecture (activation deferred until hosted instance available) |
+| v3.0.0 | Core Builds Base Config draft — parent config with all scraper presets \+ universal ESE/ISE layer for AIOStreams parent/child architecture (activation deferred until hosted instance available) |
 | v3.0.0 | Flash plain-string ESE fix — converted bare-string ESE to standard dict format |
 | v2.9.9 | Anime BD T1 regex drift fix — Vidhin05 removed ZR/NAN0; pattern updated across all 34 non-Anime templates; resolves "1 regex not allowed" on elfhosted |
 | v2.9.9 | NZBGeek preset disabled by default — Hybrid, Hybrid Lite, 4K Hybrid — prevents IP-mismatch bans on shared hosting (ElfHosted, fortheweak.cloud) |
@@ -18,23 +21,23 @@ description: "Planned work, active development, and recently completed milestone
 | v2.9.8 | REPACK/PROPER Passthrough ISE — pins REPACK/PROPER releases ahead of limit/excluded filters; all templates via shared ISE file |
 | v2.9.8 | Codec Efficiency Booster PSE — HEVC/AV1 over AVC; AllDebrid and Samsung TV templates |
 | v2.9.8 | Audio Pinnacle PSE — Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3 priority; AllDebrid and Samsung TV templates |
-| v2.9.8 | HDR / DV Priority PSE — DV/HDR10+/HDR10 over SDR within 4K; AllDebrid and Samsung TV templates |
+| v2.9.8 | HDR / DV Priority PSE — DV/HDR10\+/HDR10 over SDR within 4K; AllDebrid and Samsung TV templates |
 | v2.9.8 | Apple TV 4K Nightly — SeaDex passthrough ISE added (was missing despite SeaDex preset being enabled) |
 | v2.9.8 | Speed TorBox templates — broken dynamic group instanceId references fixed; disabled MediaFusion fallback added |
 | v2.9.7 | Meteor timeout 10000ms → 6000ms — 28 templates — fixes Nuvio "addon request timed out" on niche/new series |
-| v2.9.7 | 4K Apex v0.4.17 — time-based dynamicAddonFetching exit (5s hard cap + ≥5 cached 4K) |
+| v2.9.7 | 4K Apex v0.4.17 — time-based dynamicAddonFetching exit (5s hard cap \+ ≥5 cached 4K) |
 | v2.9.6 | Hybrid TorBox-priority PSEs — Hybrid (IQR twins) and Hybrid Lite (CB-style twins) complete the pattern from 4K Hybrid |
-| v2.9.5 | TorrentsDB added to 13 non-Lite templates — 21+ provider coverage (YTS, 1337x, Nyaa, AnimeTosho, regional), TorBox native, no API key, flood guard ≤1 |
+| v2.9.5 | TorrentsDB added to 13 non-Lite templates — 21\+ provider coverage (YTS, 1337x, Nyaa, AnimeTosho, regional), TorBox native, no API key, flood guard ≤1 |
 | v2.9.4 | Stream 720p fallback PSEs — surfaces 720p WEB-DL/WEBRip when no 1080p source exists |
 | v2.9.4 | MediaFusion and HdHub enabled by default on all non-Speed, non-Flash TorBox templates |
 | v2.9.4 | Cached-only TorBox Apex variant fixed — StremThru Torz now on by default |
 | v2.9.4 | Nightly and Labs templates — all 6 import cleanly (regex blockers, missing metadata, audio/resolution fixes) |
 | v2.9.3 | 4K WEB-DL exemption — prevents new theatrical releases from being suppressed when no Blu-ray exists |
 | v2.9.2 | Knaben and Torrent Galaxy demoted to backup scrapers (≤1 result each) |
-| v2.9.2 | OpenSubtitles V3+ removed — AIOSubtitle covers the same sources with no redundant network call |
+| v2.9.2 | OpenSubtitles V3\+ removed — AIOSubtitle covers the same sources with no redundant network call |
 | v2.9.1 | Per-Addon Flood Guard ESE — AllDebrid and Samsung TV templates |
-| v2.9.0 | Regex compatibility — fortheweak whitelist sync (11 ranked + 3 excluded removed from all 33 non-Anime templates) |
-| v2.9.0 | Debrid timeout raised 3000ms → 5000ms on 35 templates — fixes playback errors on Nuvio and AIOStreams v2.24.0+ |
+| v2.9.0 | Regex compatibility — fortheweak whitelist sync (11 ranked \+ 3 excluded removed from all 33 non-Anime templates) |
+| v2.9.0 | Debrid timeout raised 3000ms → 5000ms on 35 templates — fixes playback errors on Nuvio and AIOStreams v2.24.0\+ |
 | v2.9.0 | AllDebrid setup guide |
 | v2.9.0 | Docs expansion — formatters (3→16), device profiles, troubleshooting rewrite, Choosing a Host section |
 | v2.8.4 | Boost Cached Usenet PSE restored — all 27 TorBox templates |
@@ -48,8 +51,8 @@ description: "Planned work, active development, and recently completed milestone
 | v2.8.0 | pow() exponential age-decay replaces hard 60-day cliff |
 | v2.8.0 | Core Builds Expression Layer — 24 ESEs, 3 ISEs, IQR PSEs deployed |
 | v2.7.5 | Addon timeout tuning — fixes silent Usenet result drops |
-| v2.7.5 | Dedup tiebreakers — torrent_seeders + usenet_age |
-| v2.7.0 | Core Nexus 4K Hybrid — TorBox + NZBGeek Usenet |
+| v2.7.5 | Dedup tiebreakers — torrent\_seeders \+ usenet\_age |
+| v2.7.0 | Core Nexus 4K Hybrid — TorBox \+ NZBGeek Usenet |
 | v2.7.0 | IQR Tukey fence PSEs |
 
 ---
@@ -57,8 +60,8 @@ description: "Planned work, active development, and recently completed milestone
 ## In Progress
 
 | Item | Notes |
-|---|---|
-| `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate — if SeaDex data exists, require SeaDex-matched stream in top tier; else fall through to standard sort |
+| --- | --- |
+| `hasSeaDex` \+ `seMatched()` anime gating | Adaptive anime quality gate — if SeaDex data exists, require SeaDex-matched stream in top tier; else fall through to standard sort |
 
 ---
 
@@ -66,7 +69,7 @@ description: "Planned work, active development, and recently completed milestone
 
 ### Parent/Child Config Architecture
 
-The Core Builds Base Config (`Templates/Core-Builds-Base-Config.json`) is drafted and ready — it contains all scraper presets, the universal ESE layer, ISEs, sort criteria, formatter, and synced URLs. Activation is deferred until a permanent hosted AIOStreams instance is available to hold the parent config UUID. Once live, each child template only needs its service preset + PSEs + template-specific ESEs. One timeout change in the parent propagates to all templates instantly.
+The Core Builds Base Config (`Templates/Core-Builds-Base-Config.json`) is drafted and ready — it contains all scraper presets, the universal ESE layer, ISEs, sort criteria, formatter, and synced URLs. Activation is deferred until a permanent hosted AIOStreams instance is available to hold the parent config UUID. Once live, each child template only needs its service preset \+ PSEs \+ template-specific ESEs. One timeout change in the parent propagates to all templates instantly.
 
 ### Expression Layer
 
@@ -74,15 +77,19 @@ The Core Builds Base Config (`Templates/Core-Builds-Base-Config.json`) is drafte
   <Accordion title="Usenet Propagation Guard ESE">
     Holds back NZBs younger than 2 hours when propagated alternatives exist. Eliminates corrupt early-propagation grabs. All Usenet-enabled templates.
   </Accordion>
+
   <Accordion title="Codec Efficiency Booster PSE — broader rollout">
     Shipped on AllDebrid and Samsung TV in v2.9.8. Planned expansion: Stream, Essential, Anime.
   </Accordion>
+
   <Accordion title="Audio Pinnacle PSE — broader rollout">
     Shipped on AllDebrid and Samsung TV in v2.9.8. Planned expansion: Apex, 4K Hybrid, 4K Essential.
   </Accordion>
+
   <Accordion title="HDR / DV Priority PSE — broader rollout">
     Shipped on AllDebrid and Samsung TV in v2.9.8. Planned expansion: Apex, 4K Essential, 4K Hybrid, Flash 4K.
   </Accordion>
+
   <Accordion title="pin() top result">
     Pin the #1 PSE-matched stream to position 1 regardless of sort order.
   </Accordion>
@@ -108,7 +115,7 @@ The Core Builds Base Config (`Templates/Core-Builds-Base-Config.json`) is drafte
 ## Ideas / Under Consideration
 
 | Idea | Status |
-|---|---|
+| --- | --- |
 | New unified template suite | Under consideration — tighter 6-template lineup built around the Core Builds expression layer |
 | Debrid-Link template | Under research — supported in AIOStreams |
 | Premiumize template | Under research — natively supported |
