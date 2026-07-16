@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Build script: obfuscates configurator/index.src.html → configurator/index.html
+// Build script: obfuscates configurator/index_src.html → configurator/index.html
 // Targets only the main application <script> block (the largest one).
-// Leaves the theme initializer and third-party QR library untouched.
+// Inlines the external qrcode.min.js back into the output for standalone use.
 // Run: node configurator/build.js
 
 const fs   = require('fs');
@@ -14,7 +14,19 @@ const srcPath = fs.existsSync(path.join(__dirname, 'index.src.html'))
   : fallbackSrc;
 const outPath = path.join(__dirname, 'index.html');
 
-const html = fs.readFileSync(srcPath, 'utf8');
+let html = fs.readFileSync(srcPath, 'utf8');
+
+// Inline external <script src="..."> references so the output is a standalone file.
+html = html.replace(/<script\s+src="([^"]+)">\s*<\/script>/gi, (tag, src) => {
+  const filePath = path.join(__dirname, src);
+  if (!fs.existsSync(filePath)) {
+    console.warn(`Warning: referenced script not found: ${filePath} — leaving tag as-is`);
+    return tag;
+  }
+  const js = fs.readFileSync(filePath, 'utf8');
+  console.log(`Inlined ${src} (${Math.round(js.length / 1024)} KB)`);
+  return `<script>${js}</script>`;
+});
 
 const scriptBlocks = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\b[^>]*>/gi)];
 if (!scriptBlocks.length) { console.error('No <script> blocks found'); process.exit(1); }
