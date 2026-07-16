@@ -8,22 +8,34 @@ For full technical details, see the [Changelog](/changelog).
 
 ---
 
+## Configurator v2.56 — July 2026
+
+**Resolution First toggle.** Users reported 720p/1080p streams ranking above 4K — this is by design (cached streams always sort above uncached). The new **Resolution First** toggle in the configurator's Video Preferences changes this: when enabled, 4K always ranks above 1080p/720p regardless of cache status. Within the same resolution, cached still beats uncached.
+
+- Default sort: `cached → resolution → quality`
+- Resolution First: `resolution → quality → cached`
+
+**Foreign Language Kill.** The fleet templates have always had a hard ESE blocking foreign-language streams from movies and TV results. The configurator wasn't generating it — so configurator users were getting Spanish, Portuguese, and other non-English streams in their results. Now on by default. Adapts to your Language Preferences — if you've added Spanish or French, those pass through too. Library, SeaDex, and anime content are always exempt.
+
+**Configurator v2.55 UX overhaul.** Staggered splash animations, smart service pre-selection (remembers your last service), contextual Quick Deploy presets (debrid shows 4K/1080p, free shows Free Streaming/P2P), keyboard navigation throughout splash (arrow keys, Enter/Space), step dot tooltips showing current selection on hover, auto-saved indicator, and `prefers-reduced-motion` support.
+
+**How to update:** Generate a fresh template from the [configurator](/configurator), or use "Update Existing Template" to see the diff and cherry-pick changes. The Foreign Language Kill and Resolution First toggles are in the wizard's advanced preferences.
+
+---
+
 ## v3.2.5 — July 2026
 
-**ESE v2.0 — fleet-wide rollout.**
-Three foundational ESE improvements have been deployed across all 42 active templates:
+**ESE v2.0 — fleet-wide rollout.** Three foundational ESE improvements have been deployed across all 42 active templates:
 
 - **Info & Other Unwanted** replaces Bad NZBs — now catches info-type streams, `-sample` keyword Usenet files, and streams with prohibited markers, in addition to everything Bad NZBs already handled.
-- **G's Low Bitrate count() fix** — the bitrate floor now activates at 10+ cached streams (was incorrectly thresholding against the wrong pool).
+- **G's Low Bitrate count() fix** — the bitrate floor now activates at 10\+ cached streams (was incorrectly thresholding against the wrong pool).
 - **Standard ESE v2.0 version marker** — a no-op tag for tracking which ESE generation a template runs.
 
 Re-import from the [Template Directory](/template-directory) to pick up these changes.
 
-**Configurator overhauled.**
-The Template Configurator has been completely redesigned with a new splash screen, Quick Deploy presets (one-tap installs for common setups), and a guided 6-step wizard. Key validation has been removed — the old "API key failed validation" dialog was unreliable on mobile and behind CORS-restricted services. The configurator now accepts your key directly and lets AIOStreams validate it on first use. See [Configurator](/configurator) for the full walkthrough.
+**Configurator overhauled.** The Template Configurator has been completely redesigned with a new splash screen, Quick Deploy presets (one-tap installs for common setups), and a guided 6-step wizard. Key validation has been removed — the old "API key failed validation" dialog was unreliable on mobile and behind CORS-restricted services. The configurator now accepts your key directly and lets AIOStreams validate it on first use. See [Configurator](/configurator) for the full walkthrough.
 
-**ESE v2.0 experimental features in LABS.**
-Six LABS templates now carry the full ESE v2.0 experimental stack — features being validated before fleet-wide promotion:
+**ESE v2.0 experimental features in LABS.** Six LABS templates now carry the full ESE v2.0 experimental stack — features being validated before fleet-wide promotion:
 
 - **Protect Library** — library-aware CAM/TS kill. Library items survive even when tagged as low quality (replaces Hard CAM Kill).
 - **SeaDex Duplicates** — `perGroup()` dedup keeps 1 per release group for best and non-best SeaDex tiers (replaces Extra SeaDex).
@@ -36,131 +48,105 @@ See [Nightly and Labs](/nightly-and-labs) for import links.
 
 ## v3.0.0 — June 2026
 
-**Bad dual-audio groups are now excluded from every template.**
-27 release groups that falsely label streams as dual-audio (alfaHD, BAT, BiOMA, BlackBit, and 23 others) are now excluded across all 28 stable non-Anime templates. These groups produce streams where the English track is either absent or a low-quality dub — the label is inaccurate. You won't see those results any more without any manual configuration.
+**Bad dual-audio groups are now excluded from every template.** 27 release groups that falsely label streams as dual-audio (alfaHD, BAT, BiOMA, BlackBit, and 23 others) are now excluded across all 28 stable non-Anime templates. These groups produce streams where the English track is either absent or a low-quality dub — the label is inaccurate. You won't see those results any more without any manual configuration.
 
-**One scraper can no longer flood your results.**
-A new Indexer Diversity rule caps any single scraper at 2 results when your total stream pool exceeds 20. Previously, if Meteor or MediaFusion returned 15 results for a popular title, they could crowd out higher-quality matches from other scrapers that returned fewer. Now every active scraper gets fair representation in the list. Applied to all 28 stable non-Anime templates.
+**One scraper can no longer flood your results.** A new Indexer Diversity rule caps any single scraper at 2 results when your total stream pool exceeds 20. Previously, if Meteor or MediaFusion returned 15 results for a popular title, they could crowd out higher-quality matches from other scrapers that returned fewer. Now every active scraper gets fair representation in the list. Applied to all 28 stable non-Anime templates.
 
-**Score IQR Guard — statistical outlier filtering on 4K full templates.**
-The five 4K templates with IQR-adaptive quality tiers (4K Apex, 4K Apex TorBox, 4K Hybrid, 4K Essential, 4K AllDebrid) now automatically filter streams whose quality score falls below the statistical lower fence of the pool. In plain terms: if your stream list has a clear quality cluster and a handful of results that scored much worse, those low outliers are now removed rather than appearing at the bottom. This has been in Labs for several releases — it's now stable.
+**Score IQR Guard — statistical outlier filtering on 4K full templates.** The five 4K templates with IQR-adaptive quality tiers (4K Apex, 4K Apex TorBox, 4K Hybrid, 4K Essential, 4K AllDebrid) now automatically filter streams whose quality score falls below the statistical lower fence of the pool. In plain terms: if your stream list has a clear quality cluster and a handful of results that scored much worse, those low outliers are now removed rather than appearing at the bottom. This has been in Labs for several releases — it's now stable.
 
 ---
 
 ## v2.9.9 — June 2026
 
-**Anime BD T1 regex updated — resolves the "1 regex not allowed" import error.**
-Vidhin05 (the source elfhosted uses to validate allowed regex patterns) silently updated their file, removing two release groups — ZR and NAN0 — from the Anime BD T1 pattern. If you saw a "1 out of N regexes not allowed" error when importing a template, this was the cause. All templates now match Vidhin05's current version of the pattern. Re-import from the [Template Directory](/template-directory) to clear the error.
+**Anime BD T1 regex updated — resolves the "1 regex not allowed" import error.** Vidhin05 (the source elfhosted uses to validate allowed regex patterns) silently updated their file, removing two release groups — ZR and NAN0 — from the Anime BD T1 pattern. If you saw a "1 out of N regexes not allowed" error when importing a template, this was the cause. All templates now match Vidhin05's current version of the pattern. Re-import from the [Template Directory](/template-directory) to clear the error.
 
-**NZBGeek preset now disabled by default on Hybrid templates.**
-NZBGeek has been issuing account bans to users running AIOStreams on shared hosting (ElfHosted, fortheweak.cloud). The root cause is an IP mismatch: on these platforms, search queries and NZB grabs can come from different IPs, which NZBGeek flags as multi-account sharing. The NZBGeek preset is still included in all Hybrid templates — it is just switched off out of the box. Re-enabling it on ElfHosted requires routing requests through the [Zyclops proxy](https://zyclops.elfhosted.com) so both operations share a single IP. On a private or self-hosted instance where all requests originate from one IP, you can enable the preset directly. See [Importing a Template](/importing) for the full setup steps.
+**NZBGeek preset now disabled by default on Hybrid templates.** NZBGeek has been issuing account bans to users running AIOStreams on shared hosting (ElfHosted, fortheweak.cloud). The root cause is an IP mismatch: on these platforms, search queries and NZB grabs can come from different IPs, which NZBGeek flags as multi-account sharing. The NZBGeek preset is still included in all Hybrid templates — it is just switched off out of the box. Re-enabling it on ElfHosted requires routing requests through the [Zyclops proxy](https://zyclops.elfhosted.com) so both operations share a single IP. On a private or self-hosted instance where all requests originate from one IP, you can enable the preset directly. See [Importing a Template](/importing) for the full setup steps.
 
 ---
 
 ## v2.9.8 — June 2026
 
-**REPACK/PROPER releases now always surface, even when they'd normally be filtered out.**
-When a release group issues a REPACK or PROPER — a corrected re-encode replacing a broken or mislabelled original — the previous filtering logic could suppress it if it fell outside the quality window or hit a limit cap. It now bypasses those filters and always reaches your stream list. This is especially relevant for anime fansub groups, which frequently issue REPACKs for audio sync or subtitle fixes. Applied to all templates via the shared ISE file.
+**REPACK/PROPER releases now always surface, even when they'd normally be filtered out.** When a release group issues a REPACK or PROPER — a corrected re-encode replacing a broken or mislabelled original — the previous filtering logic could suppress it if it fell outside the quality window or hit a limit cap. It now bypasses those filters and always reaches your stream list. This is especially relevant for anime fansub groups, which frequently issue REPACKs for audio sync or subtitle fixes. Applied to all templates via the shared ISE file.
 
-**Booster PSEs added to AllDebrid and Samsung TV templates.**
-Three new priority expressions are now active on all AllDebrid and Samsung TV templates: Codec Efficiency Booster (surfaces HEVC/AV1 ahead of AVC at equivalent quality), Audio Pinnacle (promotes Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3 within each quality tier), and HDR/DV Priority (surfaces Dolby Vision and HDR10+ ahead of HDR10 and SDR within 4K results). These were previously Apex and 4K Hybrid only — the AllDebrid and Samsung families now have the same priority stack.
+**Booster PSEs added to AllDebrid and Samsung TV templates.** Three new priority expressions are now active on all AllDebrid and Samsung TV templates: Codec Efficiency Booster (surfaces HEVC/AV1 ahead of AVC at equivalent quality), Audio Pinnacle (promotes Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3 within each quality tier), and HDR/DV Priority (surfaces Dolby Vision and HDR10\+ ahead of HDR10 and SDR within 4K results). These were previously Apex and 4K Hybrid only — the AllDebrid and Samsung families now have the same priority stack.
 
-**Apple TV 4K Nightly — SeaDex passthrough fixed.**
-The Apple TV 4K Nightly template had SeaDex enabled in its preset list and its config, but was missing the SeaDex passthrough ISE that tells AIOStreams to treat SeaDex-matched streams as untouchable. In practice this meant SeaDex results were subject to the same limit and exclusion filters as everything else. Fixed — SeaDex streams now bypass those filters on Apple TV 4K exactly as they do on every other template.
+**Apple TV 4K Nightly — SeaDex passthrough fixed.** The Apple TV 4K Nightly template had SeaDex enabled in its preset list and its config, but was missing the SeaDex passthrough ISE that tells AIOStreams to treat SeaDex-matched streams as untouchable. In practice this meant SeaDex results were subject to the same limit and exclusion filters as everything else. Fixed — SeaDex streams now bypass those filters on Apple TV 4K exactly as they do on every other template.
 
-**Speed templates — dynamic group references corrected.**
-All four Speed TorBox templates (Speed 4K, Speed 4K Lite, Speed, Speed Lite) had a broken reference in their dynamic addon grouping: the group was pointing at instanceIds `nx-fix-01` and `nx-fix-02` which don't exist in any of the templates. AIOStreams' group validation was failing silently on import. Fixed to point at the correct Zilean and StremThru Torz instanceIds. A disabled MediaFusion preset has also been added as a fallback so fresh imports don't fail validation before TorBox credentials are configured.
+**Speed templates — dynamic group references corrected.** All four Speed TorBox templates (Speed 4K, Speed 4K Lite, Speed, Speed Lite) had a broken reference in their dynamic addon grouping: the group was pointing at instanceIds `nx-fix-01` and `nx-fix-02` which don't exist in any of the templates. AIOStreams' group validation was failing silently on import. Fixed to point at the correct Zilean and StremThru Torz instanceIds. A disabled MediaFusion preset has also been added as a fallback so fresh imports don't fail validation before TorBox credentials are configured.
 
 ---
 
 ## v2.9.7 — June 2026
 
-**Meteor scraper timeout lowered — fixes "addon request timed out" on Nuvio and similar players.**
-Meteor was set to a 10-second timeout on all templates. For new or niche series, the template's secondary scraper group (Meteor + Comet RD) almost always fires because the faster primary scrapers don't find enough cached results. With Meteor waiting up to 10 seconds, the total addon request time was regularly exceeding Nuvio's internal timeout — showing "the addon request timed out" even when streams actually exist. Lowered to 6 seconds across all 28 affected templates. Samsung TV templates were already at 3 seconds and are unchanged. Re-import your template to pick up this fix.
+**Meteor scraper timeout lowered — fixes "addon request timed out" on Nuvio and similar players.** Meteor was set to a 10-second timeout on all templates. For new or niche series, the template's secondary scraper group (Meteor \+ Comet RD) almost always fires because the faster primary scrapers don't find enough cached results. With Meteor waiting up to 10 seconds, the total addon request time was regularly exceeding Nuvio's internal timeout — showing "the addon request timed out" even when streams actually exist. Lowered to 6 seconds across all 28 affected templates. Samsung TV templates were already at 3 seconds and are unchanged. Re-import your template to pick up this fix.
 
-**4K Apex now has a 5-second hard cap on scraper wait time.**
-4K Apex v0.4.16 adds a time-based exit to its dynamic addon fetching: if 5 seconds pass and fewer than 5 cached 4K streams have been found, AIOStreams stops querying and shows what's available rather than waiting for slow scrapers to time out. Previously the only exit condition required 10+ cached 4K streams — a threshold that almost never fired for new or niche content. This change is live on 4K Apex only while it's being validated; it will extend to other full templates once confirmed.
+**4K Apex now has a 5-second hard cap on scraper wait time.** 4K Apex v0.4.16 adds a time-based exit to its dynamic addon fetching: if 5 seconds pass and fewer than 5 cached 4K streams have been found, AIOStreams stops querying and shows what's available rather than waiting for slow scrapers to time out. Previously the only exit condition required 10\+ cached 4K streams — a threshold that almost never fired for new or niche content. This change is live on 4K Apex only while it's being validated; it will extend to other full templates once confirmed.
 
 ---
 
 ## v2.9.6 — June 2026
 
-**Hybrid templates now prioritise TorBox streams first.**
-If you use the Hybrid or Hybrid Lite template (TorBox + Real-Debrid), your TorBox-cached streams will now appear before equivalent Real-Debrid results at the top two quality tiers. The logic has been in 4K Hybrid since v2.9.4 — this release brings it to the 1080p Hybrid variants. Hybrid uses the same IQR-adaptive prioritisation as 4K Hybrid; Hybrid Lite uses a simpler quality-tier version consistent with its lighter design. The change only affects ordering within the same quality tier — if no TorBox stream matches, the expression returns empty and falls through to the all-service result as before. Re-import from the [Template Directory](/template-directory) to pick up this update.
+**Hybrid templates now prioritise TorBox streams first.** If you use the Hybrid or Hybrid Lite template (TorBox \+ Real-Debrid), your TorBox-cached streams will now appear before equivalent Real-Debrid results at the top two quality tiers. The logic has been in 4K Hybrid since v2.9.4 — this release brings it to the 1080p Hybrid variants. Hybrid uses the same IQR-adaptive prioritisation as 4K Hybrid; Hybrid Lite uses a simpler quality-tier version consistent with its lighter design. The change only affects ordering within the same quality tier — if no TorBox stream matches, the expression returns empty and falls through to the all-service result as before. Re-import from the [Template Directory](/template-directory) to pick up this update.
 
 ---
 
 ## v2.9.5 — June 2026
 
-**More scraper coverage — TorrentsDB added to all full templates.**
-TorrentsDB is a Torrentio fork that indexes 21+ torrent providers including YTS, 1337x, Nyaa, AnimeTosho, and a handful of regional trackers that the existing scrapers don't hit. It works natively with TorBox — no API key or account needed. It's configured as a backup scraper (capped at one result like Knaben and Torrent Galaxy), so it won't slow down queries on popular titles that Meteor, MediaFusion, and HdHub already cover well. Where it makes a difference is niche content, older releases, and anime — titles where TorBox's native scraper and the faster general scrapers come up short. Added to all 13 full-feature templates; Lite, Flash, and Speed templates unchanged.
+**More scraper coverage — TorrentsDB added to all full templates.** TorrentsDB is a Torrentio fork that indexes 21\+ torrent providers including YTS, 1337x, Nyaa, AnimeTosho, and a handful of regional trackers that the existing scrapers don't hit. It works natively with TorBox — no API key or account needed. It's configured as a backup scraper (capped at one result like Knaben and Torrent Galaxy), so it won't slow down queries on popular titles that Meteor, MediaFusion, and HdHub already cover well. Where it makes a difference is niche content, older releases, and anime — titles where TorBox's native scraper and the faster general scrapers come up short. Added to all 13 full-feature templates; Lite, Flash, and Speed templates unchanged.
 
 ---
 
 ## v2.9.4 — June 2026
 
-**Stream template now shows 720p when no 1080p source exists.**
-The base Stream template was missing the 720p fallback that the Lite and Fire Stick variants already had. If you searched for an older or niche title where only 720p streams are indexed, Stream returned zero results instead of showing what was available. It now surfaces 720p WEB-DL and WEBRip as a fallback tier below the four 1080p priority tiers — so for any title where 1080p exists, your list is unchanged; for titles with only 720p sources, you now get results. Re-import from the [Template Directory](/template-directory) to pick up this fix.
+**Stream template now shows 720p when no 1080p source exists.** The base Stream template was missing the 720p fallback that the Lite and Fire Stick variants already had. If you searched for an older or niche title where only 720p streams are indexed, Stream returned zero results instead of showing what was available. It now surfaces 720p WEB-DL and WEBRip as a fallback tier below the four 1080p priority tiers — so for any title where 1080p exists, your list is unchanged; for titles with only 720p sources, you now get results. Re-import from the [Template Directory](/template-directory) to pick up this fix.
 
-**MediaFusion and HdHub now on by default.**
-Previously these two scrapers were opt-in — you had to manually enable them after every template import before they'd contribute any results. They're now enabled out of the box so templates work fully on a fresh import. MediaFusion adds regional content coverage that TorBox's native scraper misses; HdHub is a TorBox-native P2P scraper for additional cached sources. If you don't want either of them, toggle them off in the Addons section of your AIOStreams dashboard.
+**MediaFusion and HdHub now on by default.** Previously these two scrapers were opt-in — you had to manually enable them after every template import before they'd contribute any results. They're now enabled out of the box so templates work fully on a fresh import. MediaFusion adds regional content coverage that TorBox's native scraper misses; HdHub is a TorBox-native P2P scraper for additional cached sources. If you don't want either of them, toggle them off in the Addons section of your AIOStreams dashboard.
 
-**Cached-only template fixed — streams now actually load.**
-The 4K Apex TorBox variant (the cached-only version of 4K Apex) was shipping with its stream delivery addon disabled. This meant importing it and hitting play returned nothing — the template was technically correct but the service that delivers the streams was switched off. Fixed. The cached-only behaviour is preserved through the exclude-uncached setting, not by disabling the provider.
+**Cached-only template fixed — streams now actually load.** The 4K Apex TorBox variant (the cached-only version of 4K Apex) was shipping with its stream delivery addon disabled. This meant importing it and hitting play returned nothing — the template was technically correct but the service that delivers the streams was switched off. Fixed. The cached-only behaviour is preserved through the exclude-uncached setting, not by disabling the provider.
 
-**Nightly and Labs templates fixed — all 6 now import cleanly.**
-A batch of import blockers has been cleared across the full Nightly and Labs template set. Every template had eleven regex patterns in its scoring layer that were being rejected by fortheweak's stricter import filter — those have been removed. Additional per-template fixes: Apple TV Nightly (v0.1.9) was clean besides the regex; Samsung Nightly (v0.2.14) had wrong audio exclusions and missing SEL sync URLs; Essential Labs (v0.1.7) was missing a changelog link and a resolution kill rule; 4K Essential Labs (v0.1.7) was missing its changelog link; 4K Apex Labs (v0.8.6) had six required metadata fields completely absent; Stream Labs (v0.6.7) had a contradiction between its resolution settings and its exclusion filter that was blocking 720p streams it was supposed to allow.
+**Nightly and Labs templates fixed — all 6 now import cleanly.** A batch of import blockers has been cleared across the full Nightly and Labs template set. Every template had eleven regex patterns in its scoring layer that were being rejected by fortheweak's stricter import filter — those have been removed. Additional per-template fixes: Apple TV Nightly (v0.1.9) was clean besides the regex; Samsung Nightly (v0.2.14) had wrong audio exclusions and missing SEL sync URLs; Essential Labs (v0.1.7) was missing a changelog link and a resolution kill rule; 4K Essential Labs (v0.1.7) was missing its changelog link; 4K Apex Labs (v0.8.6) had six required metadata fields completely absent; Stream Labs (v0.6.7) had a contradiction between its resolution settings and its exclusion filter that was blocking 720p streams it was supposed to allow.
 
 ---
 
 ## v2.9.3 — June 2026
 
-**4K WEB-DL streams no longer suppressed on new releases.**
-When a film releases digitally before its Blu-ray ships — think Spider-Man: Brand New Day — the template was accidentally blocking all 4K WEB-DL streams. The logic was designed to avoid showing upscaled content when a proper 4K Blu-ray exists, but it was too aggressive: it also blocked legitimate 4K streaming masters for titles that simply don't have a Blu-ray yet. Fixed. Streaming masters for theatrical releases come through correctly now. Once the Blu-ray arrives and remuxes are indexed, those will rank above the WEB-DL as normal.
+**4K WEB-DL streams no longer suppressed on new releases.** When a film releases digitally before its Blu-ray ships — think Spider-Man: Brand New Day — the template was accidentally blocking all 4K WEB-DL streams. The logic was designed to avoid showing upscaled content when a proper 4K Blu-ray exists, but it was too aggressive: it also blocked legitimate 4K streaming masters for titles that simply don't have a Blu-ray yet. Fixed. Streaming masters for theatrical releases come through correctly now. Once the Blu-ray arrives and remuxes are indexed, those will rank above the WEB-DL as normal.
 
 ---
 
 ## v2.9.2 — June 2026
 
-**Knaben and Torrent Galaxy moved to backup scrapers.**
-Both scrapers were confirmed slow and only useful for content already in debrid cache — they weren't meaningfully adding results that faster scrapers missed. They're still in the template as last-resort sources (capped at one result each) so they can catch a cache hit when everything else comes up empty, but they no longer slow down your stream request on every query.
+**Knaben and Torrent Galaxy moved to backup scrapers.** Both scrapers were confirmed slow and only useful for content already in debrid cache — they weren't meaningfully adding results that faster scrapers missed. They're still in the template as last-resort sources (capped at one result each) so they can catch a cache hit when everything else comes up empty, but they no longer slow down your stream request on every query.
 
-**AIOSubtitle is now the sole subtitle source.**
-OpenSubtitles V3+ has been removed from all templates. AIOSubtitle covers the same subtitle content, so there's no loss in coverage — this just removes a redundant network call on every stream request.
+**AIOSubtitle is now the sole subtitle source.** OpenSubtitles V3\+ has been removed from all templates. AIOSubtitle covers the same subtitle content, so there's no loss in coverage — this just removes a redundant network call on every stream request.
 
 ---
 
 ## v2.9.1 — June 2026
 
-**Per-addon flood guard extended to AllDebrid and Samsung TV templates.**
-A flood guard that caps how many results any single scraper can contribute to your list has been in the main TorBox templates for a while. It prevents one slow or noisy scraper from flooding your stream list with 20 low-quality results. This release extends that guard to the AllDebrid and Samsung TV templates that were previously missing it.
+**Per-addon flood guard extended to AllDebrid and Samsung TV templates.** A flood guard that caps how many results any single scraper can contribute to your list has been in the main TorBox templates for a while. It prevents one slow or noisy scraper from flooding your stream list with 20 low-quality results. This release extends that guard to the AllDebrid and Samsung TV templates that were previously missing it.
 
 ---
 
 ## v2.9.0 — June 2026
 
-**Templates now work on both ElfHosted and fortheweak.cloud.**
-If you use Yeb's AIOStreams instance at fortheweak.cloud, you may have seen regex import errors with earlier templates — patterns that imported cleanly on ElfHosted were being rejected on fortheweak's stricter setup. Eleven ranking patterns and three exclusion patterns that caused these rejections have been removed from all templates. All Core Builds templates from v2.9.0 onwards are verified clean on both hosts. Quality ranking and LQ exclusion are preserved through the remaining patterns and the shared Tamtaro exclusion list.
+**Templates now work on both ElfHosted and fortheweak.cloud.** If you use Yeb's AIOStreams instance at fortheweak.cloud, you may have seen regex import errors with earlier templates — patterns that imported cleanly on ElfHosted were being rejected on fortheweak's stricter setup. Eleven ranking patterns and three exclusion patterns that caused these rejections have been removed from all templates. All Core Builds templates from v2.9.0 onwards are verified clean on both hosts. Quality ranking and LQ exclusion are preserved through the remaining patterns and the shared Tamtaro exclusion list.
 
 ---
 
 ## v2.8.4 — June 2026
 
-**Cached Usenet streams now rank where they belong.**
-TorBox supports Usenet (NZB) sources alongside torrents. When a cached Usenet stream didn't fit neatly inside the quality-window filters, it was falling below all the ranked torrent streams — sometimes even below uncached content. A new sorting pass at the end of each template catches any remaining cached Usenet streams that slipped through and promotes them above uncached results. If you use TorBox Pro's Usenet features, NZB results now appear in a sensible position.
+**Cached Usenet streams now rank where they belong.** TorBox supports Usenet (NZB) sources alongside torrents. When a cached Usenet stream didn't fit neatly inside the quality-window filters, it was falling below all the ranked torrent streams — sometimes even below uncached content. A new sorting pass at the end of each template catches any remaining cached Usenet streams that slipped through and promotes them above uncached results. If you use TorBox Pro's Usenet features, NZB results now appear in a sensible position.
 
 ---
 
 ## v2.8.0 — June 2026
 
-**AllDebrid template family launched.**
-Four dedicated templates for AllDebrid users: 4K AllDebrid, 4K AllDebrid Lite, AllDebrid, and AllDebrid Lite. The full quality filtering stack — IQR Tukey fence adaptive bitrate windows, all the hard quality kills, regex scoring — carries over from the TorBox equivalents. The only structural difference is that AllDebrid uses a different stream delivery service than TorBox.
+**AllDebrid template family launched.** Four dedicated templates for AllDebrid users: 4K AllDebrid, 4K AllDebrid Lite, AllDebrid, and AllDebrid Lite. The full quality filtering stack — IQR Tukey fence adaptive bitrate windows, all the hard quality kills, regex scoring — carries over from the TorBox equivalents. The only structural difference is that AllDebrid uses a different stream delivery service than TorBox.
 
-**Fire Stick optimised template added.**
-Core Nexus Stream Fire Stick is a 1080p template tuned for Fire Stick codec constraints — same quality filtering as Core Nexus Stream, adjusted for the hardware limitations of Fire Stick and similar low-RAM devices.
+**Fire Stick optimised template added.** Core Nexus Stream Fire Stick is a 1080p template tuned for Fire Stick codec constraints — same quality filtering as Core Nexus Stream, adjusted for the hardware limitations of Fire Stick and similar low-RAM devices.
 
-**Age-decay replaces the hard 60-day cliff.**
-Previously, when a title had very few ranked peers, content older than 60 days fell through all quality filters and ended up at the bottom of your list. Day 59 got a bitrate window; day 61 got nothing. This has been replaced with a smooth exponential curve — content gradually ages out of the quality window over about 90 days rather than hitting an abrupt cutoff. Newer releases get tighter filtering; older releases progressively relax until they're no longer windowed at all. Applied to the 4K Apex, 4K Hybrid, and 4K Essential templates.
+**Age-decay replaces the hard 60-day cliff.** Previously, when a title had very few ranked peers, content older than 60 days fell through all quality filters and ended up at the bottom of your list. Day 59 got a bitrate window; day 61 got nothing. This has been replaced with a smooth exponential curve — content gradually ages out of the quality window over about 90 days rather than hitting an abrupt cutoff. Newer releases get tighter filtering; older releases progressively relax until they're no longer windowed at all. Applied to the 4K Apex, 4K Hybrid, and 4K Essential templates.
 
 ---
 

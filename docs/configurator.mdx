@@ -17,11 +17,7 @@ The **Template Configurator** generates a ready-to-import AIOStreams template ba
   Opens in a new tab — runs entirely in your browser. No data is sent anywhere.
 </Card>
 
-<iframe
-  src="https://brevitya.github.io/Core-Builds/"
-  style={{ width: '100%', height: '920px', border: 'none', borderRadius: '12px', marginTop: '16px' }}
-  title="Core Builds Template Configurator"
-/>
+<iframe src="https://brevitya.github.io/Core-Builds/" style={{ width: '100%', height: '920px', border: 'none', borderRadius: '12px', marginTop: '16px' }} title="Core Builds Template Configurator" />
 
 <Note>
   **Offline use:** the configurator is a self-contained HTML file — save it and open it locally with no internet needed. [Download from GitHub](https://github.com/brevityA/Core-Builds/blob/main/configurator/index.html) → Raw → Save As.
@@ -46,7 +42,7 @@ Jump straight to the full configuration panel with all options visible at once. 
 One-tap presets for common setups — no questions asked:
 
 | Preset | What it does |
-|---|---|
+| --- | --- |
 | **4K Apex** | Flagship 4K template with full expression stack. Requires TorBox Pro |
 | **1080p Stream** | Optimised 1080p streaming. Requires TorBox Pro |
 | **Free Streaming** | HTTP direct-play sources — no debrid service needed |
@@ -65,29 +61,28 @@ Quick Deploy presets generate a template with sensible defaults and install it o
     Choose your streaming service. The splash screen shows service chips — tap one to select it and proceed. This sets which presets, cache layer, and search addons are included.
 
     | Choice | Cache layer | Key addons |
-    |---|---|---|
+    | --- | --- | --- |
     | **TorBox Pro** | StremThru Torz | TorBox Search · HdHub · full scraper stack |
     | **TorBox Essential** | StremThru Torz | Same scrapers, Essential plan limits |
     | **AllDebrid** | StremThru Store | HdHub disabled (no AllDebrid support) |
     | **Real-Debrid** | StremThru Store | Standard scraper stack |
     | **EasyDebrid** | StremThru Store | Multi-debrid aggregator |
-    | **PikPak** | StremThru Store | Cloud torrent + download caching |
+    | **PikPak** | StremThru Store | Cloud torrent \+ download caching |
     | **Seedr** | StremThru Store | Cloud torrent streaming |
-    | **Hybrid (TorBox + RD)** | Both | TorBox-priority with RD fallback |
-    | **EasyNews** | N/A | EasyNews search + usenet scrapers |
+    | **Hybrid (TorBox \+ RD)** | Both | TorBox-priority with RD fallback |
+    | **EasyNews** | N/A | EasyNews search \+ usenet scrapers |
     | **Free (No Debrid)** | None | P2P or HTTP direct-play sources only |
   </Step>
-
   <Step title="Your Device">
     Device profile sets audio exclusions, codec restrictions, and HDR/DV handling automatically. If your device isn't listed, "Generic" works for most setups.
 
     | Device | Audio excluded | Encodes excluded | DV-Only Kill |
-    |---|---|---|---|
+    | --- | --- | --- | --- |
     | Generic TV / Box | — | — | Off |
     | Samsung TV (Tizen) | TrueHD · DTS-HD MA · DTS:X · FLAC | AV1 · VC-1 | **On** |
     | Apple TV 4K (1st / 2nd gen) | — | AV1 | Off |
     | Apple TV 4K (3rd gen / A15) | — | — | Off |
-    | LG TV (webOS 2019+) | — | — | Off |
+    | LG TV (webOS 2019\+) | — | — | Off |
     | Windows PC / Ultrawide | — | VC-1 | Off |
     | Fire Stick (HD) | TrueHD · DTS-HD MA · DTS:X · FLAC | AV1 · VC-1 | **On** |
     | Fire Stick 4K Max | TrueHD · DTS-HD MA · DTS:X · FLAC | VC-1 | Off |
@@ -96,40 +91,36 @@ Quick Deploy presets generate a template with sensible defaults and install it o
       See [Device Profiles](/device-profiles) for full codec support details and recommended settings for each device.
     </Tip>
   </Step>
-
   <Step title="Resolution">
     Determines the PSE stack, resolution locks, and which streams get filtered out.
 
     | Choice | What happens | Best for |
-    |---|---|---|
+    | --- | --- | --- |
     | **4K HDR primary** | Full 4K tier stack with 1080p fallback | 4K TVs and monitors |
     | **1080p only** | Hard-kills 4K/1440p streams entirely | 1080p TVs, Fire Stick HD |
-    | **1080p-first + 4K** | Prefers 1080p, falls through to 4K | Bandwidth-limited setups |
+    | **1080p-first \+ 4K** | Prefers 1080p, falls through to 4K | Bandwidth-limited setups |
   </Step>
-
   <Step title="Audio">
     Sets `excludedAudioTags` and `preferredAudioChannels`. "Device-managed" means Step 2's device profile decides — usually the right choice.
 
     | Choice | Excluded | Channels | Best for |
-    |---|---|---|---|
+    | --- | --- | --- | --- |
     | **Full lossless** | Nothing | 7.1 · 5.1 · 2.0 | Home theater with receiver |
-    | **DD+ / Atmos** | Nothing | 5.1 · 2.0 | Soundbar / TV speakers |
+    | **DD\+ / Atmos** | Nothing | 5.1 · 2.0 | Soundbar / TV speakers |
     | **Device-managed** | Per device profile | Per device profile | Most users |
   </Step>
-
   <Step title="Content Type">
     Controls SeaDex integration and anime-specific filtering.
 
     | Choice | SeaDex | Bad Dual Audio ESE | Best for |
-    |---|---|---|---|
+    | --- | --- | --- | --- |
     | **Live-action only** | Off | Included | Movies & TV only |
-    | **Live-action + Anime** | On (all matches) | Included | Mixed library |
+    | **Live-action \+ Anime** | On (all matches) | Included | Mixed library |
     | **Anime-focused** | On (best only) | Off | Dedicated anime setup |
   </Step>
-
   <Step title="Review & Install">
-    See a summary of your choices, enter your API key, and optionally give the template a custom name. 
-    
+    See a summary of your choices, enter your API key, and optionally give the template a custom name.
+
     Click **Create & Install** to generate the template and deploy it to a supported AIOStreams instance in one step. You can also download the raw JSON file to import manually.
 
     The configurator will ask you to pick an AIOStreams instance (ElfHosted, ForthWeak, and others are available) and create your config automatically.
@@ -141,6 +132,21 @@ Quick Deploy presets generate a template with sensible defaults and install it o
 ## Additional Options
 
 The configurator includes several optional features accessible during setup:
+
+### Resolution First (v2.56)
+
+By default, cached streams always sort above uncached — a cached 1080p WEB-DL beats an uncached 4K REMUX because it plays instantly. **Resolution First** flips this for users who'd rather wait for the download: 4K always ranks above 1080p/720p regardless of cache status. Within the same resolution, cached still beats uncached.
+
+- Default: `cached → resolution → quality`
+- Resolution First: `resolution → quality → cached`
+
+Toggle this in the wizard's **Video Preferences** step.
+
+### Foreign Language Kill (v2.56)
+
+Blocks foreign-language streams from movies and TV results. On by default — matches what the fleet templates have always done. Adapts to your **Language Preferences**: if you've added Spanish or French, those languages pass through. Library, SeaDex, and anime content are always exempt.
+
+Disable this in the wizard's **Language Preferences** if you want unfiltered multilingual results.
 
 ### Multi-Service Support
 
@@ -193,8 +199,7 @@ Every generated template contains the full production infrastructure from Core B
     - **1080p:** Elite REMUX pin → S/A/B/C 1080p tiers → 720p fallback → codec booster
     - **Ultrawide:** 1080p tiers → 1440p → 4K REMUX → 4K WEB-DL HDR → any 4K → 720p → boosters
 
-    Release group pins (top): FraMeSToR · DON · FLUX · HIFI · playBD · BMF · QxR · EPSiLON  
-    Release group pins (bottom): YIFY · RARBG · EVO · YTS · PSA · MeGusta · Tigole
+    Release group pins (top): FraMeSToR · DON · FLUX · HIFI · playBD · BMF · QxR · EPSiLON<br />Release group pins (bottom): YIFY · RARBG · EVO · YTS · PSA · MeGusta · Tigole
   </Accordion>
 
   <Accordion title="Regex & sorting">
