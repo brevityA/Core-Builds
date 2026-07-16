@@ -863,6 +863,8 @@ The `sortCriteria` field only accepts recognised sort keys. These are **not** va
 
 Valid keys include: `quality`, `resolution`, `cached`, `seeders`, `size`, `age`, `bitrate`, `releaseGroup`, `streamExpressionMatched`, `seadex`, and others listed in the AIOStreams schema.
 
+> 💡 **Resolution First (v2.56+):** The configurator can generate sort criteria where `resolution` and `quality` appear before `cached` in the global sort order. This is intentional — it makes 4K always rank above 1080p/720p regardless of cache status. The sort keys themselves are unchanged; only their order differs.
+
 #### Formatter Expressions — Use `||` Not `|`
 In the formatter's name and description fields, condition separators must be double-pipe `||`. A single pipe `|` will cause the expression to fail and render raw template text.
 
@@ -1158,6 +1160,19 @@ Normal. Classic TV episodes under 512 MB and older encodes often have unrecognis
 
 ---
 
+#### Foreign language streams appearing in results
+
+If you're seeing Spanish, Portuguese, or other non-English streams mixed into your movie and TV results:
+
+1. **Using the configurator?** The Foreign Language Kill is on by default in v2.56+. Generate a fresh template to get it.
+2. **Using a fleet template?** All 37 non-anime fleet templates already include the Foreign Language Kill ESE. Re-import the latest version.
+3. **Custom config?** Add this ESE manually in AIOStreams → Excluded Stream Expressions:
+   ```
+   (queryType == 'movie' or queryType == 'series') ? negate(merge(library(streams), seadex(streams), language(streams, 'English', 'Original', 'Multi', 'Dual Audio', 'Dubbed', 'Unknown')), streams) : []
+   ```
+
+---
+
 #### NZBGeek returns nothing (Hybrid template only)
 
 The NZBGeek API key placeholder hasn't been replaced.
@@ -1278,6 +1293,10 @@ Your services were reset when you re-imported. Re-enable TorBox (and any other s
 #### I only get a handful of streams for older TV shows
 
 Normal for older content. Many classic TV episodes are under 512 MB and older encodes often have unrecognised audio or encode tags. Templates since v2.4.6 lower the size minimums and add `Unknown` fallbacks for audio and encode filters to address this.
+
+#### I'm seeing foreign language streams in my results
+
+The Foreign Language Kill ESE blocks non-English streams from movies and TV while keeping Library, SeaDex, and anime exempt. It's on by default in configurator v2.56+ and in all fleet templates. If you're on an older version, generate a fresh template from the configurator or re-import the latest fleet template.
 
 ---
 
@@ -1497,6 +1516,17 @@ Controls which audio languages are allowed or prioritised.
 | `preferredLanguages` | **Soft preference** used for sorting. Streams with these languages rank higher. Nothing is blocked. |
 
 **Core Builds sets `requiredLanguages: []` (empty) on all templates.** This is intentional. Hard-requiring languages blocks streams that don't have language metadata embedded (common in older releases, scene content, and some Usenet uploads) even when the content is perfectly valid English content. The Tamtaro ISEs handle language contextually — `preferredLanguages` handles ranking.
+
+#### Foreign Language Kill (Configurator v2.56+)
+
+The configurator now includes a **Foreign Language Kill** toggle (on by default) that generates a hard ESE blocking foreign-language streams from movies and TV results. This is separate from `requiredLanguages` — it uses a smarter approach:
+
+- **Adapts to your Language Preferences** — if you've added Spanish or French in the wizard, those languages pass through automatically
+- **Library and SeaDex streams are exempt** — streams from your personal library or SeaDex best-releases are never blocked
+- **Anime is fully exempt** — anime queries bypass the kill entirely (fansubs use non-standard language tagging)
+- **Always includes safe passthroughs** — `Original`, `Multi`, `Dual Audio`, `Dubbed`, and `Unknown` are always allowed
+
+This is the recommended approach for English-primary users who want to eliminate foreign-language noise without the blunt force of `requiredLanguages`.
 
 #### When to use `requiredLanguages`
 

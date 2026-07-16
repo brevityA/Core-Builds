@@ -46,7 +46,7 @@ The solution is **two separate Stremio accounts** — one for low-end devices, o
 *Nvidia Shield · Apple TV 4K · 4K OLED/QLED TVs · High-end Android TV*
 
 ### Recommended Templates
-- **[Core Nexus 4K Pro](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-pro.json)** — TorBox Pro · 4K HDR · home theater quality
+- **[Core Nexus 4K Apex](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Single/core-nexus-4k-apex.json)** — TorBox Pro · 4K HDR · home theater quality
 - **[Core Nexus 4K Essential](https://github.com/brevityA/Core-Builds/blob/main/Templates/Torbox/Essential/core-nexus-4k-essential.json)** — TorBox Essential · 4K HDR
 
 ### What these builds do

@@ -1,87 +1,66 @@
-# Core Builds v2.8.2
+# Configurator v2.56
 
-**Released:** June 15, 2026  
+**Released:** July 2026  
 **Repository:** [brevityA/Core-Builds](https://github.com/brevityA/Core-Builds)  
-**AIOStreams compatibility:** v2.30+
+**AIOStreams compatibility:** v2.31+
 
 ---
 
 ## What's in this release
 
-### Regex scoring overhaul
+### Resolution First toggle
 
-The previous approach embedded 149 inline patterns (~40 KB) per template, then switched to `syncedRankedRegexUrls` in an attempt to shrink file sizes. Neither extreme worked cleanly — 149 inline pushed templates past 120 KB, and synced URLs aren't available on all AIOStreams instances (silently providing zero scoring).
+New option in Video Preferences. When enabled, resolution sorts before cache status — 4K always ranks above 1080p/720p even if lower-res streams are cached.
 
-**New approach:** 53 high-impact patterns embedded inline (~16 KB), all templates under 100 KB.
-
-| Tier | Score | Count | Purpose |
-|---|---|---|---|
-| S-Tier | +100 | 5 | Top release groups (FraMeSToR, Radarr Remux T1…) |
-| A-Tier | +80 | 11 | High-quality groups (CtrlHD, DON, hallowed…) |
-| B-Tier | +60 | 14 | Good groups (FLUX, NTb, KiNGS…) |
-| Penalised | −50 | 9 | Below-average quality |
-| Bad Quality | −75 | 12 | Known bad encodes / upscale groups |
-| Blacklist | −200 | 2 | Extras packages (Radarr/Sonarr) |
-
-Mid-tier scores (0 / 20 / 40) provided no meaningful ranking differentiation and are dropped. `syncedRankedRegexUrls` removed from all templates.
-
-Anime templates retain `rankedRegexPatterns: []` — live-action group names don't match anime release naming; SeaDex + AnimeTosho handle quality selection.
-
----
-
-### Samsung TV audit fixes (v0.2.1 → v0.2.2)
-
-Applies to both `core-nexus-samsung-tv-4k.json` and `core-nexus-samsung-tv.json`.
-
-**AV1 and VC-1 excluded** — Samsung Tizen (2018–2022 models: RU7100, RU8000, NU8000, Q60) has no hardware AV1 decoder; VC-1 is absent. Both are now in `excludedEncodes`. Previously they were ranked *above* HEVC in `preferredEncodes`, causing silent playback failures on these models.
-
-**Visual tag cleanup** — Dolby Vision, HDR+DV (dual-layer), and AI upscale removed from `preferredVisualTags`. DV streams are already blocked by the DV-Only Kill ESE; ranking them created inconsistent ordering for the few DV+HDR10 streams that slipped through. AI upscale is not a real HDR format.
-
-**Result limits aligned** — `maxResults` → 20, `maxResultsPerResolution` → 8 (matched standard defaults).
-
----
-
-### 4K Apex audit fixes (v0.4.2 → v0.4.3)
-
-- **AI upscale removed** from `preferredVisualTags` — not a genuine HDR format
-- **`2.0` added** to `preferredAudioChannels` → `["7.1", "5.1", "2.0"]` — stereo streams were unranked
-- **`seadexBestOnly: false`** — was silently dropping non-SeaDex streams for all anime queries
-- **`maxResults` → 20, `maxResultsPerResolution` → 8** (aligned with defaults)
-- **Duplicate regex names fixed** — `"Radarr UHD Bluray T1 — DON"` and `"Anime BD T1 [sam]"` each appeared twice; second instances renamed `[B]`
-- **Low resolutions removed** from `preferredResolutions` (144p, 240p, 360p)
-
----
-
-## Files changed
-
-| File | Change |
+| Mode | Sort order |
 |---|---|
-| `Filtering/ranked-regex-patterns.json` | Source of truth — 149 patterns, 10 tiers (reference only) |
-| `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` | v0.2.1 → v0.2.2 |
-| `Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` | v0.2.1 → v0.2.2 |
-| `Templates/Torbox/Single/core-nexus-4k-apex.json` | v0.4.2 → v0.4.3 |
-| All 28 non-Anime active templates | 53 inline patterns, no `syncedRankedRegexUrls` |
-| All 6 Anime templates | `rankedRegexPatterns: []` confirmed |
-| `CHANGELOG.md` | v2.8.2 entry added |
-| `Templates/Torbox/README.md` | Version badge → v2.8.2 |
+| Default | `cached → resolution → quality` |
+| Resolution First | `resolution → quality → cached` |
+
+Within the same resolution, cached still beats uncached. Available in both the wizard's advanced preferences and Simple Mode.
 
 ---
 
-## Template inventory (v2.8.2)
+### Foreign Language Kill
 
-34 active templates across 8 categories:
+Hard ESE that blocks foreign-language streams from movies and TV results. On by default for all new configurations.
 
-| Category | Templates |
+- Adapts to Language Preferences — if you've added Spanish, French, etc., those languages pass through
+- Library, SeaDex, and anime content are always exempt
+- Uses `negate(merge(library(streams), seadex(streams), language(streams, ...)), streams)` pattern
+- Located in Language Preferences as a toggle with red accent
+
+---
+
+### v2.55 — UX Optimizations
+
+1. **Staggered fade-in animations** — splash elements animate in sequentially (50ms stagger)
+2. **Smart service pre-selection** — remembers last-used service via `localStorage`
+3. **Contextual Quick Deploy presets** — preset cards adapt when switching services (debrid → 4K/1080p, free → Free Streaming/P2P)
+4. **Step dot tooltips** — hovering completed progress dots shows current selection ("Resolution: 4K")
+5. **Auto-saved indicator** — subtle badge flashes after each state change
+6. **Keyboard navigation** — arrow keys navigate between service chips, doors, and preset cards; Enter/Space activates
+7. **ARIA accessibility** — service chips use `radiogroup`/`radio` with `aria-checked`
+8. **Reduced motion support** — `prefers-reduced-motion` disables all animations
+9. **Mobile tertiary reflow** — tertiary links switch to 2-column grid below 400px
+
+---
+
+## Previous configurator releases
+
+| Version | Key Features |
 |---|---|
-| TorBox Pro — Single | 4K Apex, 4K Apex (TorBox), Stream, Stream Lite, Stream Firestick, Stream Firestick Lite |
-| Hybrid (Pro + NZBGeek) | 4K Hybrid, Hybrid, Hybrid Lite |
-| Essential | 4K Essential, 4K Essential Lite, Essential, Essential Lite |
-| Flash | Flash 4K, Flash |
-| Speed (EasyNews) | Speed 4K+, Speed EasyNews |
-| AllDebrid | 4K AllDebrid, 4K AllDebrid Lite, AllDebrid, AllDebrid Lite |
-| Device — Samsung TV | Samsung TV 4K, Samsung TV |
-| Anime | Anime 4K, Anime 4K Lite, Anime, Anime Lite, Anime Dub, Anime Dub Lite |
-| Nightly 🌙 | Apple TV 4K, 4K Apex Labs |
+| v2.54 | Host Compatibility Checker, Import Existing Config, Guided Troubleshooter, Stremio Deep Link, Template Backup Timeline |
+| v2.53 | IQR PSE Architecture — Apex IQR quality mode with three-tier adaptive bitrate filtering |
+| v2.52 | Anime Addon Stack — AnimeTosho, NekoBT, Sootio presets auto-enabled for anime profiles |
+| v2.51 | Usenet Engine Support — `stremio_nntp` and `aiostreams` service entries |
+| v2.50 | Selective Migration (per-section checkboxes), Parent/Child Config ("Use Core Builds Base") |
+
+---
+
+## Template inventory
+
+46 active templates across 10 categories. See [CLAUDE.md](CLAUDE.md) for the full inventory.
 
 ---
 
@@ -99,6 +78,4 @@ Full import URL index: [Templates/Torbox/README.md](https://github.com/brevityA/
 
 ## Upgrading
 
-Templates with in-app update notifications will show a badge automatically. To update manually: AIOStreams → your config → **Update** button, or re-import from the URL above.
-
-**No breaking changes.** All PSE logic, ESE stacks, and preset configurations are compatible with v2.8.1.
+Generate a fresh template from the [configurator](https://brevitya.github.io/Core-Builds/), or use "Update Existing Template" to see the diff and cherry-pick changes. The Foreign Language Kill and Resolution First toggles are in the wizard's advanced preferences.

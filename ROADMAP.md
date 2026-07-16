@@ -8,6 +8,9 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| v2.56 | Resolution First toggle — configurator option to rank 4K above 1080p/720p regardless of cache status; sort order changes from `cached → resolution` to `resolution → quality → cached` |
+| v2.56 | Foreign Language Kill — configurator ESE that hard-blocks foreign-language streams from movies/TV; on by default, adapts to Language Preferences, Library/SeaDex/anime exempt |
+| v2.55 | Configurator UX optimizations — staggered splash animations, smart service pre-selection, contextual Quick Deploy presets, step dot tooltips, auto-saved indicator, keyboard navigation, ARIA accessibility, reduced motion support |
 | v2.8.0 | Speed tier consolidation — 8 redundant Speed templates deprecated (4 TorBox-only, 4 EasyNews lite/plus variants); Speed 4K+ and Speed EasyNews retained as the two EasyNews-differentiated templates |
 | v2.8.0 | Core Builds Expression Layer rollout — all 7 expressions deployed to all 31 active templates (3 ESEs + 1 ISE + 3 PSEs); replaces trial-only Stream v2.7.10 scope |
 | v2.8.0 | Core Nexus 4K Pro deprecated — moved to `Templates/Torbox/Deprecated/`; Apex is the direct replacement |
@@ -46,7 +49,6 @@ This is a living list of planned work, active development, and recently complete
 |---|---|
 | **Core Builds Expression Layer — post-trial rollout** | All 7 expressions deployed to all active templates at v2.8.0. Audio Pinnacle PSE, HDR/DV Priority PSE, AI Upscale Exclusion ESE added alongside the 4 trial expressions. See `Expressions/core-builds-expression-layer.pdf` |
 | `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate: if SeaDex data exists → require SeaDex-matched stream in top tier; else fall through to standard sort |
-| AllDebrid template suite | Essential variant; natively supported in AIOStreams; biggest unserved community segment |
 | Samsung TV Nightly → stable | Gather community feedback; promote out of Nightly once validated on hardware |
 
 ---
@@ -85,6 +87,7 @@ This is a living list of planned work, active development, and recently complete
 ### Documentation
 - [ ] **Video walkthrough** — Import flow and template selection walkthrough for new users
 - [ ] **AllDebrid setup guide** — Mirror of the TorBox import guide scoped to AllDebrid credential setup
+- [ ] **Configurator guide** — Dedicated documentation for the configurator wizard features (Resolution First, Foreign Language Kill, IQR PSEs, Parent/Child Config, Host Checker, Import)
 
 ---
 
