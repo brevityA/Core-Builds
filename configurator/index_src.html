@@ -33,6 +33,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 #main.nav-back .card{animation-name:slideInBack}
 #main{flex:1;display:flex;flex-direction:column}
 .opts{align-content:start}
+@keyframes splashEntry{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes slideInRight{from{opacity:0;transform:translateX(13px)}to{opacity:1;transform:none}}
 @keyframes slideInBack{from{opacity:0;transform:translateX(-13px)}to{opacity:1;transform:none}}
@@ -728,7 +729,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-footer a{color:#00d4ff;text-decoration:none;opacity:.7}
 .splash-paste{font-size:.72rem;color:#4a4f60;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s;margin-top:-12px}
 .splash-paste:hover{color:#7a8194}
+.splash-anim{opacity:0;animation:splashEntry .4s ease-out forwards}
+.splash-anim-d1{animation-delay:.05s}.splash-anim-d2{animation-delay:.1s}.splash-anim-d3{animation-delay:.15s}.splash-anim-d4{animation-delay:.2s}.splash-anim-d5{animation-delay:.25s}.splash-anim-d6{animation-delay:.3s}.splash-anim-d7{animation-delay:.35s}
+.step-unit{position:relative}
+.step-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1c2333;color:#c9d1d9;font-size:.64rem;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:10;border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.step-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1c2333}
+.step-unit:hover .step-tip{opacity:1}
+.auto-saved{display:inline-flex;align-items:center;gap:4px;font-size:.6rem;color:#4b7c93;opacity:0;transition:opacity .4s;pointer-events:none}
+.auto-saved.show{opacity:1}
+@media(max-width:400px){.splash-tertiary{display:grid;grid-template-columns:1fr 1fr;gap:6px}.splash-tertiary .splash-tertiary-btn{min-width:0;justify-content:center}}
 @media(max-width:480px){.splash-doors{grid-template-columns:1fr}.splash-presets{grid-template-columns:1fr 1fr}.splash-tertiary{flex-direction:column}.splash-watermark{width:320px;height:320px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms !important;animation-delay:0ms !important;transition-duration:0.01ms !important}}
 /* ── Theme toggle ─────────────────────────────────────── */
 #themeToggle{position:fixed;top:14px;left:14px;z-index:300;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:700;padding:5px 11px;cursor:pointer;transition:all .15s;letter-spacing:.02em;line-height:1.4}
 #themeToggle:hover{background:rgba(255,255,255,.12);color:#e6edf3;border-color:rgba(255,255,255,.2)}
@@ -819,6 +830,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .splash-tertiary-btn:hover{background:rgba(0,0,0,.03);border-color:#afb8c1;color:#1c2128}
 [data-theme="light"] .splash-tertiary-kofi{border-color:rgba(255,94,91,.25);color:#e5443e}
 [data-theme="light"] .splash-tertiary-kofi:hover{background:rgba(255,94,91,.06);border-color:rgba(255,94,91,.4);color:#d63a34}
+[data-theme="light"] .step-tip{background:#fff;color:#1f2328;border-color:#d0d7de;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+[data-theme="light"] .step-tip::after{border-top-color:#fff}
+[data-theme="light"] .auto-saved{color:#57606a}
 [data-theme="light"] .splash-footer{color:#8c959f}
 [data-theme="light"] .splash-watermark{opacity:.015}
 [data-theme="light"] .step-pending .step-bub{background:#d0d7de}
@@ -1206,7 +1220,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.54';
+const CONFIGURATOR_VERSION = '2.55';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1260,6 +1274,17 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.55', date:'Jul 16 2026', items:[
+    'Splash — staggered fade-in animations for a polished entrance',
+    'Splash — smart service pre-selection remembers your last used service',
+    'Splash — Quick Deploy presets now adapt to the selected service (debrid shows 4K/1080p, free shows Free Streaming/P2P)',
+    'Splash — keyboard navigation: arrow keys to move between chips, doors, and presets; Enter/Space to activate',
+    'Splash — service chips now use ARIA radiogroup for screen readers',
+    'Splash — tertiary links reflow to 2-column grid on narrow screens (< 400px)',
+    'Progress — step dots show current selection on hover (e.g. "Resolution: 4K")',
+    'Progress — "Auto-saved" indicator flashes after each state change',
+    'Accessibility — prefers-reduced-motion disables all animations and transitions',
+  ]},
   { v:'2.54', date:'Jul 16 2026', items:[
     'Host Compatibility Checker — pre-export validation against elfhosted, fortheweak, and other host whitelists. Shows green/yellow/red per-host report with specific issues before you deploy',
     'Import Existing Config — paste any AIOStreams config JSON or URL to reverse-engineer settings back into the configurator wizard. Migrate from hand-edited configs or other templates without starting from scratch',
@@ -1877,6 +1902,9 @@ function saveState() {
   const {stremioPassword: _, ...persist} = S;
   localStorage.setItem('coreBuild', JSON.stringify(persist));
   localStorage.setItem('coreBuildStep', step);
+  if (S.service) localStorage.setItem('coreBuildLastSvc', S.service);
+  const badge = document.getElementById('autoSavedBadge');
+  if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
 const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch'];
@@ -2569,11 +2597,14 @@ function renderProgress() {
     const SHORT_LABELS = {0:'Service',1:'Device',2:'Resolution',3:'Content',4:'API Keys',5:'Review'};
     const shortName = SHORT_LABELS[i] || tipName;
     const clickable = state === 'done' ? ` data-action="jump-step" data-step="${n}" role="button" tabindex="0" aria-label="Go back to ${tipName}"` : '';
-    return `<div class="step-unit ${state}" title="${tipName}"${clickable}><div class="step-bub">${state==='done'?ICO.check(12,'currentColor'):''}</div><div class="step-lbl">${shortName}</div></div>`;
+    const k = keys[i];
+    const tipVal = k && S[k] ? label(k, S[k]) : null;
+    const tipHtml = tipVal ? `<span class="step-tip">${tipName}: ${tipVal}</span>` : '';
+    return `<div class="step-unit ${state}"${clickable}>${tipHtml}<div class="step-bub">${state==='done'?ICO.check(12,'currentColor'):''}</div><div class="step-lbl">${shortName}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
-  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Start over from scratch">${ICO.refresh(14,'currentColor')} Start Over</button></div>`;
+  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Start over from scratch">${ICO.refresh(14,'currentColor')} Start Over</button></div><div class="auto-saved" id="autoSavedBadge">${ICO.check(10,'currentColor')} Auto-saved</div>`;
 
   // Breadcrumb chips — show completed selections
   const chips = keys.slice(0, step - 1).map((k, i) => {
@@ -2586,8 +2617,29 @@ function renderProgress() {
   if (bc) bc.innerHTML = chips.length ? `<div class="bc-row">${chips.join('')}</div>` : '';
 }
 
+function splashPresetsHtml(svc) {
+  const debrid = !['free','http','p2p'].includes(svc);
+  const presets = [];
+  if (debrid) {
+    presets.push({action:'quick-start',preset:'4k',icon:ICO.crown(22,'#a78bfa'),name:'4K Apex',detail:'Flagship · IQR · Lossless'});
+    presets.push({action:'quick-start',preset:'1080p',icon:ICO.tv(22,'#00d4ff'),name:'1080p Stream',detail:'Balanced · DD+ audio'});
+  }
+  if (svc === 'easynews') presets.push({action:'quick-start',preset:'1080p',icon:ICO.newspaper(22,'#94a3b8'),name:'Usenet Stream',detail:'EasyNews · Fast'});
+  if (!debrid || svc === 'free') {
+    presets.push({action:'quick-start',preset:'http',icon:ICO.globe(22,'#34d399'),name:'Free Streaming',detail:'No account needed'});
+    presets.push({action:'quick-start',preset:'p2p',icon:ICO.link(22,'#fbbf24'),name:'Free P2P',detail:'Torrents · No debrid'});
+  }
+  presets.push({action:'open-quickstart',preset:'',icon:ICO.question(22,'#f472b6'),name:'Quick Start',detail:'New here? Start here'});
+  presets.push({action:'paste-manifest-splash',preset:'',icon:ICO.clipboard(22,'#fb923c'),name:'Paste Manifest',detail:'Import existing config'});
+  return presets.map(p => `<div class="splash-preset-card" data-action="${p.action}"${p.preset?` data-preset="${p.preset}"`:''} tabindex="0" role="button">
+    <div class="splash-preset-icon">${p.icon}</div>
+    <div class="splash-preset-name">${p.name}</div>
+    <div class="splash-preset-detail">${p.detail}</div>
+  </div>`).join('');
+}
 function splashHtml() {
   const _lt = document.documentElement.getAttribute('data-theme') === 'light';
+  const _splashSvc = S.service || (hadSavedState ? 'torbox' : (localStorage.getItem('coreBuildLastSvc') || 'torbox'));
   const _clrCurrent = _lt ? '#0369a1' : '#67e8f9';
   const _clrOlder   = _lt ? '#57606a' : '#4b5563';
   const _clrDate    = _lt ? '#444c56' : '#374151';
@@ -2602,7 +2654,7 @@ function splashHtml() {
       <path d="M100 35 L155 65 L155 135 L100 165 L45 135 L45 65 Z" stroke="currentColor" stroke-width="1" fill="none" opacity=".4"/>
       <path d="M100 60 L132 78 L132 122 L100 140 L68 122 L68 78 Z" stroke="currentColor" stroke-width=".5" fill="none" opacity=".2"/>
     </svg>
-    <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <svg class="splash-icon splash-anim splash-anim-d1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
       <defs>
         <linearGradient id="sg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
         <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
@@ -2625,19 +2677,19 @@ function splashHtml() {
         <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
       </g>
     </svg>
-    <div class="splash-title"><span class="splash-title-core hdr-core">CORE</span><span class="splash-title-builds"> BUILDS</span></div>
-    <div class="splash-by">By Brevity <span data-action="show-changelog" style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;cursor:pointer;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08);transition:all .15s" title="View changelog">v${CONFIGURATOR_VERSION}</span></div>
-    <div class="splash-tagline">Build your perfect AIOStreams template. No manual JSON editing.</div>
+    <div class="splash-title splash-anim splash-anim-d2"><span class="splash-title-core hdr-core">CORE</span><span class="splash-title-builds"> BUILDS</span></div>
+    <div class="splash-by splash-anim splash-anim-d2">By Brevity <span data-action="show-changelog" style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;cursor:pointer;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08);transition:all .15s" title="View changelog">v${CONFIGURATOR_VERSION}</span></div>
+    <div class="splash-tagline splash-anim splash-anim-d3">Build your perfect AIOStreams template. No manual JSON editing.</div>
 
-    <div class="splash-chips-section">
+    <div class="splash-chips-section splash-anim splash-anim-d3">
       <div class="splash-chips-label">Your service</div>
-      <div class="splash-chips">
-        <span class="splash-chip active" data-svc="torbox"><span class="splash-chip-icon">${ICO.bolt(14,'#fbbf24')}</span> TorBox</span>
-        <span class="splash-chip" data-svc="alldebrid"><span class="splash-chip-icon">${ICO.diamond(14,'#60a5fa')}</span> AllDebrid</span>
-        <span class="splash-chip" data-svc="realdebrid"><span class="splash-chip-icon">${ICO.circle(14,'#4ade80')}</span> Real-Debrid</span>
-        <span class="splash-chip" data-svc="easynews"><span class="splash-chip-icon">${ICO.newspaper(14,'#94a3b8')}</span> EasyNews</span>
-        <span class="splash-chip" data-svc="hybrid"><span class="splash-chip-icon">${ICO.shuffle(14,'#c084fc')}</span> Hybrid</span>
-        <span class="splash-chip" data-svc="free"><span class="splash-chip-icon">${ICO.free(14,'#34d399')}</span> Free</span>
+      <div class="splash-chips" role="radiogroup" aria-label="Select your service">
+        <span class="splash-chip${_splashSvc==='torbox'?' active':''}" data-svc="torbox" role="radio" aria-checked="${_splashSvc==='torbox'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#fbbf24')}</span> TorBox</span>
+        <span class="splash-chip${_splashSvc==='alldebrid'?' active':''}" data-svc="alldebrid" role="radio" aria-checked="${_splashSvc==='alldebrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#60a5fa')}</span> AllDebrid</span>
+        <span class="splash-chip${_splashSvc==='realdebrid'?' active':''}" data-svc="realdebrid" role="radio" aria-checked="${_splashSvc==='realdebrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#4ade80')}</span> Real-Debrid</span>
+        <span class="splash-chip${_splashSvc==='easynews'?' active':''}" data-svc="easynews" role="radio" aria-checked="${_splashSvc==='easynews'}" tabindex="0"><span class="splash-chip-icon">${ICO.newspaper(14,'#94a3b8')}</span> EasyNews</span>
+        <span class="splash-chip${_splashSvc==='hybrid'?' active':''}" data-svc="hybrid" role="radio" aria-checked="${_splashSvc==='hybrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.shuffle(14,'#c084fc')}</span> Hybrid</span>
+        <span class="splash-chip${_splashSvc==='free'?' active':''}" data-svc="free" role="radio" aria-checked="${_splashSvc==='free'}" tabindex="0"><span class="splash-chip-icon">${ICO.free(14,'#34d399')}</span> Free</span>
       </div>
     </div>
 
@@ -2652,22 +2704,22 @@ function splashHtml() {
     </div>
     ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:420px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">${ICO.bolt(16,'#34d399')} Use previous settings — go to install</button>` : ''}` : ''}
 
-    <div class="splash-doors">
-      <div class="splash-door" data-action="easy-start">
+    <div class="splash-doors splash-anim splash-anim-d4">
+      <div class="splash-door" data-action="easy-start" tabindex="0" role="button">
         <div class="splash-door-icon">${ICO.compass(22,'#00d4ff')}</div>
         <div class="splash-door-text">
           <div class="splash-door-title">Guided Setup <span class="splash-door-tag splash-tag-guided">Core Start</span></div>
           <div class="splash-door-desc">Walk through device, resolution, and cache — we build the template for you.</div>
         </div>
       </div>
-      <div class="splash-door" data-action="custom-start">
+      <div class="splash-door" data-action="custom-start" tabindex="0" role="button">
         <div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div>
         <div class="splash-door-text">
           <div class="splash-door-title">Core Configure <span class="splash-door-tag splash-tag-advanced">Advanced</span></div>
           <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
         </div>
       </div>
-      <div class="splash-door" data-action="update-template">
+      <div class="splash-door" data-action="update-template" tabindex="0" role="button">
         <div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div>
         <div class="splash-door-text">
           <div class="splash-door-title">Update Template <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div>
@@ -2676,46 +2728,17 @@ function splashHtml() {
       </div>
     </div>
 
-    <div class="splash-section-hdr">
+    <div class="splash-section-hdr splash-anim splash-anim-d5">
       <div class="splash-section-line"></div>
       <div class="splash-section-title">Quick Deploy Presets</div>
       <div class="splash-section-line"></div>
     </div>
 
-    <div class="splash-presets">
-      <div class="splash-preset-card" data-action="quick-start" data-preset="4k">
-        <div class="splash-preset-icon">${ICO.crown(22,'#a78bfa')}</div>
-        <div class="splash-preset-name">4K Apex</div>
-        <div class="splash-preset-detail">Flagship · IQR · Lossless</div>
-      </div>
-      <div class="splash-preset-card" data-action="quick-start" data-preset="1080p">
-        <div class="splash-preset-icon">${ICO.tv(22,'#00d4ff')}</div>
-        <div class="splash-preset-name">1080p Stream</div>
-        <div class="splash-preset-detail">Balanced · DD+ audio</div>
-      </div>
-      <div class="splash-preset-card" data-action="quick-start" data-preset="http">
-        <div class="splash-preset-icon">${ICO.globe(22,'#34d399')}</div>
-        <div class="splash-preset-name">Free Streaming</div>
-        <div class="splash-preset-detail">No account needed</div>
-      </div>
-      <div class="splash-preset-card" data-action="quick-start" data-preset="p2p">
-        <div class="splash-preset-icon">${ICO.link(22,'#fbbf24')}</div>
-        <div class="splash-preset-name">Free P2P</div>
-        <div class="splash-preset-detail">Torrents · No debrid</div>
-      </div>
-      <div class="splash-preset-card" data-action="open-quickstart">
-        <div class="splash-preset-icon">${ICO.question(22,'#f472b6')}</div>
-        <div class="splash-preset-name">Quick Start</div>
-        <div class="splash-preset-detail">New here? Start here</div>
-      </div>
-      <div class="splash-preset-card" data-action="paste-manifest-splash">
-        <div class="splash-preset-icon">${ICO.clipboard(22,'#fb923c')}</div>
-        <div class="splash-preset-name">Paste Manifest</div>
-        <div class="splash-preset-detail">Import existing config</div>
-      </div>
+    <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">
+      ${splashPresetsHtml(_splashSvc)}
     </div>
 
-    <div class="splash-tertiary">
+    <div class="splash-tertiary splash-anim splash-anim-d6">
       <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">
         <span class="splash-tertiary-icon">${ICO.folder(16,'#a78bfa')}</span> Browse Templates
       </a>
@@ -3297,7 +3320,26 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (step === 0) return;
+    if (step === 0) {
+      const chip = document.activeElement?.closest('.splash-chip[data-svc]');
+      if (chip && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+        e.preventDefault();
+        const chips = [...document.querySelectorAll('.splash-chip[data-svc]')];
+        const idx = chips.indexOf(chip);
+        const next = e.key === 'ArrowRight' ? chips[(idx+1) % chips.length] : chips[(idx-1+chips.length) % chips.length];
+        next.focus(); next.click();
+      }
+      if (chip && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); chip.click(); }
+      const card = document.activeElement?.closest('.splash-door,.splash-preset-card');
+      if (card && (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp')) {
+        e.preventDefault();
+        const cards = [...card.parentElement.children];
+        const idx = cards.indexOf(card);
+        const next = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? cards[(idx+1) % cards.length] : cards[(idx-1+cards.length) % cards.length];
+        next.focus();
+      }
+      return;
+    }
     const rem = document.getElementById('apiReminder');
     if (rem && !rem.classList.contains('hidden')) return;
     const tag = document.activeElement?.tagName;
@@ -3369,8 +3411,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const svcChip = e.target.closest('.splash-chip[data-svc]');
     if (svcChip) {
-      document.querySelectorAll('.splash-chip[data-svc]').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.splash-chip[data-svc]').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-checked','false'); });
       svcChip.classList.add('active');
+      svcChip.setAttribute('aria-checked','true');
+      const pp = document.getElementById('splashPresets');
+      if (pp) pp.innerHTML = splashPresetsHtml(svcChip.dataset.svc);
       return;
     }
     const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
