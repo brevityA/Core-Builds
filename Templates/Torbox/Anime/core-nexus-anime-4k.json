@@ -1461,7 +1461,7 @@
     },
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 6"
+      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 10"
     },
     "checkOwned": false,
     "digitalReleaseFilter": {
@@ -1480,6 +1480,8 @@
     ],
     "excludedRegexPatterns": [],
     "showChanges": true,
-    "rankedRegexPatterns": []
+    "rankedRegexPatterns": [],
+    "maxResults": 30,
+    "maxResultsPerResolution": 12
   }
 }

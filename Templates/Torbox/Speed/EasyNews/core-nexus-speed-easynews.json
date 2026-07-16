@@ -2235,7 +2235,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 5"
+      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 10"
     },
     "groups": {
       "enabled": true,
@@ -2332,8 +2332,8 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 30,
-    "maxResultsPerResolution": 12,
+    "maxResults": 50,
+    "maxResultsPerResolution": 20,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
