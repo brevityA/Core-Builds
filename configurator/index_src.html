@@ -877,7 +877,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .hc-box{border-color:#d0d7de}
 [data-theme="light"] .hc-hdr{background:#f6f8fa;color:#57606a}
 [data-theme="light"] #tsModal>div{background:#fff!important;border-color:#d0d7de!important}
+[data-theme="light"] #tsModal div[style*="font-weight:700"][style*="color:#c9d1d9"]{color:#1f2328!important}
+[data-theme="light"] #tsModal div[style*="font-weight:600"][style*="color:#c9d1d9"]{color:#1f2328!important}
+[data-theme="light"] #tsModal div[style*="color:#8b949e"]{color:#656d76!important}
+[data-theme="light"] #tsModal div[style*="background:rgba(255,255,255,.02)"]{background:rgba(0,0,0,.03)!important;border-color:#d0d7de!important}
 [data-theme="light"] #tsModal [data-action="ts-choose"]{background:rgba(9,105,218,.03)!important;border-color:rgba(9,105,218,.15)!important;color:#0969da!important}
+[data-theme="light"] #tsModal [data-action="ts-back"]{border-color:#d0d7de!important;color:#656d76!important}
+[data-theme="light"] #tsModal [data-action="ts-fix"]{border-color:rgba(9,105,218,.3)!important;background:rgba(9,105,218,.06)!important;color:#0969da!important}
+[data-theme="light"] #tsModal [data-action="ts-close"]{color:#656d76!important}
 [data-theme="light"] .hc-name{color:#1c2128}
 [data-theme="light"] .hc-status{color:#57606a}
 [data-theme="light"] .hc-issue{color:#57606a}
@@ -1918,10 +1925,12 @@ function saveBackup() {
     snap._ts = Date.now();
     snap._ver = CONFIGURATOR_VERSION;
     const list = JSON.parse(localStorage.getItem('coreBuildBackups') || '[]');
-    if (list.length && list[0]._ts && Date.now() - list[0]._ts < 30000) list.shift();
-    list.unshift(snap);
-    if (list.length > BACKUP_MAX) list.length = BACKUP_MAX;
-    localStorage.setItem('coreBuildBackups', JSON.stringify(list));
+    const same = (a, b) => SHARE_KEYS.every(k => JSON.stringify(a[k]) === JSON.stringify(b[k]));
+    const deduped = list.filter(entry => !same(entry, snap));
+    deduped.unshift(snap);
+    const list2 = deduped;
+    if (list2.length > BACKUP_MAX) list2.length = BACKUP_MAX;
+    localStorage.setItem('coreBuildBackups', JSON.stringify(list2));
   } catch(e) {}
 }
 function getBackups() {
@@ -1948,14 +1957,14 @@ function deleteBackup(idx) {
 function backupTimelineHtml() {
   const list = getBackups();
   if (!list.length) return '';
-  const rows = list.slice(0, 10).map((b, i) => {
+  const rows = list.map((b, i) => {
     const d = new Date(b._ts);
     const time = d.toLocaleDateString(undefined, {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
     const svc = b.multiServices && b.multiServices.length ? b.multiServices[0] : (b.device || '?');
     const res = b.resolution || '?';
     return `<div class="bk-row" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .12s" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'"><span style="font-size:.68rem;color:#6b7280;min-width:110px">${time}</span><span style="font-size:.68rem;color:#8b949e;flex:1">${svc} · ${res}${b._ver?' · v'+b._ver:''}</span><button data-action="restore-backup" data-idx="${i}" style="padding:3px 10px;font-size:.65rem;font-weight:700;border-radius:5px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#3d9db5;cursor:pointer;transition:background .12s" onmouseover="this.style.background='rgba(0,212,255,.14)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Restore</button></div>`;
   }).join('');
-  return `<div class="hc-box" style="margin-top:8px"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Backup History (${list.length}) <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts" style="display:none;max-height:240px;overflow-y:auto">${rows}</div></div>`;
+  return `<details class="hc-box" style="margin-top:8px"><summary class="hc-hdr" style="list-style:none;cursor:pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Backup History (${list.length}) <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></summary><div class="hc-hosts" style="max-height:240px;overflow-y:auto">${rows}</div></details>`;
 }
 function lastGenDiff() {
   try {
@@ -5957,12 +5966,27 @@ function troubleshootHtml() {
 function showTroubleshooter() {
   _tsNode = 'root';
   _tsHistory = [];
+  const trigger = document.activeElement;
   const modal = document.createElement('div');
   modal.id = 'tsModal';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-label', 'Troubleshooter');
   modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)';
-  modal.innerHTML = `<div style="width:min(480px,90vw);max-height:80vh;overflow-y:auto;background:#0d1117;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:.88rem;font-weight:700;color:#c9d1d9">🔧 Troubleshooter</div><button data-action="ts-close" style="padding:4px 8px;font-size:.9rem;background:none;border:none;color:#8b949e;cursor:pointer">✕</button></div><div id="tsBody">${troubleshootHtml()}</div></div>`;
+  modal.innerHTML = `<div style="width:min(480px,90vw);max-height:80vh;overflow-y:auto;background:#0d1117;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:.88rem;font-weight:700;color:#c9d1d9">🔧 Troubleshooter</div><button data-action="ts-close" aria-label="Close troubleshooter" style="padding:4px 8px;font-size:.9rem;background:none;border:none;color:#8b949e;cursor:pointer">✕</button></div><div id="tsBody">${troubleshootHtml()}</div></div>`;
+  const closeModal = () => { modal.remove(); if (trigger && trigger.focus) trigger.focus(); };
+  modal.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.stopPropagation(); closeModal(); return; }
+    if (e.key === 'Tab') {
+      const focusable = modal.querySelectorAll('button,a,[tabindex]');
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
   modal.addEventListener('click', e => {
-    if (e.target === modal || e.target.closest('[data-action="ts-close"]')) { modal.remove(); return; }
+    if (e.target === modal || e.target.closest('[data-action="ts-close"]')) { closeModal(); return; }
     const a = (e.target.closest('[data-action]') || e.target).dataset.action;
     if (a === 'ts-choose') {
       const next = (e.target.closest('[data-next]') || e.target).dataset.next;
@@ -5978,11 +6002,14 @@ function showTroubleshooter() {
       const key = e.target.dataset.key, val = e.target.dataset.val;
       S[key] = val;
       saveState();
+      render();
       document.getElementById('tsBody').innerHTML = troubleshootHtml();
       showToast('Applied: ' + key + ' → ' + val);
     }
   });
   document.body.appendChild(modal);
+  const firstBtn = modal.querySelector('button[data-action="ts-choose"],button[data-action="ts-close"]');
+  if (firstBtn) firstBtn.focus();
 }
 
 async function preflightCheck() {
