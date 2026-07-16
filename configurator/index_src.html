@@ -1260,6 +1260,35 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.54', date:'Jul 16 2026', items:[
+    'Host Compatibility Checker — pre-export validation against elfhosted, fortheweak, and other host whitelists. Shows green/yellow/red per-host report with specific issues before you deploy',
+    'Import Existing Config — paste any AIOStreams config JSON or URL to reverse-engineer settings back into the configurator wizard. Migrate from hand-edited configs or other templates without starting from scratch',
+    'Guided Troubleshooter — interactive decision tree for common issues (no streams, wrong quality, import errors). Walks through causes and suggests specific config changes',
+    'Stremio Deep Link — one-click stremio:// protocol link that opens Stremio and installs the addon directly, skipping the manual import flow',
+    'Template Backup Timeline — every generation snapshots to localStorage with timestamp. Scroll through history and restore any previous build',
+  ]},
+  { v:'2.53', date:'Jul 16 2026', items:[
+    'IQR PSE Architecture — new "Apex IQR" quality mode uses statistical bitrate filtering (Tukey fences) matching the flagship 4K Apex template. Three-tier adaptive: ≥4 peers → IQR outlier detection, 1–3 → min/max ±20%, 0 → pow(0.95) age-decay window',
+    'Score IQR Guard — automatically added with IQR mode to kill statistical outlier streams below the Tukey lower fence of SEL scores',
+  ]},
+  { v:'2.52', date:'Jul 16 2026', items:[
+    'Anime addon stack — AnimeTosho (auto-enabled for Anime content), NekoBT, and Sootio presets added to generated templates',
+    'Fix — Download JSON no longer clears migration state, so Install/Deploy actions in the same session keep selective migration overrides',
+    'Fix — migration diff modal tracks offered sections, preventing silent reversion of config sections with unchanged labels but updated internal logic',
+  ]},
+  { v:'2.51', date:'Jul 15 2026', items:[
+    'Built-in Usenet Engine — stremio_nntp and aiostreams services added to generated templates (v2.31.0); enabled automatically on private instances via Base Config inheritance',
+    'Base Config v1.3.0 — added stremio_nntp, aiostreams, nzbdav, altmount, stremthru_newz services; NZBHydra and Usenet Streamer presets (disabled by default, operator-configured)',
+  ]},
+  { v:'2.50', date:'Jul 15 2026', items:[
+    'Selective Migration — per-section checkboxes in the diff modal let you cherry-pick which changes to apply (PSEs, ESEs, sort, regex, settings) and keep the rest from your existing config',
+    'Parent/Child Config — "Use Core Builds Base" option enables parent config inheritance; child templates only carry PSEs, branding, and template-specific filters',
+    'Base Config v1.2.0 — sort criteria synced to fleet standard (seadex, bitrate, subtitle, age keys), ESEs updated to v2.0 (Info & Other Unwanted, Foreign Language Kill)',
+  ]},
+  { v:'2.49', date:'Jul 15 2026', items:[
+    'Template Migration Tool — "Update Existing Template" now shows a full diff of what changes before applying, with Apply & Upgrade / Cancel options',
+    'Device detection on import — Samsung, Xiaomi, Fire Stick, Apple TV, Shield, Google TV, and Windows profiles auto-detected from template signatures',
+  ]},
   { v:'2.46', date:'Jul 15 2026', items:[
     'Host Compatibility Checker — see at a glance whether your template works on ElfHosted, ForTheWeak, or self-hosted instances. Validates regex patterns, synced URLs, and SEL expressions against each host\'s known restrictions',
   ]},
@@ -1290,35 +1319,6 @@ const CHANGELOG = [
     'Direct Install — new toggle in Deploy: enter Stremio email + password inline to push the addon straight to your library',
     'Get Manifest URL mode preserved for manual install / WuPlay / Nuvio',
     '"Create random account" link generates a Stremio account in one click (no email verification)',
-  ]},
-  { v:'2.54', date:'Jul 16 2026', items:[
-    'Host Compatibility Checker — pre-export validation against elfhosted, fortheweak, and other host whitelists. Shows green/yellow/red per-host report with specific issues before you deploy',
-    'Import Existing Config — paste any AIOStreams config JSON or URL to reverse-engineer settings back into the configurator wizard. Migrate from hand-edited configs or other templates without starting from scratch',
-    'Guided Troubleshooter — interactive decision tree for common issues (no streams, wrong quality, import errors). Walks through causes and suggests specific config changes',
-    'Stremio Deep Link — one-click stremio:// protocol link that opens Stremio and installs the addon directly, skipping the manual import flow',
-    'Template Backup Timeline — every generation snapshots to localStorage with timestamp. Scroll through history and restore any previous build',
-  ]},
-  { v:'2.53', date:'Jul 16 2026', items:[
-    'IQR PSE Architecture — new "Apex IQR" quality mode uses statistical bitrate filtering (Tukey fences) matching the flagship 4K Apex template. Three-tier adaptive: ≥4 peers → IQR outlier detection, 1–3 → min/max ±20%, 0 → pow(0.95) age-decay window',
-    'Score IQR Guard — automatically added with IQR mode to kill statistical outlier streams below the Tukey lower fence of SEL scores',
-  ]},
-  { v:'2.52', date:'Jul 16 2026', items:[
-    'Anime addon stack — AnimeTosho (auto-enabled for Anime content), NekoBT, and Sootio presets added to generated templates',
-    'Fix — Download JSON no longer clears migration state, so Install/Deploy actions in the same session keep selective migration overrides',
-    'Fix — migration diff modal tracks offered sections, preventing silent reversion of config sections with unchanged labels but updated internal logic',
-  ]},
-  { v:'2.51', date:'Jul 15 2026', items:[
-    'Built-in Usenet Engine — stremio_nntp and aiostreams services added to generated templates (v2.31.0); enabled automatically on private instances via Base Config inheritance',
-    'Base Config v1.3.0 — added stremio_nntp, aiostreams, nzbdav, altmount, stremthru_newz services; NZBHydra and Usenet Streamer presets (disabled by default, operator-configured)',
-  ]},
-  { v:'2.50', date:'Jul 15 2026', items:[
-    'Selective Migration — per-section checkboxes in the diff modal let you cherry-pick which changes to apply (PSEs, ESEs, sort, regex, settings) and keep the rest from your existing config',
-    'Parent/Child Config — "Use Core Builds Base" option enables parent config inheritance; child templates only carry PSEs, branding, and template-specific filters',
-    'Base Config v1.2.0 — sort criteria synced to fleet standard (seadex, bitrate, subtitle, age keys), ESEs updated to v2.0 (Info & Other Unwanted, Foreign Language Kill)',
-  ]},
-  { v:'2.49', date:'Jul 15 2026', items:[
-    'Template Migration Tool — "Update Existing Template" now shows a full diff of what changes before applying, with Apply & Upgrade / Cancel options',
-    'Device detection on import — Samsung, Xiaomi, Fire Stick, Apple TV, Shield, Google TV, and Windows profiles auto-detected from template signatures',
   ]},
   { v:'2.39', date:'Jul 14 2026', items:[
     'Changelog is now its own page — click the version badge (header or splash) to open the full release history',
