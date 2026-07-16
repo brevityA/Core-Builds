@@ -5,7 +5,7 @@
     "description": "Dedicated anime template. SeaDex best releases · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.16",
+    "version": "2.8.17",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -1443,7 +1443,7 @@
     },
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 12"
+      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 18"
     },
     "checkOwned": false,
     "digitalReleaseFilter": {
@@ -1462,6 +1462,8 @@
     ],
     "excludedRegexPatterns": [],
     "showChanges": true,
-    "rankedRegexPatterns": []
+    "rankedRegexPatterns": [],
+    "maxResults": 35,
+    "maxResultsPerResolution": 15
   }
 }

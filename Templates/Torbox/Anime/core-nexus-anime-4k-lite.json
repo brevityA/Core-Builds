@@ -5,7 +5,7 @@
     "description": "Dedicated 4K anime template. SeaDex best releases · DV/HDR10+ priority · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.14",
+    "version": "2.8.15",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
@@ -1381,7 +1381,7 @@
     },
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 6"
+      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 10"
     },
     "checkOwned": false,
     "digitalReleaseFilter": {
@@ -1400,6 +1400,8 @@
     ],
     "excludedRegexPatterns": [],
     "showChanges": true,
-    "rankedRegexPatterns": []
+    "rankedRegexPatterns": [],
+    "maxResults": 30,
+    "maxResultsPerResolution": 12
   }
 }

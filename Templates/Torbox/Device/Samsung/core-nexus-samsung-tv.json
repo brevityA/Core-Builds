@@ -5,7 +5,7 @@
     "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p · TorBox Essential · Library, TorBox Search, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1196,7 +1196,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
+      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
     },
     "groups": {
       "enabled": false,
@@ -2411,8 +2411,8 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 20,
-    "maxResultsPerResolution": 8,
+    "maxResults": 35,
+    "maxResultsPerResolution": 15,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",

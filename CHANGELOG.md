@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.3.0 (2026-07-16)
+
+### Changed
+- **Stream pool broadening** (Configurator v2.55 + all 31 active templates) — increased `maxResults`, `maxResultsPerResolution`, and `dynamicAddonFetching` exit thresholds across the entire fleet. Templates now wait for more cached streams before stopping and return more results to the user.
+  - **4K Apex/Device:** maxResults 20→30, MRPR 8→12, DAF cached 2160p >=5→>=8, timeout 5s→6s
+  - **4K Essential/AllDebrid:** added maxResults 30/MRPR 12 (previously uncapped), DAF 2160p >=10→>=15 or 1080p >=15→>=20
+  - **1080p (Single/Essential/AllDebrid/Device):** maxResults 25→35, MRPR 10→15, DAF 1080p >=15→>=20
+  - **Hybrid:** maxResults 30→50, MRPR 12→20, DAF 4K >=15→>=20, 1080p >=15→>=25
+  - **EasyNews:** maxResults 30→50, MRPR 12→20, DAF thresholds doubled
+  - **Anime:** added maxResults (4K 30/12, 1080p 35/15), DAF 4K >=6→>=10, 1080p >=12→>=18
+  - **Configurator pool tiers:** Normal 30–35 results (was 20–25), Large 50 (was 30–35), Max 75 (was 50)
+- Skipped: Flash (instant play), Speed/TorBox (lean), Nightly (parameterized), Deprecated
+
+### Fixed
+- **Build script CodeQL compliance** — replaced all regex-based HTML tag matching in `configurator/build.js` with string-based `indexOf`/`slice` operations. Resolves CodeQL `js/bad-tag-filter` alert that blocked CI.
+
 ## 3.2.9 (2026-07-15)
 
 ### Added

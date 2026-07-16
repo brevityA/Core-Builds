@@ -5,7 +5,7 @@
     "description": "1080p AllDebrid Lite. DTS:X / TrueHD / HEVC · Relaxed filtering. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1206,7 +1206,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
+      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
     },
     "groups": {
       "enabled": true,
@@ -2268,8 +2268,8 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 25,
-    "maxResultsPerResolution": 10,
+    "maxResults": 35,
+    "maxResultsPerResolution": 15,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",

@@ -5,7 +5,7 @@
     "description": "A full-featured 4K build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.12.7",
+    "version": "2.12.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1267,7 +1267,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 10 or count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
+      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 15 or count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
     },
     "groups": {
       "enabled": true,
@@ -2471,6 +2471,8 @@
     ],
     "syncedRankedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    ],
+    "maxResults": 30,
+    "maxResultsPerResolution": 12
   }
 }

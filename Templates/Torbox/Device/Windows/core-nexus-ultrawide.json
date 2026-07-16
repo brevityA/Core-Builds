@@ -5,7 +5,7 @@
     "description": "Windows PC / Ultra-Wide. 1080p primary · 1440p when available · 4K fallback. Full audio (Atmos, TrueHD, DTS-HD MA, DTS:X) · all encodes including AV1 · HDR-first visual priority. No codec restrictions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1227,7 +1227,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
+      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
     },
     "groups": {
       "enabled": true,
@@ -2478,8 +2478,8 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 25,
-    "maxResultsPerResolution": 10,
+    "maxResults": 35,
+    "maxResultsPerResolution": 15,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",

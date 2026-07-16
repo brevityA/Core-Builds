@@ -1,0 +1,3 @@
+# Mark the built/obfuscated configurator output as generated so GitHub
+# collapses it by default in pull request diffs.
+configurator/index.html linguist-generated=true

@@ -5,7 +5,7 @@
     "description": "4K template tuned for Xiaomi Mi Box S (2nd gen) and similar Xiaomi/Android TV devices. Dolby Vision Profile 5 and HDR10+ supported — DV-Only Kill disabled. AV1 and VC-1 excluded (no hardware decode on 2nd gen). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded — Xiaomi passes bitstream via HDMI but most users use built-in speakers or basic soundbars. Handles REMUX well. 2160p primary with 1080p fallback. Based on Core Nexus 4K Samsung TV (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1219,7 +1219,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
+      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
     },
     "groups": {
       "enabled": false,
@@ -2434,8 +2434,8 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 20,
-    "maxResultsPerResolution": 8,
+    "maxResults": 30,
+    "maxResultsPerResolution": 12,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",

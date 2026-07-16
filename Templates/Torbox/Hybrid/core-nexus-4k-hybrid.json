@@ -5,7 +5,7 @@
     "description": "4K flagship for TorBox users who also run a Usenet indexer. Pairs TorBox debrid with NZBGeek for maximum source diversity across debrid, torrent, and Usenet streams. Prioritises 2160p with 1080p fallback. Full HDR and lossless audio. Adaptive IQR bitrate PSEs — Tukey fence (≥4 ranked) with min/max and new-release median cluster fallbacks. NZBGeek API key required — enter your key in the Usenet preset before saving.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.12.8",
+    "version": "2.12.9",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1283,7 +1283,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 15"
+      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 20"
     },
     "groups": {
       "enabled": true,
@@ -2546,8 +2546,8 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 30,
-    "maxResultsPerResolution": 12,
+    "maxResults": 50,
+    "maxResultsPerResolution": 20,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
