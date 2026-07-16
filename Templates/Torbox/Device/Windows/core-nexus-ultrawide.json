@@ -5,7 +5,7 @@
     "description": "Windows PC / Ultra-Wide. 1080p primary · 1440p when available · 4K fallback. Full audio (Atmos, TrueHD, DTS-HD MA, DTS:X) · all encodes including AV1 · HDR-first visual priority. No codec restrictions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

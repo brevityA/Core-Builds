@@ -5,7 +5,7 @@
     "description": "Firestick and budget Android TV optimised build. Hard SDR-only enforcement — excludes Dolby Vision, HDR10+, HDR10, HLG, and 10-bit content. AV1 excluded. TrueHD/Atmos/lossless audio excluded. 1080p + 720p · WEB-DL/WEBRip · TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.7",
+    "version": "2.10.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

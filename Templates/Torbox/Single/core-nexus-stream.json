@@ -5,7 +5,7 @@
     "description": "A frictionless 1080p SDR build running exclusively on TorBox, with RPDB poster database integration for enhanced metadata visuals in Stremio. Targets 1080p WEB-DL and WEBRip sources, with 720p fallback for titles where 1080p is unavailable. Blocks BluRay, Remux, 4K, and HDR content for reliable playback on any hardware. File range 1 GB–60 GB, 1080p capped at 25 GB. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. No secondary debrid service required — a single TorBox subscription is sufficient. Designed for phones, tablets, budget Android TV boxes, and Fire TV Sticks.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.7",
+    "version": "2.10.8",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
