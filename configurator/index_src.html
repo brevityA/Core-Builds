@@ -3536,7 +3536,7 @@ const TUT_STEPS = [
   {
     id:'debrid', badge:'Step 3 of 4', title:'What\'s a Debrid Service?',
     desc:'A <span class="hl">debrid service</span> downloads torrents on fast servers and gives you a direct stream link — so you get <strong>instant playback without seeding</strong>.<br><br>Think of it as a middleman: it caches popular content so streams load in seconds. <span class="gold">TorBox</span> and <span class="gold">Real-Debrid</span> are the most popular.<br><br>Cost is typically <strong>$3–5/month</strong> for unlimited streaming.',
-    target:'.splash-chips', arrow:'bottom', nextLabel:'Next'
+    target:'.splash-chips-section', arrow:'top', nextLabel:'Next'
   },
   {
     id:'start', badge:'Step 4 of 4', title:'Ready to Build!',
@@ -3564,10 +3564,16 @@ function tutGo(n) {
   document.getElementById('tutBackdrop').style.display = 'none';
   const el = document.querySelector(s.target);
   if (!el) { tutClose(); return; }
-  el.scrollIntoView({ behavior:'smooth', block:'center' });
+  const wantAbove = (s.arrow === 'bottom');
+  el.scrollIntoView({ behavior:'smooth', block: wantAbove ? 'center' : 'start' });
   setTimeout(() => {
-    const r = el.getBoundingClientRect();
+    let r = el.getBoundingClientRect();
     const pad = 8;
+    const vh = window.innerHeight;
+    if (!wantAbove && r.top < 60) {
+      window.scrollBy({ top: r.top - 80, behavior:'instant' });
+      r = el.getBoundingClientRect();
+    }
     spot.style.display = '';
     spot.style.position = 'fixed';
     spot.style.top = (r.top - pad) + 'px';
@@ -3588,7 +3594,6 @@ function tutGo(n) {
     tip.style.position = 'fixed';
     tip.style.left = Math.max(20, r.left) + 'px';
     tip.style.right = 'auto';
-    const vh = window.innerHeight;
     const tipH = tip.offsetHeight;
     const spaceBelow = vh - r.bottom - 16;
     const spaceAbove = r.top - 16;
@@ -3603,15 +3608,17 @@ function tutGo(n) {
     }
     requestAnimationFrame(() => {
       const tr = tip.getBoundingClientRect();
-      if (tr.right > vh - 20) tip.style.left = (window.innerWidth - tr.width - 20) + 'px';
+      const cw = document.documentElement.clientWidth;
+      if (tr.right > cw - 20) tip.style.left = Math.max(20, cw - tr.width - 20) + 'px';
       if (tr.bottom > vh - 10) {
         const needed = tr.bottom - vh + 40;
-        window.scrollBy({ top: needed, behavior:'smooth' });
-        spot.style.top = (parseFloat(spot.style.top) - needed) + 'px';
-        tip.style.top = (parseFloat(tip.style.top) - needed) + 'px';
+        window.scrollBy({ top: needed, behavior:'instant' });
+        r = el.getBoundingClientRect();
+        spot.style.top = (r.top - pad) + 'px';
+        tip.style.top = Math.max(20, Math.min(r.bottom + 16, vh - tipH - 20)) + 'px';
       }
     });
-  }, 350);
+  }, 400);
 }
 function tutClose() {
   document.getElementById('tutOverlay').classList.remove('active');
