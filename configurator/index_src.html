@@ -3608,13 +3608,14 @@ function tutGo(n) {
     }
     requestAnimationFrame(() => {
       const tr = tip.getBoundingClientRect();
-      if (tr.right > window.innerWidth - 20) tip.style.left = (window.innerWidth - tr.width - 20) + 'px';
+      const cw = document.documentElement.clientWidth;
+      if (tr.right > cw - 20) tip.style.left = Math.max(20, cw - tr.width - 20) + 'px';
       if (tr.bottom > vh - 10) {
         const needed = tr.bottom - vh + 40;
         window.scrollBy({ top: needed, behavior:'instant' });
         r = el.getBoundingClientRect();
         spot.style.top = (r.top - pad) + 'px';
-        tip.style.top = Math.min(r.bottom + 16, vh - tipH - 20) + 'px';
+        tip.style.top = Math.max(20, Math.min(r.bottom + 16, vh - tipH - 20)) + 'px';
       }
     });
   }, 400);
