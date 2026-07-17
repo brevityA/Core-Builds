@@ -3951,9 +3951,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (key && key in S) {
         S[key] = !S[key]; saveState();
         const on = !!S[key];
-        card.classList.toggle('pref-on', on);
-        const circ = card.querySelector('.pref-circle');
-        if (circ) circ.innerHTML = on ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+        if (key === 'proxyEnabled') {
+          const sy = window.scrollY; render(); window.scrollTo(0, sy);
+        } else {
+          card.classList.toggle('pref-on', on);
+          const circ = card.querySelector('.pref-circle');
+          if (circ) circ.innerHTML = on ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+        }
       }
     }
     if (action === 'set-size-limit') {
@@ -3997,36 +4001,64 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     if (action === 'toggle-sub-addon') {
-      const val = (e.target.closest('[data-action="toggle-sub-addon"]') || e.target).dataset.val;
+      const row = e.target.closest('[data-action="toggle-sub-addon"]') || e.target;
+      const val = row.dataset.val;
       if (!S.subtitleAddons) S.subtitleAddons = ['aiosubtitle'];
       const idx = S.subtitleAddons.indexOf(val);
       if (idx >= 0) { if (S.subtitleAddons.length > 1) S.subtitleAddons.splice(idx, 1); }
       else S.subtitleAddons.push(val);
-      saveState(); render();
+      const on = S.subtitleAddons.includes(val);
+      row.style.borderColor = on ? 'rgba(6,182,212,.35)' : 'rgba(255,255,255,.06)';
+      row.style.background = on ? 'rgba(6,182,212,.05)' : 'transparent';
+      const box = row.querySelector('div[style*="border-radius:4px"]');
+      if (box) { box.style.borderColor = on ? '#06b6d4' : '#374151'; box.style.background = on ? '#06b6d4' : 'transparent'; box.innerHTML = on ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''; }
+      const nm = row.querySelector('div[style*="font-size:.8rem"]');
+      if (nm) nm.style.color = on ? '#06b6d4' : '#9ca3af';
+      saveState();
     }
     if (action === 'toggle-sub-lang') {
-      const val = (e.target.closest('[data-action="toggle-sub-lang"]') || e.target).dataset.val;
+      const btn = e.target.closest('[data-action="toggle-sub-lang"]') || e.target;
+      const val = btn.dataset.val;
       if (!S.subtitleLangs) S.subtitleLangs = ['en'];
       const idx = S.subtitleLangs.indexOf(val);
       if (idx >= 0) { if (S.subtitleLangs.length > 1) S.subtitleLangs.splice(idx, 1); }
       else S.subtitleLangs.push(val);
-      saveState(); render();
+      const on = S.subtitleLangs.includes(val);
+      btn.style.borderColor = on ? 'rgba(6,182,212,.4)' : 'rgba(255,255,255,.07)';
+      btn.style.background = on ? 'rgba(6,182,212,.1)' : 'transparent';
+      btn.style.color = on ? '#06b6d4' : '#6b7280';
+      btn.style.fontWeight = on ? '700' : '500';
+      saveState();
     }
     if (action === 'toggle-catalog') {
-      const val = (e.target.closest('[data-action="toggle-catalog"]') || e.target).dataset.val;
+      const row = e.target.closest('[data-action="toggle-catalog"]') || e.target;
+      const val = row.dataset.val;
       if (!S.catalogs) S.catalogs = ['tmdb-addon'];
       const idx = S.catalogs.indexOf(val);
       if (idx >= 0) S.catalogs.splice(idx, 1);
       else S.catalogs.push(val);
-      saveState(); render();
+      const on = S.catalogs.includes(val);
+      row.style.borderColor = on ? 'rgba(249,115,22,.35)' : 'rgba(255,255,255,.06)';
+      row.style.background = on ? 'rgba(249,115,22,.05)' : 'transparent';
+      const box = row.querySelector('div[style*="border-radius:4px"]');
+      if (box) { box.style.borderColor = on ? '#f97316' : '#374151'; box.style.background = on ? '#f97316' : 'transparent'; box.innerHTML = on ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''; }
+      const nm = row.querySelector('div[style*="font-size:.8rem"]');
+      if (nm) nm.style.color = on ? '#f97316' : '#9ca3af';
+      saveState();
     }
     if (action === 'toggle-proxy-svc') {
-      const val = (e.target.closest('[data-action="toggle-proxy-svc"]') || e.target).dataset.val;
+      const btn = e.target.closest('[data-action="toggle-proxy-svc"]') || e.target;
+      const val = btn.dataset.val;
       if (!S.proxiedServices) S.proxiedServices = [];
       const idx = S.proxiedServices.indexOf(val);
       if (idx >= 0) S.proxiedServices.splice(idx, 1);
       else S.proxiedServices.push(val);
-      saveState(); render();
+      const on = S.proxiedServices.includes(val);
+      btn.style.borderColor = on ? 'rgba(100,116,139,.5)' : 'rgba(255,255,255,.07)';
+      btn.style.background = on ? 'rgba(100,116,139,.12)' : 'transparent';
+      btn.style.color = on ? '#94a3b8' : '#6b7280';
+      btn.style.fontWeight = on ? '700' : '500';
+      saveState();
     }
     if (action === 'set-match-mode') {
       S.matchMode = (e.target.closest('[data-action="set-match-mode"]') || e.target).dataset.val;
@@ -4652,6 +4684,7 @@ function pses() {
       iqr2('A-Tier 1080p WEB-DL — IQR + pow() decay', "resolution(quality(streams,'WEB-DL'),'1080p')", null, true, '1Mbps'),
       { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" },
       { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" },
+      ...audPinnArr,
       { enabled:true, expression:codecExpr },
       { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" },
       { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }
@@ -4659,7 +4692,7 @@ function pses() {
   } else if (res === '4k') {
     out.push({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" }, pin1080Elite, pinLQ, seasonPSE);
     if (dv) out.push({ enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" });
-    out.push({ enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 4K WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* B-Tier 4K WEB-DL */ quality(resolution(streams,'2160p'),'WEB-DL')" }, { enabled:true, expression:"/* C-Tier Any 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+    out.push({ enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 4K WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* B-Tier 4K WEB-DL */ quality(resolution(streams,'2160p'),'WEB-DL')" }, { enabled:true, expression:"/* C-Tier Any 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
   } else if (res === '1080p' && S.pseArch === 'iqr') {
     const iqr1 = (label, pool, floor, decay, decayFloor) => {
       const b = `q1(values(${pool},'bitrate'))-1.5*iqr(values(${pool},'bitrate'))`, t = `q3(values(${pool},'bitrate'))+1.5*iqr(values(${pool},'bitrate'))`;
@@ -4679,13 +4712,14 @@ function pses() {
       { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" },
       { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" },
       { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" },
+      ...audPinnArr,
       { enabled:true, expression:codecExpr },
       { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }
     );
   } else if (res === '1080p') {
-    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
   } else {
-    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 1440p Any Quality */ quality(resolution(streams,'1440p'),'BluRay REMUX','BluRay','WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 4K Fallback BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* 4K Fallback WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* 4K Fallback Any */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 1440p Any Quality */ quality(resolution(streams,'1440p'),'BluRay REMUX','BluRay','WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 4K Fallback BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* 4K Fallback WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* 4K Fallback Any */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
   }
   return out;
 }
@@ -4697,7 +4731,7 @@ function build() {
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
     preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','SCR','TC','TS','CAM','Unknown'],
-    excludedLanguages: [], includedLanguages: [], requiredLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
+    excludedLanguages: [], includedLanguages: [], requiredLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])], preferredLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed'])],
     preferredAudioTags: ac.preferredAudioTags,
     syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
     rankedRegexPatterns: (S.service==='p2p'||S.service==='http') ? [] : (S.resolution==='4k'||S.resolution==='ultrawide' ? [...RANKED_REGEX_COMMON,...RANKED_REGEX_UHD] : [...RANKED_REGEX_COMMON]),
@@ -4712,7 +4746,7 @@ function build() {
       if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
       const isHybrid=S.service==='hybrid'||(S.service==='multi'&&S.multiServices&&S.multiServices.includes('torbox-pro')&&S.multiServices.includes('realdebrid')), svcKey=isHybrid?[{key:'service',direction:d}]:[];
       return { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] }; })(),
-    deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'keep_all' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'keep_all' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', merge: S.dedupMerge || false, tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] }; })(),
+    deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] }; })(),
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v3')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
@@ -4751,7 +4785,7 @@ function build() {
     yearMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
     groups: (function(){ const isFree=S.service==='p2p'||S.service==='http'; if(!isFree) return { enabled:false, groupings:[] }; return { enabled:true, groupings:[
-      { name:'Primary', addons:['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'], condition:'' },
+      { name:'Primary', addons:['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'], condition:'true' },
       { name:'Secondary', addons:['Meteor','Comet','MediaFusion','HdHub'], condition:'count(totalStreams)<5' },
       { name:'Fallback', addons:['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'], condition:'count(totalStreams)<15' }
     ] }; })(),
