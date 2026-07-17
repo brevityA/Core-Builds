@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.3.1 (2026-07-17)
+
+### Added
+- **Free Tier Overhaul** (Configurator v2.56) — comprehensive improvements to P2P and HTTP template generation:
+  - **New P2P presets** — Torrentio (primary scraper), Peerflix, Sootio, and HdHub now enabled by default for P2P templates
+  - **New HTTP presets** — Sootio, Peerflix, and HdHub added to HTTP template stack
+  - **3-tier addon grouping** — P2P/HTTP templates now cascade addons: Primary always runs, Secondary activates when <5 streams found, Fallback when <15 streams
+  - **Smart auto-hide ESEs** — SD content excluded when enough 1080p+720p exists; 720p excluded when enough 1080p/4K exists
+  - **minSeeders filter** — P2P templates set `minSeeders: 1` to filter dead torrents
+  - **Deduplicator tuning** — free templates use `keep_all` for cached/uncached (no debrid cache to deduplicate)
+
 ## 3.3.0 (2026-07-16)
 
 ### Changed
