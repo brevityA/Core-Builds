@@ -3951,9 +3951,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (key && key in S) {
         S[key] = !S[key]; saveState();
         const on = !!S[key];
-        card.classList.toggle('pref-on', on);
-        const circ = card.querySelector('.pref-circle');
-        if (circ) circ.innerHTML = on ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+        if (key === 'proxyEnabled') {
+          const sy = window.scrollY; render(); window.scrollTo(0, sy);
+        } else {
+          card.classList.toggle('pref-on', on);
+          const circ = card.querySelector('.pref-circle');
+          if (circ) circ.innerHTML = on ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+        }
       }
     }
     if (action === 'set-size-limit') {
@@ -3997,36 +4001,64 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     if (action === 'toggle-sub-addon') {
-      const val = (e.target.closest('[data-action="toggle-sub-addon"]') || e.target).dataset.val;
+      const row = e.target.closest('[data-action="toggle-sub-addon"]') || e.target;
+      const val = row.dataset.val;
       if (!S.subtitleAddons) S.subtitleAddons = ['aiosubtitle'];
       const idx = S.subtitleAddons.indexOf(val);
       if (idx >= 0) { if (S.subtitleAddons.length > 1) S.subtitleAddons.splice(idx, 1); }
       else S.subtitleAddons.push(val);
-      saveState(); render();
+      const on = S.subtitleAddons.includes(val);
+      row.style.borderColor = on ? 'rgba(6,182,212,.35)' : 'rgba(255,255,255,.06)';
+      row.style.background = on ? 'rgba(6,182,212,.05)' : 'transparent';
+      const box = row.querySelector('div[style*="border-radius:4px"]');
+      if (box) { box.style.borderColor = on ? '#06b6d4' : '#374151'; box.style.background = on ? '#06b6d4' : 'transparent'; box.innerHTML = on ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''; }
+      const nm = row.querySelector('div[style*="font-size:.8rem"]');
+      if (nm) nm.style.color = on ? '#06b6d4' : '#9ca3af';
+      saveState();
     }
     if (action === 'toggle-sub-lang') {
-      const val = (e.target.closest('[data-action="toggle-sub-lang"]') || e.target).dataset.val;
+      const btn = e.target.closest('[data-action="toggle-sub-lang"]') || e.target;
+      const val = btn.dataset.val;
       if (!S.subtitleLangs) S.subtitleLangs = ['en'];
       const idx = S.subtitleLangs.indexOf(val);
       if (idx >= 0) { if (S.subtitleLangs.length > 1) S.subtitleLangs.splice(idx, 1); }
       else S.subtitleLangs.push(val);
-      saveState(); render();
+      const on = S.subtitleLangs.includes(val);
+      btn.style.borderColor = on ? 'rgba(6,182,212,.4)' : 'rgba(255,255,255,.07)';
+      btn.style.background = on ? 'rgba(6,182,212,.1)' : 'transparent';
+      btn.style.color = on ? '#06b6d4' : '#6b7280';
+      btn.style.fontWeight = on ? '700' : '500';
+      saveState();
     }
     if (action === 'toggle-catalog') {
-      const val = (e.target.closest('[data-action="toggle-catalog"]') || e.target).dataset.val;
+      const row = e.target.closest('[data-action="toggle-catalog"]') || e.target;
+      const val = row.dataset.val;
       if (!S.catalogs) S.catalogs = ['tmdb-addon'];
       const idx = S.catalogs.indexOf(val);
       if (idx >= 0) S.catalogs.splice(idx, 1);
       else S.catalogs.push(val);
-      saveState(); render();
+      const on = S.catalogs.includes(val);
+      row.style.borderColor = on ? 'rgba(249,115,22,.35)' : 'rgba(255,255,255,.06)';
+      row.style.background = on ? 'rgba(249,115,22,.05)' : 'transparent';
+      const box = row.querySelector('div[style*="border-radius:4px"]');
+      if (box) { box.style.borderColor = on ? '#f97316' : '#374151'; box.style.background = on ? '#f97316' : 'transparent'; box.innerHTML = on ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''; }
+      const nm = row.querySelector('div[style*="font-size:.8rem"]');
+      if (nm) nm.style.color = on ? '#f97316' : '#9ca3af';
+      saveState();
     }
     if (action === 'toggle-proxy-svc') {
-      const val = (e.target.closest('[data-action="toggle-proxy-svc"]') || e.target).dataset.val;
+      const btn = e.target.closest('[data-action="toggle-proxy-svc"]') || e.target;
+      const val = btn.dataset.val;
       if (!S.proxiedServices) S.proxiedServices = [];
       const idx = S.proxiedServices.indexOf(val);
       if (idx >= 0) S.proxiedServices.splice(idx, 1);
       else S.proxiedServices.push(val);
-      saveState(); render();
+      const on = S.proxiedServices.includes(val);
+      btn.style.borderColor = on ? 'rgba(100,116,139,.5)' : 'rgba(255,255,255,.07)';
+      btn.style.background = on ? 'rgba(100,116,139,.12)' : 'transparent';
+      btn.style.color = on ? '#94a3b8' : '#6b7280';
+      btn.style.fontWeight = on ? '700' : '500';
+      saveState();
     }
     if (action === 'set-match-mode') {
       S.matchMode = (e.target.closest('[data-action="set-match-mode"]') || e.target).dataset.val;
