@@ -298,6 +298,78 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt-scraper-remove{width:28px;height:28px;border-radius:6px;background:transparent;border:1px solid #2a3a4f;color:#5a6a7c;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s}
 .opt-scraper-remove:hover{border-color:#ef444460;color:#ef4444}
 .opt-scraper-hint{font-size:.68rem;color:#4b5563;margin-top:10px;line-height:1.5;padding:8px 12px;background:#131c27;border-radius:8px;border-left:3px solid #e8a33a40}
+/* ── Onboarding Tutorial ── */
+.tut-overlay{position:fixed;inset:0;z-index:10000;pointer-events:none;transition:opacity .3s}
+.tut-overlay.active{pointer-events:auto}
+.tut-overlay:not(.active){opacity:0}
+.tut-backdrop{position:absolute;inset:0;background:rgba(6,10,16,.82);transition:opacity .3s}
+.tut-spotlight{position:absolute;border-radius:14px;box-shadow:0 0 0 4000px rgba(6,10,16,.82);border:2px solid #00d4ff;transition:all .4s cubic-bezier(.4,0,.2,1);z-index:10001}
+.tut-spotlight::after{content:'';position:absolute;inset:-4px;border-radius:16px;border:2px solid rgba(0,212,255,.2);animation:tutPulse 2s ease-in-out infinite}
+@keyframes tutPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.01)}}
+.tut-tooltip{position:absolute;z-index:10002;width:360px;max-width:calc(100vw - 40px);background:#0f1820;border:1.5px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(0,212,255,.06);transition:all .4s cubic-bezier(.4,0,.2,1);pointer-events:auto}
+.tut-tooltip::before{content:'';position:absolute;width:14px;height:14px;background:#0f1820;border:1.5px solid rgba(255,255,255,.08);transform:rotate(45deg)}
+.tut-tooltip.arrow-top::before{top:-8px;left:32px;border-right:none;border-bottom:none}
+.tut-tooltip.arrow-bottom::before{bottom:-8px;left:32px;border-left:none;border-top:none}
+.tut-tooltip.arrow-left::before{left:-8px;top:24px;border-right:none;border-top:none}
+.tut-progress{display:flex;gap:6px;margin-bottom:14px}
+.tut-prog-dot{width:24px;height:4px;border-radius:2px;background:rgba(255,255,255,.08);transition:all .3s}
+.tut-prog-dot.active{background:#00d4ff}
+.tut-prog-dot.done{background:rgba(0,212,255,.3)}
+.tut-step-badge{display:inline-flex;align-items:center;gap:6px;font-size:.6rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#00d4ff;margin-bottom:8px}
+.tut-step-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#00d4ff}
+.tut-title{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;line-height:1.3}
+.tut-desc{font-size:.8rem;color:#8b949e;line-height:1.6;margin-bottom:16px}
+.tut-desc strong{color:#e6edf3;font-weight:600}
+.tut-desc .hl{color:#00d4ff;font-weight:600}
+.tut-desc .gold{color:#e8a33a;font-weight:600}
+.tut-actions{display:flex;align-items:center;gap:8px}
+.tut-btn{padding:9px 18px;border-radius:8px;border:none;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+.tut-btn-primary{background:#00d4ff;color:#0b1219}
+.tut-btn-primary:hover{background:#33dfff}
+.tut-btn-ghost{background:transparent;color:#8b949e;border:1px solid rgba(255,255,255,.08)}
+.tut-btn-ghost:hover{color:#e6edf3;border-color:rgba(255,255,255,.15)}
+.tut-skip{margin-left:auto;font-size:.72rem;color:#4a4f60;background:none;border:none;cursor:pointer;font-family:inherit;font-weight:500}
+.tut-skip:hover{color:#8b949e}
+.tut-welcome{position:absolute;z-index:10002;top:50%;left:50%;transform:translate(-50%,-50%);width:440px;max-width:calc(100vw - 32px);background:linear-gradient(170deg,#111d2a 0%,#0b1219 100%);border:1.5px solid rgba(255,255,255,.08);border-radius:18px;padding:36px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(0,212,255,.04);pointer-events:auto}
+.tut-welcome-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#00d4ff,#0091b3);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:1.3rem}
+.tut-welcome h2{font-size:1.25rem;font-weight:900;letter-spacing:-.03em;margin-bottom:10px}
+.tut-welcome p{font-size:.82rem;color:#8b949e;line-height:1.7;margin-bottom:24px}
+.tut-welcome-features{display:flex;gap:12px;margin-bottom:24px;text-align:left}
+.tut-wf{flex:1;padding:12px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:10px}
+.tut-wf-icon{font-size:1.1rem;margin-bottom:4px}
+.tut-wf-label{font-size:.68rem;font-weight:700;color:#e6edf3}
+.tut-wf-desc{font-size:.62rem;color:#8b949e;margin-top:2px;line-height:1.4}
+.tut-welcome-actions{display:flex;flex-direction:column;gap:8px}
+.tut-welcome-actions .tut-btn{width:100%}
+.tut-time{font-size:.68rem;color:#4a4f60;margin-top:10px}
+[data-theme="light"] .tut-overlay .tut-backdrop{background:rgba(255,255,255,.82)}
+[data-theme="light"] .tut-spotlight{box-shadow:0 0 0 4000px rgba(255,255,255,.82);border-color:#0969da}
+[data-theme="light"] .tut-spotlight::after{border-color:rgba(9,105,218,.2)}
+[data-theme="light"] .tut-tooltip{background:#fff;border-color:#d0d7de;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+[data-theme="light"] .tut-tooltip::before{background:#fff;border-color:#d0d7de}
+[data-theme="light"] .tut-prog-dot{background:#d0d7de}
+[data-theme="light"] .tut-prog-dot.active{background:#0969da}
+[data-theme="light"] .tut-prog-dot.done{background:rgba(9,105,218,.3)}
+[data-theme="light"] .tut-step-badge{color:#0969da}
+[data-theme="light"] .tut-step-badge::before{background:#0969da}
+[data-theme="light"] .tut-title{color:#1c2128}
+[data-theme="light"] .tut-desc{color:#57606a}
+[data-theme="light"] .tut-desc strong{color:#1c2128}
+[data-theme="light"] .tut-desc .hl{color:#0969da}
+[data-theme="light"] .tut-desc .gold{color:#a16207}
+[data-theme="light"] .tut-btn-primary{background:#0969da;color:#fff}
+[data-theme="light"] .tut-btn-primary:hover{background:#0550ae}
+[data-theme="light"] .tut-btn-ghost{border-color:#d0d7de;color:#57606a}
+[data-theme="light"] .tut-btn-ghost:hover{color:#1c2128;border-color:#8c959f}
+[data-theme="light"] .tut-skip{color:#8c959f}
+[data-theme="light"] .tut-welcome{background:linear-gradient(170deg,#f6f8fa 0%,#fff 100%);border-color:#d0d7de;box-shadow:0 30px 80px rgba(0,0,0,.1)}
+[data-theme="light"] .tut-welcome h2{color:#1c2128}
+[data-theme="light"] .tut-welcome p{color:#57606a}
+[data-theme="light"] .tut-wf{background:rgba(9,105,218,.03);border-color:rgba(9,105,218,.1)}
+[data-theme="light"] .tut-wf-label{color:#1c2128}
+[data-theme="light"] .tut-wf-desc{color:#57606a}
+[data-theme="light"] .tut-time{color:#8c959f}
+@media(max-width:480px){.tut-tooltip{width:calc(100vw - 32px)}.tut-welcome{padding:24px}.tut-welcome-features{flex-direction:column}}
 .qs-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
 .qs-overlay.open{opacity:1;pointer-events:auto}
 .qs-panel{width:100%;max-width:440px;max-height:85vh;overflow-y:auto;background:#151923;border:1px solid rgba(255,255,255,.06);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.5);transform:translateY(12px);transition:transform .25s}
@@ -1213,6 +1285,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </div>
   </div>
 </div>
+<!-- Onboarding Tutorial Overlay -->
+<div class="tut-overlay" id="tutOverlay">
+  <div class="tut-backdrop" id="tutBackdrop"></div>
+  <div class="tut-welcome" id="tutWelcome" style="display:none">
+    <div class="tut-welcome-icon">&#9889;</div>
+    <h2>Welcome to Core Builds</h2>
+    <p>Core Builds creates optimised streaming configs for <strong style="color:#e6edf3">Stremio</strong>. It sets up how your streams are found, filtered, sorted, and displayed — so you get the best results without manual tweaking.</p>
+    <div class="tut-welcome-features">
+      <div class="tut-wf">
+        <div class="tut-wf-icon">&#127916;</div>
+        <div class="tut-wf-label">What it does</div>
+        <div class="tut-wf-desc">Builds a template that tells AIOStreams how to find and rank your streams</div>
+      </div>
+      <div class="tut-wf">
+        <div class="tut-wf-icon">&#128338;</div>
+        <div class="tut-wf-label">How long</div>
+        <div class="tut-wf-desc">Under 2 minutes with Guided Setup, or customise everything yourself</div>
+      </div>
+      <div class="tut-wf">
+        <div class="tut-wf-icon">&#128274;</div>
+        <div class="tut-wf-label">Privacy</div>
+        <div class="tut-wf-desc">Nothing leaves your browser — API keys stay in your downloaded file only</div>
+      </div>
+    </div>
+    <div class="tut-welcome-actions">
+      <button class="tut-btn tut-btn-primary" data-action="tut-start" style="padding:11px 24px;font-size:.88rem">Show Me Around</button>
+      <button class="tut-btn tut-btn-ghost" data-action="tut-close" style="padding:9px 24px">I know what I'm doing — skip</button>
+    </div>
+    <div class="tut-time">Takes about 30 seconds</div>
+  </div>
+  <div class="tut-spotlight" id="tutSpotlight" style="display:none"></div>
+  <div class="tut-tooltip arrow-top" id="tutTooltip" style="display:none">
+    <div class="tut-progress" id="tutProgress"></div>
+    <div class="tut-step-badge" id="tutBadge"></div>
+    <div class="tut-title" id="tutTitle"></div>
+    <div class="tut-desc" id="tutDesc"></div>
+    <div class="tut-actions">
+      <button class="tut-btn tut-btn-primary" id="tutNext" data-action="tut-next">Next</button>
+      <button class="tut-btn tut-btn-ghost" id="tutBack" data-action="tut-back">Back</button>
+      <button class="tut-skip" data-action="tut-close">Skip tutorial</button>
+    </div>
+  </div>
+</div>
 <nav class="cb-sidebar" id="cbSidebar">
   <div class="sb-brand">
     <div class="sb-brand-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22"><defs><linearGradient id="sbg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient><linearGradient id="sbg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient></defs><polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#sbg1)" stroke-width="22" stroke-linejoin="round"/><polygon points="256,166 346,256 256,346 166,256" fill="url(#sbg2)" opacity=".85"/></svg></div>
@@ -1246,7 +1361,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.60';
+const CONFIGURATOR_VERSION = '2.61';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1300,6 +1415,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.61', date:'Jul 17 2026', items:[
+    'Onboarding Tutorial — interactive coach-mark walkthrough for first-time visitors with spotlight cutouts on key UI elements',
+    'Tutorial auto-launches on first visit (skipped for returning users with saved state); accessible via the Tutorial preset on the splash screen',
+    '4-step guided tour: Choose Your Path, Quick Deploy Presets, What\'s Debrid, and Ready to Build',
+  ]},
   { v:'2.60', date:'Jul 17 2026', items:[
     'Optional Scrapers — add extra Newznab indexers (NZBnoob, altHUB, Usenet Crawler, DrunkenSlug, NZBFinder) from a dropdown in the service selection step',
     'Optional scraper API keys automatically appear on the API Keys step when a scraper is added',
@@ -2757,7 +2877,7 @@ function splashPresetsHtml(svc) {
     presets.push({action:'quick-start',preset:'http',icon:ICO.globe(22,'#34d399'),name:'Free Streaming',detail:'No account needed'});
     presets.push({action:'quick-start',preset:'p2p',icon:ICO.link(22,'#fbbf24'),name:'Free P2P',detail:'Torrents · No debrid'});
   }
-  presets.push({action:'open-quickstart',preset:'',icon:ICO.question(22,'#f472b6'),name:'Quick Start',detail:'New here? Start here'});
+  presets.push({action:'open-tutorial',preset:'',icon:ICO.question(22,'#f472b6'),name:'Tutorial',detail:'New here? Start here'});
   presets.push({action:'paste-manifest-splash',preset:'',icon:ICO.clipboard(22,'#fb923c'),name:'Paste Manifest',detail:'Import existing config'});
   return presets.map(p => `<div class="splash-preset-card" data-action="${p.action}"${p.preset?` data-preset="${p.preset}"`:''} tabindex="0" role="button">
     <div class="splash-preset-icon">${p.icon}</div>
@@ -3400,6 +3520,93 @@ function syncNext() {
 
 /* DELEGATED EVENTS */
 { const l = document.getElementById('cb-loader'); if (l) l.addEventListener('animationend', () => l.remove()); }
+// ── Onboarding Tutorial System ──
+const TUT_STEPS = [
+  { id:'welcome' },
+  {
+    id:'paths', badge:'Step 1 of 4', title:'Choose Your Path',
+    desc:'<strong>Guided Setup</strong> is perfect if you\'re new — just 3 quick steps and you\'re done.<br><br><span class="hl">Core Configure</span> gives you full control over every filter, sort rule, and formatter.<br><br>Already have a template? <span class="gold">Update Template</span> lets you paste it in and tweak.',
+    target:'.splash-doors', arrow:'top', nextLabel:'Next'
+  },
+  {
+    id:'presets', badge:'Step 2 of 4', title:'Quick Deploy Presets',
+    desc:'Don\'t want to configure anything? These <strong>one-click presets</strong> generate a full template instantly based on your selected service.<br><br>Just pick one, enter your API key, and you\'re streaming.',
+    target:'#splashPresets', arrow:'top', nextLabel:'Next'
+  },
+  {
+    id:'debrid', badge:'Step 3 of 4', title:'What\'s a Debrid Service?',
+    desc:'A <span class="hl">debrid service</span> downloads torrents on fast servers and gives you a direct stream link — so you get <strong>instant playback without seeding</strong>.<br><br>Think of it as a middleman: it caches popular content so streams load in seconds. <span class="gold">TorBox</span> and <span class="gold">Real-Debrid</span> are the most popular.<br><br>Cost is typically <strong>$3–5/month</strong> for unlimited streaming.',
+    target:'.splash-chips', arrow:'bottom', nextLabel:'Next'
+  },
+  {
+    id:'start', badge:'Step 4 of 4', title:'Ready to Build!',
+    desc:'That\'s everything you need to know. Pick <strong>Guided Setup</strong> for the fastest path, or <span class="hl">Core Configure</span> for full control.<br><br>Your template will include <strong>14+ scrapers</strong>, smart sorting, regex scoring, and quality filters — all pre-configured based on your choices.',
+    target:'.splash-doors [data-action="easy-start"]', arrow:'top', nextLabel:'Start Building'
+  },
+];
+let _tutStep = -1;
+function tutGo(n) {
+  _tutStep = n;
+  const ov = document.getElementById('tutOverlay');
+  const welcome = document.getElementById('tutWelcome');
+  const spot = document.getElementById('tutSpotlight');
+  const tip = document.getElementById('tutTooltip');
+  ov.classList.add('active');
+  const s = TUT_STEPS[n];
+  if (s.id === 'welcome') {
+    welcome.style.display = '';
+    spot.style.display = 'none';
+    tip.style.display = 'none';
+    document.getElementById('tutBackdrop').style.display = '';
+    return;
+  }
+  welcome.style.display = 'none';
+  document.getElementById('tutBackdrop').style.display = 'none';
+  const el = document.querySelector(s.target);
+  if (!el) { tutClose(); return; }
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
+  setTimeout(() => {
+    const r = el.getBoundingClientRect();
+    const pad = 8;
+    spot.style.display = '';
+    spot.style.position = 'fixed';
+    spot.style.top = (r.top - pad) + 'px';
+    spot.style.left = (r.left - pad) + 'px';
+    spot.style.width = (r.width + pad * 2) + 'px';
+    spot.style.height = (r.height + pad * 2) + 'px';
+    tip.style.display = '';
+    tip.style.position = 'fixed';
+    tip.className = 'tut-tooltip arrow-' + (s.arrow || 'top');
+    if (s.arrow === 'bottom') {
+      tip.style.top = Math.max(20, r.top - tip.offsetHeight - 16) + 'px';
+    } else {
+      tip.style.top = (r.bottom + 16) + 'px';
+    }
+    tip.style.left = Math.max(20, r.left) + 'px';
+    tip.style.right = 'auto';
+    requestAnimationFrame(() => {
+      const tr = tip.getBoundingClientRect();
+      if (tr.right > window.innerWidth - 20) tip.style.left = (window.innerWidth - tr.width - 20) + 'px';
+      if (tr.bottom > window.innerHeight - 20) tip.style.top = Math.max(20, window.innerHeight - tr.height - 20) + 'px';
+    });
+    document.getElementById('tutBadge').textContent = s.badge;
+    document.getElementById('tutTitle').textContent = s.title;
+    document.getElementById('tutDesc').innerHTML = s.desc;
+    document.getElementById('tutNext').textContent = s.nextLabel || 'Next';
+    document.getElementById('tutBack').style.display = n <= 1 ? 'none' : '';
+    const dots = TUT_STEPS.slice(1).map((_, i) => {
+      const cls = i < n - 1 ? 'done' : i === n - 1 ? 'active' : '';
+      return '<div class="tut-prog-dot ' + cls + '"></div>';
+    }).join('');
+    document.getElementById('tutProgress').innerHTML = dots;
+  }, 350);
+}
+function tutClose() {
+  document.getElementById('tutOverlay').classList.remove('active');
+  localStorage.setItem('cb_tut_seen', '1');
+  _tutStep = -1;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   // Migrate legacy '10GB'-style size limits saved by older versions
@@ -3427,6 +3634,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => showToast('Shared config loaded — review and install'), 300);
   }
   render();
+  if (!hadSavedState && !_sharedImport && !localStorage.getItem('cb_tut_seen')) {
+    setTimeout(() => tutGo(0), 600);
+  }
   try { history.replaceState({ step: step }, ''); } catch(e) {}
   window.addEventListener('popstate', (e) => {
     const m = document.getElementById('manifestModal'); if (m) m.remove();
@@ -3437,6 +3647,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcuts: Enter = next, Escape = back, Arrows = navigate options
   document.addEventListener('keydown', (e) => {
+    if (_tutStep >= 0) { if (e.key === 'Escape') tutClose(); return; }
     const qsOv = document.getElementById('qsOverlay');
     if (qsOv && qsOv.classList.contains('open')) { if (e.key === 'Escape') qsOv.classList.remove('open'); return; }
 
@@ -3666,6 +3877,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'open-quickstart') { document.getElementById('qsOverlay').classList.add('open'); }
     if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { document.getElementById('qsOverlay').classList.remove('open'); }
+    if (action === 'tut-start') { tutGo(1); }
+    if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else tutClose(); }
+    if (action === 'tut-back') { if (_tutStep > 1) tutGo(_tutStep - 1); }
+    if (action === 'tut-close') { tutClose(); }
+    if (action === 'open-tutorial') { tutGo(0); }
     if (action === 'share-config') shareConfig();
     if (action === 'open-troubleshooter') showTroubleshooter();
     if (action === 'restore-backup') {
