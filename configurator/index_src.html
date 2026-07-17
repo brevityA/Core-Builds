@@ -278,6 +278,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-list-row input:checked+label .svc-row-ck{background:#00d4ff;border-color:#00d4ff}
 .svc-list-row input:checked+label .svc-row-ck svg{opacity:1}
 .svc-empty{text-align:center;padding:24px 0;color:#3e4a5c;font-size:.76rem;display:none}
+.opt-scraper-section{margin-top:24px}
+.opt-scraper-divider{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.opt-scraper-line{flex:1;height:1px;background:#1c2d3f}
+.opt-scraper-label{font-size:.68rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#e8a33a;white-space:nowrap}
+.opt-scraper-desc{font-size:.72rem;color:#5a6a7c;margin-bottom:12px;line-height:1.5}
+.opt-scraper-dd-wrap{position:relative;margin-bottom:10px}
+.opt-scraper-dd{width:100%;padding:12px 16px;padding-right:36px;background:#131c27;border:1.5px solid #1c2d3f;border-radius:10px;color:#dfe8f0;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color .2s}
+.opt-scraper-dd:hover,.opt-scraper-dd:focus{border-color:#e8a33a40;outline:none}
+.opt-scraper-dd-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#5a6a7c;font-size:13px;pointer-events:none}
+.opt-scraper-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#131c27;border:1.5px solid #1c2d3f;border-radius:10px;margin-bottom:8px;transition:border-color .2s}
+.opt-scraper-row:hover{border-color:#e8a33a30}
+.opt-scraper-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0}
+.opt-scraper-info{flex:1;min-width:0}
+.opt-scraper-name{font-size:.82rem;font-weight:700;color:#dfe8f0}
+.opt-scraper-subdesc{font-size:.68rem;color:#5a6a7c;margin-top:1px}
+.opt-scraper-badge{font-size:.55rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.opt-scraper-badge-usenet{background:#06b6d418;color:#06b6d4;border:1px solid #06b6d430}
+.opt-scraper-badge-debrid{background:#14b8a618;color:#14b8a6;border:1px solid #14b8a630}
+.opt-scraper-remove{width:28px;height:28px;border-radius:6px;background:transparent;border:1px solid #2a3a4f;color:#5a6a7c;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s}
+.opt-scraper-remove:hover{border-color:#ef444460;color:#ef4444}
+.opt-scraper-hint{font-size:.68rem;color:#4b5563;margin-top:10px;line-height:1.5;padding:8px 12px;background:#131c27;border-radius:8px;border-left:3px solid #e8a33a40}
 .qs-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
 .qs-overlay.open{opacity:1;pointer-events:auto}
 .qs-panel{width:100%;max-width:440px;max-height:85vh;overflow-y:auto;background:#151923;border:1px solid rgba(255,255,255,.06);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.5);transform:translateY(12px);transition:transform .25s}
@@ -859,6 +880,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .svc-row-ck{border-color:#d0d7de}
 [data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da;border-color:#0969da}
 [data-theme="light"] .svc-empty{color:#8c959f}
+[data-theme="light"] .opt-scraper-line{background:#d0d7de}
+[data-theme="light"] .opt-scraper-dd{background:#fff;border-color:#d0d7de;color:#1c2128}
+[data-theme="light"] .opt-scraper-row{background:#fff;border-color:#d0d7de}
+[data-theme="light"] .opt-scraper-name{color:#1c2128}
+[data-theme="light"] .opt-scraper-subdesc{color:#57606a}
+[data-theme="light"] .opt-scraper-desc{color:#57606a}
+[data-theme="light"] .opt-scraper-remove{border-color:#d0d7de;color:#8c959f}
+[data-theme="light"] .opt-scraper-hint{background:#f6f8fa;border-left-color:rgba(9,105,218,.3);color:#57606a}
 [data-theme="light"] .qs-panel{background:#fff;border-color:#d0d7de;box-shadow:0 16px 48px rgba(0,0,0,.15)}
 [data-theme="light"] .qs-hdr{background:linear-gradient(135deg,rgba(9,105,218,.04),rgba(130,80,223,.03));border-bottom-color:#d0d7de}
 [data-theme="light"] .qs-hdr-icon{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.25)}
@@ -1218,7 +1247,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.59';
+const CONFIGURATOR_VERSION = '2.60';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1272,6 +1301,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.60', date:'Jul 17 2026', items:[
+    'Optional Scrapers — add extra indexers (NZBnoob, altHUB, Usenet Crawler, DrunkenSlug, NZBFinder, Debridio) from a dropdown in the service selection step',
+    'Optional scraper API keys automatically appear on the API Keys step when a scraper is added',
+    'Newznab indexers use the same integration pattern as NZBGeek — type:newznab with full config options',
+  ]},
   { v:'2.59', date:'Jul 17 2026', items:[
     'Subtitle Picker — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 30 languages in the Fine-Tune panel',
     'Catalog Presets — add TMDB, Streaming, Anime, RPDB, and Torrent catalog addons from the Fine-Tune panel',
@@ -1697,7 +1731,15 @@ function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [H
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [] };
+const OPTIONAL_SCRAPER_DEFS = [
+  { id:'debridio-opt', label:'Debridio', desc:'Search + caching via Debridio', presetType:'debridio', cat:'debrid', color:'#14b8a6', credKey:'debridio' },
+  { id:'nzbnoob', label:'NZBnoob', desc:'Free Newznab indexer · 1,500-day retention', presetType:'newznab', cat:'usenet', color:'#22c55e', credKey:'nzbnoob', apiUrl:'https://nzbnoob.com', apiPath:'/api' },
+  { id:'althub', label:'altHUB', desc:'Newznab indexer · 900k+ NZBs', presetType:'newznab', cat:'usenet', color:'#3b82f6', credKey:'althub', apiUrl:'https://api.althub.co.za', apiPath:'/api' },
+  { id:'usenetcrawler', label:'Usenet Crawler', desc:'Newznab indexer · 5k free API/day', presetType:'newznab', cat:'usenet', color:'#a78bfa', credKey:'usenetcrawler', apiUrl:'https://usenet-crawler.com', apiPath:'/api' },
+  { id:'drunkenslug', label:'DrunkenSlug', desc:'Popular Newznab indexer', presetType:'newznab', cat:'usenet', color:'#f97316', credKey:'drunkenslug', apiUrl:'https://api.drunkenslug.com', apiPath:'/api' },
+  { id:'nzbfinder', label:'NZBFinder', desc:'Newznab indexer · generous free tier', presetType:'newznab', cat:'usenet', color:'#06b6d4', credKey:'nzbfinder', apiUrl:'https://nzbfinder.ws', apiPath:'/api' },
+];
 
 const FORMATTERS = [
   {
@@ -1926,7 +1968,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers'];
 function shareConfig() {
   try {
     const pub = {};
@@ -1958,6 +2000,7 @@ function sanitizeSharedConfig(d) {
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
   if (Array.isArray(d.langs)) { const l = d.langs.filter(v => LANG_OPTS.some(o => o.v === v)); if (l.length) out.langs = l; }
   if (typeof d.name === 'string') out.name = d.name.replace(/[<>"'&`]/g, '').slice(0, 60);
+  if (Array.isArray(d.optionalScrapers)) out.optionalScrapers = d.optionalScrapers.filter(v => OPTIONAL_SCRAPER_DEFS.some(x => x.id === v));
   return out;
 }
 
@@ -2241,7 +2284,9 @@ function renderOpts(def) {
       </label></div>`;
     }).join('');
     const emptyHtml = '<div class="svc-empty" id="svcEmpty">No services match your search</div>';
-    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}</div>`;
+    const availScrapers = OPTIONAL_SCRAPER_DEFS.filter(d => !S.optionalScrapers.includes(d.id));
+    const optDropdown = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Add extra indexers and scrapers. Each requires an API key — entered on the API Keys step.</div><div class="opt-scraper-dd-wrap"><select data-action="add-optional-scraper" class="opt-scraper-dd"><option value="">Add a scraper…</option>${availScrapers.map(d => `<option value="${d.id}">${d.label} — ${d.desc}</option>`).join('')}</select><span class="opt-scraper-dd-arrow">&#9662;</span></div>${S.optionalScrapers.map(id => { const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === id); if (!d) return ''; const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat; return `<div class="opt-scraper-row"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><div class="opt-scraper-info"><div class="opt-scraper-name">${d.label}</div><div class="opt-scraper-subdesc">${d.desc}</div></div><span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span><button type="button" data-action="remove-optional-scraper" data-scraper-id="${d.id}" class="opt-scraper-remove" title="Remove">&times;</button></div>`; }).join('')}${S.optionalScrapers.length ? '<div class="opt-scraper-hint">API keys for added scrapers appear on Step 5 (API Keys). Newznab indexers use the same integration as NZBGeek.</div>' : ''}</div>`;
+    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optDropdown}</div>`;
   }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
@@ -3477,6 +3522,14 @@ document.addEventListener('DOMContentLoaded', () => {
       updateFmtReceiptRow();
       document.querySelectorAll('[data-action="fmt-dropdown-change"]').forEach(sel => { if (sel !== e.target) sel.value = S.formatter; });
     }
+    if (e.target.matches('[data-action="add-optional-scraper"]')) {
+      const id = e.target.value;
+      if (id && OPTIONAL_SCRAPER_DEFS.find(d => d.id === id) && !S.optionalScrapers.includes(id)) {
+        S.optionalScrapers.push(id);
+        saveState(); render();
+      }
+      e.target.value = '';
+    }
     if (e.target.matches('[data-action="dev-more-select"]')) {
       const val = e.target.value;
       if (val) {
@@ -3789,6 +3842,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'import-formatter') { showFormatterImport(); }
     if (action === 'compare-templates') { showCompareTemplates(); }
     if (action === 'show-changelog') { showChangelog(); }
+    if (action === 'remove-optional-scraper') {
+      const sid = el.dataset.scraperId;
+      const i = S.optionalScrapers.indexOf(sid);
+      if (i >= 0) { S.optionalScrapers.splice(i, 1); saveState(); render(); }
+    }
     if (action === 'svc-cat') {
       const cat = el.dataset.cat;
       document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === cat));
@@ -4025,6 +4083,11 @@ function getDebridInputs() {
     pikpak:       { label:'PikPak API Key',        placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://mypikpak.com/' },
     seedr:        { label:'Seedr API Key',         placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://www.seedr.cc/' },
     streamnzb:    { label:'StreamNZB Manifest URL', placeholder:'https://your-streamnzb-instance/manifest.json', url:'' },
+    nzbnoob:      { label:'NZBnoob API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbnoob.com' },
+    althub:       { label:'altHUB API Key',         placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://althub.co.za' },
+    usenetcrawler:{ label:'Usenet Crawler API Key', placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://usenet-crawler.com' },
+    drunkenslug:  { label:'DrunkenSlug API Key',    placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://drunkenslug.com' },
+    nzbfinder:    { label:'NZBFinder API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbfinder.ws' },
   };
   const ids = [];
   if (m.includes('torbox-pro')||m.includes('torbox-ess')||m.includes('hybrid')) ids.push('torbox');
@@ -4040,6 +4103,10 @@ function getDebridInputs() {
   if (m.includes('seedr'))      ids.push('seedr');
   if (m.includes('nzbgeek'))    ids.push('nzbgeek');
   if (m.includes('streamnzb'))  ids.push('streamnzb');
+  S.optionalScrapers.forEach(sid => {
+    const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+    if (d && d.credKey && defs[d.credKey] && !ids.includes(d.credKey)) ids.push(d.credKey);
+  });
   return [...new Set(ids)].map(id => ({id, ...defs[id]})).filter(d => d.label);
 }
 
@@ -4129,6 +4196,16 @@ function presets() {
     ...(isDebridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
+    ...S.optionalScrapers.filter(sid => {
+      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      if (!d) return false;
+      if (d.id === 'debridio-opt' && isDebridio) return false;
+      return true;
+    }).map(sid => {
+      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      if (d.presetType === 'debridio') return { type:'debridio', instanceId:'dbio-opt-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] };
+      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, newznabUrl:d.apiUrl, apiPath:d.apiPath, apiKey:S.creds[d.credKey] || '', timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } };
+    }),
     ...(hasExtraHttp ? [
       { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
       { type:'nuvio-streams', instanceId:'nvs-1', enabled:true, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
