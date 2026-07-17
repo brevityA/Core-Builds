@@ -1287,6 +1287,12 @@ const CHANGELOG = [
     'Progress — "Auto-saved" indicator flashes after each state change',
     'Accessibility — prefers-reduced-motion disables all animations and transitions',
   ]},
+  { v:'2.57', date:'Jul 17 2026', items:[
+    'Subtitle Picker — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 30 languages in the Fine-Tune panel',
+    'Catalog Presets — add TMDB, Streaming, Anime, RPDB, and Torrent catalog addons from the Fine-Tune panel',
+    'Proxy Configuration — enable MediaFlow proxy and select which debrid services to route through it',
+    'Dedup Merge / Failover — toggle deduplicator merge mode to keep deduplicated streams as failover alternatives instead of discarding them',
+  ]},
   { v:'2.56', date:'Jul 17 2026', items:[
     'Free Tier Overhaul — P2P templates now include Torrentio, Peerflix, and Sootio as primary scrapers with HdHub enabled by default',
     'Free Tier — 3-tier addon grouping: Primary (Torrentio/Zilean/Sootio/Peerflix/Nuvio) always runs, Secondary (Meteor/Comet/MediaFusion/HdHub) activates when <5 streams, Fallback (EZTV/TG/Knaben/TorrentsDB) when <15 streams',
@@ -1691,7 +1697,7 @@ function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [H
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '' };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false };
 
 const FORMATTERS = [
   {
@@ -1920,7 +1926,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge'];
 function shareConfig() {
   try {
     const pub = {};
@@ -2552,6 +2558,69 @@ function renderAdvancedPanel() {
         ${fmtDropdownHtml()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles</div>
+        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
+          <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            ${[['aiosubtitle','AIOSubtitle','Built-in, fast'],['opensubtitles-v3-plus','OpenSubtitles v3+','Largest database'],['subdl','SubDL','Fast alternative']].map(([id,name,desc])=>{
+              const on=(S.subtitleAddons||['aiosubtitle']).includes(id);
+              return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:all .15s">
+                <div style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#06b6d4':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#06b6d4':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+                <div style="flex:1"><div style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
+              </div>`;
+            }).join('')}
+          </div>
+          <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-top:12px;margin-bottom:8px">Subtitle Languages</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            ${['en','es','fr','de','it','pt','nl','pl','ru','ar','ja','ko','zh','hi','tr','sv','da','no','fi','cs','hu','ro','el','he','th','vi','id','ms','uk','bg'].map(l=>{
+              const on=(S.subtitleLangs||['en']).includes(l);
+              const names={en:'English',es:'Spanish',fr:'French',de:'German',it:'Italian',pt:'Portuguese',nl:'Dutch',pl:'Polish',ru:'Russian',ar:'Arabic',ja:'Japanese',ko:'Korean',zh:'Chinese',hi:'Hindi',tr:'Turkish',sv:'Swedish',da:'Danish',no:'Norwegian',fi:'Finnish',cs:'Czech',hu:'Hungarian',ro:'Romanian',el:'Greek',he:'Hebrew',th:'Thai',vi:'Vietnamese',id:'Indonesian',ms:'Malay',uk:'Ukrainian',bg:'Bulgarian'};
+              return `<button data-action="toggle-sub-lang" data-val="${l}" style="padding:4px 8px;border-radius:6px;font-size:.68rem;font-weight:${on?'700':'500'};border:1px solid ${on?'rgba(6,182,212,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(6,182,212,.1)':'transparent'};color:${on?'#06b6d4':'#6b7280'};cursor:pointer;transition:all .15s" title="${names[l]||l}">${l.toUpperCase()}</button>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery</div>
+        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
+          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            ${[['tmdb-addon','TMDB Addon','Popular & trending movies/series'],['streaming-catalogs','Streaming Catalogs','Netflix, Disney+, etc.'],['anime-catalogs','Anime Catalogs','MAL, AniList, Kitsu'],['rpdb-catalogs','RPDB Catalogs','Release tracking & ratings'],['torrent-catalogs','Torrent Catalogs','Top seeded torrents']].map(([id,name,desc])=>{
+              const on=(S.catalogs||['tmdb-addon']).includes(id);
+              return `<div data-action="toggle-catalog" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(249,115,22,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(249,115,22,.05)':'transparent'};transition:all .15s">
+                <div style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#f97316':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#f97316':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+                <div style="flex:1"><div style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      ${(S.service !== 'p2p' && S.service !== 'http') ? `<div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.gear(16,'#64748b')} Proxy & Resilience</div>
+        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
+          ${prefCard('proxyEnabled','Enable Stream Proxy','Route streams through MediaFlow proxy. Helps with geo-restrictions and ISP throttling.')}
+          ${S.proxyEnabled ? `<div style="margin-top:10px">
+            <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Proxy Through Services</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              ${['realdebrid','alldebrid','torbox','premiumize','debridlink','easynews'].map(s=>{
+                const on=(S.proxiedServices||[]).includes(s);
+                const names={realdebrid:'Real-Debrid',alldebrid:'AllDebrid',torbox:'TorBox',premiumize:'Premiumize',debridlink:'Debrid-Link',easynews:'EasyNews'};
+                return `<button data-action="toggle-proxy-svc" data-val="${s}" style="padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:${on?'700':'500'};border:1px solid ${on?'rgba(100,116,139,.5)':'rgba(255,255,255,.07)'};background:${on?'rgba(100,116,139,.12)':'transparent'};color:${on?'#94a3b8':'#6b7280'};cursor:pointer;transition:all .15s">${names[s]||s}</button>`;
+              }).join('')}
+            </div>
+          </div>` : ''}
+          <div style="margin-top:10px">
+            ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks instead of discarding. If the primary stream fails, AIOStreams tries the next best match.')}
+          </div>
+        </div>
+      </div>` : `<div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.gear(16,'#64748b')} Resilience</div>
+        ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks. If the primary stream fails, AIOStreams tries the next best match.')}
+      </div>`}
 
     </div>
   </div>`;
@@ -3641,6 +3710,38 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.fontWeight  = on ? '700' : '500';
       });
     }
+    if (action === 'toggle-sub-addon') {
+      const val = (e.target.closest('[data-action="toggle-sub-addon"]') || e.target).dataset.val;
+      if (!S.subtitleAddons) S.subtitleAddons = ['aiosubtitle'];
+      const idx = S.subtitleAddons.indexOf(val);
+      if (idx >= 0) { if (S.subtitleAddons.length > 1) S.subtitleAddons.splice(idx, 1); }
+      else S.subtitleAddons.push(val);
+      saveState(); render();
+    }
+    if (action === 'toggle-sub-lang') {
+      const val = (e.target.closest('[data-action="toggle-sub-lang"]') || e.target).dataset.val;
+      if (!S.subtitleLangs) S.subtitleLangs = ['en'];
+      const idx = S.subtitleLangs.indexOf(val);
+      if (idx >= 0) { if (S.subtitleLangs.length > 1) S.subtitleLangs.splice(idx, 1); }
+      else S.subtitleLangs.push(val);
+      saveState(); render();
+    }
+    if (action === 'toggle-catalog') {
+      const val = (e.target.closest('[data-action="toggle-catalog"]') || e.target).dataset.val;
+      if (!S.catalogs) S.catalogs = ['tmdb-addon'];
+      const idx = S.catalogs.indexOf(val);
+      if (idx >= 0) S.catalogs.splice(idx, 1);
+      else S.catalogs.push(val);
+      saveState(); render();
+    }
+    if (action === 'toggle-proxy-svc') {
+      const val = (e.target.closest('[data-action="toggle-proxy-svc"]') || e.target).dataset.val;
+      if (!S.proxiedServices) S.proxiedServices = [];
+      const idx = S.proxiedServices.indexOf(val);
+      if (idx >= 0) S.proxiedServices.splice(idx, 1);
+      else S.proxiedServices.push(val);
+      saveState(); render();
+    }
     if (action === 'set-match-mode') {
       S.matchMode = (e.target.closest('[data-action="set-match-mode"]') || e.target).dataset.val;
       if (S.matchMode === 'strict') S.qualityFirst = true;
@@ -3942,6 +4043,27 @@ function getDebridInputs() {
   return [...new Set(ids)].map(id => ({id, ...defs[id]})).filter(d => d.label);
 }
 
+function subtitlePresets() {
+  const addons = S.subtitleAddons || ['aiosubtitle'];
+  const langs = S.subtitleLangs || ['en'];
+  const out = [];
+  if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
+  if (addons.includes('opensubtitles')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000 } });
+  if (addons.includes('subdl')) out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000 } });
+  return out;
+}
+
+function catalogPresets() {
+  const cats = S.catalogs || ['tmdb-addon'];
+  const out = [];
+  if (cats.includes('tmdb-addon')) out.push({ type:'tmdb-addon', instanceId:'tmdb-cat-1', enabled:true, options:{ name:'TMDB', timeout:5000 }, resources:['catalog','meta'], category:'meta_catalogs' });
+  if (cats.includes('streaming-catalogs')) out.push({ type:'streaming-catalogs', instanceId:'strm-cat-1', enabled:true, options:{ name:'Streaming Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  if (cats.includes('anime-catalogs')) out.push({ type:'anime-catalogs', instanceId:'ani-cat-1', enabled:true, options:{ name:'Anime Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  if (cats.includes('rpdb-catalogs')) out.push({ type:'rpdb-catalogs', instanceId:'rpdb-cat-1', enabled:true, options:{ name:'RPDB Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  if (cats.includes('torrent-catalogs')) out.push({ type:'torrent-catalogs', instanceId:'torr-cat-1', enabled:true, options:{ name:'Torrent Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  return out;
+}
+
 function sid() { return Math.random().toString(36).substring(2,8); }
 
 function defaultName() {
@@ -3975,7 +4097,8 @@ function presets() {
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:true, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     { type:'hdhub', instanceId:'hdhub-1', enabled:true, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
-    { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
+    ...subtitlePresets(),
+    ...catalogPresets()
   ];
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr','hybrid':'StremThru RD'};
   const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
@@ -4025,7 +4148,8 @@ function presets() {
     ] : []),
     { type:'sootio', instanceId:'sootio-core-builds', enabled:isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
     ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000 }, resources:['stream'] }] : []),
-    { type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:['en'] } }
+    ...subtitlePresets(),
+    ...catalogPresets()
   ];
   if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
   return list;
@@ -4284,9 +4408,9 @@ function build() {
       if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
       const isHybrid=S.service==='hybrid'||(S.service==='multi'&&S.multiServices&&S.multiServices.includes('torbox-pro')&&S.multiServices.includes('realdebrid')), svcKey=isHybrid?[{key:'service',direction:d}]:[];
       return { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] }; })(),
-    deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'keep_all' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'keep_all' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] }; })(),
+    deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'keep_all' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'keep_all' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', merge: S.dedupMerge || false, tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] }; })(),
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v3')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
-    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
+    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: presets(), services: services(),
   };

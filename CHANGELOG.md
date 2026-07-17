@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.3.2 (2026-07-17)
+
+### Added
+- **Subtitle Picker** (Configurator v2.57) — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 30 languages in the Fine-Tune panel
+- **Catalog Presets** (Configurator v2.57) — add TMDB, Streaming, Anime, RPDB, and Torrent catalog addons from the Fine-Tune panel
+- **Proxy Configuration** (Configurator v2.57) — enable MediaFlow proxy and select which debrid services to route through it
+- **Dedup Merge / Failover** (Configurator v2.57) — toggle deduplicator merge mode to keep deduplicated streams as failover alternatives
+
 ## 3.3.1 (2026-07-17)
 
 ### Added
