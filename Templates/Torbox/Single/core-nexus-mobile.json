@@ -111,8 +111,7 @@
       "TrueHD",
       "DTS-HD MA",
       "DTS:X",
-      "FLAC",
-      "DTS-HD HRA"
+      "FLAC"
     ],
     "includedAudioTags": [],
     "requiredAudioTags": [],
@@ -157,9 +156,7 @@
     "preferredEncodes": [
       "HEVC",
       "AV1",
-      "H.264",
-      "x264",
-      "x265"
+      "AVC"
     ],
     "excludedRegexPatterns": [
       "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
