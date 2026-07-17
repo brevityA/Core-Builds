@@ -1291,7 +1291,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="tut-welcome" id="tutWelcome" style="display:none">
     <div class="tut-welcome-icon">&#9889;</div>
     <h2>Welcome to Core Builds</h2>
-    <p>Core Builds creates optimised streaming configs for <strong style="color:#e6edf3">Stremio</strong>. It sets up how your streams are found, filtered, sorted, and displayed — so you get the best results without manual tweaking.</p>
+    <p>Core Builds creates optimised streaming configs for <strong style="color:#e6edf3">Stremio</strong> and third-party applications that support Stremio addons. It sets up how your streams are found, filtered, sorted, and displayed — so you get the best results without manual tweaking.</p>
     <div class="tut-welcome-features">
       <div class="tut-wf">
         <div class="tut-wf-icon">&#127916;</div>
@@ -3574,21 +3574,6 @@ function tutGo(n) {
     spot.style.left = (r.left - pad) + 'px';
     spot.style.width = (r.width + pad * 2) + 'px';
     spot.style.height = (r.height + pad * 2) + 'px';
-    tip.style.display = '';
-    tip.style.position = 'fixed';
-    tip.className = 'tut-tooltip arrow-' + (s.arrow || 'top');
-    if (s.arrow === 'bottom') {
-      tip.style.top = Math.max(20, r.top - tip.offsetHeight - 16) + 'px';
-    } else {
-      tip.style.top = (r.bottom + 16) + 'px';
-    }
-    tip.style.left = Math.max(20, r.left) + 'px';
-    tip.style.right = 'auto';
-    requestAnimationFrame(() => {
-      const tr = tip.getBoundingClientRect();
-      if (tr.right > window.innerWidth - 20) tip.style.left = (window.innerWidth - tr.width - 20) + 'px';
-      if (tr.bottom > window.innerHeight - 20) tip.style.top = Math.max(20, window.innerHeight - tr.height - 20) + 'px';
-    });
     document.getElementById('tutBadge').textContent = s.badge;
     document.getElementById('tutTitle').textContent = s.title;
     document.getElementById('tutDesc').innerHTML = s.desc;
@@ -3599,6 +3584,33 @@ function tutGo(n) {
       return '<div class="tut-prog-dot ' + cls + '"></div>';
     }).join('');
     document.getElementById('tutProgress').innerHTML = dots;
+    tip.style.display = '';
+    tip.style.position = 'fixed';
+    tip.style.left = Math.max(20, r.left) + 'px';
+    tip.style.right = 'auto';
+    const vh = window.innerHeight;
+    const tipH = tip.offsetHeight;
+    const spaceBelow = vh - r.bottom - 16;
+    const spaceAbove = r.top - 16;
+    let arrow = s.arrow || 'top';
+    if (arrow === 'top' && spaceBelow < tipH + 20 && spaceAbove > spaceBelow) arrow = 'bottom';
+    if (arrow === 'bottom' && spaceAbove < tipH + 20 && spaceBelow > spaceAbove) arrow = 'top';
+    tip.className = 'tut-tooltip arrow-' + arrow;
+    if (arrow === 'bottom') {
+      tip.style.top = Math.max(20, r.top - tipH - 16) + 'px';
+    } else {
+      tip.style.top = Math.min(r.bottom + 16, vh - tipH - 20) + 'px';
+    }
+    requestAnimationFrame(() => {
+      const tr = tip.getBoundingClientRect();
+      if (tr.right > vh - 20) tip.style.left = (window.innerWidth - tr.width - 20) + 'px';
+      if (tr.bottom > vh - 10) {
+        const needed = tr.bottom - vh + 40;
+        window.scrollBy({ top: needed, behavior:'smooth' });
+        spot.style.top = (parseFloat(spot.style.top) - needed) + 'px';
+        tip.style.top = (parseFloat(tip.style.top) - needed) + 'px';
+      }
+    });
   }, 350);
 }
 function tutClose() {
