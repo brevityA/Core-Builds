@@ -1218,7 +1218,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.56';
+const CONFIGURATOR_VERSION = '2.59';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1272,11 +1272,25 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
-  { v:'2.56', date:'Jul 16 2026', items:[
+  { v:'2.59', date:'Jul 17 2026', items:[
+    'Subtitle Picker — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 30 languages in the Fine-Tune panel',
+    'Catalog Presets — add TMDB, Streaming, Anime, RPDB, and Torrent catalog addons from the Fine-Tune panel',
+    'Proxy Configuration — enable MediaFlow proxy and select which debrid services to route through it',
+    'Dedup Merge / Failover — toggle deduplicator merge mode to keep deduplicated streams as failover alternatives instead of discarding them',
+  ]},
+  { v:'2.58', date:'Jul 17 2026', items:[
+    'Free Tier Overhaul — P2P templates now include Torrentio, Peerflix, and Sootio as primary scrapers with HdHub enabled by default',
+    'Free Tier — 3-tier addon grouping: Primary (Torrentio/Zilean/Sootio/Peerflix/Nuvio) always runs, Secondary (Meteor/Comet/MediaFusion/HdHub) activates when <5 streams, Fallback (EZTV/TG/Knaben/TorrentsDB) when <15 streams',
+    'Free Tier — smart auto-hide ESEs: SD excluded when ≥5 1080p AND ≥5 720p; 720p excluded when ≥15 1080p OR ≥15 4K',
+    'Free Tier — minSeeders set to 1 for P2P to filter dead torrents',
+    'Free Tier — deduplicator tuned: cached/uncached set to keep_all (no debrid cache to deduplicate)',
+    'Free Tier — HTTP presets expanded with Sootio, Peerflix, and HdHub enabled by default',
+  ]},
+  { v:'2.57', date:'Jul 16 2026', items:[
     'Resolution First toggle — 4K always ranks above 1080p/720p regardless of cache status. Enable in Video Preferences when you want the highest resolution to win even if a lower-res stream is already cached',
     'Foreign Language Kill — hard-blocks streams not in your selected languages. On by default (matches fleet templates). Library and SeaDex results always pass through. Anime content exempt. Toggle in Language Preferences',
   ]},
-  { v:'2.55', date:'Jul 16 2026', items:[
+  { v:'2.56', date:'Jul 16 2026', items:[
     'Splash — staggered fade-in animations for a polished entrance',
     'Splash — smart service pre-selection remembers your last used service',
     'Splash — Quick Deploy presets now adapt to the selected service (debrid shows 4K/1080p, free shows Free Streaming/P2P)',
@@ -1286,20 +1300,6 @@ const CHANGELOG = [
     'Progress — step dots show current selection on hover (e.g. "Resolution: 4K")',
     'Progress — "Auto-saved" indicator flashes after each state change',
     'Accessibility — prefers-reduced-motion disables all animations and transitions',
-  ]},
-  { v:'2.57', date:'Jul 17 2026', items:[
-    'Subtitle Picker — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 30 languages in the Fine-Tune panel',
-    'Catalog Presets — add TMDB, Streaming, Anime, RPDB, and Torrent catalog addons from the Fine-Tune panel',
-    'Proxy Configuration — enable MediaFlow proxy and select which debrid services to route through it',
-    'Dedup Merge / Failover — toggle deduplicator merge mode to keep deduplicated streams as failover alternatives instead of discarding them',
-  ]},
-  { v:'2.56', date:'Jul 17 2026', items:[
-    'Free Tier Overhaul — P2P templates now include Torrentio, Peerflix, and Sootio as primary scrapers with HdHub enabled by default',
-    'Free Tier — 3-tier addon grouping: Primary (Torrentio/Zilean/Sootio/Peerflix/Nuvio) always runs, Secondary (Meteor/Comet/MediaFusion/HdHub) activates when <5 streams, Fallback (EZTV/TG/Knaben/TorrentsDB) when <15 streams',
-    'Free Tier — smart auto-hide ESEs: SD excluded when ≥5 1080p AND ≥5 720p; 720p excluded when ≥15 1080p OR ≥15 4K',
-    'Free Tier — minSeeders set to 1 for P2P to filter dead torrents',
-    'Free Tier — deduplicator tuned: cached/uncached set to keep_all (no debrid cache to deduplicate)',
-    'Free Tier — HTTP presets expanded with Sootio, Peerflix, and HdHub enabled by default',
   ]},
   { v:'2.55', date:'Jul 16 2026', items:[
     'Stream Pool Broadening — increased maxResults, maxResultsPerResolution, and dynamic addon fetching thresholds across all three pool tiers (Normal/Large/Max). Normal now returns 30–35 results (was 20–25), Large 50 (was 30–35), Max 75 (was 50). DAF exit conditions raised to wait for more cached streams before stopping',
