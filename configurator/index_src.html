@@ -295,7 +295,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt-scraper-subdesc{font-size:.68rem;color:#5a6a7c;margin-top:1px}
 .opt-scraper-badge{font-size:.55rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:4px;flex-shrink:0}
 .opt-scraper-badge-usenet{background:#06b6d418;color:#06b6d4;border:1px solid #06b6d430}
-.opt-scraper-badge-debrid{background:#14b8a618;color:#14b8a6;border:1px solid #14b8a630}
 .opt-scraper-remove{width:28px;height:28px;border-radius:6px;background:transparent;border:1px solid #2a3a4f;color:#5a6a7c;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s}
 .opt-scraper-remove:hover{border-color:#ef444460;color:#ef4444}
 .opt-scraper-hint{font-size:.68rem;color:#4b5563;margin-top:10px;line-height:1.5;padding:8px 12px;background:#131c27;border-radius:8px;border-left:3px solid #e8a33a40}
@@ -1302,7 +1301,7 @@ const ICO = {
 };
 const CHANGELOG = [
   { v:'2.60', date:'Jul 17 2026', items:[
-    'Optional Scrapers — add extra indexers (NZBnoob, altHUB, Usenet Crawler, DrunkenSlug, NZBFinder, Debridio) from a dropdown in the service selection step',
+    'Optional Scrapers — add extra Newznab indexers (NZBnoob, altHUB, Usenet Crawler, DrunkenSlug, NZBFinder) from a dropdown in the service selection step',
     'Optional scraper API keys automatically appear on the API Keys step when a scraper is added',
     'Newznab indexers use the same integration pattern as NZBGeek — type:newznab with full config options',
   ]},
@@ -1733,13 +1732,11 @@ function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [H
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
 const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [] };
 const OPTIONAL_SCRAPER_DEFS = [
-  { id:'debridio-opt', label:'Debridio', desc:'Search + caching via Debridio', presetType:'debridio', cat:'debrid', color:'#14b8a6', credKey:'debridio' },
   { id:'nzbnoob', label:'NZBnoob', desc:'Free Newznab indexer · 1,500-day retention', presetType:'newznab', cat:'usenet', color:'#22c55e', credKey:'nzbnoob', apiUrl:'https://nzbnoob.com', apiPath:'/api' },
   { id:'althub', label:'altHUB', desc:'Newznab indexer · 900k+ NZBs', presetType:'newznab', cat:'usenet', color:'#3b82f6', credKey:'althub', apiUrl:'https://api.althub.co.za', apiPath:'/api' },
   { id:'usenetcrawler', label:'Usenet Crawler', desc:'Newznab indexer · 5k free API/day', presetType:'newznab', cat:'usenet', color:'#a78bfa', credKey:'usenetcrawler', apiUrl:'https://usenet-crawler.com', apiPath:'/api' },
   { id:'drunkenslug', label:'DrunkenSlug', desc:'Popular Newznab indexer', presetType:'newznab', cat:'usenet', color:'#f97316', credKey:'drunkenslug', apiUrl:'https://api.drunkenslug.com', apiPath:'/api' },
   { id:'nzbfinder', label:'NZBFinder', desc:'Newznab indexer · generous free tier', presetType:'newznab', cat:'usenet', color:'#06b6d4', credKey:'nzbfinder', apiUrl:'https://nzbfinder.ws', apiPath:'/api' },
-  { id:'nzbgeek-opt', label:'NZBGeek', desc:'Premium Newznab indexer · lifetime plans', presetType:'newznab', cat:'usenet', color:'#f59e0b', credKey:'nzbgeek', apiUrl:'https://api.nzbgeek.info', apiPath:'/api' },
 ];
 
 const FORMATTERS = [
@@ -4197,15 +4194,8 @@ function presets() {
     ...(isDebridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
-    ...S.optionalScrapers.filter(sid => {
+    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid)).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      if (!d) return false;
-      if (d.id === 'debridio-opt' && isDebridio) return false;
-      if (d.id === 'nzbgeek-opt' && isNzbgeek) return false;
-      return true;
-    }).map(sid => {
-      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      if (d.presetType === 'debridio') return { type:'debridio', instanceId:'dbio-opt-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] };
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, newznabUrl:d.apiUrl, apiPath:d.apiPath, apiKey:S.creds[d.credKey] || '', timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
