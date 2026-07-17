@@ -1739,6 +1739,7 @@ const OPTIONAL_SCRAPER_DEFS = [
   { id:'usenetcrawler', label:'Usenet Crawler', desc:'Newznab indexer · 5k free API/day', presetType:'newznab', cat:'usenet', color:'#a78bfa', credKey:'usenetcrawler', apiUrl:'https://usenet-crawler.com', apiPath:'/api' },
   { id:'drunkenslug', label:'DrunkenSlug', desc:'Popular Newznab indexer', presetType:'newznab', cat:'usenet', color:'#f97316', credKey:'drunkenslug', apiUrl:'https://api.drunkenslug.com', apiPath:'/api' },
   { id:'nzbfinder', label:'NZBFinder', desc:'Newznab indexer · generous free tier', presetType:'newznab', cat:'usenet', color:'#06b6d4', credKey:'nzbfinder', apiUrl:'https://nzbfinder.ws', apiPath:'/api' },
+  { id:'nzbgeek-opt', label:'NZBGeek', desc:'Premium Newznab indexer · lifetime plans', presetType:'newznab', cat:'usenet', color:'#f59e0b', credKey:'nzbgeek', apiUrl:'https://api.nzbgeek.info', apiPath:'/api' },
 ];
 
 const FORMATTERS = [
@@ -4200,6 +4201,7 @@ function presets() {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       if (!d) return false;
       if (d.id === 'debridio-opt' && isDebridio) return false;
+      if (d.id === 'nzbgeek-opt' && isNzbgeek) return false;
       return true;
     }).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
