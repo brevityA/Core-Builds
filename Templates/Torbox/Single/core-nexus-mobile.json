@@ -815,11 +815,6 @@
         "score": -25
       },
       {
-        "pattern": "/\\bSDR\\b/i",
-        "name": "SDR",
-        "score": -25
-      },
-      {
         "pattern": "/\\b((FRENCH|MULTi|WiTH|((BA?|A)SL[ ._-]and))[ ._-](AD|Audio[ ._-]Description))\\b/i",
         "name": "WiTH AD",
         "score": -25
@@ -1296,7 +1291,7 @@
         },
         {
           "key": "size",
-          "direction": "desc"
+          "direction": "asc"
         },
         {
           "key": "subtitle",
@@ -1366,7 +1361,7 @@
         },
         {
           "key": "size",
-          "direction": "desc"
+          "direction": "asc"
         },
         {
           "key": "subtitle",
@@ -1436,7 +1431,7 @@
         },
         {
           "key": "size",
-          "direction": "desc"
+          "direction": "asc"
         },
         {
           "key": "subtitle",
@@ -1506,7 +1501,7 @@
         },
         {
           "key": "size",
-          "direction": "desc"
+          "direction": "asc"
         },
         {
           "key": "subtitle",
@@ -1576,7 +1571,7 @@
         },
         {
           "key": "size",
-          "direction": "desc"
+          "direction": "asc"
         },
         {
           "key": "subtitle",
@@ -1650,7 +1645,7 @@
         },
         {
           "key": "size",
-          "direction": "desc"
+          "direction": "asc"
         },
         {
           "key": "subtitle",
@@ -1724,7 +1719,7 @@
         },
         {
           "key": "size",
-          "direction": "desc"
+          "direction": "asc"
         },
         {
           "key": "subtitle",
