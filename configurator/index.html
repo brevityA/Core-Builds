@@ -1370,7 +1370,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.63';
+const CONFIGURATOR_VERSION = '2.64';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1424,6 +1424,10 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.64', date:'Jul 18 2026', items:[
+    'Fix — Family v3 formatter: preloading and library fields now use conditional formatting instead of showing raw true/false',
+    'Family v3 formatter: added uncached badge, visual tags line, and spacing fixes',
+  ]},
   { v:'2.63', date:'Jul 18 2026', items:[
     'Fix — Fine-Tune info popups now stay within viewport on mobile instead of overflowing off-screen',
   ]},
@@ -1881,7 +1885,7 @@ const FORMATTERS = [
     desc: 'Human-readable · ✅ Plays Fast · network source · edition badges · by RB3',
     img: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg',
     name: `{addon.name} | {stream.title::exists["\"{stream.title}\""||\"\"]}{stream.season::>=0[" S"||""]}{stream.season::<=9["0"||""]}{stream.season::>0["{stream.season}"||""]}{stream.episode::>=0[" • E"||""]}{stream.episode::<=9["0"||""]}{stream.episode::>0["{stream.episode}"||""]}`,
-    d: `{service.cached::istrue["✅ Plays Fast"||""]}{stream.nSeScore::exists::and::stream.nSeScore::>=75::istrue["🥇Good Stream"||""]}\n{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEB-DL::istrue["📺 From {stream.network::replace('iTunes','Apple TV')}"||\"\"]}{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEBRip::istrue["📺 From {stream.network::replace('iTunes','Apple TV')}"||\"\"]}\n{stream.resolution::exists["🖥️ {stream.resolution::replace('2160p', 'Highest Resolution 4k')::replace('1440p','High Resolution 2k')::replace('1080p','Great Resolution 1080p')::replace('720p','Decent Resolution 720p')}"||\"\"]}\n{stream.quality::exists["🎥 "||""]}{stream.quality::exists::isfalse::and::stream.encode::exists["🎞️ "||""]}{stream.quality::exists["{stream.quality}"||""]}{stream.quality::exists::istrue::and::stream.encode::exists[" • "||""]}{stream.encode::exists["{stream.encode}"||""]}\n{stream.audioChannels::exists::or::stream.audioTags::exists["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::join(', ')}"||\"\"]}{stream.audioChannels::exists::and::stream.audioTags::exists[" • "||""]}{stream.audioTags::exists["{stream.audioTags::join(', ')}"||\"\"]}\n{stream.edition::exists["⭐️ {stream.edition}"||""]}\n{stream.size::exists["💾 {stream.size::bytes}"||""]} • ☁️ {stream.preloading}\n🏞️ {service.id} • {stream.type} • 📚 {stream.library}\n🗣️ {stream.uLanguages}`
+    d: `{service.cached::istrue["✅ Plays Fast"||""]} {service.cached::isfalse["❌ Uncached"||""]}{stream.nSeScore::exists::and::stream.nSeScore::>=75::istrue[" 🥇 Good Stream"||""]}\n{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEB-DL::istrue["📺 From {stream.network::replace('iTunes','Apple TV')}"||\"\"]}{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEBRip::istrue["📺 From {stream.network::replace('iTunes','Apple TV')}"||\"\"]}\n{stream.resolution::exists["🖥️ {stream.resolution::replace('2160p', 'Highest Resolution 4k')::replace('1440p','High Resolution 2k')::replace('1080p','Great Resolution 1080p')::replace('720p','Decent Resolution 720p')}"||\"\"]}\n{stream.quality::exists["🎥 "||""]}{stream.quality::exists::isfalse::and::stream.encode::exists["🎞️ "||""]}{stream.quality::exists["{stream.quality}"||""]}{stream.quality::exists::istrue::and::stream.encode::exists[" • "||""]}{stream.encode::exists["{stream.encode}"||""]}{stream.visualTags::exists[" • "||""]}{stream.visualTags}\n{stream.audioChannels::exists::or::stream.audioTags::exists["🔊 "||""]}{stream.audioChannels::exists["{stream.audioChannels::join(', ')}"||\"\"]}{stream.audioChannels::exists::and::stream.audioTags::exists[" • "||""]}{stream.audioTags::exists["{stream.audioTags::join(', ')}"||\"\"]}\n{stream.edition::exists["⭐️ {stream.edition}"||""]}\n{stream.size::exists["💾 {stream.size::bytes}"||""]}{stream.preloading::istrue[" • ⏳ Preloading"||""]}\n🏞️ {service.id} • {stream.type}{stream.library::istrue[" • 📚 Library"||""]}\n🗣️ {stream.uLanguages}`
   },
   {
     id: 'ultra', label: 'Ultra', badge: 'Flagship', bc: '#e11d48',
