@@ -893,6 +893,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-tertiary-kofi{border-color:rgba(255,94,91,.15);color:#ff5e5b}
 .splash-tertiary-kofi:hover{background:rgba(255,94,91,.06);border-color:rgba(255,94,91,.3);color:#ff5e5b}
 .splash-tertiary-icon{font-size:.82rem;opacity:.7}
+.splash-stats{display:flex;align-items:center;justify-content:center;gap:18px;font-size:.68rem;color:#6b7280;letter-spacing:.03em;opacity:0;transition:opacity .4s}
+.splash-stats.loaded{opacity:1}
+.splash-stats .stat{display:flex;align-items:center;gap:5px}
+.splash-stats .stat-val{font-weight:700;color:#00d4ff;font-variant-numeric:tabular-nums}
+.splash-stats .stat-dot{width:3px;height:3px;border-radius:50%;background:#374151;flex-shrink:0}
+[data-theme="light"] .splash-stats{color:#6b7280}
+[data-theme="light"] .splash-stats .stat-val{color:#0284c7}
+[data-theme="light"] .splash-stats .stat-dot{background:#d1d5db}
 .splash-footer{font-size:.6rem;color:#4a4f60;line-height:1.6;margin-top:-8px}
 .splash-footer a{color:#00d4ff;text-decoration:none;opacity:.7}
 .splash-paste{font-size:.72rem;color:#4a4f60;cursor:pointer;text-decoration:underline;text-underline-offset:3px;transition:color .15s;margin-top:-12px}
@@ -1444,10 +1452,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.71';
+const CONFIGURATOR_VERSION = '2.72';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
+const COUNTER_URL = '';
 const EXCLUDED_REGEX = ["/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/","/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i","/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"];
 const PREFERRED_REGEX_4K = [{"name":"Radarr Remux T1","pattern":"/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i"},{"name":"Sonarr Remux T1","pattern":"/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(BLURANiUM|BMF|FraMeSToR|PmP)\\b).*/i"},{"name":"Radarr UHD Bluray T1","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:CtrlHD|MainFrame|W4NK3R)\\b).*/i"},{"name":"Radarr UHD Bluray T1 — DON","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*(?:\\b(?:DON)\\b)).*/"},{"name":"Anime BD T1","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i"},{"name":"Anime BD T1 [sam]","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[sam\\]|-sam\\b)).*/"},{"name":"FraMeSToR","pattern":"/\\b(FraMeSToR)\\b/"}];
 const PREFERRED_REGEX_1080P = [{"name":"Web T1","pattern":"/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:APEX|FLUX|KiNGS|TOMMY)\\b).*/"},{"name":"126811","pattern":"/\\b(126811)\\b/i"},{"name":"FLUX","pattern":"/\\b(FLUX)\\b/i"},{"name":"SiC","pattern":"/\\b(SiC)\\b/"},{"name":"BHDStudio","pattern":"/\\b(BHDStudio)\\b/i"}];
@@ -1498,6 +1507,11 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.72', date:'Jul 18 2026', items:[
+    'Usage counter — splash page shows live visit count and templates built when a counter endpoint is configured',
+    'Visit beacon fires on page load; generate beacon fires on template download — both use sendBeacon for zero-latency tracking',
+    'Cloudflare Worker + KV counter service included in configurator/worker/',
+  ]},
   { v:'2.71', date:'Jul 18 2026', items:[
     'Tutorial expanded — Fine-Tune panel and Review & Install steps added as centered coach-mark cards (6 steps, was 4)',
   ]},
@@ -2814,6 +2828,7 @@ function splashHtml() {
     <div class="splash-title splash-anim splash-anim-d2"><span class="splash-title-core hdr-core">CORE</span><span class="splash-title-builds"> BUILDS</span></div>
     <div class="splash-by splash-anim splash-anim-d2">By Brevity <span data-action="show-changelog" style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;cursor:pointer;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08);transition:all .15s" title="View changelog">v${CONFIGURATOR_VERSION}</span></div>
     <div class="splash-tagline splash-anim splash-anim-d3">Build your perfect AIOStreams template. No manual JSON editing.</div>
+    <div class="splash-stats splash-anim splash-anim-d3" id="splashStats"></div>
 
     <div class="splash-chips-section splash-anim splash-anim-d3">
       <div class="splash-chips-label">Your service</div>
@@ -3597,6 +3612,18 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   if (!hadSavedState && !_sharedImport && !localStorage.getItem('cb_tut_seen')) {
     setTimeout(() => tutGo(0), 600);
+  }
+  if (COUNTER_URL) {
+    fetch(COUNTER_URL + '/api/stats').then(r => r.json()).then(d => {
+      const el = document.getElementById('splashStats');
+      if (!el) return;
+      const fmt = n => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : n.toLocaleString();
+      el.innerHTML = `<span class="stat"><span class="stat-val">${fmt(d.visits)}</span> visits</span><span class="stat-dot"></span><span class="stat"><span class="stat-val">${fmt(d.generates)}</span> templates built</span>`;
+      el.classList.add('loaded');
+    }).catch(() => {});
+    if (navigator.sendBeacon) {
+      try { navigator.sendBeacon(COUNTER_URL + '/api/visit'); } catch(e) {}
+    }
   }
   try { history.replaceState({ step: step }, ''); } catch(e) {}
   window.addEventListener('popstate', (e) => {
@@ -4835,6 +4862,9 @@ function generate() {
   saveLastGen();
   if (USAGE_BEACON_URL && S.telemetryOk && navigator.sendBeacon) {
     try { navigator.sendBeacon(USAGE_BEACON_URL, JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution })); } catch(e) {}
+  }
+  if (COUNTER_URL && navigator.sendBeacon) {
+    try { navigator.sendBeacon(COUNTER_URL + '/api/generate', JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service })); } catch(e) {}
   }
   const dlBtn = document.querySelector('.btn-dl');
   if (dlBtn) {
