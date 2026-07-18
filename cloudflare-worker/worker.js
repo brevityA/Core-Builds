@@ -1,8 +1,13 @@
-// Core Builds — CORS proxy + template paste for the configurator.
+// Core Builds — CORS proxy + template paste + usage counter for the configurator.
 //
-// /proxy/* — re-issues AIOStreams API requests server-to-server to bypass CORS.
-// /paste   — stores a template JSON in KV and returns a URL that serves it back.
-//            Templates expire after 30 days. Nothing is logged or inspected.
+// /proxy/*       — re-issues AIOStreams API requests server-to-server to bypass CORS.
+// /paste         — stores a template JSON in KV and returns a URL that serves it back.
+//                  Templates expire after 30 days. Nothing is logged or inspected.
+// /api/stats     — returns all usage counters.
+// /api/visit     — increments configurator visit counter.
+// /api/generate  — increments template generation counter.
+//
+// Proxy calls, paste creates, and paste views are counted automatically.
 
 const ALLOWED_HOSTS = new Set([
   'https://aiostreams.elfhosted.com',
@@ -43,13 +48,46 @@ function randomId() {
   return id;
 }
 
+async function increment(kv, key) {
+  const raw = await kv.get(key);
+  const val = (parseInt(raw, 10) || 0) + 1;
+  await kv.put(key, val.toString());
+  return val;
+}
+
+function bgIncrement(ctx, kv, key) {
+  ctx.waitUntil(increment(kv, key));
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: CORS_HEADERS });
     }
 
     const url = new URL(request.url);
+
+    // --- Counter: return all stats ---
+    if (url.pathname === '/api/stats' && request.method === 'GET') {
+      if (!env.STATS) return json(200, {});
+      const keys = ['visits', 'generates', 'proxy_calls', 'pastes_created', 'pastes_viewed'];
+      const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
+      const stats = {};
+      keys.forEach((k, i) => { stats[k] = parseInt(vals[i], 10) || 0; });
+      return json(200, stats);
+    }
+
+    // --- Counter: increment visit ---
+    if (url.pathname === '/api/visit' && request.method === 'POST') {
+      if (env.STATS) { const v = await increment(env.STATS, 'visits'); return json(200, { visits: v }); }
+      return json(200, { visits: 0 });
+    }
+
+    // --- Counter: increment generate ---
+    if (url.pathname === '/api/generate' && request.method === 'POST') {
+      if (env.STATS) { const v = await increment(env.STATS, 'generates'); return json(200, { generates: v }); }
+      return json(200, { generates: 0 });
+    }
 
     // --- Paste: store template ---
     if (url.pathname === '/paste' && request.method === 'POST') {
@@ -61,6 +99,7 @@ export default {
       try { JSON.parse(body); } catch { return json(400, { error: 'invalid JSON' }); }
       const id = randomId();
       await env.TEMPLATES.put(`t:${id}`, body, { expirationTtl: PASTE_TTL });
+      if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_created');
       const pasteUrl = `${url.origin}/t/${id}`;
       return json(200, { url: pasteUrl });
     }
@@ -72,6 +111,7 @@ export default {
       if (!/^[a-z0-9]{6,20}$/.test(id)) return json(400, { error: 'invalid id' });
       const val = await env.TEMPLATES.get(`t:${id}`);
       if (!val) return json(404, { error: 'not found or expired' });
+      if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_viewed');
       return new Response(val, {
         headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
       });
@@ -110,6 +150,8 @@ export default {
     } catch (e) {
       return json(502, { error: 'upstream unreachable' });
     }
+
+    if (env.STATS) bgIncrement(ctx, env.STATS, 'proxy_calls');
 
     const resBody = await upstreamRes.text();
     return new Response(resBody, {
