@@ -1446,7 +1446,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.70';
+const CONFIGURATOR_VERSION = '2.71';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1500,6 +1500,9 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.71', date:'Jul 18 2026', items:[
+    'Tutorial expanded — Fine-Tune panel and Review & Install steps added as centered coach-mark cards (6 steps, was 4)',
+  ]},
   { v:'2.70', date:'Jul 18 2026', items:[
     'Hybrid service option removed — select TorBox + Real-Debrid individually via multi-select instead. Imported hybrid templates auto-map to multi-service',
     'Extras carousel — P2P Free, HTTP Streams, NZBGeek, StreamNZB, and optional Newznab indexers shown as a side-scroll card picker with multi-select toggle',
@@ -3428,22 +3431,32 @@ function syncNext() {
 const TUT_STEPS = [
   { id:'welcome' },
   {
-    id:'paths', badge:'Step 1 of 4', title:'Choose Your Path',
+    id:'paths', badge:'Step 1 of 6', title:'Choose Your Path',
     desc:'<strong>Guided Setup</strong> is perfect if you\'re new — just 3 quick steps and you\'re done.<br><br><span class="hl">Core Configure</span> gives you full control over every filter, sort rule, and formatter.<br><br>Already have a template? <span class="gold">Update Template</span> lets you paste it in and tweak.',
     target:'.splash-doors', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'presets', badge:'Step 2 of 4', title:'Quick Deploy Presets',
+    id:'presets', badge:'Step 2 of 6', title:'Quick Deploy Presets',
     desc:'Don\'t want to configure anything? These <strong>one-click presets</strong> generate a full template instantly based on your selected service.<br><br>Just pick one, enter your API key, and you\'re streaming.',
     target:'#splashPresets', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'debrid', badge:'Step 3 of 4', title:'What\'s a Debrid Service?',
+    id:'debrid', badge:'Step 3 of 6', title:'What\'s a Debrid Service?',
     desc:'A <span class="hl">debrid service</span> downloads torrents on fast servers and gives you a direct stream link — so you get <strong>instant playback without seeding</strong>.<br><br>Think of it as a middleman: it caches popular content so streams load in seconds. <span class="gold">TorBox</span> and <span class="gold">Real-Debrid</span> are the most popular.<br><br>Cost is typically <strong>$3–5/month</strong> for unlimited streaming.',
     target:'.splash-chips-section', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'start', badge:'Step 4 of 4', title:'Ready to Build!',
+    id:'finetune', badge:'Step 4 of 6', title:'Fine-Tune Panel',
+    desc:'After picking your service, you\'ll see a <span class="hl">Fine-Tune</span> button. It opens a full settings panel where you can tweak:<br><br>• <strong>Audio profile</strong> — Lossless, DD+, Auto, Dolby Only<br>• <strong>Video prefs</strong> — exclude 4K, DV, specific encodes<br>• <strong>Subtitles</strong> — pick sources and languages<br>• <strong>Catalogs</strong> — TMDB, Anime, Streaming, RPDB<br>• <strong>Proxy</strong> — MediaFlow proxy routing<br>• <strong>Formatter</strong> — choose how streams look in Stremio<br><br>Everything has safe defaults, so skip it if you\'re not sure.',
+    center:true, nextLabel:'Next'
+  },
+  {
+    id:'review', badge:'Step 5 of 6', title:'Review & Install',
+    desc:'The final step shows a <strong>receipt card</strong> summarizing all your choices. From here you can:<br><br>• <span class="hl">Download</span> the template JSON to import manually<br>• <span class="hl">Create & Install</span> to push it directly to an AIOStreams host<br>• <strong>Test Drive</strong> your streams before installing<br>• <strong>Share</strong> your config link with others<br>• Check the <strong>Health Check</strong> for potential issues<br><br>Click any receipt row to jump back and change that setting.',
+    center:true, nextLabel:'Next'
+  },
+  {
+    id:'start', badge:'Step 6 of 6', title:'Ready to Build!',
     desc:'That\'s everything you need to know. Pick <strong>Guided Setup</strong> for the fastest path, or <span class="hl">Core Configure</span> for full control.<br><br>Your template will include <strong>14+ scrapers</strong>, smart sorting, regex scoring, and quality filters — all pre-configured based on your choices.',
     target:'.splash-doors [data-action="easy-start"]', arrow:'top', nextLabel:'Start Building'
   },
@@ -3466,8 +3479,35 @@ function tutGo(n) {
   }
   welcome.style.display = 'none';
   document.getElementById('tutBackdrop').style.display = 'none';
+  if (s.center) {
+    spot.style.display = 'none';
+    document.getElementById('tutBackdrop').style.display = '';
+    document.getElementById('tutBadge').textContent = s.badge;
+    document.getElementById('tutTitle').textContent = s.title;
+    document.getElementById('tutDesc').innerHTML = s.desc;
+    document.getElementById('tutNext').textContent = s.nextLabel || 'Next';
+    document.getElementById('tutBack').style.display = n <= 1 ? 'none' : '';
+    const dots = TUT_STEPS.slice(1).map((_, i) => {
+      const cls = i < n - 1 ? 'done' : i === n - 1 ? 'active' : '';
+      return '<div class="tut-prog-dot ' + cls + '"></div>';
+    }).join('');
+    document.getElementById('tutProgress').innerHTML = dots;
+    tip.style.display = '';
+    tip.style.position = 'fixed';
+    tip.className = 'tut-tooltip';
+    const vh = window.innerHeight;
+    const cw = document.documentElement.clientWidth;
+    tip.style.left = '50%';
+    tip.style.right = 'auto';
+    tip.style.transform = 'translateX(-50%)';
+    tip.style.top = Math.max(80, vh / 2 - 160) + 'px';
+    tip.style.maxWidth = Math.min(420, cw - 40) + 'px';
+    return;
+  }
   const el = document.querySelector(s.target);
   if (!el) { tutClose(); return; }
+  tip.style.transform = '';
+  tip.style.maxWidth = '';
   const wantAbove = (s.arrow === 'bottom');
   el.scrollIntoView({ behavior:'smooth', block: wantAbove ? 'center' : 'start' });
   setTimeout(() => {
