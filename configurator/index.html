@@ -297,6 +297,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt-scraper-subdesc{font-size:.66rem;color:#6b7280;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .opt-scraper-badge{font-size:.55rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:4px;white-space:nowrap}
 .opt-scraper-badge-usenet{background:#06b6d418;color:#06b6d4;border:1px solid #06b6d430}
+.opt-scraper-badge-debrid{background:#22c55e18;color:#22c55e;border:1px solid #22c55e30}
+.opt-scraper-badge-noaccount{background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf630}
 .opt-scraper-card-ck{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s}
 .opt-scraper-card[data-active="true"] .opt-scraper-card-ck{border-color:#e8a33a;background:#e8a33a}
 .opt-scraper-card[data-active="true"] .opt-scraper-card-ck svg{opacity:1}
@@ -1460,7 +1462,7 @@ const ICO = {
 };
 const CHANGELOG = [
   { v:'2.67', date:'Jul 18 2026', items:[
-    'Optional scrapers — replaced dropdown with horizontal scroll carousel; tap cards to toggle scrapers on/off',
+    'Extras carousel — Hybrid, P2P Free, HTTP Streams, NZBGeek, StreamNZB, and optional Newznab indexers now shown as a side-scroll card picker with multi-select toggle',
   ]},
   { v:'2.66', date:'Jul 18 2026', items:[
     'Formatter picker — replaced dropdown menu with horizontal scroll carousel showing live previews of all formatters',
@@ -2455,7 +2457,8 @@ function renderOpts(def) {
       <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="usenet">Usenet<span class="svc-seg-help">?<span class="svc-seg-tip">Usenet is a paid alternative to torrents. Streams come from news servers instead of peers — often faster, with no seeding required.</span></span></button>
       <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="noaccount">No Account</button>
     </div>`;
-    const rowsHtml = def.opts.slice(1).map(o => {
+    const CAROUSEL_SVCS = ['hybrid','p2p','http','nzbgeek','streamnzb'];
+    const rowsHtml = def.opts.slice(1).filter(o => !CAROUSEL_SVCS.includes(o.v)).map(o => {
       const auth = SVC_AUTH[o.v] || '';
       const cat = SVC_CAT[o.v] || 'debrid';
       const isFree = auth === 'Free';
@@ -2467,18 +2470,33 @@ function renderOpts(def) {
       </label></div>`;
     }).join('');
     const emptyHtml = '<div class="svc-empty" id="svcEmpty">No services match your search</div>';
+    const ckIcon = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const svcCarouselCards = CAROUSEL_SVCS.map(sv => {
+      const o = def.opts.find(x => x.v === sv); if (!o) return '';
+      const active = S.multiServices.includes(sv);
+      const cat = SVC_CAT[sv] || 'debrid';
+      const catLabel = cat === 'debrid' ? 'Debrid' : cat === 'usenet' ? 'Usenet' : cat === 'noaccount' ? 'Free' : cat;
+      const color = sv === 'hybrid' ? '#22c55e' : sv === 'p2p' ? '#8b5cf6' : sv === 'http' ? '#f472b6' : sv === 'nzbgeek' ? '#22c55e' : '#f59e0b';
+      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-carousel-service" data-svc-id="${sv}">
+        <div class="opt-scraper-card-ck">${ckIcon}</div>
+        <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${color}15;color:${color}">${o.name.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${o.name}</span></div>
+        <div class="opt-scraper-subdesc">${SVC_DESC[sv] || ''}</div>
+        <span class="opt-scraper-badge opt-scraper-badge-${cat}">${catLabel}</span>
+      </div>`;
+    }).join('');
     const scraperCards = OPTIONAL_SCRAPER_DEFS.map(d => {
       const active = S.optionalScrapers.includes(d.id);
       const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat;
       return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-optional-scraper" data-scraper-id="${d.id}">
-        <div class="opt-scraper-card-ck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
         <div class="opt-scraper-subdesc">${d.desc}</div>
         <span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span>
       </div>`;
     }).join('');
-    const optDropdown = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Tap a card to add or remove extra indexers. Each requires an API key — entered on the API Keys step.</div><div class="opt-scraper-scroll">${scraperCards}</div>${S.optionalScrapers.length ? '<div class="opt-scraper-hint">API keys for added scrapers appear on Step 5 (API Keys). Newznab indexers use the same integration as NZBGeek.</div>' : ''}</div>`;
-    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optDropdown}</div>`;
+    const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
+    const optSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Tap cards to toggle additional services and scrapers. Multi-select is supported.</div><div class="opt-scraper-scroll">${svcCarouselCards}${scraperCards}</div>${hasExtras ? '<div class="opt-scraper-hint">API keys for selected extras appear on Step 5 (API Keys).</div>' : ''}</div>`;
+    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optSection}</div>`;
   }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
@@ -4232,6 +4250,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'import-formatter') { showFormatterImport(); }
     if (action === 'compare-templates') { showCompareTemplates(); }
     if (action === 'show-changelog') { showChangelog(); }
+    if (action === 'toggle-carousel-service') {
+      const sv = el.dataset.svcId;
+      if (!sv) return;
+      const idx = S.multiServices.indexOf(sv);
+      if (idx >= 0) { S.multiServices.splice(idx, 1); } else { S.multiServices.push(sv); }
+      S.service = deriveService() || S.service;
+      saveState(); render();
+    }
     if (action === 'toggle-optional-scraper') {
       const sid = el.dataset.scraperId;
       if (!sid) return;
