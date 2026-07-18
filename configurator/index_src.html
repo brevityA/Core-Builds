@@ -298,6 +298,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt-scraper-remove{width:28px;height:28px;border-radius:6px;background:transparent;border:1px solid #2a3a4f;color:#5a6a7c;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s}
 .opt-scraper-remove:hover{border-color:#ef444460;color:#ef4444}
 .opt-scraper-hint{font-size:.68rem;color:#4b5563;margin-top:10px;line-height:1.5;padding:8px 12px;background:#131c27;border-radius:8px;border-left:3px solid #e8a33a40}
+/* ── Fine-Tune Info Tooltips ── */
+.ft-info{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#6b7280;font-size:.6rem;font-weight:800;cursor:pointer;transition:all .15s;user-select:none;flex-shrink:0;font-style:normal;line-height:1}
+.ft-info:hover{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:#00d4ff}
+.ft-popup{display:none;position:absolute;z-index:999;width:280px;max-width:calc(100vw - 40px);background:#0f1820;border:1.5px solid rgba(0,212,255,.2);border-radius:12px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 20px rgba(0,212,255,.06);font-size:.75rem;color:#9ca3af;line-height:1.6;margin-top:8px;left:0}
+.ft-popup.active{display:block}
+.ft-popup strong{color:#e6edf3;font-weight:600}
+.ft-popup .hl{color:#00d4ff;font-weight:600}
 /* ── Onboarding Tutorial ── */
 .tut-overlay{position:fixed;inset:0;z-index:10000;pointer-events:none;transition:opacity .3s}
 .tut-overlay.active{pointer-events:auto}
@@ -1850,7 +1857,7 @@ function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [H
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [] };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [] };
 const OPTIONAL_SCRAPER_DEFS = [
   { id:'nzbnoob', label:'NZBnoob', desc:'Free Newznab indexer · 1,500-day retention', presetType:'newznab', cat:'usenet', color:'#22c55e', credKey:'nzbnoob', apiUrl:'https://nzbnoob.com', apiPath:'/api' },
   { id:'althub', label:'altHUB', desc:'Newznab indexer · 900k+ NZBs', presetType:'newznab', cat:'usenet', color:'#3b82f6', credKey:'althub', apiUrl:'https://api.althub.co.za', apiPath:'/api' },
@@ -2596,6 +2603,8 @@ function renderP2pToggle() {
   </div>`;
 }
 
+function ftTip(text) { return `<span style="position:relative;display:inline-flex"><i class="ft-info">?</i><div class="ft-popup">${text}</div></span>`; }
+
 function renderMatchMode() {
   const modes = [
     { v:'relaxed',  icon:'<svg width="16" height="16" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".05"/><circle cx="15" cy="20" r="2.5" fill="#22c55e" fill-opacity=".7"/><circle cx="22" cy="17" r="2.5" fill="#22c55e" fill-opacity=".5"/><circle cx="29" cy="20" r="2.5" fill="#22c55e" fill-opacity=".3"/><circle cx="18" cy="27" r="2.5" fill="#22c55e" fill-opacity=".4"/><circle cx="26" cy="27" r="2.5" fill="#22c55e" fill-opacity=".6"/></svg>', label:'Relaxed',  desc:'More results, conservative dedup' },
@@ -2611,7 +2620,7 @@ function renderMatchMode() {
     </button>`;
   }).join('');
   return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
-    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase">Match Aggressiveness</div>
+    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px">Match Aggressiveness ${ftTip('Controls how aggressively AIOStreams <strong>deduplicates</strong> (removes duplicate) streams. <strong>Relaxed</strong> keeps more results &mdash; you see more options but some may be near-identical. <strong>Balanced</strong> removes obvious duplicates while keeping variety (recommended). <strong>Strict</strong> aggressively merges similar streams, showing fewer but higher-quality results.')}</div>
     <div style="display:flex;gap:6px">${pills}</div>
   </div>`;
 }
@@ -2631,7 +2640,7 @@ function renderCacheMode() {
     </button>`;
   }).join('');
   return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
-    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase">Stream Availability</div>
+    <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px">Stream Availability ${ftTip('<strong>Mixed</strong> shows both cached (instant play) and uncached (needs downloading) streams, with cached ranked first. <strong>Cached Only</strong> shows only streams already stored on your debrid service for instant playback. <strong>Uncached</strong> shows only streams that need to be downloaded first &mdash; useful for building your debrid library.')}</div>
     <div style="display:flex;gap:6px">${pills}</div>
   </div>`;
 }
@@ -2681,12 +2690,12 @@ function renderAdvancedPanel() {
     <div style="padding:18px 20px;display:flex;flex-direction:column;gap:20px">
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Limited</strong> excludes lossless formats (TrueHD, DTS-HD MA) that need high bandwidth. <strong>Full</strong> includes everything for home theater setups with proper receivers.')}</div>
         <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:10px">Size Limit</div>
           <div style="display:flex;gap:5px">${sizePills}</div>
@@ -2697,7 +2706,7 @@ function renderAdvancedPanel() {
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span>
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('How many streams AIOStreams collects before sorting and filtering. <strong>More streams = better quality picks</strong> but slower load times. Normal is good for most users. Increase if you want the absolute best quality match.')}
             <span style="font-size:.65rem;color:#4b5563">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
           </div>
           <div style="display:flex;gap:5px">
@@ -2707,7 +2716,7 @@ function renderAdvancedPanel() {
         </div>
         ${(S.service !== 'http' && S.service !== 'p2p') ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">PSE Quality Architecture</span>
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">PSE Quality Architecture</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what\\'s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How stream quality tiers are built. Standard uses simple resolution/quality filters. Apex IQR uses statistical bitrate analysis matching the flagship Apex template.</div>
           <div style="display:flex;gap:5px">
@@ -2717,13 +2726,13 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter)</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it\\'s arranged. You can import custom formatters for different visual styles.')}</div>
         ${fmtDropdownHtml()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>AIOSubtitle</strong> is built-in and fast. <strong>OpenSubtitles v3+</strong> has the largest database. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
           <div style="display:flex;flex-direction:column;gap:5px">
@@ -2735,6 +2744,23 @@ function renderAdvancedPanel() {
               </div>`;
             }).join('')}
           </div>
+          ${(S.subtitleAddons||[]).includes('subdl') ? `
+          <div style="margin-top:10px;padding:10px 12px;background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.15);border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:.72rem;font-weight:600;color:#06b6d4">SubDL API Key</span>
+              <a href="https://subdl.com" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#06b6d4;text-decoration:none;font-weight:700;opacity:.7">Get key &rarr;</a>
+            </div>
+            <div style="position:relative;display:flex;align-items:center">
+              <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" placeholder="Your SubDL API key"
+                value="${S.creds.subdl || ''}" maxlength="120" style="padding-right:38px;font-size:.78rem">
+              <button type="button" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
+                style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
+                onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div style="font-size:.62rem;color:#4b5563;margin-top:5px;line-height:1.4">Required by SubDL. Free keys available at subdl.com</div>
+          </div>` : ''}
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-top:12px;margin-bottom:8px">Subtitle Languages</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px">
             ${['en','es','fr','de','it','pt','nl','pl','ru','ar','ja','ko','zh','hi','tr','sv','da','no','fi','cs','hu','ro','el','he','th','vi','id','ms','uk','bg'].map(l=>{
@@ -2747,7 +2773,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don\\'t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
           <div style="display:flex;flex-direction:column;gap:5px">
@@ -3791,6 +3817,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pp) pp.innerHTML = splashPresetsHtml(svcChip.dataset.svc);
       return;
     }
+    const ftInfo = e.target.closest('.ft-info');
+    if (ftInfo) {
+      e.stopPropagation();
+      const popup = ftInfo.parentElement.querySelector('.ft-popup');
+      if (popup) {
+        const wasActive = popup.classList.contains('active');
+        document.querySelectorAll('.ft-popup.active').forEach(p => p.classList.remove('active'));
+        if (!wasActive) popup.classList.add('active');
+      }
+      return;
+    }
+    if (!e.target.closest('.ft-popup')) document.querySelectorAll('.ft-popup.active').forEach(p => p.classList.remove('active'));
     const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
     const action = el?.dataset.action;
     if(!action) return;
@@ -4015,6 +4053,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const nm = row.querySelector('div[style*="font-size:.8rem"]');
       if (nm) nm.style.color = on ? '#06b6d4' : '#9ca3af';
       saveState();
+      if (val === 'subdl') render();
     }
     if (action === 'toggle-sub-lang') {
       const btn = e.target.closest('[data-action="toggle-sub-lang"]') || e.target;
@@ -4380,8 +4419,8 @@ function subtitlePresets() {
   const langs = S.subtitleLangs || ['en'];
   const out = [];
   if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
-  if (addons.includes('opensubtitles')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000 } });
-  if (addons.includes('subdl')) out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000 } });
+  if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000 } });
+  if (addons.includes('subdl')) out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, ...(S.creds.subdl ? { subDlApiKey:S.creds.subdl } : {}) } });
   return out;
 }
 
@@ -4686,13 +4725,13 @@ function pses() {
       { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" },
       ...audPinnArr,
       { enabled:true, expression:codecExpr },
-      { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" },
+      { enabled:true, expression:"/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR+DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))" },
       { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }
     );
   } else if (res === '4k') {
     out.push({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" }, pin1080Elite, pinLQ, seasonPSE);
     if (dv) out.push({ enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" });
-    out.push({ enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 4K WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* B-Tier 4K WEB-DL */ quality(resolution(streams,'2160p'),'WEB-DL')" }, { enabled:true, expression:"/* C-Tier Any 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+    out.push({ enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 4K WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* B-Tier 4K WEB-DL */ quality(resolution(streams,'2160p'),'WEB-DL')" }, { enabled:true, expression:"/* C-Tier Any 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR+DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
   } else if (res === '1080p' && S.pseArch === 'iqr') {
     const iqr1 = (label, pool, floor, decay, decayFloor) => {
       const b = `q1(values(${pool},'bitrate'))-1.5*iqr(values(${pool},'bitrate'))`, t = `q3(values(${pool},'bitrate'))+1.5*iqr(values(${pool},'bitrate'))`;
@@ -4719,7 +4758,7 @@ function pses() {
   } else if (res === '1080p') {
     out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
   } else {
-    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 1440p Any Quality */ quality(resolution(streams,'1440p'),'BluRay REMUX','BluRay','WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 4K Fallback BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* 4K Fallback WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* 4K Fallback Any */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* HDR Priority */ visualTag(streams,'HDR+DV','DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
+    out.push(pin1080Elite, pinLQ, seasonPSE, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 1440p Any Quality */ quality(resolution(streams,'1440p'),'BluRay REMUX','BluRay','WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 4K Fallback BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* 4K Fallback WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* 4K Fallback Any */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR+DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" });
   }
   return out;
 }
@@ -5454,7 +5493,7 @@ function showUpdateTemplateModal() {
       S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
       S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
       S.streamPool = 'normal';
-      const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:''};
+      const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',subdl:''};
       Object.assign(S, parsed);
       S.creds = Object.assign(defaultCreds, parsed.creds || {});
       S.simpleMode = false;

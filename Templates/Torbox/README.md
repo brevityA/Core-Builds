@@ -46,6 +46,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | Template | Plan | Resolution | Best for |
 |---|---|---|---|
 | [4K Apex](#-core-nexus-4k-apex) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet · IQR adaptive bitrate floors |
+| [Mobile](#-core-nexus-mobile) | Pro | 1080p | Bandwidth-optimised, mobile / data-capped |
 | [Stream](#-core-nexus-stream) | Pro | 1080p | WEB-DL only, budget hardware |
 | [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
@@ -60,6 +61,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [4K Essential](#-core-nexus-4k-essential) | Essential | 4K + 1080p | Full 4K on Essential plan |
 | [Essential](#-core-nexus-essential) | Essential | 1080p | Standard Essential build |
 | [4K AllDebrid](#-core-nexus-4k-alldebrid) | AllDebrid | 4K + 1080p | AllDebrid users — full 4K |
+| [4K AllDebrid Essential](#-core-nexus-4k-alldebrid-essential) | AllDebrid | 4K + 1080p | AllDebrid — Essential-grade ESE stack |
 | [AllDebrid](#-core-nexus-alldebrid) | AllDebrid | 1080p | AllDebrid users — 1080p |
 | [4K AllDebrid Lite](#-core-nexus-4k-alldebrid-lite) | AllDebrid | 4K + 1080p | AllDebrid — simple filtering |
 | [AllDebrid Lite](#-core-nexus-alldebrid-lite) | AllDebrid | 1080p | AllDebrid — simple filtering |
@@ -98,6 +100,7 @@ TorBox Pro?
 ├── Google TV Streamer? → Google TV Streamer 4K
 ├── Apple TV 4K (Infuse)? → Apple TV 4K (Nightly)
 ├── Windows PC / ultrawide monitor? → Ultrawide
+├── Mobile / data-capped? → Mobile
 └── 1080p only? → Stream
 
 TorBox Essential?
@@ -115,6 +118,7 @@ EasyNews only (no TorBox)? → Speed EasyNews
 AllDebrid (no TorBox)?
 ├── Want 4K?
 │   ├── Full IQR filtering → 4K AllDebrid
+│   ├── Essential-grade ESE stack → 4K AllDebrid Essential
 │   └── Simpler filtering → 4K AllDebrid Lite
 └── 1080p only?
     ├── Full → AllDebrid
@@ -148,6 +152,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 |---|---|---|---|
 | **Core Nexus 4K Apex** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Core Nexus 4K Apex (TorBox)** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json` |
+| **Core Nexus Mobile** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-mobile.json` |
 | **Core Nexus Stream** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
 | **Core Nexus Stream (Fire Stick)** | TorBox Pro | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Core Nexus Samsung TV** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
@@ -168,6 +173,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus 4K Essential** | Essential | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json` |
 | **Core Nexus Essential** | Essential | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json` |
 | **Core Nexus 4K AllDebrid** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
+| **Core Nexus 4K AllDebrid Essential** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-essential.json` |
 | **Core Nexus AllDebrid** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json` |
 | **Core Nexus 4K AllDebrid Lite** | AllDebrid | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json` |
 | **Core Nexus AllDebrid Lite** | AllDebrid | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json` |
@@ -222,6 +228,20 @@ Flagship 4K build for TorBox Pro. Full addon stack — DV/HDR, TrueHD/Atmos, Blu
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 | **Usenet** | ✅ cacheAndPlay + nzbFailover |
+
+---
+
+### 📱 Core Nexus Mobile
+
+Bandwidth-optimised 1080p template for mobile and data-capped connections. 25 Mbps bitrate ceiling, WEB-DL preferred, SDR-first visual tags. Designed for cellular streaming where file size and bandwidth matter most.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/Single/core-nexus-mobile.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-mobile.json` |
+| **Resolution** | 1080p · 720p fallback |
+| **Usenet** | ❌ |
 
 ---
 
@@ -502,6 +522,17 @@ Full 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD
 | **File** | `Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
 | **Version** | v0.4.7 |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json` |
+| **Resolution** | 2160p primary, 1080p fallback |
+
+### 💎 Core Nexus 4K AllDebrid Essential
+
+4K AllDebrid build with Essential-grade ESE stack. IQR Tukey fence PSEs, HDR/DV Priority, elite group pins, perGroup() Extra Cached. Same filtering depth as 4K Essential but for AllDebrid users.
+
+| | |
+|---|---|
+| **File** | `Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-essential.json` |
+| **Version** | v0.1.0 |
+| **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-essential.json` |
 | **Resolution** | 2160p primary, 1080p fallback |
 
 ### 📱 Core Nexus AllDebrid

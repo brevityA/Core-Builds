@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "id": "core-nexus-speed-4k",
-    "name": "Core Nexus Speed 4K",
-    "description": "Speed-optimised 4K build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean + TorBox Search for fast cached results. Exits as soon as 3 cached 4K streams found or 4 s elapsed. TorBox Essential required.",
+    "id": "brevity.core-nexus-4k-alldebrid-essential",
+    "name": "Core Nexus 4K AllDebrid Essential",
+    "description": "4K AllDebrid build with Essential-grade ESE stack. IQR Tukey fence PSEs, HDR/DV Priority, Usenet Propagation Guard, AI Upscale Exclusion, Kill Multi-Episode. No TorBox required — AllDebrid only.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.7",
+    "version": "0.1.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
-    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json",
+    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-essential.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
   },
   "config": {
     "trusted": false,
     "showChanges": true,
-    "addonName": "Core Nexus Speed 4K ⚡",
+    "addonName": "Core Nexus 4K AllDebrid Essential",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Speed v2.8.2 — TorBox cached 4K: Library · Zilean · TorBox Search. Exits at 3+ cached 4K or 4s.",
+    "addonDescription": "4K AllDebrid Essential. DV/HDR · TrueHD/Atmos · Uncapped Bitrate · AV1. Essential ESE stack.",
     "appliedTemplates": [
       {
         "id": "core-nexus-4k-ht-torbox",
@@ -220,7 +220,7 @@
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
       {
-        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
+        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))",
         "enabled": true
       },
       {
@@ -245,6 +245,10 @@
       },
       {
         "expression": "/*G's Low Bitrate*/ count(negate((isAnime or 'Animation' in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))),cached(streams)))>10?(isAnime or 'Animation'in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))):[]",
+        "enabled": true
+      },
+      {
+        "expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')",
         "enabled": true
       },
       {
@@ -288,28 +292,24 @@
         "enabled": true
       },
       {
-        "expression": "/*Extra Cached (HQ)*/ merge( slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'Unknown'), 3))",
+        "expression": "/* Score IQR Guard */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
         "enabled": true
       },
       {
-        "expression": "/*Extra Cached (LQ)*/ merge( slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'DVDRip','HC HD-Rip'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'DVDRip','HC HD-Rip'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'DVDRip','HC HD-Rip'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'TC','SCR'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'TC','SCR'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS','TC','SCR'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS','TC','SCR'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'CAM','TS','TC','SCR'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Unknown'),'Unknown'), 3))",
+        "expression": "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 5), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
         "enabled": true
       },
       {
-        "expression": "/*Extra Uncached (All)*/ merge( slice(resolution(quality(uncached(streams),'Bluray REMUX'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'1080p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'720p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'576p','480p'), 3), slice(resolution(quality(uncached(streams),'Bluray REMUX'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'1080p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'720p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'576p','480p'), 3), slice(resolution(quality(uncached(streams),'Bluray'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'1080p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'720p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'WEB-DL'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'1080p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'720p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'WEBRip'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'1080p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'720p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'HDTV','HDRip','DVDRip','HC HD-Rip'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'1080p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'720p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'CAM','TS','TC','SCR'),'Unknown'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'2160p','1440p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'1080p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'720p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'576p','480p','360p'), 3), slice(resolution(quality(uncached(streams),'Unknown'),'Unknown'), 3))",
+        "expression": "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')), 'resolution', 5), negate(merge(library(streams), uncached(streams)), quality(streams, 'HDTV', 'HDRip', 'DVDRip', 'HC HD-Rip', 'CAM', 'TS', 'TC', 'SCR', 'Unknown')))",
+        "enabled": true
+      },
+      {
+        "expression": "/* Extra Uncached */ negate(perGroup(uncached(streams), 'resolution', 3), uncached(streams))",
         "enabled": true
       },
       {
         "expression": "/*Final Limit (All)*/ merge(count(quality(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip'))>12? quality(negate(merge(library(streams), seadex(streams)),streams),'HDRip','HC HD-Rip','DVDRip','HDTV','CAM','TS','TC','SCR'):count(quality(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV'))>12? quality(streams,'CAM','TS','TC','SCR'):[], count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>15? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>12? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'),3))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>12? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>9? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'), 3))): count(resolution(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>6? negate(merge(library(streams), seadex(streams)),merge(type(uncached(streams),'debrid'), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),6))): count(resolution(negate(merge(library(streams), seadex(streams)), merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>3? negate(merge(library(streams), seadex(streams)),merge(slice(type(uncached(streams),'debrid'), 6), slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),-1))):[])",
         "enabled": true
-      },
-      {
-        "expression": "/*Unknown Resolution*/ count(resolution(merge(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet'), cached(type(streams, 'debrid'))), '2160p', '1440p', '1080p','720p','576p','480p')) > 5 ? negate(merge(library(streams), seadex(streams)), resolution(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet', 'debrid'), 'Unknown')): []",
-        "enabled": false
-      },
-      {
-        "expression": "/*Unknown Quality*/ count(quality(merge(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet'), cached(type(streams, 'debrid'))), 'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV')) > 5 ? negate(merge(library(streams), seadex(streams)), quality(type(streams, 'p2p', 'http', 'usenet', 'stremio-usenet', 'debrid'), 'Unknown')): []",
-        "enabled": false
       },
       {
         "expression": "/* Indexer Diversity */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) > 20 ? negate(perGroup(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http'))), 'indexer', 2), negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) : []",
@@ -338,59 +338,71 @@
       {
         "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? negate(seasonPack(streams), episodePack(streams)) : []",
         "enabled": true
-      },
-      {
-        "enabled": false,
-        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
       }
     ],
     "preferredStreamExpressions": [
       {
-        "expression": "/*ESSENTIAL S-Tier 4K Remux — IQR Tukey fence (≥4 ranked) · min/max fallback (1–3) · size floor 15GB*/ count(resolution(quality(streams,'BluRay REMUX'),'2160p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),q1(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate')),q3(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))), '15GB'):count(resolution(quality(streams,'BluRay REMUX'),'2160p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),min(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))*1.20), '15GB'):[]",
+        "expression": "/* Elite 4K Remux pin */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
         "enabled": true
       },
       {
-        "expression": "/*ESSENTIAL A-Tier 4K WEB-DL HDR — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+        "expression": "/* Elite 1080p Remux pin */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
         "enabled": true
       },
       {
-        "expression": "/*ESSENTIAL B-Tier 4K WEB-DL SDR — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(quality(streams,'WEB-DL'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),q1(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate')),q3(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))):count(resolution(quality(streams,'WEB-DL'),'2160p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),min(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+        "expression": "/* LQ group pin bottom */ pin(releaseGroup(streams, 'YIFY', 'RARBG', 'EVO', 'YTS', 'PSA', 'MeGusta', 'Tigole'), 'bottom')",
         "enabled": true
       },
       {
-        "expression": "/*ESSENTIAL C-Tier 4K WEBRip HDR — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+        "expression": "/* IMAX pin */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
         "enabled": true
       },
       {
-        "expression": "/*ESSENTIAL D-Tier 4K WEBRip SDR — IQR Tukey fence (≥4) · min/max fallback (1–3)*/ count(resolution(quality(streams,'WEBRip'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),q1(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate')),q3(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))):count(resolution(quality(streams,'WEBRip'),'2160p'))>0?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),min(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))*1.20):[]",
+        "expression": "/*ALLDEBRID-ESSENTIAL S-Tier 4K Remux — IQR Tukey fence (≥4 ranked) · min/max fallback (1–3) · size floor 15GB*/ count(resolution(quality(streams,'BluRay REMUX'),'2160p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),q1(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate')),q3(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))), '15GB'):count(resolution(quality(streams,'BluRay REMUX'),'2160p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'),min(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))*1.20), '15GB'):[]",
         "enabled": true
       },
       {
-        "expression": "/* ESSENTIAL E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
+        "expression": "/*ALLDEBRID-ESSENTIAL A-Tier 4K WEB-DL HDR — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
         "enabled": true
       },
       {
-        "expression": "/*ESSENTIAL S-Tier 1080p Remux — IQR Tukey fence (≥4 ranked) · min/max fallback (1–3) · size floor 8GB*/ count(resolution(quality(streams,'BluRay REMUX'),'1080p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),q1(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate')),q3(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))), '8GB'):count(resolution(quality(streams,'BluRay REMUX'),'1080p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),min(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))*1.20), '8GB'):[]",
+        "expression": "/*ALLDEBRID-ESSENTIAL B-Tier 4K WEB-DL SDR — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(quality(streams,'WEB-DL'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),q1(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate')),q3(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))):count(resolution(quality(streams,'WEB-DL'),'2160p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),min(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
         "enabled": true
       },
       {
-        "expression": "/*ESSENTIAL A-Tier 1080p WEB-DL — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(quality(streams,'WEB-DL'),'1080p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),q1(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate')),q3(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))):count(resolution(quality(streams,'WEB-DL'),'1080p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),min(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+        "expression": "/*ALLDEBRID-ESSENTIAL C-Tier 4K WEBRip HDR — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),q1(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')),q3(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))):count(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),min(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80,max(values(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20):((count(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),median(values(bitrate(resolution(visualTag(quality(streams,'WEBRip'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
         "enabled": true
       },
       {
-        "expression": "/* ESSENTIAL B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
+        "expression": "/*ALLDEBRID-ESSENTIAL D-Tier 4K WEBRip SDR — IQR Tukey fence (≥4) · min/max fallback (1–3)*/ count(resolution(quality(streams,'WEBRip'),'2160p'))>=4?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),q1(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate')),q3(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))):count(resolution(quality(streams,'WEBRip'),'2160p'))>0?bitrate(resolution(quality(streams,'WEBRip'),'2160p'),min(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'WEBRip'),'2160p'),'bitrate'))*1.20):[]",
         "enabled": true
       },
       {
-        "expression": "/* ESSENTIAL C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
+        "expression": "/* ALLDEBRID-ESSENTIAL E-Tier 4K | Any 2160p fallback */ resolution(streams,'2160p')",
         "enabled": true
       },
       {
-        "expression": "/* ESSENTIAL 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
+        "expression": "/*ALLDEBRID-ESSENTIAL S-Tier 1080p Remux — IQR Tukey fence (≥4 ranked) · min/max fallback (1–3) · size floor 8GB*/ count(resolution(quality(streams,'BluRay REMUX'),'1080p'))>=4?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),q1(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate')),q3(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))), '8GB'):count(resolution(quality(streams,'BluRay REMUX'),'1080p'))>0?size(bitrate(resolution(quality(streams,'BluRay REMUX'),'1080p'),min(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'BluRay REMUX'),'1080p'),'bitrate'))*1.20), '8GB'):[]",
         "enabled": true
       },
       {
-        "expression": "/* ESSENTIAL 720p | Any */ resolution(streams,'720p')",
+        "expression": "/*ALLDEBRID-ESSENTIAL A-Tier 1080p WEB-DL — IQR Tukey fence (≥4) · min/max fallback (1–3) · age-decay median window (pow 0.95/d)*/ count(resolution(quality(streams,'WEB-DL'),'1080p'))>=4?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),q1(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate')),q3(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))+1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))):count(resolution(quality(streams,'WEB-DL'),'1080p'))>0?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),min(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))*0.80,max(values(resolution(quality(streams,'WEB-DL'),'1080p'),'bitrate'))*1.20):((count(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease)),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1+0.4*pow(0.95,daysSinceRelease))))>=1?bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),median(values(bitrate(resolution(quality(streams,'WEB-DL'),'1080p'),'1Mbps'),'bitrate'))*(1-0.4*pow(0.95,daysSinceRelease))):[]))",
+        "enabled": true
+      },
+      {
+        "expression": "/* ALLDEBRID-ESSENTIAL B-Tier 1080p | WEBRip or BluRay */ resolution(quality(streams,'WEBRip','BluRay'),'1080p')",
+        "enabled": true
+      },
+      {
+        "expression": "/* ALLDEBRID-ESSENTIAL C-Tier 1080p | Any 1080p */ resolution(streams,'1080p')",
+        "enabled": true
+      },
+      {
+        "expression": "/* ALLDEBRID-ESSENTIAL 720p | WEB-DL or WEBRip */ resolution(quality(streams,'WEB-DL','WEBRip'),'720p')",
+        "enabled": true
+      },
+      {
+        "expression": "/* ALLDEBRID-ESSENTIAL 720p | Any */ resolution(streams,'720p')",
         "enabled": true
       },
       {
@@ -1263,15 +1275,15 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 3 or totalTimeTaken > 4000"
+      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 15 or count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
     },
     "groups": {
       "enabled": true,
       "groupings": [
         {
           "addons": [
-            "nx-fix-04",
-            "67c"
+            "nx-fix-02",
+            "nx-fix-01"
           ],
           "condition": "count(cached(previousStreams)) < 3"
         }
@@ -2125,7 +2137,7 @@
       },
       {
         "id": "torbox",
-        "enabled": true,
+        "enabled": false,
         "credentials": {}
       },
       {
@@ -2203,13 +2215,28 @@
         ]
       },
       {
-        "type": "stremthruTorz",
-        "instanceId": "67c",
+        "type": "seadex",
+        "instanceId": "tam-seadex",
+        "enabled": false,
+        "options": {
+          "name": "SeaDex",
+          "timeout": 4000,
+          "mediaTypes": [
+            "anime"
+          ]
+        },
+        "category": "Debrid",
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "stremthruStore",
+        "instanceId": "68a",
         "enabled": true,
         "options": {
-          "name": "StremThru Torz",
+          "name": "StremThru AllDebrid",
           "timeout": 5000,
-          "includeP2P": false,
           "useMultipleInstances": false
         },
         "resources": [
@@ -2217,9 +2244,58 @@
         ]
       },
       {
+        "type": "meteor",
+        "instanceId": "nx-fix-02",
+        "enabled": true,
+        "options": {
+          "name": "Meteor",
+          "timeout": 6000,
+          "yourMedia": {
+            "sources": [
+              "torrent",
+              "webdl"
+            ],
+            "showStreams": true,
+            "enabled": true
+          },
+          "usenet": {
+            "enabled": false,
+            "customSearchEngines": true
+          },
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
+        },
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "comet",
+        "instanceId": "nx-fix-01",
+        "enabled": true,
+        "options": {
+          "name": "Comet",
+          "timeout": 7000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ],
+          "scrapeDebridAccountTorrents": true
+        },
+        "resources": [
+          "stream"
+        ]
+      },
+      {
         "type": "mediafusion",
-        "enabled": false,
-        "instanceId": "mf-speed-fallback",
+        "enabled": true,
+        "instanceId": "5e733da8-f747-44bb-8713-0b9840492db3",
         "options": {
           "timeout": 7000,
           "name": "MediaFusion",
@@ -2231,6 +2307,75 @@
             "series",
             "anime"
           ]
+        },
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "hdhub",
+        "enabled": false,
+        "instanceId": "hdhub-1",
+        "options": {
+          "name": "HdHub",
+          "timeout": 5000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ]
+        }
+      },
+      {
+        "type": "eztv",
+        "enabled": true,
+        "options": {
+          "timeout": 5000,
+          "name": "EZTV"
+        },
+        "instanceId": "2dc445aa-2c65-40f9-a229-2d4f791b9a59",
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "torrent-galaxy",
+        "enabled": true,
+        "options": {
+          "timeout": 5000,
+          "name": "Torrent Galaxy"
+        },
+        "instanceId": "0ef926e5-117f-464a-820a-47395f119956",
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "knaben",
+        "instanceId": "tam-knaben",
+        "enabled": true,
+        "options": {
+          "name": "Knaben",
+          "timeout": 6000,
+          "mediaTypes": [],
+          "useMultipleInstances": false
+        },
+        "category": "Debrid",
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "torrents-db",
+        "enabled": true,
+        "instanceId": "nx-tdb-1",
+        "options": {
+          "name": "TorrentsDB",
+          "timeout": 5000,
+          "useMultipleInstances": false
         },
         "resources": [
           "stream"
@@ -2279,22 +2424,6 @@
             "en"
           ]
         }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       }
     ],
     "addonCategoryColors": {
@@ -2327,13 +2456,13 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 15,
-    "maxResultsPerResolution": 6,
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
     "syncedRankedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    ],
+    "maxResults": 30,
+    "maxResultsPerResolution": 12
   }
 }
