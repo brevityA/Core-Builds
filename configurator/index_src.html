@@ -283,21 +283,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt-scraper-line{flex:1;height:1px;background:#1c2d3f}
 .opt-scraper-label{font-size:.68rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#e8a33a;white-space:nowrap}
 .opt-scraper-desc{font-size:.72rem;color:#5a6a7c;margin-bottom:12px;line-height:1.5}
-.opt-scraper-dd-wrap{position:relative;margin-bottom:10px}
-.opt-scraper-dd{width:100%;padding:12px 16px;padding-right:36px;background:#131c27;border:1.5px solid #1c2d3f;border-radius:10px;color:#dfe8f0;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color .2s}
-.opt-scraper-dd:hover,.opt-scraper-dd:focus{border-color:#e8a33a40;outline:none}
-.opt-scraper-dd-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#5a6a7c;font-size:13px;pointer-events:none}
-.opt-scraper-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#131c27;border:1.5px solid #1c2d3f;border-radius:10px;margin-bottom:8px;transition:border-color .2s}
-.opt-scraper-row:hover{border-color:#e8a33a30}
-.opt-scraper-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0}
-.opt-scraper-info{flex:1;min-width:0}
-.opt-scraper-name{font-size:.82rem;font-weight:700;color:#dfe8f0}
-.opt-scraper-subdesc{font-size:.68rem;color:#5a6a7c;margin-top:1px}
-.opt-scraper-badge{font-size:.55rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.opt-scraper-scroll{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px 12px;scrollbar-width:thin;scrollbar-color:rgba(232,163,58,.25) transparent}
+.opt-scraper-scroll::-webkit-scrollbar{height:4px}
+.opt-scraper-scroll::-webkit-scrollbar-track{background:transparent}
+.opt-scraper-scroll::-webkit-scrollbar-thumb{background:rgba(232,163,58,.25);border-radius:4px}
+.opt-scraper-card{scroll-snap-align:start;flex:0 0 200px;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(8,12,18,.9);cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative}
+.opt-scraper-card:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.03)}
+.opt-scraper-card[data-active="true"]{border-color:rgba(232,163,58,.6);background:rgba(232,163,58,.06);box-shadow:0 0 12px rgba(232,163,58,.1)}
+.opt-scraper-card-head{display:flex;align-items:center;gap:8px}
+.opt-scraper-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:800;flex-shrink:0}
+.opt-scraper-name{font-size:.8rem;font-weight:700;color:#9ca3af;white-space:nowrap}
+.opt-scraper-card[data-active="true"] .opt-scraper-name{color:#e8a33a}
+.opt-scraper-subdesc{font-size:.66rem;color:#6b7280;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.opt-scraper-badge{font-size:.55rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:4px;white-space:nowrap}
 .opt-scraper-badge-usenet{background:#06b6d418;color:#06b6d4;border:1px solid #06b6d430}
-.opt-scraper-remove{width:28px;height:28px;border-radius:6px;background:transparent;border:1px solid #2a3a4f;color:#5a6a7c;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s}
-.opt-scraper-remove:hover{border-color:#ef444460;color:#ef4444}
-.opt-scraper-hint{font-size:.68rem;color:#4b5563;margin-top:10px;line-height:1.5;padding:8px 12px;background:#131c27;border-radius:8px;border-left:3px solid #e8a33a40}
+.opt-scraper-badge-debrid{background:#22c55e18;color:#22c55e;border:1px solid #22c55e30}
+.opt-scraper-badge-noaccount{background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf630}
+.opt-scraper-card-ck{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s}
+.opt-scraper-card[data-active="true"] .opt-scraper-card-ck{border-color:#e8a33a;background:#e8a33a}
+.opt-scraper-card[data-active="true"] .opt-scraper-card-ck svg{opacity:1}
+.opt-scraper-card-ck svg{opacity:0;transition:opacity .2s}
+.opt-scraper-hint{font-size:.68rem;color:#4b5563;margin-top:4px;line-height:1.5;padding:8px 12px;background:#131c27;border-radius:8px;border-left:3px solid #e8a33a40}
 /* ── Fine-Tune Info Tooltips ── */
 .ft-info{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#6b7280;font-size:.6rem;font-weight:800;cursor:pointer;transition:all .15s;user-select:none;flex-shrink:0;font-style:normal;line-height:1}
 .ft-info:hover{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:#00d4ff}
@@ -987,12 +993,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da;border-color:#0969da}
 [data-theme="light"] .svc-empty{color:#8c959f}
 [data-theme="light"] .opt-scraper-line{background:#d0d7de}
-[data-theme="light"] .opt-scraper-dd{background:#fff;border-color:#d0d7de;color:#1c2128}
-[data-theme="light"] .opt-scraper-row{background:#fff;border-color:#d0d7de}
-[data-theme="light"] .opt-scraper-name{color:#1c2128}
+[data-theme="light"] .opt-scraper-card{background:#fff;border-color:#d0d7de}
+[data-theme="light"] .opt-scraper-card:hover{border-color:#afb8c1;background:#f6f8fa}
+[data-theme="light"] .opt-scraper-card[data-active="true"]{border-color:rgba(154,103,0,.6);background:rgba(154,103,0,.04)}
+[data-theme="light"] .opt-scraper-card[data-active="true"] .opt-scraper-name{color:#9a6700}
+[data-theme="light"] .opt-scraper-name{color:#1f2328}
 [data-theme="light"] .opt-scraper-subdesc{color:#57606a}
 [data-theme="light"] .opt-scraper-desc{color:#57606a}
-[data-theme="light"] .opt-scraper-remove{border-color:#d0d7de;color:#8c959f}
+[data-theme="light"] .opt-scraper-card-ck{border-color:#d0d7de}
+[data-theme="light"] .opt-scraper-card[data-active="true"] .opt-scraper-card-ck{border-color:#9a6700;background:#9a6700}
 [data-theme="light"] .opt-scraper-hint{background:#f6f8fa;border-left-color:rgba(9,105,218,.3);color:#57606a}
 [data-theme="light"] .qs-panel{background:#fff;border-color:#d0d7de;box-shadow:0 16px 48px rgba(0,0,0,.15)}
 [data-theme="light"] .qs-hdr{background:linear-gradient(135deg,rgba(9,105,218,.04),rgba(130,80,223,.03));border-bottom-color:#d0d7de}
@@ -1396,7 +1405,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.66';
+const CONFIGURATOR_VERSION = '2.67';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1450,6 +1459,9 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.67', date:'Jul 18 2026', items:[
+    'Extras carousel — Hybrid, P2P Free, HTTP Streams, NZBGeek, StreamNZB, and optional Newznab indexers now shown as a side-scroll card picker with multi-select toggle',
+  ]},
   { v:'2.66', date:'Jul 18 2026', items:[
     'Formatter picker — replaced dropdown menu with horizontal scroll carousel showing live previews of all formatters',
   ]},
@@ -2443,7 +2455,8 @@ function renderOpts(def) {
       <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="usenet">Usenet<span class="svc-seg-help">?<span class="svc-seg-tip">Usenet is a paid alternative to torrents. Streams come from news servers instead of peers — often faster, with no seeding required.</span></span></button>
       <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="noaccount">No Account</button>
     </div>`;
-    const rowsHtml = def.opts.slice(1).map(o => {
+    const CAROUSEL_SVCS = ['hybrid','p2p','http','nzbgeek','streamnzb'];
+    const rowsHtml = def.opts.slice(1).filter(o => !CAROUSEL_SVCS.includes(o.v)).map(o => {
       const auth = SVC_AUTH[o.v] || '';
       const cat = SVC_CAT[o.v] || 'debrid';
       const isFree = auth === 'Free';
@@ -2455,9 +2468,33 @@ function renderOpts(def) {
       </label></div>`;
     }).join('');
     const emptyHtml = '<div class="svc-empty" id="svcEmpty">No services match your search</div>';
-    const availScrapers = OPTIONAL_SCRAPER_DEFS.filter(d => !S.optionalScrapers.includes(d.id));
-    const optDropdown = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Add extra indexers and scrapers. Each requires an API key — entered on the API Keys step.</div><div class="opt-scraper-dd-wrap"><select data-action="add-optional-scraper" class="opt-scraper-dd"><option value="">Add a scraper…</option>${availScrapers.map(d => `<option value="${d.id}">${d.label} — ${d.desc}</option>`).join('')}</select><span class="opt-scraper-dd-arrow">&#9662;</span></div>${S.optionalScrapers.map(id => { const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === id); if (!d) return ''; const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat; return `<div class="opt-scraper-row"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><div class="opt-scraper-info"><div class="opt-scraper-name">${d.label}</div><div class="opt-scraper-subdesc">${d.desc}</div></div><span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span><button type="button" data-action="remove-optional-scraper" data-scraper-id="${d.id}" class="opt-scraper-remove" title="Remove">&times;</button></div>`; }).join('')}${S.optionalScrapers.length ? '<div class="opt-scraper-hint">API keys for added scrapers appear on Step 5 (API Keys). Newznab indexers use the same integration as NZBGeek.</div>' : ''}</div>`;
-    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optDropdown}</div>`;
+    const ckIcon = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const svcCarouselCards = CAROUSEL_SVCS.map(sv => {
+      const o = def.opts.find(x => x.v === sv); if (!o) return '';
+      const active = S.multiServices.includes(sv);
+      const cat = SVC_CAT[sv] || 'debrid';
+      const catLabel = cat === 'debrid' ? 'Debrid' : cat === 'usenet' ? 'Usenet' : cat === 'noaccount' ? 'Free' : cat;
+      const color = sv === 'hybrid' ? '#22c55e' : sv === 'p2p' ? '#8b5cf6' : sv === 'http' ? '#f472b6' : sv === 'nzbgeek' ? '#22c55e' : '#f59e0b';
+      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-carousel-service" data-svc-id="${sv}">
+        <div class="opt-scraper-card-ck">${ckIcon}</div>
+        <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${color}15;color:${color}">${o.name.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${o.name}</span></div>
+        <div class="opt-scraper-subdesc">${SVC_DESC[sv] || ''}</div>
+        <span class="opt-scraper-badge opt-scraper-badge-${cat}">${catLabel}</span>
+      </div>`;
+    }).join('');
+    const scraperCards = OPTIONAL_SCRAPER_DEFS.map(d => {
+      const active = S.optionalScrapers.includes(d.id);
+      const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat;
+      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-optional-scraper" data-scraper-id="${d.id}">
+        <div class="opt-scraper-card-ck">${ckIcon}</div>
+        <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
+        <div class="opt-scraper-subdesc">${d.desc}</div>
+        <span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span>
+      </div>`;
+    }).join('');
+    const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
+    const optSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Tap cards to toggle additional services and scrapers. Multi-select is supported.</div><div class="opt-scraper-scroll">${svcCarouselCards}${scraperCards}</div>${hasExtras ? '<div class="opt-scraper-hint">API keys for selected extras appear on Step 5 (API Keys).</div>' : ''}</div>`;
+    return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optSection}</div>`;
   }
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
@@ -4211,6 +4248,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'import-formatter') { showFormatterImport(); }
     if (action === 'compare-templates') { showCompareTemplates(); }
     if (action === 'show-changelog') { showChangelog(); }
+    if (action === 'toggle-carousel-service') {
+      const sv = el.dataset.svcId;
+      if (!sv) return;
+      const idx = S.multiServices.indexOf(sv);
+      if (idx >= 0) { S.multiServices.splice(idx, 1); } else { S.multiServices.push(sv); }
+      S.service = deriveService() || S.service;
+      saveState(); render();
+    }
+    if (action === 'toggle-optional-scraper') {
+      const sid = el.dataset.scraperId;
+      if (!sid) return;
+      const idx = S.optionalScrapers.indexOf(sid);
+      if (idx >= 0) { S.optionalScrapers.splice(idx, 1); } else if (OPTIONAL_SCRAPER_DEFS.find(d => d.id === sid)) { S.optionalScrapers.push(sid); }
+      saveState(); render();
+    }
     if (action === 'remove-optional-scraper') {
       const sid = el.dataset.scraperId;
       const i = S.optionalScrapers.indexOf(sid);
