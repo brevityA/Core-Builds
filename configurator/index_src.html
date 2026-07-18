@@ -3368,7 +3368,7 @@ function render() {
                 </div>
                 <div style="position:relative">
                   <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
-                    value="${S.instancePassword}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
+                    value="${(S.instancePassword||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
                     style="padding-right:40px">
                   <button type="button" id="pwdEye" data-action="toggle-pwd"
                     title="Show/hide password"
