@@ -3307,11 +3307,11 @@ function render() {
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Enter your Stremio credentials to install the addon directly to your library.</div>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
               <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
-                value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"
+                value="${(S.stremioEmail||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"
                 class="th-input">
               <div style="position:relative">
                 <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
-                  value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"
+                  value="${(S.stremioPassword||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"
                   class="th-input" style="padding-right:40px">
                 <button type="button" data-action="toggle-stremio-pwd" aria-label="Show or hide password"
                   style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--th-tx4);padding:2px;line-height:1;display:flex;align-items:center">
@@ -3406,14 +3406,14 @@ function render() {
                   <label style="color:var(--th-purple)">Base UUID</label>
                   <input class="name-input" id="baseUuidInput" type="text"
                     placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                    value="${S.baseUuid}" data-action="update-base-uuid" maxlength="36"
+                    value="${(S.baseUuid||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-action="update-base-uuid" maxlength="36"
                     style="font-family:monospace;font-size:.85rem;border-color:${S.baseUuid ? 'var(--th-purple-border)' : ''}">
                 </div>
                 <div class="name-row" style="margin-bottom:0">
                   <label style="color:var(--th-purple)">Base Password</label>
                   <input class="name-input" id="basePwdInput" type="password"
                     placeholder="leave blank if none"
-                    value="${(S.basePassword||'').replace(/"/g,'&quot;')}" data-action="update-base-pwd" maxlength="200"
+                    value="${(S.basePassword||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-action="update-base-pwd" maxlength="200"
                     autocomplete="new-password">
                 </div>
                 ${S.baseUuid ? `<div style="font-size:.7rem;color:#a855f7;margin-top:8px;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generated template will use parentConfig — formatter, sort, presets inherited from base.</div>` : ''}
