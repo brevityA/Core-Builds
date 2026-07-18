@@ -1368,7 +1368,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.61';
+const CONFIGURATOR_VERSION = '2.62';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1422,6 +1422,10 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.62', date:'Jul 18 2026', items:[
+    'Fix — configurator blank page caused by syntax error in Fine-Tune tooltip text (escaped apostrophes breaking template literals)',
+    'Fine-Tune tooltips now use HTML entities for apostrophes to avoid string termination inside template literals',
+  ]},
   { v:'2.61', date:'Jul 17 2026', items:[
     'Onboarding Tutorial — interactive coach-mark walkthrough for first-time visitors with spotlight cutouts on key UI elements',
     'Tutorial auto-launches on first visit (skipped for returning users with saved state); accessible via the Tutorial preset on the splash screen',
@@ -2716,7 +2720,7 @@ function renderAdvancedPanel() {
         </div>
         ${(S.service !== 'http' && S.service !== 'p2p') ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">PSE Quality Architecture</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what\\'s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">PSE Quality Architecture</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what&apos;s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How stream quality tiers are built. Standard uses simple resolution/quality filters. Apex IQR uses statistical bitrate analysis matching the flagship Apex template.</div>
           <div style="display:flex;gap:5px">
@@ -2726,7 +2730,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it\\'s arranged. You can import custom formatters for different visual styles.')}</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
         ${fmtDropdownHtml()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
@@ -2773,7 +2777,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don\\'t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
           <div style="display:flex;flex-direction:column;gap:5px">
