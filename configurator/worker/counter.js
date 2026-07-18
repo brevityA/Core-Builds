@@ -16,7 +16,9 @@
 const ALLOWED_ORIGINS = [
   'https://core-builds-configurator.pages.dev',
   'https://configurator.corebuilds.app',
+  'https://core-builds-cors-proxy.tlorenzato26.workers.dev',
   'http://localhost:8787',
+  'null',
 ];
 
 function corsHeaders(request) {
