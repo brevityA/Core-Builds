@@ -8,3 +8,7 @@ enabled = false
 [[kv_namespaces]]
 binding = "TEMPLATES"
 id = "100cc344297b41c785f8c07dba85982c"
+
+[[kv_namespaces]]
+binding = "STATS"
+id = "e21df08fe77846ee8246bda94288c111"
