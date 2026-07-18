@@ -557,6 +557,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .srh-ring{width:40px;height:40px}
   .srh-num{font-size:.95rem}
   .summary{grid-template-columns:1fr}
+  .td-tiles{grid-template-columns:1fr}
+  .hero-sub{grid-template-columns:1fr}
+  .cmp-row{grid-template-columns:70px 1fr 1fr;font-size:.68rem}
+  .cmp-label,.cmp-val{padding:4px 6px}
 }
 /* Touch devices — larger tap targets */
 @media(pointer:coarse){
@@ -1370,7 +1374,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.64';
+const CONFIGURATOR_VERSION = '2.65';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1424,6 +1428,10 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.65', date:'Jul 18 2026', items:[
+    'Mobile UX — grids (test drive tiles, hero sections, compare table) now collapse to single column on extra-small screens (≤360px)',
+    'Family v3 preview card updated to reflect fixed formatter (removed raw boolean values, added visual tags)',
+  ]},
   { v:'2.64', date:'Jul 18 2026', items:[
     'Fix — Family v3 formatter: preloading and library fields now use conditional formatting instead of showing raw true/false',
     'Family v3 formatter: added uncached badge, visual tags line, and spacing fixes',
@@ -2439,7 +2447,7 @@ function renderOpts(def) {
 const FMT_PREVIEWS = {
   'family-v3': {
     n:'Torrentio | "Frankenstein" S01 • E05',
-    d:['✅ Plays Fast  🥇Good Stream','📺 From Apple TV','🖥️ Highest Resolution 4k','🎥 WEB-DL • HEVC','🔊 5.1 • Atmos, EAC3','💾 4.2 GB • ☁️ false','🏞️ torbox • debrid • 📚 false','🗣️ English']
+    d:['✅ Plays Fast 🥇 Good Stream','📺 From Apple TV','🖥️ Highest Resolution 4k','🎥 WEB-DL • HEVC • HDR10+','🔊 5.1 • Atmos, EAC3','💾 4.2 GB','🏞️ torbox • debrid','🗣️ English']
   },
   'ultra': {
     n:'4K · ⚡ TORBOX · REMUX · FRANKENSTEIN',
