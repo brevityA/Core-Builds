@@ -714,7 +714,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .fmt-live-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .fmt-live-n{font-size:.73rem;color:#e2e8f0;line-height:1.55;word-break:break-word}
 .fmt-live-d{font-size:.7rem;color:#6b7280;line-height:1.55;word-break:break-word}
-/* Formatter dropdown picker */
+/* Formatter horizontal scroll picker */
+.fmt-scroll{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px 12px;scrollbar-width:thin;scrollbar-color:rgba(0,212,255,.25) transparent}
+.fmt-scroll::-webkit-scrollbar{height:4px}
+.fmt-scroll::-webkit-scrollbar-track{background:transparent}
+.fmt-scroll::-webkit-scrollbar-thumb{background:rgba(0,212,255,.25);border-radius:4px}
+.fmt-scroll-card{scroll-snap-align:start;flex:0 0 260px;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(8,12,18,.9);cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.fmt-scroll-card:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.03)}
+.fmt-scroll-card[data-active="true"]{border-color:rgba(0,212,255,.6);background:rgba(0,212,255,.06);box-shadow:0 0 12px rgba(0,212,255,.1)}
+.fmt-scroll-head{display:flex;align-items:center;gap:8px}
+.fmt-scroll-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fmt-scroll-label{font-weight:700;font-size:.8rem;color:#9ca3af;white-space:nowrap}
+.fmt-scroll-card[data-active="true"] .fmt-scroll-label{color:#00d4ff}
+.fmt-scroll-badge{font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.fmt-scroll-desc{font-size:.66rem;color:#6b7280;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fmt-scroll-card .fmt-live-preview{margin-top:2px;background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.05)}
+.fmt-scroll-card .fmt-live-n{font-size:.65rem}
+.fmt-scroll-card .fmt-live-d{font-size:.6rem}
+.fmt-scroll-card .fmt-live-poster{width:28px;height:40px;font-size:1rem}
+/* Keep dropdown styles for fallback/import custom formatter */
 .fmt-select-wrap{position:relative}
 .fmt-select{width:100%;padding:11px 40px 11px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.13);background:#0d1117;color:#e6edf3;font-size:.85rem;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .2s}
 .fmt-select:focus{border-color:rgba(0,212,255,.5)}
@@ -729,6 +747,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .fmt-select:focus{border-color:#0969da}
 [data-theme="light"] .fmt-featured{border-color:rgba(9,105,218,.3);background:rgba(9,105,218,.04)}
 [data-theme="light"] .fmt-featured-label{color:#0969da}
+[data-theme="light"] .fmt-scroll-card{background:#fff;border-color:#d0d7de}
+[data-theme="light"] .fmt-scroll-card:hover{border-color:#afb8c1;background:#f6f8fa}
+[data-theme="light"] .fmt-scroll-card[data-active="true"]{border-color:rgba(9,105,218,.6);background:rgba(9,105,218,.04)}
+[data-theme="light"] .fmt-scroll-card[data-active="true"] .fmt-scroll-label{color:#0969da}
+[data-theme="light"] .fmt-scroll-card .fmt-live-preview{background:rgba(0,0,0,.03)}
+[data-theme="light"] .fmt-scroll-label{color:#1f2328}
 /* Animated logo */
 @keyframes corePulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.07);opacity:1}}
 @keyframes coreGlowPulse{0%,100%{transform:scale(1);opacity:.38}50%{transform:scale(1.24);opacity:.84}}
@@ -1372,7 +1396,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.65';
+const CONFIGURATOR_VERSION = '2.66';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1426,6 +1450,9 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.66', date:'Jul 18 2026', items:[
+    'Formatter picker — replaced dropdown menu with horizontal scroll carousel showing live previews of all formatters',
+  ]},
   { v:'2.65', date:'Jul 18 2026', items:[
     'Mobile UX — grids (test drive tiles, hero sections, compare table) now collapse to single column on extra-small screens (≤360px)',
     'Family v3 preview card updated to reflect fixed formatter (removed raw boolean values, added visual tags)',
@@ -2529,36 +2556,37 @@ function fmtPreviewHtml(fmtId) {
 }
 
 function fmtDropdownHtml() {
-  const cur = FORMATTERS.find(f => f.id === S.formatter) || FORMATTERS[0];
   const isCustom = S.formatter === 'custom' && S.customFormatter;
-  const opts = FORMATTERS.map(f => `<option value="${f.id}"${f.id === S.formatter && !isCustom ? ' selected' : ''}>${f.label} — ${f.badge}</option>`).join('');
-  const customOpt = S.customFormatter ? `<option value="custom"${isCustom ? ' selected' : ''}>${S.customFormatter.label || 'Custom'} — Imported</option>` : '';
-  const display = isCustom ? { bc:'#a78bfa', label:S.customFormatter.label||'Custom', badge:'Imported', desc:'Your imported formatter' } : cur;
-  return `<div>
-    <div class="fmt-select-wrap">
-      <select class="fmt-select" data-action="fmt-dropdown-change">${opts}${customOpt}</select>
-      <span class="fmt-select-arrow">▾</span>
-    </div>
-    <div class="fmt-featured" id="fmtFeaturedCard">
-      <div class="fmt-featured-head">
-        <div class="fmt-featured-dot" style="background:${display.bc};box-shadow:0 0 8px ${display.bc}88"></div>
-        <span class="fmt-featured-label" id="fmtFeaturedLabel">${display.label}</span>
-        <span class="fmt-featured-badge" id="fmtFeaturedBadge" style="background:${display.bc}22;color:${display.bc}">${display.badge}</span>
+  const allFmts = [...FORMATTERS];
+  if (S.customFormatter) allFmts.push({ id:'custom', label:S.customFormatter.label||'Custom', badge:'Imported', bc:'#a78bfa', desc:'Your imported formatter' });
+  const cards = allFmts.map(f => {
+    const active = (isCustom && f.id === 'custom') || (!isCustom && f.id === S.formatter);
+    const p = FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v3'];
+    return `<div class="fmt-scroll-card" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}">
+      <div class="fmt-scroll-head">
+        <div class="fmt-scroll-dot" style="background:${f.bc}"></div>
+        <span class="fmt-scroll-label">${f.label}</span>
+        <span class="fmt-scroll-badge" style="background:${f.bc}22;color:${f.bc}">${f.badge}</span>
       </div>
-      <div class="fmt-featured-desc" id="fmtFeaturedDesc">${display.desc}</div>
-      <div id="fmtFeaturedPreview">${fmtPreviewHtml(isCustom ? 'family-v3' : cur.id)}</div>
-    </div>
-  </div>`;
+      <div class="fmt-scroll-desc">${f.desc}</div>
+      <div class="fmt-live-preview">
+        <div class="fmt-live-poster">${ICO.film(14,'#6b7280')}</div>
+        <div class="fmt-live-lines">
+          <div class="fmt-live-n">${p.n}</div>
+          ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="fmt-scroll" id="fmtScroll">${cards}</div>`;
 }
 
 function updateFmtFeatured() {
-  const isCustom = S.formatter === 'custom' && S.customFormatter;
-  const cur = isCustom ? { bc:'#a78bfa', label:S.customFormatter.label||'Custom', badge:'Imported', desc:'Your imported formatter', id:'custom' } : (FORMATTERS.find(f => f.id === S.formatter) || FORMATTERS[0]);
-  document.querySelectorAll('#fmtFeaturedLabel').forEach(el => { el.textContent = cur.label; });
-  document.querySelectorAll('#fmtFeaturedBadge').forEach(el => { el.textContent = cur.badge; el.style.background = cur.bc + '22'; el.style.color = cur.bc; });
-  document.querySelectorAll('#fmtFeaturedDesc').forEach(el => { el.textContent = cur.desc; });
-  document.querySelectorAll('.fmt-featured-dot').forEach(el => { el.style.background = cur.bc; el.style.boxShadow = '0 0 8px ' + cur.bc + '88'; });
-  document.querySelectorAll('#fmtFeaturedPreview').forEach(el => { el.innerHTML = fmtPreviewHtml(isCustom ? 'family-v3' : cur.id); });
+  document.querySelectorAll('.fmt-scroll-card').forEach(card => {
+    const isSel = card.dataset.fmt === S.formatter;
+    card.dataset.active = isSel ? 'true' : 'false';
+    if (isSel) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  });
 }
 function updateFmtReceiptRow() {
   const fmtLbl = label('formatter', S.formatter);
@@ -3861,6 +3889,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
     const action = el?.dataset.action;
     if(!action) return;
+
+    if (action === 'fmt-scroll-pick') {
+      S.formatter = el.dataset.fmt;
+      saveState();
+      updateFmtFeatured();
+      updateFmtReceiptRow();
+      return;
+    }
 
     if (action === 'nav-next') {
       if (step === 1 && S.multiServices.length === 0) return;
