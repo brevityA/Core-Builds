@@ -721,6 +721,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .fmt-live-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .fmt-live-n{font-size:.73rem;color:#e2e8f0;line-height:1.55;word-break:break-word}
 .fmt-live-d{font-size:.7rem;color:#6b7280;line-height:1.55;word-break:break-word}
+/* Scroll fade indicators */
+.scroll-fade-wrap{position:relative}
+.scroll-fade-wrap::before,.scroll-fade-wrap::after{content:'';position:absolute;top:0;bottom:4px;width:32px;pointer-events:none;z-index:2;transition:opacity .25s;opacity:0}
+.scroll-fade-wrap::before{left:0;background:linear-gradient(90deg,var(--th-bg,#0d1017) 0%,transparent 100%)}
+.scroll-fade-wrap::after{right:0;background:linear-gradient(270deg,var(--th-bg,#0d1017) 0%,transparent 100%)}
+.scroll-fade-wrap[data-scroll-start="false"]::before{opacity:1}
+.scroll-fade-wrap[data-scroll-end="false"]::after{opacity:1}
 /* Formatter horizontal scroll picker */
 .fmt-scroll{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px 12px;scrollbar-width:thin;scrollbar-color:rgba(0,212,255,.25) transparent}
 .fmt-scroll::-webkit-scrollbar{height:4px}
@@ -754,6 +761,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .fmt-select:focus{border-color:#0969da}
 [data-theme="light"] .fmt-featured{border-color:rgba(9,105,218,.3);background:rgba(9,105,218,.04)}
 [data-theme="light"] .fmt-featured-label{color:#0969da}
+[data-theme="light"] .scroll-fade-wrap::before{background:linear-gradient(90deg,var(--th-bg,#fff) 0%,transparent 100%)}
+[data-theme="light"] .scroll-fade-wrap::after{background:linear-gradient(270deg,var(--th-bg,#fff) 0%,transparent 100%)}
 [data-theme="light"] .fmt-scroll-card{background:#fff;border-color:#d0d7de}
 [data-theme="light"] .fmt-scroll-card:hover{border-color:#afb8c1;background:#f6f8fa}
 [data-theme="light"] .fmt-scroll-card[data-active="true"]{border-color:rgba(9,105,218,.6);background:rgba(9,105,218,.04)}
@@ -1408,7 +1417,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.67';
+const CONFIGURATOR_VERSION = '2.68';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -2496,7 +2505,7 @@ function renderOpts(def) {
       </div>`;
     }).join('');
     const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
-    const optSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Tap cards to toggle additional services and scrapers. Multi-select is supported.</div><div class="opt-scraper-scroll">${svcCarouselCards}${scraperCards}</div>${hasExtras ? '<div class="opt-scraper-hint">API keys for selected extras appear on Step 5 (API Keys).</div>' : ''}</div>`;
+    const optSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Tap cards to toggle additional services and scrapers. Multi-select is supported.</div><div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="opt-scraper-scroll">${svcCarouselCards}${scraperCards}</div></div>${hasExtras ? '<div class="opt-scraper-hint">API keys for selected extras appear on Step 5 (API Keys).</div>' : ''}</div>`;
     return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optSection}</div>`;
   }
   if (def.layout === 'hero') {
@@ -2618,7 +2627,7 @@ function fmtDropdownHtml() {
       </div>
     </div>`;
   }).join('');
-  return `<div class="fmt-scroll" id="fmtScroll">${cards}</div>`;
+  return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="fmtScroll">${cards}</div></div>`;
 }
 
 function updateFmtFeatured() {
@@ -3127,6 +3136,22 @@ function splashHtml() {
   </div>`;
 }
 
+function initScrollFades() {
+  document.querySelectorAll('.scroll-fade-wrap').forEach(wrap => {
+    const inner = wrap.firstElementChild;
+    if (!inner) return;
+    function update() {
+      wrap.dataset.scrollStart = inner.scrollLeft <= 1 ? 'true' : 'false';
+      wrap.dataset.scrollEnd = (inner.scrollLeft + inner.clientWidth >= inner.scrollWidth - 1) ? 'true' : 'false';
+    }
+    if (!inner._scrollFadeBound) {
+      inner.addEventListener('scroll', update, { passive: true });
+      inner._scrollFadeBound = true;
+    }
+    update();
+  });
+}
+
 function render() {
   renderProgress();
   const main = document.getElementById('main');
@@ -3607,6 +3632,7 @@ function render() {
     }
     syncNext();
   }
+  initScrollFades();
 }
 
 function syncNext() {
