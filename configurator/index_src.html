@@ -2456,7 +2456,7 @@ function renderOpts(def) {
       <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="usenet">Usenet<span class="svc-seg-help">?<span class="svc-seg-tip">Usenet is a paid alternative to torrents. Streams come from news servers instead of peers — often faster, with no seeding required.</span></span></button>
       <button type="button" class="svc-seg-b" data-action="svc-cat" data-cat="noaccount">No Account</button>
     </div>`;
-    const CAROUSEL_SVCS = ['hybrid','p2p','http','nzbgeek','streamnzb'];
+    const CAROUSEL_SVCS = ['hybrid','debridio','p2p','http','nzbgeek','streamnzb'];
     const rowsHtml = def.opts.slice(1).filter(o => !CAROUSEL_SVCS.includes(o.v)).map(o => {
       const auth = SVC_AUTH[o.v] || '';
       const cat = SVC_CAT[o.v] || 'debrid';
@@ -2475,7 +2475,7 @@ function renderOpts(def) {
       const active = S.multiServices.includes(sv);
       const cat = SVC_CAT[sv] || 'debrid';
       const catLabel = cat === 'debrid' ? 'Debrid' : cat === 'usenet' ? 'Usenet' : cat === 'noaccount' ? 'Free' : cat;
-      const color = sv === 'hybrid' ? '#22c55e' : sv === 'p2p' ? '#8b5cf6' : sv === 'http' ? '#f472b6' : sv === 'nzbgeek' ? '#22c55e' : '#f59e0b';
+      const color = sv === 'hybrid' ? '#22c55e' : sv === 'debridio' ? '#14b8a6' : sv === 'p2p' ? '#8b5cf6' : sv === 'http' ? '#f472b6' : sv === 'nzbgeek' ? '#22c55e' : '#f59e0b';
       return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-carousel-service" data-svc-id="${sv}">
         <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon opt-scraper-icon-svg">${o.icon}</div><span class="opt-scraper-name">${o.name}</span></div>
