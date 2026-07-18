@@ -13,19 +13,9 @@
 //   POST /api/visit     → increments visit counter
 //   POST /api/generate  → increments generate counter (accepts JSON body with metadata)
 
-const ALLOWED_ORIGINS = [
-  'https://core-builds-configurator.pages.dev',
-  'https://configurator.corebuilds.app',
-  'https://core-builds-cors-proxy.tlorenzato26.workers.dev',
-  'http://localhost:8787',
-  'null',
-];
-
-function corsHeaders(request) {
-  const origin = request.headers.get('Origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+function corsHeaders() {
   return {
-    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
@@ -42,7 +32,7 @@ async function increment(kv, key) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const cors = corsHeaders(request);
+    const cors = corsHeaders();
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: cors });
