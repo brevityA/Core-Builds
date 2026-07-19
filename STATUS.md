@@ -18,7 +18,7 @@ Live status for all known public AIOStreams instances. Checked every 30 minutes 
 | **ATBP** | 🟢 Online | [aio.atbphosting.com](https://aio.atbphosting.com/stremio/configure) |
 | **Omni's** | 🟢 Online | [aiostreams.12312023.xyz](https://aiostreams.12312023.xyz/stremio/configure) |
 
-*Last checked: 2026-07-19 02:06 UTC*
+*Last checked: 2026-07-19 08:06 UTC*
 <!-- STATUS_STABLE_END -->
 
 ---
@@ -33,7 +33,7 @@ Live status for all known public AIOStreams instances. Checked every 30 minutes 
 | **Kuu's Nightly** | 🟢 Online | [aiostreams-nightly.stremio.ru](https://aiostreams-nightly.stremio.ru/stremio/configure) |
 | **Viren's Nightly** | 🟢 Online | [aiostreams.viren070.me](https://aiostreams.viren070.me/stremio/configure) |
 
-*Last checked: 2026-07-19 02:06 UTC*
+*Last checked: 2026-07-19 08:06 UTC*
 <!-- STATUS_NIGHTLY_END -->
 
 ---
