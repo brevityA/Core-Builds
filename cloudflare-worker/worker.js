@@ -1,13 +1,14 @@
-// Core Builds — CORS proxy + template paste + usage counter for the configurator.
+// Core Builds — CORS proxy + template paste + usage analytics for the configurator.
 //
 // /proxy/*       — re-issues AIOStreams API requests server-to-server to bypass CORS.
 // /paste         — stores a template JSON in KV and returns a URL that serves it back.
 //                  Templates expire after 30 days. Nothing is logged or inspected.
-// /api/stats     — returns all usage counters.
+// /api/stats     — returns all usage counters (totals + breakdowns).
 // /api/visit     — increments configurator visit counter.
-// /api/generate  — increments template generation counter.
+// /api/generate  — increments template generation counter (accepts service/device/resolution).
 //
 // Proxy calls, paste creates, and paste views are counted automatically.
+// Per-host proxy counts, per-service generates, and daily counters are tracked.
 
 const ALLOWED_HOSTS = new Set([
   'https://aiostreams.elfhosted.com',
@@ -48,6 +49,14 @@ function randomId() {
   return id;
 }
 
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function hostLabel(hostUrl) {
+  try { return new URL(hostUrl).hostname; } catch { return 'unknown'; }
+}
+
 async function increment(kv, key) {
   const raw = await kv.get(key);
   const val = (parseInt(raw, 10) || 0) + 1;
@@ -57,6 +66,25 @@ async function increment(kv, key) {
 
 function bgIncrement(ctx, kv, key) {
   ctx.waitUntil(increment(kv, key));
+}
+
+function bgIncrementMulti(ctx, kv, keys) {
+  ctx.waitUntil(Promise.all(keys.map(k => increment(kv, k))));
+}
+
+async function listByPrefix(kv, prefix) {
+  const result = {};
+  let cursor;
+  do {
+    const list = await kv.list({ prefix, cursor });
+    for (const key of list.keys) {
+      const val = await kv.get(key.name);
+      const label = key.name.slice(prefix.length);
+      result[label] = parseInt(val, 10) || 0;
+    }
+    cursor = list.list_complete ? undefined : list.cursor;
+  } while (cursor);
+  return result;
 }
 
 export default {
@@ -70,22 +98,53 @@ export default {
     // --- Counter: return all stats ---
     if (url.pathname === '/api/stats' && request.method === 'GET') {
       if (!env.STATS) return json(200, {});
-      const keys = ['visits', 'generates', 'proxy_calls', 'pastes_created', 'pastes_viewed'];
+      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_errors', 'pastes_created', 'pastes_viewed'];
       const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
-      const stats = {};
-      keys.forEach((k, i) => { stats[k] = parseInt(vals[i], 10) || 0; });
-      return json(200, stats);
+      const totals = {};
+      keys.forEach((k, i) => { totals[k] = parseInt(vals[i], 10) || 0; });
+
+      const [byHost, byService, byDevice, byResolution, daily] = await Promise.all([
+        listByPrefix(env.STATS, 'proxy:'),
+        listByPrefix(env.STATS, 'gen:service:'),
+        listByPrefix(env.STATS, 'gen:device:'),
+        listByPrefix(env.STATS, 'gen:res:'),
+        listByPrefix(env.STATS, 'daily:'),
+      ]);
+
+      return json(200, { ...totals, by_host: byHost, by_service: byService, by_device: byDevice, by_resolution: byResolution, daily });
     }
 
     // --- Counter: increment visit ---
     if (url.pathname === '/api/visit' && request.method === 'POST') {
-      if (env.STATS) { const v = await increment(env.STATS, 'visits'); return json(200, { visits: v }); }
+      if (env.STATS) {
+        const d = today();
+        const v = await increment(env.STATS, 'visits');
+        bgIncrement(ctx, env.STATS, `daily:visits:${d}`);
+        return json(200, { visits: v });
+      }
       return json(200, { visits: 0 });
     }
 
     // --- Counter: increment generate ---
     if (url.pathname === '/api/generate' && request.method === 'POST') {
-      if (env.STATS) { const v = await increment(env.STATS, 'generates'); return json(200, { generates: v }); }
+      if (env.STATS) {
+        const d = today();
+        const v = await increment(env.STATS, 'generates');
+        const extra = [`daily:generates:${d}`];
+
+        try {
+          const body = await request.text();
+          if (body) {
+            const data = JSON.parse(body);
+            if (data.service) extra.push(`gen:service:${data.service}`);
+            if (data.device) extra.push(`gen:device:${data.device}`);
+            if (data.resolution) extra.push(`gen:res:${data.resolution}`);
+          }
+        } catch {}
+
+        bgIncrementMulti(ctx, env.STATS, extra);
+        return json(200, { generates: v });
+      }
       return json(200, { generates: 0 });
     }
 
@@ -99,7 +158,7 @@ export default {
       try { JSON.parse(body); } catch { return json(400, { error: 'invalid JSON' }); }
       const id = randomId();
       await env.TEMPLATES.put(`t:${id}`, body, { expirationTtl: PASTE_TTL });
-      if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_created');
+      if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['pastes_created', `daily:pastes:${today()}`]);
       const pasteUrl = `${url.origin}/t/${id}`;
       return json(200, { url: pasteUrl });
     }
@@ -144,14 +203,27 @@ export default {
       body: request.method === 'GET' ? undefined : await request.text(),
     });
 
+    const hostname = hostLabel(host);
+
     let upstreamRes;
     try {
       upstreamRes = await fetch(upstreamReq);
     } catch (e) {
+      if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
       return json(502, { error: 'upstream unreachable' });
     }
 
-    if (env.STATS) bgIncrement(ctx, env.STATS, 'proxy_calls');
+    if (env.STATS) {
+      const d = today();
+      bgIncrementMulti(ctx, env.STATS, [
+        'proxy_calls',
+        `proxy:${hostname}`,
+        `daily:proxy:${d}`,
+      ]);
+      if (upstreamRes.status >= 400) {
+        bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
+      }
+    }
 
     const resBody = await upstreamRes.text();
     return new Response(resBody, {

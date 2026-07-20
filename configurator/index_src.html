@@ -4864,7 +4864,7 @@ function generate() {
     try { navigator.sendBeacon(USAGE_BEACON_URL, JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution })); } catch(e) {}
   }
   if (COUNTER_URL && navigator.sendBeacon) {
-    try { navigator.sendBeacon(COUNTER_URL + '/api/generate', JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service })); } catch(e) {}
+    try { navigator.sendBeacon(COUNTER_URL + '/api/generate', JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution })); } catch(e) {}
   }
   const dlBtn = document.querySelector('.btn-dl');
   if (dlBtn) {
