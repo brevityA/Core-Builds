@@ -31,6 +31,9 @@ __pycache__/
 venv/
 .pytest_cache/
 
+# Wrangler
+.wrangler/
+
 # Temp / working files
 *.tmp
 *.bak
