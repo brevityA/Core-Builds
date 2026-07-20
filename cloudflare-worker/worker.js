@@ -77,11 +77,11 @@ async function listByPrefix(kv, prefix) {
   let cursor;
   do {
     const list = await kv.list({ prefix, cursor });
-    for (const key of list.keys) {
-      const val = await kv.get(key.name);
+    const vals = await Promise.all(list.keys.map(k => kv.get(k.name)));
+    list.keys.forEach((key, i) => {
       const label = key.name.slice(prefix.length);
-      result[label] = parseInt(val, 10) || 0;
-    }
+      result[label] = parseInt(vals[i], 10) || 0;
+    });
     cursor = list.list_complete ? undefined : list.cursor;
   } while (cursor);
   return result;
@@ -103,15 +103,16 @@ export default {
       const totals = {};
       keys.forEach((k, i) => { totals[k] = parseInt(vals[i], 10) || 0; });
 
-      const [byHost, byService, byDevice, byResolution, daily] = await Promise.all([
+      const [byHost, byHostErrors, byService, byDevice, byResolution, daily] = await Promise.all([
         listByPrefix(env.STATS, 'proxy:'),
+        listByPrefix(env.STATS, 'proxy_err:'),
         listByPrefix(env.STATS, 'gen:service:'),
         listByPrefix(env.STATS, 'gen:device:'),
         listByPrefix(env.STATS, 'gen:res:'),
         listByPrefix(env.STATS, 'daily:'),
       ]);
 
-      return json(200, { ...totals, by_host: byHost, by_service: byService, by_device: byDevice, by_resolution: byResolution, daily });
+      return json(200, { ...totals, by_host: byHost, by_host_errors: byHostErrors, by_service: byService, by_device: byDevice, by_resolution: byResolution, daily });
     }
 
     // --- Counter: increment visit ---
