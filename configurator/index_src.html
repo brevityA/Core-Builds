@@ -1452,7 +1452,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.72';
+const CONFIGURATOR_VERSION = '2.73';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1571,6 +1571,9 @@ const CHANGELOG = [
     'UI refresh — calmer, Duck-inspired look: single accent, glow/pulse animations retired, flat selection states',
     'Multi-select service rows use toggle switches instead of checkboxes',
     'Spelling — "Debrid.io" is now "Debridio" across the configurator',
+  ]},
+  { v:'2.73', date:'Jul 20 2026', items:[
+    'Fix — OpenSubtitles v3+ preset now includes language, sources, and AI-translation settings (was causing "Invalid input" on import)',
   ]},
   { v:'2.36', date:'Jul 11 2026', items:[
     'Fix — Configurator-generated templates no longer cause "Invalid input error" on elfhosted/fortheweak',
@@ -4410,8 +4413,8 @@ function subtitlePresets() {
   const langs = S.subtitleLangs || ['en'];
   const out = [];
   if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
-  if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000 } });
-  if (addons.includes('subdl')) out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, ...(S.creds.subdl ? { subDlApiKey:S.creds.subdl } : {}) } });
+  if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false } });
+  if (addons.includes('subdl')) out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, languages:langs, ...(S.creds.subdl ? { subDlApiKey:S.creds.subdl } : {}) } });
   return out;
 }
 
