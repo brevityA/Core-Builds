@@ -1437,7 +1437,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
     </div>
-    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.2</span>
+    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.73</span>
   </header>
 
   <div id="main"></div>
@@ -1508,6 +1508,7 @@ const ICO = {
 };
 const CHANGELOG = [
   { v:'2.73', date:'Jul 21 2026', items:[
+    'Ecosystem — Integrated cutting-edge Stream Expression Language (SEL) boosters globally: Sub-First Anime Booster, Dolby Priority for Sonos/Bose bars, Incomplete Ongoing Show filter, and Clutter-Free Single Episode filter',
     'Fix — Overhauled Stremio Account authentication pathways (Login / Registration) to query the distinct sub-endpoints directly (/api/login and /api/register), successfully resolving the 404 router failures caused by Stremio’s recent base API path deprecations',
     'Security — Added a prominent green "Zero-Knowledge Security Shield" reassurance banner at the top of Step 5 (API Keys) explaining that credentials never leave their browser and are compiled 100% locally',
     'Security — Added a "Safe Auth" green shield warning beneath the Stremio credentials on the direct-install panel, assuring users that accounts are used locally and never stored',
@@ -4808,7 +4809,7 @@ function eses() {
     const langArgs = [...new Set([...(S.langs||['English']),'Original','Multi','Dual Audio','Dubbed','Unknown'])].map(l=>`'${l}'`).join(',');
     out.push({ enabled:true, expression:`/* CB | Foreign Language Kill (movies/series only — anime exempt) */ (queryType == 'movie' or queryType == 'series') ? negate(merge(library(streams), seadex(streams), language(streams, ${langArgs})), streams) : []` });
   }
-  out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
+  out.push({ enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" }, { enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" }, { enabled:true, expression:"/* Weekly Ongoing Series Pack Filter */ ((queryType == 'series' or queryType == 'anime.series') and ongoingSeason) ? seasonPack(streams) : []" }, { enabled:true, expression:"/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []" });
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
   if (['samsung','firestick-hd','roku','projector'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
   if (S.cacheMode !== 'uncached') out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" });
@@ -4832,6 +4833,12 @@ function pses() {
 
   if (S.langs && S.langs.length) {
     out.push({ enabled:true, expression:`/* Language Preference — ${(S.langs||['English']).join('/')} */ language(streams,${(S.langs||['English']).map(l=>`'${l}'`).join(',')})` });
+  }
+
+  // Ecosystem: Sub-First Anime Booster & Dolby Priority
+  out.push({ enabled:true, expression:"/* Sub-First Anime Booster */ (queryType == 'anime.series' or queryType == 'anime.movie') ? language(cached(streams), 'Japanese') : []" });
+  if (S.audio === 'dolby') {
+    out.push({ enabled:true, expression:"/* Dolby Priority for Sonos/Bose */ audioTag(streams,'Atmos','TrueHD','DDP','DD+')" });
   }
 
   if (S.service === 'http') {
