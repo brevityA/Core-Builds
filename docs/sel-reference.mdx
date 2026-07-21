@@ -1,0 +1,83 @@
+---
+title: "Stream Expression Language (SEL) Reference"
+sidebarTitle: "SEL Reference"
+description: "A comprehensive technical guide to AIOStreams' Stream Expression Language (SEL) and the adaptive boosters baked into Core Builds v2.73."
+---
+
+import { Card, CardGroup, Info, Warning, CodeGroup } from '@mintlify/components';
+
+# Stream Expression Language (SEL)
+
+The **Stream Expression Language (SEL)** is a domain-specific expression system built on the `expr-eval` parser in AIOStreams. It enables programmatic, edge-evaluated control over stream filtering, early early early-exit fetching, and advanced multi-group fallback sorting.
+
+In Core Builds **v2.73**, we have baked four highly optimal, community-approved SEL expressions directly into our default templates to completely eliminate list clutter and playback friction.
+
+---
+
+## 🚀 1. The Core Builds Adaptive Booster Pack
+
+These expressions are processed dynamically by AIOStreams during runtime, and have been thoroughly optimized for maximum edge efficiency.
+
+### 🎌 Sub-First Anime Booster
+Forces Japanese audio tracks to the top of your list when watching Anime series or movies, leaving standard Hollywood movies and TV series untouched.
+* **Type**: Preferred Stream Expression (PSE)
+* **The Code**:
+```javascript
+/* Sub-First Anime Booster */ (queryType == 'anime.series' or queryType == 'anime.movie') ? language(cached(streams), 'Japanese') : []
+```
+* **Why it helps**: Solves the common frustration where English-dubbed anime files clutter the top results, saving subtitle-seeking users from manual scrolling.
+
+### 🔊 Dolby Priority (for Sonos / Bose soundbars)
+Ensures that full Dolby audio formats (Atmos, TrueHD, DD+) are prioritised on soundbars that play DTS tracks as absolute silence.
+* **Type**: Preferred Stream Expression (PSE)
+* **The Code**:
+```javascript
+/* Dolby Priority for Sonos/Bose */ audioTag(streams, 'Atmos', 'TrueHD', 'DDP', 'DD+')
+```
+* **Why it helps**: Prevents users from accidentally playing high-bitrate DTS or DTS-HD MA tracks on hardware that doesn't support them, eliminating silent playback errors.
+
+### 📅 Weekly Ongoing Series Pack Filter
+Automatically identifies if a TV show is currently airing. If true, it filters out incomplete season packs (e.g. S01 containing only episodes 1–5), ensuring only individual, freshly working single-episode files are displayed.
+* **Type**: Excluded Stream Expression (ESE)
+* **The Code**:
+```javascript
+/* Weekly Ongoing Series Pack Filter */ ((queryType == 'series' or queryType == 'anime.series') and ongoingSeason) ? seasonPack(streams) : []
+```
+* **Why it helps**: Prevents manifest parsing crashes and buffering loops caused by tapping incomplete, newly uploaded season packs.
+
+### 🗂️ Clutter-Free Single Episode Booster
+Hides multi-episode spam files (like "Episodes 1-4" in a single file) on individual Stremio episode pages when at least 3 dedicated, single-episode files are already available.
+* **Type**: Excluded Stream Expression (ESE)
+* **The Code**:
+```javascript
+/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []
+```
+* **Why it helps**: Keeps your stream pool clean and direct, preventing users from opening compilation files that start playing from Episode 1.
+
+---
+
+## ⚡ 2. Adaptive Bitrate Outlier Detection (Tukey IQR)
+
+The flagship **Core Nexus 4K Apex** template uses a dynamic **Tukey IQR (Interquartile Range)** formula to compute score and bitrate boundaries on the fly.
+
+<CodeGroup>
+```javascript Score IQR Guard
+/* Score IQR Guard */ 
+count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? 
+streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, 
+q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []
+```
+
+```javascript Tukey Bitrate Guard
+/* APEX S-Tier 4K Remux */ 
+count(resolution(quality(streams,'BluRay REMUX'),'2160p'))>=4 ? 
+size(bitrate(resolution(quality(streams,'BluRay REMUX'),'2160p'), 
+q1(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate')) - 1.5 * iqr(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate')), 
+q3(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate')) + 1.5 * iqr(values(resolution(quality(streams,'BluRay REMUX'),'2160p'),'bitrate'))), '15GB') : []
+```
+</CodeGroup>
+
+### How it works:
+1. **First Quartile ($Q_1$) & Third Quartile ($Q_3$)**: Computes the 25th and 75th percentiles of the current stream pool's bitrates or scores.
+2. **IQR Fence Expansion**: Sets a dynamic threshold at $Q_1 - 1.5 \times IQR$ and $Q_3 + 1.5 \times IQR$.
+3. **Outlier Filtering**: Instantly filters out files that fall outside this adaptive window (such as poorly encoded "bloated" bitrates or fake compressed Remuxes), yielding an extremely smooth, premium stream pool.

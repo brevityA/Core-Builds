@@ -1,0 +1,73 @@
+---
+title: "What's New in v2.73"
+sidebarTitle: "What's New"
+description: "Plain-English release highlights for Core Builds Configurator v2.73 — introducing the Device Carousel, Zero-Knowledge Security, and major Stremio API compliance fixes."
+---
+
+import { Card, CardGroup, Info, Warning, CodeGroup } from '@mintlify/components';
+
+# Version 2.73 (July 21, 2026)
+
+Welcome to **v2.73** of the Core Builds Configurator! This major master release resolves critical Stremio API router deprecations, introduces a visual redesign of our device-selection flow, and implements industry-first mobile and security safeguards.
+
+<CardGroup cols={2}>
+  <Card title="Device Carousel Redesign" icon="tv" color="#00d4ff">
+    The static dropdown list is gone! Step 3 now features a fully responsive, horizontal-scrolling card carousel with expandable specification sheets and automated progression.
+  </Card>
+  <Card title="Zero-Knowledge Shield" icon="shield-halved" color="#34d399">
+    New, prominent browser privacy indicators assure you that your debrid API keys, passwords, and tokens are compiled 100% locally and never sent to any server.
+  </Card>
+</CardGroup>
+
+---
+
+## 🛠️ Critical Bug Fixes & API Compliance
+
+### 🔑 Stremio Direct-Install 404 Error Resolved
+Stremio's API recently retired its legacy base router (`https://api.strem.io/api/`), causing direct-installation and random account registration inside configurators to fail with a `Stremio API error (404)`.
+* **The Fix**: We overhauled our authentication pathways to query the direct sub-endpoints (**`/api/login`** and **`/api/register`**) directly, making one-click installations completely functional and stable again!
+
+### 🆓 HTTP / Free Tier Manifest Crash Fixed
+When setting up a Free Tier HTTP configuration, AIOStreams tried to fetch Nuvio Streams' base URL, which returned a HTML configuration page (`<!doctype html>`) rather than JSON. This threw a fatal parsing crash: `Unexpected token '<'` and blocked all installations.
+* **The Fix**: **Nuvio Streams** is now safely set to `enabled: false` by default in HTTP and extra-HTTP presets. Standard setups will now install cleanly without throwing any JSON validation errors!
+
+### 🛑 OpenSubtitles v3+ Preset Validation Fixed
+Older configurations caused AIOStreams to reject deployments with: *`Option movieHashPlusAutoAdjustment is required, got undefined`*.
+* **The Fix**: The configurator now automatically compiles the required `movieHashPlusAutoAdjustment: false` option into the OpenSubtitles v3+ options block.
+
+---
+
+## 🎴 Sleek UI & Navigation Upgrades
+
+### 📱 Responsive Device Selection Carousel
+We have completely retired the traditional HTML `<select>` dropdown menu! Step 3 (Your Device) now renders as a gorgeous, horizontal-scrolling card carousel:
+* **Auto-Expanding Guides**: Active device cards dynamically expand to display their specific audio caps (e.g., Samsung gets standard DD+, Shield gets lossless), video decoder limits, and specification sheets.
+* **Scroll-to-Center**: Activating any card triggers an instant, smooth centering animation.
+* **Fluid Simple-Pathing**: Choosing a device in Simple Mode automatically advances you to the next step after a brief **350ms delay**.
+
+### 🎨 Community Formatting Sandbox Link (`crispyduck.xyz`)
+To support advanced visual layout customizers, we have added a direct integration link to **`crispyduck.xyz`**—the Stremio community's standard formatting designer—directly inside the custom formatter import panel.
+
+### 🗺️ Step 6 Changelog Access
+Added an explicit **Changelog** button next to the "Start Over" button on Step 6 (Review & Deploy), allowing users to easily browse our full release history at the finish line.
+
+---
+
+## 🔒 Security & Peace of Mind Designs
+
+<Info>
+  **Zero-Knowledge Philosophy**: Core Builds believes in absolute transparency. Your private keys and credentials are yours alone.
+</Info>
+
+* **Step 5 Security Shield**: An eye-catching, highly reassuring green security shield banner is now positioned at the top of Step 5 (API Keys) outlining that all credential-baking is done purely client-side inside their local browser memory.
+* **"Safe Auth" Direct-Install Locker**: A reassuring lock warning is displayed beneath the inline Stremio email and password fields, guaranteeing that accounts are used locally only to authenticate with Stremio and are never stored in localStorage or shared with third parties.
+
+---
+
+## 🏎️ Mobile UX & Micro-Interactions
+
+* **Tactile "✓ Copied" Buttons**: Tapping copy buttons (for Manifest URLs, credentials, or WuPlay codes) triggers a glowing emerald-green animation, temporarily transitioning the text to `✓ Copied`.
+* **Context-Aware Toast Alerts**: Copying keys, usernames, or passwords now triggers a custom `Copied to clipboard` toast, separating credential copy feedback from the main `Manifest URL copied` alert.
+* **iOS Safari 'Select-All-on-Focus'**: Solved mobile keyboard selection friction! Tapping into any text input box on iOS Safari now programmatically highlights the entire value instantly, allowing mobile users to overwrite keys in a single tap.
+* **Smart Auto-Scrolling**: Enabling conditional subtitle panels (such as SubDL) now smoothly auto-scrolls the screen directly to the newly expanded credentials card, ensuring mobile users never miss required fields.
+* **CORS-Bypassing Live Checks**: The final Review card's live "Test" check now automatically routes queries through our secure CORS proxy first, completely bypassing cross-origin blocks on strict public hosts and yielding 100% accurate stream-testing results.
