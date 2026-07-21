@@ -1,26 +1,10 @@
-name = "core-builds-cors-proxy"
-main = "worker.js"
-compatibility_date = "2026-01-01"
-
-[observability]
-enabled = true
-head_sampling_rate = 1
-
-[observability.logs]
-enabled = true
-head_sampling_rate = 1
-persist = true
-invocation_logs = true
-
-[observability.traces]
-enabled = true
-persist = true
-head_sampling_rate = 1
-
-[[kv_namespaces]]
-binding = "TEMPLATES"
-id = "100cc344297b41c785f8c07dba85982c"
+name = "core-builds-counter"
+main = "counter.js"
+compatibility_date = "2024-09-25"
 
 [[kv_namespaces]]
 binding = "STATS"
 id = "e21df08fe77846ee8246bda94288c111"
+
+[vars]
+ALLOWED_ORIGIN = "*"
