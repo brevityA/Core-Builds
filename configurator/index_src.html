@@ -1372,7 +1372,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @media(min-width:1000px){.card.splash.hybrid-splash{max-width:1040px!important}.cb-sidebar.sb-hidden~.wrap:has(.hybrid-splash){max-width:1120px}}
 @media(max-width:820px){.hybrid-hero{grid-template-columns:1fr;padding-top:34px}.hybrid-core-stage{min-height:245px}.hybrid-splash .splash-doors{grid-template-columns:1fr 1fr}.hybrid-splash .splash-door:first-child{grid-column:span 2}.hybrid-splash .splash-presets{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.card.splash.hybrid-splash{padding:0 16px 24px}.hybrid-toplinks a{display:none}.hybrid-hero{gap:24px}.hybrid-hero h1{font-size:2.7rem}.hybrid-splash .splash-doors{grid-template-columns:1fr}.hybrid-splash .splash-door:first-child{grid-column:auto}.hybrid-section-head{align-items:flex-start;flex-direction:column;gap:2px}.hybrid-splash .splash-footer{text-align:left;margin-top:12px}.hybrid-session{align-items:flex-start;flex-wrap:wrap}}
-/* v2.77 — unified hybrid design system across every configurator menu */
+/* v2.74 — unified hybrid design system across every configurator menu */
 :root{--ui-bg:#070b11;--ui-panel:rgba(14,21,31,.88);--ui-panel-solid:#0e151f;--ui-raised:#121c29;--ui-line:rgba(255,255,255,.085);--ui-line-strong:rgba(255,255,255,.15);--ui-text:#edf4f8;--ui-muted:#7d8999;--ui-faint:#526174;--ui-accent:#00d4ff;--ui-accent-soft:rgba(0,212,255,.08);--ui-violet:#a78bfa;--ui-green:#4ade80;--ui-radius:16px;--ui-shadow:0 24px 70px rgba(0,0,0,.24)}
 html{background:var(--ui-bg);scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:radial-gradient(circle at 14% -8%,rgba(0,212,255,.105),transparent 30%),radial-gradient(circle at 92% 86%,rgba(167,139,250,.07),transparent 30%),var(--ui-bg);color:var(--ui-text);min-height:100svh;min-height:100dvh;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));overscroll-behavior-y:none}
@@ -1584,7 +1584,7 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
     </div>
-    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.77</span>
+    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.74</span>
   </header>
 
   <div id="main"></div>
@@ -1663,19 +1663,15 @@ const CHANGELOG = [
     'Responsive UI — Added dedicated phone, small-phone, landscape, tablet, desktop, and standalone-PWA behavior while preserving light and dark themes',
     'Debugging — Validated application JavaScript syntax, HTML structure, standalone QR-library build, required element IDs, delegated actions, and ZIP integrity',
   ]},
-  { v:'2.77', date:'Jul 21 2026', items:[
+  { v:'2.74', date:'Jul 21 2026', items:[
     'Reference Template Parity — generated templates now match the flagship Core Nexus 4K Apex output quality',
     'ESE Stack — Added 12 new ESEs: Extra SeaDex, Bad 4K Anime, Upscaled 4K, Bad 4K/1080P Bluray, AI Upscale Exclusion, Info & Unwanted, Low SEL Score, G\'s Low Bitrate, Low Seeders, Final Limit, Indexer Diversity, RD Copyright (per DMM)',
     'ISE Stack — Added Library fallback, digitalRelease Bypass, 0Cached passthrough, enhanced REPACK/PROPER Passthrough',
     'PSE Stack — Added per-quality/resolution slice limits (8 entries for 4K, 5 for 1080p), IMAX pin',
     'Config — Added hideErrors, digitalReleaseFilter, size/bitrate per-resolution limits, autoPlay, precache/preload, cacheAndPlay, nzbFailover, areYouStillThere, syncedRankedStreamExpressionUrls, resultLimits',
     'ESE — HdHub added to Per-Addon Flood Guard, ongoingSeasonPack uses onlySeasons mode, Hard Season Pack Kill with anime exemption',
-  ]},
-  { v:'2.76', date:'Jul 21 2026', items:[
-    'Fix — "All addons must belong to a group" error: P2P/HTTP groups now dynamically include all preset addon names (subtitles, catalogs, optional scrapers)',
+    'Fix — “All addons must belong to a group” error: P2P/HTTP groups now dynamically include all preset addon names (subtitles, catalogs, optional scrapers)',
     'Fix — Removed SCR/TC/TS/CAM/Unknown from preferredQualities (low-quality sources should not be preferred)',
-  ]},
-  { v:'2.74', date:'Jul 21 2026', items:[
     'Landing UI — Rebuilt the start screen as a cohesive hybrid of Precision Dark structure, editorial typography, Aurora glass depth, Bento-style presets, and compact technical microcopy',
     'Support — Removed the floating heart and footer support buttons; the central Core gem is now the compact, keyboard-accessible support entry point with a pulsing glow, expanding signal ring, tooltip, and one subtle caption',
     'Usage counter — Retained live visit and template-generation statistics on the redesigned landing page',
