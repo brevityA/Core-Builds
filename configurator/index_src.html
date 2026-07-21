@@ -9,7 +9,7 @@
 :root{--th-bg:#0d1017;--th-card:#151923;--th-card-alt:#111720;--th-border:rgba(255,255,255,.06);--th-border-strong:rgba(255,255,255,.12);--th-tx:#e4e7ed;--th-tx2:#8b949e;--th-tx3:#6b7280;--th-tx4:#4b5563;--th-tx5:#374151;--th-accent:#00d4ff;--th-accent-bg:rgba(0,212,255,.08);--th-accent-border:rgba(0,212,255,.18);--th-green:#34d399;--th-green-bg:rgba(52,211,153,.06);--th-green-border:rgba(52,211,153,.2);--th-yellow:#fbbf24;--th-yellow-bg:rgba(251,191,36,.04);--th-yellow-border:rgba(245,158,11,.12);--th-red:#f87171;--th-red-bg:rgba(239,68,68,.04);--th-red-border:rgba(239,68,68,.15);--th-purple:#a78bfa;--th-purple-bg:rgba(168,85,247,.04);--th-purple-border:rgba(168,85,247,.18);--th-input-bg:rgba(255,255,255,.03);--th-input-border:rgba(255,255,255,.08);--th-select-scheme:dark}
 [data-theme="light"]{--th-bg:#f6f8fa;--th-card:#ffffff;--th-card-alt:#f6f8fa;--th-border:rgba(0,0,0,.09);--th-border-strong:rgba(0,0,0,.18);--th-tx:#1c2128;--th-tx2:#57606a;--th-tx3:#6b7280;--th-tx4:#8c959f;--th-tx5:#9ca3af;--th-accent:#0969da;--th-accent-bg:rgba(9,105,218,.06);--th-accent-border:rgba(9,105,218,.25);--th-green:#059669;--th-green-bg:rgba(5,150,105,.06);--th-green-border:rgba(5,150,105,.2);--th-yellow:#a16207;--th-yellow-bg:rgba(161,98,7,.04);--th-yellow-border:rgba(161,98,7,.15);--th-red:#dc2626;--th-red-bg:rgba(220,38,38,.04);--th-red-border:rgba(220,38,38,.12);--th-purple:#7c3aed;--th-purple-bg:rgba(124,58,237,.04);--th-purple-border:rgba(124,58,237,.18);--th-input-bg:rgba(0,0,0,.03);--th-input-border:rgba(0,0,0,.12);--th-select-scheme:light}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1017;color:#e4e7ed;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1017;background-image:radial-gradient(ellipse at 15% 15%,rgba(0,212,255,0.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,0.05) 0%,transparent 45%);background-attachment:fixed;color:#e4e7ed;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
 .wrap{width:100%;max-width:700px;flex:1;display:flex;flex-direction:column}
 .hdr{margin-bottom:8px}
 .hdr-banner{display:flex;align-items:center;gap:14px;background:#151923;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px 20px;margin-bottom:16px;position:relative;overflow:hidden}
@@ -30,7 +30,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .prog-label{color:#8b949e;font-size:.75rem;letter-spacing:.03em}
 .btn-reset{background:none;border:none;color:#8b949e;font-size:.7rem;cursor:pointer;text-decoration:underline;padding:0;transition:color .15s}
 .btn-reset:hover{color:#00d4ff}
-.card{background:#151923;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:28px;margin-bottom:14px;animation:slideInRight .32s cubic-bezier(.4,0,.2,1);flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.card{background:rgba(21,25,35,0.72);background-image:radial-gradient(circle at 100% 0%,rgba(0,212,255,0.12) 0%,transparent 45%),radial-gradient(circle at 0% 100%,rgba(168,85,247,0.09) 0%,transparent 45%);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:28px;margin-bottom:14px;animation:slideInRight .32s cubic-bezier(.4,0,.2,1);flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%)}
 .card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.2),transparent);pointer-events:none}
 #main.nav-back .card{animation-name:slideInBack}
 #main{flex:1;display:flex;flex-direction:column}
@@ -841,7 +841,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .receipt-row-lbl{font-size:.74rem;color:#4b5563;font-weight:600;text-transform:capitalize}
 .receipt-row-val{font-size:.84rem;font-weight:700;color:#c9d1d9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:54%}
 .receipt-row-val.hl{color:#00d4ff}
-.card.splash{background:#0a0f16;background-image:radial-gradient(ellipse at 50% 18%,rgba(0,180,210,.13) 0%,transparent 55%),radial-gradient(ellipse at 50% 92%,rgba(120,30,180,.08) 0%,transparent 50%);position:relative;overflow:hidden}
+.card.splash{background:rgba(10,15,22,0.72);background-image:radial-gradient(ellipse at 50% 18%,rgba(0,180,210,0.18) 0%,transparent 55%),radial-gradient(ellipse at 50% 92%,rgba(120,30,180,0.12) 0%,transparent 50%);position:relative;overflow:hidden;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%)}
 .splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 20px 36px;gap:24px;position:relative;z-index:1}
 .splash-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:520px;height:520px;opacity:.025;pointer-events:none;z-index:0}
 .splash-icon{width:80px;height:80px;filter:drop-shadow(0 0 24px rgba(0,212,255,.5))}
@@ -890,8 +890,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .splash-tertiary{width:100%;max-width:480px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .splash-tertiary-btn{flex:1;min-width:70px;display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 10px;background:transparent;border:1px solid rgba(255,255,255,.06);border-radius:10px;color:#7a8194;font-size:.7rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none}
 .splash-tertiary-btn:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1);color:#e4e7ed}
-.splash-tertiary-kofi{border-color:rgba(255,94,91,.15);color:#ff5e5b}
-.splash-tertiary-kofi:hover{background:rgba(255,94,91,.06);border-color:rgba(255,94,91,.3);color:#ff5e5b}
+.splash-tertiary-kofi{border-color:rgba(251,191,36,.28);background:rgba(251,191,36,.03);color:#fbbf24;box-shadow:0 0 10px rgba(251,191,36,.04)}
+.splash-tertiary-kofi:hover{background:rgba(251,191,36,.09);border-color:rgba(251,191,36,.5);color:#fccb4c;box-shadow:0 0 16px rgba(251,191,36,.12)}
 .splash-tertiary-icon{font-size:.82rem;opacity:.7}
 .splash-stats{display:flex;align-items:center;justify-content:center;gap:18px;font-size:.68rem;color:#6b7280;letter-spacing:.03em;opacity:0;transition:opacity .4s}
 .splash-stats.loaded{opacity:1}
@@ -1004,8 +1004,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 [data-theme="light"] .splash-preset-detail{color:#8c959f}
 [data-theme="light"] .splash-tertiary-btn{border-color:#d0d7de;color:#57606a}
 [data-theme="light"] .splash-tertiary-btn:hover{background:rgba(0,0,0,.03);border-color:#afb8c1;color:#1c2128}
-[data-theme="light"] .splash-tertiary-kofi{border-color:rgba(255,94,91,.25);color:#e5443e}
-[data-theme="light"] .splash-tertiary-kofi:hover{background:rgba(255,94,91,.06);border-color:rgba(255,94,91,.4);color:#d63a34}
+[data-theme="light"] .splash-tertiary-kofi{border-color:rgba(180,83,9,.35);background:rgba(180,83,9,.03);color:#b45309}
+[data-theme="light"] .splash-tertiary-kofi:hover{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.55);color:#92400e}
 [data-theme="light"] .step-tip{background:#fff;color:#1f2328;border-color:#d0d7de;box-shadow:0 4px 12px rgba(0,0,0,.12)}
 [data-theme="light"] .step-tip::after{border-top-color:#fff}
 [data-theme="light"] .auto-saved{color:#57606a}
@@ -1289,6 +1289,125 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @media(min-width:1000px){
   .cb-sidebar:not(.sb-hidden)~#themeToggle{top:auto;left:auto;bottom:14px;right:14px}
 }
+
+/* Logo-integrated support affordance — replaces the floating heart button */
+.core-support-mark{appearance:none;border:0;background:transparent;padding:0;margin:0;display:inline-flex;flex-direction:column;align-items:center;position:relative;cursor:pointer;border-radius:24px;color:inherit}
+.core-support-mark .splash-icon{display:block;transition:transform .2s ease,filter .2s ease}
+.core-support-mark:hover .splash-icon{transform:translateY(-2px) scale(1.04);filter:drop-shadow(0 0 28px rgba(0,212,255,.62))}
+.core-support-mark:focus-visible{outline:2px solid #00d4ff;outline-offset:7px}
+.core-support-label{display:inline-flex;align-items:center;gap:5px;margin-top:7px;padding:4px 10px;border-radius:999px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.28);color:#67e8f9;font-size:.6rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;transition:background .15s,border-color .15s,color .15s,transform .15s}
+.core-support-label::before{content:'';width:5px;height:5px;border-radius:50%;background:#00d4ff;box-shadow:0 0 7px rgba(0,212,255,.7)}
+.core-support-label::after{content:'→';font-size:.68rem;letter-spacing:0}
+.core-support-mark:hover .core-support-label,.core-support-mark:focus-visible .core-support-label{background:rgba(0,212,255,.16);border-color:rgba(0,212,255,.48);color:#fff;transform:translateY(1px)}
+@keyframes supportGemPulse{0%,100%{filter:drop-shadow(0 0 3px rgba(167,139,250,.38));opacity:.84}50%{filter:drop-shadow(0 0 13px rgba(167,139,250,.95)) drop-shadow(0 0 24px rgba(0,212,255,.58));opacity:1}}
+@keyframes supportRingPulse{0%{transform:scale(.72);opacity:.7;stroke-width:7}75%,100%{transform:scale(1.3);opacity:0;stroke-width:2}}
+.core-support-gem{transform-box:fill-box;transform-origin:center;transition:transform .2s ease,opacity .2s ease;animation:supportGemPulse 2s ease-in-out infinite}
+.core-click-ring{transform-box:fill-box;transform-origin:center;fill:none;stroke:#a78bfa;pointer-events:none;animation:supportRingPulse 2s ease-out infinite}
+.core-support-mark:hover .core-support-gem,.core-support-mark:focus-visible .core-support-gem{animation-play-state:paused;transform:scale(.76) rotate(45deg);opacity:1;filter:drop-shadow(0 0 14px rgba(167,139,250,1)) drop-shadow(0 0 25px rgba(0,212,255,.72))}
+.core-support-mark:hover .core-click-ring,.core-support-mark:focus-visible .core-click-ring{animation-duration:1s}
+@media(prefers-reduced-motion:reduce){.core-support-gem,.core-click-ring{animation:none}.core-click-ring{opacity:.42}}
+[data-theme="light"] .core-support-label{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.3);color:#0969da}
+[data-theme="light"] .core-support-label::before{background:#0969da;box-shadow:none}
+[data-theme="light"] .core-support-mark:hover .core-support-label,[data-theme="light"] .core-support-mark:focus-visible .core-support-label{background:rgba(9,105,218,.12);border-color:rgba(9,105,218,.5);color:#0550ae}
+
+/* Support Modal Overlay */
+.sup-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .15s ease}
+.sup-overlay.active{opacity:1;pointer-events:all}
+.sup-panel{background:#151923;border-radius:14px;border:1px solid rgba(255,255,255,.06);width:min(440px,92vw);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.45);animation:scaleIn .2s ease;overflow-y:auto;padding:18px 20px}
+[data-theme="light"] .sup-panel{background:#ffffff;border-color:#d0d7de;box-shadow:0 15px 45px rgba(0,0,0,.15)}
+
+.sup-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:10px}
+[data-theme="light"] .sup-header{border-color:#eaedf0}
+.sup-title{font-weight:800;font-size:1.02rem;color:#e6edf3}
+[data-theme="light"] .sup-title{color:#1f2328}
+.sup-close{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;font-size:.85rem;padding:4px 8px;cursor:pointer;line-height:1}
+[data-theme="light"] .sup-close{background:rgba(0,0,0,.03);border-color:#d0d7de;color:#57606a}
+
+/* Support Options & Rows */
+.sup-row{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.01);margin-bottom:8px}
+[data-theme="light"] .sup-row{border-color:#eaedf0;background:#f6f8fa}
+.sup-row-ico{font-size:1.15rem;width:24px;text-align:center;flex-shrink:0}
+.sup-row-body{flex:1;min-width:0;text-align:left}
+.sup-row-lbl{font-size:.76rem;font-weight:700;color:#c9d1d9}
+[data-theme="light"] .sup-row-lbl{color:#1f2328}
+.sup-row-val{font-size:.65rem;color:#6b7280;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;user-select:all}
+
+/* Copy button inside support row */
+.sup-row-copy{flex-shrink:0;padding:4px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
+.sup-row-copy:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.35)}
+[data-theme="light"] .sup-row-copy{background:rgba(9,105,218,.05);border-color:rgba(9,105,218,.25);color:#0969da}
+[data-theme="light"] .sup-row-copy:hover{background:rgba(9,105,218,.12);border-color:rgba(9,105,218,.4)}
+
+/* OSRS and Kofi button styles */
+.sup-kofi-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;border-radius:10px;font-weight:800;font-size:.88rem;cursor:pointer;border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.04);color:#a78bfa;transition:all .15s;text-decoration:none;margin-bottom:14px;box-shadow:0 4px 12px rgba(168,85,247,.04)}
+.sup-kofi-btn:hover{background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.55);box-shadow:0 6px 18px rgba(168,85,247,.1)}
+[data-theme="light"] .sup-kofi-btn{border-color:rgba(124,58,237,.35);background:rgba(124,58,237,.04);color:#7c3aed;box-shadow:0 4px 12px rgba(124,58,237,.04)}
+[data-theme="light"] .sup-kofi-btn:hover{background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.5);box-shadow:0 6px 18px rgba(124,58,237,.08)}
+/* Hybrid landing page — precision structure + editorial type + glass depth + bento presets */
+.card.splash.hybrid-splash{display:block;text-align:left;padding:0 34px 30px;overflow:visible;background:rgba(10,15,22,.74);border-color:rgba(255,255,255,.09);backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%)}
+.hybrid-topbar{height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07)}
+.hybrid-mini-brand{font-size:.76rem;font-weight:950;letter-spacing:-.02em}.hybrid-mini-brand b{color:#00d4ff}
+.hybrid-toplinks{display:flex;align-items:center;gap:14px}.hybrid-toplinks a,.hybrid-toplinks button{border:0;background:none;color:#657386;text-decoration:none;font-size:.59rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;padding:3px 0}.hybrid-toplinks a:hover,.hybrid-toplinks button:hover{color:#67e8f9}
+.hybrid-version{padding:2px 7px!important;border:1px solid rgba(0,212,255,.24)!important;border-radius:99px;color:#00d4ff!important;background:rgba(0,212,255,.06)!important}
+.hybrid-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr);gap:36px;align-items:center;padding:44px 0 34px}
+.hybrid-eyebrow{display:flex;align-items:center;gap:7px;color:#67e8f9;font-size:.6rem;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.hybrid-eyebrow::before{content:'';width:18px;height:1px;background:#00d4ff}
+.hybrid-hero h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.65rem,6vw,4.4rem);line-height:.93;letter-spacing:-.065em;margin:13px 0 18px;color:#edf4f8;font-weight:800}
+.hybrid-lede{font-size:.86rem;line-height:1.65;color:#8b97a7;max-width:510px}.hybrid-lede strong{color:#dbe6ee}
+.hybrid-trust{display:flex;gap:16px;flex-wrap:wrap;margin-top:20px}.hybrid-trust span{display:flex;align-items:center;gap:6px;color:#637185;font-size:.62rem;font-weight:700}.hybrid-trust i{width:5px;height:5px;border-radius:50%;background:#4ade80;box-shadow:0 0 7px rgba(74,222,128,.5)}
+.hybrid-core-stage{min-height:270px;display:grid;place-items:center;position:relative;border:1px solid rgba(255,255,255,.09);border-radius:24px;background:radial-gradient(circle at 50% 43%,rgba(0,212,255,.12),transparent 36%),linear-gradient(145deg,rgba(20,31,45,.76),rgba(10,15,23,.74));box-shadow:inset 0 1px rgba(255,255,255,.07),0 26px 60px rgba(0,0,0,.22);overflow:hidden}
+.hybrid-core-stage::before{content:'';position:absolute;inset:17px;border:1px dashed rgba(255,255,255,.05);border-radius:18px;pointer-events:none}.hybrid-core-stage .splash-icon{width:112px;height:112px}.hybrid-core-stage .core-support-mark{z-index:1}.hybrid-core-caption{position:absolute;bottom:13px;color:#4f5e70;font:700 .5rem/1.2 monospace;letter-spacing:.08em;text-transform:uppercase}
+.hybrid-session{margin:-14px 0 22px;padding:12px 14px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.16);border-radius:11px;display:flex;align-items:center;gap:10px}
+.hybrid-services{border-block:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:18px;padding:13px 0;overflow-x:auto}.hybrid-services-label{flex:0 0 auto;font:700 .56rem/1.2 monospace;color:#58687a;text-transform:uppercase;letter-spacing:.1em}.hybrid-services .splash-chips{justify-content:flex-start;flex-wrap:nowrap}.hybrid-services .splash-chip{white-space:nowrap;border-radius:8px;padding:7px 11px;font-size:.65rem}
+.hybrid-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:32px 0 12px}.hybrid-section-head h2{font-family:Georgia,serif;font-size:1.48rem;letter-spacing:-.04em;margin:0;color:#edf4f8}.hybrid-section-head p{color:#5e6b7b;font-size:.61rem;margin:2px 0 0}.hybrid-section-index{font:700 .56rem/1.2 monospace!important;letter-spacing:.08em;text-transform:uppercase}
+.hybrid-splash .splash-doors{display:grid;grid-template-columns:1.25fr .875fr .875fr;max-width:none;width:100%;gap:11px}
+.hybrid-splash .splash-door{min-height:172px;display:block;padding:18px;border-radius:16px;background:linear-gradient(150deg,#121c29,#0d141e);border:1px solid rgba(255,255,255,.085);position:relative;overflow:hidden}
+.hybrid-splash .splash-door:first-child{background:radial-gradient(circle at 100% 0,rgba(0,212,255,.14),transparent 45%),linear-gradient(145deg,#12303e,#111c29);border-color:rgba(0,212,255,.18)}
+.hybrid-splash .splash-door::before{display:none}.hybrid-splash .splash-door::after{content:'→';position:absolute;right:17px;bottom:14px;color:#526174;font-size:1.05rem;transition:.2s}.hybrid-splash .splash-door:hover::after{color:#00d4ff;transform:translateX(3px)}
+.hybrid-splash .splash-door-icon{width:35px;height:35px;margin:0 0 24px;border-radius:10px}.hybrid-splash .splash-door-title{font-size:.82rem}.hybrid-splash .splash-door-desc{font-size:.61rem;max-width:210px;margin-top:5px}.hybrid-splash .splash-door-tag{position:absolute;top:17px;right:17px}
+.hybrid-splash .splash-presets{display:grid;grid-template-columns:repeat(3,1fr);max-width:none;width:100%;gap:9px}
+.hybrid-splash .splash-preset-card{min-height:110px;border-radius:14px;padding:14px;background:#0f1722}.hybrid-splash .splash-preset-card::before{display:none}.hybrid-splash .splash-preset-card:hover{border-color:rgba(167,139,250,.3);background:#131d2a}.hybrid-splash .splash-preset-icon{justify-content:flex-start;margin:0}.hybrid-splash .splash-preset-icon svg{width:18px;height:18px}.hybrid-splash .splash-preset-name{font-size:.66rem;margin-top:13px}.hybrid-splash .splash-preset-detail{font-size:.52rem;margin-top:2px}
+.hybrid-splash .splash-tertiary{max-width:none;width:100%;justify-content:flex-start;border-top:1px solid rgba(255,255,255,.07);margin-top:28px;padding-top:14px}.hybrid-splash .splash-tertiary-btn{flex:0 0 auto;border:0;padding:4px 2px;color:#748194;text-transform:uppercase;letter-spacing:.05em;font-size:.56rem}.hybrid-splash .splash-tertiary-icon{display:none}.hybrid-splash .splash-footer{text-align:right;margin-top:-21px;font-size:.52rem}.hybrid-splash .splash-stats{justify-content:flex-start;margin-top:12px}
+[data-theme='light'] .card.splash.hybrid-splash{background:rgba(255,255,255,.9);border-color:#d0d7de}.hybrid-splash[data-x='x']{display:block}
+[data-theme='light'] .hybrid-topbar,[data-theme='light'] .hybrid-services{border-color:#d0d7de}[data-theme='light'] .hybrid-hero h1,[data-theme='light'] .hybrid-section-head h2{color:#1c2128}[data-theme='light'] .hybrid-lede{color:#57606a}[data-theme='light'] .hybrid-core-stage{background:radial-gradient(circle at 50% 43%,rgba(9,105,218,.1),transparent 36%),linear-gradient(145deg,#f6f8fa,#eef2f6);border-color:#d0d7de;box-shadow:inset 0 1px #fff,0 18px 40px rgba(0,0,0,.08)}[data-theme='light'] .hybrid-splash .splash-door,[data-theme='light'] .hybrid-splash .splash-preset-card{background:#f6f8fa!important;border-color:#d0d7de}[data-theme='light'] .hybrid-splash .splash-door:first-child{background:linear-gradient(145deg,#eaf7fb,#f6f8fa)!important;border-color:rgba(9,105,218,.25)!important}
+@media(min-width:1000px){.card.splash.hybrid-splash{max-width:1040px!important}.cb-sidebar.sb-hidden~.wrap:has(.hybrid-splash){max-width:1120px}}
+@media(max-width:820px){.hybrid-hero{grid-template-columns:1fr;padding-top:34px}.hybrid-core-stage{min-height:245px}.hybrid-splash .splash-doors{grid-template-columns:1fr 1fr}.hybrid-splash .splash-door:first-child{grid-column:span 2}.hybrid-splash .splash-presets{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.card.splash.hybrid-splash{padding:0 16px 24px}.hybrid-toplinks a{display:none}.hybrid-hero{gap:24px}.hybrid-hero h1{font-size:2.7rem}.hybrid-splash .splash-doors{grid-template-columns:1fr}.hybrid-splash .splash-door:first-child{grid-column:auto}.hybrid-section-head{align-items:flex-start;flex-direction:column;gap:2px}.hybrid-splash .splash-footer{text-align:left;margin-top:12px}.hybrid-session{align-items:flex-start;flex-wrap:wrap}}
+/* v2.75 — unified hybrid design system across every configurator menu */
+:root{--ui-bg:#070b11;--ui-panel:rgba(14,21,31,.88);--ui-panel-solid:#0e151f;--ui-raised:#121c29;--ui-line:rgba(255,255,255,.085);--ui-line-strong:rgba(255,255,255,.15);--ui-text:#edf4f8;--ui-muted:#7d8999;--ui-faint:#526174;--ui-accent:#00d4ff;--ui-accent-soft:rgba(0,212,255,.08);--ui-violet:#a78bfa;--ui-green:#4ade80;--ui-radius:16px;--ui-shadow:0 24px 70px rgba(0,0,0,.24)}
+html{background:var(--ui-bg);scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:radial-gradient(circle at 14% -8%,rgba(0,212,255,.105),transparent 30%),radial-gradient(circle at 92% 86%,rgba(167,139,250,.07),transparent 30%),var(--ui-bg);color:var(--ui-text);min-height:100svh;min-height:100dvh;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));overscroll-behavior-y:none}
+button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlight-color:transparent}button,[role='button'],a,summary,label{touch-action:manipulation}
+/* Shared surfaces */
+.card:not(.splash){background:linear-gradient(155deg,rgba(17,27,39,.94),rgba(10,16,24,.94));background-image:none;border:1px solid var(--ui-line);border-radius:var(--ui-radius);box-shadow:var(--ui-shadow),inset 0 1px rgba(255,255,255,.035);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);padding:30px 32px}
+.card:not(.splash)::after{display:none}.card h2,.srh-title{font-family:Georgia,'Times New Roman',serif;color:var(--ui-text);letter-spacing:-.035em;text-shadow:none}.card h2{font-size:1.34rem}.card .desc,.srh-sub{color:#8290a2}.srh{border-bottom:1px solid var(--ui-line);padding-bottom:17px;margin-bottom:20px}.srh-ring{filter:none}.srh-ring svg circle:first-child{stroke:rgba(255,255,255,.08)!important}.srh-num{color:var(--ui-accent)}
+/* Progress and breadcrumbs */
+.step-strip{padding:12px 0 8px}.step-unit:not(:first-child)::before{background:var(--ui-line)}.step-bub{border:1px solid rgba(255,255,255,.05)}.step-pending .step-bub{background:#202a37}.step-active .step-bub,.step-done .step-bub{background:var(--ui-accent);border-color:var(--ui-accent)}.step-active .step-bub{box-shadow:0 0 0 4px rgba(0,212,255,.1)}.step-lbl{color:#526174}.step-active .step-lbl{color:#67e8f9}.bc-chip{background:var(--ui-accent-soft);border-color:rgba(0,212,255,.2);color:#67e8f9;border-radius:6px}.btn-reset-strip{border-color:var(--ui-line)!important;color:#607084}
+/* Selection menus */
+.opts{gap:11px}.opt label,.opts.pills .opt label,.svc-list-row label,.svc-list-hero label{background:linear-gradient(145deg,#111a26,#0e1621)!important;border:1px solid var(--ui-line)!important;border-radius:13px!important;box-shadow:none!important;transition:transform .16s,border-color .16s,background .16s!important}.opt label:hover,.opts.pills .opt label:hover,.svc-list-row label:hover,.svc-list-hero label:hover{background:#14202d!important;border-color:rgba(0,212,255,.24)!important;transform:translateY(-1px)}.opt input:checked+label,.opts.pills .opt input:checked+label,.svc-list-row input:checked+label,.svc-list-hero input:checked+label{background:linear-gradient(145deg,rgba(0,212,255,.1),rgba(14,25,36,.98))!important;border-color:rgba(0,212,255,.42)!important;box-shadow:inset 3px 0 #00d4ff!important}.opt input:checked+label::after{background-color:var(--ui-accent);box-shadow:none}.opt-name,.pref-title,.fmt-card .fmt-lbl{color:#dce5ec}.opt-desc,.pref-desc{color:#718093}.opt-icon svg{filter:none!important}.hero-badge,.svc-hero-badge{background:var(--ui-accent-soft);border-color:rgba(0,212,255,.2);color:#67e8f9}
+/* Search, segmented controls, fields */
+.name-input,.th-input,.fmt-select,.svc-search input,.td-custom input,#apiReminderCard .rem-input,#pwdPromptCard .pwd-manual-input{background:#0b121b!important;border:1px solid var(--ui-line-strong)!important;border-radius:10px!important;color:var(--ui-text)!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.18);min-height:44px}.name-input:focus,.th-input:focus,.fmt-select:focus,.svc-search input:focus,.td-custom input:focus{border-color:rgba(0,212,255,.55)!important;box-shadow:0 0 0 3px rgba(0,212,255,.08)!important}.name-row label,.pref-section-label{color:#728094}.svc-seg{background:#0b121b;border-color:var(--ui-line);border-radius:10px}.svc-seg-b{color:#637185;border-color:var(--ui-line);min-height:40px}.svc-seg-b.act{background:var(--ui-accent-soft);color:#67e8f9}.pref-card{background:#101923;border-color:var(--ui-line);border-radius:12px}.pref-card.pref-on{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.4)}.toggle-track{background:#283341}.toggle-sw input:checked~.toggle-track{background:var(--ui-accent)}
+/* Formatter, scraper and device cards */
+.fmt-card,.fmt-scroll-card,.opt-scraper-card{background:#0e1621;border-color:var(--ui-line);border-radius:13px;box-shadow:none}.fmt-card[data-active='true'],.fmt-scroll-card[data-active='true']{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.45);box-shadow:inset 3px 0 #00d4ff}.opt-scraper-card[data-active='true']{background:rgba(246,196,83,.06);border-color:rgba(246,196,83,.4)}.fmt-live-preview{background:#0a1119;border-color:var(--ui-line)}
+/* Navigation buttons */
+.nav{gap:8px}.nav::before{background:linear-gradient(to bottom,transparent,var(--ui-bg) 46%)}.btn-next,.btn-manifest,.btn-dl{border:0;border-radius:12px;background:linear-gradient(135deg,#00abd3,#00d4ff);color:#04202b;box-shadow:0 8px 26px rgba(0,212,255,.2);min-height:50px}.btn-next:hover:not(:disabled),.btn-manifest:hover,.btn-dl:hover{background:linear-gradient(135deg,#08b8df,#35dfff);box-shadow:0 10px 32px rgba(0,212,255,.29);transform:translateY(-1px)}.btn-next:disabled{background:#111923;color:#4f5d6d;border:1px solid var(--ui-line);box-shadow:none}.btn-back{background:#0d151f;border:1px solid var(--ui-line)!important;color:#758396;border-radius:11px}.btn-back:hover{background:#121c28;color:#d9e2e9;border-color:var(--ui-line-strong)!important}.btn-aio,.btn-td{border-radius:11px}
+/* Receipts and review */
+.summary{gap:9px}.sum-item,.receipt-card,.rv-section,.rv-accord,.hc-box{background:#0d151f;border-color:var(--ui-line);border-radius:13px}.receipt-hdr{background:#111b27;border-color:var(--ui-line)}.receipt-row{border-color:rgba(255,255,255,.045)}.receipt-row[data-action]:hover{background:rgba(0,212,255,.045)}.sum-lbl,.receipt-row-lbl{color:#657386}.sum-val,.receipt-row-val,.receipt-hdr-name{color:#dbe4eb}.rv-section-hdr,.rv-accord-hdr,.hc-hdr{background:#111a25;color:#718093}.rv-section-body,.rv-accord-body{border-color:var(--ui-line)}
+/* Sidebar desktop menu */
+@media(min-width:1000px){body{padding:0;background-attachment:fixed}.cb-sidebar{width:272px;background:rgba(8,13,20,.96);border-right:1px solid var(--ui-line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.cb-sidebar .sb-brand{padding:22px 20px;border-color:var(--ui-line)}.cb-sidebar .sb-brand-icon{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.18);border-radius:11px}.cb-sidebar .sb-brand-text{font-family:Georgia,serif;letter-spacing:-.035em}.cb-sidebar .sb-progress{padding-top:17px}.cb-sidebar .sb-prog-bar{height:4px;background:#17212d}.cb-sidebar .sb-step{padding:11px 20px}.cb-sidebar .sb-step.sb-active{background:linear-gradient(90deg,rgba(0,212,255,.09),transparent)}.cb-sidebar .sb-step.sb-active::before{width:2px}.cb-sidebar .sb-num{background:#0d151f;border-color:var(--ui-line)}.cb-sidebar .sb-step-title{color:#b9c5cf}.cb-sidebar .sb-step-sub{color:#526174}.cb-sidebar .sb-footer{border-color:var(--ui-line);padding-bottom:64px}.cb-sidebar:not(.sb-hidden)~.wrap{margin-left:272px}.cb-sidebar:not(.sb-hidden)~.wrap #main{padding:34px 44px}.cb-sidebar:not(.sb-hidden)~.wrap #main>.card{max-width:920px}.cb-sidebar:not(.sb-hidden)~.wrap .nav{max-width:920px}.card:not(.splash){padding:36px 40px}}
+/* Modals and overlays */
+.modal-overlay,.sup-overlay,.qs-overlay,.df-overlay,#apiReminder,#pwdPrompt{padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:rgba(2,5,8,.76);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.modal-box,.sup-panel,.qs-panel,.df-box,#apiReminderCard,#pwdPromptCard{background:linear-gradient(155deg,#131d29,#0c131c);border:1px solid rgba(0,212,255,.22);border-radius:18px;box-shadow:0 28px 90px rgba(0,0,0,.58);max-height:calc(100dvh - max(32px,env(safe-area-inset-top) + env(safe-area-inset-bottom)))}.sup-panel{padding:20px}.sup-header,.qs-hdr,.df-hdr{border-color:var(--ui-line)}.sup-row,.td-tile,.td-stream{background:#0e1621;border-color:var(--ui-line)}.sup-kofi-btn{border-radius:10px}.toast{bottom:max(20px,calc(env(safe-area-inset-bottom) + 10px));background:#111b27;border-color:rgba(0,212,255,.28);border-radius:9px}
+/* Theme control */
+#themeToggle{background:#101923;border-color:var(--ui-line);color:#718093;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.16)}
+/* Light mode parity */
+[data-theme='light']{--ui-bg:#f3f6f9;--ui-panel:#fff;--ui-panel-solid:#fff;--ui-raised:#f6f8fa;--ui-line:#d7dee5;--ui-line-strong:#c4cdd7;--ui-text:#1c252d;--ui-muted:#5f6c78;--ui-faint:#87929c;--ui-accent:#0969da;--ui-accent-soft:rgba(9,105,218,.07);--ui-shadow:0 18px 55px rgba(32,48,64,.09)}[data-theme='light'] body{background:radial-gradient(circle at 14% -8%,rgba(9,105,218,.08),transparent 30%),#f3f6f9;color:#1c252d}[data-theme='light'] .card:not(.splash){background:#fff;border-color:#d7dee5;box-shadow:var(--ui-shadow)}[data-theme='light'] .card h2,[data-theme='light'] .srh-title{color:#1c252d}[data-theme='light'] .card .desc,[data-theme='light'] .srh-sub{color:#5f6c78}[data-theme='light'] .opt label,[data-theme='light'] .opts.pills .opt label,[data-theme='light'] .svc-list-row label,[data-theme='light'] .svc-list-hero label{background:#fff!important;border-color:#d7dee5!important}[data-theme='light'] .opt label:hover,[data-theme='light'] .opts.pills .opt label:hover,[data-theme='light'] .svc-list-row label:hover{background:#f6f8fa!important;border-color:rgba(9,105,218,.28)!important}[data-theme='light'] .opt input:checked+label,[data-theme='light'] .opts.pills .opt input:checked+label,[data-theme='light'] .svc-list-row input:checked+label{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.42)!important;box-shadow:inset 3px 0 #0969da!important}[data-theme='light'] .opt-name,[data-theme='light'] .pref-title,[data-theme='light'] .fmt-card .fmt-lbl{color:#1f2933}[data-theme='light'] .name-input,[data-theme='light'] .th-input,[data-theme='light'] .fmt-select,[data-theme='light'] .svc-search input{background:#fff!important;border-color:#cdd5de!important;color:#1c252d!important}[data-theme='light'] .pref-card,[data-theme='light'] .fmt-card,[data-theme='light'] .fmt-scroll-card,[data-theme='light'] .sum-item,[data-theme='light'] .receipt-card,[data-theme='light'] .rv-section,[data-theme='light'] .rv-accord{background:#f8fafc;border-color:#d7dee5}[data-theme='light'] .receipt-hdr,[data-theme='light'] .rv-section-hdr,[data-theme='light'] .rv-accord-hdr{background:#f1f5f8}[data-theme='light'] .nav::before{background:linear-gradient(to bottom,transparent,#f3f6f9 46%)}[data-theme='light'] .btn-back{background:#fff;border-color:#d7dee5!important;color:#5f6c78}[data-theme='light'] .modal-box,[data-theme='light'] .sup-panel,[data-theme='light'] .qs-panel,[data-theme='light'] .df-box{background:#fff;border-color:#cfd8e2;box-shadow:0 24px 70px rgba(32,48,64,.18)}[data-theme='light'] .cb-sidebar{background:rgba(255,255,255,.97);border-color:#d7dee5}
+/* Android + iPhone phones */
+@media(max-width:599px){body{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));background-attachment:scroll}.wrap{max-width:100%;min-width:0}.card:not(.splash){padding:20px 16px;border-radius:14px;margin-bottom:10px}.card h2{font-size:1.2rem}.card .desc{font-size:.83rem;margin-bottom:16px}.srh{gap:11px}.srh-title{font-size:1.08rem}.srh-sub{font-size:.78rem}.opts,.opts.c2,.opts.c3,.opts.c3d,.opts.c4d,.opts.c2d{grid-template-columns:1fr!important;gap:9px}.opts.pills{grid-template-columns:1fr 1fr!important}.opt label{min-height:64px;padding:14px}.opt-name{font-size:.95rem}.opt-desc{font-size:.8rem}.name-input,.th-input,.fmt-select,.svc-search input,select,textarea{font-size:16px!important}.nav{position:sticky;bottom:max(8px,env(safe-area-inset-bottom));padding-top:6px}.nav::before{inset:-24px -10px -8px}.btn-next,.btn-back{min-height:48px}.step-strip{overflow-x:auto;scrollbar-width:none}.step-strip::-webkit-scrollbar{display:none}.step-lbl{display:none}.step-bub{width:9px;height:9px}.summary{grid-template-columns:1fr 1fr}.receipt-row{padding:10px 12px}.receipt-row-val{max-width:50%;font-size:.76rem}.svc-seg{overflow-x:auto}.svc-seg-b{min-width:78px}.fmt-scroll-card{flex-basis:82vw}.opt-scraper-card{flex-basis:72vw}.modal-box,.sup-panel,.qs-panel,#apiReminderCard,#pwdPromptCard{width:100%;max-width:none;border-radius:16px;padding:20px 16px}.modal-actions,.df-footer{flex-direction:column}.m-btn,.df-btn{min-height:46px}.toast{max-width:calc(100vw - 24px);white-space:normal;text-align:center}.tut-welcome{width:calc(100vw - 24px);padding:24px 18px}.tut-welcome-features{flex-direction:column}.tut-tooltip{width:calc(100vw - 24px);padding:18px}.qs-panel{max-height:calc(100dvh - 24px)}#themeToggle{top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));font-size:0;width:38px;height:38px;padding:0;display:grid;place-items:center}#themeToggle .ico-theme{margin:0}.copy-field{align-items:stretch}.copy-btn{min-height:42px}}
+/* Small Android devices */
+@media(max-width:380px){.card:not(.splash){padding:17px 13px}.opts.pills{grid-template-columns:1fr!important}.summary{grid-template-columns:1fr}.srh-ring{width:44px;height:44px}.btn-next{font-size:.86rem}.hybrid-hero h1{font-size:2.35rem}.hybrid-splash .splash-presets{grid-template-columns:1fr}}
+/* iPhone landscape and compact-height Android */
+@media(max-height:520px) and (orientation:landscape){.modal-overlay,.sup-overlay,.qs-overlay,#apiReminder,#pwdPrompt{align-items:flex-start;overflow-y:auto}.modal-box,.sup-panel,.qs-panel,#apiReminderCard,#pwdPromptCard{max-height:none;margin-block:8px}.card:not(.splash){padding-block:18px}.nav{position:static}}
+/* PWA / standalone safe-area behavior */
+@media(display-mode:standalone){body{padding-top:max(14px,env(safe-area-inset-top));padding-bottom:max(14px,env(safe-area-inset-bottom))}.nav{bottom:max(10px,env(safe-area-inset-bottom))}}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -1321,6 +1440,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div id="cb-loader-sub">by Brevity</div>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- Support Modal Overlay -->
+<div class="sup-overlay" id="supportOverlay" data-action="close-support">
+  <div class="sup-panel" data-action="support-panel">
+    <div class="sup-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="22" height="22" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M22 4 39 14v16L22 40 5 30V14Z" stroke="#00d4ff" stroke-width="2"/><path d="m22 13 9 9-9 9-9-9Z" fill="#a78bfa"/></svg>
+        <span class="sup-title">Support Core Builds</span>
+      </div>
+      <button class="sup-close" data-action="close-support">✕</button>
+    </div>
+    
+    <div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:14px;text-align:left">
+      Core Builds is a free, non-commercial, open-source project. If these templates or filters have improved your Stremio experience, consider showing some love to support continued development!
+    </div>
+
+    <!-- Kofi Main CTA (Styled in Core Purple) -->
+    <a href="https://ko-fi.com/branding_brevity" target="_blank" rel="noopener noreferrer" class="sup-kofi-btn" style="margin-bottom:12px">
+      <span>☕</span> <span>Support on Ko-fi</span>
+    </a>
+
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="sup-row-copy" style="flex:1;text-decoration:none;text-align:center;background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.06);color:#8b949e;padding:10px 8px;font-size:.76rem">GitHub Code</a>
+      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="sup-row-copy" style="flex:1;text-decoration:none;text-align:center;background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.06);color:#8b949e;padding:10px 8px;font-size:.76rem">Core Crew</a>
+    </div>
+  </div>
+</div>
+
 <div class="qs-overlay" id="qsOverlay" data-action="close-quickstart-overlay">
   <div class="qs-panel">
     <div class="qs-hdr">
@@ -1437,7 +1584,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
     </div>
-    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.73</span>
+    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.75</span>
   </header>
 
   <div id="main"></div>
@@ -1451,8 +1598,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script src="qrcode.min.js"></script>
 <script>
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
+
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.73';
+const CONFIGURATOR_VERSION = '2.76';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1507,7 +1655,30 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.75', date:'Jul 21 2026', items:[
+    'Unified UI — Extended the approved hybrid visual system across every configurator step, option menu, form, review panel, sidebar, modal, receipt, and navigation control',
+    'Desktop — Refined the fixed workflow rail, widened content canvas, clarified active-step hierarchy, and standardized glass surfaces and spacing',
+    'iPhone — Added safe-area handling for notches and home indicators, 16px form controls to prevent Safari input zoom, compact progress navigation, and keyboard-friendly sticky actions',
+    'Android — Added larger touch targets, tap-highlight cleanup, compact-device breakpoints, horizontal picker sizing, and dynamic viewport-height handling for browser chrome and keyboards',
+    'Responsive UI — Added dedicated phone, small-phone, landscape, tablet, desktop, and standalone-PWA behavior while preserving light and dark themes',
+    'Debugging — Validated application JavaScript syntax, HTML structure, standalone QR-library build, required element IDs, delegated actions, and ZIP integrity',
+  ]},
+  { v:'2.76', date:'Jul 21 2026', items:[
+    'Fix — "All addons must belong to a group" error: P2P/HTTP groups now dynamically include all preset addon names (subtitles, catalogs, optional scrapers)',
+    'Fix — Removed SCR/TC/TS/CAM/Unknown from preferredQualities (low-quality sources should not be preferred)',
+  ]},
+  { v:'2.74', date:'Jul 21 2026', items:[
+    'Landing UI — Rebuilt the start screen as a cohesive hybrid of Precision Dark structure, editorial typography, Aurora glass depth, Bento-style presets, and compact technical microcopy',
+    'Support — Removed the floating heart and footer support buttons; the central Core gem is now the compact, keyboard-accessible support entry point with a pulsing glow, expanding signal ring, tooltip, and one subtle caption',
+    'Usage counter — Retained live visit and template-generation statistics on the redesigned landing page',
+    'Community — Renamed visible Reddit links to “Core Crew” while retaining the existing community destination',
+    'Responsive UI — Added purpose-built desktop, tablet, and mobile layouts for the new hero, workflow routes, service selector, session-resume panel, and quick-deploy grid',
+    'Compatibility — Preserved service selection, guided and advanced setup, template migration, saved-session resume, quick reinstall, comparison, changelog, usage counters, and all existing preset actions',
+  ]},
   { v:'2.73', date:'Jul 21 2026', items:[
+    'Ecosystem — Moved support into the central Core logo, removed the floating heart and footer support buttons, and renamed the Reddit community link to Core Crew',
+    'UI Revamp — Upgraded the entire configurator layout to a breathtaking, translucent glassmorphic style. All step cards and the splash panel now render as premium frosted glass with high-end backdrop blurs, clean border outlines, and rich glowing cyan-purple radial background gradients that move beautifully behind the glass layers',
+    'Diagnostics — Added new automated Health Check rules on the final step to instantly alert users if they enabled EasyNews or SubDL but forgot to enter their credentials',
     'Ecosystem — Integrated cutting-edge Stream Expression Language (SEL) boosters globally: Sub-First Anime Booster, Dolby Priority for Sonos/Bose bars, Incomplete Ongoing Show filter, and Clutter-Free Single Episode filter',
     'Fix — Overhauled Stremio Account authentication pathways (Login / Registration) to query the distinct sub-endpoints directly (/api/login and /api/register), successfully resolving the 404 router failures caused by Stremio’s recent base API path deprecations',
     'Security — Added a prominent green "Zero-Knowledge Security Shield" reassurance banner at the top of Step 5 (API Keys) explaining that credentials never leave their browser and are compiled 100% locally',
@@ -2570,6 +2741,8 @@ function renderCacheMode() {
 
 function renderAdvancedPanel() {
   const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const reachedReview = (localStorage.getItem('coreBuildStep') && parseInt(localStorage.getItem('coreBuildStep'), 10) === STEPS);
+  const backText = reachedReview ? '← Save & Return' : '← Back';
   const AUDIO_OPTS = [
     { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M34 7a16 16 0 010 30" stroke="#10b981" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
     { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" fill="none"/><text x="40" y="14" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
@@ -2604,7 +2777,7 @@ function renderAdvancedPanel() {
 
   return `<div class="card" style="padding:0">
     <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
-      <button data-action="close-advanced" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">← Back</button>
+      <button data-action="close-advanced" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">${backText}</button>
       <div>
         <div style="font-weight:800;font-size:1rem;color:#e6edf3">Fine-Tune</div>
         <div style="font-size:.72rem;color:#4b5563;margin-top:1px">Audio · Video · Formatter</div>
@@ -2662,8 +2835,8 @@ function renderAdvancedPanel() {
             ${[['aiosubtitle','AIOSubtitle','Built-in, fast'],['opensubtitles-v3-plus','OpenSubtitles v3+','Largest database'],['subdl','SubDL','Fast alternative']].map(([id,name,desc])=>{
               const on=(S.subtitleAddons||['aiosubtitle']).includes(id);
               return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:all .15s">
-                <div style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#06b6d4':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#06b6d4':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-                <div style="flex:1"><div style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
+                <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#06b6d4':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#06b6d4':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+                <div style="flex:1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
               </div>`;
             }).join('')}
           </div>
@@ -2703,8 +2876,8 @@ function renderAdvancedPanel() {
             ${[['tmdb-addon','TMDB Addon','Popular & trending movies/series'],['streaming-catalogs','Streaming Catalogs','Netflix, Disney+, etc.'],['anime-catalogs','Anime Catalogs','MAL, AniList, Kitsu'],['rpdb-catalogs','RPDB Catalogs','Release tracking & ratings'],['torrent-catalogs','Torrent Catalogs','Top seeded torrents']].map(([id,name,desc])=>{
               const on=(S.catalogs||['tmdb-addon']).includes(id);
               return `<div data-action="toggle-catalog" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(249,115,22,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(249,115,22,.05)':'transparent'};transition:all .15s">
-                <div style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#f97316':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#f97316':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-                <div style="flex:1"><div style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
+                <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#f97316':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#f97316':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+                <div style="flex:1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
               </div>`;
             }).join('')}
           </div>
@@ -2835,52 +3008,54 @@ function splashPresetsHtml(svc) {
   </div>`).join('');
 }
 function splashHtml() {
-  const _lt = document.documentElement.getAttribute('data-theme') === 'light';
   const _splashSvc = S.service || (hadSavedState ? 'torbox' : (localStorage.getItem('coreBuildLastSvc') || 'torbox'));
-  const _clrCurrent = _lt ? '#0369a1' : '#67e8f9';
-  const _clrOlder   = _lt ? '#57606a' : '#4b5563';
-  const _clrDate    = _lt ? '#444c56' : '#374151';
-  const _badgeColor = _lt ? '#0369a1' : '#00d4ff';
-  const _badgeBg    = _lt ? 'rgba(3,105,161,.08)' : 'rgba(0,212,255,.08)';
-  const _badgeBdr   = _lt ? 'rgba(3,105,161,.25)' : 'rgba(0,212,255,.18)';
-  const _oldBg      = _lt ? 'rgba(0,0,0,.04)' : 'rgba(255,255,255,.03)';
-  const _oldBdr     = _lt ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.06)';
-  return `<div class="card splash">
-    <svg class="splash-watermark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M100 10 L178 55 L178 145 L100 190 L22 145 L22 55 Z" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".8"/>
-      <path d="M100 35 L155 65 L155 135 L100 165 L45 135 L45 65 Z" stroke="currentColor" stroke-width="1" fill="none" opacity=".4"/>
-      <path d="M100 60 L132 78 L132 122 L100 140 L68 122 L68 78 Z" stroke="currentColor" stroke-width=".5" fill="none" opacity=".2"/>
-    </svg>
-    <svg class="splash-icon splash-anim splash-anim-d1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-      <defs>
-        <linearGradient id="sg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
-        <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
-        <radialGradient id="srmask" cx="50%" cy="50%" r="50%"><stop offset="20%" stop-color="white" stop-opacity="1"/><stop offset="70%" stop-color="white" stop-opacity="0.6"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient>
-        <mask id="sm"><rect width="512" height="512" fill="url(#srmask)"/></mask>
-        <filter id="sf1"><feGaussianBlur stdDeviation="32"/></filter>
-        <filter id="sf2"><feGaussianBlur stdDeviation="16" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
-        <filter id="sf3"><feGaussianBlur stdDeviation="60"/></filter>
-        <filter id="sf4"><feGaussianBlur stdDeviation="6" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
-      </defs>
-      <g mask="url(#sm)">
-        <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity="0.14" filter="url(#sf3)"/>
-        <polygon points="256,166 346,256 256,346 166,256" fill="#c060c0" opacity="0.22" filter="url(#sf3)"/>
-        <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="52" stroke-linejoin="round" opacity="0.18" filter="url(#sf1)"/>
-        <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="18" stroke-linejoin="round" opacity="0.28" filter="url(#sf4)"/>
-        <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#sg1)" stroke-width="14" stroke-linejoin="round" opacity="0.82"/>
-        <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#sg2)" opacity="0.3" filter="url(#sf2)"/>
-        <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#sg2)" opacity="0.85"/>
-        <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
-        <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#sg2)"/>
-      </g>
-    </svg>
-    <div class="splash-title splash-anim splash-anim-d2"><span class="splash-title-core hdr-core">CORE</span><span class="splash-title-builds"> BUILDS</span></div>
-    <div class="splash-by splash-anim splash-anim-d2">By Brevity <span data-action="show-changelog" style="font-size:.68rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(168,85,247,.14));border:1px solid rgba(0,212,255,.6);border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.07em;vertical-align:middle;cursor:pointer;box-shadow:0 0 10px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.08);transition:all .15s" title="View changelog">v${CONFIGURATOR_VERSION}</span></div>
-    <div class="splash-tagline splash-anim splash-anim-d3">Build your perfect AIOStreams template. No manual JSON editing.</div>
-    <div class="splash-stats splash-anim splash-anim-d3" id="splashStats"></div>
+  return `<div class="card splash hybrid-splash">
+    <div class="hybrid-topbar splash-anim splash-anim-d1">
+      <div class="hybrid-mini-brand">CORE <b>BUILDS</b></div>
+      <div class="hybrid-toplinks">
+        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener">Templates</a>
+        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener">Core Crew</a>
+        <button data-action="show-changelog" class="hybrid-version">v${CONFIGURATOR_VERSION}</button>
+      </div>
+    </div>
 
-    <div class="splash-chips-section splash-anim splash-anim-d3">
-      <div class="splash-chips-label">Your service</div>
+    <div class="hybrid-hero">
+      <div class="splash-anim splash-anim-d2">
+        <div class="hybrid-eyebrow">AIOStreams template configurator</div>
+        <h1>Build streams<br>with intent.</h1>
+        <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a polished <strong>AIOStreams template</strong> — without touching JSON.</div>
+        <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source</span><span><i></i> No account required</span></div>
+        <div class="splash-stats" id="splashStats"></div>
+      </div>
+      <div class="hybrid-core-stage splash-anim splash-anim-d2">
+        <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
+          <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
+            <defs>
+              <linearGradient id="hsg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
+              <linearGradient id="hsg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
+              <filter id="hsf"><feGaussianBlur stdDeviation="12" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+            </defs>
+            <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity=".05"/>
+            <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#hsg1)" stroke-width="14" stroke-linejoin="round" opacity=".88"/>
+            <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#hsg2)" opacity=".34" filter="url(#hsf)"/>
+            <polygon class="diamond-core core-support-gem" points="256,166 346,256 256,346 166,256" fill="url(#hsg2)" opacity=".9"/>
+            <circle class="core-click-ring" cx="256" cy="256" r="86"/>
+          </svg>
+        </button>
+        <div class="hybrid-core-caption">Tap the core to support</div>
+      </div>
+    </div>
+
+    ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
+      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
+      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
+      <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
+      ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="padding:8px 13px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:800;cursor:pointer">${ICO.bolt(14,'#34d399')} Previous settings → Install</button>` : ''}
+    </div>` : ''}
+
+    <div class="hybrid-services splash-anim splash-anim-d3">
+      <div class="hybrid-services-label">Your service</div>
       <div class="splash-chips" role="radiogroup" aria-label="Select your service">
         <span class="splash-chip${_splashSvc==='torbox'?' active':''}" data-svc="torbox" role="radio" aria-checked="${_splashSvc==='torbox'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#fbbf24')}</span> TorBox</span>
         <span class="splash-chip${_splashSvc==='alldebrid'?' active':''}" data-svc="alldebrid" role="radio" aria-checked="${_splashSvc==='alldebrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#60a5fa')}</span> AllDebrid</span>
@@ -2890,79 +3065,26 @@ function splashHtml() {
       </div>
     </div>
 
-    ${hadSavedState && _savedStep > 0 ? `<div class="continue-banner" style="width:100%;max-width:420px;padding:12px 16px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:12px;display:flex;align-items:center;gap:10px">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:.76rem;font-weight:700;color:#00d4ff">Continue where you left off</div>
-        <div style="font-size:.7rem;color:#6b7280;margin-top:2px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div>
-        ${(() => { const d = lastGenDiff(); return d.length ? `<div style="font-size:.68rem;color:var(--th-yellow);margin-top:3px;line-height:1.4">Changed since last download — ${d.slice(0,2).join(' · ')}${d.length > 2 ? ` +${d.length - 2} more` : ''}</div>` : ''; })()}
-      </div>
-      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Resume</button>
-      <button data-action="start-fresh" class="splash-cta-discard" style="padding:5px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#4b5563;font-size:.75rem;cursor:pointer;flex-shrink:0" title="Discard saved session">&#10005;</button>
-    </div>
-    ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="width:100%;max-width:420px;padding:10px 16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;color:#34d399;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='rgba(52,211,153,.12)'" onmouseout="this.style.background='rgba(52,211,153,.06)'">${ICO.bolt(16,'#34d399')} Use previous settings — go to install</button>` : ''}` : ''}
-
+    <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4">
-      <div class="splash-door" data-action="easy-start" tabindex="0" role="button">
-        <div class="splash-door-icon">${ICO.compass(22,'#00d4ff')}</div>
-        <div class="splash-door-text">
-          <div class="splash-door-title">Guided Setup <span class="splash-door-tag splash-tag-guided">Core Start</span></div>
-          <div class="splash-door-desc">Walk through device, resolution, and cache — we build the template for you.</div>
-        </div>
-      </div>
-      <div class="splash-door" data-action="custom-start" tabindex="0" role="button">
-        <div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div>
-        <div class="splash-door-text">
-          <div class="splash-door-title">Core Configure <span class="splash-door-tag splash-tag-advanced">Advanced</span></div>
-          <div class="splash-door-desc">Full control over every filter, sort rule, and formatter.</div>
-        </div>
-      </div>
-      <div class="splash-door" data-action="update-template" tabindex="0" role="button">
-        <div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div>
-        <div class="splash-door-text">
-          <div class="splash-door-title">Update Template <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div>
-          <div class="splash-door-desc">Paste an existing template — we detect your settings and rebuild with the latest logic.</div>
-        </div>
-      </div>
+      <div class="splash-door" data-action="easy-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.compass(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Core Start <span class="splash-door-tag splash-tag-guided">Recommended</span></div><div class="splash-door-desc">Guided setup through device, quality, and cache preferences.</div></div></div>
+      <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Core Configure <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
+      <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Template <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
     </div>
 
-    <div class="splash-section-hdr splash-anim splash-anim-d5">
-      <div class="splash-section-line"></div>
-      <div class="splash-section-title">Quick Deploy Presets</div>
-      <div class="splash-section-line"></div>
-    </div>
-
-    <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">
-      ${splashPresetsHtml(_splashSvc)}
-    </div>
+    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Quick deploy</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
+    <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
     <div class="splash-tertiary splash-anim splash-anim-d6">
-      <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">
-        <span class="splash-tertiary-icon">${ICO.folder(16,'#a78bfa')}</span> Browse Templates
-      </a>
-      <button data-action="compare-templates" class="splash-tertiary-btn">
-        <span class="splash-tertiary-icon">${ICO.compare(16,'#00d4ff')}</span> Compare
-      </button>
-      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-tertiary-btn">
-        <span class="splash-tertiary-icon">${ICO.github(16,'#8b949e')}</span> GitHub
-      </a>
-      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-tertiary-btn">
-        <span class="splash-tertiary-icon">${ICO.reddit(16,'#ff4500')}</span> Reddit
-      </a>
-      <a href="https://ko-fi.com/branding_brevity" target="_blank" rel="noopener" class="splash-tertiary-btn splash-tertiary-kofi">
-        <span class="splash-tertiary-icon">${ICO.coffee(16,'#fbbf24')}</span> Support
-      </a>
+      <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">Browse Templates</a>
+      <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
+      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-tertiary-btn">GitHub</a>
+      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-tertiary-btn">Core Crew</a>
+      <button data-action="show-changelog" class="splash-tertiary-btn">What's new · v${CONFIGURATOR_VERSION}</button>
     </div>
-
-    <button data-action="show-changelog" style="width:100%;max-width:420px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;background:none;border-left:none;border-right:none;border-bottom:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:.68rem;font-weight:800;color:${_clrOlder};letter-spacing:.07em;text-transform:uppercase;transition:color .15s" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='${_clrOlder}'">
-      ${ICO.newspaper(16,_badgeColor)} What's new
-      <span style="color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeBdr};border-radius:4px;padding:1px 7px;font-size:.64rem;font-weight:800">v${CONFIGURATOR_VERSION}</span>
-      <span style="margin-left:auto;font-size:.75rem;opacity:.4">→</span>
-    </button>
-
     <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
   </div>`;
 }
-
 function initScrollFades() {
   document.querySelectorAll('.scroll-fade-wrap').forEach(wrap => {
     const inner = wrap.firstElementChild;
@@ -3261,7 +3383,7 @@ function render() {
         <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);text-align:center">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase">More from Core Builds</div>
-            <div style="display:flex;gap:12px">
+            <div style="display:flex;gap:12px;align-items:center">
               <button data-action="show-changelog" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Changelog</button>
               <button data-action="start-setup" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
             </div>
@@ -3277,7 +3399,7 @@ function render() {
             </a>
             <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
-              Reddit
+              Core Crew
             </a>
           </div>
         </div>
@@ -3967,7 +4089,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (d) { d.open = true; d.scrollIntoView({ behavior:'smooth', block:'center' }); }
     }
     if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
-    if (action === 'close-advanced') { showAdvanced = false; render(); window.scrollTo(0,0); }
+    if (action === 'close-advanced') {
+      showAdvanced = false;
+      const reachedReview = (localStorage.getItem('coreBuildStep') && parseInt(localStorage.getItem('coreBuildStep'), 10) === STEPS);
+      if (reachedReview) {
+        step = STEPS;
+        saveState();
+      }
+      render();
+      window.scrollTo(0,0);
+    }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
@@ -4075,6 +4206,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+    if (action === 'open-support') {
+      const modal = document.getElementById('supportOverlay');
+      if (modal) modal.classList.add('active');
+    }
+    if (action === 'close-support') {
+      const modal = document.getElementById('supportOverlay');
+      if (modal) modal.classList.remove('active');
+    }
+    if (action === 'copy-crypt') {
+      const btn = e.target.closest('[data-target]') || e.target;
+      const targetId = btn.dataset.target;
+      const textNode = document.getElementById(targetId);
+      if (textNode) {
+        navigator.clipboard.writeText(textNode.textContent.trim()).then(() => {
+          showToast('Address copied to clipboard');
+          const origText = btn.textContent;
+          btn.textContent = '✓ Copied';
+          btn.style.color = '#34d399';
+          btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+          btn.style.background = 'rgba(16, 185, 129, 0.12)';
+          setTimeout(() => {
+            btn.textContent = origText;
+            btn.style.color = '';
+            btn.style.borderColor = '';
+            btn.style.background = '';
+          }, 2000);
+        });
+      }
+    }
     if (action === 'copy-wuplay') {
       const btn = e.target.closest('[data-action="copy-wuplay"]') || e.target;
       const url = btn.dataset.url;
@@ -4163,9 +4323,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const on = S.subtitleAddons.includes(val);
       row.style.borderColor = on ? 'rgba(6,182,212,.35)' : 'rgba(255,255,255,.06)';
       row.style.background = on ? 'rgba(6,182,212,.05)' : 'transparent';
-      const box = row.querySelector('div[style*="border-radius:4px"]');
+      const box = row.querySelector('.chk-box');
       if (box) { box.style.borderColor = on ? '#06b6d4' : '#374151'; box.style.background = on ? '#06b6d4' : 'transparent'; box.innerHTML = on ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''; }
-      const nm = row.querySelector('div[style*="font-size:.8rem"]');
+      const nm = row.querySelector('.opt-nm');
       if (nm) nm.style.color = on ? '#06b6d4' : '#9ca3af';
       saveState();
       if (val === 'subdl') {
@@ -4202,9 +4362,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const on = S.catalogs.includes(val);
       row.style.borderColor = on ? 'rgba(249,115,22,.35)' : 'rgba(255,255,255,.06)';
       row.style.background = on ? 'rgba(249,115,22,.05)' : 'transparent';
-      const box = row.querySelector('div[style*="border-radius:4px"]');
+      const box = row.querySelector('.chk-box');
       if (box) { box.style.borderColor = on ? '#f97316' : '#374151'; box.style.background = on ? '#f97316' : 'transparent'; box.innerHTML = on ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''; }
-      const nm = row.querySelector('div[style*="font-size:.8rem"]');
+      const nm = row.querySelector('.opt-nm');
       if (nm) nm.style.color = on ? '#f97316' : '#9ca3af';
       saveState();
     }
@@ -4926,9 +5086,10 @@ function build() {
   const name = (S.name.trim() || defaultName()), rc = resolutionCfg(), ec = encodeCfg(), ac = audioCfg();
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
+  const _presets = presets();
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
-    preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV','SCR','TC','TS','CAM','Unknown'],
+    preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HDTV'],
     excludedLanguages: [], includedLanguages: [], requiredLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])], preferredLanguages: [...new Set([...(S.langs||['English']),'Original','Dual Audio','Multi','Dubbed'])],
     preferredAudioTags: ac.preferredAudioTags,
     syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
@@ -4948,7 +5109,7 @@ function build() {
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v3')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
-    presets: presets(), services: services(),
+    presets: _presets, services: services(),
   };
 
   const cfg = {
@@ -4982,11 +5143,18 @@ function build() {
     titleMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
     yearMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
-    groups: (function(){ const isFree=S.service==='p2p'||S.service==='http'; if(!isFree) return { enabled:false, groupings:[] }; return { enabled:true, groupings:[
-      { name:'Primary', addons:['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'], condition:'true' },
-      { name:'Secondary', addons:['Meteor','Comet','MediaFusion','HdHub'], condition:'count(totalStreams)<5' },
-      { name:'Fallback', addons:['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'], condition:'count(totalStreams)<15' }
-    ] }; })(),
+    groups: (function(){ const isFree=S.service==='p2p'||S.service==='http'; if(!isFree) return { enabled:false, groupings:[] };
+      const primary=['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'];
+      const secondary=['Meteor','Comet','MediaFusion','HdHub'];
+      const fallback=['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'];
+      const grouped=new Set([...primary,...secondary,...fallback]);
+      const all=_presets.map(p=>p.options?.name).filter(Boolean);
+      all.forEach(n=>{ if(!grouped.has(n)) primary.push(n); });
+      return { enabled:true, groupings:[
+        { name:'Primary', addons:primary, condition:'true' },
+        { name:'Secondary', addons:secondary, condition:'count(totalStreams)<5' },
+        { name:'Fallback', addons:fallback, condition:'count(totalStreams)<15' }
+      ] }; })(),
   };
 
   const result = {
@@ -6020,7 +6188,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       </details>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px">
         <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="community-link">Browse Templates →</a>
-        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">Reddit</a>
+        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">Core Crew</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">GitHub</a>
       </div>
     </div>`;
@@ -6546,6 +6714,12 @@ function templateHealthCheck() {
     if (!has1080pGuard) warns.push('1080p template missing 2160p exclusion ESE — 4K streams may leak through');
   }
   if (!S.tmdbToken && !S.tmdbApiKey && !['p2p','http'].includes(S.service)) warns.push('No TMDB key — title/year matching is disabled (metadata will be less accurate)');
+  if ((S.service === 'easynews' || S.multiServices.includes('easynews')) && (!S.creds.easynews || !S.creds.easynewsPass)) {
+    warns.push('EasyNews selected but username or password is missing — Usenet streams won\'t load');
+  }
+  if ((S.subtitleAddons || []).includes('subdl') && !S.creds.subdl) {
+    warns.push('SubDL subtitles enabled but API Key is missing — SubDL subtitles won\'t load');
+  }
   if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio on a device that doesn\'t support passthrough');
   if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('4K resolution on Fire Stick HD — device cannot play 2160p');
   const credInputs = getDebridInputs();
