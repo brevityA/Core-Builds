@@ -1741,6 +1741,7 @@ const CHANGELOG = [
     'Startup & state — Reduced the fixed loader from three seconds to under one second and added schema migration for corrected device defaults and newly saved settings',
     'Tutorial alignment — Rebuilt onboarding around Quick Install, multi-provider Sources, Ready-Made Setups, Guided Setup, Advanced Builder, validation, and Review & Install with working spotlight targets',
     'Credential transparency — Replaced inaccurate zero-knowledge wording with explicit local-export versus chosen-host Direct Install behaviour',
+    'Schema guard — Added final enum sanitization for autoPlay attributes and cacheAndPlay stream types, including safe aliases and deduplication, to prevent legacy invalid-value import errors',
   ]},
   { v:'2.75', date:'Jul 21 2026', items:[
     'Unified UI — Extended the approved hybrid visual system across every configurator step, option menu, form, review panel, sidebar, modal, receipt, and navigation control',
@@ -5346,9 +5347,26 @@ function build() {
   return result;
 }
 
+function sanitizeAioEnumArrays(config) {
+  const autoAllowed=new Set(['service','addon','proxied','resolution','quality','encode','audioTags','visualTags','languages','releaseGroup','type','infoHash','size']);
+  const autoAliases={audio:'audioTags',language:'languages',release_group:'releaseGroup',info_hash:'infoHash'};
+  if(config.autoPlay){
+    const raw=Array.isArray(config.autoPlay.attributes)?config.autoPlay.attributes:[];
+    const clean=[...new Set(raw.map(v=>autoAliases[String(v).trim()]||String(v).trim()).filter(v=>autoAllowed.has(v)))];
+    config.autoPlay.attributes=clean.length?clean:['resolution','quality','releaseGroup'];
+  }
+  if(config.cacheAndPlay){
+    const raw=Array.isArray(config.cacheAndPlay.streamTypes)?config.cacheAndPlay.streamTypes:[];
+    const mapped=raw.map(v=>{v=String(v).trim();if(['debrid','p2p','torrent'].includes(v))return'torrent';if(['stremio-usenet','nzb','usenet'].includes(v))return'usenet';return v;});
+    config.cacheAndPlay.streamTypes=[...new Set(mapped.filter(v=>v==='usenet'||v==='torrent'))];
+    if(!config.cacheAndPlay.streamTypes.length)config.cacheAndPlay.streamTypes=['usenet','torrent'];
+  }
+  return config;
+}
 function buildFinal() {
   const tpl = build();
   if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
+  sanitizeAioEnumArrays(tpl.config);
   return tpl;
 }
 
