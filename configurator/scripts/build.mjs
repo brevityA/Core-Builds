@@ -1,4 +1,5 @@
 import { build, transform } from 'esbuild';
+import { createHash } from 'node:crypto';
 import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,12 +32,17 @@ await copyFile(resolve(src, 'vendor/qrcode.min.js'), resolve(assets, 'qrcode.min
 const shell = await readFile(resolve(src, 'index.html'), 'utf8');
 const js = await readFile(jsOut, 'utf8');
 const qr = await readFile(resolve(src, 'vendor/qrcode.min.js'), 'utf8');
+const digest = value => createHash('sha256').update(value).digest('hex').slice(0, 12);
+const assetVersions = { css: digest(css), js: digest(js), qr: digest(qr) };
 
 const sourceStyleLinks = cssFiles.map(file => `<link rel="stylesheet" href="./styles/${file}">`).join('\n');
 const webHtml = shell
-  .replace(sourceStyleLinks, '<link rel="stylesheet" href="./assets/app.css">')
-  .replace('<script src="./vendor/qrcode.min.js"></script>', '<script src="./assets/qrcode.min.js"></script>')
-  .replace('<script type="module" src="./js/app.js"></script>', '<script defer src="./assets/app.js"></script>');
+  .replace(sourceStyleLinks, `<link rel="stylesheet" href="./assets/app.css?v=${assetVersions.css}">`)
+  .replace('<script src="./vendor/qrcode.min.js"></script>', `<script src="./assets/qrcode.min.js?v=${assetVersions.qr}"></script>`)
+  .replace('<script type="module" src="./js/app.js"></script>', `<script defer src="./assets/app.js?v=${assetVersions.js}"></script>`);
+if (!webHtml.includes(`app.js?v=${assetVersions.js}`) || !webHtml.includes(`app.css?v=${assetVersions.css}`)) {
+  throw new Error('Web build is missing content-versioned asset URLs');
+}
 await writeFile(resolve(web, 'index.html'), webHtml);
 
 const standalone = shell

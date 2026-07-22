@@ -3084,6 +3084,7 @@ function pses() {
 
 function build() {
   const name = (S.name.trim() || defaultName()), rc = resolutionCfg(), ec = encodeCfg(), ac = audioCfg();
+  const hasTmdb = !!(S.tmdbToken || S.tmdbApiKey);
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
   const _presets = presets();
@@ -3110,9 +3111,9 @@ function build() {
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
     size: (function(){ const is4k = S.resolution==='4k'||S.resolution==='ultrawide'; return { global:{ movies:[1610612736,80000000000], series:[209715200,40000000000] }, resolution:{ ...(is4k ? { '2160p':{ movies:[1610612736,150000000000], series:[209715200,80000000000] } } : {}), '1080p':{ movies:[524288000,30000000000], series:[104857600,20000000000] }, '720p':{ movies:[209715200,12000000000], series:[52428800,8000000000] } } }; })(),
-    bitrate: { useMetadataRuntime:true, global:{ movies:[1000000,150000000], series:[1000000,150000000] }, resolution:{ ...(S.resolution==='4k'||S.resolution==='ultrawide' ? { '2160p':{ movies:[5000000,150000000], series:[5000000,150000000] } } : {}), '1080p':{ movies:[2000000,150000000], series:[2000000,150000000] }, '720p':{ movies:[1000000,150000000], series:[1000000,150000000] } } },
+    bitrate: { useMetadataRuntime:hasTmdb, global:{ movies:[1000000,150000000], series:[1000000,150000000] }, resolution:{ ...(S.resolution==='4k'||S.resolution==='ultrawide' ? { '2160p':{ movies:[5000000,150000000], series:[5000000,150000000] } } : {}), '1080p':{ movies:[2000000,150000000], series:[2000000,150000000] }, '720p':{ movies:[1000000,150000000], series:[1000000,150000000] } } },
     hideErrors: true, hideErrorsForResources: ['addon_catalog','catalog','subtitles'],
-    digitalReleaseFilter: { enabled:true, tolerance:7, requestTypes:['movie','series','anime'], addons:[] },
+    digitalReleaseFilter: { enabled:hasTmdb, tolerance:7, requestTypes:['movie','series','anime'], addons:[] },
     autoPlay: { enabled:true, method:'matchingFile', attributes:['resolution','quality','audioTags'] },
     precacheNextEpisode: true,
     precacheSelector: "count(cached(streams)) == 0 ? slice(uncached(type(streams, 'debrid', 'usenet')), 0, 1) : []",
@@ -3144,7 +3145,7 @@ function build() {
     excludedStreamExpressions: eses(),
     includedStreamExpressions: [
       { enabled:true, expression:"/*Library*/ count(streams)==count(library(streams)) ? library(streams) : []" },
-      { enabled:true, expression:"/*digitalRelease Bypass*/ queryType=='movie' or queryType=='anime.movie' ? (count(passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease'))>15 ? passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease') : passthrough(streams,'digitalRelease')) : []" },
+      ...(hasTmdb ? [{ enabled:true, expression:"/*digitalRelease Bypass*/ queryType=='movie' or queryType=='anime.movie' ? (count(passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease'))>15 ? passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease') : passthrough(streams,'digitalRelease')) : []" }] : []),
       { enabled:true, expression:"/*0Cached*/ count(merge(cached(streams),type(streams,'p2p','http','usenet','stremio-usenet')))==0 ? passthrough(streams,'title') : []" },
       { enabled:true, expression:"/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'))>0 ? passthrough(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'),'excluded','limit') : []" },
       ...(S.langExclusive && S.langs && S.langs.length ? [{
@@ -3157,8 +3158,8 @@ function build() {
       if(S.resolution==='4k'){ const c4k=pool==='max'?25:pool==='large'?15:8; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'2160p')")})>=${c4k} or totalTimeTaken>${timeout}`}; }
       if(S.resolution==='ultrawide'){ return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=15 or count(${wrap("resolution(totalStreams,'2160p')")})>=5 or totalTimeTaken>${timeout}`}; }
       const c1k=pool==='max'?45:pool==='large'?30:20; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=${c1k} or totalTimeTaken>${timeout}`}; })(),
-    titleMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
-    yearMatching: { enabled:!!(S.tmdbToken||S.tmdbApiKey), strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
+    titleMatching: { enabled:hasTmdb, mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
+    yearMatching: { enabled:hasTmdb, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
     groups: (function(){ const isFree=S.service==='p2p'||S.service==='http'; if(!isFree) return { enabled:false, groupings:[] };
       const primary=['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'];
@@ -4527,10 +4528,11 @@ function simpleFinishHtml() {
           </span>
         </div>
         ${S.tmdbToken||S.tmdbApiKey ? '' : `<div style="padding:10px 14px;font-size:.72rem;color:#9ca3af;line-height:1.6;border-bottom:1px solid rgba(255,255,255,.04)">
-          <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">Without a TMDB key, two quality features are off:</div>
+          <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">Without a TMDB key, TMDB-powered filters are switched off automatically:</div>
           <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
-            <span>× <b style="color:#fbbf24">Title matching</b> — wrong movies with similar names sneak through</span>
-            <span>× <b style="color:#fbbf24">Year matching</b> — remakes and reboots mix with originals</span>
+            <span>× <b style="color:#fbbf24">Title matching</b> — similar names are not cross-checked</span>
+            <span>× <b style="color:#fbbf24">Year matching</b> — remakes and reboots are not cross-checked</span>
+            <span>× <b style="color:#fbbf24">Digital release filtering</b> — release dates are not checked</span>
           </div>
           <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">How to get a free TMDB key (2 min):</div>
           <div style="display:flex;flex-direction:column;gap:2px">
@@ -4725,7 +4727,6 @@ function templateHealthCheck() {
     const has1080pGuard = ec.some(e => e.expression && /resolution\s*\(\s*streams\s*,\s*'2160p'/.test(e.expression) && e.enabled !== false);
     if (!has1080pGuard) warns.push('1080p template missing 2160p exclusion ESE — 4K streams may leak through');
   }
-  if (!S.tmdbToken && !S.tmdbApiKey && !['p2p','http'].includes(S.service)) warns.push('No TMDB key — title/year matching is disabled (metadata will be less accurate)');
   if ((S.service === 'easynews' || S.multiServices.includes('easynews')) && (!S.creds.easynews || !S.creds.easynewsPass)) {
     warns.push('EasyNews selected but username or password is missing — Usenet streams won\'t load');
   }
@@ -5133,7 +5134,7 @@ function showFastLane() {
     state.extras.filter(v=>extraCreds[v]).forEach(v=>fields.push(credentialField(extraCreds[v],{type:v==='streamnzb'?'url':'password'})));
     state.scrapers.forEach(id=>{const d=OPTIONAL_SCRAPER_DEFS.find(x=>x.id===id);if(d?.credKey)fields.push(credentialField(d.credKey));});
     const tmdbField=(key,{type='password',maxlength=400}={})=>{const d=PROVIDER_CREDENTIALS[key];return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label><a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a></div><input class="fastlane-field" data-fl-tmdb="${key}" type="${type}" autocomplete="off" maxlength="${maxlength}" placeholder="${d.placeholder}" value="${(S[key]||'').replace(/"/g,'&quot;')}"></div>`;};
-    const tmdbMetadata=`<details class="fastlane-metadata" ${S.tmdbToken||S.tmdbApiKey?'open':''}><summary><span><b>TMDB metadata</b><small>Optional · recommended for accurate title/year matching</small></span><span class="fastlane-metadata-state">${S.tmdbToken||S.tmdbApiKey?'Set':'Add key'}</span></summary><div class="fastlane-metadata-body"><div class="fastlane-note">Add either a TMDB Read Access Token or API Key. Leave both blank to continue with title/year matching disabled.</div><div class="fastlane-fields">${tmdbField('tmdbToken')}${tmdbField('tmdbApiKey',{maxlength:60})}</div></div></details>`;
+    const tmdbMetadata=`<details class="fastlane-metadata" ${S.tmdbToken||S.tmdbApiKey?'open':''}><summary><span><b>TMDB metadata</b><small>Optional · improves matching and release-date filtering</small></span><span class="fastlane-metadata-state">${S.tmdbToken||S.tmdbApiKey?'Set':'Add key'}</span></summary><div class="fastlane-metadata-body"><div class="fastlane-note">Add either a TMDB Read Access Token or API Key. Leave both blank and Core Builds will disable every TMDB-dependent feature so AIOStreams accepts the config.</div><div class="fastlane-fields">${tmdbField('tmdbToken')}${tmdbField('tmdbApiKey',{maxlength:60})}</div></div></details>`;
     const freeNote=[...state.services,...state.extras].some(v=>v==='p2p'||v==='http')?'<div class="fastlane-note">Free/P2P sources require no key and depend on active seeders and compatible hosts.</div>':'';
     const providerFields=fields.length?`<div class="fastlane-label">Provider credentials</div><div class="fastlane-fields">${fields.join('')}</div>${freeNote}`:freeNote||'<div class="fastlane-note">Select at least one provider.</div>';
     creds.innerHTML = providerFields + tmdbMetadata;

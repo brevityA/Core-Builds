@@ -64,7 +64,7 @@ TMDB credentials are optional but recommended. Add either:
 - a **TMDB Read Access Token**, or
 - a **TMDB API Key**.
 
-With neither value, title and year matching are disabled and metadata matching may be less accurate. The preflight warning can be accepted if that trade-off is intentional.
+With neither value, Core Builds automatically disables title matching, year matching, the digital-release filter, and metadata-runtime bitrate calculations. Standard bitrate limits remain active, and AIOStreams accepts the configuration without requiring TMDB. This is an optional compatibility mode, not a failed preflight check.
 
 ## Device profiles
 
