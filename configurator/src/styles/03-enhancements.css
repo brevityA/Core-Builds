@@ -98,6 +98,47 @@
 [data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da}
 [data-theme="light"] .btn-next,[data-theme="light"] .btn-dl{color:#04202b}
 [data-theme="light"] .btn-next:disabled{background:#f6f8fa;color:#8c959f;border:1px solid #d0d7de}
+/* ===== Device picker grid (Advanced Builder > Your Device) =====
+   Replaces the old sideways-scrolling carousel with a neat, responsive grid
+   of equal-height cards plus a single contextual explanation banner. */
+.device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:9px;padding:2px}
+.device-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 12px 13px;border:1px solid rgba(255,255,255,.085);border-radius:14px;background:linear-gradient(145deg,#111b27,#0d151f);cursor:pointer;transition:border-color .18s,background .18s,transform .18s,box-shadow .18s;outline:none}
+.device-card:hover{border-color:rgba(0,212,255,.26);background:linear-gradient(145deg,#152331,#101923);transform:translateY(-1px)}
+.device-card:focus-visible{outline:2px solid rgba(0,212,255,.5);outline-offset:2px}
+.device-card[data-active="true"]{border-color:rgba(0,212,255,.43);background:radial-gradient(circle at 100% 0,rgba(0,212,255,.13),transparent 42%),linear-gradient(145deg,#102431,#0e1823);box-shadow:inset 3px 0 #00d4ff}
+.device-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;min-height:32px}
+.device-card-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.device-card-icon svg{width:32px;height:32px;display:block}
+.device-card-check{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0}
+.device-card-name{font-size:.82rem;font-weight:700;color:#dce6ed;line-height:1.25;display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.device-card[data-active="true"] .device-card-name{color:#67e8f9}
+.device-card-pop{display:inline-block;padding:1px 6px;border-radius:4px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);color:#67e8f9;font-size:.5rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.device-card-desc{font-size:.64rem;color:#718093;line-height:1.45}
+/* Contextual explanation banner for the currently selected device */
+.device-help-banner{display:flex;gap:11px;align-items:flex-start;margin-top:12px;padding:12px 14px;border:1px solid rgba(0,212,255,.16);border-radius:12px;background:radial-gradient(circle at 0% 0%,rgba(0,212,255,.06),transparent 55%),rgba(255,255,255,.02)}
+.device-help-banner-ico{flex-shrink:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.device-help-banner-title{font-size:.78rem;font-weight:800;color:#67e8f9;letter-spacing:.02em;margin-bottom:4px}
+.device-help-banner-body{font-size:.71rem;color:#9aa6b2;line-height:1.55}
+.device-help-banner-body b{color:#cfe6ef;font-weight:700}
+/* Light theme */
+[data-theme="light"] .device-card{background:#f8fafc;border-color:#d7dee5}
+[data-theme="light"] .device-card:hover{background:#f2f6f9;border-color:rgba(9,105,218,.28)}
+[data-theme="light"] .device-card[data-active="true"]{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.4);box-shadow:inset 3px 0 #0969da}
+[data-theme="light"] .device-card-name{color:#1f2933}
+[data-theme="light"] .device-card[data-active="true"] .device-card-name{color:#0969da}
+[data-theme="light"] .device-card-pop{background:rgba(9,105,218,.08);border-color:rgba(9,105,218,.2);color:#0a6fcd}
+[data-theme="light"] .device-card-desc{color:#5f6c78}
+[data-theme="light"] .device-help-banner{background:rgba(9,105,218,.04);border-color:rgba(9,105,218,.2)}
+[data-theme="light"] .device-help-banner-title{color:#0969da}
+[data-theme="light"] .device-help-banner-body{color:#4a5663}
+[data-theme="light"] .device-help-banner-body b{color:#27323b}
+[data-theme="light"] .device-help-banner-ico svg{stroke:#0969da}
+/* Mobile: keep two tidy columns on narrow screens */
+@media(max-width:599px){
+  .device-grid{grid-template-columns:repeat(2,1fr);gap:9px}
+  .device-card{padding:11px 11px 12px}
+  .device-card-name{font-size:.8rem}
+}
 /* Theme toggle: dock bottom-right when the sidebar rail is visible (was overlapping the brand) */
 @media(min-width:1000px){
   .cb-sidebar:not(.sb-hidden)~#themeToggle{top:auto;left:auto;bottom:14px;right:14px}
