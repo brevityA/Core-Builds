@@ -1722,7 +1722,7 @@ const CHANGELOG = [
   { v:'2.77', date:'Jul 22 2026', items:[
     'Quick Install — Added a Duck-inspired one-page flow for app, service, contextual credentials, and Fast/Balanced/Maximum performance profiles',
     'Progressive disclosure — Stremio login, debrid API keys, and EasyNews credentials appear only when the selected path needs them',
-    'Reliability — The last successful AIOStreams host is remembered and checked first on later installs and test drives',
+    'Reliability — The last successful AIOStreams host is checked first, stable hosts are preferred, outdated versions are skipped, free/P2P avoids incompatible hosts, and nightly is used only as fallback',
     'Clean install — Added an opt-in replacement mode for older manifests from known public AIOStreams hosts during direct Stremio installation',
     'Diagnostics & preflight — Added a sanitized issue report plus template structure, duplicate preset, health, credential, and host compatibility checks',
     'Unified menus — Applied the splash screen’s glass surfaces, editorial headings, cyan interaction language, forms, navigation, sidebar, review cards, receipts, and modal treatment throughout',
@@ -1980,27 +1980,53 @@ let _detectedDevice = null;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz', wizaardd:'https://aiostreams-stable.forthewizards.uk' };
-const HOST_LABEL_MAP = { elfhosted:'ElfHosted', fortheweak:'ForthWeak', midnight:"Midnight's", viren:"Viren's", kuu:"Kuu's", atbp:'ATBP', omni:"Omni's", wizaardd:'Wizaardd' };
+const HOST_LABEL_MAP = { elfhosted:'ElfHosted', fortheweak:"Yeb's / ForTheWeak", midnight:"Midnight's", viren:"Viren's Nightly", kuu:"Kuu's", atbp:'ATBP', omni:"Omni's (legacy)", wizaardd:'Wizaardd' };
+const HOST_META = {
+  elfhosted:{channel:'stable',priority:1,blocksFree:true}, fortheweak:{channel:'stable',priority:2}, midnight:{channel:'stable',priority:3},
+  kuu:{channel:'stable',priority:4}, atbp:{channel:'stable',priority:5}, wizaardd:{channel:'stable',priority:6},
+  viren:{channel:'nightly',priority:20}, omni:{channel:'stable',priority:30}
+};
+const MIN_AIOSTREAMS_VERSION = '2.31.1';
 function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [HOST_LABEL_MAP[k]||k, u]); }
+function hostKeyFromUrl(url) { return Object.keys(HOST_BASE_URLS).find(k=>HOST_BASE_URLS[k]===url) || ''; }
+function versionAtLeast(actual, minimum) {
+  const a=String(actual||'0').split('.').map(Number), b=String(minimum||'0').split('.').map(Number);
+  for(let i=0;i<Math.max(a.length,b.length);i++){const d=(a[i]||0)-(b[i]||0);if(d)return d>0;} return true;
+}
 function orderedHostEntries() {
   const entries = hostEntries();
   let preferred = '';
   try { preferred = localStorage.getItem('coreBuildLastGoodHost') || ''; } catch(e) {}
-  return entries.sort((a,b) => (b[1] === preferred) - (a[1] === preferred));
+  return entries.sort((a,b) => {
+    if (a[1]===preferred) return -1; if (b[1]===preferred) return 1;
+    return (HOST_META[hostKeyFromUrl(a[1])]?.priority||99) - (HOST_META[hostKeyFromUrl(b[1])]?.priority||99);
+  });
 }
 function rememberGoodHost(host) {
   try { if (host) localStorage.setItem('coreBuildLastGoodHost', host); } catch(e) {}
 }
 async function selectHealthyHost(timeout=4000) {
-  const entries = orderedHostEntries();
+  const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
+  const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree));
   let preferred='';
   try { preferred=localStorage.getItem('coreBuildLastGoodHost')||''; } catch(e) {}
-  const probe = host => raceHostFetch(host,'/api/v1/status',{method:'GET'},timeout).then(res=>{if(res.ok||res.status===404||res.status===405)return host;throw new Error('down');});
+  const probe = async host => {
+    const res=await raceHostFetch(host,'/api/v1/status',{method:'GET'},timeout);
+    if(!res.ok) throw new Error('host unavailable');
+    const payload=await res.clone().json().catch(()=>null);
+    const version=payload?.data?.version || payload?.version || '';
+    if(version && !versionAtLeast(version,MIN_AIOSTREAMS_VERSION)) throw new Error(`host outdated (${version})`);
+    return host;
+  };
   if (preferred && entries.some(([,host])=>host===preferred)) {
     try { const host=await probe(preferred); rememberGoodHost(host); return host; } catch(e) {}
   }
-  const hosts=entries.map(([,host])=>host).filter(host=>host!==preferred);
-  const winner=await Promise.any(hosts.map(probe));
+  const candidates=entries.filter(([,host])=>host!==preferred);
+  const stable=candidates.filter(([,host])=>(HOST_META[hostKeyFromUrl(host)]?.channel||'stable')==='stable').map(([,host])=>host);
+  const nightly=candidates.filter(([,host])=>HOST_META[hostKeyFromUrl(host)]?.channel==='nightly').map(([,host])=>host);
+  let winner;
+  try { winner=await Promise.any(stable.map(probe)); }
+  catch(e) { winner=await Promise.any(nightly.map(probe)); }
   rememberGoodHost(winner); return winner;
 }
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
