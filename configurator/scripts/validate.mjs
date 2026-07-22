@@ -35,6 +35,7 @@ const checks = {
   'host metadata coverage': hostKeys.every(k => HOST_META[k]),
   'minimum host version': MIN_AIOSTREAMS_VERSION === '2.31.1',
   'device defaults': ['generic','appletv-new','shield','chromecast','onn'].every(k => k in DEVICE_AUDIO_DEFAULTS),
+  'device grid layout': app.includes('class="device-grid"') && app.includes('class="device-card"') && app.includes('class="device-help-banner"') && !app.includes('id="devScroll"'),
   'Apple TV AV1 conservative': !DEVICE_AV1_SAFE.has('appletv-new'),
   'ONN DV conservative': !DEVICE_DV_SAFE.has('onn'),
   'schema guard wired': app.includes("import { sanitizeAioEnumArrays }"),

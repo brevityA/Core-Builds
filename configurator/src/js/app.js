@@ -372,20 +372,25 @@ function renderOpts(def) {
   const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
   if (def.layout === 'device-hybrid') {
+    // Responsive grid of equal-height device cards + a single contextual
+    // explanation banner for the currently selected device (neat + consistent
+    // with the vertical list steps, instead of a sideways-scrolling carousel).
+    const activeOpt = def.opts.find(o => o.v === S[key]);
     const cards = def.opts.map(o => {
       const active = (S[key] === o.v);
-      return `<div class="fmt-scroll-card" data-active="${active}" data-action="device-scroll-pick" data-val="${o.v}" style="flex:0 0 280px;height:auto">
-        <div class="fmt-scroll-head">
-          <div class="opt-icon" style="flex-shrink:0;margin-right:2px">${o.icon}</div>
-          <div style="min-width:0">
-            <span class="fmt-scroll-label" style="font-size:.84rem;color:${active?'#00d4ff':'#c9d1d9'}">${o.name}</span>${POPULAR_DEVICE_IDS.has(o.v)?'<span style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);color:#67e8f9;font-size:.5rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase">Popular</span>':''}
-          </div>
+      return `<div class="device-card" data-active="${active}" data-action="device-scroll-pick" data-val="${o.v}" role="radio" aria-checked="${active}" tabindex="0">
+        <div class="device-card-head">
+          <div class="device-card-icon">${o.icon}</div>
+          <span class="device-card-check">${active ? ICO.check(15,'#00d4ff') : ''}</span>
         </div>
-        <div style="font-size:.65rem;color:#8b949e;line-height:1.45;margin-top:2px">${o.desc}</div>
-        ${o.help ? `<div style="font-size:.62rem;color:#4b5563;line-height:1.4;margin-top:6px;border-top:1px dashed rgba(255,255,255,.05);padding-top:6px;display:${active?'block':'none'}">${o.help}</div>` : ''}
+        <div class="device-card-name">${o.name}${POPULAR_DEVICE_IDS.has(o.v) ? '<span class="device-card-pop">Popular</span>' : ''}</div>
+        <div class="device-card-desc">${o.desc}</div>
       </div>`;
     }).join('');
-    return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="devScroll" style="padding-bottom:14px">${cards}</div></div>`;
+    const banner = activeOpt && activeOpt.help
+      ? `<div class="device-help-banner"><div class="device-help-banner-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.8" r="0.4" fill="#00d4ff"/></svg></div><div class="device-help-banner-text"><div class="device-help-banner-title">${activeOpt.name}</div><div class="device-help-banner-body">${activeOpt.help}</div></div></div>`
+      : '';
+    return `<div class="device-grid" role="radiogroup" aria-label="Your device">${cards}</div>${banner}`;
   }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
     `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
@@ -667,14 +672,11 @@ function updateFmtFeatured() {
 }
 
 function updateDeviceScroll() {
-  document.querySelectorAll('.fmt-scroll-card[data-action="device-scroll-pick"]').forEach(card => {
-    const isSel = card.dataset.val === S.device;
-    card.dataset.active = isSel ? 'true' : 'false';
-    const helpPanel = card.querySelector('div[style*="line-height:1.4"]');
-    if (helpPanel) helpPanel.style.display = isSel ? 'block' : 'none';
-    const label = card.querySelector('.fmt-scroll-label');
-    if (label) label.style.color = isSel ? '#00d4ff' : '#c9d1d9';
-    if (isSel) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  // The device picker is now a responsive grid rebuilt from state on every
+  // render, so there are no carousel snaps or inline help panels to sync.
+  // Just bring the selected card gently into view (vertical only).
+  document.querySelectorAll('.device-card[data-action="device-scroll-pick"]').forEach(card => {
+    if (card.dataset.val === S.device) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
   });
 }
 function updateFmtReceiptRow() {
@@ -2019,6 +2021,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (S.device && !document.querySelector('input[name="device"]:checked')) render();
       }
     }
+  });
+  // Keyboard support for the device grid cards (Enter / Space activates them).
+  document.addEventListener('keydown', (e) => {
+    const card = e.target.closest && e.target.closest('.device-card');
+    if (!card) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
   });
   document.addEventListener('click', (e) => {
     const flashBtn = e.target.closest('button:not(:disabled):not(.btn-manifest):not(.btn-dl)');
