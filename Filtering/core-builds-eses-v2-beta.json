@@ -1,7 +1,7 @@
 [
   {
     "name": "Standard ESE v2.0",
-    "expression": "/*Standard ESE v2.0 [git.tamtaro.de]*/[]",
+    "expression": "/*Standard ESE v2.0*/[]",
     "description": "Version marker — no-op expression"
   },
   {
@@ -52,6 +52,6 @@
   {
     "name": "IQR Low Seeders",
     "expression": "/*IQR Low Seeders*/ count(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)))>=8?seeders(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),0,max(1,floor(q1(values(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),'seeders'))-1.5*iqr(values(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),'seeders'))))):count(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)))>=4?seeders(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),0,max(1,floor(min(values(negate(merge(library(streams),seadex(streams),cached(streams)),uncached(streams)),'seeders'))*0.5))):[]",
-    "description": "CB's IQR-progressive low seeder guard — superior to Tamtaro's flat threshold"
+    "description": "CB's IQR-progressive low seeder guard — superior to a flat threshold"
   }
 ]

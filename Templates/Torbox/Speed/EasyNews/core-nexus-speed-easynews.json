@@ -1392,7 +1392,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Speed EasyNews",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "EasyNews-only speed build · 1080p SDR · WEB-DL · Usenet cached · Tamtaro v1.5.0 SEL · No TorBox required",
+    "addonDescription": "EasyNews-only speed build · 1080p SDR · WEB-DL · Usenet cached · Core Builds SEL · No TorBox required",
     "appliedTemplates": [
       {
         "id": "brevity.core-nexus-speed-plus",
@@ -1559,11 +1559,11 @@
         "enabled": true
       },
       {
-        "expression": "/*Part of Tamtaro SEL Setup*/[]",
+        "expression": "/*Core Builds SEL Setup*/[]",
         "enabled": true
       },
       {
-        "expression": "/*Standard ESE v2.0 [git.tamtaro.de]*/[]",
+        "expression": "/*Standard ESE v2.0*/[]",
         "enabled": true
       },
       {
@@ -1691,11 +1691,11 @@
     ],
     "includedStreamExpressions": [
       {
-        "expression": "/*Part of Tamtaro SEL Setup*/[]",
+        "expression": "/*Core Builds SEL Setup*/[]",
         "enabled": true
       },
       {
-        "expression": "/*ISE v1.2.3* [git.tamtaro.de]*/[]",
+        "expression": "/*ISE v1.2.3*/[]",
         "enabled": true
       },
       {

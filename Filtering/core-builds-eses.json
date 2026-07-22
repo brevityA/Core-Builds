@@ -97,7 +97,7 @@
     ]
   },
   {
-    "expression": "/*Part of Tamtaro SEL Setup*/[]",
+    "expression": "/*Core Builds SEL Setup*/[]",
     "enabled": true,
     "templates": [
       "4K AllDebrid",
@@ -145,7 +145,7 @@
     ]
   },
   {
-    "expression": "/*Standard ESE v2.0 [git.tamtaro.de]*/[]",
+    "expression": "/*Standard ESE v2.0*/[]",
     "enabled": true,
     "templates": [
       "4K AllDebrid",

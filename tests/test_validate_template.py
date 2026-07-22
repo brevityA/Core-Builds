@@ -520,17 +520,17 @@ class TestStreamExpressions:
         _, _, passes = validate_template(path)
         assert any("2 ISEs, 1 ESEs, 2 PSEs" in p for p in passes)
 
-    def test_double_load_synced_url_and_inline_tamtaro_warns(self, write_template, base_template):
+    def test_double_load_synced_url_and_inline_ises_warns(self, write_template, base_template):
         t = base_template(
             syncedIncludedStreamExpressionUrls=["https://example.com/ises"],
             includedStreamExpressions=[
                 {"expression": "0Cached == true"},
-                {"expression": "Tamtaro ISE v3 — match expression"},
+                {"expression": "Core Builds ISE v3 — match expression"},
             ]
         )
         path = write_template(t)
         _, warnings, _ = validate_template(path)
-        assert any("Tamtaro ISEs inline AND synced URL" in w for w in warnings)
+        assert any("ISEs inline AND synced URL" in w for w in warnings)
 
     def test_double_load_inline_ise_v_pattern_warns(self, write_template, base_template):
         t = base_template(
@@ -542,16 +542,16 @@ class TestStreamExpressions:
         )
         path = write_template(t)
         _, warnings, _ = validate_template(path)
-        assert any("Tamtaro ISEs inline AND synced URL" in w for w in warnings)
+        assert any("ISEs inline AND synced URL" in w for w in warnings)
 
-    def test_synced_url_without_inline_tamtaro_no_warn(self, write_template, base_template):
+    def test_synced_url_without_inline_ises_no_warn(self, write_template, base_template):
         t = base_template(
             syncedIncludedStreamExpressionUrls=["https://example.com/ises"],
             includedStreamExpressions=[{"expression": "0Cached == true"}]
         )
         path = write_template(t)
         _, warnings, _ = validate_template(path)
-        assert not any("Tamtaro ISEs inline AND synced URL" in w for w in warnings)
+        assert not any("ISEs inline AND synced URL" in w for w in warnings)
 
 
 # ── Isolation ─────────────────────────────────────────────────

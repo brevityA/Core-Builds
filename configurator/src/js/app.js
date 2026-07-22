@@ -4901,8 +4901,7 @@ function templateHealthCheck() {
 function hostCompatCheck() {
   const cfg = buildFinal().config;
   const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
-  const TAMTARO_URL_FRAGMENT = 'Tam-Taro/SEL-Filtering-and-Sorting';
-  const TAMTARO_OLD_URL_FRAGMENT = 'Tamtaro/SEL-Filtering-and-Sorting';
+  const LEGACY_SYNCED_URL_FRAGMENTS = ['Tam-Taro/SEL-Filtering-and-Sorting', 'Tamtaro/SEL-Filtering-and-Sorting'];
   const regexFields = [
     ...(cfg.rankedRegexPatterns||[]),
     ...(cfg.excludedRegexPatterns||[]).map((p,i) => typeof p === 'string' ? {name:'Excluded #'+(i+1), pattern:p} : p),
@@ -4920,9 +4919,9 @@ function hostCompatCheck() {
     elfhosted:  { label:'ElfHosted', issues:[], status:'ok' },
     fortheweak: { label:'ForTheWeak', issues:[], status:'ok' },
   };
-  const tamtaroUrls = syncedUrls.filter(u => u.includes(TAMTARO_URL_FRAGMENT) || u.includes(TAMTARO_OLD_URL_FRAGMENT));
-  if (tamtaroUrls.length) {
-    hosts.elfhosted.issues.push('Tam-Taro synced URL not on elfhosted allowlist — will cause "Forbidden URL" error');
+  const legacySyncedUrls = syncedUrls.filter(u => LEGACY_SYNCED_URL_FRAGMENTS.some(f => u.includes(f)));
+  if (legacySyncedUrls.length) {
+    hosts.elfhosted.issues.push('Legacy synced URL not on elfhosted allowlist — will cause "Forbidden URL" error');
     hosts.elfhosted.status = 'err';
   }
   const ranked = cfg.rankedRegexPatterns||[];
@@ -5060,7 +5059,7 @@ const TROUBLESHOOT_TREE = {
   forbiddenUrl: {
     q: '"Forbidden URL" means the host doesn\'t trust a synced URL in your template:',
     tips: [
-      '🔗 <b>Tam-Taro URL</b> — elfhosted\'s allowlist hasn\'t been updated for the Tam-Taro account rename. The configurator no longer includes this URL — re-generate your template.',
+      '🔗 <b>Legacy synced URL</b> — Older templates may reference synced URLs no longer on the host allowlist. Re-generate your template to fix this.',
       '🌐 <b>Custom synced URLs</b> — Public hosts only allow specific synced URLs. Self-hosted instances allow any URL.',
       '✅ <b>Check Host Compatibility</b> — The checker above shows which hosts will accept your template.',
     ]

@@ -263,10 +263,10 @@ def validate_template(fpath):
     # Ignore comment-only placeholder entries (expression is bare [] with no logic)
     synced_ise = c.get('syncedIncludedStreamExpressionUrls', [])
     inline_ises = [e for e in c.get('includedStreamExpressions', [])
-                   if ('Tamtaro' in e.get('expression', '') or 'ISE v' in e.get('expression', ''))
+                   if ('Core Builds' in e.get('expression', '') or 'ISE v' in e.get('expression', ''))
                    and e.get('expression', '').strip().rstrip('*/').strip().endswith('[]') is False]
     if synced_ise and inline_ises:
-        warn(name, "Tamtaro ISEs inline AND synced URL set — potential duplicates")
+        warn(name, "ISEs inline AND synced URL set — potential duplicates")
 
     return errors, warnings, passes
 
