@@ -1,0 +1,16 @@
+{
+  "name": "core-builds-configurator",
+  "version": "2.78.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8080 -d src",
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate.mjs",
+    "build": "node scripts/build.mjs",
+    "release": "npm test && npm run validate && npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

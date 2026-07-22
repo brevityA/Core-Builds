@@ -1,0 +1,104 @@
+/* v2.5 — theme-aware panels, test keys, device help */
+.import-error{border-color:#4b1a1a!important;background:#1a0606!important}
+.import-info{border-color:#374151!important;background:#111827!important}
+[data-theme="light"] .import-error{border-color:#f1aeb5!important;background:#fff5f5!important}
+[data-theme="light"] .import-error strong[style]{color:#cf222e!important}
+[data-theme="light"] .import-info{border-color:#d0d7de!important;background:#f6f8fa!important}
+[data-theme="light"] .import-info strong[style]{color:#1f2328!important}
+.insights-box{background:#060e15;border:1px solid #162030;border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.insights-hdr{color:#7eeeff;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.insights-box li{color:#8b949e;font-size:.85rem;line-height:1.45;display:flex;gap:6px}
+[data-theme="light"] .insights-box{background:#f0f9ff;border-color:#bae6fd}
+[data-theme="light"] .insights-hdr{color:#0369a1}
+[data-theme="light"] .insights-box li{color:#57606a}
+[data-theme="light"] .what-next strong[style]{color:#9a3412!important}
+[data-theme="light"] .wn-title{color:#1f2328!important}
+[data-theme="light"] .wn-body{color:#57606a!important}
+[data-theme="light"] .cred-remind strong[style]{color:#9a3412!important}
+[data-theme="light"] .cred-remind .cr-hdr{color:#b45309!important}
+[data-theme="light"] .import-success strong[style*="e6edf3"]{color:#1f2328!important}
+[data-theme="light"] .import-success strong[style*="fbbf24"]{color:#9a3412!important}
+.fmt-card{border:1.5px solid rgba(255,255,255,.13);border-radius:12px;background:rgba(8,12,18,.9);cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;overflow:hidden}
+.fmt-card[data-active="true"]{border-color:rgba(0,212,255,.65);background:rgba(0,212,255,.08);box-shadow:0 0 0 1px rgba(0,212,255,.22)}
+.fmt-card .fmt-lbl{color:#e6edf3}
+.fmt-card[data-active="true"] .fmt-lbl{color:#00d4ff!important}
+.fmt-card .fmt-preview-wrap{display:none;padding:0 13px 11px}
+.fmt-card[data-active="true"] .fmt-preview-wrap{display:block}
+.fmt-arr{color:#374151;font-size:.9rem;flex-shrink:0}
+.fmt-card[data-active="true"] .fmt-arr{color:#00d4ff}
+.fmt-arr::after{content:'›'}
+.fmt-card[data-active="true"] .fmt-arr{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 44 44' fill='none'%3E%3Cpath d='M12 22l7 7 13-13' stroke='%2300d4ff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat}
+.fmt-card[data-active="true"] .fmt-arr::after{content:''}
+[data-theme="light"] .fmt-card{background:#fff;border-color:#d0d7de}
+[data-theme="light"] .fmt-card[data-active="true"]{background:rgba(9,105,218,.06);border-color:#0969da;box-shadow:0 0 0 1px rgba(9,105,218,.2)}
+[data-theme="light"] .fmt-card .fmt-lbl{color:#1f2328}
+[data-theme="light"] .fmt-card[data-active="true"] .fmt-lbl{color:#0969da!important}
+.cred-status{font-size:.74rem;margin-top:4px;min-height:16px;display:block}
+.help-btn{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#6b7280;font-size:.7rem;font-weight:800;cursor:pointer;flex-shrink:0;line-height:1;margin-right:8px;transition:all .15s;padding:0}
+.help-btn:hover{color:#00d4ff;border-color:rgba(0,212,255,.4)}
+.device-help{font-size:.8rem;color:#8b949e;line-height:1.55;padding:9px 14px 11px;border-top:1px dashed rgba(255,255,255,.09);display:none}
+.device-help b{color:#c9d1d9}
+[data-theme="light"] .device-help{color:#57606a;border-color:rgba(0,0,0,.12)}
+[data-theme="light"] .device-help b{color:#1f2328}
+[data-theme="light"] .help-btn{border-color:rgba(0,0,0,.15);background:rgba(0,0,0,.03);color:#8c959f}
+.step-unit.done{cursor:pointer}
+.step-unit.done:hover .step-bub{box-shadow:0 0 10px rgba(0,212,255,.8);transform:scale(1.3)}
+.step-unit.done:hover .step-lbl{color:#00d4ff}
+.receipt-row[data-action]{cursor:pointer;transition:background .15s}
+.receipt-row[data-action]:hover{background:rgba(0,212,255,.05)}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* ===== v2.38 Nexus calm UI — Duck-inspired mix (single accent, no glow) ===== */
+/* Motion: retire pulse/glow loops (keyframes redefined to static states) */
+@keyframes optSelect{0%,100%{box-shadow:none}}
+@keyframes hoverPulse{0%,100%{box-shadow:none}}
+@keyframes bubPulse{0%,100%{box-shadow:none}}
+@keyframes manifestPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.22)}}
+@keyframes dlPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.22)}}
+@keyframes btnFlash{0%,100%{box-shadow:none}}
+@keyframes btnHoverPulse{0%,100%{box-shadow:none}}
+/* Decorative hairline glows off */
+.card::after,.opt label::before,.btn-next::before,.hdr-banner::before{display:none}
+.hdr-icon,.cb-sidebar .sb-brand-icon{filter:none}
+.opts.list .opt-icon svg,.opts.pills .opt-icon svg,
+.opts.list .opt input:checked+label .opt-icon svg,.opts.pills .opt input:checked+label .opt-icon svg{filter:none}
+/* Flat selection states */
+.opt input:checked+label{border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.07);box-shadow:none}
+.opt input:checked+label::after{box-shadow:none}
+.opts.pills .opt input:checked+label{box-shadow:none}
+.svc-list-hero input:checked+label{box-shadow:none!important}
+.bc-chip{box-shadow:none}
+.step-active .step-bub{box-shadow:none;transform:scale(1.35)}
+.step-done .step-bub{box-shadow:none}
+/* One CTA identity — cyan gradient, dark text */
+.btn-next{background:linear-gradient(135deg,#00a8d4,#00d4ff);color:#04202b;border:none;box-shadow:0 5px 22px rgba(0,212,255,.22)}
+.btn-next:hover:not(:disabled){background:linear-gradient(135deg,#00b8e6,#2adcff);border:none;box-shadow:0 7px 28px rgba(0,212,255,.32)}
+.btn-next:disabled{background:#111720;color:#4a4f60;border:1px solid rgba(255,255,255,.06);box-shadow:none}
+.btn-next .cta-step-lbl{opacity:.72}
+.btn-dl{background:linear-gradient(135deg,#00a8d4,#00d4ff);color:#04202b;box-shadow:0 5px 22px rgba(0,212,255,.22)}
+.btn-dl:hover{box-shadow:0 7px 28px rgba(0,212,255,.32)}
+.btn-manifest{box-shadow:0 4px 20px rgba(0,212,255,.2)}
+/* Multi-select rows read as switches (service picker / optional scrapers) */
+.svc-row-ck{width:36px;height:20px;border-radius:20px;background:#2a3140;border:none;position:relative;transition:background .18s}
+.svc-row-ck svg{display:none}
+.svc-row-ck::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#8b94a3;transition:left .18s,background .18s}
+.svc-list-row input:checked+label .svc-row-ck{background:#00d4ff;border:none}
+.svc-list-row input:checked+label .svc-row-ck::after{left:19px;background:#08131a}
+/* Splash — Duck-style: quiet doors as full-width rows with a trailing arrow */
+.splash-doors{display:flex;flex-direction:column;gap:10px;width:100%;max-width:460px}
+.splash-door{flex-direction:row;align-items:center;gap:14px;text-align:left;padding:16px 18px;border-radius:14px;position:relative}
+.splash-door::after{content:'→';margin-left:auto;color:#4a4f60;font-size:1.05rem;flex-shrink:0;transition:color .15s,transform .15s}
+.splash-door:hover::after{color:#00d4ff;transform:translateX(2px)}
+.splash-door .splash-door-icon{margin-bottom:0}
+.splash-door-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.splash-door .splash-door-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.splash-door .splash-door-desc{margin-top:0}
+.splash-door .splash-door-tag{position:static;font-size:.56rem;flex-shrink:0}
+[data-theme="light"] .svc-row-ck{background:#d0d7de}
+[data-theme="light"] .svc-row-ck::after{background:#fff}
+[data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da}
+[data-theme="light"] .btn-next,[data-theme="light"] .btn-dl{color:#04202b}
+[data-theme="light"] .btn-next:disabled{background:#f6f8fa;color:#8c959f;border:1px solid #d0d7de}
+/* Theme toggle: dock bottom-right when the sidebar rail is visible (was overlapping the brand) */
+@media(min-width:1000px){
+  .cb-sidebar:not(.sb-hidden)~#themeToggle{top:auto;left:auto;bottom:14px;right:14px}
+}
