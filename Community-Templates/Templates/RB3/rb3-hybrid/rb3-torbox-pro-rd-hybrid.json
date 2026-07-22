@@ -373,7 +373,7 @@
           "direction": "desc"
         },
         {
-          "key": "streamType",
+          "key": "type",
           "direction": "desc"
         },
         {
@@ -435,7 +435,7 @@
           "direction": "desc"
         },
         {
-          "key": "streamType",
+          "key": "type",
           "direction": "desc"
         },
         {
