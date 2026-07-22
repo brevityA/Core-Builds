@@ -48,9 +48,18 @@ VALID = {
         'stremthruStore','stremthruTorz','zilean','comet','meteor','seadex',
         'mediafusion','knaben','torrent-galaxy','eztv','animeTosho','nekobt',
         'library','opensubtitles-v3-plus','aiosubtitle','newznab','torbox-search',
-        'debridio','jackett','prowlarr','torrentio','torznab','custom'
+        'debridio','jackett','prowlarr','torrentio','torznab','custom',
+        # Current AIOStreams/community preset identifiers used by the template suite.
+        'hdhub','torrents-db','sootio','neko-bt','animetosho','dmm-cast',
+        'easynews','davex'
     }
 }
+
+# Intentional language policies reviewed by maintainers. New combinations still warn.
+REVIEWED_REQUIRED_LANGUAGES = {
+    ('English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown'),
+}
+REVIEWED_NO_ZERO_CACHED = {'core-nexus-base-torbox'}  # Parent/base config, not a standalone child.
 
 
 def validate_list(values, valid_set):
@@ -185,8 +194,11 @@ def validate_template(fpath):
     if sem.get('strict'):
         warn(name, "seasonEpisodeMatching.strict=True — drops BluRay/REMUX without S/E metadata")
 
-    if c.get('requiredLanguages'):
-        warn(name, f"requiredLanguages is set {c['requiredLanguages'][:3]} — hard-blocks untagged streams")
+    required_languages = tuple(c.get('requiredLanguages', []))
+    if required_languages and required_languages not in REVIEWED_REQUIRED_LANGUAGES:
+        warn(name, f"requiredLanguages is set {list(required_languages)[:3]} — hard-blocks untagged streams")
+    elif required_languages:
+        ok(name, "requiredLanguages policy reviewed")
 
     # ── Size limits ───────────────────────────────────────────
     # (size.global and size.resolution are both valid AIOStreams schema keys)
@@ -210,8 +222,10 @@ def validate_template(fpath):
 
     has_zero_cached = any('0Cached' in e.get('expression', '')
                           for e in c.get('includedStreamExpressions', []))
-    if not has_zero_cached:
+    if not has_zero_cached and name not in REVIEWED_NO_ZERO_CACHED:
         warn(name, "0Cached ISE missing — no fallback when nothing is cached")
+    elif not has_zero_cached:
+        ok(name, "0Cached ISE exception reviewed for parent/base config")
 
     # ── Double-load check ─────────────────────────────────────
     # Ignore comment-only placeholder entries (expression is bare [] with no logic)

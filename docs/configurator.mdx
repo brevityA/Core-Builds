@@ -1,6 +1,6 @@
 ---
 title: "Template Configurator"
-description: "Build a custom AIOStreams template in under 2 minutes — no manual JSON editing required."
+description: "Build and install a custom AIOStreams configuration without editing JSON."
 ---
 
 <Frame>
@@ -11,215 +11,97 @@ description: "Build a custom AIOStreams template in under 2 minutes — no manua
   />
 </Frame>
 
-The **Template Configurator** generates a ready-to-import AIOStreams template based on your setup. Pick your service, device, and resolution — the configurator handles presets, expressions, sorting, and formatting automatically.
+The **Core Builds Configurator** generates an AIOStreams configuration based on your providers, device, resolution, audio capabilities, content preferences, and install target.
 
 <Card title="Open Template Configurator" icon="wand-magic-sparkles" href="https://brevitya.github.io/Core-Builds/">
-  Opens in a new tab — runs entirely in your browser. No data is sent anywhere.
+  Open the current Configurator v2.78 release.
 </Card>
 
-<iframe src="https://brevitya.github.io/Core-Builds/" style={{ width: '100%', height: '920px', border: 'none', borderRadius: '12px', marginTop: '16px' }} title="Core Builds Template Configurator" />
+<Info>
+  **What leaves your browser depends on the action you choose.** Export JSON creates the configuration locally. Direct Install sends the generated configuration to the selected AIOStreams host. A direct Stremio installation sends the supplied login details to the Stremio API for that operation.
+</Info>
 
 <Note>
-  **Offline use:** the configurator is a self-contained HTML file — save it and open it locally with no internet needed. [Download from GitHub](https://github.com/brevityA/Core-Builds/blob/main/configurator/index.html) → Raw → Save As.
+  **Standalone use:** download [`configurator/index.html`](https://github.com/brevityA/Core-Builds/blob/main/configurator/index.html) and open it locally. Network-dependent actions—including account links, host probing, Direct Install, and external APIs—still require internet access.
 </Note>
 
----
+## Choose a route
 
-## Splash Screen
+### Quick Install
 
-The configurator opens to a splash screen with three ways to get started:
+The fastest route for most people:
 
-### Guided Setup (Core Start)
+1. Choose Stremio, WuPlay, Nuvio, or manifest output.
+2. Select one or more providers.
+3. Add optional services or scrapers if needed.
+4. Enter contextual provider credentials.
+5. Optionally expand **TMDB metadata** and enter either a Read Access Token or API Key.
+6. Choose Fast, Balanced, or Maximum.
+7. Create and install.
 
-The step-by-step wizard. Answer 5–6 questions about your setup and the configurator builds the template for you. Best for first-time users or anyone who wants full control over every option.
+Provider fields include direct **Get key**, **Open account**, or **Open dashboard** links. StreamNZB instead explains that you must use your own instance manifest.
 
-### Core Configure
+### Advanced Builder
 
-Jump straight to the full configuration panel with all options visible at once. Best if you already know what you want and just need to generate the JSON.
+Use the complete configuration interface for device profiles, filters, expressions, sorting, formatters, subtitles, catalogs, proxy behaviour, language handling, and other advanced controls.
 
-### Quick Deploy
+### Update Existing Setup
 
-One-tap presets for common setups — no questions asked:
+Import an existing template or manifest and rebuild it with current schema guards and configurator logic.
 
-| Preset | What it does |
+### Ready-Made Setups
+
+Use **4K Apex** or **1080p Stream** when you want an opinionated starting point. These are separate from the complete Template Suite in the [Template Directory](/template-directory).
+
+## Multi-provider and optional sources
+
+Quick Install supports more than one provider. The compact **Additional services & scrapers** picker holds P2P, HTTP, Debridio, Usenet, StreamNZB, and optional indexers without cluttering the primary flow. Required credential fields appear after you apply the selection.
+
+## TMDB metadata
+
+TMDB credentials are optional but recommended. Add either:
+
+- a **TMDB Read Access Token**, or
+- a **TMDB API Key**.
+
+With neither value, title and year matching are disabled and metadata matching may be less accurate. The preflight warning can be accepted if that trade-off is intentional.
+
+## Device profiles
+
+Device selection applies conservative video, HDR, audio, and channel defaults. Unknown devices do not automatically receive AV1, Dolby Vision, or lossless-audio assumptions. See [Device Profiles](/device-profiles) for current model-specific guidance.
+
+## Automatic host selection
+
+Automatic selection:
+
+- remembers the last successful host;
+- prefers stable instances;
+- requires AIOStreams `2.31.1` or newer;
+- skips known legacy or incompatible hosts;
+- respects Free/P2P restrictions;
+- uses nightly infrastructure only as a fallback.
+
+You can review current availability in [Instance Status](/instance-status).
+
+## Validation and compatibility
+
+Before installation, the configurator validates provider requirements, device/audio conflicts, generated preset structure, duplicate names, host compatibility, and known schema enums. The final guard normalizes legacy AIOStreams values and supplies safe defaults when an enum array would otherwise be empty.
+
+## Installation choices
+
+| Action | Behaviour |
 | --- | --- |
-| **4K Apex** | Flagship 4K template with full expression stack. Requires TorBox Pro |
-| **1080p Stream** | Optimised 1080p streaming. Requires TorBox Pro |
-| **Free Streaming** | HTTP direct-play sources — no debrid service needed |
-| **Free P2P** | Peer-to-peer torrents — no debrid service needed |
-| **Quick Start Guide** | Opens the [Quick Start](/quick-start) docs |
-| **Paste Manifest** | Import an existing AIOStreams manifest URL directly |
+| **Export JSON** | Builds and downloads the configuration locally |
+| **Create manifest** | Sends the generated configuration to the chosen AIOStreams host and returns a manifest |
+| **Direct Stremio install** | Creates the hosted configuration, then uses the supplied Stremio login details with the Stremio API |
+| **WuPlay / Nuvio** | Creates a protected manifest and opens the relevant instructions |
 
-Quick Deploy presets generate a template with sensible defaults and install it on a supported AIOStreams instance in one click. You'll be asked for your API key and then taken directly to the install screen.
+Credentials are excluded from sanitized diagnostic reports; diagnostics include only settings and whether a credential is present.
 
----
+## Versions
 
-## Guided Setup — The 6 Steps
-
-<Steps>
-  <Step title="Debrid Service">
-    Choose your streaming service. The splash screen shows service chips — tap one to select it and proceed. This sets which presets, cache layer, and search addons are included.
-
-    | Choice | Cache layer | Key addons |
-    | --- | --- | --- |
-    | **TorBox Pro** | StremThru Torz | TorBox Search · HdHub · full scraper stack |
-    | **TorBox Essential** | StremThru Torz | Same scrapers, Essential plan limits |
-    | **AllDebrid** | StremThru Store | HdHub disabled (no AllDebrid support) |
-    | **Real-Debrid** | StremThru Store | Standard scraper stack |
-    | **EasyDebrid** | StremThru Store | Multi-debrid aggregator |
-    | **PikPak** | StremThru Store | Cloud torrent \+ download caching |
-    | **Seedr** | StremThru Store | Cloud torrent streaming |
-    | **Hybrid (TorBox \+ RD)** | Both | TorBox-priority with RD fallback |
-    | **EasyNews** | N/A | EasyNews search \+ usenet scrapers |
-    | **Free (No Debrid)** | None | P2P or HTTP direct-play sources only |
-  </Step>
-  <Step title="Your Device">
-    Device profile sets audio exclusions, codec restrictions, and HDR/DV handling automatically. If your device isn't listed, "Generic" works for most setups.
-
-    | Device | Audio excluded | Encodes excluded | DV-Only Kill |
-    | --- | --- | --- | --- |
-    | Generic TV / Box | — | — | Off |
-    | Samsung TV (Tizen) | TrueHD · DTS-HD MA · DTS:X · FLAC | AV1 · VC-1 | **On** |
-    | Apple TV 4K (1st / 2nd gen) | — | AV1 | Off |
-    | Apple TV 4K (3rd gen / A15) | — | — | Off |
-    | LG TV (webOS 2019\+) | — | — | Off |
-    | Windows PC / Ultrawide | — | VC-1 | Off |
-    | Fire Stick (HD) | TrueHD · DTS-HD MA · DTS:X · FLAC | AV1 · VC-1 | **On** |
-    | Fire Stick 4K Max | TrueHD · DTS-HD MA · DTS:X · FLAC | VC-1 | Off |
-
-    <Tip>
-      See [Device Profiles](/device-profiles) for full codec support details and recommended settings for each device.
-    </Tip>
-  </Step>
-  <Step title="Resolution">
-    Determines the PSE stack, resolution locks, and which streams get filtered out.
-
-    | Choice | What happens | Best for |
-    | --- | --- | --- |
-    | **4K HDR primary** | Full 4K tier stack with 1080p fallback | 4K TVs and monitors |
-    | **1080p only** | Hard-kills 4K/1440p streams entirely | 1080p TVs, Fire Stick HD |
-    | **1080p-first \+ 4K** | Prefers 1080p, falls through to 4K | Bandwidth-limited setups |
-  </Step>
-  <Step title="Audio">
-    Sets `excludedAudioTags` and `preferredAudioChannels`. "Device-managed" means Step 2's device profile decides — usually the right choice.
-
-    | Choice | Excluded | Channels | Best for |
-    | --- | --- | --- | --- |
-    | **Full lossless** | Nothing | 7.1 · 5.1 · 2.0 | Home theater with receiver |
-    | **DD\+ / Atmos** | Nothing | 5.1 · 2.0 | Soundbar / TV speakers |
-    | **Device-managed** | Per device profile | Per device profile | Most users |
-  </Step>
-  <Step title="Content Type">
-    Controls SeaDex integration and anime-specific filtering.
-
-    | Choice | SeaDex | Bad Dual Audio ESE | Best for |
-    | --- | --- | --- | --- |
-    | **Live-action only** | Off | Included | Movies & TV only |
-    | **Live-action \+ Anime** | On (all matches) | Included | Mixed library |
-    | **Anime-focused** | On (best only) | Off | Dedicated anime setup |
-  </Step>
-  <Step title="Review & Install">
-    See a summary of your choices, enter your API key, and optionally give the template a custom name.
-
-    Click **Create & Install** to generate the template and deploy it to a supported AIOStreams instance in one step. You can also download the raw JSON file to import manually.
-
-    The configurator will ask you to pick an AIOStreams instance (ElfHosted, ForthWeak, and others are available) and create your config automatically.
-  </Step>
-</Steps>
-
----
-
-## Additional Options
-
-The configurator includes several optional features accessible during setup:
-
-### Resolution First (v2.56)
-
-By default, cached streams always sort above uncached — a cached 1080p WEB-DL beats an uncached 4K REMUX because it plays instantly. **Resolution First** flips this for users who'd rather wait for the download: 4K always ranks above 1080p/720p regardless of cache status. Within the same resolution, cached still beats uncached.
-
-- Default: `cached → resolution → quality`
-- Resolution First: `resolution → quality → cached`
-
-Toggle this in the wizard's **Video Preferences** step.
-
-### Foreign Language Kill (v2.56)
-
-Blocks foreign-language streams from movies and TV results. On by default — matches what the fleet templates have always done. Adapts to your **Language Preferences**: if you've added Spanish or French, those languages pass through. Library, SeaDex, and anime content are always exempt.
-
-Disable this in the wizard's **Language Preferences** if you want unfiltered multilingual results.
-
-### Multi-Service Support
-
-Add secondary services alongside your primary debrid provider:
-
-- **EasyNews** — usenet source alongside torrent scrapers (requires EasyNews subscription)
-- **NZBGeek** — premium usenet indexer
-- **StreamNZB** — self-hosted usenet streaming
-
-### TMDB Integration
-
-Adding your TMDB Read Access Token or API Key improves title matching accuracy — especially for anime and foreign-language content. The configurator shows format hints to help you paste the right value. See [AIO Metadata](/aiometadata) for setup details.
-
-### Custom Formatters
-
-Import a custom stream formatter to replace the default Tamtaro layout. The configurator accepts any valid AIOStreams formatter JSON — see [Formatters](/formatters) for the full gallery.
-
----
-
-## What the generated template includes
-
-Every generated template contains the full production infrastructure from Core Builds stable releases:
-
-<AccordionGroup>
-  <Accordion title="Presets & scrapers">
-    - **Library** — continue watching / user library
-    - **Zilean** — fast cached torrent search
-    - **SeaDex** — best-release anime (enabled based on content choice)
-    - **StremThru Torz / StremThru Store** — debrid cache layer
-    - **Meteor, Comet, MediaFusion** — primary scrapers
-    - **HdHub, EZTV, Torrent Galaxy, Knaben, TorrentsDB** — supplementary scrapers
-    - **AIOSubtitle** — English subtitles
-    - **TorBox Search** — TorBox-native search (disabled by default, enable as needed)
-  </Accordion>
-
-  <Accordion title="Excluded Stream Expressions (ESEs)">
-    - **Per-Addon Flood Guard** — caps per scraper (Meteor ≤5, Comet ≤5, MediaFusion ≤4, EZTV ≤3, HdHub ≤3, Knaben ≤1, TorrentsDB ≤1)
-    - **Bad Dual Audio Groups** — 27 groups that falsely label tracks as dual-audio
-    - **Usenet Propagation Guard** — hides Usenet streams younger than 2 hours
-    - **Hard YouTube Kill, 3D Content Kill, Season Pack Kill**
-    - **Hard Resolution Kill** — 4K excluded when 1080p-only is selected
-    - **DV-Only Kill** — Dolby Vision-only streams excluded on Samsung / Fire Stick
-    - **Extra Cached HQ / LQ / Uncached** — `perGroup()` dedup capping 3 streams per quality tier per resolution
-  </Accordion>
-
-  <Accordion title="Preferred Stream Expressions (PSEs)">
-    Quality-tier PSE stack matched to your resolution choice:
-
-    - **4K:** Elite REMUX pin → S-Tier 4K REMUX → A-Tier 4K WEB-DL HDR → B-Tier 4K WEB-DL → C-Tier any 4K → 1080p tiers → codec/audio/HDR boosters
-    - **1080p:** Elite REMUX pin → S/A/B/C 1080p tiers → 720p fallback → codec booster
-    - **Ultrawide:** 1080p tiers → 1440p → 4K REMUX → 4K WEB-DL HDR → any 4K → 720p → boosters
-
-    Release group pins (top): FraMeSToR · DON · FLUX · HIFI · playBD · BMF · QxR · EPSiLON<br />Release group pins (bottom): YIFY · RARBG · EVO · YTS · PSA · MeGusta · Tigole
-  </Accordion>
-
-  <Accordion title="Regex & sorting">
-    - `syncedRankedRegexUrls` → Vidhin05 English regex scoring (174 patterns)
-    - `syncedExcludedRegexUrls` → Tamtaro excluded regex set
-    - Full `sortCriteria` stack: cached → SE matched → SE score → resolution → quality → regex score → visual tag → encode → audio → seeders → size
-    - Smart deduplicator with `single_result` cached mode and `aggressive` multi-group behaviour
-    - Tamtaro formatter with emoji stream labels
-  </Accordion>
-</AccordionGroup>
-
----
-
-## After importing
-
-1. **Set your service credentials** — AIOStreams → Settings → enter your TorBox / AllDebrid / RD API key
-2. **Set your TMDB token** — Settings → TMDB Access Token (required for accurate title matching)
-3. **Configure StremThru** — the StremThru preset needs your debrid service linked in the StremThru Store options
-4. **Tune PSEs** — the generated PSEs are solid defaults; see [Customising](/customising) to add IQR adaptive bitrate floors or other advanced tiers
-
-<Tip>
-  The configurator generates a **v0.1.0 starting point**. For the most advanced filtering (IQR Tukey fence PSEs, Score IQR Guard, elite group scoring), use the hand-tuned [template directory](/template-directory) templates directly.
-</Tip>
+| Component | Current version |
+| --- | --- |
+| Template Suite | `3.3.2` |
+| Configurator | `2.78.0` |
+| Minimum AIOStreams | `2.31.1` |

@@ -1,198 +1,103 @@
 ---
 title: "Device Profiles"
-description: "Template recommendations and codec constraints for Samsung TV, Apple TV, Fire Stick, Google TV Streamer, Android TV, and Chromecast."
+description: "Conservative Core Builds playback defaults for common streaming devices."
 ---
 
-Device profiles document which codecs and HDR formats each platform can decode, and which Core Builds templates are tuned for them. Using the wrong template on a device that lacks hardware decoders causes silent playback failures — the stream loads but transcodes, stutters, or refuses to play.
-
----
-
-## Samsung TV (Tizen 2018–2022)
-
-**Models:** RU7100, RU8000, NU8000, Q60, and similar Tizen models from that period
-
-**Recommended templates:** [Samsung TV](/template-directory#torbox-pro) (1080p) or [Samsung TV 4K](/template-directory#torbox-pro)
-
-| Feature | Support |
-|---|---|
-| Dolby Vision | No hardware DV decoder — DV-Only streams excluded by default |
-| AV1 | No hardware decoder — hard-excluded |
-| VC-1 | Not supported — hard-excluded |
-| HEVC (H.265) | Hardware decode |
-| AVC (H.264) | Hardware decode |
-| HDR10+ | Supported (preferred) |
-| HDR10 | Supported |
-| HLG | Supported |
-| TrueHD / DTS:X / DTS-HD MA / FLAC | Hard-excluded — Tizen cannot pass these through without an AVR |
-| DD+ Atmos | Preferred — native decode |
-| AAC | Native |
+Device profiles reduce playback failures by avoiding formats a device cannot reliably decode or pass through. Capabilities vary by exact model, operating-system release, app, television, sound system, and HDMI path, so Core Builds uses conservative defaults rather than assuming the most capable variant.
 
 <Warning>
-  Samsung Tizen TVs do not have a hardware AV1 decoder. Streams encoded in AV1 will either refuse to play or trigger software transcoding. Both Samsung templates hard-exclude AV1.
+  Audio **decode**, **bitstream passthrough**, and conversion to multichannel PCM are different behaviours. A device or app decoding a format does not mean it can bitstream that format unchanged to a receiver.
 </Warning>
 
-<Info>
-  **Stable template:** [Samsung RU7100 4K](/template-directory#torbox-pro) — full APEX IQR Tukey fence PSE stack, FLAC/AAC native audio, tuned specifically for the RU7100 (2019) and compatible Tizen models. Promoted from Nightly to stable in v2.9.x.
-</Info>
+## Standard / Not Sure
 
-### Audio passthrough
+The default profile prefers broadly compatible HEVC/AVC video and DD+/AAC audio. It does not assume AV1, Dolby Vision, or lossless-audio passthrough. Start here when the exact device model or audio path is unknown.
 
-Samsung templates exclude lossless audio (`TrueHD`, `DTS-HD MA`, `DTS:X`, `FLAC`) by default because Tizen TVs cannot decode them natively — they require HDMI ARC/eARC passthrough to a compatible AV receiver. If you have an AVR and want lossless audio, remove those tags from `excludedAudioTags` in AIOStreams settings after importing.
+## Apple TV 4K
 
-### Dolby Vision
-
-The DV-Only Kill ESE is enabled by default on Samsung templates. It removes streams where DV is the only signal layer (no HDR10 fallback), which would display as SDR on non-DV screens. Dual-layer streams (DV + HDR10 base) are kept.
-
----
-
-## Apple TV 4K (A15 / A17)
-
-**Models:** Apple TV 4K 3rd generation (2022) and later
-
-**Recommended template:** [Apple TV 4K (Nightly)](/nightly-and-labs#nightly-apple-tv-4k) via Infuse
-
-| Feature | Support |
-|---|---|
-| Dolby Vision | Profile 5 and 8 — natively supported, prioritised |
-| Dolby Vision Profile 7 | Not supported on A15 |
-| AV1 | No hardware decoder on A15 — hard-excluded |
-| HEVC (H.265) | Hardware decode |
-| AVC (H.264) | Hardware decode |
-| HDR10+ | 3rd gen exclusive |
-| HDR10 / HLG | Supported |
-| DD+ Atmos | Native preferred audio |
-| TrueHD | Passthrough only — requires an AVR via eARC |
-
-<Info>
-  The Apple TV 4K Nightly template prioritises DV Profile 5/8 — the profiles natively decoded by the A15 chip. Use Infuse for the best DV playback experience; the native Apple TV app handles DV differently depending on the content source.
-</Info>
-
-<Warning>
-  The A15 chip has no hardware AV1 decoder. Keep AV1 in `excludedEncodes` for Apple TV. If you switch to a generic template, add AV1 to the exclusions manually.
-</Warning>
-
----
-
-## Fire Stick
-
-**Models:** Fire Stick 4K, Fire Stick 4K Max, Fire Stick (standard HD)
-
-**Recommended template:** [Stream (Fire Stick)](/template-directory#torbox-pro) or Stream (Fire Stick) Lite
-
-| Feature | Fire Stick (HD) | Fire Stick 4K | Fire Stick 4K Max |
-|---|---|---|---|
-| 4K | No | Yes | Yes |
-| AV1 | No | No | Yes |
-| Dolby Vision | No | No | Yes |
-| HDR10+ | No | Yes | Yes |
-| HEVC | Yes | Yes | Yes |
-| AVC | Yes | Yes | Yes |
-| RAM | 1 GB | 1.5 GB | 2 GB |
-
-<Tip>
-  Fire Stick 4K Max supports AV1 and Dolby Vision. Fire Stick 4K supports neither. The Stream (Fire Stick) template hard-excludes both for broadest compatibility — if you have a 4K Max and want AV1/DV, use a standard Stream template and add DV/AV1 to your preferred encodes manually.
-</Tip>
-
-The Fire Stick template also hard-excludes HDR10+, lossless audio, and high-bitrate REMUX streams — all formats that can exceed the Fire Stick's RAM ceiling and cause buffering on shared connections.
-
-### Buffering and RAM
-
-On Fire Stick (HD) or older 4K units, use the **Lite variant** if buffering occurs — it removes quality gates to allow more results through and lets the device pick from a wider bitrate range. Setting a max file size in AIOStreams can also help (e.g. 20 GB cap).
-
----
-
-## Google TV Streamer (2024)
-
-**Recommended template:** [Google TV Streamer 4K](/template-directory#torbox-pro)
-
-| Feature | Support |
-|---|---|
-| Dolby Vision | Yes — natively supported |
-| AV1 | Yes — hardware decode |
-| HDR10+ | Yes |
-| HDR10 / HLG | Yes |
+| Capability | Guidance |
+| --- | --- |
 | HEVC / AVC | Hardware decode |
-| TrueHD / DTS:X / DTS-HD MA / FLAC | Hard-excluded — no lossless audio passthrough |
-| DD+ Atmos | Preferred — native decode, audio ceiling |
-| Audio channels | 5.1 max |
+| Dolby Vision | Supported profiles depend on model, app, and source |
+| AV1 on 3rd-generation A15 | **No hardware AV1 decode** |
+| TrueHD / DTS-HD bitstream | Do not assume passthrough |
+| Compatible high-resolution audio | Some apps can decode supported formats to multichannel PCM |
 
-The Google TV Streamer 4K template is based on 4K Apex with full IQR Tukey fence PSE stack, but excludes lossless audio formats and caps channels at 5.1. The Audio Pinnacle PSE is removed since the device cannot benefit from lossless audio ranking.
+Apple TV should not be documented as general TrueHD or DTS-HD bitstream passthrough hardware. Use the Apple TV profile for conservative format selection and verify app-specific Infuse or player behaviour separately.
 
-<Info>
-  The Google TV Streamer supports DV natively — no DV-Only Kill ESE is needed. DV streams are prioritised in the visual tag sort order.
-</Info>
+## Nvidia Shield TV / Pro 2019
 
----
+| Capability | Guidance |
+| --- | --- |
+| HEVC / AVC | Hardware decode |
+| Dolby Vision | Supported on 2019 models |
+| AV1 | **No hardware AV1 decode** |
+| TrueHD / DTS-HD | Passthrough supported with a compatible app, receiver, and HDMI path |
 
-## Android TV / Google TV (Other)
+Older Shield generations differ, particularly for Dolby Vision. Select the exact profile when available rather than treating every Android TV device as equivalent.
 
-For other Android TV devices (Shield, Chromecast with Google TV, Sony/Philips/TCL running Google TV) that don't have a dedicated template:
+## Chromecast with Google TV
 
-| Feature | Support |
-|---|---|
-| AV1 | Yes (Nvidia Shield, modern Google TV devices) |
-| Dolby Vision | Device-dependent (Shield does not; Chromecast w/Google TV does) |
-| HDR10+ | Most recent devices |
-| HEVC / AVC | Universal |
-| TrueHD / DTS-HD MA | Passthrough via HDMI ARC/eARC |
+| Model | AV1 | Dolby Vision |
+| --- | --- | --- |
+| Chromecast with Google TV 4K | No hardware AV1 | Supported |
+| Chromecast with Google TV HD | Hardware AV1 | Model supports Dolby Vision limitations differently; use the exact profile |
 
-**Recommended:** Use the standard **4K Apex** or **Stream** template (no device restrictions). If you have an older Shield Pro (2017) without DV, enable the DV-Only Kill ESE in AIOStreams settings.
+Do not apply the HD model's AV1 capability to the 4K model.
 
-<Info>
-  Chromecast with Google TV (4K) supports Dolby Vision natively. The standard 4K Apex template will serve DV streams correctly on this device without any changes.
-</Info>
+## Google TV Streamer
 
----
+The Google TV Streamer supports modern 4K formats including AV1 and Dolby Vision, but Core Builds does not assume lossless-audio passthrough for its standard profile. Prefer DD+/AAC unless the complete playback and receiver path has been verified.
 
-## Low-RAM / Budget Devices
+## Fire TV
 
-Any device with 2 GB RAM or less (older Fire Sticks, budget Android TV boxes, entry-level smart TVs):
+Fire TV capabilities vary substantially by generation. Fire TV Stick 4K Max models may support AV1 and Dolby Vision while older 4K and HD devices may not. Constrained profiles limit lossless audio and very large REMUX files. Confirm the exact generation before removing exclusions.
 
-- Use the **Lite variant** of any template — removes quality gates to maximise result count
-- Enable **Flash** if you only need instant cached results
-- Avoid REMUX — set `maxResultsPerQuality` or a file size cap in AIOStreams to prevent 60+ GB BluRay REMUXes from appearing
-- Use **Stream (Fire Stick)** for constrained Fire Stick hardware
+## ONN devices
 
----
+ONN hardware changes across model years and regions. Core Builds does **not** assume Dolby Vision across every ONN model. Use the exact model profile where available; otherwise retain conservative HDR and audio defaults.
 
-## Streaming Clients
+## Xiaomi TV Box S 2nd Gen
 
-### Nuvio
+The second-generation model uses an S905X4-class decoder and supports hardware AV1. Do not copy this capability to earlier Xiaomi boxes without checking their chipset.
 
-[Nuvio](https://nuvio.app) is a Stremio-compatible streaming client (by Tapframe) available on Android, iOS, Apple TV, Android TV, and web. It works with all Stremio addons including AIOStreams — no configuration changes are needed.
+## Samsung Tizen internal apps
 
-**One key difference from Stremio:** Nuvio surfaces debrid errors immediately rather than retrying silently. If a stream fails to resolve, you'll see a **Playback Error** message instead of a buffering spinner. This makes debrid timeouts visible — which is useful for diagnosing problems, but can appear alarming on the first encounter.
+- Dolby Vision is not supported.
+- Older/common profiles conservatively exclude AV1 and VC-1 where hardware support is absent.
+- Do not assume the internal app can use TrueHD or DTS-HD passthrough simply because the television has ARC/eARC.
+- DD+/AAC are the safer defaults.
 
-<Info>
-  If you see Playback Error on Nuvio but the same stream works in Stremio, the most likely cause is a debrid link resolution timeout. Core Builds templates run `stremthruTorz`/`stremthruStore` at a 5000ms timeout (raised in v2.9.0) to reduce this. If errors persist, check TorBox's status page for outages or try a different stream from the list.
-</Info>
+A connected external player and receiver can have different capabilities from the television's internal Stremio-compatible app.
 
-### Stremio
+## LG webOS and Sony internal apps
 
-Standard setup — install AIOStreams as an add-on via manifest URL. Stremio auto-retries failed stream requests without surfacing the error to the user. Compatible on Windows, macOS, Linux, Android, iOS, and smart TVs with the Stremio app.
+Model-year support varies. Core Builds avoids assuming TrueHD/DTS-HD passthrough for internal TV apps. Dolby Vision and AV1 should be enabled only for models known to support them in the actual playback application.
 
-### WuPlay
+## Generic Android TV / Google TV
 
-Web-based streaming client. Use it for Chromecast or any device without a native Stremio app. Copy the manifest URL from AIOStreams → paste into WuPlay → stream directly in browser.
+Android TV is an operating-system family, not a hardware capability. Shield, Chromecast, Google TV Streamer, Xiaomi, ONN, and television-integrated Android implementations must not share blanket AV1, Dolby Vision, or lossless-audio claims.
 
----
+## Audio setup guidance
 
-## General Tips
+| Setup | Safe starting point |
+| --- | --- |
+| TV speakers | DD+/AAC, 5.1 or lower |
+| Basic soundbar | DD+/AAC; verify Atmos and channel support |
+| Receiver via external player | Enable lossless formats only after confirming app and passthrough support |
+| Unknown device/path | Use Standard / Not Sure |
 
-<AccordionGroup>
-  <Accordion title="DV-Only Kill ESE">
-    Enabled by default on Samsung templates. Removes streams where Dolby Vision is the only signal layer (no HDR10 fallback). Safe to disable if your device supports DV natively (Fire Stick 4K Max, Google TV Streamer, Chromecast with Google TV, Apple TV).
-  </Accordion>
-  <Accordion title="Audio exclusions on Samsung">
-    Samsung templates hard-exclude TrueHD, DTS:X, DTS-HD MA, and FLAC. Remove these from `excludedAudioTags` if your TV connects to an AVR via eARC and you want lossless passthrough.
-  </Accordion>
-  <Accordion title="AV1 across devices">
-    Excluded on Samsung and Apple TV (A15). Keep excluded. Enable on: Nvidia Shield (2019+), Chromecast with Google TV (2023 4K), Fire Stick 4K Max, modern Android TV boxes.
-  </Accordion>
-  <Accordion title="Checking what codec a stream uses">
-    Your formatter's description lines show the codec (HEVC, AVC, AV1) and visual tag (DV, HDR10+). If a stream fails to play, check the codec shown in the formatter — if it's AV1 on a Samsung or Apple TV, that stream shouldn't have passed through and suggests you're on a non-device template.
-  </Accordion>
-  <Accordion title="Switching from a generic to a device template">
-    Re-import the device-specific template URL. AIOStreams will merge the new template over your existing API keys and addon config. The key changes are in `excludedEncodes`, `excludedVisualTags`, and `excludedAudioTags` — the device templates add hard exclusions that the generic templates leave open.
-  </Accordion>
-</AccordionGroup>
+## Troubleshooting
+
+If playback fails, test in this order:
+
+1. Choose **Standard / Not Sure**.
+2. Disable AV1.
+3. Prefer HDR10 over Dolby Vision-only streams.
+4. Limit audio to DD+/AAC.
+5. Reduce maximum file size and avoid REMUX.
+6. Confirm the exact model, player app, HDMI connection, and receiver capabilities.
+
+<Note>
+  Device profiles are compatibility defaults, not certification claims. Firmware and app updates can change practical playback behaviour.
+</Note>

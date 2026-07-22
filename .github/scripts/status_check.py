@@ -74,7 +74,7 @@ def update_file(path, stable_table, nightly_table):
 
 
 def update_status_md(path="STATUS.md"):
-    ts = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    ts = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M UTC")
 
     print("\nChecking stable instances...")
     stable_table = build_table(STABLE) + f"\n\n*Last checked: {ts}*"
