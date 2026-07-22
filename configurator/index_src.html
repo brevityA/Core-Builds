@@ -1408,6 +1408,70 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
 @media(max-height:520px) and (orientation:landscape){.modal-overlay,.sup-overlay,.qs-overlay,#apiReminder,#pwdPrompt{align-items:flex-start;overflow-y:auto}.modal-box,.sup-panel,.qs-panel,#apiReminderCard,#pwdPromptCard{max-height:none;margin-block:8px}.card:not(.splash){padding-block:18px}.nav{position:static}}
 /* PWA / standalone safe-area behavior */
 @media(display-mode:standalone){body{padding-top:max(14px,env(safe-area-inset-top));padding-bottom:max(14px,env(safe-area-inset-bottom))}.nav{bottom:max(10px,env(safe-area-inset-bottom))}}
+/* v2.77 — Duck-inspired fast lane, contextual setup, diagnostics */
+.fastlane-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:rgba(2,5,8,.78);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.fastlane-panel{width:min(680px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;background:linear-gradient(155deg,#131d29,#0c131c);border:1px solid rgba(0,212,255,.24);border-radius:20px;padding:22px;box-shadow:0 30px 100px rgba(0,0,0,.62)}
+.fastlane-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}.fastlane-head-copy{flex:1}.fastlane-kicker{font-size:.58rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#67e8f9}.fastlane-title{font-family:Georgia,'Times New Roman',serif;font-size:1.55rem;letter-spacing:-.035em;margin-top:3px}.fastlane-sub{color:#7e8b9c;font-size:.75rem;line-height:1.55;margin-top:4px}.fastlane-close{border:1px solid var(--ui-line,rgba(255,255,255,.09));background:#101923;color:#7e8b9c;border-radius:9px;width:38px;height:38px;cursor:pointer;font-size:1rem}
+.fastlane-section{margin-top:15px}.fastlane-label{font:800 .62rem/1.2 ui-monospace,monospace;color:#647387;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}.fastlane-grid{display:grid;gap:8px}.fastlane-grid.apps{grid-template-columns:repeat(4,1fr)}.fastlane-grid.services{grid-template-columns:repeat(3,1fr)}.fastlane-grid.profiles{grid-template-columns:repeat(3,1fr)}
+.fastlane-choice{border:1px solid var(--ui-line,rgba(255,255,255,.09));background:#0e1621;color:#8693a3;border-radius:12px;padding:11px 9px;cursor:pointer;text-align:left;transition:.15s;min-height:58px}.fastlane-choice:hover{border-color:rgba(0,212,255,.25);background:#12202c}.fastlane-choice.active{border-color:rgba(0,212,255,.48);background:rgba(0,212,255,.09);color:#dce8ef;box-shadow:inset 3px 0 #00d4ff}.fastlane-choice b{display:block;font-size:.73rem}.fastlane-choice span{display:block;color:#667487;font-size:.58rem;margin-top:2px;line-height:1.35}.fastlane-choice.active span{color:#7893a4}
+.fastlane-fields{display:grid;gap:8px}.fastlane-field{width:100%;min-height:46px;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:10px 12px;font-size:.86rem;outline:none}.fastlane-field:focus{border-color:rgba(0,212,255,.55);box-shadow:0 0 0 3px rgba(0,212,255,.08)}.fastlane-note{padding:9px 11px;border:1px solid rgba(0,212,255,.12);background:rgba(0,212,255,.04);border-radius:9px;color:#778596;font-size:.66rem;line-height:1.5}.fastlane-check{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--ui-line,rgba(255,255,255,.09));border-radius:10px;color:#8794a4;font-size:.69rem;line-height:1.45;cursor:pointer}.fastlane-check input{accent-color:#00d4ff;margin-top:2px}.fastlane-go{width:100%;min-height:50px;margin-top:16px;border:0;border-radius:12px;background:linear-gradient(135deg,#00abd3,#00d4ff);color:#04202b;font-size:.9rem;font-weight:900;cursor:pointer;box-shadow:0 8px 28px rgba(0,212,255,.22)}.fastlane-go:disabled{opacity:.45;cursor:not-allowed}.fastlane-result{margin-top:10px}
+.diag-pre{max-height:260px;overflow:auto;padding:12px;border-radius:10px;background:#081018;border:1px solid rgba(255,255,255,.08);color:#91a0b1;font: .68rem/1.55 ui-monospace,monospace;white-space:pre-wrap;word-break:break-word}.diag-actions{display:flex;gap:8px;margin-top:12px}.diag-actions button,.diag-actions a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:9px;font-size:.75rem;font-weight:800;cursor:pointer}.diag-primary{border:0;background:#00d4ff;color:#04202b}.diag-secondary{border:1px solid rgba(255,255,255,.11);background:#101923;color:#8492a3}
+.splash-door.fastlane-door{border-color:rgba(0,212,255,.3)!important;background:radial-gradient(circle at 100% 0,rgba(0,212,255,.18),transparent 48%),linear-gradient(145deg,#123342,#111c29)!important}.fastlane-badge{background:rgba(0,212,255,.12)!important;border:1px solid rgba(0,212,255,.28)!important;color:#67e8f9!important}
+[data-theme='light'] .fastlane-panel{background:#fff;border-color:#cfd8e2;box-shadow:0 28px 80px rgba(32,48,64,.2)}[data-theme='light'] .fastlane-choice{background:#f6f8fa;border-color:#d7dee5;color:#5f6c78}[data-theme='light'] .fastlane-choice.active{background:rgba(9,105,218,.07);border-color:rgba(9,105,218,.42);color:#1c252d;box-shadow:inset 3px 0 #0969da}[data-theme='light'] .fastlane-field{background:#fff;border-color:#cdd5de;color:#1c252d}[data-theme='light'] .fastlane-note,[data-theme='light'] .fastlane-check{border-color:#d7dee5;background:#f8fafc;color:#5f6c78}[data-theme='light'] .diag-pre{background:#f6f8fa;border-color:#d7dee5;color:#45525e}
+@media(max-width:640px){.fastlane-panel{padding:18px 14px;border-radius:16px}.fastlane-grid.apps{grid-template-columns:1fr 1fr}.fastlane-grid.services{grid-template-columns:1fr 1fr}.fastlane-grid.profiles{grid-template-columns:1fr}.fastlane-choice{min-height:54px}.fastlane-field{font-size:16px}.diag-actions{flex-direction:column}}
+/* Keep the mode control clear of the Core Builds wordmark, version badge, and phone navigation. */
+#themeToggle{top:auto!important;left:auto!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important}
+@media(max-width:599px){#themeToggle{right:max(10px,env(safe-area-inset-right))!important;bottom:max(76px,calc(env(safe-area-inset-bottom) + 66px))!important}}
+@media(max-height:520px) and (orientation:landscape){#themeToggle{right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important}}
+/* v2.77 menu parity — carry the splash visual language through every workflow screen */
+#main>.card:not(.splash){background:radial-gradient(circle at 100% 0,rgba(0,212,255,.075),transparent 34%),linear-gradient(155deg,rgba(17,27,39,.96),rgba(9,15,23,.96))!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:20px!important;box-shadow:inset 0 1px rgba(255,255,255,.045),0 26px 70px rgba(0,0,0,.24)!important;overflow:visible}
+#main>.card:not(.splash)::before{content:'';position:absolute;inset:14px;border:1px dashed rgba(255,255,255,.025);border-radius:15px;pointer-events:none;z-index:0}#main>.card:not(.splash)>*{position:relative;z-index:1}
+.srh{align-items:center;gap:15px;border-bottom:1px solid rgba(255,255,255,.075)!important}.srh-title,.card:not(.splash)>h2{font-family:Georgia,'Times New Roman',serif!important;font-weight:800!important;letter-spacing:-.035em!important;color:#edf4f8!important}.srh-title{font-size:1.28rem!important}.srh-sub,.card .desc{color:#7f8d9f!important}.srh-ring{border-radius:15px;background:radial-gradient(circle,rgba(0,212,255,.1),transparent 70%)}
+/* Primary choice cards */
+.opt label,.opts.pills .opt label,.svc-list-row label,.svc-list-hero label,.pref-card,.fmt-card,.fmt-scroll-card,.opt-scraper-card,.sum-item,.receipt-card,.rv-section,.rv-accord,.hc-box{background:linear-gradient(145deg,#111b27,#0d151f)!important;border:1px solid rgba(255,255,255,.085)!important;border-radius:14px!important;box-shadow:none!important}
+.opt label:hover,.opts.pills .opt label:hover,.svc-list-row label:hover,.svc-list-hero label:hover,.pref-card:hover,.fmt-card:hover,.fmt-scroll-card:hover{background:linear-gradient(145deg,#152331,#101923)!important;border-color:rgba(0,212,255,.26)!important;transform:translateY(-1px)}
+.opt input:checked+label,.opts.pills .opt input:checked+label,.svc-list-row input:checked+label,.svc-list-hero input:checked+label,.pref-card.pref-on,.fmt-card[data-active='true'],.fmt-scroll-card[data-active='true']{background:radial-gradient(circle at 100% 0,rgba(0,212,255,.13),transparent 42%),linear-gradient(145deg,#102431,#0e1823)!important;border-color:rgba(0,212,255,.43)!important;box-shadow:inset 3px 0 #00d4ff!important}.opt-name,.pref-title,.fmt-lbl,.fmt-scroll-label{color:#dce6ed!important}.opt-desc,.pref-desc,.fmt-scroll-desc{color:#718093!important}.opt input:checked+label .opt-name,.fmt-card[data-active='true'] .fmt-lbl,.fmt-scroll-card[data-active='true'] .fmt-scroll-label{color:#67e8f9!important}
+/* Form and segmented menus */
+.name-row label,.pref-section-label,.aio-section h3{font:800 .64rem/1.2 ui-monospace,monospace!important;letter-spacing:.08em!important;color:#657487!important}.name-input,.th-input,.fmt-select,.svc-search input,.td-custom input,#aioHost,#aioPwd,#aioUuid{background:#09111a!important;border:1px solid rgba(255,255,255,.13)!important;border-radius:11px!important;color:#edf4f8!important;min-height:46px!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.25)!important}.name-input:focus,.th-input:focus,.fmt-select:focus,.svc-search input:focus{border-color:rgba(0,212,255,.55)!important;box-shadow:0 0 0 3px rgba(0,212,255,.08)!important}.svc-seg,.install-toggle{background:#09111a!important;border:1px solid rgba(255,255,255,.085)!important;border-radius:11px!important}.svc-seg-b,.install-toggle-btn{color:#657487!important;min-height:42px}.svc-seg-b.act,.install-toggle-btn.active{background:rgba(0,212,255,.09)!important;color:#67e8f9!important}
+/* Fine-tune buttons that previously carried one-off inline styling */
+[data-action='set-simple-fmt'],[data-action='set-simple-match'],[data-action='set-simple-cache'],[data-action='set-simple-pool'],[data-action='set-match-mode'],[data-action='set-cache-mode'],[data-action='set-pse-arch'],.size-btn{border-radius:9px!important;border-color:rgba(255,255,255,.1)!important;background:#0d1620!important;color:#718093!important;min-height:38px}[data-action='set-simple-fmt']:hover,[data-action='set-simple-match']:hover,[data-action='set-simple-cache']:hover,[data-action='set-simple-pool']:hover,[data-action='set-match-mode']:hover,[data-action='set-cache-mode']:hover,[data-action='set-pse-arch']:hover,.size-btn:hover{border-color:rgba(0,212,255,.3)!important;color:#c8d4dd!important}
+/* Review and install surfaces */
+.receipt-hdr{background:linear-gradient(135deg,#142331,#0f1924)!important;border-color:rgba(255,255,255,.075)!important}.receipt-row{border-color:rgba(255,255,255,.05)!important}.receipt-row:hover{background:rgba(0,212,255,.04)!important}.receipt-hdr-name,.sum-val,.receipt-row-val{color:#dce5ec!important}.receipt-hdr-sub,.sum-lbl,.receipt-row-lbl{color:#657487!important}.rv-section-hdr,.rv-accord-hdr,.hc-hdr{background:#111b27!important;border-color:rgba(255,255,255,.07)!important;color:#718093!important}.rv-section-body,.rv-accord-body{border-color:rgba(255,255,255,.06)!important}.import-success,.notice,.what-next{border-radius:13px!important}
+/* Navigation mirrors the splash CTA language */
+.btn-next,.btn-manifest,.btn-dl{background:linear-gradient(135deg,#00abd3,#00d4ff)!important;color:#04202b!important;border:0!important;border-radius:13px!important;box-shadow:0 8px 27px rgba(0,212,255,.21)!important}.btn-next:hover:not(:disabled),.btn-manifest:hover,.btn-dl:hover{background:linear-gradient(135deg,#0ab8df,#38dfff)!important;box-shadow:0 11px 34px rgba(0,212,255,.3)!important}.btn-back{background:#0d1620!important;border:1px solid rgba(255,255,255,.085)!important;border-radius:12px!important;color:#748294!important}.nav::before{background:linear-gradient(to bottom,transparent,#070b11 48%)!important}
+/* Desktop workflow rail */
+@media(min-width:1000px){.cb-sidebar{background:radial-gradient(circle at 0 0,rgba(0,212,255,.07),transparent 30%),rgba(7,12,18,.97)!important;border-color:rgba(255,255,255,.08)!important}.cb-sidebar .sb-brand{border-color:rgba(255,255,255,.075)!important}.cb-sidebar .sb-brand-text{font-family:Georgia,'Times New Roman',serif!important;letter-spacing:-.035em!important}.cb-sidebar .sb-step{border-radius:0 12px 12px 0;margin-right:8px}.cb-sidebar .sb-step.sb-active{background:linear-gradient(90deg,rgba(0,212,255,.11),rgba(0,212,255,.025))!important}.cb-sidebar .sb-step-title{color:#b8c5cf!important}.cb-sidebar .sb-step.sb-active .sb-step-title{color:#67e8f9!important}.cb-sidebar .sb-num{background:#0c151f!important;border-color:rgba(255,255,255,.085)!important}.cb-sidebar .sb-footer{border-color:rgba(255,255,255,.075)!important}}
+/* Modals use the same glass panel and typography */
+.modal-box,.sup-panel,.qs-panel,.df-box,#apiReminderCard,#pwdPromptCard,#tsModal>div{background:radial-gradient(circle at 100% 0,rgba(0,212,255,.075),transparent 36%),linear-gradient(155deg,#131d29,#0c131c)!important;border:1px solid rgba(0,212,255,.2)!important;border-radius:19px!important;box-shadow:0 30px 100px rgba(0,0,0,.6)!important}.modal-title,.sup-title,.df-hdr-title{font-family:Georgia,'Times New Roman',serif!important;letter-spacing:-.025em!important}.copy-fields-card{background:#0b131d!important;border-color:rgba(0,212,255,.18)!important;border-radius:13px!important}.fmt-tab{background:#0e1721!important;border-color:rgba(255,255,255,.09)!important;border-radius:9px!important}.fmt-tab.active{background:rgba(0,212,255,.09)!important;border-color:rgba(0,212,255,.4)!important;color:#67e8f9!important}
+/* Light-mode parity */
+[data-theme='light'] #main>.card:not(.splash){background:radial-gradient(circle at 100% 0,rgba(9,105,218,.055),transparent 34%),#fff!important;border-color:#d7dee5!important;box-shadow:0 22px 60px rgba(32,48,64,.1)!important}[data-theme='light'] #main>.card:not(.splash)::before{border-color:rgba(9,105,218,.035)}[data-theme='light'] .srh-title,[data-theme='light'] .card:not(.splash)>h2{color:#1c252d!important}[data-theme='light'] .srh-sub,[data-theme='light'] .card .desc{color:#5f6c78!important}[data-theme='light'] .opt label,[data-theme='light'] .opts.pills .opt label,[data-theme='light'] .svc-list-row label,[data-theme='light'] .svc-list-hero label,[data-theme='light'] .pref-card,[data-theme='light'] .fmt-card,[data-theme='light'] .fmt-scroll-card,[data-theme='light'] .sum-item,[data-theme='light'] .receipt-card,[data-theme='light'] .rv-section,[data-theme='light'] .rv-accord{background:#f8fafc!important;border-color:#d7dee5!important}[data-theme='light'] .opt label:hover,[data-theme='light'] .pref-card:hover,[data-theme='light'] .fmt-card:hover{background:#f2f6f9!important;border-color:rgba(9,105,218,.28)!important}[data-theme='light'] .opt input:checked+label,[data-theme='light'] .opts.pills .opt input:checked+label,[data-theme='light'] .svc-list-row input:checked+label,[data-theme='light'] .pref-card.pref-on,[data-theme='light'] .fmt-card[data-active='true'],[data-theme='light'] .fmt-scroll-card[data-active='true']{background:rgba(9,105,218,.06)!important;border-color:rgba(9,105,218,.4)!important;box-shadow:inset 3px 0 #0969da!important}[data-theme='light'] .opt-name,[data-theme='light'] .pref-title,[data-theme='light'] .fmt-lbl,[data-theme='light'] .receipt-hdr-name,[data-theme='light'] .sum-val,[data-theme='light'] .receipt-row-val{color:#1f2933!important}[data-theme='light'] .name-input,[data-theme='light'] .th-input,[data-theme='light'] .fmt-select,[data-theme='light'] .svc-search input{background:#fff!important;border-color:#cdd5de!important;color:#1c252d!important}[data-theme='light'] .receipt-hdr,[data-theme='light'] .rv-section-hdr,[data-theme='light'] .rv-accord-hdr{background:#f1f5f8!important}[data-theme='light'] .btn-back{background:#fff!important;border-color:#d7dee5!important;color:#5f6c78!important}[data-theme='light'] .nav::before{background:linear-gradient(to bottom,transparent,#f3f6f9 48%)!important}[data-theme='light'] .modal-box,[data-theme='light'] .sup-panel,[data-theme='light'] .qs-panel,[data-theme='light'] .df-box,[data-theme='light'] #apiReminderCard,[data-theme='light'] #pwdPromptCard{background:#fff!important;border-color:#cfd8e2!important;box-shadow:0 24px 75px rgba(32,48,64,.19)!important}
+@media(max-width:599px){#main>.card:not(.splash){border-radius:16px!important;padding:21px 16px!important}#main>.card:not(.splash)::before{inset:9px;border-radius:12px}.srh-title{font-size:1.12rem!important}.opt label,.pref-card{border-radius:12px!important}.nav{padding-inline:2px}}
+/* v2.77 polish — expressive splash, quieter work surfaces */
+#main>.card:not(.splash){animation:none!important;background:linear-gradient(155deg,rgba(16,25,36,.97),rgba(10,16,24,.97))!important;box-shadow:inset 0 1px rgba(255,255,255,.035),0 16px 42px rgba(0,0,0,.18)!important}#main>.card:not(.splash)::before{display:none!important}.srh-sub,.card .desc,.opt-desc,.pref-desc,.fmt-scroll-desc,.receipt-row-lbl,.sum-lbl{color:#8b98a8!important}
+.opt input:checked+label,.opts.pills .opt input:checked+label,.svc-list-row input:checked+label,.svc-list-hero input:checked+label,.pref-card.pref-on,.fmt-card[data-active='true'],.fmt-scroll-card[data-active='true']{box-shadow:none!important}.opt input:checked+label::after{box-shadow:none!important}
+.opt label,.pref-card,.fmt-card,.fmt-scroll-card,.svc-list-row label,.svc-list-hero label{transform:none!important}@media(hover:hover) and (pointer:fine){.opt label:hover,.pref-card:hover,.fmt-card:hover,.fmt-scroll-card:hover,.svc-list-row label:hover,.svc-list-hero label:hover{transform:translateY(-1px)!important}}
+.modal-box,.sup-panel,.qs-panel,.df-box,#apiReminderCard,#pwdPromptCard,#tsModal>div{background:linear-gradient(155deg,#121c28,#0c131c)!important;box-shadow:0 20px 65px rgba(0,0,0,.46)!important}
+@media(min-width:1000px){.cb-sidebar{width:256px!important}.cb-sidebar:not(.sb-hidden)~.wrap{margin-left:256px!important}.cb-sidebar:not(.sb-hidden)~.wrap #main{padding-left:38px!important;padding-right:38px!important}.cb-sidebar:not(.sb-hidden)~.wrap .nav{padding-left:38px!important;padding-right:38px!important}.cb-sidebar .sb-step{padding:10px 17px!important}.cb-sidebar .sb-brand{padding:20px 17px!important}}
+@media(max-width:599px){.fastlane-overlay{align-items:flex-end!important;padding:0!important}.fastlane-panel{width:100%!important;max-height:92dvh!important;border-radius:20px 20px 0 0!important;padding:20px 15px max(18px,env(safe-area-inset-bottom))!important}.fastlane-head{position:sticky;top:-20px;z-index:3;background:linear-gradient(#131d29 82%,transparent);padding-top:16px}.fastlane-grid.profiles{grid-template-columns:1fr!important}}
+[data-theme='light'] #main>.card:not(.splash){background:#fff!important;box-shadow:0 10px 30px rgba(32,48,64,.07)!important}[data-theme='light'] .modal-box,[data-theme='light'] .sup-panel,[data-theme='light'] .qs-panel,[data-theme='light'] .df-box,[data-theme='light'] #apiReminderCard,[data-theme='light'] #pwdPromptCard{background:#fff!important;box-shadow:0 18px 55px rgba(32,48,64,.15)!important}[data-theme='light'] .opt label,[data-theme='light'] .pref-card,[data-theme='light'] .fmt-card,[data-theme='light'] .fmt-scroll-card{box-shadow:none!important}
+/* Light-mode selection repair — never inherit dark selected surfaces or low-contrast text. */
+[data-theme='light'] .opt label,[data-theme='light'] .opts.pills .opt label,[data-theme='light'] .svc-list-row label,[data-theme='light'] .svc-list-hero label,[data-theme='light'] .pref-card,[data-theme='light'] .fmt-card,[data-theme='light'] .fmt-scroll-card,[data-theme='light'] .opt-scraper-card{background:#fff!important;background-image:none!important;border-color:#d5dde5!important;color:#1c252d!important}
+[data-theme='light'] .opt input:checked+label,[data-theme='light'] .opts.pills .opt input:checked+label,[data-theme='light'] .svc-list-row input:checked+label,[data-theme='light'] .svc-list-hero input:checked+label,[data-theme='light'] .pref-card.pref-on,[data-theme='light'] .fmt-card[data-active='true'],[data-theme='light'] .fmt-scroll-card[data-active='true'],[data-theme='light'] .opt-scraper-card[data-active='true']{background:#eaf3ff!important;background-image:linear-gradient(145deg,#edf6ff,#e6f1fc)!important;border-color:#6aa7e8!important;color:#15314f!important;box-shadow:0 0 0 1px rgba(9,105,218,.08)!important}
+[data-theme='light'] .opt input:checked+label::after{background-color:#0969da!important;filter:none!important}
+[data-theme='light'] .opt-name,[data-theme='light'] .pref-title,[data-theme='light'] .fmt-lbl,[data-theme='light'] .fmt-scroll-label,[data-theme='light'] .opt-scraper-name{color:#1f2933!important;text-shadow:none!important}
+[data-theme='light'] .opt-desc,[data-theme='light'] .pref-desc,[data-theme='light'] .fmt-scroll-desc,[data-theme='light'] .opt-scraper-subdesc,[data-theme='light'] .device-help{color:#526170!important}
+[data-theme='light'] .opt input:checked+label .opt-name,[data-theme='light'] .opts.pills .opt input:checked+label .opt-name,[data-theme='light'] .svc-list-row input:checked+label .opt-name,[data-theme='light'] .svc-list-hero input:checked+label .opt-name,[data-theme='light'] .pref-card.pref-on .pref-title,[data-theme='light'] .fmt-card[data-active='true'] .fmt-lbl,[data-theme='light'] .fmt-scroll-card[data-active='true'] .fmt-scroll-label,[data-theme='light'] .opt-scraper-card[data-active='true'] .opt-scraper-name{color:#075ebd!important}
+[data-theme='light'] .svc-row-auth{background:#f2f5f8!important;border-color:#d5dde5!important;color:#5d6975!important}[data-theme='light'] .svc-row-auth.free{color:#16713a!important;border-color:#9dd9b3!important}
+[data-theme='light'] .svc-row-ck{background:#cfd7df!important}[data-theme='light'] .svc-row-ck::after{background:#fff!important}[data-theme='light'] .svc-list-row input:checked+label .svc-row-ck{background:#0969da!important}
+[data-theme='light'] .svc-seg,[data-theme='light'] .install-toggle{background:#f4f7fa!important;border-color:#d5dde5!important}[data-theme='light'] .svc-seg-b,[data-theme='light'] .install-toggle-btn{color:#5f6c78!important}[data-theme='light'] .svc-seg-b.act,[data-theme='light'] .install-toggle-btn.active{background:#dfeeff!important;color:#075ebd!important}
+[data-theme='light'] [data-action='set-simple-fmt'],[data-theme='light'] [data-action='set-simple-match'],[data-theme='light'] [data-action='set-simple-cache'],[data-theme='light'] [data-action='set-simple-pool'],[data-theme='light'] [data-action='set-match-mode'],[data-theme='light'] [data-action='set-cache-mode'],[data-theme='light'] [data-action='set-pse-arch'],[data-theme='light'] [data-action='set-audio'],[data-theme='light'] [data-action='set-formatter'],[data-theme='light'] .size-btn{background:#fff!important;border-color:#cfd8e2!important;color:#536170!important}
+[data-theme='light'] [data-action='set-simple-fmt'][data-active='true'],[data-theme='light'] [data-action='set-simple-match'][data-active='true'],[data-theme='light'] [data-action='set-simple-cache'][data-active='true'],[data-theme='light'] [data-action='set-simple-pool'][data-active='true'],[data-theme='light'] [data-action='set-match-mode'][data-active='true'],[data-theme='light'] [data-action='set-cache-mode'][data-active='true'],[data-theme='light'] [data-action='set-pse-arch'][data-active='true'],[data-theme='light'] [data-action='set-audio'][data-active='true'],[data-theme='light'] [data-action='set-formatter'][data-active='true'],[data-theme='light'] .size-btn-active{background:#e5f1ff!important;border-color:#6aa7e8!important;color:#075ebd!important}
+[data-theme='light'] .name-input,[data-theme='light'] .th-input,[data-theme='light'] .fmt-select,[data-theme='light'] .svc-search input,[data-theme='light'] .td-custom input,[data-theme='light'] #aioHost,[data-theme='light'] #aioPwd,[data-theme='light'] #aioUuid{background:#fff!important;color:#1c252d!important;border-color:#cbd5df!important;-webkit-text-fill-color:#1c252d!important}
+[data-theme='light'] .name-input::placeholder,[data-theme='light'] .th-input::placeholder,[data-theme='light'] .svc-search input::placeholder{color:#89949f!important;opacity:1}
+[data-theme='light'] .fmt-live-preview,[data-theme='light'] .copy-fields-card,[data-theme='light'] .receipt-card,[data-theme='light'] .sum-item{background:#f6f9fc!important;border-color:#d5dde5!important}[data-theme='light'] .fmt-live-n,[data-theme='light'] .receipt-hdr-name,[data-theme='light'] .receipt-row-val,[data-theme='light'] .sum-val{color:#1f2933!important}[data-theme='light'] .fmt-live-d,[data-theme='light'] .receipt-row-lbl,[data-theme='light'] .sum-lbl{color:#5f6c78!important}
+[data-theme='light'] .fastlane-choice.active{background:#eaf3ff!important;background-image:none!important;color:#15314f!important}[data-theme='light'] .fastlane-choice.active b{color:#075ebd!important}[data-theme='light'] .fastlane-choice.active span{color:#526170!important}
+[data-theme='light'] [data-action='set-simple-quality'],[data-theme='light'] [data-action='set-simple-resfirst']{background:#fff!important;border-color:#cfd8e2!important;color:#536170!important}[data-theme='light'] [data-action='set-simple-quality'][data-active='true'],[data-theme='light'] [data-action='set-simple-resfirst'][data-active='true']{background:#e5f1ff!important;border-color:#6aa7e8!important;color:#075ebd!important}
+[data-theme='light'] .fmt-scroll-card>div[style*='border-top']{color:#526170!important;border-color:#d5dde5!important}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -1584,7 +1648,7 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
     </div>
-    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.75</span>
+    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.77</span>
   </header>
 
   <div id="main"></div>
@@ -1600,7 +1664,7 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.75';
+const CONFIGURATOR_VERSION = '2.77';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1655,6 +1719,22 @@ const ICO = {
   eye:(s=20,c='currentColor')=>`<svg width="${s}" height="${s}" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M6 22s6-10 16-10 16 10 16 10-6 10-16 10S6 22 6 22z" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".04"/><circle cx="22" cy="22" r="5" stroke="${c}" stroke-width="1.5" fill="${c}" fill-opacity=".1"/><circle cx="22" cy="22" r="2" fill="${c}" fill-opacity=".5"/></svg>`,
 };
 const CHANGELOG = [
+  { v:'2.77', date:'Jul 22 2026', items:[
+    'Quick Install — Added a Duck-inspired one-page flow for app, service, contextual credentials, and Fast/Balanced/Maximum performance profiles',
+    'Progressive disclosure — Stremio login, debrid API keys, and EasyNews credentials appear only when the selected path needs them',
+    'Reliability — The last successful AIOStreams host is checked first, stable hosts are preferred, outdated versions are skipped, free/P2P avoids incompatible hosts, and nightly is used only as fallback',
+    'Clean install — Added an opt-in replacement mode for older manifests from known public AIOStreams hosts during direct Stremio installation',
+    'Diagnostics & preflight — Added a sanitized issue report plus template structure, duplicate preset, health, credential, and host compatibility checks',
+    'Unified menus — Applied the splash screen’s glass surfaces, editorial headings, cyan interaction language, forms, navigation, sidebar, review cards, receipts, and modal treatment throughout',
+    'Visual polish — Simplified wizard gradients, shadows, selected states, animation, spacing, sidebar width, muted-text contrast, light mode, and the phone Quick Install sheet',
+    'Mode control — Moved the light/dark control away from the Core Builds wordmark and added safe spacing above phone navigation',
+    'Light mode — Rebuilt selected, active, hover, form, receipt, formatter, scraper, service, profile, and fine-tune states with pale-blue surfaces and explicit dark text',
+    'Device profiles — Centralized audio, AV1, and Dolby Vision capabilities so selection, review, sorting, PSEs, ESEs, and diagnostics use the same rules',
+    'Apple TV & Apple mobile — Removed incorrect TrueHD passthrough and A15 AV1 assumptions; newer-chip AV1 support is handled conservatively',
+    'Chromecast, smart TVs, ONN & Roku — Corrected model-dependent AV1, Dolby Vision, HDR, internal-app lossless-audio, and passthrough assumptions',
+    'Fire TV & Xiaomi — Added generation-aware audio guidance and corrected Xiaomi TV Box S 2nd Gen AV1 support',
+    'Popularity — Reordered featured devices toward Android/Google TV, ONN, Shield, Fire TV 4K Max, and Samsung using Core Builds samples, Stremio community usage, and broader CTV adoption',
+  ]},
   { v:'2.75', date:'Jul 21 2026', items:[
     'Unified UI — Extended the approved hybrid visual system across every configurator step, option menu, form, review panel, sidebar, modal, receipt, and navigation control',
     'Desktop — Refined the fixed workflow rail, widened content canvas, clarified active-step hierarchy, and standardized glass surfaces and spacing',
@@ -1900,13 +1980,66 @@ let _detectedDevice = null;
 let _savedStep = 0;
 let pasteMode = false;
 const HOST_BASE_URLS = { elfhosted:'https://aiostreams.elfhosted.com', fortheweak:'https://aiostreams.fortheweak.cloud', midnight:'https://aiostreamsfortheweebsstable.midnightignite.me', viren:'https://aiostreams.viren070.me', kuu:'https://aiostreams.stremio.ru', atbp:'https://aio.atbphosting.com', omni:'https://aiostreams.12312023.xyz', wizaardd:'https://aiostreams-stable.forthewizards.uk' };
-const HOST_LABEL_MAP = { elfhosted:'ElfHosted', fortheweak:'ForthWeak', midnight:"Midnight's", viren:"Viren's", kuu:"Kuu's", atbp:'ATBP', omni:"Omni's", wizaardd:'Wizaardd' };
+const HOST_LABEL_MAP = { elfhosted:'ElfHosted', fortheweak:"Yeb's / ForTheWeak", midnight:"Midnight's", viren:"Viren's Nightly", kuu:"Kuu's", atbp:'ATBP', omni:"Omni's (legacy)", wizaardd:'Wizaardd' };
+const HOST_META = {
+  elfhosted:{channel:'stable',priority:1,blocksFree:true}, fortheweak:{channel:'stable',priority:2}, midnight:{channel:'stable',priority:3},
+  kuu:{channel:'stable',priority:4}, atbp:{channel:'stable',priority:5}, wizaardd:{channel:'stable',priority:6},
+  viren:{channel:'nightly',priority:20}, omni:{channel:'stable',priority:30}
+};
+const MIN_AIOSTREAMS_VERSION = '2.31.1';
 function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [HOST_LABEL_MAP[k]||k, u]); }
+function hostKeyFromUrl(url) { return Object.keys(HOST_BASE_URLS).find(k=>HOST_BASE_URLS[k]===url) || ''; }
+function versionAtLeast(actual, minimum) {
+  const a=String(actual||'0').split('.').map(Number), b=String(minimum||'0').split('.').map(Number);
+  for(let i=0;i<Math.max(a.length,b.length);i++){const d=(a[i]||0)-(b[i]||0);if(d)return d>0;} return true;
+}
+function orderedHostEntries() {
+  const entries = hostEntries();
+  let preferred = '';
+  try { preferred = localStorage.getItem('coreBuildLastGoodHost') || ''; } catch(e) {}
+  return entries.sort((a,b) => {
+    if (a[1]===preferred) return -1; if (b[1]===preferred) return 1;
+    return (HOST_META[hostKeyFromUrl(a[1])]?.priority||99) - (HOST_META[hostKeyFromUrl(b[1])]?.priority||99);
+  });
+}
+function rememberGoodHost(host) {
+  try { if (host) localStorage.setItem('coreBuildLastGoodHost', host); } catch(e) {}
+}
+async function selectHealthyHost(timeout=4000) {
+  const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
+  const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree));
+  let preferred='';
+  try { preferred=localStorage.getItem('coreBuildLastGoodHost')||''; } catch(e) {}
+  const probe = async host => {
+    const res=await raceHostFetch(host,'/api/v1/status',{method:'GET'},timeout);
+    if(!res.ok) throw new Error('host unavailable');
+    const payload=await res.clone().json().catch(()=>null);
+    const version=payload?.data?.version || payload?.version || '';
+    if(version && !versionAtLeast(version,MIN_AIOSTREAMS_VERSION)) throw new Error(`host outdated (${version})`);
+    return host;
+  };
+  if (preferred && entries.some(([,host])=>host===preferred)) {
+    try { const host=await probe(preferred); rememberGoodHost(host); return host; } catch(e) {}
+  }
+  const candidates=entries.filter(([,host])=>host!==preferred);
+  const stable=candidates.filter(([,host])=>(HOST_META[hostKeyFromUrl(host)]?.channel||'stable')==='stable').map(([,host])=>host);
+  const nightly=candidates.filter(([,host])=>HOST_META[hostKeyFromUrl(host)]?.channel==='nightly').map(([,host])=>host);
+  let winner;
+  try { winner=await Promise.any(stable.map(probe)); }
+  catch(e) { winner=await Promise.any(nightly.map(probe)); }
+  rememberGoodHost(winner); return winner;
+}
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [] };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced' };
 const CAROUSEL_SVCS = ['debridio','p2p','http','nzbgeek','streamnzb'];
+// Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
+const DEVICE_AUDIO_DEFAULTS = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'standard', shield:'lossless', lgtv:'standard', 'appletv-old':'standard', 'appletv-new':'standard', windows:'lossless', generic:'standard', roku:'limited', chromecast:'limited', sony:'standard', ipad:'limited', projector:'limited', onn:'limited', googletv:'limited', xiaomi:'standard', 'xiaomi-3rd':'standard' };
+const DEVICE_FORCE_LIMITED_AUDIO = new Set(['generic','samsung','firestick-hd','roku','chromecast','ipad','projector','onn','googletv','lgtv','sony','appletv-old','appletv-new']);
+const DEVICE_AV1_SAFE = new Set(['firestick-4kmax','googletv','onn','xiaomi','xiaomi-3rd','windows']);
+const DEVICE_DV_SAFE = new Set(['appletv-old','appletv-new','lgtv','firestick-4kmax','shield','googletv','chromecast','sony','xiaomi','xiaomi-3rd']);
+const POPULAR_DEVICE_IDS = new Set(['onn','shield','firestick-4kmax','googletv']);
 const OPTIONAL_SCRAPER_DEFS = [
   { id:'nzbnoob', label:'NZBnoob', desc:'Free Newznab indexer · 1,500-day retention', presetType:'newznab', cat:'usenet', color:'#22c55e', credKey:'nzbnoob', apiUrl:'https://nzbnoob.com', apiPath:'/api' },
   { id:'althub', label:'altHUB', desc:'Newznab indexer · 900k+ NZBs', presetType:'newznab', cat:'usenet', color:'#3b82f6', credKey:'althub', apiUrl:'https://api.althub.co.za', apiPath:'/api' },
@@ -2090,26 +2223,26 @@ const DEFS = [
     ]
   },
   { id:'device', title:'Your Device', desc:'Sets audio format limits, codec exclusions, and HDR/DV handling.', key:'device', cols:'c1', layout:'device-hybrid', noHero:true,
-    featured:['generic','samsung','firestick-hd','appletv-new','shield'],
+    featured:['generic','onn','shield','firestick-4kmax','googletv','samsung'],
     opts:[
-      { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg1"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#a78bfa" flood-opacity=".4"/></filter></defs><rect x="4" y="12" width="36" height="22" rx="2.5" stroke="#a78bfa" stroke-width="1.5" filter="url(#dg1)"/><rect x="7" y="14.5" width="30" height="17" rx="1" fill="#00d4ff" opacity=".06"/><line x1="17" y1="34" x2="14" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="34" x2="30" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="40" x2="32" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="7" r="2" stroke="#a78bfa" stroke-width="1.5" fill="none" filter="url(#dg1)"/><line x1="22" y1="9" x2="22" y2="12" stroke="#a78bfa" stroke-width="1.5"/></svg>', name:'Standard TV',          desc:'Broadest compatibility · no restrictions', help:'No format restrictions — every stream type is allowed. Pick this if you are unsure of your TV specs; everything will play, though rare formats may need transcoding.' },
+      { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg1"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#a78bfa" flood-opacity=".4"/></filter></defs><rect x="4" y="12" width="36" height="22" rx="2.5" stroke="#a78bfa" stroke-width="1.5" filter="url(#dg1)"/><rect x="7" y="14.5" width="30" height="17" rx="1" fill="#00d4ff" opacity=".06"/><line x1="17" y1="34" x2="14" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="34" x2="30" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="40" x2="32" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="7" r="2" stroke="#a78bfa" stroke-width="1.5" fill="none" filter="url(#dg1)"/><line x1="22" y1="9" x2="22" y2="12" stroke="#a78bfa" stroke-width="1.5"/></svg>', name:'Standard / Not Sure', desc:'Conservative video · DD+/AAC audio · broad compatibility', help:'Safe default when the exact playback hardware is unknown. Prioritises HEVC/AVC and streaming-grade DD+/AAC audio instead of assuming AV1 or lossless passthrough support.' },
       { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg2"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#3b82f6" flood-opacity=".4"/></filter></defs><rect x="3" y="10" width="38" height="22" rx="2" stroke="#3b82f6" stroke-width="1.5" filter="url(#dg2)"/><rect x="6" y="12.5" width="32" height="17" rx="1" fill="#00d4ff" opacity=".06"/><rect x="19" y="32" width="6" height="3" rx="1" fill="#3b82f6" opacity=".5"/><path d="M13 39 Q22 36 31 39" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M28 19 Q26 17.5 24 19 Q22 20.5 20 19 Q18 17.5 16 19" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+', help:'<b>DV-Only Kill</b>: Samsung TVs have no Dolby Vision support — DV streams without an HDR10 fallback show a purple/green tint, so they are removed. <b>AV1 / VC-1 excluded</b>: 2018–2022 Samsung models lack these video decoders. <b>HDR10+</b> is Samsung&#39;s own HDR format and is prioritised.' },
-      { v:'appletv-old',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg3"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#9ca3af" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#9ca3af" stroke-width="1.5" filter="url(#dg3)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#9ca3af" filter="url(#dg3)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#9ca3af" stroke-width="1.5" fill="none"/><circle cx="22" cy="35" r="1" fill="#f59e0b"/></svg>', name:'Apple TV 4K Gen 1–2', desc:'DV · TrueHD · Atmos · no AV1 · 7.1', help:'<b>DV</b>: Dolby Vision fully supported. <b>TrueHD / Atmos</b>: lossless audio passes through. <b>No AV1</b>: Gen 1–2 have no AV1 hardware decoder, so those streams are excluded. <b>7.1</b>: full surround channels ranked first.' },
-      { v:'appletv-new',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg4"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#60a5fa" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#60a5fa" stroke-width="1.5" filter="url(#dg4)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#60a5fa" filter="url(#dg4)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#60a5fa" stroke-width="1.5" fill="none" filter="url(#dg4)"/></svg>', name:'Apple TV 4K Gen 3',   desc:'DV · TrueHD · Atmos · AV1 · 7.1', help:'Same profile as Gen 1–2 plus <b>AV1</b>: the A15 chip decodes AV1 in hardware, so those smaller, more efficient streams are allowed and ranked.' },
-      { v:'lgtv',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg5"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ef4444" flood-opacity=".4"/></filter></defs><rect x="3" y="8" width="38" height="24" rx="2" stroke="#ef4444" stroke-width="1.5" filter="url(#dg5)"/><rect x="6" y="10.5" width="32" height="19" rx="1" fill="#00d4ff" opacity=".06"/><rect x="18" y="32" width="8" height="3" rx="1" fill="#ef4444" opacity=".4"/><line x1="13" y1="39" x2="31" y2="39" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><path d="M19 20 L19 23 L24 23" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>', name:'LG TV webOS',          desc:'DV · AV1 · eARC · TrueHD · 7.1', help:'<b>eARC</b>: passes lossless audio (TrueHD, DTS-HD MA) to a soundbar or receiver over HDMI. LG OLED/QNED supports Dolby Vision and AV1 — nothing is excluded on this profile.' },
+      { v:'appletv-old',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg3"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#9ca3af" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#9ca3af" stroke-width="1.5" filter="url(#dg3)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#9ca3af" filter="url(#dg3)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#9ca3af" stroke-width="1.5" fill="none"/><circle cx="22" cy="35" r="1" fill="#f59e0b"/></svg>', name:'Apple TV 4K Gen 1–2', desc:'DV · no AV1 · DD+/Atmos · multichannel PCM', help:'Dolby Vision is supported. Apple TV does not bitstream TrueHD or DTS-HD; compatible apps may decode them to multichannel PCM, but lossless Atmos metadata is not preserved. AV1 is excluded for reliable high-bitrate playback.' },
+      { v:'appletv-new',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg4"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#60a5fa" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#60a5fa" stroke-width="1.5" filter="url(#dg4)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#60a5fa" filter="url(#dg4)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#60a5fa" stroke-width="1.5" fill="none" filter="url(#dg4)"/></svg>', name:'Apple TV 4K Gen 3',   desc:'DV · HDR10+ · no hardware AV1 · DD+/Atmos', help:'Apple TV 4K Gen 3 adds HDR10+ but the A15 does not include an AV1 hardware decoder. TrueHD/DTS-HD are not bitstreamed; compatible apps may decode to multichannel PCM.' },
+      { v:'lgtv',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg5"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ef4444" flood-opacity=".4"/></filter></defs><rect x="3" y="8" width="38" height="24" rx="2" stroke="#ef4444" stroke-width="1.5" filter="url(#dg5)"/><rect x="6" y="10.5" width="32" height="19" rx="1" fill="#00d4ff" opacity=".06"/><rect x="18" y="32" width="8" height="3" rx="1" fill="#ef4444" opacity=".4"/><line x1="13" y1="39" x2="31" y2="39" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><path d="M19 20 L19 23 L24 23" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>', name:'LG TV webOS',          desc:'DV · AV1 varies · DD+/Atmos · no internal-app TrueHD', help:'LG webOS supports Dolby Vision. AV1 depends on model year. Internal TV apps generally do not pass TrueHD/DTS-HD over eARC, so the profile uses streaming-grade audio; external HDMI devices are a separate path.' },
       { v:'windows',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg6"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#38bdf8" flood-opacity=".4"/></filter></defs><rect x="4" y="7" width="36" height="24" rx="2.5" stroke="#38bdf8" stroke-width="1.5" filter="url(#dg6)"/><rect x="7" y="9.5" width="30" height="19" rx="1" fill="#00d4ff" opacity=".06"/><rect x="18" y="31" width="8" height="3" rx="1" fill="#38bdf8" opacity=".4"/><line x1="13" y1="38" x2="31" y2="38" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/><line x1="13" y1="14" x2="21" y2="12.5" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/><line x1="13" y1="19.5" x2="21" y2="18" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/><line x1="13" y1="25" x2="21" y2="23.5" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/><line x1="23" y1="12" x2="31" y2="10.5" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/><line x1="23" y1="17.5" x2="31" y2="16" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/><line x1="23" y1="23" x2="31" y2="21.5" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Windows PC',           desc:'Full lossless · AV1 · HDR-first · 7.1', help:'PCs can decode anything in software if needed, so nothing is excluded. <b>HDR-first</b>: HDR streams ranked above SDR. Full lossless audio ranked for external DACs and receivers.' },
       { v:'firestick-hd',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg7"><feDropShadow dx="0" dy="0" stdDeviation="1.8" flood-color="#f97316" flood-opacity=".4"/></filter></defs><rect x="6" y="23" width="24" height="9" rx="4.5" stroke="#f97316" stroke-width="1.5" filter="url(#dg7)"/><rect x="6" y="23" width="24" height="9" rx="4.5" fill="#00d4ff" opacity=".04"/><rect x="32" y="25" width="7" height="5" rx="1.5" fill="#f97316" opacity=".35"/><path d="M18 23 C18 19 16 15 18 12 C18 12 19.5 14 21 13 C21 10 23 7 24.5 5 C24.5 5 24.5 9 27 12 C28.5 14 28 16.5 26 18.5 C26 18.5 26 16 24 17 C24 20 22 23 18 23Z" fill="#f97316" filter="url(#dg7)"/></svg>', name:'Fire Stick HD',        desc:'DV-Only Kill · no AV1/lossless · HDR10/HLG', help:'The HD stick has no Dolby Vision, no AV1 decoder, and no lossless audio passthrough — those streams are removed or down-ranked so everything actually plays. <b>HDR10 / HLG</b> still work.' },
-      { v:'firestick-4kmax', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg8"><feDropShadow dx="0" dy="0" stdDeviation="1.8" flood-color="#fb923c" flood-opacity=".4"/></filter></defs><rect x="6" y="23" width="24" height="9" rx="4.5" stroke="#fb923c" stroke-width="1.5" filter="url(#dg8)"/><rect x="6" y="23" width="24" height="9" rx="4.5" fill="#00d4ff" opacity=".04"/><rect x="32" y="25" width="7" height="5" rx="1.5" fill="#fb923c" opacity=".35"/><path d="M16 23 C16 18 14 13 17 9 C17 9 19 13 21 11.5 C21 7 24 3 25.5 2 C25.5 2 25.5 7 29 10.5 C31 13 30.5 15.5 28 18.5 C28 18.5 28 15.5 25.5 16.5 C25.5 20 23 23 16 23Z" fill="#fb923c" filter="url(#dg8)"/><circle cx="18" cy="27.5" r="1.5" fill="#fb923c" opacity=".5"/></svg>', name:'Fire Stick 4K Max',   desc:'DV · AV1 · VC-1 excluded · no lossless', help:'<b>DV + AV1</b> are supported on the 4K Max. <b>VC-1 excluded</b>: an old Blu-ray codec the stick struggles with. <b>No lossless</b>: Fire OS does not bitstream TrueHD or DTS-HD MA, so DD+/Atmos is the ceiling.' },
+      { v:'firestick-4kmax', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg8"><feDropShadow dx="0" dy="0" stdDeviation="1.8" flood-color="#fb923c" flood-opacity=".4"/></filter></defs><rect x="6" y="23" width="24" height="9" rx="4.5" stroke="#fb923c" stroke-width="1.5" filter="url(#dg8)"/><rect x="6" y="23" width="24" height="9" rx="4.5" fill="#00d4ff" opacity=".04"/><rect x="32" y="25" width="7" height="5" rx="1.5" fill="#fb923c" opacity=".35"/><path d="M16 23 C16 18 14 13 17 9 C17 9 19 13 21 11.5 C21 7 24 3 25.5 2 C25.5 2 25.5 7 29 10.5 C31 13 30.5 15.5 28 18.5 C28 18.5 28 15.5 25.5 16.5 C25.5 20 23 23 16 23Z" fill="#fb923c" filter="url(#dg8)"/><circle cx="18" cy="27.5" r="1.5" fill="#fb923c" opacity=".5"/></svg>', name:'Fire Stick 4K Max',   desc:'DV · AV1 · VC-1 excluded · HD audio varies by generation', help:'All 4K Max models support Dolby Vision and AV1. The 2nd generation officially supports TrueHD/DTS-HD passthrough, while earlier firmware and apps vary; Standard audio is the safe default.' },
       { v:'shield',          icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg9"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#84cc16" flood-opacity=".4"/></filter></defs><path d="M22 5 L34 11 L34 25 Q34 32 22 37 Q10 32 10 25 L10 11 Z" stroke="#84cc16" stroke-width="1.5" stroke-linejoin="round" fill="none" filter="url(#dg9)"/><path d="M22 8 L31 13 L31 25 Q31 30 22 34" fill="#00d4ff" opacity=".05"/><path d="M22 15 L28 18 L28 24 Q28 27 22 29 Q16 27 16 24 L16 18 Z" stroke="#84cc16" stroke-width="1" stroke-linejoin="round" fill="#84cc16" opacity=".15" filter="url(#dg9)"/></svg>', name:'Nvidia Shield',          desc:'No AV1 · no HLG · DV · lossless audio', help:'<b>No AV1</b>: the Nvidia Shield (2019) has no AV1 decoder. <b>No HLG</b>: a broadcast HDR format with known Shield playback issues. Everything else, including Dolby Vision and lossless audio, works.' },
       { v:'googletv',          icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg16"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#4285f4" flood-opacity=".4"/></filter></defs><rect x="8" y="14" width="28" height="16" rx="8" stroke="#4285f4" stroke-width="1.5" filter="url(#dg16)" fill="none"/><rect x="8" y="14" width="28" height="16" rx="8" fill="#00d4ff" opacity=".04"/><circle cx="17" cy="22" r="3" fill="#ea4335" opacity=".7"/><circle cx="22" cy="22" r="3" fill="#fbbc04" opacity=".7"/><circle cx="27" cy="22" r="3" fill="#34a853" opacity=".7"/><circle cx="22" cy="22" r="3" fill="#4285f4" opacity=".5"/><line x1="18" y1="33" x2="26" y2="33" stroke="#4285f4" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#4285f4" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Google TV Streamer',    desc:'DV · AV1 · no lossless · DD+ Atmos · HDR10+', help:'Google TV Streamer (2024) — DV, HDR10+, HDR10, HLG all supported. AV1 hardware decode. No lossless audio passthrough — DD+ Atmos is the ceiling, 5.1 channels max. Similar to Chromecast with Google TV but newer hardware.' },
-      { v:'roku',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg10"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#7c3aed" flood-opacity=".4"/></filter></defs><rect x="12" y="6" width="20" height="32" rx="4" stroke="#7c3aed" stroke-width="1.5" fill="none" filter="url(#dg10)"/><rect x="12" y="6" width="20" height="32" rx="4" fill="#00d4ff" opacity=".05"/><circle cx="22" cy="16" r="4.5" stroke="#7c3aed" stroke-width="1.3" fill="none" filter="url(#dg10)"/><circle cx="22" cy="16" r="1.5" fill="#7c3aed"/><circle cx="18" cy="26" r="2" stroke="#7c3aed" stroke-width="1.1" fill="none"/><circle cx="26" cy="26" r="2" stroke="#7c3aed" stroke-width="1.1" fill="none"/><rect x="18" y="31" width="8" height="3" rx="1.5" stroke="#7c3aed" stroke-width="1.1" fill="none"/></svg>', name:'Roku',                   desc:'No DV · no lossless · DD+ ceiling · HDR10', help:'Roku has limited Dolby Vision support (player-dependent) so DV-Only streams are killed. No lossless audio passthrough — DD+ is the best audio. <b>AV1</b> supported on newer Roku Ultra/Plus models.' },
-      { v:'chromecast',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg11"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#4285f4" flood-opacity=".4"/></filter></defs><circle cx="22" cy="18" r="11" stroke="#4285f4" stroke-width="1.5" fill="none" filter="url(#dg11)"/><circle cx="22" cy="18" r="11" fill="#00d4ff" opacity=".04"/><circle cx="22" cy="18" r="4" fill="#34a853" opacity=".6" filter="url(#dg11)"/><rect x="19" y="30" width="6" height="8" rx="3" stroke="#4285f4" stroke-width="1.5" fill="none"/></svg>', name:'Chromecast w/ Google TV', desc:'DV · AV1 · no lossless · DD+ · HDR10', help:'Chromecast with Google TV (4K) supports Dolby Vision and AV1. No lossless audio passthrough — DD+ Atmos is the best it handles. Older Chromecast models lack DV and AV1.' },
-      { v:'sony',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg12"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#2563eb" flood-opacity=".4"/></filter></defs><rect x="3" y="9" width="38" height="23" rx="1.5" stroke="#2563eb" stroke-width="1.5" filter="url(#dg12)"/><rect x="6" y="11.5" width="32" height="18" rx="1" fill="#00d4ff" opacity=".06"/><rect x="18" y="32" width="8" height="3" rx="1" fill="#2563eb" opacity=".4"/><line x1="13" y1="39" x2="31" y2="39" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/><path d="M14 19 Q16 17 18 19 Q20 21 22 19 Q24 17 26 19 Q28 21 30 19" stroke="#2563eb" stroke-width="1.3" stroke-linecap="round" fill="none" opacity=".5"/></svg>', name:'Sony Bravia',            desc:'DV · AV1 · eARC · TrueHD · 7.1', help:'Sony Bravia XR/X series supports Dolby Vision, AV1, and lossless audio via eARC. Google TV built-in. Same unrestricted profile as LG — nothing is excluded.' },
-      { v:'ipad',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg13"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#a1a1aa" flood-opacity=".3"/></filter></defs><rect x="10" y="5" width="24" height="34" rx="3.5" stroke="#a1a1aa" stroke-width="1.5" fill="none" filter="url(#dg13)"/><rect x="10" y="5" width="24" height="34" rx="3.5" fill="#00d4ff" opacity=".04"/><rect x="13" y="8" width="18" height="25" rx="1" fill="#a1a1aa" opacity=".08"/><line x1="19" y1="36" x2="25" y2="36" stroke="#a1a1aa" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="6.5" r="1" fill="#a1a1aa" opacity=".4"/></svg>', name:'iPad / iPhone',          desc:'DV · AV1 · no lossless · stereo/headphones', help:'iOS devices support Dolby Vision and AV1 natively. Audio is limited to DD+ / AAC — no lossless passthrough. Stereo / headphone output unless connected to an external DAC.' },
+      { v:'roku',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg10"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#7c3aed" flood-opacity=".4"/></filter></defs><rect x="12" y="6" width="20" height="32" rx="4" stroke="#7c3aed" stroke-width="1.5" fill="none" filter="url(#dg10)"/><rect x="12" y="6" width="20" height="32" rx="4" fill="#00d4ff" opacity=".05"/><circle cx="22" cy="16" r="4.5" stroke="#7c3aed" stroke-width="1.3" fill="none" filter="url(#dg10)"/><circle cx="22" cy="16" r="1.5" fill="#7c3aed"/><circle cx="18" cy="26" r="2" stroke="#7c3aed" stroke-width="1.1" fill="none"/><circle cx="26" cy="26" r="2" stroke="#7c3aed" stroke-width="1.1" fill="none"/><rect x="18" y="31" width="8" height="3" rx="1.5" stroke="#7c3aed" stroke-width="1.1" fill="none"/></svg>', name:'Roku',                   desc:'HDR10 safe · DV/AV1 vary by model · no TrueHD', help:'Roku capabilities differ substantially by model. This conservative profile excludes DV-only and lossless audio; newer Roku Ultra models can handle Dolby Vision and AV1.' },
+      { v:'chromecast',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg11"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#4285f4" flood-opacity=".4"/></filter></defs><circle cx="22" cy="18" r="11" stroke="#4285f4" stroke-width="1.5" fill="none" filter="url(#dg11)"/><circle cx="22" cy="18" r="11" fill="#00d4ff" opacity=".04"/><circle cx="22" cy="18" r="4" fill="#34a853" opacity=".6" filter="url(#dg11)"/><rect x="19" y="30" width="6" height="8" rx="3" stroke="#4285f4" stroke-width="1.5" fill="none"/></svg>', name:'Chromecast w/ Google TV', desc:'DV · no AV1 on 4K model · DD+/Atmos', help:'Chromecast with Google TV 4K supports Dolby Vision but not AV1 hardware decode. The separate 1080p HD model supports AV1. This profile follows the more common 4K model and uses DD+/Atmos audio.' },
+      { v:'sony',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg12"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#2563eb" flood-opacity=".4"/></filter></defs><rect x="3" y="9" width="38" height="23" rx="1.5" stroke="#2563eb" stroke-width="1.5" filter="url(#dg12)"/><rect x="6" y="11.5" width="32" height="18" rx="1" fill="#00d4ff" opacity=".06"/><rect x="18" y="32" width="8" height="3" rx="1" fill="#2563eb" opacity=".4"/><line x1="13" y1="39" x2="31" y2="39" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/><path d="M14 19 Q16 17 18 19 Q20 21 22 19 Q24 17 26 19 Q28 21 30 19" stroke="#2563eb" stroke-width="1.3" stroke-linecap="round" fill="none" opacity=".5"/></svg>', name:'Sony Bravia',            desc:'DV · AV1 varies · DD+/Atmos · no internal-app TrueHD', help:'Recent Sony Google TVs support Dolby Vision and some support AV1, but capabilities vary by model year. Internal TV apps do not reliably pass TrueHD/DTS-HD, so Standard audio is recommended.' },
+      { v:'ipad',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg13"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#a1a1aa" flood-opacity=".3"/></filter></defs><rect x="10" y="5" width="24" height="34" rx="3.5" stroke="#a1a1aa" stroke-width="1.5" fill="none" filter="url(#dg13)"/><rect x="10" y="5" width="24" height="34" rx="3.5" fill="#00d4ff" opacity=".04"/><rect x="13" y="8" width="18" height="25" rx="1" fill="#a1a1aa" opacity=".08"/><line x1="19" y1="36" x2="25" y2="36" stroke="#a1a1aa" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="6.5" r="1" fill="#a1a1aa" opacity=".4"/></svg>', name:'iPad / iPhone',          desc:'DV · AV1 on newer chips only · AAC/DD+ audio', help:'Dolby Vision is broadly supported. AV1 hardware decoding starts with newer Apple silicon such as A17 Pro/A18 and M-series generations; the conservative profile excludes AV1 for older iPhones and iPads.' },
       { v:'projector',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg14"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#eab308" flood-opacity=".4"/></filter></defs><rect x="5" y="14" width="34" height="18" rx="3" stroke="#eab308" stroke-width="1.5" filter="url(#dg14)"/><rect x="5" y="14" width="34" height="18" rx="3" fill="#00d4ff" opacity=".05"/><circle cx="16" cy="23" r="5" stroke="#eab308" stroke-width="1.5" fill="none"/><circle cx="16" cy="23" r="2" fill="#eab308" opacity=".6"/><line x1="24" y1="20" x2="35" y2="20" stroke="#eab308" stroke-width="1.2" stroke-linecap="round" opacity=".4"/><line x1="24" y1="23.5" x2="32" y2="23.5" stroke="#eab308" stroke-width="1.2" stroke-linecap="round" opacity=".4"/><line x1="24" y1="27" x2="29" y2="27" stroke="#eab308" stroke-width="1.2" stroke-linecap="round" opacity=".4"/><line x1="11" y1="32" x2="11" y2="38" stroke="#eab308" stroke-width="1.5" stroke-linecap="round"/><line x1="33" y1="32" x2="33" y2="38" stroke="#eab308" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Projector',              desc:'HDR10 · no DV · no lossless · AV1 varies', help:'Most projectors (Epson, BenQ, XGIMI) lack Dolby Vision — DV-Only streams are killed. HDR10 is the primary HDR format. Audio depends on your receiver/soundbar. AV1 support varies by model — excluded by default for safety.' },
-      { v:'onn',             icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg15"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#f59e0b" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="16" rx="2.5" stroke="#f59e0b" stroke-width="1.5" filter="url(#dg15)"/><rect x="8" y="12" width="28" height="16" rx="2.5" fill="#00d4ff" opacity=".05"/><circle cx="22" cy="20" r="4" stroke="#f59e0b" stroke-width="1.3" fill="none" filter="url(#dg15)"/><circle cx="22" cy="20" r="1.5" fill="#f59e0b" opacity=".6"/><line x1="16" y1="33" x2="28" y2="33" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="28" x2="22" y2="31" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'ONN Box',                desc:'DV · AV1 · no lossless · DD+ · HDR10', help:'Walmart ONN 4K streaming boxes run Android TV. DV and AV1 supported on 2021+ models. No lossless audio passthrough — DD+ Atmos is the ceiling. Similar profile to Chromecast with Google TV.' },
-      { v:'xiaomi',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg17"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff6900" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="18" rx="3" stroke="#ff6900" stroke-width="1.5" filter="url(#dg17)" fill="none"/><rect x="8" y="12" width="28" height="18" rx="3" fill="#00d4ff" opacity=".04"/><text x="22" y="24" text-anchor="middle" fill="#ff6900" font-size="8" font-weight="800" font-family="system-ui,sans-serif" opacity=".7">Mi</text><line x1="18" y1="33" x2="26" y2="33" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Xiaomi Mi Box S (2nd Gen)', desc:'DV Profile 5 · no AV1 · no lossless · DD+ Atmos', help:'Xiaomi Mi Box S 2nd gen — DV Profile 5, HDR10+, HDR10, HLG all supported. <b>No AV1</b>: the Amlogic S905X3 has no AV1 decoder. <b>No lossless audio</b>: DD+ Atmos is the ceiling, 5.1 channels. Handles REMUX playback well despite 2 GB RAM.' },
-      { v:'xiaomi-3rd',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg18"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff6900" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="18" rx="3" stroke="#ff6900" stroke-width="1.5" filter="url(#dg18)" fill="none"/><rect x="8" y="12" width="28" height="18" rx="3" fill="#00d4ff" opacity=".04"/><text x="22" y="24" text-anchor="middle" fill="#ff6900" font-size="8" font-weight="800" font-family="system-ui,sans-serif" opacity=".7">Mi</text><circle cx="32" cy="14" r="3" fill="#ff6900" opacity=".5"/><line x1="18" y1="33" x2="26" y2="33" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Xiaomi Mi Box S (3rd Gen)', desc:'DV Profile 5 · AV1 · no lossless · DD+ Atmos', help:'Xiaomi Mi Box S 3rd gen (2024) — same as 2nd gen but with <b>AV1 hardware decode</b>. DV Profile 5, HDR10+, HDR10, HLG. No lossless audio — DD+ Atmos ceiling. Handles REMUX well.' },
+      { v:'onn',             icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg15"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#f59e0b" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="16" rx="2.5" stroke="#f59e0b" stroke-width="1.5" filter="url(#dg15)"/><rect x="8" y="12" width="28" height="16" rx="2.5" fill="#00d4ff" opacity=".05"/><circle cx="22" cy="20" r="4" stroke="#f59e0b" stroke-width="1.3" fill="none" filter="url(#dg15)"/><circle cx="22" cy="20" r="1.5" fill="#f59e0b" opacity=".6"/><line x1="16" y1="33" x2="28" y2="33" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="28" x2="22" y2="31" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'ONN Box',                desc:'AV1 · HDR10 · DV only on Pro models · DD+/Atmos', help:'ONN hardware varies: recent boxes support AV1, while Dolby Vision is mainly a Pro-model capability. The shared profile avoids DV-only streams and lossless audio for broad compatibility.' },
+      { v:'xiaomi',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg17"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff6900" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="18" rx="3" stroke="#ff6900" stroke-width="1.5" filter="url(#dg17)" fill="none"/><rect x="8" y="12" width="28" height="18" rx="3" fill="#00d4ff" opacity=".04"/><text x="22" y="24" text-anchor="middle" fill="#ff6900" font-size="8" font-weight="800" font-family="system-ui,sans-serif" opacity=".7">Mi</text><line x1="18" y1="33" x2="26" y2="33" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Xiaomi Mi Box S (2nd Gen)', desc:'DV · HDR10+ · AV1 · Atmos/DTS-HD support', help:'Xiaomi TV Box S 2nd gen uses an Amlogic S905X4-class decoder with AV1, Dolby Vision, HDR10+, HDR10 and HLG support. HD-audio passthrough can depend on player and firmware, so Standard audio is recommended.' },
+      { v:'xiaomi-3rd',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg18"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff6900" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="18" rx="3" stroke="#ff6900" stroke-width="1.5" filter="url(#dg18)" fill="none"/><rect x="8" y="12" width="28" height="18" rx="3" fill="#00d4ff" opacity=".04"/><text x="22" y="24" text-anchor="middle" fill="#ff6900" font-size="8" font-weight="800" font-family="system-ui,sans-serif" opacity=".7">Mi</text><circle cx="32" cy="14" r="3" fill="#ff6900" opacity=".5"/><line x1="18" y1="33" x2="26" y2="33" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Xiaomi Mi Box S (3rd Gen)', desc:'DV · HDR10+ · AV1 · Standard audio recommended', help:'Xiaomi TV Box S 3rd gen supports AV1 and modern HDR formats. Audio passthrough still varies by app and firmware, so the profile avoids assuming a full lossless home-theatre chain.' },
     ]
   },
   { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c1', layout:'svc-list', noHero:true,
@@ -2342,7 +2475,7 @@ function renderOpts(def) {
         <div class="fmt-scroll-head">
           <div class="opt-icon" style="flex-shrink:0;margin-right:2px">${o.icon}</div>
           <div style="min-width:0">
-            <span class="fmt-scroll-label" style="font-size:.84rem;color:${active?'#00d4ff':'#c9d1d9'}">${o.name}</span>
+            <span class="fmt-scroll-label" style="font-size:.84rem;color:${active?'#00d4ff':'#c9d1d9'}">${o.name}</span>${POPULAR_DEVICE_IDS.has(o.v)?'<span style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);color:#67e8f9;font-size:.5rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase">Popular</span>':''}
           </div>
         </div>
         <div style="font-size:.65rem;color:#8b949e;line-height:1.45;margin-top:2px">${o.desc}</div>
@@ -2372,7 +2505,7 @@ function renderOpts(def) {
           { v:'limited',  icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M6 18v8h5l7 5V13l-7 5H6z" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M24 18a4 4 0 010 8" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="35" cy="22" r="7" stroke="#94a3b8" stroke-width="1.5" fill="none"/><circle cx="35" cy="22" r="2" stroke="#94a3b8" stroke-width="1.2" fill="none"/><line x1="35" y1="13" x2="35" y2="16" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/><line x1="35" y1="28" x2="35" y2="31" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/><line x1="26" y1="22" x2="29" y2="22" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/><line x1="41" y1="22" x2="44" y2="22" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>', name:'Auto', desc:'Let device profile decide · safe default' },
           { v:'dolby',    icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#818cf8" stroke-width="1.5" stroke-linejoin="round" fill="none"/><rect x="26" y="13" width="14" height="18" rx="3" stroke="#818cf8" stroke-width="1.5" fill="none"/><path d="M30 13v18" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/><path d="M36 13v18" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/><path d="M30 13a9 9 0 010 18" stroke="#818cf8" stroke-width="1.5" fill="none"/><path d="M36 13a9 9 0 000 18" stroke="#818cf8" stroke-width="1.5" fill="none"/></svg>', name:'Dolby Only', desc:'Atmos · TrueHD · DD+ · no DTS' },
         ];
-        const DEV_REC = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited', onn:'limited' };
+        const DEV_REC = DEVICE_AUDIO_DEFAULTS;
         const recAudio = DEV_REC[S.device];
         const devLabel = label('device', S.device);
         const audioRows = AUDIO_OPTS.map(o => {
@@ -3071,7 +3204,7 @@ function splashHtml() {
 
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4">
-      <div class="splash-door" data-action="easy-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.compass(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Core Start <span class="splash-door-tag splash-tag-guided">Recommended</span></div><div class="splash-door-desc">Guided setup through device, quality, and cache preferences.</div></div></div>
+      <div class="splash-door fastlane-door" data-action="open-fast-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.rocket(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Quick Install <span class="splash-door-tag fastlane-badge">Fastest</span></div><div class="splash-door-desc">Choose an app, service, and performance profile — then install in one short flow.</div></div></div>
       <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Core Configure <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
       <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Template <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
     </div>
@@ -3080,11 +3213,13 @@ function splashHtml() {
     <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
     <div class="splash-tertiary splash-anim splash-anim-d6">
+      <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
       <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">Browse Templates</a>
       <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
       <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-tertiary-btn">GitHub</a>
       <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-tertiary-btn">Core Crew</a>
       <button data-action="show-changelog" class="splash-tertiary-btn">What's new · v${CONFIGURATOR_VERSION}</button>
+      <button data-action="open-diagnostics" class="splash-tertiary-btn">Report Issue</button>
     </div>
     <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
   </div>`;
@@ -3160,7 +3295,7 @@ function render() {
           ].map(({k, ico}) => {
             const JUMP = { service:1, device:2, resolution:3, audio:3, content:4 };
             const jumpAttr = JUMP[k] ? ` data-action="jump-step" data-step="${JUMP[k]}" title="Click to change"` : (k === 'formatter' ? ` data-action="open-fmt-picker" title="Click to change"` : '');
-            const audioOverride = k==='audio' && S.audio!=='limited' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device);
+            const audioOverride = k==='audio' && ['lossless','dolby'].includes(S.audio) && DEVICE_FORCE_LIMITED_AUDIO.has(S.device);
             const val = label(k, S[k]) || '—';
             const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && S.resolution==='4k') || (k==='formatter' && S.formatter!=='family-v3');
             return `<div class="receipt-row"${jumpAttr}>
@@ -3388,6 +3523,7 @@ function render() {
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase">More from Core Builds</div>
             <div style="display:flex;gap:12px;align-items:center">
+              <button data-action="open-diagnostics" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s">Report Issue</button>
               <button data-action="show-changelog" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Changelog</button>
               <button data-action="start-setup" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
             </div>
@@ -3937,7 +4073,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = e.target.value;
       if (val) {
         S.device = val;
-        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited', onn:'limited' };
+        const DEV_AUDIO = DEVICE_AUDIO_DEFAULTS;
         const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
         const newAudio = DEV_AUDIO[val];
         if (newAudio && newAudio !== S.audio) { S.audio = newAudio; showToast(`Audio auto-set to ${AUDIO_NAMES[newAudio] || newAudio}`); }
@@ -4003,10 +4139,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'device-scroll-pick') {
       const val = el.dataset.val;
       S.device = val;
-      const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited', onn:'limited' };
+      const DEV_AUDIO = DEVICE_AUDIO_DEFAULTS;
       const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
       const newAudio = DEV_AUDIO[val];
-      const devCantDoLossless = ['samsung','firestick-hd','firestick-4kmax','roku','chromecast','ipad','projector','onn'].includes(val);
+      const devCantDoLossless = DEVICE_FORCE_LIMITED_AUDIO.has(val);
       if (newAudio && newAudio !== S.audio) {
         if (S.quickStart && S.audio === 'lossless' && !devCantDoLossless) {
           // Keep lossless
@@ -4104,6 +4240,8 @@ document.addEventListener('DOMContentLoaded', () => {
       window.scrollTo(0,0);
     }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'open-fast-lane') showFastLane();
+    if (action === 'open-diagnostics') showDiagnosticsModal();
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'show-full-review') { S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
@@ -4489,10 +4627,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action === 'update-radio') {
       S[e.target.dataset.key] = e.target.value;
       if (e.target.dataset.key === 'device') {
-        const DEV_AUDIO = { samsung:'standard', 'firestick-hd':'limited', 'firestick-4kmax':'limited', shield:'lossless', lgtv:'lossless', 'appletv-old':'lossless', 'appletv-new':'lossless', windows:'lossless', generic:'lossless', roku:'limited', chromecast:'limited', sony:'lossless', ipad:'limited', projector:'limited', onn:'limited' };
+        const DEV_AUDIO = DEVICE_AUDIO_DEFAULTS;
         const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
         const newAudio = DEV_AUDIO[e.target.value];
-        const devCantDoLossless = ['samsung','firestick-hd','firestick-4kmax','roku','chromecast','ipad','projector','onn'].includes(e.target.value);
+        const devCantDoLossless = DEVICE_FORCE_LIMITED_AUDIO.has(e.target.value);
         if (newAudio && newAudio !== S.audio) {
           if (S.quickStart && S.audio === 'lossless' && !devCantDoLossless) {
             // Preset chose lossless and this device supports it — keep it
@@ -4632,17 +4770,17 @@ function insights() {
   else if (dev === 'firestick-hd') pts.push('<b>DV-Only Kill</b> on · AV1 excluded · limited audio (DD+ max)');
   else if (dev === 'shield') pts.push('<b>AV1 + HLG excluded</b> — prevents Nvidia Shield playback failures');
   else if (dev === 'appletv-old') pts.push('<b>AV1 excluded</b> — Apple TV 4K Gen 1/2 hardware limit');
-  else if (dev === 'appletv-new') pts.push('<b>Full AV1 + DV</b> — optimised for Apple TV 4K Gen 3 (A15)');
+  else if (dev === 'appletv-new') pts.push('<b>DV + HDR10+</b> · AV1 excluded · DD+/Atmos or multichannel PCM');
   else if (dev === 'windows') pts.push('<b>Full lossless + AV1</b> — Windows PC optimised, HDR-first visual tags');
-  else if (dev === 'lgtv' || dev === 'sony') pts.push('<b>Full DV + eARC + 7.1</b> — unrestricted profile');
+  else if (dev === 'lgtv' || dev === 'sony') pts.push('<b>DV profile</b> · AV1 varies by model · internal apps use streaming-grade audio');
   else if (dev === 'roku') pts.push('<b>DV-Only Kill</b> · AV1 allowed · DD+ ceiling · HDR10 primary');
-  else if (dev === 'chromecast') pts.push('<b>DV + AV1</b> · no lossless audio · DD+ Atmos ceiling');
+  else if (dev === 'chromecast') pts.push('<b>DV + HDR</b> · AV1 excluded for Chromecast 4K · DD+ Atmos');
   else if (dev === 'ipad') pts.push('<b>DV + AV1</b> · stereo/headphone audio · no lossless passthrough');
   else if (dev === 'projector') pts.push('<b>DV-Only Kill</b> · AV1 excluded · HDR10 primary · audio via receiver');
-  else if (dev === 'onn') pts.push('<b>DV + AV1</b> · no lossless audio · DD+ Atmos ceiling · HDR10');
+  else if (dev === 'onn') pts.push('<b>AV1 + HDR10</b> · DV-only excluded for non-Pro ONN models · DD+ Atmos');
   else if (dev === 'googletv') pts.push('<b>DV + AV1 + HDR10+</b> · no lossless audio · DD+ Atmos ceiling · 5.1ch');
-  else if (dev === 'xiaomi') pts.push('<b>DV Profile 5 + HDR10+</b> · no AV1 · no lossless audio · DD+ Atmos ceiling');
-  else if (dev === 'xiaomi-3rd') pts.push('<b>DV Profile 5 + AV1 + HDR10+</b> · no lossless audio · DD+ Atmos ceiling');
+  else if (dev === 'xiaomi') pts.push('<b>DV + HDR10+ + AV1</b> · Standard audio recommended');
+  else if (dev === 'xiaomi-3rd') pts.push('<b>DV + HDR10+ + AV1</b> · Standard audio recommended');
   if (aud === 'dolby') pts.push('<b>All DTS excluded</b> — safe for Bose / Dolby soundbars (Atmos · TrueHD · DD+ only)');
   else if (aud === 'lossless') pts.push('<b>Full lossless audio ranked</b> — TrueHD · Atmos · DTS-HD MA · FLAC prioritised');
   else if (aud === 'standard') pts.push('<b>DD+ / Atmos ranked</b> — soundbar and smart TV profile');
@@ -4899,41 +5037,51 @@ function resolutionCfg() {
 
 function encodeCfg() {
   const dev = S.device;
-  if (dev==='samsung'||dev==='firestick-hd'||dev==='shield'||dev==='xiaomi') return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
-  if (dev==='firestick-4kmax'||dev==='xiaomi-3rd') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
-  if (dev==='appletv-old') return { excludedEncodes:['AV1'], preferredEncodes:['HEVC','AVC','Unknown'] };
-  if (dev==='windows') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
-  if (dev==='roku') return { excludedEncodes:['VC-1'], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
-  if (dev==='projector') return { excludedEncodes:['AV1','VC-1'], preferredEncodes:['HEVC','AVC','Unknown'] };
-  return { excludedEncodes:[], preferredEncodes:['HEVC','AV1','AVC','Unknown'] };
+  const av1Unsafe = !DEVICE_AV1_SAFE.has(dev);
+  const vc1Unsafe = !['shield','windows'].includes(dev);
+  const excludedEncodes = [...(av1Unsafe ? ['AV1'] : []), ...(vc1Unsafe ? ['VC-1'] : [])];
+  const preferredEncodes = av1Unsafe ? ['HEVC','AVC','Unknown'] : ['HEVC','AV1','AVC','Unknown'];
+  return { excludedEncodes, preferredEncodes };
 }
 
 function audioCfg() {
   const dev = S.device;
-  const limited = S.audio==='limited' || dev==='samsung' || dev==='firestick-hd' || dev==='firestick-4kmax' || dev==='roku' || dev==='chromecast' || dev==='ipad' || dev==='projector' || dev==='onn' || dev==='googletv' || dev==='xiaomi' || dev==='xiaomi-3rd';
-  const dolby   = S.audio==='dolby';
-  const wide     = dev==='windows' || dev==='lgtv' || dev==='appletv-old' || dev==='appletv-new' || dev==='sony' || S.audio==='lossless' || dolby;
+  const forcedLimited = DEVICE_FORCE_LIMITED_AUDIO.has(dev);
+  const limited = S.audio === 'limited' || forcedLimited;
+  const dolby = S.audio === 'dolby';
+  const wide = ['shield','windows'].includes(dev) || (S.audio === 'lossless' && !forcedLimited) || (dolby && !forcedLimited);
+  if (dolby && forcedLimited) return {
+    excludedAudioTags: ['TrueHD','DTS-HD MA','DTS:X','DTS-HD','DTS-ES','FLAC'],
+    preferredAudioTags: ['Atmos','DD+','AAC','DD'],
+    preferredAudioChannels: ['5.1','2.0']
+  };
   if (dolby) return {
     excludedAudioTags: ['DTS','DTS-HD MA','DTS:X','DTS-HD','DTS-ES'],
     preferredAudioTags: ['TrueHD','Atmos','DD+','AAC','DD'],
     preferredAudioChannels: ['7.1','5.1','2.0']
   };
-  return { excludedAudioTags: limited ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [], preferredAudioTags:['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','DTS-HD','DD+','AAC','DTS','DD'], preferredAudioChannels: wide ? ['7.1','5.1','2.0'] : ['5.1','2.0'] };
+  return {
+    excludedAudioTags: limited ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [],
+    preferredAudioTags: limited ? ['Atmos','DD+','AAC','DD','DTS'] : ['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','DTS-HD','DD+','AAC','DTS','DD'],
+    preferredAudioChannels: wide ? ['7.1','5.1','2.0'] : ['5.1','2.0']
+  };
 }
 
 function visualTags() {
   const dev = S.device;
-  if (['appletv-old','appletv-new','lgtv','sony'].includes(dev)) return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
-  if (dev==='samsung') return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
-  if (dev==='firestick-hd') return ['HDR10','HDR','HLG','SDR'];
-  if (dev==='firestick-4kmax'||dev==='chromecast'||dev==='onn'||dev==='googletv'||dev==='xiaomi'||dev==='xiaomi-3rd') return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
-  if (dev==='shield') return ['DV','HDR+DV','HDR10+','HDR10','HDR','10bit','SDR','IMAX'];
-  if (dev==='ipad') return ['DV','HDR+DV','HDR10','HDR','10bit','SDR'];
-  if (dev==='roku'||dev==='projector') return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
-  if (dev==='windows' || S.resolution==='4k' || S.resolution==='ultrawide') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'appletv-old') return ['DV','HDR+DV','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'appletv-new') return ['DV','HDR+DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'lgtv' || dev === 'sony') return ['DV','HDR+DV','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'samsung') return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'firestick-hd') return ['HDR10','HDR','HLG','SDR'];
+  if (['firestick-4kmax','chromecast','googletv','xiaomi','xiaomi-3rd'].includes(dev)) return ['DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'onn') return ['HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'shield') return ['DV','HDR+DV','HDR10','HDR','10bit','SDR','IMAX'];
+  if (dev === 'ipad') return ['DV','HDR+DV','HDR10','HDR','10bit','SDR'];
+  if (dev === 'roku' || dev === 'projector' || dev === 'generic') return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
+  if (dev === 'windows' || S.resolution === '4k' || S.resolution === 'ultrawide') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX'];
   return ['HDR10','HDR','HLG','10bit','SDR','IMAX'];
 }
-
 function eses() {
   const out = [], dev = S.device, is1080= S.resolution === '1080p';
   const isFree = S.service === 'p2p' || S.service === 'http';
@@ -4956,7 +5104,7 @@ function eses() {
     }
     if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
     if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
-    if (['samsung','firestick-hd','roku','projector'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+    if (['generic','samsung','firestick-hd','roku','projector','onn'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
     if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
     if (S.sizeLimit !== 'unlimited') {
@@ -4996,7 +5144,7 @@ function eses() {
     { enabled:true, expression:"/*Final Limit (All)*/ merge(count(quality(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip'))>12?quality(negate(merge(library(streams),seadex(streams)),streams),'HDRip','HC HD-Rip','DVDRip','HDTV','CAM','TS','TC','SCR'):count(quality(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV'))>12?quality(streams,'CAM','TS','TC','SCR'):[],count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>15?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>12?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'),3))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>12?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>9?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),3))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>6?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),6))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>3?negate(merge(library(streams),seadex(streams)),merge(slice(type(uncached(streams),'debrid'),6),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),-1))):[])" }
   );
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
-  if (['samsung','firestick-hd','roku','projector'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+  if (['generic','samsung','firestick-hd','roku','projector','onn'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
   const hasRD = S.service==='realdebrid' || S.service==='hybrid' || (S.service==='multi' && S.multiServices && S.multiServices.includes('realdebrid'));
   if (hasRD) out.push({ enabled:true, expression:"/*RD Copyright (per DMM)*/ service(keyword(streams,'all','web-dl','webrip','bdrip','hdrip','dvdrip','bluray.x264','hdtv.x264','hdtv.xvid','web.x264','web.h264'),'realdebrid')" });
   out.push({ enabled:true, expression:"/* Indexer Diversity */ count(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))))>20 ? negate(perGroup(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'indexer',2),negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http')))) : []" });
@@ -5015,8 +5163,8 @@ function eses() {
 }
 
 function pses() {
-  const out = [], res = S.resolution, dev = S.device, dv = dev==='appletv-old' || dev==='appletv-new' || dev==='lgtv' || dev==='firestick-4kmax', codecExpr = !['samsung','firestick-hd','appletv-old','xiaomi'].includes(dev) ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
-  const audPinnArr = (S.audio === 'limited' || ['samsung','firestick-hd','firestick-4kmax','googletv'].includes(dev)) ? [] : S.audio === 'dolby' ? [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos')" }] : [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" }];
+  const out = [], res = S.resolution, dev = S.device, dv = DEVICE_DV_SAFE.has(dev), supportsAv1 = DEVICE_AV1_SAFE.has(dev), codecExpr = supportsAv1 ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
+  const audPinnArr = (S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev)) ? [] : S.audio === 'dolby' ? [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos')" }] : [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" }];
   const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" }, pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" }, imaxPin = { enabled:true, expression:"/*IMAX pin*/ count(visualTag(streams,'IMAX'))>0 ? pin(visualTag(streams,'IMAX'),'top') : []" };
   const sliceLimits4k = [
     { enabled:true, expression:"/* Limit 4K Remux */ slice(resolution(quality(streams,'Bluray REMUX'),'2160p'),0,3)" },
@@ -5570,8 +5718,8 @@ function parseTemplateToState(tpl) {
   const ee = new Set(c.excludedEncodes || []);
   const pvt = c.preferredVisualTags || [];
   const nameLC = ((tpl.metadata && tpl.metadata.name) || c.addonName || '').toLowerCase();
-  if (nameLC.includes('xiaomi') || (ee.has('AV1') && ee.has('VC-1') && pvt.includes('DV') && pvt.includes('HDR10+'))) {
-    st.device = ee.has('AV1') ? 'xiaomi' : 'xiaomi-3rd';
+  if (nameLC.includes('xiaomi')) {
+    st.device = nameLC.includes('3rd') ? 'xiaomi-3rd' : 'xiaomi';
   } else if (nameLC.includes('samsung') || (ee.has('AV1') && ee.has('VC-1') && pvt.includes('HDR10+') && !pvt.includes('DV'))) {
     st.device = 'samsung';
   } else if (nameLC.includes('fire') || nameLC.includes('firestick')) {
@@ -6040,15 +6188,9 @@ function showTestDriveModal() {
     try {
       const cfg = buildFinal().config;
       const tempPwd = makePwd();
-      const allHosts = hostEntries();
 
-      // Find fastest reachable host
-      const fastest = await Promise.any(
-        allHosts.map(([, host]) =>
-          raceHostFetch(host, '/api/v1/status', { method:'GET' }, 4000)
-            .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
-        )
-      );
+      // Prefer the last known-good host; fall back to racing the remaining hosts.
+      const fastest = await selectHealthyHost(4000);
 
       // Upload config
       const uploadRes = await raceHostFetch(fastest, '/api/v1/user', {
@@ -6641,19 +6783,19 @@ function simpleFinishHtml() {
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Formatter</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px">
-              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.formatter===f.id?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(0,212,255,.1)':'transparent'};color:${S.formatter===f.id?'#00d4ff':'#6b7280'}">${f.label}</button>`).join('')}
+              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" data-active="${S.formatter===f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.formatter===f.id?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(0,212,255,.1)':'transparent'};color:${S.formatter===f.id?'#00d4ff':'#6b7280'}">${f.label}</button>`).join('')}
             </div>
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Dedup matching</div>
             <div style="display:flex;gap:6px">
-              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" data-active="${S.matchMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Cache mode</div>
             <div style="display:flex;gap:6px">
-              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           <div>
@@ -6662,19 +6804,19 @@ function simpleFinishHtml() {
               <span style="font-size:.6rem;color:#4b5563;font-weight:600">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
             </div>
             <div style="display:flex;gap:6px">
-              ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
+              ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
           </div>
           <div>
-            <button data-action="set-simple-quality" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-quality" data-active="${S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Quality over resolution</span>
               <span>${S.qualityFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">A 1080p REMUX ranks above a 4K WEB-DL when enabled</div>
           </div>
           <div>
-            <button data-action="set-simple-resfirst" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.resolutionFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.resolutionFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-resfirst" data-active="${S.resolutionFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.resolutionFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.resolutionFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Resolution first</span>
               <span>${S.resolutionFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
@@ -6784,7 +6926,7 @@ function templateHealthCheck() {
   if ((S.subtitleAddons || []).includes('subdl') && !S.creds.subdl) {
     warns.push('SubDL subtitles enabled but API Key is missing — SubDL subtitles won\'t load');
   }
-  if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio on a device that doesn\'t support passthrough');
+  if (S.audio === 'lossless' && DEVICE_FORCE_LIMITED_AUDIO.has(S.device)) warns.push('Lossless audio selected for a profile that does not reliably support passthrough');
   if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('4K resolution on Fire Stick HD — device cannot play 2160p');
   const credInputs = getDebridInputs();
   const filledCreds = credInputs.filter(i => S.creds[i.id] && S.creds[i.id].trim());
@@ -7091,8 +7233,138 @@ async function preflightCheck() {
   if (S.multiServices.includes('easynews') && !S.creds.easynewsPass) warns.push('EasyNews selected but no password entered');
   if (S.multiServices.includes('nzbgeek') && !S.creds.nzbgeek) warns.push('NZBGeek selected but no API key entered');
   if (S.multiServices.includes('streamnzb') && !S.creds.streamnzb) warns.push('StreamNZB selected but no manifest URL entered');
-  if (S.audio === 'lossless' && ['samsung','firestick-hd','firestick-4kmax'].includes(S.device)) warns.push('Lossless audio selected but your device doesn\'t support it — streams may not play');
+  if (S.audio === 'lossless' && DEVICE_FORCE_LIMITED_AUDIO.has(S.device)) warns.push('Lossless audio selected but this device profile does not reliably support passthrough');
+  try {
+    const cfg = buildFinal()?.config;
+    if (!cfg || !Array.isArray(cfg.presets)) warns.push('Generated template is missing its preset list');
+    const names=(cfg?.presets||[]).map(p=>p.name).filter(Boolean), duplicates=[...new Set(names.filter((n,i)=>names.indexOf(n)!==i))];
+    if (duplicates.length) warns.push('Duplicate preset names detected: '+duplicates.slice(0,3).join(', '));
+    const health=templateHealthCheck(); health.forEach(w=>{if(!warns.includes(w))warns.push(w);});
+    const compat=hostCompatCheck();
+    const selected=S.instanceHost && compat[S.instanceHost];
+    if (selected?.status==='err') warns.push((selected.label||S.instanceHost)+' host compatibility check is blocked');
+  } catch(e) { warns.push('Template preflight could not complete: '+e.message); }
   return warns;
+}
+
+function applyQuickProfile(profile) {
+  S.quickProfile = profile;
+  S.device = 'generic';
+  S.content = 'all';
+  S.formatter = 'family-v3';
+  S.matchMode = 'balanced';
+  S.excludeDV = false;
+  S.exclude4K = false;
+  if (profile === 'fast') {
+    Object.assign(S, { resolution:'1080p', audio:'limited', cacheMode:'cached', streamPool:'normal', sizeLimit:'20', qualityFirst:false, resolutionFirst:true });
+  } else if (profile === 'maximum') {
+    Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'mixed', streamPool:'max', sizeLimit:'unlimited', qualityFirst:true, resolutionFirst:false });
+  } else {
+    Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'mixed', streamPool:'normal', sizeLimit:'30', qualityFirst:false, resolutionFirst:true });
+  }
+}
+
+function showFastLane() {
+  document.getElementById('fastLaneModal')?.remove();
+  const selectedService = (S.service && !['http'].includes(S.service)) ? S.service : 'torbox';
+  const state = { target:'app', service:selectedService === 'p2p' ? 'free' : selectedService, profile:S.quickProfile || 'balanced' };
+  const overlay = document.createElement('div');
+  overlay.id = 'fastLaneModal';
+  overlay.className = 'fastlane-overlay';
+  overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="fastLaneTitle">
+    <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Quick install</div><div class="fastlane-title" id="fastLaneTitle">Working streams in one short flow.</div><div class="fastlane-sub">Pick where you watch, your service, and how aggressively Core Builds should search. Advanced controls remain available later.</div></div><button class="fastlane-close" id="fastLaneClose" aria-label="Close">✕</button></div>
+    <div class="fastlane-section"><div class="fastlane-label">1 / Where do you watch?</div><div class="fastlane-grid apps" id="flApps">
+      ${[['app','Stremio','Direct or manifest'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button class="fastlane-choice${state.target===v?' active':''}" data-fl-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
+    </div></div>
+    <div class="fastlane-section"><div class="fastlane-label">2 / Debrid service</div><div class="fastlane-grid services" id="flServices">
+      ${[['torbox','TorBox'],['realdebrid','Real-Debrid'],['alldebrid','AllDebrid'],['premiumize','Premiumize'],['easynews','EasyNews'],['free','Free / P2P']].map(([v,n])=>`<button class="fastlane-choice${state.service===v?' active':''}" data-fl-service="${v}"><b>${n}</b><span>${v==='free'?'No key required':'Credentials required'}</span></button>`).join('')}
+    </div></div>
+    <div class="fastlane-section" id="flCredentials"></div>
+    <div class="fastlane-section"><div class="fastlane-label">3 / Performance profile</div><div class="fastlane-grid profiles" id="flProfiles">
+      ${[['fast','Fast','1080p · cached first · smaller files'],['balanced','Balanced','4K · sensible pool · 30GB cap'],['maximum','Maximum','4K · largest pool · quality first']].map(([v,n,d])=>`<button class="fastlane-choice${state.profile===v?' active':''}" data-fl-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
+    </div></div>
+    <div class="fastlane-section" id="flInstallFields"></div>
+    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label>
+    <button class="fastlane-go" id="btnAutoCreate">Create &amp; Install →</button><div id="aioResult" class="fastlane-result"></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  const creds = document.getElementById('flCredentials');
+  const installFields = document.getElementById('flInstallFields');
+  const renderContext = () => {
+    if (state.service === 'free') creds.innerHTML = '<div class="fastlane-note">No debrid key is required. Free/P2P availability depends on active seeders and compatible hosts.</div>';
+    else if (state.service === 'easynews') creds.innerHTML = `<div class="fastlane-label">EasyNews credentials</div><div class="fastlane-fields"><input class="fastlane-field" id="flEasyUser" autocomplete="username" placeholder="EasyNews username" value="${(S.creds.easynews||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" id="flEasyPass" type="password" autocomplete="current-password" placeholder="EasyNews password" value="${(S.creds.easynewsPass||'').replace(/"/g,'&quot;')}"></div>`;
+    else creds.innerHTML = `<div class="fastlane-label">API key</div><div class="fastlane-fields"><input class="fastlane-field" id="flApiKey" type="password" autocomplete="off" placeholder="Paste your ${state.service} API key" value="${(S.creds[state.service]||'').replace(/"/g,'&quot;')}"></div>`;
+    installFields.innerHTML = state.target === 'app' ? `<div class="fastlane-label">Stremio direct install <span style="font-weight:600;text-transform:none;letter-spacing:0">— optional</span></div><div class="fastlane-fields"><input class="fastlane-field" id="flStremioEmail" type="email" autocomplete="email" placeholder="Stremio email (leave blank for manifest)" value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" id="flStremioPass" type="password" autocomplete="current-password" placeholder="Stremio password" value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"></div><div class="fastlane-note" style="margin-top:7px">Credentials are used only for the direct Stremio API request. Leave both blank to receive a manifest URL instead.</div>` : `<div class="fastlane-note">Core Builds will create a protected manifest and open the ${state.target==='manifest'?'copy/install':state.target} instructions.</div>`;
+  };
+  const activate = (selector, attr, value) => overlay.querySelectorAll(selector).forEach(b=>b.classList.toggle('active',b.getAttribute(attr)===value));
+  overlay.addEventListener('click', async e => {
+    const targetBtn = e.target.closest('[data-fl-target]');
+    if (targetBtn) { state.target=targetBtn.dataset.flTarget; activate('[data-fl-target]','data-fl-target',state.target); renderContext(); return; }
+    const serviceBtn = e.target.closest('[data-fl-service]');
+    if (serviceBtn) { state.service=serviceBtn.dataset.flService; activate('[data-fl-service]','data-fl-service',state.service); renderContext(); return; }
+    const profileBtn = e.target.closest('[data-fl-profile]');
+    if (profileBtn) { state.profile=profileBtn.dataset.flProfile; activate('[data-fl-profile]','data-fl-profile',state.profile); return; }
+    if (e.target === overlay || e.target.closest('#fastLaneClose')) { overlay.remove(); return; }
+    if (e.target.closest('#btnAutoCreate')) {
+      const btn = document.getElementById('btnAutoCreate');
+      const result = document.getElementById('aioResult');
+      result.innerHTML='';
+      if (state.service !== 'free') {
+        if (state.service === 'easynews') {
+          const u=document.getElementById('flEasyUser').value.trim(), p=document.getElementById('flEasyPass').value;
+          if (!u || !p) { result.innerHTML='<div class="td-error">Enter both EasyNews username and password.</div>'; return; }
+          S.creds.easynews=u; S.creds.easynewsPass=p;
+        } else {
+          const key=document.getElementById('flApiKey').value.trim();
+          if (!key) { result.innerHTML='<div class="td-error">Enter your debrid API key.</div>'; return; }
+          S.creds[state.service]=key;
+        }
+      }
+      S.service = state.service === 'free' ? 'p2p' : state.service;
+      S.multiServices = [];
+      S.p2pEnabled = state.service === 'free';
+      S.simpleMode = true; S.quickStart = true;
+      applyQuickProfile(state.profile);
+      S.cleanInstall = document.getElementById('flClean').checked;
+      let installTarget = state.target;
+      if (state.target === 'app') {
+        S.stremioEmail=document.getElementById('flStremioEmail').value.trim();
+        S.stremioPassword=document.getElementById('flStremioPass').value;
+        const hasLogin=S.stremioEmail && S.stremioPassword;
+        S.installMode=hasLogin?'direct':'manifest';
+        installTarget='app';
+      } else { S.installMode='manifest'; if (state.target==='manifest') installTarget='app'; }
+      step=STEPS; saveState();
+      btn.disabled=true;
+      try { await simpleInstall(installTarget); } finally { btn.disabled=false; }
+    }
+  });
+  renderContext();
+  document.getElementById('fastLaneClose').focus();
+}
+
+function buildSanitizedDiagnostics() {
+  const hosts = (()=>{ try{return hostCompatCheck();}catch(e){return null;} })();
+  return {
+    coreBuildsVersion: CONFIGURATOR_VERSION,
+    createdAt: new Date().toISOString(),
+    browser: navigator.userAgent,
+    viewport: `${window.innerWidth}x${window.innerHeight}`,
+    online: navigator.onLine,
+    settings: { service:S.service, multiServices:S.multiServices, device:S.device, resolution:S.resolution, audio:S.audio, cacheMode:S.cacheMode, streamPool:S.streamPool, formatter:S.formatter, installMode:S.installMode, instanceHost:S.instanceHost, quickProfile:S.quickProfile },
+    credentialPresence: Object.fromEntries(Object.entries(S.creds||{}).map(([k,v])=>[k,Boolean(v)])),
+    templateWarnings: (()=>{try{return templateHealthCheck();}catch(e){return [e.message];}})(),
+    hostCompatibility: hosts
+  };
+}
+function showDiagnosticsModal() {
+  document.getElementById('diagnosticsModal')?.remove();
+  const data=buildSanitizedDiagnostics();
+  const overlay=document.createElement('div'); overlay.id='diagnosticsModal'; overlay.className='fastlane-overlay';
+  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="diagTitle" style="max-width:620px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Sanitized diagnostics</div><div class="fastlane-title" id="diagTitle">Report an issue safely.</div><div class="fastlane-sub">Review and copy this report. It contains settings and credential presence only — never API keys, passwords, UUID passwords, or tokens.</div></div><button class="fastlane-close" id="diagClose" aria-label="Close">✕</button></div><pre class="diag-pre" id="diagPre">${JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre><div class="diag-actions"><button class="diag-primary" id="diagCopy">Copy report</button><a class="diag-secondary" href="https://github.com/brevityA/Core-Builds/issues/new" target="_blank" rel="noopener">Open GitHub issue</a></div></div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',e=>{if(e.target===overlay||e.target.closest('#diagClose'))overlay.remove(); if(e.target.closest('#diagCopy'))navigator.clipboard.writeText(JSON.stringify(data,null,2)).then(()=>{e.target.closest('#diagCopy').textContent='✓ Copied';});});
+  document.getElementById('diagClose').focus();
 }
 
 async function simpleInstall(target) {
@@ -7132,17 +7404,12 @@ async function simpleInstall(target) {
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
   const cfg = buildFinal().config;
-  const _allHosts = hostEntries();
+  const _allHosts = orderedHostEntries();
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
   try {
-    const fastest = await Promise.any(
-      _allHosts.map(([, host]) =>
-        raceHostFetch(host, '/api/v1/status', { method:'GET' }, 4000)
-          .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
-      )
-    );
+    const fastest = await selectHealthyHost(4000);
     const res = await raceHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {
@@ -7164,7 +7431,7 @@ async function simpleInstall(target) {
           if (installed === 'already') {
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div></div>`;
           } else {
-            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} Installed to Stremio!</div><div style="font-size:.78rem;color:#8b949e">Reopen Stremio and search for any movie or show — streams will appear with Core Builds sorting.</div><div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} ${installed==='replaced'?'Previous install replaced!':'Installed to Stremio!'}</div><div style="font-size:.78rem;color:#8b949e">Reopen Stremio and search for any movie or show — streams will appear with Core Builds sorting.</div><div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
           }
           showToast('Addon installed to your Stremio library');
           return;
@@ -7240,11 +7507,15 @@ async function pushToStremio(manifestUrl, email, password) {
   const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
   if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
   const existing = getData.result.addons;
-  if (existing.some(a => a.transportUrl === manifestUrl)) return 'already';
-  const updated = [...existing, { transportName:'http', transportUrl: manifestUrl, flags:{} }];
-  const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
+  const already = existing.some(a => a.transportUrl === manifestUrl);
+  if (already && !S.cleanInstall) return 'already';
+  const knownBases = Object.values(HOST_BASE_URLS);
+  const isKnownAioManifest = a => typeof a?.transportUrl === 'string' && a.transportUrl.includes('/stremio/') && knownBases.some(base => a.transportUrl.startsWith(base));
+  const kept = S.cleanInstall ? existing.filter(a => !isKnownAioManifest(a)) : existing.slice();
+  if (!kept.some(a => a.transportUrl === manifestUrl)) kept.push({ transportName:'http', transportUrl: manifestUrl, flags:{} });
+  const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: kept });
   if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
-  return 'installed';
+  return S.cleanInstall ? 'replaced' : 'installed';
 }
 
 async function createRandomStremioAccount() {
@@ -7458,14 +7729,9 @@ async function openInAIOStreams() {
     setBtnLoading(); result.innerHTML = '';
     const cfg = buildFinal().config;
     const existingUuid = validateUuid(uuid) ? uuid : null;
-    const allHosts = Object.values(HOST_URLS);
-    const fastest = await Promise.any(
-      allHosts.map(host =>
-        raceHostFetch(host, '/api/v1/status', { method:'GET' }, 4000)
-          .then(res => { if (res.ok || res.status === 404 || res.status === 405) return host; throw new Error('down'); })
-      )
-    ).catch(() => null);
+    const fastest = await selectHealthyHost(4000).catch(() => null);
     if (!fastest) { resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
+    rememberGoodHost(fastest);
     const attempt = async (id) => {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
       const res = await raceHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
