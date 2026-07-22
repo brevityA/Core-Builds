@@ -42,3 +42,17 @@
 [data-theme='light'] .fastlane-metadata-state{color:#7a4a00;border-color:#d9ad59;background:#fff2d2}
 [data-theme='light'] .fastlane-metadata-body{border-top-color:#ead9b7}
 @media(max-width:420px){.fastlane-metadata summary{align-items:flex-start}.fastlane-metadata-state{margin-top:1px}}
+
+/* Fine-Tune pop-out: keeps the wizard and Next step intact underneath. */
+body.advanced-drawer-open{overflow:hidden}
+.advanced-drawer-overlay{position:fixed;inset:0;z-index:10030;display:flex;justify-content:flex-end;background:rgba(2,5,8,.7);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);opacity:0;transition:opacity .18s ease}
+.advanced-drawer-overlay.active{opacity:1}
+.advanced-drawer-panel{width:min(680px,calc(100vw - 28px));height:100dvh;overflow-y:auto;overscroll-behavior:contain;background:#0b121b;border-left:1px solid rgba(0,212,255,.2);box-shadow:-20px 0 60px rgba(0,0,0,.48);transform:translateX(28px);transition:transform .18s ease;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) 12px}
+.advanced-drawer-overlay.active .advanced-drawer-panel{transform:translateX(0)}
+.advanced-drawer-content>.card{margin:0;min-height:auto}
+.advanced-drawer-content>.card>div:first-child{position:sticky;top:-12px;z-index:5;background:rgba(11,18,27,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+[data-theme='light'] .advanced-drawer-overlay{background:rgba(30,41,59,.36)}
+[data-theme='light'] .advanced-drawer-panel{background:#f7fbff;border-left-color:#9fc4ea;box-shadow:-16px 0 45px rgba(15,23,42,.18)}
+[data-theme='light'] .advanced-drawer-content>.card>div:first-child{background:rgba(247,251,255,.97)}
+@media(max-width:599px){.advanced-drawer-overlay{align-items:flex-end}.advanced-drawer-panel{width:100%;height:auto;max-height:94dvh;border-left:0;border-top:1px solid rgba(0,212,255,.2);border-radius:20px 20px 0 0;transform:translateY(28px);padding:12px max(12px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}.advanced-drawer-overlay.active .advanced-drawer-panel{transform:translateY(0)}.advanced-drawer-content>.card>div:first-child{top:-12px}}
+@media(prefers-reduced-motion:reduce){.advanced-drawer-overlay,.advanced-drawer-panel{transition:none!important}}

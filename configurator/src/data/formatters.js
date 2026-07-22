@@ -137,7 +137,7 @@ export const FORMATTERS = [
   },
 ];
 
-const AUDIO_HELP = {
+export const AUDIO_HELP = {
   lossless: '<b>TrueHD / DTS-HD MA / FLAC</b>: full-quality studio audio. These tracks only work when your TV or player passes them to a receiver or soundbar over <b>eARC</b> (a newer HDMI audio channel). Without eARC you may get silence on these streams.',
   standard: '<b>DD+ (Dolby Digital Plus)</b>: compressed surround that virtually every soundbar and smart TV supports. <b>Atmos</b> over DD+ works on most Dolby soundbars. The safe pick for TV speakers and soundbars.',
   limited:  'Follows your device profile. If you picked Samsung or Fire Stick, lossless audio is already excluded automatically — this option simply lets the device choice decide.',
