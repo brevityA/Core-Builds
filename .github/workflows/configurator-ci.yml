@@ -9,6 +9,9 @@ on:
     paths:
       - 'configurator/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
