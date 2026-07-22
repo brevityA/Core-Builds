@@ -30,7 +30,7 @@ jobs:
 
       - name: Audit
         working-directory: configurator
-        run: npm audit --omit=dev
+        run: npm audit --audit-level=high
 
       - name: Run tests
         working-directory: configurator
