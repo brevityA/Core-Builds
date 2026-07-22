@@ -73,7 +73,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced' };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000 };
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
@@ -146,7 +146,7 @@ const DEFS = [
 ];
 
 /* STATE MANAGEMENT */
-const STATE_SCHEMA = 1;
+const STATE_SCHEMA = 2;
 function migrateState(input) {
   const d={...(input||{})}, schema=Number(d._schema||0);
   if(schema<1){
@@ -155,6 +155,11 @@ function migrateState(input) {
     if(!Array.isArray(d.optionalScrapers)) d.optionalScrapers=[];
     if(typeof d.cleanInstall!=='boolean') d.cleanInstall=false;
     if(!d.quickProfile) d.quickProfile='balanced';
+  }
+  if(schema<2){
+    if(typeof d.preloadEnabled!=='boolean') d.preloadEnabled=true;
+    if(!['matchingFile','matchingIndex','firstFile'].includes(d.autoPlayMethod)) d.autoPlayMethod='matchingFile';
+    if(![4000,6000,8000,10000].includes(Number(d.addonTimeout))) d.addonTimeout=6000;
   }
   d._schema=STATE_SCHEMA; return d;
 }
@@ -168,7 +173,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout'];
 function shareConfig() {
   try {
     const pub = {};
@@ -196,7 +201,9 @@ function sanitizeSharedConfig(d) {
   pick('pseArch',      v => ['standard','iqr'].includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
+  pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
   if (Array.isArray(d.langs)) { const l = d.langs.filter(v => LANG_OPTS.some(o => o.v === v)); if (l.length) out.langs = l; }
   if (typeof d.name === 'string') out.name = d.name.replace(/[<>"'&`]/g, '').slice(0, 60);
@@ -365,25 +372,20 @@ function renderOpts(def) {
   const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
   if (def.layout === 'device-hybrid') {
-    // Responsive grid of equal-height device cards + a single contextual
-    // explanation banner for the currently selected device (neat + consistent
-    // with the vertical list steps, instead of a sideways-scrolling carousel).
-    const activeOpt = def.opts.find(o => o.v === S[key]);
     const cards = def.opts.map(o => {
       const active = (S[key] === o.v);
-      return `<div class="device-card" data-active="${active}" data-action="device-scroll-pick" data-val="${o.v}" role="radio" aria-checked="${active}" tabindex="0">
-        <div class="device-card-head">
-          <div class="device-card-icon">${o.icon}</div>
-          <span class="device-card-check">${active ? ICO.check(15,'#00d4ff') : ''}</span>
+      return `<div class="fmt-scroll-card" data-active="${active}" data-action="device-scroll-pick" data-val="${o.v}" style="flex:0 0 280px;height:auto">
+        <div class="fmt-scroll-head">
+          <div class="opt-icon" style="flex-shrink:0;margin-right:2px">${o.icon}</div>
+          <div style="min-width:0">
+            <span class="fmt-scroll-label" style="font-size:.84rem;color:${active?'#00d4ff':'#c9d1d9'}">${o.name}</span>${POPULAR_DEVICE_IDS.has(o.v)?'<span style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);color:#67e8f9;font-size:.5rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase">Popular</span>':''}
+          </div>
         </div>
-        <div class="device-card-name">${o.name}${POPULAR_DEVICE_IDS.has(o.v) ? '<span class="device-card-pop">Popular</span>' : ''}</div>
-        <div class="device-card-desc">${o.desc}</div>
+        <div style="font-size:.65rem;color:#8b949e;line-height:1.45;margin-top:2px">${o.desc}</div>
+        ${o.help ? `<div style="font-size:.62rem;color:#4b5563;line-height:1.4;margin-top:6px;border-top:1px dashed rgba(255,255,255,.05);padding-top:6px;display:${active?'block':'none'}">${o.help}</div>` : ''}
       </div>`;
     }).join('');
-    const banner = activeOpt && activeOpt.help
-      ? `<div class="device-help-banner"><div class="device-help-banner-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.8" r="0.4" fill="#00d4ff"/></svg></div><div class="device-help-banner-text"><div class="device-help-banner-title">${activeOpt.name}</div><div class="device-help-banner-body">${activeOpt.help}</div></div></div>`
-      : '';
-    return `<div class="device-grid" role="radiogroup" aria-label="Your device">${cards}</div>${banner}`;
+    return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="devScroll" style="padding-bottom:14px">${cards}</div></div>`;
   }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
     `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
@@ -665,11 +667,14 @@ function updateFmtFeatured() {
 }
 
 function updateDeviceScroll() {
-  // The device picker is now a responsive grid rebuilt from state on every
-  // render, so there are no carousel snaps or inline help panels to sync.
-  // Just bring the selected card gently into view (vertical only).
-  document.querySelectorAll('.device-card[data-action="device-scroll-pick"]').forEach(card => {
-    if (card.dataset.val === S.device) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  document.querySelectorAll('.fmt-scroll-card[data-action="device-scroll-pick"]').forEach(card => {
+    const isSel = card.dataset.val === S.device;
+    card.dataset.active = isSel ? 'true' : 'false';
+    const helpPanel = card.querySelector('div[style*="line-height:1.4"]');
+    if (helpPanel) helpPanel.style.display = isSel ? 'block' : 'none';
+    const label = card.querySelector('.fmt-scroll-label');
+    if (label) label.style.color = isSel ? '#00d4ff' : '#c9d1d9';
+    if (isSel) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
   });
 }
 function updateFmtReceiptRow() {
@@ -943,6 +948,21 @@ function renderAdvancedPanel() {
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.gear(16,'#64748b')} Resilience</div>
         ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks. If the primary stream fails, AIOStreams tries the next best match.')}
       </div>`}
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Playback & Timing</div>
+        ${prefCard('preloadEnabled','Preload first streams','Preload cached candidates to reduce wait time. Disable to reduce background requests.')}
+        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Autoplay method</div><div style="display:flex;gap:5px">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
+        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Global addon timeout</div><div style="display:flex;gap:5px">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Partial Exports</div>
+        <div style="font-size:.67rem;color:#6b7280;margin-bottom:8px">Download only the layer you want to apply. Credentials are excluded.</div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+          ${[['formatter','Formatter only'],['filtering','Filtering only'],['sorting','Sorting only'],['device','Device limits'],['services','Services & presets']].map(([kind,label])=>`<button data-action="export-partial" data-kind="${kind}" style="padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#67e8f9;font-size:.7rem;font-weight:700;cursor:pointer">${label}</button>`).join('')}
+        </div>
+      </div>
 
     </div>
   </div>`;
@@ -2000,12 +2020,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-  // Keyboard support for the device grid cards (Enter / Space activates them).
-  document.addEventListener('keydown', (e) => {
-    const card = e.target.closest && e.target.closest('.device-card');
-    if (!card) return;
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
-  });
   document.addEventListener('click', (e) => {
     const flashBtn = e.target.closest('button:not(:disabled):not(.btn-manifest):not(.btn-dl)');
     if (flashBtn) {
@@ -2164,6 +2178,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'set-simple-pool') { S.streamPool = el.dataset.val; saveState(); render(); }
     if (action === 'set-simple-quality') { S.qualityFirst = !S.qualityFirst; saveState(); render(); }
     if (action === 'set-simple-resfirst') { S.resolutionFirst = !S.resolutionFirst; saveState(); render(); }
+    if (action === 'set-autoplay-method') { S.autoPlayMethod=el.dataset.val; saveState(); render(); }
+    if (action === 'set-addon-timeout') { S.addonTimeout=Number(el.dataset.val); saveState(); render(); }
     if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
     if (action === 'set-install-mode') {
       S.installMode = el.dataset.mode;
@@ -2205,6 +2221,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     if (action === 'generate-dl') generate();
+    if (action === 'export-partial') exportPartial(el.dataset.kind);
     if (action === 'create-import') createImportUrl();
     if (action === 'gen-pwd') genPwd();
     if (action === 'toggle-pwd') togglePwd();
@@ -3186,6 +3203,8 @@ function build() {
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
   const _presets = presets();
+  const globalTimeout = Number(S.addonTimeout)||6000;
+  _presets.forEach(preset => { if (preset.options && 'timeout' in preset.options) preset.options.timeout = globalTimeout; });
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
     preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HDTV'],
@@ -3212,11 +3231,11 @@ function build() {
     bitrate: { useMetadataRuntime:hasTmdb, global:{ movies:[1000000,150000000], series:[1000000,150000000] }, resolution:{ ...(S.resolution==='4k'||S.resolution==='ultrawide' ? { '2160p':{ movies:[5000000,150000000], series:[5000000,150000000] } } : {}), '1080p':{ movies:[2000000,150000000], series:[2000000,150000000] }, '720p':{ movies:[1000000,150000000], series:[1000000,150000000] } } },
     hideErrors: true, hideErrorsForResources: ['addon_catalog','catalog','subtitles'],
     digitalReleaseFilter: { enabled:hasTmdb, tolerance:7, requestTypes:['movie','series','anime'], addons:[] },
-    autoPlay: { enabled:true, method:'matchingFile', attributes:['resolution','quality','audioTags'] },
+    autoPlay: { enabled:true, method:S.autoPlayMethod||'matchingFile', attributes:['resolution','quality','audioTags'] },
     precacheNextEpisode: true,
     precacheSelector: "count(cached(streams)) == 0 ? slice(uncached(type(streams, 'debrid', 'usenet')), 0, 1) : []",
     precacheSingleStream: true,
-    preloadStreams: { enabled:true, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
+    preloadStreams: { enabled:S.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
     nzbFailover: { enabled:true, position:'last' },
     areYouStillThere: { enabled:false },
@@ -3304,6 +3323,35 @@ function buildFinal() {
   if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
   sanitizeAioEnumArrays(tpl.config);
   return tpl;
+}
+
+const PARTIAL_EXPORT_FIELDS = {
+  formatter: ['formatter'],
+  sorting: ['sortCriteria','deduplicator','resultLimits'],
+  services: ['services','presets','groups'],
+  device: ['excludedResolutions','includedResolutions','requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes','excludedAudioTags','preferredAudioTags','preferredAudioChannels','preferredVisualTags','size','bitrate'],
+  filtering: ['excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages','excludedQualities','includedQualities','requiredQualities','preferredQualities','excludedVisualTags','includedVisualTags','requiredVisualTags','excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions','syncedExcludedStreamExpressionUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedRankedStreamExpressionUrls','excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns','syncedExcludedRegexUrls','syncedRankedRegexUrls','titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter'],
+};
+
+function downloadJsonFile(payload, filename) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob), link = document.createElement('a');
+  link.href = url; link.download = filename; document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+function exportPartial(kind) {
+  const fields = PARTIAL_EXPORT_FIELDS[kind];
+  if (!fields) { showToast('Unknown partial export', true); return; }
+  const full = buildFinal().config, config = {};
+  for (const field of fields) if (field in full) config[field] = structuredClone(full[field]);
+  if (Array.isArray(config.services)) config.services = config.services.map(service => ({...service, credentials:{}}));
+  const payload = {
+    metadata: { id:`core-partial-${kind}-${sid()}`, name:`Core Builds — ${kind} only`, description:`Partial Core Builds export containing ${kind} settings only.`, author:'Branding-Brevity', version:'1.0.0', category:'Utility', source:'external' },
+    config,
+  };
+  downloadJsonFile(payload, `core-builds-${kind}-only.json`);
+  showToast(`${kind[0].toUpperCase()+kind.slice(1)} partial export downloaded`);
 }
 
 function generate() {
@@ -4098,7 +4146,7 @@ function showTestDriveModal() {
       const fastest = await selectHealthyHost(4000);
 
       // Upload config
-      const uploadRes = await raceHostFetch(fastest, '/api/v1/user', {
+      const uploadRes = await writeHostFetch(fastest, '/api/v1/user', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({ config:cfg, password:tempPwd })
@@ -5351,7 +5399,7 @@ async function simpleInstall(target) {
 
   try {
     const fastest = await selectHealthyHost(4000);
-    const res = await raceHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
+    const res = await writeHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {
       const apiMsg = data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`;
@@ -5577,6 +5625,15 @@ function raceHostFetch(host, path, options, timeout) {
   return Promise.any(attempts);
 }
 
+// Never race mutating requests: a direct POST can succeed server-side while CORS hides
+// the response, causing the proxied attempt to create a duplicate configuration.
+function writeHostFetch(host, path, options, timeout) {
+  const url = CORS_PROXY
+    ? `${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`
+    : `${host}${path}`;
+  return fetchWithTimeout(url, options, timeout);
+}
+
 async function uploadTemplateForImport() {
   const tmpl = buildFinal();
   if (tmpl.config) {
@@ -5676,7 +5733,7 @@ async function openInAIOStreams() {
     rememberGoodHost(fastest);
     const attempt = async (id) => {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
-      const res = await raceHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
+      const res = await writeHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) return { host: fastest, uuid: id || data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id, epwd: data?.data?.encryptedPassword };
       const apiMsg = data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`;

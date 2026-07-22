@@ -8,9 +8,11 @@
     "test": "node --test tests/*.test.mjs",
     "validate": "node scripts/validate.mjs",
     "build": "node scripts/build.mjs",
+    "test:e2e": "playwright test",
     "release": "npm test && npm run validate && npm run build"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "esbuild": "^0.25.0"
   }
 }

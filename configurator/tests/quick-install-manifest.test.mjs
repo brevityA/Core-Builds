@@ -21,3 +21,9 @@ test('Other app target keeps and displays the raw manifest URL', () => {
 test('successful Quick Install closes its overlay before opening the result modal', () => {
   assert.ok(app.includes("document.getElementById('fastLaneModal')?.remove();\n      showManifestModal(manifestUrl, pwd, hostLbl, target);"));
 });
+
+test('mutating host requests are never raced through direct and proxy paths', () => {
+  assert.ok(app.includes('function writeHostFetch'));
+  assert.ok(app.includes("writeHostFetch(fastest, '/api/v1/user'"));
+  assert.ok(!app.includes("raceHostFetch(fastest, '/api/v1/user', { method:'POST'"));
+});
