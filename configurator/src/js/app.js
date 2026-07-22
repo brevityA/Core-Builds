@@ -5,6 +5,7 @@ import { OPTIONAL_SCRAPER_DEFS } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
+import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
@@ -2651,27 +2652,7 @@ function formatterPickerHtml() {
 
 function getDebridInputs() {
   const m = S.multiServices;
-  const defs = {
-    torbox:       { label:'TorBox API Key',       placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', url:'https://torbox.app/settings' },
-    realdebrid:   { label:'Real-Debrid API Key',  placeholder:'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',      url:'https://real-debrid.com/apitoken' },
-    alldebrid:    { label:'AllDebrid API Key',     placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://alldebrid.com/apikeys' },
-    premiumize:   { label:'Premiumize API Key',    placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://www.premiumize.me/account' },
-    debridlink:   { label:'Debrid-Link API Key',   placeholder:'XXXXXXXXXXXXXXXX',                     url:'https://debrid-link.com/webapp#/account/api' },
-    offcloud:     { label:'Offcloud API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://offcloud.com/#/account/api' },
-    easynews:     { label:'EasyNews Username',     placeholder:'your-username',                        url:'https://www.easynews.com/account' },
-    easynewsPass: { label:'EasyNews Password',     placeholder:'your-password',                        url:'https://www.easynews.com/account' },
-    nzbgeek:      { label:'NZBGeek API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbgeek.info/dashboard.php?call=profile' },
-    debridio:     { label:'Debridio API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://debridio.com/' },
-    easydebrid:   { label:'EasyDebrid API Key',    placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://easydebrid.com/' },
-    pikpak:       { label:'PikPak API Key',        placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://mypikpak.com/' },
-    seedr:        { label:'Seedr API Key',         placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://www.seedr.cc/' },
-    streamnzb:    { label:'StreamNZB Manifest URL', placeholder:'https://your-streamnzb-instance/manifest.json', url:'' },
-    nzbnoob:      { label:'NZBnoob API Key',       placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbnoob.com' },
-    althub:       { label:'altHUB API Key',         placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://althub.co.za' },
-    usenetcrawler:{ label:'Usenet Crawler API Key', placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://usenet-crawler.com' },
-    drunkenslug:  { label:'DrunkenSlug API Key',    placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://drunkenslug.com' },
-    nzbfinder:    { label:'NZBFinder API Key',      placeholder:'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',      url:'https://nzbfinder.ws' },
-  };
+  const defs = PROVIDER_CREDENTIALS;
   const ids = [];
   if (m.includes('torbox-pro')||m.includes('torbox-ess')||m.includes('hybrid')) ids.push('torbox');
   if (m.includes('realdebrid')||m.includes('hybrid')) ids.push('realdebrid');
