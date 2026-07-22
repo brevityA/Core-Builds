@@ -19,6 +19,7 @@ await Promise.all(required.map(file => access(resolve(root, file))));
 
 const app = await readFile(resolve(root, 'src/js/app.js'), 'utf8');
 const shell = await readFile(resolve(root, 'src/index.html'), 'utf8');
+const buildScript = await readFile(resolve(root, 'scripts/build.mjs'), 'utf8');
 const cssFiles = ['01-core.css','02-brand-theme.css','03-enhancements.css','04-landing.css','05-unified-ui.css','06-features.css','07-menu-parity.css'];
 const cssParts = await Promise.all(cssFiles.map(file => readFile(resolve(root, 'src/styles', file), 'utf8')));
 const css = cssParts.join('\n');
@@ -40,6 +41,8 @@ const checks = {
   'credential registry': Object.keys(PROVIDER_CREDENTIALS).length >= 18 && app.includes("import { PROVIDER_CREDENTIALS }"),
   'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
   'quick install optional TMDB': app.includes('data-fl-tmdb') && app.includes("tmdbField('tmdbToken')") && app.includes("tmdbField('tmdbApiKey'"),
+  'TMDB-free config compatibility': app.includes('bitrate: { useMetadataRuntime:hasTmdb') && app.includes('digitalReleaseFilter: { enabled:hasTmdb') && app.includes('titleMatching: { enabled:hasTmdb') && app.includes('yearMatching: { enabled:hasTmdb') && !app.includes("warns.push('No TMDB key"),
+  'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),
