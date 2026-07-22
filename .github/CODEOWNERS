@@ -11,5 +11,8 @@ Formatters/          @Branding-Brevity
 # Filtering configs
 Filtering/           @Branding-Brevity
 
+# Configurator
+configurator/        @Branding-Brevity
+
 # CI / infra — extra review gate
 .github/             @Branding-Brevity

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Builds — Template Configurator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImhleEdyYWQiIHgxPSI1MCUiIHkxPSIwJSIgeDI9IjUwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDBlNWZmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzRmYWNmZSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZGlhbUdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGZhY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjYzA2MGMwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmNGIyYiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9ImhleEdsb3ciPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJibHVyIi8+CiAgICAgIDxmZUNvbXBvc2l0ZSBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJibHVyIiBvcGVyYXRvcj0ib3ZlciIvPgogICAgPC9maWx0ZXI+CiAgICA8ZmlsdGVyIGlkPSJkaWFtR2xvdyI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjE0IiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlQ29tcG9zaXRlIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImJsdXIiIG9wZXJhdG9yPSJvdmVyIi8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9InNvZnRHbG93Ij4KICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMjQiLz4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KCiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyNDgiIGZpbGw9IiMwZDExMTciLz4KCiAgPCEtLSBBbWJpZW50IGdsb3cgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyNTYsNDEgNDQyLDE0OSA0NDIsMzYzIDI1Niw0NzEgNzAsMzYzIDcwLDE0OSIKICAgIGZpbGw9IiMwMGU1ZmYiIG9wYWNpdHk9IjAuMDQiIGZpbHRlcj0idXJsKCNzb2Z0R2xvdykiLz4KICA8cG9seWdvbiBwb2ludHM9IjI1NiwxNjYgMzQ2LDI1NiAyNTYsMzQ2IDE2NiwyNTYiCiAgICBmaWxsPSIjYzA2MGMwIiBvcGFjaXR5PSIwLjA4IiBmaWx0ZXI9InVybCgjc29mdEdsb3cpIi8+CgogIDwhLS0gSGV4IGdsb3cgbGF5ZXIgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyNTYsNDEgNDQyLDE0OSA0NDIsMzYzIDI1Niw0NzEgNzAsMzYzIDcwLDE0OSIKICAgIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwZTVmZiIgc3Ryb2tlLXdpZHRoPSIzMCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIKICAgIG9wYWNpdHk9IjAuMyIgZmlsdGVyPSJ1cmwoI2hleEdsb3cpIi8+CgogIDwhLS0gSGV4IG91dGxpbmUgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyNTYsNDEgNDQyLDE0OSA0NDIsMzYzIDI1Niw0NzEgNzAsMzYzIDcwLDE0OSIKICAgIGZpbGw9Im5vbmUiIHN0cm9rZT0idXJsKCNoZXhHcmFkKSIgc3Ryb2tlLXdpZHRoPSIyMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgoKICA8IS0tIERpYW1vbmQgZ2xvdyAtLT4KICA8cG9seWdvbiBwb2ludHM9IjI1NiwxNjYgMzQ2LDI1NiAyNTYsMzQ2IDE2NiwyNTYiCiAgICBmaWxsPSJ1cmwoI2RpYW1HcmFkKSIgb3BhY2l0eT0iMC40IiBmaWx0ZXI9InVybCgjZGlhbUdsb3cpIi8+CgogIDwhLS0gRGlhbW9uZCAtLT4KICA8cG9seWdvbiBwb2ludHM9IjI1NiwxNjYgMzQ2LDI1NiAyNTYsMzQ2IDE2NiwyNTYiCiAgICBmaWxsPSJ1cmwoI2RpYW1HcmFkKSIgb3BhY2l0eT0iMC45NSIvPgo8L3N2Zz4K">
+<link rel="stylesheet" href="./styles/01-core.css">
+<link rel="stylesheet" href="./styles/02-brand-theme.css">
+<link rel="stylesheet" href="./styles/03-enhancements.css">
+<link rel="stylesheet" href="./styles/04-landing.css">
+<link rel="stylesheet" href="./styles/05-unified-ui.css">
+<link rel="stylesheet" href="./styles/06-features.css">
+<link rel="stylesheet" href="./styles/07-menu-parity.css">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
+</head>
+<body>
+<div id="cb-loader">
+  <svg id="cb-loader-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <defs>
+      <linearGradient id="lg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
+      <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#8a4890"/><stop offset="100%" stop-color="#c03a20"/></linearGradient>
+      <radialGradient id="lrmask" cx="50%" cy="50%" r="50%"><stop offset="20%" stop-color="white" stop-opacity="1"/><stop offset="70%" stop-color="white" stop-opacity="0.6"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient>
+      <mask id="lm"><rect width="512" height="512" fill="url(#lrmask)"/></mask>
+      <filter id="lf1"><feGaussianBlur stdDeviation="32"/></filter>
+      <filter id="lf2"><feGaussianBlur stdDeviation="16" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+      <filter id="lf3"><feGaussianBlur stdDeviation="60"/></filter>
+      <filter id="lf4"><feGaussianBlur stdDeviation="6" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+    </defs>
+    <g mask="url(#lm)">
+      <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00c4d9" opacity="0.14" filter="url(#lf3)"/>
+      <polygon points="256,166 346,256 256,346 166,256" fill="#8a4890" opacity="0.22" filter="url(#lf3)"/>
+      <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="52" stroke-linejoin="round" opacity="0.18" filter="url(#lf1)"/>
+      <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="#00e5ff" stroke-width="18" stroke-linejoin="round" opacity="0.28" filter="url(#lf4)"/>
+      <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#lg1)" stroke-width="14" stroke-linejoin="round" opacity="0.82"/>
+      <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#lg2)" opacity="0.3" filter="url(#lf2)"/>
+      <polygon class="diamond-core" points="256,166 346,256 256,346 166,256" fill="url(#lg2)" opacity="0.7"/>
+      <circle class="core-ring" cx="256" cy="256" r="90" stroke="url(#lg2)" opacity=".42"/>
+      <circle class="core-ring core-ring-2" cx="256" cy="256" r="90" stroke="url(#lg2)" opacity=".42"/>
+    </g>
+  </svg>
+  <div id="cb-loader-title">CORE <span>BUILDS</span></div>
+  <div id="cb-loader-sub">by Brevity</div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- Support Modal Overlay -->
+<div class="sup-overlay" id="supportOverlay" data-action="close-support">
+  <div class="sup-panel" data-action="support-panel">
+    <div class="sup-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="22" height="22" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M22 4 39 14v16L22 40 5 30V14Z" stroke="#00d4ff" stroke-width="2"/><path d="m22 13 9 9-9 9-9-9Z" fill="#a78bfa"/></svg>
+        <span class="sup-title">Support Core Builds</span>
+      </div>
+      <button class="sup-close" data-action="close-support">✕</button>
+    </div>
+    
+    <div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:14px;text-align:left">
+      Core Builds is a free, non-commercial, open-source project. If these templates or filters have improved your Stremio experience, consider showing some love to support continued development!
+    </div>
+
+    <!-- Kofi Main CTA (Styled in Core Purple) -->
+    <a href="https://ko-fi.com/branding_brevity" target="_blank" rel="noopener noreferrer" class="sup-kofi-btn" style="margin-bottom:12px">
+      <span>☕</span> <span>Support on Ko-fi</span>
+    </a>
+
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="sup-row-copy" style="flex:1;text-decoration:none;text-align:center;background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.06);color:#8b949e;padding:10px 8px;font-size:.76rem">GitHub Code</a>
+      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="sup-row-copy" style="flex:1;text-decoration:none;text-align:center;background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.06);color:#8b949e;padding:10px 8px;font-size:.76rem">Core Crew</a>
+    </div>
+  </div>
+</div>
+
+<div class="qs-overlay" id="qsOverlay" data-action="close-quickstart-overlay">
+  <div class="qs-panel">
+    <div class="qs-hdr">
+      <div class="qs-hdr-icon"><svg width="24" height="24" viewBox="0 0 44 44" fill="none" style="vertical-align:middle"><path d="M10 8h20a4 4 0 014 4v20a4 4 0 01-4 4H14a4 4 0 01-4-4V8z" stroke="#a78bfa" stroke-width="1.5" fill="#a78bfa" fill-opacity=".06"/><path d="M10 8v24" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/><path d="M16 14h12M16 19h8" stroke="#a78bfa" stroke-width="1.3" stroke-linecap="round" stroke-opacity=".4"/></svg></div>
+      <div><h2>Quick Start Guide</h2><p>New to Core Builds? Here's how it works</p></div>
+      <button class="qs-close" data-action="close-quickstart">&times;</button>
+    </div>
+    <div class="qs-intro">
+      Core Builds generates <strong style="color:#e6edf3">AIOStreams templates</strong> — config files that control how your streaming addon finds, filters, and sorts torrents and usenet results. Pick your service, device, and preferences, and we build the template for you.
+    </div>
+    <div class="qs-body">
+      <div class="qs-step">
+        <div class="qs-num">1</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Pick your debrid service</div>
+          <div class="qs-step-desc">TorBox, AllDebrid, Real-Debrid, EasyNews, or go free with P2P/HTTP streaming. This determines which scrapers and presets your template uses.</div>
+          <div class="qs-tip">Don't have a debrid account? Choose "Free Streaming" or "Free P2P" from the splash — no signup needed.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">2</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Choose your device</div>
+          <div class="qs-step-desc">Fire Stick, Apple TV, Samsung TV, Android, PC, etc. This sets audio codec limits, HDR handling, and resolution caps automatically.</div>
+          <div class="qs-tip">Not sure? "Generic" works for most devices — you can fine-tune later.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">3</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Set your resolution</div>
+          <div class="qs-step-desc">4K or 1080p. This controls which quality tiers, regex scoring, and bitrate filters are applied to your streams.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">4</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Add your API key <span style="font-size:.64rem;color:#4b5563;font-weight:600">(optional)</span></div>
+          <div class="qs-step-desc">Paste credentials only for the providers you select. Export JSON keeps them local; Direct Install sends the generated config to your chosen AIOStreams host.</div>
+        </div>
+      </div>
+      <div class="qs-step">
+        <div class="qs-num">5</div>
+        <div style="flex:1;min-width:0">
+          <div class="qs-step-title">Deploy</div>
+          <div class="qs-step-desc">One click creates your config on the fastest AIOStreams instance and opens it in Stremio, WuPlay, or Nuvio. Or export the JSON to import manually.</div>
+          <div class="qs-tip">Your template includes 14+ scrapers, smart sorting, regex scoring, and quality filters — all pre-configured based on your choices.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qs-cta">
+      <button data-action="close-quickstart">Got it — let's go</button>
+    </div>
+  </div>
+</div>
+<!-- Onboarding Tutorial Overlay -->
+<div class="tut-overlay" id="tutOverlay">
+  <div class="tut-backdrop" id="tutBackdrop"></div>
+  <div class="tut-welcome" id="tutWelcome" style="display:none">
+    <div class="tut-welcome-icon">&#9889;</div>
+    <h2>Welcome to Core Builds</h2>
+    <p>Core Builds creates optimised streaming configs for <strong style="color:#e6edf3">Stremio</strong> and third-party applications that support Stremio addons. It sets up how your streams are found, filtered, sorted, and displayed — so you get the best results without manual tweaking.</p>
+    <div class="tut-welcome-features">
+      <div class="tut-wf">
+        <div class="tut-wf-icon">&#127916;</div>
+        <div class="tut-wf-label">What it does</div>
+        <div class="tut-wf-desc">Builds a template that tells AIOStreams how to find and rank your streams</div>
+      </div>
+      <div class="tut-wf">
+        <div class="tut-wf-icon">&#128338;</div>
+        <div class="tut-wf-label">How long</div>
+        <div class="tut-wf-desc">About a minute with Quick Install, or use Guided and Advanced routes for more control</div>
+      </div>
+      <div class="tut-wf">
+        <div class="tut-wf-icon">&#128274;</div>
+        <div class="tut-wf-label">Privacy</div>
+        <div class="tut-wf-desc">Credentials are not logged by Core Builds; Direct Install sends the config only to the host you choose</div>
+      </div>
+    </div>
+    <div class="tut-welcome-actions">
+      <button type="button" class="tut-btn tut-btn-primary" data-action="tut-start" style="padding:11px 24px;font-size:.88rem">Show Me Around</button>
+      <button type="button" class="tut-btn tut-btn-ghost" data-action="tut-close" style="padding:9px 24px">I know what I'm doing — skip</button>
+    </div>
+    <div class="tut-time">Takes about 30 seconds</div>
+  </div>
+  <div class="tut-spotlight" id="tutSpotlight" style="display:none"></div>
+  <div class="tut-tooltip arrow-top" id="tutTooltip" style="display:none">
+    <div class="tut-progress" id="tutProgress"></div>
+    <div class="tut-step-badge" id="tutBadge"></div>
+    <div class="tut-title" id="tutTitle"></div>
+    <div class="tut-desc" id="tutDesc"></div>
+    <div class="tut-actions">
+      <button type="button" class="tut-btn tut-btn-primary" id="tutNext" data-action="tut-next">Next</button>
+      <button type="button" class="tut-btn tut-btn-ghost" id="tutBack" data-action="tut-back">Back</button>
+      <button type="button" class="tut-skip" data-action="tut-close">Skip tutorial</button>
+    </div>
+  </div>
+</div>
+<nav class="cb-sidebar" id="cbSidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22"><defs><linearGradient id="sbg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient><linearGradient id="sbg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient></defs><polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#sbg1)" stroke-width="22" stroke-linejoin="round"/><polygon points="256,166 346,256 256,346 166,256" fill="url(#sbg2)" opacity=".85"/></svg></div>
+    <div>
+      <div class="sb-brand-text"><span style="color:#fff">Core </span><span style="color:#00d4ff">Builds</span></div>
+      <div class="sb-brand-sub">Template Configurator</div>
+    </div>
+  </div>
+  <div class="sb-progress"><div class="sb-prog-label">Step <span id="sbStepNum">1</span> of <span id="sbStepTotal">6</span></div><div class="sb-prog-bar"><div class="sb-prog-fill" id="sbProgFill" style="width:16%"></div></div></div>
+  <ul class="sb-steps" id="sbSteps"></ul>
+  <div class="sb-footer"><button data-action="reset-state">Start over</button></div>
+</nav>
+<div class="wrap">
+  <header class="hdr">
+    <div class="prog-wrap">
+      <div id="stepStrip"></div>
+      <div id="breadcrumbs"></div>
+    </div>
+    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v2.78</span>
+  </header>
+
+  <div id="main"></div>
+
+  <div class="nav" id="nav">
+    <button class="btn btn-back" id="btnBack" data-action="nav-back">← Back</button>
+    <button class="btn btn-next" id="btnNext" data-action="nav-next">Next →</button>
+  </div>
+</div>
+<button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle theme"><span class="ico-theme"><span class="ico-sun"><svg width="14" height="14" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="7" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".15"/><path d="M22 8v4M22 32v4M8 22h4M32 22h4M12.3 12.3l2.8 2.8M28.9 28.9l2.8 2.8M31.7 12.3l-2.8 2.8M15.1 28.9l-2.8 2.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="ico-moon"><svg width="14" height="14" viewBox="0 0 44 44" fill="none"><path d="M30 12a14 14 0 10-4 24 11 11 0 014-24z" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".1"/></svg></span></span> Mode</button>
+<script src="./vendor/qrcode.min.js"></script>
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
