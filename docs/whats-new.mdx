@@ -1,73 +1,73 @@
 ---
-title: "What's New in v2.73"
+title: "What's New in v2.78"
 sidebarTitle: "What's New"
-description: "Plain-English release highlights for Core Builds Configurator v2.73 — introducing the Device Carousel, Zero-Knowledge Security, and major Stremio API compliance fixes."
+description: "Core Builds Configurator v2.78: modular source, tested releases, Quick Install, safer schema handling, corrected devices, and resilient host selection."
 ---
 
-import { Card, CardGroup, Info, Warning, CodeGroup } from '@mintlify/components';
+# Configurator v2.78 (July 22, 2026)
 
-# Version 2.73 (July 21, 2026)
-
-Welcome to **v2.73** of the Core Builds Configurator! This major master release resolves critical Stremio API router deprecations, introduces a visual redesign of our device-selection flow, and implements industry-first mobile and security safeguards.
+Version **2.78** moves the configurator from a single hand-maintained source file to a modular, tested package while preserving a downloadable standalone `configurator/index.html` release.
 
 <CardGroup cols={2}>
-  <Card title="Device Carousel Redesign" icon="tv" color="#00d4ff">
-    The static dropdown list is gone! Step 3 now features a fully responsive, horizontal-scrolling card carousel with expandable specification sheets and automated progression.
+  <Card title="Modular and tested" icon="code-branch">
+    Source code, data registries, styles, schema guards, tests, validation, and build scripts now live under `configurator/`.
   </Card>
-  <Card title="Zero-Knowledge Shield" icon="shield-halved" color="#34d399">
-    New, prominent browser privacy indicators assure you that your debrid API keys, passwords, and tokens are compiled 100% locally and never sent to any server.
+  <Card title="Quick Install" icon="bolt">
+    Choose an app, one or more providers, optional sources, a performance profile, and install in one short flow.
+  </Card>
+  <Card title="Compatible output" icon="shield-check">
+    Legacy AIOStreams enum values are normalized or removed before export and installation.
+  </Card>
+  <Card title="Mobile-first workflow" icon="mobile-screen">
+    Touch targets, safe areas, keyboard behaviour, landscape layouts, light mode, and the seven-step tutorial were refined and tested.
   </Card>
 </CardGroup>
 
----
+## Quick Install improvements
 
-## 🛠️ Critical Bug Fixes & API Compliance
+- Multi-provider selection remains supported.
+- Paid provider fields now include **Get key**, **Open account**, or **Open dashboard** links.
+- StreamNZB displays manifest guidance rather than a nonexistent central key page.
+- An expandable **TMDB metadata — optional** section accepts either a Read Access Token or API Key.
+- Missing TMDB credentials produce a clear warning because title/year matching will be disabled; users may still continue.
+- Optional services and scrapers stay in a compact picker instead of crowding the main flow.
 
-### 🔑 Stremio Direct-Install 404 Error Resolved
-Stremio's API recently retired its legacy base router (`https://api.strem.io/api/`), causing direct-installation and random account registration inside configurators to fail with a `Stremio API error (404)`.
-* **The Fix**: We overhauled our authentication pathways to query the direct sub-endpoints (**`/api/login`** and **`/api/register`**) directly, making one-click installations completely functional and stable again!
+## Host selection
 
-### 🆓 HTTP / Free Tier Manifest Crash Fixed
-When setting up a Free Tier HTTP configuration, AIOStreams tried to fetch Nuvio Streams' base URL, which returned a HTML configuration page (`<!doctype html>`) rather than JSON. This threw a fatal parsing crash: `Unexpected token '<'` and blocked all installations.
-* **The Fix**: **Nuvio Streams** is now safely set to `enabled: false` by default in HTTP and extra-HTTP presets. Standard setups will now install cleanly without throwing any JSON validation errors!
+Automatic selection remembers the last successful host, prefers stable instances running AIOStreams `2.31.1` or newer, respects provider restrictions, and uses nightly infrastructure only as a fallback. Legacy or incompatible instances are skipped automatically.
 
-### 🛑 OpenSubtitles v3+ Preset Validation Fixed
-Older configurations caused AIOStreams to reject deployments with: *`Option movieHashPlusAutoAdjustment is required, got undefined`*.
-* **The Fix**: The configurator now automatically compiles the required `movieHashPlusAutoAdjustment: false` option into the OpenSubtitles v3+ options block.
+## Device corrections
 
----
+Device capabilities are centralized and conservative:
 
-## 🎴 Sleek UI & Navigation Upgrades
+- Apple TV 4K A15 is not treated as hardware-AV1 capable.
+- Apple TV is not described as bitstreaming TrueHD or DTS-HD; compatible apps may decode supported formats to multichannel PCM.
+- Chromecast with Google TV 4K and HD are treated as separate models for AV1 support.
+- Nvidia Shield 2019 retains Dolby Vision and lossless-audio passthrough support, but not AV1.
+- Internal TV apps and unknown devices no longer assume lossless-audio passthrough.
+- ONN profiles do not assume Dolby Vision across every model.
 
-### 📱 Responsive Device Selection Carousel
-We have completely retired the traditional HTML `<select>` dropdown menu! Step 3 (Your Device) now renders as a gorgeous, horizontal-scrolling card carousel:
-* **Auto-Expanding Guides**: Active device cards dynamically expand to display their specific audio caps (e.g., Samsung gets standard DD+, Shield gets lossless), video decoder limits, and specification sheets.
-* **Scroll-to-Center**: Activating any card triggers an instant, smooth centering animation.
-* **Fluid Simple-Pathing**: Choosing a device in Simple Mode automatically advances you to the next step after a brief **350ms delay**.
+## Schema compatibility
 
-### 🎨 Community Formatting Sandbox Link (`crispyduck.xyz`)
-To support advanced visual layout customizers, we have added a direct integration link to **`crispyduck.xyz`**—the Stremio community's standard formatting designer—directly inside the custom formatter import panel.
+The final schema guard maps known legacy enum names, trims values, removes unsupported entries, deduplicates arrays, and adds safe defaults. This prevents old values such as `audio`, `language`, `release_group`, `debrid`, or `nzb` from reaching current AIOStreams enum fields unchanged.
 
-### 🗺️ Step 6 Changelog Access
-Added an explicit **Changelog** button next to the "Start Over" button on Step 6 (Review & Deploy), allowing users to easily browse our full release history at the finish line.
+## Privacy wording
 
----
+Core Builds now describes each path precisely:
 
-## 🔒 Security & Peace of Mind Designs
+- **Export JSON:** creates the configuration locally in the browser.
+- **Direct Install:** sends the generated configuration to the selected AIOStreams host.
+- **Direct Stremio installation:** sends the supplied Stremio login details to the Stremio API for that operation.
 
-<Info>
-  **Zero-Knowledge Philosophy**: Core Builds believes in absolute transparency. Your private keys and credentials are yours alone.
-</Info>
+Credentials are not included in sanitized diagnostics. Core Builds does not use “zero-knowledge” or “no data is sent anywhere” claims.
 
-* **Step 5 Security Shield**: An eye-catching, highly reassuring green security shield banner is now positioned at the top of Step 5 (API Keys) outlining that all credential-baking is done purely client-side inside their local browser memory.
-* **"Safe Auth" Direct-Install Locker**: A reassuring lock warning is displayed beneath the inline Stremio email and password fields, guaranteeing that accounts are used locally only to authenticate with Stremio and are never stored in localStorage or shared with third parties.
+## Interface and community
 
----
+- The central Core gem remains the support control and visibly pulses/glows.
+- The live usage counter remains enabled.
+- Community links use the visible name **Core Crew** and point to `r/CoreBuilds`.
+- Light mode uses readable pale selected surfaces rather than inheriting dark gradients.
 
-## 🏎️ Mobile UX & Micro-Interactions
-
-* **Tactile "✓ Copied" Buttons**: Tapping copy buttons (for Manifest URLs, credentials, or WuPlay codes) triggers a glowing emerald-green animation, temporarily transitioning the text to `✓ Copied`.
-* **Context-Aware Toast Alerts**: Copying keys, usernames, or passwords now triggers a custom `Copied to clipboard` toast, separating credential copy feedback from the main `Manifest URL copied` alert.
-* **iOS Safari 'Select-All-on-Focus'**: Solved mobile keyboard selection friction! Tapping into any text input box on iOS Safari now programmatically highlights the entire value instantly, allowing mobile users to overwrite keys in a single tap.
-* **Smart Auto-Scrolling**: Enabling conditional subtitle panels (such as SubDL) now smoothly auto-scrolls the screen directly to the newly expanded credentials card, ensuring mobile users never miss required fields.
-* **CORS-Bypassing Live Checks**: The final Review card's live "Test" check now automatically routes queries through our secure CORS proxy first, completely bypassing cross-origin blocks on strict public hosts and yielding 100% accurate stream-testing results.
+<Note>
+  Template Suite and Configurator versions are separate: Template Suite `3.3.2`, Configurator `2.78.0`, minimum AIOStreams `2.31.1`.
+</Note>

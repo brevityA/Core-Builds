@@ -12,6 +12,7 @@ on:
       - 'Templates/**/*.json'
       - 'Formatters/**/*.json'
       - '**/*.md'
+      - '**/*.mdx'
       - 'Assets/**'
 
 permissions:

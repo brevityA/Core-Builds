@@ -25,3 +25,20 @@
 [data-theme='light'] .fastlane-get-key{color:#075ebd;border-color:#9fc4ea;background:#edf6ff}
 [data-theme='light'] .fastlane-get-key:hover,[data-theme='light'] .fastlane-get-key:focus-visible{color:#064f9d;border-color:#6aa7e8;background:#dfeeff}
 [data-theme='light'] .fastlane-key-hint{color:#526170}
+
+/* Optional TMDB metadata in Quick Install */
+.fastlane-metadata{margin-top:14px;border:1px solid rgba(251,191,36,.2);border-radius:12px;background:rgba(251,191,36,.025);overflow:hidden}
+.fastlane-metadata summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;padding:12px 14px;color:#dbe5ec}
+.fastlane-metadata summary::-webkit-details-marker{display:none}
+.fastlane-metadata summary span:first-child{display:flex;flex-direction:column;gap:2px}
+.fastlane-metadata summary b{font-size:.74rem;letter-spacing:.02em}
+.fastlane-metadata summary small{font-size:.62rem;color:#82909b;font-weight:600}
+.fastlane-metadata-state{font-size:.62rem;font-weight:800;color:#fbbf24;border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.07);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.fastlane-metadata-body{padding:0 14px 14px;border-top:1px solid rgba(255,255,255,.05)}
+.fastlane-metadata-body>.fastlane-note{margin:10px 0}
+[data-theme='light'] .fastlane-metadata{border-color:#e5bd69;background:#fffaf0}
+[data-theme='light'] .fastlane-metadata summary{color:#17202a}
+[data-theme='light'] .fastlane-metadata summary small{color:#596875}
+[data-theme='light'] .fastlane-metadata-state{color:#7a4a00;border-color:#d9ad59;background:#fff2d2}
+[data-theme='light'] .fastlane-metadata-body{border-top-color:#ead9b7}
+@media(max-width:420px){.fastlane-metadata summary{align-items:flex-start}.fastlane-metadata-state{margin-top:1px}}

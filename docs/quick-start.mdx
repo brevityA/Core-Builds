@@ -1,42 +1,58 @@
 ---
 title: "Quick Start"
 sidebarTitle: "Quick Start"
-description: "Set up Core Builds in under 5 minutes."
+description: "Create and install a Core Builds configuration in about a minute."
 ---
 
-No setup history? Start here. Five steps, under 5 minutes.
+The **Configurator Quick Install** route is the recommended way to start. It supports multiple providers, chooses a compatible AIOStreams host, validates the generated configuration, and can return a manifest URL or perform a direct Stremio install.
+
+<Card title="Open Core Builds Configurator" icon="bolt" href="https://brevitya.github.io/Core-Builds/">
+  Choose **Quick Install** on the opening screen.
+</Card>
 
 <Steps>
-  <Step title="Pick a template">
-    If you have TorBox Pro and want 4K: use [Core Nexus 4K Apex](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json).
-
-    If you have TorBox Pro and want 1080p: use [Core Nexus Stream](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json).
-
-    If you have TorBox Essential: use [Core Nexus Essential](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json).
-
-    Not sure? See [Which Template?](/which-template).
+  <Step title="Choose where you watch">
+    Select Stremio, WuPlay, Nuvio, or manifest output. For Stremio, leaving the login fields blank returns a manifest URL instead of sending a direct-install request.
   </Step>
 
-  <Step title="Open a host">
-    Go to [aiostreams.elfhosted.com](https://aiostreams.elfhosted.com/stremio/configure) — the recommended public instance. Create a password when prompted.
+  <Step title="Choose one or more providers">
+    Select TorBox, Real-Debrid, AllDebrid, Premiumize, EasyNews, or Free/P2P. Use **Additional services & scrapers** for optional services and indexers.
   </Step>
 
-  <Step title="Import the template">
-    Go to **Template → Import**. Paste the raw URL from Step 1. Click **Load Template**.
+  <Step title="Enter the credentials you use">
+    Each selected paid provider displays its required credential fields and a **Get key** or **Open account** link. Free/P2P sources do not require a key.
+
+    Expand **TMDB metadata — optional** to add either a TMDB Read Access Token or API Key. TMDB improves title and year matching; without it, those matching features remain disabled.
   </Step>
 
-  <Step title="Enter your API key">
-    Go to **Services**. Make sure TorBox is toggled ON. Paste your API key from [torbox.app/settings](https://torbox.app/settings) → API. Click **Save**.
+  <Step title="Choose a performance profile">
+    - **Fast:** 1080p, cached-first, smaller files
+    - **Balanced:** 4K with a sensible pool and 30 GB cap
+    - **Maximum:** 4K, largest pool, quality-first
   </Step>
 
-  <Step title="Install in Stremio">
-    Click **Install** — Stremio opens automatically. Confirm the install. Done — open any movie and streams will appear.
+  <Step title="Create and install">
+    Select **Create & Install**. Core Builds validates the generated configuration, selects a compatible AIOStreams host, and opens the appropriate install instructions or result.
   </Step>
 </Steps>
 
+<Info>
+  **Privacy and network behaviour:** Export JSON creates the configuration locally. Direct Install sends the generated configuration to the selected AIOStreams host. A direct Stremio installation sends the supplied Stremio login details to the Stremio API for that operation. Core Builds does not claim that no data is transmitted.
+</Info>
+
+## Manual import
+
+Manual import remains available for advanced users and recovery:
+
+1. Choose a template from the [Template Directory](/template-directory).
+2. Open a compatible host from [Instance Status](/instance-status).
+3. Import the template's raw JSON URL.
+4. Add provider credentials in AIOStreams.
+5. Review the configuration and install its manifest.
+
 <Note>
-  - Wrong template? → [Which Template?](/which-template)
-  - Using AllDebrid? → [AllDebrid Setup](/alldebrid-setup)
-  - Using EasyNews? → [EasyNews Setup](/easynews-setup)
-  - Something broken? → [Troubleshooting](/troubleshooting)
+  - Choosing between templates → [Which Template?](/which-template)
+  - AllDebrid details → [AllDebrid Setup](/alldebrid-setup)
+  - EasyNews details → [EasyNews Setup](/easynews-setup)
+  - Playback or installation problems → [Troubleshooting](/troubleshooting)
 </Note>

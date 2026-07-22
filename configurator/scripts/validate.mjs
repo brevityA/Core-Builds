@@ -39,6 +39,7 @@ const checks = {
   'schema guard wired': app.includes("import { sanitizeAioEnumArrays }"),
   'credential registry': Object.keys(PROVIDER_CREDENTIALS).length >= 18 && app.includes("import { PROVIDER_CREDENTIALS }"),
   'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
+  'quick install optional TMDB': app.includes('data-fl-tmdb') && app.includes("tmdbField('tmdbToken')") && app.includes("tmdbField('tmdbApiKey'"),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),

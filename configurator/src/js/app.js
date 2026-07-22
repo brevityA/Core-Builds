@@ -5115,7 +5115,10 @@ function showFastLane() {
   document.body.appendChild(overlay);
   const creds = document.getElementById('flCredentials');
   const installFields = document.getElementById('flInstallFields');
-  const captureCredentialDrafts = () => overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{if(inp.value)S.creds[inp.dataset.flCred]=inp.value;});
+  const captureCredentialDrafts = () => {
+    overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{S.creds[inp.dataset.flCred]=inp.value.trim();});
+    overlay.querySelectorAll('[data-fl-tmdb]').forEach(inp=>{S[inp.dataset.flTmdb]=inp.value.trim();});
+  };
   const renderContext = () => {
     const credKeys={ 'torbox-pro':'torbox',realdebrid:'realdebrid',alldebrid:'alldebrid',premiumize:'premiumize' };
     const fields=[];
@@ -5129,8 +5132,11 @@ function showFastLane() {
     const extraCreds={debridio:'debridio',nzbgeek:'nzbgeek',streamnzb:'streamnzb'};
     state.extras.filter(v=>extraCreds[v]).forEach(v=>fields.push(credentialField(extraCreds[v],{type:v==='streamnzb'?'url':'password'})));
     state.scrapers.forEach(id=>{const d=OPTIONAL_SCRAPER_DEFS.find(x=>x.id===id);if(d?.credKey)fields.push(credentialField(d.credKey));});
+    const tmdbField=(key,{type='password',maxlength=400}={})=>{const d=PROVIDER_CREDENTIALS[key];return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label><a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a></div><input class="fastlane-field" data-fl-tmdb="${key}" type="${type}" autocomplete="off" maxlength="${maxlength}" placeholder="${d.placeholder}" value="${(S[key]||'').replace(/"/g,'&quot;')}"></div>`;};
+    const tmdbMetadata=`<details class="fastlane-metadata" ${S.tmdbToken||S.tmdbApiKey?'open':''}><summary><span><b>TMDB metadata</b><small>Optional · recommended for accurate title/year matching</small></span><span class="fastlane-metadata-state">${S.tmdbToken||S.tmdbApiKey?'Set':'Add key'}</span></summary><div class="fastlane-metadata-body"><div class="fastlane-note">Add either a TMDB Read Access Token or API Key. Leave both blank to continue with title/year matching disabled.</div><div class="fastlane-fields">${tmdbField('tmdbToken')}${tmdbField('tmdbApiKey',{maxlength:60})}</div></div></details>`;
     const freeNote=[...state.services,...state.extras].some(v=>v==='p2p'||v==='http')?'<div class="fastlane-note">Free/P2P sources require no key and depend on active seeders and compatible hosts.</div>':'';
-    creds.innerHTML = fields.length ? `<div class="fastlane-label">Provider credentials</div><div class="fastlane-fields">${fields.join('')}</div>${freeNote}` : freeNote || '<div class="fastlane-note">Select at least one provider.</div>';
+    const providerFields=fields.length?`<div class="fastlane-label">Provider credentials</div><div class="fastlane-fields">${fields.join('')}</div>${freeNote}`:freeNote||'<div class="fastlane-note">Select at least one provider.</div>';
+    creds.innerHTML = providerFields + tmdbMetadata;
     const extraCount=state.extras.length+state.scrapers.length, countEl=document.getElementById('flExtrasCount');if(countEl)countEl.textContent=extraCount?`${extraCount} selected`:'';
     installFields.innerHTML = state.target === 'app' ? `<div class="fastlane-label">Stremio direct install <span style="font-weight:600;text-transform:none;letter-spacing:0">— optional</span></div><div class="fastlane-fields"><input class="fastlane-field" id="flStremioEmail" type="email" autocomplete="email" placeholder="Stremio email (leave blank for manifest)" value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" id="flStremioPass" type="password" autocomplete="current-password" placeholder="Stremio password" value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"></div><div class="fastlane-note" style="margin-top:7px">Credentials are used only for the direct Stremio API request. Leave both blank to receive a manifest URL instead.</div>` : `<div class="fastlane-note">Core Builds will create a protected manifest and open the ${state.target==='manifest'?'copy/install':state.target} instructions.</div>`;
   };
@@ -5149,7 +5155,8 @@ function showFastLane() {
       const result = document.getElementById('aioResult');
       result.innerHTML='';
       let missing='';
-      overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{const v=inp.value.trim();if(!v&&!missing)missing=inp.placeholder;else if(v)S.creds[inp.dataset.flCred]=v;});
+      overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{const v=inp.value.trim();if(!v&&!missing)missing=inp.placeholder;else S.creds[inp.dataset.flCred]=v;});
+      overlay.querySelectorAll('[data-fl-tmdb]').forEach(inp=>{S[inp.dataset.flTmdb]=inp.value.trim();});
       if(missing){result.innerHTML=`<div class="td-error">Enter ${missing}.</div>`;return;}
       S.multiServices = [...new Set([...state.services,...state.extras])];
       S.optionalScrapers = [...state.scrapers];

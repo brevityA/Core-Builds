@@ -30,6 +30,7 @@ jobs:
             --exclude 'example.com'
             --timeout 20
             './**/*.md'
+            './**/*.mdx'
           fail: false   # Don't fail the build — just report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

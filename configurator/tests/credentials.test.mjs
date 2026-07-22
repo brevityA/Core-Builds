@@ -26,4 +26,6 @@ test('Quick Install renderer uses the credential registry and visible key links'
   assert.match(app, /PROVIDER_CREDENTIALS\[key\]/);
   assert.ok(app.includes('fastlane-get-key'));
   assert.ok(app.includes('noopener noreferrer'));
+  assert.ok(app.includes('data-fl-tmdb'));
+  assert.ok(app.includes('Optional · recommended for accurate title/year matching'));
 });

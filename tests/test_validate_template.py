@@ -189,6 +189,18 @@ class TestPresets:
         _, warnings, _ = validate_template(path)
         assert not any("unknown type" in w for w in warnings)
 
+    @pytest.mark.parametrize("preset_type", [
+        "hdhub", "torrents-db", "sootio", "neko-bt",
+        "animetosho", "dmm-cast", "easynews", "davex",
+    ])
+    def test_current_suite_preset_types_are_known(self, preset_type, write_template, base_template):
+        t = base_template(presets=[{
+            "type": preset_type, "instanceId": "p1", "enabled": True, "options": {}
+        }])
+        path = write_template(t)
+        _, warnings, _ = validate_template(path)
+        assert not any("unknown type" in w for w in warnings)
+
     def test_unknown_preset_type_warns(self, write_template, base_template):
         t = base_template(presets=[{
             "type": "future-addon", "instanceId": "p1", "enabled": True, "options": {}
@@ -398,6 +410,13 @@ class TestMatching:
         path = write_template(base_template(requiredLanguages=["en", "fr"]))
         _, warnings, _ = validate_template(path)
         assert any("requiredLanguages" in w for w in warnings)
+
+    def test_reviewed_required_languages_do_not_warn(self, write_template, base_template):
+        reviewed = ["English", "Original", "Dual Audio", "Multi", "Dubbed", "Unknown"]
+        path = write_template(base_template(requiredLanguages=reviewed))
+        _, warnings, passes = validate_template(path)
+        assert not any("requiredLanguages" in w for w in warnings)
+        assert any("requiredLanguages policy reviewed" in p for p in passes)
 
     def test_no_required_languages_no_warn(self, write_template, base_template):
         path = write_template(base_template())
