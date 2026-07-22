@@ -499,9 +499,34 @@ function renderOpts(def) {
       </label></div>`;
     }).join('');
     const emptyHtml = '<div class="svc-empty" id="svcEmpty">No services match your search</div>';
+    const ckIcon = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const svcCarouselCards = CAROUSEL_SVCS.map(sv => {
+      const o = def.opts.find(x => x.v === sv); if (!o) return '';
+      const active = S.multiServices.includes(sv);
+      const cat = SVC_CAT[sv] || 'debrid';
+      const catLabel = cat === 'debrid' ? 'Debrid' : cat === 'usenet' ? 'Usenet' : cat === 'noaccount' ? 'Free' : cat;
+      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-carousel-service" data-svc-id="${sv}" role="checkbox" aria-checked="${active}" tabindex="0">
+        <div class="opt-scraper-card-ck">${ckIcon}</div>
+        <div class="opt-scraper-card-head"><div class="opt-scraper-icon opt-scraper-icon-svg">${o.icon}</div><span class="opt-scraper-name">${o.name}</span></div>
+        <div class="opt-scraper-subdesc">${SVC_DESC[sv] || ''}</div>
+        <span class="opt-scraper-badge opt-scraper-badge-${cat}">${catLabel}</span>
+      </div>`;
+    }).join('');
+    const scraperCards = OPTIONAL_SCRAPER_DEFS.map(d => {
+      const active = S.optionalScrapers.includes(d.id);
+      const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat;
+      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-optional-scraper" data-scraper-id="${d.id}" role="checkbox" aria-checked="${active}" tabindex="0">
+        <div class="opt-scraper-card-ck">${ckIcon}</div>
+        <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
+        <div class="opt-scraper-subdesc">${d.desc}</div>
+        <span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span>
+      </div>`;
+    }).join('');
     const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
-    const extraCount=S.multiServices.filter(s=>CAROUSEL_SVCS.includes(s)).length+S.optionalScrapers.length;
-    const optSection = `<div class="opt-scraper-section"><button type="button" class="additional-services-btn" data-action="open-additional-services" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111b27,#0d151f);color:#c9d5df;cursor:pointer;text-align:left"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(167,139,250,.09);color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.82rem">Additional services &amp; scrapers</b><span style="display:block;color:#718093;font-size:.68rem;margin-top:2px">P2P, HTTP, Usenet, Debridio and optional indexers</span></span>${extraCount?`<span style="padding:3px 8px;border-radius:99px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.2);color:#67e8f9;font-size:.62rem;font-weight:900">${extraCount} selected</span>`:''}<span style="color:#637185">→</span></button>${hasExtras?'<div class="opt-scraper-hint">Selected extras are active. Their credentials appear on Accounts &amp; Keys.</div>':''}</div>`;
+    const extraCount = S.multiServices.filter(s=>CAROUSEL_SVCS.includes(s)).length + S.optionalScrapers.length;
+    const compactOptSection = `<div class="opt-scraper-section"><button type="button" class="additional-services-btn" data-action="open-additional-services" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111b27,#0d151f);color:#c9d5df;cursor:pointer;text-align:left"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(167,139,250,.09);color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.82rem">Additional services &amp; scrapers</b><span style="display:block;color:#718093;font-size:.68rem;margin-top:2px">P2P, HTTP, Usenet, Debridio and optional indexers</span></span>${extraCount?`<span style="padding:3px 8px;border-radius:99px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.2);color:#67e8f9;font-size:.62rem;font-weight:900">${extraCount} selected</span>`:''}<span style="color:#637185">→</span></button>${hasExtras?'<div class="opt-scraper-hint">Selected extras are active. Their credentials appear on Accounts &amp; Keys.</div>':''}</div>`;
+    const carouselOptSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-count" id="extrasCarouselCount">${extraCount ? extraCount+' selected' : 'Optional'}</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Swipe or scroll, then tap any card to toggle it. Multi-select is supported.</div><div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="opt-scraper-scroll" aria-label="Additional services and optional scrapers">${svcCarouselCards}${scraperCards}</div></div>${hasExtras ? '<div class="opt-scraper-hint">Selected extras are active. Required credentials appear on Accounts &amp; Keys.</div>' : ''}</div>`;
+    const optSection = S.simpleMode ? compactOptSection : carouselOptSection;
     return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optSection}</div>`;
   }
   if (def.layout === 'hero') {
@@ -1902,6 +1927,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rem && !rem.classList.contains('hidden')) return;
     const tag = document.activeElement?.tagName;
     const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable;
+    const extrasCard = document.activeElement?.closest('.opt-scraper-card[data-action]');
+    if (extrasCard && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      extrasCard.click();
+      return;
+    }
 
     // Arrow key navigation within option grids
     if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key) && !inInput) {
@@ -2452,7 +2483,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (idx >= 0) { S.multiServices.splice(idx, 1); } else { S.multiServices.push(sv); }
       S.service = deriveService() || S.service;
       const card = el.closest('.opt-scraper-card') || el;
-      card.dataset.active = String(S.multiServices.includes(sv));
+      const selected = S.multiServices.includes(sv);
+      card.dataset.active = String(selected);
+      card.setAttribute('aria-checked', String(selected));
+      const count = S.multiServices.filter(s=>CAROUSEL_SVCS.includes(s)).length + S.optionalScrapers.length;
+      const countEl = document.getElementById('extrasCarouselCount');
+      if (countEl) countEl.textContent = count ? `${count} selected` : 'Optional';
       const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
       const hint = document.querySelector('.opt-scraper-hint');
       if (hasExtras && !hint) {
@@ -2467,7 +2503,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const idx = S.optionalScrapers.indexOf(sid);
       if (idx >= 0) { S.optionalScrapers.splice(idx, 1); } else if (OPTIONAL_SCRAPER_DEFS.find(d => d.id === sid)) { S.optionalScrapers.push(sid); }
       const card = el.closest('.opt-scraper-card') || el;
-      card.dataset.active = String(S.optionalScrapers.includes(sid));
+      const selected = S.optionalScrapers.includes(sid);
+      card.dataset.active = String(selected);
+      card.setAttribute('aria-checked', String(selected));
+      const count = S.multiServices.filter(s=>CAROUSEL_SVCS.includes(s)).length + S.optionalScrapers.length;
+      const countEl = document.getElementById('extrasCarouselCount');
+      if (countEl) countEl.textContent = count ? `${count} selected` : 'Optional';
       const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
       const hint = document.querySelector('.opt-scraper-hint');
       if (hasExtras && !hint) {
