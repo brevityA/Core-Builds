@@ -13,3 +13,15 @@
 #themeToggle{top:auto!important;left:auto!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important}
 @media(max-width:599px){#themeToggle{right:max(10px,env(safe-area-inset-right))!important;bottom:max(76px,calc(env(safe-area-inset-bottom) + 66px))!important}}
 @media(max-height:520px) and (orientation:landscape){#themeToggle{right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important}}
+
+/* Quick Install contextual credential links */
+.fastlane-credential{display:flex;flex-direction:column;gap:6px}
+.fastlane-credential-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fastlane-credential-head label{font-size:.7rem;font-weight:800;color:#b9c7d2;letter-spacing:.02em}
+.fastlane-get-key{flex-shrink:0;color:#67e8f9;text-decoration:none;font-size:.66rem;font-weight:800;padding:3px 7px;border-radius:6px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06)}
+.fastlane-get-key:hover,.fastlane-get-key:focus-visible{color:#fff;border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.12);outline:none}
+.fastlane-key-hint{font-size:.62rem;color:#718093}
+[data-theme='light'] .fastlane-credential-head label{color:#1f2933}
+[data-theme='light'] .fastlane-get-key{color:#075ebd;border-color:#9fc4ea;background:#edf6ff}
+[data-theme='light'] .fastlane-get-key:hover,[data-theme='light'] .fastlane-get-key:focus-visible{color:#064f9d;border-color:#6aa7e8;background:#dfeeff}
+[data-theme='light'] .fastlane-key-hint{color:#526170}

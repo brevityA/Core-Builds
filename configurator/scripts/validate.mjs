@@ -38,6 +38,7 @@ const checks = {
   'ONN DV conservative': !DEVICE_DV_SAFE.has('onn'),
   'schema guard wired': app.includes("import { sanitizeAioEnumArrays }"),
   'credential registry': Object.keys(PROVIDER_CREDENTIALS).length >= 18 && app.includes("import { PROVIDER_CREDENTIALS }"),
+  'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),

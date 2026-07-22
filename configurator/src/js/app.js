@@ -5117,14 +5117,18 @@ function showFastLane() {
   const installFields = document.getElementById('flInstallFields');
   const captureCredentialDrafts = () => overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{if(inp.value)S.creds[inp.dataset.flCred]=inp.value;});
   const renderContext = () => {
-    const labels={ 'torbox-pro':'TorBox',realdebrid:'Real-Debrid',alldebrid:'AllDebrid',premiumize:'Premiumize' };
     const credKeys={ 'torbox-pro':'torbox',realdebrid:'realdebrid',alldebrid:'alldebrid',premiumize:'premiumize' };
     const fields=[];
-    state.services.filter(v=>credKeys[v]).forEach(v=>{const k=credKeys[v];fields.push(`<input class="fastlane-field" data-fl-cred="${k}" type="password" autocomplete="off" placeholder="${labels[v]} API key" value="${(S.creds[k]||'').replace(/"/g,'&quot;')}">`);});
-    if(state.services.includes('easynews')) fields.push(`<input class="fastlane-field" data-fl-cred="easynews" autocomplete="username" placeholder="EasyNews username" value="${(S.creds.easynews||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" data-fl-cred="easynewsPass" type="password" autocomplete="current-password" placeholder="EasyNews password" value="${(S.creds.easynewsPass||'').replace(/"/g,'&quot;')}">`);
-    const extraCreds={debridio:['debridio','Debridio API key'],nzbgeek:['nzbgeek','NZBGeek API key'],streamnzb:['streamnzb','StreamNZB manifest URL']};
-    state.extras.filter(v=>extraCreds[v]).forEach(v=>{const [k,label]=extraCreds[v];fields.push(`<input class="fastlane-field" data-fl-cred="${k}" type="password" autocomplete="off" placeholder="${label}" value="${(S.creds[k]||'').replace(/"/g,'&quot;')}">`);});
-    state.scrapers.forEach(id=>{const d=OPTIONAL_SCRAPER_DEFS.find(x=>x.id===id);if(d?.credKey)fields.push(`<input class="fastlane-field" data-fl-cred="${d.credKey}" type="password" autocomplete="off" placeholder="${d.label} API key" value="${(S.creds[d.credKey]||'').replace(/"/g,'&quot;')}">`);});
+    const credentialField=(key,{type='password',autocomplete='off',showLink=true}={})=>{
+      const d=PROVIDER_CREDENTIALS[key]||{label:key,placeholder:''};
+      const link=showLink&&d.url?`<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>`:key==='streamnzb'?'<span class="fastlane-key-hint">Use your instance manifest</span>':'';
+      return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-fl-cred="${key}" type="${type}" autocomplete="${autocomplete}" placeholder="${d.placeholder||''}" value="${(S.creds[key]||'').replace(/"/g,'&quot;')}"></div>`;
+    };
+    state.services.filter(v=>credKeys[v]).forEach(v=>fields.push(credentialField(credKeys[v])));
+    if(state.services.includes('easynews')) fields.push(credentialField('easynews',{type:'text',autocomplete:'username'}),credentialField('easynewsPass',{autocomplete:'current-password',showLink:false}));
+    const extraCreds={debridio:'debridio',nzbgeek:'nzbgeek',streamnzb:'streamnzb'};
+    state.extras.filter(v=>extraCreds[v]).forEach(v=>fields.push(credentialField(extraCreds[v],{type:v==='streamnzb'?'url':'password'})));
+    state.scrapers.forEach(id=>{const d=OPTIONAL_SCRAPER_DEFS.find(x=>x.id===id);if(d?.credKey)fields.push(credentialField(d.credKey));});
     const freeNote=[...state.services,...state.extras].some(v=>v==='p2p'||v==='http')?'<div class="fastlane-note">Free/P2P sources require no key and depend on active seeders and compatible hosts.</div>':'';
     creds.innerHTML = fields.length ? `<div class="fastlane-label">Provider credentials</div><div class="fastlane-fields">${fields.join('')}</div>${freeNote}` : freeNote || '<div class="fastlane-note">Select at least one provider.</div>';
     const extraCount=state.extras.length+state.scrapers.length, countEl=document.getElementById('flExtrasCount');if(countEl)countEl.textContent=extraCount?`${extraCount} selected`:'';
