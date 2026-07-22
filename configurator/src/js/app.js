@@ -1,6 +1,6 @@
 import { ICO } from '../data/icons.js';
 import { CHANGELOG } from '../data/changelog.js';
-import { FORMATTERS } from '../data/formatters.js';
+import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
 import { OPTIONAL_SCRAPER_DEFS } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS } from '../data/devices.js';
@@ -752,7 +752,7 @@ function renderCacheMode() {
 function renderAdvancedPanel() {
   const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   const reachedReview = (localStorage.getItem('coreBuildStep') && parseInt(localStorage.getItem('coreBuildStep'), 10) === STEPS);
-  const backText = reachedReview ? '← Save & Return' : '← Back';
+  const backText = reachedReview ? '✓ Save & Close' : '✕ Close';
   const AUDIO_OPTS = [
     { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M34 7a16 16 0 010 30" stroke="#10b981" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
     { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" fill="none"/><text x="40" y="14" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
@@ -919,6 +919,68 @@ function renderAdvancedPanel() {
 
     </div>
   </div>`;
+}
+
+let _advancedTrigger = null;
+function openAdvancedDrawer(trigger) {
+  document.getElementById('advancedDrawer')?.remove();
+  _advancedTrigger = trigger || document.activeElement;
+  let content;
+  try { content = renderAdvancedPanel(); }
+  catch (error) {
+    showAdvanced = false;
+    showToast('Fine-Tune could not open — your setup is still safe', true);
+    console.error('Fine-Tune render failed', error);
+    return;
+  }
+  showAdvanced = true;
+  const overlay = document.createElement('div');
+  overlay.id = 'advancedDrawer';
+  overlay.className = 'advanced-drawer-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Fine-Tune settings');
+  overlay.innerHTML = `<div class="advanced-drawer-panel"><div class="advanced-drawer-content">${content}</div></div>`;
+  document.body.appendChild(overlay);
+  document.body.classList.add('advanced-drawer-open');
+  overlay.addEventListener('click', event => { if (event.target === overlay) closeAdvancedDrawer(); });
+  overlay.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); closeAdvancedDrawer(); return; }
+    if (event.key !== 'Tab') return;
+    const focusable = overlay.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),summary,[tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
+  overlay.querySelector('[data-action="close-advanced"]')?.focus();
+  requestAnimationFrame(() => overlay.classList.add('active'));
+}
+
+function closeAdvancedDrawer() {
+  const overlay = document.getElementById('advancedDrawer');
+  showAdvanced = false;
+  document.body.classList.remove('advanced-drawer-open');
+  if (overlay) {
+    overlay.classList.remove('active');
+    setTimeout(() => overlay.remove(), 180);
+  }
+  render();
+  const trigger = _advancedTrigger;
+  _advancedTrigger = null;
+  setTimeout(() => trigger?.focus?.(), 200);
+}
+
+function refreshAdvancedDrawer() {
+  const content = document.querySelector('#advancedDrawer .advanced-drawer-content');
+  if (!content) return false;
+  try { content.innerHTML = renderAdvancedPanel(); }
+  catch (error) {
+    console.error('Fine-Tune refresh failed', error);
+    closeAdvancedDrawer();
+    showToast('Fine-Tune closed after a rendering error — your setup was preserved', true);
+  }
+  return true;
 }
 
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -1125,11 +1187,7 @@ function render() {
   }
   main.style.justifyContent = '';
 
-  if (showAdvanced) {
-    main.innerHTML = renderAdvancedPanel();
-    nav.style.display = 'none';
-    return;
-  }
+  if (showAdvanced && refreshAdvancedDrawer()) return;
 
   const def  = DEFS[step - 1];
 
@@ -2052,17 +2110,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const d = document.getElementById('fmtPickerDetails');
       if (d) { d.open = true; d.scrollIntoView({ behavior:'smooth', block:'center' }); }
     }
-    if (action === 'open-advanced')  { showAdvanced = true;  render(); window.scrollTo(0,0); }
-    if (action === 'close-advanced') {
-      showAdvanced = false;
-      const reachedReview = (localStorage.getItem('coreBuildStep') && parseInt(localStorage.getItem('coreBuildStep'), 10) === STEPS);
-      if (reachedReview) {
-        step = STEPS;
-        saveState();
-      }
-      render();
-      window.scrollTo(0,0);
-    }
+    if (action === 'open-advanced') openAdvancedDrawer(el);
+    if (action === 'close-advanced') closeAdvancedDrawer();
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showFastLane();
     if (action === 'open-diagnostics') showDiagnosticsModal();
@@ -4091,8 +4140,9 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const FMTS = [
     { key:'app',    label:'Stremio App', getUrl: u => u.replace(/^https?:\/\//, 'stremio://'), action:'link' },
     { key:'web',    label:'Web',         getUrl: u => `https://web.stremio.com/#/addons?addon=${encodeURIComponent(u)}`, action:'link' },
-    { key:'wuplay', label:'WuPlay',      getUrl: u => u, action:'open', configUrl:'https://config.wuplay.app/#addons' },
-    { key:'nuvio',  label:'Nuvio',       getUrl: u => u, action:'open', configUrl:'https://nuvio.tv/account?tab=addons' },
+    { key:'wuplay',  label:'WuPlay',       getUrl: u => u, action:'open', configUrl:'https://config.wuplay.app/#addons' },
+    { key:'nuvio',   label:'Nuvio',        getUrl: u => u, action:'open', configUrl:'https://nuvio.tv/account?tab=addons' },
+    { key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' },
   ];
   const qrSrc = u => {
     try {
@@ -4222,12 +4272,13 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const actionBtn = document.getElementById('mActionBtn');
   let activeFi = 0;
 
-  const BTN_CLS = ['m-install','m-web','m-wu','m-nuvio'];
+  const BTN_CLS = ['m-install','m-web','m-wu','m-nuvio','m-web'];
   const BTN_LABELS = [
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install`,
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web`,
     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open WuPlay`,
     `${ICO.nuvio(13)}Open Nuvio`,
+    `${ICO.clipboard(13,'currentColor')}Copy Manifest`,
   ];
 
   function switchFmt(fi) {
@@ -4265,7 +4316,8 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     }
     document.getElementById('mUrlLabel').innerHTML =
       fi === 2 ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') :
-      fi === 3 ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') : 'Manifest URL';
+      fi === 3 ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') :
+      fi === 4 ? 'Raw manifest URL — auto-copied ' + ICO.check(12,'currentColor') : 'Manifest URL';
     if (copyBtn) { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }
     const helpEl = document.getElementById('mAppHelp');
     const qrWrap = document.getElementById('mQrWrap');
@@ -5173,7 +5225,7 @@ function showFastLane() {
         const hasLogin=S.stremioEmail && S.stremioPassword;
         S.installMode=hasLogin?'direct':'manifest';
         installTarget='app';
-      } else { S.installMode='manifest'; if (state.target==='manifest') installTarget='app'; }
+      } else { S.installMode='manifest'; }
       step=STEPS; saveState();
       btn.disabled=true;
       try { await simpleInstall(installTarget); } finally { btn.disabled=false; }
@@ -5282,6 +5334,7 @@ async function simpleInstall(target) {
         }
       }
       btn.disabled = false; btn.innerHTML = origHtml;
+      document.getElementById('fastLaneModal')?.remove();
       showManifestModal(manifestUrl, pwd, hostLbl, target);
       return;
     }

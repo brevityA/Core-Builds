@@ -42,6 +42,8 @@ const checks = {
   'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
   'quick install optional TMDB': app.includes('data-fl-tmdb') && app.includes("tmdbField('tmdbToken')") && app.includes("tmdbField('tmdbApiKey'"),
   'TMDB-free config compatibility': app.includes('bitrate: { useMetadataRuntime:hasTmdb') && app.includes('digitalReleaseFilter: { enabled:hasTmdb') && app.includes('titleMatching: { enabled:hasTmdb') && app.includes('yearMatching: { enabled:hasTmdb') && !app.includes("warns.push('No TMDB key"),
+  'Quick Install manifest lifecycle': app.includes("{ key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' }") && app.includes("document.getElementById('fastLaneModal')?.remove()") && !app.includes("if (state.target==='manifest') installTarget='app'"),
+  'Fine-Tune pop-out lifecycle': app.includes("import { FORMATTERS, AUDIO_HELP }") && app.includes("openAdvancedDrawer(el)") && app.includes("overlay.id = 'advancedDrawer'") && app.includes('closeAdvancedDrawer()') && !app.includes("main.innerHTML = renderAdvancedPanel();\n    nav.style.display = 'none'"),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
