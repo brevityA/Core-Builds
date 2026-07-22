@@ -233,7 +233,8 @@
           "manifestUrl": "<your_davex_manifest_url>",
           "timeout": 5000,
           "mediaTypes": []
-        }
+        },
+        "instanceId": "dvx-speed-4k-plus"
       },
       {
         "type": "torrent-galaxy",

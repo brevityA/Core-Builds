@@ -1644,7 +1644,6 @@
       "attributes": [
         "resolution",
         "quality",
-        "bitrate",
         "audioTags"
       ]
     },
@@ -2042,8 +2041,7 @@
       "enabled": true,
       "streamTypes": [
         "usenet",
-        "torrent",
-        "debrid"
+        "torrent"
       ]
     },
     "checkOwned": false,

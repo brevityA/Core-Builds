@@ -52,7 +52,7 @@
     ],
     "excludedVisualTags": [
       "3D",
-      "DV Only"
+      "DV"
     ],
     "includedVisualTags": [],
     "requiredVisualTags": [],
@@ -168,11 +168,11 @@
           "direction": "desc"
         },
         {
-          "key": "regexPatterns",
+          "key": "regexScore",
           "direction": "desc"
         },
         {
-          "key": "streamType",
+          "key": "type",
           "direction": "desc"
         },
         {

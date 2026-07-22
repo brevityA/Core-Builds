@@ -51,15 +51,25 @@ VALID = {
         'debridio','jackett','prowlarr','torrentio','torznab','custom',
         # Current AIOStreams/community preset identifiers used by the template suite.
         'hdhub','torrents-db','sootio','neko-bt','animetosho','dmm-cast',
-        'easynews','davex'
-    }
+        'easynews','davex','nzbhydra','usenet-streamer','streamnzb'
+    },
+    'autoplay_attributes': {
+        'service','addon','proxied','resolution','quality','encode','audioTags',
+        'visualTags','languages','releaseGroup','type','infoHash','size'
+    },
+    'cache_and_play_types': {'usenet','torrent'},
 }
 
 # Intentional language policies reviewed by maintainers. New combinations still warn.
 REVIEWED_REQUIRED_LANGUAGES = {
     ('English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown'),
 }
-REVIEWED_NO_ZERO_CACHED = {'core-nexus-base-torbox'}  # Parent/base config, not a standalone child.
+REVIEWED_NO_ZERO_CACHED = {
+    'core-nexus-base-torbox',  # Parent/base config, not a standalone child.
+    'core-nexus-4k-dual-core',
+    'core-nexus-4k-essential-dual-core',
+    'core-nexus-dual-core-1080p',
+}  # Deprecated dual-core configs are retained only for archive compatibility.
 
 
 def validate_list(values, valid_set):
@@ -130,10 +140,17 @@ def validate_template(fpath):
 
     # ── Presets ───────────────────────────────────────────────
     preset_map = {}
+    seen_preset_ids = set()
     for p in c.get('presets', []):
         ptype = p.get('type', '')
         pid   = p.get('instanceId', '')
-        preset_map[pid] = ptype
+        if not pid:
+            err(name, f"preset '{ptype}': instanceId is required even when disabled")
+        elif pid in seen_preset_ids:
+            err(name, f"preset '{ptype}': duplicate instanceId '{pid}'")
+        else:
+            seen_preset_ids.add(pid)
+            preset_map[pid] = ptype
 
         if ptype not in VALID['preset_types']:
             warn(name, f"preset '{ptype}' — unknown type (may still be valid)")
@@ -178,6 +195,21 @@ def validate_template(fpath):
         val = dedup.get(key)
         if val and val not in VALID['dedup_modes']:
             err(name, f"deduplicator.{key}: invalid value '{val}'")
+
+    # ── Playback enum contracts ───────────────────────────────
+    autoplay = c.get('autoPlay', {})
+    bad_autoplay = validate_list(autoplay.get('attributes', []), VALID['autoplay_attributes'])
+    if bad_autoplay:
+        err(name, f"autoPlay.attributes: invalid values {bad_autoplay}")
+    elif autoplay.get('attributes'):
+        ok(name, f"autoPlay.attributes: {len(autoplay['attributes'])} values valid")
+
+    cache_and_play = c.get('cacheAndPlay', {})
+    bad_cache_types = validate_list(cache_and_play.get('streamTypes', []), VALID['cache_and_play_types'])
+    if bad_cache_types:
+        err(name, f"cacheAndPlay.streamTypes: invalid values {bad_cache_types}")
+    elif cache_and_play.get('streamTypes'):
+        ok(name, f"cacheAndPlay.streamTypes: {len(cache_and_play['streamTypes'])} values valid")
 
     # ── Matching ──────────────────────────────────────────────
     tm = c.get('titleMatching', {})
@@ -253,13 +285,9 @@ def main():
         files = []
         for d in dirs:
             p = Path(d)
-            found = sorted(p.rglob('core-nexus*.json')) + sorted(p.rglob('core-cipher*.json'))
-            files += [f for f in found
-                      if 'fixed' not in str(f)
-                      and 'dual' not in str(f)
-                      and 'Nightly' not in str(f)
-                      and 'Community-Templates' not in str(f)
-                      and 'Formatters' not in str(f)]
+            files.extend(sorted(p.rglob('*.json')))
+        # A path can be reached through overlapping --dir arguments; validate once.
+        files = list(dict.fromkeys(files))
 
     print(f"\n{'='*60}")
     print(f"  CORE BUILDS TEMPLATE VALIDATOR")
