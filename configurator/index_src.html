@@ -1174,9 +1174,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .host-cfg-link:hover{color:#00d4ff;text-shadow:0 0 10px rgba(0,212,255,.4)}
 [data-theme="light"] .host-cfg-link{color:#0e7490}
 [data-theme="light"] .host-cfg-link:hover{color:#0c4a6e;text-shadow:none}
-#cb-loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0d1117;animation:cbLoad 3s cubic-bezier(.4,0,.2,1) forwards;pointer-events:none}
+#cb-loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0d1117;animation:cbLoad .9s cubic-bezier(.4,0,.2,1) forwards;pointer-events:none}
 [data-theme="light"] #cb-loader{background:#e8eef4}
-#cb-loader-icon{width:150px;height:150px;animation:cbIconPop .7s cubic-bezier(.34,1.56,.64,1) .15s both}
+#cb-loader-icon{width:150px;height:150px;animation:cbIconPop .42s cubic-bezier(.34,1.56,.64,1) .05s both}
 #cb-loader-title{font-family:system-ui,-apple-system,sans-serif;font-size:1.55rem;font-weight:900;letter-spacing:-.03em;color:#e6edf3;line-height:1}
 [data-theme="light"] #cb-loader-title{color:#1c2128}
 #cb-loader-title span{color:#00b8cc}
@@ -1472,6 +1472,7 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
 [data-theme='light'] .fastlane-choice.active{background:#eaf3ff!important;background-image:none!important;color:#15314f!important}[data-theme='light'] .fastlane-choice.active b{color:#075ebd!important}[data-theme='light'] .fastlane-choice.active span{color:#526170!important}
 [data-theme='light'] [data-action='set-simple-quality'],[data-theme='light'] [data-action='set-simple-resfirst']{background:#fff!important;border-color:#cfd8e2!important;color:#536170!important}[data-theme='light'] [data-action='set-simple-quality'][data-active='true'],[data-theme='light'] [data-action='set-simple-resfirst'][data-active='true']{background:#e5f1ff!important;border-color:#6aa7e8!important;color:#075ebd!important}
 [data-theme='light'] .fmt-scroll-card>div[style*='border-top']{color:#526170!important;border-color:#d5dde5!important}
+[data-theme='light'] .additional-services-btn{background:#fff!important;background-image:none!important;border-color:#d5dde5!important;color:#1f2933!important}[data-theme='light'] .additional-services-btn span{color:#526170!important}[data-theme='light'] .additional-services-btn b{color:#1f2933!important}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cbTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))}catch(e){}</script>
 </head>
@@ -1570,7 +1571,7 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
         <div class="qs-num">4</div>
         <div style="flex:1;min-width:0">
           <div class="qs-step-title">Add your API key <span style="font-size:.64rem;color:#4b5563;font-weight:600">(optional)</span></div>
-          <div class="qs-step-desc">Paste your debrid API key to bake it into the template. Keys are stored only in your downloaded JSON — never sent to any server.</div>
+          <div class="qs-step-desc">Paste credentials only for the providers you select. Export JSON keeps them local; Direct Install sends the generated config to your chosen AIOStreams host.</div>
         </div>
       </div>
       <div class="qs-step">
@@ -1603,12 +1604,12 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
       <div class="tut-wf">
         <div class="tut-wf-icon">&#128338;</div>
         <div class="tut-wf-label">How long</div>
-        <div class="tut-wf-desc">Under 2 minutes with Guided Setup, or customise everything yourself</div>
+        <div class="tut-wf-desc">About a minute with Quick Install, or use Guided and Advanced routes for more control</div>
       </div>
       <div class="tut-wf">
         <div class="tut-wf-icon">&#128274;</div>
         <div class="tut-wf-label">Privacy</div>
-        <div class="tut-wf-desc">Nothing leaves your browser — API keys stay in your downloaded file only</div>
+        <div class="tut-wf-desc">Credentials are not logged by Core Builds; Direct Install sends the config only to the host you choose</div>
       </div>
     </div>
     <div class="tut-welcome-actions">
@@ -1734,6 +1735,12 @@ const CHANGELOG = [
     'Chromecast, smart TVs, ONN & Roku — Corrected model-dependent AV1, Dolby Vision, HDR, internal-app lossless-audio, and passthrough assumptions',
     'Fire TV & Xiaomi — Added generation-aware audio guidance and corrected Xiaomi TV Box S 2nd Gen AV1 support',
     'Popularity — Reordered featured devices toward Android/Google TV, ONN, Shield, Fire TV 4K Max, and Samsung using Core Builds samples, Stremio community usage, and broader CTV adoption',
+    'Multi-provider setup — Quick Install now supports selecting multiple debrid/Usenet/P2P providers and renders all required credentials contextually',
+    'Additional sources — Added one shared popup for Quick Install and Guided/Advanced Sources; optional paid extras create contextual credential fields and selected-count summaries',
+    'Naming — Standardized beginner-facing routes and steps as Guided Setup, Advanced Builder, Update Existing Setup, Ready-Made Setups, Sources, Video Quality, Accounts & Keys, and Review & Install',
+    'Startup & state — Reduced the fixed loader from three seconds to under one second and added schema migration for corrected device defaults and newly saved settings',
+    'Tutorial alignment — Rebuilt onboarding around Quick Install, multi-provider Sources, Ready-Made Setups, Guided Setup, Advanced Builder, validation, and Review & Install with working spotlight targets',
+    'Credential transparency — Replaced inaccurate zero-knowledge wording with explicit local-export versus chosen-host Direct Install behaviour',
   ]},
   { v:'2.75', date:'Jul 21 2026', items:[
     'Unified UI — Extended the approved hybrid visual system across every configurator step, option menu, form, review panel, sidebar, modal, receipt, and navigation control',
@@ -1765,7 +1772,7 @@ const CHANGELOG = [
     'Diagnostics — Added new automated Health Check rules on the final step to instantly alert users if they enabled EasyNews or SubDL but forgot to enter their credentials',
     'Ecosystem — Integrated cutting-edge Stream Expression Language (SEL) boosters globally: Sub-First Anime Booster, Dolby Priority for Sonos/Bose bars, Incomplete Ongoing Show filter, and Clutter-Free Single Episode filter',
     'Fix — Overhauled Stremio Account authentication pathways (Login / Registration) to query the distinct sub-endpoints directly (/api/login and /api/register), successfully resolving the 404 router failures caused by Stremio’s recent base API path deprecations',
-    'Security — Added a prominent green "Zero-Knowledge Security Shield" reassurance banner at the top of Step 5 (API Keys) explaining that credentials never leave their browser and are compiled 100% locally',
+    'Security — Added a prominent green "Zero-Knowledge Security Shield" reassurance banner at the top of Accounts & Keys explaining that credentials never leave their browser and are compiled 100% locally',
     'Security — Added a "Safe Auth" green shield warning beneath the Stremio credentials on the direct-install panel, assuring users that accounts are used locally and never stored',
     'Redesign — Retires the device-selection select dropdown and featured list, replacing them with a highly polished side-scrolling Device Carousel showing specifications, capabilities, and specs guides directly inside expandable cards',
     'Navigation — Added a Changelog modal link next to "Start Over" on Step 6 to make reading version histories highly discoverable',
@@ -2202,7 +2209,7 @@ const LANG_OPTS = [
 ];
 
 const DEFS = [
-  { id:'service', title:'Debrid Service', desc:'Which service are you using for cached streams?', key:'service', cols:'c4d', layout:'svc-list',
+  { id:'service', title:'Sources', desc:'Choose one or more providers for streams. Add optional sources separately.', key:'service', cols:'c4d', layout:'svc-list',
     opts:[
       { v:'torbox-pro',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="28" rx="4" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".06"/><path d="M14 16h16M14 22h10M14 28h13" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"/><circle cx="34" cy="14" r="3.5" fill="#22c55e" stroke="#22c55e" stroke-width="1"/><path d="M33 14l1 1 2-2" stroke="#fff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><text x="22" y="7" text-anchor="middle" fill="#22c55e" font-size="5" font-weight="800" letter-spacing=".5">PRO</text></svg>', name:'TorBox Pro', desc:'Best pick — full scraper stack<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Stream · 4K Apex</span>' },
       { v:'torbox-ess',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="26" rx="4" stroke="#4ade80" stroke-width="1.5" fill="#4ade80" fill-opacity=".05"/><path d="M14 18h16M14 24h10M14 30h8" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/><text x="22" y="9" text-anchor="middle" fill="#4ade80" font-size="4.5" font-weight="700" letter-spacing=".4">ESS</text></svg>', name:'TorBox Essential', desc:'Essential plan — same smart sorting<br><span style="color:#3fb950;font-size:.8em">e.g. Core Nexus Essential · 4K Essential</span>' },
@@ -2245,14 +2252,14 @@ const DEFS = [
       { v:'xiaomi-3rd',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg18"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff6900" flood-opacity=".4"/></filter></defs><rect x="8" y="12" width="28" height="18" rx="3" stroke="#ff6900" stroke-width="1.5" filter="url(#dg18)" fill="none"/><rect x="8" y="12" width="28" height="18" rx="3" fill="#00d4ff" opacity=".04"/><text x="22" y="24" text-anchor="middle" fill="#ff6900" font-size="8" font-weight="800" font-family="system-ui,sans-serif" opacity=".7">Mi</text><circle cx="32" cy="14" r="3" fill="#ff6900" opacity=".5"/><line x1="18" y1="33" x2="26" y2="33" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/><line x1="22" y1="30" x2="22" y2="32" stroke="#ff6900" stroke-width="1.3" stroke-linecap="round" opacity=".4"/></svg>', name:'Xiaomi Mi Box S (3rd Gen)', desc:'DV · HDR10+ · AV1 · Standard audio recommended', help:'Xiaomi TV Box S 3rd gen supports AV1 and modern HDR formats. Audio passthrough still varies by app and firmware, so the profile avoids assuming a full lossless home-theatre chain.' },
     ]
   },
-  { id:'resolution', title:'Resolution', desc:'Primary resolution target for this template.', key:'resolution', cols:'c1', layout:'svc-list', noHero:true,
+  { id:'resolution', title:'Video Quality', desc:'Choose your target resolution, HDR and audio compatibility.', key:'resolution', cols:'c1', layout:'svc-list', noHero:true,
     opts:[
       { v:'4k',        icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><polygon points="22,3 40,16 22,42 4,16" stroke="#7c3aed" stroke-width="2" fill="#1a0a3a"/><polygon points="22,3 40,16 22,16 4,16" fill="#7c3aed" opacity="0.4"/><text x="22" y="34" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="800" font-family="system-ui,sans-serif">4K</text></svg>', name:'4K HDR',        desc:'2160p first · 1080p fallback · for 4K displays' },
       { v:'1080p',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="8" width="38" height="24" rx="3" stroke="#3b82f6" stroke-width="2" fill="#0a1428"/><text x="22" y="25" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="800" font-family="system-ui,sans-serif">1080p</text><rect x="17" y="32" width="10" height="4" rx="1" fill="#3b82f6"/><line x1="13" y1="40" x2="31" y2="40" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/></svg>', name:'1080p',          desc:'Hard lock · 2160p excluded · bandwidth-friendly' },
       { v:'ultrawide', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="11" width="40" height="22" rx="2" stroke="#8b5cf6" stroke-width="2" fill="#0e0a1f"/><text x="22" y="26" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="700" font-family="system-ui,sans-serif">21 : 9</text><rect x="17" y="33" width="10" height="4" rx="1" fill="#8b5cf6"/><line x1="12" y1="41" x2="32" y2="41" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>', name:'Ultrawide',      desc:'1080p → 1440p → 4K tiers · pair with Windows PC device' },
     ]
   },
-  { id:'content', title:'Content Type', desc:'What will you primarily watch? Not sure? <strong style="color:#e6edf3">Skip — it covers everything.</strong>', key:'content', cols:'c1', layout:'svc-list', noHero:true,
+  { id:'content', title:'Content Preferences', desc:'What will you primarily watch? Not sure? <strong style="color:#e6edf3">Skip — it covers everything.</strong>', key:'content', cols:'c1', layout:'svc-list', noHero:true,
     opts:[
       { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><circle cx="15" cy="16" r="4.5" fill="#ef4444" opacity="0.85"/><circle cx="29" cy="16" r="4.5" fill="#3b82f6" opacity="0.85"/><circle cx="15" cy="28" r="4.5" fill="#f9a8d4" opacity="0.85"/><circle cx="29" cy="28" r="4.5" fill="#94a3b8" opacity="0.6"/></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
       { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Movies & TV',      desc:'Films &amp; series · no anime scrapers' },
@@ -2260,13 +2267,26 @@ const DEFS = [
       { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
     ]
   },
-  { id:'apis', title:'API Keys', desc:'Optional — bake your keys directly into the template. They are stored <strong style="color:#3fb950">only in the downloaded JSON file</strong> and are <strong style="color:#3fb950">never sent to any server</strong>.', key:null, cols:'c1', opts:[] },
-  { id:'review', title:'Review & Deploy', desc:'Confirm your settings and generate the template JSON.', key:null, cols:'c2', opts:[] }
+  { id:'apis', title:'Accounts & Keys', desc:'Optional — add credentials for selected providers. <strong style="color:#3fb950">Export JSON</strong> keeps the generated file local; <strong style="color:#fbbf24">Direct Install</strong> sends it to the AIOStreams host you choose.', key:null, cols:'c1', opts:[] },
+  { id:'review', title:'Review & Install', desc:'Confirm your settings, install directly, or generate a manifest URL.', key:null, cols:'c2', opts:[] }
 ];
 
 /* STATE MANAGEMENT */
+const STATE_SCHEMA = 1;
+function migrateState(input) {
+  const d={...(input||{})}, schema=Number(d._schema||0);
+  if(schema<1){
+    if(DEVICE_FORCE_LIMITED_AUDIO.has(d.device) && ['lossless','dolby'].includes(d.audio)) d.audio=DEVICE_AUDIO_DEFAULTS[d.device]||'standard';
+    if(!Array.isArray(d.multiServices)) d.multiServices=[];
+    if(!Array.isArray(d.optionalScrapers)) d.optionalScrapers=[];
+    if(typeof d.cleanInstall!=='boolean') d.cleanInstall=false;
+    if(!d.quickProfile) d.quickProfile='balanced';
+  }
+  d._schema=STATE_SCHEMA; return d;
+}
 function saveState() {
   const {stremioPassword: _, ...persist} = S;
+  persist._schema=STATE_SCHEMA;
   localStorage.setItem('coreBuild', JSON.stringify(persist));
   localStorage.setItem('coreBuildStep', step);
   if (S.service) localStorage.setItem('coreBuildLastSvc', S.service);
@@ -2409,7 +2429,7 @@ function loadState() {
     const savedStep = localStorage.getItem('coreBuildStep');
     if (savedS) {
       try {
-        const parsed = JSON.parse(savedS);
+        const parsed = migrateState(JSON.parse(savedS));
         Object.assign(S, sanitizeSharedConfig(parsed));
         if (parsed.creds) Object.assign(S.creds, parsed.creds);
         if (parsed.instanceUrl) S.instanceUrl = parsed.instanceUrl;
@@ -2419,6 +2439,8 @@ function loadState() {
         if (parsed.basePassword) S.basePassword = parsed.basePassword;
         if (parsed.stremioEmail) S.stremioEmail = parsed.stremioEmail;
         if (parsed.stremioPassword) S.stremioPassword = parsed.stremioPassword;
+        if (typeof parsed.cleanInstall === 'boolean') S.cleanInstall = parsed.cleanInstall;
+        if (['fast','balanced','maximum'].includes(parsed.quickProfile)) S.quickProfile = parsed.quickProfile;
         hadSavedState = true;
         S.service = deriveService();
       } catch(e) {
@@ -2603,32 +2625,9 @@ function renderOpts(def) {
       </label></div>`;
     }).join('');
     const emptyHtml = '<div class="svc-empty" id="svcEmpty">No services match your search</div>';
-    const ckIcon = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    const svcCarouselCards = CAROUSEL_SVCS.map(sv => {
-      const o = def.opts.find(x => x.v === sv); if (!o) return '';
-      const active = S.multiServices.includes(sv);
-      const cat = SVC_CAT[sv] || 'debrid';
-      const catLabel = cat === 'debrid' ? 'Debrid' : cat === 'usenet' ? 'Usenet' : cat === 'noaccount' ? 'Free' : cat;
-      const color = sv === 'debridio' ? '#14b8a6' : sv === 'p2p' ? '#8b5cf6' : sv === 'http' ? '#f472b6' : sv === 'nzbgeek' ? '#22c55e' : '#f59e0b';
-      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-carousel-service" data-svc-id="${sv}">
-        <div class="opt-scraper-card-ck">${ckIcon}</div>
-        <div class="opt-scraper-card-head"><div class="opt-scraper-icon opt-scraper-icon-svg">${o.icon}</div><span class="opt-scraper-name">${o.name}</span></div>
-        <div class="opt-scraper-subdesc">${SVC_DESC[sv] || ''}</div>
-        <span class="opt-scraper-badge opt-scraper-badge-${cat}">${catLabel}</span>
-      </div>`;
-    }).join('');
-    const scraperCards = OPTIONAL_SCRAPER_DEFS.map(d => {
-      const active = S.optionalScrapers.includes(d.id);
-      const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat;
-      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-optional-scraper" data-scraper-id="${d.id}">
-        <div class="opt-scraper-card-ck">${ckIcon}</div>
-        <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
-        <div class="opt-scraper-subdesc">${d.desc}</div>
-        <span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span>
-      </div>`;
-    }).join('');
     const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
-    const optSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Tap cards to toggle additional services and scrapers. Multi-select is supported.</div><div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="opt-scraper-scroll">${svcCarouselCards}${scraperCards}</div></div>${hasExtras ? '<div class="opt-scraper-hint">API keys for selected extras appear on Step 5 (API Keys).</div>' : ''}</div>`;
+    const extraCount=S.multiServices.filter(s=>CAROUSEL_SVCS.includes(s)).length+S.optionalScrapers.length;
+    const optSection = `<div class="opt-scraper-section"><button type="button" class="additional-services-btn" data-action="open-additional-services" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111b27,#0d151f);color:#c9d5df;cursor:pointer;text-align:left"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(167,139,250,.09);color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.82rem">Additional services &amp; scrapers</b><span style="display:block;color:#718093;font-size:.68rem;margin-top:2px">P2P, HTTP, Usenet, Debridio and optional indexers</span></span>${extraCount?`<span style="padding:3px 8px;border-radius:99px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.2);color:#67e8f9;font-size:.62rem;font-weight:900">${extraCount} selected</span>`:''}<span style="color:#637185">→</span></button>${hasExtras?'<div class="opt-scraper-hint">Selected extras are active. Their credentials appear on Accounts &amp; Keys.</div>':''}</div>`;
     return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optSection}</div>`;
   }
   if (def.layout === 'hero') {
@@ -3054,7 +3053,7 @@ function renderSidebar() {
   const sb = document.getElementById('cbSidebar');
   if (!sb) return;
   const stepsEl = document.getElementById('sbSteps');
-  const SHORT = {0:'Service',1:'Device',2:'Resolution',3:'Content',4:'API Keys',5:'Review & Deploy'};
+  const SHORT = {0:'Sources',1:'Device',2:'Video Quality',3:'Content Preferences',4:'Accounts & Keys',5:'Review & Install'};
   if (step === 0) { sb.classList.add('sb-hidden'); return; }
   sb.classList.remove('sb-hidden');
   const items = Array.from({length: STEPS}, (_, i) => {
@@ -3101,7 +3100,7 @@ function renderProgress() {
     const n = i + 1;
     const state = n < step ? 'done' : n === step ? 'active' : 'pending';
     const tipName = DEFS[i] ? DEFS[i].title : (n === STEPS ? 'Review' : `Step ${n}`);
-    const SHORT_LABELS = {0:'Service',1:'Device',2:'Resolution',3:'Content',4:'API Keys',5:'Review'};
+    const SHORT_LABELS = {0:'Sources',1:'Device',2:'Quality',3:'Content',4:'Accounts',5:'Install'};
     const shortName = SHORT_LABELS[i] || tipName;
     const clickable = state === 'done' ? ` data-action="jump-step" data-step="${n}" role="button" tabindex="0" aria-label="Go back to ${tipName}"` : '';
     const k = keys[i];
@@ -3205,11 +3204,11 @@ function splashHtml() {
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4">
       <div class="splash-door fastlane-door" data-action="open-fast-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.rocket(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Quick Install <span class="splash-door-tag fastlane-badge">Fastest</span></div><div class="splash-door-desc">Choose an app, service, and performance profile — then install in one short flow.</div></div></div>
-      <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Core Configure <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
-      <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Template <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
+      <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
+      <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
     </div>
 
-    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Quick deploy</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
     <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
     <div class="splash-tertiary splash-anim splash-anim-d6">
@@ -3313,7 +3312,7 @@ function render() {
           ${hasApis ? `<div class="receipt-row">
             <div class="receipt-row-left">
               <span class="receipt-row-ico">${ICO.key(14,'#8b949e')}</span>
-              <span class="receipt-row-lbl">API Keys</span>
+              <span class="receipt-row-lbl">Accounts &amp; Keys</span>
             </div>
             <div class="receipt-row-val" style="color:#10b981">${[
               Object.values(S.creds).filter(v=>v).length ? ICO.check(10,'#10b981')+' Debrid' : '',
@@ -3586,12 +3585,12 @@ function render() {
             <div class="srh-sub">${def.desc}</div>
           </div>
         </div>
-        <!-- Zero-Knowledge Security Shield Banner -->
+        <!-- Transparent credential-handling notice -->
         <div style="display:flex;align-items:flex-start;gap:12px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);border-radius:10px;padding:12px 14px;margin-bottom:16px;box-shadow:0 2px 10px rgba(16,185,129,.02)">
           <div style="font-size:1.3rem;line-height:1.2;flex-shrink:0;color:#10b981">🛡️</div>
           <div style="text-align:left">
-            <div style="font-size:.82rem;font-weight:800;color:#34d399;letter-spacing:.02em;margin-bottom:2px">Zero-Knowledge Security Shield</div>
-            <div style="font-size:.7rem;color:#8b949e;line-height:1.45">Your API keys, tokens, and passwords are compiled <b>locally in your browser</b> and baked directly into your downloaded JSON. We never send, transmit, store, or log your credentials on any server. 100% client-side &amp; open-source.</div>
+            <div style="font-size:.82rem;font-weight:800;color:#34d399;letter-spacing:.02em;margin-bottom:2px">Transparent Credential Handling</div>
+            <div style="font-size:.7rem;color:#8b949e;line-height:1.45">Core Builds does not log your credentials. <b>Export JSON</b> creates the file locally in your browser. If you choose <b>Direct Install</b>, the generated configuration is transmitted to the AIOStreams host you selected so it can create your manifest.</div>
           </div>
         </div>
         <details id="langDetails" style="margin-bottom:16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
@@ -3772,145 +3771,96 @@ function syncNext() {
 const TUT_STEPS = [
   { id:'welcome' },
   {
-    id:'paths', badge:'Step 1 of 6', title:'Choose Your Path',
-    desc:'<strong>Guided Setup</strong> is perfect if you\'re new — just 3 quick steps and you\'re done.<br><br><span class="hl">Core Configure</span> gives you full control over every filter, sort rule, and formatter.<br><br>Already have a template? <span class="gold">Update Template</span> lets you paste it in and tweak.',
+    id:'paths', badge:'Step 1 of 7', title:'Choose the Right Path',
+    desc:'Use <strong>Quick Install</strong> for the shortest setup: app, providers, credentials, and a performance profile in one place.<br><br><span class="hl">Advanced Builder</span> exposes every filter and formatter. <span class="gold">Update Existing Setup</span> imports an older template. Guided Setup remains available below for a step-by-step route.',
     target:'.splash-doors', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'presets', badge:'Step 2 of 6', title:'Quick Deploy Presets',
-    desc:'Don\'t want to configure anything? These <strong>one-click presets</strong> generate a full template instantly based on your selected service.<br><br>Just pick one, enter your API key, and you\'re streaming.',
+    id:'sources', badge:'Step 2 of 7', title:'Choose One or More Providers',
+    desc:'Select every provider you actually use. Multi-select is supported for debrid and Usenet services.<br><br>Optional P2P, HTTP, Debridio, NZBGeek, StreamNZB, and extra indexers live under <strong>Additional services & scrapers</strong> so the main list stays simple.',
+    target:'.hybrid-services', arrow:'top', nextLabel:'Next'
+  },
+  {
+    id:'presets', badge:'Step 3 of 7', title:'Ready-Made Setups',
+    desc:'These presets apply sensible device, quality, cache, and sorting choices for common use cases. They are the fastest route when one of the descriptions already matches what you want.',
     target:'#splashPresets', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'debrid', badge:'Step 3 of 6', title:'What\'s a Debrid Service?',
-    desc:'A <span class="hl">debrid service</span> downloads torrents on fast servers and gives you a direct stream link — so you get <strong>instant playback without seeding</strong>.<br><br>Think of it as a middleman: it caches popular content so streams load in seconds. <span class="gold">TorBox</span> and <span class="gold">Real-Debrid</span> are the most popular.<br><br>Cost is typically <strong>$3–5/month</strong> for unlimited streaming.',
-    target:'.splash-chips-section', arrow:'top', nextLabel:'Next'
+    id:'quick', badge:'Step 4 of 7', title:'Quick Install',
+    desc:'Quick Install asks only what is required. Choose Stremio, Nuvio, WuPlay, or another app; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
+    target:'.splash-doors [data-action="open-fast-lane"]', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'finetune', badge:'Step 4 of 6', title:'Fine-Tune Panel',
-    desc:'After picking your service, you\'ll see a <span class="hl">Fine-Tune</span> button. It opens a full settings panel where you can tweak:<br><br>• <strong>Audio profile</strong> — Lossless, DD+, Auto, Dolby Only<br>• <strong>Video prefs</strong> — exclude 4K, DV, specific encodes<br>• <strong>Subtitles</strong> — pick sources and languages<br>• <strong>Catalogs</strong> — TMDB, Anime, Streaming, RPDB<br>• <strong>Proxy</strong> — MediaFlow proxy routing<br>• <strong>Formatter</strong> — choose how streams look in Stremio<br><br>Everything has safe defaults, so skip it if you\'re not sure.',
+    id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Advanced Builder',
+    desc:'<strong>Guided Setup</strong> walks through Sources, Device, Video Quality, Content Preferences, Accounts & Keys, and Review & Install.<br><br><span class="hl">Advanced Builder</span> adds detailed audio, video, formatter, subtitles, catalogs, proxy, matching, and filtering controls. Safe defaults are used when you skip an option.',
     center:true, nextLabel:'Next'
   },
   {
-    id:'review', badge:'Step 5 of 6', title:'Review & Install',
-    desc:'The final step shows a <strong>receipt card</strong> summarizing all your choices. From here you can:<br><br>• <span class="hl">Download</span> the template JSON to import manually<br>• <span class="hl">Create & Install</span> to push it directly to an AIOStreams host<br>• <strong>Test Drive</strong> your streams before installing<br>• <strong>Share</strong> your config link with others<br>• Check the <strong>Health Check</strong> for potential issues<br><br>Click any receipt row to jump back and change that setting.',
+    id:'install', badge:'Step 6 of 7', title:'Review, Validate, and Install',
+    desc:'Before installation, Core Builds runs credential, template, device, and host checks. The final screen prioritises the install action, then manifest recovery, exports, diagnostics, and the detailed configuration summary.<br><br>Direct Install sends the generated configuration to the selected AIOStreams host. Export JSON keeps the generated file local until you import it yourself.',
     center:true, nextLabel:'Next'
   },
   {
-    id:'start', badge:'Step 6 of 6', title:'Ready to Build!',
-    desc:'That\'s everything you need to know. Pick <strong>Guided Setup</strong> for the fastest path, or <span class="hl">Core Configure</span> for full control.<br><br>Your template will include <strong>14+ scrapers</strong>, smart sorting, regex scoring, and quality filters — all pre-configured based on your choices.',
-    target:'.splash-doors [data-action="easy-start"]', arrow:'top', nextLabel:'Start Building'
+    id:'start', badge:'Step 7 of 7', title:'Ready to Build',
+    desc:'For most people, start with <strong>Quick Install</strong>. Choose Guided Setup if you want help with each decision, or Advanced Builder when you already know the exact formats and filters you need.',
+    target:'.splash-doors [data-action="open-fast-lane"]', arrow:'top', nextLabel:'Open Quick Install'
   },
 ];
 let _tutStep = -1;
-function tutGo(n) {
-  _tutStep = n;
-  const ov = document.getElementById('tutOverlay');
-  const welcome = document.getElementById('tutWelcome');
-  const spot = document.getElementById('tutSpotlight');
-  const tip = document.getElementById('tutTooltip');
-  ov.classList.add('active');
-  const s = TUT_STEPS[n];
-  if (s.id === 'welcome') {
-    welcome.style.display = '';
-    spot.style.display = 'none';
-    tip.style.display = 'none';
-    document.getElementById('tutBackdrop').style.display = '';
+function tutFill(s,n){
+  document.getElementById('tutBadge').textContent=s.badge||'';
+  document.getElementById('tutTitle').textContent=s.title||'';
+  document.getElementById('tutDesc').innerHTML=s.desc||'';
+  document.getElementById('tutNext').textContent=s.nextLabel||'Next';
+  document.getElementById('tutBack').style.display=n<=1?'none':'';
+  document.getElementById('tutProgress').innerHTML=TUT_STEPS.slice(1).map((_,i)=>`<div class="tut-prog-dot ${i<n-1?'done':i===n-1?'active':''}"></div>`).join('');
+}
+function tutResetPosition(){
+  const tip=document.getElementById('tutTooltip'),spot=document.getElementById('tutSpotlight');
+  ['top','left','right','bottom','width','height','maxWidth','maxHeight','overflowY','transform'].forEach(k=>tip.style[k]='');
+  ['top','left','right','bottom','width','height'].forEach(k=>spot.style[k]='');
+  tip.className='tut-tooltip';
+}
+function tutShowCentered(s,n){
+  const tip=document.getElementById('tutTooltip'),spot=document.getElementById('tutSpotlight'),back=document.getElementById('tutBackdrop');
+  spot.style.display='none';back.style.display='';tutFill(s,n);tutResetPosition();
+  tip.style.display='';tip.style.position='fixed';tip.style.left='50%';tip.style.top='50%';tip.style.transform='translate(-50%,-50%)';tip.style.width='min(420px,calc(100vw - 28px))';tip.style.maxHeight='calc(100dvh - 28px)';tip.style.overflowY='auto';
+}
+function tutPositionTarget(el,s,n){
+  if(_tutStep!==n||!document.body.contains(el))return;
+  const tip=document.getElementById('tutTooltip'),spot=document.getElementById('tutSpotlight'),back=document.getElementById('tutBackdrop');
+  const r=el.getBoundingClientRect(),pad=8,vw=document.documentElement.clientWidth,vh=window.innerHeight;
+  if(!r.width||!r.height||r.bottom<0||r.top>vh){tutShowCentered(s,n);return;}
+  tutResetPosition();back.style.display='none';spot.style.display='';spot.style.position='fixed';spot.style.top=Math.max(4,r.top-pad)+'px';spot.style.left=Math.max(4,r.left-pad)+'px';spot.style.width=Math.min(vw-8,r.width+pad*2)+'px';spot.style.height=Math.min(vh-8,r.height+pad*2)+'px';
+  tutFill(s,n);tip.style.display='';tip.style.position='fixed';tip.style.width='min(380px,calc(100vw - 28px))';tip.style.maxHeight='calc(100dvh - 28px)';tip.style.overflowY='auto';
+  const tipW=Math.min(380,vw-28),estimatedH=Math.min(tip.scrollHeight||280,vh-28),below=vh-r.bottom-14,above=r.top-14;
+  const placeBelow=below>=Math.min(estimatedH,300)||below>=above;
+  tip.className='tut-tooltip arrow-'+(placeBelow?'top':'bottom');
+  tip.style.left=Math.max(14,Math.min(r.left,vw-tipW-14))+'px';
+  tip.style.top=(placeBelow?Math.min(r.bottom+14,vh-estimatedH-14):Math.max(14,r.top-estimatedH-14))+'px';
+}
+function tutGo(n,reposition=false){
+  if(n<0||n>=TUT_STEPS.length)return;
+  _tutStep=n;
+  const ov=document.getElementById('tutOverlay'),welcome=document.getElementById('tutWelcome'),spot=document.getElementById('tutSpotlight'),tip=document.getElementById('tutTooltip'),back=document.getElementById('tutBackdrop'),s=TUT_STEPS[n];
+  ov.classList.add('active');tutResetPosition();
+  if(s.id==='welcome'){
+    welcome.style.display='';spot.style.display='none';tip.style.display='none';back.style.display='';
+    if(!reposition)setTimeout(()=>welcome.querySelector('button')?.focus(),0);
     return;
   }
-  welcome.style.display = 'none';
-  document.getElementById('tutBackdrop').style.display = 'none';
-  if (s.center) {
-    spot.style.display = 'none';
-    document.getElementById('tutBackdrop').style.display = '';
-    document.getElementById('tutBadge').textContent = s.badge;
-    document.getElementById('tutTitle').textContent = s.title;
-    document.getElementById('tutDesc').innerHTML = s.desc;
-    document.getElementById('tutNext').textContent = s.nextLabel || 'Next';
-    document.getElementById('tutBack').style.display = n <= 1 ? 'none' : '';
-    const dots = TUT_STEPS.slice(1).map((_, i) => {
-      const cls = i < n - 1 ? 'done' : i === n - 1 ? 'active' : '';
-      return '<div class="tut-prog-dot ' + cls + '"></div>';
-    }).join('');
-    document.getElementById('tutProgress').innerHTML = dots;
-    tip.style.display = '';
-    tip.style.position = 'fixed';
-    tip.className = 'tut-tooltip';
-    const vh = window.innerHeight;
-    const cw = document.documentElement.clientWidth;
-    tip.style.left = '50%';
-    tip.style.right = 'auto';
-    tip.style.transform = 'translateX(-50%)';
-    tip.style.top = Math.max(80, vh / 2 - 160) + 'px';
-    tip.style.maxWidth = Math.min(420, cw - 40) + 'px';
-    return;
-  }
-  const el = document.querySelector(s.target);
-  if (!el) { tutClose(); return; }
-  tip.style.transform = '';
-  tip.style.maxWidth = '';
-  const wantAbove = (s.arrow === 'bottom');
-  el.scrollIntoView({ behavior:'smooth', block: wantAbove ? 'center' : 'start' });
-  setTimeout(() => {
-    let r = el.getBoundingClientRect();
-    const pad = 8;
-    const vh = window.innerHeight;
-    if (!wantAbove && r.top < 60) {
-      window.scrollBy({ top: r.top - 80, behavior:'instant' });
-      r = el.getBoundingClientRect();
-    }
-    spot.style.display = '';
-    spot.style.position = 'fixed';
-    spot.style.top = (r.top - pad) + 'px';
-    spot.style.left = (r.left - pad) + 'px';
-    spot.style.width = (r.width + pad * 2) + 'px';
-    spot.style.height = (r.height + pad * 2) + 'px';
-    document.getElementById('tutBadge').textContent = s.badge;
-    document.getElementById('tutTitle').textContent = s.title;
-    document.getElementById('tutDesc').innerHTML = s.desc;
-    document.getElementById('tutNext').textContent = s.nextLabel || 'Next';
-    document.getElementById('tutBack').style.display = n <= 1 ? 'none' : '';
-    const dots = TUT_STEPS.slice(1).map((_, i) => {
-      const cls = i < n - 1 ? 'done' : i === n - 1 ? 'active' : '';
-      return '<div class="tut-prog-dot ' + cls + '"></div>';
-    }).join('');
-    document.getElementById('tutProgress').innerHTML = dots;
-    tip.style.display = '';
-    tip.style.position = 'fixed';
-    tip.style.left = Math.max(20, r.left) + 'px';
-    tip.style.right = 'auto';
-    const tipH = tip.offsetHeight;
-    const spaceBelow = vh - r.bottom - 16;
-    const spaceAbove = r.top - 16;
-    let arrow = s.arrow || 'top';
-    if (arrow === 'top' && spaceBelow < tipH + 20 && spaceAbove > spaceBelow) arrow = 'bottom';
-    if (arrow === 'bottom' && spaceAbove < tipH + 20 && spaceBelow > spaceAbove) arrow = 'top';
-    tip.className = 'tut-tooltip arrow-' + arrow;
-    if (arrow === 'bottom') {
-      tip.style.top = Math.max(20, r.top - tipH - 16) + 'px';
-    } else {
-      tip.style.top = Math.min(r.bottom + 16, vh - tipH - 20) + 'px';
-    }
-    requestAnimationFrame(() => {
-      const tr = tip.getBoundingClientRect();
-      const cw = document.documentElement.clientWidth;
-      if (tr.right > cw - 20) tip.style.left = Math.max(20, cw - tr.width - 20) + 'px';
-      if (tr.bottom > vh - 10) {
-        const needed = tr.bottom - vh + 40;
-        window.scrollBy({ top: needed, behavior:'instant' });
-        r = el.getBoundingClientRect();
-        spot.style.top = (r.top - pad) + 'px';
-        tip.style.top = Math.max(20, Math.min(r.bottom + 16, vh - tipH - 20)) + 'px';
-      }
-    });
-  }, 400);
+  welcome.style.display='none';
+  const el=s.target?document.querySelector(s.target):null;
+  if(s.center||window.innerWidth<720||!el){tutShowCentered(s,n);if(!reposition)setTimeout(()=>document.getElementById('tutNext')?.focus(),0);return;}
+  el.scrollIntoView({behavior:'auto',block:'center',inline:'nearest'});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{tutPositionTarget(el,s,n);if(!reposition)document.getElementById('tutNext')?.focus();}));
 }
-function tutClose() {
-  document.getElementById('tutOverlay').classList.remove('active');
-  localStorage.setItem('cb_tut_seen', '1');
-  _tutStep = -1;
+function tutClose(){
+  const ov=document.getElementById('tutOverlay');ov.classList.remove('active');
+  document.getElementById('tutWelcome').style.display='none';document.getElementById('tutSpotlight').style.display='none';document.getElementById('tutTooltip').style.display='none';document.getElementById('tutBackdrop').style.display='none';
+  localStorage.setItem('cb_tut_seen','1');_tutStep=-1;
 }
-
+window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
 
@@ -3953,7 +3903,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   render();
   if (!hadSavedState && !_sharedImport && !localStorage.getItem('cb_tut_seen')) {
-    setTimeout(() => tutGo(0), 600);
+    setTimeout(() => tutGo(0), 1000);
   }
   if (COUNTER_URL) {
     fetch(COUNTER_URL + '/api/stats').then(r => r.json()).then(d => {
@@ -3977,7 +3927,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcuts: Enter = next, Escape = back, Arrows = navigate options
   document.addEventListener('keydown', (e) => {
-    if (_tutStep >= 0) { if (e.key === 'Escape') tutClose(); return; }
+    if (_tutStep >= 0) { if (e.key === 'Escape') tutClose(); else if (e.key === 'ArrowRight' || e.key === 'Enter') document.getElementById('tutNext')?.click(); else if (e.key === 'ArrowLeft') document.getElementById('tutBack')?.click(); return; }
     const qsOv = document.getElementById('qsOverlay');
     if (qsOv && qsOv.classList.contains('open')) { if (e.key === 'Escape') qsOv.classList.remove('open'); return; }
 
@@ -4242,6 +4192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showFastLane();
     if (action === 'open-diagnostics') showDiagnosticsModal();
+    if (action === 'open-additional-services') showAdditionalServicesPicker();
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'show-full-review') { S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
@@ -4272,7 +4223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'tut-start') { tutGo(1); }
-    if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else tutClose(); }
+    if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else { tutClose(); showFastLane(); } }
     if (action === 'tut-back') { if (_tutStep > 1) tutGo(_tutStep - 1); }
     if (action === 'tut-close') { tutClose(); }
     if (action === 'open-tutorial') { tutGo(0); }
@@ -4583,7 +4534,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const hint = document.querySelector('.opt-scraper-hint');
       if (hasExtras && !hint) {
         const sec = document.querySelector('.opt-scraper-section');
-        if (sec) sec.insertAdjacentHTML('beforeend', '<div class="opt-scraper-hint">API keys for selected extras appear on Step 5 (API Keys).</div>');
+        if (sec) sec.insertAdjacentHTML('beforeend', '<div class="opt-scraper-hint">API keys for selected extras appear on Accounts & Keys.</div>');
       } else if (!hasExtras && hint) { hint.remove(); }
       saveState(); renderProgress();
     }
@@ -4598,7 +4549,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const hint = document.querySelector('.opt-scraper-hint');
       if (hasExtras && !hint) {
         const sec = document.querySelector('.opt-scraper-section');
-        if (sec) sec.insertAdjacentHTML('beforeend', '<div class="opt-scraper-hint">API keys for selected extras appear on Step 5 (API Keys).</div>');
+        if (sec) sec.insertAdjacentHTML('beforeend', '<div class="opt-scraper-hint">API keys for selected extras appear on Accounts & Keys.</div>');
       } else if (!hasExtras && hint) { hint.remove(); }
       saveState(); renderProgress();
     }
@@ -6036,9 +5987,9 @@ function showUpdateTemplateModal() {
   overlay.id = 'updateTplModal';
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
-    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Update Template" style="max-width:480px">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Update Existing Setup" style="max-width:480px">
       <button class="modal-close" id="updTplClose" aria-label="Close">×</button>
-      <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Template</div>
+      <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Setup</div>
       <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll show you exactly what changes before upgrading to the latest sort logic, regex patterns, and formatters.</div>
       <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.72rem;color:#8b949e;line-height:1.5">
         <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — all rebuilt with the latest configurator logic.<br>
@@ -7264,10 +7215,29 @@ function applyQuickProfile(profile) {
   }
 }
 
+function showAdditionalServicesPicker(options={}) {
+  document.getElementById('additionalServicesModal')?.remove();
+  const serviceDef=DEFS.find(d=>d.key==='service');
+  const selectedServices=new Set(options.services || S.multiServices.filter(v=>CAROUSEL_SVCS.includes(v)));
+  const selectedScrapers=new Set(options.scrapers || S.optionalScrapers||[]);
+  const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}" data-extra-service="${id}"><b>${o.name}</b><span>${id==='p2p'||id==='http'?'No account required':'Credentials may be required'}</span></button>`;}).join('');
+  const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>`<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"><b>${d.label}</b><span>${d.desc}</span></button>`).join('');
+  const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
+  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',e=>{
+    const svc=e.target.closest('[data-extra-service]');if(svc){const id=svc.dataset.extraService;selectedServices.has(id)?selectedServices.delete(id):selectedServices.add(id);svc.classList.toggle('active',selectedServices.has(id));return;}
+    const scr=e.target.closest('[data-extra-scraper]');if(scr){const id=scr.dataset.extraScraper;selectedScrapers.has(id)?selectedScrapers.delete(id):selectedScrapers.add(id);scr.classList.toggle('active',selectedScrapers.has(id));return;}
+    if(e.target===overlay||e.target.closest('#extraClose')){overlay.remove();return;}
+    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
+  });
+  document.getElementById('extraClose').focus();
+}
+
 function showFastLane() {
   document.getElementById('fastLaneModal')?.remove();
-  const selectedService = (S.service && !['http'].includes(S.service)) ? S.service : 'torbox';
-  const state = { target:'app', service:selectedService === 'p2p' ? 'free' : selectedService, profile:S.quickProfile || 'balanced' };
+  const initialServices = (S.multiServices && S.multiServices.length ? S.multiServices : [S.service || 'torbox-pro']).map(v=>v==='torbox'?'torbox-pro':v).filter(v=>['torbox-pro','realdebrid','alldebrid','premiumize','easynews','p2p'].includes(v));
+  const state = { target:'app', services:initialServices.length?initialServices:['torbox-pro'], extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v)), scrapers:[...(S.optionalScrapers||[])], profile:S.quickProfile || 'balanced' };
   const overlay = document.createElement('div');
   overlay.id = 'fastLaneModal';
   overlay.className = 'fastlane-overlay';
@@ -7276,9 +7246,9 @@ function showFastLane() {
     <div class="fastlane-section"><div class="fastlane-label">1 / Where do you watch?</div><div class="fastlane-grid apps" id="flApps">
       ${[['app','Stremio','Direct or manifest'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button class="fastlane-choice${state.target===v?' active':''}" data-fl-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
     </div></div>
-    <div class="fastlane-section"><div class="fastlane-label">2 / Debrid service</div><div class="fastlane-grid services" id="flServices">
-      ${[['torbox','TorBox'],['realdebrid','Real-Debrid'],['alldebrid','AllDebrid'],['premiumize','Premiumize'],['easynews','EasyNews'],['free','Free / P2P']].map(([v,n])=>`<button class="fastlane-choice${state.service===v?' active':''}" data-fl-service="${v}"><b>${n}</b><span>${v==='free'?'No key required':'Credentials required'}</span></button>`).join('')}
-    </div></div>
+    <div class="fastlane-section"><div class="fastlane-label">2 / Providers <span style="font-weight:600;text-transform:none;letter-spacing:0">— choose one or more</span></div><div class="fastlane-grid services" id="flServices">
+      ${[['torbox-pro','TorBox'],['realdebrid','Real-Debrid'],['alldebrid','AllDebrid'],['premiumize','Premiumize'],['easynews','EasyNews'],['p2p','Free / P2P']].map(([v,n])=>`<button class="fastlane-choice${state.services.includes(v)?' active':''}" data-fl-service="${v}"><b>${n}</b><span>${v==='p2p'?'No key required':'Credentials required'}</span></button>`).join('')}
+    </div><button type="button" id="flExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">P2P, HTTP, Debridio, Usenet and optional indexers</span></span><span id="flExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button></div>
     <div class="fastlane-section" id="flCredentials"></div>
     <div class="fastlane-section"><div class="fastlane-label">3 / Performance profile</div><div class="fastlane-grid profiles" id="flProfiles">
       ${[['fast','Fast','1080p · cached first · smaller files'],['balanced','Balanced','4K · sensible pool · 30GB cap'],['maximum','Maximum','4K · largest pool · quality first']].map(([v,n,d])=>`<button class="fastlane-choice${state.profile===v?' active':''}" data-fl-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
@@ -7290,10 +7260,19 @@ function showFastLane() {
   document.body.appendChild(overlay);
   const creds = document.getElementById('flCredentials');
   const installFields = document.getElementById('flInstallFields');
+  const captureCredentialDrafts = () => overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{if(inp.value)S.creds[inp.dataset.flCred]=inp.value;});
   const renderContext = () => {
-    if (state.service === 'free') creds.innerHTML = '<div class="fastlane-note">No debrid key is required. Free/P2P availability depends on active seeders and compatible hosts.</div>';
-    else if (state.service === 'easynews') creds.innerHTML = `<div class="fastlane-label">EasyNews credentials</div><div class="fastlane-fields"><input class="fastlane-field" id="flEasyUser" autocomplete="username" placeholder="EasyNews username" value="${(S.creds.easynews||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" id="flEasyPass" type="password" autocomplete="current-password" placeholder="EasyNews password" value="${(S.creds.easynewsPass||'').replace(/"/g,'&quot;')}"></div>`;
-    else creds.innerHTML = `<div class="fastlane-label">API key</div><div class="fastlane-fields"><input class="fastlane-field" id="flApiKey" type="password" autocomplete="off" placeholder="Paste your ${state.service} API key" value="${(S.creds[state.service]||'').replace(/"/g,'&quot;')}"></div>`;
+    const labels={ 'torbox-pro':'TorBox',realdebrid:'Real-Debrid',alldebrid:'AllDebrid',premiumize:'Premiumize' };
+    const credKeys={ 'torbox-pro':'torbox',realdebrid:'realdebrid',alldebrid:'alldebrid',premiumize:'premiumize' };
+    const fields=[];
+    state.services.filter(v=>credKeys[v]).forEach(v=>{const k=credKeys[v];fields.push(`<input class="fastlane-field" data-fl-cred="${k}" type="password" autocomplete="off" placeholder="${labels[v]} API key" value="${(S.creds[k]||'').replace(/"/g,'&quot;')}">`);});
+    if(state.services.includes('easynews')) fields.push(`<input class="fastlane-field" data-fl-cred="easynews" autocomplete="username" placeholder="EasyNews username" value="${(S.creds.easynews||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" data-fl-cred="easynewsPass" type="password" autocomplete="current-password" placeholder="EasyNews password" value="${(S.creds.easynewsPass||'').replace(/"/g,'&quot;')}">`);
+    const extraCreds={debridio:['debridio','Debridio API key'],nzbgeek:['nzbgeek','NZBGeek API key'],streamnzb:['streamnzb','StreamNZB manifest URL']};
+    state.extras.filter(v=>extraCreds[v]).forEach(v=>{const [k,label]=extraCreds[v];fields.push(`<input class="fastlane-field" data-fl-cred="${k}" type="password" autocomplete="off" placeholder="${label}" value="${(S.creds[k]||'').replace(/"/g,'&quot;')}">`);});
+    state.scrapers.forEach(id=>{const d=OPTIONAL_SCRAPER_DEFS.find(x=>x.id===id);if(d?.credKey)fields.push(`<input class="fastlane-field" data-fl-cred="${d.credKey}" type="password" autocomplete="off" placeholder="${d.label} API key" value="${(S.creds[d.credKey]||'').replace(/"/g,'&quot;')}">`);});
+    const freeNote=[...state.services,...state.extras].some(v=>v==='p2p'||v==='http')?'<div class="fastlane-note">Free/P2P sources require no key and depend on active seeders and compatible hosts.</div>':'';
+    creds.innerHTML = fields.length ? `<div class="fastlane-label">Provider credentials</div><div class="fastlane-fields">${fields.join('')}</div>${freeNote}` : freeNote || '<div class="fastlane-note">Select at least one provider.</div>';
+    const extraCount=state.extras.length+state.scrapers.length, countEl=document.getElementById('flExtrasCount');if(countEl)countEl.textContent=extraCount?`${extraCount} selected`:'';
     installFields.innerHTML = state.target === 'app' ? `<div class="fastlane-label">Stremio direct install <span style="font-weight:600;text-transform:none;letter-spacing:0">— optional</span></div><div class="fastlane-fields"><input class="fastlane-field" id="flStremioEmail" type="email" autocomplete="email" placeholder="Stremio email (leave blank for manifest)" value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" id="flStremioPass" type="password" autocomplete="current-password" placeholder="Stremio password" value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"></div><div class="fastlane-note" style="margin-top:7px">Credentials are used only for the direct Stremio API request. Leave both blank to receive a manifest URL instead.</div>` : `<div class="fastlane-note">Core Builds will create a protected manifest and open the ${state.target==='manifest'?'copy/install':state.target} instructions.</div>`;
   };
   const activate = (selector, attr, value) => overlay.querySelectorAll(selector).forEach(b=>b.classList.toggle('active',b.getAttribute(attr)===value));
@@ -7301,7 +7280,8 @@ function showFastLane() {
     const targetBtn = e.target.closest('[data-fl-target]');
     if (targetBtn) { state.target=targetBtn.dataset.flTarget; activate('[data-fl-target]','data-fl-target',state.target); renderContext(); return; }
     const serviceBtn = e.target.closest('[data-fl-service]');
-    if (serviceBtn) { state.service=serviceBtn.dataset.flService; activate('[data-fl-service]','data-fl-service',state.service); renderContext(); return; }
+    if (serviceBtn) { captureCredentialDrafts(); const v=serviceBtn.dataset.flService, i=state.services.indexOf(v); if(i>=0){if(state.services.length===1)return;state.services.splice(i,1);}else state.services.push(v); overlay.querySelectorAll('[data-fl-service]').forEach(b=>b.classList.toggle('active',state.services.includes(b.dataset.flService))); renderContext(); return; }
+    if(e.target.closest('#flExtrasBtn')){captureCredentialDrafts();showAdditionalServicesPicker({services:state.extras,scrapers:state.scrapers,onApply:(sv,sc)=>{state.extras=sv;state.scrapers=sc;renderContext();}});return;}
     const profileBtn = e.target.closest('[data-fl-profile]');
     if (profileBtn) { state.profile=profileBtn.dataset.flProfile; activate('[data-fl-profile]','data-fl-profile',state.profile); return; }
     if (e.target === overlay || e.target.closest('#fastLaneClose')) { overlay.remove(); return; }
@@ -7309,20 +7289,13 @@ function showFastLane() {
       const btn = document.getElementById('btnAutoCreate');
       const result = document.getElementById('aioResult');
       result.innerHTML='';
-      if (state.service !== 'free') {
-        if (state.service === 'easynews') {
-          const u=document.getElementById('flEasyUser').value.trim(), p=document.getElementById('flEasyPass').value;
-          if (!u || !p) { result.innerHTML='<div class="td-error">Enter both EasyNews username and password.</div>'; return; }
-          S.creds.easynews=u; S.creds.easynewsPass=p;
-        } else {
-          const key=document.getElementById('flApiKey').value.trim();
-          if (!key) { result.innerHTML='<div class="td-error">Enter your debrid API key.</div>'; return; }
-          S.creds[state.service]=key;
-        }
-      }
-      S.service = state.service === 'free' ? 'p2p' : state.service;
-      S.multiServices = [];
-      S.p2pEnabled = state.service === 'free';
+      let missing='';
+      overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{const v=inp.value.trim();if(!v&&!missing)missing=inp.placeholder;else if(v)S.creds[inp.dataset.flCred]=v;});
+      if(missing){result.innerHTML=`<div class="td-error">Enter ${missing}.</div>`;return;}
+      S.multiServices = [...new Set([...state.services,...state.extras])];
+      S.optionalScrapers = [...state.scrapers];
+      S.service = deriveService();
+      S.p2pEnabled = S.multiServices.includes('p2p');
       S.simpleMode = true; S.quickStart = true;
       applyQuickProfile(state.profile);
       S.cleanInstall = document.getElementById('flClean').checked;
