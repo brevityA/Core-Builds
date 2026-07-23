@@ -125,6 +125,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .hc-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.02);font-size:.72rem;font-weight:700;color:#8b949e;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;user-select:none;transition:background .15s}
 .hc-hdr:hover{background:rgba(255,255,255,.04)}
 .hc-hosts{padding:8px 12px 10px}
+.bk-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .12s}
+.bk-row:hover{background:rgba(255,255,255,.04)}
+.bk-restore{padding:3px 10px;font-size:.65rem;font-weight:700;border-radius:5px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#3d9db5;cursor:pointer;transition:background .12s}
+.bk-restore:hover{background:rgba(0,212,255,.14)}
 .hc-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;margin-bottom:4px;transition:background .15s}
 .hc-row:last-child{margin-bottom:0}
 .hc-row:hover{background:rgba(255,255,255,.02)}

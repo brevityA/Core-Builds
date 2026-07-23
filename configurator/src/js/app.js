@@ -164,7 +164,7 @@ function migrateState(input) {
   d._schema=STATE_SCHEMA; return d;
 }
 function saveState() {
-  const {stremioPassword: _, ...persist} = S;
+  const {stremioPassword: _sp, instancePassword: _ip, ...persist} = S;
   persist._schema=STATE_SCHEMA;
   localStorage.setItem('coreBuild', JSON.stringify(persist));
   localStorage.setItem('coreBuildStep', step);
@@ -241,12 +241,14 @@ function restoreBackup(idx) {
   const list = getBackups();
   if (!list[idx]) return;
   const snap = list[idx];
+  const hadCreds = snap.creds && Object.values(snap.creds).some(v => v);
   const safe = sanitizeSharedConfig(snap);
   Object.assign(S, safe);
   S.service = deriveService();
   saveState();
   render();
-  showToast('Restored backup from ' + new Date(snap._ts).toLocaleString());
+  const ts = new Date(snap._ts).toLocaleString();
+  showToast(hadCreds ? `Restored from ${ts} — re-enter API keys in Services` : `Restored backup from ${ts}`);
 }
 function deleteBackup(idx) {
   try {
@@ -263,7 +265,7 @@ function backupTimelineHtml() {
     const time = d.toLocaleDateString(undefined, {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
     const svc = b.multiServices && b.multiServices.length ? b.multiServices[0] : (b.device || '?');
     const res = b.resolution || '?';
-    return `<div class="bk-row" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .12s" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'"><span style="font-size:.68rem;color:#6b7280;min-width:110px">${time}</span><span style="font-size:.68rem;color:#8b949e;flex:1">${svc} · ${res}${b._ver?' · v'+b._ver:''}</span><button data-action="restore-backup" data-idx="${i}" style="padding:3px 10px;font-size:.65rem;font-weight:700;border-radius:5px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#3d9db5;cursor:pointer;transition:background .12s" onmouseover="this.style.background='rgba(0,212,255,.14)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Restore</button></div>`;
+    return `<div class="bk-row"><span style="font-size:.68rem;color:#6b7280;min-width:110px">${time}</span><span style="font-size:.68rem;color:#8b949e;flex:1">${svc} · ${res}${b._ver?' · v'+b._ver:''}</span><button data-action="restore-backup" data-idx="${i}" class="bk-restore">Restore</button></div>`;
   }).join('');
   return `<details class="hc-box" style="margin-top:8px"><summary class="hc-hdr" style="list-style:none;cursor:pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Backup History (${list.length}) <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></summary><div class="hc-hosts" style="max-height:240px;overflow-y:auto">${rows}</div></details>`;
 }
@@ -4326,7 +4328,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       <div style="margin-top:12px;padding:10px 13px;border-radius:8px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
           <div style="font-size:.72rem;font-weight:700;color:#34d399">What's next</div>
-          <button id="mTestStreams" style="font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:5px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Test streams</button>
+          <button id="mTestStreams" class="bk-restore" style="font-size:.68rem;font-weight:700;color:#00d4ff;border-color:rgba(0,212,255,.25)">Test streams</button>
         </div>
         <div style="font-size:.72rem;color:#8b949e;line-height:1.55">
           <strong style="color:#e6edf3">1.</strong> Open Stremio and search for any movie or show<br>
@@ -4541,28 +4543,24 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   });
 
   document.getElementById('stremioInstallBtn').addEventListener('click', async () => {
-    const email    = document.getElementById('stremioEmail').value.trim();
-    const password = document.getElementById('stremioPassword').value;
+    const stremEmail = document.getElementById('stremioEmail').value.trim();
+    const stremPwd   = document.getElementById('stremioPassword').value;
     const resEl    = document.getElementById('stremioInstallResult');
     const btn      = document.getElementById('stremioInstallBtn');
-    if (!email || !password) { resEl.innerHTML = `<span style="color:#f87171">Enter your Stremio email and password.</span>`; return; }
+    if (!stremEmail || !stremPwd) { resEl.innerHTML = `<span style="color:#f87171">Enter your Stremio email and password.</span>`; return; }
     btn.disabled = true; btn.textContent = 'Signing in…'; resEl.innerHTML = '';
     try {
-      const SAPI = 'https://api.strem.io/api/';
-      const loginRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'Login', email, password, facebook:false }) });
-      const loginData = await loginRes.json();
+      const loginData = await stremioFetch('https://api.strem.io/api/login', { type:'Login', email: stremEmail, password: stremPwd, facebook:false });
       const authKey = loginData?.result?.authKey;
       if (!authKey) throw new Error(loginData?.error || 'Login failed — check your email and password.');
       btn.textContent = 'Installing…';
-      const getRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionGet', authKey, update:true }) });
-      const getData = await getRes.json();
+      const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
       if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
       const existing = getData.result.addons;
       const already = existing.some(a => a.transportUrl === manifestUrl);
       if (!already) {
         const updated = [...existing, { transportName:'http', transportUrl: manifestUrl, flags:{} }];
-        const setRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionSet', authKey, addons: updated }) });
-        const setData = await setRes.json();
+        const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
         if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
       }
       btn.innerHTML = ICO.check(12,'currentColor') + ' Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
@@ -5826,7 +5824,7 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     try {
-      const res = await fetchWithTimeout(`${base}/api/v1/user`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: buildFinal().config, password: pwd }) });
+      const res = await writeHostFetch(base, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: buildFinal().config, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
