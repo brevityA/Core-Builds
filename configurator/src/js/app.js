@@ -741,7 +741,7 @@ function renderP2pToggle() {
   </div>`;
 }
 
-function ftTip(text) { return `<span style="position:relative;display:inline-flex"><i class="ft-info">?</i><div class="ft-popup">${text}</div></span>`; }
+function ftTip(text) { return `<span style="position:relative;display:inline-flex;z-index:999"><i class="ft-info">?</i><div class="ft-popup">${text}</div></span>`; }
 
 function renderMatchMode() {
   const modes = [
