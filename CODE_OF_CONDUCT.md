@@ -25,8 +25,8 @@ community include:
 * Focusing on what is best not just for us as individuals, but for the
   overall community
 * Properly crediting and attributing the upstream open-source work this
-  project builds upon — including Tamtaro's SEL Setup, Vidhin's regex
-  patterns, and the AIOStreams platform
+  project builds upon — including Vidhin's regex patterns and the
+  AIOStreams platform
 
 Examples of unacceptable behavior include:
 
@@ -140,11 +140,9 @@ must be preserved in all templates and forks.
 
 | Project | Author | Role in this project |
 |---|---|---|
-| [Tamtaro SEL Setup](https://git.tamtaro.de) | [Tam-Taro](https://github.com/Tam-Taro) | ISEs, ESEs, PSEs, synced URL patterns, and the `tamtaro` formatter type used by every template |
 | [Releases-Regex](https://github.com/Vidhin05/Releases-Regex) | [Vidhin05](https://github.com/Vidhin05) | Ranked regex patterns for quality detection, synced into all templates |
 | [AIOStreams](https://github.com/Viren070/AIOStreams) | [Viren070](https://github.com/Viren070) | The open-source platform all templates are built for |
 | Meteor for the Weebs | midnightignite | Community Meteor endpoint pinned in all templates |
 
-If you find this project useful, please consider supporting
-[Tamtaro on Ko-fi](https://ko-fi.com/tamtaro) and visiting
+If you find this project useful, please consider visiting
 [Vidhin's repository](https://github.com/Vidhin05/Releases-Regex).

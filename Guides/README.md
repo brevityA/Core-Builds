@@ -408,11 +408,11 @@ AIOStreams v2.28+ supports a parent/child config system. A "parent" config lives
 | Category | Contents |
 |---|---|
 | **Presets** | Library, Zilean, SeaDex, StremThru Torz, Meteor, Comet, MediaFusion, HdHub, EZTV, Torrent Galaxy, Knaben, AIOSubtitle, TorBox Search — all 13, pre-tuned |
-| **Formatter** | Full tamtaro Core Syntax formatter with all definitions |
+| **Formatter** | Full Core Syntax formatter with all definitions |
 | **Sort criteria** | 12-key sort order (cached → expression score → seeders → bitrate → …) |
 | **Deduplicator** | Smart dedup with seeder/age tiebreakers |
 | **Proxy** | MediaFlow proxy config |
-| **Regex URLs** | Vidhin05 + Tamtaro synced regex files |
+| **Regex URLs** | Vidhin05 synced regex files |
 | **Category colours** | Addon category colour map (Mix/Debrid/Usenet/HTTP/P2P/Subs) |
 | **Misc** | RPDB poster service, TMDB integration defaults, autoPlay, enhanceResults |
 
@@ -458,7 +458,7 @@ Import the generated child JSON into AIOStreams as you normally would. AIOStream
 | Services | `inherit` | Parent service config used; enter credentials after import as usual |
 | Filters (ESEs/ISEs/PSEs) | `override` | Child expressions take full effect |
 | Sorting | `inherit` | Parent sort criteria used |
-| Formatter | `inherit` | Parent tamtaro formatter used |
+| Formatter | `inherit` | Parent Core Syntax formatter used |
 | Branding | `override` | Child name/logo/description used |
 | Proxy | `inherit` | Parent MediaFlow proxy config used |
 
@@ -1515,7 +1515,7 @@ Controls which audio languages are allowed or prioritised.
 | `requiredLanguages` | **Hard-requires** every stream to match. Streams without any of these languages are dropped completely. |
 | `preferredLanguages` | **Soft preference** used for sorting. Streams with these languages rank higher. Nothing is blocked. |
 
-**Core Builds sets `requiredLanguages: []` (empty) on all templates.** This is intentional. Hard-requiring languages blocks streams that don't have language metadata embedded (common in older releases, scene content, and some Usenet uploads) even when the content is perfectly valid English content. The Tamtaro ISEs handle language contextually — `preferredLanguages` handles ranking.
+**Core Builds sets `requiredLanguages: []` (empty) on all templates.** This is intentional. Hard-requiring languages blocks streams that don't have language metadata embedded (common in older releases, scene content, and some Usenet uploads) even when the content is perfectly valid English content. The ISEs handle language contextually — `preferredLanguages` handles ranking.
 
 #### Foreign Language Kill (Configurator v2.56+)
 
@@ -1571,7 +1571,7 @@ Work through in order:
 
 #### Series returning season packs instead of individual episodes
 
-This is handled by the `ongoingSeasonPack` ESE (Tamtaro standard set) — it removes ambiguous season packs when you're watching a currently airing show week-to-week. If season packs are still appearing:
+This is handled by the `ongoingSeasonPack` ESE (standard set) — it removes ambiguous season packs when you're watching a currently airing show week-to-week. If season packs are still appearing:
 
 1. Confirm the ESE is enabled in your config
 2. Check that your TMDB API key is correctly set — `ongoingSeasonPack` uses TMDB data to determine whether a show is currently airing

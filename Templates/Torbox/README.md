@@ -15,7 +15,7 @@
 
 # Core Builds — Template Directory
 
-All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, Tamtaro standard ESEs + Core Builds kill ESEs, Tamtaro ISEs, and in-app update notifications.
+All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, standard ESEs + Core Builds kill ESEs, Core Builds ISEs, and in-app update notifications.
 
 > **Current version: v3.3.2** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
@@ -658,9 +658,9 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 | Feature | Detail |
 |---|---|
 | **Formatter** | Core Syntax · `id: tamtaro` · `overrides['tamtaro']` |
-| **ESEs (standard)** | 24 total — 20 Tamtaro standard + Hard CAM Kill, YouTube Kill, 3D Kill, Season Pack Guard |
+| **ESEs (standard)** | 24 total — 20 standard + Hard CAM Kill, YouTube Kill, 3D Kill, Season Pack Guard |
 | **ESEs (Lite)** | 12 total — quality gates removed, hard kills retained |
-| **ISEs** | 6 Tamtaro ISEs — Library, 0Cached, digitalRelease Bypass, SeaDex (anime only), REPACK Passthrough |
+| **ISEs** | 6 ISEs — Library, 0Cached, digitalRelease Bypass, SeaDex (anime only), REPACK Passthrough |
 | **Sort** | 16 keys: cached → seMatched → seScore → seadex → resolution → quality → regexScore → visualTag → audioTag → audioChannel → language → encode → library → seeders → bitrate → size |
 | **Deduplication** | filename + infoHash + smartDetect · 14 attributes · `libraryBehaviour: prefer` |
 | **Matching** | title `contains/0.75` · year `±2yr` · season/episode `non-strict` |

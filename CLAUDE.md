@@ -250,7 +250,7 @@ Ranked regex entries double as **named matchers** via `rseMatched(streams, ...na
 - Tier-guarded kills: `Bad 4k Bluray` only fires when no `Radarr UHD Bluray T1-T3` / `Remux T1/T2` match exists
 - `S+ Tier` micro-PSEs: T1-matched remuxes rank above generic remuxes (replaces the dead regexScore signal with live seScore)
 - `T1 Pattern Pin`: pins pattern-verified elites beyond the hand-listed release groups
-- Names must match the ranked set verbatim (`Radarr Remux T1`, not `Remux T1`) — the RU7100 shipped with Tamtaro's German names (`DE Bluray T1`, `BD T1`) which never matched, making its guards permanently pass (fixed v0.3.0)
+- Names must match the ranked set verbatim (`Radarr Remux T1`, not `Remux T1`) — the RU7100 originally shipped with German-locale names (`DE Bluray T1`, `BD T1`) which never matched, making its guards permanently pass (fixed v0.3.0)
 
 ### `excludedRegexPatterns`
 **8 inline patterns per template** (was 11 — 3 LQ patterns removed in v2.9.0 for fortheweak compatibility). All remaining 8 strings appear verbatim in Vidhin05's `pattern` fields:
@@ -266,7 +266,7 @@ Ranked regex entries double as **named matchers** via `rseMatched(streams, ...na
 Points to Vidhin05's file on all non-Hybrid templates. Supplements ranked patterns with Vidhin05's 174-pattern set at score 0; our inline `rankedRegexPatterns` entries override scoring by name. Hybrid templates now also carry the Vidhin05 URL (added v3.2.0).
 
 ### `syncedExcludedRegexUrls`
-Points to Tamtaro's excluded regex file at `Tam-Taro/SEL-Filtering-and-Sorting` on all active templates. **Note:** Tamtaro renamed their GitHub account from `Tamtaro` → `Tam-Taro`; the old URL 404s. The new `Tam-Taro` URL works (200) but elfhosted's allowlist has not been updated — users on elfhosted get "Forbidden URL" errors on import until elfhosted ships an allowlist update. Same applies to `syncedIncludedStreamExpressionUrls` (ISEs) and `syncedPreferredStreamExpressionUrls` (PSEs).
+Removed from all active templates. Previously pointed to a third-party excluded regex file that caused "Forbidden URL" errors on elfhosted due to allowlist drift. Excluded regex patterns are now handled entirely via inline `excludedRegexPatterns`.
 
 ---
 
@@ -274,7 +274,7 @@ Points to Tamtaro's excluded regex file at `Tam-Taro/SEL-Filtering-and-Sorting` 
 
 ### How AIOStreams whitelists synced URLs
 
-AIOStreams uses `registerTrustedAccess()` (`packages/core/src/utils/templates.ts`) to auto-whitelist synced URLs. When an operator adds a template URL to their `TEMPLATE_URLS` env var, AIOStreams fetches the template at startup and whitelists all `synced*Urls` and inline regex patterns found inside it. This is how Tam-Taro gets their URLs whitelisted — operators add their template collection to `TEMPLATE_URLS`.
+AIOStreams uses `registerTrustedAccess()` (`packages/core/src/utils/templates.ts`) to auto-whitelist synced URLs. When an operator adds a template URL to their `TEMPLATE_URLS` env var, AIOStreams fetches the template at startup and whitelists all `synced*Urls` and inline regex patterns found inside it. This is how Core Builds gets its URLs whitelisted — operators add the template collection to `TEMPLATE_URLS`.
 
 ### Core Builds template collection
 

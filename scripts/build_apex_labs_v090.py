@@ -83,10 +83,10 @@ ese_02 = apex_ese_by_label("/*Usenet Propagation Guard*/")
 # 3  AI Upscale Exclusion (stable Apex)
 ese_03 = apex_ese_by_label("/*AI Upscale Exclusion*/")
 
-# 4a Tamtaro marker (stable Apex)
-ese_04a = apex_ese_by_label("/*Part of Tamtaro SEL Setup*/")
+# 4a Core Builds SEL Setup marker (stable Apex)
+ese_04a = apex_ese_by_label("/*Core Builds SEL Setup*/")
 
-# 4b Tamtaro standard ESE (stable Apex)
+# 4b Standard ESE (stable Apex)
 ese_04b = apex_ese_by_label("/*Standard ESE v1.2.8")
 
 # 5  No Sootio Library (from Labs v0.8.6)

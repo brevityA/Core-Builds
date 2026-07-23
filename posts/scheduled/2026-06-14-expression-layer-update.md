@@ -28,17 +28,17 @@ We've been running 4 custom SEL expressions in trial on Stream v2.7.10 for a few
 
 **Planned (post-trial)**
 
-5. **Audio Pinnacle PSE** — Promotes lossless and object-based audio within the ranked pool: Atmos / TrueHD → DTS-HD MA / DTS-X → EAC3 / DD+. Tam-Taro has no audio preference expressions at all — this fills that gap entirely. Critical for Apex and 4K Hybrid users with home theatre setups.
-6. **HDR / DV Priority PSE** — Surfaces DV and HDR variants ahead of SDR within 4K results. Tam-Taro's cache tiers treat all visual tags equally. Safe no-op on 1080p-only templates.
+5. **Audio Pinnacle PSE** — Promotes lossless and object-based audio within the ranked pool: Atmos / TrueHD → DTS-HD MA / DTS-X → EAC3 / DD+. No existing audio preference expressions covered this gap. Critical for Apex and 4K Hybrid users with home theatre setups.
+6. **HDR / DV Priority PSE** — Surfaces DV and HDR variants ahead of SDR within 4K results. Standard cache tiers treat all visual tags equally. Safe no-op on 1080p-only templates.
 7. **AI Upscale Exclusion ESE** — Excludes streams with AI upscaling keywords (topaz, ai-upscale, upscaled, neural, enhancedai) using the keyword() function added in AIOStreams v2.29.6. Critical for 4K and Anime where Topaz releases are common.
 
 All 7 are inline — no synced URLs, works on every AIOStreams instance.
 
 Full reference doc (expression strings + per-template use cases): https://github.com/brevityA/Core-Builds/blob/main/Expressions/core-builds-expression-layer.pdf
 
-## What the Tam-Taro audit found
+## What the expression audit found
 
-Tam-Taro covers tiering, bitrate floors, seeder intelligence, SeaDex passthrough, result limiting, and file type exclusion well. What it doesn't touch at all: audio quality ordering, HDR/DV separation within 4K, codec preference, AI upscale detection. Those are the four gaps the new expressions target. We're not replacing Tam-Taro — the Core Builds layer sits on top of it.
+The standard SEL layer covers tiering, bitrate floors, seeder intelligence, SeaDex passthrough, result limiting, and file type exclusion well. What it doesn't touch: audio quality ordering, HDR/DV separation within 4K, codec preference, AI upscale detection. Those are the four gaps the new expressions target.
 
 ## Template audit
 

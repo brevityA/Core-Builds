@@ -237,7 +237,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 | Feature | Detail |
 |---|---|
 | **Formatter** | Core Syntax — `id: tamtaro`, custom override |
-| **Filtering** | 24 ESEs (20 Tamtaro standard + 4 CB kills) · 6 ISEs (Library, 0Cached, digitalRelease Bypass) |
+| **Filtering** | 24 ESEs (20 standard + 4 CB kills) · 6 ISEs (Library, 0Cached, digitalRelease Bypass) |
 | **Sorting** | cached → matched → score → resolution → quality → audio → language |
 | **Deduplication** | filename + infoHash + smartDetect · 14 attributes · libraryBehaviour: prefer |
 | **Matching** | titleMatching contains/0.75 · yearMatching ±2yr · seasonEpisode non-strict |
@@ -317,11 +317,8 @@ Core Builds by Brevity is built on the work of the following projects and author
 
 | Project | Author | Contribution |
 |---|---|---|
-| [Tamtaro SEL Setup](https://git.tamtaro.de) | [@Tam-Taro](https://github.com/Tam-Taro) | ISEs, ESEs, PSEs, synced URL patterns, and the `tamtaro` formatter type powering every template in this repo |
 | [Releases-Regex](https://github.com/Vidhin05/Releases-Regex) | [@Vidhin05](https://github.com/Vidhin05) | Ranked regex pattern format that influenced the `Filtering/ranked-regex-patterns.json` scoring architecture |
 | [AIOStreams](https://github.com/Viren070/AIOStreams) | [@Viren070](https://github.com/Viren070) | The open-source platform all templates are built for |
 | Meteor for the Weebs | [@midnightignite](https://github.com/midnightignite) | Community Meteor endpoint pinned across all templates |
-
-> The filtering engine in every Core Builds template directly embeds Tamtaro's Standard SEL ISEs and ESEs. The formatter uses `id: "tamtaro"` — a type he contributed to AIOStreams itself. If these templates are useful to you, please consider supporting [Tamtaro on Ko-fi](https://ko-fi.com/tamtaro).
 
 ---

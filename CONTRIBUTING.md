@@ -104,9 +104,6 @@ Not a bug or contribution — just a question? Open a [Discussion](https://githu
 
 Every template in this repository stands on the work of the following projects. These attributions are not optional — they must be preserved in any fork, derivative template, or contribution.
 
-**[Tamtaro SEL Setup](https://git.tamtaro.de)** — [@Tam-Taro](https://github.com/Tam-Taro)
-All 20 standard ESEs, 6 ISEs, PSEs, synced URL patterns, and the `id: "tamtaro"` formatter type are Tamtaro's work. The entire filtering engine inside every Core Builds template is his architecture. If you use these templates or build on them, credit Tamtaro. Consider supporting him at [ko-fi.com/tamtaro](https://ko-fi.com/tamtaro).
-
 **[Releases-Regex](https://github.com/Vidhin05/Releases-Regex)** — [@Vidhin05](https://github.com/Vidhin05)
 Ranked regex patterns for quality detection are sourced from Vidhin's repository via synced URLs in all templates.
 

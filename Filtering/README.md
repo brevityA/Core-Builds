@@ -60,7 +60,7 @@ Each IQR tier has a TorBox-only twin PSE before it — `service(tier, 'torbox')`
 | Adaptive guards | 4 | Score IQR Guard, Usenet Propagation, Bad NZBs, RD Copyright |
 | Device-specific | 2 | DV-Only Kill, No Sootio Library |
 | LABS experimental | 15 | perGroup() dedup, tier-guarded kills, Bitrate Floor, Adaptive Seeder Guard |
-| Synced external | 2 | Tamtaro SEL Setup, Standard ESE |
+| Synced external | 2 | Core Builds SEL Setup, Standard ESE |
 | Other | 36 | Resolution kills, foreign language, AI upscale, 3D, YouTube, anime-specific |
 
 ---
@@ -75,7 +75,7 @@ Each IQR tier has a TorBox-only twin PSE before it — `service(tier, 'torbox')`
 | digitalRelease Bypass | Allow digital releases through ESE gates |
 | English Language | English audio priority |
 | SeaDex (×2 variants) | Best-release anime pins |
-| Tamtaro ISE (synced) | External ISE set |
+| Core Builds ISE (synced) | External ISE set |
 
 ---
 

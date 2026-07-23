@@ -28,16 +28,6 @@ jobs:
                   "Regex/vidhin05-regexes.json",
               "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json":
                   "Regex/vidhin05-expressions.json",
-              "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json":
-                  "Regex/tamtaro-ise.json",
-              "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-standard.json":
-                  "Regex/tamtaro-ese-standard.json",
-              "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-extended.json":
-                  "Regex/tamtaro-ese.json",
-              "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json":
-                  "Regex/tamtaro-pse.json",
-              "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json":
-                  "Regex/tamtaro-excluded-regex.json",
           }
 
           errors = 0
@@ -77,18 +67,13 @@ jobs:
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: sync upstream Vidhin05 regex + Tamtaro ESE/PSE"
+          commit-message: "chore: sync upstream Vidhin05 regex"
           title: "🔄 Sync upstream regex & expressions"
           body: |
             Automated weekly sync of upstream rule sets:
 
             - `Regex/vidhin05-regexes.json` — Vidhin05 ranked regex
             - `Regex/vidhin05-expressions.json` — Vidhin05 ranked expressions
-            - `Regex/tamtaro-ise.json` — Tamtaro synced ISEs
-            - `Regex/tamtaro-ese-standard.json` — Tamtaro synced ESEs (standard)
-            - `Regex/tamtaro-ese.json` — Tamtaro synced ESEs (extended)
-            - `Regex/tamtaro-pse.json` — Tamtaro synced PSEs
-            - `Regex/tamtaro-excluded-regex.json` — Tamtaro excluded file regex
 
             Review diffs before merging to confirm upstream changes align with Core Builds logic.
           branch: sync-upstream-rules
