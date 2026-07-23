@@ -2102,6 +2102,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       render();
+      const picked = document.querySelector(`.device-card[data-val="${val}"]`);
+      if (picked) picked.focus();
       if (S.simpleMode && step === 3) {
         setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled) b.click(); }, 350);
       }
