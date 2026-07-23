@@ -1,10 +1,11 @@
 import { build, transform } from 'esbuild';
 import { createHash } from 'node:crypto';
-import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, copyFile, cp } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = resolve(root, '..');
 const src = resolve(root, 'src');
 const dist = resolve(root, 'dist');
 const web = resolve(dist, 'web');
@@ -44,6 +45,10 @@ if (!webHtml.includes(`app.js?v=${assetVersions.js}`) || !webHtml.includes(`app.
   throw new Error('Web build is missing content-versioned asset URLs');
 }
 await writeFile(resolve(web, 'index.html'), webHtml);
+
+// Publish the independent static utilities beside the Configurator.
+await cp(resolve(repoRoot, 'account-tools'), resolve(web, 'account-tools'), { recursive: true });
+await cp(resolve(repoRoot, 'tools'), resolve(web, 'tools'), { recursive: true });
 
 const standalone = shell
   .replace(sourceStyleLinks, () => `<style>${css}</style>`)

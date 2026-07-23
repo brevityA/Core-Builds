@@ -1496,11 +1496,11 @@
         "enabled": true
       },
       {
-        "expression": "/*Part of Tamtaro SEL Setup*/[]",
+        "expression": "/*Core Builds SEL Setup*/[]",
         "enabled": true
       },
       {
-        "expression": "/*Standard ESE v2.0 [git.tamtaro.de]*/[]",
+        "expression": "/*Standard ESE v2.0*/[]",
         "enabled": true
       },
       {
@@ -1636,11 +1636,11 @@
     ],
     "includedStreamExpressions": [
       {
-        "expression": "/*Part of Tamtaro SEL Setup*/[]",
+        "expression": "/*Core Builds SEL Setup*/[]",
         "enabled": true
       },
       {
-        "expression": "/*ISE v1.2.3* [git.tamtaro.de]*/[]",
+        "expression": "/*ISE v1.2.3*/[]",
         "enabled": true
       },
       {

@@ -110,11 +110,11 @@ Public AIOStreams instances block certain external URLs in synced config fields:
 |---|---|---|
 | `syncedRankedRegexUrls` | ✗ Always blocked | Embed patterns inline in `rankedRegexPatterns` |
 | `syncedRankedStreamExpressionUrls` (Vidhin05) | ✗ Blocked | Remove; inline RSE tiers or remove `rseMatched` references |
-| `syncedPreferredStreamExpressionUrls` (Tamtaro PSEs) | ⚠ Works if RSE URL works | Keep; but fix any `rseMatched` in synced PSEs |
-| `syncedIncludedStreamExpressionUrls` (Tamtaro ISEs) | ✓ Works | Keep |
+| `syncedPreferredStreamExpressionUrls` (Core Builds PSEs) | ⚠ Works if RSE URL works | Keep; but fix any `rseMatched` in synced PSEs |
+| `syncedIncludedStreamExpressionUrls` (Core Builds ISEs) | ✓ Works | Keep |
 | `syncedRankedRegexUrls` (jsdelivr CDN) | ✓ Works | Safe to use |
 
-**Key constraint:** If `syncedRankedStreamExpressionUrls` is blocked and Tamtaro's synced PSEs call `rseMatched(streams, 'tier_name')`, every one of those PSEs will fail. The Tamtaro synced PSEs file (v1.2.8) still contains `rseMatched` with Vidhin05 tier names as of this writing.
+**Key constraint:** If `syncedRankedStreamExpressionUrls` is blocked and synced PSEs call `rseMatched(streams, 'tier_name')`, every one of those PSEs will fail.
 
 ---
 
@@ -185,7 +185,7 @@ An active ESE expression that returns a non-empty list **removes those streams**
 quality(streams, 'CAM', 'SCR', 'TS', 'TC')
 
 // ESE that excludes nothing (placeholder / label-only)
-/*Standard ESE v1.2.8 [git.tamtaro.de]*/[]
+/*Standard ESE v2.0*/[]
 ```
 
 `passthrough(streams, 'excluded')` inside an ESE marks the returned streams as **exempt from exclusion** (bypasses other ESEs), not excluded.

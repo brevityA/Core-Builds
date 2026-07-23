@@ -48,6 +48,7 @@ const checks = {
   'Advanced extras carousel': app.includes('const carouselOptSection =') && app.includes('const optSection = S.simpleMode ? compactOptSection : carouselOptSection') && app.includes('toggle-carousel-service') && app.includes('toggle-optional-scraper'),
   'advanced playback controls': app.includes("preloadEnabled:true") && app.includes("autoPlayMethod:'matchingFile'") && app.includes('preset.options.timeout = globalTimeout'),
   'partial exports': app.includes('const PARTIAL_EXPORT_FIELDS') && app.includes("credentials:{}") && app.includes("exportPartial(el.dataset.kind)"),
+  'Core Tools links': app.includes('Back Up Addons') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),

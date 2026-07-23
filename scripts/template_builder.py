@@ -34,9 +34,7 @@ ICON_URL = f"{RAW_BASE}/Assets/core_icon.svg"
 # Shared data
 # ---------------------------------------------------------------------------
 
-SYNCED_EXCLUDED_REGEX = [
-    "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
-]
+SYNCED_EXCLUDED_REGEX = []
 SYNCED_RANKED_REGEX = [
     "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
 ]

@@ -62,3 +62,10 @@ body.advanced-drawer-open{overflow:hidden}
 .opt-scraper-card:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 [data-theme='light'] .opt-scraper-count{color:#075ebd;background:#edf6ff;border-color:#9fc4ea}
 @media(max-width:599px){.opt-scraper-divider{gap:8px}.opt-scraper-label{white-space:normal}.opt-scraper-count{flex-shrink:0}}
+
+/* Core Tools launcher cards */
+a.core-tool-door{text-decoration:none;color:inherit}
+a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
+.fastlane-backup-link{display:inline-block;margin-top:5px;color:#67e8f9;text-decoration:none;font-size:.66rem;font-weight:800}
+.fastlane-backup-link:hover,.fastlane-backup-link:focus-visible{text-decoration:underline;outline:none}
+[data-theme='light'] .fastlane-backup-link{color:#075ebd}

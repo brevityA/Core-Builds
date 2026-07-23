@@ -179,7 +179,7 @@ EXPRESSIONS = [
             "Promotes lossless and object-based audio tracks to the top of the ranked pool. Ordered by "
             "priority: Atmos / TrueHD (highest) → DTS-HD MA / DTS-X → EAC3 / DD+. Applied only to "
             "non-library, non-SeaDex cached streams — library and SeaDex results remain untouched. "
-            "Tam-Taro has zero audio preference expressions; this fills the gap entirely."
+            "No existing audio preference expressions covered this gap."
         ),
         "expression": (
             "/*Audio Pinnacle*/\n"
@@ -207,8 +207,8 @@ EXPRESSIONS = [
         "status": "planned",
         "summary": (
             "Within 4K results, surfaces Dolby Vision and HDR variants ahead of SDR equivalents. "
-            "Ordered by priority: DV / HDR10+ / HDR10+DV (highest) → HDR10 / HDR → SDR (falls through to Tam-Taro ranking). "
-            "Tam-Taro's cache tier PSEs treat all visual tags equally; this adds the missing HDR layer on top. "
+            "Ordered by priority: DV / HDR10+ / HDR10+DV (highest) → HDR10 / HDR → SDR (falls through to standard ranking). "
+            "Standard cache tier PSEs treat all visual tags equally; this adds the missing HDR layer on top. "
             "On 1080p-only templates the expression evaluates to an empty 2160p pool and has zero effect — "
             "safe to deploy universally."
         ),
@@ -226,7 +226,7 @@ EXPRESSIONS = [
             ")"
         ),
         "use_cases": [
-            ("Apex · 4K Apex (TorBox)", "Critical", "Core use case — DV REMUX and HDR10+ should always rank above SDR 4K Bluray. Without this a SDR WEB-DL can outscore a DV REMUX if Tam-Taro's tier ranking happens to favour it."),
+            ("Apex · 4K Apex (TorBox)", "Critical", "Core use case — DV REMUX and HDR10+ should always rank above SDR 4K Bluray. Without this a SDR WEB-DL can outscore a DV REMUX if the standard tier ranking happens to favour it."),
             ("4K Essential", "Critical", "Essential 4K users target the best available quality within their debrid tier; HDR/DV ordering is a key part of that."),
             ("4K Hybrid", "Critical", "Hybrid pulls from both Usenet and debrid; HDR/DV results from different sources need consistent ordering regardless of origin."),
             ("Flash 4K", "High", "4K Flash is cached-only; among cached 4K results DV should surface above SDR for devices that support it."),
@@ -305,7 +305,7 @@ def build():
     story.append(Paragraph("Core Builds", TITLE))
     story.append(Paragraph("SEL Expression Layer", S("st2", fontName="Helvetica-Bold", fontSize=16,
                                                        textColor=ACCENT, alignment=TA_CENTER, spaceAfter=3)))
-    story.append(Paragraph("Custom AIOStreams expressions built on top of the Tam-Taro SEL baseline",
+    story.append(Paragraph("Custom AIOStreams expressions for the Core Builds SEL layer",
                             SUBTITLE))
     story.append(Spacer(1, 3 * mm))
     story.append(HRFlowable(width="100%", thickness=1, color=BORDER))
@@ -318,7 +318,7 @@ def build():
         [Paragraph("<b>Expressions</b>", S("sc", fontName="Helvetica-Bold", fontSize=9, textColor=MUTED, alignment=TA_CENTER)),
          Paragraph("<b>In Trial</b>",    S("sc", fontName="Helvetica-Bold", fontSize=9, textColor=MUTED, alignment=TA_CENTER)),
          Paragraph("<b>Planned</b>",     S("sc", fontName="Helvetica-Bold", fontSize=9, textColor=MUTED, alignment=TA_CENTER)),
-         Paragraph("<b>Tam-Taro Gap</b>",S("sc", fontName="Helvetica-Bold", fontSize=9, textColor=MUTED, alignment=TA_CENTER))],
+         Paragraph("<b>Gap Filled</b>",S("sc", fontName="Helvetica-Bold", fontSize=9, textColor=MUTED, alignment=TA_CENTER))],
         [Paragraph(f"<b>{len(EXPRESSIONS)}</b>", S("sv", fontName="Helvetica-Bold", fontSize=18, textColor=WHITE, alignment=TA_CENTER)),
          Paragraph(f"<b>{trial_n}</b>",           S("sv", fontName="Helvetica-Bold", fontSize=18, textColor=AMBER, alignment=TA_CENTER)),
          Paragraph(f"<b>{planned_n}</b>",          S("sv", fontName="Helvetica-Bold", fontSize=18, textColor=GREEN, alignment=TA_CENTER)),

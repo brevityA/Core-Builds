@@ -1196,6 +1196,12 @@ function splashHtml() {
     <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
     <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
+    <div class="splash-doors splash-anim splash-anim-d6">
+      <a class="splash-door core-tool-door" href="./account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
+      <a class="splash-door core-tool-door" href="./tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
+    </div>
+
     <div class="splash-tertiary splash-anim splash-anim-d6">
       <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
       <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">Browse Templates</a>
@@ -2096,6 +2102,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       render();
+      const picked = document.querySelector(`.device-card[data-val="${val}"]`);
+      if (picked) picked.focus();
       if (S.simpleMode && step === 3) {
         setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled) b.click(); }, 350);
       }
@@ -5267,7 +5275,7 @@ function showFastLane() {
       ${[['fast','Fast','1080p · cached first · smaller files'],['balanced','Balanced','4K · sensible pool · 30GB cap'],['maximum','Maximum','4K · largest pool · quality first']].map(([v,n,d])=>`<button class="fastlane-choice${state.profile===v?' active':''}" data-fl-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
     </div></div>
     <div class="fastlane-section" id="flInstallFields"></div>
-    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label>
+    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="./account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
     <button class="fastlane-go" id="btnAutoCreate">Create &amp; Install →</button><div id="aioResult" class="fastlane-result"></div>
   </div>`;
   document.body.appendChild(overlay);

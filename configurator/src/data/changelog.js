@@ -146,7 +146,7 @@ export const CHANGELOG = [
 
   { v:'2.36', date:'Jul 11 2026', items:[
     'Fix — Configurator-generated templates no longer cause "Invalid input error" on elfhosted/fortheweak',
-    'Removed syncedExcludedRegexUrls (Tam-Taro URL blocked by host allowlists)',
+    'Removed syncedExcludedRegexUrls (legacy URL blocked by host allowlists)',
     'Added 107 ranked regex patterns for proper regexScore sorting',
     'Added 8 excluded regex patterns and resolution-aware preferred regex patterns',
     'Fix — excludedRegexPatterns now emitted as plain strings (was objects)',

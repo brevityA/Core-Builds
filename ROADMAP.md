@@ -64,7 +64,7 @@ This is a living list of planned work, active development, and recently complete
 - [ ] **Usenet Propagation Guard ESE** — Holds back NZBs younger than 2 hours when propagated alternatives exist; eliminates corrupt early-propagation grabs. *All Usenet-enabled templates — critical for Apex, 4K Hybrid, Hybrid; not applicable to Flash*
 - [ ] **Codec Efficiency Booster PSE** — Surfaces HEVC/AV1 encodes of 1080p + 720p Bluray REMUX and WEB-DL/WEBRip ahead of AVC equivalents. *Stream, Essential, Anime (primary) — limited effect on 4K REMUX templates where HEVC is already standard; not applicable to Flash*
 
-**Planned** (post-trial, pending research — no Tam-Taro equivalent exists for any of these):
+**Planned** (post-trial, pending research):
 
 - [ ] **Audio Pinnacle PSE** — Promotes lossless/object-based audio tracks within the ranked pool: Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3/DD+. *Critical for Apex, 4K Apex, 4K Hybrid, 4K Essential (home theatre users); moderate for Stream, Hybrid, Essential; low impact on Anime (fansub FLAC/AAC standard) and Flash*
 - [ ] **HDR / DV Priority PSE** — Within 4K results, surfaces DV/HDR10+/HDR10 ahead of SDR equivalents. Safe no-op on 1080p-only templates (empty 2160p pool). *Critical for Apex, 4K Apex, 4K Essential, 4K Hybrid, Flash 4K, Speed 4K; high for Anime 4K; no effect on Stream/Essential/FireStick/Flash*

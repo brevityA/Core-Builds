@@ -232,7 +232,7 @@ Timeout is in milliseconds. Don't go above 15000ms or it will delay the whole re
 |---|---|
 | `metadata.id` | Changing this on an upstream template breaks update tracking — only change it on a fork |
 | `config.addonLogo` | Must stay on the `raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/` URL or the logo breaks |
-| `syncedExcludedRegexUrls` | Points to Tamtaro's LQ exclusion list — removing it lets junk encodes through |
+| `excludedRegexPatterns` | Inline LQ exclusion patterns — removing them lets junk encodes through |
 | `syncedRankedRegexUrls` | Points to the shared release-group scoring database — removing it zeroes out group scores |
 | PSE order | PSE tiers are ordered by priority — inserting a new tier in the wrong position can bury or surface the wrong results |
 
