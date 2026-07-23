@@ -1196,6 +1196,12 @@ function splashHtml() {
     <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
     <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
+    <div class="splash-doors splash-anim splash-anim-d6">
+      <a class="splash-door core-tool-door" href="./account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
+      <a class="splash-door core-tool-door" href="./tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
+    </div>
+
     <div class="splash-tertiary splash-anim splash-anim-d6">
       <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
       <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">Browse Templates</a>
@@ -4901,7 +4907,8 @@ function templateHealthCheck() {
 function hostCompatCheck() {
   const cfg = buildFinal().config;
   const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
-  const LEGACY_SYNCED_URL_FRAGMENTS = ['Tam-Taro/SEL-Filtering-and-Sorting', 'Tamtaro/SEL-Filtering-and-Sorting'];
+  const TAMTARO_URL_FRAGMENT = 'Tam-Taro/SEL-Filtering-and-Sorting';
+  const TAMTARO_OLD_URL_FRAGMENT = 'Tamtaro/SEL-Filtering-and-Sorting';
   const regexFields = [
     ...(cfg.rankedRegexPatterns||[]),
     ...(cfg.excludedRegexPatterns||[]).map((p,i) => typeof p === 'string' ? {name:'Excluded #'+(i+1), pattern:p} : p),
@@ -4919,9 +4926,9 @@ function hostCompatCheck() {
     elfhosted:  { label:'ElfHosted', issues:[], status:'ok' },
     fortheweak: { label:'ForTheWeak', issues:[], status:'ok' },
   };
-  const legacySyncedUrls = syncedUrls.filter(u => LEGACY_SYNCED_URL_FRAGMENTS.some(f => u.includes(f)));
-  if (legacySyncedUrls.length) {
-    hosts.elfhosted.issues.push('Legacy synced URL not on elfhosted allowlist — will cause "Forbidden URL" error');
+  const tamtaroUrls = syncedUrls.filter(u => u.includes(TAMTARO_URL_FRAGMENT) || u.includes(TAMTARO_OLD_URL_FRAGMENT));
+  if (tamtaroUrls.length) {
+    hosts.elfhosted.issues.push('Tam-Taro synced URL not on elfhosted allowlist — will cause "Forbidden URL" error');
     hosts.elfhosted.status = 'err';
   }
   const ranked = cfg.rankedRegexPatterns||[];
@@ -5059,7 +5066,7 @@ const TROUBLESHOOT_TREE = {
   forbiddenUrl: {
     q: '"Forbidden URL" means the host doesn\'t trust a synced URL in your template:',
     tips: [
-      '🔗 <b>Legacy synced URL</b> — Older templates may reference synced URLs no longer on the host allowlist. Re-generate your template to fix this.',
+      '🔗 <b>Tam-Taro URL</b> — elfhosted\'s allowlist hasn\'t been updated for the Tam-Taro account rename. The configurator no longer includes this URL — re-generate your template.',
       '🌐 <b>Custom synced URLs</b> — Public hosts only allow specific synced URLs. Self-hosted instances allow any URL.',
       '✅ <b>Check Host Compatibility</b> — The checker above shows which hosts will accept your template.',
     ]
@@ -5266,7 +5273,7 @@ function showFastLane() {
       ${[['fast','Fast','1080p · cached first · smaller files'],['balanced','Balanced','4K · sensible pool · 30GB cap'],['maximum','Maximum','4K · largest pool · quality first']].map(([v,n,d])=>`<button class="fastlane-choice${state.profile===v?' active':''}" data-fl-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
     </div></div>
     <div class="fastlane-section" id="flInstallFields"></div>
-    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label>
+    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.<br><a href="./account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link">Back up your current addons first →</a></span></label>
     <button class="fastlane-go" id="btnAutoCreate">Create &amp; Install →</button><div id="aioResult" class="fastlane-result"></div>
   </div>`;
   document.body.appendChild(overlay);
