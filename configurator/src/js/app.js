@@ -741,7 +741,7 @@ function renderP2pToggle() {
   </div>`;
 }
 
-function ftTip(text) { return `<span style="position:relative;display:inline-flex"><i class="ft-info">?</i><div class="ft-popup">${text}</div></span>`; }
+function ftTip(text) { return `<span style="position:relative;display:inline-flex;z-index:999"><i class="ft-info">?</i><div class="ft-popup">${text}</div></span>`; }
 
 function renderMatchMode() {
   const modes = [
@@ -2373,6 +2373,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-cache-mode"]').forEach(btn => {
         const on = btn.dataset.val === S.cacheMode;
+        btn.dataset.active = on ? 'true' : 'false';
         btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.07)';
         btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
         btn.style.color       = on ? '#00d4ff' : '#6b7280';
@@ -2384,6 +2385,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-pool"]').forEach(btn => {
         const on = btn.dataset.val === (S.streamPool||'normal');
+        btn.dataset.active = on ? 'true' : 'false';
         btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
         btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
         btn.style.color       = on ? '#00d4ff' : '#6b7280';
@@ -2395,6 +2397,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-pse-arch"]').forEach(btn => {
         const on = btn.dataset.val === (S.pseArch||'standard');
+        btn.dataset.active = on ? 'true' : 'false';
         btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
         btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
         btn.style.color       = on ? '#00d4ff' : '#6b7280';
@@ -2477,6 +2480,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-match-mode"]').forEach(btn => {
         const on = btn.dataset.val === S.matchMode;
+        btn.dataset.active = on ? 'true' : 'false';
         btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.07)';
         btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
         btn.style.color       = on ? '#00d4ff' : '#6b7280';
@@ -2494,6 +2498,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       document.querySelectorAll('[data-action="set-audio"]').forEach(row => {
         const on = row.dataset.val === S.audio;
+        row.dataset.active = on ? 'true' : 'false';
         row.style.borderColor = on ? 'rgba(0,212,255,.35)' : 'rgba(255,255,255,.07)';
         row.style.background  = on ? 'rgba(0,212,255,.05)' : 'rgba(13,17,23,.7)';
         const nm = row.querySelector('.opt-name');
@@ -2608,6 +2613,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (e.target.dataset.action === 'toggle-p2p') {
       S.p2pEnabled = e.target.checked;
+      e.target.closest('.pref-card')?.classList.toggle('pref-on', e.target.checked);
       saveState();
     }
     if (e.target.dataset.action === 'toggle-service') {
