@@ -2613,6 +2613,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (e.target.dataset.action === 'toggle-p2p') {
       S.p2pEnabled = e.target.checked;
+      e.target.closest('.pref-card')?.classList.toggle('pref-on', e.target.checked);
       saveState();
     }
     if (e.target.dataset.action === 'toggle-service') {
