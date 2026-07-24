@@ -120,12 +120,6 @@
     "excludeUncachedFromAddons": [],
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
-    "includedStreamExpressions": [
-      {
-        "expression": "/*0Cached*/ count(merge(cached(streams), type(streams, 'p2p','http','usenet','stremio-usenet')))==0?passthrough(streams,'title'):[]",
-        "enabled": true
-      }
-    ],
     "excludedStreamExpressions": [
       {
         "expression": "quality(streams, 'CAM', 'TS', 'TC', 'SCR', 'Bluray REMUX')",
@@ -227,7 +221,12 @@
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "formatter": {
-      "id": "prism"
+      "id": "tamtaro",
+      "definitions": {
+        "overrides": {
+          "tamtaro": {}
+        }
+      }
     },
     "proxy": {
       "id": "mediaflow",
@@ -268,7 +267,7 @@
       "addons": []
     },
     "titleMatching": {
-      "mode": "fuzzy",
+      "mode": "exact",
       "enabled": false,
       "requestTypes": [],
       "addons": []
