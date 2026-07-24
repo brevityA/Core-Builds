@@ -1,78 +1,230 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Core Builds — Template Inspector</title>
 <style>
-  :root{--bg:#0d1117;--card:#161b22;--border:rgba(255,255,255,.06);--tx:#e6edf3;--tx2:#8b949e;--tx3:#4b5563;--accent:#00d4ff;--accent-bg:rgba(0,212,255,.08);--ok:#34d399;--warn:#fbbf24;--err:#f87171;--purple:#a78bfa}
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding:24px}
-  .container{max-width:800px;margin:0 auto}
-  h1{font-size:1.4rem;font-weight:800;margin-bottom:4px}
-  .sub{color:var(--tx2);font-size:.82rem;margin-bottom:24px}
-  textarea{width:100%;height:280px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;color:var(--tx);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.78rem;resize:vertical;outline:none;transition:border-color .15s}
-  textarea:focus{border-color:rgba(0,212,255,.4)}
-  .actions{display:flex;gap:8px;margin:12px 0}
-  button{padding:10px 20px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:var(--accent-bg);color:var(--accent);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
-  button:hover{background:rgba(0,212,255,.15)}
-  button:disabled{opacity:.4;cursor:not-allowed}
-  .btn-secondary{border-color:var(--border);background:transparent;color:var(--tx2)}
-  .btn-secondary:hover{background:rgba(255,255,255,.04)}
-  .results{margin-top:20px}
-  .section{margin-bottom:16px}
-  .section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:6px;font-size:.68rem;font-weight:800;padding:0 6px}
-  .badge-ok{background:rgba(52,211,153,.12);color:var(--ok)}
-  .badge-warn{background:rgba(251,191,36,.12);color:var(--warn)}
-  .badge-err{background:rgba(248,113,113,.12);color:var(--err)}
-  .badge-pass{background:rgba(52,211,153,.12);color:var(--ok)}
-  .item{padding:8px 12px;border-radius:8px;margin-bottom:4px;font-size:.78rem;line-height:1.5;display:flex;align-items:flex-start;gap:8px}
-  .item-err{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.12)}
-  .item-warn{background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12)}
-  .item-pass{background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.08)}
-  .item-icon{flex-shrink:0;font-size:.9rem;margin-top:1px}
-  .item-text{flex:1;color:var(--tx2)}
-  .host-compat{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-  .host-chip{padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:6px}
-  .host-ok{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:var(--ok)}
-  .host-warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);color:var(--warn)}
-  .host-err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--err)}
-  .summary-bar{display:flex;gap:12px;padding:14px 16px;border-radius:10px;background:var(--card);border:1px solid var(--border);margin-bottom:16px;flex-wrap:wrap}
-  .summary-stat{text-align:center;flex:1;min-width:80px}
-  .summary-num{font-size:1.4rem;font-weight:900}
-  .summary-lbl{font-size:.65rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em}
-  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-  .dot-ok{background:var(--ok)}
-  .dot-warn{background:var(--warn)}
-  .dot-err{background:var(--err)}
-  .export-btn{margin-top:12px}
-  .hidden{display:none}
-  #loading{text-align:center;padding:40px;color:var(--tx2)}
-  .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle}
-  @keyframes spin{to{transform:rotate(360deg)}}
+:root{
+  --bg:#0d1117;--card:#161b22;--card-alt:#111720;
+  --border:rgba(255,255,255,.06);--border-strong:rgba(255,255,255,.12);
+  --tx:#e4e7ed;--tx2:#8b949e;--tx3:#6b7280;--tx4:#4b5563;--tx5:#374151;
+  --accent:#00d4ff;--accent-bg:rgba(0,212,255,.08);--accent-border:rgba(0,212,255,.18);
+  --ok:#34d399;--ok-bg:rgba(52,211,153,.06);--ok-border:rgba(52,211,153,.2);
+  --warn:#fbbf24;--warn-bg:rgba(251,191,36,.04);--warn-border:rgba(245,158,11,.12);
+  --err:#f87171;--err-bg:rgba(239,68,68,.04);--err-border:rgba(239,68,68,.15);
+  --purple:#a78bfa;--purple-bg:rgba(168,85,247,.04);--purple-border:rgba(168,85,247,.18);
+}
+[data-theme="light"]{
+  --bg:#f6f8fa;--card:#ffffff;--card-alt:#f6f8fa;
+  --border:rgba(0,0,0,.09);--border-strong:rgba(0,0,0,.18);
+  --tx:#1c2128;--tx2:#57606a;--tx3:#6b7280;--tx4:#8c959f;--tx5:#9ca3af;
+  --accent:#0969da;--accent-bg:rgba(9,105,218,.06);--accent-border:rgba(9,105,218,.25);
+  --ok:#059669;--ok-bg:rgba(5,150,105,.06);--ok-border:rgba(5,150,105,.2);
+  --warn:#a16207;--warn-bg:rgba(161,98,7,.04);--warn-border:rgba(161,98,7,.15);
+  --err:#dc2626;--err-bg:rgba(220,38,38,.04);--err-border:rgba(220,38,38,.12);
+  --purple:#7c3aed;--purple-bg:rgba(124,58,237,.04);--purple-border:rgba(124,58,237,.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);background-image:radial-gradient(ellipse at 15% 15%,rgba(0,212,255,.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,.05) 0%,transparent 45%);background-attachment:fixed;color:var(--tx);min-height:100dvh;padding:24px 16px 40px}
+.container{max-width:860px;margin:0 auto}
+
+/* ── Header (matches configurator) ── */
+.hdr-banner{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.3),transparent);pointer-events:none}
+.hdr-icon{width:46px;height:46px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
+.hdr-divider{width:1px;height:44px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.35),transparent);flex-shrink:0}
+.hdr-text{display:flex;flex-direction:column;gap:1px}
+.hdr-title{font-size:1.55rem;font-weight:900;letter-spacing:-.02em;line-height:1}
+.hdr-core{color:var(--tx)}.hdr-builds{color:var(--accent)}
+.hdr-underline{height:1.5px;width:96px;background:linear-gradient(90deg,rgba(0,212,255,.55),transparent);border-radius:1px;margin-bottom:3px}
+.hdr-sub{font-size:.78rem;color:var(--tx2);line-height:1.3}
+.hdr-actions{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+.hdr-btn{padding:7px 12px;border-radius:8px;font-size:.68rem;font-weight:700;border:1px solid var(--border);background:transparent;color:var(--tx2);cursor:pointer;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.hdr-btn:hover{border-color:var(--accent-border);color:var(--accent)}
+
+/* ── Import area ── */
+.import-area{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.drop-zone{border:2px dashed var(--border-strong);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--card-alt);position:relative;overflow:hidden}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(0,212,255,.04)}
+.drop-zone.drag-over{box-shadow:0 0 20px rgba(0,212,255,.15)}
+.drop-zone-icon{font-size:2rem;margin-bottom:8px;opacity:.6}
+.drop-zone-title{font-size:.82rem;font-weight:700;color:var(--tx);margin-bottom:4px}
+.drop-zone-desc{font-size:.68rem;color:var(--tx3)}
+.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.url-input{display:flex;gap:8px;margin-bottom:16px}
+.url-input input{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--tx);font-size:.82rem;outline:none;transition:border-color .15s}
+.url-input input:focus{border-color:var(--accent-border)}
+.url-input input::placeholder{color:var(--tx4)}
+.url-input button{padding:10px 18px;border-radius:10px;border:1.5px solid var(--accent-border);background:var(--accent-bg);color:var(--accent);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.url-input button:hover{background:rgba(0,212,255,.15)}
+
+/* ── Paste area ── */
+.paste-area{position:relative}
+textarea{width:100%;height:200px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;color:var(--tx);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.78rem;resize:vertical;outline:none;transition:border-color .15s}
+textarea:focus{border-color:var(--accent-border)}
+textarea::placeholder{color:var(--tx4)}
+
+/* ── Actions ── */
+.actions{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;border:1.5px solid}
+.btn-primary{border-color:var(--accent-border);background:var(--accent-bg);color:var(--accent)}
+.btn-primary:hover{background:rgba(0,212,255,.15)}
+.btn-secondary{border-color:var(--border);background:transparent;color:var(--tx2)}
+.btn-secondary:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.btn-ok{border-color:var(--ok-border);background:var(--ok-bg);color:var(--ok)}
+.btn-ok:hover{background:rgba(52,211,153,.12)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── Results ── */
+.results{margin-top:20px}
+.summary-bar{display:flex;gap:12px;padding:14px 16px;border-radius:10px;background:var(--card);border:1px solid var(--border);margin-bottom:16px;flex-wrap:wrap}
+.summary-stat{text-align:center;flex:1;min-width:80px}
+.summary-num{font-size:1.4rem;font-weight:900}
+.summary-lbl{font-size:.65rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-ok{background:var(--ok)}.dot-warn{background:var(--warn)}.dot-err{background:var(--err)}
+
+/* ── Sections ── */
+.section{margin-bottom:16px}
+.section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:6px;font-size:.68rem;font-weight:800;padding:0 6px}
+.badge-ok{background:var(--ok-bg);color:var(--ok)}
+.badge-warn{background:var(--warn-bg);color:var(--warn)}
+.badge-err{background:var(--err-bg);color:var(--err)}
+.badge-pass{background:var(--ok-bg);color:var(--ok)}
+
+/* ── Items ── */
+.item{padding:8px 12px;border-radius:8px;margin-bottom:4px;font-size:.78rem;line-height:1.5;display:flex;align-items:flex-start;gap:8px}
+.item-err{background:var(--err-bg);border:1px solid var(--err-border)}
+.item-warn{background:var(--warn-bg);border:1px solid var(--warn-border)}
+.item-pass{background:var(--ok-bg);border:1px solid rgba(52,211,153,.08)}
+.item-icon{flex-shrink:0;font-size:.9rem;margin-top:1px}
+.item-text{flex:1;color:var(--tx2)}
+
+/* ── Host compat ── */
+.host-compat{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.host-chip{padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:6px}
+.host-ok{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok)}
+.host-warn{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn)}
+.host-err{background:var(--err-bg);border:1px solid var(--err-border);color:var(--err)}
+
+/* ── Health score ── */
+.health-ring{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.health-inner{width:64px;height:64px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column}
+.health-score{font-size:1.4rem;font-weight:900;line-height:1}
+.health-grade{font-size:.55rem;font-weight:700;opacity:.7}
+
+/* ── Template info ── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.info-card{padding:10px 14px;border-radius:8px;background:var(--card);border:1px solid var(--border)}
+.info-label{font-size:.65rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.info-value{font-size:.82rem;font-weight:700;color:var(--tx)}
+
+/* ── Buttons ── */
+.export-btn{margin-top:12px}
+
+/* ── Loading ── */
+.hidden{display:none}
+#loading{text-align:center;padding:40px;color:var(--tx2)}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Section label ── */
+.section-label{display:flex;align-items:center;gap:12px;margin:20px 0 14px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+.section-label::after{content:'';height:1px;flex:1;background:var(--border)}
+
+/* ── Footer ── */
+.rule{margin:24px 0 14px;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--tx3);font-size:.68rem;font-weight:600;letter-spacing:.04em}
+.foot a{color:var(--tx2);text-decoration:none;transition:color .15s}
+.foot a:hover{color:var(--accent)}
+
+/* ── Theme toggle ── */
+#themeToggle{position:fixed;top:14px;right:14px;z-index:100;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--tx3);font-size:.7rem;font-weight:700;cursor:pointer;transition:all .15s}
+#themeToggle:hover{border-color:var(--accent-border);color:var(--accent)}
+
+/* ── Responsive ── */
+@media(max-width:560px){
+  .import-area{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr}
+  .hdr-actions{display:none}
+  .hdr-banner{padding:14px 16px;gap:12px}
+  .hdr-title{font-size:1.3rem}
+}
+@media(prefers-reduced-motion:reduce){.spinner,.drop-zone,.btn,.hdr-btn{animation:none;transition:none}}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>🔍 Template Inspector</h1>
-  <p class="sub">Paste any AIOStreams JSON config — get plain-English findings, safe repairs, and host compatibility.</p>
+<button id="themeToggle" onclick="toggleTheme()">☀ Light</button>
 
-  <textarea id="input" placeholder='Paste your AIOStreams template JSON here...\n\nOr paste a manifest URL (https://...) to fetch and inspect.'></textarea>
+<div class="container">
+
+  <!-- Header -->
+  <header class="hdr-banner">
+    <svg class="hdr-icon" width="46" height="46" viewBox="0 0 64 64" fill="none">
+      <path d="M32 4 56 18v28L32 60 8 46V18L32 4Z" stroke="url(#hg1)" stroke-width="2.5"/>
+      <path d="m32 20 12 12-12 12-12-12 12-12Z" fill="url(#hg1)" opacity=".9"/>
+      <defs><linearGradient id="hg1" x1="9" y1="8" x2="55" y2="57"><stop stop-color="#00e5ff"/><stop offset=".55" stop-color="#a78bfa"/><stop offset="1" stop-color="#ff7043"/></linearGradient></defs>
+    </svg>
+    <div class="hdr-divider"></div>
+    <div class="hdr-text">
+      <div class="hdr-title"><span class="hdr-core">Template </span><span class="hdr-builds">Inspector</span></div>
+      <div class="hdr-underline"></div>
+      <div class="hdr-sub">Paste, upload, or import any AIOStreams JSON — get instant validation.</div>
+    </div>
+    <div class="hdr-actions">
+      <a class="hdr-btn" href="../">← Builder</a>
+      <a class="hdr-btn" href="../tools/">Tools</a>
+    </div>
+  </header>
+
+  <!-- Import section -->
+  <div class="section-label">01 · Import template</div>
+
+  <div class="import-area">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".json,.txt" />
+      <div class="drop-zone-icon">📂</div>
+      <div class="drop-zone-title">Drop JSON file here</div>
+      <div class="drop-zone-desc">or click to browse</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-primary" onclick="pasteFromClipboard()" style="flex:1">📋 Paste from Clipboard</button>
+      <button class="btn btn-secondary" onclick="loadExample()" style="flex:1">📝 Load Example</button>
+      <button class="btn btn-secondary" onclick="loadFromURL()" style="flex:1">🔗 Fetch from URL</button>
+    </div>
+  </div>
+
+  <div class="url-input hidden" id="urlRow">
+    <input type="text" id="urlInput" placeholder="https://raw.githubusercontent.com/... or https://aiostreams.example.com/stremio/uuid/pwd/manifest.json" />
+    <button onclick="fetchURL()">Fetch</button>
+  </div>
+
+  <!-- Paste area -->
+  <div class="section-label">02 · Or paste directly</div>
+  <div class="paste-area">
+    <textarea id="input" placeholder="Paste your AIOStreams template JSON here...&#10;&#10;Or drag a .json file onto the drop zone above."></textarea>
+  </div>
 
   <div class="actions">
-    <button id="inspectBtn" onclick="inspect()">Inspect Template</button>
-    <button class="btn-secondary" onclick="clearAll()">Clear</button>
-    <button class="btn-secondary" onclick="loadExample()">Load Example</button>
+    <button class="btn btn-primary" onclick="inspect()">🔍 Inspect Template</button>
+    <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+    <button class="btn btn-ok hidden" id="exportBtn" onclick="exportReport()">📥 Export Report</button>
   </div>
 
   <div id="loading" class="hidden"><span class="spinner"></span>Validating…</div>
-
   <div id="results" class="results hidden"></div>
+
+  <div class="rule"></div>
+  <footer class="foot">
+    <span>Core Builds by Brevity</span>
+    <span><a href="https://github.com/brevityA/Core-Builds">GitHub</a> · <a href="https://www.reddit.com/r/CoreBuilds/">Core Crew</a> · <a href="https://core-builds.mintlify.app/">Docs</a></span>
+  </footer>
 </div>
 
 <script>
-// ── Validation engine (ported from validate_templates.py) ──────────
+// ── Validation engine (synced with validate_templates.py) ──────────
 
 const VALID_SORT_KEYS = new Set([
   'resolution','quality','cached','size','seeders','bitrate','encode',
@@ -91,8 +243,11 @@ const KNOWN_PRESET_TYPES = [
   'torrentio','comet','mediafusion','torbox-search','torbox-usenet',
   'jackettio','debridio','peerflix','sootio','neko-bt','animetosho',
   'dmm-cast','hdhub','torrents-db','easynews','davex','stremthruStore',
-  'aiosubtitle','opensubtitles-v3-plus','subdl','tmdb-addon','streamingCatalogs',
-  'animeCatalogs','rpdb','torrentCatalogs','baguettio','flixStreams'
+  'stremthruTorz','aiosubtitle','opensubtitles-v3-plus','subdl',
+  'tmdb-addon','streamingCatalogs','animeCatalogs','rpdb','torrentCatalogs',
+  'baguettio','flixStreams','knaben','zilean','jackett','prowlarr',
+  'webstreamr','nuvio-streams','nuvio-anime','debrider','library',
+  'torrent-galaxy','eztv','seadex','stremio_nntp','aiostreams'
 ];
 
 const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
@@ -191,11 +346,99 @@ function validateTemplate(config) {
 
   // Deduplicator
   const dedup = cfg.deduplicator || {};
-  const validDedup = ['per_addon','per_service','per_quality_resolution','global'];
+  const validDedup = ['per_addon','per_service','per_quality_resolution','global','single_result','disabled'];
   if (dedup.cached && !validDedup.includes(dedup.cached)) errors.push(`deduplicator.cached: invalid mode '${dedup.cached}'`);
   if (dedup.uncached && dedup.uncached === 'all') errors.push("deduplicator.uncached: 'all' is not a valid mode");
 
+  // Size
+  const size = cfg.size || {};
+  if (size.global?.movies && !Array.isArray(size.global.movies)) errors.push('size.global.movies must be an array [min, max]');
+  if (size.global?.series && !Array.isArray(size.global.series)) errors.push('size.global.series must be an array [min, max]');
+
+  // Bitrate
+  const bitrate = cfg.bitrate || {};
+  if (bitrate.global?.movies && !Array.isArray(bitrate.global.movies)) errors.push('bitrate.global.movies must be an array [min, max]');
+
   return { errors, warnings, passes };
+}
+
+// ── Health score ──────────────────────────────────────────────────
+
+function calculateHealth(config) {
+  const cfg = config.config || {};
+  let score = 0, max = 0;
+  const checks = [];
+
+  function check(label, maxPts, pts, reason) {
+    max += maxPts;
+    score += Math.min(pts, maxPts);
+    checks.push({ label, points: Math.min(pts, maxPts), max: maxPts, reason });
+  }
+
+  // Sort criteria
+  const sortKeys = (cfg.sortCriteria?.global || []).map(k => k.key);
+  if (sortKeys.length >= 6) check('Sort criteria', 15, 15, `${sortKeys.length} keys — excellent`);
+  else if (sortKeys.length >= 4) check('Sort criteria', 15, 12, `${sortKeys.length} keys — good`);
+  else if (sortKeys.length >= 2) check('Sort criteria', 15, 8, `${sortKeys.length} keys — basic`);
+  else check('Sort criteria', 15, 3, `${sortKeys.length} keys — add more`);
+
+  // 0Cached ISE
+  const ises = cfg.includedStreamExpressions || [];
+  if (ises.some(e => e.expression && /0Cached/i.test(e.expression))) check('0Cached ISE', 10, 10, 'Present');
+  else check('0Cached ISE', 10, 0, 'Missing');
+
+  // ESEs
+  const eses = cfg.excludedStreamExpressions || [];
+  if (eses.length >= 5) check('ESEs', 10, 10, `${eses.length} expressions`);
+  else if (eses.length >= 2) check('ESEs', 10, 7, `${eses.length} expressions`);
+  else check('ESEs', 10, 3, `${eses.length} expressions`);
+
+  // Presets
+  const presets = (cfg.presets || []).filter(p => p.enabled !== false);
+  if (presets.length >= 4) check('Presets', 10, 10, `${presets.length} enabled`);
+  else if (presets.length >= 2) check('Presets', 10, 7, `${presets.length} enabled`);
+  else check('Presets', 10, 3, `${presets.length} enabled`);
+
+  // Formatter
+  const fmt = cfg.formatter || {};
+  if (fmt.id === 'tamtaro' && fmt.definitions?.overrides?.tamtaro?.name) check('Formatter', 10, 10, 'Custom tamtaro');
+  else if (fmt.id) check('Formatter', 10, 7, `Built-in: ${fmt.id}`);
+  else check('Formatter', 10, 3, 'No formatter');
+
+  // Matching
+  const tm = cfg.titleMatching || {};
+  if (tm.mode === 'fuzzy' && (tm.similarityThreshold || 0.85) <= 0.9) check('Matching', 10, 10, 'Fuzzy — good');
+  else if (tm.mode === 'exact') check('Matching', 10, 2, 'Exact — too strict');
+  else check('Matching', 10, 6, 'Default');
+
+  // Deduplicator
+  const dedup = cfg.deduplicator || {};
+  if (dedup.cached && dedup.uncached) check('Deduplicator', 10, 10, 'Both configured');
+  else if (dedup.cached || dedup.uncached) check('Deduplicator', 10, 5, 'Partial');
+  else check('Deduplicator', 10, 3, 'Default');
+
+  // Regex
+  const ranked = cfg.rankedRegexPatterns || [];
+  if (ranked.length >= 50) check('Regex scoring', 10, 10, `${ranked.length} patterns`);
+  else if (ranked.length >= 10) check('Regex scoring', 10, 6, `${ranked.length} patterns`);
+  else check('Regex scoring', 10, 2, `${ranked.length} patterns`);
+
+  // Groups
+  if (cfg.groups?.enabled && cfg.groups.groups?.length) check('Groups', 5, 5, 'Configured');
+  else check('Groups', 5, 2, 'Not configured');
+
+  // Proxy
+  if (cfg.proxy?.id) check('Proxy', 5, 5, cfg.proxy.id);
+  else check('Proxy', 5, 2, 'None');
+
+  // Size/bitrate limits
+  if (cfg.size?.global && cfg.bitrate?.global) check('Size & bitrate', 5, 5, 'Both configured');
+  else if (cfg.size?.global || cfg.bitrate?.global) check('Size & bitrate', 5, 3, 'Partial');
+  else check('Size & bitrate', 5, 1, 'None');
+
+  const finalScore = Math.min(Math.round((score / max) * 100), 100);
+  const grade = finalScore >= 90 ? 'A' : finalScore >= 75 ? 'B' : finalScore >= 60 ? 'C' : finalScore >= 40 ? 'D' : 'F';
+  return { score: finalScore, grade, checks };
 }
 
 // ── Host compatibility ─────────────────────────────────────────────
@@ -217,7 +460,7 @@ function checkHostCompat(config) {
   ];
 
   if (syncedUrls.some(u => u.includes('Tam-Taro') || u.includes('Tamtaro'))) {
-    hosts.elfhosted.issues.push('Tam-Taro synced URL — blocked on elfhosted');
+    hosts.elfhosted.issues.push('Tam-Taro synced URL — blocked');
     hosts.elfhosted.status = 'err';
   }
 
@@ -239,51 +482,203 @@ function checkHostCompat(config) {
   return hosts;
 }
 
-// ── UI ─────────────────────────────────────────────────────────────
+// ── Import handlers ───────────────────────────────────────────────
+
+// File drop
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) readFile(file);
+});
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) readFile(file);
+});
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('input').value = e.target.result;
+    dropZone.querySelector('.drop-zone-title').textContent = '✓ ' + file.name;
+    dropZone.querySelector('.drop-zone-desc').textContent = (file.size / 1024).toFixed(1) + ' KB loaded';
+  };
+  reader.readAsText(file);
+}
+
+// Paste from clipboard
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('input').value = text;
+    showToast('Pasted from clipboard');
+  } catch(e) {
+    showToast('Could not read clipboard — paste manually', true);
+  }
+}
+
+// URL fetch
+function loadFromURL() {
+  const urlRow = document.getElementById('urlRow');
+  urlRow.classList.toggle('hidden');
+  if (!urlRow.classList.contains('hidden')) {
+    document.getElementById('urlInput').focus();
+  }
+}
+
+async function fetchURL() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    // Try to parse as JSON
+    try {
+      JSON.parse(text);
+      document.getElementById('input').value = text;
+      showToast('Fetched and loaded');
+    } catch(e) {
+      // Maybe it's a manifest URL — try to extract config
+      document.getElementById('input').value = text;
+      showToast('Loaded — may need manual JSON extraction');
+    }
+  } catch(e) {
+    showToast('Could not fetch URL: ' + e.message, true);
+  }
+}
+
+// Example
+function loadExample() {
+  document.getElementById('input').value = JSON.stringify({
+    metadata: { version: "3.2.6", name: "Core Nexus 4K Apex", description: "Flagship 4K template with IQR PSE", author: "Core Builds", category: "Debrid" },
+    config: {
+      presets: [
+        { type: "torrentio", instanceId: "t1", enabled: true, options: { name: "Torrentio", timeout: 7000 } },
+        { type: "torbox-search", instanceId: "tb1", enabled: true, options: { name: "TorBox Search", timeout: 7000 } },
+        { type: "comet", instanceId: "c1", enabled: true, options: { name: "Comet", timeout: 7000 } },
+        { type: "mediafusion", instanceId: "mf1", enabled: true, options: { name: "MediaFusion", timeout: 7000 } },
+        { type: "knaben", instanceId: "kn1", enabled: true, options: { name: "Knaben", timeout: 7000 } },
+      ],
+      formatter: { id: "tamtaro", definitions: { overrides: { tamtaro: { name: "4K Apex Formatter", description: "Premium 4K formatting" } } } },
+      includedStreamExpressions: [{ expression: "0Cached == true" }],
+      excludedStreamExpressions: [
+        { expression: "/* Hard Resolution Kill */ resolution(streams, '2160p', '1440p')" },
+        { expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR')))" },
+        { expression: "/* AI Upscale Exclusion */ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','upscaled')" },
+        { expression: "/* Hard CAM Kill */ quality(streams,'CAM','SCR','TS','TC')" },
+        { expression: "/* 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" },
+      ],
+      preferredStreamExpressions: [],
+      sortCriteria: {
+        global: [
+          { key: "resolution", direction: "desc" },
+          { key: "cached", direction: "desc" },
+          { key: "streamExpressionScore", direction: "desc" },
+          { key: "seadex", direction: "desc" },
+          { key: "quality", direction: "desc" },
+          { key: "regexScore", direction: "desc" },
+        ]
+      },
+      titleMatching: { mode: "fuzzy", similarityThreshold: 0.85 },
+      yearMatching: { strict: false },
+      deduplicator: { enabled: true, cached: "single_result", uncached: "per_service" },
+      size: { global: { movies: [1610612736, 150000000000], series: [209715200, 80000000000] } },
+      bitrate: { global: { movies: [5000000, 150000000], series: [5000000, 150000000] } },
+      proxy: { id: "mediaflow", proxiedAddons: [], proxiedServices: [] },
+      groups: { enabled: true, groups: [{ name: "Primary", addonInstanceIds: ["t1", "tb1", "c1", "mf1"], condition: "" }] },
+    }
+  }, null, 2);
+  showToast('Example loaded — click Inspect');
+}
+
+// ── Inspect ───────────────────────────────────────────────────────
 
 async function inspect() {
   const raw = document.getElementById('input').value.trim();
-  if (!raw) return;
+  if (!raw) { showToast('Paste or import a template first', true); return; }
 
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('results').classList.add('hidden');
+  document.getElementById('exportBtn').classList.add('hidden');
 
   let json;
   try {
-    // Try parsing as JSON
     json = JSON.parse(raw);
   } catch(e) {
-    // Try fetching as URL
+    // Try cleaning common issues
+    let cleaned = raw.replace(/,(\s*[}\]])/g, '$1'); // trailing commas
     try {
-      const res = await fetch(raw);
-      json = await res.json();
+      json = JSON.parse(cleaned);
     } catch(e2) {
       document.getElementById('loading').classList.add('hidden');
-      alert('Could not parse as JSON or fetch as URL.\n\n' + e.message);
+      showToast('Invalid JSON: ' + e.message, true);
       return;
     }
   }
 
-  // Small delay for UX
-  await new Promise(r => setTimeout(r, 300));
+  await new Promise(r => setTimeout(r, 200));
 
-  const result = validateTemplate(json);
+  const validation = validateTemplate(json);
+  const health = calculateHealth(json);
   const hosts = checkHostCompat(json);
-  renderResults(result, hosts);
+  renderResults(json, validation, health, hosts);
 
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('results').classList.remove('hidden');
+  document.getElementById('exportBtn').classList.remove('hidden');
+
+  window._lastReport = { ...validation, health, hosts, template: json.metadata || {}, inspectedAt: new Date().toISOString() };
 }
 
-function renderResults(result, hosts) {
-  const { errors, warnings, passes } = result;
+// ── Render results ────────────────────────────────────────────────
+
+function renderResults(template, validation, health, hosts) {
+  const { errors, warnings, passes } = validation;
   const el = document.getElementById('results');
+  const meta = template.metadata || {};
+  const cfg = template.config || {};
 
   const statusColor = errors.length ? 'err' : warnings.length ? 'warn' : 'ok';
-  const statusText = errors.length ? 'Issues Found' : warnings.length ? 'Warnings' : 'All Clear';
-  const statusEmoji = errors.length ? '✕' : warnings.length ? '⚠' : '✓';
+  const statusText = errors.length ? 'Issues Found' : warnings.length ? 'Warnings Only' : 'All Clear';
+
+  // Health ring
+  const healthColor = health.grade === 'A' ? 'var(--ok)' : health.grade === 'B' ? 'var(--accent)' : health.grade === 'C' ? 'var(--warn)' : health.grade === 'D' ? '#f97316' : 'var(--err)';
+  const pct = health.score;
 
   let html = `
+    <!-- Template info -->
+    <div class="info-grid">
+      <div class="info-card"><div class="info-label">Name</div><div class="info-value">${esc(meta.name || 'Unnamed')}</div></div>
+      <div class="info-card"><div class="info-label">Version</div><div class="info-value">${esc(meta.version || 'Unknown')}</div></div>
+      <div class="info-card"><div class="info-label">Author</div><div class="info-value">${esc(meta.author || 'Unknown')}</div></div>
+      <div class="info-card"><div class="info-label">Category</div><div class="info-value">${esc(meta.category || 'Unknown')}</div></div>
+      <div class="info-card"><div class="info-label">Formatter</div><div class="info-value">${esc(cfg.formatter?.id || 'None')}</div></div>
+      <div class="info-card"><div class="info-label">Presets</div><div class="info-value">${(cfg.presets||[]).filter(p=>p.enabled!==false).length} enabled</div></div>
+      <div class="info-card"><div class="info-label">ESEs / ISEs / PSEs</div><div class="info-value">${(cfg.excludedStreamExpressions||[]).length} / ${(cfg.includedStreamExpressions||[]).length} / ${(cfg.preferredStreamExpressions||[]).length}</div></div>
+      <div class="info-card"><div class="info-label">Health Score</div><div class="info-value" style="color:${healthColor}">${health.score}/100 (${health.grade})</div></div>
+    </div>
+
+    <!-- Health ring -->
+    <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:10px;background:var(--card);border:1px solid var(--border);margin-bottom:16px">
+      <div class="health-ring" style="background:conic-gradient(${healthColor} ${pct*3.6}deg, var(--border) 0deg)">
+        <div class="health-inner">
+          <span class="health-score" style="color:${healthColor}">${health.score}</span>
+          <span class="health-grade" style="color:${healthColor}">${health.grade}</span>
+        </div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:800;color:var(--tx)">Template Health</div>
+        <div style="font-size:.68rem;color:${healthColor};font-weight:600;margin-top:2px">${health.score >= 90 ? 'Excellent template' : health.score >= 75 ? 'Good — minor improvements possible' : health.score >= 60 ? 'Decent — consider adding more features' : health.score >= 40 ? 'Basic — significant improvements recommended' : 'Minimal — needs major configuration'}</div>
+        <div style="font-size:.62rem;color:var(--tx3);margin-top:2px">${health.checks.filter(c=>c.points===c.max).length}/${health.checks.length} checks passed</div>
+      </div>
+    </div>
+
+    <!-- Summary bar -->
     <div class="summary-bar">
       <div class="summary-stat"><div class="summary-num" style="color:var(--err)">${errors.length}</div><div class="summary-lbl">Errors</div></div>
       <div class="summary-stat"><div class="summary-num" style="color:var(--warn)">${warnings.length}</div><div class="summary-lbl">Warnings</div></div>
@@ -291,20 +686,23 @@ function renderResults(result, hosts) {
       <div class="summary-stat"><div class="summary-num"><span class="dot dot-${statusColor}"></span></div><div class="summary-lbl">${statusText}</div></div>
     </div>`;
 
+  // Errors
   if (errors.length) {
     html += `<div class="section"><div class="section-title"><span class="badge badge-err">${errors.length}</span> Errors</div>`;
     html += errors.map(e => `<div class="item item-err"><span class="item-icon">✕</span><span class="item-text">${esc(e)}</span></div>`).join('');
     html += '</div>';
   }
 
+  // Warnings
   if (warnings.length) {
     html += `<div class="section"><div class="section-title"><span class="badge badge-warn">${warnings.length}</span> Warnings</div>`;
     html += warnings.map(w => `<div class="item item-warn"><span class="item-icon">⚠</span><span class="item-text">${esc(w)}</span></div>`).join('');
     html += '</div>';
   }
 
+  // Passed
   if (passes.length) {
-    html += `<div class="section"><div class="section-title"><span class="badge badge-pass">${passes.length}</span> Passed Checks</div>`;
+    html += `<div class="section"><div class="section-title"><span class="badge badge-pass">${passes.length}</span> Passed</div>`;
     html += passes.map(p => `<div class="item item-pass"><span class="item-icon">✓</span><span class="item-text">${esc(p)}</span></div>`).join('');
     html += '</div>';
   }
@@ -318,38 +716,28 @@ function renderResults(result, hosts) {
   }
   html += '</div></div>';
 
-  // Export button
-  html += `<button class="export-btn btn-secondary" onclick="exportReport()">Export Report as JSON</button>`;
+  // Health breakdown
+  html += `<details style="margin-top:12px"><summary style="list-style:none;cursor:pointer;font-size:.72rem;font-weight:700;color:var(--tx3);display:flex;align-items:center;gap:4px"><span style="font-size:.55rem">▶</span> Health Score Breakdown</summary>`;
+  html += `<div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px">`;
+  for (const c of health.checks) {
+    const barColor = c.points === c.max ? 'var(--ok)' : c.points === 0 ? 'var(--err)' : 'var(--warn)';
+    html += `<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;background:var(--card);border:1px solid var(--border)"><span style="font-size:.68rem;color:var(--tx2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.label)}</span><span style="font-size:.65rem;color:${barColor};font-weight:700;flex-shrink:0">${c.points}/${c.max}</span></div>`;
+  }
+  html += '</div></details>';
 
   el.innerHTML = html;
-
-  // Store for export
-  window._lastReport = { errors, warnings, passes, hosts, inspectedAt: new Date().toISOString() };
 }
+
+// ── Utility ───────────────────────────────────────────────────────
 
 function clearAll() {
   document.getElementById('input').value = '';
   document.getElementById('results').classList.add('hidden');
   document.getElementById('results').innerHTML = '';
-}
-
-function loadExample() {
-  document.getElementById('input').value = JSON.stringify({
-    metadata: { version: "1.0.0", name: "Example Template", description: "Test", author: "User", category: "Debrid" },
-    config: {
-      presets: [
-        { type: "torrentio", instanceId: "t1", enabled: true, options: {} },
-        { type: "torbox-search", instanceId: "tb1", enabled: true, options: {} }
-      ],
-      formatter: { id: "tamtaro", definitions: { overrides: { tamtaro: { name: "Custom", description: "Test" } } } },
-      includedStreamExpressions: [{ expression: "0Cached == true" }],
-      excludedStreamExpressions: [],
-      preferredStreamExpressions: [],
-      sortCriteria: { global: [{ key: "resolution", order: "desc" }, { key: "cached", order: "desc" }] },
-      titleMatching: { mode: "fuzzy", similarityThreshold: 0.85 },
-      yearMatching: { strict: false }
-    }
-  }, null, 2);
+  document.getElementById('exportBtn').classList.add('hidden');
+  document.getElementById('urlRow').classList.add('hidden');
+  document.querySelector('.drop-zone-title').textContent = 'Drop JSON file here';
+  document.querySelector('.drop-zone-desc').textContent = 'or click to browse';
 }
 
 function exportReport() {
@@ -362,6 +750,36 @@ function exportReport() {
 }
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg, isError) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;padding:10px 18px;border-radius:8px;font-size:.82rem;font-weight:600;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = isError ? 'rgba(248,113,113,.12)' : 'rgba(0,212,255,.12)';
+  t.style.border = isError ? '1px solid rgba(248,113,113,.3)' : '1px solid rgba(0,212,255,.3)';
+  t.style.color = isError ? 'var(--err)' : 'var(--accent)';
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; }, 3000);
+}
+
+function toggleTheme() {
+  const h = document.documentElement;
+  const t = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  h.setAttribute('data-theme', t);
+  localStorage.setItem('cbTheme', t);
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀ Light' : '🌙 Dark';
+}
+(function() {
+  const t = localStorage.getItem('cbTheme');
+  if (t) { document.documentElement.setAttribute('data-theme', t); document.getElementById('themeToggle').textContent = t === 'dark' ? '☀ Light' : '🌙 Dark'; }
+})();
 </script>
 </body>
 </html>
