@@ -1,6 +1,6 @@
 {
   "version": "2.7.1",
-  "exportedAt": "2026-07-23T12:00:00.000Z",
+  "exportedAt": "2026-06-20T00:00:00.000Z",
   "config": {
     "language": "en-US",
     "includeAdult": false,
@@ -82,9 +82,10 @@
       "movie": "movie",
       "series": "series"
     },
-    "lastModified": 1784736000000,
-    "configVersion": 1784736000001,
+    "lastModified": 1781913600000,
+    "configVersion": 1781913600001,
     "catalogs": [
+
       {
         "id": "tmdb.top",
         "name": "TMDB Popular",
@@ -112,7 +113,7 @@
         "type": "movie",
         "name": "Trakt Trending",
         "enabled": true,
-        "showInHome": false,
+        "showInHome": true,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -133,7 +134,7 @@
         "type": "series",
         "name": "Trakt Trending",
         "enabled": true,
-        "showInHome": false,
+        "showInHome": true,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -214,6 +215,7 @@
           "updated": "2026-02-02T12:19:54.445833Z"
         }
       },
+
       {
         "id": "mdblist.88328",
         "type": "movie",
@@ -397,7 +399,7 @@
         "metadata": {
           "author": "tvgeniekodi",
           "slug": "apple-movies",
-          "name": "Apple TV+ Movies",
+          "name": "Apple+ Movies",
           "itemCount": 105,
           "updated": "2026-02-03T16:43:40Z",
           "url": "https://mdblist.com/lists/tvgeniekodi/apple-movies"
@@ -418,7 +420,7 @@
         "metadata": {
           "author": "tvgeniekodi",
           "slug": "apple-tv-shows",
-          "name": "Apple TV+ Shows",
+          "name": "Apple+ Shows",
           "itemCount": 188,
           "updated": "2026-02-03T23:54:48Z",
           "url": "https://mdblist.com/lists/tvgeniekodi/apple-tv-shows"
@@ -508,6 +510,7 @@
           "url": "https://mdblist.com/lists/tvgeniekodi/hulu-tv-shows"
         }
       },
+
       {
         "id": "mdblist.91211",
         "type": "movie",
@@ -962,7 +965,7 @@
         "type": "movie",
         "name": "Trending Kids",
         "enabled": true,
-        "showInHome": false,
+        "showInHome": true,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -983,7 +986,7 @@
         "type": "series",
         "name": "Trending Kids",
         "enabled": true,
-        "showInHome": false,
+        "showInHome": true,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -999,6 +1002,7 @@
           "url": "https://mdblist.com/lists/tvgeniekodi/trending-kids-tv-shows"
         }
       },
+
       {
         "id": "tmdb.year",
         "name": "TMDB By Year",
@@ -1268,6 +1272,7 @@
           "url": "https://mdblist.com/lists/snoak/top-1980s-movies"
         }
       },
+
       {
         "id": "tmdb.trending",
         "name": "TMDB Trending",
@@ -1380,14 +1385,12 @@
         "enabled": false,
         "showInHome": false
       }
+
     ]
   },
   "metadata": {
     "apiKeysExcluded": true,
     "totalCatalogs": 71,
-    "enabledCatalogs": 60,
-    "homeVisible": 40,
-    "revampedFrom": "Core-Builds + Tam-Taro insights (Movies & TV only)",
-    "notes": "Revamped 2026-07-23: Movies/TV variant. No anime catalogs. Balanced home catalogs."
+    "enabledCatalogs": 60
   }
 }
