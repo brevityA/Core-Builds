@@ -25,7 +25,7 @@ Templates control how streams are filtered, sorted, deduplicated, and formatted 
 
 ## Repo Structure
 
-```
+```text
 configurator/               — Web app (main product)
   src/js/app.js             — 6000+ line core logic
   src/data/                 — Data modules (devices, hosts, services, scrapers, formatters, changelog, etc.)
@@ -83,7 +83,7 @@ scripts/                    — One-off maintenance scripts
 - **Source:** `configurator/src/js/app.js` + data modules + CSS layers
 - **Build:** `node scripts/build.mjs` → esbuild bundles into standalone `index.html` + web assets (`dist/web/`)
 - **Deploy:** `deploy-configurator.yml` builds and pushes to GitHub Pages
-- **Version:** `CONFIGURATOR_VERSION` in app.js (currently `'2.82'`), mirrored in `package.json` and `versions.json`
+- **Version:** `CONFIGURATOR_VERSION` in app.js uses `MAJOR.MINOR` (e.g. `'2.82'`); `package.json` and `versions.json` append `.0` (e.g. `2.82.0`); `changelog.js` uses the short form (`v:'2.82'`)
 
 ### State Management
 
@@ -169,7 +169,7 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 | Workflow | Trigger | Purpose |
 |---|---|---|
 | `deploy-configurator.yml` | push to main | Builds configurator, deploys to GitHub Pages |
-| `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` |
+| `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` + `npm run build` |
 | `configurator-e2e.yml` | PRs | Playwright E2E tests |
 | `validate.yml` | PRs | Template JSON validation |
 | `tests.yml` | PRs | pytest suite |
