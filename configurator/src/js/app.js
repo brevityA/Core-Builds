@@ -7,6 +7,12 @@ import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEV
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
+import { initErrorBoundary } from '../../../tools/debug/error-boundary.js';
+import { loadStateGuard, autoRepairState } from '../../../tools/debug/state-guard.js';
+import { initOfflineDetection, diagnoseNetworkError } from '../../../tools/debug/network-resilience.js';
+import { validateConfigBeforeDeploy } from '../../../tools/debug/config-validator.js';
+import { sanitize, logError } from '../../../tools/debug/sanitized-logger.js';
+import { safeParseTemplate, validateImportStructure } from '../../../tools/debug/template-import-recovery.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -1858,8 +1864,13 @@ function tutClose(){
   localStorage.setItem('cb_tut_seen','1');_tutStep=-1;
 }
 window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
+initErrorBoundary();
+
 document.addEventListener('DOMContentLoaded', () => {
+  loadStateGuard();
   loadState();
+  autoRepairState(S, saveState);
+  initOfflineDetection();
 
   // Mobile optimization: select all on focus for text/password/url inputs to make replacing easier on iOS
   document.addEventListener('focusin', e => {
@@ -3605,16 +3616,16 @@ function showFormatterImport() {
 
   function parseAndApply(raw) {
     errEl.style.display = 'none';
-    try {
-      const obj = JSON.parse(raw);
-      if (!obj.name || typeof obj.name !== 'string') { errEl.textContent = 'Missing or invalid "name" field'; errEl.style.display = ''; return; }
-      if (!obj.description || typeof obj.description !== 'string') { errEl.textContent = 'Missing or invalid "description" field'; errEl.style.display = ''; return; }
-      S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
-      S.formatter = 'custom';
-      saveState();
-      overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
-      setTimeout(() => { overlay.remove(); render(); showToast('Custom formatter imported'); }, 160);
-    } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
+    const result = safeParseTemplate(raw);
+    if (!result.ok) { errEl.textContent = result.error; errEl.style.display = ''; return; }
+    const obj = result.data;
+    if (!obj.name || typeof obj.name !== 'string') { errEl.textContent = 'Missing or invalid "name" field'; errEl.style.display = ''; return; }
+    if (!obj.description || typeof obj.description !== 'string') { errEl.textContent = 'Missing or invalid "description" field'; errEl.style.display = ''; return; }
+    S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
+    S.formatter = 'custom';
+    saveState();
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => { overlay.remove(); render(); showToast(result.recovery ? 'Custom formatter imported (auto-recovered: ' + result.recovery + ')' : 'Custom formatter imported'); }, 160);
   }
 
   document.getElementById('fmtImApply').addEventListener('click', () => parseAndApply(textarea.value));
@@ -4067,7 +4078,10 @@ function showUpdateTemplateModal() {
     errEl.style.display = 'none';
     infoEl.style.display = 'none';
     try {
-      const obj = JSON.parse(raw);
+      const result = safeParseTemplate(raw);
+      if (!result.ok) { errEl.textContent = result.error; errEl.style.display = ''; return; }
+      if (result.recovery) { infoEl.textContent = 'Auto-recovered: ' + result.recovery; infoEl.style.display = ''; }
+      const obj = result.data;
       if (!obj.config && !obj.services && !obj.presets) { errEl.textContent = 'Not a valid AIOStreams template — missing config object'; errEl.style.display = ''; return; }
       const tpl = obj.config ? obj : { config: obj };
       const parsed = parseTemplateToState(tpl);
@@ -5398,6 +5412,9 @@ async function preflightCheck() {
     const names=(cfg?.presets||[]).map(p=>p.name).filter(Boolean), duplicates=[...new Set(names.filter((n,i)=>names.indexOf(n)!==i))];
     if (duplicates.length) warns.push('Duplicate preset names detected: '+duplicates.slice(0,3).join(', '));
     const health=templateHealthCheck(); health.forEach(w=>{if(!warns.includes(w))warns.push(w);});
+    const deployCheck = validateConfigBeforeDeploy(cfg);
+    deployCheck.blockers.forEach(b => { if (!warns.includes(b)) warns.push(b); });
+    deployCheck.warnings.forEach(w => { if (!warns.includes(w)) warns.push(w); });
     const compat=hostCompatCheck();
     const selected=S.instanceHost && compat[S.instanceHost];
     if (selected?.status==='err') warns.push((selected.label||S.instanceHost)+' host compatibility check is blocked');
@@ -5654,6 +5671,8 @@ async function simpleInstall(target) {
       return;
     }
   } catch(e) {
+    logError('simpleInstall', e, { service: S.service, host: S.instanceHost });
+    const netDiag = diagnoseNetworkError(e, S.instanceHost);
     const isApiError = e.message && e.message.startsWith('API_ERROR:');
     const apiDetail = isApiError ? e.message.slice(10) : '';
     if (isApiError) {
@@ -5682,7 +5701,7 @@ async function simpleInstall(target) {
     } else {
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
         <strong style="color:#f87171">Could not reach any host or paste service</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All methods failed. Download the JSON and import it manually into AIOStreams.</div>
+        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">${netDiag.suggestion || 'All methods failed.'} Download the JSON and import it manually into AIOStreams.</div>
         <div style="display:flex;gap:10px;justify-content:center">
           <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
           <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button>

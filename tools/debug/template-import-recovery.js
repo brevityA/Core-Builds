@@ -62,12 +62,21 @@ export function safeParseTemplate(raw) {
   } catch (e) { /* continue */ }
 
   // 6. All attempts failed
-  const lineMatch = e?.message?.match(/position (\d+)/);
-  const hint = lineMatch ? ` near position ${lineMatch[1]}` : '';
+  let hint = '';
+  try { JSON.parse(trimmed); } catch (finalErr) {
+    const lineMatch = finalErr?.message?.match(/position (\d+)/);
+    hint = lineMatch ? ` near position ${lineMatch[1]}` : '';
+    return {
+      ok: false,
+      data: null,
+      error: `Invalid JSON${hint}: ${finalErr?.message || 'parse failed'}`,
+      recovery: 'Could not auto-recover — check for missing brackets, commas, or quotes',
+    };
+  }
   return {
     ok: false,
     data: null,
-    error: `Invalid JSON${hint}: ${e?.message || 'parse failed'}`,
+    error: 'Invalid JSON: parse failed',
     recovery: 'Could not auto-recover — check for missing brackets, commas, or quotes',
   };
 }
