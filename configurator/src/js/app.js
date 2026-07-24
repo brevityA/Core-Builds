@@ -7,6 +7,12 @@ import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEV
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
+import { initErrorBoundary } from '../../../tools/debug/error-boundary.js';
+import { loadStateGuard, autoRepairState } from '../../../tools/debug/state-guard.js';
+import { initOfflineDetection, diagnoseNetworkError } from '../../../tools/debug/network-resilience.js';
+import { validateConfigBeforeDeploy } from '../../../tools/debug/config-validator.js';
+import { sanitize, logError } from '../../../tools/debug/sanitized-logger.js';
+import { safeParseTemplate, validateImportStructure } from '../../../tools/debug/template-import-recovery.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -1516,6 +1522,7 @@ function render() {
             <div style="display:flex;gap:12px;align-items:center">
               <button data-action="open-diagnostics" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s">Report Issue</button>
               <button data-action="show-changelog" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Changelog</button>
+              <a href="./tools/" style="font-size:.74rem;font-weight:700;color:#6b7280;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#6b7280'">Tools</a>
               <button data-action="start-setup" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
             </div>
           </div>
@@ -1523,6 +1530,10 @@ function render() {
             <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
+            </a>
+            <a href="./tools/" class="community-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Tools
             </a>
             <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
@@ -1853,8 +1864,13 @@ function tutClose(){
   localStorage.setItem('cb_tut_seen','1');_tutStep=-1;
 }
 window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
+initErrorBoundary();
+
 document.addEventListener('DOMContentLoaded', () => {
+  loadStateGuard();
   loadState();
+  autoRepairState(S, saveState);
+  initOfflineDetection();
 
   // Mobile optimization: select all on focus for text/password/url inputs to make replacing easier on iOS
   document.addEventListener('focusin', e => {
@@ -3600,16 +3616,16 @@ function showFormatterImport() {
 
   function parseAndApply(raw) {
     errEl.style.display = 'none';
-    try {
-      const obj = JSON.parse(raw);
-      if (!obj.name || typeof obj.name !== 'string') { errEl.textContent = 'Missing or invalid "name" field'; errEl.style.display = ''; return; }
-      if (!obj.description || typeof obj.description !== 'string') { errEl.textContent = 'Missing or invalid "description" field'; errEl.style.display = ''; return; }
-      S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
-      S.formatter = 'custom';
-      saveState();
-      overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
-      setTimeout(() => { overlay.remove(); render(); showToast('Custom formatter imported'); }, 160);
-    } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
+    const result = safeParseTemplate(raw);
+    if (!result.ok) { errEl.textContent = result.error; errEl.style.display = ''; return; }
+    const obj = result.data;
+    if (!obj.name || typeof obj.name !== 'string') { errEl.textContent = 'Missing or invalid "name" field'; errEl.style.display = ''; return; }
+    if (!obj.description || typeof obj.description !== 'string') { errEl.textContent = 'Missing or invalid "description" field'; errEl.style.display = ''; return; }
+    S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
+    S.formatter = 'custom';
+    saveState();
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
+    setTimeout(() => { overlay.remove(); render(); showToast(result.recovery ? 'Custom formatter imported (auto-recovered: ' + result.recovery + ')' : 'Custom formatter imported'); }, 160);
   }
 
   document.getElementById('fmtImApply').addEventListener('click', () => parseAndApply(textarea.value));
@@ -4062,7 +4078,10 @@ function showUpdateTemplateModal() {
     errEl.style.display = 'none';
     infoEl.style.display = 'none';
     try {
-      const obj = JSON.parse(raw);
+      const result = safeParseTemplate(raw);
+      if (!result.ok) { errEl.textContent = result.error; errEl.style.display = ''; return; }
+      if (result.recovery) { infoEl.textContent = 'Auto-recovered: ' + result.recovery; infoEl.style.display = ''; }
+      const obj = result.data;
       if (!obj.config && !obj.services && !obj.presets) { errEl.textContent = 'Not a valid AIOStreams template — missing config object'; errEl.style.display = ''; return; }
       const tpl = obj.config ? obj : { config: obj };
       const parsed = parseTemplateToState(tpl);
@@ -4355,6 +4374,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <strong style="color:#e6edf3">2.</strong> Streams should appear with Core Builds sorting<br>
           <strong style="color:#e6edf3">3.</strong> Save your password — you'll need it to edit settings later
         </div>
+        <div style="margin-top:6px"><a href="./account-tools/" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#34d399'" onmouseout="this.style.color='#8b949e'">Back up your current addons first →</a></div>
         <div id="mTestResult" style="margin-top:6px;font-size:.72rem"></div>
       </div>
       <details style="margin-top:10px;border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow:hidden">
@@ -5392,6 +5412,9 @@ async function preflightCheck() {
     const names=(cfg?.presets||[]).map(p=>p.name).filter(Boolean), duplicates=[...new Set(names.filter((n,i)=>names.indexOf(n)!==i))];
     if (duplicates.length) warns.push('Duplicate preset names detected: '+duplicates.slice(0,3).join(', '));
     const health=templateHealthCheck(); health.forEach(w=>{if(!warns.includes(w))warns.push(w);});
+    const deployCheck = validateConfigBeforeDeploy(cfg);
+    deployCheck.blockers.forEach(b => { if (!warns.includes(b)) warns.push(b); });
+    deployCheck.warnings.forEach(w => { if (!warns.includes(w)) warns.push(w); });
     const compat=hostCompatCheck();
     const selected=S.instanceHost && compat[S.instanceHost];
     if (selected?.status==='err') warns.push((selected.label||S.instanceHost)+' host compatibility check is blocked');
@@ -5456,6 +5479,7 @@ function showFastLane() {
     </div></div>
     <div class="fastlane-section" id="flInstallFields"></div>
     <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="./account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
+    <a href="./tools/" target="_blank" rel="noopener noreferrer" style="display:block;margin:3px 0 0 28px;font-size:.72rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#8b949e'">All Core Tools →</a>
     <div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
       <div style="font-size:.72rem;font-weight:700;color:#34d399;margin-bottom:8px;display:flex;align-items:center;gap:6px">${ICO.rocket(12,'#34d399')} Full Stack Setup <span style="font-size:.58rem;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)">NEW</span></div>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="flPatchCinemeta" ${S.patchCinemeta!==false?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Patch Cinemeta</b><br><span style="color:#8b949e">Hide Cinemeta catalogs/metadata so AIOMetadata takes over. Uses Cinebye.</span></span></label>
@@ -5647,6 +5671,8 @@ async function simpleInstall(target) {
       return;
     }
   } catch(e) {
+    logError('simpleInstall', e, { service: S.service, host: S.instanceHost });
+    const netDiag = diagnoseNetworkError(e, S.instanceHost);
     const isApiError = e.message && e.message.startsWith('API_ERROR:');
     const apiDetail = isApiError ? e.message.slice(10) : '';
     if (isApiError) {
@@ -5675,7 +5701,7 @@ async function simpleInstall(target) {
     } else {
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
         <strong style="color:#f87171">Could not reach any host or paste service</strong>
-        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All methods failed. Download the JSON and import it manually into AIOStreams.</div>
+        <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">${netDiag.suggestion || 'All methods failed.'} Download the JSON and import it manually into AIOStreams.</div>
         <div style="display:flex;gap:10px;justify-content:center">
           <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
           <button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button>
