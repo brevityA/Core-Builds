@@ -4,6 +4,7 @@ branch and asserts that the returned (errors, warnings, passes) lists reflect
 the expected outcome — no shared global state between calls.
 """
 import json
+from pathlib import Path
 import pytest
 from validate_templates import validate_template
 
@@ -585,3 +586,48 @@ class TestCallIsolation:
         assert any("titleMatching.mode is 'exact'" in w for w in warnings_w)
         assert not any("titleMatching" in w for w in warnings_c)
 
+
+
+# ── Static Template File Checks ───────────────────────────────
+
+class TestStaticTemplateFiles:
+    """Validates all JSON files under Templates/ and Community-Templates/ against
+    schema rules that the per-template validate_template() does not cover."""
+
+    REPO_ROOT = Path(__file__).parent.parent
+    TAMTARO_FRAGMENT = "Tam-Taro/SEL-Filtering-and-Sorting"
+
+    def _collect_templates(self, skip_deprecated=True):
+        for d in [self.REPO_ROOT / "Templates", self.REPO_ROOT / "Community-Templates"]:
+            if not d.exists():
+                continue
+            for f in d.rglob("*.json"):
+                if skip_deprecated and "Deprecated" in f.parts:
+                    continue
+                yield f
+
+    def test_all_active_templates_have_tamtaro_formatter_id(self):
+        """Every non-deprecated template with an embedded formatter must use id:'tamtaro'."""
+        bad = []
+        for f in self._collect_templates():
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                continue
+            fmt = d.get("config", {}).get("formatter", {})
+            fid = fmt.get("id")
+            if fid and fid != "tamtaro":
+                bad.append(f"{f.relative_to(self.REPO_ROOT)}: id={fid}")
+        assert not bad, "Templates with non-tamtaro formatter id:\n" + "\n".join(bad)
+
+    def test_no_stale_tamtaro_synced_urls(self):
+        """No active template should reference the old Tam-Taro synced URL."""
+        bad = []
+        for f in self._collect_templates():
+            try:
+                text = f.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            if self.TAMTARO_FRAGMENT in text:
+                bad.append(str(f.relative_to(self.REPO_ROOT)))
+        assert not bad, "Templates with stale Tam-Taro synced URL:\n" + "\n".join(bad)

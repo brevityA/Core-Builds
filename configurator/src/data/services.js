@@ -1,1 +1,1 @@
-export const CAROUSEL_SVCS = ['debridio','p2p','http','nzbgeek','streamnzb'];
+export const CAROUSEL_SVCS = ['debridio','debrider','p2p','http','nzbgeek','streamnzb'];
