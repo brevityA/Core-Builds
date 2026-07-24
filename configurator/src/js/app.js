@@ -2912,7 +2912,7 @@ function presets() {
       if (d.id === 'zilean') return { type:'zilean', instanceId:'zilean-1', enabled:true, options:{ name:'Zilean', timeout:7000 }, resources:['stream'] };
       return null;
     }).filter(Boolean),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && x.apiUrl)).map(sid => {
+    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl)).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       if (d.id === 'jackett') return { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', timeout:10000, ...(S.creds.jackett ? { apiKey:S.creds.jackett } : {}) }, resources:['stream'] };
       if (d.id === 'prowlarr') return { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', timeout:10000, ...(S.creds.prowlarr ? { apiKey:S.creds.prowlarr } : {}) }, resources:['stream'] };
