@@ -1,51 +1,237 @@
 # Core Builds — Claude Context
 
-This is **brevityA/Core-Builds**, a backup mirror of [Core Builds by Brevity](https://github.com/Branding-Brevity/Core-Builds-By-Brevity).
+This is **brevityA/Core-Builds**, the canonical repo for Core Builds by Brevity — a configurator and template suite for [AIOStreams](https://github.com/Viren070/AIOStreams).
 
 ---
 
 ## Workflow Rules
 
 - **Create a new PR for every task.** After committing and pushing changes, always open a pull request — even for small or experimental changes.
+- **Build and test before push.** Run `npm run build && npm test && npm run validate` in `configurator/` before pushing configurator changes.
+- **Version consistency.** When bumping `CONFIGURATOR_VERSION` in `app.js`, also update `configurator/package.json`, `versions.json`, `configurator/src/data/changelog.js`, and `configurator/scripts/validate.mjs`.
 
 ---
 
 ## What This Repo Is
 
-A collection of optimised AIOStreams templates for TorBox subscribers. Templates control how streams are filtered, sorted, deduplicated, and formatted inside [AIOStreams](https://github.com/Viren070/AIOStreams).
+Two products:
+
+1. **Configurator** (`configurator/`) — a web app that generates optimised AIOStreams template JSON through a guided UI. Deployed to GitHub Pages. This is the main product.
+2. **Template Suite** (`Templates/`) — 46+ pre-made AIOStreams templates for TorBox, AllDebrid, EasyNews, Hybrid, Anime, and device-specific profiles.
+
+Templates control how streams are filtered, sorted, deduplicated, and formatted inside [AIOStreams](https://github.com/Viren070/AIOStreams).
 
 ---
 
 ## Repo Structure
 
 ```
+configurator/               — Web app (main product)
+  src/js/app.js             — 6000+ line core logic
+  src/data/                 — Data modules (devices, hosts, services, scrapers, formatters, changelog, etc.)
+  src/styles/               — 7 CSS cascade layers (01-core through 07-menu-parity)
+  src/config/schema-guard.js — AIOStreams enum sanitization
+  scripts/build.mjs         — esbuild bundler
+  scripts/validate.mjs      — 25 static validation checks
+  tests/                    — Node test runner unit tests (29 tests)
+  e2e/                      — Playwright E2E tests
+  index.html                — Built output (standalone, deployed to Pages)
+  package.json              — v2.82.0
+
+tools/                      — Tools hub
+  inspector/                — Template Inspector (paste JSON for instant validation)
+  debug/                    — Debug utilities
+account-tools/              — Addon Backup (read-only Stremio addon backup)
+cli/                        — CLI tool (planned)
+cloudflare-worker/          — CORS proxy (Cloudflare Worker for cross-origin requests)
+AIOMetadata/                — AIOMetadata configs (movies+TV, full)
+
 Templates/Torbox/
-  Single/           → TorBox Pro templates (4K Apex, Stream + Lite variants)
-  Essential/        → TorBox Essential templates (4K Essential, Essential + Lite variants)
-  Flash/            → Cached-only instant play (Flash, Flash 4K)
-  Speed/TorBox/     → Fast cached play (Speed 4K, Speed + Lite variants)
-  Speed/EasyNews/   → EasyNews dual-source variants (Speed, Speed 4K + Lite variants)
-  Anime/            → Anime-optimised templates (Anime, Anime 4K + Lite variants)
-  Hybrid/           → TorBox + RD hybrid templates (4K Hybrid, Hybrid, Hybrid Lite)
-  AllDebrid/        → AllDebrid variants (4K AllDebrid, AllDebrid + Lite variants)
-  Device/Samsung/   → Samsung TV device templates (Samsung TV, Samsung TV 4K, RU7100 4K)
-  Device/Xiaomi/    → Xiaomi Android TV device templates (Xiaomi 4K)
-  Device/Windows/   → Windows PC device templates (Ultrawide)
-  Nightly/          → Pre-release / nightly builds (Apple TV 4K)
-  Deprecated/       → Retired templates kept for reference
-Templates/Personal/ → Personal/experimental templates (core-cipher) — do not document
-Templates/Deprecated/ → Retired non-Torbox templates
-Community-Templates/ → Community-contributed templates (MightyIcyy, RB3)
-Formatters/         → 14 custom stream layout formatters
-Filtering/          → Shared filter expression files (ESEs, ISEs, PSEs, ranked regex)
-Regex/              → Excluded regex pattern lists
-Assets/             → Banners, icons, formatter preview images
-core-builds-template-collection.json → Operator template catalog for TEMPLATE_URLS
-Guides/             → Import guide, troubleshooting, device profiles, FAQ
-tests/              → pytest test suite (template validation, integration)
-.github/            → Workflows, issue templates, discussion templates
-scripts/            → One-off maintenance scripts (not imported by templates)
+  Single/                   — TorBox Pro templates (4K Apex, Stream + Lite variants)
+  Essential/                — TorBox Essential templates
+  Flash/                    — Cached-only instant play
+  Speed/TorBox/             — Fast cached play
+  Speed/EasyNews/           — EasyNews dual-source variants
+  Anime/                    — Anime-optimised templates
+  Hybrid/                   — TorBox + RD hybrid templates
+  AllDebrid/                — AllDebrid variants
+  Device/Samsung/           — Samsung TV device templates
+  Device/Xiaomi/            — Xiaomi Android TV device templates
+  Device/Windows/           — Windows PC device templates
+  Nightly/                  — Pre-release / nightly builds
+  Deprecated/               — Retired templates
+Templates/Personal/         — Personal/experimental — do not document or expose
+Community-Templates/        — Community-contributed templates
+Formatters/                 — 19 custom stream layout formatters
+Filtering/                  — Shared filter expression files (ESEs, ISEs, PSEs, ranked regex)
+Regex/                      — Excluded regex pattern lists
+Assets/                     — Banners, icons, formatter preview images
+Guides/                     — Import guide, troubleshooting, device profiles, FAQ, CHANGELOG
+core-builds-template-collection.json — Operator template catalog for TEMPLATE_URLS
+versions.json               — Version tracking (configurator, templateSuite, minimumAIOStreams)
+tests/                      — pytest test suite (233 tests — template validation, integration)
+.github/                    — Workflows, issue templates, discussion templates
+scripts/                    — One-off maintenance scripts
 ```
+
+---
+
+## Configurator Architecture
+
+### Source → Build → Deploy
+
+- **Source:** `configurator/src/js/app.js` + data modules + CSS layers
+- **Build:** `node scripts/build.mjs` → esbuild bundles into standalone `index.html` + web assets (`dist/web/`)
+- **Deploy:** `deploy-configurator.yml` builds and pushes to GitHub Pages
+- **Version:** `CONFIGURATOR_VERSION` in app.js (currently `'2.82'`), mirrored in `package.json` and `versions.json`
+
+### State Management
+
+- **`S` object** (line 82) — global state with all user selections (service, device, resolution, audio, formatters, credentials, etc.)
+- **`SHARE_KEYS`** (line 183) — subset of S keys included in shareable config links
+- **`saveState()`** — persists S to `localStorage`
+- **`sanitizeSharedConfig()`** — validates and strips credentials from imported/shared configs
+- **`schema-guard.js`** — sanitizes AIOStreams enum arrays against known-valid values
+
+### Template Generation
+
+`S` → `build()` → `buildFinal()` → JSON template output
+
+The `build()` function (line ~3400) assembles the full AIOStreams config from current state: presets, ESEs, ISEs, PSEs, sort criteria, formatter, regex patterns, deduplicator, groups, and metadata.
+
+### Key Modules
+
+| File | Purpose |
+|---|---|
+| `src/data/devices.js` | 20+ device profiles with AV1/DV/HDR/audio capabilities |
+| `src/data/hosts.js` | AIOStreams host metadata (elfhosted, fortheweak, self-hosted) |
+| `src/data/services.js` | Debrid/usenet service definitions |
+| `src/data/scrapers.js` | Scraper addon definitions with credentials |
+| `src/data/formatters.js` | 19 built-in formatter definitions |
+| `src/data/credentials.js` | `PROVIDER_CREDENTIALS` registry (18+ providers) |
+| `src/data/changelog.js` | Version changelog displayed in UI |
+| `src/config/schema-guard.js` | AIOStreams enum validation |
+
+---
+
+## Tools Suite
+
+| Tool | Location | Status |
+|---|---|---|
+| **Template Builder** | `configurator/` | Live — the configurator |
+| **Template Inspector** | `tools/inspector/` | Live — paste/upload/fetch JSON for instant validation, health score, host compatibility |
+| **Addon Backup** | `account-tools/` | Live — read-only Stremio addon backup |
+| **Account Manager** | planned | Locked |
+| **CLI** | `cli/` | Planned |
+| **CORS Proxy** | `cloudflare-worker/` | Live — Cloudflare Worker for cross-origin config push |
+
+---
+
+## Recent Features (v2.78–v2.82)
+
+- **family-v4 formatter** — new default with bitrate, release group, seeders, age, indexer, season pack info
+- **Debrider service** — multi-debrid aggregator support
+- **Knaben, Zilean, Jackett, Prowlarr scrapers** — additional scraper addons
+- **Health Score** — 0–100 template quality score with A–F grading in Review step
+- **Template Versioning** — auto-update banner when saved template is outdated
+- **Full Stack Install** — AIOMetadata + Cinemeta patch + addon ordering in one click
+- **CORS proxy** — Cloudflare Worker for cross-origin config reliability
+- **Template Inspector** — standalone validation tool with host compatibility checks
+- **Addon Backup** — read-only Stremio addon backup
+- **Quick Install** — one-page guided setup flow
+- **Device-aware profiles** — 20+ devices with AV1/DV/HDR handling
+- **IQR PSE Architecture** — statistical bitrate filtering with Tukey fences
+- **Host compatibility checking** — pre-deploy validation for elfhosted/fortheweak
+- **Troubleshooter** — interactive decision tree for common issues
+- **Diagnostics modal** — sanitized issue reports
+- **Backup timeline** — 20-entry local backup with restore
+- **Library Boost** — three modes: Default, Strong (top priority), None (disabled)
+- **Bandwidth Estimator** — device-aware bandwidth suggestion with manual override
+- **Age Limit** — content age filter with 7d/30d/90d/1y/2y presets
+- **NZB Failover** — configurable position (before/after torrents) and max NZB count
+- **Patch Cinemeta** — automatic by default (hides Cinemeta catalogs, uses Cinebye)
+
+---
+
+## Testing
+
+| Suite | Count | Runner | What it covers |
+|---|---|---|---|
+| pytest | 233 tests | `pytest tests/` | Template validation, JSON schema, integration, regex patterns |
+| npm test | 29 tests | `node --test` in `configurator/` | Unit tests (credentials, device profiles, schema guard, UI lifecycle) |
+| Static validation | 25 checks | `npm run validate` in `configurator/` | Version consistency, host metadata, device defaults, module wiring |
+| Playwright E2E | varies | `configurator/e2e/` | Browser-based stability tests |
+
+---
+
+## CI/CD
+
+| Workflow | Trigger | Purpose |
+|---|---|---|
+| `deploy-configurator.yml` | push to main | Builds configurator, deploys to GitHub Pages |
+| `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` |
+| `configurator-e2e.yml` | PRs | Playwright E2E tests |
+| `validate.yml` | PRs | Template JSON validation |
+| `tests.yml` | PRs | pytest suite |
+| `status-check.yml` | PRs | Aggregate status check |
+| `link-checker.yml` | scheduled | Dead link detection |
+| `sync-upstream.yml` | scheduled | Upstream AIOStreams sync |
+
+---
+
+## Formatters
+
+19 formatters in `Formatters/`. Most use `id: "tamtaro"` with `definitions.overrides['tamtaro']`. Some use `id: "custom"`.
+
+| Formatter | ID | Notes |
+|---|---|---|
+| `family-v4.json` | tamtaro | Current default — bitrate, release group, seeders, age, indexer |
+| `core-nexus-apex-v2-formatter.json` | tamtaro | Premium 4K formatting |
+| `core-nexus-elite-formatter.json` | tamtaro | Elite variant |
+| `nexus-prime-formatter.json` | tamtaro | Prime variant |
+| `core-nexus-apex-formatter.json` | tamtaro | Original apex |
+| `core-nexus-ultra-formatter.json` | tamtaro | Ultra detail |
+| `core-nexus-sigma-formatter.json` | tamtaro | Sigma variant |
+| `core-nexus-minimal-formatter.json` | tamtaro | Minimal/clean |
+| `core-nexus-uniform-formatter.json` | tamtaro | Uniform layout |
+| `core-nexus-tv-formatter.json` | tamtaro | TV-optimised |
+| `core-clean.json` | tamtaro | Clean minimal |
+| `core-syntax-formatter.json` | tamtaro | Syntax-highlighted |
+| `core-syntax-v3.json` | tamtaro | Syntax v3 |
+| `core-zenith-auburn-tiger-edition.json` | tamtaro | Zenith Auburn Tiger |
+| `core-zenith-diamond.json` | tamtaro | Zenith Diamond |
+| `midnight-slate.json` | tamtaro | Dark theme |
+| `omni-diamond-v2.2.0.json` | custom | Omni Diamond |
+| `rb3-clean-v4-formatter.json` | custom | Community (RB3) |
+| `rb3-formatter.json` | custom | Community (RB3) |
+
+Import via AIOStreams → Formatter → Import icon → paste raw URL.
+
+---
+
+## Security
+
+- Real API keys must **NEVER** be committed
+- Personal templates are in `Templates/Personal/` — do not document or expose
+- `instancePassword` is stored in `localStorage` (unencrypted)
+- `stremioPassword` is correctly excluded from `saveState()` — never persisted
+- `sanitizeSharedConfig()` strips credentials from share links
+- The CORS proxy (`cloudflare-worker/`) does not log credentials
+- Template import URLs strip credentials before upload
+- `PROVIDER_CREDENTIALS` in `credentials.js` defines per-provider credential structure — never stores actual values
+- All import URLs use `brevityA/Core-Builds` — NOT the `Branding-Brevity` repo
+
+---
+
+## Competitive Landscape
+
+| Product | What it does | Core Builds differentiator |
+|---|---|---|
+| **Duck Tools** (QuackStart, Account Cloner, Time Machine) | Stremio addon management | Core Builds focuses on template generation, not addon management |
+| **TVFlix Builder** | Template builder with age limits, visual styles, bandwidth hints | Core Builds has deeper PSE architecture (IQR, pow() decay), more device profiles |
+| **Tam-Taro SEL** | Template wizard, synced URLs, library boost | Core Builds has standalone configurator, health scoring, host compatibility |
+| **CrispyFormat** | Visual formatter builder | Core Builds has 19 built-in formatters + family-v4 default |
+| **AIOStreams configure page** | Built-in AIOStreams config UI | Core Builds replaces this with guided wizard + advanced features |
 
 ---
 
@@ -432,8 +618,6 @@ Top-level field: `parentConfig`
 - `fieldOverrides` overrides a single field while inheriting the rest
 - Graceful fallback: if parent unreachable, child loads unmerged
 
-**Planned use:** "Core Builds Base" parent config holding all presets (with tuned timeouts), ESEs, ISEs, sort criteria, and formatter. Child templates specify only PSEs and branding. One change propagates to all 46 templates instantly.
-
 ---
 
 ## AIOStreams v2.31.0 Schema Notes
@@ -626,17 +810,9 @@ Same structure but with `service` key after `seadex` for debrid provider priorit
 
 ---
 
-## Formatters
-
-All formatters use `id: "tamtaro"` with `definitions.overrides['tamtaro']`. Import via AIOStreams → Formatter → Import icon → paste raw URL.
-
-Active formatters: `core-nexus-apex-v2-formatter.json`, `core-nexus-elite-formatter.json`, `nexus-prime-formatter.json` (+ 11 others)
-
----
-
 ## Conventions
 
-- **Version scheme:** `MAJOR.MINOR.PATCH` — minor bump for new features/PSE logic changes, patch for fixes
+- **Version schemes:** Configurator uses `MAJOR.MINOR` (e.g. 2.82). Template suite uses semver `MAJOR.MINOR.PATCH` (e.g. 3.3.2). Template JSONs use their own version scheme (e.g. v2.10.8).
 - **PSE labels:** `/* TEMPLATE_LABEL Tier Description */` e.g. `/* APEX S-Tier 4K Remux — IQR Tukey fence */`
 - **ESE labels:** `/* Description */` plain English
 - **1080p templates MUST have** a hard resolution exclusion ESE: `resolution(streams, '2160p', '1440p')` to prevent 4K leaking through (PSEs rank but do not exclude)
@@ -646,15 +822,13 @@ Active formatters: `core-nexus-apex-v2-formatter.json`, `core-nexus-elite-format
 
 ---
 
-## Security
-
-Real API keys must NEVER be committed. Personal templates are in `Templates/Personal/` — do not document or expose.
-
----
-
 ## Links
 
-- Main repo: https://github.com/Branding-Brevity/Core-Builds-By-Brevity
+- Canonical repo: https://github.com/brevityA/Core-Builds
+- Live site: https://brevitya.github.io/Core-Builds/configurator/
+- Tools page: https://brevitya.github.io/Core-Builds/tools/
+- Account tools: https://brevitya.github.io/Core-Builds/account-tools/
+- Docs: https://core-builds.mintlify.app/
+- Reddit (Core Crew): https://www.reddit.com/r/CoreBuilds/
 - AIOStreams: https://github.com/Viren070/AIOStreams
 - AIOStreams docs: https://docs.aiostreams.viren070.me
-- Offline archive: https://mega.nz/folder/DvQGwYYJ#eAnBsID9nc4Nkr8eQfZ2Lg
