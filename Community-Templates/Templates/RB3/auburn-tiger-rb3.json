@@ -156,21 +156,13 @@
     "requiredRegexPatterns": [],
     "preferredRegexPatterns": [],
     "syncedPreferredRegexUrls": [],
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
-    ],
+    "syncedExcludedRegexUrls": [],
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
-    ],
-    "syncedExcludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-extended.json"
-    ],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
+    "syncedPreferredStreamExpressionUrls": [],
+    "syncedExcludedStreamExpressionUrls": [],
+    "syncedIncludedStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
     ],
@@ -219,11 +211,11 @@
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
       {
-        "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟2.6.1: 𝙴𝚡𝚝𝚎𝚗𝚍𝚎𝚍 𝚂𝙴𝙻 𝚏𝚒𝚕𝚝𝚎𝚛𝚒𝚗𝚐 𝚎𝚗𝚐𝚒𝚗𝚎*/ []",
+        "expression": "/*\ud835\ude83\ud835\ude8a\ud835\ude96\ud835\ude9d\ud835\ude8a\ud835\ude9b\ud835\ude98 \ud835\ude72\ud835\ude98\ud835\ude96\ud835\ude99\ud835\ude95\ud835\ude8e\ud835\ude9d\ud835\ude8e \ud835\ude82\ud835\ude74\ud835\ude7b \ud835\ude82\ud835\ude8e\ud835\ude9d\ud835\ude9e\ud835\ude99 \ud835\ude9f2.6.1: \ud835\ude74\ud835\udea1\ud835\ude9d\ud835\ude8e\ud835\ude97\ud835\ude8d\ud835\ude8e\ud835\ude8d \ud835\ude82\ud835\ude74\ud835\ude7b \ud835\ude8f\ud835\ude92\ud835\ude95\ud835\ude9d\ud835\ude8e\ud835\ude9b\ud835\ude92\ud835\ude97\ud835\ude90 \ud835\ude8e\ud835\ude97\ud835\ude90\ud835\ude92\ud835\ude97\ud835\ude8e*/ []",
         "enabled": true
       },
       {
-        "expression": "/*𝚐𝚒𝚝.𝚝𝚊𝚖𝚝𝚊𝚛𝚘.𝚍𝚎 𝚏𝚘𝚛 𝚏𝚞𝚕𝚕 𝚐𝚞𝚒𝚍𝚎 & 𝚊𝚍𝚍𝚒𝚝𝚒𝚘𝚗𝚊𝚕 𝚂𝙴𝙻𝚜*/[]",
+        "expression": "/*\ud835\ude90\ud835\ude92\ud835\ude9d.\ud835\ude9d\ud835\ude8a\ud835\ude96\ud835\ude9d\ud835\ude8a\ud835\ude9b\ud835\ude98.\ud835\ude8d\ud835\ude8e \ud835\ude8f\ud835\ude98\ud835\ude9b \ud835\ude8f\ud835\ude9e\ud835\ude95\ud835\ude95 \ud835\ude90\ud835\ude9e\ud835\ude92\ud835\ude8d\ud835\ude8e & \ud835\ude8a\ud835\ude8d\ud835\ude8d\ud835\ude92\ud835\ude9d\ud835\ude92\ud835\ude98\ud835\ude97\ud835\ude8a\ud835\ude95 \ud835\ude82\ud835\ude74\ud835\ude7b\ud835\ude9c*/[]",
         "enabled": true
       },
       {
@@ -271,10 +263,6 @@
       {
         "expression": "/*TB Pro Download Limit*/ size(uncached(service(streams, 'torbox')), '1TB')",
         "enabled": true
-      },
-      {
-        "expression": "<SYNCED: https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-extended.json>",
-        "enabled": true
       }
     ],
     "requiredStreamExpressions": [],
@@ -284,28 +272,19 @@
         "enabled": true
       },
       {
-        "expression": "/*𝙸𝚏 𝚢𝚘𝚞 𝚞𝚜𝚎𝚍 𝙿𝚊𝚛𝚝𝚒𝚊𝚕 𝚃𝚎𝚖𝚙𝚕𝚊𝚝𝚎, 𝚊𝚍𝚍 𝚂𝚝𝚛𝚎𝚊𝚖 𝙴𝚡𝚙𝚛𝚎𝚜𝚜𝚒𝚘𝚗𝚜 𝚒𝚗 𝚂𝚘𝚛𝚝 𝙾𝚛𝚍𝚎𝚛 𝚊𝚏𝚝𝚎𝚛 𝚀𝚞𝚊𝚕𝚒𝚝𝚢 𝚝𝚘 𝚞𝚜𝚎 𝙿𝚂𝙴 𝚜𝚢𝚗𝚌𝚎𝚍 𝚞𝚛𝚕 𝚋𝚎𝚕𝚘𝚠.*/ []",
-        "enabled": true
-      },
-      {
-        "expression": "<SYNCED: https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json>",
+        "expression": "/*\ud835\ude78\ud835\ude8f \ud835\udea2\ud835\ude98\ud835\ude9e \ud835\ude9e\ud835\ude9c\ud835\ude8e\ud835\ude8d \ud835\ude7f\ud835\ude8a\ud835\ude9b\ud835\ude9d\ud835\ude92\ud835\ude8a\ud835\ude95 \ud835\ude83\ud835\ude8e\ud835\ude96\ud835\ude99\ud835\ude95\ud835\ude8a\ud835\ude9d\ud835\ude8e, \ud835\ude8a\ud835\ude8d\ud835\ude8d \ud835\ude82\ud835\ude9d\ud835\ude9b\ud835\ude8e\ud835\ude8a\ud835\ude96 \ud835\ude74\ud835\udea1\ud835\ude99\ud835\ude9b\ud835\ude8e\ud835\ude9c\ud835\ude9c\ud835\ude92\ud835\ude98\ud835\ude97\ud835\ude9c \ud835\ude92\ud835\ude97 \ud835\ude82\ud835\ude98\ud835\ude9b\ud835\ude9d \ud835\ude7e\ud835\ude9b\ud835\ude8d\ud835\ude8e\ud835\ude9b \ud835\ude8a\ud835\ude8f\ud835\ude9d\ud835\ude8e\ud835\ude9b \ud835\ude80\ud835\ude9e\ud835\ude8a\ud835\ude95\ud835\ude92\ud835\ude9d\ud835\udea2 \ud835\ude9d\ud835\ude98 \ud835\ude9e\ud835\ude9c\ud835\ude8e \ud835\ude7f\ud835\ude82\ud835\ude74 \ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d \ud835\ude9e\ud835\ude9b\ud835\ude95 \ud835\ude8b\ud835\ude8e\ud835\ude95\ud835\ude98\ud835\udea0.*/ []",
         "enabled": true
       }
     ],
-    "includedStreamExpressions": [
-      {
-        "expression": "<SYNCED: https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json>",
-        "enabled": true
-      }
-    ],
+    "includedStreamExpressions": [],
     "rankedStreamExpressions": [
       {
-        "expression": "/*#𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 — 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚂𝚝𝚛𝚎𝚊𝚖 𝙴𝚡𝚙𝚛𝚎𝚜𝚜𝚒𝚘𝚗𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍). 𝚄𝚜𝚎𝚍 𝚝𝚘 𝚜𝚌𝚘𝚛𝚎 𝚊𝚗𝚍 𝚝𝚊𝚐 𝚜𝚝𝚛𝚎𝚊𝚖𝚜, 𝚟𝚒𝚜𝚒𝚋𝚕𝚎 𝚒𝚗 𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚛.*/ []",
+        "expression": "/*#\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c \u2014 \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude82\ud835\ude9d\ud835\ude9b\ud835\ude8e\ud835\ude8a\ud835\ude96 \ud835\ude74\ud835\udea1\ud835\ude99\ud835\ude9b\ud835\ude8e\ud835\ude9c\ud835\ude9c\ud835\ude92\ud835\ude98\ud835\ude97\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d). \ud835\ude84\ud835\ude9c\ud835\ude8e\ud835\ude8d \ud835\ude9d\ud835\ude98 \ud835\ude9c\ud835\ude8c\ud835\ude98\ud835\ude9b\ud835\ude8e \ud835\ude8a\ud835\ude97\ud835\ude8d \ud835\ude9d\ud835\ude8a\ud835\ude90 \ud835\ude9c\ud835\ude9d\ud835\ude9b\ud835\ude8e\ud835\ude8a\ud835\ude96\ud835\ude9c, \ud835\ude9f\ud835\ude92\ud835\ude9c\ud835\ude92\ud835\ude8b\ud835\ude95\ud835\ude8e \ud835\ude92\ud835\ude97 \ud835\ude8f\ud835\ude98\ud835\ude9b\ud835\ude96\ud835\ude8a\ud835\ude9d\ud835\ude9d\ud835\ude8e\ud835\ude9b.*/ []",
         "score": 0,
         "enabled": true
       },
       {
-        "expression": "/*𝚐𝚒𝚝𝚑𝚞𝚋.𝚌𝚘𝚖/Vidhin05/Releases-Regex 𝚏𝚘𝚛 𝚏𝚞𝚕𝚕 𝚐𝚞𝚒𝚍𝚎*/ []",
+        "expression": "/*\ud835\ude90\ud835\ude92\ud835\ude9d\ud835\ude91\ud835\ude9e\ud835\ude8b.\ud835\ude8c\ud835\ude98\ud835\ude96/Vidhin05/Releases-Regex \ud835\ude8f\ud835\ude98\ud835\ude9b \ud835\ude8f\ud835\ude9e\ud835\ude95\ud835\ude95 \ud835\ude90\ud835\ude9e\ud835\ude92\ud835\ude8d\ud835\ude8e*/ []",
         "score": 0,
         "enabled": true
       },
@@ -317,8 +296,8 @@
     ],
     "rankedRegexPatterns": [
       {
-        "name": "𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍)",
-        "pattern": "/^(?!𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍))𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍)$/",
+        "name": "\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d)",
+        "pattern": "/^(?!\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d))\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d)$/",
         "score": 0
       },
       {
@@ -481,8 +460,8 @@
       "id": "custom",
       "definitions": {
         "custom": {
-          "name": "{service.cached::istrue[\"⚡ Iɴsᴛᴀɴᴛ 🔸 \"||\"⏳ Uɴᴄᴀᴄʜᴇᴅ 🔸 \"]}{service.shortName::exists[\"{service.shortName} 🔸 \"||\"\"]}{stream.resolution::exists[\"{stream.resolution::replace('2160p','🟠 4K UHD')::replace('1440p','🔵 2K')::replace('1080p','🔵 1080ᴘ')::replace('720p','🟠 720ᴘ')::replace('480p','🔵 480ᴘ')}\"||\"⚪ Uɴᴋɴᴏᴡɴ\"]} 🔸 {stream.quality::exists[\"{stream.quality::replace('BluRay REMUX','💎 Rᴇᴍᴜx')::replace('BLURAY REMUX','💎 Rᴇᴍᴜx')::replace('Bluray Remux','💎 Rᴇᴍᴜx')::replace('BluRay Remux','💎 Rᴇᴍᴜx')::replace('BluRay','💿 BʟᴜRᴀʏ')::replace('BLURAY','💿 BʟᴜRᴀʏ')::replace('WEB-DL','🦅 Wᴇʙ-DL')::replace('Web-dl','🦅 Wᴇʙ-DL')::replace('WEBRip','📼 WᴇʙRɪᴘ')::replace('Webrip','📼 WᴇʙRɪᴘ')::smallcaps}\"||\"🔘 Sᴛᴀɴᴅᴀʀᴅ\"]}{stream.audioTags::exists[\" 🔸 {stream.audioTags::join(' 🔸 ')::replace('Atmos','🎶 Aᴛᴍᴏs')::replace('TrueHD','💎 TʀᴜᴇHD')::replace('DTS-HD MA','🔷 DTS-HD MA')::replace('DTS-X','🎵 DTS-X')::replace('DDP','🎶 DD+')::replace('DD+','🎶 DD+')::replace('DD','🎵 DD')::replace('AAC','🎵 ᴀᴀᴄ')::replace('FLAC','💿 ꜰʟᴀᴄ')::smallcaps}\"||\"\"]}{stream.audioTags::~(?i)(EAC3|DDP|DD\\+)[\" 🔸 🔊 JBL Sᴘᴀᴛɪᴀʟ\"||\"\"]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)[\" 🔸 👑 Pʀᴇᴍɪᴜᴍ\"||\"\"]}{stream.editions::exists[\" 🔸 🎬 {stream.editions::join(' 🔸 ')::smallcaps}\"||\"\"]}{stream.filename::~Boutique[\" 🔸 🎬 ʙᴏᴜᴛɪQᴜᴇ\"||\"\"]}{stream.filename::~Despecialized[\" 🔸 🌌 ᴅᴇꜱᴘᴇᴄɪᴀʟɪᴢᴇᴅ\"||\"\"]}{stream.filename::~Final.Cut[\" 🔸 ✂️ ꜰɪɴᴀʟ ᴄᴜᴛ\"||\"\"]}{stream.filename::~International[\" 🔸 🌍 ɪɴᴛᴇʀɴᴀᴛɪᴏɴᴀʟ\"||\"\"]}{stream.filename::~Matte[\" 🔸 🌌 ᴏᴘᴇɴ ᴍᴀᴛᴛᴇ\"||\"\"]}{stream.filename::~Uncensored[\" 🔸 🩸 ᴜɴᴄᴇɴꜱᴏʀᴇᴅ\"||\"\"]}{stream.filename::~Unrated[\" 🔸 🎬 ᴜɴʀᴀᴛᴇᴅ\"||\"\"]}{stream.filename::~IMAX[\" 🔸 🎞️ ɪᴍᴀx\"||\"\"]}{stream.filename::~Hybrid[\" 🔸 🧬 ʜʏʙʀɪᴅ\"||\"\"]}",
-          "description": "🗓️ {stream.age::>0[\"{stream.age} Dᴀʏs\"||\"✨ Nᴇᴡ\"]}{stream.type::exists[\" 🔸 ☁️ {stream.type::smallcaps}\"||\"\"]} 🔸 💾 {stream.size::>0[\"{stream.size::sbytes::smallcaps}\"||\"Uɴᴋɴᴏᴡɴ\"]}"
+          "name": "{service.cached::istrue[\"\u26a1 I\u0274s\u1d1b\u1d00\u0274\u1d1b \ud83d\udd38 \"||\"\u23f3 U\u0274\u1d04\u1d00\u1d04\u029c\u1d07\u1d05 \ud83d\udd38 \"]}{service.shortName::exists[\"{service.shortName} \ud83d\udd38 \"||\"\"]}{stream.resolution::exists[\"{stream.resolution::replace('2160p','\ud83d\udfe0 4K UHD')::replace('1440p','\ud83d\udd35 2K')::replace('1080p','\ud83d\udd35 1080\u1d18')::replace('720p','\ud83d\udfe0 720\u1d18')::replace('480p','\ud83d\udd35 480\u1d18')}\"||\"\u26aa U\u0274\u1d0b\u0274\u1d0f\u1d21\u0274\"]} \ud83d\udd38 {stream.quality::exists[\"{stream.quality::replace('BluRay REMUX','\ud83d\udc8e R\u1d07\u1d0d\u1d1cx')::replace('BLURAY REMUX','\ud83d\udc8e R\u1d07\u1d0d\u1d1cx')::replace('Bluray Remux','\ud83d\udc8e R\u1d07\u1d0d\u1d1cx')::replace('BluRay Remux','\ud83d\udc8e R\u1d07\u1d0d\u1d1cx')::replace('BluRay','\ud83d\udcbf B\u029f\u1d1cR\u1d00\u028f')::replace('BLURAY','\ud83d\udcbf B\u029f\u1d1cR\u1d00\u028f')::replace('WEB-DL','\ud83e\udd85 W\u1d07\u0299-DL')::replace('Web-dl','\ud83e\udd85 W\u1d07\u0299-DL')::replace('WEBRip','\ud83d\udcfc W\u1d07\u0299R\u026a\u1d18')::replace('Webrip','\ud83d\udcfc W\u1d07\u0299R\u026a\u1d18')::smallcaps}\"||\"\ud83d\udd18 S\u1d1b\u1d00\u0274\u1d05\u1d00\u0280\u1d05\"]}{stream.audioTags::exists[\" \ud83d\udd38 {stream.audioTags::join(' \ud83d\udd38 ')::replace('Atmos','\ud83c\udfb6 A\u1d1b\u1d0d\u1d0fs')::replace('TrueHD','\ud83d\udc8e T\u0280\u1d1c\u1d07HD')::replace('DTS-HD MA','\ud83d\udd37 DTS-HD MA')::replace('DTS-X','\ud83c\udfb5 DTS-X')::replace('DDP','\ud83c\udfb6 DD+')::replace('DD+','\ud83c\udfb6 DD+')::replace('DD','\ud83c\udfb5 DD')::replace('AAC','\ud83c\udfb5 \u1d00\u1d00\u1d04')::replace('FLAC','\ud83d\udcbf \ua730\u029f\u1d00\u1d04')::smallcaps}\"||\"\"]}{stream.audioTags::~(?i)(EAC3|DDP|DD\\+)[\" \ud83d\udd38 \ud83d\udd0a JBL S\u1d18\u1d00\u1d1b\u026a\u1d00\u029f\"||\"\"]}{stream.releaseGroup::~(?i)(epsilon|framestor|qxr|tigole|ntb|flux|d-z0n3|playbd|hifi|don|huno|bmf)[\" \ud83d\udd38 \ud83d\udc51 P\u0280\u1d07\u1d0d\u026a\u1d1c\u1d0d\"||\"\"]}{stream.editions::exists[\" \ud83d\udd38 \ud83c\udfac {stream.editions::join(' \ud83d\udd38 ')::smallcaps}\"||\"\"]}{stream.filename::~Boutique[\" \ud83d\udd38 \ud83c\udfac \u0299\u1d0f\u1d1c\u1d1b\u026aQ\u1d1c\u1d07\"||\"\"]}{stream.filename::~Despecialized[\" \ud83d\udd38 \ud83c\udf0c \u1d05\u1d07\ua731\u1d18\u1d07\u1d04\u026a\u1d00\u029f\u026a\u1d22\u1d07\u1d05\"||\"\"]}{stream.filename::~Final.Cut[\" \ud83d\udd38 \u2702\ufe0f \ua730\u026a\u0274\u1d00\u029f \u1d04\u1d1c\u1d1b\"||\"\"]}{stream.filename::~International[\" \ud83d\udd38 \ud83c\udf0d \u026a\u0274\u1d1b\u1d07\u0280\u0274\u1d00\u1d1b\u026a\u1d0f\u0274\u1d00\u029f\"||\"\"]}{stream.filename::~Matte[\" \ud83d\udd38 \ud83c\udf0c \u1d0f\u1d18\u1d07\u0274 \u1d0d\u1d00\u1d1b\u1d1b\u1d07\"||\"\"]}{stream.filename::~Uncensored[\" \ud83d\udd38 \ud83e\ude78 \u1d1c\u0274\u1d04\u1d07\u0274\ua731\u1d0f\u0280\u1d07\u1d05\"||\"\"]}{stream.filename::~Unrated[\" \ud83d\udd38 \ud83c\udfac \u1d1c\u0274\u0280\u1d00\u1d1b\u1d07\u1d05\"||\"\"]}{stream.filename::~IMAX[\" \ud83d\udd38 \ud83c\udf9e\ufe0f \u026a\u1d0d\u1d00x\"||\"\"]}{stream.filename::~Hybrid[\" \ud83d\udd38 \ud83e\uddec \u029c\u028f\u0299\u0280\u026a\u1d05\"||\"\"]}",
+          "description": "\ud83d\uddd3\ufe0f {stream.age::>0[\"{stream.age} D\u1d00\u028fs\"||\"\u2728 N\u1d07\u1d21\"]}{stream.type::exists[\" \ud83d\udd38 \u2601\ufe0f {stream.type::smallcaps}\"||\"\"]} \ud83d\udd38 \ud83d\udcbe {stream.size::>0[\"{stream.size::sbytes::smallcaps}\"||\"U\u0274\u1d0b\u0274\u1d0f\u1d21\u0274\"]}"
         }
       }
     }
