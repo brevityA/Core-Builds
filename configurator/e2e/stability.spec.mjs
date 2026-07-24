@@ -38,6 +38,7 @@ test('Quick Install creates a raw manifest without TMDB', async ({ page }) => {
   await page.locator('[data-action="open-fast-lane"]').click();
   await page.locator('[data-fl-target="manifest"]').click();
   await page.locator('[data-fl-cred="torbox"]').fill('test-torbox-key');
+  page.on('dialog', dialog => dialog.accept());
   await page.locator('#btnAutoCreate').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible();
