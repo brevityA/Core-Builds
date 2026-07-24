@@ -1,4 +1,13 @@
 export const CHANGELOG = [
+  { v:'2.81', date:'Jul 24 2026', items:[
+    'Health Score — Added a template health score ring to the Review step with breakdown by sort criteria, ISEs, ESEs, formatter, regex, and deduplicator',
+    'Template Versioning — Templates now embed coreBuildsVersion and generatedAt metadata; an update banner appears when a saved template is outdated',
+    'Full Stack Install — One-click setup now installs AIOMetadata and patches Cinemeta catalogs alongside AIOStreams, with addon reordering',
+    'CORS proxy — Config push to AIOStreams routed through writeHostFetch for cross-origin reliability',
+    'Tools hub — Added links to Core Tools from Review step, Quick Install, and manifest modal',
+    'Debug modules — Wired error boundary, state guard, network resilience, config validator, sanitized logger, and template import recovery',
+    'family-v4 formatter — New default formatter with bitrate, release group, seeders, age, indexer, and season pack info; family-v3 demoted to Legacy',
+  ]},
   { v:'2.78', date:'Jul 22 2026', items:[
     'Modular architecture — Migrated from monolithic single-file source to ES modules under src/ with esbuild bundling',
     'Build pipeline — Added standalone (all-inlined) and web (cache-friendly) distribution builds',
