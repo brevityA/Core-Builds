@@ -79,7 +79,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:true, installAIOMeta:true };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:true, installAIOMeta:true };
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
@@ -560,6 +560,10 @@ function renderOpts(def) {
 }
 
 const FMT_PREVIEWS = {
+  'family-v4': {
+    n:'4K ⚡ Frankenstein S01 • E05',
+    d:['✅ Plays Fast 🥇 Good Stream 🏷 FraMeSToR','📺 From Apple TV','🎥 WEB-DL • HEVC • HDR10+','🔊 5.1 • Atmos, EAC3  ⚡ 16.2 Mbps','💾 4.2G • 🌱 1247 • ⏱ 3d','🏞 torrentio • debrid • 🔍 Torrentio','🗣 English']
+  },
   'family-v3': {
     n:'Torrentio | "Frankenstein" S01 • E05',
     d:['✅ Plays Fast 🥇 Good Stream','📺 From Apple TV','🖥️ Highest Resolution 4k','🎥 WEB-DL • HEVC • HDR10+','🔊 5.1 • Atmos, EAC3','💾 4.2 GB','🏞️ torbox • debrid','🗣️ English']
@@ -635,7 +639,7 @@ const FMT_PREVIEWS = {
 };
 
 function fmtPreviewHtml(fmtId) {
-  const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['family-v3'];
+  const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['family-v4'];
   return `<div class="fmt-live-preview">
     <div class="fmt-live-poster">${ICO.film(16,'#6b7280')}</div>
     <div class="fmt-live-lines">
@@ -651,7 +655,7 @@ function fmtDropdownHtml() {
   if (S.customFormatter) allFmts.push({ id:'custom', label:S.customFormatter.label||'Custom', badge:'Imported', bc:'#a78bfa', desc:'Your imported formatter' });
   const cards = allFmts.map(f => {
     const active = (isCustom && f.id === 'custom') || (!isCustom && f.id === S.formatter);
-    const p = FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v3'];
+    const p = FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v4'];
     return `<div class="fmt-scroll-card" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}">
       <div class="fmt-scroll-head">
         <div class="fmt-scroll-dot" style="background:${f.bc}"></div>
@@ -695,7 +699,7 @@ function updateFmtReceiptRow() {
     const lbl2 = row.querySelector('.receipt-row-lbl');
     if (lbl2 && lbl2.textContent.trim() === 'formatter') {
       const val = row.querySelector('.receipt-row-val');
-      if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'family-v3' ? ' hl' : ''}`; }
+      if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'family-v4' ? ' hl' : ''}`; }
     }
   });
 }
@@ -1292,7 +1296,7 @@ function render() {
             const jumpAttr = JUMP[k] ? ` data-action="jump-step" data-step="${JUMP[k]}" title="Click to change"` : (k === 'formatter' ? ` data-action="open-fmt-picker" title="Click to change"` : '');
             const audioOverride = k==='audio' && ['lossless','dolby'].includes(S.audio) && DEVICE_FORCE_LIMITED_AUDIO.has(S.device);
             const val = label(k, S[k]) || '—';
-            const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && S.resolution==='4k') || (k==='formatter' && S.formatter!=='family-v3');
+            const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && S.resolution==='4k') || (k==='formatter' && S.formatter!=='family-v4');
             return `<div class="receipt-row"${jumpAttr}>
               <div class="receipt-row-left">
                 <span class="receipt-row-ico">${ico}</span>
@@ -2175,16 +2179,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
       if (preset === 'http') {
-        Object.assign(S, { service:'http', multiServices:['http'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        Object.assign(S, { service:'http', multiServices:['http'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = STEPS; pushStep(); render(); window.scrollTo(0,0);
       } else if (preset === 'p2p') {
-        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:true, quickStart:true, simpleMode:true });
+        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:true, quickStart:true, simpleMode:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 5; pushStep(); render(); window.scrollTo(0,0);
       } else {
-        if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
-        else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'family-v3', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 1; pushStep(); render(); window.scrollTo(0,0);
       }
@@ -2599,7 +2603,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'clear-custom-formatter') {
       e.preventDefault();
       delete S.customFormatter;
-      if (S.formatter === 'custom') S.formatter = 'family-v3';
+      if (S.formatter === 'custom') S.formatter = 'family-v4';
       saveState(); render();
     }
   });
@@ -3283,7 +3287,7 @@ function build() {
       const isHybrid=S.service==='hybrid'||(S.service==='multi'&&S.multiServices&&S.multiServices.includes('torbox-pro')&&S.multiServices.includes('realdebrid')), svcKey=isHybrid?[{key:'service',direction:d}]:[];
       return { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] }; })(),
     deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}], ...(S.dedupMerge ? { merge: { enabled: true, failoverVariants: true, fields: [] } } : {}) }; })(),
-    formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v3')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
+    formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
     size: (function(){ const is4k = S.resolution==='4k'||S.resolution==='ultrawide'; return { global:{ movies:[1610612736,80000000000], series:[209715200,40000000000] }, resolution:{ ...(is4k ? { '2160p':{ movies:[1610612736,150000000000], series:[209715200,80000000000] } } : {}), '1080p':{ movies:[524288000,30000000000], series:[104857600,20000000000] }, '720p':{ movies:[209715200,12000000000], series:[52428800,8000000000] } } }; })(),
@@ -3646,7 +3650,7 @@ function parseTemplateToState(tpl) {
   const c = tpl.config || tpl;
   const st = {
     service: null, device: null, resolution: null, audio: 'limited', content: null,
-    name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v3',
+    name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
     exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
     cacheMode: 'mixed', streamPool: 'normal', simpleMode: false
@@ -4092,7 +4096,7 @@ function showUpdateTemplateModal() {
       // Reset state then apply parsed values (prevents old state bleeding between imports)
       S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
       S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
-      S.formatter = 'family-v3'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
+      S.formatter = 'family-v4'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
       S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
       S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
       S.streamPool = 'normal';
@@ -5426,7 +5430,7 @@ function applyQuickProfile(profile) {
   S.quickProfile = profile;
   S.device = 'generic';
   S.content = 'all';
-  S.formatter = 'family-v3';
+  S.formatter = 'family-v4';
   S.matchMode = 'balanced';
   S.excludeDV = false;
   S.exclude4K = false;
