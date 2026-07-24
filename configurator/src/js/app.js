@@ -73,7 +73,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000 };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v3', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:true, installAIOMeta:true };
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
@@ -174,7 +174,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','patchCinemeta','installAIOMeta'];
 function shareConfig() {
   try {
     const pub = {};
@@ -202,7 +202,7 @@ function sanitizeSharedConfig(d) {
   pick('pseArch',      v => ['standard','iqr'].includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled','patchCinemeta','installAIOMeta'].forEach(k => pick(k, v => typeof v === 'boolean'));
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
@@ -1171,6 +1171,7 @@ function splashHtml() {
     </div>
 
     ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
+      ${versionBannerHtml()}
       <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
       <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
@@ -1312,6 +1313,8 @@ function render() {
         </div>
         ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
         ${(() => { const h = templateHealthCheck(); return h.length ? `<div class="th-alert th-alert-red" style="margin-top:6px"><div style="font-size:.68rem;font-weight:700;color:var(--th-red);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:var(--th-tx2);line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:var(--th-red);flex-shrink:0">${ICO.warn(12,'currentColor')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div class="th-alert th-alert-green" style="margin-top:6px;font-weight:600">${ICO.check(12,'currentColor')} Template looks good</div>`; })()}
+        ${healthScoreHtml()}
+        ${versionBannerHtml()}
         ${hostCompatHtml()}
         ${backupTimelineHtml()}
         <details class="rv-accord" style="margin-top:10px">
@@ -3362,6 +3365,7 @@ function buildFinal() {
   const tpl = build();
   if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
   sanitizeAioEnumArrays(tpl.config);
+  addVersionMetadata(tpl);
   return tpl;
 }
 
@@ -4930,6 +4934,158 @@ function templateHealthCheck() {
   return warns;
 }
 
+// ── Template Health Score (unique to Core Builds) ──────────────────
+
+function calculateHealthScore() {
+  const cfg = buildFinal().config;
+  const breakdown = [];
+  let score = 0, max = 0;
+  const check = (label, maxPts, pts, reason) => { max += maxPts; score += Math.min(pts, maxPts); breakdown.push({ label, points: Math.min(pts, maxPts), max: maxPts, reason }); };
+
+  // 1. Sort criteria coverage (20)
+  const sortKeys = (cfg.sortCriteria?.global || []).map(k => k.key);
+  if (sortKeys.length >= 6) check('Sort criteria', 20, 20, `${sortKeys.length} keys — excellent`);
+  else if (sortKeys.length >= 4) check('Sort criteria', 20, 15, `${sortKeys.length} keys — good`);
+  else if (sortKeys.length >= 2) check('Sort criteria', 20, 10, `${sortKeys.length} keys — basic`);
+  else check('Sort criteria', 20, 5, `${sortKeys.length} keys — add more`);
+
+  // 2. Resolution + cached in sort (5)
+  const hasRes = sortKeys.includes('resolution'), hasCached = sortKeys.includes('cached');
+  if (hasRes && hasCached) check('Sort essentials', 5, 5, 'Resolution + cached present');
+  else if (hasRes || hasCached) check('Sort essentials', 5, 3, 'Missing one of resolution/cached');
+  else check('Sort essentials', 5, 0, 'Missing both');
+
+  // 3. 0Cached ISE (15)
+  const ises = cfg.includedStreamExpressions || [];
+  if (ises.some(e => e.expression && /0Cached/i.test(e.expression))) check('0Cached ISE', 15, 15, 'Present — fallback when nothing cached');
+  else check('0Cached ISE', 15, 0, 'Missing — no fallback for uncached');
+
+  // 4. ESE coverage (10)
+  const eses = cfg.excludedStreamExpressions || [];
+  if (eses.length >= 5) check('Exclusion rules', 10, 10, `${eses.length} ESEs — thorough`);
+  else if (eses.length >= 2) check('Exclusion rules', 10, 7, `${eses.length} ESEs — decent`);
+  else if (eses.length >= 1) check('Exclusion rules', 10, 4, `${eses.length} ESE — minimal`);
+  else check('Exclusion rules', 10, 0, 'No ESEs — no filtering');
+
+  // 5. Device-aware exclusions (10)
+  const esesText = eses.map(e => e.expression || '').join(' ');
+  if (/visualTag|encode|resolution.*2160p/.test(esesText)) check('Device awareness', 10, 10, 'Device-aware exclusions present');
+  else check('Device awareness', 10, 5, 'No device-aware exclusions');
+
+  // 6. Formatter (10)
+  const fmt = cfg.formatter || {};
+  if (fmt.id === 'tamtaro' && fmt.definitions?.overrides?.tamtaro?.name) check('Formatter', 10, 10, 'Custom formatter');
+  else if (fmt.id && fmt.id !== 'tamtaro') check('Formatter', 10, 7, `Built-in: ${fmt.id}`);
+  else check('Formatter', 10, 3, 'No formatter');
+
+  // 7. Title matching (5)
+  const tm = cfg.titleMatching || {};
+  if (tm.mode === 'fuzzy' && (tm.similarityThreshold || 0.85) <= 0.9) check('Title matching', 5, 5, `Fuzzy at ${tm.similarityThreshold || 0.85}`);
+  else if (tm.mode === 'exact') check('Title matching', 5, 1, 'Exact — will miss variations');
+  else check('Title matching', 5, 3, 'Default');
+
+  // 8. Year matching (5)
+  if (cfg.yearMatching?.strict === false) check('Year matching', 5, 5, 'Non-strict — allows remakes');
+  else if (cfg.yearMatching?.strict === true) check('Year matching', 5, 2, 'Strict — may block valid');
+  else check('Year matching', 5, 4, 'Default');
+
+  // 9. Preset count (10)
+  const presets = (cfg.presets || []).filter(p => p.enabled !== false);
+  if (presets.length >= 4) check('Addon coverage', 10, 10, `${presets.length} presets — excellent`);
+  else if (presets.length >= 2) check('Addon coverage', 10, 7, `${presets.length} presets — good`);
+  else if (presets.length >= 1) check('Addon coverage', 10, 4, `${presets.length} preset — minimal`);
+  else check('Addon coverage', 10, 0, 'No presets');
+
+  // 10. Regex scoring (5)
+  const ranked = cfg.rankedRegexPatterns || [];
+  if (ranked.length >= 50) check('Regex scoring', 5, 5, `${ranked.length} patterns — full`);
+  else if (ranked.length >= 10) check('Regex scoring', 5, 3, `${ranked.length} patterns — partial`);
+  else check('Regex scoring', 5, 1, `${ranked.length} patterns — minimal`);
+
+  // 11. Deduplicator (5)
+  const dedup = cfg.deduplicator || {};
+  if (dedup.cached && dedup.uncached) check('Deduplicator', 5, 5, `${dedup.cached} / ${dedup.uncached}`);
+  else if (dedup.cached || dedup.uncached) check('Deduplicator', 5, 3, 'Partial');
+  else check('Deduplicator', 5, 2, 'Default');
+
+  const finalScore = Math.min(score, 100);
+  const grade = finalScore >= 90 ? 'A' : finalScore >= 75 ? 'B' : finalScore >= 60 ? 'C' : finalScore >= 40 ? 'D' : 'F';
+  const summary = finalScore >= 90 ? 'Excellent template' : finalScore >= 75 ? 'Good template — minor improvements possible' : finalScore >= 60 ? 'Decent — consider adding more features' : finalScore >= 40 ? 'Basic — significant improvements recommended' : 'Minimal — needs major configuration';
+  return { score: finalScore, maxScore: 100, grade, summary, breakdown };
+}
+
+function healthScoreHtml() {
+  const r = calculateHealthScore();
+  const color = r.grade === 'A' ? '#34d399' : r.grade === 'B' ? '#00d4ff' : r.grade === 'C' ? '#fbbf24' : r.grade === 'D' ? '#f97316' : '#f87171';
+  const pct = Math.round(r.score / r.maxScore * 100);
+  const ring = `background:conic-gradient(${color} ${pct * 3.6}deg, rgba(255,255,255,.06) 0deg)`;
+  const rows = r.breakdown.map(b => {
+    const barColor = b.points === b.max ? '#34d399' : b.points === 0 ? '#f87171' : '#fbbf24';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:3px 0"><span style="font-size:.68rem;color:#8b949e;flex:1;min-width:0">${b.label}</span><span style="font-size:.65rem;color:${barColor};font-weight:700;flex-shrink:0">${b.points}/${b.max}</span></div>`;
+  }).join('');
+  return `<div style="margin-top:10px;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06)">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="width:64px;height:64px;border-radius:50%;${ring};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="width:52px;height:52px;border-radius:50%;background:#0d1117;display:flex;align-items:center;justify-content:center;flex-direction:column">
+          <span style="font-size:1.1rem;font-weight:900;color:${color}">${r.score}</span>
+          <span style="font-size:.55rem;font-weight:700;color:${color};opacity:.7">${r.grade}</span>
+        </div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.78rem;font-weight:700;color:#e6edf3">Template Health Score</div>
+        <div style="font-size:.68rem;color:${color};font-weight:600;margin-top:2px">${r.summary}</div>
+        <div style="font-size:.62rem;color:#4b5563;margin-top:2px">${r.breakdown.filter(b=>b.points===b.max).length}/${r.breakdown.length} checks passed</div>
+      </div>
+    </div>
+    <details style="margin-top:10px"><summary style="list-style:none;cursor:pointer;font-size:.68rem;font-weight:600;color:#4b5563;display:flex;align-items:center;gap:4px"><span style="font-size:.55rem">▶</span> Breakdown</summary>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.04)">${rows}</div></details>
+  </div>`;
+}
+
+// ── Template Versioning ────────────────────────────────────────────
+
+const TEMPLATE_VERSION = CONFIGURATOR_VERSION;
+
+function addVersionMetadata(template) {
+  if (!template.metadata) template.metadata = {};
+  template.metadata.coreBuildsVersion = TEMPLATE_VERSION;
+  template.metadata.generatedAt = new Date().toISOString();
+  return template;
+}
+
+function checkTemplateVersion() {
+  try {
+    const last = JSON.parse(localStorage.getItem('coreBuildLastGen') || 'null');
+    if (!last) return null;
+    const ver = last._ver || last.coreBuildsVersion;
+    if (!ver) return { outdated: true, installed: 'unknown', current: TEMPLATE_VERSION, message: 'No version — template may be old' };
+    const installed = ver.split('.').map(Number);
+    const current = TEMPLATE_VERSION.split('.').map(Number);
+    let outdated = false;
+    for (let i = 0; i < Math.max(installed.length, current.length); i++) {
+      const a = installed[i] || 0, b = current[i] || 0;
+      if (b > a) { outdated = true; break; }
+      if (a > b) break;
+    }
+    const ts = last._ts;
+    const daysOld = ts ? Math.floor((Date.now() - ts) / 86400000) : null;
+    return { outdated, installed: ver, current: TEMPLATE_VERSION, daysOld, message: outdated ? `v${ver} is outdated — v${TEMPLATE_VERSION} available` : `v${ver} is current` };
+  } catch(e) { return null; }
+}
+
+function versionBannerHtml() {
+  const v = checkTemplateVersion();
+  if (!v || !v.outdated) return '';
+  return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);margin-bottom:12px;display:flex;align-items:center;gap:10px">
+    <span style="font-size:1.1rem">🔄</span>
+    <div style="flex:1">
+      <div style="font-size:.78rem;font-weight:700;color:#00d4ff">Update Available</div>
+      <div style="font-size:.7rem;color:#8b949e">${v.message}${v.daysOld ? ` · ${v.daysOld} days old` : ''}</div>
+    </div>
+    <button data-action="start-fresh" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer">Rebuild →</button>
+  </div>`;
+}
+
 function hostCompatCheck() {
   const cfg = buildFinal().config;
   const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
@@ -5300,6 +5456,11 @@ function showFastLane() {
     </div></div>
     <div class="fastlane-section" id="flInstallFields"></div>
     <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="./account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
+    <div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
+      <div style="font-size:.72rem;font-weight:700;color:#34d399;margin-bottom:8px;display:flex;align-items:center;gap:6px">${ICO.rocket(12,'#34d399')} Full Stack Setup <span style="font-size:.58rem;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)">NEW</span></div>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="flPatchCinemeta" ${S.patchCinemeta!==false?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Patch Cinemeta</b><br><span style="color:#8b949e">Hide Cinemeta catalogs/metadata so AIOMetadata takes over. Uses Cinebye.</span></span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="checkbox" id="flInstallAIOMeta" ${S.installAIOMeta!==false?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Install AIOMetadata</b><br><span style="color:#8b949e">Better catalogs, metadata, and posters. Replaces Cinemeta.</span></span></label>
+    </div>
     <button class="fastlane-go" id="btnAutoCreate">Create &amp; Install →</button><div id="aioResult" class="fastlane-result"></div>
   </div>`;
   document.body.appendChild(overlay);
@@ -5355,6 +5516,8 @@ function showFastLane() {
       S.simpleMode = true; S.quickStart = true;
       applyQuickProfile(state.profile);
       S.cleanInstall = document.getElementById('flClean').checked;
+      S.patchCinemeta = document.getElementById('flPatchCinemeta')?.checked !== false;
+      S.installAIOMeta = document.getElementById('flInstallAIOMeta')?.checked !== false;
       let installTarget = state.target;
       if (state.target === 'app') {
         S.stremioEmail=document.getElementById('flStremioEmail').value.trim();
@@ -5456,11 +5619,19 @@ async function simpleInstall(target) {
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Pushing to Stremio…`;
         try {
           const installed = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
+          // ── Full Stack: AIOMetadata + Cinemeta patch + addon ordering ──
+          btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Setting up full stack…`;
+          const stackResult = await fullStackAfterPush(
+            (await stremioFetch('https://api.strem.io/api/login', { type:'Login', email:S.stremioEmail, password:S.stremioPassword, facebook:false }))?.result?.authKey,
+            manifestUrl,
+            { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true }
+          );
           btn.disabled = false; btn.innerHTML = origHtml;
+          const stackHtml = stackResult.steps.length ? `<div style="margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.1);font-size:.72rem;color:#8b949e;line-height:1.6">${stackResult.steps.join('<br>')}${stackResult.errors.length ? '<br>' + stackResult.errors.map(e=>`<span style="color:#f87171">⚠ ${e}</span>`).join('<br>') : ''}</div>` : '';
           if (installed === 'already') {
-            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div></div>`;
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div>${stackHtml}</div>`;
           } else {
-            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} ${installed==='replaced'?'Previous install replaced!':'Installed to Stremio!'}</div><div style="font-size:.78rem;color:#8b949e">Reopen Stremio and search for any movie or show — streams will appear with Core Builds sorting.</div><div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} ${installed==='replaced'?'Previous install replaced!':'Full Stack Installed!'}</div><div style="font-size:.78rem;color:#8b949e">AIOStreams, AIOMetadata, and Cinemeta patch deployed. Reopen Stremio to see your new setup.</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
           }
           showToast('Addon installed to your Stremio library');
           return;
@@ -5546,6 +5717,91 @@ async function pushToStremio(manifestUrl, email, password) {
   const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: kept });
   if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
   return S.cleanInstall ? 'replaced' : 'installed';
+}
+
+// ── Full Stack Install (Cinemeta patch + AIOMetadata + addon ordering) ──
+
+const CINEBYE_HOSTS = ['https://cinebye.elfhosted.com', 'https://cinebye.dinsden.top'];
+const AIOMETADATA_MANIFEST = 'https://aiometadata.elfhosted.com/manifest.json';
+
+/**
+ * Patch Cinemeta via Cinebye to hide its catalogs/metadata/search.
+ * Returns { ok: boolean, message: string }
+ */
+async function patchCinemeta(authKey, patches = ['removeSearch','removeCatalogs']) {
+  for (const host of CINEBYE_HOSTS) {
+    try {
+      const res = await fetchWithTimeout(`${host}/api/patch`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ authKey, patches })
+      }, 8000);
+      if (res.ok) return { ok:true, message:`Cinemeta patched: ${patches.join(', ')}` };
+    } catch(e) { /* try next host */ }
+  }
+  return { ok:false, message:'Could not reach Cinebye — patch manually at cinebye.elfhosted.com' };
+}
+
+/**
+ * Reorder addons: Cinemeta → AIOMetadata → AIOStreams → others
+ * Returns { ok: boolean, message: string }
+ */
+async function reorderAddons(authKey, aiometadataUrl, aiostreamsUrl) {
+  const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+  if (!getData?.result?.addons) return { ok:false, message:'Could not fetch addons' };
+  const existing = getData.result.addons;
+  const cinemeta = existing.find(a => a.transportUrl?.includes('cinemeta'));
+  const aiometa = existing.find(a => a.transportUrl === aiometadataUrl);
+  const aios = existing.find(a => a.transportUrl === aiostreamsUrl);
+  const others = existing.filter(a => a !== cinemeta && a !== aiometa && a !== aios);
+  const ordered = [];
+  if (cinemeta) ordered.push(cinemeta);
+  if (aiometa) ordered.push(aiometa);
+  if (aios) ordered.push(aios);
+  ordered.push(...others);
+  const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: ordered });
+  if (!setData?.result) return { ok:false, message:'Failed to save addon order' };
+  return { ok:true, message:'Addon order: Cinemeta → AIOMetadata → AIOStreams' };
+}
+
+/**
+ * Full stack install: AIOStreams + AIOMetadata + Cinemeta patch + addon order.
+ * Called after the AIOStreams config has been pushed to Stremio.
+ */
+async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
+  const steps = [];
+  const errors = [];
+  const { patchCinemeta: doPatch = true, installAIOMetadata = true, reorder = true } = opts;
+
+  // Step 1: Install AIOMetadata
+  if (installAIOMetadata) {
+    try {
+      const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+      const existing = getData?.result?.addons || [];
+      if (!existing.some(a => a.transportUrl === AIOMETADATA_MANIFEST)) {
+        const updated = [...existing, { transportName:'http', transportUrl: AIOMETADATA_MANIFEST, flags:{} }];
+        await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
+        steps.push('✓ AIOMetadata installed');
+      } else {
+        steps.push('✓ AIOMetadata already installed');
+      }
+    } catch(e) { errors.push('AIOMetadata: ' + e.message); }
+  }
+
+  // Step 2: Patch Cinemeta
+  if (doPatch) {
+    const r = await patchCinemeta(authKey);
+    if (r.ok) steps.push('✓ ' + r.message);
+    else errors.push(r.message);
+  }
+
+  // Step 3: Reorder addons
+  if (reorder) {
+    const r = await reorderAddons(authKey, AIOMETADATA_MANIFEST, aiostreamsUrl);
+    if (r.ok) steps.push('✓ ' + r.message);
+    else errors.push(r.message);
+  }
+
+  return { steps, errors, ok: errors.length === 0 };
 }
 
 async function createRandomStremioAccount() {
