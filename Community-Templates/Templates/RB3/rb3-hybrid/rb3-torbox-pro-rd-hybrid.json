@@ -150,7 +150,7 @@
         "instanceId": "8f3",
         "enabled": true,
         "options": {
-          "name": "Searchⁿᶻᵇ",
+          "name": "Search\u207f\u1dbb\u1d47",
           "newznabUrl": "https://search-api.torbox.app/newznab",
           "apiPath": "/api",
           "timeout": 5000,
@@ -300,8 +300,8 @@
       "id": "custom",
       "definitions": {
         "custom": {
-          "name": "{stream.resolution::exists[\"{stream.resolution::replace('2160p','   4K   ')::replace('1440p','    2K   ')::replace('p','P')}‍\"||\"‍     \"]}{stream.type::exists[\"‍{stream.type::replace('debrid','    ')::replace('p2p','⁽ᵖ²ᵖ⁾')::replace('live','⁽ˡᶦᵛᵉ⁾')::replace('http','⁽ʷᵉᵇ⁾')::replace('usenet','‍⁽ⁿᶻᵇ⁾‍')::replace('stremio-usenet','‏⁽ⁿᶻᵇ⁾')::replace('info','⁽ᶦⁿᶠᵒ⁾')::replace('statistic','⁽ˢᵗᵃᵗˢ⁾')::replace('external','⁽ᵉˣᵗ⁾')::replace('error','⁽ᵉʳʳᵒʳ⁾')::replace('youtube','⁽ʸᵗ⁾')}‍‍‍\"||\"\"]}{service.cached::istrue[\"⚡\"||\"\"]}{service.cached::isfalse[\"‍⏳‍​\"||\"\"]}{stream.quality::exists[\"‍‍\\n  〈{stream.quality::title::replace('Bluray Remux','Remux')::replace('Web-dl','Web‍-‍dl')::replace('Hc Hd-rip','HC HDRip')::replace('Hdrip','HDRip')}〉‍     \"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\\n\"||\"\"]}{stream.nSeScore::exists[\"‍\\n  {stream.nSeScore::star::replace('⯪','☆')}            \"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\\n\"||\"\"]}",
-          "description": "{stream.title::exists::and::stream.library::isfalse[\"✎  {stream.title::title::truncate(15)}\"||\"\"]}{stream.title::exists::and::stream.library::istrue[\"☁︎  {stream.title::title::truncate(15)} \"||\"\"]}{stream.year::exists::and::stream.episodes::exists::isfalse::and::stream.seasons::exists::isfalse[\" ({stream.year})\"||\"\"]}{stream.seasonEpisode::exists[\"  {stream.seasonEpisode::join('·')::replace('E','ᴇ')::replace('S','s')::replace('0','₀')::replace('1','₁')::replace('2','₂')::replace('3','₃')::replace('4','₄')::replace('5','₅')::replace('6','₆')::replace('7','₇')::replace('8','₈')::replace('9','₉')}\"||\"\"]}\n{stream.visualTags::=IMAX[\"{tools.removeLine}\\n\"||\"{tools.removeLine}\\n\"]}{stream.encode::exists[\"▣  {stream.encode}  \"||\"\"]}{stream.visualTags::~DV::or::stream.visualTags::~HDR::or::stream.visualTags::~HDR10::or::stream.visualTags::~HDR10+::and::stream.visualTags::exists::and::stream.visualTags::=IMAX::isfalse[\"✦  \"||\"\"]}{stream.visualTags::exists::and::stream.visualTags::=IMAX::isfalse::and::stream.visualTags::~DV::isfalse::and::stream.visualTags::~HDR::isfalse::and::stream.visualTags::~HDR10::isfalse::and::stream.visualTags::~HDR10+::isfalse[\"✧  \"||\"\"]}{stream.visualTags::exists::and::stream.visualTags::=IMAX::isfalse[\"{stream.visualTags::sort::join(' · ')::replace('HDR · HDR','HDR')::replace(' · IMAX','')} \"||\"\"]}\n{stream.audioTags::exists[\"♬  {stream.audioTags::lsort::join(' · ')::replace('DD · DD','DD')::replace('DTS · DTS','DTS')}  \"||\"\"]}{stream.audioChannels::exists[\"♯  {stream.audioChannels::join(' · ')} \"||\"\"]}\n{stream.size::>0::and::stream.seasonPack::istrue[\"❖  \"||\"\"]}{stream.size::>0::and::stream.seasonPack::isfalse[\"◈  \"||\"\"]}{stream.size::>0[\"{stream.size::sbytes}\"||\"\"]}{stream.folderSize::>0[\"/{stream.folderSize::sbytes}\"||\"\"]}{stream.bitrate::exists[\" · {stream.bitrate::sbitrate::replace('Mbps','ᴹᵇᵖˢ')::replace('Kbps','ᴷᵇᵖˢ')} \"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\"||\"\"]}{service.cached::isfalse::or::stream.type::=p2p::and::stream.seeders::>0[\"⇄ {stream.seeders}❦ \"||\"\"]}{stream.age::exists[\"· {stream.age}\"||\"\"]}\n{stream.proxied::istrue[\"⛊  \"||\"⛉  \"]}{service.shortName::exists[\"[{service.shortName}] \"||\"\"]}{addon.name}{stream.private::istrue[\" ⚿ ᴘʀɪᴠᴀᴛᴇ \"||\"\"]}{stream.releaseGroup::exists[\" · {stream.releaseGroup::truncate(13)}\"||\"\"]}{stream.indexer::exists::and::stream.type::~usenet[\" · {stream.indexer::truncate(13)}\"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\\n\"||\"\"]}\n{stream.uLanguages::exists[\"⛿  {stream.uSmallLanguageCodes::join(' · ')::replace('ꜰ','ғ')::replace('x','х')::replace('ꞯ','ϙ')::replace('ꜱ','s')::replace('ᴅᴜᴀʟ ᴀᴜᴅɪᴏ','ᴅᴜᴏ')::replace('ᴅᴜʙʙᴇᴅ','ᴅᴜʙ')}  \"||\"\"]}{stream.subbed::istrue::and::stream.uLanguages::exists[\"· sᴜʙ \"||\"\"]}{stream.subbed::istrue::and::stream.uLanguages::exists::isfalse[\"⛿  sᴜʙ \"||\"\"]}{stream.uSubtitles::exists[\"({stream.uSmallSubtitleCodes::join(' · ')::replace('ꜰ','ғ')::replace('x','х')::replace('ꞯ','ϙ')::replace('ꜱ','s')})  \"||\"\"]}{stream.seadex::or::stream.seScore::>0::or::stream.seScore::<0::or::stream.message::exists::or::stream.rseMatched::length::>0[\" »  \"||\"\"]}{stream.seadexBest::istrue[\" ʙᴇsᴛ ʀᴇʟᴇᴀsᴇ \"||\"\"]}{stream.seadex::istrue::and::stream.seadexBest::isfalse[\" ᴀʟᴛ ʙᴇsᴛ ʀᴇʟᴇᴀsᴇ \"||\"\"]}{stream.seadex::isfalse::and::stream.rseMatched::length::>0[\"{stream.rseMatched::remove('TrueHD ATMOS')::remove('DD+ ATMOS')::remove('ATMOS')::remove('TrueHD')::remove('DTS-HD MA')::remove('FLAC')::remove('DTS-HD HRA')::remove('DD+')::remove('DD')::remove('DTS-ES')::remove('DTS X')::remove('DTS')::remove('AAC')::remove('Opus')::remove('DV (Disk)')::remove('DV')::remove('HDR10+ Boost')::remove('HDR')::remove('UHD Streaming Boost')::remove('HD Streaming Boost')::remove('INTERNAL')::remove('No-RlsGroup')::remove('FHD')::remove('UHD')::remove('HD')::remove('4K')::remove('126811')::remove('SiC')::remove('FraMeSToR')::remove('TheFarm')::remove('hallowed')::remove('BHDStudio')::remove('FLUX')::remove('Season Pack')::join('  ')::replace('UHD ','')::replace('HD ','')::replace('Movies Anywhere','MA')::upper::replace('F','ғ')::replace('X','х')::replace('Q','ϙ')::replace('0','₀')::replace('1','₁')::replace('2','₂')::replace('3','₃')::replace('4','₄')::replace('5','₅')::replace('6','₆')::replace('7','₇')::replace('8','₈')::replace('9','₉')::smallcaps::replace('ꜱ','s')} \"||\"\"]}{stream.message::exists[\" {stream.message::replace('NZB Health: ✅','✅ ɴᴢʙ')::replace('NZB Health: 🧝','🧝 ɴᴢʙ')::replace('AvailNZB 💚','💚 ɴᴢʙ')::replace('NZB Health: ⚠️','ᴜɴᴠᴇʀɪғɪᴇᴅ ɴᴢʙ')::replace('NZB Health: 🚫','✘ɴᴢʙ')::smallcaps} \"||\"\"]}{stream.seScore::>0::or::stream.seScore::<0[\"{stream.seScore::string::replace('0','₀')::replace('1','₁')::replace('2','₂')::replace('3','₃')::replace('4','₄')::replace('5','₅')::replace('6','₆')::replace('7','₇')::replace('8','₈')::replace('9','₉')}\"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\"||\"\"]}{service.cached::istrue::and::stream.message::~Download::istrue[\"\\n➥ DL Stream\"||\"\"]}"
+          "name": "{stream.resolution::exists[\"{stream.resolution::replace('2160p','\u00a0\u00a0\u00a04K\u00a0\u00a0\u00a0')::replace('1440p','\u00a0\u00a0\u00a0\u00a02K\u00a0\u00a0\u00a0')::replace('p','P')}\u200d\"||\"\u200d\u00a0\u00a0\u00a0\u00a0\u00a0\"]}{stream.type::exists[\"\u200d{stream.type::replace('debrid','\u00a0\u00a0\u00a0\u00a0')::replace('p2p','\u207d\u1d56\u00b2\u1d56\u207e')::replace('live','\u207d\u02e1\u1da6\u1d5b\u1d49\u207e')::replace('http','\u207d\u02b7\u1d49\u1d47\u207e')::replace('usenet','\u200d\u207d\u207f\u1dbb\u1d47\u207e\u200d')::replace('stremio-usenet','\u200f\u207d\u207f\u1dbb\u1d47\u207e')::replace('info','\u207d\u1da6\u207f\u1da0\u1d52\u207e')::replace('statistic','\u207d\u02e2\u1d57\u1d43\u1d57\u02e2\u207e')::replace('external','\u207d\u1d49\u02e3\u1d57\u207e')::replace('error','\u207d\u1d49\u02b3\u02b3\u1d52\u02b3\u207e')::replace('youtube','\u207d\u02b8\u1d57\u207e')}\u200d\u200d\u200d\"||\"\"]}{service.cached::istrue[\"\u26a1\"||\"\"]}{service.cached::isfalse[\"\u200d\u23f3\u200d\u200b\"||\"\"]}{stream.quality::exists[\"\u200d\u200d\\n\u00a0\u00a0\u2329{stream.quality::title::replace('Bluray Remux','Remux')::replace('Web-dl','Web\u200d-\u200ddl')::replace('Hc Hd-rip','HC\u00a0HDRip')::replace('Hdrip','HDRip')}\u232a\u200d\u00a0\u00a0\u00a0\u00a0\u00a0\"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\\n\"||\"\"]}{stream.nSeScore::exists[\"\u200d\\n\u00a0\u00a0{stream.nSeScore::star::replace('\u2bea','\u2606')}\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\\n\"||\"\"]}",
+          "description": "{stream.title::exists::and::stream.library::isfalse[\"\u270e  {stream.title::title::truncate(15)}\"||\"\"]}{stream.title::exists::and::stream.library::istrue[\"\u2601\ufe0e  {stream.title::title::truncate(15)} \"||\"\"]}{stream.year::exists::and::stream.episodes::exists::isfalse::and::stream.seasons::exists::isfalse[\" ({stream.year})\"||\"\"]}{stream.seasonEpisode::exists[\"  {stream.seasonEpisode::join('\u00b7')::replace('E','\u1d07')::replace('S','s')::replace('0','\u2080')::replace('1','\u2081')::replace('2','\u2082')::replace('3','\u2083')::replace('4','\u2084')::replace('5','\u2085')::replace('6','\u2086')::replace('7','\u2087')::replace('8','\u2088')::replace('9','\u2089')}\"||\"\"]}\n{stream.visualTags::=IMAX[\"{tools.removeLine}\\n\"||\"{tools.removeLine}\\n\"]}{stream.encode::exists[\"\u25a3  {stream.encode}  \"||\"\"]}{stream.visualTags::~DV::or::stream.visualTags::~HDR::or::stream.visualTags::~HDR10::or::stream.visualTags::~HDR10+::and::stream.visualTags::exists::and::stream.visualTags::=IMAX::isfalse[\"\u2726  \"||\"\"]}{stream.visualTags::exists::and::stream.visualTags::=IMAX::isfalse::and::stream.visualTags::~DV::isfalse::and::stream.visualTags::~HDR::isfalse::and::stream.visualTags::~HDR10::isfalse::and::stream.visualTags::~HDR10+::isfalse[\"\u2727  \"||\"\"]}{stream.visualTags::exists::and::stream.visualTags::=IMAX::isfalse[\"{stream.visualTags::sort::join(' \u00b7 ')::replace('HDR \u00b7 HDR','HDR')::replace(' \u00b7 IMAX','')} \"||\"\"]}\n{stream.audioTags::exists[\"\u266c  {stream.audioTags::lsort::join(' \u00b7 ')::replace('DD \u00b7 DD','DD')::replace('DTS \u00b7 DTS','DTS')}  \"||\"\"]}{stream.audioChannels::exists[\"\u266f  {stream.audioChannels::join(' \u00b7 ')} \"||\"\"]}\n{stream.size::>0::and::stream.seasonPack::istrue[\"\u2756  \"||\"\"]}{stream.size::>0::and::stream.seasonPack::isfalse[\"\u25c8  \"||\"\"]}{stream.size::>0[\"{stream.size::sbytes}\"||\"\"]}{stream.folderSize::>0[\"/{stream.folderSize::sbytes}\"||\"\"]}{stream.bitrate::exists[\" \u00b7 {stream.bitrate::sbitrate::replace('Mbps','\u1d39\u1d47\u1d56\u02e2')::replace('Kbps','\u1d37\u1d47\u1d56\u02e2')} \"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\"||\"\"]}{service.cached::isfalse::or::stream.type::=p2p::and::stream.seeders::>0[\"\u21c4 {stream.seeders}\u2766 \"||\"\"]}{stream.age::exists[\"\u00b7 {stream.age}\"||\"\"]}\n{stream.proxied::istrue[\"\u26ca  \"||\"\u26c9  \"]}{service.shortName::exists[\"[{service.shortName}] \"||\"\"]}{addon.name}{stream.private::istrue[\" \u26bf \u1d18\u0280\u026a\u1d20\u1d00\u1d1b\u1d07 \"||\"\"]}{stream.releaseGroup::exists[\" \u00b7 {stream.releaseGroup::truncate(13)}\"||\"\"]}{stream.indexer::exists::and::stream.type::~usenet[\" \u00b7 {stream.indexer::truncate(13)}\"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\\n\"||\"\"]}\n{stream.uLanguages::exists[\"\u26ff  {stream.uSmallLanguageCodes::join(' \u00b7 ')::replace('\ua730','\u0493')::replace('x','\u0445')::replace('\ua7af','\u03d9')::replace('\ua731','s')::replace('\u1d05\u1d1c\u1d00\u029f \u1d00\u1d1c\u1d05\u026a\u1d0f','\u1d05\u1d1c\u1d0f')::replace('\u1d05\u1d1c\u0299\u0299\u1d07\u1d05','\u1d05\u1d1c\u0299')}  \"||\"\"]}{stream.subbed::istrue::and::stream.uLanguages::exists[\"\u00b7 s\u1d1c\u0299 \"||\"\"]}{stream.subbed::istrue::and::stream.uLanguages::exists::isfalse[\"\u26ff  s\u1d1c\u0299 \"||\"\"]}{stream.uSubtitles::exists[\"({stream.uSmallSubtitleCodes::join(' \u00b7 ')::replace('\ua730','\u0493')::replace('x','\u0445')::replace('\ua7af','\u03d9')::replace('\ua731','s')})  \"||\"\"]}{stream.seadex::or::stream.seScore::>0::or::stream.seScore::<0::or::stream.message::exists::or::stream.rseMatched::length::>0[\" \u00bb  \"||\"\"]}{stream.seadexBest::istrue[\" \u0299\u1d07s\u1d1b \u0280\u1d07\u029f\u1d07\u1d00s\u1d07 \"||\"\"]}{stream.seadex::istrue::and::stream.seadexBest::isfalse[\" \u1d00\u029f\u1d1b \u0299\u1d07s\u1d1b \u0280\u1d07\u029f\u1d07\u1d00s\u1d07 \"||\"\"]}{stream.seadex::isfalse::and::stream.rseMatched::length::>0[\"{stream.rseMatched::remove('TrueHD ATMOS')::remove('DD+ ATMOS')::remove('ATMOS')::remove('TrueHD')::remove('DTS-HD MA')::remove('FLAC')::remove('DTS-HD HRA')::remove('DD+')::remove('DD')::remove('DTS-ES')::remove('DTS X')::remove('DTS')::remove('AAC')::remove('Opus')::remove('DV (Disk)')::remove('DV')::remove('HDR10+ Boost')::remove('HDR')::remove('UHD Streaming Boost')::remove('HD Streaming Boost')::remove('INTERNAL')::remove('No-RlsGroup')::remove('FHD')::remove('UHD')::remove('HD')::remove('4K')::remove('126811')::remove('SiC')::remove('FraMeSToR')::remove('TheFarm')::remove('hallowed')::remove('BHDStudio')::remove('FLUX')::remove('Season Pack')::join('  ')::replace('UHD ','')::replace('HD ','')::replace('Movies Anywhere','MA')::upper::replace('F','\u0493')::replace('X','\u0445')::replace('Q','\u03d9')::replace('0','\u2080')::replace('1','\u2081')::replace('2','\u2082')::replace('3','\u2083')::replace('4','\u2084')::replace('5','\u2085')::replace('6','\u2086')::replace('7','\u2087')::replace('8','\u2088')::replace('9','\u2089')::smallcaps::replace('\ua731','s')} \"||\"\"]}{stream.message::exists[\" {stream.message::replace('NZB Health: \u2705','\u2705 \u0274\u1d22\u0299')::replace('NZB Health: \ud83e\udddd','\ud83e\udddd \u0274\u1d22\u0299')::replace('AvailNZB \ud83d\udc9a','\ud83d\udc9a \u0274\u1d22\u0299')::replace('NZB Health: \u26a0\ufe0f','\u1d1c\u0274\u1d20\u1d07\u0280\u026a\u0493\u026a\u1d07\u1d05 \u0274\u1d22\u0299')::replace('NZB Health: \ud83d\udeab','\u2718\u0274\u1d22\u0299')::smallcaps} \"||\"\"]}{stream.seScore::>0::or::stream.seScore::<0[\"{stream.seScore::string::replace('0','\u2080')::replace('1','\u2081')::replace('2','\u2082')::replace('3','\u2083')::replace('4','\u2084')::replace('5','\u2085')::replace('6','\u2086')::replace('7','\u2087')::replace('8','\u2088')::replace('9','\u2089')}\"||\"\"]}{stream.message::~Download[\"{tools.removeLine}\"||\"\"]}{service.cached::istrue::and::stream.message::~Download::istrue[\"\\n\u27a5 DL Stream\"||\"\"]}"
         }
       }
     },
@@ -558,7 +558,7 @@
       "addons": []
     },
     "titleMatching": {
-      "mode": "exact",
+      "mode": "fuzzy",
       "similarityThreshold": 1,
       "enabled": true,
       "requestTypes": [
@@ -667,8 +667,8 @@
     "preferredRegexPatterns": [],
     "rankedRegexPatterns": [
       {
-        "name": "𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍)",
-        "pattern": "/^(?!𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍))𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍)$/",
+        "name": "\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d)",
+        "pattern": "/^(?!\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d))\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d)$/",
         "score": 0
       },
       {
@@ -681,15 +681,9 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
-    ],
-    "syncedExcludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-extended.json"
-    ],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
+    "syncedPreferredStreamExpressionUrls": [],
+    "syncedExcludedStreamExpressionUrls": [],
+    "syncedIncludedStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
     ],
@@ -720,11 +714,11 @@
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
       {
-        "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟2.6.1: 𝙴𝚡𝚝𝚎𝚗𝚍𝚎𝚍 𝚂𝙴𝙻 𝚏𝚒𝚕𝚝𝚎𝚛𝚒𝚗𝚐 𝚎𝚗𝚐𝚒𝚗𝚎*/ []",
+        "expression": "/*\ud835\ude83\ud835\ude8a\ud835\ude96\ud835\ude9d\ud835\ude8a\ud835\ude9b\ud835\ude98 \ud835\ude72\ud835\ude98\ud835\ude96\ud835\ude99\ud835\ude95\ud835\ude8e\ud835\ude9d\ud835\ude8e \ud835\ude82\ud835\ude74\ud835\ude7b \ud835\ude82\ud835\ude8e\ud835\ude9d\ud835\ude9e\ud835\ude99 \ud835\ude9f2.6.1: \ud835\ude74\ud835\udea1\ud835\ude9d\ud835\ude8e\ud835\ude97\ud835\ude8d\ud835\ude8e\ud835\ude8d \ud835\ude82\ud835\ude74\ud835\ude7b \ud835\ude8f\ud835\ude92\ud835\ude95\ud835\ude9d\ud835\ude8e\ud835\ude9b\ud835\ude92\ud835\ude97\ud835\ude90 \ud835\ude8e\ud835\ude97\ud835\ude90\ud835\ude92\ud835\ude97\ud835\ude8e*/ []",
         "enabled": true
       },
       {
-        "expression": "/*𝚐𝚒𝚝.𝚝𝚊𝚖𝚝𝚊𝚛𝚘.𝚍𝚎 𝚏𝚘𝚛 𝚏𝚞𝚕𝚕 𝚐𝚞𝚒𝚍𝚎 & 𝚊𝚍𝚍𝚒𝚝𝚒𝚘𝚗𝚊𝚕 𝚂𝙴𝙻𝚜*/[]",
+        "expression": "/*\ud835\ude90\ud835\ude92\ud835\ude9d.\ud835\ude9d\ud835\ude8a\ud835\ude96\ud835\ude9d\ud835\ude8a\ud835\ude9b\ud835\ude98.\ud835\ude8d\ud835\ude8e \ud835\ude8f\ud835\ude98\ud835\ude9b \ud835\ude8f\ud835\ude9e\ud835\ude95\ud835\ude95 \ud835\ude90\ud835\ude9e\ud835\ude92\ud835\ude8d\ud835\ude8e & \ud835\ude8a\ud835\ude8d\ud835\ude8d\ud835\ude92\ud835\ude9d\ud835\ude92\ud835\ude98\ud835\ude97\ud835\ude8a\ud835\ude95 \ud835\ude82\ud835\ude74\ud835\ude7b\ud835\ude9c*/[]",
         "enabled": true
       },
       {
@@ -754,10 +748,6 @@
       {
         "expression": "/*TB Pro Download Limit*/ size(uncached(service(streams, 'torbox')), '1TB')",
         "enabled": true
-      },
-      {
-        "expression": "<SYNCED: https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-extended.json>",
-        "enabled": true
       }
     ],
     "requiredStreamExpressions": [],
@@ -767,28 +757,19 @@
         "enabled": true
       },
       {
-        "expression": "/*𝙸𝚏 𝚢𝚘𝚞 𝚞𝚜𝚎𝚍 𝙿𝚊𝚛𝚝𝚒𝚊𝚕 𝚃𝚎𝚖𝚙𝚕𝚊𝚝𝚎, 𝚊𝚍𝚍 𝚂𝚝𝚛𝚎𝚊𝚖 𝙴𝚡𝚙𝚛𝚎𝚜𝚜𝚒𝚘𝚗𝚜 𝚒𝚗 𝚂𝚘𝚛𝚝 𝙾𝚛𝚍𝚎𝚛 𝚊𝚏𝚝𝚎𝚛 𝚀𝚞𝚊𝚕𝚒𝚝𝚢 𝚝𝚘 𝚞𝚜𝚎 𝙿𝚂𝙴 𝚜𝚢𝚗𝚌𝚎𝚍 𝚞𝚛𝚕 𝚋𝚎𝚕𝚘𝚠.*/ []",
-        "enabled": true
-      },
-      {
-        "expression": "<SYNCED: https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json>",
+        "expression": "/*\ud835\ude78\ud835\ude8f \ud835\udea2\ud835\ude98\ud835\ude9e \ud835\ude9e\ud835\ude9c\ud835\ude8e\ud835\ude8d \ud835\ude7f\ud835\ude8a\ud835\ude9b\ud835\ude9d\ud835\ude92\ud835\ude8a\ud835\ude95 \ud835\ude83\ud835\ude8e\ud835\ude96\ud835\ude99\ud835\ude95\ud835\ude8a\ud835\ude9d\ud835\ude8e, \ud835\ude8a\ud835\ude8d\ud835\ude8d \ud835\ude82\ud835\ude9d\ud835\ude9b\ud835\ude8e\ud835\ude8a\ud835\ude96 \ud835\ude74\ud835\udea1\ud835\ude99\ud835\ude9b\ud835\ude8e\ud835\ude9c\ud835\ude9c\ud835\ude92\ud835\ude98\ud835\ude97\ud835\ude9c \ud835\ude92\ud835\ude97 \ud835\ude82\ud835\ude98\ud835\ude9b\ud835\ude9d \ud835\ude7e\ud835\ude9b\ud835\ude8d\ud835\ude8e\ud835\ude9b \ud835\ude8a\ud835\ude8f\ud835\ude9d\ud835\ude8e\ud835\ude9b \ud835\ude80\ud835\ude9e\ud835\ude8a\ud835\ude95\ud835\ude92\ud835\ude9d\ud835\udea2 \ud835\ude9d\ud835\ude98 \ud835\ude9e\ud835\ude9c\ud835\ude8e \ud835\ude7f\ud835\ude82\ud835\ude74 \ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d \ud835\ude9e\ud835\ude9b\ud835\ude95 \ud835\ude8b\ud835\ude8e\ud835\ude95\ud835\ude98\ud835\udea0.*/ []",
         "enabled": true
       }
     ],
-    "includedStreamExpressions": [
-      {
-        "expression": "<SYNCED: https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json>",
-        "enabled": true
-      }
-    ],
+    "includedStreamExpressions": [],
     "rankedStreamExpressions": [
       {
-        "expression": "/*#𝚅𝚒𝚍𝚑𝚒𝚗'𝚜 𝚁𝚎𝚐𝚎𝚡𝚎𝚜 — 𝙴𝚗𝚐𝚕𝚒𝚜𝚑 𝚁𝚊𝚗𝚔𝚎𝚍 𝚂𝚝𝚛𝚎𝚊𝚖 𝙴𝚡𝚙𝚛𝚎𝚜𝚜𝚒𝚘𝚗𝚜 (𝚜𝚢𝚗𝚌𝚎𝚍). 𝚄𝚜𝚎𝚍 𝚝𝚘 𝚜𝚌𝚘𝚛𝚎 𝚊𝚗𝚍 𝚝𝚊𝚐 𝚜𝚝𝚛𝚎𝚊𝚖𝚜, 𝚟𝚒𝚜𝚒𝚋𝚕𝚎 𝚒𝚗 𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚛.*/ []",
+        "expression": "/*#\ud835\ude85\ud835\ude92\ud835\ude8d\ud835\ude91\ud835\ude92\ud835\ude97'\ud835\ude9c \ud835\ude81\ud835\ude8e\ud835\ude90\ud835\ude8e\ud835\udea1\ud835\ude8e\ud835\ude9c \u2014 \ud835\ude74\ud835\ude97\ud835\ude90\ud835\ude95\ud835\ude92\ud835\ude9c\ud835\ude91 \ud835\ude81\ud835\ude8a\ud835\ude97\ud835\ude94\ud835\ude8e\ud835\ude8d \ud835\ude82\ud835\ude9d\ud835\ude9b\ud835\ude8e\ud835\ude8a\ud835\ude96 \ud835\ude74\ud835\udea1\ud835\ude99\ud835\ude9b\ud835\ude8e\ud835\ude9c\ud835\ude9c\ud835\ude92\ud835\ude98\ud835\ude97\ud835\ude9c (\ud835\ude9c\ud835\udea2\ud835\ude97\ud835\ude8c\ud835\ude8e\ud835\ude8d). \ud835\ude84\ud835\ude9c\ud835\ude8e\ud835\ude8d \ud835\ude9d\ud835\ude98 \ud835\ude9c\ud835\ude8c\ud835\ude98\ud835\ude9b\ud835\ude8e \ud835\ude8a\ud835\ude97\ud835\ude8d \ud835\ude9d\ud835\ude8a\ud835\ude90 \ud835\ude9c\ud835\ude9d\ud835\ude9b\ud835\ude8e\ud835\ude8a\ud835\ude96\ud835\ude9c, \ud835\ude9f\ud835\ude92\ud835\ude9c\ud835\ude92\ud835\ude8b\ud835\ude95\ud835\ude8e \ud835\ude92\ud835\ude97 \ud835\ude8f\ud835\ude98\ud835\ude9b\ud835\ude96\ud835\ude8a\ud835\ude9d\ud835\ude9d\ud835\ude8e\ud835\ude9b.*/ []",
         "score": 0,
         "enabled": true
       },
       {
-        "expression": "/*𝚐𝚒𝚝𝚑𝚞𝚋.𝚌𝚘𝚖/Vidhin05/Releases-Regex 𝚏𝚘𝚛 𝚏𝚞𝚕𝚕 𝚐𝚞𝚒𝚍𝚎*/ []",
+        "expression": "/*\ud835\ude90\ud835\ude92\ud835\ude9d\ud835\ude91\ud835\ude9e\ud835\ude8b.\ud835\ude8c\ud835\ude98\ud835\ude96/Vidhin05/Releases-Regex \ud835\ude8f\ud835\ude98\ud835\ude9b \ud835\ude8f\ud835\ude9e\ud835\ude95\ud835\ude95 \ud835\ude90\ud835\ude9e\ud835\ude92\ud835\ude8d\ud835\ude8e*/ []",
         "score": 0,
         "enabled": true
       },
@@ -964,9 +945,7 @@
     "preloadStreams": {
       "enabled": true
     },
-    "syncedExcludedRegexUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json"
-    ],
+    "syncedExcludedRegexUrls": [],
     "usePosterServiceForMeta": true
   }
 }
