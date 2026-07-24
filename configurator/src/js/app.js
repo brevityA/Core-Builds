@@ -2886,7 +2886,7 @@ function presets() {
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
   if (isHttp) return [
     { type:'sootio', instanceId:'sootio-core-builds', enabled:true, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000 }, resources:['stream'] },
+    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] },
     { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
@@ -2960,7 +2960,7 @@ function presets() {
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:false, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     { type:'sootio', instanceId:'sootio-core-builds', enabled:isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000 }, resources:['stream'] }] : []),
+    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...subtitlePresets(),
     ...catalogPresets()
   ];
@@ -3342,17 +3342,19 @@ function build() {
     yearMatching: { enabled:hasTmdb, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
     groups: (function(){ const isFree=S.service==='p2p'||S.service==='http'; if(!isFree) return { enabled:false, groupings:[] };
+      const all=_presets.map(p=>p.options?.name).filter(Boolean);
+      const has=new Set(all);
       const primary=['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'];
       const secondary=['Meteor','Comet','MediaFusion','HdHub'];
       const fallback=['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'];
       const grouped=new Set([...primary,...secondary,...fallback]);
-      const all=_presets.map(p=>p.options?.name).filter(Boolean);
       all.forEach(n=>{ if(!grouped.has(n)) primary.push(n); });
-      return { enabled:true, groupings:[
-        { name:'Primary', addons:primary, condition:'true' },
-        { name:'Secondary', addons:secondary, condition:'count(totalStreams)<5' },
-        { name:'Fallback', addons:fallback, condition:'count(totalStreams)<15' }
-      ] }; })(),
+      const groups=[
+        { name:'Primary', addons:primary.filter(n=>has.has(n)), condition:'true' },
+        { name:'Secondary', addons:secondary.filter(n=>has.has(n)), condition:'count(totalStreams)<5' },
+        { name:'Fallback', addons:fallback.filter(n=>has.has(n)), condition:'count(totalStreams)<15' }
+      ].filter(g=>g.addons.length>0);
+      return { enabled:groups.length>0, groupings:groups }; })(),
   };
 
   const result = {
