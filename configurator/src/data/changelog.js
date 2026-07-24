@@ -1,4 +1,13 @@
 export const CHANGELOG = [
+  { v:'2.82', date:'Jul 24 2026', items:[
+    'Patch Cinemeta & AIOMetadata now enabled by default — new templates automatically patch Cinemeta catalogs and install AIOMetadata',
+    'Full Setup service selection — Full Setup now reads the active splash chip and sets the correct service/multiServices',
+    'Library Boost — Three modes: Default (normal position), Strong (top priority), None (disabled)',
+    'Bandwidth Estimator — Device-aware bandwidth suggestion with manual override (10–200 Mbps)',
+    'Age Limit — Content age filter with 7d / 30d / 90d / 1y / 2y presets',
+    'NZB Failover — Configurable position (before/after torrents) and max NZB count (1/2/3/5)',
+    'Template Inspector upgraded — File import, URL fetch, clipboard paste, health score ring, host compatibility checks, export report, theme toggle',
+  ]},
   { v:'2.81', date:'Jul 24 2026', items:[
     'Health Score — Added a template health score ring to the Review step with breakdown by sort criteria, ISEs, ESEs, formatter, regex, and deduplicator',
     'Template Versioning — Templates now embed coreBuildsVersion and generatedAt metadata; an update banner appears when a saved template is outdated',
