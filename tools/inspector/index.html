@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Builds — Template Inspector</title>
+<style>
+  :root{--bg:#0d1117;--card:#161b22;--border:rgba(255,255,255,.06);--tx:#e6edf3;--tx2:#8b949e;--tx3:#4b5563;--accent:#00d4ff;--accent-bg:rgba(0,212,255,.08);--ok:#34d399;--warn:#fbbf24;--err:#f87171;--purple:#a78bfa}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding:24px}
+  .container{max-width:800px;margin:0 auto}
+  h1{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+  .sub{color:var(--tx2);font-size:.82rem;margin-bottom:24px}
+  textarea{width:100%;height:280px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;color:var(--tx);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.78rem;resize:vertical;outline:none;transition:border-color .15s}
+  textarea:focus{border-color:rgba(0,212,255,.4)}
+  .actions{display:flex;gap:8px;margin:12px 0}
+  button{padding:10px 20px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:var(--accent-bg);color:var(--accent);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
+  button:hover{background:rgba(0,212,255,.15)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .btn-secondary{border-color:var(--border);background:transparent;color:var(--tx2)}
+  .btn-secondary:hover{background:rgba(255,255,255,.04)}
+  .results{margin-top:20px}
+  .section{margin-bottom:16px}
+  .section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:6px;font-size:.68rem;font-weight:800;padding:0 6px}
+  .badge-ok{background:rgba(52,211,153,.12);color:var(--ok)}
+  .badge-warn{background:rgba(251,191,36,.12);color:var(--warn)}
+  .badge-err{background:rgba(248,113,113,.12);color:var(--err)}
+  .badge-pass{background:rgba(52,211,153,.12);color:var(--ok)}
+  .item{padding:8px 12px;border-radius:8px;margin-bottom:4px;font-size:.78rem;line-height:1.5;display:flex;align-items:flex-start;gap:8px}
+  .item-err{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.12)}
+  .item-warn{background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12)}
+  .item-pass{background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.08)}
+  .item-icon{flex-shrink:0;font-size:.9rem;margin-top:1px}
+  .item-text{flex:1;color:var(--tx2)}
+  .host-compat{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .host-chip{padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:6px}
+  .host-ok{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:var(--ok)}
+  .host-warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);color:var(--warn)}
+  .host-err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--err)}
+  .summary-bar{display:flex;gap:12px;padding:14px 16px;border-radius:10px;background:var(--card);border:1px solid var(--border);margin-bottom:16px;flex-wrap:wrap}
+  .summary-stat{text-align:center;flex:1;min-width:80px}
+  .summary-num{font-size:1.4rem;font-weight:900}
+  .summary-lbl{font-size:.65rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .dot-ok{background:var(--ok)}
+  .dot-warn{background:var(--warn)}
+  .dot-err{background:var(--err)}
+  .export-btn{margin-top:12px}
+  .hidden{display:none}
+  #loading{text-align:center;padding:40px;color:var(--tx2)}
+  .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔍 Template Inspector</h1>
+  <p class="sub">Paste any AIOStreams JSON config — get plain-English findings, safe repairs, and host compatibility.</p>
+
+  <textarea id="input" placeholder='Paste your AIOStreams template JSON here...\n\nOr paste a manifest URL (https://...) to fetch and inspect.'></textarea>
+
+  <div class="actions">
+    <button id="inspectBtn" onclick="inspect()">Inspect Template</button>
+    <button class="btn-secondary" onclick="clearAll()">Clear</button>
+    <button class="btn-secondary" onclick="loadExample()">Load Example</button>
+  </div>
+
+  <div id="loading" class="hidden"><span class="spinner"></span>Validating…</div>
+
+  <div id="results" class="results hidden"></div>
+</div>
+
+<script>
+// ── Validation engine (ported from validate_templates.py) ──────────
+
+const VALID_SORT_KEYS = new Set([
+  'resolution','quality','cached','size','seeders','bitrate','encode',
+  'audioChannels','audioTags','visualTags','releaseGroup','age',
+  'regexScore','seScore','language','subtitle','title','year',
+  'service','type','filename','indexer'
+]);
+
+const VALID_EXCLUDED_RESOLUTIONS = ['240p','360p','480p','576p','720p','1080p','1440p','2160p'];
+const VALID_EXCLUDED_QUALITIES = ['HDRip','Cam','TeleSync','Telecine','Scr','Unknown'];
+const VALID_EXCLUDED_VISUAL_TAGS = ['DV','HDR10','HDR10+','HDR','HLG','SDR','10bit'];
+const VALID_EXCLUDED_AUDIO_TAGS = ['Atmos','TrueHD','DTS-HD MA','DTS','EAC3','DD+','AAC','FLAC','AC3','OPUS'];
+const VALID_EXCLUDED_AUDIO_CHANNELS = ['2.0','5.1','7.1'];
+
+const KNOWN_PRESET_TYPES = [
+  'torrentio','comet','mediafusion','torbox-search','torbox-usenet',
+  'jackettio','debridio','peerflix','sootio','neko-bt','animetosho',
+  'dmm-cast','hdhub','torrents-db','easynews','davex','stremthruStore',
+  'aiosubtitle','opensubtitles-v3-plus','subdl','tmdb-addon','streamingCatalogs',
+  'animeCatalogs','rpdb','torrentCatalogs','baguettio','flixStreams'
+];
+
+const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
+
+function validateTemplate(config) {
+  const errors = [], warnings = [], passes = [];
+
+  // Metadata
+  const meta = config.metadata || {};
+  if (!config.metadata) warnings.push('metadata.version missing — no version tracking');
+  else {
+    if (!meta.version) warnings.push('metadata.version missing');
+    if (!meta.name) warnings.push('metadata.name missing');
+    if (!meta.description) warnings.push('metadata.description missing');
+    if (!meta.author) warnings.push('metadata.author missing');
+    if (!meta.category) warnings.push('metadata.category missing');
+    if (meta.version && meta.name && meta.description && meta.author && meta.category)
+      passes.push('metadata: complete');
+  }
+
+  const cfg = config.config || {};
+
+  // Sort criteria
+  for (const scope of ['global','movies','series','anime','cached','uncached','cachedMovies','uncachedMovies','cachedSeries','uncachedSeries']) {
+    const keys = cfg.sortCriteria?.[scope];
+    if (!Array.isArray(keys)) continue;
+    const invalid = keys.filter(k => !VALID_SORT_KEYS.has(k.key));
+    if (invalid.length) errors.push(`sortCriteria.${scope}: invalid key(s): ${invalid.map(k=>k.key).join(', ')}`);
+    else passes.push(`sortCriteria.${scope}: ${keys.length} keys valid`);
+  }
+
+  // Excluded lists
+  for (const [field, valid] of [['excludedResolutions',VALID_EXCLUDED_RESOLUTIONS],['excludedQualities',VALID_EXCLUDED_QUALITIES],['excludedVisualTags',VALID_EXCLUDED_VISUAL_TAGS],['excludedAudioTags',VALID_EXCLUDED_AUDIO_TAGS],['excludedAudioChannels',VALID_EXCLUDED_AUDIO_CHANNELS]]) {
+    const arr = cfg[field];
+    if (!Array.isArray(arr)) continue;
+    const invalid = arr.filter(v => !valid.includes(v));
+    if (invalid.length) errors.push(`${field}: invalid value(s): ${invalid.join(', ')}`);
+  }
+
+  // Presets
+  const presets = cfg.presets || [];
+  const enabledPresets = presets.filter(p => p.enabled !== false);
+  passes.push(`presets: ${presets.length} total, ${enabledPresets.length} enabled`);
+
+  const presetTypes = presets.map(p => p.type).filter(Boolean);
+  const missingIids = presets.filter(p => p.enabled !== false && !p.instanceId);
+  if (missingIids.length) warnings.push(`${missingIids.length} enabled preset(s) missing instanceId`);
+
+  const unknownTypes = presetTypes.filter(t => !KNOWN_PRESET_TYPES.includes(t));
+  if (unknownTypes.length) warnings.push(`unknown preset type(s): ${[...new Set(unknownTypes)].join(', ')}`);
+
+  // Formatter
+  const fmt = cfg.formatter || {};
+  if (fmt.id) {
+    if (fmt.id === 'tamtaro') {
+      const overrides = fmt.definitions?.overrides;
+      if (overrides && overrides.tamtaro) passes.push("formatter: tamtaro override correctly keyed");
+      else errors.push("formatter: id='tamtaro' but overrides key is not 'tamtaro' — formatter won't apply");
+    } else {
+      passes.push(`formatter: using built-in '${fmt.id}'`);
+    }
+  }
+
+  // Stream expressions
+  const ises = cfg.includedStreamExpressions || [];
+  const eses = cfg.excludedStreamExpressions || [];
+  const pses = cfg.preferredStreamExpressions || [];
+  passes.push(`expressions: ${ises.length} ISEs, ${eses.length} ESEs, ${pses.length} PSEs`);
+
+  const hasCachedIse = ises.some(e => e.expression && /0Cached/i.test(e.expression));
+  if (!hasCachedIse) warnings.push('0Cached ISE missing — no fallback when nothing is cached');
+
+  // Matching
+  if (cfg.titleMatching?.mode === 'exact') warnings.push("titleMatching.mode is 'exact' — causes zero results on title variations");
+  if (cfg.titleMatching?.similarityThreshold >= 0.9) warnings.push(`titleMatching.similarityThreshold ${cfg.titleMatching.similarityThreshold} — very strict`);
+  if (cfg.yearMatching?.strict) warnings.push('yearMatching.strict=True — blocks valid releases with TMDB date discrepancies');
+  if (cfg.seasonEpisodeMatching?.strict) warnings.push('seasonEpisodeMatching.strict=True — drops BluRay/REMUX without S/E metadata');
+
+  // Required languages
+  const reqLangs = cfg.requiredLanguages || [];
+  const reviewedLangs = ['English','Original','Dual Audio','Multi','Dubbed','Unknown'];
+  if (reqLangs.length && !reqLangs.every(l => reviewedLangs.includes(l)))
+    warnings.push(`requiredLanguages is set [${reqLangs.map(l=>`'${l}'`).join(', ')}] — hard-blocks untagged streams`);
+
+  // Groups
+  const groups = cfg.groups;
+  if (groups?.enabled && groups.groups) {
+    for (const g of groups.groups) {
+      const presetIds = new Set(presets.map(p => p.instanceId).filter(Boolean));
+      const stale = (g.addonInstanceIds || []).filter(id => !presetIds.has(id));
+      if (stale.length) errors.push(`Group "${g.name}": stale instanceId(s): ${stale.join(', ')}`);
+      if (g.condition && !/totalTimeTaken|previousGroupTimeTaken/.test(g.condition))
+        warnings.push(`Group "${g.name}": no time safety net in condition`);
+    }
+  }
+
+  // Deduplicator
+  const dedup = cfg.deduplicator || {};
+  const validDedup = ['per_addon','per_service','per_quality_resolution','global'];
+  if (dedup.cached && !validDedup.includes(dedup.cached)) errors.push(`deduplicator.cached: invalid mode '${dedup.cached}'`);
+  if (dedup.uncached && dedup.uncached === 'all') errors.push("deduplicator.uncached: 'all' is not a valid mode");
+
+  return { errors, warnings, passes };
+}
+
+// ── Host compatibility ─────────────────────────────────────────────
+
+function checkHostCompat(config) {
+  const cfg = config.config || {};
+  const hosts = {
+    selfhosted: { label:'Self-Hosted', issues:[], status:'ok' },
+    elfhosted:  { label:'ElfHosted', issues:[], status:'ok' },
+    fortheweak: { label:'ForTheWeak', issues:[], status:'ok' },
+  };
+
+  const syncedUrls = [
+    ...(cfg.syncedRankedRegexUrls||[]),
+    ...(cfg.syncedExcludedRegexUrls||[]),
+    ...(cfg.syncedIncludedStreamExpressionUrls||[]),
+    ...(cfg.syncedPreferredStreamExpressionUrls||[]),
+    ...(cfg.syncedExcludedStreamExpressionUrls||[]),
+  ];
+
+  if (syncedUrls.some(u => u.includes('Tam-Taro') || u.includes('Tamtaro'))) {
+    hosts.elfhosted.issues.push('Tam-Taro synced URL — blocked on elfhosted');
+    hosts.elfhosted.status = 'err';
+  }
+
+  const ranked = cfg.rankedRegexPatterns || [];
+  const ftwBlocked = ranked.filter(r => FORTHEWEAK_BLOCKED.includes(r.name));
+  if (ftwBlocked.length) {
+    hosts.fortheweak.issues.push(`${ftwBlocked.length} regex pattern(s) blocked`);
+    hosts.fortheweak.status = 'err';
+  }
+
+  const allExprs = [...(cfg.excludedStreamExpressions||[]),...(cfg.includedStreamExpressions||[]),...(cfg.preferredStreamExpressions||[])];
+  if (allExprs.some(e => e.expression && /\bnot\s*\(/.test(e.expression))) {
+    hosts.elfhosted.issues.push('SEL uses not() — must use negate()');
+    hosts.elfhosted.status = 'err';
+    hosts.fortheweak.issues.push('SEL uses not() — must use negate()');
+    hosts.fortheweak.status = 'err';
+  }
+
+  return hosts;
+}
+
+// ── UI ─────────────────────────────────────────────────────────────
+
+async function inspect() {
+  const raw = document.getElementById('input').value.trim();
+  if (!raw) return;
+
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('results').classList.add('hidden');
+
+  let json;
+  try {
+    // Try parsing as JSON
+    json = JSON.parse(raw);
+  } catch(e) {
+    // Try fetching as URL
+    try {
+      const res = await fetch(raw);
+      json = await res.json();
+    } catch(e2) {
+      document.getElementById('loading').classList.add('hidden');
+      alert('Could not parse as JSON or fetch as URL.\n\n' + e.message);
+      return;
+    }
+  }
+
+  // Small delay for UX
+  await new Promise(r => setTimeout(r, 300));
+
+  const result = validateTemplate(json);
+  const hosts = checkHostCompat(json);
+  renderResults(result, hosts);
+
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('results').classList.remove('hidden');
+}
+
+function renderResults(result, hosts) {
+  const { errors, warnings, passes } = result;
+  const el = document.getElementById('results');
+
+  const statusColor = errors.length ? 'err' : warnings.length ? 'warn' : 'ok';
+  const statusText = errors.length ? 'Issues Found' : warnings.length ? 'Warnings' : 'All Clear';
+  const statusEmoji = errors.length ? '✕' : warnings.length ? '⚠' : '✓';
+
+  let html = `
+    <div class="summary-bar">
+      <div class="summary-stat"><div class="summary-num" style="color:var(--err)">${errors.length}</div><div class="summary-lbl">Errors</div></div>
+      <div class="summary-stat"><div class="summary-num" style="color:var(--warn)">${warnings.length}</div><div class="summary-lbl">Warnings</div></div>
+      <div class="summary-stat"><div class="summary-num" style="color:var(--ok)">${passes.length}</div><div class="summary-lbl">Passed</div></div>
+      <div class="summary-stat"><div class="summary-num"><span class="dot dot-${statusColor}"></span></div><div class="summary-lbl">${statusText}</div></div>
+    </div>`;
+
+  if (errors.length) {
+    html += `<div class="section"><div class="section-title"><span class="badge badge-err">${errors.length}</span> Errors</div>`;
+    html += errors.map(e => `<div class="item item-err"><span class="item-icon">✕</span><span class="item-text">${esc(e)}</span></div>`).join('');
+    html += '</div>';
+  }
+
+  if (warnings.length) {
+    html += `<div class="section"><div class="section-title"><span class="badge badge-warn">${warnings.length}</span> Warnings</div>`;
+    html += warnings.map(w => `<div class="item item-warn"><span class="item-icon">⚠</span><span class="item-text">${esc(w)}</span></div>`).join('');
+    html += '</div>';
+  }
+
+  if (passes.length) {
+    html += `<div class="section"><div class="section-title"><span class="badge badge-pass">${passes.length}</span> Passed Checks</div>`;
+    html += passes.map(p => `<div class="item item-pass"><span class="item-icon">✓</span><span class="item-text">${esc(p)}</span></div>`).join('');
+    html += '</div>';
+  }
+
+  // Host compatibility
+  html += `<div class="section"><div class="section-title">Host Compatibility</div><div class="host-compat">`;
+  for (const [key, h] of Object.entries(hosts)) {
+    const dot = h.status === 'ok' ? '✓' : h.status === 'warn' ? '⚠' : '✕';
+    const issues = h.issues.length ? ` — ${h.issues.join('; ')}` : '';
+    html += `<div class="host-chip host-${h.status}">${dot} ${esc(h.label)}${esc(issues)}</div>`;
+  }
+  html += '</div></div>';
+
+  // Export button
+  html += `<button class="export-btn btn-secondary" onclick="exportReport()">Export Report as JSON</button>`;
+
+  el.innerHTML = html;
+
+  // Store for export
+  window._lastReport = { errors, warnings, passes, hosts, inspectedAt: new Date().toISOString() };
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('results').innerHTML = '';
+}
+
+function loadExample() {
+  document.getElementById('input').value = JSON.stringify({
+    metadata: { version: "1.0.0", name: "Example Template", description: "Test", author: "User", category: "Debrid" },
+    config: {
+      presets: [
+        { type: "torrentio", instanceId: "t1", enabled: true, options: {} },
+        { type: "torbox-search", instanceId: "tb1", enabled: true, options: {} }
+      ],
+      formatter: { id: "tamtaro", definitions: { overrides: { tamtaro: { name: "Custom", description: "Test" } } } },
+      includedStreamExpressions: [{ expression: "0Cached == true" }],
+      excludedStreamExpressions: [],
+      preferredStreamExpressions: [],
+      sortCriteria: { global: [{ key: "resolution", order: "desc" }, { key: "cached", order: "desc" }] },
+      titleMatching: { mode: "fuzzy", similarityThreshold: 0.85 },
+      yearMatching: { strict: false }
+    }
+  }, null, 2);
+}
+
+function exportReport() {
+  if (!window._lastReport) return;
+  const blob = new Blob([JSON.stringify(window._lastReport, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'template-inspector-report.json';
+  a.click();
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
