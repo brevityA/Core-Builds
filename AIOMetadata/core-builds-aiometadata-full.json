@@ -1,6 +1,6 @@
 {
   "version": "2.7.1",
-  "exportedAt": "2026-06-20T00:00:00.000Z",
+  "exportedAt": "2026-07-23T12:00:00.000Z",
   "config": {
     "language": "en-US",
     "includeAdult": false,
@@ -75,17 +75,18 @@
         "mal.search.series": true
       }
     },
-    "streaming": ["cru"],
+    "streaming": [
+      "cru"
+    ],
     "mdblistWatchTracking": true,
     "showDisabledCatalogs": false,
     "displayTypeOverrides": {
       "movie": "movie",
       "series": "series"
     },
-    "lastModified": 1781913600000,
-    "configVersion": 1781913600001,
+    "lastModified": 1784736000000,
+    "configVersion": 1784736000001,
     "catalogs": [
-
       {
         "id": "tmdb.top",
         "name": "TMDB Popular",
@@ -113,7 +114,7 @@
         "type": "movie",
         "name": "Trakt Trending",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -134,7 +135,7 @@
         "type": "series",
         "name": "Trakt Trending",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -215,7 +216,6 @@
           "updated": "2026-02-02T12:19:54.445833Z"
         }
       },
-
       {
         "id": "mdblist.88328",
         "type": "movie",
@@ -510,7 +510,6 @@
           "url": "https://mdblist.com/lists/tvgeniekodi/hulu-tv-shows"
         }
       },
-
       {
         "id": "mdblist.91211",
         "type": "movie",
@@ -965,7 +964,7 @@
         "type": "movie",
         "name": "Trending Kids",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -986,7 +985,7 @@
         "type": "series",
         "name": "Trending Kids",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "source": "mdblist",
         "sort": "default",
         "order": "asc",
@@ -1002,7 +1001,6 @@
           "url": "https://mdblist.com/lists/tvgeniekodi/trending-kids-tv-shows"
         }
       },
-
       {
         "id": "tmdb.year",
         "name": "TMDB By Year",
@@ -1272,7 +1270,6 @@
           "url": "https://mdblist.com/lists/snoak/top-1980s-movies"
         }
       },
-
       {
         "id": "tmdb.trending",
         "name": "TMDB Trending",
@@ -1385,7 +1382,6 @@
         "enabled": false,
         "showInHome": false
       },
-
       {
         "id": "mal.airing",
         "name": "MAL Airing Now",
@@ -1412,7 +1408,7 @@
         "type": "anime",
         "name": "AniDB Latest Ended",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "source": "custom",
         "sourceUrl": "https://1fe84bc728af-stremio-anime-catalogs.baby-beamup.club/%7B%22anidb_popular%22%3A%22on%22%2C%22anidb_latest-started%22%3A%22on%22%2C%22anidb_latest-ended%22%3A%22on%22%2C%22anilist_trending-now%22%3A%22on%22%7D/catalog/anime/anidb_latest-ended.json",
         "genres": [],
@@ -1425,18 +1421,49 @@
             {
               "name": "genre",
               "options": [
-                "Action", "Adventure", "Comedy", "Drama", "Sci-Fi", "Space",
-                "Mystery", "Magic", "Supernatural", "Police", "Fantasy",
-                "Sports", "Romance", "Cars", "Slice of Life", "Racing",
-                "Horror", "Psychological", "Thriller", "Martial Arts",
-                "Super Power", "School", "Ecchi", "Vampire", "Historical",
-                "Military", "Dementia", "Mecha", "Demons", "Samurai",
-                "Harem", "Music", "Parody", "Kids"
+                "Action",
+                "Adventure",
+                "Comedy",
+                "Drama",
+                "Sci-Fi",
+                "Space",
+                "Mystery",
+                "Magic",
+                "Supernatural",
+                "Police",
+                "Fantasy",
+                "Sports",
+                "Romance",
+                "Cars",
+                "Slice of Life",
+                "Racing",
+                "Horror",
+                "Psychological",
+                "Thriller",
+                "Martial Arts",
+                "Super Power",
+                "School",
+                "Ecchi",
+                "Vampire",
+                "Historical",
+                "Military",
+                "Dementia",
+                "Mecha",
+                "Demons",
+                "Samurai",
+                "Harem",
+                "Music",
+                "Parody",
+                "Kids"
               ]
             },
-            { "name": "skip" }
+            {
+              "name": "skip"
+            }
           ],
-          "idPrefixes": ["kitsu:"]
+          "idPrefixes": [
+            "kitsu:"
+          ]
         },
         "displayType": "anime"
       },
@@ -1446,7 +1473,7 @@
         "type": "series",
         "source": "streaming",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "series"
@@ -1457,7 +1484,7 @@
         "type": "movie",
         "source": "streaming",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "movie"
@@ -1468,7 +1495,7 @@
         "type": "anime",
         "source": "mal",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "randomizePerPage": true
@@ -1479,7 +1506,7 @@
         "type": "anime",
         "source": "mal",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "anime",
@@ -1491,7 +1518,7 @@
         "type": "anime",
         "source": "mal",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "anime"
@@ -1502,7 +1529,7 @@
         "type": "anime",
         "source": "mal",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "anime"
@@ -1513,7 +1540,7 @@
         "type": "anime",
         "source": "mal",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "anime"
@@ -1524,7 +1551,7 @@
         "type": "anime",
         "source": "mal",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "anime"
@@ -1535,12 +1562,11 @@
         "type": "anime",
         "source": "mal",
         "enabled": true,
-        "showInHome": true,
+        "showInHome": false,
         "sort": "default",
         "order": "asc",
         "displayType": "anime"
       },
-
       {
         "id": "mal.genres",
         "name": "MAL Genres",
@@ -1562,7 +1588,6 @@
         "order": "asc",
         "displayType": "anime"
       },
-
       {
         "id": "mal.upcoming",
         "name": "MAL Upcoming Season",
@@ -1622,12 +1647,14 @@
         "sort": "default",
         "order": "asc"
       }
-
     ]
   },
   "metadata": {
     "apiKeysExcluded": true,
     "totalCatalogs": 91,
-    "enabledCatalogs": 74
+    "enabledCatalogs": 74,
+    "homeVisible": 42,
+    "revampedFrom": "Core-Builds + Tam-Taro insights",
+    "notes": "Revamped 2026-07-23: Updated timestamps, balanced home catalogs (~50), standardized names, ensured modern schema fields, prioritized popular + streaming services + key anime."
   }
 }
