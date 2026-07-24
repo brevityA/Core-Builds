@@ -1516,6 +1516,7 @@ function render() {
             <div style="display:flex;gap:12px;align-items:center">
               <button data-action="open-diagnostics" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s">Report Issue</button>
               <button data-action="show-changelog" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Changelog</button>
+              <a href="./tools/" style="font-size:.74rem;font-weight:700;color:#6b7280;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#6b7280'">Tools</a>
               <button data-action="start-setup" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
             </div>
           </div>
@@ -1523,6 +1524,10 @@ function render() {
             <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
+            </a>
+            <a href="./tools/" class="community-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Tools
             </a>
             <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
@@ -4355,6 +4360,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <strong style="color:#e6edf3">2.</strong> Streams should appear with Core Builds sorting<br>
           <strong style="color:#e6edf3">3.</strong> Save your password — you'll need it to edit settings later
         </div>
+        <div style="margin-top:6px"><a href="./account-tools/" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#34d399'" onmouseout="this.style.color='#8b949e'">Back up your current addons first →</a></div>
         <div id="mTestResult" style="margin-top:6px;font-size:.72rem"></div>
       </div>
       <details style="margin-top:10px;border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow:hidden">
@@ -5456,6 +5462,7 @@ function showFastLane() {
     </div></div>
     <div class="fastlane-section" id="flInstallFields"></div>
     <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="./account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
+    <a href="./tools/" target="_blank" rel="noopener noreferrer" style="display:block;margin:3px 0 0 28px;font-size:.72rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#8b949e'">All Core Tools →</a>
     <div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
       <div style="font-size:.72rem;font-weight:700;color:#34d399;margin-bottom:8px;display:flex;align-items:center;gap:6px">${ICO.rocket(12,'#34d399')} Full Stack Setup <span style="font-size:.58rem;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)">NEW</span></div>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="flPatchCinemeta" ${S.patchCinemeta!==false?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Patch Cinemeta</b><br><span style="color:#8b949e">Hide Cinemeta catalogs/metadata so AIOMetadata takes over. Uses Cinebye.</span></span></label>
