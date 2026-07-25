@@ -1,0 +1,19 @@
+name: All Releases
+on:
+  release:
+    types: [created, edited, deleted, unpublished, prereleased, released]
+
+permissions: {}
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post releases
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+        run: |
+          jq -n --arg name "$RELEASE_NAME" '{"content": "Release: \($name)"}' \
+            | curl -X POST -H 'Content-type: application/json' -d @- \
+              --fail-with-body --silent --show-error "$WEBHOOK_URL"
