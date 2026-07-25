@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="socialGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <circle cx="44" cy="42" r="12" fill="none" stroke="url(#socialGrad)" stroke-width="4" filter="url(#glow)"/>
+  <path d="M24,82 Q24,62 44,62 Q64,62 64,82" fill="none" stroke="url(#socialGrad)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="84" cy="42" r="12" fill="none" stroke="url(#socialGrad)" stroke-width="4" filter="url(#glow)"/>
+  <path d="M64,82 Q64,62 84,62 Q104,62 104,82" fill="none" stroke="url(#socialGrad)" stroke-width="4" stroke-linecap="round"/>
+  <line x1="54" y1="96" x2="74" y2="96" stroke="url(#socialGrad)" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+</svg>

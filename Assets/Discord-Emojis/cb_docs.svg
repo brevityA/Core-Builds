@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="docsGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <path d="M38,18 L78,18 L94,36 L94,110 Q94,114 90,114 L42,114 Q38,114 38,110 Z" fill="none" stroke="url(#docsGrad)" stroke-width="4" filter="url(#glow)"/>
+  <path d="M78,18 L78,36 L94,36" fill="none" stroke="url(#docsGrad)" stroke-width="3" stroke-linejoin="round"/>
+  <line x1="50" y1="54" x2="82" y2="54" stroke="url(#docsGrad)" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <line x1="50" y1="68" x2="82" y2="68" stroke="url(#docsGrad)" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <line x1="50" y1="82" x2="74" y2="82" stroke="url(#docsGrad)" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <line x1="50" y1="96" x2="66" y2="96" stroke="url(#docsGrad)" stroke-width="3" stroke-linecap="round" opacity="0.3"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="rulesGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <rect x="34" y="20" width="60" height="88" rx="8" fill="none" stroke="url(#rulesGrad)" stroke-width="4" filter="url(#glow)"/>
+  <line x1="48" y1="44" x2="80" y2="44" stroke="url(#rulesGrad)" stroke-width="3" stroke-linecap="round"/>
+  <line x1="48" y1="60" x2="80" y2="60" stroke="url(#rulesGrad)" stroke-width="3" stroke-linecap="round"/>
+  <line x1="48" y1="76" x2="80" y2="76" stroke="url(#rulesGrad)" stroke-width="3" stroke-linecap="round"/>
+  <line x1="48" y1="92" x2="68" y2="92" stroke="url(#rulesGrad)" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <path d="M76,28 L88,28 L88,40" fill="none" stroke="url(#rulesGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+</svg>
