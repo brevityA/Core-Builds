@@ -22,7 +22,7 @@ jobs:
 
       - name: Post docs to Discord
         env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_DOCS_WEBHOOK_URL }}
           GROUP_FILTER: ${{ inputs.group }}
         run: |
           BASE_URL="https://core-builds.mintlify.app"
