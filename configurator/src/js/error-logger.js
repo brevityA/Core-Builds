@@ -77,7 +77,7 @@ export function logError(category, message, context = {}) {
     const entry = {
       ts: new Date().toISOString(),
       cat: category,
-      msg: String(message).slice(0, 500),
+      msg: sanitizeMessage(String(message).slice(0, 500)),
       ctx: sanitizeContext(context),
       url: location.pathname,
       ua: navigator.userAgent?.slice(0, 100),
@@ -98,7 +98,9 @@ export function logError(category, message, context = {}) {
  */
 export function getErrorLog() {
   try {
-    return JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
+    const parsed = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
+    if (!Array.isArray(parsed)) { localStorage.removeItem(LOG_KEY); return []; }
+    return parsed;
   } catch {
     return [];
   }
@@ -206,6 +208,12 @@ export function exportErrorLog() {
 
 // ── Helpers ────────────────────────────────────────────────────────
 
+function sanitizeMessage(msg) {
+  return sanitizeUrl(msg)
+    .replace(/[a-f0-9]{32,}/gi, '{hash}')
+    .replace(/eyJ[A-Za-z0-9_-]{10,}/g, '{jwt}');
+}
+
 function sanitizeUrl(url) {
   if (!url) return '';
   // Strip UUIDs and passwords from manifest URLs
@@ -233,6 +241,8 @@ function sanitizeContext(ctx) {
   for (const [k, v] of Object.entries(ctx)) {
     if (SENSITIVE_KEYS.has(k) || k.toLowerCase().includes('password') || k.toLowerCase().includes('token')) {
       out[k] = typeof v === 'string' && v.length > 0 ? '••••' : v;
+    } else if (k === 'stack' || k === 'filename') {
+      out[k] = typeof v === 'string' ? sanitizeMessage(v) : v;
     } else if (typeof v === 'object' && v !== null) {
       out[k] = sanitizeContext(v);
     } else {

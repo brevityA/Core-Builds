@@ -12,6 +12,22 @@
 
 // ── Add this handler to your existing worker ──
 
+const RATE_WINDOW_MS = 120_000;
+const RATE_MAX = 3;
+const _ipLog = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = _ipLog.get(ip);
+  if (!entry || now - entry.start > RATE_WINDOW_MS) {
+    _ipLog.set(ip, { start: now, count: 1 });
+    if (_ipLog.size > 5000) { const oldest = _ipLog.keys().next().value; _ipLog.delete(oldest); }
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_MAX;
+}
+
 async function handleContact(request, env) {
   const ip = request.headers.get('cf-connecting-ip') || 'unknown';
 
@@ -27,6 +43,13 @@ async function handleContact(request, env) {
 
   if (request.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
+  }
+
+  if (isRateLimited(ip)) {
+    return new Response(JSON.stringify({ error: 'Too many requests — try again later' }), {
+      status: 429,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Retry-After': '120' },
+    });
   }
 
   let body;

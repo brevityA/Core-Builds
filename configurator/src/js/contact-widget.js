@@ -30,6 +30,13 @@ export function initContactWidget() {
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && _widgetOpen) closeWidget();
+    if (e.key === 'Tab' && _widgetOpen) {
+      const panel = document.getElementById('cbContactPanel');
+      const focusable = panel.querySelectorAll('input:not([tabindex="-1"]),select,textarea,button');
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   });
 }
 
@@ -37,15 +44,20 @@ function toggleWidget() { _widgetOpen ? closeWidget() : openWidget(); }
 function openWidget() {
   _widgetOpen = true;
   document.getElementById('cbContactOverlay').classList.add('open');
-  document.getElementById('cbContactPanel').classList.add('open');
+  const panel = document.getElementById('cbContactPanel');
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden', 'false');
   document.getElementById('cbContactBtn').classList.add('active');
   setTimeout(() => document.getElementById('cbContactName')?.focus(), 200);
 }
 function closeWidget() {
   _widgetOpen = false;
   document.getElementById('cbContactOverlay').classList.remove('open');
-  document.getElementById('cbContactPanel').classList.remove('open');
+  const panel = document.getElementById('cbContactPanel');
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
   document.getElementById('cbContactBtn').classList.remove('active');
+  document.getElementById('cbContactBtn').focus();
 }
 
 async function handleSubmit(e) {
@@ -159,9 +171,9 @@ const CONTACT_HTML = `
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
 </button>
 <div class="cb-contact-overlay" id="cbContactOverlay"></div>
-<div class="cb-contact-panel" id="cbContactPanel">
+<div class="cb-contact-panel" id="cbContactPanel" role="dialog" aria-modal="true" aria-labelledby="cbContactTitle" aria-hidden="true">
   <div class="cb-contact-header">
-    <h3>💬 Message Brevity</h3>
+    <h3 id="cbContactTitle">💬 Message Brevity</h3>
     <button class="cb-contact-close" id="cbContactClose" aria-label="Close">✕</button>
   </div>
   <div class="cb-contact-body">

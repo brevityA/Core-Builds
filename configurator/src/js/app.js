@@ -409,7 +409,7 @@ function renderOpts(def) {
   }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
     `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
-    `<div style="font-size:.65rem;color:#4b5563;margin-top:6px;text-align:center">Want to build your own custom formatter? Design one visually at <a href="http://crispyduck.xyz" target="_blank" rel="noopener noreferrer" style="color:#a78bfa;text-decoration:none;font-weight:700">crispyduck.xyz</a></div>`;
+    `<div style="font-size:.65rem;color:#4b5563;margin-top:6px;text-align:center">Want to build your own custom formatter? Design one visually at <a href="https://crispyduck.xyz" target="_blank" rel="noopener noreferrer" style="color:#a78bfa;text-decoration:none;font-weight:700">crispyduck.xyz</a></div>`;
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
