@@ -1,4 +1,7 @@
 export const CHANGELOG = [
+  { v:'2.84', date:'Jul 25 2026', items:[
+    'v2.84 fixes — Patch modules extracted (age-limit, bandwidth, library-boost, nzb-failover, one-click-preset), worker rate limiting, competitive features patch, tools and inspector updates',
+  ]},
   { v:'2.83', date:'Jul 25 2026', items:[
     'Error Logger — Captures build, deploy, fetch, and unhandled errors into a localStorage ring buffer (50 entries); view, copy, and clear from the Diagnostics modal',
     'Live Contact Widget — Floating message button routes feedback directly to Discord via the CORS proxy worker (no secrets in client JS)',

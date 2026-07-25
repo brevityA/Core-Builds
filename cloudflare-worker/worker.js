@@ -10,6 +10,23 @@
 // Proxy calls, paste creates, and paste views are counted automatically.
 // Per-host proxy counts, per-service generates, and daily counters are tracked.
 
+// ── Rate limiting for contact endpoint ──
+const RATE_LIMIT = new Map(); // ip -> { count, resetAt }
+const RATE_MAX = 5;
+const RATE_WINDOW = 3600000; // 1 hour
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const entry = RATE_LIMIT.get(ip);
+  if (!entry || now > entry.resetAt) {
+    RATE_LIMIT.set(ip, { count: 1, resetAt: now + RATE_WINDOW });
+    return true;
+  }
+  if (entry.count >= RATE_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 const ALLOWED_HOSTS = new Set([
   'https://aiostreams.elfhosted.com',
   'https://aiostreams.fortheweak.cloud',
@@ -154,12 +171,18 @@ export default {
       const webhookUrl = env.DISCORD_WEBHOOK_URL;
       if (!webhookUrl) return json(500, { error: 'Contact not configured' });
 
+      // Rate limit check
+      const contactIp = request.headers.get('cf-connecting-ip') || 'unknown';
+      if (!checkRateLimit(contactIp)) return json(429, { error: 'Rate limit exceeded. Try again later.' });
+
       let body;
       try { body = await request.json(); } catch { return json(400, { error: 'Invalid JSON' }); }
 
       const { name, email, category, message, setup } = body;
-      if (!name || !message) return json(400, { error: 'Name and message required' });
+      if (!name || name.length < 1 || name.length > 100) return json(400, { error: 'Name must be 1-100 characters' });
+      if (!message) return json(400, { error: 'Message required' });
       if (message.length > 2000) return json(400, { error: 'Message too long' });
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(400, { error: 'Invalid email format' });
 
       const safe = s => (s || '').replace(/[<>]/g, '').slice(0, 2000);
       const catColors = { Bug: 0xf87171, Feature: 0x00d4ff, Question: 0xfbbf24, Feedback: 0x34d399 };

@@ -3,165 +3,336 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Core Builds — Core Tools</title>
+<title>Core Builds — Tools</title>
 <style>
-:root{--th-bg:#0d1017;--th-card:#151923;--th-card-alt:#111720;--th-border:rgba(255,255,255,.06);--th-border-strong:rgba(255,255,255,.12);--th-tx:#e4e7ed;--th-tx2:#8b949e;--th-tx3:#6b7280;--th-tx4:#4b5563;--th-tx5:#374151;--th-accent:#00d4ff;--th-accent-bg:rgba(0,212,255,.08);--th-accent-border:rgba(0,212,255,.18);--th-green:#34d399;--th-green-bg:rgba(52,211,153,.06);--th-green-border:rgba(52,211,153,.2);--th-yellow:#fbbf24;--th-yellow-bg:rgba(251,191,36,.04);--th-yellow-border:rgba(245,158,11,.12);--th-red:#f87171;--th-red-bg:rgba(239,68,68,.04);--th-red-border:rgba(239,68,68,.15);--th-purple:#a78bfa;--th-purple-bg:rgba(168,85,247,.04);--th-purple-border:rgba(168,85,247,.18)}
-[data-theme="light"]{--th-bg:#f6f8fa;--th-card:#ffffff;--th-card-alt:#f6f8fa;--th-border:rgba(0,0,0,.09);--th-border-strong:rgba(0,0,0,.18);--th-tx:#1c2128;--th-tx2:#57606a;--th-tx3:#6b7280;--th-tx4:#8c959f;--th-tx5:#9ca3af;--th-accent:#0969da;--th-accent-bg:rgba(9,105,218,.06);--th-accent-border:rgba(9,105,218,.25);--th-green:#059669;--th-green-bg:rgba(5,150,105,.06);--th-green-border:rgba(5,150,105,.2);--th-yellow:#a16207;--th-yellow-bg:rgba(161,98,7,.04);--th-yellow-border:rgba(161,98,7,.15);--th-red:#dc2626;--th-red-bg:rgba(220,38,38,.04);--th-red-border:rgba(220,38,38,.12);--th-purple:#7c3aed;--th-purple-bg:rgba(124,58,237,.04);--th-purple-border:rgba(124,58,237,.18)}
+:root{
+  --th-bg:#0d1017;--th-card:#151923;--th-card-alt:#111720;
+  --th-border:rgba(255,255,255,.06);--th-border-strong:rgba(255,255,255,.12);
+  --th-tx:#e4e7ed;--th-tx2:#8b949e;--th-tx3:#6b7280;--th-tx4:#4b5563;--th-tx5:#374151;
+  --th-accent:#00d4ff;--th-accent-bg:rgba(0,212,255,.08);--th-accent-border:rgba(0,212,255,.18);
+  --th-green:#34d399;--th-green-bg:rgba(52,211,153,.06);--th-green-border:rgba(52,211,153,.2);
+  --th-yellow:#fbbf24;--th-yellow-bg:rgba(251,191,36,.04);--th-yellow-border:rgba(245,158,11,.12);
+  --th-red:#f87171;--th-red-bg:rgba(239,68,68,.04);--th-red-border:rgba(239,68,68,.15);
+  --th-purple:#a78bfa;--th-purple-bg:rgba(168,85,247,.04);--th-purple-border:rgba(168,85,247,.18);
+}
+[data-theme="light"]{
+  --th-bg:#f6f8fa;--th-card:#ffffff;--th-card-alt:#f6f8fa;
+  --th-border:rgba(0,0,0,.09);--th-border-strong:rgba(0,0,0,.18);
+  --th-tx:#1c2128;--th-tx2:#57606a;--th-tx3:#6b7280;--th-tx4:#8c959f;--th-tx5:#9ca3af;
+  --th-accent:#0969da;--th-accent-bg:rgba(9,105,218,.06);--th-accent-border:rgba(9,105,218,.25);
+  --th-green:#059669;--th-green-bg:rgba(5,150,105,.06);--th-green-border:rgba(5,150,105,.2);
+  --th-yellow:#a16207;--th-yellow-bg:rgba(161,98,7,.04);--th-yellow-border:rgba(161,98,7,.15);
+  --th-red:#dc2626;--th-red-bg:rgba(220,38,38,.04);--th-red-border:rgba(220,38,38,.12);
+  --th-purple:#7c3aed;--th-purple-bg:rgba(124,58,237,.04);--th-purple-border:rgba(124,58,237,.18);
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--th-bg);background-image:radial-gradient(ellipse at 15% 15%,rgba(0,212,255,0.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,0.05) 0%,transparent 45%);background-attachment:fixed;color:var(--th-tx);min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
-.wrap{width:100%;max-width:700px;flex:1;display:flex;flex-direction:column}
-.hdr-banner{display:flex;align-items:center;gap:14px;background:var(--th-card);border:1px solid var(--th-border);border-radius:14px;padding:16px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--th-bg);
+  background-image:radial-gradient(ellipse at 15% 15%,rgba(0,212,255,.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,.05) 0%,transparent 45%);
+  background-attachment:fixed;
+  color:var(--th-tx);min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:24px 16px 20px;
+}
+.wrap{width:100%;max-width:980px;flex:1;display:flex;flex-direction:column}
+
+/* ── Header banner (identical to configurator) ── */
+.hdr-banner{
+  display:flex;align-items:center;gap:14px;
+  background:var(--th-card);border:1px solid var(--th-border);
+  border-radius:14px;padding:16px 20px;margin-bottom:20px;
+  position:relative;overflow:hidden;
+}
 .hdr-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.3),transparent);pointer-events:none}
 .hdr-icon{width:46px;height:46px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
 .hdr-divider{width:1px;height:44px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.35),transparent);flex-shrink:0}
 .hdr-text{display:flex;flex-direction:column;gap:1px}
-.hdr-title{font-size:1.55rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:2px}
-.hdr-core{color:var(--th-tx)}
-.hdr-builds{color:var(--th-accent)}
+.hdr-title{font-size:1.55rem;font-weight:900;letter-spacing:-.02em;line-height:1}
+.hdr-core{color:var(--th-tx)}.hdr-builds{color:var(--th-accent)}
 .hdr-underline{height:1.5px;width:96px;background:linear-gradient(90deg,rgba(0,212,255,.55),transparent);border-radius:1px;margin-bottom:3px}
-.hdr-by{font-size:.63rem;letter-spacing:.16em;color:var(--th-tx4);margin-bottom:2px}
+.hdr-by{font-size:.63rem;letter-spacing:.16em;color:#4b8fa8;margin-bottom:2px}
 .hdr-sub{font-size:.78rem;color:var(--th-tx3);line-height:1.3}
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.theme-toggle{background:none;border:1px solid var(--th-border);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--th-tx2);font-size:1rem;transition:all .15s;line-height:1}
-.theme-toggle:hover{border-color:var(--th-accent-border);color:var(--th-accent)}
-.back-link{color:var(--th-tx2);text-decoration:none;font-size:.78rem;font-weight:600;padding:8px 14px;border:1px solid var(--th-border);border-radius:8px;transition:all .15s;white-space:nowrap}
-.back-link:hover{color:var(--th-accent);border-color:var(--th-accent-border)}
-.section-label{display:flex;align-items:center;gap:10px;margin:24px 0 14px}
-.section-line{flex:1;height:1px;background:var(--th-border)}
-.section-title{font-size:.6rem;color:var(--th-tx4);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
-.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tool-card{background:var(--th-card);border:1px solid var(--th-border);border-radius:14px;padding:22px 20px 18px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:all .2s;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%)}
-.tool-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.2),transparent);pointer-events:none}
-.tool-card:hover{transform:translateY(-2px);border-color:var(--th-accent-border);background:var(--th-card-alt)}
-.tool-card.disabled{pointer-events:none;opacity:.6}
-.tool-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--th-accent-bg);border:1px solid var(--th-accent-border)}
-.tool-card-icon.purple{background:var(--th-purple-bg);border-color:var(--th-purple-border)}
-.tool-card-icon.yellow{background:var(--th-yellow-bg);border-color:var(--th-yellow-border)}
-.tool-card-icon.green{background:var(--th-green-bg);border-color:var(--th-green-border)}
-.tool-card h3{font-size:1rem;font-weight:800;color:var(--th-tx);line-height:1.2}
-.tool-card p{font-size:.76rem;color:var(--th-tx2);line-height:1.55;margin:0;flex:1}
-.tool-card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:10px}
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:.6rem;font-weight:700;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
-.badge-green{color:var(--th-green);background:var(--th-green-bg);border:1px solid var(--th-green-border)}
-.badge-yellow{color:var(--th-yellow);background:var(--th-yellow-bg);border:1px solid var(--th-yellow-border)}
-.badge-purple{color:var(--th-purple);background:var(--th-purple-bg);border:1px solid var(--th-purple-border)}
-.badge-muted{color:var(--th-tx4);background:rgba(255,255,255,.02);border:1px solid var(--th-border)}
-.arrow{font-size:.72rem;font-weight:700;color:var(--th-accent)}
-.news-card{background:var(--th-card);border:1px solid var(--th-border);border-radius:14px;padding:22px 20px;position:relative;overflow:hidden;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%)}
-.news-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.2),transparent);pointer-events:none}
-.news-card h3{font-size:.92rem;font-weight:800;color:var(--th-tx);margin-bottom:12px}
-.news-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-.news-list li{font-size:.76rem;color:var(--th-tx2);line-height:1.55;padding-left:16px;position:relative}
-.news-list li::before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--th-accent);opacity:.5}
-.footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--th-border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:.68rem;color:var(--th-tx4)}
-.footer a{color:var(--th-tx3);text-decoration:none;transition:color .15s}
-.footer a:hover{color:var(--th-accent)}
-@media(max-width:560px){.tool-grid{grid-template-columns:1fr}.hdr-right{flex-direction:column;gap:6px}.hdr-banner{flex-wrap:wrap}}
+.hdr-actions{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+.hdr-btn{
+  padding:7px 12px;border-radius:8px;font-size:.68rem;font-weight:700;
+  border:1px solid var(--th-border);background:transparent;color:var(--th-tx2);
+  cursor:pointer;text-decoration:none;transition:all .15s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.hdr-btn:hover{border-color:var(--th-accent-border);color:var(--th-accent)}
+
+/* ── Section labels ── */
+.section-label{
+  display:flex;align-items:center;gap:12px;margin:12px 0 14px;
+  font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--th-tx3);
+}
+.section-label::after{content:'';height:1px;flex:1;background:var(--th-border)}
+
+/* ── Tool cards ── */
+.tool-grid{display:grid;gap:12px}
+.tool-grid.g2{grid-template-columns:1fr 1fr}
+.tool-grid.g3{grid-template-columns:1fr 1fr 1fr}
+.tool-card{
+  display:flex;flex-direction:column;padding:18px;
+  background:var(--th-card-alt);border:1px solid var(--th-border);border-radius:12px;
+  text-decoration:none;color:inherit;cursor:pointer;
+  transition:border-color .2s,background .2s,transform .2s;
+  position:relative;overflow:hidden;
+}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--th-accent);opacity:0;transition:opacity .25s;box-shadow:0 0 12px rgba(0,200,255,.45)}
+.tool-card:hover::before{opacity:1}
+.tool-card:hover{border-color:var(--th-accent-border);background:rgba(0,212,255,.04);transform:translateY(-1px)}
+.tool-card[data-status="locked"]{pointer-events:none;opacity:.5}
+.tool-card[data-status="locked"]::before{background:var(--th-tx5)}
+
+.tool-idx{font-size:.58rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--th-tx4);margin-bottom:10px}
+.tool-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:10px;flex-shrink:0;border:1px solid;
+}
+.tool-icon.cyan{background:var(--th-accent-bg);border-color:var(--th-accent-border);color:var(--th-accent)}
+.tool-icon.green{background:var(--th-green-bg);border-color:var(--th-green-border);color:var(--th-green)}
+.tool-icon.purple{background:var(--th-purple-bg);border-color:var(--th-purple-border);color:var(--th-purple)}
+.tool-icon.yellow{background:var(--th-yellow-bg);border-color:var(--th-yellow-border);color:var(--th-yellow)}
+.tool-icon.red{background:var(--th-red-bg);border-color:var(--th-red-border);color:var(--th-red)}
+.tool-name{font-size:.92rem;font-weight:800;color:var(--th-tx);margin-bottom:4px}
+.tool-desc{font-size:.72rem;color:var(--th-tx2);line-height:1.5;margin-bottom:12px;flex:1}
+.tool-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:10px;border-top:1px solid var(--th-border)}
+.badge{
+  font-size:.56rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;
+}
+.badge-green{background:var(--th-green-bg);color:var(--th-green);border:1px solid var(--th-green-border)}
+.badge-yellow{background:var(--th-yellow-bg);color:var(--th-yellow);border:1px solid var(--th-yellow-border)}
+.badge-purple{background:var(--th-purple-bg);color:var(--th-purple);border:1px solid var(--th-purple-border)}
+.badge-muted{background:rgba(255,255,255,.03);color:var(--th-tx4);border:1px solid var(--th-border)}
+.badge-cyan{background:var(--th-accent-bg);color:var(--th-accent);border:1px solid var(--th-accent-border)}
+.tool-link{font-size:.66rem;font-weight:700;color:var(--th-accent);display:flex;align-items:center;gap:4px}
+
+/* ── Inline card ── */
+.inline-card{
+  padding:16px 18px;background:var(--th-card-alt);border:1px solid var(--th-border);border-radius:12px;margin-top:12px;
+}
+.inline-card h3{font-size:.82rem;font-weight:800;color:var(--th-tx);margin-bottom:6px}
+.inline-card p{font-size:.72rem;color:var(--th-tx2);line-height:1.5;margin:0}
+
+/* ── What's New ── */
+.news-item{display:flex;align-items:center;gap:8px;font-size:.74rem;padding:3px 0}
+
+/* ── Footer ── */
+.rule{margin:24px 0 14px;height:1px;background:linear-gradient(90deg,transparent,var(--th-border),transparent)}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--th-tx4);font-size:.68rem;font-weight:600;letter-spacing:.04em}
+.foot a{color:var(--th-tx3);text-decoration:none;transition:color .15s}
+.foot a:hover{color:var(--th-accent)}
+
+/* ── Light theme ── */
+[data-theme="light"] .hdr-banner{background:#fff;border-color:rgba(0,0,0,.09)}
+[data-theme="light"] .hdr-btn{border-color:rgba(0,0,0,.12);color:var(--th-tx3)}
+[data-theme="light"] .hdr-btn:hover{border-color:rgba(9,105,218,.3);color:var(--th-accent)}
+[data-theme="light"] .tool-card{background:#fff;border-color:rgba(0,0,0,.09)}
+[data-theme="light"] .tool-card:hover{border-color:rgba(9,105,218,.3);background:rgba(9,105,218,.03)}
+[data-theme="light"] .inline-card{background:#fff;border-color:rgba(0,0,0,.09)}
+
+/* ── Theme toggle ── */
+#themeToggle{
+  position:fixed;top:14px;right:14px;z-index:100;
+  padding:5px 10px;border-radius:7px;border:1px solid var(--th-border);
+  background:var(--th-card);color:var(--th-tx3);font-size:.7rem;font-weight:700;
+  cursor:pointer;transition:all .15s;
+}
+#themeToggle:hover{border-color:var(--th-accent-border);color:var(--th-accent)}
+
+/* ── Responsive ── */
+@media(max-width:480px){
+  .hdr-banner{padding:14px 16px;gap:12px}
+  .hdr-title{font-size:1.3rem}
+  .hdr-icon{width:40px;height:40px}
+  .hdr-divider{height:40px}
+  .hdr-actions{display:none}
+  .tool-grid.g2,.tool-grid.g3{grid-template-columns:1fr}
+}
+@media(min-width:720px){
+  .hdr-banner{padding:20px 28px;gap:20px}
+  .hdr-icon{width:56px;height:56px}
+  .hdr-divider{height:56px}
+  .hdr-title{font-size:1.8rem}
+}
 @media(prefers-reduced-motion:reduce){.tool-card{transition:none}}
 </style>
 </head>
 <body>
+<button id="themeToggle" onclick="toggleTheme()">☀ Light</button>
+
 <main class="wrap">
+
+  <!-- Header (identical to configurator) -->
   <header class="hdr-banner">
-    <svg class="hdr-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="cg" x1="10" y1="10" x2="90" y2="90"><stop stop-color="#00e5ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#ff7043"/></linearGradient></defs>
-      <path d="M50 5 L93.3 30 L93.3 70 L50 95 L6.7 70 L6.7 30 Z" stroke="url(#cg)" stroke-width="3" fill="none" opacity=".7"/>
-      <path d="M50 25 L75 50 L50 75 L25 50 Z" fill="url(#cg)" opacity=".85"/>
+    <svg class="hdr-icon" width="46" height="46" viewBox="0 0 64 64" fill="none">
+      <path d="M32 4 56 18v28L32 60 8 46V18L32 4Z" stroke="url(#hg1)" stroke-width="2.5"/>
+      <path d="m32 20 12 12-12 12-12-12 12-12Z" fill="url(#hg1)" opacity=".9"/>
+      <defs><linearGradient id="hg1" x1="9" y1="8" x2="55" y2="57"><stop stop-color="#00e5ff"/><stop offset=".55" stop-color="#a78bfa"/><stop offset="1" stop-color="#ff7043"/></linearGradient></defs>
     </svg>
     <div class="hdr-divider"></div>
     <div class="hdr-text">
-      <div class="hdr-title"><span class="hdr-core">Core </span><span class="hdr-builds">Tools</span></div>
+      <div class="hdr-title"><span class="hdr-core">Core </span><span class="hdr-builds">Builds</span></div>
       <div class="hdr-underline"></div>
       <div class="hdr-by">by Brevity</div>
-      <div class="hdr-sub">Build, verify, back up, and manage</div>
+      <div class="hdr-sub">Tools &amp; utilities for your AIOStreams setup</div>
     </div>
-    <div class="hdr-right">
-      <button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme" aria-label="Toggle theme">🌙</button>
-      <a class="back-link" href="../">← Configurator</a>
+    <div class="hdr-actions">
+      <a class="hdr-btn" href="../">← Configurator</a>
+      <a class="hdr-btn" href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a>
     </div>
   </header>
 
-  <div class="section-label">
-    <span class="section-title">Tools</span>
-    <div class="section-line"></div>
-  </div>
-
-  <section class="tool-grid">
+  <!-- Section 1: Core Tools -->
+  <div class="section-label">01 · Core tools</div>
+  <div class="tool-grid g2">
     <a class="tool-card" href="../">
-      <div class="tool-card-icon">🔧</div>
-      <h3>Template Builder</h3>
-      <p>Quick Install, Advanced Builder, device profiles, partial exports, and manifest deployment.</p>
-      <div class="tool-card-foot">
-        <span class="badge badge-green">Live</span>
-        <span class="arrow">Open →</span>
+      <div class="tool-idx">Build</div>
+      <div class="tool-icon cyan">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>
+      </div>
+      <div class="tool-name">Template Builder</div>
+      <p class="tool-desc">Quick Install, Advanced Builder, device-aware profiles, family-v4 formatter, Full Stack Install (AIOMetadata + Cinemeta patch), and protected manifest deployment.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Live</span>
+        <span class="tool-link">Launch →</span>
       </div>
     </a>
     <a class="tool-card" href="../account-tools/">
-      <div class="tool-card-icon green">🛡️</div>
-      <h3>Addon Backup</h3>
-      <p>Read and download your current Stremio addon collection. No account changes — read-only.</p>
-      <div class="tool-card-foot">
-        <span class="badge badge-green">Live</span>
-        <span class="arrow">Open →</span>
+      <div class="tool-idx">Safety</div>
+      <div class="tool-icon green">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </div>
+      <div class="tool-name">Addon Backup</div>
+      <p class="tool-desc">Read and download your current Stremio addon collection. No account changes. Nothing is modified.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Read-only</span>
+        <span class="tool-link">Open →</span>
       </div>
     </a>
+  </div>
+
+  <!-- Section 2: Verification & Debug -->
+  <div class="section-label">02 · Verify &amp; debug</div>
+  <div class="tool-grid g3">
     <a class="tool-card" href="./inspector/">
-      <div class="tool-card-icon purple">🔍</div>
-      <h3>Template Inspector</h3>
-      <p>Paste a template JSON to get schema checks, plain-English findings, and compatibility reports.</p>
-      <div class="tool-card-foot">
-        <span class="badge badge-green">Live</span>
-        <span class="arrow">Open →</span>
+      <div class="tool-idx">Schema</div>
+      <div class="tool-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div class="tool-name">Template Inspector</div>
+      <p class="tool-desc">Paste any AIOStreams JSON — get schema checks, plain-English findings, and host compatibility.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Live</span>
+        <span class="tool-link">Open →</span>
       </div>
     </a>
-    <div class="tool-card disabled">
-      <div class="tool-card-icon yellow">📋</div>
-      <h3>Account Manager</h3>
-      <p>Restore, ordering, cloning, Cinemeta controls, diffs, and rollback — coming soon.</p>
-      <div class="tool-card-foot">
-        <span class="badge badge-muted">Planned</span>
+    <a class="tool-card" href="../#health-score">
+      <div class="tool-idx">Quality</div>
+      <div class="tool-icon cyan">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div class="tool-name">Health Score</div>
+      <p class="tool-desc">0–100 score with letter grade on the Review step. Checks sort criteria, ESE/ISE balance, device awareness, formatter quality.</p>
+      <div class="tool-foot">
+        <span class="badge badge-cyan">In Builder</span>
+        <span class="tool-link">Open Builder →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="../#troubleshooter">
+      <div class="tool-idx">Fix</div>
+      <div class="tool-icon yellow">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div class="tool-name">Troubleshooter</div>
+      <p class="tool-desc">Interactive decision tree for no streams, wrong quality, import errors, and buffering issues.</p>
+      <div class="tool-foot">
+        <span class="badge badge-cyan">In Builder</span>
+        <span class="tool-link">Open Builder →</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Section 3: Coming Soon -->
+  <div class="section-label">03 · Coming soon</div>
+  <div class="tool-grid g2">
+    <div class="tool-card" data-status="locked">
+      <div class="tool-idx">Account</div>
+      <div class="tool-icon yellow">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div class="tool-name">Account Manager</div>
+      <p class="tool-desc">Restore, ordering, cloning, Cinemeta controls, exact diffs, and rollback.</p>
+      <div class="tool-foot">
+        <span class="badge badge-purple">🔒 Security review</span>
+        <span class="badge badge-muted">Locked</span>
       </div>
     </div>
-  </section>
-
-  <div class="section-label">
-    <span class="section-title">What's New</span>
-    <div class="section-line"></div>
+    <div class="tool-card" data-status="locked">
+      <div class="tool-idx">CLI</div>
+      <div class="tool-icon red">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      </div>
+      <div class="tool-name">CLI Tool</div>
+      <p class="tool-desc">Generate, validate, and diff templates from the command line. <code>npx core-builds generate</code></p>
+      <div class="tool-foot">
+        <span class="badge badge-yellow">⏳ Planned</span>
+        <span class="badge badge-muted">npm</span>
+      </div>
+    </div>
   </div>
 
-  <div class="news-card">
-    <h3>Latest Updates — v2.81</h3>
-    <ul class="news-list">
-      <li>Health Score ring with letter grade on the Review step</li>
-      <li>Template Versioning — coreBuildsVersion and generatedAt metadata</li>
-      <li>Full Stack Install — one-click AIOMetadata + Cinemeta patch</li>
-      <li>family-v4 default formatter with bitrate, release group, and seeders</li>
-      <li>Template Inspector now live — paste JSON for instant validation</li>
-      <li>Debug modules — error boundary, state guard, network resilience</li>
-    </ul>
+  <!-- What's New -->
+  <div class="inline-card" style="margin-top:16px">
+    <h3>🆕 What's New — v2.81</h3>
+    <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">family-v4 default formatter — bitrate, release group, seeders, age, indexer, season packs</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Full Stack Install — AIOMetadata + Cinemeta patch + addon ordering in Quick Install</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Knaben, Zilean, Jackett, Prowlarr scrapers + Debrider multi-debrid service</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Health Score — 0–100 template quality score with letter grade on Review step</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Template versioning — auto-update banner when your template is outdated</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Template Inspector — paste JSON for instant schema validation and host compatibility</span></div>
+    </div>
   </div>
 
-  <footer class="footer">
+  <!-- Built-in tools reference -->
+  <div class="inline-card" style="margin-top:12px">
+    <h3>🔧 Built-in tools (inside the Builder)</h3>
+    <p style="margin-bottom:8px">These tools live inside the Template Builder. Open the Builder to use them:</p>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Health Score</span><span style="color:var(--th-tx2)">Review step — 0–100 score with 11 checks and letter grade</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Troubleshooter</span><span style="color:var(--th-tx2)">Review step → Tools — interactive decision tree for common issues</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Stream Test</span><span style="color:var(--th-tx2)">Manifest modal → "Test streams" — fetches real streams to verify your config</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Compare</span><span style="color:var(--th-tx2)">Splash page → Compare — side-by-side template diff (presets, ESEs, PSEs, sort)</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Diagnostics</span><span style="color:var(--th-tx2)">Footer → Report Issue — sanitized config dump safe for GitHub issues</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Backup History</span><span style="color:var(--th-tx2)">Review step — 20-entry local backup timeline with restore</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Host Compat</span><span style="color:var(--th-tx2)">Review step — checks elfhosted/fortheweak/self-hosted compatibility</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Preflight</span><span style="color:var(--th-tx2)">Install step — checks credentials, device mismatches, missing guards before deploy</span></div>
+    </div>
+  </div>
+
+  <div class="rule"></div>
+  <footer class="foot">
     <span>Core Builds by Brevity</span>
-    <span>
-      <a href="https://github.com/brevityA/Core-Builds">GitHub</a> ·
-      <a href="https://www.reddit.com/r/CoreBuilds/">Core Crew</a> ·
-      <a href="https://core-builds.mintlify.app/">Docs</a>
-    </span>
+    <span><a href="https://github.com/brevityA/Core-Builds">GitHub</a> · <a href="https://www.reddit.com/r/CoreBuilds/">Core Crew</a> · <a href="https://core-builds.mintlify.app/">Docs</a></span>
   </footer>
 </main>
+
 <script>
+function toggleTheme(){
+  const h=document.documentElement;
+  const t=h.getAttribute('data-theme')==='dark'?'light':'dark';
+  h.setAttribute('data-theme',t);
+  localStorage.setItem('cbTheme',t);
+  document.getElementById('themeToggle').textContent=t==='dark'?'☀ Light':'🌙 Dark';
+}
 (function(){
-  const btn = document.getElementById('themeToggle');
-  const root = document.documentElement;
-  const stored = localStorage.getItem('cb-theme');
-  if (stored === 'light') { root.dataset.theme = 'light'; btn.textContent = '☀️'; }
-  btn.addEventListener('click', function(){
-    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
-    root.dataset.theme = next;
-    btn.textContent = next === 'light' ? '☀️' : '🌙';
-    localStorage.setItem('cb-theme', next);
-  });
+  const t=localStorage.getItem('cbTheme');
+  if(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('themeToggle').textContent=t==='dark'?'☀ Light':'🌙 Dark';}
 })();
 </script>
 </body>
