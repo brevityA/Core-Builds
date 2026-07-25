@@ -1,0 +1,11 @@
+name: Announce
+on:
+  release:
+    types: [published]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post to Discord
+        run: curl -X POST -H 'Content-type: application/json' --data '{"content":"New release!"}' ${{ secrets.DISCORD_WEBHOOK_URL }}

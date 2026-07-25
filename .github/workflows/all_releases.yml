@@ -1,0 +1,13 @@
+name: All Releases
+on:
+  release:
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post releases
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' -d '{"content":"Release: ${{ github.event.release.name }}"}' $WEBHOOK_URL
