@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'2.83', date:'Jul 25 2026', items:[
+    'Error Logger — Captures build, deploy, fetch, and unhandled errors into a localStorage ring buffer (50 entries); view, copy, and clear from the Diagnostics modal',
+    'Live Contact Widget — Floating message button routes feedback directly to Discord via the CORS proxy worker (no secrets in client JS)',
+    'Worker contact endpoint — Server-side Discord webhook relay added to the Cloudflare Worker',
+  ]},
   { v:'2.82', date:'Jul 24 2026', items:[
     'Patch Cinemeta & AIOMetadata now enabled by default — new templates automatically patch Cinemeta catalogs and install AIOMetadata',
     'Full Setup service selection — Full Setup now reads the active splash chip and sets the correct service/multiServices',
