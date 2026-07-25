@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <circle cx="64" cy="64" r="48" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.3"/>
+  <circle cx="64" cy="64" r="38" fill="none" stroke="#00e5ff" stroke-width="3" opacity="0.15"/>
+  <polygon points="52,38 52,90 94,64" fill="url(#playGrad)" filter="url(#glow)"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <rect x="16" y="36" width="96" height="56" rx="10" fill="none" stroke="url(#badgeGrad)" stroke-width="4" filter="url(#glow)"/>
+  <text x="64" y="76" font-family="system-ui,sans-serif" font-size="42" font-weight="900" fill="url(#badgeGrad)" text-anchor="middle" letter-spacing="-1">4K</text>
+</svg>

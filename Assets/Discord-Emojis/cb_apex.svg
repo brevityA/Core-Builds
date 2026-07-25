@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="crownGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ffcc80"/>
+      <stop offset="50%" stop-color="#ff9472"/>
+      <stop offset="100%" stop-color="#c03a20"/>
+    </linearGradient>
+    <linearGradient id="diamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4facfe"/>
+      <stop offset="50%" stop-color="#8a4890"/>
+      <stop offset="100%" stop-color="#c03a20"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <path d="M22,82 L36,40 L52,62 L64,24 L76,62 L92,40 L106,82 Z" fill="url(#crownGrad)" filter="url(#glow)"/>
+  <rect x="22" y="82" width="84" height="10" rx="3" fill="url(#crownGrad)"/>
+  <polygon points="64,70 72,78 64,86 56,78" fill="url(#diamGrad)" opacity="0.9"/>
+  <text x="64" y="116" font-family="system-ui,sans-serif" font-size="14" font-weight="800" fill="#00e5ff" text-anchor="middle" letter-spacing="2">APEX</text>
+</svg>

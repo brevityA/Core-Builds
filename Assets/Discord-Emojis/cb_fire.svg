@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="fireGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#c03a20"/>
+      <stop offset="40%" stop-color="#ff6b35"/>
+      <stop offset="80%" stop-color="#ff9472"/>
+      <stop offset="100%" stop-color="#ffcc80"/>
+    </linearGradient>
+    <linearGradient id="innerGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#8a4890"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <path d="M64,10 C64,10 88,36 88,56 C96,42 100,50 100,68 C100,92 84,116 64,116 C44,116 28,92 28,68 C28,50 32,42 40,56 C40,36 64,10 64,10 Z" fill="url(#fireGrad)" filter="url(#glow)"/>
+  <path d="M64,50 C64,50 78,66 78,78 C78,86 72,96 64,96 C56,96 50,86 50,78 C50,66 64,50 64,50 Z" fill="url(#innerGrad)" opacity="0.9"/>
+</svg>

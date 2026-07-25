@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="cacheGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <circle cx="64" cy="58" r="32" fill="none" stroke="url(#cacheGrad)" stroke-width="6" stroke-dasharray="160 40" filter="url(#glow)"/>
+  <polygon points="56,46 56,70 76,58" fill="url(#cacheGrad)" opacity="0.9"/>
+  <text x="64" y="112" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#4ade80" text-anchor="middle" letter-spacing="1">CACHED</text>
+</svg>
