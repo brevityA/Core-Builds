@@ -149,6 +149,56 @@ export default {
       return json(200, { generates: 0 });
     }
 
+    // --- Contact: send message to Discord via webhook ---
+    if (url.pathname === '/contact' && request.method === 'POST') {
+      const webhookUrl = env.DISCORD_WEBHOOK_URL;
+      if (!webhookUrl) return json(500, { error: 'Contact not configured' });
+
+      let body;
+      try { body = await request.json(); } catch { return json(400, { error: 'Invalid JSON' }); }
+
+      const { name, email, category, message, setup } = body;
+      if (!name || !message) return json(400, { error: 'Name and message required' });
+      if (message.length > 2000) return json(400, { error: 'Message too long' });
+
+      const safe = s => (s || '').replace(/[<>]/g, '').slice(0, 2000);
+      const catColors = { Bug: 0xf87171, Feature: 0x00d4ff, Question: 0xfbbf24, Feedback: 0x34d399 };
+      const safeCat = ['Bug', 'Feature', 'Question', 'Feedback'].includes(category) ? category : 'Feedback';
+
+      const embed = {
+        title: `New ${safeCat} message`,
+        color: catColors[safeCat] || 0x8b949e,
+        fields: [
+          { name: 'Name', value: safe(name).slice(0, 100), inline: true },
+          { name: 'Category', value: safeCat, inline: true },
+          { name: 'Message', value: safe(message) },
+        ],
+        timestamp: new Date().toISOString(),
+        footer: { text: 'Core Builds Contact Widget' },
+      };
+      if (email) embed.fields.push({ name: 'Email', value: safe(email).slice(0, 200), inline: true });
+      if (setup) embed.fields.push({ name: 'Setup', value: safe(setup).slice(0, 500) });
+
+      try {
+        const res = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: 'Core Builds Contact',
+            avatar_url: 'https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg',
+            embeds: [embed],
+          }),
+        });
+        if (res.ok || res.status === 204) {
+          if (env.STATS) bgIncrement(ctx, env.STATS, 'contact_messages');
+          return json(200, { ok: true });
+        }
+        return json(502, { error: 'Discord rejected the message' });
+      } catch (e) {
+        return json(502, { error: 'Failed to reach Discord' });
+      }
+    }
+
     // --- Paste: store template ---
     if (url.pathname === '/paste' && request.method === 'POST') {
       if (!env.TEMPLATES) return json(500, { error: 'KV not configured' });
