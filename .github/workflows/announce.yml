@@ -2,10 +2,17 @@ name: Announce
 on:
   release:
     types: [published]
+
+permissions: {}
+
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - name: Post to Discord
-        run: curl -X POST -H 'Content-type: application/json' --data '{"content":"New release!"}' ${{ secrets.DISCORD_WEBHOOK_URL }}
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"content":"New release!"}' \
+            --fail-with-body --silent --show-error "$WEBHOOK_URL"
