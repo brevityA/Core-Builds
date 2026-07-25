@@ -1,0 +1,84 @@
+name: Sync Docs to Discord
+
+on:
+  workflow_dispatch:
+    inputs:
+      group:
+        description: 'Post a specific group only (leave empty for all)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: docs
+
+      - name: Post docs to Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_DOCS_WEBHOOK_URL }}
+          GROUP_FILTER: ${{ inputs.group }}
+        run: |
+          BASE_URL="https://core-builds.mintlify.app"
+          COLOR=591103  # #00d4ff in decimal
+
+          # Parse navigation groups and pages from docs.json
+          groups=$(jq -c '.navigation.tabs[0].groups[]' docs/docs.json)
+
+          total=0
+          echo "$groups" | while read -r group; do
+            group_name=$(echo "$group" | jq -r '.group')
+
+            # Skip if filter is set and doesn't match
+            if [ -n "$GROUP_FILTER" ] && [ "$group_name" != "$GROUP_FILTER" ]; then
+              continue
+            fi
+
+            pages=$(echo "$group" | jq -r '.pages[]')
+
+            # Build embed fields from pages in this group
+            fields="[]"
+            for slug in $pages; do
+              mdx_file="docs/${slug}.mdx"
+              if [ -f "$mdx_file" ]; then
+                title=$(grep -m1 '^title:' "$mdx_file" | sed 's/^title: *"\{0,1\}\([^"]*\)"\{0,1\}/\1/')
+                desc=$(grep -m1 '^description:' "$mdx_file" | sed 's/^description: *"\{0,1\}\([^"]*\)"\{0,1\}/\1/' | head -c 100)
+              fi
+              title="${title:-$slug}"
+              desc="${desc:-}"
+
+              fields=$(echo "$fields" | jq \
+                --arg name "$title" \
+                --arg value "[Read →](${BASE_URL}/${slug})$(if [ -n "$desc" ]; then echo " — ${desc}"; fi)" \
+                '. + [{ name: $name, value: $value, inline: false }]')
+            done
+
+            # Post one embed per group
+            jq -n \
+              --arg group_name "$group_name" \
+              --argjson fields "$fields" \
+              --argjson color "$COLOR" \
+              '{
+                embeds: [{
+                  title: ("📚 " + $group_name),
+                  description: "Documentation pages",
+                  color: $color,
+                  fields: $fields,
+                  footer: { text: "Core Builds Docs" }
+                }]
+              }' | curl -X POST -H 'Content-type: application/json' -d @- \
+                --fail-with-body --silent --show-error "$WEBHOOK_URL"
+
+            page_count=$(echo "$fields" | jq 'length')
+            total=$((total + page_count))
+            echo "Posted group: $group_name ($page_count pages)"
+            sleep 1
+          done
+
+          echo "Synced docs to Discord."
