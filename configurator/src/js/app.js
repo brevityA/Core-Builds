@@ -7,6 +7,9 @@ import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEV
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
+import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
+import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
+import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../data/bandwidth.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -73,7 +76,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
@@ -174,7 +177,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','patchCinemeta','installAIOMeta'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
   try {
     const pub = {};
@@ -201,8 +204,12 @@ function sanitizeSharedConfig(d) {
   pick('streamPool',   v => ['normal','large','max'].includes(v));
   pick('pseArch',      v => ['standard','iqr'].includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
+  pick('ageLimit',     v => AGE_RATINGS.some(r => r.v === v));
+  pick('libraryBoost', v => ['none','default','strong'].includes(v));
+  pick('nzbFailoverPosition', v => ['before-torrents','after-torrents'].includes(v));
+  pick('maxFailoverNzbs', v => [1,2,3,5].includes(Number(v)));
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled','patchCinemeta','installAIOMeta'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
@@ -305,7 +312,7 @@ function loadState() {
         S.service = deriveService();
         history.replaceState(null, '', location.pathname);
         return;
-      } catch(e) { console.warn('Failed to load shared config', e); history.replaceState(null, '', location.pathname); setTimeout(() => showToast('Share link could not be loaded — it may be corrupted or from an older version', true), 300); }
+      } catch(e) { console.warn('Failed to load shared config', e); logError('import', 'Share link decode failed', { error: e.message }); history.replaceState(null, '', location.pathname); setTimeout(() => showToast('Share link could not be loaded — it may be corrupted or from an older version', true), 300); }
     }
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
@@ -327,6 +334,7 @@ function loadState() {
         S.service = deriveService();
       } catch(e) {
         console.warn("Failed to sanitize local storage config, starting fresh", e);
+        logError('import', 'Local storage config corrupted', { error: e.message });
         localStorage.removeItem('coreBuild');
       }
     }
@@ -851,6 +859,15 @@ function renderAdvancedPanel() {
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Age Rating Limit</span> ${ftTip('Filter content by age certification (MPAA/TV). <strong>None</strong> shows everything. Lower ratings restrict to age-appropriate content. Requires <strong>certification()</strong> SEL support in AIOStreams.')}
+          </div>
+          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Restrict streams by age rating — useful for shared/family setups</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            ${AGE_RATINGS.map(r => { const on = S.ageLimit === r.v; return `<button data-action="set-age-limit" data-val="${r.v}" style="padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'}">${r.label.split(' — ')[0]}</button>`; }).join('')}
+          </div>
+        </div>
+        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
             <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('How many streams AIOStreams collects before sorting and filtering. <strong>More streams = better quality picks</strong> but slower load times. Normal is good for most users. Increase if you want the absolute best quality match.')}
             <span style="font-size:.65rem;color:#4b5563">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
@@ -868,6 +885,32 @@ function renderAdvancedPanel() {
           <div style="display:flex;gap:5px">
             ${[['standard','Standard','Simple quality tiers'],['iqr','Apex IQR','Statistical bitrate filtering']].map(([v,l,d]) => { const on=(S.pseArch||'standard')===v; return `<button data-action="set-pse-arch" data-val="${v}" data-active="${on}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${d}</span></button>`; }).join('')}
           </div>
+        </div>` : ''}
+        ${(S.service !== 'http' && S.service !== 'p2p') ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Library Boost</span> ${ftTip('<strong>Default</strong> ranks library items first within each quality tier. <strong>Strong</strong> always puts library items at the very top regardless of quality. <strong>None</strong> removes library sorting entirely.')}
+          </div>
+          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How much priority your existing library items get in results</div>
+          <div style="display:flex;gap:5px">
+            ${[['none','None','Sorted normally'],['default','Default','First within tier'],['strong','Strong','Always top']].map(([v,l,dd]) => { const on=(S.libraryBoost||'default')===v; return `<button data-action="set-library-boost" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${dd}</span></button>`; }).join('')}
+          </div>
+        </div>` : ''}
+        ${(S.service !== 'http' && S.service !== 'p2p' && (S.multiServices.includes('easynews') || S.multiServices.includes('nzbgeek') || S.multiServices.includes('streamnzb') || S.service === 'easynews' || S.service === 'nzbgeek' || S.service === 'streamnzb')) ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div>
+              <div style="font-size:.78rem;font-weight:700;color:#e6edf3">NZB Failover</div>
+              <div style="font-size:.68rem;color:#6b7280">Configurable NZB failover position and count</div>
+            </div>
+            <label class="toggle-sw"><input type="checkbox" data-action="toggle-nzb-failover" ${S.nzbFailover?'checked':''}><span class="toggle-track"></span></label>
+          </div>
+          ${S.nzbFailover ? `
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              ${[['before-torrents','Before Torrents'],['after-torrents','After Torrents']].map(([v,l]) => { const on=(S.nzbFailoverPosition||'after-torrents')===v; return `<button data-action="set-nzb-failover-pos" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+            </div>
+            <div style="display:flex;gap:6px">
+              ${[[1,'1 NZB'],[2,'2 NZBs'],[3,'3 NZBs'],[5,'5 NZBs']].map(([v,l]) => { const on=(S.maxFailoverNzbs||3)===v; return `<button data-action="set-max-failover-nzbs" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+            </div>
+          ` : ''}
         </div>` : ''}
       </div>
 
@@ -1864,6 +1907,10 @@ function tutClose(){
 window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  initErrorLogger();
+  window._formatErrorLog = formatErrorLog;
+  window._clearErrorLog = () => { clearErrorLog(); document.querySelectorAll('.cb-error-log-section').forEach(el => { el.innerHTML = errorLogHtml(); }); };
+  window._exportErrorLog = exportErrorLog;
 
   // Mobile optimization: select all on focus for text/password/url inputs to make replacing easier on iOS
   document.addEventListener('focusin', e => {
@@ -2404,6 +2451,35 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
         btn.style.color       = on ? '#00d4ff' : '#6b7280';
         btn.style.fontWeight  = on ? '700' : '500';
+      });
+    }
+    if (action === 'set-library-boost') {
+      S.libraryBoost = (e.target.closest('[data-action="set-library-boost"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-library-boost"]').forEach(btn => {
+        const on = btn.dataset.val === (S.libraryBoost||'default');
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
+      });
+    }
+    if (action === 'toggle-nzb-failover') { S.nzbFailover = !S.nzbFailover; saveState(); render(); }
+    if (action === 'set-nzb-failover-pos') {
+      S.nzbFailoverPosition = (e.target.closest('[data-action="set-nzb-failover-pos"]') || e.target).dataset.val;
+      saveState(); render();
+    }
+    if (action === 'set-max-failover-nzbs') {
+      S.maxFailoverNzbs = Number((e.target.closest('[data-action="set-max-failover-nzbs"]') || e.target).dataset.val);
+      saveState(); render();
+    }
+    if (action === 'set-age-limit') {
+      S.ageLimit = (e.target.closest('[data-action="set-age-limit"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-age-limit"]').forEach(btn => {
+        const on = btn.dataset.val === S.ageLimit;
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
       });
     }
     if (action === 'set-pse-arch') {
@@ -3063,6 +3139,7 @@ function eses() {
     if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
     if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
+    { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     return out;
   }
 
@@ -3083,6 +3160,7 @@ function eses() {
       const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
       out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
     }
+    { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     return out;
   }
 
@@ -3131,6 +3209,8 @@ function eses() {
     const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
     out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
   }
+  const ageEse = generateAgeRatingESE(S.ageLimit);
+  if (ageEse) out.push(ageEse);
   return out;
 }
 
@@ -3274,7 +3354,11 @@ function build() {
       if (S.service==='http') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'language',direction:d},{key:'size',direction:d}] }; }
       if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
       const isHybrid=S.service==='hybrid'||(S.service==='multi'&&S.multiServices&&S.multiServices.includes('torbox-pro')&&S.multiServices.includes('realdebrid')), svcKey=isHybrid?[{key:'service',direction:d}]:[];
-      return { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] }; })(),
+      const sc = { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] };
+      const lb = S.libraryBoost || 'default';
+      if (lb === 'none') { for (const k of Object.keys(sc)) sc[k] = sc[k].filter(e => e.key !== 'library'); }
+      else if (lb === 'strong') { for (const k of Object.keys(sc)) { sc[k] = sc[k].filter(e => e.key !== 'library'); sc[k].unshift({key:'library',direction:d}); } }
+      return sc; })(),
     deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}], ...(S.dedupMerge ? { merge: { enabled: true, failoverVariants: true, fields: [] } } : {}) }; })(),
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
@@ -3289,7 +3373,7 @@ function build() {
     precacheSingleStream: true,
     preloadStreams: { enabled:S.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
-    nzbFailover: { enabled:true, position:'last' },
+    nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(S.maxFailoverNzbs)||3 } : { enabled:true, position:'last' },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
@@ -3371,11 +3455,16 @@ function build() {
 }
 
 function buildFinal() {
-  const tpl = build();
-  if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
-  sanitizeAioEnumArrays(tpl.config);
-  addVersionMetadata(tpl);
-  return tpl;
+  try {
+    const tpl = build();
+    if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
+    sanitizeAioEnumArrays(tpl.config);
+    addVersionMetadata(tpl);
+    return tpl;
+  } catch (err) {
+    logError('build', err.message, { service: S.service, device: S.device, resolution: S.resolution, stack: err.stack?.slice(0, 300) });
+    throw err;
+  }
 }
 
 const PARTIAL_EXPORT_FIELDS = {
@@ -4704,6 +4793,7 @@ function simpleFinishHtml() {
       <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:16px 0">
         ${bits.map(([i2, t]) => `<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.16);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:#9ca3af">${i2} ${t}</span>`).join('')}
       </div>
+      ${(() => { const hint = DEVICE_BANDWIDTH_HINTS[S.device]; if (!hint) return ''; const bw = calculateBitrateLimit(hint.recommended); return `<div style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">📶</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#9ca3af">Bandwidth hint for your device</div><div style="font-size:.68rem;color:#6b7280;line-height:1.4">Recommended: <strong style="color:#00d4ff">${hint.recommended} Mbps+</strong> — ${hint.reason}. Safe bitrate cap: <strong style="color:#e6edf3">${bw.label}</strong> (${bw.description})</div></div></div>`; })()}
       ${needed.length ? `<div style="margin-bottom:14px">
         ${needed.map(inp => `
         <div class="name-row" style="margin-bottom:10px">
@@ -5564,7 +5654,7 @@ function showDiagnosticsModal() {
   document.getElementById('diagnosticsModal')?.remove();
   const data=buildSanitizedDiagnostics();
   const overlay=document.createElement('div'); overlay.id='diagnosticsModal'; overlay.className='fastlane-overlay';
-  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="diagTitle" style="max-width:620px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Sanitized diagnostics</div><div class="fastlane-title" id="diagTitle">Report an issue safely.</div><div class="fastlane-sub">Review and copy this report. It contains settings and credential presence only — never API keys, passwords, UUID passwords, or tokens.</div></div><button class="fastlane-close" id="diagClose" aria-label="Close">✕</button></div><pre class="diag-pre" id="diagPre">${JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre><div class="diag-actions"><button class="diag-primary" id="diagCopy">Copy report</button><a class="diag-secondary" href="https://github.com/brevityA/Core-Builds/issues/new" target="_blank" rel="noopener">Open GitHub issue</a></div></div>`;
+  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="diagTitle" style="max-width:620px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Sanitized diagnostics</div><div class="fastlane-title" id="diagTitle">Report an issue safely.</div><div class="fastlane-sub">Review and copy this report. It contains settings and credential presence only — never API keys, passwords, UUID passwords, or tokens.</div></div><button class="fastlane-close" id="diagClose" aria-label="Close">✕</button></div><pre class="diag-pre" id="diagPre">${JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre><div class="cb-error-log-section" style="padding:0 20px 12px">${errorLogHtml()}</div><div class="diag-actions"><button class="diag-primary" id="diagCopy">Copy report</button><a class="diag-secondary" href="https://github.com/brevityA/Core-Builds/issues/new" target="_blank" rel="noopener">Open GitHub issue</a></div></div>`;
   document.body.appendChild(overlay);
   overlay.addEventListener('click',e=>{if(e.target===overlay||e.target.closest('#diagClose'))overlay.remove(); if(e.target.closest('#diagCopy'))navigator.clipboard.writeText(JSON.stringify(data,null,2)).then(()=>{e.target.closest('#diagCopy').textContent='✓ Copied';});});
   document.getElementById('diagClose').focus();
@@ -6009,6 +6099,7 @@ async function createImportUrl() {
     result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong style="color:#e6edf3">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong style="color:#fbbf24">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link expires after 30 days — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
+    logError('deploy', 'Paste service blocked or timed out', { service: S.service });
     result.innerHTML = `<div class="import-success import-error" style="margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">The upload failed — CORS block, rate limit, or paste.rs downtime. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
     showToast('Paste service unreachable', true);
   }
@@ -6036,7 +6127,7 @@ async function openInAIOStreams() {
     const cfg = buildFinal().config;
     const existingUuid = validateUuid(uuid) ? uuid : null;
     const fastest = await selectHealthyHost(4000).catch(() => null);
-    if (!fastest) { resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
+    if (!fastest) { logError('deploy', 'All hosts unreachable', { service: S.service, host: S.instanceHost }); resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
     rememberGoodHost(fastest);
     const attempt = async (id) => {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
@@ -6121,6 +6212,7 @@ async function openInAIOStreams() {
         showManifestModal(`${base}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');
     } catch(e) {
+      logError('deploy', 'Connection failed to host', { host: S.instanceHost, error: e.message });
       resetBtn(origHtml);
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Host timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
     }

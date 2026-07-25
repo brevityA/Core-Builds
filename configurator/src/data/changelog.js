@@ -1,6 +1,10 @@
 export const CHANGELOG = [
   { v:'2.84', date:'Jul 25 2026', items:[
-    'v2.84 fixes — Patch modules extracted (age-limit, bandwidth, library-boost, nzb-failover, one-click-preset), worker rate limiting, competitive features patch, tools and inspector updates',
+    'Error Logger wired — initErrorLogger() at startup, logError() on build/deploy/import failures, error log section in Diagnostics modal with copy/clear/export',
+    'Age Rating Limit — Restrict content by MPAA/TV certification (G, PG, PG-13, R) via ESE; added to Video Preferences panel',
+    'Library Boost — Three modes in Fine-Tune: Default (first within tier), Strong (always top), None (disabled); modifies sort criteria across all scopes',
+    'NZB Failover — Configurable position (before/after torrents) and max NZB count (1/2/3/5) in Fine-Tune; shown when Usenet service selected',
+    'Bandwidth Estimator — Device-aware bandwidth hint card in Review step showing recommended speed and safe bitrate cap',
   ]},
   { v:'2.83', date:'Jul 25 2026', items:[
     'Error Logger — Captures build, deploy, fetch, and unhandled errors into a localStorage ring buffer (50 entries); view, copy, and clear from the Diagnostics modal',
