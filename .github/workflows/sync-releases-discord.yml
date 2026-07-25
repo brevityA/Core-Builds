@@ -1,0 +1,63 @@
+name: Sync Releases to Discord
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max releases to post (newest first)'
+        required: false
+        default: '10'
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post all releases to Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GH_TOKEN: ${{ github.token }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          releases=$(gh api "repos/${{ github.repository }}/releases?per_page=${LIMIT}" \
+            --jq '.[] | select(.draft == false) | {name: .name, tag: .tag_name, url: .html_url, body: (.body // "" | .[0:200]), published: .published_at}')
+
+          if [ -z "$releases" ]; then
+            echo "No releases found."
+            exit 0
+          fi
+
+          count=0
+          echo "$releases" | jq -c '.' | while read -r release; do
+            name=$(echo "$release" | jq -r '.name // .tag')
+            tag=$(echo "$release" | jq -r '.tag')
+            url=$(echo "$release" | jq -r '.url')
+            body=$(echo "$release" | jq -r '.body')
+            published=$(echo "$release" | jq -r '.published')
+
+            jq -n \
+              --arg name "$name" \
+              --arg tag "$tag" \
+              --arg url "$url" \
+              --arg body "$body" \
+              --arg published "$published" \
+              '{
+                embeds: [{
+                  title: $name,
+                  url: $url,
+                  description: (if ($body | length) > 0 then $body else "No description" end),
+                  color: 5814783,
+                  footer: { text: $tag },
+                  timestamp: $published
+                }]
+              }' | curl -X POST -H 'Content-type: application/json' -d @- \
+                --fail-with-body --silent --show-error "$WEBHOOK_URL"
+
+            count=$((count + 1))
+            echo "Posted: $name ($tag)"
+            sleep 1
+          done
+
+          echo "Synced $count release(s) to Discord."
