@@ -13,11 +13,13 @@ import { initOfflineDetection, diagnoseNetworkError } from '../../../tools/debug
 import { validateConfigBeforeDeploy } from '../../../tools/debug/config-validator.js';
 import { sanitize, logError } from '../../../tools/debug/sanitized-logger.js';
 import { safeParseTemplate, validateImportStructure } from '../../../tools/debug/template-import-recovery.js';
+import { initErrorLogger, logError as persistError, getErrorLog, formatErrorLog, clearErrorLog, errorLogHtml } from './error-logger.js';
+import { initContactWidget } from './contact-widget.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.82';
+const CONFIGURATOR_VERSION = '2.83';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -407,7 +409,7 @@ function renderOpts(def) {
   }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
     `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
-    `<div style="font-size:.65rem;color:#4b5563;margin-top:6px;text-align:center">Want to build your own custom formatter? Design one visually at <a href="http://crispyduck.xyz" target="_blank" rel="noopener noreferrer" style="color:#a78bfa;text-decoration:none;font-weight:700">crispyduck.xyz</a></div>`;
+    `<div style="font-size:.65rem;color:#4b5563;margin-top:6px;text-align:center">Want to build your own custom formatter? Design one visually at <a href="https://crispyduck.xyz" target="_blank" rel="noopener noreferrer" style="color:#a78bfa;text-decoration:none;font-weight:700">crispyduck.xyz</a></div>`;
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
@@ -1926,6 +1928,8 @@ document.addEventListener('DOMContentLoaded', () => {
   loadState();
   autoRepairState(S, saveState);
   initOfflineDetection();
+  initErrorLogger();
+  initContactWidget();
 
   // Mobile optimization: select all on focus for text/password/url inputs to make replacing easier on iOS
   document.addEventListener('focusin', e => {
@@ -3483,11 +3487,19 @@ function build() {
 }
 
 function buildFinal() {
-  const tpl = build();
-  if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
-  sanitizeAioEnumArrays(tpl.config);
-  addVersionMetadata(tpl);
-  return tpl;
+  try {
+    const tpl = build();
+    if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
+    sanitizeAioEnumArrays(tpl.config);
+    addVersionMetadata(tpl);
+    return tpl;
+  } catch (e) {
+    persistError('build', 'Template generation failed: ' + e.message, {
+      service: S.service, device: S.device, resolution: S.resolution,
+      formatter: S.formatter, stack: e.stack?.split('\n').slice(0, 5).join('\n'),
+    });
+    throw e;
+  }
 }
 
 const PARTIAL_EXPORT_FIELDS = {
@@ -5675,14 +5687,17 @@ function buildSanitizedDiagnostics() {
     settings: { service:S.service, multiServices:S.multiServices, device:S.device, resolution:S.resolution, audio:S.audio, cacheMode:S.cacheMode, streamPool:S.streamPool, formatter:S.formatter, installMode:S.installMode, instanceHost:S.instanceHost, quickProfile:S.quickProfile },
     credentialPresence: Object.fromEntries(Object.entries(S.creds||{}).map(([k,v])=>[k,Boolean(v)])),
     templateWarnings: (()=>{try{return templateHealthCheck();}catch(e){return [e.message];}})(),
-    hostCompatibility: hosts
+    hostCompatibility: hosts,
+    errorLog: getErrorLog().slice(0, 20)
   };
 }
 function showDiagnosticsModal() {
   document.getElementById('diagnosticsModal')?.remove();
   const data=buildSanitizedDiagnostics();
   const overlay=document.createElement('div'); overlay.id='diagnosticsModal'; overlay.className='fastlane-overlay';
-  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="diagTitle" style="max-width:620px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Sanitized diagnostics</div><div class="fastlane-title" id="diagTitle">Report an issue safely.</div><div class="fastlane-sub">Review and copy this report. It contains settings and credential presence only — never API keys, passwords, UUID passwords, or tokens.</div></div><button class="fastlane-close" id="diagClose" aria-label="Close">✕</button></div><pre class="diag-pre" id="diagPre">${JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre><div class="diag-actions"><button class="diag-primary" id="diagCopy">Copy report</button><a class="diag-secondary" href="https://github.com/brevityA/Core-Builds/issues/new" target="_blank" rel="noopener">Open GitHub issue</a></div></div>`;
+  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="diagTitle" style="max-width:620px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Sanitized diagnostics</div><div class="fastlane-title" id="diagTitle">Report an issue safely.</div><div class="fastlane-sub">Review and copy this report. It contains settings and credential presence only — never API keys, passwords, UUID passwords, or tokens.</div></div><button class="fastlane-close" id="diagClose" aria-label="Close">✕</button></div><pre class="diag-pre" id="diagPre">${JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre><div style="margin:0 20px 16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)"><div style="font-size:.75rem;font-weight:700;color:#8b949e;margin-bottom:8px">Error Log</div>${errorLogHtml()}</div><div class="diag-actions"><button class="diag-primary" id="diagCopy">Copy report</button><a class="diag-secondary" href="https://github.com/brevityA/Core-Builds/issues/new" target="_blank" rel="noopener">Open GitHub issue</a></div></div>`;
+  window._clearErrorLog = () => { clearErrorLog(); document.getElementById('diagnosticsModal')?.remove(); showDiagnosticsModal(); };
+  window._formatErrorLog = formatErrorLog;
   document.body.appendChild(overlay);
   overlay.addEventListener('click',e=>{if(e.target===overlay||e.target.closest('#diagClose'))overlay.remove(); if(e.target.closest('#diagCopy'))navigator.clipboard.writeText(JSON.stringify(data,null,2)).then(()=>{e.target.closest('#diagCopy').textContent='✓ Copied';});});
   document.getElementById('diagClose').focus();
@@ -5777,6 +5792,7 @@ async function simpleInstall(target) {
     }
   } catch(e) {
     logError('simpleInstall', e, { service: S.service, host: S.instanceHost });
+    persistError('deploy', 'Install failed: ' + e.message, { target, service: S.service, host: S.instanceHost, stack: e.stack?.split('\n').slice(0, 5).join('\n') });
     const netDiag = diagnoseNetworkError(e, S.instanceHost);
     const isApiError = e.message && e.message.startsWith('API_ERROR:');
     const apiDetail = isApiError ? e.message.slice(10) : '';

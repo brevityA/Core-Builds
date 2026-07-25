@@ -30,7 +30,7 @@ const versions = JSON.parse(await readFile(resolve(repoRoot, 'versions.json'), '
 const appVer = app.match(/CONFIGURATOR_VERSION\s*=\s*'([^']+)'/)?.[1];
 
 const checks = {
-  'single current release': CHANGELOG[0]?.v === '2.82' && !CHANGELOG.some(x => x.v === '2.76'),
+  'single current release': CHANGELOG[0]?.v === '2.83' && !CHANGELOG.some(x => x.v === '2.76'),
   'version consistency': appVer === CHANGELOG[0]?.v && pkg.version.startsWith(appVer + '.') && versions.configurator === pkg.version,
   'host metadata coverage': hostKeys.every(k => HOST_META[k]),
   'minimum host version': MIN_AIOSTREAMS_VERSION === '2.31.1',
