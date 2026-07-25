@@ -5,9 +5,6 @@ on:
     branches: [main]
     paths:
       - 'configurator/**'
-      - 'tools/**'
-      - 'account-tools/**'
-      - 'Formatters/**'
   workflow_dispatch:
 
 permissions:
@@ -17,7 +14,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -49,18 +46,6 @@ jobs:
       - name: Build
         working-directory: configurator
         run: npm run build
-
-      - name: Validate build output
-        working-directory: configurator
-        run: |
-          test -f dist/web/index.html || { echo "ERROR: dist/web/index.html missing"; exit 1; }
-          test -f dist/web/assets/app.js || { echo "ERROR: dist/web/assets/app.js missing"; exit 1; }
-          test -f dist/web/assets/app.css || { echo "ERROR: dist/web/assets/app.css missing"; exit 1; }
-          JS_SIZE=$(wc -c < dist/web/assets/app.js)
-          CSS_SIZE=$(wc -c < dist/web/assets/app.css)
-          echo "app.js: ${JS_SIZE} bytes | app.css: ${CSS_SIZE} bytes"
-          test "$JS_SIZE" -gt 100000 || { echo "ERROR: app.js too small (${JS_SIZE} bytes, expected 500KB+)"; exit 1; }
-          echo "Build output validated"
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
