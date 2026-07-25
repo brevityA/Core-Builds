@@ -35,6 +35,9 @@
   <a href="https://core-builds.mintlify.app">
     <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-00d4ff?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
   </a>
+  <a href="https://discord.gg/ZvjnKbrq">
+    <img src="https://img.shields.io/badge/DISCORD-Join_Us-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1a1f27" alt="Discord"/>
+  </a>
 </p>
 
 <p align="center">

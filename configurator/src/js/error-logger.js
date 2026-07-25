@@ -179,6 +179,7 @@ export function errorLogHtml() {
       <div style="font-size:.72rem;font-weight:700;color:#8b949e">${log.length} error${log.length > 1 ? 's' : ''} logged</div>
       <div style="display:flex;gap:6px">
         <button onclick="navigator.clipboard.writeText(window._formatErrorLog?.() || '')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.65rem;font-weight:700;cursor:pointer">Copy Log</button>
+        <button onclick="window._exportErrorLog?.()" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.65rem;font-weight:700;cursor:pointer">Export JSON</button>
         <button onclick="window._clearErrorLog?.()" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(248,113,113,.2);background:rgba(248,113,113,.06);color:#f87171;font-size:.65rem;font-weight:700;cursor:pointer">Clear</button>
       </div>
     </div>

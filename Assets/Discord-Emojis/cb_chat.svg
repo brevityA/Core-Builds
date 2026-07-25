@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="chatGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <path d="M24,36 Q24,24 36,24 L92,24 Q104,24 104,36 L104,72 Q104,84 92,84 L52,84 L36,100 L36,84 Q24,84 24,72 Z" fill="none" stroke="url(#chatGrad)" stroke-width="4" filter="url(#glow)"/>
+  <circle cx="48" cy="54" r="5" fill="url(#chatGrad)" opacity="0.8"/>
+  <circle cx="64" cy="54" r="5" fill="url(#chatGrad)" opacity="0.8"/>
+  <circle cx="80" cy="54" r="5" fill="url(#chatGrad)" opacity="0.8"/>
+</svg>

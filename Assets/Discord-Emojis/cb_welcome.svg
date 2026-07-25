@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="welcomeGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <path d="M38,88 L38,44 C38,34 46,26 56,26 L72,26 C82,26 90,34 90,44 L90,58" fill="none" stroke="url(#welcomeGrad)" stroke-width="5" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M28,88 L38,88 L38,60" fill="none" stroke="url(#welcomeGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="76" cy="72" r="4" fill="url(#welcomeGrad)"/>
+  <path d="M90,58 L90,88 L100,88" fill="none" stroke="url(#welcomeGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M56,96 L72,96" stroke="url(#welcomeGrad)" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="diamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4facfe"/>
+      <stop offset="50%" stop-color="#8a4890"/>
+      <stop offset="100%" stop-color="#c03a20"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <polygon points="64,16 112,64 64,112 16,64" fill="url(#diamGrad)" opacity="0.3" filter="url(#glow)"/>
+  <polygon points="64,20 108,64 64,108 20,64" fill="url(#diamGrad)" opacity="0.95"/>
+  <polygon points="64,36 92,64 64,92 36,64" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="announceGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <path d="M30,52 L46,44 L46,84 L30,76 Z" fill="url(#announceGrad)" filter="url(#glow)" opacity="0.9"/>
+  <path d="M46,44 L86,24 L86,104 L46,84 Z" fill="url(#announceGrad)" filter="url(#glow)" opacity="0.7"/>
+  <rect x="86" y="52" width="16" height="24" rx="4" fill="url(#announceGrad)" opacity="0.5"/>
+  <line x1="22" y1="52" x2="22" y2="76" stroke="url(#announceGrad)" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+</svg>

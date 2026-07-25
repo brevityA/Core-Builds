@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="supportGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <circle cx="64" cy="60" r="34" fill="none" stroke="url(#supportGrad)" stroke-width="5" filter="url(#glow)"/>
+  <circle cx="64" cy="60" r="18" fill="none" stroke="url(#supportGrad)" stroke-width="4" opacity="0.6"/>
+  <line x1="64" y1="26" x2="64" y2="42" stroke="url(#supportGrad)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="64" y1="78" x2="64" y2="94" stroke="url(#supportGrad)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="30" y1="60" x2="46" y2="60" stroke="url(#supportGrad)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="82" y1="60" x2="98" y2="60" stroke="url(#supportGrad)" stroke-width="6" stroke-linecap="round"/>
+  <text x="64" y="116" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#4facfe" text-anchor="middle" opacity="0.7">HELP</text>
+</svg>

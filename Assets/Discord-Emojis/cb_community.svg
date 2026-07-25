@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="commGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <circle cx="64" cy="34" r="11" fill="none" stroke="url(#commGrad)" stroke-width="4" filter="url(#glow)"/>
+  <path d="M44,66 Q44,50 64,50 Q84,50 84,66" fill="none" stroke="url(#commGrad)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="34" cy="58" r="9" fill="none" stroke="url(#commGrad)" stroke-width="3" opacity="0.6"/>
+  <path d="M18,82 Q18,70 34,70 Q44,70 46,76" fill="none" stroke="url(#commGrad)" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <circle cx="94" cy="58" r="9" fill="none" stroke="url(#commGrad)" stroke-width="3" opacity="0.6"/>
+  <path d="M110,82 Q110,70 94,70 Q84,70 82,76" fill="none" stroke="url(#commGrad)" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <line x1="44" y1="96" x2="84" y2="96" stroke="url(#commGrad)" stroke-width="3" stroke-linecap="round" opacity="0.3"/>
+</svg>

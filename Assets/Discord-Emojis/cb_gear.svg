@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="gearGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#0d1117"/>
+  <path d="M64,16 L72,16 L75,28 L84,32 L96,26 L100,32 L90,42 L92,52 L104,56 L104,64 L92,68 L90,78 L100,88 L96,94 L84,88 L75,92 L72,104 L64,104 L61,92 L52,88 L40,94 L36,88 L46,78 L44,68 L32,64 L32,56 L44,52 L46,42 L36,32 L40,26 L52,32 L61,28 Z" fill="url(#gearGrad)" filter="url(#glow)" opacity="0.9"/>
+  <circle cx="68" cy="60" r="16" fill="#0d1117"/>
+  <circle cx="68" cy="60" r="12" fill="none" stroke="#00e5ff" stroke-width="2" opacity="0.5"/>
+</svg>

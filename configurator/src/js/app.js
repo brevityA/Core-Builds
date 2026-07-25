@@ -7,6 +7,9 @@ import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEV
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
+import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
+import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
+import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../data/bandwidth.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -73,7 +76,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false };
+const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
@@ -174,7 +177,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','patchCinemeta','installAIOMeta'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
   try {
     const pub = {};
@@ -201,8 +204,12 @@ function sanitizeSharedConfig(d) {
   pick('streamPool',   v => ['normal','large','max'].includes(v));
   pick('pseArch',      v => ['standard','iqr'].includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
+  pick('ageLimit',     v => AGE_RATINGS.some(r => r.v === v));
+  pick('libraryBoost', v => ['none','default','strong'].includes(v));
+  pick('nzbFailoverPosition', v => ['before-torrents','after-torrents'].includes(v));
+  pick('maxFailoverNzbs', v => [1,2,3,5].includes(Number(v)));
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled','patchCinemeta','installAIOMeta'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
@@ -298,14 +305,16 @@ function loadState() {
     const hash = location.hash;
     if (hash.startsWith('#cfg=')) {
       try {
-        const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(5)))));
+        const b64 = hash.slice(5);
+        if (b64.length > 100000) throw new Error('Share link too large');
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(b64))));
         Object.assign(S, sanitizeSharedConfig(decoded));
         hadSavedState = true;
         _sharedImport = true;
         S.service = deriveService();
         history.replaceState(null, '', location.pathname);
         return;
-      } catch(e) { console.warn('Failed to load shared config', e); history.replaceState(null, '', location.pathname); setTimeout(() => showToast('Share link could not be loaded — it may be corrupted or from an older version', true), 300); }
+      } catch(e) { console.warn('Failed to load shared config', e); logError('import', 'Share link decode failed', { error: e.message }); history.replaceState(null, '', location.pathname); setTimeout(() => showToast('Share link could not be loaded — it may be corrupted or from an older version', true), 300); }
     }
     const savedS = localStorage.getItem('coreBuild');
     const savedStep = localStorage.getItem('coreBuildStep');
@@ -313,7 +322,14 @@ function loadState() {
       try {
         const parsed = migrateState(JSON.parse(savedS));
         Object.assign(S, sanitizeSharedConfig(parsed));
-        if (parsed.creds) Object.assign(S.creds, parsed.creds);
+        if (parsed.creds && typeof parsed.creds === 'object' && !Array.isArray(parsed.creds)) {
+          const safeCreds = Object.create(null);
+          for (const k of Object.keys(parsed.creds)) {
+            if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+            if (typeof parsed.creds[k] === 'string') safeCreds[k] = parsed.creds[k];
+          }
+          Object.assign(S.creds, safeCreds);
+        }
         if (parsed.instanceUrl) S.instanceUrl = parsed.instanceUrl;
         if (parsed.instanceUuid) S.instanceUuid = parsed.instanceUuid;
         if (parsed.instancePassword) S.instancePassword = parsed.instancePassword;
@@ -327,6 +343,7 @@ function loadState() {
         S.service = deriveService();
       } catch(e) {
         console.warn("Failed to sanitize local storage config, starting fresh", e);
+        logError('import', 'Local storage config corrupted', { error: e.message });
         localStorage.removeItem('coreBuild');
       }
     }
@@ -395,7 +412,7 @@ function renderOpts(def) {
   }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
     `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
-    `<div style="font-size:.65rem;color:#4b5563;margin-top:6px;text-align:center">Want to build your own custom formatter? Design one visually at <a href="http://crispyduck.xyz" target="_blank" rel="noopener noreferrer" style="color:#a78bfa;text-decoration:none;font-weight:700">crispyduck.xyz</a></div>`;
+    `<div style="font-size:.65rem;color:#4b5563;margin-top:6px;text-align:center">Want to build your own custom formatter? Design one visually at <a href="https://crispyduck.xyz" target="_blank" rel="noopener noreferrer" style="color:#a78bfa;text-decoration:none;font-weight:700">crispyduck.xyz</a></div>`;
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
@@ -851,6 +868,15 @@ function renderAdvancedPanel() {
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Age Rating Limit</span> ${ftTip('Filter content by age certification (MPAA/TV). <strong>None</strong> shows everything. Lower ratings restrict to age-appropriate content. Requires <strong>certification()</strong> SEL support in AIOStreams.')}
+          </div>
+          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Restrict streams by age rating — useful for shared/family setups</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            ${AGE_RATINGS.map(r => { const on = S.ageLimit === r.v; return `<button data-action="set-age-limit" data-val="${r.v}" style="padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'}">${r.label.split(' — ')[0]}</button>`; }).join('')}
+          </div>
+        </div>
+        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
             <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('How many streams AIOStreams collects before sorting and filtering. <strong>More streams = better quality picks</strong> but slower load times. Normal is good for most users. Increase if you want the absolute best quality match.')}
             <span style="font-size:.65rem;color:#4b5563">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
@@ -868,6 +894,32 @@ function renderAdvancedPanel() {
           <div style="display:flex;gap:5px">
             ${[['standard','Standard','Simple quality tiers'],['iqr','Apex IQR','Statistical bitrate filtering']].map(([v,l,d]) => { const on=(S.pseArch||'standard')===v; return `<button data-action="set-pse-arch" data-val="${v}" data-active="${on}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${d}</span></button>`; }).join('')}
           </div>
+        </div>` : ''}
+        ${(S.service !== 'http' && S.service !== 'p2p') ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Library Boost</span> ${ftTip('<strong>Default</strong> ranks library items first within each quality tier. <strong>Strong</strong> always puts library items at the very top regardless of quality. <strong>None</strong> removes library sorting entirely.')}
+          </div>
+          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How much priority your existing library items get in results</div>
+          <div style="display:flex;gap:5px">
+            ${[['none','None','Sorted normally'],['default','Default','First within tier'],['strong','Strong','Always top']].map(([v,l,dd]) => { const on=(S.libraryBoost||'default')===v; return `<button data-action="set-library-boost" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${dd}</span></button>`; }).join('')}
+          </div>
+        </div>` : ''}
+        ${(S.service !== 'http' && S.service !== 'p2p' && (S.multiServices.includes('easynews') || S.multiServices.includes('nzbgeek') || S.multiServices.includes('streamnzb') || S.service === 'easynews' || S.service === 'nzbgeek' || S.service === 'streamnzb')) ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div>
+              <div style="font-size:.78rem;font-weight:700;color:#e6edf3">NZB Failover</div>
+              <div style="font-size:.68rem;color:#6b7280">Configurable NZB failover position and count</div>
+            </div>
+            <label class="toggle-sw"><input type="checkbox" data-action="toggle-nzb-failover" ${S.nzbFailover?'checked':''}><span class="toggle-track"></span></label>
+          </div>
+          ${S.nzbFailover ? `
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              ${[['before-torrents','Before Torrents'],['after-torrents','After Torrents']].map(([v,l]) => { const on=(S.nzbFailoverPosition||'after-torrents')===v; return `<button data-action="set-nzb-failover-pos" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+            </div>
+            <div style="display:flex;gap:6px">
+              ${[[1,'1 NZB'],[2,'2 NZBs'],[3,'3 NZBs'],[5,'5 NZBs']].map(([v,l]) => { const on=(S.maxFailoverNzbs||3)===v; return `<button data-action="set-max-failover-nzbs" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+            </div>
+          ` : ''}
         </div>` : ''}
       </div>
 
@@ -898,7 +950,7 @@ function renderAdvancedPanel() {
             </div>
             <div style="position:relative;display:flex;align-items:center">
               <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" placeholder="Your SubDL API key"
-                value="${S.creds.subdl || ''}" maxlength="120" style="padding-right:38px;font-size:.78rem">
+                value="${escH(S.creds.subdl || '')}" maxlength="120" style="padding-right:38px;font-size:.78rem">
               <button type="button" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
                 onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -1140,9 +1192,10 @@ function splashHtml() {
     <div class="hybrid-topbar splash-anim splash-anim-d1">
       <div class="hybrid-mini-brand">CORE <b>BUILDS</b></div>
       <div class="hybrid-toplinks">
-        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener">Templates</a>
-        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener">Core Crew</a>
+        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer">Templates</a>
+        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a>
+        <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer">Discord</a>
         <button data-action="show-changelog" class="hybrid-version">v${CONFIGURATOR_VERSION}</button>
       </div>
     </div>
@@ -1211,10 +1264,11 @@ function splashHtml() {
 
     <div class="splash-tertiary splash-anim splash-anim-d6">
       <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
-      <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="splash-tertiary-btn">Browse Templates</a>
+      <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Browse Templates</a>
       <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
-      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="splash-tertiary-btn">GitHub</a>
-      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="splash-tertiary-btn">Core Crew</a>
+      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">GitHub</a>
+      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Core Crew</a>
+      <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Discord</a>
       <button data-action="show-changelog" class="splash-tertiary-btn">What's new · v${CONFIGURATOR_VERSION}</button>
       <button data-action="open-diagnostics" class="splash-tertiary-btn">Report Issue</button>
     </div>
@@ -1331,7 +1385,7 @@ function render() {
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
-            value="${S.name}" data-action="update-name" maxlength="60">
+            value="${escH(S.name)}" data-action="update-name" maxlength="60">
         </div>
         ${sizeLimitHtml()}
         <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
@@ -1358,11 +1412,11 @@ function render() {
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Enter your Stremio credentials to install the addon directly to your library.</div>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
               <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
-                value="${(S.stremioEmail||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"
+                value="${escH(S.stremioEmail||'')}"
                 class="th-input">
               <div style="position:relative">
                 <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
-                  value="${(S.stremioPassword||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"
+                  value="${escH(S.stremioPassword||'')}"
                   class="th-input" style="padding-right:40px">
                 <button type="button" data-action="toggle-stremio-pwd" aria-label="Show or hide password"
                   style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--th-tx4);padding:2px;line-height:1;display:flex;align-items:center">
@@ -1371,7 +1425,7 @@ function render() {
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:-2px">
                 <button type="button" data-action="create-stremio-account" style="font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600;opacity:.8;transition:opacity .15s">Create random account →</button>
-                <a href="https://www.stremio.com/register" target="_blank" rel="noopener" style="font-size:.72rem;color:var(--th-tx3);text-decoration:none;transition:color .15s">Sign up at stremio.com</a>
+                <a href="https://www.stremio.com/register" target="_blank" rel="noopener noreferrer" style="font-size:.72rem;color:var(--th-tx3);text-decoration:none;transition:color .15s">Sign up at stremio.com</a>
               </div>
             </div>
             <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
@@ -1422,7 +1476,7 @@ function render() {
                 </div>
                 <div style="position:relative">
                   <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
-                    value="${(S.instancePassword||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
+                    value="${escH(S.instancePassword||'')}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
                     style="padding-right:40px">
                   <button type="button" id="pwdEye" data-action="toggle-pwd"
                     title="Show/hide password"
@@ -1432,7 +1486,7 @@ function render() {
                 </div>
               </div>
               <div id="hostConfigLinkRow" style="margin-top:-4px;margin-bottom:2px;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
-                <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener" class="host-cfg-link">
+                <a id="hostConfigLink" href="${HOST_BASE_URLS[S.instanceHost]?HOST_BASE_URLS[S.instanceHost]+'/configure':'#'}" target="_blank" rel="noopener noreferrer" class="host-cfg-link">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   Open configure page
                 </a>
@@ -1460,14 +1514,14 @@ function render() {
                   <label style="color:var(--th-purple)">Base UUID</label>
                   <input class="name-input" id="baseUuidInput" type="text"
                     placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                    value="${(S.baseUuid||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-action="update-base-uuid" maxlength="36"
+                    value="${escH(S.baseUuid||'')}" data-action="update-base-uuid" maxlength="36"
                     style="font-family:monospace;font-size:.85rem;border-color:${S.baseUuid ? 'var(--th-purple-border)' : ''}">
                 </div>
                 <div class="name-row" style="margin-bottom:0">
                   <label style="color:var(--th-purple)">Base Password</label>
                   <input class="name-input" id="basePwdInput" type="password"
                     placeholder="leave blank if none"
-                    value="${(S.basePassword||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-action="update-base-pwd" maxlength="200"
+                    value="${escH(S.basePassword||'')}" data-action="update-base-pwd" maxlength="200"
                     autocomplete="new-password">
                 </div>
                 ${S.baseUuid ? `<div style="font-size:.7rem;color:#a855f7;margin-top:8px;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generated template will use parentConfig — formatter, sort, presets inherited from base.</div>` : ''}
@@ -1525,7 +1579,7 @@ function render() {
             </div>
           </div>
           <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 16px">
-            <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="community-link">
+            <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
             </a>
@@ -1533,13 +1587,17 @@ function render() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               Tools
             </a>
-            <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">
+            <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
               GitHub
             </a>
-            <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">
+            <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
               Core Crew
+            </a>
+            <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="community-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+              Discord
             </a>
           </div>
         </div>
@@ -1639,7 +1697,7 @@ function render() {
           </div>
           <div style="position:relative;display:flex;align-items:center">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
-              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:38px">
+              value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
               onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -1667,7 +1725,7 @@ function render() {
               </div>
               <div style="position:relative;display:flex;align-items:center">
                 <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
-                  value="${S.tmdbToken}" maxlength="400" style="padding-right:38px">
+                  value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
                   onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -1684,7 +1742,7 @@ function render() {
               </div>
               <div style="position:relative;display:flex;align-items:center">
                 <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
-                  value="${S.tmdbApiKey}" maxlength="60" style="padding-right:38px">
+                  value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
                   onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -1717,7 +1775,7 @@ function render() {
             <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${{1:1,2:2,3:3}[step]||step} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak','seedr'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${Math.min({1:1,2:2,3:3}[step]||step, 3)} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak','seedr'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -1864,6 +1922,10 @@ function tutClose(){
 window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  initErrorLogger();
+  window._formatErrorLog = formatErrorLog;
+  window._clearErrorLog = () => { clearErrorLog(); document.querySelectorAll('.cb-error-log-section').forEach(el => { el.innerHTML = errorLogHtml(); }); };
+  window._exportErrorLog = exportErrorLog;
 
   // Mobile optimization: select all on focus for text/password/url inputs to make replacing easier on iOS
   document.addEventListener('focusin', e => {
@@ -2406,6 +2468,35 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.fontWeight  = on ? '700' : '500';
       });
     }
+    if (action === 'set-library-boost') {
+      S.libraryBoost = (e.target.closest('[data-action="set-library-boost"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-library-boost"]').forEach(btn => {
+        const on = btn.dataset.val === (S.libraryBoost||'default');
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
+      });
+    }
+    if (action === 'toggle-nzb-failover') { S.nzbFailover = !S.nzbFailover; saveState(); render(); }
+    if (action === 'set-nzb-failover-pos') {
+      S.nzbFailoverPosition = (e.target.closest('[data-action="set-nzb-failover-pos"]') || e.target).dataset.val;
+      saveState(); render();
+    }
+    if (action === 'set-max-failover-nzbs') {
+      S.maxFailoverNzbs = Number((e.target.closest('[data-action="set-max-failover-nzbs"]') || e.target).dataset.val);
+      saveState(); render();
+    }
+    if (action === 'set-age-limit') {
+      S.ageLimit = (e.target.closest('[data-action="set-age-limit"]') || e.target).dataset.val;
+      saveState();
+      document.querySelectorAll('[data-action="set-age-limit"]').forEach(btn => {
+        const on = btn.dataset.val === S.ageLimit;
+        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
+        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
+        btn.style.color       = on ? '#00d4ff' : '#6b7280';
+      });
+    }
     if (action === 'set-pse-arch') {
       S.pseArch = (e.target.closest('[data-action="set-pse-arch"]') || e.target).dataset.val;
       saveState();
@@ -2713,7 +2804,11 @@ document.addEventListener('DOMContentLoaded', () => {
         filterSvcRows(activeCat ? activeCat.dataset.cat : 'all', '');
       }
     }
-    else if (a === 'update-url') S.instanceUrl = e.target.value.trim();
+    else if (a === 'update-url') {
+      const raw = e.target.value.trim();
+      if (raw && !/^https?:\/\/.+/i.test(raw)) { showToast('URL must start with http:// or https://', true); return; }
+      S.instanceUrl = raw;
+    }
     else if (a === 'update-pwd') S.instancePassword = e.target.value;
     else if (a === 'update-base-uuid') { S.baseUuid = e.target.value.trim(); e.target.style.borderColor = S.baseUuid ? 'rgba(168,85,247,.5)' : ''; }
     else if (a === 'update-base-pwd') S.basePassword = e.target.value;
@@ -3063,6 +3158,7 @@ function eses() {
     if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
     if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
+    { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     return out;
   }
 
@@ -3083,6 +3179,7 @@ function eses() {
       const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
       out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
     }
+    { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     return out;
   }
 
@@ -3131,6 +3228,8 @@ function eses() {
     const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
     out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
   }
+  const ageEse = generateAgeRatingESE(S.ageLimit);
+  if (ageEse) out.push(ageEse);
   return out;
 }
 
@@ -3274,7 +3373,11 @@ function build() {
       if (S.service==='http') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rq,{key:'language',direction:d},{key:'size',direction:d}] }; }
       if (S.service==='p2p') { return { global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }; }
       const isHybrid=S.service==='hybrid'||(S.service==='multi'&&S.multiServices&&S.multiServices.includes('torbox-pro')&&S.multiServices.includes('realdebrid')), svcKey=isHybrid?[{key:'service',direction:d}]:[];
-      return { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] }; })(),
+      const sc = { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] };
+      const lb = S.libraryBoost || 'default';
+      if (lb === 'none') { for (const k of Object.keys(sc)) sc[k] = sc[k].filter(e => e.key !== 'library'); }
+      else if (lb === 'strong') { for (const k of Object.keys(sc)) { sc[k] = sc[k].filter(e => e.key !== 'library'); sc[k].unshift({key:'library',direction:d}); } }
+      return sc; })(),
     deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}], ...(S.dedupMerge ? { merge: { enabled: true, failoverVariants: true, fields: [] } } : {}) }; })(),
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
@@ -3289,7 +3392,7 @@ function build() {
     precacheSingleStream: true,
     preloadStreams: { enabled:S.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
-    nzbFailover: { enabled:true, position:'last' },
+    nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(S.maxFailoverNzbs)||3 } : { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
@@ -3371,11 +3474,23 @@ function build() {
 }
 
 function buildFinal() {
-  const tpl = build();
-  if (S._migrationKeep) Object.assign(tpl.config, S._migrationKeep);
-  sanitizeAioEnumArrays(tpl.config);
-  addVersionMetadata(tpl);
-  return tpl;
+  try {
+    const tpl = build();
+    if (S._migrationKeep && typeof S._migrationKeep === 'object') {
+      const ALLOWED_MIGRATION_FIELDS = new Set(['services','presets','groups','sortCriteria','deduplicator','formatter','parentConfig','resultLimits','excludedResolutions','includedResolutions','requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes','excludedAudioTags','preferredAudioTags','preferredAudioChannels','preferredVisualTags','excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages','excludedQualities','includedQualities','requiredQualities','preferredQualities','excludedVisualTags','includedVisualTags','requiredVisualTags','excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions','syncedExcludedStreamExpressionUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedRankedStreamExpressionUrls','excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns','syncedExcludedRegexUrls','syncedRankedRegexUrls','size','bitrate','titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter']);
+      const filtered = {};
+      for (const k of Object.keys(S._migrationKeep)) {
+        if (ALLOWED_MIGRATION_FIELDS.has(k)) filtered[k] = S._migrationKeep[k];
+      }
+      Object.assign(tpl.config, filtered);
+    }
+    sanitizeAioEnumArrays(tpl.config);
+    addVersionMetadata(tpl);
+    return tpl;
+  } catch (err) {
+    logError('build', err.message, { service: S.service, device: S.device, resolution: S.resolution, stack: err.stack?.slice(0, 300) });
+    throw err;
+  }
 }
 
 const PARTIAL_EXPORT_FIELDS = {
@@ -4401,9 +4516,10 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         </div>
       </details>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px">
-        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener" class="community-link">Browse Templates →</a>
-        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener" class="community-link">Core Crew</a>
-        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener" class="community-link">GitHub</a>
+        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
+        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="community-link">Core Crew</a>
+        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="community-link">GitHub</a>
+        <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="community-link">Discord</a>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -4634,7 +4750,7 @@ function showApiReminder(onContinue) {
             <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
               type="password"
               placeholder="${inp.placeholder}"
-              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:40px">
+              value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:40px">
             <button type="button" data-action="toggle-cred-vis" data-target="rem_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
               onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -4704,6 +4820,7 @@ function simpleFinishHtml() {
       <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:16px 0">
         ${bits.map(([i2, t]) => `<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.16);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:#9ca3af">${i2} ${t}</span>`).join('')}
       </div>
+      ${(() => { const hint = DEVICE_BANDWIDTH_HINTS[S.device]; if (!hint) return ''; const bw = calculateBitrateLimit(hint.recommended); return `<div style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">📶</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#9ca3af">Bandwidth hint for your device</div><div style="font-size:.68rem;color:#6b7280;line-height:1.4">Recommended: <strong style="color:#00d4ff">${hint.recommended} Mbps+</strong> — ${hint.reason}. Safe bitrate cap: <strong style="color:#e6edf3">${bw.label}</strong> (${bw.description})</div></div></div>`; })()}
       ${needed.length ? `<div style="margin-bottom:14px">
         ${needed.map(inp => `
         <div class="name-row" style="margin-bottom:10px">
@@ -4713,7 +4830,7 @@ function simpleFinishHtml() {
           </div>
           <div style="position:relative;display:flex;align-items:center">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
-              value="${S.creds[inp.id] || ''}" maxlength="120" style="padding-right:38px">
+              value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
               onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -4752,7 +4869,7 @@ function simpleFinishHtml() {
             </div>
             <div style="position:relative;display:flex;align-items:center">
               <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
-                value="${S.tmdbToken}" maxlength="400" style="padding-right:38px">
+                value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
                 onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -4769,7 +4886,7 @@ function simpleFinishHtml() {
             </div>
             <div style="position:relative;display:flex;align-items:center">
               <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
-                value="${S.tmdbApiKey}" maxlength="60" style="padding-right:38px">
+                value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
                 onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
@@ -4837,7 +4954,7 @@ function simpleFinishHtml() {
       </details>
       <div class="name-row">
         <label>Template name (optional)</label>
-        <input class="name-input" id="nameIn" type="text" placeholder="${S.name}" value="${S.name}" data-action="update-name" maxlength="60">
+        <input class="name-input" id="nameIn" type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
       </div>
       ${isFree ? `
       <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
@@ -4850,11 +4967,11 @@ function simpleFinishHtml() {
       ${S.installMode === 'direct' ? `
       <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
         <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
-          value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"
+          value="${escH(S.stremioEmail||'')}"
           style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:.8rem;outline:none">
         <div style="position:relative">
           <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
-            value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"
+            value="${escH(S.stremioPassword||'')}"
             style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;padding-right:38px;color:var(--tx);font-size:.8rem;outline:none">
           <button type="button" data-action="toggle-stremio-pwd" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -4946,8 +5063,8 @@ function templateHealthCheck() {
 
 // ── Template Health Score (unique to Core Builds) ──────────────────
 
-function calculateHealthScore() {
-  const cfg = buildFinal().config;
+function calculateHealthScore(prebuilt) {
+  const cfg = (prebuilt || buildFinal()).config;
   const breakdown = [];
   let score = 0, max = 0;
   const check = (label, maxPts, pts, reason) => { max += maxPts; score += Math.min(pts, maxPts); breakdown.push({ label, points: Math.min(pts, maxPts), max: maxPts, reason }); };
@@ -5487,7 +5604,7 @@ function showFastLane() {
     const credentialField=(key,{type='password',autocomplete='off',showLink=true}={})=>{
       const d=PROVIDER_CREDENTIALS[key]||{label:key,placeholder:''};
       const link=showLink&&d.url?`<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>`:key==='streamnzb'?'<span class="fastlane-key-hint">Use your instance manifest</span>':'';
-      return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-fl-cred="${key}" type="${type}" autocomplete="${autocomplete}" placeholder="${d.placeholder||''}" value="${(S.creds[key]||'').replace(/"/g,'&quot;')}"></div>`;
+      return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-fl-cred="${key}" type="${type}" autocomplete="${autocomplete}" placeholder="${d.placeholder||''}" value="${escH(S.creds[key]||'')}"></div>`;
     };
     state.services.filter(v=>credKeys[v]).forEach(v=>fields.push(credentialField(credKeys[v])));
     if(state.services.includes('easynews')) fields.push(credentialField('easynews',{type:'text',autocomplete:'username'}),credentialField('easynewsPass',{autocomplete:'current-password',showLink:false}));
@@ -5564,7 +5681,7 @@ function showDiagnosticsModal() {
   document.getElementById('diagnosticsModal')?.remove();
   const data=buildSanitizedDiagnostics();
   const overlay=document.createElement('div'); overlay.id='diagnosticsModal'; overlay.className='fastlane-overlay';
-  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="diagTitle" style="max-width:620px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Sanitized diagnostics</div><div class="fastlane-title" id="diagTitle">Report an issue safely.</div><div class="fastlane-sub">Review and copy this report. It contains settings and credential presence only — never API keys, passwords, UUID passwords, or tokens.</div></div><button class="fastlane-close" id="diagClose" aria-label="Close">✕</button></div><pre class="diag-pre" id="diagPre">${JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre><div class="diag-actions"><button class="diag-primary" id="diagCopy">Copy report</button><a class="diag-secondary" href="https://github.com/brevityA/Core-Builds/issues/new" target="_blank" rel="noopener">Open GitHub issue</a></div></div>`;
+  overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="diagTitle" style="max-width:620px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Sanitized diagnostics</div><div class="fastlane-title" id="diagTitle">Report an issue safely.</div><div class="fastlane-sub">Review and copy this report. It contains settings and credential presence only — never API keys, passwords, UUID passwords, or tokens.</div></div><button class="fastlane-close" id="diagClose" aria-label="Close">✕</button></div><pre class="diag-pre" id="diagPre">${JSON.stringify(data,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre><div class="cb-error-log-section" style="padding:0 20px 12px">${errorLogHtml()}</div><div class="diag-actions"><button class="diag-primary" id="diagCopy">Copy report</button><a class="diag-secondary" href="https://github.com/brevityA/Core-Builds/issues/new" target="_blank" rel="noopener noreferrer">Open GitHub issue</a></div></div>`;
   document.body.appendChild(overlay);
   overlay.addEventListener('click',e=>{if(e.target===overlay||e.target.closest('#diagClose'))overlay.remove(); if(e.target.closest('#diagCopy'))navigator.clipboard.writeText(JSON.stringify(data,null,2)).then(()=>{e.target.closest('#diagCopy').textContent='✓ Copied';});});
   document.getElementById('diagClose').focus();
@@ -5890,7 +6007,7 @@ function onPasteManifest(val) {
 }
 
 function wuplayBtn(manifestUrl) {
-  const safe = (manifestUrl||'').replace(/"/g,'&quot;');
+  const safe = escH(manifestUrl||'');
   return `<button type="button" data-action="copy-wuplay" data-url="${safe}" title="Copy manifest URL — paste into WuPlay → Addons → Add Addon" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;border:1px solid #4f46e5;background:#16103a;color:#a78bfa;transition:all .15s"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>WuPlay</button>`;
 }
 
@@ -5952,6 +6069,14 @@ async function uploadTemplateForImport() {
     });
   }
   if (tmpl.parentConfig) tmpl.parentConfig = { ...tmpl.parentConfig, password: '' };
+  if (tmpl.config) {
+    delete tmpl.config.tmdbApiKey;
+    delete tmpl.config.tmdbToken;
+    if (Array.isArray(tmpl.config.presets)) tmpl.config.presets = tmpl.config.presets.map(p => {
+      if (p.options && p.options.tmdbApiKey) { const { tmdbApiKey, ...rest } = p.options; return { ...p, options: rest }; }
+      return p;
+    });
+  }
   const jsonStr = JSON.stringify(tmpl, null, 2);
   let url = null;
   if (CORS_PROXY) {
@@ -6009,6 +6134,7 @@ async function createImportUrl() {
     result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong style="color:#e6edf3">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong style="color:#fbbf24">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link expires after 30 days — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
+    logError('deploy', 'Paste service blocked or timed out', { service: S.service });
     result.innerHTML = `<div class="import-success import-error" style="margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">The upload failed — CORS block, rate limit, or paste.rs downtime. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
     showToast('Paste service unreachable', true);
   }
@@ -6036,7 +6162,7 @@ async function openInAIOStreams() {
     const cfg = buildFinal().config;
     const existingUuid = validateUuid(uuid) ? uuid : null;
     const fastest = await selectHealthyHost(4000).catch(() => null);
-    if (!fastest) { resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
+    if (!fastest) { logError('deploy', 'All hosts unreachable', { service: S.service, host: S.instanceHost }); resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
     rememberGoodHost(fastest);
     const attempt = async (id) => {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
@@ -6121,6 +6247,7 @@ async function openInAIOStreams() {
         showManifestModal(`${base}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');
     } catch(e) {
+      logError('deploy', 'Connection failed to host', { host: S.instanceHost, error: e.message });
       resetBtn(origHtml);
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Host timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
     }

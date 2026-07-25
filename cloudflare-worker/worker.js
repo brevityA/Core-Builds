@@ -40,20 +40,35 @@ const ALLOWED_HOSTS = new Set([
 
 const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Max-Age': '86400',
-};
+const ALLOWED_ORIGINS = new Set([
+  'https://brevitya.github.io',
+  'http://localhost:3000',
+  'http://localhost:5500',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5500',
+]);
+
+function corsHeaders(request) {
+  const origin = request?.headers?.get('Origin') || '';
+  const allowed = ALLOWED_ORIGINS.has(origin) ? origin : 'https://brevitya.github.io';
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
+  };
+}
 
 const PASTE_TTL = 30 * 24 * 60 * 60; // 30 days
 const PASTE_MAX_SIZE = 512 * 1024; // 512 KB
 
+let _cors = {};
+
 function json(status, body) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+    headers: { 'Content-Type': 'application/json', ..._cors },
   });
 }
 
@@ -106,8 +121,9 @@ async function listByPrefix(kv, prefix) {
 
 export default {
   async fetch(request, env, ctx) {
+    _cors = corsHeaders(request);
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: CORS_HEADERS });
+      return new Response(null, { headers: _cors });
     }
 
     const url = new URL(request.url);
@@ -170,6 +186,10 @@ export default {
     if (url.pathname === '/contact' && request.method === 'POST') {
       const webhookUrl = env.DISCORD_WEBHOOK_URL;
       if (!webhookUrl) return json(500, { error: 'Contact not configured' });
+
+      // Origin check (CSRF protection)
+      const reqOrigin = request.headers.get('Origin') || '';
+      if (!ALLOWED_ORIGINS.has(reqOrigin)) return json(403, { error: 'Origin not allowed' });
 
       // Rate limit check
       const contactIp = request.headers.get('cf-connecting-ip') || 'unknown';
@@ -246,7 +266,7 @@ export default {
       if (!val) return json(404, { error: 'not found or expired' });
       if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_viewed');
       return new Response(val, {
-        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+        headers: { 'Content-Type': 'application/json', ..._cors },
       });
     }
 
@@ -304,7 +324,7 @@ export default {
       status: upstreamRes.status,
       headers: {
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
-        ...CORS_HEADERS,
+        ..._cors,
       },
     });
   },
