@@ -1,5 +1,5 @@
 name = "core-builds-counter"
-main = "counter.js"
+main = "worker.js"
 compatibility_date = "2024-09-25"
 
 [[kv_namespaces]]
