@@ -3373,7 +3373,7 @@ function build() {
     precacheSingleStream: true,
     preloadStreams: { enabled:S.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
-    nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(S.maxFailoverNzbs)||3 } : { enabled:true, position:'last' },
+    nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(S.maxFailoverNzbs)||3 } : { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
