@@ -2991,7 +2991,7 @@ function presets() {
   const list = [
     { type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000 }, resources:['stream'] }] : []),
-    { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] }, resources:['stream'] },
+    { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
     ...storeSlot,
     ...(isEasynews || multiHasEasynews ? [
@@ -3013,7 +3013,7 @@ function presets() {
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       if (d.id === 'knaben') return { type:'knaben', instanceId:'knaben-1', enabled:true, options:{ name:'Knaben', timeout:7000 }, resources:['stream'] };
-      if (d.id === 'zilean') return { type:'zilean', instanceId:'zilean-1', enabled:true, options:{ name:'Zilean', timeout:7000 }, resources:['stream'] };
+      if (d.id === 'zilean') return null;
       return null;
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && x.apiUrl)).map(sid => {
@@ -3031,10 +3031,10 @@ function presets() {
       { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
       { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     ] : []),
-    { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] }, resources:['stream'] },
-    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true }, resources:['stream'] },
-    { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] }, resources:['stream'] },
-    { type:'hdhub', instanceId:'hdhub-1', enabled:isP2P, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], ...(isP2P ? {} : {tb_only:true}) } },
+    { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] } },
+    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true } },
+    { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
+    { type:'hdhub', instanceId:'hdhub-1', enabled:isP2P, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], ...(!isP2P && (multiHasTorbox || svc === 'torbox-pro' || svc === 'torbox-ess') ? {tb_only:true} : {}) } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
@@ -3067,7 +3067,7 @@ function services() {
     {id:'seedr', enabled: svc==='seedr' || (isMulti && m.includes('seedr')), credentials:cred('seedr')},
     {id:'easynews', enabled: svc==='easynews' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || (isMulti && m.includes('easynews'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
     {id:'putio', enabled: false, credentials:{}},
-    {id:'debrider', enabled: false, credentials:{}},
+    {id:'debrider', enabled: svc==='debrider' || (isMulti && m.includes('debrider')), credentials:cred('debrider')},
     {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}},
     {id:'stremio_nntp', enabled: false, credentials:{}}, {id:'aiostreams', enabled: false, credentials:{}}
   ];
@@ -3097,7 +3097,7 @@ function resolutionCfg() {
   const mr1k  = pool === 'max' ? 75 : pool === 'large' ? 50 : 35;
   const pr4k  = pool === 'max' ? 30 : pool === 'large' ? 20 : 12;
   const pr1k  = pool === 'max' ? 30 : pool === 'large' ? 20 : 15;
-  if (S.resolution === '4k') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','720p','Unknown'], maxResults:mr4k, maxResultsPerResolution:pr4k };
+  if (S.resolution === '4k') return { excludedResolutions:[...ex,'480p','576p'], includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','720p','Unknown'], maxResults:mr4k, maxResultsPerResolution:pr4k };
   if (S.resolution === '1080p') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:['1080p','720p'], preferredResolutions:['1080p','720p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
   return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['1080p','1440p','2160p','720p','576p','480p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
 }
@@ -3127,9 +3127,10 @@ function audioCfg() {
     preferredAudioTags: ['TrueHD','Atmos','DD+','AAC','DD'],
     preferredAudioChannels: ['7.1','5.1','2.0']
   };
+  const losslessCapable = ['shield','windows'].includes(dev);
   return {
-    excludedAudioTags: limited ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [],
-    preferredAudioTags: limited ? ['Atmos','DD+','AAC','DD','DTS'] : ['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','DTS-HD','DD+','AAC','DTS','DD'],
+    excludedAudioTags: (limited && !losslessCapable) ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [],
+    preferredAudioTags: (limited && !losslessCapable) ? ['Atmos','DD+','AAC','DD','DTS'] : ['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','DTS-HD','DD+','AAC','DTS','DD'],
     preferredAudioChannels: wide ? ['7.1','5.1','2.0'] : ['5.1','2.0']
   };
 }
@@ -3191,7 +3192,7 @@ function eses() {
     out.push({ enabled:true, expression:`/* CB | Foreign Language Kill (movies/series only — anime exempt) */ (queryType == 'movie' or queryType == 'series') ? negate(merge(library(streams), seadex(streams), language(streams, ${langArgs})), streams) : []` });
   }
   out.push(
-    { enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'0.083'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'0.083'):[]" },
+    { enabled:true, expression: "/*Usenet Propagation Guard*/ count(negate(age(type(streams,'usenet','stremio-usenet'),0,'2'),type(streams,'usenet','stremio-usenet')))>0?age(type(streams,'usenet','stremio-usenet'),0,'2'):[]" },
     { enabled:true, expression:"/*AI Upscale Exclusion*/ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','aiupscale','upscaled','neural','enhancedai')" },
     { enabled:true, expression:"/*Info & Other Unwanted*/ merge(type(streams,'info'),releaseGroup(type(streams,'usenet','stremio-usenet'),'sample'),type(keyword(streams,'all','-sample'),'usenet','stremio-usenet'),message(type(streams,'usenet','stremio-usenet'),'includes','🚫'))" },
     { enabled:true, expression:"/* CB | Hard CAM Kill */ quality(streams,'CAM','SCR','TS','TC','HC HD-Rip')" },
@@ -3473,6 +3474,7 @@ function build() {
   return result;
 }
 
+let _cachedBuildResult = null;
 function buildFinal() {
   try {
     const tpl = build();
@@ -3486,6 +3488,7 @@ function buildFinal() {
     }
     sanitizeAioEnumArrays(tpl.config);
     addVersionMetadata(tpl);
+    _cachedBuildResult = tpl;
     return tpl;
   } catch (err) {
     logError('build', err.message, { service: S.service, device: S.device, resolution: S.resolution, stack: err.stack?.slice(0, 300) });
@@ -5142,7 +5145,7 @@ function calculateHealthScore(prebuilt) {
 }
 
 function healthScoreHtml() {
-  const r = calculateHealthScore();
+  const r = calculateHealthScore(_cachedBuildResult);
   const color = r.grade === 'A' ? '#34d399' : r.grade === 'B' ? '#00d4ff' : r.grade === 'C' ? '#fbbf24' : r.grade === 'D' ? '#f97316' : '#f87171';
   const pct = Math.round(r.score / r.maxScore * 100);
   const ring = `background:conic-gradient(${color} ${pct * 3.6}deg, rgba(255,255,255,.06) 0deg)`;
