@@ -1467,7 +1467,7 @@ function render() {
               <div id="aioUrlRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='custom'?'':'display:none'}">
                 <label>Instance URL</label>
                 <input class="name-input" id="aioUrl" type="url" placeholder="https://your-aiostreams.example.com"
-                  value="${S.instanceHost==='custom'?S.instanceUrl:''}" data-action="update-url" maxlength="200">
+                  value="${S.instanceHost==='custom'?escH(S.instanceUrl):''}" data-action="update-url" maxlength="200">
               </div>
               <div class="name-row" style="margin-bottom:0">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
@@ -3016,7 +3016,7 @@ function presets() {
       if (d.id === 'zilean') return null;
       return null;
     }).filter(Boolean),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && x.apiUrl)).map(sid => {
+    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl)).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       if (d.id === 'jackett') return { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', timeout:10000, ...(S.creds.jackett ? { apiKey:S.creds.jackett } : {}) }, resources:['stream'] };
       if (d.id === 'prowlarr') return { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', timeout:10000, ...(S.creds.prowlarr ? { apiKey:S.creds.prowlarr } : {}) }, resources:['stream'] };

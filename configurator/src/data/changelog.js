@@ -12,11 +12,11 @@ export const CHANGELOG = [
     'Worker contact endpoint — Server-side Discord webhook relay added to the Cloudflare Worker',
   ]},
   { v:'2.82', date:'Jul 24 2026', items:[
-    'Patch Cinemeta & AIOMetadata now enabled by default — new templates automatically patch Cinemeta catalogs and install AIOMetadata',
+    'Patch Cinemeta & AIOMetadata — opt-in toggles in Full Setup for patching Cinemeta catalogs and installing AIOMetadata',
     'Full Setup service selection — Full Setup now reads the active splash chip and sets the correct service/multiServices',
     'Library Boost — Three modes: Default (normal position), Strong (top priority), None (disabled)',
     'Bandwidth Estimator — Device-aware bandwidth suggestion with manual override (10–200 Mbps)',
-    'Age Limit — Content age filter with 7d / 30d / 90d / 1y / 2y presets',
+    'Age Rating Limit — MPAA certification filter (G / PG / PG-13 / R) powered by TMDB metadata',
     'NZB Failover — Configurable position (before/after torrents) and max NZB count (1/2/3/5)',
     'Template Inspector upgraded — File import, URL fetch, clipboard paste, health score ring, host compatibility checks, export report, theme toggle',
   ]},

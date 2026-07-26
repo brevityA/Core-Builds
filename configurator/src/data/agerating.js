@@ -11,7 +11,6 @@ export const AGE_RATINGS = [
   { v: 'PG',    label: 'PG — Parental Guidance', desc: 'Some material may not be suitable for young children' },
   { v: 'PG-13', label: 'PG-13',               desc: 'Some material may be inappropriate for children under 13' },
   { v: 'R',     label: 'R — Restricted',       desc: 'Under 17 requires accompanying parent — most streaming content' },
-  { v: 'NC-17', label: 'NC-17 — No Restriction', desc: 'No age filtering — equivalent to unrestricted' },
 ];
 
 export const AGE_RATING_CERTIFICATIONS = {
