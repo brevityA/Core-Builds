@@ -573,7 +573,7 @@ function renderOpts(def) {
 const FMT_PREVIEWS = {
   'family-v4': {
     n:'4K ⚡ Frankenstein S01 • E05',
-    d:['✅ Plays Fast 🥇 Good Stream 🏷 FraMeSToR','📺 From Apple TV','🎥 WEB-DL • HEVC • HDR10+','🔊 5.1 • Atmos, EAC3  ⚡ 16.2 Mbps','💾 4.2G • 🌱 1247 • ⏱ 3d','🏞 torrentio • debrid • 🔍 Torrentio','🗣 English']
+    d:['✅ Plays Fast 🥇 Good Stream 🏷 FraMeSToR','📺 From Apple TV','🎥 WEB-DL • HEVC • HDR10+','🔊 5.1 • Atmos, EAC3  ⚡ 16.2 Mbps','💾 4.2G • 🌱 1247 • ⏱ 3d','🏞 torrentio • debrid • 🔍 Torrentio • 🥈 Radarr Remux T1','🗣 English']
   },
   'family-v3': {
     n:'Torrentio | "Frankenstein" S01 • E05',
