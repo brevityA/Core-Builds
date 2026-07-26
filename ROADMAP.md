@@ -6,40 +6,64 @@ This is a living list of planned work, active development, and recently complete
 
 ## ✅ Recently Completed
 
+### v2.84 — Configurator & Expression Layer
+
 | Version | Item |
 |---|---|
-| v2.56 | Resolution First toggle — configurator option to rank 4K above 1080p/720p regardless of cache status; sort order changes from `cached → resolution` to `resolution → quality → cached` |
-| v2.56 | Foreign Language Kill — configurator ESE that hard-blocks foreign-language streams from movies/TV; on by default, adapts to Language Preferences, Library/SeaDex/anime exempt |
-| v2.55 | Configurator UX optimizations — staggered splash animations, smart service pre-selection, contextual Quick Deploy presets, step dot tooltips, auto-saved indicator, keyboard navigation, ARIA accessibility, reduced motion support |
-| v2.8.0 | Speed tier consolidation — 8 redundant Speed templates deprecated (4 TorBox-only, 4 EasyNews lite/plus variants); Speed 4K+ and Speed EasyNews retained as the two EasyNews-differentiated templates |
-| v2.8.0 | Core Builds Expression Layer rollout — all 7 expressions deployed to all 31 active templates (3 ESEs + 1 ISE + 3 PSEs); replaces trial-only Stream v2.7.10 scope |
-| v2.8.0 | Core Nexus 4K Pro deprecated — moved to `Templates/Torbox/Deprecated/`; Apex is the direct replacement |
-| v2.7.5 | Addon timeout tuning — per-addon values replacing flat 3000ms across all 33 templates; fixes silent usenet result drops on Meteor + TorBox NZB |
-| v2.7.5 | Dedup tiebreakers explicitly configured — `torrent_seeders` + `usenet_age` (`before_addon`) added to all 33 templates; formalises AIOStreams v2.30.3 default behavior |
-| v2.7.5 | `hdhub` preset added (disabled by default) to 12 full non-Lite templates — TorBox-native P2P scraper; `resources: ['stream']`, 5000ms timeout, `tb_only: true`; enable in AIOStreams addon settings |
-| v2.7.4 | 📖 Chapter badge added to Elite/Apex-v2/Nexus Prime formatters and all 33 active templates — BluRay REMUXes with embedded chapters now visually distinguished |
-| v2.7.3 | `zilean` + `meteor` catalog bleed fix — `resources: ['stream']` added to both scrapers across all 33 active templates; suppresses scraper catalog entries appearing in Stremio instead of playable streams |
-| v2.7.2 | `size()` floor guards on BluRay REMUX PSEs — 15 GB floor for 4K Remux, 8 GB floor for 1080p Remux; applied to 4K Apex, 4K Pro, 4K Essential, 4K Hybrid, and 1080p Hybrid |
-| v2.7.1 | Addon stack cleanup — Knaben moved to last P2P slot, `torbox-search` renamed-addon fix, AnimeTosho + NekoBT enabled across all 6 anime templates; applied to all 33 active templates |
-| v2.7.0 | Core Nexus 4K Hybrid — new TorBox + NZBGeek Usenet template; full 4K, full HDR, full lossless audio |
-| v2.7.0 | IQR Tukey fence PSEs rolled out to 4K Pro, 4K Essential, and Hybrid (1080p tiers) |
-| v0.3.0 | Core Nexus 4K Apex — IQR Tukey fence PSEs (Q1−1.5×IQR / Q3+1.5×IQR); three-tier adaptive gate with thin-pool and new-release fallbacks; replaces min/max approach |
-| v0.3.0 | Standalone PSE reference files — `Expressions/apex-iqr-pses.md` + `.json` |
-| v2.6.0 | Live nSeScore display — `💎 94` replaces binary `💎 ELITE` badge in formatter |
-| v2.6.0 | Smart content-type preload — movies get quality diversity, series get resolution balance |
-| v2.6.0 | Core Nexus Samsung TV Nightly — DV-only kill enabled, device-specific template |
-| v2.6.0 | DV-Only Kill ESE — optional, disabled by default, added to all 30 templates |
-| v2.6.0 | Subtitle language flags — `uSubtitleEmojis` replaces generic 📝 SUB badge |
-| v2.6.0 | Flash `daysSinceRelease` guard — uncached allowed for content ≤ 3 days old |
-| v2.6.0 | Core Nexus Stream (Fire Stick) + Lite variants |
-| v2.6.0 | Anime Non-Anime Query Guard — `and not isAnime` ISE guard |
-| v2.5.1 | Local test environment — `requirements.txt` + CONTRIBUTING.md setup guide |
-| v2.5.0 | Lite template suite — 12 Lite variants of every active template |
-| v2.5.0 | Core Nexus Anime 4K template |
-| v2.5.0 | Core Nexus Speed EasyNews — EasyNews-only speed build |
-| v2.4.7 | Core Nexus Apex, Sigma, and Minimal formatters |
-| v2.4.6 | Core Nexus Elite formatter (bundled in all templates) |
-| v2.4.5 | SeaDex best-release enforcement on Anime template |
+| v2.84 | **Age Rating Limit** (Kids Mode) — G/PG/PG-13/R/NC-17 content filtering |
+| v2.84 | **Library Boost** — Default / Strong / None options |
+| v2.84 | **NZB Failover** with position control |
+| v2.84 | **Bandwidth Estimator** |
+| v2.84 | **Security audit** — XSS, CSP, CORS, credential stripping fixes |
+| v2.84 | **Error Logger & Diagnostics modal** |
+| v2.84 | **Contact Widget** → Discord webhook relay |
+| v2.84 | **Debrider** multi-debrid aggregator service |
+| v2.84 | **Knaben, Zilean, Jackett, Prowlarr** scrapers |
+| v2.84 | **REPACK/PROPER Passthrough ISE** — 42 templates |
+| v2.84 | **Per-Addon Flood Guard ESE** — 3 variants (19/14/4 templates) |
+| v2.84 | **Usenet Propagation Guard ESE** — 35 templates |
+| v2.84 | **Codec Efficiency Booster PSE** — 39 templates |
+| v2.84 | **Audio Pinnacle PSE** — 40 templates (Atmos/TrueHD → DTS-HD MA → DD+) |
+| v2.84 | **HDR/DV Priority PSE** — 40 templates (DV/HDR10+/HDR10 → SDR) |
+| v2.84 | **AI Upscale Exclusion ESE** — 35 templates |
+| v2.84 | **Indexer Diversity ESE** — 29 templates |
+| v2.84 | **Score IQR Guard ESE** — 5 templates |
+| v2.84 | **Adaptive Seeder Guard ESE** — 5 Labs templates |
+| v2.84 | **Bitrate Floor ESEs** (1080p + 4K REMUX) — 2 Labs templates |
+| v2.84 | **Tier-guarded Bluray/Anime kills** — 1 Samsung template |
+
+### v2.81–v2.83 — Configurator Features
+
+| Version | Item |
+|---|---|
+| v2.83 | **Health Score** — 0–100 with A–F grading, 11 checks, ring gauge |
+| v2.82 | **Template Inspector** — paste JSON for instant validation + host compatibility |
+| v2.81 | **Template Versioning** — auto-update banner when template is outdated |
+| v2.81 | **Full Stack Install** — AIOMetadata + Cinemeta patch + addon ordering in one click |
+| v2.81 | **family-v4 formatter** — truncated title, bitrate, release group, seeders, age, indexer |
+| v2.81 | **Troubleshooter** — interactive decision tree for common issues |
+| v2.81 | **17 device profiles** — Shield, Fire Stick, Samsung, Apple TV, LG, Roku, etc. |
+| v2.81 | **19 formatter presets** — family-v4, Apex, Elite, Sigma, Syntax, Prime, TV, etc. |
+
+### v2.56–v2.8.0 — Earlier Milestones
+
+| Version | Item |
+|---|---|
+| v2.8.0 | Speed tier consolidation — 8 redundant Speed templates deprecated |
+| v2.8.0 | Core Builds Expression Layer rollout — 7 expressions deployed to all 31 active templates |
+| v2.8.0 | Core Nexus 4K Pro deprecated — Apex is the direct replacement |
+| v2.7.5 | Addon timeout tuning — per-addon values replacing flat 3000ms |
+| v2.7.5 | Dedup tiebreakers explicitly configured |
+| v2.7.5 | `hdhub` preset added to 12 full non-Lite templates |
+| v2.7.4 | Chapter badge added to Elite/Apex-v2/Nexus Prime formatters |
+| v2.7.3 | `zilean` + `meteor` catalog bleed fix |
+| v2.7.2 | `size()` floor guards on BluRay REMUX PSEs |
+| v2.7.1 | Addon stack cleanup — Knaben moved, AnimeTosho + NekoBT enabled |
+| v2.7.0 | Core Nexus 4K Hybrid — new TorBox + NZBGeek Usenet template |
+| v2.7.0 | IQR Tukey fence PSEs rolled out to 4K Pro, 4K Essential, Hybrid |
+| v2.6.0 | Live nSeScore display, Smart preload, DV-Only Kill, Subtitle flags |
+| v2.5.0 | Lite template suite, Anime 4K, Speed EasyNews |
+| v2.56 | Resolution First toggle, Foreign Language Kill |
 
 ---
 
@@ -47,47 +71,38 @@ This is a living list of planned work, active development, and recently complete
 
 | Item | Notes |
 |---|---|
-| **Core Builds Expression Layer — post-trial rollout** | All 7 expressions deployed to all active templates at v2.8.0. Audio Pinnacle PSE, HDR/DV Priority PSE, AI Upscale Exclusion ESE added alongside the 4 trial expressions. See `Expressions/core-builds-expression-layer.pdf` |
-| `hasSeaDex` + `seMatched()` anime gating | Adaptive anime quality gate: if SeaDex data exists → require SeaDex-matched stream in top tier; else fall through to standard sort |
-| Samsung TV Nightly → stable | Gather community feedback; promote out of Nightly once validated on hardware |
+| `hasSeaDex` + `seMatched()` anime gating | LABS templates have it (Anime 4K Labs, All-Rounder Labs); needs promotion to stable Anime, Anime 4K, Anime Dub |
+| Samsung TV Nightly → stable | Samsung RU7100 4K has tier-guarded expressions; gathering hardware feedback before stable promotion |
+| Mobile / Bandwidth template validation | `core-nexus-mobile.json` exists in `Single/`; needs validation and documentation |
 
 ---
 
 ## 📋 Planned
 
-### Expression Layer
-
-**In trial** (Core Nexus Stream v2.7.10 — roll out to all templates post-trial):
-
-- [ ] **REPACK/PROPER Passthrough ISE** — Pins REPACK/PROPER releases ahead of limit/excluded filters; ensures patched releases always surface. *All templates — critical for Anime (fansub REPACKs), Hybrid, and Stream (streaming service fix runs)*
-- [ ] **Per-Addon Flood Guard ESE** — Per-addon result cap (Meteor ≤5, Comet ≤5, MediaFusion ≤4, Torrent Galaxy/EZTV/Knaben/HdHub ≤3) on cached non-library streams. *All templates — most impactful on Stream, Essential, and Apex where Meteor can return 15–20+ results*
-- [ ] **Usenet Propagation Guard ESE** — Holds back NZBs younger than 2 hours when propagated alternatives exist; eliminates corrupt early-propagation grabs. *All Usenet-enabled templates — critical for Apex, 4K Hybrid, Hybrid; not applicable to Flash*
-- [ ] **Codec Efficiency Booster PSE** — Surfaces HEVC/AV1 encodes of 1080p + 720p Bluray REMUX and WEB-DL/WEBRip ahead of AVC equivalents. *Stream, Essential, Anime (primary) — limited effect on 4K REMUX templates where HEVC is already standard; not applicable to Flash*
-
-**Planned** (post-trial, pending research):
-
-- [ ] **Audio Pinnacle PSE** — Promotes lossless/object-based audio tracks within the ranked pool: Atmos/TrueHD → DTS-HD MA/DTS-X → EAC3/DD+. *Critical for Apex, 4K Apex, 4K Hybrid, 4K Essential (home theatre users); moderate for Stream, Hybrid, Essential; low impact on Anime (fansub FLAC/AAC standard) and Flash*
-- [ ] **HDR / DV Priority PSE** — Within 4K results, surfaces DV/HDR10+/HDR10 ahead of SDR equivalents. Safe no-op on 1080p-only templates (empty 2160p pool). *Critical for Apex, 4K Apex, 4K Essential, 4K Hybrid, Flash 4K, Speed 4K; high for Anime 4K; no effect on Stream/Essential/FireStick/Flash*
-- [ ] **AI Upscale Exclusion ESE** — Excludes streams containing AI upscaling keywords (topaz, ai-upscale, aiupscale, upscaled, neural, enhancedai) using the `keyword()` function (AIOStreams v2.29.6+). First Core Builds expression to use `keyword()`. *Critical for all 4K templates and Anime 4K; high for Anime (upscaled 1080p); moderate for Stream/Essential*
-
 ### Templates
-- [ ] **Deprecate Flash suite** — Flash 4K and Flash remain active; under review — their `excludeUncached: true` behaviour is genuinely distinct from Speed/Essential
-- [ ] **`pin()` top result** — Pin the #1 PSE-matched stream to position 1 regardless of sort order; clean UX improvement across all quality-gated templates
-- [ ] **AllDebrid Essential** — Full-coverage AllDebrid template with quality gates (`Templates/AllDebrid/Essential/`)
-- [ ] **Mobile / Bandwidth template** — 25 Mbps bitrate ceiling, SDR-preferred, no REMUX; covers mobile, travel, data-capped users
 - [ ] **Anime Dub 4K variant** — English-dub priority at 4K for the growing dub community
+- [ ] **AllDebrid Essential** — Full-coverage AllDebrid template with quality gates (`Templates/AllDebrid/Essential/`)
+- [ ] **`pin()` top result** — Pin the #1 PSE-matched stream to position 1 regardless of sort order
+- [ ] **Deprecate Flash suite** — Under review; `excludeUncached: true` behaviour is genuinely distinct from Speed/Essential
+
+### Expression Layer
+- [ ] **`hasSeaDex` anime gating promotion** — Move from LABS to stable Anime templates
+- [ ] **`stddev()` / `variance()` PSE variants** — z-score style gating as alternative to IQR for large pools
+- [ ] **Per-indexer score weighting** — Reward high-trust indexers (BTN, PTP) above general public trackers
 
 ### Formatters
 - [ ] **Formatter v2 pass** — Review new AIOStreams token additions; refresh Elite formatter with any newly available fields
+- [ ] **Community formatter gallery** — Dedicated `Formatters/Community/` directory with user-submitted layouts
 
 ### Infrastructure
+- [ ] **Automated live AIOStreams testing** — Docker-based e2e validation against a real AIOStreams instance
 - [ ] **GitHub Sponsors setup** — Ko-fi is live; explore GitHub-native sponsorship tier
-- [ ] **Automated live AIOStreams testing** — Docker-based end-to-end validation against a real AIOStreams instance (local validator + pytest shipped in v2.5.1; live instance test still pending)
 
 ### Documentation
 - [ ] **Video walkthrough** — Import flow and template selection walkthrough for new users
 - [ ] **AllDebrid setup guide** — Mirror of the TorBox import guide scoped to AllDebrid credential setup
-- [ ] **Configurator guide** — Dedicated documentation for the configurator wizard features (Resolution First, Foreign Language Kill, IQR PSEs, Parent/Child Config, Host Checker, Import)
+- [ ] **Configurator guide** — Dedicated docs for wizard features (Resolution First, Foreign Language Kill, IQR PSEs, Parent/Child Config, Host Checker, Import)
+- [ ] **Samsung TV setup guide** — Which models are supported, what the template excludes, how to report hardware issues
 
 ---
 
@@ -95,13 +110,12 @@ This is a living list of planned work, active development, and recently complete
 
 | Idea | Status |
 |---|---|
-| New unified template suite | Under consideration — if Speed/Flash/Pro are deprecated, explore a tighter 6-template lineup (Apex · Essential · Hybrid · Stream · Anime · Samsung TV) built around the Core Builds expression layer from the ground up |
-| Debrid-Link template | Under research — supported in AIOStreams; smaller user base than AllDebrid |
-| Premiumize template | Under research — natively supported; European user base overlap with AllDebrid |
-| RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results; situation under review |
-| `stddev()` / `variance()` PSE variants | Exploratory — z-score style gating (mean ± 2×stddev) as alternative to IQR for large pools |
-| Per-indexer score weighting in PSEs | Exploratory — reward high-trust indexers (e.g. BTN, PTP) above general public trackers |
-| Community formatter gallery | Under consideration — dedicated `Formatters/Community/` directory with user-submitted layouts |
+| Unified 6-template suite | Under consideration — Apex · Essential · Hybrid · Stream · Anime · Samsung TV |
+| Debrid-Link template | Under research — supported in AIOStreams; smaller user base |
+| Premiumize template | Under research — natively supported; European user base |
+| RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results |
+| Template Migration Tool | Under consideration — auto-upgrade old schemas to current version |
+| Live Stream Preview | Under consideration — fetch real streams before deploying |
 
 ---
 
