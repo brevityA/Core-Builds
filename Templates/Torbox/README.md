@@ -17,7 +17,7 @@
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, standard ESEs + Core Builds kill ESEs, Core Builds ISEs, and in-app update notifications.
 
-> **Current version: v3.3.2** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+> **Current version: v3.4.0** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
 > 📖 **New here?** Start with the [Complete Setup Guide](https://github.com/brevityA/Core-Builds/wiki) — it covers picking a template, importing, API keys, device profiles, and troubleshooting.
 
@@ -32,6 +32,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | Template | Version | Testing | Import URL |
 |---|---|---|---|
 | **4K Apex Labs** | v0.14.0 | v0.14.0 SEL — runtime-aware bitrate floors, anime passthrough, latestSeason packs, subtitle PSE, age sort, cachedAnime/uncachedAnime sort | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **4K Apex Mixed** | v0.1.0 | Mixed adaptive resolution × Apex IQR stack — no resolution caps (wakes Apex's dormant 480p/240p tiers + new 576p niche tier), quality-before-resolution blend, blended DAF exit | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-mixed.json` |
 | **Stream Labs** | v0.10.0 | v0.14.0 SEL — 1080p variant, all LABS features except bitrate floors | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
 | **All-Rounder Labs** | v0.4.0 | v0.14.0 SEL — single template for TV, movies, and anime with isAnime/hasSeaDex conditional tiers | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
 | **4K Essential Labs** | v0.5.0 | v0.14.0 SEL — Essential 4K with runtime-aware bitrate floors, all LABS features | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
@@ -48,6 +49,7 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [4K Apex](#-core-nexus-4k-apex) | Pro | 4K + 1080p | Flagship — DV/HDR REMUX + Usenet · IQR adaptive bitrate floors |
 | [Mobile](#-core-nexus-mobile) | Pro | 1080p | Bandwidth-optimised, mobile / data-capped |
 | [Stream](#-core-nexus-stream) | Pro | 1080p | WEB-DL only, budget hardware |
+| [Mixed](#-core-nexus-mixed) | Pro | 4K → SD adaptive | Niche / mixed libraries — no hard caps, cached × quality blend |
 | [Stream (Fire Stick)](#-core-nexus-stream-fire-stick) | Pro | 1080p SDR | Fire Stick + low-RAM devices |
 | [Samsung TV](#-core-nexus-samsung-tv) | Pro | 1080p | Samsung / no Dolby Vision |
 | [Samsung TV 4K](#-core-nexus-samsung-tv-4k) | Pro | 4K + 1080p | Samsung 4K / HDR10+ |
@@ -154,6 +156,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 | **Core Nexus 4K Apex (TorBox)** | TorBox Pro | 4K+1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json` |
 | **Core Nexus Mobile** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-mobile.json` |
 | **Core Nexus Stream** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json` |
+| **Core Nexus Mixed** | TorBox Pro | 4K → SD adaptive | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-mixed.json` |
 | **Core Nexus Stream (Fire Stick)** | TorBox Pro | 1080p SDR | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json` |
 | **Core Nexus Samsung TV** | TorBox Pro | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json` |
 | **Core Nexus Samsung TV 4K** | TorBox Pro | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json` |

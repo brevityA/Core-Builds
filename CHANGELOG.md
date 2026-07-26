@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.4.0 (2026-07-26)
+
+### Added
+- **Core Nexus Mixed template** (`Templates/Torbox/Single/core-nexus-mixed.json`) — adaptive multi-resolution build for niche and mixed libraries: no hard resolution caps, 4K → 1080p → 720p → 576p/480p PSE ladder, quality-before-resolution sort blend, UHD-class regex tiers, blended dynamic-fetch exit. Listed in the Torbox template directory.
+- **Core Nexus 4K Apex Mixed (Nightly)** (`Templates/Torbox/Nightly/Single/core-nexus-4k-apex-mixed.json`) — the Apex v0.9.0 IQR Tukey-fence stack with the Mixed adaptive resolution policy: `requiredResolutions` cap lifted (activating Apex's dormant 480p/240p fallback tiers), new 576p niche tier, cached × quality sort blend, and a blended 4K/1080p dynamic-fetch exit. Trial template — feedback in the Nightly thread before stable promotion.
+- **Mixed · Adaptive resolution tier** (Configurator v2.85) — fourth resolution option generating the same policy: uncapped `requiredResolutions`, broad preferred ladder, dedicated PSE stack with SD niche fallback, 4K size/bitrate bounds, `PREFERRED_REGEX_4K` + UHD ranked patterns, and import round-trip detection for mixed configs.
+
+### Fixed
+- **Jackett & Prowlarr presets never generated** (Configurator v2.85) — the optional-scraper preset filter required `credKey && apiUrl`, but Jackett/Prowlarr have no `apiUrl`, silently dropping both scrapers from generated templates. Restores the `credKey && !apiUrl` guard from PR #557 that was lost in the v2.84 modular rewrite. New regression tests cover branch coverage for every optional scraper.
+- **Template validator crash on bare run** — `validate_templates.py` no longer raises `AttributeError` on non-template JSON (e.g. `Filtering/` expression libraries), so `python3 validate_templates.py` works from the repo root without `--dir` arguments.
+
 ## 3.3.2 (2026-07-17)
 
 ### Added

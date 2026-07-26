@@ -93,6 +93,10 @@ def validate_template(fpath):
         err(name, f"INVALID JSON — {e}")
         return errors, warnings, passes
 
+    if not isinstance(t, dict):
+        passes.append(f"  – [{name}] not a template object — skipped")
+        return errors, warnings, passes
+
     c = t.get('config', t)
     meta = t.get('metadata', {})
 
@@ -281,7 +285,7 @@ def main():
     if args.file:
         files = [args.file]
     else:
-        dirs = args.dir if args.dir else ['.']
+        dirs = args.dir if args.dir else ['Templates', 'Community-Templates']
         files = []
         for d in dirs:
             p = Path(d)

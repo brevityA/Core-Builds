@@ -1,4 +1,11 @@
 export const CHANGELOG = [
+  { v:'2.85', date:'Jul 26 2026', items:[
+    'Mixed · Adaptive resolution tier — new fourth resolution option: no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend; dedicated PSE ladder (4K REMUX/HDR → 1080p → 720p → 576p/480p niche fallback), UHD-class regex tiers, blended dynamic-fetch exit, and import round-trip detection',
+    'Apex Mixed PSE architecture — third architecture option (Standard / Apex IQR / Apex Mixed): the flagship 35-PSE IQR × adaptive stack from the 4K Apex Mixed nightly, generatable for any device/service; adopts the mixed resolution policy (no caps, quality-blend sort, blended DAF exit) and names builds "Core Nexus Apex Mixed". Golden-link test keeps it byte-identical to the static template',
+    'Fixed: Jackett & Prowlarr optional scraper presets were never generated (regression of the #557 filter fix, lost in the v2.84 modular rewrite) — restored `credKey && !apiUrl` guard',
+    'Regression tests: optional-scrapers branch coverage (every scraper maps to exactly one preset branch) and resolution-mixed generation guards',
+    'Fixed: template validator crashed on non-template JSON (e.g. Filtering/ expression libraries) when run without --dir arguments',
+  ]},
   { v:'2.84', date:'Jul 25 2026', items:[
     'Error Logger wired — initErrorLogger() at startup, logError() on build/deploy/import failures, error log section in Diagnostics modal with copy/clear/export',
     'Age Rating Limit — Restrict content by MPAA/TV certification (G, PG, PG-13, R) via ESE; added to Video Preferences panel',
@@ -12,11 +19,11 @@ export const CHANGELOG = [
     'Worker contact endpoint — Server-side Discord webhook relay added to the Cloudflare Worker',
   ]},
   { v:'2.82', date:'Jul 24 2026', items:[
-    'Patch Cinemeta & AIOMetadata now enabled by default — new templates automatically patch Cinemeta catalogs and install AIOMetadata',
+    'Patch Cinemeta & AIOMetadata — opt-in toggles in Full Setup for patching Cinemeta catalogs and installing AIOMetadata',
     'Full Setup service selection — Full Setup now reads the active splash chip and sets the correct service/multiServices',
     'Library Boost — Three modes: Default (normal position), Strong (top priority), None (disabled)',
     'Bandwidth Estimator — Device-aware bandwidth suggestion with manual override (10–200 Mbps)',
-    'Age Limit — Content age filter with 7d / 30d / 90d / 1y / 2y presets',
+    'Age Rating Limit — MPAA certification filter (G / PG / PG-13 / R) powered by TMDB metadata',
     'NZB Failover — Configurable position (before/after torrents) and max NZB count (1/2/3/5)',
     'Template Inspector upgraded — File import, URL fetch, clipboard paste, health score ring, host compatibility checks, export report, theme toggle',
   ]},

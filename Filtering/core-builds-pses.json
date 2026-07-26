@@ -1559,5 +1559,35 @@
     "templates": [
       "All-Rounder Labs"
     ]
+  },
+  {
+    "expression": "/*hasSeaDex Best Pin*/ count(seadex(streams, 'best')) > 0 ? pin(seadex(streams, 'best'), 'top') : []",
+    "enabled": true,
+    "templates": [
+      "Anime",
+      "Anime 4K",
+      "Anime Dub",
+      "Anime Lite",
+      "Anime 4K Lite",
+      "Anime Dub Lite"
+    ]
+  },
+  {
+    "expression": "/*hasSeaDex A-Tier \u2014 SeaDex Best 1080p*/ hasSeaDex and count(seadex(resolution(streams, '1080p'), 'best')) > 0 ? seadex(resolution(streams, '1080p'), 'best') : []",
+    "enabled": true,
+    "templates": [
+      "Anime",
+      "Anime Dub",
+      "Anime Lite",
+      "Anime Dub Lite"
+    ]
+  },
+  {
+    "expression": "/*hasSeaDex S-Tier \u2014 SeaDex Best 2160p*/ hasSeaDex and count(seadex(resolution(streams, '2160p'), 'best')) > 0 ? seadex(resolution(streams, '2160p'), 'best') : []",
+    "enabled": true,
+    "templates": [
+      "Anime 4K",
+      "Anime 4K Lite"
+    ]
   }
 ]
