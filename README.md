@@ -304,7 +304,7 @@ Full docs at **[core-builds.mintlify.app](https://core-builds.mintlify.app)**
 
 ## 📜 Version
 
-Current: **`v3.3.2`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
+Current: **`v3.4.0`** · [Full changelog](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) · [Releases](https://github.com/brevityA/Core-Builds/releases)
 
 ---
 

@@ -656,7 +656,7 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 
 ---
 
-## 🛠️ Common to All Templates (v3.3.2)
+## 🛠️ Common to All Templates (v3.4.0)
 
 | Feature | Detail |
 |---|---|
