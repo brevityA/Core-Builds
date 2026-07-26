@@ -1,6 +1,7 @@
 export const CHANGELOG = [
   { v:'2.85', date:'Jul 26 2026', items:[
     'Mixed · Adaptive resolution tier — new fourth resolution option: no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend; dedicated PSE ladder (4K REMUX/HDR → 1080p → 720p → 576p/480p niche fallback), UHD-class regex tiers, blended dynamic-fetch exit, and import round-trip detection',
+    'Apex Mixed PSE architecture — third architecture option (Standard / Apex IQR / Apex Mixed): the flagship 35-PSE IQR × adaptive stack from the 4K Apex Mixed nightly, generatable for any device/service; adopts the mixed resolution policy (no caps, quality-blend sort, blended DAF exit) and names builds "Core Nexus Apex Mixed". Golden-link test keeps it byte-identical to the static template',
     'Fixed: Jackett & Prowlarr optional scraper presets were never generated (regression of the #557 filter fix, lost in the v2.84 modular rewrite) — restored `credKey && !apiUrl` guard',
     'Regression tests: optional-scrapers branch coverage (every scraper maps to exactly one preset branch) and resolution-mixed generation guards',
     'Fixed: template validator crashed on non-template JSON (e.g. Filtering/ expression libraries) when run without --dir arguments',

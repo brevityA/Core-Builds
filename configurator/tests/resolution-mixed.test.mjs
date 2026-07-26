@@ -11,7 +11,7 @@ test('resolution step offers the Mixed · Adaptive tier', () => {
 });
 
 test('resolutionCfg gives mixed no caps and a broad preferred ladder incl. SD niche tiers', () => {
-  assert.match(app, /S\.resolution === 'mixed'\) return \{ excludedResolutions:ex, includedResolutions:\[\], requiredResolutions:\[\], preferredResolutions:\['2160p','1080p','1440p','720p','576p','480p','Unknown'\]/);
+  assert.match(app, /S\.resolution === 'mixed' \|\| S\.pseArch === 'apex-mixed'\) return \{ excludedResolutions:ex, includedResolutions:\[\], requiredResolutions:\[\], preferredResolutions:\['2160p','1080p','1440p','720p','576p','480p','Unknown'\]/);
 });
 
 test('mixed gets its own debrid PSE stack with 4K → 1080p → 720p → SD niche fallback', () => {
@@ -32,17 +32,17 @@ test('p2p mixed route ranks 4K above 1080p', () => {
 });
 
 test('mixed default sort ranks quality before resolution (cached × quality blend)', () => {
-  assert.match(app, /rq=\(qf\|\|\(S\.resolution==='mixed'&&!rf\)\)\?\[\{key:'quality',direction:d\},\{key:'resolution',direction:d\}\]/);
+  assert.match(app, /rq=\(qf\|\|\(\(S\.resolution==='mixed'\|\|S\.pseArch==='apex-mixed'\)&&!rf\)\)\?\[\{key:'quality',direction:d\},\{key:'resolution',direction:d\}\]/);
 });
 
 test('mixed uses 4K-class regex tiers and size/bitrate bounds', () => {
-  assert.ok(app.includes("(S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed') ? [...RANKED_REGEX_COMMON,...RANKED_REGEX_UHD]"));
-  assert.ok(app.includes("(S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed') ? PREFERRED_REGEX_4K"));
+  assert.ok(app.includes("(S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? [...RANKED_REGEX_COMMON,...RANKED_REGEX_UHD]"));
+  assert.ok(app.includes("(S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? PREFERRED_REGEX_4K"));
   assert.ok(app.includes("const is4k = S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'"));
 });
 
 test('dynamicAddonFetching has a blended exit condition for mixed', () => {
-  assert.match(app, /if\(S\.resolution==='mixed'\)\{ const c1m=pool==='max'\?35:pool==='large'\?22:12, c4m=pool==='max'\?20:pool==='large'\?12:6/);
+  assert.match(app, /if\(S\.resolution==='mixed'\|\|S\.pseArch==='apex-mixed'\)\{ const c1m=pool==='max'\?35:pool==='large'\?22:12, c4m=pool==='max'\?20:pool==='large'\?12:6/);
 });
 
 test('imported mixed configs round-trip back to the mixed tier', () => {
@@ -50,5 +50,5 @@ test('imported mixed configs round-trip back to the mixed tier', () => {
 });
 
 test('mixed qualifies for the full HDR visual tag ladder', () => {
-  assert.ok(app.includes("S.resolution === '4k' || S.resolution === 'ultrawide' || S.resolution === 'mixed') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX']"));
+  assert.ok(app.includes("S.resolution === '4k' || S.resolution === 'ultrawide' || S.resolution === 'mixed' || S.pseArch === 'apex-mixed') return ['HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX']"));
 });
