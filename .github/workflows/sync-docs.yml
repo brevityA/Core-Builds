@@ -41,6 +41,30 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CLAUDE.md README.md "Templates/Torbox/README.md" "Guides/LABS.md" \
-            docs/introduction.mdx docs/template-directory.mdx docs/nightly-and-labs.mdx
+            docs/introduction.mdx docs/template-directory.mdx docs/nightly-and-labs.mdx \
+            docs/changelog.mdx docs/roadmap.mdx docs/whats-new.mdx
           git commit -m "chore: sync doc versions from template JSONs"
           git push origin HEAD:main
+
+      - name: Announce synced release to Discord
+        # Only when this push actually changed CHANGELOG.md (i.e. a release landed),
+        # so template-only syncs don't spam the channel. Reuses the same embed/webhook
+        # mechanism as the manual Sync Docs to Discord workflow.
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[skip ci]') == false
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          set -e
+          if ! git diff --name-only HEAD~1 HEAD | grep -qx 'CHANGELOG.md'; then
+            echo "CHANGELOG.md unchanged in this push — no Discord announcement."
+            exit 0
+          fi
+          VER="${{ steps.sync.outputs.release_version }}"
+          if [ -z "$VER" ]; then
+            echo "No release version emitted — skipping."
+            exit 0
+          fi
+          chmod +x scripts/announce-discord.sh
+          ./scripts/announce-discord.sh "$VER" \
+            "📚 Docs synced for template-suite v${VER}" \
+            "Changelog index, roadmap \"Recently shipped\", and What's New auto-regenerated from source."

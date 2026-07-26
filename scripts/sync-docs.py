@@ -17,6 +17,7 @@ Usage:
 """
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -344,6 +345,15 @@ def main():
     print("\n── Mintlify docs ──")
     patch_mintlify_docs(patcher, versions, release_version)
 
+    print("\n── Generated doc pages (changelog index / roadmap / what's-new) ──")
+    sync_generated_pages(patcher)
+
+    # Emit the top release version so CI can announce a synced release to Discord.
+    gh_out = os.environ.get("GITHUB_OUTPUT")
+    if gh_out:
+        with open(gh_out, "a", encoding="utf-8") as fh:
+            fh.write(f"release_version={release_version}\n")
+
     # Summary
     print("\n" + "=" * 60)
     if patcher.changes:
@@ -357,6 +367,205 @@ def main():
     else:
         print("  All docs are in sync. Nothing to do.")
     print("=" * 60)
+
+
+
+
+# ─── 10. Auto-generated doc pages (changelog index / roadmap / whats-new) ─────
+#
+# These close the "frozen docs" gap: the docs site has two changelogs that drifted
+# (root CHANGELOG.md = terse template-suite log; docs/changelog.mdx = curated prose),
+# plus a What's-New page and a roadmap "Shipped" table that were hand-updated and
+# stopped being updated. The functions below regenerate the *index* parts from the
+# canonical sources so they can never freeze, while curated prose stays hand-edited
+# inside managed regions (<!-- AUTO:* --> markers).
+
+import datetime as _dt
+
+CHANGELOG_BEGIN = "<!-- AUTO:RECENT_RELEASES:BEGIN -->"
+CHANGELOG_END = "<!-- AUTO:RECENT_RELEASES:END -->"
+ROADMAP_BEGIN = "<!-- AUTO:SHIPPED:BEGIN -->"
+ROADMAP_END = "<!-- AUTO:SHIPPED:END -->"
+DOCS_BASE = "https://core-builds.mintlify.app"
+REPO_BASE = "https://github.com/brevityA/Core-Builds"
+
+
+def _md_anchor(version):
+    """GitHub-style heading anchor for a CHANGELOG.md '## <version> (...)' heading."""
+    slug = (" " + version + " ").strip().lower().replace(" ", "-")
+    slug = re.sub(r"[^a-z0-9\-]", "", slug)
+    return slug
+
+
+def parse_root_changelog():
+    """Parse CHANGELOG.md into [{version, date, body}]. Body keeps ### subsections."""
+    text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    entries = []
+    for m in re.finditer(r"^##\s+([\d][\d.\w\-+]*)\s*\(([^)]*)\)\s*$", text, re.MULTILINE):
+        version, date = m.group(1), m.group(2).strip()
+        start = m.end()
+        nxt = re.search(r"^##\s+", text[start:], re.MULTILINE)
+        body = text[start:start + nxt.start()].strip() if nxt else text[start:].strip()
+        entries.append({"version": version, "date": date, "body": body})
+    return entries
+
+
+def parse_config_changelog():
+    """Parse configurator/src/data/changelog.js into [{v, date, items:[...]}]."""
+    path = ROOT / "configurator" / "src" / "data" / "changelog.js"
+    if not path.exists():
+        return []
+    text = path.read_text(encoding="utf-8")
+    entries = []
+    for m in re.finditer(r"\{\s*v:'([^']+)',\s*date:'([^']*)',\s*items:\[(.*?)\]\s*\}", text, re.DOTALL):
+        v, date, block = m.group(1), m.group(2), m.group(3)
+        items = re.findall(r"'((?:[^'\\]|\\.)*)'", block)
+        entries.append({"v": v, "date": date, "items": [i.replace("\\'", "'").replace("\\\\", "\\") for i in items]})
+    return entries
+
+
+def _replace_managed_region(text, begin, end, inner):
+    """Replace content between begin/end markers (inclusive of markers). If the
+    markers are absent, return the text unchanged (caller reports a warning)."""
+    pattern = re.compile(re.escape(begin) + r".*?" + re.escape(end), re.DOTALL)
+    new_block = begin + "\n" + inner.rstrip("\n") + "\n" + end
+    if not pattern.search(text):
+        return None  # markers not present — do not clobber curated-only files
+    return pattern.sub(lambda _m: new_block, text, count=1)
+
+
+def _first_summary_line(body):
+    """One-line summary from a CHANGELOG entry body — the first real bullet,
+    skipping ### subsection headings and blank lines."""
+    for raw in body.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        if line.startswith("#"):          # skip "### Added" / "### Fixed" headings
+            continue
+        line = re.sub(r"^[-*+]\s*", "", line)  # strip bullet marker
+        if not line:
+            continue
+        line = re.sub(r"\*\*(.+?)\*\*", r"\1", line)
+        line = re.sub(r"`([^`]+)`", r"\1", line)
+        line = re.sub(r"\s+", " ", line).strip()
+        if line:
+            return (line[:120] + "…") if len(line) > 120 else line
+    return "—"
+
+
+def gen_changelog_index_md(entries, limit=10):
+    """Managed 'Recent releases' index rendered from CHANGELOG.md."""
+    rows = "\n".join(
+        f"| [v{e['version']}]({REPO_BASE}/blob/main/CHANGELOG.md#{_md_anchor(e['version'])}) "
+        f"| {e['date']} | {_first_summary_line(e['body'])} |"
+        for e in entries[:limit]
+    )
+    note = f"\n\n_Showing the {min(limit, len(entries))} most recent template-suite releases._" if entries else ""
+    return (
+        "Auto-generated from [`CHANGELOG.md`](" + REPO_BASE + "/blob/main/CHANGELOG.md) "
+        "by `scripts/sync-docs.py` — curated release notes follow below.\n\n"
+        "| Version | Date | Highlights |\n| --- | --- | --- |\n" + rows + note + "\n"
+    )
+
+
+def gen_roadmap_shipped_md(entries, limit=12):
+    """Managed 'Recently shipped' table rendered from CHANGELOG.md."""
+    rows = "\n".join(
+        f"| v{e['version']} | {e['date']} | {_first_summary_line(e['body'])} |"
+        for e in entries[:limit]
+    )
+    preamble = (
+        "Auto-generated from [`CHANGELOG.md`](" + REPO_BASE + "/blob/main/CHANGELOG.md) "
+        "by `scripts/sync-docs.py`. Curated priorities and ideas follow below.\n\n"
+        "| Version | Date | Completed work |\n| --- | --- | --- |\n"
+    )
+    return preamble + rows + "\n"
+
+
+def gen_whats_new_page(cfg_entries, limit=4):
+    """Fully regenerate docs/whats-new.mdx from configurator changelog.js."""
+    if not cfg_entries:
+        return None
+    latest = cfg_entries[0]
+    icon_cycle = ["sparkles", "bolt", "shield-check", "sliders", "gauge", "wand", "layers", "bug"]
+    blocks = []
+    for e in cfg_entries[:limit]:
+        cards = []
+        for i, item in enumerate(e["items"]):
+            title, _, rest = item.partition(" — ")
+            title = title.strip() or f"Update {i + 1}"
+            body = rest.strip() or item
+            icon = icon_cycle[i % len(icon_cycle)]
+            safe_title = title.replace('"', "'")
+            safe_body = body.replace('"', "'")
+            cards.append(f'  <Card title="{safe_title}" icon="{icon}">\n    {safe_body}\n  </Card>')
+        cardgroup = f'<CardGroup cols={{2}}>\n' + "\n".join(cards) + "\n</CardGroup>"
+        blocks.append(f"## Configurator v{e['v']} ({e['date']})\n\n{cardgroup}")
+
+    fm = (
+        "---\n"
+        f'title: "What\'s New — Configurator v{latest["v"]}"\n'
+        'sidebarTitle: "What\'s New"\n'
+        f'description: "Latest Core Builds Configurator releases (v{latest["v"]} and earlier), auto-generated from the in-app changelog."\n'
+        "---\n\n"
+    )
+    intro = (
+        f"# What's New in the Configurator\n\n"
+        f"This page is regenerated from `configurator/src/data/changelog.js` by "
+        f"`scripts/sync-docs.py`, so it always reflects the latest shipped configurator "
+        f"version (currently **v{latest['v']}**).\n\n"
+        f"For the template-suite release log, see the [Changelog]({DOCS_BASE}/changelog).\n\n"
+    )
+    return fm + intro + "\n\n---\n\n".join(blocks) + "\n"
+
+
+def sync_generated_pages(patcher):
+    """Regenerate the managed regions + the fully-generated What's-New page."""
+    root_entries = parse_root_changelog()
+    cfg_entries = parse_config_changelog()
+
+    # docs/changelog.mdx — managed recent-releases index (curated prose preserved)
+    cp = ROOT / "docs" / "changelog.mdx"
+    if cp.exists():
+        text = cp.read_text(encoding="utf-8")
+        new = _replace_managed_region(text, CHANGELOG_BEGIN, CHANGELOG_END,
+                                        gen_changelog_index_md(root_entries))
+        if new is None:
+            print("  WARN docs/changelog.mdx has no AUTO:RECENT_RELEASES markers — skipping")
+        elif new != text:
+            if not patcher.dry_run:
+                cp.write_text(new, encoding="utf-8")
+            print(f"  {'UPDATED' if not patcher.dry_run else 'WOULD UPDATE'} docs/changelog.mdx (recent-releases index)")
+        else:
+            print("  OK docs/changelog.mdx (index in sync)")
+
+    # docs/roadmap.mdx — managed shipped table (curated priorities preserved)
+    rp = ROOT / "docs" / "roadmap.mdx"
+    if rp.exists():
+        text = rp.read_text(encoding="utf-8")
+        new = _replace_managed_region(text, ROADMAP_BEGIN, ROADMAP_END,
+                                        gen_roadmap_shipped_md(root_entries))
+        if new is None:
+            print("  WARN docs/roadmap.mdx has no AUTO:SHIPPED markers — skipping")
+        elif new != text:
+            if not patcher.dry_run:
+                rp.write_text(new, encoding="utf-8")
+            print(f"  {'UPDATED' if not patcher.dry_run else 'WOULD UPDATE'} docs/roadmap.mdx (shipped table)")
+        else:
+            print("  OK docs/roadmap.mdx (shipped table in sync)")
+
+    # docs/whats-new.mdx — fully generated from configurator changelog.js
+    wp = ROOT / "docs" / "whats-new.mdx"
+    page = gen_whats_new_page(cfg_entries)
+    if page and wp.exists():
+        old = wp.read_text(encoding="utf-8")
+        if page != old:
+            if not patcher.dry_run:
+                wp.write_text(page, encoding="utf-8")
+            print(f"  {'UPDATED' if not patcher.dry_run else 'WOULD UPDATE'} docs/whats-new.mdx (regenerated from changelog.js)")
+        else:
+            print("  OK docs/whats-new.mdx (in sync)")
 
 
 if __name__ == "__main__":
