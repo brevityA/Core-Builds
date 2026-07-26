@@ -10,6 +10,10 @@ This is a living list of planned work, active development, and recently complete
 
 | Version | Item |
 |---|---|
+| v3.4.0 / v2.85 | **Mixed · Adaptive resolution tier** — fourth resolution option (configurator + `core-nexus-mixed.json` template): no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend with an SD niche fallback tier for classic/rare content |
+| v3.4.0 | **4K Apex Mixed (Nightly trial)** — Apex v0.9.0 IQR stack + Mixed policy: resolution cap lifted (wakes Apex's dormant 480p/240p tiers), 576p niche tier, quality-blend sort, blended DAF exit. Gather community feedback; promote out of Nightly once validated |
+| v2.85 | **Jackett/Prowlarr preset regression fixed** — optional-scraper filter restored to `credKey && !apiUrl` (fix from #557 lost in the v2.84 rewrite); regression tests now cover every optional scraper's preset branch |
+| v2.85 | **Validator bare-run crash fixed** — `validate_templates.py` skips non-template JSON gracefully instead of raising `AttributeError` |
 | v2.84 | **Age Rating Limit** (Kids Mode) — G/PG/PG-13/R/NC-17 content filtering |
 | v2.84 | **Library Boost** — Default / Strong / None options |
 | v2.84 | **NZB Failover** with position control |

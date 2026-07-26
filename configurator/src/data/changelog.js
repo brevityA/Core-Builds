@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'2.85', date:'Jul 26 2026', items:[
+    'Mixed · Adaptive resolution tier — new fourth resolution option: no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend; dedicated PSE ladder (4K REMUX/HDR → 1080p → 720p → 576p/480p niche fallback), UHD-class regex tiers, blended dynamic-fetch exit, and import round-trip detection',
+    'Fixed: Jackett & Prowlarr optional scraper presets were never generated (regression of the #557 filter fix, lost in the v2.84 modular rewrite) — restored `credKey && !apiUrl` guard',
+    'Regression tests: optional-scrapers branch coverage (every scraper maps to exactly one preset branch) and resolution-mixed generation guards',
+    'Fixed: template validator crashed on non-template JSON (e.g. Filtering/ expression libraries) when run without --dir arguments',
+  ]},
   { v:'2.84', date:'Jul 25 2026', items:[
     'Error Logger wired — initErrorLogger() at startup, logError() on build/deploy/import failures, error log section in Diagnostics modal with copy/clear/export',
     'Age Rating Limit — Restrict content by MPAA/TV certification (G, PG, PG-13, R) via ESE; added to Video Preferences panel',

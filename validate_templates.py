@@ -94,6 +94,7 @@ def validate_template(fpath):
         return errors, warnings, passes
 
     if not isinstance(t, dict):
+        passes.append(f"  – [{name}] not a template object — skipped")
         return errors, warnings, passes
 
     c = t.get('config', t)
