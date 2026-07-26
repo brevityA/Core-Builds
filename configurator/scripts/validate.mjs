@@ -55,6 +55,7 @@ const checks = {
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),
   'tutorial runtime': app.includes('function tutPositionTarget') && app.includes('Step 7 of 7'),
   'multi-provider quick install': app.includes('state.services') && app.includes('showAdditionalServicesPicker(options={})'),
+  'e2e golden generation hook': app.includes("get('cb-e2e') === '1'") && app.includes('window.__coreBuilds') && app.includes("out.metadata.id = 'core-custom-golden'"),
 };
 
 for (const [name, ok] of Object.entries(checks)) {
