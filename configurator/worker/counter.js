@@ -1,4 +1,15 @@
 // Core Builds Configurator — Usage Counter Worker
+//
+// ⚠️  DEPRECATED — do not deploy or extend this worker.
+// Its endpoints (/api/stats, /api/visit, /api/generate) are now served by the
+// consolidated worker in ../../cloudflare-worker/worker.js, which the configurator
+// points at (COUNTER_URL / CORS_PROXY). This legacy worker also writes a DIFFERENT
+// KV key schema (stat_service_*, stat_res_*, stat_device_*) into the SAME STATS
+// namespace, so those keys are dead writes that nothing reads. It is kept here only
+// for reference; the hardening (rate limits, size caps, no-store, edge-wide counters)
+// lives in the consolidated worker. If you still run this worker, repoint the
+// configurator at the consolidated worker and delete this one.
+//
 // Deploy to Cloudflare Workers with a KV namespace bound as STATS
 //
 // Setup:

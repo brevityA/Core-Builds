@@ -6,5 +6,12 @@ compatibility_date = "2024-09-25"
 binding = "STATS"
 id = "e21df08fe77846ee8246bda94288c111"
 
+# Optional but recommended: edge-wide rate limiting. If unbound, rate limits degrade to
+# "allow" (the worker never 503s on a missing namespace). Create a KV namespace and bind
+# it as RATELIMIT to enable per-IP limits on /proxy, /paste, /contact and /api/*.
+# [[kv_namespaces]]
+# binding = "RATELIMIT"
+# id = "<your-ratelimit-kv-namespace-id>"
+
 [vars]
 ALLOWED_ORIGIN = "*"
