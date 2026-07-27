@@ -76,3 +76,31 @@ def test_nav_lists_generated_pages():
     pages = {p for tab in nav["navigation"]["tabs"] for g in tab["groups"] for p in g["pages"]}
     for slug in ("changelog", "roadmap", "whats-new"):
         assert slug in pages, f"{slug} missing from docs.json navigation"
+
+
+def test_root_roadmap_completed_matches_source():
+    """The root ROADMAP.md managed 'Recently Completed' region must equal a fresh
+    generation from CHANGELOG.md (else the hand-maintained table has rotted again)."""
+    page = (ROOT / "ROADMAP.md").read_text(encoding="utf-8")
+    entries = sync.parse_root_changelog()
+    expected = sync.gen_root_roadmap_completed(entries)
+    region = sync._replace_managed_region(page, sync.ROOT_ROADMAP_BEGIN, sync.ROOT_ROADMAP_END, expected)
+    assert region is not None, "ROADMAP.md is missing the AUTO:ROOT_COMPLETED markers"
+    assert region == page, "ROADMAP.md 'Recently Completed' is stale — run scripts/sync-docs.py --apply"
+    top = _top_changelog_version()
+    assert top and top in page, f"top CHANGELOG version {top} not reflected in ROADMAP.md"
+
+
+def test_tools_whatsnew_matches_config_changelog():
+    """The standalone Core Tools page (tools/index.html) 'What's New' block must equal a
+    fresh generation from changelog.js — this is the page that froze at v2.84."""
+    page = (ROOT / "tools" / "index.html").read_text(encoding="utf-8")
+    cfg = sync.parse_config_changelog()
+    expected = sync.gen_tools_whatsnew(cfg)
+    region = sync._replace_managed_region(page, sync.TOOLS_WN_BEGIN, sync.TOOLS_WN_END, expected)
+    assert region is not None, "tools/index.html is missing the AUTO:TOOLS_WHATSNEW markers"
+    assert region == page, "tools/index.html 'What's New' is stale — run scripts/sync-docs.py --apply"
+    top = _top_config_version()
+    assert top and top in page, f"top configurator version {top} not reflected in tools/index.html"
+    # the page must link to the configurator changelog (the missing-link bug report)
+    assert "Full Configurator changelog" in page or "#changelog" in page, "tools page missing changelog link"
