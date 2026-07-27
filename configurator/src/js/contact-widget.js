@@ -13,6 +13,7 @@ let _lastSendTime = 0;
 let _widgetOpen = false;
 
 export function initContactWidget() {
+  if (document.getElementById('cbContactWidget')) return; // idempotent — safe if bootstrap runs twice
   const style = document.createElement('style');
   style.textContent = CONTACT_CSS;
   document.head.appendChild(style);

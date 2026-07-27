@@ -48,3 +48,7 @@ configurator/node_modules/
 
 # Environment
 .env
+
+# Playwright artifacts
+configurator/test-results/
+configurator/playwright-report/
