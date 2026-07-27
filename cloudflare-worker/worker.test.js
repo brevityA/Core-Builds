@@ -80,3 +80,84 @@ test('paste: returns 404 for missing id', async () => {
   const res = await worker.fetch(req, env);
   assert.equal(res.status, 404);
 });
+
+// ── Hardening regression tests (2026-07-27 worker hardening) ──
+
+function makeFullEnv(kvStore = {}, rlStore = {}) {
+  const mk = (store) => ({
+    put: async (k, v) => { store[k] = v; },
+    get: async (k) => (k in store ? store[k] : null),
+  });
+  return { TEMPLATES: mk(kvStore), RATELIMIT: mk(rlStore) };
+}
+
+test('proxy: path guard rejects an empty upstream path (/proxy with no path)', async () => {
+  let fetchCalled = false;
+  global.fetch = async () => { fetchCalled = true; return new Response('{}'); };
+  const req = new Request(
+    'https://example.com/proxy?host=' + encodeURIComponent('https://aiostreams.elfhosted.com'),
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+  const res = await worker.fetch(req, {});
+  assert.equal(res.status, 403);
+  assert.equal(fetchCalled, false);
+});
+
+test('proxy: host allowlist is the SSRF control (non-allowed host rejected, upstream untouched)', async () => {
+  let fetchCalled = false;
+  global.fetch = async () => { fetchCalled = true; return new Response('{}'); };
+  const req = new Request(
+    'https://example.com/proxy/api/v1/user?host=' + encodeURIComponent('https://attacker.example.com'),
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+  const res = await worker.fetch(req, {});
+  assert.equal(res.status, 403);
+  assert.equal(fetchCalled, false, 'a non-allowlisted host must never be proxied');
+});
+
+test('proxy: rejects oversized request body (413)', async () => {
+  let fetchCalled = false;
+  global.fetch = async () => { fetchCalled = true; return new Response('{}'); };
+  const big = 'x'.repeat(3 * 1024 * 1024); // 3 MB > 2 MB cap
+  const req = new Request(
+    'https://example.com/proxy/api/v1/user?host=' + encodeURIComponent('https://aiostreams.elfhosted.com'),
+    { method: 'POST', headers: { 'Content-Type': 'application/json', 'content-length': String(big.length) }, body: big }
+  );
+  const res = await worker.fetch(req, {});
+  assert.equal(res.status, 413);
+  assert.equal(fetchCalled, false);
+});
+
+test('paste: retrieval sets Cache-Control: no-store (pastes may carry config)', async () => {
+  const env = makeFullEnv();
+  const tmpl = JSON.stringify({ config: { secret: 'torbox-key-xyz' } });
+  const post = new Request('https://example.com/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: tmpl });
+  const { url } = await (await worker.fetch(post, env)).json();
+  const id = url.split('/t/')[1];
+  const get = new Request(`https://example.com/t/${id}`, { method: 'GET' });
+  const res = await worker.fetch(get, env);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+});
+
+test('rate limit: 31st /api/visit from one IP within a minute is rejected (429)', async () => {
+  const env = makeFullEnv();
+  const ip = '203.0.113.42';
+  let last = 200;
+  for (let i = 0; i < 31; i++) {
+    const req = new Request('https://example.com/api/visit', { method: 'POST', headers: { 'cf-connecting-ip': ip } });
+    const res = await worker.fetch(req, env);
+    last = res.status;
+    if (res.status === 429) break;
+  }
+  assert.equal(last, 429, 'expected the per-IP analytics bucket to trip within 31 requests');
+});
+
+test('randomId: produces a 10-char id from the allowed alphabet', async () => {
+  // exercised indirectly via /paste; assert shape of the returned id
+  const env = makeFullEnv();
+  const post = new Request('https://example.com/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const { url } = await (await worker.fetch(post, env)).json();
+  const id = url.split('/t/')[1];
+  assert.match(id, /^[a-z0-9]{10}$/);
+});

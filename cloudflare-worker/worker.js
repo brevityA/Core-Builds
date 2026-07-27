@@ -10,22 +10,63 @@
 // Proxy calls, paste creates, and paste views are counted automatically.
 // Per-host proxy counts, per-service generates, and daily counters are tracked.
 
-// ── Rate limiting for contact endpoint ──
-const RATE_LIMIT = new Map(); // ip -> { count, resetAt }
-const RATE_MAX = 5;
-const RATE_WINDOW = 3600000; // 1 hour
+// ── Hardening constants ─────────────────────────────────────────────────────
+// Edge-wide rate limits (KV-backed; see rateAllow). The legacy in-memory map was
+// per-isolate and reset on every cold start, so it did nothing at the edge.
+const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
+const PROXY_RESP_MAX_SIZE = 8 * 1024 * 1024; // 8 MB proxy response cap
+const PROXY_TIMEOUT_MS = 15000;              // upstream fetch timeout
+const PROXY_PATH_RE = /^\/[A-Za-z0-9_\-./%]*$/; // upstream path allowlist (no traversal)
+const PASTE_CREATE_PER_MIN = 10;
+const PASTE_READ_PER_MIN = 60;
+const CONTACT_PER_HOUR = 5;
+const ANALYTICS_PER_MIN = 30;
+const STATS_PER_MIN = 20;
 
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const entry = RATE_LIMIT.get(ip);
-  if (!entry || now > entry.resetAt) {
-    RATE_LIMIT.set(ip, { count: 1, resetAt: now + RATE_WINDOW });
+// Client IP from Cloudflare's header. Returns '' when absent (direct calls / tests),
+// in which case rate limiting is skipped — you cannot fairly bucket an unknown client,
+// and Cloudflare always sets this header for real edge traffic.
+function getClientIp(request) {
+  return request.headers.get('cf-connecting-ip') || '';
+}
+
+// Token-bucket-ish rate limit stored in KV (the RATELIMIT namespace). Degrades to
+// "allow" when the namespace is unbound or on any error, so a KV blip never 503s the
+// proxy/paste/contact paths. Window is a fixed 60s (or 3600s) bucket derived from now.
+async function rateAllow(kv, scope, ip, max, windowSec) {
+  if (!kv || !ip) return true;
+  const bucket = Math.floor(Date.now() / (windowSec * 1000));
+  const key = `rl:${scope}:${ip}:${bucket}`;
+  try {
+    const raw = await kv.get(key);
+    const count = parseInt(raw, 10) || 0;
+    if (count >= max) return false;
+    await kv.put(key, String(count + 1), { expirationTtl: windowSec + 60 });
+    return true;
+  } catch {
     return true;
   }
-  if (entry.count >= RATE_MAX) return false;
-  entry.count++;
-  return true;
 }
+
+// Read a request body as text with a hard byte cap (returns null on overflow/empty-GET).
+async function readCapped(request, max) {
+  const len = parseInt(request.headers.get('content-length') || '0', 10);
+  if (len > max) return null;
+  const buf = await request.arrayBuffer();
+  if (buf.byteLength > max) return null;
+  return new TextDecoder().decode(buf);
+}
+
+// Read an upstream response body as text with a hard byte cap (null on overflow).
+async function readResponseCapped(response, max) {
+  const len = parseInt(response.headers.get('content-length') || '0', 10);
+  if (len > max) return null;
+  const buf = await response.arrayBuffer();
+  if (buf.byteLength > max) return null;
+  return new TextDecoder().decode(buf);
+}
+
+const NO_STORE = { 'Cache-Control': 'no-store' };
 
 const ALLOWED_HOSTS = new Set([
   'https://aiostreams.elfhosted.com',
@@ -66,9 +107,18 @@ const PASTE_MAX_SIZE = 512 * 1024; // 512 KB
 let _cors = {};
 
 function json(status, body) {
-  return new Response(JSON.stringify(body), {
+  // Allow callers to pass response headers via a `headers` field without them leaking
+  // into the JSON body (used for Cache-Control / no-store on sensitive/mutating routes).
+  let data = body;
+  let extraHeaders;
+  if (body && typeof body === 'object' && !Array.isArray(body) && 'headers' in body) {
+    const { headers, ...rest } = body;
+    extraHeaders = headers;
+    data = rest;
+  }
+  return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ..._cors },
+    headers: { 'Content-Type': 'application/json', ..._cors, ...(extraHeaders || {}) },
   });
 }
 
@@ -77,7 +127,14 @@ function randomId() {
   let id = '';
   const bytes = new Uint8Array(10);
   crypto.getRandomValues(bytes);
-  for (const b of bytes) id += chars[b % chars.length];
+  for (const b of bytes) {
+    if (b < 252) id += chars[b % chars.length]; // rejection sampling — removes modulo bias
+  }
+  while (id.length < 10) { // top up in the vanishingly rare case a byte was rejected
+    const extra = new Uint8Array(1);
+    crypto.getRandomValues(extra);
+    if (extra[0] < 252) id += chars[extra[0] % chars.length];
+  }
   return id;
 }
 
@@ -89,11 +146,32 @@ function hostLabel(hostUrl) {
   try { return new URL(hostUrl).hostname; } catch { return 'unknown'; }
 }
 
+// get→modify→put increment with bounded retry on TRANSIENT write failures only.
+// KV has no atomic counter, so genuine concurrent-increment collisions cannot be
+// eliminated without an external primitive; this at least retries on network/timeout
+// errors instead of silently dropping the write. Analytics tolerance makes the
+// residual lost-update rate acceptable.
 async function increment(kv, key) {
-  const raw = await kv.get(key);
-  const val = (parseInt(raw, 10) || 0) + 1;
-  await kv.put(key, val.toString());
-  return val;
+  const MAX_TRIES = 4;
+  for (let i = 0; i < MAX_TRIES; i++) {
+    try {
+      const raw = await kv.get(key);
+      const val = (parseInt(raw, 10) || 0) + 1;
+      await kv.put(key, val.toString());
+      return val;
+    } catch {
+      if (i === MAX_TRIES - 1) break;
+    }
+  }
+  // last-resort non-throwing attempt so the caller always gets a number
+  try {
+    const raw = await kv.get(key);
+    const val = (parseInt(raw, 10) || 0) + 1;
+    await kv.put(key, val.toString());
+    return val;
+  } catch {
+    return 0;
+  }
 }
 
 function bgIncrement(ctx, kv, key) {
@@ -130,6 +208,10 @@ export default {
 
     // --- Counter: return all stats ---
     if (url.pathname === '/api/stats' && request.method === 'GET') {
+      const statsIp = getClientIp(request);
+      if (!(await rateAllow(env.RATELIMIT, 'stats', statsIp, STATS_PER_MIN, 60))) {
+        return json(429, { error: 'rate limit exceeded' });
+      }
       if (!env.STATS) return json(200, {});
       const keys = ['visits', 'generates', 'proxy_calls', 'proxy_errors', 'pastes_created', 'pastes_viewed'];
       const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
@@ -145,11 +227,15 @@ export default {
         listByPrefix(env.STATS, 'daily:'),
       ]);
 
-      return json(200, { ...totals, by_host: byHost, by_host_errors: byHostErrors, by_service: byService, by_device: byDevice, by_resolution: byResolution, daily });
+      return json(200, { ...totals, by_host: byHost, by_host_errors: byHostErrors, by_service: byService, by_device: byDevice, by_resolution: byResolution, daily, headers: { 'Cache-Control': 'public, max-age=60' } });
     }
 
     // --- Counter: increment visit ---
     if (url.pathname === '/api/visit' && request.method === 'POST') {
+      const visitIp = getClientIp(request);
+      if (!(await rateAllow(env.RATELIMIT, 'visit', visitIp, ANALYTICS_PER_MIN, 60))) {
+        return json(429, { error: 'rate limit exceeded' });
+      }
       if (env.STATS) {
         const d = today();
         const v = await increment(env.STATS, 'visits');
@@ -161,13 +247,17 @@ export default {
 
     // --- Counter: increment generate ---
     if (url.pathname === '/api/generate' && request.method === 'POST') {
+      const genIp = getClientIp(request);
+      if (!(await rateAllow(env.RATELIMIT, 'generate', genIp, ANALYTICS_PER_MIN, 60))) {
+        return json(429, { error: 'rate limit exceeded' });
+      }
       if (env.STATS) {
         const d = today();
         const v = await increment(env.STATS, 'generates');
         const extra = [`daily:generates:${d}`];
 
         try {
-          const body = await request.text();
+          const body = await readCapped(request, 64 * 1024); // telemetry payloads are tiny
           if (body) {
             const data = JSON.parse(body);
             if (data.service) extra.push(`gen:service:${data.service}`);
@@ -191,9 +281,11 @@ export default {
       const reqOrigin = request.headers.get('Origin') || '';
       if (!ALLOWED_ORIGINS.has(reqOrigin)) return json(403, { error: 'Origin not allowed' });
 
-      // Rate limit check
-      const contactIp = request.headers.get('cf-connecting-ip') || 'unknown';
-      if (!checkRateLimit(contactIp)) return json(429, { error: 'Rate limit exceeded. Try again later.' });
+      // Rate limit check (edge-wide via KV; in-memory map was per-isolate and useless at the edge)
+      const contactIp = getClientIp(request) || 'unknown';
+      if (!(await rateAllow(env.RATELIMIT, 'contact', contactIp, CONTACT_PER_HOUR, 3600))) {
+        return json(429, { error: 'Rate limit exceeded. Try again later.' });
+      }
 
       let body;
       try { body = await request.json(); } catch { return json(400, { error: 'Invalid JSON' }); }
@@ -245,16 +337,25 @@ export default {
     // --- Paste: store template ---
     if (url.pathname === '/paste' && request.method === 'POST') {
       if (!env.TEMPLATES) return json(500, { error: 'KV not configured' });
-      const body = await request.text();
-      if (!body || body.length > PASTE_MAX_SIZE) {
-        return json(400, { error: body ? 'too large' : 'empty body' });
+      const pasteIp = getClientIp(request);
+      if (!(await rateAllow(env.RATELIMIT, 'paste', pasteIp, PASTE_CREATE_PER_MIN, 60))) {
+        return json(429, { error: 'rate limit exceeded', headers: { ..._cors, ...NO_STORE } });
       }
-      try { JSON.parse(body); } catch { return json(400, { error: 'invalid JSON' }); }
+      const body = await readCapped(request, PASTE_MAX_SIZE);
+      if (!body) {
+        return json(400, { error: body === null ? 'too large' : 'empty body' });
+      }
+      let parsed;
+      try { parsed = JSON.parse(body); } catch { return json(400, { error: 'invalid JSON' }); }
+      // Only accept template-shaped objects so the KV store isn't used as a generic dump.
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return json(400, { error: 'expected a JSON object' });
+      }
       const id = randomId();
       await env.TEMPLATES.put(`t:${id}`, body, { expirationTtl: PASTE_TTL });
       if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['pastes_created', `daily:pastes:${today()}`]);
       const pasteUrl = `${url.origin}/t/${id}`;
-      return json(200, { url: pasteUrl });
+      return json(200, { url: pasteUrl, headers: { ..._cors, ...NO_STORE } });
     }
 
     // --- Paste: retrieve template ---
@@ -262,17 +363,31 @@ export default {
       if (!env.TEMPLATES) return json(500, { error: 'KV not configured' });
       const id = url.pathname.slice(3);
       if (!/^[a-z0-9]{6,20}$/.test(id)) return json(400, { error: 'invalid id' });
+      const readIp = getClientIp(request);
+      if (!(await rateAllow(env.RATELIMIT, 'paste_read', readIp, PASTE_READ_PER_MIN, 60))) {
+        return json(429, { error: 'rate limit exceeded', headers: { ..._cors, ...NO_STORE } });
+      }
       const val = await env.TEMPLATES.get(`t:${id}`);
       if (!val) return json(404, { error: 'not found or expired' });
       if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_viewed');
+      // no-store: pastes can carry a user's config — never let a shared CDN cache them.
       return new Response(val, {
-        headers: { 'Content-Type': 'application/json', ..._cors },
+        headers: { 'Content-Type': 'application/json', ..._cors, ...NO_STORE },
       });
     }
 
     // --- Proxy: forward to AIOStreams ---
-    if (!url.pathname.startsWith('/proxy/')) {
+    if (!url.pathname.startsWith('/proxy')) {
       return json(404, { error: 'not found' });
+    }
+
+    const upstreamPath = url.pathname.slice('/proxy'.length);
+    // Path guard: require a non-empty upstream path of safe characters. NOTE on traversal:
+    // the WHATWG URL parser collapses any "/.." *before* this handler runs, so the value
+    // here is always a clean absolute path — the host allowlist above is the real SSRF
+    // control. This guard mainly rejects an empty path ("/proxy" with nothing after it).
+    if (!upstreamPath || upstreamPath.includes('..') || !PROXY_PATH_RE.test(upstreamPath)) {
+      return json(403, { error: 'path not allowed' });
     }
     if (!ALLOWED_METHODS.has(request.method)) {
       return json(405, { error: 'method not allowed' });
@@ -283,7 +398,12 @@ export default {
       return json(403, { error: 'host not allowed' });
     }
 
-    const upstreamPath = url.pathname.slice('/proxy'.length);
+    // Per-IP rate limit on the proxy (open relays to allowed hosts are an amplification risk).
+    const proxyIp = getClientIp(request);
+    if (!(await rateAllow(env.RATELIMIT, 'proxy', proxyIp, ANALYTICS_PER_MIN * 2, 60))) {
+      return json(429, { error: 'rate limit exceeded', headers: { ..._cors, ...NO_STORE } });
+    }
+
     const upstreamSearch = url.searchParams.toString();
     const upstreamUrl = new URL(host + upstreamPath);
     if (upstreamSearch) {
@@ -291,10 +411,18 @@ export default {
       if (cleanedSearch) upstreamUrl.search = cleanedSearch;
     }
 
+    // Capped request body (GET has none). 413 on overflow rather than buffering unbounded.
+    let reqBody = undefined;
+    if (request.method !== 'GET') {
+      reqBody = await readCapped(request, PROXY_MAX_SIZE);
+      if (reqBody === null) return json(413, { error: 'request too large' });
+    }
+
     const upstreamReq = new Request(upstreamUrl, {
       method: request.method,
       headers: { 'Content-Type': request.headers.get('Content-Type') || 'application/json' },
-      body: request.method === 'GET' ? undefined : await request.text(),
+      body: reqBody,
+      signal: AbortSignal.timeout(PROXY_TIMEOUT_MS),
     });
 
     const hostname = hostLabel(host);
@@ -319,12 +447,18 @@ export default {
       }
     }
 
-    const resBody = await upstreamRes.text();
+    // Capped response body — protects the worker from an oversized/malicious upstream.
+    const resBody = await readResponseCapped(upstreamRes, PROXY_RESP_MAX_SIZE);
+    if (resBody === null) {
+      if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
+      return json(502, { error: 'upstream response too large' });
+    }
     return new Response(resBody, {
       status: upstreamRes.status,
       headers: {
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
         ..._cors,
+        ...NO_STORE,
       },
     });
   },

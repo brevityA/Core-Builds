@@ -64,3 +64,38 @@ Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 
 - `CLOUDFLARE_API_TOKEN` — a token with Workers Scripts:Edit permission
 - `CLOUDFLARE_ACCOUNT_ID` — found on the Cloudflare dashboard's right sidebar
+
+## Hardening & security model (2026-07-27)
+
+The worker is an **open relay by design** (it proxies/pastes on behalf of an
+unauthenticated browser), so every abuse surface is bounded:
+
+- **Proxy (`/proxy/*`)** — only forwards to the hardcoded `ALLOWED_HOSTS` (the real
+  SSRF control; note the WHATWG URL parser collapses any `/..` before the handler runs,
+  so a path-traversal attempt can never reach a non-allowlisted host). Request body capped
+  at 2 MB (`413` on overflow), upstream fetch has a 15 s `AbortSignal.timeout`, upstream
+  response capped at 8 MB, and per-IP rate-limited. Responses carry `Cache-Control: no-store`.
+- **Paste (`/paste`, `/t/:id`)** — create is per-IP rate-limited and only accepts JSON
+  *objects* (no generic dump); retrieval is rate-limited and returns `Cache-Control: no-store`
+  because a stored paste can carry a user's config. IDs are unbiased (`crypto.getRandomValues`
+  with rejection sampling) and validated against `^[a-z0-9]{6,20}$`.
+- **Contact (`/contact`)** — origin allowlist (CSRF) + per-IP rate limit + field length/shape
+  validation; input stripped of `<>`.
+- **Analytics (`/api/*`)** — per-IP rate limits; `/api/stats` (six KV `list` calls) is also
+  CDN-cached for 60 s via `Cache-Control: public, max-age=60`.
+- **Counters** — `increment()` retries get→put on transient KV failures (KV has no atomic
+  counter, so genuine concurrent collisions can't be fully eliminated; analytics tolerate it).
+
+### Rate-limit storage
+Rate limits are **edge-wide**, stored in the optional `RATELIMIT` KV namespace (the old
+in-memory map was per-isolate and reset on every cold start, so it did nothing at the edge).
+Bind it in `wrangler.toml` (see the commented `[[kv_namespaces]]` block). If it's **not**
+bound, `rateAllow()` degrades to *allow* — the worker never 503s on a missing namespace.
+Rate limiting keys off `cf-connecting-ip`; direct calls with no such header (e.g. unit tests)
+skip the limit, since an unknown client can't be fairly bucketed (Cloudflare always sets the
+header for real edge traffic).
+
+### Legacy `configurator/worker/counter.js`
+**Deprecated.** The configurator points only at this consolidated worker, and `counter.js`
+writes a *different* KV key schema into the same `STATS` namespace (dead writes). Repoint any
+stragglers here and delete it.
