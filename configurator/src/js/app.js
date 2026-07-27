@@ -6353,3 +6353,22 @@ async function openInAIOStreams() {
 }
 
 window.toggleTheme = toggleTheme;
+
+// Test-only generation hook — active only with ?cb-e2e=1. The golden-snapshot e2e
+// specs (e2e/golden-configs.spec.mjs) drive the real pipeline (S → build() →
+// buildFinal()) across a service × resolution × architecture matrix and diff the
+// output against checked-in goldens. Exposes pure generation logic only; never
+// credentials (none are set in the test states) and never the network.
+if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
+  window.__coreBuilds = {
+    generate(overrides) {
+      Object.assign(S, overrides || {});
+      const out = buildFinal();
+      if (out && out.metadata) {
+        delete out.metadata.generatedAt;                    // volatile timestamp
+        out.metadata.id = 'core-custom-golden';             // sid() is random per build
+      }
+      return out;
+    },
+  };
+}
