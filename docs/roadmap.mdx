@@ -3,19 +3,26 @@ title: "Roadmap"
 description: "Recently shipped work and the current Core Builds engineering priorities."
 ---
 
-## Shipped on July 22, 2026
+## Recently shipped
 
-| Area | Completed work |
-| --- | --- |
-| Configurator v2.78 | Modular source architecture with a generated standalone `index.html` release |
-| Quick Install | Multi-provider selection, contextual Get-key links, optional TMDB metadata, compact extras picker |
-| Compatibility | AIOStreams enum normalization and safe defaults before export/install |
-| Hosts | Stable-first probing, minimum-version checks, restrictions, remembered successful host, nightly fallback |
-| Devices | Centralized conservative video, HDR, and audio capability rules |
-| UX | Seven-step tutorial, mobile safe areas, keyboard handling, landscape support, repaired light mode |
-| Security messaging | Accurate local export, hosted Direct Install, and Stremio API descriptions |
-| Community | Core Crew naming, central gem support control, live usage counter retained |
-| Apex v0.9.0 | Resolution-first sorting and Core Clean formatter refinements |
+<!-- AUTO:SHIPPED:BEGIN -->
+Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) by `scripts/sync-docs.py`. Curated priorities and ideas follow below.
+
+| Version | Date | Completed work |
+| --- | --- | --- |
+| v3.3.2 | 2026-07-17 | Subtitle Picker (Configurator v2.57) — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 3… |
+| v3.3.1 | 2026-07-17 | Free Tier Overhaul (Configurator v2.56) — comprehensive improvements to P2P and HTTP template generation: |
+| v3.3.0 | 2026-07-16 | Stream pool broadening (Configurator v2.55 + all 31 active templates) — increased maxResults, maxResultsPerResolution, a… |
+| v3.2.9 | 2026-07-15 | Template Migration Tool (Configurator v2.49) — "Update Existing Template" now shows a full visual diff of every change (… |
+| v3.2.8 | 2026-07-15 | REMUX ranking fix (all 44 active templates) — BluRay REMUX files were consistently ranked below WEB-DL streams because t… |
+| v3.2.7 | 2026-07-11 | LABS v0.14.0 SEL expressions (6 Labs templates) — seven new expression features across all Labs templates: |
+| v3.2.6 | 2026-07-09 | Configurator v2.30 — 3 new debrid services: EasyDebrid, PikPak, Seedr (all using StremThru Store cache layer). Generated… |
+| v3.2.5 | 2026-07-03 | Template collection file (core-builds-template-collection.json) — operator-facing template catalog for AIOStreams TEMPLA… |
+| v3.2.4 | 2026-07-03 | Sort criteria overhaul (all 42 templates) — rebuilt the sort pipeline based on AIOStreams' stable multi-key sort archite… |
+| v3.2.3 | 2026-07-02 | Configurator v2.9 — Easy Setup one-click button now opens AIOStreams directly via ?template=URL deep link instead of cal… |
+| v3.2.2 | 2026-07-02 | Configurator v2.8.1 — groups.groupings now omitted when groups are disabled, fixing "Every group must have at least one … |
+| v3.2.1 | 2026-07-02 | Older-Show Pack Pass (all 36 standard templates + shared Filtering/core-builds-eses.json) — refines the v3.2.0 Hard Seas… |
+<!-- AUTO:SHIPPED:END -->
 
 ## Current priorities
 

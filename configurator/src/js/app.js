@@ -8,6 +8,7 @@ import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
+import { initContactWidget } from './contact-widget.js';
 import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
 import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../data/bandwidth.js';
 
@@ -806,7 +807,50 @@ function renderP2pToggle() {
   </div>`;
 }
 
-function ftTip(text) { return `<span style="position:relative;display:inline-flex;z-index:999"><i class="ft-info">?</i><div class="ft-popup">${text}</div></span>`; }
+function ftTip(text) {
+  // Text is stashed in a data attribute (entity-escaped for attribute safety). The popup
+  // itself is portaled to <body> on open (showFtTip) so it can never be clipped by an
+  // ancestor's overflow — the Fine-Tune drawer scrolls, which used to cut these help
+  // cards off mid-sentence. Reported by the Core Crew (layering bug #2).
+  const esc = String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  return `<i class="ft-info" data-fttip="${esc}" tabindex="0" role="button" aria-label="More information">?</i>`;
+}
+
+let _ftPop = null, _ftActiveIcon = null;
+function _ftPopup() {
+  if (_ftPop) return _ftPop;
+  _ftPop = document.createElement('div');
+  _ftPop.className = 'ft-popup';
+  document.body.appendChild(_ftPop);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { hideFtTip(); return; }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.closest) {
+      const i = e.target.closest('.ft-info[data-fttip]');
+      if (i) { e.preventDefault(); toggleFtTip(i); }
+    }
+  });
+  document.addEventListener('scroll', hideFtTip, true); // capture phase — drawer scroll closes the tip
+  window.addEventListener('resize', hideFtTip);
+  return _ftPop;
+}
+function hideFtTip() { if (_ftPop) _ftPop.classList.remove('active'); _ftActiveIcon = null; }
+function toggleFtTip(icon) { (_ftActiveIcon === icon && _ftPop && _ftPop.classList.contains('active')) ? hideFtTip() : showFtTip(icon); }
+function showFtTip(icon) {
+  const pop = _ftPopup();
+  pop.innerHTML = icon.getAttribute('data-fttip') || '';
+  pop.classList.add('active');
+  const iw = window.innerWidth, ih = window.innerHeight;
+  const r = icon.getBoundingClientRect();
+  const pw = pop.offsetWidth, ph = pop.offsetHeight;
+  let left = Math.round(r.left + r.width / 2 - pw / 2);
+  left = Math.max(8, Math.min(left, iw - pw - 8));
+  let top = Math.round(r.bottom + 8);
+  if (top + ph > ih - 8) top = Math.round(r.top - ph - 8); // flip above the icon if it would clip the viewport bottom
+  if (top < 8) top = 8;                                     // popup scrolls internally if still taller than the viewport
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+  _ftActiveIcon = icon;
+}
 
 function renderMatchMode() {
   const modes = [
@@ -1965,6 +2009,7 @@ window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{pass
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   initErrorLogger();
+  initContactWidget();
   window._formatErrorLog = formatErrorLog;
   window._clearErrorLog = () => { clearErrorLog(); document.querySelectorAll('.cb-error-log-section').forEach(el => { el.innerHTML = errorLogHtml(); }); };
   window._exportErrorLog = exportErrorLog;
@@ -2169,28 +2214,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pp) pp.innerHTML = splashPresetsHtml(svcChip.dataset.svc);
       return;
     }
-    const ftInfo = e.target.closest('.ft-info');
+    const ftInfo = e.target.closest('.ft-info[data-fttip]');
     if (ftInfo) {
       e.stopPropagation();
-      const popup = ftInfo.parentElement.querySelector('.ft-popup');
-      if (popup) {
-        const wasActive = popup.classList.contains('active');
-        document.querySelectorAll('.ft-popup.active').forEach(p => { p.classList.remove('active'); p.style.left = ''; p.style.right = ''; });
-        if (!wasActive) {
-          popup.style.left = '0'; popup.style.right = 'auto';
-          popup.classList.add('active');
-          const rect = popup.getBoundingClientRect();
-          if (rect.right > window.innerWidth - 12) {
-            popup.style.left = 'auto'; popup.style.right = '0';
-            const r2 = popup.getBoundingClientRect();
-            if (r2.left < 12) { popup.style.left = '0'; popup.style.right = 'auto'; popup.style.left = (-rect.left + 12) + 'px'; }
-          }
-          if (rect.left < 12) { popup.style.left = (-rect.left + 12) + 'px'; popup.style.right = 'auto'; }
-        }
-      }
+      toggleFtTip(ftInfo);
       return;
     }
-    if (!e.target.closest('.ft-popup')) document.querySelectorAll('.ft-popup.active').forEach(p => { p.classList.remove('active'); p.style.left = ''; p.style.right = ''; });
+    if (!e.target.closest('.ft-popup')) hideFtTip();
     const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
     const action = el?.dataset.action;
     if(!action) return;
@@ -3765,7 +3795,7 @@ function showFormatterImport() {
   if (ex) ex.remove();
   const overlay = document.createElement('div');
   overlay.id = 'fmtImportModal';
-  overlay.className = 'modal-overlay';
+  overlay.className = 'modal-overlay above-drawer';
   overlay.innerHTML = `
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Import Formatter" style="max-width:420px">
       <button class="modal-close" id="fmtImClose" aria-label="Close">×</button>

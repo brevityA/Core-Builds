@@ -1,73 +1,103 @@
 ---
-title: "What's New in v2.78"
+title: "What's New — Configurator v2.84"
 sidebarTitle: "What's New"
-description: "Core Builds Configurator v2.78: modular source, tested releases, Quick Install, safer schema handling, corrected devices, and resilient host selection."
+description: "Latest Core Builds Configurator releases (v2.84 and earlier), auto-generated from the in-app changelog."
 ---
 
-# Configurator v2.78 (July 22, 2026)
+# What's New in the Configurator
 
-Version **2.78** moves the configurator from a single hand-maintained source file to a modular, tested package while preserving a downloadable standalone `configurator/index.html` release.
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.84**).
+
+For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v2.84 (Jul 25 2026)
 
 <CardGroup cols={2}>
-  <Card title="Modular and tested" icon="code-branch">
-    Source code, data registries, styles, schema guards, tests, validation, and build scripts now live under `configurator/`.
+  <Card title="Error Logger wired" icon="sparkles">
+    initErrorLogger() at startup, logError() on build/deploy/import failures, error log section in Diagnostics modal with copy/clear/export
   </Card>
-  <Card title="Quick Install" icon="bolt">
-    Choose an app, one or more providers, optional sources, a performance profile, and install in one short flow.
+  <Card title="Age Rating Limit" icon="bolt">
+    Restrict content by MPAA/TV certification (G, PG, PG-13, R) via ESE; added to Video Preferences panel
   </Card>
-  <Card title="Compatible output" icon="shield-check">
-    Legacy AIOStreams enum values are normalized or removed before export and installation.
+  <Card title="Library Boost" icon="shield-check">
+    Three modes in Fine-Tune: Default (first within tier), Strong (always top), None (disabled); modifies sort criteria across all scopes
   </Card>
-  <Card title="Mobile-first workflow" icon="mobile-screen">
-    Touch targets, safe areas, keyboard behaviour, landscape layouts, light mode, and the seven-step tutorial were refined and tested.
+  <Card title="NZB Failover" icon="sliders">
+    Configurable position (before/after torrents) and max NZB count (1/2/3/5) in Fine-Tune; shown when Usenet service selected
+  </Card>
+  <Card title="Bandwidth Estimator" icon="gauge">
+    Device-aware bandwidth hint card in Review step showing recommended speed and safe bitrate cap
   </Card>
 </CardGroup>
 
-## Quick Install improvements
+---
 
-- Multi-provider selection remains supported.
-- Paid provider fields now include **Get key**, **Open account**, or **Open dashboard** links.
-- StreamNZB displays manifest guidance rather than a nonexistent central key page.
-- An expandable **TMDB metadata — optional** section accepts either a Read Access Token or API Key.
-- TMDB remains optional: without credentials, title/year matching, digital-release filtering, and metadata-runtime bitrate calculations are disabled automatically so AIOStreams accepts the configuration without a blocking warning.
-- Optional services and scrapers stay in a compact picker instead of crowding the main flow.
+## Configurator v2.83 (Jul 25 2026)
 
-## Host selection
+<CardGroup cols={2}>
+  <Card title="Error Logger" icon="sparkles">
+    Captures build, deploy, fetch, and unhandled errors into a localStorage ring buffer (50 entries); view, copy, and clear from the Diagnostics modal
+  </Card>
+  <Card title="Live Contact Widget" icon="bolt">
+    Floating message button routes feedback directly to Discord via the CORS proxy worker (no secrets in client JS)
+  </Card>
+  <Card title="Worker contact endpoint" icon="shield-check">
+    Server-side Discord webhook relay added to the Cloudflare Worker
+  </Card>
+</CardGroup>
 
-Automatic selection remembers the last successful host, prefers stable instances running AIOStreams `2.31.1` or newer, respects provider restrictions, and uses nightly infrastructure only as a fallback. Legacy or incompatible instances are skipped automatically.
+---
 
-## Device corrections
+## Configurator v2.82 (Jul 24 2026)
 
-Device capabilities are centralized and conservative:
+<CardGroup cols={2}>
+  <Card title="Patch Cinemeta & AIOMetadata now enabled by default" icon="sparkles">
+    new templates automatically patch Cinemeta catalogs and install AIOMetadata
+  </Card>
+  <Card title="Full Setup service selection" icon="bolt">
+    Full Setup now reads the active splash chip and sets the correct service/multiServices
+  </Card>
+  <Card title="Library Boost" icon="shield-check">
+    Three modes: Default (normal position), Strong (top priority), None (disabled)
+  </Card>
+  <Card title="Bandwidth Estimator" icon="sliders">
+    Device-aware bandwidth suggestion with manual override (10–200 Mbps)
+  </Card>
+  <Card title="Age Limit" icon="gauge">
+    Content age filter with 7d / 30d / 90d / 1y / 2y presets
+  </Card>
+  <Card title="NZB Failover" icon="wand">
+    Configurable position (before/after torrents) and max NZB count (1/2/3/5)
+  </Card>
+  <Card title="Template Inspector upgraded" icon="layers">
+    File import, URL fetch, clipboard paste, health score ring, host compatibility checks, export report, theme toggle
+  </Card>
+</CardGroup>
 
-- Apple TV 4K A15 is not treated as hardware-AV1 capable.
-- Apple TV is not described as bitstreaming TrueHD or DTS-HD; compatible apps may decode supported formats to multichannel PCM.
-- Chromecast with Google TV 4K and HD are treated as separate models for AV1 support.
-- Nvidia Shield 2019 retains Dolby Vision and lossless-audio passthrough support, but not AV1.
-- Internal TV apps and unknown devices no longer assume lossless-audio passthrough.
-- ONN profiles do not assume Dolby Vision across every model.
+---
 
-## Schema compatibility
+## Configurator v2.81 (Jul 24 2026)
 
-The final schema guard maps known legacy enum names, trims values, removes unsupported entries, deduplicates arrays, and adds safe defaults. This prevents old values such as `audio`, `language`, `release_group`, `debrid`, or `nzb` from reaching current AIOStreams enum fields unchanged.
-
-## Privacy wording
-
-Core Builds now describes each path precisely:
-
-- **Export JSON:** creates the configuration locally in the browser.
-- **Direct Install:** sends the generated configuration to the selected AIOStreams host.
-- **Direct Stremio installation:** sends the supplied Stremio login details to the Stremio API for that operation.
-
-Credentials are not included in sanitized diagnostics. Core Builds does not use “zero-knowledge” or “no data is sent anywhere” claims.
-
-## Interface and community
-
-- The central Core gem remains the support control and visibly pulses/glows.
-- The live usage counter remains enabled.
-- Community links use the visible name **Core Crew** and point to `r/CoreBuilds`.
-- Light mode uses readable pale selected surfaces rather than inheriting dark gradients.
-
-<Note>
-  Template Suite and Configurator versions are separate: Template Suite `3.3.2`, Configurator `2.78.0`, minimum AIOStreams `2.31.1`.
-</Note>
+<CardGroup cols={2}>
+  <Card title="Health Score" icon="sparkles">
+    Added a template health score ring to the Review step with breakdown by sort criteria, ISEs, ESEs, formatter, regex, and deduplicator
+  </Card>
+  <Card title="Template Versioning" icon="bolt">
+    Templates now embed coreBuildsVersion and generatedAt metadata; an update banner appears when a saved template is outdated
+  </Card>
+  <Card title="Full Stack Install" icon="shield-check">
+    One-click setup now installs AIOMetadata and patches Cinemeta catalogs alongside AIOStreams, with addon reordering
+  </Card>
+  <Card title="CORS proxy" icon="sliders">
+    Config push to AIOStreams routed through writeHostFetch for cross-origin reliability
+  </Card>
+  <Card title="Tools hub" icon="gauge">
+    Added links to Core Tools from Review step, Quick Install, and manifest modal
+  </Card>
+  <Card title="Debug modules" icon="wand">
+    Wired error boundary, state guard, network resilience, config validator, sanitized logger, and template import recovery
+  </Card>
+  <Card title="family-v4 formatter" icon="layers">
+    New default formatter with bitrate, release group, seeders, age, indexer, and season pack info; family-v3 demoted to Legacy
+  </Card>
+</CardGroup>
