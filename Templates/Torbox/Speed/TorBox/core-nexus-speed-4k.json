@@ -1267,13 +1267,22 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
+          "name": "Primary",
           "addons": [
-            "nx-fix-04",
-            "67c"
+            "Zilean",
+            "StremThru Torz"
           ],
-          "condition": "count(cached(previousStreams)) < 3"
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "TorBox Search"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },

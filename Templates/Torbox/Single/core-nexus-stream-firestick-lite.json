@@ -1173,13 +1173,27 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
+          "name": "Primary",
           "addons": [
-            "nx-fix-02",
-            "nx-fix-01"
+            "Zilean",
+            "StremThru Torz",
+            "Meteor",
+            "Comet"
           ],
-          "condition": "count(cached(previousStreams)) < 3"
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "MediaFusion",
+            "EZTV",
+            "Torrent Galaxy",
+            "Knaben"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },

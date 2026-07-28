@@ -3544,26 +3544,20 @@ function build() {
     titleMatching: { enabled:hasTmdb, mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
     yearMatching: { enabled:hasTmdb, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
-    groups: (function(){ const isFree=S.service==='p2p'||S.service==='http';
-      const presetNames=new Set(_presets.filter(p=>p.enabled&&p.resources?.includes('stream')).map(p=>p.options?.name).filter(Boolean));
-      const filt=(arr)=>arr.filter(n=>presetNames.has(n));
-      const mkGroup=(name,addons,cond)=>{ const f=filt(addons); return f.length?{name,addons:f,condition:cond}:null; };
-      if(isFree) {
-        const primary=['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'];
-        const secondary=['Meteor','Comet','MediaFusion','HdHub'];
-        const fallback=['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'];
-        const grouped=new Set([...primary,...secondary,...fallback]);
-        _presets.forEach(p=>{ const n=p.options?.name; if(n&&!grouped.has(n)) primary.push(n); });
-        const g=[mkGroup('Primary',primary,'true'),mkGroup('Secondary',secondary,'count(totalStreams)<5'),mkGroup('Fallback',fallback,'count(totalStreams)<15')].filter(Boolean);
-        return g.length?{enabled:true,behaviour:'sequential',groupings:g}:{enabled:false,groupings:[]};
-      }
+    groups: (function(){
       const pool=S.streamPool||'normal', timeout=pool==='max'?10000:pool==='large'?8000:6000;
-      const threshold=S.resolution==='4k'?4:S.resolution==='ultrawide'?12:8;
-      const fast=['TorBox Search','Torrentio','Comet'], standard=['StremThru Torz','MediaFusion','Debridio'], extended=['Meteor','Knaben','TorrentsDB','Flix-Streams'];
-      const allDebrid=new Set([...fast,...standard,...extended]);
-      _presets.forEach(p=>{ const n=p.options?.name; if(n&&!allDebrid.has(n)) fast.push(n); });
-      const g=[mkGroup('Fast',fast,'true'),mkGroup('Standard',standard,`count(cached(totalStreams))<${threshold} and totalTimeTaken<${timeout}`),mkGroup('Extended',extended,`count(cached(totalStreams))<${Math.ceil(threshold/2)} and totalTimeTaken<${Math.floor(timeout*1.5)}`)].filter(Boolean);
-      return g.length?{enabled:true,behaviour:'sequential',groupings:g}:{enabled:false,groupings:[]}; })(),
+      const isFree=S.service==='p2p'||S.service==='http';
+      const threshold=isFree?5:(S.resolution==='4k'?4:S.resolution==='ultrawide'?12:8);
+      const wrap=isFree?'totalStreams':'cached(totalStreams)';
+      const active=_presets.filter(p=>p.enabled!==false&&p.options?.name&&!['Library','AIOSubtitle','OpenSubtitles','AIOStreams'].includes(p.options.name));
+      const names=active.map(p=>p.options.name);
+      if(names.length<2) return {enabled:false,groupings:[]};
+      const mid=Math.ceil(names.length/2);
+      const g1=names.slice(0,mid), g2=names.slice(mid);
+      const groupings=[{name:'Primary',addons:g1,condition:'true'}];
+      if(g2.length) groupings.push({name:'Secondary',addons:g2,condition:`count(${wrap})<${threshold} and totalTimeTaken<${timeout}`});
+      return {enabled:true,behaviour:'sequential',groupings};
+    })(),
   };
 
   const result = {

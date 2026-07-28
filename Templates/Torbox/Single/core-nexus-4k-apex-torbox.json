@@ -1272,13 +1272,23 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
+          "name": "Primary",
           "addons": [
-            "nx-fix-02",
-            "nx-fix-01"
+            "StremThru Torz",
+            "Searchⁿᶻᵇ"
           ],
-          "condition": "count(cached(previousStreams)) < 3"
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "TorrentsDB",
+            "TorBox Search"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },

@@ -152,7 +152,7 @@
         "overrides": {
           "tamtaro": {
             "name": "{stream.resolution::exists[\"{stream.resolution::replace('2160p','4K')::replace('1440p','2K')::replace('1080p','1080p')::replace('720p','720p')} \"||\"HD \"]}{service.cached::istrue[\"⚡ \"||\"⏳ \"]}{stream.title::exists[\"{stream.title::truncate(36)}\"||\"\"]}{stream.season::>=0[\" S\"||\"\"]}{stream.season::<=9[\"0\"||\"\"]}{stream.season::>0[\"{stream.season}\"||\"\"]}{stream.episode::>=0[\" • E\"||\"\"]}{stream.episode::<=9[\"0\"||\"\"]}{stream.episode::>0[\"{stream.episode}\"||\"\"]}",
-            "description": "{service.cached::istrue[\"✅ Plays Fast\"||\"\"]}{service.cached::isfalse[\"❌ Uncached\"||\"\"]}{stream.nSeScore::>=75[\" 🥇 Good Stream\"||\"\"]}{stream.seadexBest::istrue[\" ⭐ Best\"||\"\"]}{stream.seadex::istrue[\" ✅ SeaDex\"||\"\"]}{stream.releaseGroup::exists[\" 🏷 {stream.releaseGroup}\"||\"\"]}\n{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEB-DL::istrue[\"📺 From {stream.network::replace('iTunes','Apple TV')}\"||\"\"]}{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEBRip::istrue[\"📺 From {stream.network::replace('iTunes','Apple TV')}\"||\"\"]}\n{stream.quality::exists[\"🎥 {stream.quality}\"||\"\"]}{stream.quality::exists::istrue::and::stream.encode::exists[\" • \"||\"\"]}{stream.encode::exists[\"{stream.encode}\"||\"\"]}{stream.visualTags::exists[\" • \"||\"\"]}{stream.visualTags::join(' • ')}\n{stream.audioChannels::exists::or::stream.audioTags::exists[\"🔊 \"||\"\"]}{stream.audioChannels::exists[\"{stream.audioChannels::join(', ')}\"||\"\"]}{stream.audioChannels::exists::and::stream.audioTags::exists[\" • \"||\"\"]}{stream.audioTags::exists[\"{stream.audioTags::join(', ')}\"||\"\"]}{stream.bitrate::exists[\"  ⚡ {stream.bitrate::sbitrate}\"||\"\"]}\n{stream.size::exists[\"💾 {stream.size::sbytes}\"||\"\"]}{stream.folderSize::exists[\" • 📁 {stream.folderSize::sbytes}\"||\"\"]}{stream.seasonPack::istrue[\" • 📦 PACK\"||\"\"]}{stream.repack::istrue[\" • 🛠 REPACK\"||\"\"]}{stream.freeleech::istrue[\" • 🆓 FREE\"||\"\"]}{stream.preloading::istrue[\" • ⏳ Preloading\"||\"\"]}{stream.seeders::exists[\" • 🌱 {stream.seeders}\"||\"\"]}{stream.age::exists[\" • ⏱ {stream.age::smallcaps}\"||\"\"]}\n🏞 {service.id} • {stream.type}{stream.library::istrue[\" • 📚 Library\"||\"\"]}{stream.indexer::exists[\" • 🔍 {stream.indexer::truncate(14)}\"||\"\"]}\n🗣 {stream.uLanguages}"
+            "description": "{service.cached::istrue[\"✅ Plays Fast\"||\"\"]}{service.cached::isfalse[\"❌ Uncached\"||\"\"]}{stream.nSeScore::>=75[\" 🥇 Good Stream\"||\"\"]}{stream.seadexBest::istrue[\" ⭐ Best\"||\"\"]}{stream.seadex::istrue[\" ✅ SeaDex\"||\"\"]}{stream.releaseGroup::exists[\" 🏷 {stream.releaseGroup}\"||\"\"]}\n{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEB-DL::istrue[\"📺 From {stream.network::replace('iTunes','Apple TV')}\"||\"\"]}{stream.network::exists::istrue::and::stream.quality::exists::istrue::and::stream.quality::~WEBRip::istrue[\"📺 From {stream.network::replace('iTunes','Apple TV')}\"||\"\"]}\n{stream.quality::exists[\"🎥 {stream.quality}\"||\"\"]}{stream.quality::exists::istrue::and::stream.encode::exists[\" • \"||\"\"]}{stream.encode::exists[\"{stream.encode}\"||\"\"]}{stream.visualTags::exists[\" • \"||\"\"]}{stream.visualTags::join(' • ')}\n{stream.audioChannels::exists::or::stream.audioTags::exists[\"🔊 \"||\"\"]}{stream.audioChannels::exists[\"{stream.audioChannels::join(', ')}\"||\"\"]}{stream.audioChannels::exists::and::stream.audioTags::exists[\" • \"||\"\"]}{stream.audioTags::exists[\"{stream.audioTags::join(', ')}\"||\"\"]}{stream.bitrate::exists[\"  ⚡ {stream.bitrate::sbitrate}\"||\"\"]}\n{stream.size::exists[\"💾 {stream.size::sbytes}\"||\"\"]}{stream.folderSize::exists[\" • 📁 {stream.folderSize::sbytes}\"||\"\"]}{stream.seasonPack::istrue[\" • 📦 PACK\"||\"\"]}{stream.repack::istrue[\" • 🛠 REPACK\"||\"\"]}{stream.freeleech::istrue[\" • 🆓 FREE\"||\"\"]}{stream.preloading::istrue[\" • ⏳ Preloading\"||\"\"]}{stream.seeders::exists[\" • 🌱 {stream.seeders}\"||\"\"]}{stream.age::exists[\" • ⏱ {stream.age::smallcaps}\"||\"\"]}\n🏞 {service.id} • {stream.type}{stream.library::istrue[\" • 📚 Library\"||\"\"]}{stream.indexer::exists[\" • 🔍 {stream.indexer::truncate(14)}\"||\"\"]}{stream.rseMatched::exists[\" • 🥈 {stream.rseMatched::first::truncate(18)}\"||\"\"]}\n🗣 {stream.uLanguages}"
           }
         }
       }
@@ -556,6 +556,18 @@
     "includedStreamExpressions": [
       {
         "enabled": true,
+        "expression": "/* Protect Library & SeaDex */ passthrough(merge(library(streams), seadex(streams)), 'excluded')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* ID-Matched Trust */ passthrough(idMatched(streams), 'title', 'year', 'episode')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* Smart Play Pin */ pin(message(streams, 'includes', '🎯'), 'top')"
+      },
+      {
+        "enabled": true,
         "expression": "/*Library*/ count(streams)==count(library(streams)) ? library(streams) : []"
       },
       {
@@ -608,41 +620,23 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
           "name": "Primary",
           "addons": [
-            "Torrentio",
-            "Zilean",
             "Sootio",
-            "Peerflix",
-            "Nuvio Streams",
-            "AIOSubtitle",
-            "TMDB"
+            "Peerflix"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "Meteor",
-            "Comet",
-            "MediaFusion",
-            "HdHub"
+            "HdHub",
+            "TMDB"
           ],
-          "condition": "count(totalStreams)<5"
-        },
-        {
-          "name": "Fallback",
-          "addons": [
-            "EZTV",
-            "Torrent Galaxy",
-            "Knaben",
-            "TorrentsDB",
-            "Flix-Streams",
-            "WebStreamr"
-          ],
-          "condition": "count(totalStreams)<15"
+          "condition": "count(totalStreams)<5 and totalTimeTaken<6000"
         }
       ]
     }
