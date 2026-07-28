@@ -1589,5 +1589,21 @@
       "Anime 4K",
       "Anime 4K Lite"
     ]
+  },
+  {
+    "expression": "/* QR Balance — HQ */ perGroup(quality(streams,'Bluray REMUX','Bluray','WEB-DL'),'resolution',3,'2160p','1080p','720p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* QR Balance — LQ */ perGroup(quality(streams,'WEBRip','HDTV','HDRip'),'resolution',2,'1080p','720p','480p')",
+    "enabled": true
+  },
+  {
+    "expression": "/* Addon Diversity */ perGroup(cached(streams),'indexer',2)",
+    "enabled": true
+  },
+  {
+    "expression": "/* Bitrate Anomaly Pin */ count(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))>=4?pin(bitrate(resolution(quality(streams,'Bluray REMUX'),'2160p'),0,q1(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))),'bottom'):[]",
+    "enabled": true
   }
 ]
