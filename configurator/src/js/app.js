@@ -3545,7 +3545,7 @@ function build() {
     yearMatching: { enabled:hasTmdb, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
     groups: (function(){ const isFree=S.service==='p2p'||S.service==='http';
-      const presetNames=new Set(_presets.map(p=>p.options?.name).filter(Boolean));
+      const presetNames=new Set(_presets.filter(p=>p.enabled&&p.resources?.includes('stream')).map(p=>p.options?.name).filter(Boolean));
       const filt=(arr)=>arr.filter(n=>presetNames.has(n));
       const mkGroup=(name,addons,cond)=>{ const f=filt(addons); return f.length?{name,addons:f,condition:cond}:null; };
       if(isFree) {
