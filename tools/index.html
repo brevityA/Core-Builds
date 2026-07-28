@@ -288,15 +288,29 @@ body{
 
   <!-- What's New -->
   <div class="inline-card" style="margin-top:16px">
-    <h3>🆕 What's New — v2.84</h3>
+<!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
+    <h3>🆕 What's New — v2.85</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">family-v4 default formatter — bitrate, release group, seeders, age, indexer, season packs</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Full Stack Install — AIOMetadata + Cinemeta patch + addon ordering in Quick Install</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Knaben, Zilean, Jackett, Prowlarr scrapers + Debrider multi-debrid service</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Health Score — 0–100 template quality score with letter grade on Review step</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Template versioning — auto-update banner when your template is outdated</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Template Inspector — paste JSON for instant schema validation and host compatibility</span></div>
+      <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://core-builds.mintlify.app/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.85 · Jul 26 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Mixed · Adaptive resolution tier — new fourth resolution option: no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend; dedicated PSE ladder (4K REMUX/HDR → 1080p → 720p → 576p/480p niche fallback), UHD-class regex tiers, blended dynamic-fetch exit, and import round-trip detection</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Apex Mixed PSE architecture — third architecture option (Standard / Apex IQR / Apex Mixed): the flagship 35-PSE IQR × adaptive stack from the 4K Apex Mixed nightly, generatable for any device/service; adopts the mixed resolution policy (no caps, quality-blend sort, blended DAF exit) and names builds "Core Nexus Apex Mixed". Golden-link test keeps it byte-identical to the static template</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Golden config snapshots — Playwright e2e drives the real generation pipeline across 12 service × resolution × architecture combinations and diffs full template output against checked-in goldens (e2e/golden/); any logic change that alters generated templates now fails CI, with UPDATE_GOLDEN=1 for intentional re-pins</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Jackett &amp; Prowlarr optional scraper presets were never generated (regression of the #557 filter fix, lost in the v2.84 modular rewrite) — restored `credKey &amp;&amp; !apiUrl` guard</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Regression tests: optional-scrapers branch coverage (every scraper maps to exactly one preset branch) and resolution-mixed generation guards</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: template validator crashed on non-template JSON (e.g. Filtering/ expression libraries) when run without --dir arguments</span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.84 · Jul 25 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Error Logger wired — initErrorLogger() at startup, logError() on build/deploy/import failures, error log section in Diagnostics modal with copy/clear/export</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Age Rating Limit — Restrict content by MPAA/TV certification (G, PG, PG-13, R) via ESE; added to Video Preferences panel</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Library Boost — Three modes in Fine-Tune: Default (first within tier), Strong (always top), None (disabled); modifies sort criteria across all scopes</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">NZB Failover — Configurable position (before/after torrents) and max NZB count (1/2/3/5) in Fine-Tune; shown when Usenet service selected</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Bandwidth Estimator — Device-aware bandwidth hint card in Review step showing recommended speed and safe bitrate cap</span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.83 · Jul 25 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Error Logger — Captures build, deploy, fetch, and unhandled errors into a localStorage ring buffer (50 entries); view, copy, and clear from the Diagnostics modal</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Live Contact Widget — Floating message button routes feedback directly to Discord via the CORS proxy worker (no secrets in client JS)</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Worker contact endpoint — Server-side Discord webhook relay added to the Cloudflare Worker</span></div>
     </div>
+<!-- AUTO:TOOLS_WHATSNEW:END -->
   </div>
 
   <!-- Built-in tools reference -->

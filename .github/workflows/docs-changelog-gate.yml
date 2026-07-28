@@ -1,0 +1,92 @@
+name: Docs Changelog Gate
+
+# ADVISORY (never blocks merge). When a PR changes user-facing code/templates but does NOT
+# touch CHANGELOG.md or configurator/src/data/changelog.js, post a reminder: on merge the
+# docs + roadmap auto-regenerate FROM the changelog (see sync-docs.yml), so a feature shipped
+# without a changelog entry would be missing from the docs/roadmap/tools page.
+#
+# Opt out: title or body contains "[skip docs-gate]", or the PR is labelled chore/docs,
+# or the diff has no user-facing paths (e.g. docs-only / CI-only / fix-only outside src).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # need the merge-base to compute the PR diff
+
+      - name: Evaluate changelog coverage
+        id: eval
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          BASE="${{ github.base_ref }}"
+          CHANGED="$(git diff --name-only "origin/${BASE}...HEAD" 2>/dev/null || git diff --name-only HEAD 2>/dev/null || true)"
+
+          user_facing=false
+          if echo "$CHANGED" | grep -qE '^(configurator/src/|Templates/|Formatters/|Filtering/|AIOMetadata/)'; then
+            user_facing=true
+          fi
+
+          changelog_touched=false
+          if echo "$CHANGED" | grep -qE '(^CHANGELOG\.md$|configurator/src/data/changelog\.js)'; then
+            changelog_touched=true
+          fi
+
+          # Read PR title + body + labels for opt-outs.
+          META="$(gh pr view "${{ github.event.pull_request.number }}" --json title,body,labels --jq '{t:.title,b:.body,l:[.labels[].name]}' 2>/dev/null || echo '{"t":"","b":"","l":[]}')"
+          TITLE="$(echo "$META" | jq -r .t)"
+          BODY="$(echo "$META" | jq -r .b)"
+          LABELS="$(echo "$META" | jq -r '.l | join(",")')"
+
+          opt_out=false
+          case "$TITLE $BODY" in *"[skip docs-gate]"*) opt_out=true;; esac
+          case ",$LABELS," in *,chore,*|*,docs,*) opt_out=true;; esac
+          if [ "$user_facing" = "false" ]; then opt_out=true; fi
+
+          echo "user_facing=$user_facing changelog_touched=$changelog_touched opt_out=$opt_out"
+          echo "labels=$LABELS"
+
+          if [ "$user_facing" = "true" ] && [ "$changelog_touched" = "false" ] && [ "$opt_out" = "false" ]; then
+            echo "warn=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "warn=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment reminder (advisory)
+        if: steps.eval.outputs.warn == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MARKER="<!-- docs-changelog-gate -->"
+          EXISTING="$(gh pr view "${{ github.event.pull_request.number }}" --json comments \
+            --jq "[.comments[].body | select(contains(\"$MARKER\"))] | length" 2>/dev/null || echo 0)"
+          if [ "$EXISTING" -gt 0 ]; then
+            echo "Reminder comment already present — not reposting."
+            exit 0
+          fi
+          BODY="$MARKER
+          ⚠️ **Docs/roadmap auto-sync notice (advisory — not blocking).**
+          This PR changes user-facing code/templates but doesn't touch \`CHANGELOG.md\` or \`configurator/src/data/changelog.js\`.
+          On merge, the docs site, the root roadmap, and the Core Tools page **regenerate themselves from the changelog** — so if there's no changelog entry, this change won't show up in *What's New / Recently shipped / the Tools page*.
+          **Action:** add a bullet under \`### Added\` / \`### Fixed\` / \`### Changed\` in \`CHANGELOG.md\` (template-suite) and/or an entry in \`configurator/src/data/changelog.js\` (configurator). If this PR is intentionally internal, add \`[skip docs-gate]\` to the title or the \`chore\`/\`docs\` label to silence this.
+          _(Posted by the docs-changelog-gate workflow.)_"
+          gh pr comment "${{ github.event.pull_request.number }}" --body "$BODY"
+
+      - name: Result (always success — advisory only)
+        run: |
+          if [ "${{ steps.eval.outputs.warn }}" = "true" ]; then
+            echo "::notice::User-facing change with no changelog entry — reminder comment posted (advisory)."
+          else
+            echo "OK — changelog coverage present or PR is internal/docs-only."
+          fi

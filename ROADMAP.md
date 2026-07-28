@@ -6,68 +6,28 @@ This is a living list of planned work, active development, and recently complete
 
 ## ✅ Recently Completed
 
-### v2.84 — Configurator & Expression Layer
+<!-- AUTO:ROOT_COMPLETED:BEGIN -->
+Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) by `scripts/sync-docs.py`. In Progress / Planned / Ideas below are hand-curated.
 
-| Version | Item |
-|---|---|
-| v3.4.0 / v2.85 | **Mixed · Adaptive resolution tier** — fourth resolution option (configurator + `core-nexus-mixed.json` template): no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend with an SD niche fallback tier for classic/rare content |
-| v3.4.0 | **4K Apex Mixed (Nightly trial)** — Apex v0.9.0 IQR stack + Mixed policy: resolution cap lifted (wakes Apex's dormant 480p/240p tiers), 576p niche tier, quality-blend sort, blended DAF exit. Gather community feedback; promote out of Nightly once validated |
-| v2.85 | **Jackett/Prowlarr preset regression fixed** — optional-scraper filter restored to `credKey && !apiUrl` (fix from #557 lost in the v2.84 rewrite); regression tests now cover every optional scraper's preset branch |
-| v2.85 | **Validator bare-run crash fixed** — `validate_templates.py` skips non-template JSON gracefully instead of raising `AttributeError` |
-| v2.84 | **Age Rating Limit** (Kids Mode) — G/PG/PG-13/R/NC-17 content filtering |
-| v2.84 | **Library Boost** — Default / Strong / None options |
-| v2.84 | **NZB Failover** with position control |
-| v2.84 | **Bandwidth Estimator** |
-| v2.84 | **Security audit** — XSS, CSP, CORS, credential stripping fixes |
-| v2.84 | **Error Logger & Diagnostics modal** |
-| v2.84 | **Contact Widget** → Discord webhook relay |
-| v2.84 | **Debrider** multi-debrid aggregator service |
-| v2.84 | **Knaben, Zilean, Jackett, Prowlarr** scrapers |
-| v2.84 | **REPACK/PROPER Passthrough ISE** — 42 templates |
-| v2.84 | **Per-Addon Flood Guard ESE** — 3 variants (19/14/4 templates) |
-| v2.84 | **Usenet Propagation Guard ESE** — 35 templates |
-| v2.84 | **Codec Efficiency Booster PSE** — 39 templates |
-| v2.84 | **Audio Pinnacle PSE** — 40 templates (Atmos/TrueHD → DTS-HD MA → DD+) |
-| v2.84 | **HDR/DV Priority PSE** — 40 templates (DV/HDR10+/HDR10 → SDR) |
-| v2.84 | **AI Upscale Exclusion ESE** — 35 templates |
-| v2.84 | **Indexer Diversity ESE** — 29 templates |
-| v2.84 | **Score IQR Guard ESE** — 5 templates |
-| v2.84 | **Adaptive Seeder Guard ESE** — 5 Labs templates |
-| v2.84 | **Bitrate Floor ESEs** (1080p + 4K REMUX) — 2 Labs templates |
-| v2.84 | **Tier-guarded Bluray/Anime kills** — 1 Samsung template |
+| Version | Date | Highlights |
+| --- | --- | --- |
+| v3.4.0 | 2026-07-26 | Core Nexus Mixed template (Templates/Torbox/Single/core-nexus-mixed.json) — adaptive multi-resolution build for niche an… |
+| v3.3.2 | 2026-07-17 | Subtitle Picker (Configurator v2.57) — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 3… |
+| v3.3.1 | 2026-07-17 | Free Tier Overhaul (Configurator v2.56) — comprehensive improvements to P2P and HTTP template generation: |
+| v3.3.0 | 2026-07-16 | Stream pool broadening (Configurator v2.55 + all 31 active templates) — increased maxResults, maxResultsPerResolution, a… |
+| v3.2.9 | 2026-07-15 | Template Migration Tool (Configurator v2.49) — "Update Existing Template" now shows a full visual diff of every change (… |
+| v3.2.8 | 2026-07-15 | REMUX ranking fix (all 44 active templates) — BluRay REMUX files were consistently ranked below WEB-DL streams because t… |
+| v3.2.7 | 2026-07-11 | LABS v0.14.0 SEL expressions (6 Labs templates) — seven new expression features across all Labs templates: |
+| v3.2.6 | 2026-07-09 | Configurator v2.30 — 3 new debrid services: EasyDebrid, PikPak, Seedr (all using StremThru Store cache layer). Generated… |
+| v3.2.5 | 2026-07-03 | Template collection file (core-builds-template-collection.json) — operator-facing template catalog for AIOStreams TEMPLA… |
+| v3.2.4 | 2026-07-03 | Sort criteria overhaul (all 42 templates) — rebuilt the sort pipeline based on AIOStreams' stable multi-key sort archite… |
+| v3.2.3 | 2026-07-02 | Configurator v2.9 — Easy Setup one-click button now opens AIOStreams directly via ?template=URL deep link instead of cal… |
+| v3.2.2 | 2026-07-02 | Configurator v2.8.1 — groups.groupings now omitted when groups are disabled, fixing "Every group must have at least one … |
+| v3.2.1 | 2026-07-02 | Older-Show Pack Pass (all 36 standard templates + shared Filtering/core-builds-eses.json) — refines the v3.2.0 Hard Seas… |
+| v3.2.0 | 2026-07-02 | Override scoring restored fleet-wide (36 active templates + both Base configs) — the inline rankedRegexPatterns layer wa… |
+<!-- AUTO:ROOT_COMPLETED:END -->
 
-### v2.81–v2.83 — Configurator Features
-
-| Version | Item |
-|---|---|
-| v2.83 | **Health Score** — 0–100 with A–F grading, 11 checks, ring gauge |
-| v2.82 | **Template Inspector** — paste JSON for instant validation + host compatibility |
-| v2.81 | **Template Versioning** — auto-update banner when template is outdated |
-| v2.81 | **Full Stack Install** — AIOMetadata + Cinemeta patch + addon ordering in one click |
-| v2.81 | **family-v4 formatter** — truncated title, bitrate, release group, seeders, age, indexer |
-| v2.81 | **Troubleshooter** — interactive decision tree for common issues |
-| v2.81 | **17 device profiles** — Shield, Fire Stick, Samsung, Apple TV, LG, Roku, etc. |
-| v2.81 | **19 formatter presets** — family-v4, Apex, Elite, Sigma, Syntax, Prime, TV, etc. |
-
-### v2.56–v2.8.0 — Earlier Milestones
-
-| Version | Item |
-|---|---|
-| v2.8.0 | Speed tier consolidation — 8 redundant Speed templates deprecated |
-| v2.8.0 | Core Builds Expression Layer rollout — 7 expressions deployed to all 31 active templates |
-| v2.8.0 | Core Nexus 4K Pro deprecated — Apex is the direct replacement |
-| v2.7.5 | Addon timeout tuning — per-addon values replacing flat 3000ms |
-| v2.7.5 | Dedup tiebreakers explicitly configured |
-| v2.7.5 | `hdhub` preset added to 12 full non-Lite templates |
-| v2.7.4 | Chapter badge added to Elite/Apex-v2/Nexus Prime formatters |
-| v2.7.3 | `zilean` + `meteor` catalog bleed fix |
-| v2.7.2 | `size()` floor guards on BluRay REMUX PSEs |
-| v2.7.1 | Addon stack cleanup — Knaben moved, AnimeTosho + NekoBT enabled |
-| v2.7.0 | Core Nexus 4K Hybrid — new TorBox + NZBGeek Usenet template |
-| v2.7.0 | IQR Tukey fence PSEs rolled out to 4K Pro, 4K Essential, Hybrid |
-| v2.6.0 | Live nSeScore display, Smart preload, DV-Only Kill, Subtitle flags |
-| v2.5.0 | Lite template suite, Anime 4K, Speed EasyNews |
-| v2.56 | Resolution First toggle, Foreign Language Kill |
+> **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.
 
 ---
 
@@ -118,7 +78,6 @@ This is a living list of planned work, active development, and recently complete
 | Debrid-Link template | Under research — supported in AIOStreams; smaller user base |
 | Premiumize template | Under research — natively supported; European user base |
 | RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results |
-| Template Migration Tool | Under consideration — auto-upgrade old schemas to current version |
 | Live Stream Preview | Under consideration — fetch real streams before deploying |
 
 ---
