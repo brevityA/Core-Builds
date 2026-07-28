@@ -1723,13 +1723,26 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
+          "name": "Primary",
           "addons": [
-            "nx-fix-01",
-            "5f6c2152-6b7f-4f8d-b1e2-c9068ffdc66e"
+            "Zilean",
+            "Comet RD",
+            "Meteor",
+            "Knaben"
           ],
-          "condition": "count(cached(previousStreams)) < 2"
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "OpenSubtitles V3+",
+            "EZTV",
+            "StremThru Torz"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },

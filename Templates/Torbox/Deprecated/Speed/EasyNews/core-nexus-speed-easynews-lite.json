@@ -1640,12 +1640,24 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
+          "name": "Primary",
           "addons": [
-            "1fa89382-5938-4d6e-bcba-a1aa9fc88a95"
+            "Zilean",
+            "Meteor",
+            "OpenSubtitles V3+"
           ],
-          "condition": "count(cached(previousStreams)) < 2"
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "EZTV",
+            "StremThru Torz"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },

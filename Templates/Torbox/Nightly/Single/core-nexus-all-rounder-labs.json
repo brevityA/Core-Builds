@@ -1272,13 +1272,30 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
+          "name": "Primary",
           "addons": [
-            "nx-fix-02",
-            "nx-fix-01"
+            "Zilean",
+            "SeaDex",
+            "AnimeTosho",
+            "NekoBT",
+            "StremThru Torz",
+            "Meteor"
           ],
-          "condition": "count(cached(previousStreams)) < 3"
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "Comet",
+            "MediaFusion",
+            "EZTV",
+            "Torrent Galaxy",
+            "Knaben"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },

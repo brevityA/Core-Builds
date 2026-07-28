@@ -1146,15 +1146,27 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
-          "condition": "count(cached(previousStreams)) < 3",
+          "name": "Primary",
           "addons": [
-            "nx-fix-02",
-            "nx-fix-01",
-            "nx-fix-04",
-            "tam-mf"
-          ]
+            "TorBox Search",
+            "Comet RD",
+            "Meteor",
+            "Zilean"
+          ],
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "SeaDex",
+            "Knaben",
+            "MediaFusion",
+            "OpenSubtitles V3+"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },

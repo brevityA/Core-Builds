@@ -669,13 +669,31 @@
     },
     "groups": {
       "enabled": true,
+      "behaviour": "sequential",
       "groupings": [
         {
+          "name": "Primary",
           "addons": [
-            "60f24567-7539-4a79-afe1-e8fb2ffd3c13",
-            "0a1bc005-3cad-44d6-a403-06ff7ad6764f"
+            "Zilean",
+            "SeaDex",
+            "Meteor",
+            "Comet",
+            "MediaFusion",
+            "HdHub"
           ],
-          "condition": "count(cached(previousStreams)) < 3"
+          "condition": "true"
+        },
+        {
+          "name": "Secondary",
+          "addons": [
+            "AnimeTosho",
+            "NekoBT",
+            "StremThru Torz",
+            "Torrent Galaxy",
+            "Knaben",
+            "TorrentsDB"
+          ],
+          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
       ]
     },
