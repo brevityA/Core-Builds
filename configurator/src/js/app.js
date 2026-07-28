@@ -1357,8 +1357,8 @@ function splashHtml() {
 
     <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
     <div class="splash-doors splash-anim splash-anim-d6">
-      <a class="splash-door core-tool-door" href="./account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
-      <a class="splash-door core-tool-door" href="./tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
+      <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
+      <a class="splash-door core-tool-door" href="../tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
     </div>
 
     <div class="splash-tertiary splash-anim splash-anim-d6">
@@ -1673,7 +1673,7 @@ function render() {
             <div style="display:flex;gap:12px;align-items:center">
               <button data-action="open-diagnostics" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s">Report Issue</button>
               <button data-action="show-changelog" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Changelog</button>
-              <a href="./tools/" style="font-size:.74rem;font-weight:700;color:#6b7280;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#6b7280'">Tools</a>
+              <a href="../tools/" style="font-size:.74rem;font-weight:700;color:#6b7280;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#6b7280'">Tools</a>
               <button data-action="start-setup" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
             </div>
           </div>
@@ -1682,7 +1682,7 @@ function render() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
             </a>
-            <a href="./tools/" class="community-link">
+            <a href="../tools/" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               Tools
             </a>
@@ -4645,7 +4645,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <strong style="color:#e6edf3">2.</strong> Streams should appear with Core Builds sorting<br>
           <strong style="color:#e6edf3">3.</strong> Save your password — you'll need it to edit settings later
         </div>
-        <div style="margin-top:6px"><a href="./account-tools/" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#34d399'" onmouseout="this.style.color='#8b949e'">Back up your current addons first →</a></div>
+        <div style="margin-top:6px"><a href="../account-tools/" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#34d399'" onmouseout="this.style.color='#8b949e'">Back up your current addons first →</a></div>
         <div id="mTestResult" style="margin-top:6px;font-size:.72rem"></div>
       </div>
       <details style="margin-top:10px;border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow:hidden">
@@ -5754,8 +5754,8 @@ function showFastLane() {
       ${[['fast','Fast','1080p · cached first · smaller files'],['balanced','Balanced','4K · sensible pool · 30GB cap'],['maximum','Maximum','4K · largest pool · quality first']].map(([v,n,d])=>`<button class="fastlane-choice${state.profile===v?' active':''}" data-fl-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
     </div></div>
     <div class="fastlane-section" id="flInstallFields"></div>
-    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="./account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
-    <a href="./tools/" target="_blank" rel="noopener noreferrer" style="display:block;margin:3px 0 0 28px;font-size:.72rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#8b949e'">All Core Tools →</a>
+    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="../account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
+    <a href="../tools/" target="_blank" rel="noopener noreferrer" style="display:block;margin:3px 0 0 28px;font-size:.72rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#8b949e'">All Core Tools →</a>
     <div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
       <div style="font-size:.72rem;font-weight:700;color:#34d399;margin-bottom:8px;display:flex;align-items:center;gap:6px">${ICO.rocket(12,'#34d399')} Full Stack Setup <span style="font-size:.58rem;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)">NEW</span></div>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="flPatchCinemeta" ${S.patchCinemeta?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Patch Cinemeta</b><br><span style="color:#8b949e">Hide Cinemeta catalogs/metadata so AIOMetadata takes over. Uses Cinebye.</span></span></label>
