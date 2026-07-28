@@ -386,6 +386,10 @@ CHANGELOG_BEGIN = "<!-- AUTO:RECENT_RELEASES:BEGIN -->"
 CHANGELOG_END = "<!-- AUTO:RECENT_RELEASES:END -->"
 ROADMAP_BEGIN = "<!-- AUTO:SHIPPED:BEGIN -->"
 ROADMAP_END = "<!-- AUTO:SHIPPED:END -->"
+ROOT_ROADMAP_BEGIN = "<!-- AUTO:ROOT_COMPLETED:BEGIN -->"
+ROOT_ROADMAP_END = "<!-- AUTO:ROOT_COMPLETED:END -->"
+TOOLS_WN_BEGIN = "<!-- AUTO:TOOLS_WHATSNEW:BEGIN -->"
+TOOLS_WN_END = "<!-- AUTO:TOOLS_WHATSNEW:END -->"
 DOCS_BASE = "https://core-builds.mintlify.app"
 REPO_BASE = "https://github.com/brevityA/Core-Builds"
 ROOT_ROADMAP_BEGIN = "<!-- AUTO:ROOT_COMPLETED:BEGIN -->"
@@ -574,6 +578,50 @@ def gen_whats_new_page(cfg_entries, limit=4):
         f"For the template-suite release log, see the [Changelog]({DOCS_BASE}/changelog).\n\n"
     )
     return fm + intro + "\n\n---\n\n".join(blocks) + "\n"
+
+
+
+def gen_root_roadmap_completed(entries, limit=14):
+    """Managed 'Recently Completed' table for the ROOT ROADMAP.md, from CHANGELOG.md."""
+    rows = "\n".join(
+        f"| v{e['version']} | {e['date']} | {_first_summary_line(e['body'])} |"
+        for e in entries[:limit]
+    )
+    return (
+        "Auto-generated from [`CHANGELOG.md`](" + REPO_BASE + "/blob/main/CHANGELOG.md) "
+        "by `scripts/sync-docs.py`. In Progress / Planned / Ideas below are hand-curated.\n\n"
+        "| Version | Date | Highlights |\n| --- | --- | --- |\n" + rows + "\n"
+    )
+
+
+def gen_tools_whatsnew(cfg_entries, limit=4, per_version=4):
+    """Managed 'What's New' block for tools/index.html (standalone Core Tools page),
+    regenerated from configurator changelog.js so it can never freeze on an old version."""
+    blocks = []
+    for e in cfg_entries[:limit]:
+        blocks.append(
+            f'      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);'
+            f'letter-spacing:.04em;margin-top:8px">v{e["v"]} · {e["date"]}</div>'
+        )
+        for item in e["items"][:per_version]:
+            text = item.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            blocks.append(
+                '      <div class="news-item"><span class="badge badge-green" '
+                f'style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">{text}</span></div>'
+            )
+    link = (
+        '      <div class="news-item"><span class="badge" style="flex-shrink:0;background:'
+        'rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)">'
+        '<a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);'
+        'text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; '
+        '<a href="https://core-builds.mintlify.app/changelog" style="color:var(--th-accent);'
+        'text-decoration:none">suite changelog →</a></span></div>'
+    )
+    return (
+        "    <h3>🆕 What's New — v" + cfg_entries[0]["v"] + "</h3>\n"
+        '    <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">\n'
+        + link + "\n" + "\n".join(blocks) + "\n    </div>"
+    )
 
 
 def sync_generated_pages(patcher):

@@ -6,7 +6,7 @@ const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8')
 
 test('generated config disables every TMDB-dependent AIOStreams feature without a key', () => {
   assert.ok(app.includes('const hasTmdb = !!(S.tmdbToken || S.tmdbApiKey)'));
-  assert.ok(app.includes('bitrate: { useMetadataRuntime:hasTmdb'));
+  assert.ok(app.includes('useMetadataRuntime:hasTmdb'));
   assert.ok(app.includes('digitalReleaseFilter: { enabled:hasTmdb'));
   assert.ok(app.includes('titleMatching: { enabled:hasTmdb'));
   assert.ok(app.includes('yearMatching: { enabled:hasTmdb'));

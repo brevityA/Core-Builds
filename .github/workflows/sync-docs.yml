@@ -36,14 +36,15 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Rebuild configurator bundle (so deployed Tools page picks up managed What's New)
+      - name: Setup Node + rebuild configurator bundle (inlines tools page)
         if: steps.sync.outputs.changed == 'true'
-        run: |
-          cd configurator
-          npm ci --no-audit --no-fund || npm install --no-audit --no-fund
-          npm run build
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Rebuild bundle
+        if: steps.sync.outputs.changed == 'true'
+        run: cd configurator && npm ci --no-audit --no-fund && npm run build
         continue-on-error: true
-
       - name: Commit and push
         if: steps.sync.outputs.changed == 'true'
         run: |
