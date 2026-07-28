@@ -72,6 +72,10 @@ let hadSavedState = false;
 let _sharedImport = false;
 let _detectedDevice = null;
 let _savedStep = 0;
+let _disabledAddons = new Set();
+let _lastInstall = { target: 'app', pwd: '' };
+let _lastAddonKey = '';
+const _simulateAddonFail = (() => { try { return new URLSearchParams(location.search).get('simulateAddonFail'); } catch(e){ return null; } })();
 let pasteMode = false;
 function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [HOST_LABEL_MAP[k]||k, u]); }
 function hostKeyFromUrl(url) { return Object.keys(HOST_BASE_URLS).find(k=>HOST_BASE_URLS[k]===url) || ''; }
@@ -118,7 +122,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
@@ -192,6 +196,14 @@ const DEFS = [
   { id:'review', title:'Review & Install', desc:'Confirm your settings, install directly, or generate a manifest URL.', key:null, cols:'c2', opts:[] }
 ];
 
+const RADIO_ALLOWED = (() => {
+  const m = {};
+  for (const d of DEFS) {
+    if (d && d.key && Array.isArray(d.opts)) m[d.key] = new Set(d.opts.map(o => o.v));
+  }
+  return m;
+})();
+
 /* STATE MANAGEMENT */
 const STATE_SCHEMA = 2;
 function migrateState(input) {
@@ -220,7 +232,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
   try {
     const pub = {};
@@ -1100,6 +1112,7 @@ function renderAdvancedPanel() {
         ${prefCard('preloadEnabled','Preload first streams','Preload cached candidates to reduce wait time. Disable to reduce background requests.')}
         <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Autoplay method</div><div style="display:flex;gap:5px">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
         <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Global addon timeout</div><div style="display:flex;gap:5px">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
+        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Bandwidth cap (Mbps) <span style="opacity:.6">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${S.bandwidthMbps||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e6edf3;font-size:.72rem;outline:none" /></div>
       </div>
 
       <div>
@@ -2052,6 +2065,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => showToast('Shared config loaded — review and install'), 300);
   }
   render();
+  try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
   if (!hadSavedState && !_sharedImport && !localStorage.getItem('cb_tut_seen')) {
     setTimeout(() => tutGo(0), 1000);
   }
@@ -2344,6 +2358,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'set-simple-resfirst') { S.resolutionFirst = !S.resolutionFirst; saveState(); render(); }
     if (action === 'set-autoplay-method') { S.autoPlayMethod=el.dataset.val; saveState(); render(); }
     if (action === 'set-addon-timeout') { S.addonTimeout=Number(el.dataset.val); saveState(); render(); }
+    if (action === 'save-without-addon') { if (_lastAddonKey) _disabledAddons.add(_lastAddonKey); simpleInstall(_lastInstall.target || el.dataset.target || 'app'); }
     if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
     if (action === 'set-install-mode') {
       S.installMode = el.dataset.mode;
@@ -2763,12 +2778,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle inputs and changes
   document.addEventListener('change', (e) => {
     if (e.target.dataset.action === 'update-radio') {
-      S[e.target.dataset.key] = e.target.value;
-      if (e.target.dataset.key === 'device') {
+      const k = e.target.dataset.key;
+      const v = e.target.value;
+      const allowed = RADIO_ALLOWED[k];
+      if (!allowed || !allowed.has(v)) return;
+      S[k] = v;
+      if (k === 'device') {
         const DEV_AUDIO = DEVICE_AUDIO_DEFAULTS;
         const AUDIO_NAMES = { lossless:'Lossless (TrueHD / DTS-HD)', standard:'DD+ / Atmos', limited:'Auto', dolby:'Dolby Only' };
-        const newAudio = DEV_AUDIO[e.target.value];
-        const devCantDoLossless = DEVICE_FORCE_LIMITED_AUDIO.has(e.target.value);
+        const newAudio = DEV_AUDIO[v];
+        const devCantDoLossless = DEVICE_FORCE_LIMITED_AUDIO.has(v);
         if (newAudio && newAudio !== S.audio) {
           if (S.quickStart && S.audio === 'lossless' && !devCantDoLossless) {
             // Preset chose lossless and this device supports it — keep it
@@ -3281,7 +3300,9 @@ function eses() {
     { enabled:true, expression:"/*Upscaled 4k*/ (queryType=='movie' or queryType=='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'))==0 ? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')) : []" },
     { enabled:true, expression:"/*Bad 4k Bluray*/ (queryType=='movie' or queryType=='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and count(seadex(resolution(streams,'2160p')))==0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')) : []" },
     { enabled:true, expression:"/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []" },
-    { enabled:true, expression:"/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10 ? [] : streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)" },
+    { enabled:true, expression:"/* Adaptive Score Floor */ count(streamExpressionScore(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50+min(30,daysSinceRelease*0.1)))<5?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50+min(30,daysSinceRelease*0.1))" },
+    { enabled:true, expression:"/* Low Seeder Cull */ count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))<=3?[]:seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,0)" },
+    ...(S.service!=='p2p'&&S.service!=='http'&&((S.multiServices||[]).includes('realdebrid')||S.service==='realdebrid') ? [{ enabled:true, expression:"/* RD Copyright */ service(keyword(streams,'all','web-dl','webrip','bdrip','hdrip','dvdrip','bluray.x264','hdtv.x264','hdtv.xvid','web.x264','web.h264'),'realdebrid')" }] : []),
     { enabled:true, expression:"/*G's Low Bitrate*/ count(negate((isAnime or 'Animation' in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))),cached(streams)))>10?(isAnime or 'Animation' in genres?bitrate(streams,1,'0.67Mbps'):merge(bitrate(quality(resolution(streams,'2160p'),'Bluray REMUX'),1,'25Mbps'),bitrate(quality(resolution(streams,'2160p'),'Bluray'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'),1,'4.6Mbps'),bitrate(quality(resolution(streams,'2160p'),'HDTV'),1,'11.33Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray REMUX'),1,'13.6Mbps'),bitrate(quality(resolution(streams,'1080p'),'Bluray'),1,'6.77Mbps'),bitrate(quality(resolution(streams,'1080p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'1080p'),'HDTV'),1,'4.51Mbps'),bitrate(quality(resolution(streams,'720p'),'Bluray'),1,'3.43Mbps'),bitrate(quality(resolution(streams,'720p'),'WEB-DL','WEBRip'),1,'1.67Mbps'),bitrate(quality(resolution(streams,'720p'),'HDTV'),1,'2.28Mbps'),bitrate(streams,1,'0.67Mbps'))):[]" },
     { enabled:true, expression:"/*Low Seeders*/ count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))<=5?[]:count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'))))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1,q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),q1(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'))))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1,q1(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),percentile(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'),10)))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1,percentile(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'),10))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))>5?negate(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),1),merge(type(streams,'p2p'),type(uncached(streams),'debrid'))):[]" },
     { enabled:true, expression:"/*Final Limit (All)*/ merge(count(quality(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip'))>12?quality(negate(merge(library(streams),seadex(streams)),streams),'HDRip','HC HD-Rip','DVDRip','HDTV','CAM','TS','TC','SCR'):count(quality(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV'))>12?quality(streams,'CAM','TS','TC','SCR'):[],count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>15?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>12?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'),3))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>12?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>9?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),3))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>6?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),6))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>3?negate(merge(library(streams),seadex(streams)),merge(slice(type(uncached(streams),'debrid'),6),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),-1))):[])" }
@@ -3311,22 +3332,16 @@ function pses() {
   const out = [], res = S.resolution, dev = S.device, dv = DEVICE_DV_SAFE.has(dev), supportsAv1 = DEVICE_AV1_SAFE.has(dev), codecExpr = supportsAv1 ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
   const audPinnArr = (S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev)) ? [] : S.audio === 'dolby' ? [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos')" }] : [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" }];
   const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" }, pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" }, imaxPin = { enabled:true, expression:"/*IMAX pin*/ count(visualTag(streams,'IMAX'))>0 ? pin(visualTag(streams,'IMAX'),'top') : []" };
+  const qrLimit = dv ? 4 : 3;
   const sliceLimits4k = [
-    { enabled:true, expression:"/* Limit 4K Remux */ slice(resolution(quality(streams,'Bluray REMUX'),'2160p'),0,3)" },
-    { enabled:true, expression:"/* Limit 4K Bluray */ slice(resolution(quality(streams,'Bluray'),'2160p'),0,3)" },
-    { enabled:true, expression:"/* Limit 4K WEB-DL */ slice(resolution(quality(streams,'WEB-DL'),'2160p'),0,3)" },
-    { enabled:true, expression:"/* Limit 1080p Remux */ slice(resolution(quality(streams,'Bluray REMUX'),'1080p'),0,3)" },
-    { enabled:true, expression:"/* Limit 1080p Bluray */ slice(resolution(quality(streams,'Bluray'),'1080p'),0,3)" },
-    { enabled:true, expression:"/* Limit 1080p WEB-DL */ slice(resolution(quality(streams,'WEB-DL'),'1080p'),0,3)" },
-    { enabled:true, expression:"/* Limit 720p WEB-DL */ slice(resolution(quality(streams,'WEB-DL'),'720p'),0,3)" },
-    { enabled:true, expression:"/* Limit 720p WEBRip */ slice(resolution(quality(streams,'WEBRip'),'720p'),0,3)" }
+    { enabled:true, expression:`/* QR Balance — HQ */ perGroup(quality(streams,'Bluray REMUX','Bluray','WEB-DL'),'resolution',${qrLimit},'2160p','1080p','720p')` },
+    { enabled:true, expression:"/* QR Balance — LQ */ perGroup(quality(streams,'WEBRip','HDTV','HDRip'),'resolution',2,'1080p','720p','480p')" },
+    { enabled:true, expression:"/* Addon Diversity */ perGroup(cached(streams),'indexer',2)" }
   ];
   const sliceLimits1080 = [
-    { enabled:true, expression:"/* Limit 1080p Remux */ slice(resolution(quality(streams,'Bluray REMUX'),'1080p'),0,3)" },
-    { enabled:true, expression:"/* Limit 1080p Bluray */ slice(resolution(quality(streams,'Bluray'),'1080p'),0,3)" },
-    { enabled:true, expression:"/* Limit 1080p WEB-DL */ slice(resolution(quality(streams,'WEB-DL'),'1080p'),0,3)" },
-    { enabled:true, expression:"/* Limit 720p WEB-DL */ slice(resolution(quality(streams,'WEB-DL'),'720p'),0,3)" },
-    { enabled:true, expression:"/* Limit 720p WEBRip */ slice(resolution(quality(streams,'WEBRip'),'720p'),0,3)" }
+    { enabled:true, expression:"/* QR Balance — HQ */ perGroup(quality(streams,'Bluray REMUX','Bluray','WEB-DL'),'resolution',3,'1080p','720p')" },
+    { enabled:true, expression:"/* QR Balance — LQ */ perGroup(quality(streams,'WEBRip','HDTV','HDRip'),'resolution',2,'720p','480p')" },
+    { enabled:true, expression:"/* Addon Diversity */ perGroup(cached(streams),'indexer',2)" }
   ];
 
   if (S.langs && S.langs.length) {
@@ -3390,7 +3405,8 @@ function pses() {
       { enabled:true, expression:codecExpr },
       { enabled:true, expression:"/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR+DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))" },
       { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" },
-      imaxPin, ...sliceLimits4k
+      imaxPin, ...sliceLimits4k,
+      { enabled:true, expression:"/* Bitrate Anomaly Pin */ count(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))>=4?pin(bitrate(resolution(quality(streams,'Bluray REMUX'),'2160p'),0,q1(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))-1.5*iqr(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))),'bottom'):[]" }
     );
   } else if (res === '4k') {
     out.push({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" }, pin1080Elite, pinLQ);
@@ -3474,7 +3490,7 @@ function build() {
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
     size: (function(){ const is4k = S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed'; return { global:{ movies:[1610612736,80000000000], series:[209715200,40000000000] }, resolution:{ ...(is4k ? { '2160p':{ movies:[1610612736,150000000000], series:[209715200,80000000000] } } : {}), '1080p':{ movies:[524288000,30000000000], series:[104857600,20000000000] }, '720p':{ movies:[209715200,12000000000], series:[52428800,8000000000] } } }; })(),
-    bitrate: { useMetadataRuntime:hasTmdb, global:{ movies:[1000000,150000000], series:[1000000,150000000] }, resolution:{ ...((S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? { '2160p':{ movies:[5000000,150000000], series:[5000000,150000000] } } : {}), '1080p':{ movies:[2000000,150000000], series:[2000000,150000000] }, '720p':{ movies:[1000000,150000000], series:[1000000,150000000] } } },
+    bitrate: (function(){ const bwCap=S.bandwidthMbps>0?Math.floor(S.bandwidthMbps*1000000*0.8):150000000; return { useMetadataRuntime:hasTmdb, global:{ movies:[1000000,bwCap], series:[1000000,bwCap] }, resolution:{ ...((S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? { '2160p':{ movies:[5000000,Math.min(bwCap,150000000)], series:[5000000,Math.min(bwCap,150000000)] } } : {}), '1080p':{ movies:[2000000,150000000], series:[2000000,150000000] }, '720p':{ movies:[1000000,Math.min(bwCap,150000000)], series:[1000000,Math.min(bwCap,150000000)] } } }; })(),
     hideErrors: true, hideErrorsForResources: ['addon_catalog','catalog','subtitles'],
     digitalReleaseFilter: { enabled:hasTmdb, tolerance:7, requestTypes:['movie','series','anime'], addons:[] },
     autoPlay: { enabled:true, method:S.autoPlayMethod||'matchingFile', attributes:['resolution','quality','audioTags'] },
@@ -3507,6 +3523,9 @@ function build() {
     maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
     excludedStreamExpressions: eses(),
     includedStreamExpressions: [
+      { enabled:true, expression:"/* Protect Library & SeaDex */ passthrough(merge(library(streams), seadex(streams)), 'excluded')" },
+      { enabled:true, expression:"/* ID-Matched Trust */ passthrough(idMatched(streams), 'title', 'year', 'episode')" },
+      { enabled:true, expression:"/* Smart Play Pin */ pin(message(streams, 'includes', '🎯'), 'top')" },
       { enabled:true, expression:"/*Library*/ count(streams)==count(library(streams)) ? library(streams) : []" },
       ...(hasTmdb ? [{ enabled:true, expression:"/*digitalRelease Bypass*/ queryType=='movie' or queryType=='anime.movie' ? (count(passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease'))>15 ? passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease') : passthrough(streams,'digitalRelease')) : []" }] : []),
       { enabled:true, expression:"/*0Cached*/ count(merge(cached(streams),type(streams,'p2p','http','usenet','stremio-usenet')))==0 ? passthrough(streams,'title') : []" },
@@ -3525,17 +3544,30 @@ function build() {
     titleMatching: { enabled:hasTmdb, mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
     yearMatching: { enabled:hasTmdb, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
-    groups: (function(){ const isFree=S.service==='p2p'||S.service==='http'; if(!isFree) return { enabled:false, groupings:[] };
-      const primary=['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'];
-      const secondary=['Meteor','Comet','MediaFusion','HdHub'];
-      const fallback=['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'];
-      const grouped=new Set([...primary,...secondary,...fallback]);
-      const all=_presets.map(p=>p.options?.name).filter(Boolean);
-      all.forEach(n=>{ if(!grouped.has(n)) primary.push(n); });
-      return { enabled:true, groupings:[
-        { name:'Primary', addons:primary, condition:'true' },
-        { name:'Secondary', addons:secondary, condition:'count(totalStreams)<5' },
-        { name:'Fallback', addons:fallback, condition:'count(totalStreams)<15' }
+    groups: (function(){ const isFree=S.service==='p2p'||S.service==='http';
+      if(isFree) {
+        const primary=['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'];
+        const secondary=['Meteor','Comet','MediaFusion','HdHub'];
+        const fallback=['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'];
+        const grouped=new Set([...primary,...secondary,...fallback]);
+        const all=_presets.map(p=>p.options?.name).filter(Boolean);
+        all.forEach(n=>{ if(!grouped.has(n)) primary.push(n); });
+        return { enabled:true, behaviour:'sequential', groupings:[
+          { name:'Primary', addons:primary, condition:'true' },
+          { name:'Secondary', addons:secondary, condition:'count(totalStreams)<5' },
+          { name:'Fallback', addons:fallback, condition:'count(totalStreams)<15' }
+        ] };
+      }
+      const pool=S.streamPool||'normal', timeout=pool==='max'?10000:pool==='large'?8000:6000;
+      const threshold=S.resolution==='4k'?4:S.resolution==='ultrawide'?12:8;
+      const fast=['TorBox Search','Torrentio','Comet'], standard=['StremThru Torz','MediaFusion','Debridio'], extended=['Meteor','Knaben','TorrentsDB','Flix-Streams'];
+      const allDebrid=new Set([...fast,...standard,...extended]);
+      const allNames=_presets.map(p=>p.options?.name).filter(Boolean);
+      allNames.forEach(n=>{ if(!allDebrid.has(n)) fast.push(n); });
+      return { enabled:true, behaviour:'sequential', groupings:[
+        { name:'Fast', addons:fast, condition:'true' },
+        { name:'Standard', addons:standard, condition:`count(cached(totalStreams))<${threshold} and totalTimeTaken<${timeout}` },
+        { name:'Extended', addons:extended, condition:`count(cached(totalStreams))<${Math.ceil(threshold/2)} and totalTimeTaken<${Math.floor(timeout*1.5)}` }
       ] }; })(),
   };
 
@@ -3566,9 +3598,48 @@ function build() {
 }
 
 let _cachedBuildResult = null;
+function parseAddonFetchError(msg) {
+  if (!msg) return null;
+  const m = /Failed to fetch manifest for\s*([^:]+?)\s*:\s*(.+)$/i.exec(String(msg).trim());
+  return m ? { name: m[1].trim(), reason: m[2].trim() } : null;
+}
+function normAddonName(n) { return String(n || '').replace(/\s+(TB|AD|RD|STORE)\s*$/i, '').trim().toLowerCase(); }
+function presetMatchesAddon(p, name) {
+  const n = normAddonName(name); if (!n) return false;
+  const cands = [p && p.options && p.options.name, p && p.type, p && p.instanceId].map(normAddonName).filter(Boolean);
+  return cands.some(c => c === n || c.includes(n) || n.includes(c));
+}
+function renderAddonFetchFallback(name, reason, safeMsg) {
+  const k = _lastAddonKey || name || 'the addon';
+  return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25)">`+
+    `<div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:6px">${ICO.warn(14,'#fbbf24')} Your config is valid — one addon couldn't be reached</div>`+
+    `<div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px">AIOStreams couldn't fetch the manifest for <strong style="color:#fbbf24">${name}</strong> — its backend is likely <strong>temporarily down</strong> (not a problem with your config). Save without it and re-add it later from AIOStreams → Addons when it's back.</div>`+
+    `<code style="font-size:.7rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-bottom:8px;word-break:break-word;color:#f59e0b">${safeMsg}</code>`+
+    `<div style="display:flex;gap:8px;flex-wrap:wrap">`+
+    `<button data-action="save-without-addon" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.12);color:#fbbf24;font-size:.78rem;font-weight:700;cursor:pointer">Save without ${k}</button>`+
+    `<button data-action="simple-install" data-target="${_lastInstall.target}" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Retry</button>`+
+    `<button data-action="generate-dl" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.78rem;font-weight:700;cursor:pointer">Export JSON</button>`+
+    `</div></div>`;
+}
+function renderConfigRejectedDispatch(safeMsg, apiDetail) {
+  try { const snap={}; SHARE_KEYS.forEach(k=>{snap[k]=S[k];}); snap._ver=CONFIGURATOR_VERSION; snap._ts=Date.now(); snap._reason='soft-fail-recovery'; const list=JSON.parse(localStorage.getItem('coreBuildBackups')||'[]'); list.unshift(snap); localStorage.setItem('coreBuildBackups',JSON.stringify(list.slice(0,10))); } catch(e) {}
+  const sim = (typeof _simulateAddonFail !== 'undefined' && _simulateAddonFail) ? parseAddonFetchError('Failed to fetch manifest for ' + _simulateAddonFail) : null;
+  const afe = sim || parseAddonFetchError(apiDetail);
+  if (afe) {
+    const built = (typeof _cachedBuildResult !== 'undefined' && _cachedBuildResult && _cachedBuildResult.config && _cachedBuildResult.config.presets) || [];
+    const mp = built.find(p => presetMatchesAddon(p, afe.name));
+    _lastAddonKey = mp ? (mp.options && mp.options.name) || mp.type || afe.name : afe.name;
+    return renderAddonFetchFallback(afe.name, afe.reason, safeMsg);
+  }
+  return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+}
+
 function buildFinal() {
   try {
     const tpl = build();
+    if (_disabledAddons.size && Array.isArray(tpl.config && tpl.config.presets)) {
+      tpl.config.presets = tpl.config.presets.filter(p => ![..._disabledAddons].some(n => presetMatchesAddon(p, n)));
+    }
     if (S._migrationKeep && typeof S._migrationKeep === 'object') {
       const ALLOWED_MIGRATION_FIELDS = new Set(['services','presets','groups','sortCriteria','deduplicator','formatter','parentConfig','resultLimits','excludedResolutions','includedResolutions','requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes','excludedAudioTags','preferredAudioTags','preferredAudioChannels','preferredVisualTags','excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages','excludedQualities','includedQualities','requiredQualities','preferredQualities','excludedVisualTags','includedVisualTags','requiredVisualTags','excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions','syncedExcludedStreamExpressionUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedRankedStreamExpressionUrls','excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns','syncedExcludedRegexUrls','syncedRankedRegexUrls','size','bitrate','titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter']);
       const filtered = {};
@@ -5548,6 +5619,12 @@ function troubleshootHtml() {
   }
   return back + body;
 }
+function handleDeepLink(hash) {
+  if (!hash || hash.startsWith('#cfg=')) return;
+  if (hash === '#troubleshooter') { setTimeout(showTroubleshooter, 300); return; }
+  if (hash === '#health-score') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; }
+}
+
 function showTroubleshooter() {
   _tsNode = 'root';
   _tsHistory = [];
@@ -5816,6 +5893,7 @@ async function simpleInstall(target) {
   }
   const pwd = await promptPassword();
   if (!pwd) return;
+  _lastInstall = { target, pwd };
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
   const cfg = buildFinal().config;
@@ -5875,7 +5953,7 @@ async function simpleInstall(target) {
     if (isApiError) {
       btn.disabled = false; btn.innerHTML = origHtml;
       const safeMsg = apiDetail.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-      result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+      result.innerHTML = renderConfigRejectedDispatch(safeMsg, apiDetail);
       return;
     }
     btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
@@ -6284,7 +6362,7 @@ async function openInAIOStreams() {
       if (isApiError) {
         resetBtn(origHtml);
         const safeMsg = apiDetail.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-        result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+        result.innerHTML = renderConfigRejectedDispatch(safeMsg, apiDetail);
       } else if (S.simpleMode) {
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
         const importUrl = await uploadTemplateForImport();

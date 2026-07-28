@@ -93,8 +93,11 @@ def validate_template(fpath):
         err(name, f"INVALID JSON — {e}")
         return errors, warnings, passes
 
-    if not isinstance(t, dict):
-        passes.append(f"  – [{name}] not a template object — skipped")
+    if isinstance(t, list):
+        # Array-only JSON (e.g. Filtering expression lists) — validate entries have 'expression'
+        for i, entry in enumerate(t):
+            if isinstance(entry, dict) and 'expression' not in entry:
+                warn(name, f"entry [{i}] missing 'expression' key")
         return errors, warnings, passes
 
     c = t.get('config', t)
@@ -285,7 +288,7 @@ def main():
     if args.file:
         files = [args.file]
     else:
-        dirs = args.dir if args.dir else ['Templates', 'Community-Templates']
+        dirs = args.dir if args.dir else ['.']
         files = []
         for d in dirs:
             p = Path(d)
