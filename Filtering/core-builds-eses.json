@@ -870,7 +870,7 @@
     ]
   },
   {
-    "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
+    "expression": "/* Adaptive Score Floor */ count(streamExpressionScore(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50+min(30,daysSinceRelease*0.1)))<5?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50+min(30,daysSinceRelease*0.1))",
     "enabled": true,
     "templates": [
       "4K AllDebrid",
@@ -1581,5 +1581,9 @@
     "templates": [
       "Samsung RU7100 4K"
     ]
+  },
+  {
+    "expression": "/* Low Seeder Cull */ count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))<=3?[]:seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,0)",
+    "enabled": true
   }
 ]
