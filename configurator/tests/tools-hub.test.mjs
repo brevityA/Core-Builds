@@ -7,8 +7,8 @@ test('Configurator links the read-only backup and Core Tools hub',()=>{
  assert.ok(app.includes('Back Up Addons'));
  assert.ok(app.includes('All Core Tools'));
  assert.ok(app.includes('Back up your current addons first'));
- assert.ok(app.includes('href="./account-tools/"'));
- assert.ok(app.includes('href="./tools/"'));
+ assert.ok(app.includes('href="../account-tools/"'));
+ assert.ok(app.includes('href="../tools/"'));
 });
 test('web build publishes both independent static utilities',()=>{
  assert.ok(build.includes("resolve(repoRoot, 'account-tools')"));
