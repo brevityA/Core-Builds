@@ -3545,30 +3545,25 @@ function build() {
     yearMatching: { enabled:hasTmdb, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
     seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
     groups: (function(){ const isFree=S.service==='p2p'||S.service==='http';
+      const presetNames=new Set(_presets.map(p=>p.options?.name).filter(Boolean));
+      const filt=(arr)=>arr.filter(n=>presetNames.has(n));
+      const mkGroup=(name,addons,cond)=>{ const f=filt(addons); return f.length?{name,addons:f,condition:cond}:null; };
       if(isFree) {
         const primary=['Torrentio','Zilean','Sootio','Peerflix','Nuvio Streams'];
         const secondary=['Meteor','Comet','MediaFusion','HdHub'];
         const fallback=['EZTV','Torrent Galaxy','Knaben','TorrentsDB','Flix-Streams','WebStreamr'];
         const grouped=new Set([...primary,...secondary,...fallback]);
-        const all=_presets.map(p=>p.options?.name).filter(Boolean);
-        all.forEach(n=>{ if(!grouped.has(n)) primary.push(n); });
-        return { enabled:true, behaviour:'sequential', groupings:[
-          { name:'Primary', addons:primary, condition:'true' },
-          { name:'Secondary', addons:secondary, condition:'count(totalStreams)<5' },
-          { name:'Fallback', addons:fallback, condition:'count(totalStreams)<15' }
-        ] };
+        _presets.forEach(p=>{ const n=p.options?.name; if(n&&!grouped.has(n)) primary.push(n); });
+        const g=[mkGroup('Primary',primary,'true'),mkGroup('Secondary',secondary,'count(totalStreams)<5'),mkGroup('Fallback',fallback,'count(totalStreams)<15')].filter(Boolean);
+        return g.length?{enabled:true,behaviour:'sequential',groupings:g}:{enabled:false,groupings:[]};
       }
       const pool=S.streamPool||'normal', timeout=pool==='max'?10000:pool==='large'?8000:6000;
       const threshold=S.resolution==='4k'?4:S.resolution==='ultrawide'?12:8;
       const fast=['TorBox Search','Torrentio','Comet'], standard=['StremThru Torz','MediaFusion','Debridio'], extended=['Meteor','Knaben','TorrentsDB','Flix-Streams'];
       const allDebrid=new Set([...fast,...standard,...extended]);
-      const allNames=_presets.map(p=>p.options?.name).filter(Boolean);
-      allNames.forEach(n=>{ if(!allDebrid.has(n)) fast.push(n); });
-      return { enabled:true, behaviour:'sequential', groupings:[
-        { name:'Fast', addons:fast, condition:'true' },
-        { name:'Standard', addons:standard, condition:`count(cached(totalStreams))<${threshold} and totalTimeTaken<${timeout}` },
-        { name:'Extended', addons:extended, condition:`count(cached(totalStreams))<${Math.ceil(threshold/2)} and totalTimeTaken<${Math.floor(timeout*1.5)}` }
-      ] }; })(),
+      _presets.forEach(p=>{ const n=p.options?.name; if(n&&!allDebrid.has(n)) fast.push(n); });
+      const g=[mkGroup('Fast',fast,'true'),mkGroup('Standard',standard,`count(cached(totalStreams))<${threshold} and totalTimeTaken<${timeout}`),mkGroup('Extended',extended,`count(cached(totalStreams))<${Math.ceil(threshold/2)} and totalTimeTaken<${Math.floor(timeout*1.5)}`)].filter(Boolean);
+      return g.length?{enabled:true,behaviour:'sequential',groupings:g}:{enabled:false,groupings:[]}; })(),
   };
 
   const result = {
