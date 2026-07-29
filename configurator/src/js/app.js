@@ -12,6 +12,7 @@ import { initContactWidget } from './contact-widget.js';
 import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
 import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../data/bandwidth.js';
 import { hasTmdbCredentials, bandwidthCapMbps } from '../core/template-policy.js';
+import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-policies.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -3184,51 +3185,9 @@ function filterSvcRows(cat, q) {
   if (empty) empty.style.display = anyVis ? 'none' : 'block';
 }
 
-function resolutionCfg() {
-  const ex = ['144p','240p','360p'];
-  const pool = S.streamPool || 'normal';
-  const mr4k  = pool === 'max' ? 75 : pool === 'large' ? 50 : 30;
-  const mr1k  = pool === 'max' ? 75 : pool === 'large' ? 50 : 35;
-  const pr4k  = pool === 'max' ? 30 : pool === 'large' ? 20 : 12;
-  const pr1k  = pool === 'max' ? 30 : pool === 'large' ? 20 : 15;
-  if (S.resolution === '4k') return { excludedResolutions:[...ex,'480p','576p'], includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','720p','Unknown'], maxResults:mr4k, maxResultsPerResolution:pr4k };
-  if (S.resolution === '1080p') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:['1080p','720p'], preferredResolutions:['1080p','720p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
-  if (S.resolution === 'mixed' || S.pseArch === 'apex-mixed') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','1440p','720p','576p','480p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
-  return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['1080p','1440p','2160p','720p','576p','480p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
-}
-
-function encodeCfg() {
-  const dev = S.device;
-  const av1Unsafe = !DEVICE_AV1_SAFE.has(dev);
-  const vc1Unsafe = !['shield','windows'].includes(dev);
-  const excludedEncodes = [...(av1Unsafe ? ['AV1'] : []), ...(vc1Unsafe ? ['VC-1'] : [])];
-  const preferredEncodes = av1Unsafe ? ['HEVC','AVC','Unknown'] : ['HEVC','AV1','AVC','Unknown'];
-  return { excludedEncodes, preferredEncodes };
-}
-
-function audioCfg() {
-  const dev = S.device;
-  const forcedLimited = DEVICE_FORCE_LIMITED_AUDIO.has(dev);
-  const limited = S.audio === 'limited' || forcedLimited;
-  const dolby = S.audio === 'dolby';
-  const wide = ['shield','windows'].includes(dev) || (S.audio === 'lossless' && !forcedLimited) || (dolby && !forcedLimited);
-  if (dolby && forcedLimited) return {
-    excludedAudioTags: ['TrueHD','DTS-HD MA','DTS:X','DTS-HD','DTS-ES','FLAC'],
-    preferredAudioTags: ['Atmos','DD+','AAC','DD'],
-    preferredAudioChannels: ['5.1','2.0']
-  };
-  if (dolby) return {
-    excludedAudioTags: ['DTS','DTS-HD MA','DTS:X','DTS-HD','DTS-ES'],
-    preferredAudioTags: ['TrueHD','Atmos','DD+','AAC','DD'],
-    preferredAudioChannels: ['7.1','5.1','2.0']
-  };
-  const losslessCapable = ['shield','windows'].includes(dev);
-  return {
-    excludedAudioTags: (limited && !losslessCapable) ? ['TrueHD','DTS-HD MA','DTS:X','FLAC'] : [],
-    preferredAudioTags: (limited && !losslessCapable) ? ['Atmos','DD+','AAC','DD','DTS'] : ['TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC','DTS-HD','DD+','AAC','DTS','DD'],
-    preferredAudioChannels: wide ? ['7.1','5.1','2.0'] : ['5.1','2.0']
-  };
-}
+function resolutionCfg() { return resolutionPolicy(S); }
+function encodeCfg() { return encodePolicy(S, DEVICE_AV1_SAFE); }
+function audioCfg() { return audioPolicy(S, DEVICE_FORCE_LIMITED_AUDIO); }
 
 function visualTags() {
   const dev = S.device;

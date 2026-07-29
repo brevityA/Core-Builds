@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { resolutionPolicy } from '../src/core/device-policies.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
@@ -11,7 +12,9 @@ test('resolution step offers the Mixed · Adaptive tier', () => {
 });
 
 test('resolutionCfg gives mixed no caps and a broad preferred ladder incl. SD niche tiers', () => {
-  assert.match(app, /S\.resolution === 'mixed' \|\| S\.pseArch === 'apex-mixed'\) return \{ excludedResolutions:ex, includedResolutions:\[\], requiredResolutions:\[\], preferredResolutions:\['2160p','1080p','1440p','720p','576p','480p','Unknown'\]/);
+  const cfg = resolutionPolicy({ resolution: 'mixed' });
+  assert.deepEqual(cfg.requiredResolutions, []);
+  assert.deepEqual(cfg.preferredResolutions, ['2160p','1080p','1440p','720p','576p','480p','Unknown']);
 });
 
 test('mixed gets its own debrid PSE stack with 4K → 1080p → 720p → SD niche fallback', () => {
