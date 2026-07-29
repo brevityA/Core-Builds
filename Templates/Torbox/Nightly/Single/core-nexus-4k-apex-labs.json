@@ -3,7 +3,7 @@
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
     "version": "0.15.0",
-    "description": "Nightly Labs v0.14.0 — runtime-aware bitrate floors, anime language passthrough, latestSeason pack logic, age sort key, subtitle preference PSE, cachedAnime/uncachedAnime sorts, private tracker kill, totalCachedStreams DAF, catalog-aware Unknown kills, strict year+title matching, SeaDex Best PSE, Score IQR Guard, perGroup() ESEs, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
+    "description": "Nightly Labs v0.15.0 — runtime-aware bitrate floors, anime language passthrough, latestSeason pack logic, age sort key, subtitle preference PSE, cachedAnime/uncachedAnime sorts, private tracker kill, totalCachedStreams DAF, catalog-aware Unknown kills, strict year+title matching, SeaDex Best PSE, Score IQR Guard, perGroup() ESEs, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "source": "external",
     "author": "Branding-Brevity",
@@ -17,7 +17,7 @@
     "showChanges": true,
     "addonName": "Core Nexus 4K Apex Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.14.0 — runtime bitrate floors · anime language passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · private tracker kill · totalCachedStreams DAF · catalog Unknown kills · strict year+title · SeaDex Best · Score IQR Guard · perGroup() · Indexer Diversity · Elite pins.",
+    "addonDescription": "Nightly Labs v0.15.0 — runtime bitrate floors · anime language passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · private tracker kill · totalCachedStreams DAF · catalog Unknown kills · strict year+title · SeaDex Best · Score IQR Guard · perGroup() · Indexer Diversity · Elite pins.",
     "excludedResolutions": [
       "144p",
       "240p",
