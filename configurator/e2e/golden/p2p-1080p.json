@@ -848,25 +848,25 @@
         {
           "name": "Primary",
           "addons": [
-            "Torrentio",
-            "Zilean",
-            "SeaDex",
-            "Meteor",
-            "Comet",
-            "MediaFusion",
-            "HdHub"
+            "tio-p2p-1",
+            "nx-fix-04",
+            "tam-seadex",
+            "nx-fix-02",
+            "nx-fix-01",
+            "nx-mf-01",
+            "hdhub-1"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "EZTV",
-            "Torrent Galaxy",
-            "Knaben",
-            "Sootio",
-            "Peerflix",
-            "TMDB"
+            "nx-ez-01",
+            "nx-tg-01",
+            "tam-knaben",
+            "sootio-core-builds",
+            "pflx-1",
+            "tmdb-cat-1"
           ],
           "condition": "count(totalStreams)<5 and totalTimeTaken<6000"
         }

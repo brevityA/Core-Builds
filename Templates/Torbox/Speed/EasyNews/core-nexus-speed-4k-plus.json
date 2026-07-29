@@ -2303,18 +2303,18 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "EasyNews",
-            "Comet"
+            "nx-fix-04",
+            "easynews-1",
+            "nx-fix-01"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "Meteor",
-            "StremThru Torz",
-            "Knaben"
+            "f03ac4fa-476b-42b3-b8ab-42fb829e80d1",
+            "10e1f154-ad4c-4fbc-aea0-f90848dbb143",
+            "fa590424-61b0-4042-b3ee-36e1146aa075"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

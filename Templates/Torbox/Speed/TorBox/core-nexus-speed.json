@@ -1215,15 +1215,15 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "StremThru Torz"
+            "nx-fix-04",
+            "67c"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "TorBox Search"
+            "5f6"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

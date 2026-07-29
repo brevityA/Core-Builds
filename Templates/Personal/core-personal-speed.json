@@ -411,18 +411,18 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "Comet RD",
-            "Comet TB"
+            "nx-fix-04",
+            "nx-fix-01",
+            "pers-comet-tb"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "StremThru Torz",
-            "TorBox Search",
-            "OpenSubtitles V3+"
+            "67c",
+            "5f6",
+            "os-v3-hash"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

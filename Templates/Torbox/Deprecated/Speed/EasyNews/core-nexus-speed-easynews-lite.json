@@ -1645,17 +1645,17 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "Meteor",
-            "OpenSubtitles V3+"
+            "nx-fix-04",
+            "1fa89382-5938-4d6e-bcba-a1aa9fc88a95",
+            "os-v3-hash"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "EZTV",
-            "StremThru Torz"
+            "50eedd41-12ee-454c-b1c5-0d9d6ccca030",
+            "0d342c11-f3ec-4f4c-aa28-a4a4e5771ccd"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

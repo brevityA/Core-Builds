@@ -1680,19 +1680,19 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "Comet RD",
-            "Meteor",
-            "Knaben"
+            "nx-fix-04",
+            "nx-fix-01",
+            "f03ac4fa-476b-42b3-b8ab-42fb829e80d1",
+            "fa590424-61b0-4042-b3ee-36e1146aa075"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "OpenSubtitles V3+",
-            "EZTV",
-            "StremThru Torz"
+            "os-v3-hash",
+            "a6aeecd6-b56b-440e-8f68-91f0272133b7",
+            "10e1f154-ad4c-4fbc-aea0-f90848dbb143"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

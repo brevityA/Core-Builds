@@ -1215,21 +1215,21 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "StremThru Torz",
-            "Meteor",
-            "Comet",
-            "MediaFusion"
+            "nx-fix-04",
+            "67c",
+            "nx-fix-02",
+            "nx-fix-01",
+            "30ab6dcc-8234-4e6f-bce4-6b781cd0066b"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "EZTV",
-            "Torrent Galaxy",
-            "Knaben",
-            "TorrentsDB"
+            "a42458fd-db69-44c2-8be6-6a1319df3676",
+            "e5afbfd3-6987-438b-b246-a345b4f90010",
+            "tam-knaben",
+            "nx-tdb-1"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
