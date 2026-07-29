@@ -17,7 +17,7 @@ This is **brevityA/Core-Builds**, the canonical repo for Core Builds by Brevity 
 Two products:
 
 1. **Configurator** (`configurator/`) — a web app that generates optimised AIOStreams template JSON through a guided UI. Deployed to GitHub Pages. This is the main product.
-2. **Template Suite** (`Templates/`) — 46+ pre-made AIOStreams templates for TorBox, AllDebrid, EasyNews, Hybrid, Anime, and device-specific profiles.
+2. **Template Suite** (`Templates/`) — 72+ pre-made AIOStreams templates for TorBox, AllDebrid, EasyNews, Hybrid, Anime, and device-specific profiles.
 
 Templates control how streams are filtered, sorted, deduplicated, and formatted inside [AIOStreams](https://github.com/Viren070/AIOStreams).
 
@@ -36,7 +36,7 @@ configurator/               — Web app (main product)
   tests/                    — Node test runner unit tests (29 tests)
   e2e/                      — Playwright E2E tests
   index.html                — Built output (standalone, deployed to Pages)
-  package.json              — v2.82.0
+  package.json              — v2.86.0
 
 tools/                      — Tools hub
   inspector/                — Template Inspector (paste JSON for instant validation)
@@ -83,7 +83,7 @@ scripts/                    — One-off maintenance scripts
 - **Source:** `configurator/src/js/app.js` + data modules + CSS layers
 - **Build:** `node scripts/build.mjs` → esbuild bundles into standalone `index.html` + web assets (`dist/web/`)
 - **Deploy:** `deploy-configurator.yml` builds and pushes to GitHub Pages
-- **Version:** `CONFIGURATOR_VERSION` in app.js uses `MAJOR.MINOR` (e.g. `'2.82'`); `package.json` and `versions.json` append `.0` (e.g. `2.82.0`); `changelog.js` uses the short form (`v:'2.82'`)
+- **Version:** `CONFIGURATOR_VERSION` in app.js uses `MAJOR.MINOR` (e.g. `'2.86'`); `package.json` and `versions.json` append `.0` (e.g. `2.86.0`); `changelog.js` uses the short form (`v:'2.82'`)
 
 ### State Management
 
@@ -127,8 +127,25 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 
 ---
 
-## Recent Features (v2.78–v2.82)
+## Recent Features (v2.78–v2.86)
 
+### v2.85–v2.86 (Jul 2026)
+- **SEL Engine v2** — perGroup() QR balance, adaptive score floor, addon diversity, bitrate anomaly pin
+- **Debrid group conditions** — sequential Fast→Secondary with cached(totalStreams) thresholds (dynamic, instanceId-based)
+- **Soft-fail addon recovery** — parse "Failed to fetch manifest" → disable addon → retry
+- **?simulateAddonFail= hook** — browser self-test for recovery UI
+- **Bandwidth Mbps cap** — type your speed, auto-limits bitrate to 80%
+- **Mixed/Adaptive resolution tier** — no hard caps, niche content fallback
+- **Apex Mixed PSE architecture** — third architecture option (Standard / Apex IQR / Apex Mixed)
+- **Inspector direct import** — drag & drop JSON, file picker, unwrap() normaliser
+- **Library/SeaDex ISE protection** — single passthrough shields from all filters
+- **ID-Matched Trust ISE** — external-ID streams skip filename matching
+- **Smart Play Pin ISE** — 🎯 streams pinned to top
+- **Docs auto-sync** — ROADMAP.md + tools page auto-generated from changelogs
+- **Vidhin05 drift watch** — daily cron detects upstream regex/expression changes
+- **Golden config snapshots** — 12 Playwright fixtures for regression detection
+- **UI layering fixes** — import dialog z-index, info card overflow
+- **Bug fixes** — B-1 Jackett/Prowlarr, B-2 validator crash, B-3 NC-17 label, B-4 instanceUrl XSS, CodeQL #158
 - **family-v4 formatter** — new default with bitrate, release group, seeders, age, indexer, season pack info
 - **Debrider service** — multi-debrid aggregator support
 - **Knaben, Zilean, Jackett, Prowlarr scrapers** — additional scraper addons
@@ -153,6 +170,129 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 
 ---
 
+## ⚠️ CRITICAL: Groups Use instanceId, NOT Display Names
+
+AIOStreams `groups.groupings[].addons` expects **instanceId** values (e.g. `"23a"`, `"1c5"`, `"nx-fix-02"`), **NOT** display names (e.g. `"Torrentio"`, `"Comet"`, `"TorBox Search"`).
+
+Using display names causes AIOStreams to reject the config with: **"Every group must have at least one addon"** — because it can't match the name strings to any preset, the group appears empty.
+
+**Correct pattern:**
+```javascript
+const active = _presets.filter(p => p.enabled !== false && p.instanceId && !skip.has(p.options?.name || ''));
+const ids = active.map(p => p.instanceId);  // ← instanceId, NOT options.name
+```
+
+**Reference:** TVFlix's working config uses IDs (`"23a"`, `"1c5"`). Tam-Taro disables groups entirely in templates.
+
+---
+
+## Filtering/ — Synced Expression Files
+
+Templates reference three synced expression files via `syncedExcludedStreamExpressionUrls`, `syncedIncludedStreamExpressionUrls`, and `syncedPreferredStreamExpressionUrls`. AIOStreams fetches these at runtime, so updating the files updates ALL templates that reference them — no template regeneration needed.
+
+| File | Purpose | Current entries |
+|---|---|---|
+| `Filtering/core-builds-pses.json` | Preferred Stream Expressions (PSEs) | ~170 |
+| `Filtering/core-builds-eses.json` | Excluded Stream Expressions (ESEs) | ~84 |
+| `Filtering/core-builds-ises.json` | Included Stream Expressions (ISEs) | ~11 |
+
+**When adding new expressions:** update the Filtering/ JSON file AND the Configurator's inline generation in `app.js`. The Filtering files serve template importers; the inline code serves Configurator users.
+
+**SEL Engine v2 expressions added (v2.85):**
+- PSEs: `perGroup()` QR Balance (HQ/LQ), Addon Diversity, Bitrate Anomaly Pin
+- ESEs: Adaptive Score Floor (replaces static Low SEL Score), Low Seeder Cull
+- ISEs: Protect Library & SeaDex (`passthrough`), ID-Matched Trust, Smart Play Pin
+
+---
+
+## SEL Engine v2 Patterns
+
+### perGroup() over slice() chains
+`perGroup(streams, 'resolution', N)` replaces 8+ nested `slice(resolution(quality(...)))` expressions. Interleaves results round-robin across groups. Device-aware: DV-capable devices get 4/group, others 3.
+
+### Adaptive Score Floor
+Replaces fixed `-50` threshold: `-50 + min(30, daysSinceRelease * 0.1)`. Strict on new releases, lenient on niche/old content.
+
+### Dynamic Groups (no hardcoded addon names)
+Groups are built from `_presets` at build time. Split enabled presets 50/50 into Primary (always fires) and Secondary (conditional on `cached(totalStreams)` threshold). If <2 active presets, groups disable entirely.
+
+### Library/SeaDex Protection
+Single ISE: `passthrough(merge(library(streams), seadex(streams)), 'excluded')` — shields from ALL downstream ESEs. Replaces 15+ repeated `negate(merge(library(streams),seadex(streams)), ...)` wrappers.
+
+### Bitrate Anomaly Pin
+IQR outliers pinned to bottom (not removed): `pin(bitrate(..., 0, q1-1.5*iqr), 'bottom')`. Conservative — streams still available, never first.
+
+---
+
+## Soft-Fail Addon Recovery
+
+When AIOStreams rejects a config with "Failed to fetch manifest for {addon}: {reason}", the Configurator:
+1. Parses the error with `parseAddonFetchError()`
+2. Normalizes addon name with `normAddonName()` (strips store suffixes: TB, AD, RD, STORE)
+3. Offers to disable the addon and retry via `renderAddonFetchFallback()`
+4. Auto-backups config to localStorage before retry
+
+**Self-test:** append `?simulateAddonFail=StremThru Torz TB:fetch failed` to the Configurator URL.
+
+---
+
+## Bandwidth Cap
+
+`S.bandwidthMbps` (number, 0 = disabled) → auto-limits bitrate to 80% of speed: `Math.floor(mbps * 1000000 * 0.8)`. Applied in `build()` bitrate IIFE.
+
+---
+
+## GitHub Pages Deployment
+
+- **Workflow:** `deploy-configurator.yml` — deploys entire repo root (not just configurator/)
+- **Source:** GitHub Actions (not "Deploy from a branch")
+- **Configurator path:** `/configurator/` on the live site
+- **Relative links from Configurator:** use `../tools/` and `../account-tools/` (NOT `./tools/` — that resolves to `/configurator/tools/`)
+- **If Pages is stale after push:** check Actions tab for deploy failures. Empty commit to force rebuild: `git commit --allow-empty -m "chore: trigger pages rebuild"`
+
+---
+
+## Template Builder
+
+`scripts/template_builder.py` — generates templates from composable layers (base + resolution + service + device + tier + PSE). References synced URLs from `Filtering/`. Run after changing expression logic to regenerate static template JSONs.
+
+```bash
+python3 scripts/template_builder.py              # build all
+python3 scripts/template_builder.py --dry-run    # preview
+python3 scripts/template_builder.py --only stream  # filter by name
+```
+
+---
+
+## Known Pitfalls
+
+1. **groups.addons = instanceId** — NEVER use display names (see CRITICAL section above)
+2. **Relative links from /configurator/** — use `../` prefix, not `./`
+3. **GitHub Pages deploy failures** — check Actions tab; `deploy-configurator.yml` must succeed
+4. **Filtering/ files = runtime expressions** — update these to fix ALL templates at once
+5. **sortCriteria direction** — must be `"direction"` not `"order"` (AIOStreams rejects `"order"`)
+6. **addonLogo URL** — must use `/refs/heads/main/` not `/main/`
+7. **Inline regex lookahead** — `(?=...)`, `(?!...)` blocked on public instances (elfhosted, fortheweak)
+8. **NC-17 label** — means "Adults Only" (most restrictive), NOT "No Restriction"
+9. **Jackett/Prowlarr filter** — use `x.credKey && !x.apiUrl` (NOT `x.credKey && x.apiUrl`)
+10. **validate_templates.py** — guard `isinstance(t, list)` before `t.get()` (Filtering/*.json are arrays)
+
+---
+
+## Competitive Landscape (Updated v2.86)
+
+| Product | What it does | Core Builds differentiator |
+|---|---|---|
+| **Tam-Taro SEL** (733★) | Template wizard, synced URLs, perGroup(), 60 ESEs | We have standalone configurator, IQR statistical filtering, device-aware PSEs, soft-fail recovery, adaptive score floor |
+| **TVFlix Builder** (74★) | Single-file builder, group conditions, bandwidth input | We have deeper PSE architecture, 72 templates, health scoring, host compatibility, test infrastructure |
+| **Duck Tools** (QuackStart) | One-click install, account cloner, time machine | We don't need Stremio credentials server-side; our configurator gives full control |
+| **CrispyFormat** | Visual formatter builder | We have 19 built-in formatters + custom import |
+
+**Our moat:** Statistical bitrate analysis (IQR) + device-aware PSEs + adaptive thresholds + direct-to-AIOStreams deploy with error recovery. No competitor combines all four.
+
+---
+
+
 ## Testing
 
 | Suite | Count | Runner | What it covers |
@@ -168,7 +308,10 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 
 | Workflow | Trigger | Purpose |
 |---|---|---|
-| `deploy-configurator.yml` | push to main | Builds configurator, deploys to GitHub Pages |
+| `deploy-configurator.yml` | push to main | Deploys entire repo root to GitHub Pages |
+| `sync-docs.yml` | push to main | Auto-generates ROADMAP.md + tools page from changelogs |
+| `docs-changelog-gate.yml` | PRs | Blocks merges without changelog update |
+| `upstream-drift-watch.yml` | daily cron | Detects Vidhin05 regex/expression changes |
 | `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` + `npm run build` |
 | `configurator-e2e.yml` | PRs | Playwright E2E tests |
 | `validate.yml` | PRs | Template JSON validation |
@@ -812,7 +955,7 @@ Same structure but with `service` key after `seadex` for debrid provider priorit
 
 ## Conventions
 
-- **Version schemes:** Configurator uses `MAJOR.MINOR` (e.g. 2.82). Template suite uses semver `MAJOR.MINOR.PATCH` (e.g. 3.3.2). Template JSONs use their own version scheme (e.g. v2.10.8).
+- **Version schemes:** Configurator uses `MAJOR.MINOR` (e.g. 2.86). Template suite uses semver `MAJOR.MINOR.PATCH` (e.g. 3.4.0). Template JSONs use their own version scheme (e.g. v2.10.8).
 - **PSE labels:** `/* TEMPLATE_LABEL Tier Description */` e.g. `/* APEX S-Tier 4K Remux — IQR Tukey fence */`
 - **ESE labels:** `/* Description */` plain English
 - **1080p templates MUST have** a hard resolution exclusion ESE: `resolution(streams, '2160p', '1440p')` to prevent 4K leaking through (PSEs rank but do not exclude)
