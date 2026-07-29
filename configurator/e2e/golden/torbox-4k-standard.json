@@ -2045,10 +2045,6 @@
       },
       {
         "enabled": true,
-        "expression": "/* ID-Matched Trust */ passthrough(idMatched(streams), 'title', 'year', 'episode')"
-      },
-      {
-        "enabled": true,
         "expression": "/* Smart Play Pin */ pin(message(streams, 'includes', '🎯'), 'top')"
       },
       {
