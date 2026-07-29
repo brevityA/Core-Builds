@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolutionPolicy } from '../src/core/device-policies.js';
+import { sortPolicy } from '../src/core/sort-policy.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
@@ -42,7 +43,8 @@ test('apex-mixed adopts the mixed resolution policy end to end', () => {
   assert.deepEqual(resolutionPolicy({ resolution:'mixed' }).requiredResolutions, []);
   assert.deepEqual(resolutionPolicy({ pseArch:'apex-mixed', resolution:'mixed' }).preferredResolutions, ['2160p','1080p','1440p','720p','576p','480p','Unknown']);
   // Quality-before-resolution sort blend
-  assert.ok(app.includes("((S.resolution==='mixed'||S.pseArch==='apex-mixed')&&!rf)"));
+  const sort = sortPolicy({ service:'torbox', resolution:'mixed', pseArch:'apex-mixed', qualityFirst:false, resolutionFirst:false });
+  assert.equal(sort.global.findIndex(x => x.key === 'quality') < sort.global.findIndex(x => x.key === 'resolution'), true);
   // Blended dynamic-fetch exit
   assert.ok(app.includes("if(S.resolution==='mixed'||S.pseArch==='apex-mixed'){ const c1m="));
   // 4K-class regex/size/bitrate tiers
