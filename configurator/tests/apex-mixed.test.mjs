@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { resolutionPolicy } from '../src/core/device-policies.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
@@ -38,7 +39,8 @@ test('pses() emits the ported stack for apex-mixed and returns early', () => {
 
 test('apex-mixed adopts the mixed resolution policy end to end', () => {
   // Uncapped resolution config
-  assert.ok(app.includes("S.resolution === 'mixed' || S.pseArch === 'apex-mixed') return { excludedResolutions:ex"));
+  assert.deepEqual(resolutionPolicy({ resolution:'mixed' }).requiredResolutions, []);
+  assert.deepEqual(resolutionPolicy({ pseArch:'apex-mixed', resolution:'mixed' }).preferredResolutions, ['2160p','1080p','1440p','720p','576p','480p','Unknown']);
   // Quality-before-resolution sort blend
   assert.ok(app.includes("((S.resolution==='mixed'||S.pseArch==='apex-mixed')&&!rf)"));
   // Blended dynamic-fetch exit
