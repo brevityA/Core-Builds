@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolutionPolicy } from '../src/core/device-policies.js';
+import { sortPolicy } from '../src/core/sort-policy.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
@@ -35,7 +36,10 @@ test('p2p mixed route ranks 4K above 1080p', () => {
 });
 
 test('mixed default sort ranks quality before resolution (cached × quality blend)', () => {
-  assert.match(app, /rq=\(qf\|\|\(\(S\.resolution==='mixed'\|\|S\.pseArch==='apex-mixed'\)&&!rf\)\)\?\[\{key:'quality',direction:d\},\{key:'resolution',direction:d\}\]/);
+  const sort = sortPolicy({ service:'torbox', resolution:'mixed', qualityFirst:false, resolutionFirst:false });
+  const qi = sort.global.findIndex(x => x.key === 'quality');
+  const ri = sort.global.findIndex(x => x.key === 'resolution');
+  assert.ok(qi >= 0 && ri >= 0 && qi < ri, 'quality should come before resolution for mixed');
 });
 
 test('mixed uses 4K-class regex tiers and size/bitrate bounds', () => {
