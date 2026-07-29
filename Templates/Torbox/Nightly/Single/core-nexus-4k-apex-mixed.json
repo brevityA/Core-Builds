@@ -5,7 +5,7 @@
     "description": "Nightly — 4K Apex v0.9.0 IQR stack with the Mixed adaptive resolution policy. The requiredResolutions cap is lifted, which activates Apex’s dormant 480p/240p fallback tiers and adds a 576p niche tier — classic and rare content that capped templates never surface. Sort uses the cached × quality blend (quality ranks before resolution) so an elite 1080p encode can beat a mediocre 4K stream, while the full IQR Tukey-fence bitrate logic, ESE stack, slice limits, IMAX pin, and audio priority are preserved verbatim. Blended 4K/1080p dynamic-fetch exit. For niche-heavy libraries that want flagship ranking without a resolution floor.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
