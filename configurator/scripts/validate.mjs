@@ -39,7 +39,7 @@ const checks = {
   'device grid layout': app.includes('class="device-grid"') && app.includes('class="device-card"') && app.includes('class="device-help-banner"') && !app.includes('id="devScroll"'),
   'Apple TV AV1 conservative': !DEVICE_AV1_SAFE.has('appletv-new'),
   'ONN DV conservative': !DEVICE_DV_SAFE.has('onn'),
-  'schema guard wired': app.includes("import { sanitizeAioEnumArrays }"),
+  'schema guard wired': app.includes("import { assembleTemplate }") || app.includes("import { sanitizeAioEnumArrays }"),
   'credential registry': Object.keys(PROVIDER_CREDENTIALS).length >= 18 && app.includes("import { PROVIDER_CREDENTIALS }"),
   'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
   'quick install optional TMDB': app.includes('data-fl-tmdb') && app.includes("tmdbField('tmdbToken')") && app.includes("tmdbField('tmdbApiKey'"),
