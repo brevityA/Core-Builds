@@ -14,6 +14,7 @@ import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../d
 import { hasTmdbCredentials, bandwidthCapMbps, templateInput } from '../core/template-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-policies.js';
 import { sortPolicy } from '../core/sort-policy.js';
+import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -3445,8 +3446,8 @@ function build() {
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
-    size: (function(){ const is4k = S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed'; return { global:{ movies:[1610612736,80000000000], series:[209715200,40000000000] }, resolution:{ ...(is4k ? { '2160p':{ movies:[1610612736,150000000000], series:[209715200,80000000000] } } : {}), '1080p':{ movies:[524288000,30000000000], series:[104857600,20000000000] }, '720p':{ movies:[209715200,12000000000], series:[52428800,8000000000] } } }; })(),
-    bitrate: (function(){ const bwCap=bandwidthCapMbps(input.bandwidthMbps); return { useMetadataRuntime:hasTmdb, global:{ movies:[1000000,bwCap], series:[1000000,bwCap] }, resolution:{ ...((S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? { '2160p':{ movies:[5000000,Math.min(bwCap,150000000)], series:[5000000,Math.min(bwCap,150000000)] } } : {}), '1080p':{ movies:[2000000,150000000], series:[2000000,150000000] }, '720p':{ movies:[1000000,Math.min(bwCap,150000000)], series:[1000000,Math.min(bwCap,150000000)] } } }; })(),
+    size: sizePolicy(input),
+    bitrate: bitratePolicy(input, hasTmdb),
     hideErrors: true, hideErrorsForResources: ['addon_catalog','catalog','subtitles'],
     digitalReleaseFilter: { enabled:hasTmdb, tolerance:7, requestTypes:['movie','series','anime'], addons:[] },
     autoPlay: { enabled:true, method:S.autoPlayMethod||'matchingFile', attributes:['resolution','quality','audioTags'] },

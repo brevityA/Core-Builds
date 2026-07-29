@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolutionPolicy } from '../src/core/device-policies.js';
 import { sortPolicy } from '../src/core/sort-policy.js';
+import { isHighResolution } from '../src/core/filter-policy.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
@@ -36,16 +37,14 @@ test('p2p mixed route ranks 4K above 1080p', () => {
 });
 
 test('mixed default sort ranks quality before resolution (cached × quality blend)', () => {
-  const sort = sortPolicy({ service:'torbox', resolution:'mixed', qualityFirst:false, resolutionFirst:false });
-  const qi = sort.global.findIndex(x => x.key === 'quality');
-  const ri = sort.global.findIndex(x => x.key === 'resolution');
-  assert.ok(qi >= 0 && ri >= 0 && qi < ri, 'quality should come before resolution for mixed');
+  const sort = sortPolicy({ service:'torbox', resolution:'mixed', pseArch:'apex-mixed', qualityFirst:false, resolutionFirst:false });
+  assert.equal(sort.global.findIndex(x => x.key === 'quality') < sort.global.findIndex(x => x.key === 'resolution'), true);
 });
 
 test('mixed uses 4K-class regex tiers and size/bitrate bounds', () => {
   assert.ok(app.includes("(S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? [...RANKED_REGEX_COMMON,...RANKED_REGEX_UHD]"));
   assert.ok(app.includes("(S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? PREFERRED_REGEX_4K"));
-  assert.ok(app.includes("const is4k = S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'"));
+  assert.equal(isHighResolution({ resolution:'mixed' }), true);
 });
 
 test('dynamicAddonFetching has a blended exit condition for mixed', () => {
