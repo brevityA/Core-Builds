@@ -1,4 +1,23 @@
 export const CHANGELOG = [
+  { v:'2.86', date:'Jul 29 2026', items:[
+    'SEL Engine v2 — perGroup() QR balance replaces 8 slice expressions with 2 (interleaved results, device-aware limits); Addon Diversity cap; Bitrate Anomaly Pin (IQR outliers → bottom, not removed)',
+    'Adaptive Score Floor — replaces static Low SEL Score; threshold scales with content age (strict on new releases, lenient on niche/old content)',
+    'Dynamic addon groups — built from actual enabled presets using instanceId; Primary/Secondary split with cached-aware conditions; fixes "Every group must have at least one addon" rejection',
+    'Soft-fail addon recovery — Config rejected with "Failed to fetch manifest" now parses the error, identifies the addon, offers disable+retry; auto-backups config before recovery',
+    '?simulateAddonFail= self-test hook — append ?simulateAddonFail=StremThru Torz TB:fetch failed to URL to test recovery UI in-browser',
+    'Bandwidth Mbps cap — type your internet speed in Fine-Tune, bitrate auto-limits to 80%',
+    'Inspector direct import — drag & drop JSON files or click 📁 to browse; unwrap() normaliser handles all JSON shapes (template, bare config, array)',
+    'New ISEs — Protect Library & SeaDex (single passthrough shields from all filters), ID-Matched Trust (external-ID streams skip filename matching), Smart Play Pin (🎯 → top)',
+    'Low Seeder Cull — removes 0-seeder streams only when 3+ healthy streams exist (protects niche content)',
+    'RD Copyright ESE — preemptively filters WEB-DL/BDRip on RealDebrid (DMCA compliance)',
+    'Fixed: tools/account-tools links broken from Configurator (relative path ./tools/ → ../tools/)',
+    'Fixed: NC-17 label read backwards ("No Restriction" → "Adults Only")',
+    'Fixed: instanceUrl unescaped in DOM (XSS vector)',
+    'Fixed: CodeQL #158 — RADIO_ALLOWED allowlist guard on radio inputs',
+    'Fixed: UI layering — import dialog z-index, info card text clipping',
+    "Docs auto-sync — ROADMAP.md + tools What's New auto-generated from changelogs; changelog gate blocks merges without update",
+    'Vidhin05 drift watch — daily cron detects upstream regex/expression changes, opens issue with diff',
+  ]},
   { v:'2.85', date:'Jul 26 2026', items:[
     'Mixed · Adaptive resolution tier — new fourth resolution option: no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend; dedicated PSE ladder (4K REMUX/HDR → 1080p → 720p → 576p/480p niche fallback), UHD-class regex tiers, blended dynamic-fetch exit, and import round-trip detection',
     'Apex Mixed PSE architecture — third architecture option (Standard / Apex IQR / Apex Mixed): the flagship 35-PSE IQR × adaptive stack from the 4K Apex Mixed nightly, generatable for any device/service; adopts the mixed resolution policy (no caps, quality-blend sort, blended DAF exit) and names builds "Core Nexus Apex Mixed". Golden-link test keeps it byte-identical to the static template',

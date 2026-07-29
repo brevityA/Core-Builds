@@ -1,5 +1,40 @@
 # Changelog
 
+## 3.5.0 (2026-07-29)
+
+### Added
+- **SEL Engine v2** (Configurator v2.86 + all 72 templates via synced expressions) — `perGroup()` QR balance replaces 8 verbose `slice()` expressions with 2, interleaving results round-robin across resolutions instead of dumping 9 REMUXes in a row. Device-aware limits: DV-capable TVs get 4 streams per group, others get 3.
+- **Addon Diversity PSE** — `perGroup(cached(streams),'indexer',2)` caps each addon to 2 results in the preferred tier, preventing one scraper from flooding the results list.
+- **Bitrate Anomaly Pin** — streams with bitrates below the IQR Tukey lower fence are pinned to the bottom (not removed). Still available if needed, never ranked first. Conservative approach to outlier handling.
+- **Adaptive Score Floor** — replaces the static "Low SEL Score" ESE. Threshold scales with content age: `-50 + min(30, daysSinceRelease * 0.1)`. Strict on new releases where garbage is common, lenient on old/niche content where every stream counts. Fewer empty results on obscure titles.
+- **Dynamic addon groups** (Configurator v2.86 + all 59 templates with groups) — groups now build from actual enabled presets using `instanceId` (not display names). Split 50/50 into Primary (always fires) and Secondary (conditional on `cached(totalStreams)` threshold). If fewer than 2 active presets, groups disable entirely instead of sending broken config.
+- **Soft-fail addon recovery** (Configurator v2.86) — when AIOStreams rejects a config with "Failed to fetch manifest for {addon}: {reason}", the Configurator now parses the error, identifies the failing addon, and offers to save the config without it so the user can proceed. Auto-backups config to localStorage before retry.
+- **`?simulateAddonFail=` self-test hook** — append `?simulateAddonFail=StremThru Torz TB:fetch failed` to the Configurator URL to test the recovery UI in-browser without a real addon failure.
+- **Bandwidth Mbps cap** (Configurator v2.86) — new field in Fine-Tune: type your internet speed and the Configurator auto-limits bitrate to 80% of it (`Mbps × 1,000,000 × 0.8`). No more guessing which slider preset matches your connection.
+- **Inspector direct import** (tools/inspector/) — drag & drop a `.json` file onto the Inspector or click 📁 Import JSON File. No more opening the file, selecting all, copying, switching tabs, and pasting. `unwrap()` normaliser auto-detects JSON shape (full template, bare config, array collection) so it validates regardless of export format.
+- **Protect Library & SeaDex ISE** — single `passthrough(merge(library(streams), seadex(streams)), 'excluded')` shields personal library and SeaDex streams from ALL downstream ESE filters. Replaces 15+ repeated `negate(merge(library(streams),seadex(streams)), ...)` wrappers across individual expressions.
+- **ID-Matched Trust ISE** — `passthrough(idMatched(streams), 'title', 'year', 'episode')` lets streams matched by external ID (Torznab ID search, SeaDex hash) skip filename-based title matching. Already verified correct, no second-guessing.
+- **Smart Play Pin ISE** — `pin(message(streams, 'includes', '🎯'), 'top')` pins AIOStreams Smart Play flagged streams to the absolute top.
+- **Low Seeder Cull ESE** — removes 0-seeder P2P/uncached streams, but only when 3+ healthy streams exist. Protects niche content from being nuked to zero results.
+- **RD Copyright ESE** — conditionally filters WEB-DL/BDRip/HDRip/HDTV x264/x265 streams on RealDebrid (DMCA compliance). Only included when Real-Debrid service is selected.
+- **Docs auto-sync** — `sync-docs.py` + `sync-docs.yml` auto-generate ROADMAP.md "Recently Completed" section and tools page "What's New" block from CHANGELOG.md via managed markers (`AUTO:ROOT_COMPLETED:*`, `AUTO:TOOLS_WHATSNEW:*`). `docs-changelog-gate.yml` blocks PRs that don't update the changelog.
+- **Vidhin05 drift watch** — `upstream-drift-watch.yml` runs daily, compares upstream Vidhin05/Releases-Regex@main against local snapshots (174 regexes + 243 expressions), opens a GitHub issue with diff summary on drift.
+- **Golden config snapshots** — 12 Playwright e2e fixtures covering service × resolution × architecture combinations. Any logic change that alters generated template output now fails CI.
+
+### Fixed
+- **"Every group must have at least one addon"** (Configurator v2.86 + 59 templates) — groups were referencing addons by display name ("Torrentio", "Comet") but AIOStreams expects internal `instanceId` ("23a", "1c5"). When names didn't match, groups appeared empty and the entire config was rejected. Now uses `instanceId` and filters against actual enabled presets. All 59 templates with groups rebuilt from their real preset lists.
+- **Tools/account-tools links broken from Configurator** — relative links (`./tools/`, `./account-tools/`) resolved to `/configurator/tools/` (404) instead of `/tools/`. Fixed all 14 links to use `../tools/` and `../account-tools/`.
+- **NC-17 label read backwards** — age rating option said "NC-17 — No Restriction" which is confusing because NC-17 is the most restrictive MPAA rating. Relabeled to "NC-17 — Adults Only" with clearer description.
+- **instanceUrl unescaped in DOM** — custom instance URL was injected without HTML escaping (minor XSS vector). Now properly escaped with `escH()`.
+- **CodeQL #158 — RADIO_ALLOWED** — added allowlist guard on radio input values to prevent DOM-based XSS via crafted share links.
+- **UI layering** — Import Custom Format dialog opened behind the modal (z-index 10000→10050). Content Preference info cards clipped text with no scroll (added `overflow-y: auto`). Contact widget z-index placed below modals. Playwright e2e spec added for both fixes.
+- **Dead deep-links** — `handleDeepLink()` now resolves `#troubleshooter` and `#health-score` anchors that previously went nowhere.
+
+### Changed
+- **All 72 templates** — synced expression files (`Filtering/core-builds-{pses,eses,ises}.json`) updated with SEL Engine v2 expressions. Templates pick up changes at runtime via `syncedPreferredStreamExpressionUrls` / `syncedExcludedStreamExpressionUrls` / `syncedIncludedStreamExpressionUrls` — no re-import needed.
+- **Configurator version** — 2.85 → 2.86
+- **Template Suite version** — 3.4.0 → 3.5.0
+
 ## 3.4.0 (2026-07-26)
 
 ### Added
