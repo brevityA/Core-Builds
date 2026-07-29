@@ -302,27 +302,6 @@
     ],
     "presets": [
       {
-        "type": "library",
-        "instanceId": "lib-1",
-        "enabled": false,
-        "options": {
-          "name": "Library",
-          "timeout": 6000,
-          "resources": [
-            "stream",
-            "catalog",
-            "meta"
-          ],
-          "mediaTypes": [],
-          "showRefreshActions": [
-            "catalog"
-          ],
-          "skipProcessing": false,
-          "hideStreams": false,
-          "useMultipleInstances": false
-        }
-      },
-      {
         "type": "torrentio",
         "instanceId": "tio-p2p-1",
         "enabled": true,
@@ -472,49 +451,6 @@
           "timeout": 6000,
           "mediaTypes": [],
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "torrents-db",
-        "instanceId": "nx-tdb-1",
-        "enabled": false,
-        "options": {
-          "name": "TorrentsDB",
-          "timeout": 6000,
-          "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "animetosho",
-        "instanceId": "nx-at-01",
-        "enabled": false,
-        "options": {
-          "name": "AnimeTosho",
-          "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "neko-bt",
-        "instanceId": "neko-bt-core-builds",
-        "enabled": false,
-        "options": {
-          "name": "NekoBT",
-          "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
         },
         "resources": [
           "stream"

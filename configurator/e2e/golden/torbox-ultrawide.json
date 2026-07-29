@@ -1588,24 +1588,6 @@
         }
       },
       {
-        "type": "hdhub",
-        "instanceId": "hdhub-1",
-        "enabled": false,
-        "options": {
-          "name": "HdHub",
-          "timeout": 6000,
-          "resources": [
-            "stream"
-          ],
-          "mediaTypes": [
-            "movie",
-            "series",
-            "anime"
-          ],
-          "tb_only": true
-        }
-      },
-      {
         "type": "eztv",
         "instanceId": "nx-ez-01",
         "enabled": true,
@@ -1644,61 +1626,6 @@
         ]
       },
       {
-        "type": "torrents-db",
-        "instanceId": "nx-tdb-1",
-        "enabled": false,
-        "options": {
-          "name": "TorrentsDB",
-          "timeout": 6000,
-          "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "animetosho",
-        "instanceId": "nx-at-01",
-        "enabled": false,
-        "options": {
-          "name": "AnimeTosho",
-          "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "neko-bt",
-        "instanceId": "neko-bt-core-builds",
-        "enabled": false,
-        "options": {
-          "name": "NekoBT",
-          "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "sootio",
-        "instanceId": "sootio-core-builds",
-        "enabled": false,
-        "options": {
-          "name": "Sootio",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "aiosubtitle",
         "instanceId": "aio-sub-1",
         "enabled": true,
@@ -1723,23 +1650,6 @@
           "meta"
         ],
         "category": "meta_catalogs"
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 6000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       }
     ],
     "services": [

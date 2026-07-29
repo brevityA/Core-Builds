@@ -314,42 +314,6 @@
         ]
       },
       {
-        "type": "webstreamr",
-        "instanceId": "wsr-1",
-        "enabled": false,
-        "options": {
-          "name": "WebStreamr",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "nuvio-streams",
-        "instanceId": "nvs-1",
-        "enabled": false,
-        "options": {
-          "name": "Nuvio Streams",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "flix-streams",
-        "instanceId": "flx-1",
-        "enabled": false,
-        "options": {
-          "name": "Flix-Streams",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "hdhub",
         "instanceId": "hdhub-1",
         "enabled": true,
