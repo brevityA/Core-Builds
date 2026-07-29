@@ -15,6 +15,7 @@ import { hasTmdbCredentials, bandwidthCapMbps, templateInput } from '../core/tem
 import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-policies.js';
 import { sortPolicy } from '../core/sort-policy.js';
 import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
+import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -3425,9 +3426,9 @@ function build() {
   const hasTmdb = hasTmdbCredentials(input);
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
-  const _presets = presets();
-  const globalTimeout = Number(S.addonTimeout)||6000;
-  _presets.forEach(preset => { if (preset.options && 'timeout' in preset.options) preset.options.timeout = globalTimeout; });
+  const globalTimeout = Number(input.addonTimeout)||6000;
+  const normalizedPresets = assertAddonPolicy(addonPolicy(input, presets(), { defaultTimeout: globalTimeout }));
+  const activePresets = normalizedPresets.presets;
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
     preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HDTV'],
@@ -3460,7 +3461,7 @@ function build() {
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
-    presets: _presets, services: services(),
+    presets: activePresets, services: services(),
   };
 
   const cfg = {
@@ -3506,7 +3507,7 @@ function build() {
       const threshold=isFree?5:(S.resolution==='4k'?4:S.resolution==='ultrawide'?12:8);
       const wrap=isFree?'totalStreams':'cached(totalStreams)';
       const skip=new Set(['Library','AIOSubtitle','OpenSubtitles','AIOStreams']);
-      const active=_presets.filter(p=>p.enabled!==false&&p.instanceId&&!skip.has(p.options?.name||''));
+      const active=activePresets.filter(p=>p.enabled!==false&&p.instanceId&&!skip.has(p.options?.name||''));
       const ids=active.map(p=>p.instanceId);
       if(ids.length<2) return {enabled:false,groupings:[]};
       const mid=Math.ceil(ids.length/2);
