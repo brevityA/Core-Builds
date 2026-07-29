@@ -6,7 +6,6 @@ import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } fro
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
-import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
 import { initContactWidget } from './contact-widget.js';
 import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
@@ -17,6 +16,7 @@ import { sortPolicy } from '../core/sort-policy.js';
 import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
 import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
 import { generateTemplate } from '../core/generate-template.js';
+import { assembleTemplate } from '../core/assemble-template.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -3585,21 +3585,14 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
 function buildFinal() {
   try {
     const tpl = build();
-    if (_disabledAddons.size && Array.isArray(tpl.config && tpl.config.presets)) {
-      tpl.config.presets = tpl.config.presets.filter(p => ![..._disabledAddons].some(n => presetMatchesAddon(p, n)));
-    }
-    if (S._migrationKeep && typeof S._migrationKeep === 'object') {
-      const ALLOWED_MIGRATION_FIELDS = new Set(['services','presets','groups','sortCriteria','deduplicator','formatter','parentConfig','resultLimits','excludedResolutions','includedResolutions','requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes','excludedAudioTags','preferredAudioTags','preferredAudioChannels','preferredVisualTags','excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages','excludedQualities','includedQualities','requiredQualities','preferredQualities','excludedVisualTags','includedVisualTags','requiredVisualTags','excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions','syncedExcludedStreamExpressionUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedRankedStreamExpressionUrls','excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns','syncedExcludedRegexUrls','syncedRankedRegexUrls','size','bitrate','titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter']);
-      const filtered = {};
-      for (const k of Object.keys(S._migrationKeep)) {
-        if (ALLOWED_MIGRATION_FIELDS.has(k)) filtered[k] = S._migrationKeep[k];
-      }
-      Object.assign(tpl.config, filtered);
-    }
-    sanitizeAioEnumArrays(tpl.config);
-    addVersionMetadata(tpl);
-    _cachedBuildResult = tpl;
-    return tpl;
+    const result = assembleTemplate(tpl, {
+      version: TEMPLATE_VERSION,
+      disabledAddons: _disabledAddons,
+      presetMatchesAddon,
+      migrationKeep: S._migrationKeep,
+    });
+    _cachedBuildResult = result;
+    return result;
   } catch (err) {
     logError('build', err.message, { service: S.service, device: S.device, resolution: S.resolution, stack: err.stack?.slice(0, 300) });
     throw err;
@@ -6389,15 +6382,17 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
   window.__coreBuilds = {
     generate(overrides) {
       Object.assign(S, overrides || {});
-      // Transitional adapter: policy composition is now routed through the pure
-      // facade; legacy assembly remains the injected adapter until Part 8's
-      // full config assembly migration is complete.
       const out = generateTemplate(S, {
         deviceAv1Safe: DEVICE_AV1_SAFE,
         deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
         presets: presets(),
         defaultTimeout: Number(S.addonTimeout) || 6000,
-        assemble: () => buildFinal(),
+        assemble: () => assembleTemplate(build(), {
+          version: TEMPLATE_VERSION,
+          disabledAddons: _disabledAddons,
+          presetMatchesAddon,
+          migrationKeep: S._migrationKeep,
+        }),
       });
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp

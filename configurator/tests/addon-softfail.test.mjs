@@ -40,7 +40,7 @@ test('wiring present: dispatch wraps the reject path(s), build filters disabled 
   assert.match(app, /function renderConfigRejectedDispatch\(safeMsg, apiDetail\)/);
   // definition + one call per "Config rejected" render path (>=2 calls)
   assert.ok((app.match(/renderConfigRejectedDispatch\(safeMsg, apiDetail\)/g) || []).length >= 3);
-  assert.match(app, /_disabledAddons\.size && Array\.isArray\(tpl\.config && tpl\.config\.presets\)/);
+  assert.match(app, /assembleTemplate\(tpl,/);
   assert.match(app, /action === 'save-without-addon'/);
   assert.match(app, /_lastInstall = \{ target, pwd \}/);
   assert.match(app, /_simulateAddonFail/, 'self-test hook (?simulateAddonFail=) missing');
