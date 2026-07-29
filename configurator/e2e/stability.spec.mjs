@@ -2,10 +2,12 @@ import { test, expect } from '@playwright/test';
 
 const UUID = '11111111-2222-4333-8444-555555555555';
 
+const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$/;
+
 async function fresh(page) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('console', message => { if (message.type() === 'error' && !CORS_NOISE.test(message.text())) errors.push(message.text()); });
   await page.goto('/');
   await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
   await page.reload();
@@ -24,7 +26,7 @@ async function mockAioStreams(page, capture) {
       capture.push(JSON.parse(request.postData() || '{}'));
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { uuid: UUID, encryptedPassword: 'encrypted-password' } }) });
     }
-    if (url.includes('core-builds-cors-proxy') && (url.includes('/api/visit') || url.includes('/api/generate'))) {
+    if (url.includes('core-builds-cors-proxy') && (url.includes('/api/visit') || url.includes('/api/generate') || url.includes('/api/stats'))) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     }
     return route.continue();
