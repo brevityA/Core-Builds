@@ -30,7 +30,7 @@ const versions = JSON.parse(await readFile(resolve(repoRoot, 'versions.json'), '
 const appVer = app.match(/CONFIGURATOR_VERSION\s*=\s*'([^']+)'/)?.[1];
 
 const checks = {
-  'single current release': CHANGELOG[0]?.v === appVer && !CHANGELOG.some(x => x.v === '2.76'),
+  'single current release': CHANGELOG[0]?.v === '2.85' && !CHANGELOG.some(x => x.v === '2.76'),
   'version consistency': appVer === CHANGELOG[0]?.v && pkg.version.startsWith(appVer + '.') && versions.configurator === pkg.version,
   'host metadata coverage': hostKeys.every(k => HOST_META[k]),
   'minimum host version': MIN_AIOSTREAMS_VERSION === '2.31.1',
@@ -42,7 +42,7 @@ const checks = {
   'credential registry': Object.keys(PROVIDER_CREDENTIALS).length >= 18 && app.includes("import { PROVIDER_CREDENTIALS }"),
   'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
   'quick install optional TMDB': app.includes('data-fl-tmdb') && app.includes("tmdbField('tmdbToken')") && app.includes("tmdbField('tmdbApiKey'"),
-  'TMDB-free config compatibility': app.includes('useMetadataRuntime:hasTmdb') && app.includes('digitalReleaseFilter: { enabled:hasTmdb') && app.includes('titleMatching: { enabled:hasTmdb') && app.includes('yearMatching: { enabled:hasTmdb') && !app.includes("warns.push('No TMDB key"),
+  'TMDB-free config compatibility': app.includes('bitrate: { useMetadataRuntime:hasTmdb') && app.includes('digitalReleaseFilter: { enabled:hasTmdb') && app.includes('titleMatching: { enabled:hasTmdb') && app.includes('yearMatching: { enabled:hasTmdb') && !app.includes("warns.push('No TMDB key"),
   'Quick Install manifest lifecycle': app.includes("{ key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' }") && app.includes("document.getElementById('fastLaneModal')?.remove()") && !app.includes("if (state.target==='manifest') installTarget='app'"),
   'Fine-Tune pop-out lifecycle': app.includes("import { FORMATTERS, AUDIO_HELP }") && app.includes("openAdvancedDrawer(el)") && app.includes("overlay.id = 'advancedDrawer'") && app.includes('closeAdvancedDrawer()') && !app.includes("main.innerHTML = renderAdvancedPanel();\n    nav.style.display = 'none'"),
   'Advanced extras carousel': app.includes('const carouselOptSection =') && app.includes('const optSection = S.simpleMode ? compactOptSection : carouselOptSection') && app.includes('toggle-carousel-service') && app.includes('toggle-optional-scraper'),
