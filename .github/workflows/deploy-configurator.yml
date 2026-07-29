@@ -22,9 +22,32 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: configurator/package-lock.json
+
+      - name: Build Configurator
+        working-directory: configurator
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+        continue-on-error: false
+
+      - name: Verify build output
+        run: |
+          test -f configurator/index.html || { echo "ERROR: configurator/index.html not produced by build"; exit 1; }
+          node --check configurator/dist/web/assets/app.js || { echo "ERROR: built app.js has syntax errors"; exit 1; }
+          echo "Build verified: configurator/index.html is $(wc -c < configurator/index.html) bytes"
+
       - uses: actions/configure-pages@v5
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
+
       - id: deployment
         uses: actions/deploy-pages@v4
