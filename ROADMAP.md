@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.5.0 | 2026-07-29 | SEL Engine v2 (Configurator v2.86 + all 72 templates via synced expressions) — perGroup() QR balance replaces 8 verbose … |
 | v3.4.0 | 2026-07-26 | Core Nexus Mixed template (Templates/Torbox/Single/core-nexus-mixed.json) — adaptive multi-resolution build for niche an… |
 | v3.3.2 | 2026-07-17 | Subtitle Picker (Configurator v2.57) — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 3… |
 | v3.3.1 | 2026-07-17 | Free Tier Overhaul (Configurator v2.56) — comprehensive improvements to P2P and HTTP template generation: |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.2.3 | 2026-07-02 | Configurator v2.9 — Easy Setup one-click button now opens AIOStreams directly via ?template=URL deep link instead of cal… |
 | v3.2.2 | 2026-07-02 | Configurator v2.8.1 — groups.groupings now omitted when groups are disabled, fixing "Every group must have at least one … |
 | v3.2.1 | 2026-07-02 | Older-Show Pack Pass (all 36 standard templates + shared Filtering/core-builds-eses.json) — refines the v3.2.0 Hard Seas… |
-| v3.2.0 | 2026-07-02 | Override scoring restored fleet-wide (36 active templates + both Base configs) — the inline rankedRegexPatterns layer wa… |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.

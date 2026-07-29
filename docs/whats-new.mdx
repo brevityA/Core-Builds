@@ -1,14 +1,70 @@
 ---
-title: "What's New — Configurator v2.85"
+title: "What's New — Configurator v2.86"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.85 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.86 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.85**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.86**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v2.86 (Jul 29 2026)
+
+<CardGroup cols={2}>
+  <Card title="SEL Engine v2" icon="sparkles">
+    perGroup() QR balance replaces 8 slice expressions with 2 (interleaved results, device-aware limits); Addon Diversity cap; Bitrate Anomaly Pin (IQR outliers → bottom, not removed)
+  </Card>
+  <Card title="Adaptive Score Floor" icon="bolt">
+    replaces static Low SEL Score; threshold scales with content age (strict on new releases, lenient on niche/old content)
+  </Card>
+  <Card title="Dynamic addon groups" icon="shield-check">
+    built from actual enabled presets using instanceId; Primary/Secondary split with cached-aware conditions; fixes 'Every group must have at least one addon' rejection
+  </Card>
+  <Card title="Soft-fail addon recovery" icon="sliders">
+    Config rejected with 'Failed to fetch manifest' now parses the error, identifies the addon, offers disable+retry; auto-backups config before recovery
+  </Card>
+  <Card title="?simulateAddonFail= self-test hook" icon="gauge">
+    append ?simulateAddonFail=StremThru Torz TB:fetch failed to URL to test recovery UI in-browser
+  </Card>
+  <Card title="Bandwidth Mbps cap" icon="wand">
+    type your internet speed in Fine-Tune, bitrate auto-limits to 80%
+  </Card>
+  <Card title="Inspector direct import" icon="layers">
+    drag & drop JSON files or click 📁 to browse; unwrap() normaliser handles all JSON shapes (template, bare config, array)
+  </Card>
+  <Card title="New ISEs" icon="bug">
+    Protect Library & SeaDex (single passthrough shields from all filters), ID-Matched Trust (external-ID streams skip filename matching), Smart Play Pin (🎯 → top)
+  </Card>
+  <Card title="Low Seeder Cull" icon="sparkles">
+    removes 0-seeder streams only when 3+ healthy streams exist (protects niche content)
+  </Card>
+  <Card title="RD Copyright ESE" icon="bolt">
+    preemptively filters WEB-DL/BDRip on RealDebrid (DMCA compliance)
+  </Card>
+  <Card title="Fixed: tools/account-tools links broken from Configurator (relative path ./tools/ → ../tools/)" icon="shield-check">
+    Fixed: tools/account-tools links broken from Configurator (relative path ./tools/ → ../tools/)
+  </Card>
+  <Card title="Fixed: NC-17 label read backwards ('No Restriction' → 'Adults Only')" icon="sliders">
+    Fixed: NC-17 label read backwards ('No Restriction' → 'Adults Only')
+  </Card>
+  <Card title="Fixed: instanceUrl unescaped in DOM (XSS vector)" icon="gauge">
+    Fixed: instanceUrl unescaped in DOM (XSS vector)
+  </Card>
+  <Card title="Fixed: CodeQL #158" icon="wand">
+    RADIO_ALLOWED allowlist guard on radio inputs
+  </Card>
+  <Card title="Fixed: UI layering" icon="layers">
+    import dialog z-index, info card text clipping
+  </Card>
+  <Card title="s New auto-generated from changelogs; changelog gate blocks merges without update'," icon="bug">
+    s New auto-generated from changelogs; changelog gate blocks merges without update',
+    
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.85 (Jul 26 2026)
 
@@ -68,33 +124,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Worker contact endpoint" icon="shield-check">
     Server-side Discord webhook relay added to the Cloudflare Worker
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.82 (Jul 24 2026)
-
-<CardGroup cols={2}>
-  <Card title="Patch Cinemeta & AIOMetadata" icon="sparkles">
-    opt-in toggles in Full Setup for patching Cinemeta catalogs and installing AIOMetadata
-  </Card>
-  <Card title="Full Setup service selection" icon="bolt">
-    Full Setup now reads the active splash chip and sets the correct service/multiServices
-  </Card>
-  <Card title="Library Boost" icon="shield-check">
-    Three modes: Default (normal position), Strong (top priority), None (disabled)
-  </Card>
-  <Card title="Bandwidth Estimator" icon="sliders">
-    Device-aware bandwidth suggestion with manual override (10–200 Mbps)
-  </Card>
-  <Card title="Age Rating Limit" icon="gauge">
-    MPAA certification filter (G / PG / PG-13 / R) powered by TMDB metadata
-  </Card>
-  <Card title="NZB Failover" icon="wand">
-    Configurable position (before/after torrents) and max NZB count (1/2/3/5)
-  </Card>
-  <Card title="Template Inspector upgraded" icon="layers">
-    File import, URL fetch, clipboard paste, health score ring, host compatibility checks, export report, theme toggle
   </Card>
 </CardGroup>
