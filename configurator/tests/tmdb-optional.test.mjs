@@ -1,11 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { tmdbFeaturePolicy } from '../src/core/template-policy.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
 test('generated config disables every TMDB-dependent AIOStreams feature without a key', () => {
-  assert.ok(app.includes('const hasTmdb = !!(S.tmdbToken || S.tmdbApiKey)'));
+  assert.deepEqual(tmdbFeaturePolicy({}), {
+    hasTmdb: false,
+    bitrate: { useMetadataRuntime: false },
+    digitalReleaseFilter: { enabled: false },
+    titleMatching: { enabled: false },
+    yearMatching: { enabled: false },
+  });
+  assert.ok(app.includes('hasTmdbCredentials(S)'));
   assert.ok(app.includes('useMetadataRuntime:hasTmdb'));
   assert.ok(app.includes('digitalReleaseFilter: { enabled:hasTmdb'));
   assert.ok(app.includes('titleMatching: { enabled:hasTmdb'));
