@@ -50,7 +50,6 @@ test('apex-mixed adopts the mixed resolution policy end to end', () => {
   // 4K-class regex/size/bitrate tiers
   assert.ok(app.includes("S.resolution==='mixed'||S.pseArch==='apex-mixed') ? [...RANKED_REGEX_COMMON,...RANKED_REGEX_UHD]"));
   assert.ok(app.includes("S.resolution==='mixed'||S.pseArch==='apex-mixed') ? PREFERRED_REGEX_4K"));
-  assert.ok(app.includes("S.resolution==='mixed'||S.pseArch==='apex-mixed';"));
   // Full HDR visual tag ladder + Score IQR Guard
   assert.ok(app.includes("S.resolution === 'mixed' || S.pseArch === 'apex-mixed') return ['HDR+DV'"));
   assert.ok(app.includes("S.pseArch === 'iqr' || S.pseArch === 'apex-mixed') out.push({ enabled:true, expression: \"/*Score IQR Guard*/"));

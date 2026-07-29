@@ -6,7 +6,6 @@ import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } fro
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
-import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
 import { initContactWidget } from './contact-widget.js';
 import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
@@ -14,6 +13,10 @@ import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../d
 import { hasTmdbCredentials, bandwidthCapMbps, templateInput } from '../core/template-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-policies.js';
 import { sortPolicy } from '../core/sort-policy.js';
+import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
+import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
+import { generateTemplate } from '../core/generate-template.js';
+import { assembleTemplate } from '../core/assemble-template.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -43,7 +46,7 @@ const APEX_MIXED_PSES = [
   {"expression": "/* Usenet + Debrid boost */ type(streams, 'usenet', 'debrid')", "enabled": true},
   {"expression": "/* Anime original audio */ (queryType == 'anime.series' or queryType == 'anime.movie') ? language(streams, 'Japanese', 'Multi') : []", "enabled": true},
   {"expression": "/* 4K Remux — adaptive bitrate (IQR ≥4, min/max 1-3, 15GB floor) */ count(resolution(quality(streams,'Bluray REMUX'),'2160p'))>=4 ? size(bitrate(resolution(quality(streams,'Bluray REMUX'),'2160p'), q1(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate')) - 1.5*iqr(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate')), q3(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate')) + 1.5*iqr(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))), '15GB') : count(resolution(quality(streams,'Bluray REMUX'),'2160p'))>0 ? size(bitrate(resolution(quality(streams,'Bluray REMUX'),'2160p'), min(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))*0.80, max(values(resolution(quality(streams,'Bluray REMUX'),'2160p'),'bitrate'))*1.20), '15GB') : []", "enabled": true},
-  {"expression": "/* 4K WEB-DL HDR — adaptive bitrate + age decay (pow 0.95/d) */ count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4 ? bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), q1(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')) - 1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')), q3(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')) + 1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))) : count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0 ? bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), min(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80, max(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20) : ((count(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*max(0.3,1-daysSinceRelease*0.01)), median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*max(0.3,1-daysSinceRelease*0.01))))>=1 ? bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*max(0.3,1-daysSinceRelease*0.01)) : []", "enabled": true},
+  {"expression": "/* 4K WEB-DL HDR — adaptive bitrate + age decay (pow 0.95/d) */ count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>=4 ? bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), q1(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')) - 1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')), q3(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate')) + 1.5*iqr(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))) : count(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'))>0 ? bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), min(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*0.80, max(values(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'bitrate'))*1.20) : (count(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*max(0.3,1-daysSinceRelease*0.01)), median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1+0.4*max(0.3,1-daysSinceRelease*0.01)))))>=1 ? bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'), median(values(bitrate(resolution(visualTag(quality(streams,'WEB-DL'),'HDR+DV','DV','HDR10+','HDR10','HDR'),'2160p'),'5Mbps'),'bitrate'))*(1-0.4*max(0.3,1-daysSinceRelease*0.01))) : []", "enabled": true},
   {"expression": "/* 4K WEB-DL SDR — adaptive bitrate (no HDR tags) */ count(resolution(quality(streams,'WEB-DL'),'2160p'))>=4 ? bitrate(resolution(quality(streams,'WEB-DL'),'2160p'), q1(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate')) - 1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate')), q3(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate')) + 1.5*iqr(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))) : count(resolution(quality(streams,'WEB-DL'),'2160p'))>0 ? bitrate(resolution(quality(streams,'WEB-DL'),'2160p'), min(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))*0.80, max(values(resolution(quality(streams,'WEB-DL'),'2160p'),'bitrate'))*1.20) : []", "enabled": true},
   {"expression": "/* 1080p Remux — adaptive bitrate + 8GB floor */ count(resolution(quality(streams,'Bluray REMUX'),'1080p'))>=4 ? size(bitrate(resolution(quality(streams,'Bluray REMUX'),'1080p'), q1(values(resolution(quality(streams,'Bluray REMUX'),'1080p'),'bitrate')) - 1.5*iqr(values(resolution(quality(streams,'Bluray REMUX'),'1080p'),'bitrate')), q3(values(resolution(quality(streams,'Bluray REMUX'),'1080p'),'bitrate')) + 1.5*iqr(values(resolution(quality(streams,'Bluray REMUX'),'1080p'),'bitrate'))), '8GB') : count(resolution(quality(streams,'Bluray REMUX'),'1080p'))>0 ? size(bitrate(resolution(quality(streams,'Bluray REMUX'),'1080p'), min(values(resolution(quality(streams,'Bluray REMUX'),'1080p'),'bitrate'))*0.80, max(values(resolution(quality(streams,'Bluray REMUX'),'1080p'),'bitrate'))*1.20), '8GB') : []", "enabled": true},
   {"expression": "/* Limit 4K Remux */ slice(resolution(quality(streams, 'Bluray REMUX'), '2160p'), 0, 3)", "enabled": true},
@@ -3424,9 +3427,9 @@ function build() {
   const hasTmdb = hasTmdbCredentials(input);
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
-  const _presets = presets();
-  const globalTimeout = Number(S.addonTimeout)||6000;
-  _presets.forEach(preset => { if (preset.options && 'timeout' in preset.options) preset.options.timeout = globalTimeout; });
+  const globalTimeout = Number(input.addonTimeout)||6000;
+  const normalizedPresets = assertAddonPolicy(addonPolicy(input, presets(), { defaultTimeout: globalTimeout }));
+  const activePresets = normalizedPresets.presets;
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
     preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HDTV'],
@@ -3445,8 +3448,8 @@ function build() {
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
-    size: (function(){ const is4k = S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed'; return { global:{ movies:[1610612736,80000000000], series:[209715200,40000000000] }, resolution:{ ...(is4k ? { '2160p':{ movies:[1610612736,150000000000], series:[209715200,80000000000] } } : {}), '1080p':{ movies:[524288000,30000000000], series:[104857600,20000000000] }, '720p':{ movies:[209715200,12000000000], series:[52428800,8000000000] } } }; })(),
-    bitrate: (function(){ const bwCap=bandwidthCapMbps(input.bandwidthMbps); return { useMetadataRuntime:hasTmdb, global:{ movies:[1000000,bwCap], series:[1000000,bwCap] }, resolution:{ ...((S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? { '2160p':{ movies:[5000000,Math.min(bwCap,150000000)], series:[5000000,Math.min(bwCap,150000000)] } } : {}), '1080p':{ movies:[2000000,150000000], series:[2000000,150000000] }, '720p':{ movies:[1000000,Math.min(bwCap,150000000)], series:[1000000,Math.min(bwCap,150000000)] } } }; })(),
+    size: sizePolicy(input),
+    bitrate: bitratePolicy(input, hasTmdb),
     hideErrors: true, hideErrorsForResources: ['addon_catalog','catalog','subtitles'],
     digitalReleaseFilter: { enabled:hasTmdb, tolerance:7, requestTypes:['movie','series','anime'], addons:[] },
     autoPlay: { enabled:true, method:S.autoPlayMethod||'matchingFile', attributes:['resolution','quality','audioTags'] },
@@ -3459,7 +3462,7 @@ function build() {
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
-    presets: _presets, services: services(),
+    presets: activePresets, services: services(),
   };
 
   const cfg = {
@@ -3505,7 +3508,7 @@ function build() {
       const threshold=isFree?5:(S.resolution==='4k'?4:S.resolution==='ultrawide'?12:8);
       const wrap=isFree?'totalStreams':'cached(totalStreams)';
       const skip=new Set(['Library','AIOSubtitle','OpenSubtitles','AIOStreams']);
-      const active=_presets.filter(p=>p.enabled!==false&&p.instanceId&&!skip.has(p.options?.name||''));
+      const active=activePresets.filter(p=>p.enabled!==false&&p.instanceId&&!skip.has(p.options?.name||''));
       const ids=active.map(p=>p.instanceId);
       if(ids.length<2) return {enabled:false,groupings:[]};
       const mid=Math.ceil(ids.length/2);
@@ -3582,21 +3585,14 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
 function buildFinal() {
   try {
     const tpl = build();
-    if (_disabledAddons.size && Array.isArray(tpl.config && tpl.config.presets)) {
-      tpl.config.presets = tpl.config.presets.filter(p => ![..._disabledAddons].some(n => presetMatchesAddon(p, n)));
-    }
-    if (S._migrationKeep && typeof S._migrationKeep === 'object') {
-      const ALLOWED_MIGRATION_FIELDS = new Set(['services','presets','groups','sortCriteria','deduplicator','formatter','parentConfig','resultLimits','excludedResolutions','includedResolutions','requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes','excludedAudioTags','preferredAudioTags','preferredAudioChannels','preferredVisualTags','excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages','excludedQualities','includedQualities','requiredQualities','preferredQualities','excludedVisualTags','includedVisualTags','requiredVisualTags','excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions','syncedExcludedStreamExpressionUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedRankedStreamExpressionUrls','excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns','syncedExcludedRegexUrls','syncedRankedRegexUrls','size','bitrate','titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter']);
-      const filtered = {};
-      for (const k of Object.keys(S._migrationKeep)) {
-        if (ALLOWED_MIGRATION_FIELDS.has(k)) filtered[k] = S._migrationKeep[k];
-      }
-      Object.assign(tpl.config, filtered);
-    }
-    sanitizeAioEnumArrays(tpl.config);
-    addVersionMetadata(tpl);
-    _cachedBuildResult = tpl;
-    return tpl;
+    const result = assembleTemplate(tpl, {
+      version: TEMPLATE_VERSION,
+      disabledAddons: _disabledAddons,
+      presetMatchesAddon,
+      migrationKeep: S._migrationKeep,
+    });
+    _cachedBuildResult = result;
+    return result;
   } catch (err) {
     logError('build', err.message, { service: S.service, device: S.device, resolution: S.resolution, stack: err.stack?.slice(0, 300) });
     throw err;
@@ -6386,7 +6382,18 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
   window.__coreBuilds = {
     generate(overrides) {
       Object.assign(S, overrides || {});
-      const out = buildFinal();
+      const out = generateTemplate(S, {
+        deviceAv1Safe: DEVICE_AV1_SAFE,
+        deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
+        presets: presets(),
+        defaultTimeout: Number(S.addonTimeout) || 6000,
+        assemble: () => assembleTemplate(build(), {
+          version: TEMPLATE_VERSION,
+          disabledAddons: _disabledAddons,
+          presetMatchesAddon,
+          migrationKeep: S._migrationKeep,
+        }),
+      });
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp
         out.metadata.id = 'core-custom-golden';             // sid() is random per build

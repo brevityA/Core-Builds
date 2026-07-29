@@ -1554,23 +1554,6 @@
         }
       },
       {
-        "type": "hdhub",
-        "instanceId": "hdhub-1",
-        "enabled": false,
-        "options": {
-          "name": "HdHub",
-          "timeout": 6000,
-          "resources": [
-            "stream"
-          ],
-          "mediaTypes": [
-            "movie",
-            "series",
-            "anime"
-          ]
-        }
-      },
-      {
         "type": "eztv",
         "instanceId": "nx-ez-01",
         "enabled": true,
@@ -1603,61 +1586,6 @@
           "timeout": 6000,
           "mediaTypes": [],
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "torrents-db",
-        "instanceId": "nx-tdb-1",
-        "enabled": false,
-        "options": {
-          "name": "TorrentsDB",
-          "timeout": 6000,
-          "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "animetosho",
-        "instanceId": "nx-at-01",
-        "enabled": false,
-        "options": {
-          "name": "AnimeTosho",
-          "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "neko-bt",
-        "instanceId": "neko-bt-core-builds",
-        "enabled": false,
-        "options": {
-          "name": "NekoBT",
-          "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "sootio",
-        "instanceId": "sootio-core-builds",
-        "enabled": false,
-        "options": {
-          "name": "Sootio",
-          "timeout": 6000
         },
         "resources": [
           "stream"

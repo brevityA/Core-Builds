@@ -18,6 +18,7 @@ const required = [
 await Promise.all(required.map(file => access(resolve(root, file))));
 
 const app = await readFile(resolve(root, 'src/js/app.js'), 'utf8');
+const filterPolicy = await readFile(resolve(root, 'src/core/filter-policy.js'), 'utf8');
 const shell = await readFile(resolve(root, 'src/index.html'), 'utf8');
 const buildScript = await readFile(resolve(root, 'scripts/build.mjs'), 'utf8');
 const cssFiles = ['01-core.css','02-brand-theme.css','03-enhancements.css','04-landing.css','05-unified-ui.css','06-features.css','07-menu-parity.css'];
@@ -38,15 +39,15 @@ const checks = {
   'device grid layout': app.includes('class="device-grid"') && app.includes('class="device-card"') && app.includes('class="device-help-banner"') && !app.includes('id="devScroll"'),
   'Apple TV AV1 conservative': !DEVICE_AV1_SAFE.has('appletv-new'),
   'ONN DV conservative': !DEVICE_DV_SAFE.has('onn'),
-  'schema guard wired': app.includes("import { sanitizeAioEnumArrays }"),
+  'schema guard wired': app.includes("import { assembleTemplate }") || app.includes("import { sanitizeAioEnumArrays }"),
   'credential registry': Object.keys(PROVIDER_CREDENTIALS).length >= 18 && app.includes("import { PROVIDER_CREDENTIALS }"),
   'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
   'quick install optional TMDB': app.includes('data-fl-tmdb') && app.includes("tmdbField('tmdbToken')") && app.includes("tmdbField('tmdbApiKey'"),
-  'TMDB-free config compatibility': app.includes('useMetadataRuntime:hasTmdb') && app.includes('digitalReleaseFilter: { enabled:hasTmdb') && app.includes('titleMatching: { enabled:hasTmdb') && app.includes('yearMatching: { enabled:hasTmdb') && !app.includes("warns.push('No TMDB key"),
+  'TMDB-free config compatibility': filterPolicy.includes('useMetadataRuntime: Boolean(hasTmdb)') && app.includes('bitratePolicy(input, hasTmdb)') && !app.includes("warns.push('No TMDB key"),
   'Quick Install manifest lifecycle': app.includes("{ key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' }") && app.includes("document.getElementById('fastLaneModal')?.remove()") && !app.includes("if (state.target==='manifest') installTarget='app'"),
   'Fine-Tune pop-out lifecycle': app.includes("import { FORMATTERS, AUDIO_HELP }") && app.includes("openAdvancedDrawer(el)") && app.includes("overlay.id = 'advancedDrawer'") && app.includes('closeAdvancedDrawer()') && !app.includes("main.innerHTML = renderAdvancedPanel();\n    nav.style.display = 'none'"),
   'Advanced extras carousel': app.includes('const carouselOptSection =') && app.includes('const optSection = S.simpleMode ? compactOptSection : carouselOptSection') && app.includes('toggle-carousel-service') && app.includes('toggle-optional-scraper'),
-  'advanced playback controls': app.includes("preloadEnabled:true") && app.includes("autoPlayMethod:'matchingFile'") && app.includes('preset.options.timeout = globalTimeout'),
+  'advanced playback controls': app.includes("preloadEnabled:true") && app.includes("autoPlayMethod:'matchingFile'") && app.includes('addonPolicy(input, presets()'),
   'partial exports': app.includes('const PARTIAL_EXPORT_FIELDS') && app.includes("credentials:{}") && app.includes("exportPartial(el.dataset.kind)"),
   'Core Tools links': app.includes('Back Up Addons') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
