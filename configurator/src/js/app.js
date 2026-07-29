@@ -1124,6 +1124,7 @@ function renderAdvancedPanel() {
       </div>
 
     </div>
+    ${S.multiServices.length > 0 ? `<div style="position:sticky;bottom:0;padding:14px 20px;border-top:1px solid rgba(255,255,255,.06);background:linear-gradient(to top,#0d1017 60%,transparent)"><button data-action="close-and-next" style="width:100%;padding:14px 20px;border-radius:12px;border:none;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#0d1017;font-size:.92rem;font-weight:800;cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 4px 20px rgba(0,212,255,.3)" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,212,255,.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(0,212,255,.3)';this.style.transform='none'">Save &amp; Continue<span style="font-size:1.1rem">→</span></button></div>` : ''}
   </div>`;
 }
 
@@ -2343,6 +2344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'open-advanced') openAdvancedDrawer(el);
     if (action === 'close-advanced') closeAdvancedDrawer();
+    if (action === 'close-and-next') { closeAdvancedDrawer(); if (step < STEPS && S.multiServices.length > 0) { step++; pushStep(); saveState(); render(); window.scrollTo(0,0); } }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showFastLane();
     if (action === 'open-diagnostics') showDiagnosticsModal();
