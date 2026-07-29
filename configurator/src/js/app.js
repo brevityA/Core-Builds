@@ -16,6 +16,7 @@ import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-poli
 import { sortPolicy } from '../core/sort-policy.js';
 import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
 import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
+import { generateTemplate } from '../core/generate-template.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -6388,7 +6389,16 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
   window.__coreBuilds = {
     generate(overrides) {
       Object.assign(S, overrides || {});
-      const out = buildFinal();
+      // Transitional adapter: policy composition is now routed through the pure
+      // facade; legacy assembly remains the injected adapter until Part 8's
+      // full config assembly migration is complete.
+      const out = generateTemplate(S, {
+        deviceAv1Safe: DEVICE_AV1_SAFE,
+        deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
+        presets: presets(),
+        defaultTimeout: Number(S.addonTimeout) || 6000,
+        assemble: () => buildFinal(),
+      });
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp
         out.metadata.id = 'core-custom-golden';             // sid() is random per build
