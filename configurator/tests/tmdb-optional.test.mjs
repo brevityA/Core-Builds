@@ -13,7 +13,7 @@ test('generated config disables every TMDB-dependent AIOStreams feature without 
     titleMatching: { enabled: false },
     yearMatching: { enabled: false },
   });
-  assert.ok(app.includes('hasTmdbCredentials(S)'));
+  assert.ok(app.includes('hasTmdbCredentials(input)'));
   assert.ok(app.includes('useMetadataRuntime:hasTmdb'));
   assert.ok(app.includes('digitalReleaseFilter: { enabled:hasTmdb'));
   assert.ok(app.includes('titleMatching: { enabled:hasTmdb'));
