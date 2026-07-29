@@ -3526,7 +3526,6 @@ function build() {
     excludedStreamExpressions: eses(),
     includedStreamExpressions: [
       { enabled:true, expression:"/* Protect Library & SeaDex */ passthrough(merge(library(streams), seadex(streams)), 'excluded')" },
-      { enabled:true, expression:"/* ID-Matched Trust */ passthrough(idMatched(streams), 'title', 'year', 'episode')" },
       { enabled:true, expression:"/* Smart Play Pin */ pin(message(streams, 'includes', '🎯'), 'top')" },
       { enabled:true, expression:"/*Library*/ count(streams)==count(library(streams)) ? library(streams) : []" },
       ...(hasTmdb ? [{ enabled:true, expression:"/*digitalRelease Bypass*/ queryType=='movie' or queryType=='anime.movie' ? (count(passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease'))>15 ? passthrough(quality(streams,'CAM','TS','TC','SCR','WEBRip'),'digitalRelease') : passthrough(streams,'digitalRelease')) : []" }] : []),
