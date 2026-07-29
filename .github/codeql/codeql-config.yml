@@ -1,0 +1,10 @@
+name: Core Builds CodeQL
+
+# The standalone configurator/index.html is a generated deployment artifact.
+# Analyse the source and worker code instead; generated-bundle findings are
+# duplicated/noisy and are covered by the source-level checks and build parity.
+paths-ignore:
+  - configurator/index.html
+  - configurator/dist/**
+  - configurator/build/**
+  - '**/node_modules/**'
