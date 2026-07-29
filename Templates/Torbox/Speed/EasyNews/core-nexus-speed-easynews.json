@@ -2245,15 +2245,15 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "EasyNews"
+            "nx-fix-04",
+            "easynews-1"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "Meteor"
+            "1fa89382-5938-4d6e-bcba-a1aa9fc88a95"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

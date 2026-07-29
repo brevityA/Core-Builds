@@ -1175,21 +1175,21 @@
         {
           "name": "Primary",
           "addons": [
-            "TorBox Search",
-            "Comet RD",
-            "Meteor",
-            "Zilean",
-            "SeaDex"
+            "5f6",
+            "nx-fix-01",
+            "nx-fix-02",
+            "nx-fix-04",
+            "tam-seadex"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "Searchⁿᶻᵇ",
-            "Knaben",
-            "MediaFusion",
-            "OpenSubtitles V3+"
+            "tb-nzb-1",
+            "tam-knaben",
+            "tam-mf",
+            "os-v3-hash"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

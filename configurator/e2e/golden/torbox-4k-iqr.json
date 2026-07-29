@@ -2194,22 +2194,22 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "SeaDex",
-            "StremThru Torz",
-            "Meteor",
-            "Comet"
+            "nx-fix-04",
+            "tam-seadex",
+            "67c",
+            "nx-fix-02",
+            "nx-fix-01"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "MediaFusion",
-            "EZTV",
-            "Torrent Galaxy",
-            "Knaben",
-            "TMDB"
+            "nx-mf-01",
+            "nx-ez-01",
+            "nx-tg-01",
+            "tam-knaben",
+            "tmdb-cat-1"
           ],
           "condition": "count(cached(totalStreams))<4 and totalTimeTaken<6000"
         }

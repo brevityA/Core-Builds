@@ -594,22 +594,22 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "SeaDex",
-            "Meteor",
-            "Comet",
-            "MediaFusion"
+            "f7083d27-a799-46df-a2cf-ed27bac3010f",
+            "76ea77ca-cc91-439c-9e56-3bec8f115606",
+            "60f24567-7539-4a79-afe1-e8fb2ffd3c13",
+            "0a1bc005-3cad-44d6-a403-06ff7ad6764f",
+            "2b4a42a6-f640-4906-9363-98761da35325"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "AnimeTosho",
-            "NekoBT",
-            "StremThru Torz",
-            "Torrent Galaxy",
-            "Knaben"
+            "60cbafd0-1244-4fef-8ef7-a01146ed7ca5",
+            "2f483075-def2-461c-8657-ccb2e02c5e90",
+            "8416277a",
+            "d0ab7d2b-269b-4aa1-8696-f286186a2951",
+            "3ed67194-98ad-438e-b6be-67aaed730115"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

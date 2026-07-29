@@ -415,26 +415,26 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "TorBox Search",
-            "StremThru Torz",
-            "StremThru Store",
-            "Comet RD",
-            "Comet TB",
-            "Meteor"
+            "nx-fix-04",
+            "5f6",
+            "67c",
+            "056a72e1-ca17-45c8-8ae5-50aab2de7624",
+            "nx-fix-01",
+            "pers-comet-tb",
+            "nx-fix-02"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "SeaDex",
-            "Searchⁿᶻᵇ",
-            "NZBGeek",
-            "Knaben",
-            "EZTV",
-            "Debridio",
-            "OpenSubtitles V3+"
+            "tam-seadex",
+            "tb-nzb-1",
+            "nzbgeek-01",
+            "tam-knaben",
+            "eztv-01",
+            "25e4aea8-830b-4053-80d2-5fcde05183fc",
+            "os-v3-hash"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

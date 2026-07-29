@@ -3549,11 +3549,12 @@ function build() {
       const isFree=S.service==='p2p'||S.service==='http';
       const threshold=isFree?5:(S.resolution==='4k'?4:S.resolution==='ultrawide'?12:8);
       const wrap=isFree?'totalStreams':'cached(totalStreams)';
-      const active=_presets.filter(p=>p.enabled!==false&&p.options?.name&&!['Library','AIOSubtitle','OpenSubtitles','AIOStreams'].includes(p.options.name));
-      const names=active.map(p=>p.options.name);
-      if(names.length<2) return {enabled:false,groupings:[]};
-      const mid=Math.ceil(names.length/2);
-      const g1=names.slice(0,mid), g2=names.slice(mid);
+      const skip=new Set(['Library','AIOSubtitle','OpenSubtitles','AIOStreams']);
+      const active=_presets.filter(p=>p.enabled!==false&&p.instanceId&&!skip.has(p.options?.name||''));
+      const ids=active.map(p=>p.instanceId);
+      if(ids.length<2) return {enabled:false,groupings:[]};
+      const mid=Math.ceil(ids.length/2);
+      const g1=ids.slice(0,mid), g2=ids.slice(mid);
       const groupings=[{name:'Primary',addons:g1,condition:'true'}];
       if(g2.length) groupings.push({name:'Secondary',addons:g2,condition:`count(${wrap})<${threshold} and totalTimeTaken<${timeout}`});
       return {enabled:true,behaviour:'sequential',groupings};

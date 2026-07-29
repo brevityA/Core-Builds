@@ -611,21 +611,21 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "StremThru Torz",
-            "Meteor",
-            "Comet RD",
-            "Torrent Galaxy"
+            "nx-fix-04",
+            "67c",
+            "nx-fix-02",
+            "nx-fix-01",
+            "0b7a37bd-6d57-4397-bdd3-28440b087da0"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "EZTV",
-            "Searchⁿᶻᵇ",
-            "Knaben",
-            "OpenSubtitles V3+"
+            "495616cf-23f0-4dfb-96ba-104e8e5a85f0",
+            "tb-nzb-1",
+            "tam-knaben",
+            "os-v3-hash"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

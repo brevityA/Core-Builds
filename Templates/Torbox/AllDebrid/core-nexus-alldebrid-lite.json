@@ -1215,20 +1215,20 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "StremThru AllDebrid",
-            "Meteor",
-            "Comet"
+            "nx-fix-04",
+            "68a",
+            "nx-fix-02",
+            "nx-fix-01"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "MediaFusion",
-            "EZTV",
-            "Torrent Galaxy",
-            "Knaben"
+            "30ab6dcc-8234-4e6f-bce4-6b781cd0066b",
+            "a42458fd-db69-44c2-8be6-6a1319df3676",
+            "e5afbfd3-6987-438b-b246-a345b4f90010",
+            "tam-knaben"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

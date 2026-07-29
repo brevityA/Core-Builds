@@ -625,16 +625,16 @@
         {
           "name": "Primary",
           "addons": [
-            "Sootio",
-            "Peerflix"
+            "sootio-core-builds",
+            "pflx-1"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "HdHub",
-            "TMDB"
+            "hdhub-1",
+            "tmdb-cat-1"
           ],
           "condition": "count(totalStreams)<5 and totalTimeTaken<6000"
         }

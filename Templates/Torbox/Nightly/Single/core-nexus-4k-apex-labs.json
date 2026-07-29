@@ -1332,22 +1332,22 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "StremThru Torz",
-            "Meteor",
-            "Comet",
-            "MediaFusion"
+            "nx-fix-04",
+            "67c",
+            "nx-fix-02",
+            "nx-fix-01",
+            "f6a38af4-a24d-43fc-8370-c10f07760c17"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "EZTV",
-            "Searchⁿᶻᵇ",
-            "Torrent Galaxy",
-            "Knaben",
-            "TorrentsDB"
+            "495616cf-23f0-4dfb-96ba-104e8e5a85f0",
+            "tb-nzb-1",
+            "0b7a37bd-6d57-4397-bdd3-28440b087da0",
+            "tam-knaben",
+            "nx-tdb-1"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

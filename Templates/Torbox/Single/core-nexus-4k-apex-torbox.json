@@ -1277,16 +1277,16 @@
         {
           "name": "Primary",
           "addons": [
-            "StremThru Torz",
-            "Searchⁿᶻᵇ"
+            "67c",
+            "tb-nzb-1"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "TorrentsDB",
-            "TorBox Search"
+            "nx-tdb-1",
+            "5f6"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }

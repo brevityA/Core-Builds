@@ -1277,23 +1277,23 @@
         {
           "name": "Primary",
           "addons": [
-            "Zilean",
-            "SeaDex",
-            "AnimeTosho",
-            "NekoBT",
-            "StremThru Torz",
-            "Meteor"
+            "nx-fix-04",
+            "tam-seadex",
+            "60cbafd0-1244-4fef-8ef7-a01146ed7ca5",
+            "2f483075-def2-461c-8657-ccb2e02c5e90",
+            "67c",
+            "nx-fix-02"
           ],
           "condition": "true"
         },
         {
           "name": "Secondary",
           "addons": [
-            "Comet",
-            "MediaFusion",
-            "EZTV",
-            "Torrent Galaxy",
-            "Knaben"
+            "nx-fix-01",
+            "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4",
+            "3cb9b60c-eee4-4622-a992-62dd746bab58",
+            "8b334f9b-e5c2-4061-bc3d-305d1d0c422f",
+            "tam-knaben"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
