@@ -46,32 +46,25 @@ jobs:
           gh label create "$LABEL" --color "D29922" --description "Vidhin05 upstream changed — review snapshots" 2>/dev/null || true
 
           REPORT=$(head -c 4000 /tmp/drift_report.txt)
-          BODY="## ⚠️ Vidhin05 upstream drift detected
-
-The ranked regex / ranked expression files that all active templates live-sync have
-changed relative to our pinned snapshots in \`Filtering/upstream/\`.
-
-Template behaviour changes immediately whether we act or not — this issue exists so
-the change is reviewed.
-
-\`\`\`
-${REPORT}
-\`\`\`
-
-**Response checklist**
-- [ ] Review the diff upstream (linked in the report)
-- [ ] Re-pin snapshots: \`node scripts/check_upstream_drift.mjs --update\` and commit
-- [ ] Check \`Filtering/ranked-regex-patterns.json\` still matches the elfhosted whitelist (drifted pattern strings cause import rejections)
-- [ ] Re-generate affected templates if scoring changed materially
-- [ ] Close this issue once snapshots are re-pinned"
+          BODY=$(printf '%s\n' \
+            '## ⚠️ Vidhin05 upstream drift detected' \
+            '' \
+            'The ranked regex / ranked expression files that all active templates live-sync have changed relative to our pinned snapshots in `Filtering/upstream/`.' \
+            '' \
+            'Template behaviour changes immediately whether we act or not — this issue exists so the change is reviewed.' \
+            '' \
+            '```' "$REPORT" '```' \
+            '' \
+            '**Response checklist**' \
+            '- [ ] Review the diff upstream (linked in the report)' \
+            '- [ ] Re-pin snapshots with: node scripts/check_upstream_drift.mjs --update' \
+            '- [ ] Check Filtering/ranked-regex-patterns.json against the elfhosted whitelist' \
+            '- [ ] Re-generate affected templates if scoring changed materially' \
+            '- [ ] Close this issue once snapshots are re-pinned')
 
           EXISTING=$(gh issue list --label "$LABEL" --state open --json number --jq '.[0].number')
           if [ -n "$EXISTING" ]; then
-            gh issue comment "$EXISTING" --body "Drift still present as of $(date -u +%Y-%m-%dT%H:%M:%SZ):
-
-\`\`\`
-${REPORT}
-\`\`\`"
+            gh issue comment "$EXISTING" --body "Drift still present as of $(date -u +%Y-%m-%dT%H:%M:%SZ): ${REPORT}"
           else
             gh issue create --title "Upstream drift: Vidhin05 Releases-Regex changed" --label "$LABEL" --body "$BODY"
           fi
