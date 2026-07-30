@@ -3,15 +3,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolutionPolicy } from '../src/core/device-policies.js';
 import { sortPolicy } from '../src/core/sort-policy.js';
+import { APEX_MIXED_PSES } from '../src/core/sel-policy-data.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
-// ── Golden link: APEX_MIXED_PSES must stay byte-identical to the static template ──
-// Extract the constant from source (pure data — safe to evaluate).
-const start = app.indexOf('const APEX_MIXED_PSES = [');
-const end = app.indexOf('];', start);
-assert.ok(start > 0 && end > start, 'APEX_MIXED_PSES constant missing from app.js');
-const APEX_MIXED_PSES = new Function(`${app.slice(start, end + 2)}; return APEX_MIXED_PSES;`)();
+// ── Golden link: shared SEL data must stay byte-identical to the static template ──
+assert.ok(Array.isArray(APEX_MIXED_PSES) && APEX_MIXED_PSES.length > 0, 'APEX_MIXED_PSES data missing');
 
 test('APEX_MIXED_PSES is byte-identical to the 4K Apex Mixed nightly template (golden link)', async () => {
   const tpl = JSON.parse(await readFile(
