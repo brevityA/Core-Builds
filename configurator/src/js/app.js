@@ -3591,7 +3591,7 @@ function buildFinal() {
   try {
     const tpl = build();
     const result = assembleTemplate(tpl, {
-      version: TEMPLATE_VERSION,
+      metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
       disabledAddons: _disabledAddons,
       presetMatchesAddon,
       migrationKeep: S._migrationKeep,
@@ -6393,7 +6393,7 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
         presets: presets(),
         defaultTimeout: Number(S.addonTimeout) || 6000,
         assemble: () => assembleTemplate(build(), {
-          version: TEMPLATE_VERSION,
+          metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
           disabledAddons: _disabledAddons,
           presetMatchesAddon,
           migrationKeep: S._migrationKeep,
