@@ -18,6 +18,7 @@ import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
 import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { buildApexIqr4kPses, buildApexIqr1080Pses } from '../core/apex-policy.js';
+import { buildStandard4kPses, buildStandard1080Pses, buildMixedPses, buildDefaultPses } from '../core/standard-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -3302,19 +3303,7 @@ function eses() {
 
 function pses() {
   const out = [], res = S.resolution, dev = S.device, dv = DEVICE_DV_SAFE.has(dev), supportsAv1 = DEVICE_AV1_SAFE.has(dev), codecExpr = supportsAv1 ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
-  const audPinnArr = (S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev)) ? [] : S.audio === 'dolby' ? [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos')" }] : [{ enabled:true, expression:"/* Audio Pinnacle */ audioTag(streams,'TrueHD','Atmos','DTS-HD MA','DTS:X','FLAC')" }];
-  const pin1080Elite = { enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" }, pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" }, imaxPin = { enabled:true, expression:"/*IMAX pin*/ count(visualTag(streams,'IMAX'))>0 ? pin(visualTag(streams,'IMAX'),'top') : []" };
-  const qrLimit = dv ? 4 : 3;
-  const sliceLimits4k = [
-    { enabled:true, expression:`/* QR Balance — HQ */ perGroup(quality(streams,'Bluray REMUX','Bluray','WEB-DL'),'resolution',${qrLimit},'2160p','1080p','720p')` },
-    { enabled:true, expression:"/* QR Balance — LQ */ perGroup(quality(streams,'WEBRip','HDTV','HDRip'),'resolution',2,'1080p','720p','480p')" },
-    { enabled:true, expression:"/* Addon Diversity */ perGroup(cached(streams),'indexer',2)" }
-  ];
-  const sliceLimits1080 = [
-    { enabled:true, expression:"/* QR Balance — HQ */ perGroup(quality(streams,'Bluray REMUX','Bluray','WEB-DL'),'resolution',3,'1080p','720p')" },
-    { enabled:true, expression:"/* QR Balance — LQ */ perGroup(quality(streams,'WEBRip','HDTV','HDRip'),'resolution',2,'720p','480p')" },
-    { enabled:true, expression:"/* Addon Diversity */ perGroup(cached(streams),'indexer',2)" }
-  ];
+  const pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" };
 
   if (S.langs && S.langs.length) {
     out.push({ enabled:true, expression:`/* Language Preference — ${(S.langs||['English']).join('/')} */ language(streams,${(S.langs||['English']).map(l=>`'${l}'`).join(',')})` });
@@ -3352,27 +3341,20 @@ function pses() {
     const forceLimitedAudio = S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev);
     out.push(...buildApexIqr4kPses({ dv, audio: S.audio, forceLimitedAudio, supportsAv1 }));
   } else if (res === '4k') {
-    out.push({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" }, pin1080Elite, pinLQ);
-    if (dv) out.push({ enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" });
-    out.push({ enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 4K WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* B-Tier 4K WEB-DL */ quality(resolution(streams,'2160p'),'WEB-DL')" }, { enabled:true, expression:"/* C-Tier Any 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR+DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }, imaxPin, ...sliceLimits4k);
+    const forceLimitedAudio = S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev);
+    out.push(...buildStandard4kPses({ dv, audio: S.audio, forceLimitedAudio, supportsAv1 }));
   } else if (res === '1080p' && S.pseArch === 'iqr') {
     const forceLimitedAudio = S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev);
     out.push(...buildApexIqr1080Pses({ audio: S.audio, forceLimitedAudio, supportsAv1 }));
   } else if (res === '1080p') {
-    out.push(pin1080Elite, pinLQ, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }, imaxPin, ...sliceLimits1080);
+    const forceLimitedAudio = S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev);
+    out.push(...buildStandard1080Pses({ audio: S.audio, forceLimitedAudio, supportsAv1 }));
   } else if (res === 'mixed') {
-    // Mixed · Adaptive — no hard caps: 4K → 1080p → 720p → SD niche fallback. No 1080p Elite pin so 4K is never outranked.
-    out.push(pinLQ,
-      { enabled:true, expression:"/* S-Tier 4K BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 4K WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* B-Tier 4K WEB-DL */ quality(resolution(streams,'2160p'),'WEB-DL')" }, { enabled:true, expression:"/* C-Tier Any 4K */ resolution(streams,'2160p')" },
-      { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" },
-      { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:"/* 576p/480p Niche Fallback */ resolution(streams,'576p','480p')" },
-      ...audPinnArr, { enabled:true, expression:codecExpr },
-      { enabled:true, expression:"/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR+DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))" },
-      { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }, imaxPin, ...sliceLimits4k
-    );
-
+    const forceLimitedAudio = S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev);
+    out.push(...buildMixedPses({ audio: S.audio, forceLimitedAudio, supportsAv1, dv }));
   } else {
-    out.push(pin1080Elite, pinLQ, { enabled:true, expression:"/* S-Tier 1080p BluRay REMUX */ quality(resolution(streams,'1080p'),'BluRay REMUX')" }, { enabled:true, expression:"/* A-Tier 1080p WEB-DL */ quality(resolution(streams,'1080p'),'WEB-DL')" }, { enabled:true, expression:"/* B-Tier 1080p WEBRip or BluRay */ quality(resolution(streams,'1080p'),'WEBRip','BluRay')" }, { enabled:true, expression:"/* C-Tier Any 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* 1440p Any Quality */ quality(resolution(streams,'1440p'),'BluRay REMUX','BluRay','WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 4K Fallback BluRay REMUX */ quality(resolution(streams,'2160p'),'BluRay REMUX')" }, { enabled:true, expression:"/* 4K Fallback WEB-DL HDR */ visualTag(quality(resolution(streams,'2160p'),'WEB-DL'),'DV','HDR+DV','HDR10+','HDR10','HDR')" }, { enabled:true, expression:"/* 4K Fallback Any */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* 720p WEB-DL Fallback */ quality(resolution(streams,'720p'),'WEB-DL','WEBRip')" }, { enabled:true, expression:"/* 720p Any Fallback */ resolution(streams,'720p')" }, ...audPinnArr, { enabled:true, expression:codecExpr }, { enabled:true, expression:"/*HDR/DV Priority*/ merge(visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'DV','HDR10+','HDR+DV'),visualTag(resolution(cached(negate(merge(library(streams),seadex(streams)),streams)),'2160p'),'HDR10','HDR'))" }, { enabled:true, expression:"/* Boost Cached Usenet */ type(cached(streams),'usenet','stremio-usenet')" }, imaxPin, ...sliceLimits4k);
+    const forceLimitedAudio = S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(dev);
+    out.push(...buildDefaultPses({ audio: S.audio, forceLimitedAudio, supportsAv1, dv }));
   }
   return out;
 }
