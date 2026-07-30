@@ -30,6 +30,16 @@ test('assembleTemplate filters disabled addons without mutating input', () => {
   assert.deepEqual(source.config.presets.map(p => p.instanceId), ['a','b']);
 });
 
+test('migrationKeep.presets cannot reintroduce disabled addons', () => {
+  const source = { config:{ presets:[{ instanceId:'a' }] } };
+  const result = assembleTemplate(source, {
+    migrationKeep:{ presets:[{ instanceId:'a' }, { instanceId:'b' }, { instanceId:'c' }] },
+    disabledAddons:new Set(['b']),
+    presetMatchesAddon:(preset, name) => preset.instanceId === name,
+  });
+  assert.deepEqual(result.config.presets.map(p => p.instanceId), ['a','c']);
+});
+
 test('ALLOWED_MIGRATION_FIELDS covers the documented config sections', () => {
   for (const key of ['services', 'presets', 'sortCriteria', 'formatter', 'size', 'bitrate']) {
     assert.ok(ALLOWED_MIGRATION_FIELDS.has(key), `missing: ${key}`);

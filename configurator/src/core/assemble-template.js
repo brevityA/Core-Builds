@@ -32,6 +32,12 @@ export function assembleTemplate(rawTemplate, options = {}) {
     ? template.config
     : (template.config = {});
 
+  if (options.migrationKeep && typeof options.migrationKeep === 'object') {
+    for (const [key, value] of Object.entries(options.migrationKeep)) {
+      if (ALLOWED_MIGRATION_FIELDS.has(key)) config[key] = clone(value);
+    }
+  }
+
   if (options.disabledAddons?.size && Array.isArray(config.presets)) {
     const matchFn = options.presetMatchesAddon;
     if (typeof matchFn === 'function') {
@@ -39,12 +45,6 @@ export function assembleTemplate(rawTemplate, options = {}) {
       config.presets = config.presets.filter(
         preset => !disabled.some(name => matchFn(preset, name))
       );
-    }
-  }
-
-  if (options.migrationKeep && typeof options.migrationKeep === 'object') {
-    for (const [key, value] of Object.entries(options.migrationKeep)) {
-      if (ALLOWED_MIGRATION_FIELDS.has(key)) config[key] = clone(value);
     }
   }
 
