@@ -285,7 +285,12 @@ function sanitizeSharedConfig(d) {
 }
 
 function saveLastGen() {
-  try { const snap = {}; SHARE_KEYS.forEach(k => { snap[k] = S[k]; }); localStorage.setItem('coreBuildLastGen', JSON.stringify(snap)); } catch(e) {}
+  try {
+    const snap = {}; SHARE_KEYS.forEach(k => { snap[k] = S[k]; });
+    snap._ver = CONFIGURATOR_VERSION;
+    snap._ts = Date.now();
+    localStorage.setItem('coreBuildLastGen', JSON.stringify(snap));
+  } catch(e) {}
   saveBackup();
 }
 const BACKUP_MAX = 20;
