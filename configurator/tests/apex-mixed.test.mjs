@@ -31,8 +31,9 @@ test('apex-mixed stack keeps the Apex identity: IQR tiers, niche ladder, slice l
   assert.ok(text.includes('Audio channel priority'), 'audio priority missing');
 });
 
-test('pses() emits the ported stack for apex-mixed and returns early', () => {
-  assert.match(app, /if \(S\.pseArch === 'apex-mixed'\) \{\s*out\.push\(\.\.\.APEX_MIXED_PSES\.map\(p => \(\{ \.\.\.p \}\)\)\);\s*return out;/);
+test('pses() delegates to getSelPolicy for all architectures including apex-mixed', () => {
+  assert.ok(app.includes('getSelPolicy'), 'pses() must delegate to getSelPolicy');
+  assert.ok(app.includes("architecture: S.pseArch || 'standard'"), 'pses() must pass pseArch to getSelPolicy');
 });
 
 test('apex-mixed adopts the mixed resolution policy end to end', () => {

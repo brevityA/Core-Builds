@@ -21,8 +21,7 @@ test('resolutionCfg gives mixed no caps and a broad preferred ladder incl. SD ni
 });
 
 test('mixed gets its own debrid PSE stack with 4K → 1080p → 720p → SD niche fallback', () => {
-  assert.ok(app.includes("} else if (res === 'mixed') {"), 'missing mixed PSE branch');
-  assert.ok(app.includes('buildMixedPses'), 'mixed branch must delegate to buildMixedPses');
+  assert.ok(app.includes('getSelPolicy'), 'pses() must delegate to getSelPolicy');
   const pses = buildMixedPses({ audio: 'limited', forceLimitedAudio: false, supportsAv1: false, dv: false });
   const labels = pses.map(p => p.expression.match(/\/\*([^*]+)\*\//)?.[1]?.trim()).filter(Boolean);
   assert.ok(labels.includes('576p/480p Niche Fallback'), 'mixed stack must keep SD tiers reachable for niche catalogs');
