@@ -33,8 +33,14 @@ export function assertSelPolicy(policy) {
   if (!SEL_ARCHITECTURES.includes(policy?.architecture)) throw new Error('Invalid SEL architecture');
   for (const key of ['preferredStreamExpressions','includedStreamExpressions','excludedStreamExpressions','rankedStreamExpressions']) {
     if (!Array.isArray(policy[key])) throw new Error(`Invalid SEL field: ${key}`);
-    for (const expression of policy[key]) {
-      if (typeof expression.expression !== 'string' || !expression.expression.trim()) {
+    for (const entry of policy[key]) {
+      if (
+        !entry ||
+        typeof entry !== 'object' ||
+        typeof entry.enabled !== 'boolean' ||
+        typeof entry.expression !== 'string' ||
+        !entry.expression.trim()
+      ) {
         throw new Error(`Invalid SEL expression in ${key}`);
       }
     }
