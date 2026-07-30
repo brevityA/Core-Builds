@@ -229,7 +229,7 @@ program
     if (opts.tmdbToken) template.config.tmdbReadAccessToken = opts.tmdbToken;
     if (opts.tmdbKey) template.config.tmdbApiKey = opts.tmdbKey;
 
-    const result = assembleTemplate(template, { version: '2.86' });
+    const result = assembleTemplate(template, { metadata: { coreBuildsVersion: '2.86', generatedAt: new Date().toISOString() } });
 
     fs.writeFileSync(opts.output, JSON.stringify(result, null, 2));
     console.log(`\n✅ Template written to ${opts.output}`);

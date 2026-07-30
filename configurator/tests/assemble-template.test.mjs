@@ -2,39 +2,32 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assembleTemplate, ALLOWED_MIGRATION_FIELDS } from '../src/core/assemble-template.js';
 
-test('assembleTemplate stamps version metadata and calls sanitizer', () => {
-  const tpl = { metadata: { id: 'test' }, config: { autoPlay: { attributes: ['resolution', 'BOGUS'] } } };
-  const out = assembleTemplate(tpl, { version: '2.86' });
-  assert.equal(out.metadata.coreBuildsVersion, '2.86');
-  assert.ok(out.metadata.generatedAt);
-  assert.ok(!out.config.autoPlay.attributes.includes('BOGUS'));
+test('assembleTemplate is pure and does not invent volatile metadata', () => {
+  const source = { config:{ autoPlay:{ attributes:['bad'] } }, metadata:{ name:'Test' } };
+  const result = assembleTemplate(source, { metadata:{ coreBuildsVersion:'2.86' } });
+  assert.notEqual(result, source);
+  assert.equal(source.metadata.generatedAt, undefined);
+  assert.equal(result.metadata.generatedAt, undefined);
+  assert.equal(result.metadata.coreBuildsVersion, '2.86');
+  assert.notEqual(result.config, source.config);
 });
 
-test('assembleTemplate filters disabled addons via injected matcher', () => {
-  const tpl = {
-    metadata: {},
-    config: {
-      presets: [
-        { instanceId: 'a', type: 'comet', options: { name: 'Comet' } },
-        { instanceId: 'b', type: 'meteor', options: { name: 'Meteor' } },
-      ],
-    },
-  };
-  const out = assembleTemplate(tpl, {
-    disabledAddons: new Set(['comet']),
-    presetMatchesAddon: (p, name) => (p.type || '').toLowerCase() === name.toLowerCase(),
+test('assembleTemplate applies only allowlisted migration fields', () => {
+  const result = assembleTemplate({ config:{ sortCriteria:{} } }, {
+    migrationKeep:{ sortCriteria:{ global:[] }, secret:'must-not-copy' },
   });
-  assert.equal(out.config.presets.length, 1);
-  assert.equal(out.config.presets[0].instanceId, 'b');
+  assert.deepEqual(result.config.sortCriteria, { global:[] });
+  assert.equal(result.config.secret, undefined);
 });
 
-test('assembleTemplate applies only allowed migration fields', () => {
-  const tpl = { metadata: {}, config: { size: { global: {} } } };
-  const out = assembleTemplate(tpl, {
-    migrationKeep: { size: { global: { max: 999 } }, dangerousField: 'hack' },
+test('assembleTemplate filters disabled addons without mutating input', () => {
+  const source = { config:{ presets:[{ instanceId:'a' }, { instanceId:'b' }] } };
+  const result = assembleTemplate(source, {
+    disabledAddons:new Set(['b']),
+    presetMatchesAddon:(preset, name) => preset.instanceId === name,
   });
-  assert.deepEqual(out.config.size, { global: { max: 999 } });
-  assert.equal(out.config.dangerousField, undefined);
+  assert.deepEqual(result.config.presets.map(p => p.instanceId), ['a']);
+  assert.deepEqual(source.config.presets.map(p => p.instanceId), ['a','b']);
 });
 
 test('ALLOWED_MIGRATION_FIELDS covers the documented config sections', () => {

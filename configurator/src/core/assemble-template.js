@@ -8,44 +8,53 @@ const ALLOWED_MIGRATION_FIELDS = new Set([
   'excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages',
   'excludedQualities','includedQualities','requiredQualities','preferredQualities',
   'excludedVisualTags','includedVisualTags','requiredVisualTags',
-  'excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions',
-  'preferredStreamExpressions','rankedStreamExpressions',
+  'excludedStreamExpressions','includedStreamExpressions',
+  'requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions',
   'syncedExcludedStreamExpressionUrls','syncedIncludedStreamExpressionUrls',
   'syncedPreferredStreamExpressionUrls','syncedRankedStreamExpressionUrls',
   'excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns',
-  'syncedExcludedRegexUrls','syncedRankedRegexUrls',
-  'size','bitrate','titleMatching','yearMatching','seasonEpisodeMatching',
-  'digitalReleaseFilter',
+  'syncedExcludedRegexUrls','syncedRankedRegexUrls','size','bitrate',
+  'titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter',
 ]);
 
-export function assembleTemplate(rawTemplate, options = {}) {
-  const tpl = rawTemplate;
+function clone(value) {
+  if (typeof structuredClone === 'function') return structuredClone(value);
+  return JSON.parse(JSON.stringify(value));
+}
 
-  if (options.disabledAddons?.size && Array.isArray(tpl.config?.presets)) {
+export function assembleTemplate(rawTemplate, options = {}) {
+  if (!rawTemplate || typeof rawTemplate !== 'object') {
+    throw new TypeError('Template must be an object');
+  }
+
+  const template = clone(rawTemplate);
+  const config = template.config && typeof template.config === 'object'
+    ? template.config
+    : (template.config = {});
+
+  if (options.disabledAddons?.size && Array.isArray(config.presets)) {
     const matchFn = options.presetMatchesAddon;
     if (typeof matchFn === 'function') {
       const disabled = [...options.disabledAddons];
-      tpl.config.presets = tpl.config.presets.filter(
-        p => !disabled.some(n => matchFn(p, n))
+      config.presets = config.presets.filter(
+        preset => !disabled.some(name => matchFn(preset, name))
       );
     }
   }
 
   if (options.migrationKeep && typeof options.migrationKeep === 'object') {
-    const filtered = {};
-    for (const k of Object.keys(options.migrationKeep)) {
-      if (ALLOWED_MIGRATION_FIELDS.has(k)) filtered[k] = options.migrationKeep[k];
+    for (const [key, value] of Object.entries(options.migrationKeep)) {
+      if (ALLOWED_MIGRATION_FIELDS.has(key)) config[key] = clone(value);
     }
-    Object.assign(tpl.config, filtered);
   }
 
-  sanitizeAioEnumArrays(tpl.config);
+  sanitizeAioEnumArrays(config);
 
-  if (!tpl.metadata) tpl.metadata = {};
-  tpl.metadata.coreBuildsVersion = options.version || '0.0';
-  tpl.metadata.generatedAt = new Date().toISOString();
+  if (options.metadata && typeof options.metadata === 'object') {
+    template.metadata = { ...(template.metadata || {}), ...clone(options.metadata) };
+  }
 
-  return tpl;
+  return template;
 }
 
 export { ALLOWED_MIGRATION_FIELDS };
