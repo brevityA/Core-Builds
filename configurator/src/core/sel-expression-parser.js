@@ -46,6 +46,9 @@ export function validateExpressionList(list, listName = 'expressions') {
 }
 
 export function validateSelPolicy(policy) {
+  if (!policy || typeof policy !== 'object') {
+    return { policy: [{ index: -1, error: 'Policy must be a non-null object' }] };
+  }
   const errors = {};
   for (const key of ['preferredStreamExpressions', 'includedStreamExpressions', 'excludedStreamExpressions', 'rankedStreamExpressions']) {
     if (!(key in policy)) continue;

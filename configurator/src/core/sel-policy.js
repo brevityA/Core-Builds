@@ -15,14 +15,12 @@ const ARCH_ALIASES = Object.freeze({ apex: 'iqr' });
 
 export function getSelPolicy({ architecture, resolution, dv = false, audio = 'limited', forceLimitedAudio = false, supportsAv1 = false }) {
   const arch = ARCH_ALIASES[architecture] || architecture;
-  if (!SEL_ARCHITECTURES.includes(arch) && arch !== architecture) {
-    throw new Error(`Unknown SEL architecture: ${architecture}`);
-  }
   if (!SEL_ARCHITECTURES.includes(arch)) {
     throw new Error(`Unknown SEL architecture: ${architecture}`);
   }
 
   let pses;
+  let effectiveArch = arch;
   if (arch === 'apex-mixed') {
     pses = APEX_MIXED_PSES.map(p => ({ ...p }));
   } else if (arch === 'iqr' && resolution === '4k') {
@@ -31,16 +29,20 @@ export function getSelPolicy({ architecture, resolution, dv = false, audio = 'li
     pses = buildApexIqr1080Pses({ audio, forceLimitedAudio, supportsAv1 });
   } else if (resolution === '4k') {
     pses = buildStandard4kPses({ dv, audio, forceLimitedAudio, supportsAv1 });
+    if (arch === 'iqr') effectiveArch = 'standard';
   } else if (resolution === '1080p') {
     pses = buildStandard1080Pses({ audio, forceLimitedAudio, supportsAv1 });
+    if (arch === 'iqr') effectiveArch = 'standard';
   } else if (resolution === 'mixed') {
     pses = buildMixedPses({ audio, forceLimitedAudio, supportsAv1, dv });
+    if (arch === 'iqr') effectiveArch = 'standard';
   } else {
     pses = buildDefaultPses({ audio, forceLimitedAudio, supportsAv1, dv });
+    if (arch === 'iqr') effectiveArch = 'standard';
   }
 
   return {
-    architecture: arch,
+    architecture: effectiveArch,
     preferredStreamExpressions: pses,
   };
 }

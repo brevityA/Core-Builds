@@ -192,3 +192,10 @@ test('getSelPolicy DV flag adds extra PSE for IQR 4K', () => {
   const withoutDv = getSelPolicy({ architecture: 'iqr', resolution: '4k', dv: false, audio: 'limited' });
   assert.equal(withDv.preferredStreamExpressions.length, withoutDv.preferredStreamExpressions.length + 1);
 });
+
+test('getSelPolicy reports standard architecture when IQR falls back to non-IQR resolution', () => {
+  const mixed = getSelPolicy({ architecture: 'iqr', resolution: 'mixed', audio: 'limited' });
+  assert.equal(mixed.architecture, 'standard');
+  const unknown = getSelPolicy({ architecture: 'iqr', resolution: 'ultrawide', audio: 'limited' });
+  assert.equal(unknown.architecture, 'standard');
+});

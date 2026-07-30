@@ -14,7 +14,7 @@ import {
 
 // ── Standard quality tiers ──
 
-const DV_4K_REMUX = { enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" };
+const DV_4K_REMUX = Object.freeze({ enabled:true, expression:"/* S-Tier 4K REMUX DV */ visualTag(quality(resolution(streams,'2160p'),'BluRay REMUX'),'DV','HDR+DV')" });
 
 export function standardTiers4k() {
   return [

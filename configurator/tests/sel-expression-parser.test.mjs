@@ -157,6 +157,14 @@ test('validates full policy object', () => {
   assert.deepEqual(errors, {});
 });
 
+test('returns error object for null/undefined policy', () => {
+  const nullResult = validateSelPolicy(null);
+  assert.ok('policy' in nullResult);
+  assert.equal(nullResult.policy[0].error, 'Policy must be a non-null object');
+  const undefinedResult = validateSelPolicy(undefined);
+  assert.ok('policy' in undefinedResult);
+});
+
 test('reports errors per expression list key', () => {
   const errors = validateSelPolicy({
     preferredStreamExpressions: [{ expression: '', enabled: true }],
