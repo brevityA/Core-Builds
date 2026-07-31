@@ -46,7 +46,7 @@ export function validateExpressionList(list, listName = 'expressions') {
 }
 
 export function validateSelPolicy(policy) {
-  if (!policy || typeof policy !== 'object') {
+  if (!policy || typeof policy !== 'object' || Array.isArray(policy)) {
     return { policy: [{ index: -1, error: 'Policy must be a non-null object' }] };
   }
   const errors = {};

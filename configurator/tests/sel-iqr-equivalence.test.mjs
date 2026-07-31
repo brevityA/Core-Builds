@@ -35,7 +35,7 @@ test('1080p IQR policy PSEs match getSelPolicy IQR 1080p output', () => {
 
 test('4K IQR policy PSEs match golden policy data ordering', () => {
   const golden = SEL_POLICY_DATA['iqr'];
-  if (!golden) return;
+  assert.ok(golden, 'Missing IQR golden policy data');
   const policy = getIqr4kPolicy({ dv: false, audio: 'limited' });
   const goldenPses = golden.preferredStreamExpressions.filter(
     e => !e.expression.includes('Language Preference') && !e.expression.includes('Sub-First Anime')
@@ -49,14 +49,14 @@ test('4K IQR policy PSEs match golden policy data ordering', () => {
 
 test('4K IQR result limits match golden policy data', () => {
   const golden = SEL_POLICY_DATA['iqr'];
-  if (!golden || !golden.resultLimits) return;
+  assert.ok(golden?.resultLimits, 'Missing IQR golden resultLimits');
   const policy = getIqr4kPolicy();
   assert.deepEqual(policy.resultLimits, golden.resultLimits);
 });
 
 test('4K IQR dynamic addon fetching matches golden policy data', () => {
   const golden = SEL_POLICY_DATA['iqr'];
-  if (!golden || !golden.dynamicAddonFetching) return;
+  assert.ok(golden?.dynamicAddonFetching, 'Missing IQR golden dynamicAddonFetching');
   const policy = getIqr4kPolicy();
   assert.deepEqual(policy.dynamicAddonFetching, golden.dynamicAddonFetching);
 });

@@ -77,14 +77,7 @@ async function main() {
       changed = true;
       console.log(`${name}: PSE count ${data.preferredStreamExpressions.length} → ${newPses.length}`);
     }
-    updated[name] = {
-      preferredStreamExpressions: newPses,
-      includedStreamExpressions: data.includedStreamExpressions,
-      excludedStreamExpressions: data.excludedStreamExpressions,
-      rankedStreamExpressions: data.rankedStreamExpressions,
-      resultLimits: data.resultLimits,
-      dynamicAddonFetching: data.dynamicAddonFetching,
-    };
+    updated[name] = { ...data, preferredStreamExpressions: newPses };
   }
 
   if (!changed) {

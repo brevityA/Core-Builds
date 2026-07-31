@@ -165,6 +165,12 @@ test('returns error object for null/undefined policy', () => {
   assert.ok('policy' in undefinedResult);
 });
 
+test('rejects arrays as policy input', () => {
+  const result = validateSelPolicy([{ expression: "cached(streams)", enabled: true }]);
+  assert.ok('policy' in result);
+  assert.equal(result.policy[0].error, 'Policy must be a non-null object');
+});
+
 test('reports errors per expression list key', () => {
   const errors = validateSelPolicy({
     preferredStreamExpressions: [{ expression: '', enabled: true }],
