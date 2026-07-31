@@ -3449,14 +3449,16 @@ function presetMatchesAddon(p, name) {
   return cands.some(c => c === n || c.includes(n) || n.includes(c));
 }
 function renderAddonFetchFallback(name, reason, safeMsg) {
-  const k = _lastAddonKey || name || 'the addon';
+  const k = escH(_lastAddonKey || name || 'the addon');
+  const safeName = escH(name);
+  const safeTarget = escH(_lastInstall.target || '');
   return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25)">`+
     `<div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:6px">${ICO.warn(14,'#fbbf24')} Your config is valid — one addon couldn't be reached</div>`+
-    `<div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px">AIOStreams couldn't fetch the manifest for <strong style="color:#fbbf24">${name}</strong> — its backend is likely <strong>temporarily down</strong> (not a problem with your config). Save without it and re-add it later from AIOStreams → Addons when it's back.</div>`+
+    `<div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px">AIOStreams couldn't fetch the manifest for <strong style="color:#fbbf24">${safeName}</strong> — its backend is likely <strong>temporarily down</strong> (not a problem with your config). Save without it and re-add it later from AIOStreams → Addons when it's back.</div>`+
     `<code style="font-size:.7rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-bottom:8px;word-break:break-word;color:#f59e0b">${safeMsg}</code>`+
     `<div style="display:flex;gap:8px;flex-wrap:wrap">`+
     `<button data-action="save-without-addon" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.12);color:#fbbf24;font-size:.78rem;font-weight:700;cursor:pointer">Save without ${k}</button>`+
-    `<button data-action="simple-install" data-target="${_lastInstall.target}" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Retry</button>`+
+    `<button data-action="simple-install" data-target="${safeTarget}" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Retry</button>`+
     `<button data-action="generate-dl" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.78rem;font-weight:700;cursor:pointer">Export JSON</button>`+
     `</div></div>`;
 }

@@ -36,6 +36,16 @@ test('presetMatchesAddon maps the display name to the preset via name / type / i
   assert.ok(!match({ type: 'comet', options: { name: 'Comet' } }, 'StremThru Torz TB'));
 });
 
+test('renderAddonFetchFallback escapes addon name and install target to prevent XSS', () => {
+  assert.match(app, /const k = escH\(_lastAddonKey \|\| name \|\| 'the addon'\)/);
+  assert.match(app, /const safeName = escH\(name\)/);
+  assert.match(app, /const safeTarget = escH\(_lastInstall\.target \|\| ''\)/);
+  assert.match(app, /\$\{safeName\}<\/strong>/);
+  assert.match(app, /Save without \$\{k\}/);
+  assert.match(app, /data-target="\$\{safeTarget\}"/);
+  assert.doesNotMatch(app, /\$\{name\}<\/strong>/);
+});
+
 test('wiring present: dispatch wraps the reject path(s), build filters disabled presets, retry action exists', () => {
   assert.match(app, /function renderConfigRejectedDispatch\(safeMsg, apiDetail\)/);
   // definition + one call per "Config rejected" render path (>=2 calls)
