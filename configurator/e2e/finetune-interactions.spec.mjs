@@ -16,7 +16,7 @@ test('Fine-Tune nested clicks survive rerender and persist', async ({ page }) =>
 
   await page.locator('[data-action="set-audio"][data-val="standard"]').click();
   await page.locator('[data-action="set-size-limit"][data-val="10"]').click();
-  await page.locator('[data-action="set-simple-pool"][data-val="large"]').click().catch(() => {});
+  await page.locator('[data-action="set-pool"][data-val="large"]').click();
 
   await page.locator('#advancedDrawer [data-action="close-advanced"]').click();
   await expect(page.locator('#advancedDrawer')).toBeHidden();
