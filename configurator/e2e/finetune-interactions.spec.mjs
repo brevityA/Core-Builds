@@ -14,7 +14,7 @@ test('Fine-Tune nested clicks survive rerender and persist', async ({ page }) =>
   await page.locator('[data-action="open-advanced"]').click();
   await expect(page.locator('#advancedDrawer')).toBeVisible();
 
-  await page.locator('[data-action="set-audio"] .opt-name', { hasText: 'DD+ / Atmos' }).click();
+  await page.locator('[data-action="set-audio"][data-val="standard"]').click();
   await page.locator('[data-action="set-size-limit"][data-val="10"]').click();
   await page.locator('[data-action="set-simple-pool"][data-val="large"]').click().catch(() => {});
 

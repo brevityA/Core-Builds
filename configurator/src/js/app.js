@@ -1149,9 +1149,8 @@ function closeAdvancedDrawer() {
     setTimeout(() => overlay.remove(), 180);
   }
   render();
-  const trigger = _advancedTrigger;
   _advancedTrigger = null;
-  setTimeout(() => trigger?.focus?.(), 200);
+  setTimeout(() => document.querySelector('[data-action="open-advanced"]')?.focus(), 200);
 }
 
 function refreshAdvancedDrawer() {
