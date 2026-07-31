@@ -3,15 +3,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolutionPolicy } from '../src/core/device-policies.js';
 import { sortPolicy } from '../src/core/sort-policy.js';
+import { APEX_MIXED_PSES } from '../src/core/sel-policy-data.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
-// ── Golden link: APEX_MIXED_PSES must stay byte-identical to the static template ──
-// Extract the constant from source (pure data — safe to evaluate).
-const start = app.indexOf('const APEX_MIXED_PSES = [');
-const end = app.indexOf('];', start);
-assert.ok(start > 0 && end > start, 'APEX_MIXED_PSES constant missing from app.js');
-const APEX_MIXED_PSES = new Function(`${app.slice(start, end + 2)}; return APEX_MIXED_PSES;`)();
+// ── Golden link: shared SEL data must stay byte-identical to the static template ──
+assert.ok(Array.isArray(APEX_MIXED_PSES) && APEX_MIXED_PSES.length > 0, 'APEX_MIXED_PSES data missing');
 
 test('APEX_MIXED_PSES is byte-identical to the 4K Apex Mixed nightly template (golden link)', async () => {
   const tpl = JSON.parse(await readFile(
@@ -34,8 +31,9 @@ test('apex-mixed stack keeps the Apex identity: IQR tiers, niche ladder, slice l
   assert.ok(text.includes('Audio channel priority'), 'audio priority missing');
 });
 
-test('pses() emits the ported stack for apex-mixed and returns early', () => {
-  assert.match(app, /if \(S\.pseArch === 'apex-mixed'\) \{\s*out\.push\(\.\.\.APEX_MIXED_PSES\.map\(p => \(\{ \.\.\.p \}\)\)\);\s*return out;/);
+test('pses() delegates to getSelPolicy for all architectures including apex-mixed', () => {
+  assert.ok(app.includes('getSelPolicy'), 'pses() must delegate to getSelPolicy');
+  assert.ok(app.includes("architecture: S.pseArch || 'standard'"), 'pses() must pass pseArch to getSelPolicy');
 });
 
 test('apex-mixed adopts the mixed resolution policy end to end', () => {
@@ -52,7 +50,7 @@ test('apex-mixed adopts the mixed resolution policy end to end', () => {
   assert.ok(app.includes("S.resolution==='mixed'||S.pseArch==='apex-mixed') ? PREFERRED_REGEX_4K"));
   // Full HDR visual tag ladder + Score IQR Guard
   assert.ok(app.includes("S.resolution === 'mixed' || S.pseArch === 'apex-mixed') return ['HDR+DV'"));
-  assert.ok(app.includes("S.pseArch === 'iqr' || S.pseArch === 'apex-mixed') out.push({ enabled:true, expression: \"/*Score IQR Guard*/"));
+  assert.ok(app.includes("usesIqrPolicy || S.pseArch === 'apex-mixed') out.push({ ...SCORE_IQR_GUARD })"));
 });
 
 test('apex-mixed is a first-class UI option and survives share-link sanitization', () => {

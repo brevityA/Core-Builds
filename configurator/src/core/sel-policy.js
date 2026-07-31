@@ -1,12 +1,51 @@
 /**
  * Shared SEL policy boundary.
  *
- * This is intentionally data-only: the browser adapter supplies the current
- * architecture-specific expression sets while the migration moves the
- * remaining Standard/IQR/Apex branches out of app.js.
+ * Provides getSelPolicy() — the single entry point for PSE stack selection —
+ * plus normalization and validation helpers.
  */
 
+import { buildApexIqr4kPses, buildApexIqr1080Pses } from './apex-policy.js';
+import { buildStandard4kPses, buildStandard1080Pses, buildMixedPses, buildDefaultPses } from './standard-policy.js';
+import { APEX_MIXED_PSES } from './sel-policy-data.js';
+
 export const SEL_ARCHITECTURES = Object.freeze(['standard', 'iqr', 'apex', 'apex-mixed']);
+
+const ARCH_ALIASES = Object.freeze({ apex: 'iqr' });
+
+export function getSelPolicy({ architecture, resolution, dv = false, audio = 'limited', forceLimitedAudio = false, supportsAv1 = false }) {
+  const arch = ARCH_ALIASES[architecture] || architecture;
+  if (!SEL_ARCHITECTURES.includes(arch)) {
+    throw new Error(`Unknown SEL architecture: ${architecture}`);
+  }
+
+  let pses;
+  let effectiveArch = arch;
+  if (arch === 'apex-mixed') {
+    pses = APEX_MIXED_PSES.map(p => ({ ...p }));
+  } else if (arch === 'iqr' && resolution === '4k') {
+    pses = buildApexIqr4kPses({ dv, audio, forceLimitedAudio, supportsAv1 });
+  } else if (arch === 'iqr' && resolution === '1080p') {
+    pses = buildApexIqr1080Pses({ audio, forceLimitedAudio, supportsAv1 });
+  } else if (resolution === '4k') {
+    pses = buildStandard4kPses({ dv, audio, forceLimitedAudio, supportsAv1 });
+    if (arch === 'iqr') effectiveArch = 'standard';
+  } else if (resolution === '1080p') {
+    pses = buildStandard1080Pses({ audio, forceLimitedAudio, supportsAv1 });
+    if (arch === 'iqr') effectiveArch = 'standard';
+  } else if (resolution === 'mixed') {
+    pses = buildMixedPses({ audio, forceLimitedAudio, supportsAv1, dv });
+    if (arch === 'iqr') effectiveArch = 'standard';
+  } else {
+    pses = buildDefaultPses({ audio, forceLimitedAudio, supportsAv1, dv });
+    if (arch === 'iqr') effectiveArch = 'standard';
+  }
+
+  return {
+    architecture: effectiveArch,
+    preferredStreamExpressions: pses,
+  };
+}
 
 export function normalizeSelPolicy(raw = {}) {
   const clean = value => Array.isArray(value)

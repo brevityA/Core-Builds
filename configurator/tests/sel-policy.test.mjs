@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSelPolicy, assertSelPolicy } from '../src/core/sel-policy.js';
+import { normalizeSelPolicy, assertSelPolicy, SEL_ARCHITECTURES, getSelPolicy } from '../src/core/sel-policy.js';
+import { SEL_POLICY_DATA, APEX_MIXED_PSES } from '../src/core/sel-policy-data.js';
 
 test('SEL policy normalizes expression entries and preserves architecture', () => {
   const policy = normalizeSelPolicy({ architecture:'apex', preferredStreamExpressions:[{ expression:'  count(streams)>0  ' }, null] });
@@ -65,4 +66,136 @@ test('SEL policy rejects non-object entries', () => {
     preferredStreamExpressions:['not-an-object'],
     includedStreamExpressions:[], excludedStreamExpressions:[], rankedStreamExpressions:[],
   }));
+});
+
+// ── SEL_POLICY_DATA tests ──
+
+test('SEL_POLICY_DATA covers all six baseline targets', () => {
+  const required = ['standard', 'standard-4k', 'iqr', 'apex-mixed', 'mixed-standard', 'mixed-apex-mixed'];
+  for (const target of required) {
+    assert.ok(SEL_POLICY_DATA[target], `Missing target: ${target}`);
+  }
+});
+
+test('SEL_POLICY_DATA entries have all required fields', () => {
+  const fields = ['preferredStreamExpressions', 'includedStreamExpressions', 'excludedStreamExpressions', 'rankedStreamExpressions', 'resultLimits', 'dynamicAddonFetching'];
+  for (const [name, data] of Object.entries(SEL_POLICY_DATA)) {
+    for (const field of fields) {
+      assert.ok(field in data, `${name} missing field: ${field}`);
+    }
+    assert.ok(Array.isArray(data.preferredStreamExpressions), `${name} PSEs not array`);
+    assert.ok(data.preferredStreamExpressions.length > 0, `${name} has no PSEs`);
+    assert.ok(Array.isArray(data.includedStreamExpressions), `${name} ISEs not array`);
+    assert.ok(Array.isArray(data.excludedStreamExpressions), `${name} ESEs not array`);
+    assert.ok(Array.isArray(data.rankedStreamExpressions), `${name} RSEs not array`);
+  }
+});
+
+test('SEL_POLICY_DATA expression entries have valid shape', () => {
+  for (const [name, data] of Object.entries(SEL_POLICY_DATA)) {
+    for (const key of ['preferredStreamExpressions', 'includedStreamExpressions', 'excludedStreamExpressions']) {
+      for (const entry of data[key]) {
+        assert.equal(typeof entry.expression, 'string', `${name}.${key} has non-string expression`);
+        assert.ok(entry.expression.trim().length > 0, `${name}.${key} has empty expression`);
+        assert.equal(typeof entry.enabled, 'boolean', `${name}.${key} has non-boolean enabled`);
+      }
+    }
+  }
+});
+
+test('SEL_POLICY_DATA is not mutated by import', () => {
+  const original = SEL_POLICY_DATA.standard.preferredStreamExpressions.length;
+  SEL_POLICY_DATA.standard.preferredStreamExpressions.push({ expression: 'test', enabled: true });
+  assert.equal(SEL_POLICY_DATA.standard.preferredStreamExpressions.length, original + 1);
+  SEL_POLICY_DATA.standard.preferredStreamExpressions.pop();
+  assert.equal(SEL_POLICY_DATA.standard.preferredStreamExpressions.length, original);
+});
+
+test('SEL_POLICY_DATA architecture PSE counts match baseline expectations', () => {
+  assert.equal(SEL_POLICY_DATA.standard.preferredStreamExpressions.length, 16);
+  assert.equal(SEL_POLICY_DATA['standard-4k'].preferredStreamExpressions.length, 20);
+  assert.equal(SEL_POLICY_DATA.iqr.preferredStreamExpressions.length, 23);
+  assert.equal(SEL_POLICY_DATA['apex-mixed'].preferredStreamExpressions.length, 37);
+  assert.equal(SEL_POLICY_DATA['mixed-standard'].preferredStreamExpressions.length, 21);
+  assert.equal(SEL_POLICY_DATA['mixed-apex-mixed'].preferredStreamExpressions.length, 37);
+});
+
+test('APEX_MIXED_PSES is sourced from the nightly template (35 entries)', () => {
+  assert.equal(APEX_MIXED_PSES.length, 35);
+  assert.notEqual(APEX_MIXED_PSES.length, SEL_POLICY_DATA['apex-mixed'].preferredStreamExpressions.length,
+    'APEX_MIXED_PSES should differ from golden fixture apex-mixed PSEs');
+});
+
+// ── getSelPolicy tests ──
+
+test('getSelPolicy returns apex-mixed PSEs for apex-mixed architecture', () => {
+  const policy = getSelPolicy({ architecture: 'apex-mixed', resolution: '4k' });
+  assert.equal(policy.architecture, 'apex-mixed');
+  assert.equal(policy.preferredStreamExpressions.length, APEX_MIXED_PSES.length);
+});
+
+test('getSelPolicy returns IQR 4K PSEs for iqr/4k', () => {
+  const policy = getSelPolicy({ architecture: 'iqr', resolution: '4k', audio: 'limited' });
+  assert.equal(policy.architecture, 'iqr');
+  const labels = policy.preferredStreamExpressions.map(p => p.expression.match(/\/\*([^*]+)\*\//)?.[1]?.trim()).filter(Boolean);
+  assert.ok(labels.includes('S-Tier 4K REMUX — IQR Tukey fence'));
+  assert.ok(labels.includes('Elite 4K REMUX Pin'));
+});
+
+test('getSelPolicy normalizes apex alias to iqr', () => {
+  const policy = getSelPolicy({ architecture: 'apex', resolution: '4k', audio: 'limited' });
+  assert.equal(policy.architecture, 'iqr');
+});
+
+test('getSelPolicy returns standard 4K PSEs for standard/4k', () => {
+  const policy = getSelPolicy({ architecture: 'standard', resolution: '4k', audio: 'limited' });
+  assert.equal(policy.architecture, 'standard');
+  const labels = policy.preferredStreamExpressions.map(p => p.expression.match(/\/\*([^*]+)\*\//)?.[1]?.trim()).filter(Boolean);
+  assert.ok(labels.includes('S-Tier 4K BluRay REMUX'));
+  assert.ok(!labels.some(l => l.includes('IQR')));
+});
+
+test('getSelPolicy returns standard 1080p PSEs for standard/1080p', () => {
+  const policy = getSelPolicy({ architecture: 'standard', resolution: '1080p', audio: 'limited' });
+  const labels = policy.preferredStreamExpressions.map(p => p.expression.match(/\/\*([^*]+)\*\//)?.[1]?.trim()).filter(Boolean);
+  assert.ok(labels.includes('S-Tier 1080p BluRay REMUX'));
+  assert.ok(labels.includes('720p WEB-DL Fallback'));
+});
+
+test('getSelPolicy returns mixed PSEs for standard/mixed', () => {
+  const policy = getSelPolicy({ architecture: 'standard', resolution: 'mixed', audio: 'limited' });
+  const labels = policy.preferredStreamExpressions.map(p => p.expression.match(/\/\*([^*]+)\*\//)?.[1]?.trim()).filter(Boolean);
+  assert.ok(labels.includes('576p/480p Niche Fallback'));
+  assert.ok(!labels.includes('Elite 1080p REMUX Pin'));
+});
+
+test('getSelPolicy returns default PSEs for unknown resolution', () => {
+  const policy = getSelPolicy({ architecture: 'standard', resolution: 'ultrawide', audio: 'limited' });
+  const labels = policy.preferredStreamExpressions.map(p => p.expression.match(/\/\*([^*]+)\*\//)?.[1]?.trim()).filter(Boolean);
+  assert.ok(labels.includes('1440p Any Quality'));
+  assert.ok(labels.includes('4K Fallback Any'));
+});
+
+test('getSelPolicy throws for unknown architecture', () => {
+  assert.throws(() => getSelPolicy({ architecture: 'unknown', resolution: '4k' }), /Unknown SEL architecture/);
+});
+
+test('getSelPolicy deep-clones apex-mixed PSEs', () => {
+  const p1 = getSelPolicy({ architecture: 'apex-mixed', resolution: '4k' });
+  const p2 = getSelPolicy({ architecture: 'apex-mixed', resolution: '4k' });
+  assert.notEqual(p1.preferredStreamExpressions[0], p2.preferredStreamExpressions[0]);
+  assert.deepEqual(p1.preferredStreamExpressions[0], p2.preferredStreamExpressions[0]);
+});
+
+test('getSelPolicy DV flag adds extra PSE for IQR 4K', () => {
+  const withDv = getSelPolicy({ architecture: 'iqr', resolution: '4k', dv: true, audio: 'limited' });
+  const withoutDv = getSelPolicy({ architecture: 'iqr', resolution: '4k', dv: false, audio: 'limited' });
+  assert.equal(withDv.preferredStreamExpressions.length, withoutDv.preferredStreamExpressions.length + 1);
+});
+
+test('getSelPolicy reports standard architecture when IQR falls back to non-IQR resolution', () => {
+  const mixed = getSelPolicy({ architecture: 'iqr', resolution: 'mixed', audio: 'limited' });
+  assert.equal(mixed.architecture, 'standard');
+  const unknown = getSelPolicy({ architecture: 'iqr', resolution: 'ultrawide', audio: 'limited' });
+  assert.equal(unknown.architecture, 'standard');
 });

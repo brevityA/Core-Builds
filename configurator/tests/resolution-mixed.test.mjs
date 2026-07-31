@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { resolutionPolicy } from '../src/core/device-policies.js';
 import { sortPolicy } from '../src/core/sort-policy.js';
 import { isHighResolution } from '../src/core/filter-policy.js';
+import { buildMixedPses } from '../src/core/standard-policy.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
@@ -20,16 +21,13 @@ test('resolutionCfg gives mixed no caps and a broad preferred ladder incl. SD ni
 });
 
 test('mixed gets its own debrid PSE stack with 4K → 1080p → 720p → SD niche fallback', () => {
-  assert.ok(app.includes("} else if (res === 'mixed') {"), 'missing mixed PSE branch');
-  assert.ok(app.includes('/* 576p/480p Niche Fallback */'), 'mixed stack must keep SD tiers reachable for niche catalogs');
-  assert.ok(app.includes('/* S-Tier 4K BluRay REMUX */'), 'mixed stack must rank 4K tiers');
-  // The 1080p Elite pin must NOT sit inside the mixed branch (it would outrank 4K).
-  const branchStart = app.indexOf("} else if (res === 'mixed') {");
-  const branchEnd = app.indexOf('} else {', branchStart); // stop at the ultrawide branch
-  assert.ok(branchEnd > branchStart, 'mixed branch must precede the ultrawide fallback branch');
-  const branch = app.slice(branchStart, branchEnd);
-  assert.ok(!branch.includes('pin1080Elite'), 'mixed branch must not pin 1080p above 4K');
-  assert.ok(branch.includes('pinLQ'), 'mixed branch should still sink low-quality groups');
+  assert.ok(app.includes('getSelPolicy'), 'pses() must delegate to getSelPolicy');
+  const pses = buildMixedPses({ audio: 'limited', forceLimitedAudio: false, supportsAv1: false, dv: false });
+  const labels = pses.map(p => p.expression.match(/\/\*([^*]+)\*\//)?.[1]?.trim()).filter(Boolean);
+  assert.ok(labels.includes('576p/480p Niche Fallback'), 'mixed stack must keep SD tiers reachable for niche catalogs');
+  assert.ok(labels.includes('S-Tier 4K BluRay REMUX'), 'mixed stack must rank 4K tiers');
+  assert.ok(labels.includes('LQ Pin Bottom'), 'mixed branch should still sink low-quality groups');
+  assert.ok(!labels.includes('Elite 1080p REMUX Pin'), 'mixed branch must not pin 1080p above 4K');
 });
 
 test('p2p mixed route ranks 4K above 1080p', () => {
