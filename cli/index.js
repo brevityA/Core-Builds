@@ -28,7 +28,8 @@ async function loadRankedRegex() {
     const uhdMatch = src.match(/^const RANKED_REGEX_UHD\s*=\s*(\[[\s\S]*?\]);\s*$/m);
     _rankedCommon = commonMatch ? JSON.parse(commonMatch[1]) : [];
     _rankedUhd = uhdMatch ? JSON.parse(uhdMatch[1]) : [];
-    if (!_rankedCommon.length) process.stderr.write('Warning: ranked regex common patterns empty — regexScore sort key will be a no-op\n');
+    if (!_rankedCommon.length && !_rankedUhd.length) process.stderr.write('Warning: ranked regex extraction matched nothing — regexScore sorting will be a no-op\n');
+    else if (!_rankedCommon.length) process.stderr.write('Warning: ranked regex common patterns empty — regexScore sort key will be a no-op\n');
   } catch (err) {
     process.stderr.write(`Warning: failed to load ranked regex from app.js: ${err.message}\n`);
     _rankedCommon = [];

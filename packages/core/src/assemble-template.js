@@ -34,7 +34,9 @@ export function assembleTemplate(rawTemplate, options = {}) {
 
   if (options.migrationKeep && typeof options.migrationKeep === 'object') {
     for (const [key, value] of Object.entries(options.migrationKeep)) {
-      if (ALLOWED_MIGRATION_FIELDS.has(key)) config[key] = clone(value);
+      if (!ALLOWED_MIGRATION_FIELDS.has(key)) continue;
+      if (key === 'parentConfig') { template.parentConfig = clone(value); }
+      else { config[key] = clone(value); }
     }
   }
 
