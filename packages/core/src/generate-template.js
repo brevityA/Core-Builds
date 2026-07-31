@@ -517,7 +517,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     };
   }
 
-  sanitizeAioEnumArrays(result.config);
+  result.config = sanitizeAioEnumArrays(result.config);
 
   return result;
 }

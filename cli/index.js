@@ -97,11 +97,11 @@ Commands:
 Generate options:
   --service <id>       Service ID (required)
   --device <id>        Device profile (default: generic)
-  --resolution <res>   4k, 1080p, mixed (default: 4k)
+  --resolution <res>   4k, 1080p, mixed, ultrawide (default: 4k)
   --architecture <a>   standard, iqr, apex-mixed (default: standard)
-  --audio <mode>       lossless, standard, limited (default: standard)
+  --audio <mode>       lossless, standard, limited, dolby (default: standard)
   --formatter <id>     Formatter ID (default: family-v4)
-  --content <type>     all, anime (default: all)
+  --content <type>     all, anime, live, mixed (default: all)
   --match-mode <m>     relaxed, balanced, strict (default: balanced)
   --cache-mode <m>     mixed, cached, uncached (default: mixed)
   --size-limit <GB>    Max file size in GB (default: unlimited)
@@ -198,6 +198,12 @@ async function cmdGenerate() {
   const VALID_ARCHITECTURES = ['standard', 'iqr', 'apex-mixed'];
   const VALID_AUDIO = ['lossless', 'standard', 'limited', 'dolby'];
   const VALID_CONTENT = ['all', 'anime', 'live', 'mixed'];
+
+  if (opts['size-limit'] != null) {
+    const stripped = String(opts['size-limit']).replace(/GB$/i, '');
+    const num = Number(stripped);
+    if (!Number.isFinite(num) || num <= 0) die(`Invalid --size-limit "${opts['size-limit']}". Must be a positive number (in GB).`);
+  }
   const VALID_MATCH_MODES = ['relaxed', 'balanced', 'strict'];
   const VALID_CACHE_MODES = ['mixed', 'cached', 'uncached'];
   if (!VALID_RESOLUTIONS.includes(opts.resolution)) die(`Unknown resolution "${opts.resolution}". Valid: ${VALID_RESOLUTIONS.join(', ')}`);

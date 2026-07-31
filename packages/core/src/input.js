@@ -34,6 +34,11 @@ export function templateInput(input = {}) {
     tmdbToken: String(input.tmdbToken || '').trim(),
     tmdbApiKey: String(input.tmdbApiKey || '').trim(),
     bandwidthMbps: Number(input.bandwidthMbps) || 0,
-    sizeLimit: input.sizeLimit === 'unlimited' || input.sizeLimit == null ? 'unlimited' : String(input.sizeLimit).replace(/GB$/i, ''),
+    sizeLimit: (function() {
+      if (input.sizeLimit === 'unlimited' || input.sizeLimit == null) return 'unlimited';
+      const stripped = String(input.sizeLimit).replace(/GB$/i, '');
+      const num = Number(stripped);
+      return Number.isFinite(num) && num > 0 ? stripped : 'unlimited';
+    })(),
   };
 }

@@ -51,7 +51,7 @@ export function assembleTemplate(rawTemplate, options = {}) {
     );
   }
 
-  sanitizeAioEnumArrays(config);
+  template.config = sanitizeAioEnumArrays(config);
 
   if (options.metadata && typeof options.metadata === 'object') {
     template.metadata = { ...(template.metadata || {}), ...clone(options.metadata) };

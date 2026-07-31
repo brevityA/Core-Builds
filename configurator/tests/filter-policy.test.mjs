@@ -19,6 +19,13 @@ test('size policy applies the selected max file size to built-in global bounds',
   const cfg = sizePolicy({ resolution:'1080p', sizeLimit:'10' });
   assert.deepEqual(cfg.global.movies, [0, 10_000_000_000]);
   assert.deepEqual(cfg.global.series, [0, 10_000_000_000]);
+  assert.deepEqual(cfg.resolution['1080p'].movies, [0, 10_000_000_000]);
+  assert.deepEqual(cfg.resolution['720p'].series, [0, 8_000_000_000]);
+});
+
+test('size policy rejects non-finite sizeLimit', () => {
+  const cfg = sizePolicy({ resolution:'1080p', sizeLimit:'Infinity' });
+  assert.deepEqual(cfg.global.movies, [1610612736, 80000000000]);
 });
 
 test('filter policy combines pure size and bitrate policies', () => {
