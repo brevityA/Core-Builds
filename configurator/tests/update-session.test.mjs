@@ -12,6 +12,19 @@ test('update preview does not mutate the current state', () => {
   assert.equal(canCommit(session), true);
 });
 
+test('preview clones are independent of source objects', () => {
+  const current = { service:'torbox', nested:{ key:'val' } };
+  const imported = { service:'realdebrid', nested:{ key:'val2' } };
+  const preview = { diff:['sort'], meta:{ count:3 } };
+  const session = createUpdateSession(current, imported, preview);
+  current.nested.key = 'mutated';
+  imported.nested.key = 'mutated';
+  preview.meta.count = 999;
+  assert.equal(session.currentState.nested.key, 'val');
+  assert.equal(session.importedState.nested.key, 'val2');
+  assert.equal(session.preview.meta.count, 3);
+});
+
 test('cancel leaves the session uncommitted and has no next state', () => {
   const session = createUpdateSession({ service:'torbox' }, { service:'realdebrid' });
   const cancelled = cancelUpdate(session);
@@ -29,4 +42,28 @@ test('commit is explicit and clones the resulting state', () => {
   assert.equal(committed.committed, true);
   assert.equal(committed.nextState.service, 'realdebrid');
   assert.equal(canCommit(committed), false);
+});
+
+test('double commit throws', () => {
+  const session = createUpdateSession({ service:'torbox' }, { service:'realdebrid' });
+  const committed = commitUpdate(session, { service:'realdebrid' });
+  assert.throws(() => commitUpdate(committed, { service:'easynews' }), /not awaiting confirmation/i);
+});
+
+test('commit after cancel throws', () => {
+  const session = createUpdateSession({ service:'torbox' }, { service:'realdebrid' });
+  const cancelled = cancelUpdate(session);
+  assert.throws(() => commitUpdate(cancelled, { service:'easynews' }), /not awaiting confirmation/i);
+});
+
+test('cancel after commit throws', () => {
+  const session = createUpdateSession({ service:'torbox' }, { service:'realdebrid' });
+  const committed = commitUpdate(session, { service:'realdebrid' });
+  assert.throws(() => cancelUpdate(committed), /not awaiting confirmation/i);
+});
+
+test('canCommit returns false for null/undefined/non-object', () => {
+  assert.equal(canCommit(null), false);
+  assert.equal(canCommit(undefined), false);
+  assert.equal(canCommit('string'), false);
 });
