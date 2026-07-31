@@ -11,6 +11,7 @@ const RATE_LIMIT_MS = 60000;
 const MAX_MESSAGE_LENGTH = 2000;
 let _lastSendTime = 0;
 let _widgetOpen = false;
+let _previousFocus = null;
 
 export function initContactWidget() {
   if (document.getElementById('cbContactWidget')) return; // idempotent — safe if bootstrap runs twice
@@ -26,6 +27,8 @@ export function initContactWidget() {
   document.getElementById('cbContactBtn').addEventListener('click', toggleWidget);
   document.getElementById('cbContactClose').addEventListener('click', closeWidget);
   document.getElementById('cbContactForm').addEventListener('submit', handleSubmit);
+  document.getElementById('cbContactMessage').addEventListener('input', updateCharCount);
+  document.getElementById('cbContactPanel').addEventListener('keydown', handlePanelKeydown);
   document.getElementById('cbContactOverlay').addEventListener('click', (e) => {
     if (e.target.id === 'cbContactOverlay') closeWidget();
   });
@@ -36,6 +39,7 @@ export function initContactWidget() {
 
 function toggleWidget() { _widgetOpen ? closeWidget() : openWidget(); }
 function openWidget() {
+  _previousFocus = document.activeElement;
   _widgetOpen = true;
   document.getElementById('cbContactOverlay').classList.add('open');
   document.getElementById('cbContactPanel').classList.add('open');
@@ -47,6 +51,26 @@ function closeWidget() {
   document.getElementById('cbContactOverlay').classList.remove('open');
   document.getElementById('cbContactPanel').classList.remove('open');
   document.getElementById('cbContactBtn').classList.remove('active');
+  if (_previousFocus && typeof _previousFocus.focus === 'function') _previousFocus.focus();
+}
+
+function handlePanelKeydown(e) {
+  if (e.key !== 'Tab') return;
+  const panel = e.currentTarget;
+  const focusable = [...panel.querySelectorAll('button:not(:disabled), input:not([tabindex="-1"]), select, textarea, [href]')];
+  if (!focusable.length) return;
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
+function updateCharCount() {
+  const input = document.getElementById('cbContactMessage');
+  const counter = document.getElementById('cbContactCount');
+  if (!input || !counter) return;
+  const length = input.value.length;
+  counter.textContent = `${length} / ${MAX_MESSAGE_LENGTH}`;
+  counter.className = 'cb-contact-count' + (length > 1900 ? ' count-danger' : length > 1600 ? ' count-warn' : '');
 }
 
 async function handleSubmit(e) {
@@ -101,9 +125,9 @@ async function handleSubmit(e) {
 
     if (res.ok) {
       _lastSendTime = Date.now();
-      showStatus('Message sent! Brevity will see it on Discord.', 'ok');
+      showStatus('Sent successfully — Brevity will see it on Discord.', 'ok');
       document.getElementById('cbContactForm').reset();
-      setTimeout(closeWidget, 2000);
+      updateCharCount();
     } else {
       showStatus('Failed to send — try again later', 'err');
     }
@@ -120,6 +144,7 @@ function showStatus(msg, type) {
   if (!el) return;
   el.textContent = msg;
   el.className = 'cb-contact-status';
+  el.setAttribute('role', type === 'err' ? 'alert' : 'status');
   if (type === 'ok') el.classList.add('status-ok');
   else if (type === 'err') el.classList.add('status-err');
   else if (type === 'warn') el.classList.add('status-warn');
@@ -139,7 +164,7 @@ const CONTACT_CSS = `
 .cb-contact-close:hover{color:var(--th-tx,#e4e7ed);background:rgba(255,255,255,.06)}
 .cb-contact-body{padding:16px 20px 20px}
 .cb-field{margin-bottom:12px}
-.cb-field label{display:block;font-size:.72rem;font-weight:700;color:var(--th-tx2,#8b949e);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.cb-field-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.cb-field label{display:block;font-size:.72rem;font-weight:700;color:var(--th-tx2,#8b949e);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}.cb-contact-count{font-size:.65rem;color:var(--th-tx4,#4b5563);margin-bottom:4px}.count-warn{color:var(--th-warn,#fbbf24)}.count-danger{color:var(--th-err,#f87171)}
 .cb-field input,.cb-field select,.cb-field textarea{width:100%;box-sizing:border-box;padding:9px 12px;border-radius:8px;border:1.5px solid var(--th-border,rgba(255,255,255,.08));background:var(--th-card-alt,#111720);color:var(--th-tx,#e4e7ed);font-size:.82rem;font-family:inherit;outline:none;transition:border-color .15s}
 .cb-field input:focus,.cb-field select:focus,.cb-field textarea:focus{border-color:var(--th-accent-border,rgba(0,212,255,.4))}
 .cb-field input::placeholder,.cb-field textarea::placeholder{color:var(--th-tx4,#4b5563)}
@@ -152,7 +177,7 @@ const CONTACT_CSS = `
 .cb-contact-status{font-size:.72rem;margin-top:8px;min-height:1.2em;text-align:center;transition:color .15s}
 .status-ok{color:var(--th-ok,#34d399)}.status-err{color:var(--th-err,#f87171)}.status-warn{color:var(--th-warn,#fbbf24)}
 .cb-contact-info{font-size:.65rem;color:var(--th-tx4,#4b5563);text-align:center;margin-top:10px;line-height:1.4}
-@media(max-width:480px){.cb-contact-panel{bottom:0;right:0;left:0;width:100%;max-height:85vh;border-radius:16px 16px 0 0}}
+@media(max-width:480px){.cb-contact-panel{bottom:0;right:0;left:0;width:100%;max-height:85vh;border-radius:16px 16px 0 0}.cb-contact-panel:before{content:'';display:block;width:38px;height:4px;border-radius:99px;background:var(--th-border,rgba(255,255,255,.16));margin:8px auto 0}}@media(prefers-reduced-motion:reduce){.cb-contact-btn,.cb-contact-overlay,.cb-contact-panel,.cb-contact-submit{transition:none!important;animation:none!important}}
 `;
 
 const CONTACT_HTML = `
@@ -160,9 +185,9 @@ const CONTACT_HTML = `
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
 </button>
 <div class="cb-contact-overlay" id="cbContactOverlay"></div>
-<div class="cb-contact-panel" id="cbContactPanel">
+<div class="cb-contact-panel" id="cbContactPanel" role="dialog" aria-modal="true" aria-labelledby="cbContactTitle">
   <div class="cb-contact-header">
-    <h3>💬 Message Brevity</h3>
+    <h3 id="cbContactTitle">💬 Message Brevity</h3>
     <button class="cb-contact-close" id="cbContactClose" aria-label="Close">✕</button>
   </div>
   <div class="cb-contact-body">
@@ -170,7 +195,7 @@ const CONTACT_HTML = `
       <div class="cb-field"><label for="cbContactName">Name</label><input type="text" id="cbContactName" placeholder="Your name" autocomplete="name" required></div>
       <div class="cb-field"><label for="cbContactEmail">Email <span style="font-weight:400;text-transform:none;color:var(--th-tx4,#4b5563)">(optional — for reply)</span></label><input type="email" id="cbContactEmail" placeholder="you@example.com" autocomplete="email"></div>
       <div class="cb-field"><label for="cbContactCategory">Category</label><select id="cbContactCategory"><option value="Bug">🐛 Bug Report</option><option value="Feature">💡 Feature Request</option><option value="Question">❓ Question</option><option value="Feedback" selected>💬 Feedback</option></select></div>
-      <div class="cb-field"><label for="cbContactMessage">Message</label><textarea id="cbContactMessage" placeholder="What's on your mind?" required></textarea></div>
+      <div class="cb-field"><div class="cb-field-row"><label for="cbContactMessage">Message</label><span id="cbContactCount" class="cb-contact-count" aria-live="polite">0 / 2000</span></div><textarea id="cbContactMessage" maxlength="2000" placeholder="What's on your mind?" required></textarea></div>
       <div class="cb-hp"><input type="text" id="cbContactHp" tabindex="-1" autocomplete="off"></div>
       <button type="submit" class="cb-contact-submit" id="cbContactSubmit">Send Message</button>
       <div class="cb-contact-status" id="cbContactStatus"></div>
