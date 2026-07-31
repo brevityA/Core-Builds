@@ -3,6 +3,10 @@ name: Sync Doc Versions
 permissions:
   contents: write
 
+concurrency:
+  group: sync-docs-main
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
@@ -44,7 +48,6 @@ jobs:
       - name: Rebuild bundle
         if: steps.sync.outputs.changed == 'true'
         run: cd configurator && npm ci --no-audit --no-fund && npm run build
-        continue-on-error: true
       - name: Commit and push
         if: steps.sync.outputs.changed == 'true'
         run: |
@@ -55,4 +58,12 @@ jobs:
             docs/changelog.mdx docs/roadmap.mdx docs/whats-new.mdx \
             ROADMAP.md tools/index.html configurator/index.html
           git commit -m "chore: sync doc versions + roadmap + tools page from changelogs"
-          git push origin HEAD:main
+          # Avoid races with scheduled status commits or another docs sync.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main && git push origin HEAD:main && exit 0
+            git rebase --abort || true
+            sleep $((attempt * 5))
+          done
+          echo "Unable to push docs sync after 3 attempts" >&2
+          exit 1
