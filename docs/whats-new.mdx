@@ -1,14 +1,51 @@
 ---
-title: "What's New — Configurator v2.86"
+title: "What's New — Configurator v2.87"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.86 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.87 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.86**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.87**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v2.87 (Jul 31 2026)
+
+<CardGroup cols={2}>
+  <Card title="Capability-based device profiles" icon="sparkles">
+    Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV with device-specific warnings and help text
+  </Card>
+  <Card title="Matching Core Builds SVG device icons replace temporary emoji icons in the device picker" icon="bolt">
+    Matching Core Builds SVG device icons replace temporary emoji icons in the device picker
+  </Card>
+  <Card title="Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text" icon="shield-check">
+    Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text
+  </Card>
+  <Card title="Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum" icon="sliders">
+    Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum
+  </Card>
+  <Card title="Fixed: Legacy unversioned local snapshots no longer show a false 'Update Available' banner" icon="gauge">
+    Fixed: Legacy unversioned local snapshots no longer show a false 'Update Available' banner
+  </Card>
+  <Card title="Fixed: Template updates no longer mutate the active configuration before confirmation" icon="wand">
+    Fixed: Template updates no longer mutate the active configuration before confirmation
+  </Card>
+  <Card title="Fixed: Feedback messages now report current live setup context instead of stale saved state" icon="layers">
+    Fixed: Feedback messages now report current live setup context instead of stale saved state
+  </Card>
+  <Card title="Fixed: Fine-Tune interaction and focus regressions are covered by browser tests" icon="bug">
+    Fixed: Fine-Tune interaction and focus regressions are covered by browser tests
+  </Card>
+  <Card title="SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules" icon="sparkles">
+    SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules
+  </Card>
+  <Card title="CodeQL now uses the repository configuration and excludes generated bundles while scanning source code" icon="bolt">
+    CodeQL now uses the repository configuration and excludes generated bundles while scanning source code
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.86 (Jul 29 2026)
 
@@ -111,21 +148,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Bandwidth Estimator" icon="gauge">
     Device-aware bandwidth hint card in Review step showing recommended speed and safe bitrate cap
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.83 (Jul 25 2026)
-
-<CardGroup cols={2}>
-  <Card title="Error Logger" icon="sparkles">
-    Captures build, deploy, fetch, and unhandled errors into a localStorage ring buffer (50 entries); view, copy, and clear from the Diagnostics modal
-  </Card>
-  <Card title="Live Contact Widget" icon="bolt">
-    Floating message button routes feedback directly to Discord via the CORS proxy worker (no secrets in client JS)
-  </Card>
-  <Card title="Worker contact endpoint" icon="shield-check">
-    Server-side Discord webhook relay added to the Cloudflare Worker
   </Card>
 </CardGroup>
