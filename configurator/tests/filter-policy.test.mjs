@@ -15,6 +15,12 @@ test('bitrate policy applies the 80 percent bandwidth cap', () => {
   assert.deepEqual(cfg.resolution['2160p'].movies, [5000000, 80000000]);
 });
 
+test('size policy applies the selected max file size to built-in global bounds', () => {
+  const cfg = sizePolicy({ resolution:'1080p', sizeLimit:'10' });
+  assert.deepEqual(cfg.global.movies, [0, 10_000_000_000]);
+  assert.deepEqual(cfg.global.series, [0, 10_000_000_000]);
+});
+
 test('filter policy combines pure size and bitrate policies', () => {
   const cfg = filterPolicy({ resolution:'1080p', bandwidthMbps:50 }, { hasTmdb:true });
   assert.equal(cfg.bitrate.useMetadataRuntime, true);

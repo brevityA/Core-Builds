@@ -24,13 +24,16 @@ export function bandwidthCapMbps(mbps, fallback = 150_000_000) {
 }
 
 export function templateInput(input = {}) {
+  const pseArch = String(input.pseArch || input.architecture || 'standard');
   return {
     service: String(input.service || 'torbox'),
     device: String(input.device || 'generic'),
     resolution: String(input.resolution || '1080p'),
-    architecture: String(input.architecture || input.pseArch || 'standard'),
+    architecture: pseArch,
+    pseArch,
     tmdbToken: String(input.tmdbToken || '').trim(),
     tmdbApiKey: String(input.tmdbApiKey || '').trim(),
     bandwidthMbps: Number(input.bandwidthMbps) || 0,
+    sizeLimit: input.sizeLimit === 'unlimited' || input.sizeLimit == null ? 'unlimited' : String(input.sizeLimit).replace(/GB$/i, ''),
   };
 }

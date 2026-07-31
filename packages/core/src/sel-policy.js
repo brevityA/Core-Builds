@@ -44,6 +44,9 @@ export function getSelPolicy({ architecture, resolution, dv = false, audio = 'li
   return {
     architecture: effectiveArch,
     preferredStreamExpressions: pses,
+    includedStreamExpressions: [],
+    excludedStreamExpressions: [],
+    rankedStreamExpressions: [],
   };
 }
 
@@ -54,7 +57,8 @@ export function normalizeSelPolicy(raw = {}) {
       .filter(x => x.expression.length > 0)
     : [];
 
-  const architecture = SEL_ARCHITECTURES.includes(raw.architecture) ? raw.architecture : 'standard';
+  const resolved = ARCH_ALIASES[raw.architecture] || raw.architecture;
+  const architecture = SEL_ARCHITECTURES.includes(resolved) ? resolved : 'standard';
   return {
     architecture,
     preferredStreamExpressions: clean(raw.preferredStreamExpressions),

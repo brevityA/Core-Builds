@@ -103,6 +103,7 @@ Generate options:
   --content <type>     all, anime (default: all)
   --match-mode <m>     relaxed, balanced, strict (default: balanced)
   --cache-mode <m>     mixed, cached, uncached (default: mixed)
+  --size-limit <GB>    Max file size in GB (default: unlimited)
   --output <file>      Output file (default: stdout)
   --name <name>        Template name override
   --id <id>            Template metadata ID
@@ -180,6 +181,7 @@ async function cmdGenerate() {
       content:      { type: 'string', default: 'all' },
       'match-mode': { type: 'string', default: 'balanced' },
       'cache-mode': { type: 'string', default: 'mixed' },
+      'size-limit': { type: 'string' },
       output:       { type: 'string' },
       name:         { type: 'string' },
       id:           { type: 'string' },
@@ -217,6 +219,7 @@ async function cmdGenerate() {
     matchMode: opts['match-mode'],
     cacheMode: opts['cache-mode'],
     formatter: opts.formatter,
+    sizeLimit: opts['size-limit'] || 'unlimited',
     credentials: {},
     langs: ['English'],
     multiServices: [],

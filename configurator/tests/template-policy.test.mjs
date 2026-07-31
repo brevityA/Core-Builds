@@ -33,5 +33,6 @@ test('template input normalizes defaults without browser dependencies', () => {
     tmdbToken: '',
     tmdbApiKey: 'key',
     bandwidthMbps: 0,
+    sizeLimit: 'unlimited',
   });
 });

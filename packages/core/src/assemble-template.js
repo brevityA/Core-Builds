@@ -39,13 +39,14 @@ export function assembleTemplate(rawTemplate, options = {}) {
   }
 
   if (options.disabledAddons?.size && Array.isArray(config.presets)) {
-    const matchFn = options.presetMatchesAddon;
-    if (typeof matchFn === 'function') {
-      const disabled = [...options.disabledAddons];
-      config.presets = config.presets.filter(
-        preset => !disabled.some(name => matchFn(preset, name))
-      );
+    if (typeof options.presetMatchesAddon !== 'function') {
+      throw new TypeError('presetMatchesAddon function is required when disabledAddons is set');
     }
+    const matchFn = options.presetMatchesAddon;
+    const disabled = [...options.disabledAddons];
+    config.presets = config.presets.filter(
+      preset => !disabled.some(name => matchFn(preset, name))
+    );
   }
 
   sanitizeAioEnumArrays(config);
