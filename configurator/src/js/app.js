@@ -5183,7 +5183,8 @@ function checkTemplateVersion() {
     const last = JSON.parse(localStorage.getItem('coreBuildLastGen') || 'null');
     if (!last) return null;
     const ver = last._ver || last.coreBuildsVersion;
-    if (!ver) return { outdated: true, installed: 'unknown', current: TEMPLATE_VERSION, message: 'No version — template may be old' };
+    // Legacy snapshots without version metadata cannot be classified reliably.
+    if (!ver) return null;
     const installed = ver.split('.').map(Number);
     const current = TEMPLATE_VERSION.split('.').map(Number);
     let outdated = false;
