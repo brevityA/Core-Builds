@@ -13,7 +13,7 @@ let _lastSendTime = 0;
 let _widgetOpen = false;
 let _previousFocus = null;
 
-export function initContactWidget() {
+export function initContactWidget(getSetupContext = null) {
   if (document.getElementById('cbContactWidget')) return; // idempotent — safe if bootstrap runs twice
   const style = document.createElement('style');
   style.textContent = CONTACT_CSS;
@@ -93,16 +93,22 @@ async function handleSubmit(e) {
     return;
   }
 
-  // Build setup context
+  // Build a sanitized live setup context. Fall back to saved state for
+  // bootstrap/legacy callers, but prefer the current in-memory Configurator state.
   let setup = '';
   try {
-    const state = JSON.parse(localStorage.getItem('coreBuild') || '{}');
+    const state = typeof getSetupContext === 'function'
+      ? (getSetupContext() || {})
+      : JSON.parse(localStorage.getItem('coreBuild') || '{}');
+    const labels = state.labels || {};
     setup = [
-      state.service ? `Service: ${state.service}` : '',
-      state.device ? `Device: ${state.device}` : '',
-      state.resolution ? `Res: ${state.resolution}` : '',
-      state.formatter ? `Fmt: ${state.formatter}` : '',
-    ].filter(Boolean).join(' · ');
+      state.service ? `Service: ${labels.service || state.service}` : '',
+      state.device ? `Device: ${labels.device || state.device}` : '',
+      state.resolution ? `Resolution: ${labels.resolution || state.resolution}` : '',
+      state.pseArch ? `Architecture: ${labels.pseArch || state.pseArch}` : '',
+      state.formatter ? `Formatter: ${labels.formatter || state.formatter}` : '',
+      state.configuratorVersion ? `Configurator: ${state.configuratorVersion}` : '',
+    ].filter(Boolean).join(' · ').slice(0, 1000);
   } catch(e) {}
 
   const btn = document.getElementById('cbContactSubmit');

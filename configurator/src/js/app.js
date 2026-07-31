@@ -1999,7 +1999,21 @@ window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{pass
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   initErrorLogger();
-  initContactWidget();
+  initContactWidget(() => ({
+    service: S.service === 'multi' ? 'multi' : S.service,
+    device: S.device,
+    resolution: S.resolution,
+    pseArch: S.pseArch,
+    formatter: S.formatter,
+    configuratorVersion: CONFIGURATOR_VERSION,
+    labels: {
+      service: S.service === 'multi' ? (S.multiServices || []).join(' + ') : S.service,
+      device: S.device,
+      resolution: S.resolution === 'mixed' ? 'Mixed · Adaptive' : S.resolution,
+      pseArch: S.pseArch === 'apex-mixed' ? 'Apex Mixed' : S.pseArch,
+      formatter: S.formatter === 'family-v4' ? 'Family v4' : S.formatter,
+    },
+  }));
   window._formatErrorLog = formatErrorLog;
   window._clearErrorLog = () => { clearErrorLog(); document.querySelectorAll('.cb-error-log-section').forEach(el => { el.innerHTML = errorLogHtml(); }); };
   window._exportErrorLog = exportErrorLog;
