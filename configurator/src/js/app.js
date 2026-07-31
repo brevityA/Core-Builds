@@ -3201,8 +3201,7 @@ function eses() {
     if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
     if (S.sizeLimit !== 'unlimited') {
-      const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
-      out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
+      out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'1B','${S.sizeLimit}GB')` });
     }
     { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     return out;
@@ -3252,8 +3251,7 @@ function eses() {
   if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
   if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
   if (S.sizeLimit !== 'unlimited') {
-    const mb = parseInt(S.sizeLimit, 10) * 1024 + 1;
-    out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'${mb}MB','999999GB')` });
+    out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'1B','${S.sizeLimit}GB')` });
   }
   const ageEse = generateAgeRatingESE(S.ageLimit);
   if (ageEse) out.push(ageEse);

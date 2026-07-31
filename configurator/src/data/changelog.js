@@ -1,4 +1,7 @@
 export const CHANGELOG = [
+  { v:'2.86.1', date:'Jul 31 2026', hotfix:true, items:[
+    'Hotfix: Max File Size control was setting the selected limit as the minimum size (e.g. 10GB → allowed 10–999999GB); now correctly caps at the selected maximum (e.g. 10GB → 1B–10GB)',
+  ]},
   { v:'2.86', date:'Jul 29 2026', items:[
     'SEL Engine v2 — perGroup() QR balance replaces 8 slice expressions with 2 (interleaved results, device-aware limits); Addon Diversity cap; Bitrate Anomaly Pin (IQR outliers → bottom, not removed)',
     'Adaptive Score Floor — replaces static Low SEL Score; threshold scales with content age (strict on new releases, lenient on niche/old content)',
