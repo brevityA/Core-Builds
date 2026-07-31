@@ -149,7 +149,7 @@ function buildPresets(input) {
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(creds.debrider ? { apiKey:creds.debrider } : {}) }, resources:['stream'] },
     ] : []),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
-      if (sid === 'knaben') return { type:'knaben', instanceId:'knaben-1', enabled:true, options:{ name:'Knaben', timeout:7000 }, resources:['stream'] };
+      if (sid === 'knaben') return null;
       if (sid === 'zilean') return null;
       return null;
     }).filter(Boolean),
@@ -241,7 +241,7 @@ function buildEses(input) {
     if (DV_ONLY_KILL_DEVICES.has(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
     if (input.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (input.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-    if (input.sizeLimit !== 'unlimited') {
+    if (input.sizeLimit && input.sizeLimit !== 'unlimited') {
       out.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
     }
     { const ae = generateAgeRatingESE(input.ageLimit); if (ae) out.push(ae); }
@@ -293,7 +293,7 @@ function buildEses(input) {
   if (!input.p2pEnabled && !multiServices.includes('p2p')) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
   if (input.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
   if (input.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-  if (input.sizeLimit !== 'unlimited') {
+  if (input.sizeLimit && input.sizeLimit !== 'unlimited') {
     out.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
   }
   const ageEse = generateAgeRatingESE(input.ageLimit);
@@ -404,7 +404,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     excludedLanguages: [], includedLanguages: [], requiredLanguages: [...new Set([...(input.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])], preferredLanguages: [...new Set([...(input.langs||['English']),'Original','Dual Audio','Multi','Dubbed'])],
     preferredAudioTags: ac.preferredAudioTags,
     syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
-    rankedRegexPatterns: isFree ? [] : (isHighRes ? [...rankedRegexCommon,...rankedRegexUhd] : [...rankedRegexCommon]),
+    rankedRegexPatterns: isFree ? [] : (isHighRes ? [...rankedRegexCommon,...rankedRegexUhd] : [...rankedRegexCommon]).map(r => ({...r})),
     excludedRegexPatterns: [...EXCLUDED_REGEX],
     addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
     mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
@@ -474,8 +474,8 @@ export function generateTemplate(rawInput = {}, options = {}) {
       const pool=input.streamPool||'normal', timeout=pool==='max'?10000:pool==='large'?8000:6000;
       const threshold=isFree?5:(input.resolution==='4k'?4:input.resolution==='ultrawide'?12:8);
       const wrap=isFree?'totalStreams':'cached(totalStreams)';
-      const skip=new Set(['Library','AIOSubtitle','OpenSubtitles','AIOStreams']);
-      const active=activePresets.filter(p=>p.enabled!==false&&p.instanceId&&!skip.has(p.options?.name||''));
+      const skipTypes=new Set(['library','aiosubtitle','opensubtitles-v3-plus','subdl','subhero','subsource','aiostreams','tmdb-addon','streaming-catalogs','anime-catalogs','rpdb-catalogs','torrent-catalogs']);
+      const active=activePresets.filter(p=>p.enabled!==false&&p.instanceId&&!skipTypes.has(p.type));
       const ids=active.map(p=>p.instanceId);
       if(ids.length<2) return {enabled:false,groupings:[]};
       const mid=Math.ceil(ids.length/2);

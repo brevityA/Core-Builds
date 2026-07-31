@@ -3,7 +3,7 @@
 import { parseArgs } from 'node:util';
 import { readFileSync, writeFileSync, statSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   generateTemplate,
@@ -12,10 +12,11 @@ import {
 } from '@core-builds/core';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const PKG_VERSION = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')).version;
 const dataDir = resolve(__dirname, '..', 'configurator', 'src', 'data');
 
-const { FORMATTERS } = await import(resolve(dataDir, 'formatters.js'));
-const { DEVICE_AV1_SAFE, DEVICE_DV_SAFE, DEVICE_FORCE_LIMITED_AUDIO } = await import(resolve(dataDir, 'devices.js'));
+const { FORMATTERS } = await import(pathToFileURL(resolve(dataDir, 'formatters.js')).href);
+const { DEVICE_AV1_SAFE, DEVICE_DV_SAFE, DEVICE_FORCE_LIMITED_AUDIO } = await import(pathToFileURL(resolve(dataDir, 'devices.js')).href);
 
 let _rankedCommon, _rankedUhd;
 async function loadRankedRegex() {
@@ -27,7 +28,9 @@ async function loadRankedRegex() {
     const uhdMatch = src.match(/^const RANKED_REGEX_UHD\s*=\s*(\[[\s\S]*?\]);\s*$/m);
     _rankedCommon = commonMatch ? JSON.parse(commonMatch[1]) : [];
     _rankedUhd = uhdMatch ? JSON.parse(uhdMatch[1]) : [];
-  } catch {
+    if (!_rankedCommon.length) process.stderr.write('Warning: ranked regex common patterns empty — regexScore sort key will be a no-op\n');
+  } catch (err) {
+    process.stderr.write(`Warning: failed to load ranked regex from app.js: ${err.message}\n`);
     _rankedCommon = [];
     _rankedUhd = [];
   }
@@ -75,7 +78,7 @@ function die(msg) {
 
 function printHelp() {
   console.log(`
-Core Builds CLI v2.87.0
+Core Builds CLI v${PKG_VERSION}
 
 Usage:
   core-builds <command> [options]
@@ -188,6 +191,19 @@ async function cmdGenerate() {
   if (!SERVICES.includes(opts.service)) die(`Unknown service "${opts.service}". Run "core-builds services" to see options.`);
   if (!DEVICES[opts.device]) die(`Unknown device "${opts.device}". Run "core-builds devices" to see options.`);
   if (!FORMATTERS.find(f => f.id === opts.formatter)) die(`Unknown formatter "${opts.formatter}". Run "core-builds formatters" to see options.`);
+  const VALID_RESOLUTIONS = ['4k', '1080p', 'mixed', 'ultrawide'];
+  const VALID_ARCHITECTURES = ['standard', 'iqr', 'apex-mixed'];
+  const VALID_AUDIO = ['lossless', 'standard', 'limited', 'dolby'];
+  const VALID_CONTENT = ['all', 'anime', 'live', 'mixed'];
+  const VALID_MATCH_MODES = ['relaxed', 'balanced', 'strict'];
+  const VALID_CACHE_MODES = ['mixed', 'cached', 'uncached'];
+  if (!VALID_RESOLUTIONS.includes(opts.resolution)) die(`Unknown resolution "${opts.resolution}". Valid: ${VALID_RESOLUTIONS.join(', ')}`);
+  if (!VALID_ARCHITECTURES.includes(opts.architecture)) die(`Unknown architecture "${opts.architecture}". Valid: ${VALID_ARCHITECTURES.join(', ')}`);
+  if (!VALID_AUDIO.includes(opts.audio)) die(`Unknown audio mode "${opts.audio}". Valid: ${VALID_AUDIO.join(', ')}`);
+  if (!VALID_CONTENT.includes(opts.content)) die(`Unknown content type "${opts.content}". Valid: ${VALID_CONTENT.join(', ')}`);
+  if (!VALID_MATCH_MODES.includes(opts['match-mode'])) die(`Unknown match-mode "${opts['match-mode']}". Valid: ${VALID_MATCH_MODES.join(', ')}`);
+  if (!VALID_CACHE_MODES.includes(opts['cache-mode'])) die(`Unknown cache-mode "${opts['cache-mode']}". Valid: ${VALID_CACHE_MODES.join(', ')}`);
+
 
   const { common, uhd } = await loadRankedRegex();
 
@@ -225,7 +241,8 @@ async function cmdGenerate() {
   const json = JSON.stringify(template, null, 2);
 
   if (opts.output) {
-    writeFileSync(opts.output, json);
+    try { writeFileSync(opts.output, json); }
+    catch (err) { die(`Cannot write to ${opts.output}: ${err.message}`); }
     process.stderr.write(`Template written to ${opts.output}\n`);
     process.stderr.write(`  Service: ${opts.service}\n`);
     process.stderr.write(`  Device: ${opts.device} (${DEVICES[opts.device].name})\n`);
@@ -274,9 +291,13 @@ function cmdValidate() {
   for (const scope of Object.keys(cfg.sortCriteria || {})) {
     const keys = cfg.sortCriteria[scope];
     if (!Array.isArray(keys)) continue;
+    const malformed = keys.filter(k => !k || typeof k !== 'object' || typeof k.key !== 'string');
+    if (malformed.length) { errors.push(`sortCriteria.${scope}: ${malformed.length} malformed entries (expected {key,direction})`); continue; }
     const invalid = keys.filter(k => !VALID_SORT_KEYS.includes(k.key));
     if (invalid.length) errors.push(`sortCriteria.${scope}: invalid key(s): ${invalid.map(k => k.key).join(', ')}`);
-    else passes.push(`sortCriteria.${scope}: ${keys.length} keys valid`);
+    const badDir = keys.filter(k => k.direction && k.direction !== 'asc' && k.direction !== 'desc');
+    if (badDir.length) errors.push(`sortCriteria.${scope}: invalid direction(s): ${badDir.map(k => `${k.key}=${k.direction}`).join(', ')} (expected "asc" or "desc")`);
+    if (!invalid.length && !badDir.length) passes.push(`sortCriteria.${scope}: ${keys.length} keys valid`);
   }
 
   const presets = cfg.presets || [];
@@ -351,9 +372,10 @@ function cmdDiff() {
   if (cfgA.formatter?.id !== cfgB.formatter?.id)
     diffs.push(`Formatter: ${cfgA.formatter?.id} -> ${cfgB.formatter?.id}`);
 
-  const presetsA = (cfgA.presets || []).map(p => p.type).sort().join(', ');
-  const presetsB = (cfgB.presets || []).map(p => p.type).sort().join(', ');
-  if (presetsA !== presetsB) diffs.push(`Presets changed: [${presetsA}] -> [${presetsB}]`);
+  const presetSig = p => `${p.type}:${p.enabled !== false ? 'on' : 'off'}:${p.options?.timeout || ''}`;
+  const presetsA = (cfgA.presets || []).map(presetSig).sort().join(', ');
+  const presetsB = (cfgB.presets || []).map(presetSig).sort().join(', ');
+  if (presetsA !== presetsB) diffs.push(`Presets changed`);
 
   const countField = (cfg, key) => (cfg[key] || []).length;
   for (const key of ['excludedStreamExpressions', 'includedStreamExpressions', 'preferredStreamExpressions']) {

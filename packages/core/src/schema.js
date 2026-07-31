@@ -1,4 +1,4 @@
-export function sanitizeAioEnumArrays(config) {
+export function sanitizeAioEnumArrays(config = {}) {
   const autoAllowed=new Set(['service','addon','proxied','resolution','quality','encode','audioTags','visualTags','languages','releaseGroup','type','infoHash','size']);
   const autoAliases={audio:'audioTags',language:'languages',release_group:'releaseGroup',info_hash:'infoHash'};
   if(config.autoPlay){
