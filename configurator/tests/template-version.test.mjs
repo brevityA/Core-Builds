@@ -9,3 +9,8 @@ test('last-generation snapshots carry version metadata for the update banner', (
   assert.ok(match, 'saveLastGen() must exist');
   assert.match(match[1], /snap\._ver = CONFIGURATOR_VERSION;[\s\S]*snap\._ts = Date\.now\(\);/);
 });
+
+test('legacy snapshots without a version do not trigger a false update banner', () => {
+  assert.match(app, /if \(!ver\) return null;/);
+  assert.doesNotMatch(app, /No version — template may be old/);
+});
