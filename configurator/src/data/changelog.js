@@ -1,4 +1,16 @@
 export const CHANGELOG = [
+  { v:'2.87', date:'Jul 31 2026', items:[
+    'Capability-based device profiles — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV with device-specific warnings and help text',
+    'Matching Core Builds SVG device icons replace temporary emoji icons in the device picker',
+    'Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text',
+    'Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum',
+    'Fixed: Legacy unversioned local snapshots no longer show a false "Update Available" banner',
+    'Fixed: Template updates no longer mutate the active configuration before confirmation',
+    'Fixed: Feedback messages now report current live setup context instead of stale saved state',
+    'Fixed: Fine-Tune interaction and focus regressions are covered by browser tests',
+    'SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules',
+    'CodeQL now uses the repository configuration and excludes generated bundles while scanning source code',
+  ]},
   { v:'2.86', date:'Jul 29 2026', items:[
     'Hotfix: Max File Size control was setting the selected limit as the minimum size (e.g. 10GB → allowed 10–999999GB); now correctly caps at the selected maximum (e.g. 10GB → 1B–10GB)',
     'SEL Engine v2 — perGroup() QR balance replaces 8 slice expressions with 2 (interleaved results, device-aware limits); Addon Diversity cap; Bitrate Anomaly Pin (IQR outliers → bottom, not removed)',

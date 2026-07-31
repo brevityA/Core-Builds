@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.5.1 (2026-07-31)
+
+### Added
+- **Capability-based device profiles** (Configurator v2.87) — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV. Each profile includes device-specific capability warnings and expandable help text.
+- **Matching Core Builds SVG device icons** — replaces temporary emoji icons with inline SVGs matching the existing Core Builds icon style (44×44 viewBox, feDropShadow, device-specific accent colours, cyan glass fill).
+- **Expanded Playwright E2E coverage** — device card visibility, SVG icon rendering, keyboard selection, aria-checked state, and help text banner tests across desktop and mobile viewports.
+
+### Fixed
+- **Max File Size** (Configurator v2.87) — the selected limit was being used as the minimum size (e.g. 10GB → allowed 10–999999GB); now correctly caps at the selected maximum (e.g. 10GB → 1B–10GB).
+- **Legacy unversioned local snapshots** no longer show a false "Update Available" banner.
+- **Template updates** no longer mutate the active configuration before the user confirms.
+- **Feedback messages** now report current live setup context instead of stale saved state.
+- **Fine-Tune interaction and focus regressions** are now covered by browser tests.
+
+### Changed
+- SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules.
+- CodeQL now uses the repository configuration and excludes generated bundles while scanning source code.
+
 ## 3.5.0 (2026-07-29)
 
 ### Added
