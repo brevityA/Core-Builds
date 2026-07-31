@@ -19,6 +19,9 @@ import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
+import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
+import { iqrExpression } from '../core/iqr-expression.js';
+import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -4176,7 +4179,9 @@ function showUpdateTemplateModal() {
 
       const oldCfg = tpl.config || tpl;
 
-      // Reset state then apply parsed values (prevents old state bleeding between imports)
+      // Build a preview from temporary state; do not commit until the user confirms.
+      const savedState = JSON.parse(JSON.stringify(S));
+      const session = createUpdateSession(S, parsed);
       S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
       S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
       S.formatter = 'family-v4'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
@@ -4189,10 +4194,17 @@ function showUpdateTemplateModal() {
       Object.assign(S, parsed);
       S.creds = Object.assign(defaultCreds, parsed.creds || {});
       S.simpleMode = false;
-      saveState();
-
-      const newTpl = build();
-      const newCfg = newTpl.config || newTpl;
+      let newTpl, newCfg;
+      try {
+        newTpl = build();
+        newCfg = newTpl.config || newTpl;
+      } catch(buildErr) {
+        Object.assign(S, savedState);
+        errEl.textContent = 'Preview generation failed: ' + buildErr.message;
+        errEl.style.display = '';
+        return;
+      }
+      Object.assign(S, savedState);
 
       overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
       setTimeout(() => {
@@ -4214,12 +4226,16 @@ function showUpdateTemplateModal() {
               fields.forEach(f => { if (oldCfg[f] !== undefined) keep[f] = oldCfg[f]; });
             }
           }
+          commitUpdate(session, parsed);
+          Object.assign(S, parsed);
           S._migrationKeep = Object.keys(keep).length ? keep : null;
+          saveState();
           const skipped = Object.keys(SECTION_FIELDS).filter(k => offeredKeys.has(k) && !selectedKeys.has(k)).length;
           step = STEPS;
           pushStep(); render(); window.scrollTo(0,0);
           showToast(skipped ? 'Template upgraded — '+selectedKeys.size+' section'+(selectedKeys.size!==1?'s':'')+' applied, '+skipped+' kept from original' : 'Template upgraded — review settings and generate your new template');
         }, () => {
+          cancelUpdate(session);
           showToast('Migration cancelled — no changes applied', true);
         });
       }, 160);
@@ -6257,6 +6273,9 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
   window.__coreBuilds = {
     generate(overrides) {
       Object.assign(S, overrides || {});
+      // Transitional adapter: policy composition is now routed through the pure
+      // facade; legacy assembly remains the injected adapter until Part 8's
+      // full config assembly migration is complete.
       const out = generateTemplate(S, {
         deviceAv1Safe: DEVICE_AV1_SAFE,
         deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
