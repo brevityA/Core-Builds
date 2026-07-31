@@ -13,52 +13,55 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
 ## Configurator v2.86 (Jul 29 2026)
 
 <CardGroup cols={2}>
-  <Card title="SEL Engine v2" icon="sparkles">
+  <Card title="Hotfix: Max File Size control was setting the selected limit as the minimum size (e.g. 10GB → allowed 10–999999GB); now correctly caps at the selected maximum (e.g. 10GB → 1B–10GB)" icon="sparkles">
+    Hotfix: Max File Size control was setting the selected limit as the minimum size (e.g. 10GB → allowed 10–999999GB); now correctly caps at the selected maximum (e.g. 10GB → 1B–10GB)
+  </Card>
+  <Card title="SEL Engine v2" icon="bolt">
     perGroup() QR balance replaces 8 slice expressions with 2 (interleaved results, device-aware limits); Addon Diversity cap; Bitrate Anomaly Pin (IQR outliers → bottom, not removed)
   </Card>
-  <Card title="Adaptive Score Floor" icon="bolt">
+  <Card title="Adaptive Score Floor" icon="shield-check">
     replaces static Low SEL Score; threshold scales with content age (strict on new releases, lenient on niche/old content)
   </Card>
-  <Card title="Dynamic addon groups" icon="shield-check">
+  <Card title="Dynamic addon groups" icon="sliders">
     built from actual enabled presets using instanceId; Primary/Secondary split with cached-aware conditions; fixes 'Every group must have at least one addon' rejection
   </Card>
-  <Card title="Soft-fail addon recovery" icon="sliders">
+  <Card title="Soft-fail addon recovery" icon="gauge">
     Config rejected with 'Failed to fetch manifest' now parses the error, identifies the addon, offers disable+retry; auto-backups config before recovery
   </Card>
-  <Card title="?simulateAddonFail= self-test hook" icon="gauge">
+  <Card title="?simulateAddonFail= self-test hook" icon="wand">
     append ?simulateAddonFail=StremThru Torz TB:fetch failed to URL to test recovery UI in-browser
   </Card>
-  <Card title="Bandwidth Mbps cap" icon="wand">
+  <Card title="Bandwidth Mbps cap" icon="layers">
     type your internet speed in Fine-Tune, bitrate auto-limits to 80%
   </Card>
-  <Card title="Inspector direct import" icon="layers">
+  <Card title="Inspector direct import" icon="bug">
     drag & drop JSON files or click 📁 to browse; unwrap() normaliser handles all JSON shapes (template, bare config, array)
   </Card>
-  <Card title="New ISEs" icon="bug">
+  <Card title="New ISEs" icon="sparkles">
     Protect Library & SeaDex (single passthrough shields from all filters), ID-Matched Trust (external-ID streams skip filename matching), Smart Play Pin (🎯 → top)
   </Card>
-  <Card title="Low Seeder Cull" icon="sparkles">
+  <Card title="Low Seeder Cull" icon="bolt">
     removes 0-seeder streams only when 3+ healthy streams exist (protects niche content)
   </Card>
-  <Card title="RD Copyright ESE" icon="bolt">
+  <Card title="RD Copyright ESE" icon="shield-check">
     preemptively filters WEB-DL/BDRip on RealDebrid (DMCA compliance)
   </Card>
-  <Card title="Fixed: tools/account-tools links broken from Configurator (relative path ./tools/ → ../tools/)" icon="shield-check">
+  <Card title="Fixed: tools/account-tools links broken from Configurator (relative path ./tools/ → ../tools/)" icon="sliders">
     Fixed: tools/account-tools links broken from Configurator (relative path ./tools/ → ../tools/)
   </Card>
-  <Card title="Fixed: NC-17 label read backwards ('No Restriction' → 'Adults Only')" icon="sliders">
+  <Card title="Fixed: NC-17 label read backwards ('No Restriction' → 'Adults Only')" icon="gauge">
     Fixed: NC-17 label read backwards ('No Restriction' → 'Adults Only')
   </Card>
-  <Card title="Fixed: instanceUrl unescaped in DOM (XSS vector)" icon="gauge">
+  <Card title="Fixed: instanceUrl unescaped in DOM (XSS vector)" icon="wand">
     Fixed: instanceUrl unescaped in DOM (XSS vector)
   </Card>
-  <Card title="Fixed: CodeQL #158" icon="wand">
+  <Card title="Fixed: CodeQL #158" icon="layers">
     RADIO_ALLOWED allowlist guard on radio inputs
   </Card>
-  <Card title="Fixed: UI layering" icon="layers">
+  <Card title="Fixed: UI layering" icon="bug">
     import dialog z-index, info card text clipping
   </Card>
-  <Card title="s New auto-generated from changelogs; changelog gate blocks merges without update'," icon="bug">
+  <Card title="s New auto-generated from changelogs; changelog gate blocks merges without update'," icon="sparkles">
     s New auto-generated from changelogs; changelog gate blocks merges without update',
     
   </Card>
