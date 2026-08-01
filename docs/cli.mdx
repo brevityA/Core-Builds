@@ -1,0 +1,134 @@
+---
+title: CLI
+description: Generate, validate, and compare AIOStreams templates from the command line.
+---
+
+The Core Builds CLI produces the same AIOStreams template JSON as the [Configurator](/configurator) — it uses the same shared `@core-builds/core` package under the hood.
+
+<Info>
+CLI v1 is generate/validate/compare only. There is no account login, deployment, or mutation support.
+</Info>
+
+## Installation
+
+```bash
+npm install -g core-builds
+```
+
+Verify the installation:
+
+```bash
+core-builds --version
+core-builds --help
+```
+
+## Generating templates
+
+```bash
+core-builds generate \
+  --service torbox-pro \
+  --device shield \
+  --resolution 4k \
+  --architecture iqr \
+  --output template.json
+```
+
+The only required flag is `--service`. Everything else has sensible defaults.
+
+| Flag | Default | Options |
+|------|---------|---------|
+| `--service` | *(required)* | `torbox-pro`, `alldebrid`, `easynews`, `p2p`, `http` |
+| `--device` | `generic` | Run `core-builds devices` for the full list |
+| `--resolution` | `4k` | `4k`, `1080p`, `mixed`, `ultrawide` |
+| `--architecture` | `standard` | `standard`, `iqr`, `apex-mixed` |
+| `--audio` | `standard` | `lossless`, `standard`, `limited`, `dolby` |
+| `--formatter` | `family-v4` | Run `core-builds formatters` for the full list |
+| `--content` | `all` | `all`, `anime`, `live`, `mixed` |
+| `--match-mode` | `balanced` | `relaxed`, `balanced`, `strict` |
+| `--cache-mode` | `mixed` | `mixed`, `cached`, `uncached` |
+| `--size-limit` | unlimited | Max file size in GB (e.g. `10`) |
+| `--output` | stdout | File path for the generated JSON |
+
+Without `--output`, the template JSON is written to stdout so you can pipe it:
+
+```bash
+core-builds generate --service torbox-pro | jq '.metadata'
+```
+
+## Size limit
+
+Use `--size-limit` to cap the maximum file size in generated templates:
+
+```bash
+core-builds generate \
+  --service torbox-pro \
+  --device shield \
+  --resolution 4k \
+  --architecture iqr \
+  --size-limit 10 \
+  --output capped.json
+```
+
+This sets `config.size.global.movies[1]` and `config.size.global.series[1]` to 10,000,000,000 bytes and adds a `size(streams,'1B','10GB')` excluded stream expression. Without `--size-limit`, generous default bounds are used and no restrictive size ESE is added.
+
+## Validating templates
+
+```bash
+core-builds validate template.json
+```
+
+Checks the template against the AIOStreams schema. Add `--strict` to treat warnings as errors:
+
+```bash
+core-builds validate template.json --strict
+```
+
+## Comparing templates
+
+```bash
+core-builds diff old.json new.json
+```
+
+Shows a human-readable summary of differences. Add `--json` for machine-readable output:
+
+```bash
+core-builds diff old.json new.json --json
+```
+
+Exit codes follow Unix convention: `0` means identical, `1` means differences found.
+
+### Security and redaction
+
+Credentials (`apiKey`, `password`, `secret`, `authKey`, `token`) are automatically redacted in all diff output — both human-readable and JSON. Credential values never appear in CLI output, error messages, or stack traces.
+
+## Inspecting templates
+
+```bash
+core-builds info template.json
+```
+
+Shows metadata, preset counts, expression counts, sort sections, deduplicator config, and file size.
+
+## Listing available options
+
+```bash
+core-builds devices         # Device profiles (shield, samsung-tv, etc.)
+core-builds services        # Service IDs (torbox-pro, alldebrid, etc.)
+core-builds formatters      # Formatter IDs (family-v4, core-nexus-apex-v2, etc.)
+core-builds architectures   # PSE architectures (standard, iqr, apex-mixed)
+```
+
+## Golden equivalence
+
+The CLI is verified to produce identical output to the Configurator for all supported combinations. The test suite compares CLI output against Configurator golden fixtures, normalizing only volatile metadata (`generatedAt`, `id`). Configuration differences are never ignored.
+
+## What the CLI does not do
+
+CLI v1 focuses on offline template operations:
+
+- No Stremio account login
+- No deployment to AIOStreams instances
+- No addon management
+- No credential storage
+
+Use the [Configurator](/configurator) for account-connected features.

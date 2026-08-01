@@ -57,7 +57,8 @@
             "pages": [
               "configurator",
               "customising",
-              "aiometadata"
+              "aiometadata",
+              "cli"
             ]
           },
           {
