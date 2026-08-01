@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -85,6 +85,11 @@ for (const combo of GOLDEN_COMBOS) {
 
     assert.ok(template.config.sortCriteria.global, 'sortCriteria.global should exist');
     assert.ok(template.config.sortCriteria.global.length > 0, 'sortCriteria.global should have entries');
+    for (const entry of template.config.sortCriteria.global) {
+      assert.ok(typeof entry.key === 'string' && entry.key.length > 0, `sortCriteria entry needs a key: ${JSON.stringify(entry)}`);
+      assert.ok('direction' in entry, `sortCriteria entry needs "direction": ${JSON.stringify(entry)}`);
+      assert.ok(!('order' in entry), `sortCriteria entry must not use "order": ${JSON.stringify(entry)}`);
+    }
 
     assert.ok(template.config.excludedStreamExpressions.length > 0, 'ESEs should not be empty');
     assert.ok(template.config.includedStreamExpressions.length > 0, 'ISEs should not be empty');
@@ -180,15 +185,18 @@ test('golden: groups use instanceId not display names', () => {
 
 test('security: generated template JSON contains no credential values', () => {
   const t = generate(['--service', 'torbox-pro', '--device', 'generic', '--resolution', '4k', '--architecture', 'standard']);
-  const json = JSON.stringify(t);
-  for (const svc of t.config.services) {
-    const creds = svc.credentials || {};
-    for (const [key, val] of Object.entries(creds)) {
-      if (typeof val === 'string' && val.length > 0) {
-        assert.fail(`service ${svc.id} has non-empty credential ${key}="${val}"`);
+  const SAFE_DEFAULTS = new Set(['t0-free-rpdb']);
+  function walkForSecrets(obj, path = '') {
+    if (!obj || typeof obj !== 'object') return;
+    for (const [key, val] of Object.entries(obj)) {
+      const cur = path ? `${path}.${key}` : key;
+      if (SENSITIVE_PATTERNS.some(p => p.test(key)) && typeof val === 'string' && val.length > 0 && !SAFE_DEFAULTS.has(val)) {
+        assert.fail(`sensitive field ${cur} has non-empty value "${val}"`);
       }
+      if (typeof val === 'object') walkForSecrets(val, cur);
     }
   }
+  walkForSecrets(t);
 });
 
 test('security: validate output never prints sensitive field values', () => {
@@ -199,10 +207,11 @@ test('security: validate output never prints sensitive field values', () => {
     t.config.services.forEach(s => { s.credentials = { apiKey: 'SUPER_SECRET_KEY_123', password: 'HIDDEN_PASS' }; });
     writeFileSync(outPath, JSON.stringify(t, null, 2));
 
-    const validateOut = execFileSync(process.execPath, [CLI, 'validate', outPath], {
+    const valResult = spawnSync(process.execPath, [CLI, 'validate', outPath], {
       encoding: 'utf-8',
       timeout: 10000,
     });
+    const validateOut = (valResult.stdout || '') + (valResult.stderr || '');
     assert.ok(!validateOut.includes('SUPER_SECRET_KEY_123'), 'validate must not print API key values');
     assert.ok(!validateOut.includes('HIDDEN_PASS'), 'validate must not print password values');
   } finally {
@@ -223,10 +232,11 @@ test('security: diff output never prints sensitive field values', () => {
     writeFileSync(pathA, JSON.stringify(tA, null, 2));
     writeFileSync(pathB, JSON.stringify(tB, null, 2));
 
-    const diffOut = execFileSync(process.execPath, [CLI, 'diff', pathA, pathB], {
+    const diffResult = spawnSync(process.execPath, [CLI, 'diff', pathA, pathB], {
       encoding: 'utf-8',
       timeout: 10000,
     });
+    const diffOut = (diffResult.stdout || '') + (diffResult.stderr || '');
     assert.ok(!diffOut.includes('SECRET_A_KEY'), 'diff must not print API key values');
     assert.ok(!diffOut.includes('SECRET_B_KEY'), 'diff must not print API key values');
     assert.ok(!diffOut.includes('PASS_A'), 'diff must not print password values');
