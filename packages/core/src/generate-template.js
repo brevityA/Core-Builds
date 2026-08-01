@@ -474,8 +474,8 @@ export function generateTemplate(rawInput = {}, options = {}) {
       const pool=input.streamPool||'normal', timeout=pool==='max'?10000:pool==='large'?8000:6000;
       const threshold=isFree?5:(input.resolution==='4k'?4:input.resolution==='ultrawide'?12:8);
       const wrap=isFree?'totalStreams':'cached(totalStreams)';
-      const skipTypes=new Set(['library','aiosubtitle','opensubtitles-v3-plus','subdl','subhero','subsource','aiostreams','tmdb-addon','streaming-catalogs','anime-catalogs','rpdb-catalogs','torrent-catalogs']);
-      const active=activePresets.filter(p=>p.enabled!==false&&p.instanceId&&!skipTypes.has(p.type));
+      const skip=new Set(['Library','AIOSubtitle','OpenSubtitles','AIOStreams']);
+      const active=activePresets.filter(p=>p.enabled!==false&&p.instanceId&&!skip.has(p.options?.name||''));
       const ids=active.map(p=>p.instanceId);
       if(ids.length<2) return {enabled:false,groupings:[]};
       const mid=Math.ceil(ids.length/2);

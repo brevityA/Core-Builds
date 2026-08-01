@@ -25,12 +25,18 @@
   "bugs": {
     "url": "https://github.com/brevityA/Core-Builds/issues"
   },
+  "scripts": {
+    "test": "node --test 'tests/**/*.test.mjs'"
+  },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "@core-builds/core": "file:../packages/core"
   },
+  "bundleDependencies": [
+    "@core-builds/core"
+  ],
   "files": [
     "index.js",
     "data/"
