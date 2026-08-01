@@ -443,6 +443,7 @@ function cmdDiff() {
 
   if (jsonMode) {
     console.log(JSON.stringify({ fileA, fileB, differences: diffs }, null, 2));
+    process.exitCode = diffs.length > 0 ? 1 : 0;
     return;
   }
 
@@ -461,6 +462,7 @@ function cmdDiff() {
     });
     console.log(`\n  ${diffs.length} difference(s) found.\n`);
   }
+  process.exitCode = diffs.length > 0 ? 1 : 0;
 }
 
 function cmdInfo() {

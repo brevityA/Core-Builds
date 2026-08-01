@@ -215,12 +215,13 @@ test('diff: different files report changes', () => {
     writeFileSync(pathA, JSON.stringify(tA, null, 2));
     writeFileSync(pathB, JSON.stringify(tB, null, 2));
 
-    const result = spawnSync(process.execPath, [CLI, 'diff', pathA, pathB], {
+    const result = spawnSync(process.execPath, [CLI, 'diff', pathA, pathB, '--json'], {
       encoding: 'utf-8',
       timeout: 10000,
     });
-    const combined = (result.stdout || '') + (result.stderr || '');
-    assert.ok(combined.length > 0, 'diff should produce output for different files');
+    const parsed = JSON.parse(result.stdout);
+    assert.ok(parsed.differences.length > 0, 'diff should report at least one difference');
+    assert.equal(result.status, 1, 'diff with changes should exit 1');
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
@@ -240,9 +241,9 @@ test('diff: --json emits valid JSON', () => {
       encoding: 'utf-8',
       timeout: 10000,
     });
-    if (result.stdout.trim()) {
-      assert.doesNotThrow(() => JSON.parse(result.stdout), 'diff --json should output valid JSON');
-    }
+    assert.ok(result.stdout.trim().length > 0, 'diff --json should produce output');
+    const parsed = JSON.parse(result.stdout);
+    assert.ok(Array.isArray(parsed.differences), 'diff --json should have differences array');
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
@@ -317,6 +318,9 @@ test('version: CLI and core package versions are consistent', () => {
   assert.ok(corePkg.version, 'core package.json should have version');
 
   const cliMajorMinor = cliPkg.version.split('.').slice(0, 2).join('.');
+  const coreMajorMinor = corePkg.version.split('.').slice(0, 2).join('.');
+  assert.equal(cliMajorMinor, coreMajorMinor, 'CLI and core major.minor should match');
+
   if (versions.configurator) {
     const confMajorMinor = versions.configurator.split('.').slice(0, 2).join('.');
     assert.equal(cliMajorMinor, confMajorMinor, 'CLI and configurator major.minor should match');
