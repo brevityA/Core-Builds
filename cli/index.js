@@ -13,6 +13,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PKG_VERSION = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')).version;
+const TEMPLATE_VERSION = PKG_VERSION.split('.').slice(0, 2).join('.');
 const dataDir = resolve(__dirname, 'data');
 
 const { FORMATTERS } = await import(pathToFileURL(resolve(dataDir, 'formatters.js')).href);
@@ -128,6 +129,11 @@ if (!command || command === '--help' || command === '-h') {
   process.exit(0);
 }
 
+if (command === '--version' || command === '-V') {
+  console.log(PKG_VERSION);
+  process.exit(0);
+}
+
 switch (command) {
   case 'devices': cmdDevices(); break;
   case 'services': cmdServices(); break;
@@ -240,7 +246,7 @@ async function cmdGenerate() {
   };
   if (opts.name) rawInput.name = opts.name;
 
-  const metadata = {};
+  const metadata = { coreBuildsVersion: TEMPLATE_VERSION };
   if (opts.id) metadata.id = opts.id;
   if (opts.name) metadata.name = opts.name;
 
@@ -370,15 +376,31 @@ function cmdValidate() {
   if (errors.length || (strict && warnings.length)) process.exit(1);
 }
 
+function redactCredentials(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(redactCredentials);
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (/apiKey|password|secret|auth.*key|token/i.test(k) && typeof v === 'string') {
+      out[k] = '[REDACTED]';
+    } else {
+      out[k] = redactCredentials(v);
+    }
+  }
+  return out;
+}
+
 function cmdDiff() {
-  const fileA = args[1];
-  const fileB = args[2];
-  if (!fileA || !fileB) die('Usage: core-builds diff <fileA> <fileB>');
+  const jsonMode = args.includes('--json');
+  const positional = args.slice(1).filter(a => a !== '--json');
+  const fileA = positional[0];
+  const fileB = positional[1];
+  if (!fileA || !fileB) die('Usage: core-builds diff <fileA> <fileB> [--json]');
 
   let a, b;
   try {
-    a = JSON.parse(readFileSync(fileA, 'utf-8'));
-    b = JSON.parse(readFileSync(fileB, 'utf-8'));
+    a = redactCredentials(JSON.parse(readFileSync(fileA, 'utf-8')));
+    b = redactCredentials(JSON.parse(readFileSync(fileB, 'utf-8')));
   } catch (e) { die(`Cannot read or parse files: ${e.message}`); }
 
   const cfgA = a.config || {};
@@ -386,38 +408,43 @@ function cmdDiff() {
   const diffs = [];
 
   if (cfgA.formatter?.id !== cfgB.formatter?.id)
-    diffs.push(`Formatter: ${cfgA.formatter?.id} -> ${cfgB.formatter?.id}`);
+    diffs.push({ field: 'formatter', from: cfgA.formatter?.id, to: cfgB.formatter?.id });
 
   const presetSig = p => `${p.type}:${p.enabled !== false ? 'on' : 'off'}:${p.options?.timeout || ''}`;
   const presetsA = (cfgA.presets || []).map(presetSig).sort().join(', ');
   const presetsB = (cfgB.presets || []).map(presetSig).sort().join(', ');
-  if (presetsA !== presetsB) diffs.push(`Presets changed`);
+  if (presetsA !== presetsB) diffs.push({ field: 'presets', changed: true });
 
   const countField = (cfg, key) => (cfg[key] || []).length;
   for (const key of ['excludedStreamExpressions', 'includedStreamExpressions', 'preferredStreamExpressions']) {
     const cA = countField(cfgA, key), cB = countField(cfgB, key);
-    if (cA !== cB) diffs.push(`${key}: ${cA} -> ${cB}`);
+    if (cA !== cB) diffs.push({ field: key, from: cA, to: cB });
   }
 
   for (const key of ['excludedRegexPatterns', 'rankedRegexPatterns', 'preferredRegexPatterns']) {
     const cA = countField(cfgA, key), cB = countField(cfgB, key);
-    if (cA !== cB) diffs.push(`${key}: ${cA} -> ${cB}`);
+    if (cA !== cB) diffs.push({ field: key, from: cA, to: cB });
   }
 
   if (JSON.stringify(cfgA.sortCriteria || {}) !== JSON.stringify(cfgB.sortCriteria || {}))
-    diffs.push('Sort criteria changed');
+    diffs.push({ field: 'sortCriteria', changed: true });
 
   if (JSON.stringify(cfgA.titleMatching) !== JSON.stringify(cfgB.titleMatching))
-    diffs.push('Title matching changed');
+    diffs.push({ field: 'titleMatching', changed: true });
 
   if (JSON.stringify(cfgA.deduplicator) !== JSON.stringify(cfgB.deduplicator))
-    diffs.push('Deduplicator changed');
+    diffs.push({ field: 'deduplicator', changed: true });
 
   if (JSON.stringify(cfgA.size) !== JSON.stringify(cfgB.size))
-    diffs.push('Size limits changed');
+    diffs.push({ field: 'size', changed: true });
 
   if (JSON.stringify(cfgA.bitrate) !== JSON.stringify(cfgB.bitrate))
-    diffs.push('Bitrate limits changed');
+    diffs.push({ field: 'bitrate', changed: true });
+
+  if (jsonMode) {
+    console.log(JSON.stringify({ fileA, fileB, differences: diffs }, null, 2));
+    return;
+  }
 
   console.log(`\n${'='.repeat(60)}`);
   console.log('  CORE BUILDS TEMPLATE DIFF');
@@ -428,7 +455,10 @@ function cmdDiff() {
   if (diffs.length === 0) {
     console.log('  No significant differences found.\n');
   } else {
-    diffs.forEach(d => console.log(`  * ${d}`));
+    diffs.forEach(d => {
+      if (d.from !== undefined && d.to !== undefined) console.log(`  * ${d.field}: ${d.from} -> ${d.to}`);
+      else console.log(`  * ${d.field} changed`);
+    });
     console.log(`\n  ${diffs.length} difference(s) found.\n`);
   }
 }
