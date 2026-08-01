@@ -1,1 +1,384 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://api.strem.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><title>Core Account Tools — Read-only Backup</title><style>:root{color-scheme:dark;font-family:system-ui;background:#071018;color:#e6edf3}body{margin:0;padding:24px}.wrap{max-width:760px;margin:auto}.card{background:#0e1822;border:1px solid #243342;border-radius:16px;padding:20px;margin:14px 0}h1{margin:0;color:#67e8f9}p{color:#9fb0bd;line-height:1.55}input,button{box-sizing:border-box;width:100%;padding:12px;border-radius:9px;border:1px solid #314354;background:#0a121a;color:#e6edf3;font-size:16px;margin:5px 0}button{cursor:pointer;background:#083d4d;border-color:#0e7490;color:#a5f3fc;font-weight:800}button.secondary{background:transparent}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.addon{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #1e2b36}.num{color:#67e8f9;font-weight:900}.meta{min-width:0}.name{font-weight:800}.url{color:#718493;font:12px monospace;overflow-wrap:anywhere}.warn{padding:10px;border:1px solid #7c5b19;background:#2b210b;border-radius:9px;color:#fbd38d}.toolnav{display:flex;gap:8px;margin-bottom:18px}.toolnav a{color:#67e8f9;text-decoration:none;font-size:.75rem;font-weight:800;border:1px solid #294252;border-radius:8px;padding:7px 10px}.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}@media(max-width:560px){.row{grid-template-columns:1fr}}</style></head><body><main class="wrap"><nav class="toolnav"><a href="../">Configurator</a><a href="../tools/">All Tools</a></nav><h1>Core Account Tools</h1><p>Read-only backup foundation. This tool cannot change your account.</p><div class="warn">Login details are sent directly to the Stremio API for this operation and are kept only in page memory. Never use this from an untrusted copy.</div><section class="card"><h2>Load Stremio addons</h2><label for="email" class="sr">Stremio email</label><input id="email" type="email" autocomplete="email" placeholder="Stremio email"><label for="password" class="sr">Stremio password</label><input id="password" type="password" autocomplete="current-password" placeholder="Stremio password"><button type="button" id="load">Sign in & load addons</button><div id="status" role="status"></div></section><section class="card"><div class="row"><button type="button" id="download" disabled>Download backup JSON</button><button type="button" class="secondary" id="importBtn">Inspect local backup</button></div><label for="file" class="sr">Import backup file</label><input hidden id="file" type="file" accept="application/json"><div id="list"></div></section></main><script>(()=>{let snapshot=null;const $=id=>document.getElementById(id),esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));async function post(path,body){const r=await fetch('https://api.strem.io/api/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('Stremio API error '+r.status);return r.json()}function render(data,label='Current account'){const addons=data?.result?.addons||data?.addons;if(!Array.isArray(addons))throw new Error('Backup does not contain an addon list');snapshot={exportedAt:new Date().toISOString(),source:label,addons};$('list').innerHTML='<h2>'+esc(label)+'</h2>'+addons.map((a,i)=>'<div class="addon"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(a.manifest?.name||a.transportName||'Addon')+'</div><div class="url">'+esc(a.transportUrl)+'</div></div></div>').join('');$('download').disabled=false}$('load').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||!password)return $('status').textContent='Enter email and password.';$('load').disabled=true;$('status').textContent='Loading…';try{const login=await post('login',{type:'Login',email,password,facebook:false}),authKey=login?.result?.authKey;if(!authKey)throw new Error(login?.error||'Login failed');const data=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});render(data);$('status').textContent='Loaded. Password cleared from the page.';$('password').value=''}catch(e){$('status').textContent=e.message}finally{$('load').disabled=false}};$('download').onclick=()=>{if(!snapshot)return;const u=URL.createObjectURL(new Blob([JSON.stringify(snapshot,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download='core-account-addons-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),100)};$('importBtn').onclick=()=>$('file').click();$('file').onchange=async e=>{try{render(JSON.parse(await e.target.files[0].text()),'Local backup preview')}catch(err){$('status').textContent=err.message}}})();</script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://api.strem.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><title>Core Account Tools — Read-only Backup & Diff</title><style>
+:root{color-scheme:dark;font-family:system-ui;background:#071018;color:#e6edf3;--cyan:#67e8f9;--border:#243342;--card:#0e1822;--input:#0a121a;--muted:#718493;--warn-bg:#2b210b;--warn-border:#7c5b19;--warn-text:#fbd38d;--green:#34d399;--red:#f87171;--blue:#60a5fa}
+body{margin:0;padding:24px}
+.wrap{max-width:800px;margin:auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin:14px 0}
+h1{margin:0;color:var(--cyan)}
+h2{margin:0 0 12px;font-size:1.1rem}
+h3{margin:8px 0 4px;font-size:.95rem}
+p{color:#9fb0bd;line-height:1.55}
+input,button,select{box-sizing:border-box;width:100%;padding:12px;border-radius:9px;border:1px solid #314354;background:var(--input);color:#e6edf3;font-size:16px;margin:5px 0}
+button{cursor:pointer;background:#083d4d;border-color:#0e7490;color:#a5f3fc;font-weight:800}
+button.secondary{background:transparent}
+button.danger{background:#3b1219;border-color:#7f1d1d;color:var(--red)}
+button:disabled{opacity:.4;cursor:default}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.addon{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #1e2b36}
+.addon.added{border-left:3px solid var(--green);padding-left:8px}
+.addon.removed{border-left:3px solid var(--red);padding-left:8px;opacity:.7}
+.addon.moved{border-left:3px solid var(--blue);padding-left:8px}
+.num{color:var(--cyan);font-weight:900;min-width:24px}
+.meta{min-width:0;flex:1}
+.name{font-weight:800}
+.url{color:var(--muted);font:12px monospace;overflow-wrap:anywhere}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px}
+.tag.risk{background:#7f1d1d;color:var(--red)}
+.tag.added{background:#064e3b;color:var(--green)}
+.tag.removed{background:#3b1219;color:var(--red)}
+.tag.moved{background:#1e3a5f;color:var(--blue)}
+.warn{padding:10px;border:1px solid var(--warn-border);background:var(--warn-bg);border-radius:9px;color:var(--warn-text);margin:8px 0}
+.toolnav{display:flex;gap:8px;margin-bottom:18px}
+.toolnav a{color:var(--cyan);text-decoration:none;font-size:.75rem;font-weight:800;border:1px solid #294252;border-radius:8px;padding:7px 10px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.tabs{display:flex;gap:0;margin-bottom:14px;border-bottom:2px solid var(--border)}
+.tab{padding:8px 16px;cursor:pointer;color:var(--muted);font-weight:700;font-size:.85rem;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.panel{display:none}
+.panel.active{display:block}
+.search{position:relative}
+.search input{padding-left:36px}
+.search::before{content:'Search';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none}
+.inspect{background:var(--input);border:1px solid var(--border);border-radius:9px;padding:12px;margin:8px 0;font-size:.85rem}
+.inspect dt{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
+.inspect dd{margin:2px 0 0;font-weight:600}
+.diff-summary{padding:12px;background:var(--input);border-radius:9px;margin:8px 0;font-size:.9rem;line-height:1.6}
+.count{font-weight:900;color:var(--cyan)}
+.hidden{display:none}
+@media(max-width:560px){.row,.row3{grid-template-columns:1fr}}
+</style></head><body><main class="wrap">
+<nav class="toolnav"><a href="../">Configurator</a><a href="../tools/">All Tools</a></nav>
+<h1>Core Account Tools</h1>
+<p>Read-only addon backup, inspection, and comparison. This tool cannot change your account.</p>
+<div class="warn">Login details are sent directly to the Stremio API and kept only in page memory. Never use this from an untrusted copy.</div>
+
+<section class="card" id="auth-card">
+<h2>Sign in</h2>
+<div class="tabs">
+  <button class="tab active" data-tab="email-tab">Email</button>
+  <button class="tab" data-tab="authkey-tab">Auth Key</button>
+</div>
+<div id="email-tab" class="panel active">
+  <label for="email" class="sr">Stremio email</label>
+  <input id="email" type="email" autocomplete="email" placeholder="Stremio email">
+  <label for="password" class="sr">Stremio password</label>
+  <input id="password" type="password" autocomplete="current-password" placeholder="Stremio password">
+  <button type="button" id="loginEmail">Sign in &amp; load addons</button>
+</div>
+<div id="authkey-tab" class="panel">
+  <label for="authkey" class="sr">Auth key</label>
+  <input id="authkey" type="password" autocomplete="off" placeholder="Paste auth key">
+  <button type="button" id="loginKey">Load with auth key</button>
+</div>
+<div id="status" role="status"></div>
+</section>
+
+<section class="card hidden" id="session-card">
+<div class="row">
+  <div><strong id="session-label">Signed in</strong></div>
+  <div style="text-align:right"><button class="danger" id="logout" style="width:auto;padding:6px 16px">Clear session</button></div>
+</div>
+</section>
+
+<section class="card hidden" id="warnings-card">
+<h2>Credential warnings</h2>
+<div id="warnings-list"></div>
+</section>
+
+<section class="card hidden" id="addons-card">
+<h2>Addons <span id="addon-count" class="count"></span></h2>
+<div class="row">
+  <input id="search" type="search" placeholder="Search addons...">
+  <select id="type-filter"><option value="">All types</option><option value="movie">movie</option><option value="series">series</option><option value="channel">channel</option><option value="tv">tv</option></select>
+</div>
+<div id="addon-list"></div>
+</section>
+
+<section class="card hidden" id="inspect-card">
+<h2>Manifest: <span id="inspect-name"></span></h2>
+<div id="inspect-body" class="inspect"></div>
+<button class="secondary" id="close-inspect">Close</button>
+</section>
+
+<section class="card hidden" id="actions-card">
+<h2>Actions</h2>
+<div class="row3">
+  <button id="download">Download backup</button>
+  <button class="secondary" id="importBtn">Import backup</button>
+  <button class="secondary" id="diffBtn">Compare snapshots</button>
+</div>
+<label for="file" class="sr">Import backup file</label>
+<input hidden id="file" type="file" accept="application/json">
+<label for="diffFileA" class="sr">Snapshot A</label>
+<input hidden id="diffFileA" type="file" accept="application/json">
+<label for="diffFileB" class="sr">Snapshot B</label>
+<input hidden id="diffFileB" type="file" accept="application/json">
+</section>
+
+<section class="card hidden" id="diff-card">
+<h2>Snapshot comparison</h2>
+<div id="diff-summary" class="diff-summary"></div>
+<div id="diff-list"></div>
+<button class="secondary" id="close-diff">Close</button>
+</section>
+
+</main><script>(()=>{
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let authKey=null,addons=[],currentSnapshot=null;
+
+const CRED_RE=/apiKey|password|secret|auth.*key|token/i;
+
+function show(id){$(id).classList.remove('hidden')}
+function hide(id){$(id).classList.add('hidden')}
+
+function redactUrl(url){
+  if(!url)return'';
+  try{
+    const u=new URL(url),segs=u.pathname.split('/');
+    return u.origin+'/'+segs.map(s=>s.length>=16&&/^[a-zA-Z0-9+/=_-]+$/.test(s)?'[REDACTED]':s).join('/')+u.search;
+  }catch{return url.replace(/[a-zA-Z0-9+/=_-]{16,}/g,'[REDACTED]')}
+}
+
+function hasCredRisk(url){
+  if(!url)return false;
+  try{const segs=new URL(url).pathname.split('/');return segs.some(s=>s.length>=16&&/^[a-zA-Z0-9+/=_-]+$/.test(s))}
+  catch{return false}
+}
+
+function parseAddons(raw){
+  return raw.map(a=>({
+    name:a.manifest?.name||a.transportName||'Unknown',
+    version:a.manifest?.version||null,
+    description:a.manifest?.description||null,
+    types:a.manifest?.types||[],
+    catalogs:a.manifest?.catalogs||[],
+    resources:a.manifest?.resources||[],
+    id:a.manifest?.id||null,
+    transportUrl:a.transportUrl||'',
+    raw:a
+  }));
+}
+
+function renderAddon(a,i,extra=''){
+  const risk=hasCredRisk(a.transportUrl)?'<span class="tag risk">credential risk</span>':'';
+  return'<div class="addon'+extra+'" data-idx="'+i+'"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(a.name)+risk+'</div><div class="url">'+esc(redactUrl(a.transportUrl))+'</div></div></div>';
+}
+
+function renderList(list){
+  $('addon-count').textContent=list.length;
+  $('addon-list').innerHTML=list.length?list.map((a,i)=>renderAddon(a,i)).join(''):'<p style="color:var(--muted)">No addons match.</p>';
+}
+
+function filterAddons(){
+  const q=($('search').value||'').toLowerCase();
+  const t=$('type-filter').value;
+  let list=addons;
+  if(q)list=list.filter(a=>a.name.toLowerCase().includes(q)||(a.description||'').toLowerCase().includes(q)||a.transportUrl.toLowerCase().includes(q)||(a.id||'').toLowerCase().includes(q));
+  if(t)list=list.filter(a=>a.types.includes(t));
+  renderList(list);
+}
+
+function showWarnings(){
+  const risky=addons.filter(a=>hasCredRisk(a.transportUrl));
+  if(!risky.length){hide('warnings-card');return}
+  show('warnings-card');
+  $('warnings-list').innerHTML=risky.map(a=>'<div class="warn">'+esc(a.name)+' — transport URL may contain embedded credentials<br><small>'+esc(redactUrl(a.transportUrl))+'</small></div>').join('');
+}
+
+function onLogin(data,label){
+  const raw=data?.result?.addons||data?.addons;
+  if(!Array.isArray(raw))throw new Error('No addon list found');
+  addons=parseAddons(raw);
+  currentSnapshot={exportedAt:new Date().toISOString(),source:label,addons:raw};
+  renderList(addons);
+  showWarnings();
+  show('session-card');show('addons-card');show('actions-card');
+  $('session-label').textContent='Signed in'+(label?' — '+esc(label):'');
+}
+
+async function post(path,body){
+  const r=await fetch('https://api.strem.io/api/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('Stremio API error '+r.status);
+  const d=await r.json();if(d.error)throw new Error(d.error);return d;
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    $(tab.dataset.tab).classList.add('active');
+  };
+});
+
+// Email login
+$('loginEmail').onclick=async()=>{
+  const email=$('email').value.trim(),password=$('password').value;
+  if(!email||!password)return $('status').textContent='Enter email and password.';
+  $('loginEmail').disabled=true;$('status').textContent='Signing in…';
+  try{
+    const login=await post('login',{type:'Login',email,password,facebook:false});
+    authKey=login?.result?.authKey;
+    if(!authKey)throw new Error(login?.error||'Login failed');
+    const data=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+    onLogin(data,email);
+    $('status').textContent='Loaded '+addons.length+' addons. Password cleared.';
+    $('password').value='';
+    hide('auth-card');
+  }catch(e){$('status').textContent=e.message}
+  finally{$('loginEmail').disabled=false}
+};
+
+// Auth key login
+$('loginKey').onclick=async()=>{
+  const key=$('authkey').value.trim();
+  if(!key)return $('status').textContent='Paste your auth key.';
+  $('loginKey').disabled=true;$('status').textContent='Loading…';
+  try{
+    authKey=key;
+    const data=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+    onLogin(data,'auth-key');
+    $('status').textContent='Loaded '+addons.length+' addons.';
+    $('authkey').value='';
+    hide('auth-card');
+  }catch(e){authKey=null;$('status').textContent=e.message}
+  finally{$('loginKey').disabled=false}
+};
+
+// Logout
+$('logout').onclick=()=>{
+  authKey=null;addons=[];currentSnapshot=null;
+  $('addon-list').innerHTML='';$('search').value='';$('type-filter').value='';
+  $('status').textContent='Session cleared.';
+  hide('session-card');hide('addons-card');hide('actions-card');hide('warnings-card');hide('inspect-card');hide('diff-card');
+  show('auth-card');
+};
+
+// Search & filter
+$('search').oninput=filterAddons;
+$('type-filter').onchange=filterAddons;
+
+// Addon click → inspect
+$('addon-list').onclick=e=>{
+  const row=e.target.closest('.addon');
+  if(!row)return;
+  const idx=parseInt(row.dataset.idx,10);
+  const a=addons[idx];if(!a)return;
+  $('inspect-name').textContent=a.name;
+  $('inspect-body').innerHTML=[
+    '<dt>ID</dt><dd>'+esc(a.id)+'</dd>',
+    '<dt>Version</dt><dd>'+esc(a.version||'—')+'</dd>',
+    '<dt>Description</dt><dd>'+esc(a.description||'—')+'</dd>',
+    '<dt>Types</dt><dd>'+esc(a.types.join(', ')||'—')+'</dd>',
+    '<dt>Catalogs</dt><dd>'+a.catalogs.length+'</dd>',
+    '<dt>Resources</dt><dd>'+(Array.isArray(a.resources)?a.resources.map(r=>esc(typeof r==='string'?r:r.name||JSON.stringify(r))).join(', '):'—')+'</dd>',
+    '<dt>Transport URL</dt><dd style="font-family:monospace;font-size:.8rem">'+esc(redactUrl(a.transportUrl))+'</dd>',
+    hasCredRisk(a.transportUrl)?'<div class="warn" style="margin-top:10px">This URL may contain embedded credentials. Do not share it.</div>':''
+  ].join('');
+  show('inspect-card');
+};
+$('close-inspect').onclick=()=>hide('inspect-card');
+
+// Download backup
+$('download').onclick=()=>{
+  if(!currentSnapshot)return;
+  const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  const blob=new Blob([JSON.stringify({version:1,...currentSnapshot,addonCount:currentSnapshot.addons.length},null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=u;a.download='stremio-backup-'+ts+'.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),200);
+};
+
+// Import backup
+$('importBtn').onclick=()=>{$('file').value='';$('file').click()};
+$('file').onchange=async e=>{
+  try{
+    const raw=JSON.parse(await e.target.files[0].text());
+    const list=raw?.addons||raw?.result?.addons;
+    if(!Array.isArray(list))throw new Error('No addon list found in file');
+    addons=parseAddons(list);
+    currentSnapshot={exportedAt:raw.exportedAt||new Date().toISOString(),source:'Imported backup',addons:list};
+    renderList(addons);showWarnings();
+    show('addons-card');show('actions-card');
+    $('status').textContent='Imported '+addons.length+' addons from backup.';
+  }catch(err){$('status').textContent=err.message}
+};
+
+// Diff — compare two snapshots
+let diffA=null,diffB=null;
+$('diffBtn').onclick=()=>{
+  diffA=null;diffB=null;
+  $('status').textContent='Select Snapshot A (older backup)…';
+  $('diffFileA').value='';$('diffFileA').click();
+};
+$('diffFileA').onchange=async e=>{
+  try{
+    diffA=JSON.parse(await e.target.files[0].text());
+    $('status').textContent='Snapshot A loaded. Now select Snapshot B (newer backup)…';
+    $('diffFileB').value='';$('diffFileB').click();
+  }catch(err){$('status').textContent='Error reading Snapshot A: '+err.message}
+};
+$('diffFileB').onchange=async e=>{
+  try{
+    diffB=JSON.parse(await e.target.files[0].text());
+    runDiff();
+  }catch(err){$('status').textContent='Error reading Snapshot B: '+err.message}
+};
+
+function runDiff(){
+  const listA=diffA?.addons||diffA?.result?.addons||[];
+  const listB=diffB?.addons||diffB?.result?.addons||[];
+  const urlsA=new Map(listA.map(a=>[a.transportUrl,a]));
+  const urlsB=new Map(listB.map(a=>[a.transportUrl,a]));
+
+  const added=[],removed=[],moved=[];
+  for(const a of listB)if(!urlsA.has(a.transportUrl))added.push(a);
+  for(const a of listA)if(!urlsB.has(a.transportUrl))removed.push(a);
+  const shared=listA.filter(a=>urlsB.has(a.transportUrl));
+  for(const a of shared){
+    const iA=listA.findIndex(x=>x.transportUrl===a.transportUrl);
+    const iB=listB.findIndex(x=>x.transportUrl===a.transportUrl);
+    if(iA!==iB)moved.push({addon:a,from:iA,to:iB});
+  }
+
+  const unchanged=shared.length-moved.length;
+  const hasDiff=added.length||removed.length||moved.length;
+
+  $('diff-summary').innerHTML=hasDiff?[
+    '<div>Snapshot A: <span class="count">'+listA.length+'</span> addons</div>',
+    '<div>Snapshot B: <span class="count">'+listB.length+'</span> addons</div>',
+    '<div style="margin-top:8px">',
+    added.length?'<span class="tag added">+'+added.length+' added</span> ':'',
+    removed.length?'<span class="tag removed">-'+removed.length+' removed</span> ':'',
+    moved.length?'<span class="tag moved">~'+moved.length+' reordered</span> ':'',
+    unchanged?'<span>'+unchanged+' unchanged</span>':'',
+    '</div>'
+  ].join(''):'<div>No differences found between the two snapshots.</div>';
+
+  let html='';
+  if(added.length){
+    html+='<h3>Added</h3>';
+    html+=added.map((a,i)=>{const p=parseAddons([a])[0];return renderAddon(p,i,' added');}).join('');
+  }
+  if(removed.length){
+    html+='<h3>Removed</h3>';
+    html+=removed.map((a,i)=>{const p=parseAddons([a])[0];return renderAddon(p,i,' removed');}).join('');
+  }
+  if(moved.length){
+    html+='<h3>Reordered</h3>';
+    html+=moved.map(m=>{
+      const p=parseAddons([m.addon])[0];
+      return'<div class="addon moved" data-idx="-1"><span class="num">'+(m.from+1)+'→'+(m.to+1)+'</span><div class="meta"><div class="name">'+esc(p.name)+'<span class="tag moved">moved</span></div><div class="url">'+esc(redactUrl(p.transportUrl))+'</div></div></div>';
+    }).join('');
+  }
+
+  $('diff-list').innerHTML=html;
+  show('diff-card');
+  $('status').textContent='Comparison complete — '+(hasDiff?(added.length+removed.length+moved.length)+' change(s)':'no differences')+'.';
+}
+$('close-diff').onclick=()=>hide('diff-card');
+
+})();</script></body></html>
