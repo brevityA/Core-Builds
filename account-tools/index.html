@@ -108,19 +108,19 @@ button:disabled{opacity:.4;cursor:default}
 <section class="card hidden" id="undo-card">
 <div class="undo-bar">
   <span class="undo-label" id="undo-label">Last action can be undone</span>
-  <button id="undoBtn">Undo</button>
+  <button type="button" id="undoBtn">Undo</button>
 </div>
 </section>
 
 <section class="card hidden" id="actions-card">
 <h2>Actions</h2>
 <div class="row3">
-  <button id="download">Download backup</button>
-  <button class="secondary" id="importBtn">Import backup</button>
-  <button class="secondary" id="diffBtn">Compare snapshots</button>
+  <button type="button" id="download">Download backup</button>
+  <button type="button" class="secondary" id="importBtn">Import backup</button>
+  <button type="button" class="secondary" id="diffBtn">Compare snapshots</button>
 </div>
 <div class="row3" style="margin-top:4px">
-  <button class="secondary" id="restoreBtn">Restore from backup</button>
+  <button type="button" class="secondary" id="restoreBtn">Restore from backup</button>
   <div></div><div></div>
 </div>
 <label for="file" class="sr">Import backup file</label>
@@ -403,9 +403,10 @@ $('close-diff').onclick=()=>hide('diff-card');
 
 // --- Mutations ---
 
-function showUndo(label){
-  undoStack.push(label);
-  $('undo-label').textContent='Last action: '+label+' — can be undone';
+function showUndo(snap){
+  undoStack.push(snap);
+  if(undoStack.length>10)undoStack.shift();
+  $('undo-label').textContent='Last action: '+snap.label+' — can be undone';
   show('undo-card');
 }
 
@@ -422,7 +423,8 @@ async function reloadAddons(){
     addons=parseAddons(raw);
     currentSnapshot={exportedAt:new Date().toISOString(),source:'live',addons:raw};
     renderList(addons);showWarnings();
-  }catch(e){$('status').textContent='Reload error: '+e.message}
+    return true;
+  }catch(e){$('status').textContent='Reload error: '+e.message;return false}
 }
 
 async function doMove(fromIdx,toIdx){
@@ -435,14 +437,13 @@ async function doMove(fromIdx,toIdx){
   reordered.splice(toIdx,0,item);
   try{
     $('status').textContent='Moving addon…';
-    undoStack.push({addons:prev,label:'move'});
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:reordered});
-    await reloadAddons();
+    const ok=await reloadAddons();
+    if(!ok){$('status').textContent='Move saved but reload failed.';return}
+    showUndo({addons:prev,label:'move'});
     $('status').textContent='Addon moved. Undo available.';
     $('undo-label').textContent='Last: moved '+esc(item.manifest?.name||'addon')+' — undo available';
-    show('undo-card');
   }catch(e){
-    undoStack.pop();
     $('status').textContent='Move failed: '+e.message;
   }
 }
@@ -459,12 +460,14 @@ $('addon-list').addEventListener('click',e=>{
 
 $('undoBtn').onclick=async()=>{
   if(!undoStack.length||!authKey)return;
-  const snap=undoStack.pop();
+  const snap=undoStack[undoStack.length-1];
   try{
     $('status').textContent='Undoing…';
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:snap.addons});
-    await reloadAddons();
-    $('status').textContent='Undo complete — restored to previous state.';
+    undoStack.pop();
+    const ok=await reloadAddons();
+    if(!ok){$('status').textContent='Undo saved but reload failed.'}
+    else{$('status').textContent='Undo complete — restored to previous state.'}
     if(!undoStack.length)hide('undo-card');
     else{$('undo-label').textContent='Last: '+undoStack[undoStack.length-1].label+' — undo available'}
   }catch(e){$('status').textContent='Undo failed: '+e.message}
@@ -476,6 +479,7 @@ $('restoreBtn').onclick=()=>{
   $('restoreFile').value='';$('restoreFile').click();
 };
 $('restoreFile').onchange=async e=>{
+  let pushed=false;
   try{
     const raw=JSON.parse(await e.target.files[0].text());
     const list=raw?.addons||raw?.result?.addons;
@@ -484,14 +488,14 @@ $('restoreFile').onchange=async e=>{
     if(!current)throw new Error('No current snapshot — sign in first');
     if(!confirm('This will replace your '+current.length+' addons with '+list.length+' from the backup. Auto-backup of current state will be saved for undo. Continue?'))return;
     $('status').textContent='Restoring from backup…';
-    undoStack.push({addons:JSON.parse(JSON.stringify(current)),label:'restore'});
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:list});
-    await reloadAddons();
+    const ok=await reloadAddons();
+    if(!ok){$('status').textContent='Restore saved but reload failed.';return}
+    showUndo({addons:JSON.parse(JSON.stringify(current)),label:'restore'});
+    pushed=true;
     $('status').textContent='Restored '+list.length+' addons from backup. Undo available.';
     $('undo-label').textContent='Last: restored from backup — undo available';
-    show('undo-card');
   }catch(err){
-    if(err.message!=='Backup contains no addons')undoStack.pop();
     $('status').textContent=err.message;
   }
 };

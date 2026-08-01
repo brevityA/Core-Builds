@@ -1,6 +1,6 @@
 import * as defaultApi from './stremio-api.js';
 import { getAuthKey } from './auth-session.js';
-import { pushSnapshot, popSnapshot, canUndo } from './rollback.js';
+import { pushSnapshot, popSnapshot, peekSnapshot, canUndo } from './rollback.js';
 
 let _api = defaultApi;
 
@@ -23,8 +23,8 @@ async function loadCurrent(authKey) {
 }
 
 async function saveWithRollback(authKey, currentAddons, newAddons, label) {
-  pushSnapshot(currentAddons, label);
   await _api.setAddonCollection(authKey, newAddons);
+  pushSnapshot(currentAddons, label);
   return _api.getAddonCollection(authKey);
 }
 
@@ -66,9 +66,10 @@ export async function restoreFromBackup(backupAddons) {
 export async function undo() {
   if (!canUndo()) throw new Error('Nothing to undo');
   const authKey = await requireAuth();
-  const snapshot = popSnapshot();
+  const snapshot = peekSnapshot();
 
   await _api.setAddonCollection(authKey, snapshot.addons);
+  popSnapshot();
   return _api.getAddonCollection(authKey);
 }
 
