@@ -13,7 +13,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PKG_VERSION = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')).version;
-const dataDir = resolve(__dirname, '..', 'configurator', 'src', 'data');
+const dataDir = resolve(__dirname, 'data');
 
 const { FORMATTERS } = await import(pathToFileURL(resolve(dataDir, 'formatters.js')).href);
 const { DEVICE_AV1_SAFE, DEVICE_DV_SAFE, DEVICE_FORCE_LIMITED_AUDIO } = await import(pathToFileURL(resolve(dataDir, 'devices.js')).href);
@@ -22,19 +22,25 @@ let _rankedCommon, _rankedUhd;
 async function loadRankedRegex() {
   if (_rankedCommon) return { common: _rankedCommon, uhd: _rankedUhd };
   try {
-    const appPath = resolve(__dirname, '..', 'configurator', 'src', 'js', 'app.js');
-    const src = readFileSync(appPath, 'utf-8');
-    const commonMatch = src.match(/^const RANKED_REGEX_COMMON\s*=\s*(\[[\s\S]*?\]);\s*$/m);
-    const uhdMatch = src.match(/^const RANKED_REGEX_UHD\s*=\s*(\[[\s\S]*?\]);\s*$/m);
-    _rankedCommon = commonMatch ? JSON.parse(commonMatch[1]) : [];
-    _rankedUhd = uhdMatch ? JSON.parse(uhdMatch[1]) : [];
-    if (!_rankedCommon.length && !_rankedUhd.length) process.stderr.write('Warning: ranked regex extraction matched nothing — regexScore sorting will be a no-op\n');
-    else if (!_rankedCommon.length) process.stderr.write('Warning: ranked regex common patterns empty — regexScore sort key will be a no-op\n');
-  } catch (err) {
-    process.stderr.write(`Warning: failed to load ranked regex from app.js: ${err.message}\n`);
-    _rankedCommon = [];
-    _rankedUhd = [];
+    const bundledPath = resolve(dataDir, 'ranked-regex.json');
+    const raw = JSON.parse(readFileSync(bundledPath, 'utf-8'));
+    _rankedCommon = raw.common || [];
+    _rankedUhd = raw.uhd || [];
+  } catch {
+    try {
+      const appPath = resolve(__dirname, '..', 'configurator', 'src', 'js', 'app.js');
+      const src = readFileSync(appPath, 'utf-8');
+      const commonMatch = src.match(/^const RANKED_REGEX_COMMON\s*=\s*(\[[\s\S]*?\]);\s*$/m);
+      const uhdMatch = src.match(/^const RANKED_REGEX_UHD\s*=\s*(\[[\s\S]*?\]);\s*$/m);
+      _rankedCommon = commonMatch ? JSON.parse(commonMatch[1]) : [];
+      _rankedUhd = uhdMatch ? JSON.parse(uhdMatch[1]) : [];
+    } catch (err) {
+      process.stderr.write(`Warning: failed to load ranked regex: ${err.message}\n`);
+      _rankedCommon = [];
+      _rankedUhd = [];
+    }
   }
+  if (!_rankedCommon.length && !_rankedUhd.length) process.stderr.write('Warning: ranked regex data empty — regexScore sorting will be a no-op\n');
   return { common: _rankedCommon, uhd: _rankedUhd };
 }
 

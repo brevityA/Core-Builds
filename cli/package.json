@@ -31,6 +31,9 @@
   "dependencies": {
     "@core-builds/core": "file:../packages/core"
   },
+  "bundleDependencies": [
+    "@core-builds/core"
+  ],
   "files": [
     "index.js",
     "data/"
