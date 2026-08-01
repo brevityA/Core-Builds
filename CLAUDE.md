@@ -121,7 +121,7 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 | **Template Builder** | `configurator/` | Live — the configurator |
 | **Template Inspector** | `tools/inspector/` | Live — paste/upload/fetch JSON for instant validation, health score, host compatibility |
 | **Addon Backup** | `account-tools/` | Live — read-only Stremio addon backup |
-| **Account Manager** | `account-tools/` | In development — addon reorder, restore, rollback |
+| **Account Manager** | `account-tools/` | In development — addon reorder, removal, restore, rollback |
 | **CLI** | `cli/` | Available |
 | **CORS Proxy** | `cloudflare-worker/` | Live — Cloudflare Worker for cross-origin config push |
 

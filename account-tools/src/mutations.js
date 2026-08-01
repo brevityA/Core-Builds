@@ -63,14 +63,22 @@ export async function restoreFromBackup(backupAddons) {
   return saveWithRollback(authKey, current, backupAddons, 'restore');
 }
 
-export async function undo() {
-  if (!canUndo()) throw new Error('Nothing to undo');
-  const authKey = await requireAuth();
-  const snapshot = peekSnapshot();
+let _undoing = false;
 
-  await _api.setAddonCollection(authKey, snapshot.addons);
-  popSnapshot();
-  return _api.getAddonCollection(authKey);
+export async function undo() {
+  if (_undoing) throw new Error('Undo already in progress');
+  if (!canUndo()) throw new Error('Nothing to undo');
+  _undoing = true;
+  try {
+    const authKey = await requireAuth();
+    const snapshot = peekSnapshot();
+
+    await _api.setAddonCollection(authKey, snapshot.addons);
+    popSnapshot();
+    return _api.getAddonCollection(authKey);
+  } finally {
+    _undoing = false;
+  }
 }
 
 export { canUndo };

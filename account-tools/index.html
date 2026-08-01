@@ -438,11 +438,10 @@ async function doMove(fromIdx,toIdx){
   try{
     $('status').textContent='Moving addon…';
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:reordered});
-    const ok=await reloadAddons();
-    if(!ok){$('status').textContent='Move saved but reload failed.';return}
     showUndo({addons:prev,label:'move'});
-    $('status').textContent='Addon moved. Undo available.';
+    const ok=await reloadAddons();
     $('undo-label').textContent='Last: moved '+esc(item.manifest?.name||'addon')+' — undo available';
+    $('status').textContent=ok?'Addon moved. Undo available.':'Move saved but reload failed. Undo available.';
   }catch(e){
     $('status').textContent='Move failed: '+e.message;
   }
@@ -460,6 +459,8 @@ $('addon-list').addEventListener('click',e=>{
 
 $('undoBtn').onclick=async()=>{
   if(!undoStack.length||!authKey)return;
+  const btn=$('undoBtn');
+  btn.disabled=true;
   const snap=undoStack[undoStack.length-1];
   try{
     $('status').textContent='Undoing…';
@@ -471,6 +472,7 @@ $('undoBtn').onclick=async()=>{
     if(!undoStack.length)hide('undo-card');
     else{$('undo-label').textContent='Last: '+undoStack[undoStack.length-1].label+' — undo available'}
   }catch(e){$('status').textContent='Undo failed: '+e.message}
+  finally{btn.disabled=false}
 };
 
 // Restore from backup
@@ -489,12 +491,11 @@ $('restoreFile').onchange=async e=>{
     if(!confirm('This will replace your '+current.length+' addons with '+list.length+' from the backup. Auto-backup of current state will be saved for undo. Continue?'))return;
     $('status').textContent='Restoring from backup…';
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:list});
-    const ok=await reloadAddons();
-    if(!ok){$('status').textContent='Restore saved but reload failed.';return}
     showUndo({addons:JSON.parse(JSON.stringify(current)),label:'restore'});
     pushed=true;
-    $('status').textContent='Restored '+list.length+' addons from backup. Undo available.';
+    const ok=await reloadAddons();
     $('undo-label').textContent='Last: restored from backup — undo available';
+    $('status').textContent=ok?'Restored '+list.length+' addons from backup. Undo available.':'Restore saved but reload failed. Undo available.';
   }catch(err){
     $('status').textContent=err.message;
   }
