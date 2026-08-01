@@ -43,7 +43,7 @@ jobs:
           node --check configurator/dist/web/assets/app.js || { echo "ERROR: built app.js has syntax errors"; exit 1; }
           echo "Build verified: configurator/index.html is $(wc -c < configurator/index.html) bytes"
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
       - uses: actions/upload-pages-artifact@v3
         with:
