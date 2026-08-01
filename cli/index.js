@@ -1,21 +1,42 @@
 #!/usr/bin/env node
-/**
- * Core Builds CLI — Generate, validate, and diff AIOStreams templates.
- *
- * Usage:
- *   core-builds generate --service torbox-pro --device shield --resolution 4k --output template.json
- *   core-builds validate template.json
- *   core-builds diff old.json new.json
- *   core-builds devices
- *   core-builds services
- *   core-builds formatters
- */
 
-const { program } = require('commander');
-const fs = require('fs');
-const path = require('path');
+import { parseArgs } from 'node:util';
+import { readFileSync, writeFileSync, statSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-// ── Device Definitions ─────────────────────────────────────────────
+import {
+  generateTemplate,
+  SEL_ARCHITECTURES,
+  assembleTemplate,
+} from '@core-builds/core';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PKG_VERSION = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')).version;
+const dataDir = resolve(__dirname, '..', 'configurator', 'src', 'data');
+
+const { FORMATTERS } = await import(pathToFileURL(resolve(dataDir, 'formatters.js')).href);
+const { DEVICE_AV1_SAFE, DEVICE_DV_SAFE, DEVICE_FORCE_LIMITED_AUDIO } = await import(pathToFileURL(resolve(dataDir, 'devices.js')).href);
+
+let _rankedCommon, _rankedUhd;
+async function loadRankedRegex() {
+  if (_rankedCommon) return { common: _rankedCommon, uhd: _rankedUhd };
+  try {
+    const appPath = resolve(__dirname, '..', 'configurator', 'src', 'js', 'app.js');
+    const src = readFileSync(appPath, 'utf-8');
+    const commonMatch = src.match(/^const RANKED_REGEX_COMMON\s*=\s*(\[[\s\S]*?\]);\s*$/m);
+    const uhdMatch = src.match(/^const RANKED_REGEX_UHD\s*=\s*(\[[\s\S]*?\]);\s*$/m);
+    _rankedCommon = commonMatch ? JSON.parse(commonMatch[1]) : [];
+    _rankedUhd = uhdMatch ? JSON.parse(uhdMatch[1]) : [];
+    if (!_rankedCommon.length && !_rankedUhd.length) process.stderr.write('Warning: ranked regex extraction matched nothing — regexScore sorting will be a no-op\n');
+    else if (!_rankedCommon.length) process.stderr.write('Warning: ranked regex common patterns empty — regexScore sort key will be a no-op\n');
+  } catch (err) {
+    process.stderr.write(`Warning: failed to load ranked regex from app.js: ${err.message}\n`);
+    _rankedCommon = [];
+    _rankedUhd = [];
+  }
+  return { common: _rankedCommon, uhd: _rankedUhd };
+}
 
 const DEVICES = {
   'generic':         { name: 'Standard / Not Sure', audio: 'standard', av1: false, dv: false },
@@ -41,422 +62,399 @@ const DEVICES = {
 const SERVICES = [
   'torbox-pro', 'torbox-ess', 'realdebrid', 'alldebrid', 'premiumize',
   'debridlink', 'easynews', 'offcloud', 'easydebrid', 'pikpak', 'seedr',
-  'debridio', 'p2p', 'http', 'nzbgeek', 'streamnzb',
-];
-
-const FORMATTERS = [
-  'family-v3', 'ultra', 'apex-v2', 'sigma', 'minimal', 'prime', 'tv',
-  'apex', 'elite', 'uniform', 'syntax', 'syntax-v3', 'omni-diamond',
-  'zenith-diamond', 'auburn-tiger', 'midnight-slate', 'rb3-clean', 'rb3',
+  'debridio', 'debrider', 'p2p', 'http', 'nzbgeek', 'streamnzb',
 ];
 
 const VALID_SORT_KEYS = [
-  'resolution', 'quality', 'cached', 'size', 'seeders', 'bitrate', 'encode',
-  'audioChannels', 'audioTags', 'visualTags', 'releaseGroup', 'age',
-  'regexScore', 'seScore', 'language', 'subtitle', 'title', 'year',
-  'service', 'type', 'filename', 'indexer',
+  'cached','streamExpressionMatched','streamExpressionScore','seadex',
+  'resolution','quality','regexScore','visualTag','audioTag','audioChannel',
+  'language','encode','library','seeders','bitrate','size','service','addon',
+  'keyword','streamType','private','age','subtitle','regexPatterns','releaseGroup',
 ];
 
-// ── Commands ───────────────────────────────────────────────────────
+function die(msg) {
+  process.stderr.write(`Error: ${msg}\n`);
+  process.exit(1);
+}
 
-program
-  .name('core-builds')
-  .description('CLI for AIOStreams template generation, validation, and diffing')
-  .version('2.86.0');
+function printHelp() {
+  console.log(`
+Core Builds CLI v${PKG_VERSION}
 
-// --- devices ---
-program
-  .command('devices')
-  .description('List all supported device profiles')
-  .action(() => {
-    console.log('\nSupported device profiles:\n');
-    for (const [id, d] of Object.entries(DEVICES)) {
-      const caps = [
-        d.dv ? 'DV' : '',
-        d.av1 === true ? 'AV1' : d.av1 === false ? 'no-AV1' : 'AV1?',
-        d.audio,
-      ].filter(Boolean).join(', ');
-      console.log(`  ${id.padEnd(18)} ${d.name.padEnd(26)} [${caps}]`);
-    }
-    console.log('\n  Total:', Object.keys(DEVICES).length, 'devices\n');
+Usage:
+  core-builds <command> [options]
+
+Commands:
+  devices          List all supported device profiles
+  services         List all supported service IDs
+  formatters       List all available formatter IDs
+  architectures    List SEL PSE architectures
+  generate         Generate an AIOStreams template JSON
+  validate <file>  Validate an AIOStreams template JSON
+  diff <a> <b>     Compare two AIOStreams template JSONs
+  info <file>      Show template metadata summary
+
+Generate options:
+  --service <id>       Service ID (required)
+  --device <id>        Device profile (default: generic)
+  --resolution <res>   4k, 1080p, mixed, ultrawide (default: 4k)
+  --architecture <a>   standard, iqr, apex-mixed (default: standard)
+  --audio <mode>       lossless, standard, limited, dolby (default: standard)
+  --formatter <id>     Formatter ID (default: family-v4)
+  --content <type>     all, anime, live, mixed (default: all)
+  --match-mode <m>     relaxed, balanced, strict (default: balanced)
+  --cache-mode <m>     mixed, cached, uncached (default: mixed)
+  --size-limit <GB>    Max file size in GB (default: unlimited)
+  --output <file>      Output file (default: stdout)
+  --name <name>        Template name override
+  --id <id>            Template metadata ID
+
+Validate options:
+  --strict             Treat warnings as errors
+`);
+}
+
+const args = process.argv.slice(2);
+const command = args[0];
+
+if (!command || command === '--help' || command === '-h') {
+  printHelp();
+  process.exit(0);
+}
+
+switch (command) {
+  case 'devices': cmdDevices(); break;
+  case 'services': cmdServices(); break;
+  case 'formatters': cmdFormatters(); break;
+  case 'architectures': cmdArchitectures(); break;
+  case 'generate': await cmdGenerate(); break;
+  case 'validate': cmdValidate(); break;
+  case 'diff': cmdDiff(); break;
+  case 'info': cmdInfo(); break;
+  default: die(`Unknown command: ${command}. Run with --help to see usage.`);
+}
+
+function cmdDevices() {
+  console.log('\nSupported device profiles:\n');
+  for (const [id, d] of Object.entries(DEVICES)) {
+    const caps = [
+      d.dv ? 'DV' : '',
+      d.av1 === true ? 'AV1' : d.av1 === false ? 'no-AV1' : 'AV1?',
+      d.audio,
+    ].filter(Boolean).join(', ');
+    console.log(`  ${id.padEnd(18)} ${d.name.padEnd(26)} [${caps}]`);
+  }
+  console.log(`\n  Total: ${Object.keys(DEVICES).length} devices\n`);
+}
+
+function cmdServices() {
+  console.log('\nSupported services:\n');
+  SERVICES.forEach(s => console.log(`  ${s}`));
+  console.log(`\n  Total: ${SERVICES.length} services\n`);
+}
+
+function cmdFormatters() {
+  console.log('\nAvailable formatters:\n');
+  for (const f of FORMATTERS) {
+    console.log(`  ${f.id.padEnd(20)} ${f.label.padEnd(20)} [${f.badge}]`);
+  }
+  console.log(`\n  Total: ${FORMATTERS.length} formatters\n`);
+}
+
+function cmdArchitectures() {
+  console.log('\nSEL PSE architectures:\n');
+  for (const arch of SEL_ARCHITECTURES) {
+    console.log(`  ${arch}`);
+  }
+  console.log('');
+}
+
+async function cmdGenerate() {
+  const { values: opts } = parseArgs({
+    args: args.slice(1),
+    options: {
+      service:      { type: 'string' },
+      device:       { type: 'string', default: 'generic' },
+      resolution:   { type: 'string', default: '4k' },
+      architecture: { type: 'string', default: 'standard' },
+      audio:        { type: 'string', default: 'standard' },
+      formatter:    { type: 'string', default: 'family-v4' },
+      content:      { type: 'string', default: 'all' },
+      'match-mode': { type: 'string', default: 'balanced' },
+      'cache-mode': { type: 'string', default: 'mixed' },
+      'size-limit': { type: 'string' },
+      output:       { type: 'string' },
+      name:         { type: 'string' },
+      id:           { type: 'string' },
+    },
+    strict: false,
   });
 
-// --- services ---
-program
-  .command('services')
-  .description('List all supported service IDs')
-  .action(() => {
-    console.log('\nSupported services:\n');
-    SERVICES.forEach(s => console.log(`  ${s}`));
-    console.log('\n  Total:', SERVICES.length, 'services\n');
+  if (!opts.service) die('--service is required. Run "core-builds services" to see options.');
+  if (!SERVICES.includes(opts.service)) die(`Unknown service "${opts.service}". Run "core-builds services" to see options.`);
+  if (!DEVICES[opts.device]) die(`Unknown device "${opts.device}". Run "core-builds devices" to see options.`);
+  if (!FORMATTERS.find(f => f.id === opts.formatter)) die(`Unknown formatter "${opts.formatter}". Run "core-builds formatters" to see options.`);
+  const VALID_RESOLUTIONS = ['4k', '1080p', 'mixed', 'ultrawide'];
+  const VALID_ARCHITECTURES = ['standard', 'iqr', 'apex-mixed'];
+  const VALID_AUDIO = ['lossless', 'standard', 'limited', 'dolby'];
+  const VALID_CONTENT = ['all', 'anime', 'live', 'mixed'];
+
+  if (opts['size-limit'] != null) {
+    const stripped = String(opts['size-limit']).replace(/GB$/i, '');
+    const num = Number(stripped);
+    if (!Number.isFinite(num) || num <= 0) die(`Invalid --size-limit "${opts['size-limit']}". Must be a positive number (in GB).`);
+  }
+  const VALID_MATCH_MODES = ['relaxed', 'balanced', 'strict'];
+  const VALID_CACHE_MODES = ['mixed', 'cached', 'uncached'];
+  if (!VALID_RESOLUTIONS.includes(opts.resolution)) die(`Unknown resolution "${opts.resolution}". Valid: ${VALID_RESOLUTIONS.join(', ')}`);
+  if (!VALID_ARCHITECTURES.includes(opts.architecture)) die(`Unknown architecture "${opts.architecture}". Valid: ${VALID_ARCHITECTURES.join(', ')}`);
+  if (!VALID_AUDIO.includes(opts.audio)) die(`Unknown audio mode "${opts.audio}". Valid: ${VALID_AUDIO.join(', ')}`);
+  if (!VALID_CONTENT.includes(opts.content)) die(`Unknown content type "${opts.content}". Valid: ${VALID_CONTENT.join(', ')}`);
+  if (!VALID_MATCH_MODES.includes(opts['match-mode'])) die(`Unknown match-mode "${opts['match-mode']}". Valid: ${VALID_MATCH_MODES.join(', ')}`);
+  if (!VALID_CACHE_MODES.includes(opts['cache-mode'])) die(`Unknown cache-mode "${opts['cache-mode']}". Valid: ${VALID_CACHE_MODES.join(', ')}`);
+
+
+  const { common, uhd } = await loadRankedRegex();
+
+  const rawInput = {
+    service: opts.service,
+    device: opts.device,
+    resolution: opts.resolution,
+    architecture: opts.architecture,
+    audio: opts.audio,
+    content: opts.content,
+    matchMode: opts['match-mode'],
+    cacheMode: opts['cache-mode'],
+    formatter: opts.formatter,
+    sizeLimit: opts['size-limit'] || 'unlimited',
+    credentials: {},
+    langs: ['English'],
+    multiServices: [],
+    optionalScrapers: [],
+  };
+  if (opts.name) rawInput.name = opts.name;
+
+  const metadata = {};
+  if (opts.id) metadata.id = opts.id;
+  if (opts.name) metadata.name = opts.name;
+
+  const template = generateTemplate(rawInput, {
+    metadata,
+    deviceAv1Safe: DEVICE_AV1_SAFE,
+    deviceDvSafe: DEVICE_DV_SAFE,
+    deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
+    formatters: FORMATTERS,
+    rankedRegexCommon: common,
+    rankedRegexUhd: uhd,
   });
 
-// --- formatters ---
-program
-  .command('formatters')
-  .description('List all available formatter IDs')
-  .action(() => {
-    console.log('\nAvailable formatters:\n');
-    FORMATTERS.forEach(f => console.log(`  ${f}`));
-    console.log('\n  Total:', FORMATTERS.length, 'formatters\n');
-  });
+  const json = JSON.stringify(template, null, 2);
 
-// --- generate ---
-program
-  .command('generate')
-  .description('Generate an AIOStreams template JSON')
-  .requiredOption('--service <id>', 'Service ID (e.g. torbox-pro, realdebrid, p2p)')
-  .option('--device <id>', 'Device profile (default: generic)', 'generic')
-  .option('--resolution <res>', 'Resolution: 4k or 1080p (default: 4k)', '4k')
-  .option('--audio <mode>', 'Audio mode: lossless, standard, limited, dolby (default: limited)', 'limited')
-  .option('--formatter <id>', 'Formatter ID (default: family-v3)', 'family-v3')
-  .option('--content <type>', 'Content type: all, live, mixed, anime (default: all)', 'all')
-  .option('--match-mode <mode>', 'Match mode: relaxed, balanced, strict (default: balanced)', 'balanced')
-  .option('--cache-mode <mode>', 'Cache mode: mixed, cached, uncached (default: mixed)', 'mixed')
-  .option('--output <file>', 'Output file (default: template.json)', 'template.json')
-  .option('--tmdb-token <token>', 'TMDB Read Access Token (optional)')
-  .option('--tmdb-key <key>', 'TMDB API Key (optional)')
-  .action(async (opts) => {
-    if (!SERVICES.includes(opts.service)) {
-      console.error(`Error: Unknown service "${opts.service}". Run 'core-builds services' to see options.`);
-      process.exit(1);
-    }
-    if (!DEVICES[opts.device]) {
-      console.error(`Error: Unknown device "${opts.device}". Run 'core-builds devices' to see options.`);
-      process.exit(1);
-    }
-    if (!FORMATTERS.includes(opts.formatter)) {
-      console.error(`Error: Unknown formatter "${opts.formatter}". Run 'core-builds formatters' to see options.`);
-      process.exit(1);
-    }
+  if (opts.output) {
+    try { writeFileSync(opts.output, json); }
+    catch (err) { die(`Cannot write to ${opts.output}: ${err.message}`); }
+    process.stderr.write(`Template written to ${opts.output}\n`);
+    process.stderr.write(`  Service: ${opts.service}\n`);
+    process.stderr.write(`  Device: ${opts.device} (${DEVICES[opts.device].name})\n`);
+    process.stderr.write(`  Resolution: ${opts.resolution}\n`);
+    process.stderr.write(`  Architecture: ${opts.architecture}\n`);
+    process.stderr.write(`  Formatter: ${opts.formatter}\n`);
+    process.stderr.write(`  ESEs: ${template.config?.excludedStreamExpressions?.length || 0}\n`);
+    process.stderr.write(`  PSEs: ${template.config?.preferredStreamExpressions?.length || 0}\n`);
+    process.stderr.write(`  ISEs: ${template.config?.includedStreamExpressions?.length || 0}\n`);
+  } else {
+    process.stdout.write(json + '\n');
+  }
+}
 
-    const coreDir = path.resolve(__dirname, '..', 'configurator', 'src', 'core');
-    const dataDir = path.resolve(__dirname, '..', 'configurator', 'src', 'data');
+function cmdValidate() {
+  const file = args[1];
+  if (!file) die('Usage: core-builds validate <file> [--strict]');
 
-    const { templateInput, hasTmdbCredentials } = await import(path.join(coreDir, 'template-policy.js'));
-    const { resolutionPolicy, encodePolicy, audioPolicy } = await import(path.join(coreDir, 'device-policies.js'));
-    const { sortPolicy } = await import(path.join(coreDir, 'sort-policy.js'));
-    const { sizePolicy, bitratePolicy } = await import(path.join(coreDir, 'filter-policy.js'));
-    const { assembleTemplate } = await import(path.join(coreDir, 'assemble-template.js'));
-    const { DEVICE_AV1_SAFE, DEVICE_FORCE_LIMITED_AUDIO } = await import(path.join(dataDir, 'devices.js'));
+  const strict = args.includes('--strict');
+  let raw;
+  try { raw = readFileSync(file, 'utf-8'); }
+  catch { die(`Cannot read file: ${file}`); }
 
-    const device = DEVICES[opts.device];
-    const isFree = opts.service === 'p2p' || opts.service === 'http';
+  let d;
+  try { d = JSON.parse(raw); }
+  catch (e) { die(`Invalid JSON: ${e.message}`); }
 
-    const rawInput = {
-      service: opts.service,
-      device: opts.device,
-      resolution: opts.resolution,
-      audio: opts.audio,
-      contentType: opts.content,
-      formatter: opts.formatter,
-      tmdbToken: opts.tmdbToken || '',
-      tmdbApiKey: opts.tmdbKey || '',
-    };
+  const errors = [], warnings = [], passes = [];
+  const cfg = d.config || {};
+  const meta = d.metadata || {};
 
-    const input = templateInput(rawInput);
-    const hasTmdb = hasTmdbCredentials(input);
-    const resolution = resolutionPolicy(input);
-    const encode = encodePolicy(input, DEVICE_AV1_SAFE);
-    const audio = audioPolicy(input, DEVICE_FORCE_LIMITED_AUDIO);
-    const sort = sortPolicy(input);
-    const size = sizePolicy(input);
-    const bitrate = bitratePolicy(input, hasTmdb);
+  if (!meta.version) warnings.push('metadata.version missing');
+  if (!meta.name) warnings.push('metadata.name missing');
+  if (!meta.description) warnings.push('metadata.description missing');
+  if (meta.version && meta.name) passes.push('metadata: core fields present');
 
-    const eses = [];
-    if (device.dv === false) {
-      eses.push({ enabled: true, expression: "/* Exclude DV */ visualTag(streams,'DV','HDR+DV')" });
-    }
-    if (device.av1 === false) {
-      eses.push({ enabled: true, expression: "/* Exclude AV1 */ encode(streams,'AV1')" });
-    }
-    if (resolution.excludedResolutions?.length) {
-      const resArgs = resolution.excludedResolutions.map(r => `'${r}'`).join(',');
-      eses.push({ enabled: true, expression: `/* Hard Resolution Kill */ resolution(streams,${resArgs})` });
-    }
+  const fmt = cfg.formatter || {};
+  if (fmt.id === 'tamtaro') {
+    const o = fmt.definitions?.overrides;
+    if (o?.tamtaro) passes.push("formatter: tamtaro override correctly keyed");
+    else errors.push("formatter: id='tamtaro' but overrides key is not 'tamtaro'");
+  } else if (fmt.id) {
+    passes.push(`formatter: using built-in '${fmt.id}'`);
+  }
 
-    const presets = [];
-    if (!isFree) {
-      presets.push({
-        type: opts.service === 'torbox-pro' || opts.service === 'torbox-ess' ? 'torbox-search' : opts.service,
-        instanceId: 'main',
-        enabled: true,
-        options: {}
-      });
-    }
-    presets.push({ type: 'torrentio', instanceId: 'torrentio', enabled: true, options: {} });
+  for (const scope of Object.keys(cfg.sortCriteria || {})) {
+    const keys = cfg.sortCriteria[scope];
+    if (!Array.isArray(keys)) continue;
+    const malformed = keys.filter(k => !k || typeof k !== 'object' || typeof k.key !== 'string');
+    if (malformed.length) { errors.push(`sortCriteria.${scope}: ${malformed.length} malformed entries (expected {key,direction})`); continue; }
+    const invalid = keys.filter(k => !VALID_SORT_KEYS.includes(k.key));
+    if (invalid.length) errors.push(`sortCriteria.${scope}: invalid key(s): ${invalid.map(k => k.key).join(', ')}`);
+    const badDir = keys.filter(k => k.direction && k.direction !== 'asc' && k.direction !== 'desc');
+    if (badDir.length) errors.push(`sortCriteria.${scope}: invalid direction(s): ${badDir.map(k => `${k.key}=${k.direction}`).join(', ')} (expected "asc" or "desc")`);
+    if (!invalid.length && !badDir.length) passes.push(`sortCriteria.${scope}: ${keys.length} keys valid`);
+  }
 
-    const template = {
-      metadata: {
-        name: `Core Builds ${opts.resolution.toUpperCase()} — ${DEVICES[opts.device].name}`,
-        description: 'Auto-generated by Core Builds CLI',
-        version: '1.0.0',
-        author: 'Core Builds CLI',
-        category: isFree ? 'Free' : 'Debrid',
-      },
-      config: {
-        formatter: {
-          id: 'tamtaro',
-          definitions: {
-            overrides: {
-              tamtaro: {
-                name: '{stream.resolution::exists["{stream.resolution::replace(\'2160p\',\'4K\')::replace(\'1080p\',\'1080p\')}  "||"HD  "]}{service.cached::istrue["⚡ "||"⏳ "]}{stream.title::exists["{stream.title::upper}"||""]}',
-                description: '{service.cached::istrue["✅ Plays Fast "||""]}{stream.quality::exists["🎥 {stream.quality}"||""]}{stream.size::exists["💾 {stream.size::bytes}"||""]}'
-              }
-            }
-          }
-        },
-        presets,
-        includedStreamExpressions: [{ expression: "0Cached == true" }],
-        excludedStreamExpressions: eses,
-        preferredStreamExpressions: [],
-        sortCriteria: sort,
-        size,
-        bitrate,
-        ...resolution,
-        ...encode,
-        ...audio,
-        titleMatching: { mode: 'fuzzy', similarityThreshold: 0.85 },
-        yearMatching: { strict: false },
-        seasonEpisodeMatching: { strict: false },
-        deduplicator: {
-          cached: opts.matchMode === 'strict' ? 'global' : 'per_addon',
-          uncached: 'per_service'
-        },
-      }
-    };
+  const presets = cfg.presets || [];
+  const enabled = presets.filter(p => p.enabled !== false);
+  passes.push(`presets: ${presets.length} total, ${enabled.length} enabled`);
 
-    if (opts.tmdbToken) template.config.tmdbReadAccessToken = opts.tmdbToken;
-    if (opts.tmdbKey) template.config.tmdbApiKey = opts.tmdbKey;
+  const ises = cfg.includedStreamExpressions || [];
+  const eses = cfg.excludedStreamExpressions || [];
+  const pses = cfg.preferredStreamExpressions || [];
+  passes.push(`expressions: ${ises.length} ISEs, ${eses.length} ESEs, ${pses.length} PSEs`);
 
-    const result = assembleTemplate(template, { metadata: { coreBuildsVersion: '2.86', generatedAt: new Date().toISOString() } });
+  if (cfg.excludedRegexPatterns?.length) passes.push(`excludedRegexPatterns: ${cfg.excludedRegexPatterns.length} entries`);
+  else warnings.push('excludedRegexPatterns: empty or missing');
 
-    fs.writeFileSync(opts.output, JSON.stringify(result, null, 2));
-    console.log(`\n✅ Template written to ${opts.output}`);
-    console.log(`   Service: ${opts.service}`);
-    console.log(`   Device: ${opts.device} (${device.name})`);
-    console.log(`   Resolution: ${opts.resolution}`);
-    console.log(`   Audio: ${opts.audio}`);
-    console.log(`   Formatter: ${opts.formatter}`);
-    console.log(`   Sort sections: ${Object.keys(sort).join(', ')}`);
-    console.log(`   ESEs: ${eses.length} device-aware exclusions`);
+  if (cfg.rankedRegexPatterns?.length) passes.push(`rankedRegexPatterns: ${cfg.rankedRegexPatterns.length} entries`);
+  else warnings.push('rankedRegexPatterns: empty (regexScore sort key is a no-op)');
+
+  if (cfg.preferredRegexPatterns?.length) passes.push(`preferredRegexPatterns: ${cfg.preferredRegexPatterns.length} entries`);
+  else warnings.push('preferredRegexPatterns: empty or missing');
+
+  if (cfg.titleMatching?.mode === 'exact') warnings.push("titleMatching.mode is 'exact'");
+
+  const sorts = cfg.sortCriteria || {};
+  if (sorts.global?.length) passes.push(`sortCriteria: ${Object.keys(sorts).length} section(s)`);
+  else warnings.push('sortCriteria.global missing');
+
+  if (cfg.deduplicator) passes.push(`deduplicator: cached=${cfg.deduplicator.cached || 'default'}`);
+
+  console.log(`\n${'='.repeat(60)}`);
+  console.log('  CORE BUILDS TEMPLATE VALIDATOR');
+  console.log(`  Checking: ${file}`);
+  console.log(`${'='.repeat(60)}\n`);
+
+  if (errors.length) {
+    console.log('ERRORS:');
+    errors.forEach(e => console.log(`  x ${e}`));
     console.log('');
-  });
-
-// --- validate ---
-program
-  .command('validate <file>')
-  .description('Validate an AIOStreams template JSON')
-  .option('--strict', 'Treat warnings as errors')
-  .action((file, opts) => {
-    let raw;
-    try {
-      raw = fs.readFileSync(file, 'utf-8');
-    } catch(e) {
-      console.error(`\n✕ Cannot read file: ${file}\n`);
-      process.exit(1);
-    }
-
-    let d;
-    try {
-      d = JSON.parse(raw);
-    } catch(e) {
-      console.error(`\n✕ INVALID JSON: ${e.message}\n`);
-      process.exit(1);
-    }
-
-    const errors = [], warnings = [], passes = [];
-    const cfg = d.config || {};
-
-    // Metadata
-    const meta = d.metadata || {};
-    if (!meta.version) warnings.push('metadata.version missing');
-    if (!meta.name) warnings.push('metadata.name missing');
-    if (!meta.description) warnings.push('metadata.description missing');
-    if (!meta.author) warnings.push('metadata.author missing');
-    if (!meta.category) warnings.push('metadata.category missing');
-    if (meta.version && meta.name && meta.description && meta.author && meta.category)
-      passes.push('metadata: complete');
-
-    // Formatter
-    const fmt = cfg.formatter || {};
-    if (fmt.id === 'tamtaro') {
-      const overrides = fmt.definitions?.overrides;
-      if (overrides && overrides.tamtaro) passes.push("formatter: tamtaro override correctly keyed");
-      else errors.push("formatter: id='tamtaro' but overrides key is not 'tamtaro'");
-    } else if (fmt.id) {
-      passes.push(`formatter: using built-in '${fmt.id}'`);
-    }
-
-    // Sort criteria
-    for (const scope of Object.keys(cfg.sortCriteria || {})) {
-      const keys = cfg.sortCriteria[scope];
-      if (!Array.isArray(keys)) continue;
-      const invalid = keys.filter(k => !VALID_SORT_KEYS.includes(k.key));
-      if (invalid.length) errors.push(`sortCriteria.${scope}: invalid key(s): ${invalid.map(k=>k.key).join(', ')}`);
-      else passes.push(`sortCriteria.${scope}: ${keys.length} keys valid`);
-    }
-
-    // Presets
-    const presets = cfg.presets || [];
-    const enabled = presets.filter(p => p.enabled !== false);
-    passes.push(`presets: ${presets.length} total, ${enabled.length} enabled`);
-
-    // Stream expressions
-    const ises = cfg.includedStreamExpressions || [];
-    const eses = cfg.excludedStreamExpressions || [];
-    const pses = cfg.preferredStreamExpressions || [];
-    passes.push(`expressions: ${ises.length} ISEs, ${eses.length} ESEs, ${pses.length} PSEs`);
-
-    const hasCachedIse = ises.some(e => e.expression && /0Cached/i.test(e.expression));
-    if (!hasCachedIse) warnings.push('0Cached ISE missing — no fallback when nothing is cached');
-
-    // Matching
-    if (cfg.titleMatching?.mode === 'exact') warnings.push("titleMatching.mode is 'exact'");
-    if (cfg.yearMatching?.strict === true) warnings.push('yearMatching.strict=true');
-
-    // Print report
-    console.log(`\n${'═'.repeat(60)}`);
-    console.log('  CORE BUILDS TEMPLATE VALIDATOR');
-    console.log(`  Checking: ${file}`);
-    console.log(`${'═'.repeat(60)}\n`);
-
-    if (errors.length) {
-      console.log('ERRORS:');
-      errors.forEach(e => console.log(`  ✕ ${e}`));
-      console.log('');
-    }
-    if (warnings.length) {
-      console.log('WARNINGS:');
-      warnings.forEach(w => console.log(`  ⚠ ${w}`));
-      console.log('');
-    }
-    if (passes.length) {
-      console.log('PASSED:');
-      passes.forEach(p => console.log(`  ✓ ${p}`));
-      console.log('');
-    }
-
-    console.log(`${'═'.repeat(60)}`);
-    console.log(`  ${errors.length} errors | ${warnings.length} warnings | ${passes.length} checks passed`);
-    console.log(`${'═'.repeat(60)}\n`);
-
-    if (errors.length || (opts.strict && warnings.length)) process.exit(1);
-  });
-
-// --- diff ---
-program
-  .command('diff <fileA> <fileB>')
-  .description('Compare two AIOStreams template JSONs')
-  .action((fileA, fileB) => {
-    let a, b;
-    try {
-      a = JSON.parse(fs.readFileSync(fileA, 'utf-8'));
-      b = JSON.parse(fs.readFileSync(fileB, 'utf-8'));
-    } catch(e) {
-      console.error(`\n✕ Cannot read or parse files: ${e.message}\n`);
-      process.exit(1);
-    }
-
-    const cfgA = a.config || {};
-    const cfgB = b.config || {};
-    const diffs = [];
-
-    // Compare formatter
-    if (cfgA.formatter?.id !== cfgB.formatter?.id)
-      diffs.push(`Formatter: ${cfgA.formatter?.id} → ${cfgB.formatter?.id}`);
-
-    // Compare presets
-    const presetsA = (cfgA.presets || []).map(p => p.type).sort().join(', ');
-    const presetsB = (cfgB.presets || []).map(p => p.type).sort().join(', ');
-    if (presetsA !== presetsB) diffs.push(`Presets changed: [${presetsA}] → [${presetsB}]`);
-
-    // Compare ESE/ISE/PSE counts
-    const countA = {
-      ese: (cfgA.excludedStreamExpressions || []).length,
-      ise: (cfgA.includedStreamExpressions || []).length,
-      pse: (cfgA.preferredStreamExpressions || []).length,
-    };
-    const countB = {
-      ese: (cfgB.excludedStreamExpressions || []).length,
-      ise: (cfgB.includedStreamExpressions || []).length,
-      pse: (cfgB.preferredStreamExpressions || []).length,
-    };
-    if (countA.ese !== countB.ese) diffs.push(`ESEs: ${countA.ese} → ${countB.ese}`);
-    if (countA.ise !== countB.ise) diffs.push(`ISEs: ${countA.ise} → ${countB.ise}`);
-    if (countA.pse !== countB.pse) diffs.push(`PSEs: ${countA.pse} → ${countB.pse}`);
-
-    // Compare sort criteria
-    const sortA = JSON.stringify(cfgA.sortCriteria || {});
-    const sortB = JSON.stringify(cfgB.sortCriteria || {});
-    if (sortA !== sortB) diffs.push('Sort criteria changed');
-
-    // Compare matching
-    if (JSON.stringify(cfgA.titleMatching) !== JSON.stringify(cfgB.titleMatching))
-      diffs.push('Title matching changed');
-    if (JSON.stringify(cfgA.yearMatching) !== JSON.stringify(cfgB.yearMatching))
-      diffs.push('Year matching changed');
-
-    // Compare deduplicator
-    if (JSON.stringify(cfgA.deduplicator) !== JSON.stringify(cfgB.deduplicator))
-      diffs.push('Deduplicator changed');
-
-    console.log(`\n${'═'.repeat(60)}`);
-    console.log('  CORE BUILDS TEMPLATE DIFF');
-    console.log(`  A: ${fileA}`);
-    console.log(`  B: ${fileB}`);
-    console.log(`${'═'.repeat(60)}\n`);
-
-    if (diffs.length === 0) {
-      console.log('  No significant differences found.\n');
-    } else {
-      diffs.forEach(d => console.log(`  • ${d}`));
-      console.log(`\n  ${diffs.length} difference(s) found.\n`);
-    }
-  });
-
-// --- info ---
-program
-  .command('info <file>')
-  .description('Show template metadata and summary')
-  .action((file) => {
-    let d;
-    try {
-      d = JSON.parse(fs.readFileSync(file, 'utf-8'));
-    } catch(e) {
-      console.error(`\n✕ Cannot read or parse: ${e.message}\n`);
-      process.exit(1);
-    }
-
-    const meta = d.metadata || {};
-    const cfg = d.config || {};
-    const presets = cfg.presets || [];
-    const ises = cfg.includedStreamExpressions || [];
-    const eses = cfg.excludedStreamExpressions || [];
-    const pses = cfg.preferredStreamExpressions || [];
-
-    console.log(`\n${'═'.repeat(60)}`);
-    console.log('  TEMPLATE INFO');
-    console.log(`${'═'.repeat(60)}\n`);
-    console.log(`  Name:        ${meta.name || 'unnamed'}`);
-    console.log(`  Description: ${meta.description || 'none'}`);
-    console.log(`  Author:      ${meta.author || 'unknown'}`);
-    console.log(`  Version:     ${meta.version || 'unknown'}`);
-    console.log(`  Category:    ${meta.category || 'unknown'}`);
-    console.log(`  Formatter:   ${cfg.formatter?.id || 'default'}`);
-    console.log(`  Presets:     ${presets.length} total, ${presets.filter(p=>p.enabled!==false).length} enabled`);
-    console.log(`  ESEs:        ${eses.length}`);
-    console.log(`  ISEs:        ${ises.length}`);
-    console.log(`  PSEs:        ${pses.length}`);
-    console.log(`  Match mode:  ${cfg.titleMatching?.mode || 'default'}`);
-    console.log(`  Year strict: ${cfg.yearMatching?.strict || false}`);
-    console.log(`  Dedup:       cached=${cfg.deduplicator?.cached||'default'}, uncached=${cfg.deduplicator?.uncached||'default'}`);
-    console.log(`  File size:   ${fs.statSync(file).size} bytes`);
+  }
+  if (warnings.length) {
+    console.log('WARNINGS:');
+    warnings.forEach(w => console.log(`  ! ${w}`));
     console.log('');
-  });
+  }
+  if (passes.length) {
+    console.log('PASSED:');
+    passes.forEach(p => console.log(`  + ${p}`));
+    console.log('');
+  }
 
-program.parse(process.argv);
+  console.log(`${'='.repeat(60)}`);
+  console.log(`  ${errors.length} errors | ${warnings.length} warnings | ${passes.length} checks passed`);
+  console.log(`${'='.repeat(60)}\n`);
 
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
+  if (errors.length || (strict && warnings.length)) process.exit(1);
+}
+
+function cmdDiff() {
+  const fileA = args[1];
+  const fileB = args[2];
+  if (!fileA || !fileB) die('Usage: core-builds diff <fileA> <fileB>');
+
+  let a, b;
+  try {
+    a = JSON.parse(readFileSync(fileA, 'utf-8'));
+    b = JSON.parse(readFileSync(fileB, 'utf-8'));
+  } catch (e) { die(`Cannot read or parse files: ${e.message}`); }
+
+  const cfgA = a.config || {};
+  const cfgB = b.config || {};
+  const diffs = [];
+
+  if (cfgA.formatter?.id !== cfgB.formatter?.id)
+    diffs.push(`Formatter: ${cfgA.formatter?.id} -> ${cfgB.formatter?.id}`);
+
+  const presetSig = p => `${p.type}:${p.enabled !== false ? 'on' : 'off'}:${p.options?.timeout || ''}`;
+  const presetsA = (cfgA.presets || []).map(presetSig).sort().join(', ');
+  const presetsB = (cfgB.presets || []).map(presetSig).sort().join(', ');
+  if (presetsA !== presetsB) diffs.push(`Presets changed`);
+
+  const countField = (cfg, key) => (cfg[key] || []).length;
+  for (const key of ['excludedStreamExpressions', 'includedStreamExpressions', 'preferredStreamExpressions']) {
+    const cA = countField(cfgA, key), cB = countField(cfgB, key);
+    if (cA !== cB) diffs.push(`${key}: ${cA} -> ${cB}`);
+  }
+
+  for (const key of ['excludedRegexPatterns', 'rankedRegexPatterns', 'preferredRegexPatterns']) {
+    const cA = countField(cfgA, key), cB = countField(cfgB, key);
+    if (cA !== cB) diffs.push(`${key}: ${cA} -> ${cB}`);
+  }
+
+  if (JSON.stringify(cfgA.sortCriteria || {}) !== JSON.stringify(cfgB.sortCriteria || {}))
+    diffs.push('Sort criteria changed');
+
+  if (JSON.stringify(cfgA.titleMatching) !== JSON.stringify(cfgB.titleMatching))
+    diffs.push('Title matching changed');
+
+  if (JSON.stringify(cfgA.deduplicator) !== JSON.stringify(cfgB.deduplicator))
+    diffs.push('Deduplicator changed');
+
+  if (JSON.stringify(cfgA.size) !== JSON.stringify(cfgB.size))
+    diffs.push('Size limits changed');
+
+  if (JSON.stringify(cfgA.bitrate) !== JSON.stringify(cfgB.bitrate))
+    diffs.push('Bitrate limits changed');
+
+  console.log(`\n${'='.repeat(60)}`);
+  console.log('  CORE BUILDS TEMPLATE DIFF');
+  console.log(`  A: ${fileA}`);
+  console.log(`  B: ${fileB}`);
+  console.log(`${'='.repeat(60)}\n`);
+
+  if (diffs.length === 0) {
+    console.log('  No significant differences found.\n');
+  } else {
+    diffs.forEach(d => console.log(`  * ${d}`));
+    console.log(`\n  ${diffs.length} difference(s) found.\n`);
+  }
+}
+
+function cmdInfo() {
+  const file = args[1];
+  if (!file) die('Usage: core-builds info <file>');
+
+  let d;
+  try { d = JSON.parse(readFileSync(file, 'utf-8')); }
+  catch (e) { die(`Cannot read or parse: ${e.message}`); }
+
+  const meta = d.metadata || {};
+  const cfg = d.config || {};
+
+  console.log(`\n${'='.repeat(60)}`);
+  console.log('  TEMPLATE INFO');
+  console.log(`${'='.repeat(60)}\n`);
+  console.log(`  Name:        ${meta.name || 'unnamed'}`);
+  console.log(`  Description: ${meta.description || 'none'}`);
+  console.log(`  Version:     ${meta.version || 'unknown'}`);
+  console.log(`  ID:          ${meta.id || 'none'}`);
+  console.log(`  Formatter:   ${cfg.formatter?.id || 'default'}`);
+  console.log(`  Presets:     ${(cfg.presets || []).length} total, ${(cfg.presets || []).filter(p => p.enabled !== false).length} enabled`);
+  console.log(`  ESEs:        ${(cfg.excludedStreamExpressions || []).length}`);
+  console.log(`  ISEs:        ${(cfg.includedStreamExpressions || []).length}`);
+  console.log(`  PSEs:        ${(cfg.preferredStreamExpressions || []).length}`);
+  console.log(`  Ranked RX:   ${(cfg.rankedRegexPatterns || []).length}`);
+  console.log(`  Excluded RX: ${(cfg.excludedRegexPatterns || []).length}`);
+  console.log(`  Preferred RX: ${(cfg.preferredRegexPatterns || []).length}`);
+  console.log(`  Sort sections: ${Object.keys(cfg.sortCriteria || {}).join(', ') || 'none'}`);
+  console.log(`  Dedup:       cached=${cfg.deduplicator?.cached || 'default'}, uncached=${cfg.deduplicator?.uncached || 'default'}`);
+  try { console.log(`  File size:   ${statSync(file).size} bytes`); } catch {}
+  console.log('');
 }

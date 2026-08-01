@@ -1,0 +1,18 @@
+{
+  "name": "@core-builds/core",
+  "version": "2.87.0",
+  "description": "Shared template generation engine for Core Builds configurator and CLI",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "src/"
+  ],
+  "license": "UNLICENSED",
+  "private": true
+}

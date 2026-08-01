@@ -30,8 +30,18 @@ test('template input normalizes defaults without browser dependencies', () => {
     device: 'generic',
     resolution: '1080p',
     architecture: 'standard',
+    pseArch: 'standard',
     tmdbToken: '',
     tmdbApiKey: 'key',
     bandwidthMbps: 0,
+    sizeLimit: 'unlimited',
   });
+});
+
+test('template input strips GB suffix and rejects invalid sizeLimit', () => {
+  assert.equal(templateInput({ sizeLimit: '10GB' }).sizeLimit, '10');
+  assert.equal(templateInput({ sizeLimit: '25gb' }).sizeLimit, '25');
+  assert.equal(templateInput({ sizeLimit: 'abc' }).sizeLimit, 'unlimited');
+  assert.equal(templateInput({ sizeLimit: '-5' }).sizeLimit, 'unlimited');
+  assert.equal(templateInput({ sizeLimit: 'Infinity' }).sizeLimit, 'unlimited');
 });

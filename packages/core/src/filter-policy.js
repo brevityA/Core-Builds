@@ -1,5 +1,7 @@
 /** Pure filtering policies for generated AIOStreams templates. */
 
+import { bandwidthCapMbps } from './input.js';
+
 const HIGH_RES = new Set(['4k', 'ultrawide', 'mixed']);
 
 export function isHighResolution(input = {}) {
@@ -26,9 +28,7 @@ export function sizePolicy(input = {}) {
 }
 
 export function bitratePolicy(input = {}, hasTmdb = false) {
-  const cap = Number.isFinite(Number(input.bandwidthMbps)) && Number(input.bandwidthMbps) > 0
-    ? Math.floor(Number(input.bandwidthMbps) * 1_000_000 * 0.8)
-    : 150_000_000;
+  const cap = bandwidthCapMbps(input.bandwidthMbps);
   const is4k = isHighResolution(input);
   return {
     useMetadataRuntime: Boolean(hasTmdb),
