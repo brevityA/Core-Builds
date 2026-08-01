@@ -25,6 +25,9 @@
   "bugs": {
     "url": "https://github.com/brevityA/Core-Builds/issues"
   },
+  "scripts": {
+    "test": "node --test tests/golden-combos.test.mjs"
+  },
   "engines": {
     "node": ">=20"
   },
