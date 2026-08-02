@@ -13,40 +13,49 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
 ## Configurator v2.87 (Aug 2 2026)
 
 <CardGroup cols={2}>
-  <Card title="Core Builds CLI published to npm" icon="sparkles">
+  <Card title="Nuvio + TorBox Instant Quick Install" icon="sparkles">
+    dedicated flow generates a P2P-only template with device/resolution/host pickers and TorBox Connected Services warning
+  </Card>
+  <Card title="Nuvio TorBox Instant CLI route" icon="bolt">
+    core-builds generate --route nuvio-torbox-instant --host fortheweak --device shield --resolution 4k
+  </Card>
+  <Card title="Nuvio host capability metadata" icon="shield-check">
+    supportsNuvioInstant flag on all hosts; ElfHosted correctly blocked
+  </Card>
+  <Card title="Core Builds CLI published to npm" icon="sliders">
     npm install -g core-builds for generate, validate, diff, and info
   </Card>
-  <Card title="Account Manager mutations" icon="bolt">
+  <Card title="Account Manager mutations" icon="gauge">
     addon reorder, removal, backup restore, and bounded undo with stale-state detection
   </Card>
-  <Card title="Capability-based device profiles" icon="shield-check">
+  <Card title="Capability-based device profiles" icon="wand">
     Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV with device-specific warnings and help text
   </Card>
-  <Card title="Matching Core Builds SVG device icons replace temporary emoji icons in the device picker" icon="sliders">
+  <Card title="Matching Core Builds SVG device icons replace temporary emoji icons in the device picker" icon="layers">
     Matching Core Builds SVG device icons replace temporary emoji icons in the device picker
   </Card>
-  <Card title="Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text" icon="gauge">
+  <Card title="Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text" icon="bug">
     Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text
   </Card>
-  <Card title="Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum" icon="wand">
+  <Card title="Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum" icon="sparkles">
     Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum
   </Card>
-  <Card title="Fixed: Legacy unversioned local snapshots no longer show a false 'Update Available' banner" icon="layers">
+  <Card title="Fixed: Legacy unversioned local snapshots no longer show a false 'Update Available' banner" icon="bolt">
     Fixed: Legacy unversioned local snapshots no longer show a false 'Update Available' banner
   </Card>
-  <Card title="Fixed: Template updates no longer mutate the active configuration before confirmation" icon="bug">
+  <Card title="Fixed: Template updates no longer mutate the active configuration before confirmation" icon="shield-check">
     Fixed: Template updates no longer mutate the active configuration before confirmation
   </Card>
-  <Card title="Fixed: Feedback messages now report current live setup context instead of stale saved state" icon="sparkles">
+  <Card title="Fixed: Feedback messages now report current live setup context instead of stale saved state" icon="sliders">
     Fixed: Feedback messages now report current live setup context instead of stale saved state
   </Card>
-  <Card title="Fixed: Fine-Tune interaction and focus regressions are covered by browser tests" icon="bolt">
+  <Card title="Fixed: Fine-Tune interaction and focus regressions are covered by browser tests" icon="gauge">
     Fixed: Fine-Tune interaction and focus regressions are covered by browser tests
   </Card>
-  <Card title="SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules" icon="shield-check">
+  <Card title="SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules" icon="wand">
     SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules
   </Card>
-  <Card title="CodeQL now uses the repository configuration and excludes generated bundles while scanning source code" icon="sliders">
+  <Card title="CodeQL now uses the repository configuration and excludes generated bundles while scanning source code" icon="layers">
     CodeQL now uses the repository configuration and excludes generated bundles while scanning source code
   </Card>
 </CardGroup>
