@@ -3030,7 +3030,7 @@ function catalogPresets() {
   return out;
 }
 
-function sid() { return Math.random().toString(36).substring(2,8); }
+function sid() { const a = new Uint8Array(6); crypto.getRandomValues(a); return Array.from(a, b => b.toString(36).padStart(2, '0')).join('').slice(0, 8); }
 
 function defaultName() {
   const res = S.resolution, svc = S.service, dev = S.device;
@@ -6060,7 +6060,8 @@ async function createRandomStremioAccount() {
   const btn = document.querySelector('[data-action="create-stremio-account"]');
   if (btn) { btn.textContent = 'Creating…'; btn.style.pointerEvents = 'none'; }
   try {
-    const rand = Math.random().toString(36).slice(2, 10);
+    const a = new Uint8Array(8); crypto.getRandomValues(a);
+    const rand = Array.from(a, b => b.toString(36).padStart(2, '0')).join('').slice(0, 10);
     const email = `corebuilds_${rand}@stremio.com`;
     const password = makePwd();
     const data = await stremioFetch('https://api.strem.io/api/register', { type:'Register', email, password, gdpr_consent:{ tos:true, privacy:true, marketing:false, from:'web' } });
