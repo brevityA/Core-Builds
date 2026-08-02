@@ -279,17 +279,14 @@ body{
   <!-- What's New -->
   <div class="inline-card" style="margin-top:16px">
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
-    <h3>🆕 What's New — v2.87.1</h3>
+    <h3>🆕 What's New — v2.87</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://core-builds.mintlify.app/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.87.1 · Aug 2 2026</div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.87 · Aug 2 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Account Manager mutations — addon reorder, removal, backup restore, and bounded undo with stale-state detection</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.87 · Jul 31 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Capability-based device profiles — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV with device-specific warnings and help text</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Matching Core Builds SVG device icons replace temporary emoji icons in the device picker</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum</span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.86 · Jul 29 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Hotfix: Max File Size control was setting the selected limit as the minimum size (e.g. 10GB → allowed 10–999999GB); now correctly caps at the selected maximum (e.g. 10GB → 1B–10GB)</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">SEL Engine v2 — perGroup() QR balance replaces 8 slice expressions with 2 (interleaved results, device-aware limits); Addon Diversity cap; Bitrate Anomaly Pin (IQR outliers → bottom, not removed)</span></div>
@@ -300,6 +297,11 @@ body{
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Apex Mixed PSE architecture — third architecture option (Standard / Apex IQR / Apex Mixed): the flagship 35-PSE IQR × adaptive stack from the 4K Apex Mixed nightly, generatable for any device/service; adopts the mixed resolution policy (no caps, quality-blend sort, blended DAF exit) and names builds "Core Nexus Apex Mixed". Golden-link test keeps it byte-identical to the static template</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Golden config snapshots — Playwright e2e drives the real generation pipeline across 12 service × resolution × architecture combinations and diffs full template output against checked-in goldens (e2e/golden/); any logic change that alters generated templates now fails CI, with UPDATE_GOLDEN=1 for intentional re-pins</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Jackett &amp; Prowlarr optional scraper presets were never generated (regression of the #557 filter fix, lost in the v2.84 modular rewrite) — restored `credKey &amp;&amp; !apiUrl` guard</span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.84 · Jul 25 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Error Logger wired — initErrorLogger() at startup, logError() on build/deploy/import failures, error log section in Diagnostics modal with copy/clear/export</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Age Rating Limit — Restrict content by MPAA/TV certification (G, PG, PG-13, R) via ESE; added to Video Preferences panel</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Library Boost — Three modes in Fine-Tune: Default (first within tier), Strong (always top), None (disabled); modifies sort criteria across all scopes</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">NZB Failover — Configurable position (before/after torrents) and max NZB count (1/2/3/5) in Fine-Tune; shown when Usenet service selected</span></div>
     </div>
 <!-- AUTO:TOOLS_WHATSNEW:END -->
   </div>
