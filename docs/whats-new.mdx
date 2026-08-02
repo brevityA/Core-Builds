@@ -1,14 +1,27 @@
 ---
-title: "What's New — Configurator v2.87"
+title: "What's New — Configurator v2.87.1"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.87 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.87.1 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.87**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.87.1**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v2.87.1 (Aug 2 2026)
+
+<CardGroup cols={2}>
+  <Card title="Core Builds CLI published to npm" icon="sparkles">
+    npm install -g core-builds for generate, validate, diff, and info
+  </Card>
+  <Card title="Account Manager mutations" icon="bolt">
+    addon reorder, removal, backup restore, and bounded undo with stale-state detection
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.87 (Jul 31 2026)
 
@@ -126,27 +139,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Fixed: template validator crashed on non-template JSON (e.g. Filtering/ expression libraries) when run without --dir arguments" icon="wand">
     Fixed: template validator crashed on non-template JSON (e.g. Filtering/ expression libraries) when run without --dir arguments
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.84 (Jul 25 2026)
-
-<CardGroup cols={2}>
-  <Card title="Error Logger wired" icon="sparkles">
-    initErrorLogger() at startup, logError() on build/deploy/import failures, error log section in Diagnostics modal with copy/clear/export
-  </Card>
-  <Card title="Age Rating Limit" icon="bolt">
-    Restrict content by MPAA/TV certification (G, PG, PG-13, R) via ESE; added to Video Preferences panel
-  </Card>
-  <Card title="Library Boost" icon="shield-check">
-    Three modes in Fine-Tune: Default (first within tier), Strong (always top), None (disabled); modifies sort criteria across all scopes
-  </Card>
-  <Card title="NZB Failover" icon="sliders">
-    Configurable position (before/after torrents) and max NZB count (1/2/3/5) in Fine-Tune; shown when Usenet service selected
-  </Card>
-  <Card title="Bandwidth Estimator" icon="gauge">
-    Device-aware bandwidth hint card in Review step showing recommended speed and safe bitrate cap
   </Card>
 </CardGroup>

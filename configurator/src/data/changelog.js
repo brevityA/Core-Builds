@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'2.87.1', date:'Aug 2 2026', items:[
+    'Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info',
+    'Account Manager mutations — addon reorder, removal, backup restore, and bounded undo with stale-state detection',
+  ]},
   { v:'2.87', date:'Jul 31 2026', items:[
     'Capability-based device profiles — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV with device-specific warnings and help text',
     'Matching Core Builds SVG device icons replace temporary emoji icons in the device picker',

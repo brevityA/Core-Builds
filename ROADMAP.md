@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.5.2 | 2026-08-02 | Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info commands. Same @cor… |
 | v3.5.1 | 2026-07-31 | Capability-based device profiles (Configurator v2.87) — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS,… |
 | v3.5.0 | 2026-07-29 | SEL Engine v2 (Configurator v2.86 + all 72 templates via synced expressions) — perGroup() QR balance replaces 8 verbose … |
 | v3.4.0 | 2026-07-26 | Core Nexus Mixed template (Templates/Torbox/Single/core-nexus-mixed.json) — adaptive multi-resolution build for niche an… |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.2.5 | 2026-07-03 | Template collection file (core-builds-template-collection.json) — operator-facing template catalog for AIOStreams TEMPLA… |
 | v3.2.4 | 2026-07-03 | Sort criteria overhaul (all 42 templates) — rebuilt the sort pipeline based on AIOStreams' stable multi-key sort archite… |
 | v3.2.3 | 2026-07-02 | Configurator v2.9 — Easy Setup one-click button now opens AIOStreams directly via ?template=URL deep link instead of cal… |
-| v3.2.2 | 2026-07-02 | Configurator v2.8.1 — groups.groupings now omitted when groups are disabled, fixing "Every group must have at least one … |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.
