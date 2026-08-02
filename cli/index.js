@@ -9,6 +9,7 @@ import {
   generateTemplate,
   SEL_ARCHITECTURES,
   assembleTemplate,
+  isNuvioInstantHost,
 } from '@core-builds/core';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -72,6 +73,20 @@ const SERVICES = [
   'debridio', 'debrider', 'p2p', 'http', 'nzbgeek', 'streamnzb',
 ];
 
+const HOSTS = {
+  fortheweak:  { id:'fortheweak',  name:"Yeb's / ForTheWeak",       supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+  midnight:    { id:'midnight',    name:"Midnight's",                supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+  kuu:         { id:'kuu',         name:"Kuu's",                     supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+  atbp:        { id:'atbp',        name:'ATBP',                      supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+  wizaardd:    { id:'wizaardd',    name:'Wizaardd',                   supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+  viren:       { id:'viren',       name:"Viren's Nightly",           supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+  omni:        { id:'omni',        name:"Omni's (legacy)",           supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+  elfhosted:   { id:'elfhosted',   name:'ElfHosted',                  supportsP2P:false, supportsHttp:false, supportsDebrid:true,  supportsNuvioInstant:false },
+  selfhosted:  { id:'selfhosted',  name:'Self-hosted',                supportsP2P:true,  supportsHttp:true,  supportsDebrid:true,  supportsNuvioInstant:true  },
+};
+
+const VALID_ROUTES = ['nuvio-torbox-instant'];
+
 const VALID_SORT_KEYS = [
   'cached','streamExpressionMatched','streamExpressionScore','seadex',
   'resolution','quality','regexScore','visualTag','audioTag','audioChannel',
@@ -94,6 +109,7 @@ Usage:
 Commands:
   devices          List all supported device profiles
   services         List all supported service IDs
+  hosts            List all supported AIOStreams hosts
   formatters       List all available formatter IDs
   architectures    List SEL PSE architectures
   generate         Generate an AIOStreams template JSON
@@ -102,7 +118,9 @@ Commands:
   info <file>      Show template metadata summary
 
 Generate options:
-  --service <id>       Service ID (required)
+  --service <id>       Service ID (required unless --route is set)
+  --route <route>      Route: nuvio-torbox-instant (overrides --service)
+  --host <id>          AIOStreams host (required for some routes)
   --device <id>        Device profile (default: generic)
   --resolution <res>   4k, 1080p, mixed, ultrawide (default: 4k)
   --architecture <a>   standard, iqr, apex-mixed (default: standard)
@@ -112,9 +130,11 @@ Generate options:
   --match-mode <m>     relaxed, balanced, strict (default: balanced)
   --cache-mode <m>     mixed, cached, uncached (default: mixed)
   --size-limit <GB>    Max file size in GB (default: unlimited)
+  --optional-scrapers  Comma-separated scraper IDs (eztv,knaben,torrent-galaxy)
   --output <file>      Output file (default: stdout)
   --name <name>        Template name override
   --id <id>            Template metadata ID
+  --json               Output errors as JSON instead of text
 
 Validate options:
   --strict             Treat warnings as errors
@@ -137,6 +157,7 @@ if (command === '--version' || command === '-V') {
 switch (command) {
   case 'devices': cmdDevices(); break;
   case 'services': cmdServices(); break;
+  case 'hosts': cmdHosts(); break;
   case 'formatters': cmdFormatters(); break;
   case 'architectures': cmdArchitectures(); break;
   case 'generate': await cmdGenerate(); break;
@@ -165,6 +186,19 @@ function cmdServices() {
   console.log(`\n  Total: ${SERVICES.length} services\n`);
 }
 
+function cmdHosts() {
+  console.log('\nSupported AIOStreams hosts:\n');
+  for (const [id, h] of Object.entries(HOSTS)) {
+    const caps = [
+      h.supportsP2P ? 'P2P' : 'no-P2P',
+      h.supportsNuvioInstant ? 'Nuvio' : '',
+      h.supportsDebrid ? 'Debrid' : '',
+    ].filter(Boolean).join(', ');
+    console.log(`  ${id.padEnd(14)} ${h.name.padEnd(24)} [${caps}]`);
+  }
+  console.log(`\n  Total: ${Object.keys(HOSTS).length} hosts\n`);
+}
+
 function cmdFormatters() {
   console.log('\nAvailable formatters:\n');
   for (const f of FORMATTERS) {
@@ -186,6 +220,8 @@ async function cmdGenerate() {
     args: args.slice(1),
     options: {
       service:      { type: 'string' },
+      route:        { type: 'string' },
+      host:         { type: 'string' },
       device:       { type: 'string', default: 'generic' },
       resolution:   { type: 'string', default: '4k' },
       architecture: { type: 'string', default: 'standard' },
@@ -195,17 +231,38 @@ async function cmdGenerate() {
       'match-mode': { type: 'string', default: 'balanced' },
       'cache-mode': { type: 'string', default: 'mixed' },
       'size-limit': { type: 'string' },
+      'optional-scrapers': { type: 'string' },
       output:       { type: 'string' },
       name:         { type: 'string' },
       id:           { type: 'string' },
+      json:         { type: 'boolean', default: false },
     },
     strict: false,
   });
 
-  if (!opts.service) die('--service is required. Run "core-builds services" to see options.');
-  if (!SERVICES.includes(opts.service)) die(`Unknown service "${opts.service}". Run "core-builds services" to see options.`);
-  if (!DEVICES[opts.device]) die(`Unknown device "${opts.device}". Run "core-builds devices" to see options.`);
-  if (!FORMATTERS.find(f => f.id === opts.formatter)) die(`Unknown formatter "${opts.formatter}". Run "core-builds formatters" to see options.`);
+  const jsonErrors = opts.json;
+  const dieJson = (msg) => {
+    if (jsonErrors) { process.stdout.write(JSON.stringify({ error: msg }) + '\n'); process.exit(1); }
+    die(msg);
+  };
+
+  const isNuvioRoute = opts.route === 'nuvio-torbox-instant';
+
+  if (opts.route && !VALID_ROUTES.includes(opts.route)) dieJson(`Unknown route "${opts.route}". Valid: ${VALID_ROUTES.join(', ')}`);
+  if (!isNuvioRoute && !opts.service) dieJson('--service is required (unless --route is set). Run "core-builds services" to see options.');
+  if (!isNuvioRoute && opts.service && !SERVICES.includes(opts.service)) dieJson(`Unknown service "${opts.service}". Run "core-builds services" to see options.`);
+  if (!DEVICES[opts.device]) dieJson(`Unknown device "${opts.device}". Run "core-builds devices" to see options.`);
+  if (!FORMATTERS.find(f => f.id === opts.formatter)) dieJson(`Unknown formatter "${opts.formatter}". Run "core-builds formatters" to see options.`);
+
+  if (isNuvioRoute) {
+    if (!opts.host) dieJson('--host is required for the nuvio-torbox-instant route. Run "core-builds hosts" to see options.');
+    if (!HOSTS[opts.host]) dieJson(`Unknown host "${opts.host}". Run "core-builds hosts" to see options.`);
+    const hostMeta = HOSTS[opts.host];
+    if (!isNuvioInstantHost(hostMeta)) dieJson(`Host "${opts.host}" does not support Nuvio TorBox Instant (requires P2P + Nuvio Instant). Run "core-builds hosts" to see compatible hosts.`);
+  }
+
+  if (opts.host && !isNuvioRoute && !HOSTS[opts.host]) dieJson(`Unknown host "${opts.host}". Run "core-builds hosts" to see options.`);
+
   const VALID_RESOLUTIONS = ['4k', '1080p', 'mixed', 'ultrawide'];
   const VALID_ARCHITECTURES = ['standard', 'iqr', 'apex-mixed'];
   const VALID_AUDIO = ['lossless', 'standard', 'limited', 'dolby'];
@@ -214,22 +271,24 @@ async function cmdGenerate() {
   if (opts['size-limit'] != null) {
     const stripped = String(opts['size-limit']).replace(/GB$/i, '');
     const num = Number(stripped);
-    if (!Number.isFinite(num) || num <= 0) die(`Invalid --size-limit "${opts['size-limit']}". Must be a positive number (in GB).`);
+    if (!Number.isFinite(num) || num <= 0) dieJson(`Invalid --size-limit "${opts['size-limit']}". Must be a positive number (in GB).`);
   }
   const VALID_MATCH_MODES = ['relaxed', 'balanced', 'strict'];
   const VALID_CACHE_MODES = ['mixed', 'cached', 'uncached'];
-  if (!VALID_RESOLUTIONS.includes(opts.resolution)) die(`Unknown resolution "${opts.resolution}". Valid: ${VALID_RESOLUTIONS.join(', ')}`);
-  if (!VALID_ARCHITECTURES.includes(opts.architecture)) die(`Unknown architecture "${opts.architecture}". Valid: ${VALID_ARCHITECTURES.join(', ')}`);
-  if (!VALID_AUDIO.includes(opts.audio)) die(`Unknown audio mode "${opts.audio}". Valid: ${VALID_AUDIO.join(', ')}`);
-  if (!VALID_CONTENT.includes(opts.content)) die(`Unknown content type "${opts.content}". Valid: ${VALID_CONTENT.join(', ')}`);
-  if (!VALID_MATCH_MODES.includes(opts['match-mode'])) die(`Unknown match-mode "${opts['match-mode']}". Valid: ${VALID_MATCH_MODES.join(', ')}`);
-  if (!VALID_CACHE_MODES.includes(opts['cache-mode'])) die(`Unknown cache-mode "${opts['cache-mode']}". Valid: ${VALID_CACHE_MODES.join(', ')}`);
+  if (!VALID_RESOLUTIONS.includes(opts.resolution)) dieJson(`Unknown resolution "${opts.resolution}". Valid: ${VALID_RESOLUTIONS.join(', ')}`);
+  if (!VALID_ARCHITECTURES.includes(opts.architecture)) dieJson(`Unknown architecture "${opts.architecture}". Valid: ${VALID_ARCHITECTURES.join(', ')}`);
+  if (!VALID_AUDIO.includes(opts.audio)) dieJson(`Unknown audio mode "${opts.audio}". Valid: ${VALID_AUDIO.join(', ')}`);
+  if (!VALID_CONTENT.includes(opts.content)) dieJson(`Unknown content type "${opts.content}". Valid: ${VALID_CONTENT.join(', ')}`);
+  if (!VALID_MATCH_MODES.includes(opts['match-mode'])) dieJson(`Unknown match-mode "${opts['match-mode']}". Valid: ${VALID_MATCH_MODES.join(', ')}`);
+  if (!VALID_CACHE_MODES.includes(opts['cache-mode'])) dieJson(`Unknown cache-mode "${opts['cache-mode']}". Valid: ${VALID_CACHE_MODES.join(', ')}`);
 
+  const optionalScrapers = opts['optional-scrapers'] ? opts['optional-scrapers'].split(',').map(s => s.trim()).filter(Boolean) : [];
 
   const { common, uhd } = await loadRankedRegex();
 
   const rawInput = {
-    service: opts.service,
+    ...(isNuvioRoute ? { route: 'nuvio-torbox-instant' } : { service: opts.service }),
+    ...(opts.host && HOSTS[opts.host] ? { host: HOSTS[opts.host] } : {}),
     device: opts.device,
     resolution: opts.resolution,
     architecture: opts.architecture,
@@ -242,7 +301,7 @@ async function cmdGenerate() {
     credentials: {},
     langs: ['English'],
     multiServices: [],
-    optionalScrapers: [],
+    optionalScrapers,
   };
   if (opts.name) rawInput.name = opts.name;
 
@@ -252,6 +311,7 @@ async function cmdGenerate() {
 
   const template = generateTemplate(rawInput, {
     metadata,
+    host: opts.host && HOSTS[opts.host] ? HOSTS[opts.host] : undefined,
     deviceAv1Safe: DEVICE_AV1_SAFE,
     deviceDvSafe: DEVICE_DV_SAFE,
     deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
@@ -264,9 +324,11 @@ async function cmdGenerate() {
 
   if (opts.output) {
     try { writeFileSync(opts.output, json); }
-    catch (err) { die(`Cannot write to ${opts.output}: ${err.message}`); }
+    catch (err) { dieJson(`Cannot write to ${opts.output}: ${err.message}`); }
     process.stderr.write(`Template written to ${opts.output}\n`);
-    process.stderr.write(`  Service: ${opts.service}\n`);
+    if (isNuvioRoute) process.stderr.write(`  Route: nuvio-torbox-instant\n`);
+    else process.stderr.write(`  Service: ${opts.service}\n`);
+    if (opts.host) process.stderr.write(`  Host: ${opts.host} (${HOSTS[opts.host]?.name || opts.host})\n`);
     process.stderr.write(`  Device: ${opts.device} (${DEVICES[opts.device].name})\n`);
     process.stderr.write(`  Resolution: ${opts.resolution}\n`);
     process.stderr.write(`  Architecture: ${opts.architecture}\n`);

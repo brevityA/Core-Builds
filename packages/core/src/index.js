@@ -10,3 +10,6 @@ export { getSelPolicy, normalizeSelPolicy, assertSelPolicy, SEL_ARCHITECTURES } 
 export { AGE_RATINGS, AGE_RATING_CERTIFICATIONS, generateAgeRatingESE } from './agerating.js';
 export { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
 export { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
+export { isNuvioInstantHost, requireNuvioInstantHost } from './nuvio-hosts.js';
+export { NUVIO_ADDONS, validateNuvioHost, generateNuvioTorboxInstantPolicy } from './nuvio-torbox-instant.js';
+export { applyNuvioTorboxInstantPolicy } from './nuvio-template.js';

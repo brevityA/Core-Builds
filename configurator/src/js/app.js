@@ -3030,7 +3030,7 @@ function catalogPresets() {
   return out;
 }
 
-function sid() { return Math.random().toString(36).substring(2,8); }
+function sid() { const a = new Uint8Array(6); crypto.getRandomValues(a); return Array.from(a, b => b.toString(36).padStart(2, '0')).join('').slice(0, 8); }
 
 function defaultName() {
   const res = S.resolution, svc = S.service, dev = S.device;
@@ -5591,7 +5591,7 @@ function showAdditionalServicesPicker(options={}) {
 function showFastLane() {
   document.getElementById('fastLaneModal')?.remove();
   const initialServices = (S.multiServices && S.multiServices.length ? S.multiServices : [S.service || 'torbox-pro']).map(v=>v==='torbox'?'torbox-pro':v).filter(v=>['torbox-pro','realdebrid','alldebrid','premiumize','easynews','p2p'].includes(v));
-  const state = { target:'app', services:initialServices.length?initialServices:['torbox-pro'], extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v)), scrapers:[...(S.optionalScrapers||[])], profile:S.quickProfile || 'balanced' };
+  const state = { target:'app', services:initialServices.length?initialServices:['torbox-pro'], extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v)), scrapers:[...(S.optionalScrapers||[])], profile:S.quickProfile || 'balanced', nuvioDevice:S.device||'generic', nuvioResolution:S.resolution||'4k' };
   const overlay = document.createElement('div');
   overlay.id = 'fastLaneModal';
   overlay.className = 'fastlane-overlay';
@@ -5600,17 +5600,18 @@ function showFastLane() {
     <div class="fastlane-section"><div class="fastlane-label">1 / Where do you watch?</div><div class="fastlane-grid apps" id="flApps">
       ${[['app','Stremio','Direct or manifest'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button class="fastlane-choice${state.target===v?' active':''}" data-fl-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
     </div></div>
-    <div class="fastlane-section"><div class="fastlane-label">2 / Providers <span style="font-weight:600;text-transform:none;letter-spacing:0">— choose one or more</span></div><div class="fastlane-grid services" id="flServices">
+    <div class="fastlane-section" id="flServiceSection"><div class="fastlane-label">2 / Providers <span style="font-weight:600;text-transform:none;letter-spacing:0">— choose one or more</span></div><div class="fastlane-grid services" id="flServices">
       ${[['torbox-pro','TorBox'],['realdebrid','Real-Debrid'],['alldebrid','AllDebrid'],['premiumize','Premiumize'],['easynews','EasyNews'],['p2p','Free / P2P']].map(([v,n])=>`<button class="fastlane-choice${state.services.includes(v)?' active':''}" data-fl-service="${v}"><b>${n}</b><span>${v==='p2p'?'No key required':'Credentials required'}</span></button>`).join('')}
     </div><button type="button" id="flExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">P2P, HTTP, Debridio, Usenet and optional indexers</span></span><span id="flExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button></div>
+    <div id="flNuvioSection" style="display:none"></div>
     <div class="fastlane-section" id="flCredentials"></div>
-    <div class="fastlane-section"><div class="fastlane-label">3 / Performance profile</div><div class="fastlane-grid profiles" id="flProfiles">
+    <div class="fastlane-section" id="flProfileSection"><div class="fastlane-label">3 / Performance profile</div><div class="fastlane-grid profiles" id="flProfiles">
       ${[['fast','Fast','1080p · cached first · smaller files'],['balanced','Balanced','4K · sensible pool · 30GB cap'],['maximum','Maximum','4K · largest pool · quality first']].map(([v,n,d])=>`<button class="fastlane-choice${state.profile===v?' active':''}" data-fl-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
     </div></div>
     <div class="fastlane-section" id="flInstallFields"></div>
-    <label class="fastlane-check"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="../account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
+    <label class="fastlane-check" id="flCleanLabel"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="../account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" id="flBackupLink" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
     <a href="../tools/" target="_blank" rel="noopener noreferrer" style="display:block;margin:3px 0 0 28px;font-size:.72rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#8b949e'">All Core Tools →</a>
-    <div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)">
+    <div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)" id="flStackSetup">
       <div style="font-size:.72rem;font-weight:700;color:#34d399;margin-bottom:8px;display:flex;align-items:center;gap:6px">${ICO.rocket(12,'#34d399')} Full Stack Setup <span style="font-size:.58rem;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)">NEW</span></div>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="flPatchCinemeta" ${S.patchCinemeta?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Patch Cinemeta</b><br><span style="color:#8b949e">Hide Cinemeta catalogs/metadata so AIOMetadata takes over. Uses Cinebye.</span></span></label>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="checkbox" id="flInstallAIOMeta" ${S.installAIOMeta?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Install AIOMetadata</b><br><span style="color:#8b949e">Better catalogs, metadata, and posters. Replaces Cinemeta.</span></span></label>
@@ -5624,7 +5625,51 @@ function showFastLane() {
     overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{S.creds[inp.dataset.flCred]=inp.value.trim();});
     overlay.querySelectorAll('[data-fl-tmdb]').forEach(inp=>{S[inp.dataset.flTmdb]=inp.value.trim();});
   };
+  const renderNuvioSections = () => {
+    const isNuvio = state.target === 'nuvio';
+    const svcSection = overlay.querySelector('#flServiceSection');
+    const profileSection = overlay.querySelector('#flProfileSection');
+    const nuvioSection = overlay.querySelector('#flNuvioSection');
+    const extrasBtn = document.getElementById('flExtrasBtn');
+    const stackSetup = overlay.querySelector('#flStackSetup');
+    const cleanLabel = overlay.querySelector('#flCleanLabel');
+    const backupLink = overlay.querySelector('#flBackupLink');
+    if (svcSection) svcSection.style.display = isNuvio ? 'none' : '';
+    if (profileSection) profileSection.style.display = isNuvio ? 'none' : '';
+    if (extrasBtn) extrasBtn.style.display = isNuvio ? 'none' : '';
+    if (stackSetup) stackSetup.style.display = isNuvio ? 'none' : '';
+    if (cleanLabel) cleanLabel.style.display = isNuvio ? 'none' : '';
+    if (backupLink) backupLink.style.display = isNuvio ? 'none' : '';
+    if (!nuvioSection) return;
+    if (!isNuvio) { nuvioSection.style.display = 'none'; return; }
+    nuvioSection.style.display = '';
+    const nuvioHosts = Object.entries(HOST_META).filter(([,m]) => m.supportsNuvioInstant && m.supportsP2P).map(([k]) => k);
+    nuvioSection.innerHTML = `
+      <div style="margin-bottom:14px;padding:12px 14px;border-radius:10px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2)">
+        <div style="font-size:.78rem;font-weight:700;color:#fb923c;margin-bottom:5px">${ICO.warn(14,'#fb923c')} TorBox Connected Services</div>
+        <div style="font-size:.76rem;color:#c9d5df;line-height:1.55">Connect TorBox in <strong style="color:#fb923c">Nuvio → Connected Services</strong>. Do <strong style="color:#f87171">not</strong> enter a TorBox API key into AIOStreams — the generated template uses P2P scrapers only.</div>
+      </div>
+      <div class="fastlane-section"><div class="fastlane-label">2 / Device</div><div class="fastlane-grid services" id="flNuvioDevices">
+        ${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['onn','onn 4K'],['googletv','Google TV'],['samsung','Samsung TV'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button class="fastlane-choice${state.nuvioDevice===v?' active':''}" data-fl-nuvio-device="${v}"><b>${n}</b></button>`).join('')}
+      </div></div>
+      <div class="fastlane-section"><div class="fastlane-label">3 / Resolution</div><div class="fastlane-grid profiles" id="flNuvioRes">
+        ${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K content'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button class="fastlane-choice${state.nuvioResolution===v?' active':''}" data-fl-nuvio-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
+      </div></div>
+      <div class="fastlane-section"><div class="fastlane-label">4 / AIOStreams host</div>
+        <div class="fastlane-note" style="margin-bottom:8px">Only hosts that support P2P and Nuvio Instant are shown.</div>
+        <div class="fastlane-grid services" id="flNuvioHosts">
+          ${nuvioHosts.map(k=>`<button class="fastlane-choice active" data-fl-nuvio-host="${k}" disabled style="opacity:.7;cursor:default"><b>${HOST_LABEL_MAP[k]||k}</b><span>${HOST_BASE_URLS[k]?.replace('https://','')}</span></button>`).join('')}
+        </div>
+      </div>`;
+  };
   const renderContext = () => {
+    const isNuvio = state.target === 'nuvio';
+    renderNuvioSections();
+    if (isNuvio) {
+      creds.innerHTML = '';
+      installFields.innerHTML = `<div class="fastlane-note">Core Builds will generate a P2P template and open Nuvio import instructions.</div>`;
+      return;
+    }
     const credKeys={ 'torbox-pro':'torbox',realdebrid:'realdebrid',alldebrid:'alldebrid',premiumize:'premiumize',debrider:'debrider' };
     const fields=[];
     const credentialField=(key,{type='password',autocomplete='off',showLink=true}={})=>{
@@ -5649,6 +5694,10 @@ function showFastLane() {
   overlay.addEventListener('click', async e => {
     const targetBtn = e.target.closest('[data-fl-target]');
     if (targetBtn) { state.target=targetBtn.dataset.flTarget; activate('[data-fl-target]','data-fl-target',state.target); renderContext(); return; }
+    const nuvioDevBtn = e.target.closest('[data-fl-nuvio-device]');
+    if (nuvioDevBtn) { state.nuvioDevice=nuvioDevBtn.dataset.flNuvioDevice; overlay.querySelectorAll('[data-fl-nuvio-device]').forEach(b=>b.classList.toggle('active',b.dataset.flNuvioDevice===state.nuvioDevice)); return; }
+    const nuvioResBtn = e.target.closest('[data-fl-nuvio-res]');
+    if (nuvioResBtn) { state.nuvioResolution=nuvioResBtn.dataset.flNuvioRes; overlay.querySelectorAll('[data-fl-nuvio-res]').forEach(b=>b.classList.toggle('active',b.dataset.flNuvioRes===state.nuvioResolution)); return; }
     const serviceBtn = e.target.closest('[data-fl-service]');
     if (serviceBtn) { captureCredentialDrafts(); const v=serviceBtn.dataset.flService, i=state.services.indexOf(v); if(i>=0){if(state.services.length===1)return;state.services.splice(i,1);}else state.services.push(v); overlay.querySelectorAll('[data-fl-service]').forEach(b=>b.classList.toggle('active',state.services.includes(b.dataset.flService))); renderContext(); return; }
     if(e.target.closest('#flExtrasBtn')){captureCredentialDrafts();showAdditionalServicesPicker({services:state.extras,scrapers:state.scrapers,onApply:(sv,sc)=>{state.extras=sv;state.scrapers=sc;renderContext();}});return;}
@@ -5659,6 +5708,54 @@ function showFastLane() {
       const btn = document.getElementById('btnAutoCreate');
       const result = document.getElementById('aioResult');
       result.innerHTML='';
+      if (state.target === 'nuvio') {
+        btn.disabled=true;
+        btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Generating Nuvio template…`;
+        try {
+          const nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
+          if (!nuvioHost) { result.innerHTML='<div class="td-error">No compatible Nuvio host found.</div>'; return; }
+          const tmpl = generateTemplate({
+            route: 'nuvio-torbox-instant', device: state.nuvioDevice, resolution: state.nuvioResolution,
+            host: nuvioHost, formatter: 'family-v4', langs: S.langs || ['English'], foreignLangKill: S.foreignLangKill !== false,
+            tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
+          }, {
+            host: nuvioHost,
+            deviceAv1Safe: DEVICE_AV1_SAFE, deviceDvSafe: DEVICE_DV_SAFE, deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
+            formatters: FORMATTERS,
+            metadata: { coreBuildsVersion: CONFIGURATOR_VERSION, generatedAt: new Date().toISOString() },
+          });
+          if (tmpl.metadata) { delete tmpl.metadata.generatedAt; }
+          const jsonStr = JSON.stringify(tmpl, null, 2);
+          btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
+          let importUrl = null;
+          if (CORS_PROXY) {
+            try { const r = await fetchWithTimeout(`${CORS_PROXY}/paste`, { method:'POST', headers:{'Content-Type':'application/json'}, body:jsonStr }, 5000); if (r.ok) { const d = await r.json(); importUrl = d.url || null; } } catch(e) {}
+          }
+          if (!importUrl) {
+            try { const r = await fetchWithTimeout('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:jsonStr }, 5000); if (r.ok) importUrl = (await r.text()).trim(); } catch(e) {}
+          }
+          btn.disabled=false; btn.innerHTML='Create &amp; Install →';
+          if (importUrl) {
+            const nuvioChips = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>[HOST_LABEL_MAP[k]||k, HOST_BASE_URLS[k]+'/stremio/configure']);
+            const chipHtml = nuvioChips.map(([n,u])=>`<a href="${u}?template=${encodeURIComponent(importUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${n}</a>`).join('');
+            result.innerHTML = `<div class="import-success" style="margin-top:12px">
+              <div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.18)"><div style="font-size:.74rem;font-weight:700;color:#fb923c;margin-bottom:3px">${ICO.warn(12,'#fb923c')} Next step: connect TorBox</div><div style="font-size:.72rem;color:#c9d5df;line-height:1.5">Go to <strong style="color:#fb923c">Nuvio → Connected Services</strong> and connect your TorBox account there. Do <strong style="color:#f87171">not</strong> enter a TorBox API key in AIOStreams.</div></div>
+              <strong style="color:#e6edf3">Tap a host to import your Nuvio template:</strong>
+              <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap a host below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save<br><strong style="color:#e6edf3">4.</strong> Copy the manifest URL into Nuvio</div>
+              <div class="inst-chips">${chipHtml}</div>
+              <div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this import URL:</div>
+              <div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>
+            </div>`;
+            showToast('Nuvio template created — tap a host to import');
+          } else {
+            result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not reach any paste service</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">Download the JSON and import it manually into AIOStreams.</div></div>`;
+          }
+        } catch(err) {
+          btn.disabled=false; btn.innerHTML='Create &amp; Install →';
+          result.innerHTML=`<div class="td-error">${err.message.replace(/</g,'&lt;')}</div>`;
+        }
+        return;
+      }
       let missing='';
       overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{const v=inp.value.trim();if(!v&&!missing)missing=inp.placeholder;else S.creds[inp.dataset.flCred]=v;});
       overlay.querySelectorAll('[data-fl-tmdb]').forEach(inp=>{S[inp.dataset.flTmdb]=inp.value.trim();});
@@ -5669,7 +5766,7 @@ function showFastLane() {
       S.p2pEnabled = S.multiServices.includes('p2p');
       S.simpleMode = true; S.quickStart = true;
       applyQuickProfile(state.profile);
-      S.cleanInstall = document.getElementById('flClean').checked;
+      S.cleanInstall = document.getElementById('flClean')?.checked || false;
       S.patchCinemeta = document.getElementById('flPatchCinemeta')?.checked !== false;
       S.installAIOMeta = document.getElementById('flInstallAIOMeta')?.checked !== false;
       let installTarget = state.target;
@@ -5963,7 +6060,8 @@ async function createRandomStremioAccount() {
   const btn = document.querySelector('[data-action="create-stremio-account"]');
   if (btn) { btn.textContent = 'Creating…'; btn.style.pointerEvents = 'none'; }
   try {
-    const rand = Math.random().toString(36).slice(2, 10);
+    const a = new Uint8Array(8); crypto.getRandomValues(a);
+    const rand = Array.from(a, b => b.toString(36).padStart(2, '0')).join('').slice(0, 10);
     const email = `corebuilds_${rand}@stremio.com`;
     const password = makePwd();
     const data = await stremioFetch('https://api.strem.io/api/register', { type:'Register', email, password, gdpr_consent:{ tos:true, privacy:true, marketing:false, from:'web' } });

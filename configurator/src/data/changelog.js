@@ -1,5 +1,8 @@
 export const CHANGELOG = [
   { v:'2.87', date:'Aug 2 2026', items:[
+    'Nuvio + TorBox Instant Quick Install — dedicated flow generates a P2P-only template with device/resolution/host pickers and TorBox Connected Services warning',
+    'Nuvio TorBox Instant CLI route — core-builds generate --route nuvio-torbox-instant --host fortheweak --device shield --resolution 4k',
+    'Nuvio host capability metadata — supportsNuvioInstant flag on all hosts; ElfHosted correctly blocked',
     'Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info',
     'Account Manager mutations — addon reorder, removal, backup restore, and bounded undo with stale-state detection',
     'Capability-based device profiles — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV with device-specific warnings and help text',
