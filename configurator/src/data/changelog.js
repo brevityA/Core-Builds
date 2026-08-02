@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'2.88', date:'Aug 2 2026', items:[
+    'Account Manager promoted to available — tools page card now links directly to the Account Manager',
+    'Security: replaced Math.random() with crypto.getRandomValues() for session IDs and account generation (CodeQL #408)',
+  ]},
   { v:'2.87', date:'Aug 2 2026', items:[
     'Nuvio + TorBox Instant Quick Install — dedicated flow generates a P2P-only template with device/resolution/host pickers and TorBox Connected Services warning',
     'Nuvio TorBox Instant CLI route — core-builds generate --route nuvio-torbox-instant --host fortheweak --device shield --resolution 4k',
