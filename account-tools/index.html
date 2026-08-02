@@ -428,19 +428,24 @@ async function reloadAddons(){
   }catch(e){$('status').textContent='Reload error: '+e.message;return false}
 }
 
+async function verifyFresh(raw){
+  const fresh=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+  const freshAddons=fresh?.result?.addons||[];
+  if(freshAddons.length!==raw.length||!freshAddons.every((a,i)=>a.transportUrl===raw[i].transportUrl)){
+    $('status').textContent='Collection changed on server — reloading…';
+    await reloadAddons();
+    return false;
+  }
+  return true;
+}
+
 async function doMove(fromIdx,toIdx){
   if(!authKey||fromIdx===toIdx)return;
   const raw=currentSnapshot?.addons;
   if(!raw)return;
   try{
     $('status').textContent='Verifying current state…';
-    const fresh=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
-    const freshAddons=fresh?.result?.addons||[];
-    if(freshAddons.length!==raw.length||!freshAddons.every((a,i)=>a.transportUrl===raw[i].transportUrl)){
-      $('status').textContent='Collection changed on server — reloading…';
-      await reloadAddons();
-      return;
-    }
+    if(!await verifyFresh(raw))return;
   }catch(e){$('status').textContent='Failed to verify state: '+e.message;return}
   const prev=JSON.parse(JSON.stringify(raw));
   const reordered=[...raw];
@@ -451,7 +456,7 @@ async function doMove(fromIdx,toIdx){
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:reordered});
     showUndo({addons:prev,label:'move'});
     const ok=await reloadAddons();
-    $('undo-label').textContent='Last: moved '+esc(item.manifest?.name||'addon')+' — undo available';
+    $('undo-label').textContent='Last: moved '+(item.manifest?.name||'addon')+' — undo available';
     $('status').textContent=ok?'Addon moved. Undo available.':'Move saved but reload failed. Undo available.';
   }catch(e){
     $('status').textContent='Move failed: '+e.message;
@@ -466,13 +471,7 @@ async function doRemove(idx){
   if(!confirm('Remove '+name+'? This cannot be automatically undone without using the Undo button.'))return;
   try{
     $('status').textContent='Verifying current state…';
-    const fresh=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
-    const freshAddons=fresh?.result?.addons||[];
-    if(freshAddons.length!==raw.length||!freshAddons.every((a,i)=>a.transportUrl===raw[i].transportUrl)){
-      $('status').textContent='Collection changed on server — reloading…';
-      await reloadAddons();
-      return;
-    }
+    if(!await verifyFresh(raw))return;
   }catch(e){$('status').textContent='Failed to verify state: '+e.message;return}
   const prev=JSON.parse(JSON.stringify(raw));
   const updated=[...raw];
@@ -482,7 +481,7 @@ async function doRemove(idx){
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:updated});
     showUndo({addons:prev,label:'remove'});
     const ok=await reloadAddons();
-    $('undo-label').textContent='Last: removed '+esc(name)+' — undo available';
+    $('undo-label').textContent='Last: removed '+name+' — undo available';
     $('status').textContent=ok?'Addon removed. Undo available.':'Remove saved but reload failed. Undo available.';
   }catch(e){
     $('status').textContent='Remove failed: '+e.message;
@@ -529,7 +528,6 @@ $('restoreBtn').onclick=()=>{
   $('restoreFile').value='';$('restoreFile').click();
 };
 $('restoreFile').onchange=async e=>{
-  let pushed=false;
   try{
     const raw=JSON.parse(await e.target.files[0].text());
     const list=raw?.addons||raw?.result?.addons;
@@ -537,23 +535,18 @@ $('restoreFile').onchange=async e=>{
     const current=currentSnapshot?.addons;
     if(!current)throw new Error('No current snapshot — sign in first');
     $('status').textContent='Verifying current state…';
-    const freshData=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
-    const freshAddons=freshData?.result?.addons||[];
-    if(freshAddons.length!==current.length||!freshAddons.every((a,i)=>a.transportUrl===current[i].transportUrl)){
-      $('status').textContent='Collection changed on server — reloading…';
-      await reloadAddons();
-      return;
-    }
+    if(!await verifyFresh(current))return;
     if(!confirm('This will replace your '+current.length+' addons with '+list.length+' from the backup. Auto-backup of current state will be saved for undo. Continue?'))return;
     $('status').textContent='Restoring from backup…';
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:list});
     showUndo({addons:JSON.parse(JSON.stringify(current)),label:'restore'});
-    pushed=true;
     const ok=await reloadAddons();
     $('undo-label').textContent='Last: restored from backup — undo available';
     $('status').textContent=ok?'Restored '+list.length+' addons from backup. Undo available.':'Restore saved but reload failed. Undo available.';
   }catch(err){
     $('status').textContent=err.message;
+  }finally{
+    e.target.value='';
   }
 };
 

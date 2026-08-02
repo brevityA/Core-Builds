@@ -4,7 +4,7 @@ export default defineConfig({
   use: {
     browserName: 'chromium',
     launchOptions: {
-      executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+      executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
     },
   },
 });

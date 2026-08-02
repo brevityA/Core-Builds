@@ -13,12 +13,12 @@ const FIXTURE = [
   { manifest: { id: 'cinemeta', name: 'Cinemeta', version: '1.0', types: ['movie'], resources: ['meta'] }, transportUrl: 'https://cinemeta.example.com/manifest.json', flags: {} },
 ];
 
-function setupRoutes(page, options = {}) {
+async function setupRoutes(page, options = {}) {
   const setCalls = [];
   let serverAddons = JSON.parse(JSON.stringify(options.addons || FIXTURE));
   const shouldFailSet = options.failSet || false;
 
-  page.route('https://api.strem.io/api/**', async (route) => {
+  await page.route('https://api.strem.io/api/**', async (route) => {
     const url = route.request().url();
     const body = route.request().postDataJSON();
 
@@ -75,7 +75,7 @@ async function loginViaAuthKey(page) {
 test.describe('mutations', () => {
 
   test('reorder success — move first addon down', async ({ page }) => {
-    const { setCalls } = setupRoutes(page);
+    const { setCalls } = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -92,7 +92,7 @@ test.describe('mutations', () => {
   });
 
   test('undo reorder restores original order', async ({ page }) => {
-    const { setCalls } = setupRoutes(page);
+    const { setCalls } = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -112,7 +112,7 @@ test.describe('mutations', () => {
   });
 
   test('remove addon — confirm removal', async ({ page }) => {
-    const { setCalls } = setupRoutes(page);
+    const { setCalls } = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -130,7 +130,7 @@ test.describe('mutations', () => {
   });
 
   test('cancel remove — dismiss confirm, no mutation', async ({ page }) => {
-    const { setCalls } = setupRoutes(page);
+    const { setCalls } = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -145,7 +145,7 @@ test.describe('mutations', () => {
   });
 
   test('restore backup — upload and confirm', async ({ page }) => {
-    const { setCalls } = setupRoutes(page);
+    const { setCalls } = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -175,7 +175,7 @@ test.describe('mutations', () => {
   });
 
   test('cancel restore — dismiss confirm, no mutation', async ({ page }) => {
-    const { setCalls } = setupRoutes(page);
+    const { setCalls } = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -203,7 +203,7 @@ test.describe('mutations', () => {
   });
 
   test('write failure — move shows error', async ({ page }) => {
-    setupRoutes(page, { failSet: true });
+    await setupRoutes(page, { failSet: true });
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -215,7 +215,7 @@ test.describe('mutations', () => {
   });
 
   test('reload verification — undo available after successful write', async ({ page }) => {
-    const ctx = setupRoutes(page);
+    const ctx = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 
@@ -228,7 +228,7 @@ test.describe('mutations', () => {
   });
 
   test('stale-state protection — refuses move when server changed', async ({ page }) => {
-    const ctx = setupRoutes(page);
+    const ctx = await setupRoutes(page);
     await page.goto(PAGE_PATH);
     await loginViaAuthKey(page);
 

@@ -235,16 +235,18 @@ test('mutations: concurrent undo guard rejects second call', async () => {
   setSession('test-key');
   const base = ADDONS_3();
   let resolveSet;
+  let entered;
+  const enteredPromise = new Promise(r => { entered = r; });
   const slowApi = {
     getAddonCollection: async () => JSON.parse(JSON.stringify(base)),
     setAddonCollection: async (_key, addons) => {
+      entered();
       return new Promise(resolve => { resolveSet = () => resolve({ result: true }); });
     },
   };
   _setApi(slowApi);
 
   try {
-    // Do a mutation to have something to undo
     const fastApi = {
       getAddonCollection: async () => JSON.parse(JSON.stringify(base)),
       setAddonCollection: async () => ({ result: true }),
@@ -253,9 +255,9 @@ test('mutations: concurrent undo guard rejects second call', async () => {
     await removeAddon(0);
     assert.ok(canUndo());
 
-    // Now use the slow api for undo
     _setApi(slowApi);
     const firstUndo = undo();
+    await enteredPromise;
     await assert.rejects(() => undo(), /Undo already in progress/);
     resolveSet();
     await firstUndo;
