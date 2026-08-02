@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.5.2 (2026-08-02)
+
+### Added
+- **Core Builds CLI published to npm** — `npm install -g core-builds` for generate, validate, diff, and info commands. Same `@core-builds/core` engine as the Configurator.
+- **Account Manager mutations** — addon reorder, removal, backup restore, and bounded LIFO undo (max 10 snapshots) with stale-state detection and post-write reload verification.
+
 ## 3.5.1 (2026-07-31)
 
 ### Added
