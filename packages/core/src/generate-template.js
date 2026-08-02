@@ -18,6 +18,8 @@ import { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
 import { generateAgeRatingESE } from './agerating.js';
 import { sanitizeAioEnumArrays } from './schema.js';
 import { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
+import { requireNuvioInstantHost } from './nuvio-hosts.js';
+import { NUVIO_ADDONS } from './nuvio-torbox-instant.js';
 
 const EXCLUDED_REGEX = ["/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/","/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i","/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"];
 
@@ -90,6 +92,43 @@ function buildCatalogPresets(input) {
   if (cats.includes('rpdb-catalogs')) out.push({ type:'rpdb-catalogs', instanceId:'rpdb-cat-1', enabled:true, options:{ name:'RPDB Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
   if (cats.includes('torrent-catalogs')) out.push({ type:'torrent-catalogs', instanceId:'torr-cat-1', enabled:true, options:{ name:'Torrent Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
   return out;
+}
+
+const NUVIO_OPTIONAL_SCRAPERS = new Set(['eztv', 'knaben', 'torrent-galaxy']);
+
+function buildNuvioPresets(input) {
+  const optionalScrapers = (input.optionalScrapers || []).filter(s => NUVIO_OPTIONAL_SCRAPERS.has(s));
+  return [
+    { type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000 }, resources:['stream'] },
+    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:false } },
+    { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
+    { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] } },
+    { type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:true, useMultipleInstances:false }, resources:['stream'] },
+    ...(optionalScrapers.includes('eztv') ? [{ type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] }] : []),
+    ...(optionalScrapers.includes('knaben') ? [{ type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] }] : []),
+    ...(optionalScrapers.includes('torrent-galaxy') ? [{ type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] }] : []),
+    ...buildSubtitlePresets(input),
+    ...buildCatalogPresets(input)
+  ];
+}
+
+function buildNuvioServices() {
+  return [
+    {id:'realdebrid', enabled:false, credentials:{}},
+    {id:'alldebrid', enabled:false, credentials:{}},
+    {id:'premiumize', enabled:false, credentials:{}},
+    {id:'debridlink', enabled:false, credentials:{}},
+    {id:'torbox', enabled:false, credentials:{}},
+    {id:'offcloud', enabled:false, credentials:{}},
+    {id:'easydebrid', enabled:false, credentials:{}},
+    {id:'pikpak', enabled:false, credentials:{}},
+    {id:'seedr', enabled:false, credentials:{}},
+    {id:'easynews', enabled:false, credentials:{}},
+    {id:'putio', enabled:false, credentials:{}},
+    {id:'debrider', enabled:false, credentials:{}},
+    {id:'nzbdav', enabled:false, credentials:{}}, {id:'altmount', enabled:false, credentials:{}}, {id:'stremthru_newz', enabled:false, credentials:{}},
+    {id:'stremio_nntp', enabled:false, credentials:{}}, {id:'aiostreams', enabled:false, credentials:{}}
+  ];
 }
 
 function buildPresets(input) {
@@ -340,6 +379,163 @@ function buildPses(input, deviceAv1Safe, deviceDvSafe, deviceForceLimitedAudio) 
   return out;
 }
 
+function generateNuvioTemplate(input, options = {}) {
+  const host = input.host || options.host || {};
+  requireNuvioInstantHost(host);
+
+  const deviceAv1Safe = options.deviceAv1Safe || new Set();
+  const deviceDvSafe = options.deviceDvSafe || new Set();
+  const deviceForceLimitedAudio = options.deviceForceLimitedAudio || new Set();
+  const formatters = options.formatters || [];
+
+  const p2pInput = { ...input, service: 'p2p', credentials: {} };
+  const normalizedInput = templateInput(p2pInput);
+  const hasTmdb = hasTmdbCredentials(normalizedInput);
+  const rc = resolutionPolicy(normalizedInput);
+  const ec = encodePolicy(normalizedInput, deviceAv1Safe);
+  const ac = audioPolicy(normalizedInput, deviceForceLimitedAudio);
+
+  const globalTimeout = Number(input.addonTimeout) || 6000;
+  const normalizedPresets = assertAddonPolicy(addonPolicy(normalizedInput, buildNuvioPresets(input), { defaultTimeout: globalTimeout }));
+  const activePresets = normalizedPresets.presets;
+
+  const dev = input.device;
+  const is1080 = input.resolution === '1080p';
+  const name = (input.name || '').trim() || `Core Nexus${input.resolution === '4k' ? ' 4K' : ''} — Nuvio TorBox Instant`;
+
+  const eses = [];
+  eses.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" });
+  eses.push({ enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" });
+  eses.push({ enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
+  eses.push({ enabled:true, expression:"/* Auto-Hide SD */ count(resolution(streams,'1080p'))>=5 and count(resolution(streams,'720p'))>=5 ? resolution(streams,'480p','360p','SD') : []" });
+  eses.push({ enabled:true, expression:"/* Auto-Hide 720p */ count(resolution(streams,'1080p'))>=15 or count(resolution(streams,'2160p'))>=15 ? resolution(streams,'720p') : []" });
+  if (input.foreignLangKill !== false) {
+    const langArgs = [...new Set([...(input.langs || ['English']),'Original','Multi','Dual Audio','Dubbed','Unknown'])].map(l=>`'${l}'`).join(',');
+    eses.push({ enabled:true, expression:`/* CB | Foreign Language Kill (movies/series only — anime exempt) */ (queryType == 'movie' or queryType == 'series') ? negate(merge(library(streams), seadex(streams), language(streams, ${langArgs})), streams) : []` });
+  }
+  eses.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
+  if (is1080) eses.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
+  if (DV_ONLY_KILL_DEVICES.has(dev)) eses.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+  if (input.sizeLimit && input.sizeLimit !== 'unlimited') {
+    eses.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
+  }
+  { const ae = generateAgeRatingESE(input.ageLimit); if (ae) eses.push(ae); }
+
+  const pses = [];
+  const langs = input.langs || [];
+  if (langs.length) pses.push({ enabled:true, expression:`/* Language Preference — ${langs.join('/')} */ language(streams,${langs.map(l=>`'${l}'`).join(',')})` });
+  pses.push({ enabled:true, expression:"/* Sub-First Anime Booster */ (queryType == 'anime.series' or queryType == 'anime.movie') ? language(cached(streams), 'Japanese') : []" });
+  const dv = deviceDvSafe.has(dev);
+  const supportsAv1 = deviceAv1Safe.has(dev);
+  const codecExpr = supportsAv1 ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
+  const pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" };
+  pses.push(pinLQ);
+  if (input.resolution === '4k' || input.resolution === 'mixed') {
+    pses.push({ enabled:true, expression:"/* S-Tier 4K */ resolution(streams,'2160p')" }, { enabled:true, expression:"/* A-Tier 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:codecExpr });
+  } else {
+    pses.push({ enabled:true, expression:"/* S-Tier 1080p */ resolution(streams,'1080p')" }, { enabled:true, expression:"/* A-Tier 720p Fallback */ resolution(streams,'720p')" }, { enabled:true, expression:codecExpr });
+  }
+  pses.push({ enabled:true, expression:"/* Seeder Priority */ seeders(streams,5,99999)" });
+
+  const _f = input.formatter === 'custom' && input.customFormatter
+    ? input.customFormatter
+    : formatters.find(f => f.id === (input.formatter || 'family-v4')) || formatters[0] || { name:'', d:'' };
+
+  const cfg = {
+    trusted: false, showChanges: true,
+    addonName: name,
+    addonLogo: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg',
+    addonDescription: name,
+    preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HDTV'],
+    excludedLanguages: [], includedLanguages: [],
+    requiredLanguages: [...new Set([...(input.langs||['English']),'Original','Dual Audio','Multi','Dubbed','Unknown'])],
+    preferredLanguages: [...new Set([...(input.langs||['English']),'Original','Dual Audio','Multi','Dubbed'])],
+    preferredAudioTags: ac.preferredAudioTags,
+    syncedRankedRegexUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json'],
+    rankedRegexPatterns: [],
+    excludedRegexPatterns: [...EXCLUDED_REGEX],
+    addonCategoryColors: {Mix:'indigo',P2P:'orange',Subs:'purple'},
+    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
+    usePosterRedirectApi: true, usePosterServiceForMeta: true,
+    ...(input.tmdbToken ? { tmdbAccessToken: input.tmdbToken } : {}),
+    ...(input.tmdbApiKey ? { tmdbApiKey: input.tmdbApiKey } : {}),
+    sortCriteria: sortPolicy({ ...input, service: 'p2p' }),
+    deduplicator: { enabled:true, excludeAddons:[], multiGroupBehaviour:'aggressive', keys:['filename','infoHash','smartDetect'], cached:'disabled', uncached:'disabled', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding:10, libraryBehaviour:'ignore', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}] },
+    formatter: { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } },
+    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
+    resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
+    size: sizePolicy(normalizedInput),
+    bitrate: bitratePolicy(normalizedInput, hasTmdb),
+    hideErrors: true, hideErrorsForResources: ['addon_catalog','catalog','subtitles'],
+    digitalReleaseFilter: { enabled:hasTmdb, tolerance:7, requestTypes:['movie','series','anime'], addons:[] },
+    autoPlay: { enabled:true, method:input.autoPlayMethod||'matchingFile', attributes:['resolution','quality','audioTags'] },
+    precacheNextEpisode: false,
+    preloadStreams: { enabled:false },
+    cacheAndPlay: { enabled:false },
+    nzbFailover: { enabled:false },
+    areYouStillThere: { enabled:false },
+    checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
+    syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
+    presets: activePresets,
+    services: buildNuvioServices(),
+    excludedResolutions: rc.excludedResolutions, includedResolutions: rc.includedResolutions, requiredResolutions: rc.requiredResolutions, preferredResolutions: rc.preferredResolutions,
+    excludedQualities: [], includedQualities: [], requiredQualities: [],
+    excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes,
+    excludedAudioTags: ac.excludedAudioTags, preferredAudioChannels: ac.preferredAudioChannels,
+    preferredVisualTags: visualTagsFor(input.device, input.resolution, input.architecture),
+    enableSeadex: true, seadexBestOnly: false,
+    excludeCached: false, excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
+    excludeUncached: false, excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
+    excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
+    minSeeders: 1,
+    preferredRegexPatterns: [],
+    maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
+    excludedStreamExpressions: eses,
+    includedStreamExpressions: [
+      { enabled:true, expression:"/* Protect Library & SeaDex */ passthrough(merge(library(streams), seadex(streams)), 'excluded')" },
+      { enabled:true, expression:"/* Smart Play Pin */ pin(message(streams, 'includes', '🎯'), 'top')" },
+      { enabled:true, expression:"/*Library*/ count(streams)==count(library(streams)) ? library(streams) : []" },
+      { enabled:true, expression:"/*0Cached*/ count(merge(cached(streams),type(streams,'p2p','http','usenet','stremio-usenet')))==0 ? passthrough(streams,'title') : []" },
+    ],
+    preferredStreamExpressions: pses,
+    dynamicAddonFetching: (function(){ const timeout = 6000;
+      if (input.resolution === '4k') return { enabled:true, condition:`count(resolution(totalStreams,'2160p'))>=8 or totalTimeTaken>${timeout}` };
+      return { enabled:true, condition:`count(resolution(totalStreams,'1080p'))>=20 or totalTimeTaken>${timeout}` };
+    })(),
+    titleMatching: { enabled:hasTmdb, mode:'contains', similarityThreshold:0.75, requestTypes:[], addons:[] },
+    yearMatching: { enabled:hasTmdb, strict:false, useInitialAirDate:true, tolerance:2, requestTypes:[], addons:[] },
+    seasonEpisodeMatching: { enabled:true, strict:false, requestTypes:[], addons:[] },
+    groups: (function(){
+      const skip = new Set(['Library','AIOSubtitle','OpenSubtitles','AIOStreams']);
+      const active = activePresets.filter(p => p.enabled !== false && p.instanceId && !skip.has(p.options?.name || ''));
+      const ids = active.map(p => p.instanceId);
+      if (ids.length < 2) return { enabled:false, groupings:[] };
+      const mid = Math.ceil(ids.length / 2);
+      return { enabled:true, behaviour:'sequential', groupings:[
+        { name:'Primary', addons:ids.slice(0, mid), condition:'true' },
+        { name:'Secondary', addons:ids.slice(mid), condition:`count(totalStreams)<5 and totalTimeTaken<${6000}` },
+      ]};
+    })(),
+  };
+
+  const metadataId = options.metadata?.id || 'core-nuvio-000000';
+  const result = {
+    metadata: {
+      id: metadataId, name,
+      description: 'Connect TorBox in Nuvio Connected Services. Do not enter a TorBox API key in AIOStreams.',
+      source: 'external', version: '0.1.0', category: 'P2P',
+      serviceRequired: false, setToSaveInstallMenu: true,
+      sourceUrl: 'https://github.com/brevityA/Core-Builds',
+      changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md',
+      ...(options.metadata?.coreBuildsVersion ? { coreBuildsVersion: options.metadata.coreBuildsVersion } : {}),
+      ...(options.metadata?.generatedAt ? { generatedAt: options.metadata.generatedAt } : {}),
+    },
+    config: sanitizeAioEnumArrays(cfg)
+  };
+
+  return result;
+}
+
 /**
  * Generate a complete AIOStreams template.
  *
@@ -375,6 +571,10 @@ export function generateTemplate(rawInput = {}, options = {}) {
     optionalScrapers: rawInput.optionalScrapers || [],
     formatter: rawInput.formatter || 'family-v4',
   };
+
+  if (rawInput.route === 'nuvio-torbox-instant') {
+    return generateNuvioTemplate(input, options);
+  }
 
   const deviceAv1Safe = options.deviceAv1Safe || new Set();
   const deviceDvSafe = options.deviceDvSafe || new Set();
