@@ -30,3 +30,13 @@ export async function getAddonCollection(authKey) {
   if (!data?.result?.addons) throw new Error('Failed to load addon collection');
   return data.result.addons;
 }
+
+export async function setAddonCollection(authKey, addons) {
+  const data = await post('addonCollectionSet', {
+    type: 'AddonCollectionSet',
+    authKey,
+    addons,
+  });
+  if (data.error) throw new Error(data.error);
+  return data;
+}

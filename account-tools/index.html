@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://api.strem.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><title>Core Account Tools — Read-only Backup & Diff</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://api.strem.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><title>Core Account Tools — Backup, Diff & Restore</title><style>
 :root{color-scheme:dark;font-family:system-ui;background:#071018;color:#e6edf3;--cyan:#67e8f9;--border:#243342;--card:#0e1822;--input:#0a121a;--muted:#718493;--warn-bg:#2b210b;--warn-border:#7c5b19;--warn-text:#fbd38d;--green:#34d399;--red:#f87171;--blue:#60a5fa}
 body{margin:0;padding:24px}
 .wrap{max-width:800px;margin:auto}
@@ -14,7 +14,7 @@ button.danger{background:#3b1219;border-color:#7f1d1d;color:var(--red)}
 button:disabled{opacity:.4;cursor:default}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.addon{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #1e2b36}
+.addon{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #1e2b36;align-items:center}
 .addon.added{border-left:3px solid var(--green);padding-left:8px}
 .addon.removed{border-left:3px solid var(--red);padding-left:8px;opacity:.7}
 .addon.moved{border-left:3px solid var(--blue);padding-left:8px}
@@ -43,13 +43,18 @@ button:disabled{opacity:.4;cursor:default}
 .inspect dt{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
 .inspect dd{margin:2px 0 0;font-weight:600}
 .diff-summary{padding:12px;background:var(--input);border-radius:9px;margin:8px 0;font-size:.9rem;line-height:1.6}
+.move-btns{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.move-btns button{width:28px;height:22px;padding:0;font-size:12px;line-height:1;min-width:0;margin:0;border-radius:5px}
+.undo-bar{display:flex;gap:8px;align-items:center;padding:10px;background:#1a1a2e;border:1px solid #3d3d5c;border-radius:9px;margin:8px 0}
+.undo-bar .undo-label{flex:1;font-size:.85rem;color:#a78bfa}
+.undo-bar button{width:auto;padding:6px 14px;background:#312e81;border-color:#4c1d95;color:#c4b5fd}
 .count{font-weight:900;color:var(--cyan)}
 .hidden{display:none}
 @media(max-width:560px){.row,.row3{grid-template-columns:1fr}}
 </style></head><body><main class="wrap">
 <nav class="toolnav"><a href="../">Configurator</a><a href="../tools/">All Tools</a></nav>
 <h1>Core Account Tools</h1>
-<p>Read-only addon backup, inspection, and comparison. This tool cannot change your account.</p>
+<p>Addon backup, inspection, comparison, and restore. Mutations auto-backup before applying — undo is always available.</p>
 <div class="warn">Login details are sent directly to the Stremio API and kept only in page memory. Never use this from an untrusted copy.</div>
 
 <section class="card" id="auth-card">
@@ -100,15 +105,28 @@ button:disabled{opacity:.4;cursor:default}
 <button class="secondary" id="close-inspect">Close</button>
 </section>
 
+<section class="card hidden" id="undo-card">
+<div class="undo-bar">
+  <span class="undo-label" id="undo-label">Last action can be undone</span>
+  <button type="button" id="undoBtn">Undo</button>
+</div>
+</section>
+
 <section class="card hidden" id="actions-card">
 <h2>Actions</h2>
 <div class="row3">
-  <button id="download">Download backup</button>
-  <button class="secondary" id="importBtn">Import backup</button>
-  <button class="secondary" id="diffBtn">Compare snapshots</button>
+  <button type="button" id="download">Download backup</button>
+  <button type="button" class="secondary" id="importBtn">Import backup</button>
+  <button type="button" class="secondary" id="diffBtn">Compare snapshots</button>
+</div>
+<div class="row3" style="margin-top:4px">
+  <button type="button" class="secondary" id="restoreBtn">Restore from backup</button>
+  <div></div><div></div>
 </div>
 <label for="file" class="sr">Import backup file</label>
 <input hidden id="file" type="file" accept="application/json">
+<label for="restoreFile" class="sr">Restore backup file</label>
+<input hidden id="restoreFile" type="file" accept="application/json">
 <label for="diffFileA" class="sr">Snapshot A</label>
 <input hidden id="diffFileA" type="file" accept="application/json">
 <label for="diffFileB" class="sr">Snapshot B</label>
@@ -126,7 +144,7 @@ button:disabled{opacity:.4;cursor:default}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-let authKey=null,addons=[],currentSnapshot=null;
+let authKey=null,addons=[],currentSnapshot=null,undoStack=[],isLiveSession=false;
 
 const CRED_RE=/apiKey|password|secret|auth.*key|token/i;
 
@@ -161,14 +179,16 @@ function parseAddons(raw){
   }));
 }
 
-function renderAddon(a,i,extra=''){
+function renderAddon(a,i,extra='',total=0){
   const risk=hasCredRisk(a.transportUrl)?'<span class="tag risk">credential risk</span>':'';
-  return'<div class="addon'+extra+'" data-idx="'+i+'"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(a.name)+risk+'</div><div class="url">'+esc(redactUrl(a.transportUrl))+'</div></div></div>';
+  const removeBtnHtml=isLiveSession&&!extra?'<button class="danger" data-remove="'+i+'" title="Remove addon" style="width:28px;height:28px;padding:0;font-size:14px;line-height:1;min-width:0;margin:0;border-radius:5px;flex-shrink:0">&times;</button>':'';
+  const moveBtns=isLiveSession&&!extra?'<div class="move-btns">'+(i>0?'<button data-move="up" data-idx="'+i+'" title="Move up">&#9650;</button>':'<button disabled>&#9650;</button>')+(i<total-1?'<button data-move="down" data-idx="'+i+'" title="Move down">&#9660;</button>':'<button disabled>&#9660;</button>')+'</div>':'';
+  return'<div class="addon'+extra+'" data-idx="'+i+'"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(a.name)+risk+'</div><div class="url">'+esc(redactUrl(a.transportUrl))+'</div></div>'+moveBtns+removeBtnHtml+'</div>';
 }
 
 function renderList(list){
   $('addon-count').textContent=list.length;
-  $('addon-list').innerHTML=list.length?list.map((a,i)=>renderAddon(a,i)).join(''):'<p style="color:var(--muted)">No addons match.</p>';
+  $('addon-list').innerHTML=list.length?list.map((a,i)=>renderAddon(a,i,'',list.length)).join(''):'<p style="color:var(--muted)">No addons match.</p>';
 }
 
 function filterAddons(){
@@ -192,6 +212,7 @@ function onLogin(data,label){
   if(!Array.isArray(raw))throw new Error('No addon list found');
   addons=parseAddons(raw);
   currentSnapshot={exportedAt:new Date().toISOString(),source:label,addons:raw};
+  isLiveSession=true;
   renderList(addons);
   showWarnings();
   show('session-card');show('addons-card');show('actions-card');
@@ -250,10 +271,10 @@ $('loginKey').onclick=async()=>{
 
 // Logout
 $('logout').onclick=()=>{
-  authKey=null;addons=[];currentSnapshot=null;
+  authKey=null;addons=[];currentSnapshot=null;undoStack=[];isLiveSession=false;
   $('addon-list').innerHTML='';$('search').value='';$('type-filter').value='';
   $('status').textContent='Session cleared.';
-  hide('session-card');hide('addons-card');hide('actions-card');hide('warnings-card');hide('inspect-card');hide('diff-card');
+  hide('session-card');hide('addons-card');hide('actions-card');hide('warnings-card');hide('inspect-card');hide('diff-card');hide('undo-card');
   show('auth-card');
 };
 
@@ -380,5 +401,153 @@ function runDiff(){
   $('status').textContent='Comparison complete — '+(hasDiff?(added.length+removed.length+moved.length)+' change(s)':'no differences')+'.';
 }
 $('close-diff').onclick=()=>hide('diff-card');
+
+// --- Mutations ---
+
+function showUndo(snap){
+  undoStack.push(snap);
+  if(undoStack.length>10)undoStack.shift();
+  $('undo-label').textContent='Last action: '+snap.label+' — can be undone';
+  show('undo-card');
+}
+
+function hideUndo(){
+  undoStack=[];
+  hide('undo-card');
+}
+
+async function reloadAddons(){
+  try{
+    const data=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+    const raw=data?.result?.addons;
+    if(!Array.isArray(raw))throw new Error('Reload failed');
+    addons=parseAddons(raw);
+    currentSnapshot={exportedAt:new Date().toISOString(),source:'live',addons:raw};
+    renderList(addons);showWarnings();
+    return true;
+  }catch(e){$('status').textContent='Reload error: '+e.message;return false}
+}
+
+async function verifyFresh(raw){
+  const fresh=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+  const freshAddons=fresh?.result?.addons||[];
+  if(freshAddons.length!==raw.length||!freshAddons.every((a,i)=>a.transportUrl===raw[i].transportUrl)){
+    $('status').textContent='Collection changed on server — reloading…';
+    await reloadAddons();
+    return false;
+  }
+  return true;
+}
+
+async function doMove(fromIdx,toIdx){
+  if(!authKey||fromIdx===toIdx)return;
+  const raw=currentSnapshot?.addons;
+  if(!raw)return;
+  try{
+    $('status').textContent='Verifying current state…';
+    if(!await verifyFresh(raw))return;
+  }catch(e){$('status').textContent='Failed to verify state: '+e.message;return}
+  const prev=JSON.parse(JSON.stringify(raw));
+  const reordered=[...raw];
+  const[item]=reordered.splice(fromIdx,1);
+  reordered.splice(toIdx,0,item);
+  try{
+    $('status').textContent='Moving addon…';
+    await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:reordered});
+    showUndo({addons:prev,label:'move'});
+    const ok=await reloadAddons();
+    $('undo-label').textContent='Last: moved '+(item.manifest?.name||'addon')+' — undo available';
+    $('status').textContent=ok?'Addon moved. Undo available.':'Move saved but reload failed. Undo available.';
+  }catch(e){
+    $('status').textContent='Move failed: '+e.message;
+  }
+}
+
+async function doRemove(idx){
+  if(!authKey)return;
+  const raw=currentSnapshot?.addons;
+  if(!raw||idx<0||idx>=raw.length)return;
+  const name=raw[idx].manifest?.name||'addon';
+  if(!confirm('Remove '+name+'? This cannot be automatically undone without using the Undo button.'))return;
+  try{
+    $('status').textContent='Verifying current state…';
+    if(!await verifyFresh(raw))return;
+  }catch(e){$('status').textContent='Failed to verify state: '+e.message;return}
+  const prev=JSON.parse(JSON.stringify(raw));
+  const updated=[...raw];
+  updated.splice(idx,1);
+  try{
+    $('status').textContent='Removing addon…';
+    await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:updated});
+    showUndo({addons:prev,label:'remove'});
+    const ok=await reloadAddons();
+    $('undo-label').textContent='Last: removed '+name+' — undo available';
+    $('status').textContent=ok?'Addon removed. Undo available.':'Remove saved but reload failed. Undo available.';
+  }catch(e){
+    $('status').textContent='Remove failed: '+e.message;
+  }
+}
+
+$('addon-list').addEventListener('click',e=>{
+  const removeBtn=e.target.closest('[data-remove]');
+  if(removeBtn){
+    e.stopPropagation();
+    doRemove(parseInt(removeBtn.dataset.remove,10));
+    return;
+  }
+  const btn=e.target.closest('[data-move]');
+  if(!btn)return;
+  e.stopPropagation();
+  const idx=parseInt(btn.dataset.idx,10);
+  const dir=btn.dataset.move;
+  if(dir==='up'&&idx>0)doMove(idx,idx-1);
+  else if(dir==='down'&&idx<addons.length-1)doMove(idx,idx+1);
+});
+
+$('undoBtn').onclick=async()=>{
+  if(!undoStack.length||!authKey)return;
+  const btn=$('undoBtn');
+  btn.disabled=true;
+  const snap=undoStack[undoStack.length-1];
+  try{
+    $('status').textContent='Undoing…';
+    await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:snap.addons});
+    undoStack.pop();
+    const ok=await reloadAddons();
+    if(!ok){$('status').textContent='Undo saved but reload failed.'}
+    else{$('status').textContent='Undo complete — restored to previous state.'}
+    if(!undoStack.length)hide('undo-card');
+    else{$('undo-label').textContent='Last: '+undoStack[undoStack.length-1].label+' — undo available'}
+  }catch(e){$('status').textContent='Undo failed: '+e.message}
+  finally{btn.disabled=false}
+};
+
+// Restore from backup
+$('restoreBtn').onclick=()=>{
+  if(!authKey)return $('status').textContent='Sign in first.';
+  $('restoreFile').value='';$('restoreFile').click();
+};
+$('restoreFile').onchange=async e=>{
+  try{
+    const raw=JSON.parse(await e.target.files[0].text());
+    const list=raw?.addons||raw?.result?.addons;
+    if(!Array.isArray(list)||!list.length)throw new Error('Backup contains no addons');
+    const current=currentSnapshot?.addons;
+    if(!current)throw new Error('No current snapshot — sign in first');
+    $('status').textContent='Verifying current state…';
+    if(!await verifyFresh(current))return;
+    if(!confirm('This will replace your '+current.length+' addons with '+list.length+' from the backup. Auto-backup of current state will be saved for undo. Continue?'))return;
+    $('status').textContent='Restoring from backup…';
+    await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:list});
+    showUndo({addons:JSON.parse(JSON.stringify(current)),label:'restore'});
+    const ok=await reloadAddons();
+    $('undo-label').textContent='Last: restored from backup — undo available';
+    $('status').textContent=ok?'Restored '+list.length+' addons from backup. Undo available.':'Restore saved but reload failed. Undo available.';
+  }catch(err){
+    $('status').textContent=err.message;
+  }finally{
+    e.target.value='';
+  }
+};
 
 })();</script></body></html>
