@@ -209,3 +209,77 @@ test('mutations: requires auth for all operations', async () => {
   await assert.rejects(() => removeAddon(0), /Not authenticated/);
   await assert.rejects(() => restoreFromBackup([{ manifest: { name: 'x' } }]), /Not authenticated/);
 });
+
+test('mutations: failed API write does not push rollback snapshot', async () => {
+  clearHistory();
+  setSession('test-key');
+  const base = ADDONS_3();
+  const api = {
+    getAddonCollection: async () => JSON.parse(JSON.stringify(base)),
+    setAddonCollection: async () => { throw new Error('Server write failed'); },
+  };
+  _setApi(api);
+
+  try {
+    await assert.rejects(() => moveAddon(0, 2), /Server write failed/);
+    assert.ok(!canUndo(), 'No snapshot should be pushed after a failed write');
+  } finally {
+    _resetApi();
+    clearSession();
+    clearHistory();
+  }
+});
+
+test('mutations: concurrent undo guard rejects second call', async () => {
+  clearHistory();
+  setSession('test-key');
+  const base = ADDONS_3();
+  let resolveSet;
+  const slowApi = {
+    getAddonCollection: async () => JSON.parse(JSON.stringify(base)),
+    setAddonCollection: async (_key, addons) => {
+      return new Promise(resolve => { resolveSet = () => resolve({ result: true }); });
+    },
+  };
+  _setApi(slowApi);
+
+  try {
+    // Do a mutation to have something to undo
+    const fastApi = {
+      getAddonCollection: async () => JSON.parse(JSON.stringify(base)),
+      setAddonCollection: async () => ({ result: true }),
+    };
+    _setApi(fastApi);
+    await removeAddon(0);
+    assert.ok(canUndo());
+
+    // Now use the slow api for undo
+    _setApi(slowApi);
+    const firstUndo = undo();
+    await assert.rejects(() => undo(), /Undo already in progress/);
+    resolveSet();
+    await firstUndo;
+  } finally {
+    _resetApi();
+    clearSession();
+    clearHistory();
+  }
+});
+
+test('mutations: clearHistory clears rollback so canUndo is false', async () => {
+  clearHistory();
+  setSession('test-key');
+  const { api } = mockApi(ADDONS_3());
+  _setApi(api);
+
+  try {
+    await removeAddon(0);
+    assert.ok(canUndo(), 'canUndo should be true after mutation');
+    clearHistory();
+    assert.ok(!canUndo(), 'canUndo should be false after clearHistory');
+  } finally {
+    _resetApi();
+    clearSession();
+    clearHistory();
+  }
+});

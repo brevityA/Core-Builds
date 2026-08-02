@@ -181,8 +181,9 @@ function parseAddons(raw){
 
 function renderAddon(a,i,extra='',total=0){
   const risk=hasCredRisk(a.transportUrl)?'<span class="tag risk">credential risk</span>':'';
+  const removeBtnHtml=isLiveSession&&!extra?'<button class="danger" data-remove="'+i+'" title="Remove addon" style="width:28px;height:28px;padding:0;font-size:14px;line-height:1;min-width:0;margin:0;border-radius:5px;flex-shrink:0">&times;</button>':'';
   const moveBtns=isLiveSession&&!extra?'<div class="move-btns">'+(i>0?'<button data-move="up" data-idx="'+i+'" title="Move up">&#9650;</button>':'<button disabled>&#9650;</button>')+(i<total-1?'<button data-move="down" data-idx="'+i+'" title="Move down">&#9660;</button>':'<button disabled>&#9660;</button>')+'</div>':'';
-  return'<div class="addon'+extra+'" data-idx="'+i+'"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(a.name)+risk+'</div><div class="url">'+esc(redactUrl(a.transportUrl))+'</div></div>'+moveBtns+'</div>';
+  return'<div class="addon'+extra+'" data-idx="'+i+'"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(a.name)+risk+'</div><div class="url">'+esc(redactUrl(a.transportUrl))+'</div></div>'+moveBtns+removeBtnHtml+'</div>';
 }
 
 function renderList(list){
@@ -431,6 +432,16 @@ async function doMove(fromIdx,toIdx){
   if(!authKey||fromIdx===toIdx)return;
   const raw=currentSnapshot?.addons;
   if(!raw)return;
+  try{
+    $('status').textContent='Verifying current state…';
+    const fresh=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+    const freshAddons=fresh?.result?.addons||[];
+    if(freshAddons.length!==raw.length||!freshAddons.every((a,i)=>a.transportUrl===raw[i].transportUrl)){
+      $('status').textContent='Collection changed on server — reloading…';
+      await reloadAddons();
+      return;
+    }
+  }catch(e){$('status').textContent='Failed to verify state: '+e.message;return}
   const prev=JSON.parse(JSON.stringify(raw));
   const reordered=[...raw];
   const[item]=reordered.splice(fromIdx,1);
@@ -447,7 +458,44 @@ async function doMove(fromIdx,toIdx){
   }
 }
 
+async function doRemove(idx){
+  if(!authKey)return;
+  const raw=currentSnapshot?.addons;
+  if(!raw||idx<0||idx>=raw.length)return;
+  const name=raw[idx].manifest?.name||'addon';
+  if(!confirm('Remove '+name+'? This cannot be automatically undone without using the Undo button.'))return;
+  try{
+    $('status').textContent='Verifying current state…';
+    const fresh=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+    const freshAddons=fresh?.result?.addons||[];
+    if(freshAddons.length!==raw.length||!freshAddons.every((a,i)=>a.transportUrl===raw[i].transportUrl)){
+      $('status').textContent='Collection changed on server — reloading…';
+      await reloadAddons();
+      return;
+    }
+  }catch(e){$('status').textContent='Failed to verify state: '+e.message;return}
+  const prev=JSON.parse(JSON.stringify(raw));
+  const updated=[...raw];
+  updated.splice(idx,1);
+  try{
+    $('status').textContent='Removing addon…';
+    await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:updated});
+    showUndo({addons:prev,label:'remove'});
+    const ok=await reloadAddons();
+    $('undo-label').textContent='Last: removed '+esc(name)+' — undo available';
+    $('status').textContent=ok?'Addon removed. Undo available.':'Remove saved but reload failed. Undo available.';
+  }catch(e){
+    $('status').textContent='Remove failed: '+e.message;
+  }
+}
+
 $('addon-list').addEventListener('click',e=>{
+  const removeBtn=e.target.closest('[data-remove]');
+  if(removeBtn){
+    e.stopPropagation();
+    doRemove(parseInt(removeBtn.dataset.remove,10));
+    return;
+  }
   const btn=e.target.closest('[data-move]');
   if(!btn)return;
   e.stopPropagation();
@@ -488,6 +536,14 @@ $('restoreFile').onchange=async e=>{
     if(!Array.isArray(list)||!list.length)throw new Error('Backup contains no addons');
     const current=currentSnapshot?.addons;
     if(!current)throw new Error('No current snapshot — sign in first');
+    $('status').textContent='Verifying current state…';
+    const freshData=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey,update:true});
+    const freshAddons=freshData?.result?.addons||[];
+    if(freshAddons.length!==current.length||!freshAddons.every((a,i)=>a.transportUrl===current[i].transportUrl)){
+      $('status').textContent='Collection changed on server — reloading…';
+      await reloadAddons();
+      return;
+    }
     if(!confirm('This will replace your '+current.length+' addons with '+list.length+' from the backup. Auto-backup of current state will be saved for undo. Continue?'))return;
     $('status').textContent='Restoring from backup…';
     await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:list});
