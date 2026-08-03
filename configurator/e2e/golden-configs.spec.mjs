@@ -84,6 +84,12 @@ for (const combo of MATRIX) {
     expect(tpl.config, 'generated template has no config').toBeTruthy();
     expect(tpl.metadata?.generatedAt, 'generatedAt must be stripped for golden stability').toBeUndefined();
 
+    if (['p2p', 'http'].includes(state.service)) {
+      const peerflix = tpl.config.presets.find(preset => preset.type === 'peerflix');
+      expect(peerflix, `${combo.name} must include Peerflix`).toBeTruthy();
+      expect(peerflix.options.useMultipleInstances, `${combo.name} Peerflix must satisfy AIOStreams' schema`).toBe(false);
+    }
+
     const goldenPath = resolve(GOLDEN_DIR, `${combo.name}.json`);
     const json = JSON.stringify(tpl, null, 2) + '\n';
 

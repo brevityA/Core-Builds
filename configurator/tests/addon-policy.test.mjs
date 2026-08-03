@@ -14,6 +14,16 @@ test('addon policy normalizes instance IDs, enables presets, and applies timeout
   assertAddonPolicy(result);
 });
 
+test('addon policy preserves an explicit timeout when global timeout application is disabled', () => {
+  const result = addonPolicy({ addonTimeout: 9000 }, [
+    { type:'explicit', instanceId:'explicit-1', options:{ timeout: 4000 } },
+    { type:'missing', instanceId:'missing-1', options:{} },
+  ], { applyTimeout:false });
+
+  assert.equal(result.presets[0].options.timeout, 4000);
+  assert.equal(result.presets[1].options.timeout, 9000, 'missing timeout still receives a safe default');
+});
+
 test('addon policy skips malformed presets and reports warnings', () => {
   const result = addonPolicy({}, [{ options:{} }, null, { type:'ok', instanceId:'ok-1' }]);
   assert.equal(result.presets.length, 1);

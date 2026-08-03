@@ -6,6 +6,11 @@ compatibility_date = "2024-09-25"
 binding = "STATS"
 id = "e21df08fe77846ee8246bda94288c111"
 
+# Required for POST /paste and GET /t/:id.
+[[kv_namespaces]]
+binding = "TEMPLATES"
+id = "100cc344297b41c785f8c07dba85982c"
+
 # Optional but recommended: edge-wide rate limiting. If unbound, rate limits degrade to
 # "allow" (the worker never 503s on a missing namespace). Create a KV namespace and bind
 # it as RATELIMIT to enable per-IP limits on /proxy, /paste, /contact and /api/*.

@@ -56,18 +56,14 @@ jobs:
           echo "Source: $SOURCE_VER"
           echo "Built:  $BUILT_VER"
 
-      - name: Check build freshness
+      - name: Check committed standalone build is fresh
         run: |
-          # Verify committed index.html matches what the build produces
-          if [ -f configurator/index.html ]; then
-            COMMITTED_SIZE=$(wc -c < configurator/index.html)
-            BUILT_SIZE=$(wc -c < configurator/dist/index.html)
-            DIFF=$((COMMITTED_SIZE - BUILT_SIZE))
-            if [ ${DIFF#-} -gt 100 ]; then
-              echo "::error::Committed configurator/index.html ($COMMITTED_SIZE bytes) differs from build output ($BUILT_SIZE bytes) by $DIFF bytes — run 'npm run build' in configurator/ and commit the result"
-              exit 1
-            fi
-            echo "Build freshness check passed (diff: $DIFF bytes)"
-          else
-            echo "::warning::No committed configurator/index.html found"
+          # `npm run build` overwrites configurator/index.html, so comparing it
+          # with dist/index.html after the build always passes. Compare the
+          # regenerated artifact with the checked-out file instead.
+          if ! git diff --quiet -- configurator/index.html; then
+            echo "::error::configurator/index.html is stale — run 'npm run build' in configurator/ and commit the regenerated standalone artifact"
+            git --no-pager diff --stat -- configurator/index.html
+            exit 1
           fi
+          echo "Committed standalone artifact matches the current source build"

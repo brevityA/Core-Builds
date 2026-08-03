@@ -108,9 +108,7 @@ function corsHeaders(request) {
 const PASTE_TTL = 30 * 24 * 60 * 60; // 30 days
 const PASTE_MAX_SIZE = 512 * 1024; // 512 KB
 
-let _cors = {};
-
-function json(status, body) {
+function json(status, body, cors = {}) {
   // Allow callers to pass response headers via a `headers` field without them leaking
   // into the JSON body (used for Cache-Control / no-store on sensitive/mutating routes).
   let data = body;
@@ -122,7 +120,7 @@ function json(status, body) {
   }
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ..._cors, ...(extraHeaders || {}) },
+    headers: { 'Content-Type': 'application/json', ...cors, ...(extraHeaders || {}) },
   });
 }
 
@@ -203,9 +201,12 @@ async function listByPrefix(kv, prefix) {
 
 export default {
   async fetch(request, env, ctx) {
-    _cors = corsHeaders(request);
+    // Keep CORS headers request-local. A module-global header object can be
+    // overwritten while an earlier async request is awaiting KV/upstream I/O.
+    const cors = corsHeaders(request);
+    const respond = (status, payload) => json(status, payload, cors);
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: _cors });
+      return new Response(null, { headers: cors });
     }
 
     const url = new URL(request.url);
@@ -214,9 +215,9 @@ export default {
     if (url.pathname === '/api/stats' && request.method === 'GET') {
       const statsIp = getClientIp(request);
       if (!(await rateAllow(env.RATELIMIT, 'stats', statsIp, STATS_PER_MIN, 60))) {
-        return json(429, { error: 'rate limit exceeded' });
+        return respond(429, { error: 'rate limit exceeded' });
       }
-      if (!env.STATS) return json(200, {});
+      if (!env.STATS) return respond(200, {});
       const keys = ['visits', 'generates', 'proxy_calls', 'proxy_errors', 'pastes_created', 'pastes_viewed'];
       const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
       const totals = {};
@@ -231,29 +232,29 @@ export default {
         listByPrefix(env.STATS, 'daily:'),
       ]);
 
-      return json(200, { ...totals, by_host: byHost, by_host_errors: byHostErrors, by_service: byService, by_device: byDevice, by_resolution: byResolution, daily, headers: { 'Cache-Control': 'public, max-age=60' } });
+      return respond(200, { ...totals, by_host: byHost, by_host_errors: byHostErrors, by_service: byService, by_device: byDevice, by_resolution: byResolution, daily, headers: { 'Cache-Control': 'public, max-age=60' } });
     }
 
     // --- Counter: increment visit ---
     if (url.pathname === '/api/visit' && request.method === 'POST') {
       const visitIp = getClientIp(request);
       if (!(await rateAllow(env.RATELIMIT, 'visit', visitIp, ANALYTICS_PER_MIN, 60))) {
-        return json(429, { error: 'rate limit exceeded' });
+        return respond(429, { error: 'rate limit exceeded' });
       }
       if (env.STATS) {
         const d = today();
         const v = await increment(env.STATS, 'visits');
         bgIncrement(ctx, env.STATS, `daily:visits:${d}`);
-        return json(200, { visits: v });
+        return respond(200, { visits: v });
       }
-      return json(200, { visits: 0 });
+      return respond(200, { visits: 0 });
     }
 
     // --- Counter: increment generate ---
     if (url.pathname === '/api/generate' && request.method === 'POST') {
       const genIp = getClientIp(request);
       if (!(await rateAllow(env.RATELIMIT, 'generate', genIp, ANALYTICS_PER_MIN, 60))) {
-        return json(429, { error: 'rate limit exceeded' });
+        return respond(429, { error: 'rate limit exceeded' });
       }
       if (env.STATS) {
         const d = today();
@@ -271,34 +272,34 @@ export default {
         } catch {}
 
         bgIncrementMulti(ctx, env.STATS, extra);
-        return json(200, { generates: v });
+        return respond(200, { generates: v });
       }
-      return json(200, { generates: 0 });
+      return respond(200, { generates: 0 });
     }
 
     // --- Contact: send message to Discord via webhook ---
     if (url.pathname === '/contact' && request.method === 'POST') {
       const webhookUrl = env.DISCORD_WEBHOOK_URL;
-      if (!webhookUrl) return json(500, { error: 'Contact not configured' });
+      if (!webhookUrl) return respond(500, { error: 'Contact not configured' });
 
       // Origin check (CSRF protection)
       const reqOrigin = request.headers.get('Origin') || '';
-      if (!ALLOWED_ORIGINS.has(reqOrigin)) return json(403, { error: 'Origin not allowed' });
+      if (!ALLOWED_ORIGINS.has(reqOrigin)) return respond(403, { error: 'Origin not allowed' });
 
       // Rate limit check (edge-wide via KV; in-memory map was per-isolate and useless at the edge)
       const contactIp = getClientIp(request) || 'unknown';
       if (!(await rateAllow(env.RATELIMIT, 'contact', contactIp, CONTACT_PER_HOUR, 3600))) {
-        return json(429, { error: 'Rate limit exceeded. Try again later.' });
+        return respond(429, { error: 'Rate limit exceeded. Try again later.' });
       }
 
       let body;
-      try { body = await request.json(); } catch { return json(400, { error: 'Invalid JSON' }); }
+      try { body = await request.json(); } catch { return respond(400, { error: 'Invalid JSON' }); }
 
       const { name, email, category, message, setup } = body;
-      if (!name || name.length < 1 || name.length > 100) return json(400, { error: 'Name must be 1-100 characters' });
-      if (!message) return json(400, { error: 'Message required' });
-      if (message.length > 2000) return json(400, { error: 'Message too long' });
-      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(400, { error: 'Invalid email format' });
+      if (!name || name.length < 1 || name.length > 100) return respond(400, { error: 'Name must be 1-100 characters' });
+      if (!message) return respond(400, { error: 'Message required' });
+      if (message.length > 2000) return respond(400, { error: 'Message too long' });
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return respond(400, { error: 'Invalid email format' });
 
       const safe = s => (s || '').replace(/[<>]/g, '').slice(0, 2000);
       const catColors = { Bug: 0xf87171, Feature: 0x00d4ff, Question: 0xfbbf24, Feedback: 0x34d399 };
@@ -330,59 +331,59 @@ export default {
         });
         if (res.ok || res.status === 204) {
           if (env.STATS) bgIncrement(ctx, env.STATS, 'contact_messages');
-          return json(200, { ok: true });
+          return respond(200, { ok: true });
         }
-        return json(502, { error: 'Discord rejected the message' });
+        return respond(502, { error: 'Discord rejected the message' });
       } catch (e) {
-        return json(502, { error: 'Failed to reach Discord' });
+        return respond(502, { error: 'Failed to reach Discord' });
       }
     }
 
     // --- Paste: store template ---
     if (url.pathname === '/paste' && request.method === 'POST') {
-      if (!env.TEMPLATES) return json(500, { error: 'KV not configured' });
+      if (!env.TEMPLATES) return respond(500, { error: 'KV not configured' });
       const pasteIp = getClientIp(request);
       if (!(await rateAllow(env.RATELIMIT, 'paste', pasteIp, PASTE_CREATE_PER_MIN, 60))) {
-        return json(429, { error: 'rate limit exceeded', headers: { ..._cors, ...NO_STORE } });
+        return respond(429, { error: 'rate limit exceeded', headers: NO_STORE });
       }
       const body = await readCapped(request, PASTE_MAX_SIZE);
       if (!body) {
-        return json(400, { error: body === null ? 'too large' : 'empty body' });
+        return respond(400, { error: body === null ? 'too large' : 'empty body' });
       }
       let parsed;
-      try { parsed = JSON.parse(body); } catch { return json(400, { error: 'invalid JSON' }); }
+      try { parsed = JSON.parse(body); } catch { return respond(400, { error: 'invalid JSON' }); }
       // Only accept template-shaped objects so the KV store isn't used as a generic dump.
       if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-        return json(400, { error: 'expected a JSON object' });
+        return respond(400, { error: 'expected a JSON object' });
       }
       const id = randomId();
       await env.TEMPLATES.put(`t:${id}`, body, { expirationTtl: PASTE_TTL });
       if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['pastes_created', `daily:pastes:${today()}`]);
       const pasteUrl = `${url.origin}/t/${id}`;
-      return json(200, { url: pasteUrl, headers: { ..._cors, ...NO_STORE } });
+      return respond(200, { url: pasteUrl, headers: NO_STORE });
     }
 
     // --- Paste: retrieve template ---
     if (url.pathname.startsWith('/t/') && request.method === 'GET') {
-      if (!env.TEMPLATES) return json(500, { error: 'KV not configured' });
+      if (!env.TEMPLATES) return respond(500, { error: 'KV not configured' });
       const id = url.pathname.slice(3);
-      if (!/^[a-z0-9]{6,20}$/.test(id)) return json(400, { error: 'invalid id' });
+      if (!/^[a-z0-9]{6,20}$/.test(id)) return respond(400, { error: 'invalid id' });
       const readIp = getClientIp(request);
       if (!(await rateAllow(env.RATELIMIT, 'paste_read', readIp, PASTE_READ_PER_MIN, 60))) {
-        return json(429, { error: 'rate limit exceeded', headers: { ..._cors, ...NO_STORE } });
+        return respond(429, { error: 'rate limit exceeded', headers: NO_STORE });
       }
       const val = await env.TEMPLATES.get(`t:${id}`);
-      if (!val) return json(404, { error: 'not found or expired' });
+      if (!val) return respond(404, { error: 'not found or expired' });
       if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_viewed');
       // no-store: pastes can carry a user's config — never let a shared CDN cache them.
       return new Response(val, {
-        headers: { 'Content-Type': 'application/json', ..._cors, ...NO_STORE },
+        headers: { 'Content-Type': 'application/json', ...cors, ...NO_STORE },
       });
     }
 
     // --- Proxy: forward to AIOStreams ---
     if (!url.pathname.startsWith('/proxy')) {
-      return json(404, { error: 'not found' });
+      return respond(404, { error: 'not found' });
     }
 
     const upstreamPath = url.pathname.slice('/proxy'.length);
@@ -391,21 +392,21 @@ export default {
     // here is always a clean absolute path — the host allowlist above is the real SSRF
     // control. This guard mainly rejects an empty path ("/proxy" with nothing after it).
     if (!upstreamPath || upstreamPath.includes('..') || !PROXY_PATH_RE.test(upstreamPath)) {
-      return json(403, { error: 'path not allowed' });
+      return respond(403, { error: 'path not allowed' });
     }
     if (!ALLOWED_METHODS.has(request.method)) {
-      return json(405, { error: 'method not allowed' });
+      return respond(405, { error: 'method not allowed' });
     }
 
     const host = url.searchParams.get('host');
     if (!host || !ALLOWED_HOSTS.has(host)) {
-      return json(403, { error: 'host not allowed' });
+      return respond(403, { error: 'host not allowed' });
     }
 
     // Per-IP rate limit on the proxy (open relays to allowed hosts are an amplification risk).
     const proxyIp = getClientIp(request);
     if (!(await rateAllow(env.RATELIMIT, 'proxy', proxyIp, ANALYTICS_PER_MIN * 2, 60))) {
-      return json(429, { error: 'rate limit exceeded', headers: { ..._cors, ...NO_STORE } });
+      return respond(429, { error: 'rate limit exceeded', headers: NO_STORE });
     }
 
     const upstreamSearch = url.searchParams.toString();
@@ -419,7 +420,7 @@ export default {
     let reqBody = undefined;
     if (request.method !== 'GET') {
       reqBody = await readCapped(request, PROXY_MAX_SIZE);
-      if (reqBody === null) return json(413, { error: 'request too large' });
+      if (reqBody === null) return respond(413, { error: 'request too large' });
     }
 
     const upstreamReq = new Request(upstreamUrl, {
@@ -436,7 +437,7 @@ export default {
       upstreamRes = await fetch(upstreamReq);
     } catch (e) {
       if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
-      return json(502, { error: 'upstream unreachable' });
+      return respond(502, { error: 'upstream unreachable' });
     }
 
     if (env.STATS) {
@@ -455,13 +456,13 @@ export default {
     const resBody = await readResponseCapped(upstreamRes, PROXY_RESP_MAX_SIZE);
     if (resBody === null) {
       if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
-      return json(502, { error: 'upstream response too large' });
+      return respond(502, { error: 'upstream response too large' });
     }
     return new Response(resBody, {
       status: upstreamRes.status,
       headers: {
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
-        ..._cors,
+        ...cors,
         ...NO_STORE,
       },
     });

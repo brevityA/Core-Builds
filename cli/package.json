@@ -1,6 +1,6 @@
 {
   "name": "core-builds",
-  "version": "2.87.0",
+  "version": "2.88.0",
   "description": "CLI for generating, validating, and diffing AIOStreams templates",
   "type": "module",
   "bin": {
@@ -26,7 +26,7 @@
     "url": "https://github.com/brevityA/Core-Builds/issues"
   },
   "scripts": {
-    "test": "node --test 'tests/**/*.test.mjs'"
+    "test": "node --test tests/*.test.mjs"
   },
   "engines": {
     "node": ">=20"

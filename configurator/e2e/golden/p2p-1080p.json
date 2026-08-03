@@ -10,7 +10,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "2.87"
+    "coreBuildsVersion": "2.88"
   },
   "config": {
     "trusted": false,
@@ -474,7 +474,8 @@
         "enabled": true,
         "options": {
           "name": "Peerflix",
-          "timeout": 6000
+          "timeout": 6000,
+          "useMultipleInstances": false
         },
         "resources": [
           "stream"

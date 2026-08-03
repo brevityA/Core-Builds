@@ -50,7 +50,7 @@ VALID = {
         'library','opensubtitles-v3-plus','aiosubtitle','newznab','torbox-search',
         'debridio','jackett','prowlarr','torrentio','torznab','custom',
         # Current AIOStreams/community preset identifiers used by the template suite.
-        'hdhub','torrents-db','sootio','neko-bt','animetosho','dmm-cast',
+        'hdhub','torrents-db','sootio','peerflix','subdl','neko-bt','animetosho','dmm-cast',
         'easynews','davex','nzbhydra','usenet-streamer','streamnzb'
     },
     'autoplay_attributes': {
@@ -171,6 +171,18 @@ def validate_template(fpath):
                 err(name, f"preset '{ptype}': name is required, got None")
         if ptype == 'aiosubtitle' and not opts.get('languages'):
             err(name, f"preset 'aiosubtitle': languages is required, got None")
+        # AIOStreams rejects Peerflix without this explicit boolean. `false` is
+        # valid and must not be checked with truthiness.
+        if ptype == 'peerflix' and not isinstance(opts.get('useMultipleInstances'), bool):
+            err(name, f"preset 'peerflix': useMultipleInstances must be a boolean, got {opts.get('useMultipleInstances')!r}")
+        if ptype == 'subdl':
+            language = opts.get('language')
+            if not isinstance(language, list) or not language or not all(isinstance(code, str) and code for code in language):
+                err(name, f"preset 'subdl': language must be a non-empty array, got {language!r}")
+            elif len(language) > 5:
+                err(name, f"preset 'subdl': language supports at most 5 values, got {len(language)}")
+            if opts.get('hearingImpairment') not in ('hiInclude', 'hiExclude', 'hiOnly'):
+                err(name, f"preset 'subdl': hearingImpairment must be hiInclude, hiExclude, or hiOnly")
 
     ok(name, f"presets: {len(c.get('presets', []))} total, "
              f"{sum(1 for p in c.get('presets', []) if p.get('enabled'))} enabled")

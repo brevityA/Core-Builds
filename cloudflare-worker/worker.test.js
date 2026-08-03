@@ -161,3 +161,37 @@ test('randomId: produces a 10-char id from the allowed alphabet', async () => {
   const id = url.split('/t/')[1];
   assert.match(id, /^[a-z0-9]{10}$/);
 });
+
+test('concurrent requests retain their own allowed CORS origin', async () => {
+  let unblockFirst;
+  const firstBlocked = new Promise(resolve => { unblockFirst = resolve; });
+  let firstReachedRateLimit;
+  const firstReached = new Promise(resolve => { firstReachedRateLimit = resolve; });
+
+  const slowEnv = {
+    RATELIMIT: {
+      get: async () => { firstReachedRateLimit(); await firstBlocked; return null; },
+      put: async () => {},
+    },
+  };
+  const fastEnv = {
+    RATELIMIT: { get: async () => null, put: async () => {} },
+  };
+  const ctx = { waitUntil: () => {} };
+
+  const first = worker.fetch(new Request('https://example.com/api/visit', {
+    method: 'POST',
+    headers: { Origin: 'http://localhost:3000', 'cf-connecting-ip': '203.0.113.1' },
+  }), slowEnv, ctx);
+  await firstReached;
+
+  const second = await worker.fetch(new Request('https://example.com/api/visit', {
+    method: 'POST',
+    headers: { Origin: 'http://localhost:8080', 'cf-connecting-ip': '203.0.113.2' },
+  }), fastEnv, ctx);
+  unblockFirst();
+  const firstResponse = await first;
+
+  assert.equal(firstResponse.headers.get('access-control-allow-origin'), 'http://localhost:3000');
+  assert.equal(second.headers.get('access-control-allow-origin'), 'http://localhost:8080');
+});

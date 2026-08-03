@@ -79,7 +79,11 @@ function buildSubtitlePresets(input) {
   const out = [];
   if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
   if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false, movieHashPlusAutoAdjustment:false } });
-  if (addons.includes('subdl')) out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, languages:langs, ...(input.credentials?.subdl ? { subDlApiKey:input.credentials.subdl } : {}) } });
+  if (addons.includes('subdl')) {
+    // AIOStreams SubDL accepts up to five uppercase provider language codes.
+    const subdlLanguages = [...new Set(langs.map(lang => String(lang).trim().toUpperCase()).filter(Boolean))].slice(0, 5);
+    out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, resources:['subtitles'], language:subdlLanguages, hearingImpairment:'hiInclude', ...(input.credentials?.subdl ? { subDlApiKey:input.credentials.subdl } : {}) } });
+  }
   return out;
 }
 
@@ -138,6 +142,7 @@ function buildPresets(input) {
   const optionalScrapers = input.optionalScrapers || [];
   const content = input.content || 'all';
   const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio';
+  const hasDebridio = isDebridio || (isMulti && multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && multiServices.includes('easynews');
   const hasExtraHttp = isMulti && multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && multiServices.includes('nzbgeek');
@@ -146,7 +151,7 @@ function buildPresets(input) {
 
   if (isHttp) return [
     { type:'sootio', instanceId:'sootio-core-builds', enabled:true, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000 }, resources:['stream'] },
+    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] },
     { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
@@ -181,7 +186,7 @@ function buildPresets(input) {
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(creds.streamnzb ? { url:creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(isDebridio ? [
+    ...(hasDebridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(creds.debridio ? { apiKey:creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
     ...(multiServices.includes('debrider') ? [
@@ -220,7 +225,7 @@ function buildPresets(input) {
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:false, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     { type:'sootio', instanceId:'sootio-core-builds', enabled:isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000 }, resources:['stream'] }] : []),
+    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...buildSubtitlePresets(input),
     ...buildCatalogPresets(input)
   ];

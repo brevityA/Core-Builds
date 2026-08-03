@@ -6,3 +6,24 @@ updates:
       interval: "monthly"
     commit-message:
       prefix: "chore"
+
+  - package-ecosystem: "npm"
+    directory: "/configurator"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+
+  - package-ecosystem: "npm"
+    directory: "/account-tools"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+
+  - package-ecosystem: "npm"
+    directory: "/cli"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"

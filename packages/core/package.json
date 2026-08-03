@@ -1,6 +1,6 @@
 {
   "name": "@core-builds/core",
-  "version": "2.87.0",
+  "version": "2.88.0",
   "description": "Shared template generation engine for Core Builds configurator and CLI",
   "type": "module",
   "main": "src/index.js",
@@ -14,5 +14,8 @@
     "src/"
   ],
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
 }

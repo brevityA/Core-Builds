@@ -210,6 +210,45 @@ class TestPresets:
         _, warnings, _ = validate_template(path)
         assert any("future-addon" in w and "unknown type" in w for w in warnings)
 
+    def test_peerflix_requires_explicit_use_multiple_instances_boolean(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "peerflix", "instanceId": "p1", "enabled": True,
+            "options": {"name": "Peerflix", "timeout": 7000}
+        }])
+        path = write_template(t)
+        errors, warnings, _ = validate_template(path)
+        assert not any("unknown type" in w for w in warnings)
+        assert any("peerflix" in e and "useMultipleInstances" in e for e in errors)
+
+    def test_peerflix_accepts_explicit_false_use_multiple_instances(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "peerflix", "instanceId": "p1", "enabled": True,
+            "options": {"name": "Peerflix", "timeout": 7000, "useMultipleInstances": False}
+        }])
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert not any("peerflix" in e for e in errors)
+
+    def test_subdl_requires_singular_language_array_and_hearing_impairment(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "subdl", "instanceId": "p1", "enabled": True,
+            "options": {"name": "SubDL", "languages": ["en"]}
+        }])
+        path = write_template(t)
+        errors, warnings, _ = validate_template(path)
+        assert not any("unknown type" in w for w in warnings)
+        assert any("subdl" in e and "language" in e for e in errors)
+        assert any("subdl" in e and "hearingImpairment" in e for e in errors)
+
+    def test_subdl_accepts_up_to_five_provider_language_codes(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "subdl", "instanceId": "p1", "enabled": True,
+            "options": {"name": "SubDL", "language": ["EN", "IT", "FR"], "hearingImpairment": "hiInclude"}
+        }])
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert not any("subdl" in e for e in errors)
+
     def test_stremthru_missing_timeout_errors(self, write_template, base_template):
         t = base_template(presets=[{
             "type": "stremthruStore", "instanceId": "p1", "enabled": True,

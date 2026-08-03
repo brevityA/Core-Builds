@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test 'tests/**/*.test.mjs'",
+    "test": "node --test tests/*.test.mjs",
     "test:e2e": "playwright test e2e/"
   },
   "devDependencies": {

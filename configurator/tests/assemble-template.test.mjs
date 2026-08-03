@@ -20,6 +20,13 @@ test('assembleTemplate applies only allowlisted migration fields', () => {
   assert.equal(result.config.secret, undefined);
 });
 
+test('migrationKeep writes parentConfig at the template root', () => {
+  const parentConfig = { uuid:'parent-id', password:'parent-password' };
+  const result = assembleTemplate({ config:{} }, { migrationKeep:{ parentConfig } });
+  assert.deepEqual(result.parentConfig, parentConfig);
+  assert.equal(result.config.parentConfig, undefined);
+});
+
 test('assembleTemplate filters disabled addons without mutating input', () => {
   const source = { config:{ presets:[{ instanceId:'a' }, { instanceId:'b' }] } };
   const result = assembleTemplate(source, {
@@ -28,6 +35,13 @@ test('assembleTemplate filters disabled addons without mutating input', () => {
   });
   assert.deepEqual(result.config.presets.map(p => p.instanceId), ['a']);
   assert.deepEqual(source.config.presets.map(p => p.instanceId), ['a','b']);
+});
+
+test('assembleTemplate rejects disabled addons without a matching predicate', () => {
+  assert.throws(
+    () => assembleTemplate({ config:{ presets:[{ instanceId:'a' }] } }, { disabledAddons:new Set(['a']) }),
+    /presetMatchesAddon function is required/
+  );
 });
 
 test('migrationKeep.presets cannot reintroduce disabled addons', () => {
