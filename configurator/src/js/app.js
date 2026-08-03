@@ -94,6 +94,22 @@ async function selectHealthyHost(timeout=4000) {
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
 const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const SENSITIVE_TOP_LEVEL_KEYS = new Set(['instancePassword', 'basePassword', 'stremioPassword']);
+
+function sanitizeSnapshotForStorage(raw) {
+  const out = {};
+  Object.keys(raw || {}).forEach((k) => {
+    if (SENSITIVE_TOP_LEVEL_KEYS.has(k)) return;
+    if (k === 'creds' && raw.creds && typeof raw.creds === 'object') {
+      const scrubbed = {};
+      Object.keys(raw.creds).forEach((ck) => { scrubbed[ck] = ''; });
+      out.creds = scrubbed;
+      return;
+    }
+    out[k] = raw[k];
+  });
+  return out;
+}
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
@@ -3469,7 +3485,7 @@ function renderAddonFetchFallback(name, reason, safeMsg) {
     `</div></div>`;
 }
 function renderConfigRejectedDispatch(safeMsg, apiDetail) {
-  try { const snap={}; SHARE_KEYS.forEach(k=>{snap[k]=S[k];}); snap._ver=CONFIGURATOR_VERSION; snap._ts=Date.now(); snap._reason='soft-fail-recovery'; const list=JSON.parse(localStorage.getItem('coreBuildBackups')||'[]'); list.unshift(snap); localStorage.setItem('coreBuildBackups',JSON.stringify(list.slice(0,10))); } catch(e) {}
+  try { const snap={}; SHARE_KEYS.forEach(k=>{snap[k]=S[k];}); const safeSnap = sanitizeSnapshotForStorage(snap); safeSnap._ver=CONFIGURATOR_VERSION; safeSnap._ts=Date.now(); safeSnap._reason='soft-fail-recovery'; const list=JSON.parse(localStorage.getItem('coreBuildBackups')||'[]'); list.unshift(safeSnap); localStorage.setItem('coreBuildBackups',JSON.stringify(list.slice(0,10))); } catch(e) {}
   const sim = (typeof _simulateAddonFail !== 'undefined' && _simulateAddonFail) ? parseAddonFetchError('Failed to fetch manifest for ' + _simulateAddonFail) : null;
   const afe = sim || parseAddonFetchError(apiDetail);
   if (afe) {
