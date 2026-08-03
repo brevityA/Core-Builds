@@ -26,6 +26,37 @@ const cssParts = await Promise.all(cssFiles.map(file => readFile(resolve(root, '
 const css = cssParts.join('\n');
 const hostKeys = Object.keys(HOST_BASE_URLS);
 
+function hasCspOrigin(html, expectedOrigin) {
+  const policies = [];
+  const metaTagRegex = /<meta\b[^>]*>/gi;
+  for (const tag of html.match(metaTagRegex) || []) {
+    const httpEquiv = tag.match(/\bhttp-equiv\s*=\s*["']?([^"'\s>]+)["']?/i)?.[1]?.toLowerCase();
+    if (httpEquiv !== 'content-security-policy') continue;
+    const content = tag.match(/\bcontent\s*=\s*(["'])([\s\S]*?)\1/i)?.[2];
+    if (content) policies.push(content);
+  }
+
+  const allowedOrigins = new Set();
+  for (const policy of policies) {
+    for (const rawDirective of policy.split(';')) {
+      const directive = rawDirective.trim();
+      if (!directive) continue;
+      const parts = directive.split(/\s+/).filter(Boolean);
+      for (const source of parts.slice(1)) {
+        try {
+          allowedOrigins.add(new URL(source).origin);
+        } catch {
+          // Ignore non-URL CSP source expressions such as 'self', data:, blob:, etc.
+        }
+      }
+    }
+  }
+
+  return allowedOrigins.has(expectedOrigin);
+}
+
+const hasCinebyeCspOrigin = hasCspOrigin(shell, 'https://cinebye.dinsden.top');
+
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
 const versions = JSON.parse(await readFile(resolve(repoRoot, 'versions.json'), 'utf8'));
 const appVer = app.match(/CONFIGURATOR_VERSION\s*=\s*'([^']+)'/)?.[1];
@@ -53,7 +84,7 @@ const checks = {
   'Core Tools links': app.includes('Back Up Addons') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
-  'Cinebye fallback allowed by CSP': app.includes('https://cinebye.dinsden.top') && shell.includes('https://cinebye.dinsden.top'),
+  'Cinebye fallback allowed by CSP': app.includes('https://cinebye.dinsden.top') && hasCinebyeCspOrigin,
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),
   'tutorial runtime': app.includes('function tutPositionTarget') && app.includes('Step 7 of 7'),
