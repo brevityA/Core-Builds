@@ -10,14 +10,32 @@ This page is regenerated from `configurator/src/data/changelog.js` by `scripts/s
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
 
-## Configurator v2.88 (Aug 2 2026)
+## Configurator v2.88 (Aug 3 2026)
 
 <CardGroup cols={2}>
-  <Card title="Account Manager promoted to available" icon="sparkles">
+  <Card title="Fixed: SubDL language schema rejection" icon="sparkles">
+    uses singular language field with uppercase provider codes, capped at 5 (#638)
+  </Card>
+  <Card title="Fixed: Debridio missing in multi-service configurations" icon="bolt">
+    preset now emits when multiServices includes debridio (#639)
+  </Card>
+  <Card title="Fixed: Peerflix schema rejection" icon="shield-check">
+    useMultipleInstances added to all generated presets
+  </Card>
+  <Card title="Import safety" icon="sliders">
+    credentials stripped from all public paste uploads before leaving the browser
+  </Card>
+  <Card title="Worker TEMPLATES KV binding" icon="gauge">
+    wrangler.toml now carries the active KV namespace for paste storage
+  </Card>
+  <Card title="Account Manager promoted to available" icon="wand">
     tools page card now links directly to the Account Manager
   </Card>
-  <Card title="Security: replaced Math.random() with crypto.getRandomValues() for session IDs and account generation (CodeQL #408)" icon="bolt">
+  <Card title="Security: replaced Math.random() with crypto.getRandomValues() for session IDs and account generation (CodeQL #408)" icon="layers">
     Security: replaced Math.random() with crypto.getRandomValues() for session IDs and account generation (CodeQL #408)
+  </Card>
+  <Card title="New CI workflow for shared core, CLI, account-tools, and Worker test suites" icon="bug">
+    New CI workflow for shared core, CLI, account-tools, and Worker test suites
   </Card>
 </CardGroup>
 
@@ -126,10 +144,6 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   <Card title="Fixed: UI layering" icon="bug">
     import dialog z-index, info card text clipping
   </Card>
-  <Card title="s New auto-generated from changelogs; changelog gate blocks merges without update'," icon="sparkles">
-    s New auto-generated from changelogs; changelog gate blocks merges without update',
-    
-  </Card>
 </CardGroup>
 
 ---
@@ -138,13 +152,13 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
 
 <CardGroup cols={2}>
   <Card title="Mixed · Adaptive resolution tier" icon="sparkles">
-    new fourth resolution option: no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend; dedicated PSE ladder (4K REMUX/HDR → 1080p → 720p → 576p/480p niche fallback), UHD-class regex tiers, blended dynamic-fetch exit, and import round-trip detection
+    new fourth resolution option: no hard caps, 4K/1440p/1080p/720p/SD all eligible, ranked by a cached × quality blend; dedicated PSE ladder (4K REMUX/HDR → 1080p → 720p → 576p/480p niche fallback), UHD-class regex tiers, blended dynamic-fetch exit, and important i18n tweaks
   </Card>
   <Card title="Apex Mixed PSE architecture" icon="bolt">
-    third architecture option (Standard / Apex IQR / Apex Mixed): the flagship 35-PSE IQR × adaptive stack from the 4K Apex Mixed nightly, generatable for any device/service; adopts the mixed resolution policy (no caps, quality-blend sort, blended DAF exit) and names builds 'Core Nexus Apex Mixed'. Golden-link test keeps it byte-identical to the static template
+    third architecture option (Standard / Apex IQR / Apex Mixed): the flagship 35-PSE IQR × adaptive stack from the 4K Apex Mixed nightly, generatable for any device/service; adopts the mixed resolution policy (no caps, quality-blend sort, blended DAF exit) and naming that preserves highest-quality remuxes
   </Card>
   <Card title="Golden config snapshots" icon="shield-check">
-    Playwright e2e drives the real generation pipeline across 12 service × resolution × architecture combinations and diffs full template output against checked-in goldens (e2e/golden/); any logic change that alters generated templates now fails CI, with UPDATE_GOLDEN=1 for intentional re-pins
+    Playwright e2e drives the real generation pipeline across 12 service × resolution × architecture combinations and diffs full template output against checked-in goldens (e2e/golden/); any local deviations are surfaced for triage
   </Card>
   <Card title="Fixed: Jackett & Prowlarr optional scraper presets were never generated (regression of the #557 filter fix, lost in the v2.84 modular rewrite)" icon="sliders">
     restored `credKey && !apiUrl` guard
