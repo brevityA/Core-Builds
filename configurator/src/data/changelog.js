@@ -1,7 +1,13 @@
 export const CHANGELOG = [
-  { v:'2.88', date:'Aug 2 2026', items:[
+  { v:'2.88', date:'Aug 3 2026', items:[
+    'Fixed: SubDL language schema rejection — uses singular language field with uppercase provider codes, capped at 5 (#638)',
+    'Fixed: Debridio missing in multi-service configurations — preset now emits when multiServices includes debridio (#639)',
+    'Fixed: Peerflix schema rejection — useMultipleInstances added to all generated presets',
+    'Import safety — credentials stripped from all public paste uploads before leaving the browser',
+    'Worker TEMPLATES KV binding — wrangler.toml now carries the active KV namespace for paste storage',
     'Account Manager promoted to available — tools page card now links directly to the Account Manager',
     'Security: replaced Math.random() with crypto.getRandomValues() for session IDs and account generation (CodeQL #408)',
+    'New CI workflow for shared core, CLI, account-tools, and Worker test suites',
   ]},
   { v:'2.87', date:'Aug 2 2026', items:[
     'Nuvio + TorBox Instant Quick Install — dedicated flow generates a P2P-only template with device/resolution/host pickers and TorBox Connected Services warning',
