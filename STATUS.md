@@ -15,10 +15,10 @@ Live status for all known public AIOStreams instances. Checked every 30 minutes 
 | **Yeb's** | 🟢 Online | [aiostreams.fortheweak.cloud](https://aiostreams.fortheweak.cloud/stremio/configure) |
 | **Midnight's** | 🟢 Online | [aiostreamsfortheweebsstable.midnightignite.me](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure) |
 | **Kuu's** | 🟢 Online | [aiostreams.stremio.ru](https://aiostreams.stremio.ru/stremio/configure) |
-| **ATBP** | 🔴 Offline | [aio.atbphosting.com](https://aio.atbphosting.com/stremio/configure) |
+| **ATBP** | 🟢 Online | [aio.atbphosting.com](https://aio.atbphosting.com/stremio/configure) |
 | **Omni's** | 🟢 Online | [aiostreams.12312023.xyz](https://aiostreams.12312023.xyz/stremio/configure) |
 
-*Last checked: 2026-08-03 09:31 UTC*
+*Last checked: 2026-08-03 14:25 UTC*
 <!-- STATUS_STABLE_END -->
 
 ---
@@ -29,11 +29,11 @@ Live status for all known public AIOStreams instances. Checked every 30 minutes 
 | Instance | Status | URL |
 |---|---|---|
 | **Yeb's Nightly** | 🟢 Online | [aiostreams-nightly.fortheweak.cloud](https://aiostreams-nightly.fortheweak.cloud/stremio/configure) |
-| **Midnight's Nightly** | 🟢 Online | [aiostreamsfortheweebs.midnightignite.me](https://aiostreamsfortheweebs.midnightignite.me/stremio/configure) |
+| **Midnight's Nightly** | 🔴 Offline | [aiostreamsfortheweebs.midnightignite.me](https://aiostreamsfortheweebs.midnightignite.me/stremio/configure) |
 | **Kuu's Nightly** | 🟢 Online | [aiostreams-nightly.stremio.ru](https://aiostreams-nightly.stremio.ru/stremio/configure) |
 | **Viren's Nightly** | 🟢 Online | [aiostreams.viren070.me](https://aiostreams.viren070.me/stremio/configure) |
 
-*Last checked: 2026-08-03 09:31 UTC*
+*Last checked: 2026-08-03 14:25 UTC*
 <!-- STATUS_NIGHTLY_END -->
 
 ---
