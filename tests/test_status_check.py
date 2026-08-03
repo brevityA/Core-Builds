@@ -216,3 +216,22 @@ class TestUpdateStatusMd:
         content = f.read_text()
         for name in status_check.NIGHTLY:
             assert name in content
+
+    def test_docs_mirror_is_updated_only_when_explicitly_requested(self, tmp_path):
+        status = tmp_path / "STATUS.md"
+        status.write_text(STATUS_TEMPLATE)
+        docs = tmp_path / "instance-status.mdx"
+        docs.write_text("""\
+{/* STATUS_STABLE_START */}
+old stable
+{/* STATUS_STABLE_END */}
+{/* STATUS_NIGHTLY_START */}
+old nightly
+{/* STATUS_NIGHTLY_END */}
+""")
+        with patch("status_check.check", return_value="🟢 Online"):
+            status_check.update_status_md(str(status), docs_path=str(docs))
+        content = docs.read_text()
+        assert "old stable" not in content
+        assert "old nightly" not in content
+        assert "Last checked:" in content

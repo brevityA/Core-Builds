@@ -1,0 +1,55 @@
+name: Supporting JavaScript CI
+
+on:
+  pull_request:
+    paths:
+      - 'account-tools/**'
+      - 'cli/**'
+      - 'packages/core/**'
+      - 'cloudflare-worker/**'
+      - 'versions.json'
+      - '.github/workflows/supporting-js-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'account-tools/**'
+      - 'cli/**'
+      - 'packages/core/**'
+      - 'cloudflare-worker/**'
+      - 'versions.json'
+      - '.github/workflows/supporting-js-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            account-tools/package-lock.json
+            cli/package-lock.json
+
+      - name: Test shared core
+        working-directory: packages/core
+        run: npm test
+
+      - name: Test CLI
+        working-directory: cli
+        run: |
+          npm ci
+          npm test
+
+      - name: Test account tools
+        working-directory: account-tools
+        run: |
+          npm ci
+          npm test
+
+      - name: Test Cloudflare worker
+        run: node --test cloudflare-worker/worker.test.js

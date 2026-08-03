@@ -17,6 +17,7 @@ import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
 import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
 import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
+import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
 import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
@@ -2599,7 +2600,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!S.subtitleAddons) S.subtitleAddons = ['aiosubtitle'];
       const idx = S.subtitleAddons.indexOf(val);
       if (idx >= 0) { if (S.subtitleAddons.length > 1) S.subtitleAddons.splice(idx, 1); }
-      else S.subtitleAddons.push(val);
+      else {
+        if (val === 'subdl' && (S.subtitleLangs || ['en']).length > 5) {
+          showToast('SubDL supports at most 5 subtitle languages — reduce the selection first', true);
+          return;
+        }
+        S.subtitleAddons.push(val);
+      }
       const on = S.subtitleAddons.includes(val);
       row.style.borderColor = on ? 'rgba(6,182,212,.35)' : 'rgba(255,255,255,.06)';
       row.style.background = on ? 'rgba(6,182,212,.05)' : 'transparent';
@@ -2624,7 +2631,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!S.subtitleLangs) S.subtitleLangs = ['en'];
       const idx = S.subtitleLangs.indexOf(val);
       if (idx >= 0) { if (S.subtitleLangs.length > 1) S.subtitleLangs.splice(idx, 1); }
-      else S.subtitleLangs.push(val);
+      else {
+        if ((S.subtitleAddons || []).includes('subdl') && S.subtitleLangs.length >= 5) {
+          showToast('SubDL supports at most 5 subtitle languages', true);
+          return;
+        }
+        S.subtitleLangs.push(val);
+      }
       const on = S.subtitleLangs.includes(val);
       btn.style.borderColor = on ? 'rgba(6,182,212,.4)' : 'rgba(255,255,255,.07)';
       btn.style.background = on ? 'rgba(6,182,212,.1)' : 'transparent';
@@ -3015,7 +3028,11 @@ function subtitlePresets() {
   const out = [];
   if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
   if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false, movieHashPlusAutoAdjustment:false } });
-  if (addons.includes('subdl')) out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, languages:langs, ...(S.creds.subdl ? { subDlApiKey:S.creds.subdl } : {}) } });
+  if (addons.includes('subdl')) {
+    // AIOStreams SubDL accepts up to five uppercase provider language codes.
+    const subdlLanguages = [...new Set(langs.map(lang => String(lang).trim().toUpperCase()).filter(Boolean))].slice(0, 5);
+    out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, resources:['subtitles'], language:subdlLanguages, hearingImpairment:'hiInclude', ...(S.creds.subdl ? { subDlApiKey:S.creds.subdl } : {}) } });
+  }
   return out;
 }
 
@@ -3051,6 +3068,7 @@ function defaultName() {
 function presets() {
   const svc = S.service;
   const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio';
+  const hasDebridio = isDebridio || (isMulti && S.multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && S.multiServices.includes('nzbgeek');
@@ -3058,7 +3076,7 @@ function presets() {
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
   if (isHttp) return [
     { type:'sootio', instanceId:'sootio-core-builds', enabled:true, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000 }, resources:['stream'] },
+    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] },
     { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
@@ -3092,7 +3110,7 @@ function presets() {
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(isDebridio ? [
+    ...(hasDebridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
     ...(S.multiServices.includes('debrider') ? [
@@ -3132,7 +3150,7 @@ function presets() {
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:false, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     { type:'sootio', instanceId:'sootio-core-builds', enabled:isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000 }, resources:['stream'] }] : []),
+    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...subtitlePresets(),
     ...catalogPresets()
   ];
@@ -5725,21 +5743,20 @@ function showFastLane() {
             metadata: { coreBuildsVersion: CONFIGURATOR_VERSION, generatedAt: new Date().toISOString() },
           });
           if (tmpl.metadata) { delete tmpl.metadata.generatedAt; }
-          const jsonStr = JSON.stringify(tmpl, null, 2);
+          // Nuvio uses the same public import-link transport as other routes;
+          // TMDB values carried from a previous setup must not be uploaded.
+          const jsonStr = JSON.stringify(sanitizeTemplateForRemoteImport(tmpl), null, 2);
           btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
-          let importUrl = null;
-          if (CORS_PROXY) {
-            try { const r = await fetchWithTimeout(`${CORS_PROXY}/paste`, { method:'POST', headers:{'Content-Type':'application/json'}, body:jsonStr }, 5000); if (r.ok) { const d = await r.json(); importUrl = d.url || null; } } catch(e) {}
-          }
-          if (!importUrl) {
-            try { const r = await fetchWithTimeout('https://paste.rs/', { method:'POST', headers:{'Content-Type':'text/plain'}, body:jsonStr }, 5000); if (r.ok) importUrl = (await r.text()).trim(); } catch(e) {}
-          }
+          const importUrl = await uploadJsonForImport(jsonStr);
           btn.disabled=false; btn.innerHTML='Create &amp; Install →';
           if (importUrl) {
             const nuvioChips = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>[HOST_LABEL_MAP[k]||k, HOST_BASE_URLS[k]+'/stremio/configure']);
             const chipHtml = nuvioChips.map(([n,u])=>`<a href="${u}?template=${encodeURIComponent(importUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${n}</a>`).join('');
+            const tmdbReminder = S.tmdbToken || S.tmdbApiKey
+              ? `<div style="margin-bottom:10px;padding:9px 12px;border-radius:8px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.16);font-size:.72rem;color:#c9d5df;line-height:1.5">${ICO.warn(12,'#fbbf24')} Your TMDB credential was removed from this public import link. Re-enter it in AIOStreams after import if you want metadata matching features.</div>`
+              : '';
             result.innerHTML = `<div class="import-success" style="margin-top:12px">
-              <div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.18)"><div style="font-size:.74rem;font-weight:700;color:#fb923c;margin-bottom:3px">${ICO.warn(12,'#fb923c')} Next step: connect TorBox</div><div style="font-size:.72rem;color:#c9d5df;line-height:1.5">Go to <strong style="color:#fb923c">Nuvio → Connected Services</strong> and connect your TorBox account there. Do <strong style="color:#f87171">not</strong> enter a TorBox API key in AIOStreams.</div></div>
+              <div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.18)"><div style="font-size:.74rem;font-weight:700;color:#fb923c;margin-bottom:3px">${ICO.warn(12,'#fb923c')} Next step: connect TorBox</div><div style="font-size:.72rem;color:#c9d5df;line-height:1.5">Go to <strong style="color:#fb923c">Nuvio → Connected Services</strong> and connect your TorBox account there. Do <strong style="color:#f87171">not</strong> enter a TorBox API key in AIOStreams.</div></div>${tmdbReminder}
               <strong style="color:#e6edf3">Tap a host to import your Nuvio template:</strong>
               <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap a host below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save<br><strong style="color:#e6edf3">4.</strong> Copy the manifest URL into Nuvio</div>
               <div class="inst-chips">${chipHtml}</div>
@@ -5794,7 +5811,7 @@ function buildSanitizedDiagnostics() {
     browser: navigator.userAgent,
     viewport: `${window.innerWidth}x${window.innerHeight}`,
     online: navigator.onLine,
-    settings: { service:S.service, multiServices:S.multiServices, device:S.device, resolution:S.resolution, audio:S.audio, cacheMode:S.cacheMode, streamPool:S.streamPool, formatter:S.formatter, installMode:S.installMode, instanceHost:S.instanceHost, quickProfile:S.quickProfile },
+    settings: { service:S.service, multiServices:S.multiServices, optionalScrapers:S.optionalScrapers, device:S.device, resolution:S.resolution, audio:S.audio, cacheMode:S.cacheMode, streamPool:S.streamPool, formatter:S.formatter, installMode:S.installMode, instanceHost:S.instanceHost, quickProfile:S.quickProfile },
     credentialPresence: Object.fromEntries(Object.entries(S.creds||{}).map(([k,v])=>[k,Boolean(v)])),
     templateWarnings: (()=>{try{return templateHealthCheck();}catch(e){return [e.message];}})(),
     hostCompatibility: hosts
@@ -6183,26 +6200,7 @@ function writeHostFetch(host, path, options, timeout) {
   return fetchWithTimeout(url, options, timeout);
 }
 
-async function uploadTemplateForImport() {
-  const tmpl = buildFinal();
-  if (tmpl.config) {
-    if (tmpl.config.services) tmpl.config.services = tmpl.config.services.map(s => ({ ...s, credentials: {} }));
-    if (Array.isArray(tmpl.config.presets)) tmpl.config.presets = tmpl.config.presets.map(p => {
-      if (p.options && p.options.apiKey) { const { apiKey, ...rest } = p.options; return { ...p, options: rest }; }
-      if (p.type === 'streamnzb' && p.options && p.options.url) { return { ...p, options: { ...p.options, url: '' } }; }
-      return p;
-    });
-  }
-  if (tmpl.parentConfig) tmpl.parentConfig = { ...tmpl.parentConfig, password: '' };
-  if (tmpl.config) {
-    delete tmpl.config.tmdbApiKey;
-    delete tmpl.config.tmdbToken;
-    if (Array.isArray(tmpl.config.presets)) tmpl.config.presets = tmpl.config.presets.map(p => {
-      if (p.options && p.options.tmdbApiKey) { const { tmdbApiKey, ...rest } = p.options; return { ...p, options: rest }; }
-      return p;
-    });
-  }
-  const jsonStr = JSON.stringify(tmpl, null, 2);
+async function uploadJsonForImport(jsonStr) {
   let url = null;
   if (CORS_PROXY) {
     try {
@@ -6223,6 +6221,11 @@ async function uploadTemplateForImport() {
     } catch(e) { console.warn("dpaste failed/timed out", e); }
   }
   return url;
+}
+
+async function uploadTemplateForImport() {
+  const template = sanitizeTemplateForRemoteImport(buildFinal());
+  return uploadJsonForImport(JSON.stringify(template, null, 2));
 }
 
 async function createImportUrl() {
@@ -6413,6 +6416,9 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
         out.metadata.id = 'core-custom-golden';             // sid() is random per build
       }
       return out;
+    },
+    diagnostics() {
+      return buildSanitizedDiagnostics();
     },
   };
 }

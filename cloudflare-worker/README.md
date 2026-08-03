@@ -40,7 +40,9 @@ cd cloudflare-worker
 
 # Create the KV namespace first
 npx wrangler kv namespace create TEMPLATES
-# Copy the printed id into wrangler.toml
+# In wrangler.toml, uncomment the TEMPLATES block and replace
+# <paste-kv-namespace-id> with the printed id. This binding is required:
+# without it /paste returns HTTP 500 "KV not configured".
 
 npx wrangler login
 npx wrangler deploy
@@ -49,11 +51,24 @@ npx wrangler deploy
 The deploy output prints your Worker's URL:
 `https://core-builds-cors-proxy.<your-subdomain>.workers.dev`
 
+After deployment, a harmless invalid-JSON probe should return **400** (not
+**500**), confirming the required KV binding is present:
+
+```bash
+curl -i -X POST 'https://<worker>.workers.dev/paste' \
+  -H 'Content-Type: application/json' --data 'not-json'
+```
+
 ## Wire it into the configurator
 
-1. Open `configurator/index.src.html` and set `CORS_PROXY` to the URL above.
-2. Rebuild the obfuscated bundle: `node configurator/build.js`.
-3. Commit both `index.src.html` and `index.html`.
+1. Set `CORS_PROXY` in `configurator/src/js/app.js` to the Worker URL above.
+2. Rebuild the published standalone configurator:
+   ```bash
+   cd configurator
+   npm ci
+   npm run build
+   ```
+3. Commit the source changes and regenerated `configurator/index.html`.
 
 Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 

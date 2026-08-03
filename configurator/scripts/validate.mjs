@@ -13,7 +13,7 @@ const required = [
   'src/index.html', 'src/styles/01-core.css', 'src/styles/02-brand-theme.css', 'src/styles/03-enhancements.css', 'src/styles/04-landing.css', 'src/styles/05-unified-ui.css', 'src/styles/06-features.css', 'src/styles/07-menu-parity.css', 'src/js/app.js',
   'src/data/devices.js', 'src/data/hosts.js', 'src/data/services.js',
   'src/data/scrapers.js', 'src/data/formatters.js', 'src/data/icons.js',
-  'src/data/changelog.js', 'src/data/credentials.js', 'src/config/schema-guard.js'
+  'src/data/changelog.js', 'src/data/credentials.js', 'src/config/schema-guard.js', 'src/core/import-template.js'
 ];
 await Promise.all(required.map(file => access(resolve(root, file))));
 
@@ -40,6 +40,7 @@ const checks = {
   'Apple TV AV1 conservative': !DEVICE_AV1_SAFE.has('appletv-new'),
   'ONN DV conservative': !DEVICE_DV_SAFE.has('onn'),
   'schema guard wired': app.includes("import { assembleTemplate }") || app.includes("import { sanitizeAioEnumArrays }"),
+  'remote import credential sanitizer wired': app.includes("sanitizeTemplateForRemoteImport(buildFinal())") && app.includes('JSON.stringify(sanitizeTemplateForRemoteImport(tmpl), null, 2)') && app.includes('async function uploadJsonForImport'),
   'credential registry': Object.keys(PROVIDER_CREDENTIALS).length >= 18 && app.includes("import { PROVIDER_CREDENTIALS }"),
   'quick install key links': app.includes('fastlane-get-key') && app.includes('PROVIDER_CREDENTIALS[key]'),
   'quick install optional TMDB': app.includes('data-fl-tmdb') && app.includes("tmdbField('tmdbToken')") && app.includes("tmdbField('tmdbApiKey'"),
@@ -52,6 +53,7 @@ const checks = {
   'Core Tools links': app.includes('Back Up Addons') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
+  'Cinebye fallback allowed by CSP': app.includes('https://cinebye.dinsden.top') && shell.includes('https://cinebye.dinsden.top'),
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),
   'tutorial runtime': app.includes('function tutPositionTarget') && app.includes('Step 7 of 7'),

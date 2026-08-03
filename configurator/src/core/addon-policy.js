@@ -26,7 +26,7 @@ export function addonPolicy(input = {}, presets = [], options = {}) {
       enabled: true,
       options: { ...(source.options || {}) },
     };
-    if ('timeout' in preset.options || options.applyTimeout !== false) {
+    if (options.applyTimeout !== false || !('timeout' in preset.options)) {
       preset.options.timeout = timeout;
     }
     normalized.push(preset);

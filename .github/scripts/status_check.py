@@ -73,7 +73,12 @@ def update_file(path, stable_table, nightly_table):
     print(f"✓ {path} updated")
 
 
-def update_status_md(path="STATUS.md"):
+def update_status_md(path="STATUS.md", docs_path=None):
+    """Refresh a status document and, optionally, its generated docs mirror.
+
+    Keeping the mirror explicit prevents unit tests that use a temporary status
+    file from unexpectedly overwriting the repository's docs page.
+    """
     ts = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M UTC")
 
     print("\nChecking stable instances...")
@@ -84,15 +89,15 @@ def update_status_md(path="STATUS.md"):
 
     update_file(path, stable_table, nightly_table)
 
-    docs_path = "docs/instance-status.mdx"
-    try:
-        update_file(docs_path, stable_table, nightly_table)
-    except FileNotFoundError:
-        print(f"  (skipped {docs_path} — not found)")
+    if docs_path:
+        try:
+            update_file(docs_path, stable_table, nightly_table)
+        except FileNotFoundError:
+            print(f"  (skipped {docs_path} — not found)")
 
     print(f"\nDone at {ts}")
 
 
 if __name__ == "__main__":
     path = sys.argv[1] if len(sys.argv) > 1 else "STATUS.md"
-    update_status_md(path)
+    update_status_md(path, docs_path="docs/instance-status.mdx")

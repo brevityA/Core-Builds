@@ -34,21 +34,24 @@ export function assembleTemplate(rawTemplate, options = {}) {
 
   if (options.migrationKeep && typeof options.migrationKeep === 'object') {
     for (const [key, value] of Object.entries(options.migrationKeep)) {
-      if (ALLOWED_MIGRATION_FIELDS.has(key)) config[key] = clone(value);
+      if (!ALLOWED_MIGRATION_FIELDS.has(key)) continue;
+      // AIOStreams expects parentConfig at the template root, not under config.
+      if (key === 'parentConfig') template.parentConfig = clone(value);
+      else config[key] = clone(value);
     }
   }
 
   if (options.disabledAddons?.size && Array.isArray(config.presets)) {
-    const matchFn = options.presetMatchesAddon;
-    if (typeof matchFn === 'function') {
-      const disabled = [...options.disabledAddons];
-      config.presets = config.presets.filter(
-        preset => !disabled.some(name => matchFn(preset, name))
-      );
+    if (typeof options.presetMatchesAddon !== 'function') {
+      throw new TypeError('presetMatchesAddon function is required when disabledAddons is set');
     }
+    const disabled = [...options.disabledAddons];
+    config.presets = config.presets.filter(
+      preset => !disabled.some(name => options.presetMatchesAddon(preset, name))
+    );
   }
 
-  sanitizeAioEnumArrays(config);
+  template.config = sanitizeAioEnumArrays(config);
 
   if (options.metadata && typeof options.metadata === 'object') {
     template.metadata = { ...(template.metadata || {}), ...clone(options.metadata) };
