@@ -61,6 +61,21 @@ const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
 const versions = JSON.parse(await readFile(resolve(repoRoot, 'versions.json'), 'utf8'));
 const appVer = app.match(/CONFIGURATOR_VERSION\s*=\s*'([^']+)'/)?.[1];
 
+const extractOriginsFromText = (text) => {
+  const matches = text.match(/https:\/\/[^\s"'`)<]+/g) || [];
+  const origins = new Set();
+  for (const raw of matches) {
+    try {
+      origins.add(new URL(raw).origin);
+    } catch {
+      // Ignore non-URL-like matches.
+    }
+  }
+  return origins;
+};
+
+const appOrigins = extractOriginsFromText(app);
+
 const checks = {
   'single current release': CHANGELOG[0]?.v === appVer && !CHANGELOG.some(x => x.v === '2.76'),
   'version consistency': appVer === CHANGELOG[0]?.v && pkg.version.startsWith(appVer + '.') && versions.configurator === pkg.version,
@@ -84,7 +99,7 @@ const checks = {
   'Core Tools links': app.includes('Back Up Addons') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
-  'Cinebye fallback allowed by CSP': app.includes('https://cinebye.dinsden.top') && hasCinebyeCspOrigin,
+  'Cinebye fallback allowed by CSP': appOrigins.has('https://cinebye.dinsden.top') && hasCinebyeCspOrigin,
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),
   'tutorial runtime': app.includes('function tutPositionTarget') && app.includes('Step 7 of 7'),
