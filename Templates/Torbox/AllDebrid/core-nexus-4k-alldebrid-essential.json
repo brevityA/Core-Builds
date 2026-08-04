@@ -5,7 +5,7 @@
     "description": "4K AllDebrid build with Essential-grade ESE stack. IQR Tukey fence PSEs, HDR/DV Priority, Usenet Propagation Guard, AI Upscale Exclusion, and availability-safe episode-pack fallback. No TorBox required — AllDebrid only.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

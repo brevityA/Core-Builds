@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. 4K build. Template directives: TorBox Search and exit thresholds configurable at import. Based on 4K Essential v0.5.0. v0.4.0: Private Tracker Kill, DAF fix, catalog-guarded Unknown Resolution/Quality Kills.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

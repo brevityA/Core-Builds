@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'2.89', date:'Aug 4 2026', items:[
+    'Fixed: episode-pack availability — multi-episode and season-pack streams were removed too early, before cache and quality filters ran; when those filters eliminated single-episode alternatives, valid requests could return zero streams. Packs are now hidden only after three playable standalone episodes survive all filtering.',
+    'Fixed: Core Tools hub restored — the complete tools page is back after a truncated deployment removed cards and closing markup',
+  ]},
   { v:'2.88', date:'Aug 3 2026', items:[
     'Fixed: SubDL language schema rejection — uses singular language field with uppercase provider codes, capped at 5 (#638)',
     'Fixed: Debridio missing in multi-service configurations — preset now emits when multiServices includes debridio (#639)',

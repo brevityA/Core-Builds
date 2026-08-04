@@ -5,7 +5,7 @@
     "description": "Bandwidth-optimised 1080p template for mobile and data-capped connections. 25 Mbps bitrate ceiling, 10 GB movie / 3 GB series size cap, SDR-preferred, no REMUX, no lossless audio. WEB-DL and WEBRip only.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

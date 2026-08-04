@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-builds-base",
     "name": "Core Builds Base Config",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Shared scraper + expression layer for all Core Builds templates. USAGE: (1) Import this file into AIOStreams to create the parent config and get its UUID. (2) In each child template, add: \"parentConfig\": {\"uuid\": \"PASTE_UUID_HERE\", \"password\": \"PASTE_PASSWORD_HERE\", \"mergeStrategies\": {\"presets\": \"extend\", \"services\": \"extend\", \"filters\": \"override\", \"sorting\": \"inherit\", \"formatter\": \"inherit\", \"branding\": \"override\", \"misc\": \"inherit\"}}. (3) Child template only needs: its service preset (stremthruTorz / stremthruStore), its PSEs, and its template-specific ESEs (Hard Resolution Kill, Score IQR Guard, DV-Only Kill, etc.). Scrapers, sort criteria, formatter, and universal ESEs all inherit from this parent. One update here propagates to all child templates instantly.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Core-Builds-Base-Config.json",
     "author": "Branding-Brevity",

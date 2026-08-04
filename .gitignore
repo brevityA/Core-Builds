@@ -52,3 +52,7 @@ configurator/node_modules/
 # Playwright artifacts
 configurator/test-results/
 configurator/playwright-report/
+
+# Docsalot local working copies
+docsalot-docs/
+docsalot-corebuilds/
