@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "docsalot-cli": {
+      "source": "/opt/node22/lib/node_modules/docsalot-cli/skills/docsalot-cli",
+      "sourceType": "local",
+      "computedHash": "b4bedb27a21031a524bd1a0448eed952edc6cef0520ed496febd6676c3aba0fe"
+    }
+  }
+}
