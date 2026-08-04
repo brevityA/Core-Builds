@@ -258,10 +258,6 @@
         "enabled": true
       },
       {
-        "expression": "/*ongoingSeasonPack*/((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]",
-        "enabled": true
-      },
-      {
         "expression": "/*Extra SeaDex*/count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1?merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)):[]",
         "enabled": true
       },
@@ -314,24 +310,20 @@
         "enabled": true
       },
       {
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/* CB | Kill Season Packs When Episodes Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, seasonPack(streams))) >= 3 ? negate(streams, seasonPack(streams, 'onlySeasons')) : []) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []",
-        "enabled": true
-      },
-      {
         "expression": "/* CB | Kill Episode Streams on Movie Queries */ queryType == \"movie\" ? keyword(streams, \"filename\", \"S01E\", \"S02E\", \"S03E\", \"S04E\", \"S05E\", \"S06E\", \"S07E\", \"S08E\", \"S09E\", \"S10E\", \"1x0\", \"2x0\", \"3x0\", \"E01\", \"E02\", \"E03\") : []",
         "enabled": true
       },
       {
         "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
         "enabled": true
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "preferredStreamExpressions": [

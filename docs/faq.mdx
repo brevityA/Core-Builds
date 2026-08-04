@@ -78,7 +78,7 @@ description: "Quick answers to the most common Core Builds questions."
   </Accordion>
 
   <Accordion title="The wrong episode is playing">
-    Fixed in v2.4.6. Two ESEs were added: `Kill Ambiguous Season Packs` blocks streams with only season info and no episode reference, and `Kill Season Packs When Episode Streams Exist` blocks full packs when individual episode streams are available. **Re-import** the latest template.
+    Confirm `seasonEpisodeMatching` is enabled with `strict: false`, then check the file name and episode label before playing. Current Core Builds templates keep matching multi-episode and season-pack streams only as an availability-safe fallback; they are hidden after three playable standalone episode streams survive the full filter stack. **Re-import** the latest template after this policy update.
   </Accordion>
 
   <Accordion title="Stream plays for a few seconds then stutters or stops">

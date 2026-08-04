@@ -16,7 +16,7 @@ A standalone quality scoring and filtering layer for AIOStreams — built around
 
 | File | Synced URL Field | Count | Purpose |
 |---|---|---|---|
-| `core-builds-eses.json` | `syncedExcludedStreamExpressionUrls` | 83 | Full fleet ESE superset — hard kills, quality gates, flood guards, and LABS expressions |
+| `core-builds-eses.json` | `syncedExcludedStreamExpressionUrls` | 81 | Full fleet ESE superset — hard kills, quality gates, flood guards, Labs expressions, and late episode-pack fallbacks |
 | `core-builds-pses.json` | `syncedPreferredStreamExpressionUrls` | 163 | All quality tiers — CB static, IQR Tukey fence, Hybrid TorBox-priority, pins, boosters, anime |
 | `core-builds-ises.json` | `syncedIncludedStreamExpressionUrls` | 8 | Cached passthrough, Library, REPACK/PROPER, SeaDex, English language, digitalRelease bypass |
 | `ranked-regex-patterns.json` | `syncedRankedRegexUrls` | 107 | Release group scoring — 10-tier system (+100 to −200) |
@@ -50,18 +50,18 @@ Each IQR tier has a TorBox-only twin PSE before it — `service(tier, 'torbox')`
 
 ---
 
-## ESE Categories (83 total)
+## ESE Categories (81 total)
 
 | Category | Count | Examples |
 |---|---|---|
-| Universal hard kills | 5 | CAM, External, Season Pack, Multi-Episode, Ambiguous Pack |
+| Universal hard kills | 5 | CAM, External, Late Pack Fallback (multi-episode), Late Pack Fallback (ambiguous season pack), Info & Other |
 | Quality gates | 12 | Low Bitrate, Low Seeders, Upscaled 4K, Bad BluRay, Bad Dual Audio |
 | Result management | 7 | Extra Cached HQ/LQ, Extra Uncached, Final Limit, Indexer Diversity, Flood Guard |
 | Adaptive guards | 4 | Score IQR Guard, Usenet Propagation, Bad NZBs, RD Copyright |
 | Device-specific | 2 | DV-Only Kill, No Sootio Library |
 | LABS experimental | 15 | perGroup() dedup, tier-guarded kills, Bitrate Floor, Adaptive Seeder Guard |
 | Synced external | 2 | Core Builds SEL Setup, Standard ESE |
-| Other | 36 | Resolution kills, foreign language, AI upscale, 3D, YouTube, anime-specific |
+| Other | 34 | Resolution kills, foreign language, AI upscale, 3D, YouTube, anime-specific |
 
 ---
 

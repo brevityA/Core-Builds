@@ -440,7 +440,7 @@ If you do add languages to `requiredLanguages`, always include `"Unknown"` — a
 | Wrong show or movie results appearing alongside correct ones | Increase `similarityThreshold` to `0.80`, confirm `yearMatching.tolerance` is not too high |
 | Older content (pre-2000) returning few results | Lower `similarityThreshold` to `0.65`, increase `yearMatching.tolerance` to `3`, confirm `seasonEpisodeMatching.strict` is `false` |
 | Anime returning wrong dubs or wrong shows | Lower `similarityThreshold` to `0.65`, ensure SeaDex ISE is enabled, ensure `preferredLanguages` includes `"Dubbed"` if dubs are wanted |
-| Series returning season packs instead of individual episodes | Confirm the `ongoingSeasonPack` ESE is enabled, check your TMDB API key is correctly set |
+| Series showing a season or multi-episode pack below single episodes | This is expected fallback behaviour. Core Builds hides packs only after three playable standalone episode streams survive all other filters. |
 
 ### Full Reference Config
 
@@ -559,14 +559,14 @@ Not sure of the exact catalog IDs? Add the Library addon from AIOStreams → Add
 
 ## TMDB & TVDB Keys
 
-AIOStreams uses TMDB (The Movie Database) for title matching, season detection, and metadata enrichment. Without a key, some features degrade silently — season pack filtering stops working, "continue watching" recommendations don't load, and some marketplace addons refuse to start.
+AIOStreams uses TMDB (The Movie Database) for title matching, air-date metadata, and metadata enrichment. Without a key, some features degrade silently — title matching can be less precise, "continue watching" recommendations may not load, and some marketplace addons refuse to start. Core Builds' late episode-pack fallback does not depend on a TMDB key.
 
 ### Why You Need a TMDB Key
 
 | Feature | Requires TMDB |
 |---|---|
 | Title matching accuracy | Yes |
-| Season detection (`ongoingSeasonPack` ESE) | Yes |
+| Air-date-aware matching and metadata | Yes |
 | "Recommended" content in catalogs | Yes |
 | Episode air date awareness | Yes |
 | Some marketplace addons | Yes |
@@ -623,10 +623,10 @@ If you're only using Core Builds templates with TorBox, you can leave the TVDB f
 ### Troubleshooting
 
 <AccordionGroup>
-  <Accordion title="Season packs showing when they shouldn't">
-    The `ongoingSeasonPack` ESE uses TMDB data to detect whether a show is currently airing. If your TMDB token is missing or invalid, this ESE stops working — season packs may appear alongside individual episode streams.
+  <Accordion title="A season or multi-episode pack is showing">
+    Core Builds keeps matching packs as an availability-safe fallback. It hides them only after three playable standalone episode streams survive every other filter. This prevents the old failure mode where a valid pack was removed and no streams remained.
 
-    Fix: enter your TMDB Read Access Token in the Metadata section and save.
+    If you specifically want only single-episode files, use the AIOStreams filter editor after confirming that several playable singles are available for the episode.
   </Accordion>
   <Accordion title='"Recommended" catalog is empty'>
     The Recommended tab in Stremio pulls TMDB recommendation data. Without a valid token, it returns nothing.
