@@ -30,7 +30,11 @@ const { code: css } = await transform(rawCss, { loader: 'css', minify: true, tar
 await writeFile(resolve(assets, 'app.css'), css);
 await copyFile(resolve(src, 'vendor/qrcode.min.js'), resolve(assets, 'qrcode.min.js'));
 
-const shell = await readFile(resolve(src, 'index.html'), 'utf8');
+const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+const displayVersion = pkg.version.replace(/\.0$/, '');
+const rawShell = await readFile(resolve(src, 'index.html'), 'utf8');
+if (!rawShell.includes('__CB_VERSION__')) throw new Error('Source index.html is missing the __CB_VERSION__ placeholder');
+const shell = rawShell.replace(/__CB_VERSION__/g, displayVersion);
 const js = await readFile(jsOut, 'utf8');
 const qr = await readFile(resolve(src, 'vendor/qrcode.min.js'), 'utf8');
 const digest = value => createHash('sha256').update(value).digest('hex').slice(0, 12);

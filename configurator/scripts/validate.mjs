@@ -98,6 +98,7 @@ const checks = {
   'partial exports': app.includes('const PARTIAL_EXPORT_FIELDS') && app.includes("credentials:{}") && app.includes("exportPartial(el.dataset.kind)"),
   'Core Tools links': app.includes('Back Up Addons') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
+  'version badge placeholder': shell.includes('v__CB_VERSION__') && !(/v\d+\.\d+<\/span>/.test(shell)),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
   'Cinebye fallback allowed by CSP': appOrigins.has('https://cinebye.dinsden.top') && hasCinebyeCspOrigin,
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
