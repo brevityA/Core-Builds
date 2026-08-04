@@ -7,7 +7,7 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.88"
+        "coreBuildsVersion": "2.89"
       },
       "counts": {
         "preferredStreamExpressions": 16,
@@ -238,7 +238,7 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.88"
+        "coreBuildsVersion": "2.89"
       },
       "counts": {
         "preferredStreamExpressions": 20,
@@ -481,7 +481,7 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.88"
+        "coreBuildsVersion": "2.89"
       },
       "counts": {
         "preferredStreamExpressions": 23,
@@ -740,7 +740,7 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.88"
+        "coreBuildsVersion": "2.89"
       },
       "counts": {
         "preferredStreamExpressions": 37,
@@ -1055,7 +1055,7 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.88"
+        "coreBuildsVersion": "2.89"
       },
       "counts": {
         "preferredStreamExpressions": 21,
@@ -1302,7 +1302,7 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.88"
+        "coreBuildsVersion": "2.89"
       },
       "counts": {
         "preferredStreamExpressions": 37,

@@ -5,7 +5,7 @@
     "description": "4K template tuned for the Google TV Streamer (2024). DV, HDR10+, HDR10, HLG all supported. AV1 hardware decode enabled. Lossless audio excluded (TrueHD, DTS-HD MA, DTS:X, FLAC) — DD+ Atmos is the audio ceiling. Audio channels capped at 5.1. Based on Core Nexus 4K Apex with full IQR Tukey fence PSE stack, Score IQR Guard, elite group pins, and perGroup() Extra Cached.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

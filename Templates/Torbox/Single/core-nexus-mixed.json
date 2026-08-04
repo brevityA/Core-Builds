@@ -5,7 +5,7 @@
     "description": "Adaptive multi-resolution build for niche and mixed libraries. No hard resolution caps — 4K, 1440p, 1080p, 720p and SD tiers all stay eligible and are ranked by a cached × quality blend (availability first, encode quality second, resolution third). 4K BluRay REMUX and HDR WEB-DL tiers sit above the 1080p ladder, with 576p/480p niche fallbacks for classic and rare content that never surfaces in capped templates. Full ranked regex scoring (Common + UHD tiers), live-synced ESEs/PSEs, and a blended dynamic-fetch exit. Pairs with any device profile.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "category": "Mixed",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

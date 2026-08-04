@@ -5,7 +5,7 @@
     "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, TorBox Search, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.9",
+    "version": "2.10.10",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

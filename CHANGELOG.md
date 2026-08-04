@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.5.3 (2026-08-04)
+
+### Fixed
+- **Episode-pack availability** — multi-episode and season-pack streams were previously removed by an early exclusion filter before cache, quality, score, and result-limit filters had run. When those later filters eliminated the single-episode alternatives, valid TV episode requests could return zero streams. Late fallback rules now hide packs only after three playable standalone episode streams survive all prior filtering.
+- **Core Tools hub restored** — a truncated generated deployment had removed several tool cards and the closing markup from the Core Tools page. The full page is restored with Template Builder, Addon Backup, Template Inspector, Health Score, Troubleshooter, Account Manager, and CLI Tool.
+
 ## 3.5.2 (2026-08-02)
 
 ### Added

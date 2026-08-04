@@ -5,7 +5,7 @@
     "description": "Firestick and budget Android TV optimised build. Hard SDR-only enforcement — excludes Dolby Vision, HDR10+, HDR10, HLG, and 10-bit content that causes playback failures or tone-mapping artifacts on Fire TV hardware. AV1 excluded. TrueHD/Atmos/lossless audio excluded. 1080p + 720p · WEB-DL/WEBRip · TorBox Essential. Single TorBox subscription required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.8",
+    "version": "2.10.9",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

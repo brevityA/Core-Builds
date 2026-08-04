@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) — optional scrapers (MediaFusion, SeaDex) toggled at import; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. v0.10.0: Private Tracker Kill (uncached private streams), DAF totalCachedStreams fix, Unknown Resolution/Quality Kill catalog exemption (15y+ content). Based on Stream.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
