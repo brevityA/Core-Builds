@@ -111,7 +111,7 @@ test('active checked-in templates contain no destructive pack or multi-episode E
     const template = JSON.parse(readFileSync(path, 'utf8'));
     const expressions = template.config?.excludedStreamExpressions || [];
     const legacy = expressions
-      .map(entry => entry?.expression || '')
+      .map(entry => typeof entry === 'string' ? entry : entry?.expression || '')
       .filter(expression => LEGACY_PACK_ESE_MARKERS.some(marker => expression.includes(marker)));
     assert.deepEqual(legacy, [], `${path} contains a legacy destructive pack ESE`);
   }

@@ -290,7 +290,12 @@ def validate_template(fpath):
     ok(name, f"expressions: {ise_count} ISEs, {ese_count} ESEs, {pse_count} PSEs")
 
     for entry in excluded_eses:
-        expression = entry.get('expression', '') if isinstance(entry, dict) else ''
+        if isinstance(entry, str):
+            expression = entry
+        elif isinstance(entry, dict):
+            expression = entry.get('expression', '')
+        else:
+            continue
         legacy_marker = next((marker for marker in LEGACY_DESTRUCTIVE_PACK_ESE_MARKERS
                               if marker in expression), None)
         if legacy_marker and not is_deprecated:

@@ -12,6 +12,14 @@ def test_legacy_pack_ese_is_a_validation_error(write_template, base_template):
     assert any("legacy destructive pack ESE" in error for error in errors)
 
 
+def test_bare_string_legacy_pack_ese_is_a_validation_error(write_template, base_template):
+    path = write_template(base_template(excludedStreamExpressions=[
+        "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series') ? multiEpisode(streams) : []",
+    ]))
+    errors, _, _ = validate_template(path)
+    assert any("legacy destructive pack ESE" in error for error in errors)
+
+
 def test_late_pack_fallback_is_allowed(write_template, base_template):
     path = write_template(base_template(excludedStreamExpressions=[{
         "enabled": True,
