@@ -280,26 +280,6 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-      },
-      {
-        "enabled": true,
         "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
       },
       {
@@ -365,6 +345,14 @@ export const SEL_POLICY_DATA = {
       {
         "enabled": true,
         "expression": "/* P2P Kill */ type(streams,'p2p')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "rankedStreamExpressions": [],
@@ -522,26 +510,6 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-      },
-      {
-        "enabled": true,
         "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
       },
       {
@@ -603,6 +571,14 @@ export const SEL_POLICY_DATA = {
       {
         "enabled": true,
         "expression": "/* P2P Kill */ type(streams,'p2p')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "rankedStreamExpressions": [],
@@ -776,26 +752,6 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-      },
-      {
-        "enabled": true,
         "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
       },
       {
@@ -857,6 +813,14 @@ export const SEL_POLICY_DATA = {
       {
         "enabled": true,
         "expression": "/* P2P Kill */ type(streams,'p2p')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "rankedStreamExpressions": [],
@@ -1086,26 +1050,6 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-      },
-      {
-        "enabled": true,
         "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
       },
       {
@@ -1167,6 +1111,14 @@ export const SEL_POLICY_DATA = {
       {
         "enabled": true,
         "expression": "/* P2P Kill */ type(streams,'p2p')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "rankedStreamExpressions": [],
@@ -1328,26 +1280,6 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-      },
-      {
-        "enabled": true,
         "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
       },
       {
@@ -1409,6 +1341,14 @@ export const SEL_POLICY_DATA = {
       {
         "enabled": true,
         "expression": "/* P2P Kill */ type(streams,'p2p')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "rankedStreamExpressions": [],
@@ -1638,26 +1578,6 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-      },
-      {
-        "enabled": true,
-        "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-      },
-      {
-        "enabled": true,
         "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
       },
       {
@@ -1719,6 +1639,14 @@ export const SEL_POLICY_DATA = {
       {
         "enabled": true,
         "expression": "/* P2P Kill */ type(streams,'p2p')"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "rankedStreamExpressions": [],

@@ -104,3 +104,21 @@ def test_tools_whatsnew_matches_config_changelog():
     assert top and top in page, f"top configurator version {top} not reflected in tools/index.html"
     # the page must link to the configurator changelog (the missing-link bug report)
     assert "Full Configurator changelog" in page or "#changelog" in page, "tools page missing changelog link"
+
+
+def test_tools_page_keeps_complete_tool_cards():
+    """The managed What's New replacement must never truncate the static tool hub."""
+    page = (ROOT / "tools" / "index.html").read_text()
+    assert "... (truncated for brevity) ..." not in page
+    for label in (
+        "Template Builder",
+        "Addon Backup",
+        "Template Inspector",
+        "Health Score",
+        "Troubleshooter",
+        "Account Manager",
+        "CLI Tool",
+    ):
+        assert label in page
+    assert "</main>" in page
+    assert "</html>" in page

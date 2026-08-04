@@ -670,10 +670,6 @@
       },
       {
         "enabled": true,
-        "expression": "/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]"
-      },
-      {
-        "enabled": true,
         "expression": "/* Auto-Hide SD */ count(resolution(streams,'1080p'))>=5 and count(resolution(streams,'720p'))>=5 ? resolution(streams,'480p','360p','SD') : []"
       },
       {
@@ -695,6 +691,14 @@
       {
         "enabled": true,
         "expression": "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "includedStreamExpressions": [

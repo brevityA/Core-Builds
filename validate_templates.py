@@ -71,6 +71,21 @@ REVIEWED_NO_ZERO_CACHED = {
     'core-nexus-dual-core-1080p',
 }  # Deprecated dual-core configs are retained only for archive compatibility.
 
+# These early ESEs were intended to de-clutter episode results, but can remove
+# the only playable multi-episode/season-pack stream before later quality and
+# cache filters remove the supposedly better singles. Use the late fallback
+# pair instead, after all other ESEs.
+LEGACY_DESTRUCTIVE_PACK_ESE_MARKERS = (
+    'ongoingSeasonPack',
+    'Hard Season Pack Kill',
+    'Kill Ambiguous Packs',
+    'Kill Multi-Episode',
+    'Clutter-Free Single Episode Booster',
+    'Weekly Ongoing Series Pack Filter',
+    'Kill Season Packs When Episodes Exist',
+    'Season Pack Kill — latestSeason-aware',
+)
+
 
 def validate_list(values, valid_set):
     """Return a list of values that are not present in valid_set."""
@@ -80,7 +95,9 @@ def validate_list(values, valid_set):
 def validate_template(fpath):
     """Validate a single template file. Returns (errors, warnings, passes)."""
     errors, warnings, passes = [], [], []
-    name = Path(fpath).stem
+    path = Path(fpath)
+    name = path.stem
+    is_deprecated = 'Deprecated' in path.parts
 
     def err(template, msg):  errors.append(f"  ✗ [{template}] {msg}")
     def warn(template, msg): warnings.append(f"  ⚠ [{template}] {msg}")
@@ -267,9 +284,17 @@ def validate_template(fpath):
 
     # ── ISEs / ESEs ───────────────────────────────────────────
     ise_count = len(c.get('includedStreamExpressions', []))
-    ese_count = len(c.get('excludedStreamExpressions', []))
+    excluded_eses = c.get('excludedStreamExpressions', [])
+    ese_count = len(excluded_eses)
     pse_count = len(c.get('preferredStreamExpressions', []))
     ok(name, f"expressions: {ise_count} ISEs, {ese_count} ESEs, {pse_count} PSEs")
+
+    for entry in excluded_eses:
+        expression = entry.get('expression', '') if isinstance(entry, dict) else ''
+        legacy_marker = next((marker for marker in LEGACY_DESTRUCTIVE_PACK_ESE_MARKERS
+                              if marker in expression), None)
+        if legacy_marker and not is_deprecated:
+            err(name, f"excludedStreamExpressions contains legacy destructive pack ESE '{legacy_marker}' — use the late pack fallback policy")
 
     has_zero_cached = any('0Cached' in e.get('expression', '')
                           for e in c.get('includedStreamExpressions', []))

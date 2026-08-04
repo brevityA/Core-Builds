@@ -536,13 +536,17 @@ service(size(bitrate(STREAMS, IQR_LO, IQR_HI), '15GB'), 'torbox')
 ```
 Returns `[]` if no TorBox streams match → falls through to the all-service PSE.
 
-### ongoingSeason PSE (all active templates)
+### Late episode-pack fallback (all active templates)
+
+Pack filtering must be the final ESE step. Never hard-remove season packs or multi-episode files before later quality, cache, and result-limit ESEs have run: doing so can leave a valid episode request with zero streams.
+
+```javascript
+/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */
+(queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3)
+  ? multiEpisode(streams) : []
 ```
-/*ongoingSeasonPack*/
-((queryType=='series' or queryType=='anime.series') and ongoingSeason 
-  and (daysSinceLastAired < -1 or daysUntilNextEpisode >= 0))
-? seasonPack(streams, 'onlySeasons') : []
-```
+
+The paired ambiguous-season-pack expression uses the same three surviving standalone episodes threshold. AIOStreams season/episode matching remains responsible for verifying that a kept pack contains the requested episode.
 
 ---
 
@@ -616,7 +620,7 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-buil
 
 **URLs auto-whitelisted when added:**
 - `Filtering/ranked-regex-patterns.json` — 107 scored regex patterns (via `syncedRankedRegexUrls`)
-- `Filtering/core-builds-eses.json` — 83 ESEs, full fleet superset (via `syncedExcludedStreamExpressionUrls`)
+- `Filtering/core-builds-eses.json` — 81 ESEs, full fleet superset (via `syncedExcludedStreamExpressionUrls`)
 - `Filtering/core-builds-ises.json` — 8 ISEs (via `syncedIncludedStreamExpressionUrls`)
 - `Filtering/core-builds-pses.json` — 163 PSEs, all architectures (via `syncedPreferredStreamExpressionUrls`)
 - Vidhin05's `regexes.json` (via `syncedRankedRegexUrls`, already whitelisted on most instances)

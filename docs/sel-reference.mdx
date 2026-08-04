@@ -36,23 +36,19 @@ Ensures that full Dolby audio formats (Atmos, TrueHD, DD+) are prioritised on so
 ```
 * **Why it helps**: Prevents users from accidentally playing high-bitrate DTS or DTS-HD MA tracks on hardware that doesn't support them, eliminating silent playback errors.
 
-### 📅 Weekly Ongoing Series Pack Filter
-Automatically identifies if a TV show is currently airing. If true, it filters out incomplete season packs (e.g. S01 containing only episodes 1–5), ensuring only individual, freshly working single-episode files are displayed.
-* **Type**: Excluded Stream Expression (ESE)
-* **The Code**:
-```javascript
-/* Weekly Ongoing Series Pack Filter */ ((queryType == 'series' or queryType == 'anime.series') and ongoingSeason) ? seasonPack(streams) : []
-```
-* **Why it helps**: Prevents manifest parsing crashes and buffering loops caused by tapping incomplete, newly uploaded season packs.
+### 🗂️ Late Episode-Pack Fallback
+Core Builds keeps matching multi-episode files and ambiguous season packs available until the final ESE stage. They are hidden only when **three playable standalone episode streams** have survived every preceding quality, cache, language, and result-limit filter.
 
-### 🗂️ Clutter-Free Single Episode Booster
-Hides multi-episode spam files (like "Episodes 1-4" in a single file) on individual Stremio episode pages when at least 3 dedicated, single-episode files are already available.
-* **Type**: Excluded Stream Expression (ESE)
+* **Type**: Excluded Stream Expressions (ESEs), evaluated last
 * **The Code**:
 ```javascript
-/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []
+/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */
+(queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []
+
+/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */
+(queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []
 ```
-* **Why it helps**: Keeps your stream pool clean and direct, preventing users from opening compilation files that start playing from Episode 1.
+* **Why it helps**: keeps ordinary episode lists tidy when clean singles exist, while avoiding the worse failure mode where a valid matching pack is removed before later filters remove the supposed alternatives. AIOStreams season/episode matching still verifies whether a pack contains the requested episode.
 
 ---
 

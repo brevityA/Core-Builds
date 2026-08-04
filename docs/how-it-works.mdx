@@ -17,9 +17,9 @@ When you hit play in Stremio, a lot happens in under a second.
     Without Core Builds, this already produces 50–200+ results in no particular order.
   </Step>
   <Step title="ESEs remove junk">
-    **Excluded Stream Expressions** run first. Streams matching any ESE are removed entirely before ranking starts. Core Builds standard ESEs kill: CAM recordings, YouTube rips, 3D streams, sub-720p resolutions, season packs on episode queries, bad NZBs, foreign-language-only streams, bad dual audio groups, low-seeder torrents, and more.
+    **Excluded Stream Expressions** remove unusable or lower-value streams before ranking starts: CAM recordings, YouTube rips, 3D streams, bad NZBs, foreign-language-only streams, bad dual-audio groups, low-seeder torrents, and more. Matching episode packs are treated as an availability-safe fallback: they are hidden only after three playable standalone episode results survive the rest of the filter stack.
 
-    Standard: 27–31 ESEs. Lite: 13–17 (hard kills only — no quality gates).
+    The exact ESE count varies by template family. Lite variants remove selected quality gates for broader coverage.
   </Step>
   <Step title="ISEs boost priority streams">
     **Included Stream Expressions** pin certain streams to the top of the sorted list regardless of ranking. Core Builds ISEs boost: streams from your library (continue watching), cached streams, REPACK/PROPER releases, and SeaDex-verified anime.
@@ -83,7 +83,7 @@ ESEs run first, then ISEs, then PSEs. A stream matched by an ESE never reaches P
 
 ## Why Lite Returns More Results
 
-Lite templates remove the quality-gate ESEs (low bitrate, low seeders, upscaled 4K, bad BluRay encodes, bad dual audio, indexer diversity caps). Only hard kills remain (CAM, YouTube, season packs, foreign language, bad NZBs). More results come through — but without quality filtering, some bad encodes will appear.
+Lite templates remove selected quality-gate ESEs (low bitrate, low seeders, upscaled 4K, bad BluRay encodes, bad dual audio, indexer diversity caps). Safety filters remain for CAM, YouTube, foreign-language-only streams, and bad NZBs. Episode packs use the same availability-safe fallback policy rather than being hard-killed. More results come through — but without quality filtering, some bad encodes will appear.
 
 Use Lite when: your library is thin, you're on a shared host, or you're debugging why a specific title returns no results on the standard template.
 

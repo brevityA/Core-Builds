@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-30T12:29:44.004Z",
+  "generatedAt": "2026-08-03T22:33:27.330Z",
   "source": "configurator/e2e/golden",
   "targets": {
     "standard": {
@@ -7,17 +7,17 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.86"
+        "coreBuildsVersion": "2.88"
       },
       "counts": {
         "preferredStreamExpressions": 16,
         "includedStreamExpressions": 5,
-        "excludedStreamExpressions": 31,
+        "excludedStreamExpressions": 28,
         "rankedStreamExpressions": 0,
         "resultLimits": 1,
         "dynamicAddonFetching": 1
       },
-      "hash": "0da38237b29b8716e5826c8da977a6580c866b15c0a50a3ca3cd24f170d40e5e",
+      "hash": "bc8c7f1c519b7d1332a7161c7d21028ef7fcdf718a7014cbcfbcfd72e206675b",
       "policy": {
         "preferredStreamExpressions": [
           {
@@ -146,26 +146,6 @@
           },
           {
             "enabled": true,
-            "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-          },
-          {
-            "enabled": true,
             "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
           },
           {
@@ -231,6 +211,14 @@
           {
             "enabled": true,
             "expression": "/* P2P Kill */ type(streams,'p2p')"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
           }
         ],
         "rankedStreamExpressions": [],
@@ -250,17 +238,17 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.86"
+        "coreBuildsVersion": "2.88"
       },
       "counts": {
         "preferredStreamExpressions": 20,
         "includedStreamExpressions": 5,
-        "excludedStreamExpressions": 30,
+        "excludedStreamExpressions": 27,
         "rankedStreamExpressions": 0,
         "resultLimits": 1,
         "dynamicAddonFetching": 1
       },
-      "hash": "ccc276726f8171483f2d01df850b3d76f2d4f9547f669017529494321f567c51",
+      "hash": "7bcce0bb143b81f4e73653010ee67fc90018ce7cb4c0640a9b966e1148c400f8",
       "policy": {
         "preferredStreamExpressions": [
           {
@@ -405,26 +393,6 @@
           },
           {
             "enabled": true,
-            "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-          },
-          {
-            "enabled": true,
             "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
           },
           {
@@ -486,6 +454,14 @@
           {
             "enabled": true,
             "expression": "/* P2P Kill */ type(streams,'p2p')"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
           }
         ],
         "rankedStreamExpressions": [],
@@ -505,17 +481,17 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.86"
+        "coreBuildsVersion": "2.88"
       },
       "counts": {
         "preferredStreamExpressions": 23,
         "includedStreamExpressions": 5,
-        "excludedStreamExpressions": 31,
+        "excludedStreamExpressions": 28,
         "rankedStreamExpressions": 0,
         "resultLimits": 1,
         "dynamicAddonFetching": 1
       },
-      "hash": "caa6c92a6d98f1337d53d1799221db46098a6c81818439e62b178192d5083b30",
+      "hash": "10012c64920a77f6b43d412005a1eb8bfea1c32e6e8be1812bf25c0d49ce9567",
       "policy": {
         "preferredStreamExpressions": [
           {
@@ -676,26 +652,6 @@
           },
           {
             "enabled": true,
-            "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-          },
-          {
-            "enabled": true,
             "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
           },
           {
@@ -757,6 +713,14 @@
           {
             "enabled": true,
             "expression": "/* P2P Kill */ type(streams,'p2p')"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
           }
         ],
         "rankedStreamExpressions": [],
@@ -776,17 +740,17 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.86"
+        "coreBuildsVersion": "2.88"
       },
       "counts": {
         "preferredStreamExpressions": 37,
         "includedStreamExpressions": 5,
-        "excludedStreamExpressions": 31,
+        "excludedStreamExpressions": 28,
         "rankedStreamExpressions": 0,
         "resultLimits": 1,
         "dynamicAddonFetching": 1
       },
-      "hash": "2b785b549591bbfa09151f632ad477eda1d0401089eb55b27d2f3dcd89cb06aa",
+      "hash": "d640c4f306ee2219ee473deb39657aa848d5e3465a12ec779346d2484647407f",
       "policy": {
         "preferredStreamExpressions": [
           {
@@ -1003,26 +967,6 @@
           },
           {
             "enabled": true,
-            "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-          },
-          {
-            "enabled": true,
             "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
           },
           {
@@ -1084,6 +1028,14 @@
           {
             "enabled": true,
             "expression": "/* P2P Kill */ type(streams,'p2p')"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
           }
         ],
         "rankedStreamExpressions": [],
@@ -1103,17 +1055,17 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.86"
+        "coreBuildsVersion": "2.88"
       },
       "counts": {
         "preferredStreamExpressions": 21,
         "includedStreamExpressions": 5,
-        "excludedStreamExpressions": 30,
+        "excludedStreamExpressions": 27,
         "rankedStreamExpressions": 0,
         "resultLimits": 1,
         "dynamicAddonFetching": 1
       },
-      "hash": "d7521fce36a9d55162eb99c6721c6dcb5bb5854d9756f6e5089cdc819b91c2fd",
+      "hash": "1311e053b5423fa7683b3efabe1605aeb9ea354cb62000ebf917bd57112d3829",
       "policy": {
         "preferredStreamExpressions": [
           {
@@ -1262,26 +1214,6 @@
           },
           {
             "enabled": true,
-            "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-          },
-          {
-            "enabled": true,
             "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
           },
           {
@@ -1343,6 +1275,14 @@
           {
             "enabled": true,
             "expression": "/* P2P Kill */ type(streams,'p2p')"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
           }
         ],
         "rankedStreamExpressions": [],
@@ -1362,17 +1302,17 @@
       "metadata": {
         "id": "core-custom-golden",
         "version": "0.1.0",
-        "coreBuildsVersion": "2.86"
+        "coreBuildsVersion": "2.88"
       },
       "counts": {
         "preferredStreamExpressions": 37,
         "includedStreamExpressions": 5,
-        "excludedStreamExpressions": 31,
+        "excludedStreamExpressions": 28,
         "rankedStreamExpressions": 0,
         "resultLimits": 1,
         "dynamicAddonFetching": 1
       },
-      "hash": "a71344c1aed52b0302533fe2a2467fc5d6629a3640a62e65e4f96991fac8b943",
+      "hash": "99aa07dddc290a7bf30a696256981b94732e261505f1bd826a333b5dfa4df449",
       "policy": {
         "preferredStreamExpressions": [
           {
@@ -1589,26 +1529,6 @@
           },
           {
             "enabled": true,
-            "expression": "/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []"
-          },
-          {
-            "enabled": true,
-            "expression": "/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []"
-          },
-          {
-            "enabled": true,
             "expression": "/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []"
           },
           {
@@ -1670,6 +1590,14 @@
           {
             "enabled": true,
             "expression": "/* P2P Kill */ type(streams,'p2p')"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+          },
+          {
+            "enabled": true,
+            "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
           }
         ],
         "rankedStreamExpressions": [],

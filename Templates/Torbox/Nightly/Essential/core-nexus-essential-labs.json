@@ -271,10 +271,6 @@
         "enabled": true
       },
       {
-        "expression": "/*ongoingSeasonPack*/((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]",
-        "enabled": true
-      },
-      {
         "expression": "/*Low Seeders*/count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))<=5 ?[]:count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'))))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1,q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),q1(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'))))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1, q1(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')), percentile(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'),10)))>20?seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(1,percentile(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders'),10))):count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))>5? negate(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),1), merge(type(streams,'p2p'),type(uncached(streams),'debrid'))):[]",
         "enabled": true
       },
@@ -347,18 +343,6 @@
         "expression": "/* LABS | Private Tracker Kill — removes uncached private tracker streams users can't access via debrid */ private(uncached(streams))"
       },
       {
-        "expression": "/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/* LABS | Season Pack Kill — latestSeason-aware; only kills packs when viewing current/latest season; completed earlier seasons keep packs (anime exempt) */ (queryType=='series' and not isAnime and season >= latestSeason and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []",
-        "enabled": true
-      },
-      {
         "enabled": true,
         "expression": "/* LABS | Adaptive Seeder Guard — kills bottom-quartile-seeded uncached torrents on fresh titles (deep pools only); catalog titles over 1y exempt */ (daysSinceRelease >= 0 and daysSinceRelease <= 365 and count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),3)) > 10) ? seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,max(2,floor(q2(values(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),'seeders')) * 0.25))) : []"
       },
@@ -369,6 +353,14 @@
       {
         "enabled": true,
         "expression": "/* LABS | Unknown Quality Kill — 5+ known-quality streams required; catalog content (15y+) exempt */ (daysSinceEarliestAired >= 5475 and count(quality(merge(type(streams,'p2p','http','usenet','stremio-usenet'),cached(type(streams,'debrid'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV')) <= 10) ? [] : count(quality(merge(type(streams,'p2p','http','usenet','stremio-usenet'),cached(type(streams,'debrid'))),'Bluray REMUX','Bluray','WEB-DL','WEBRip','HDRip','HC HD-Rip','DVDRip','HDTV')) > 5 ? negate(merge(library(streams),seadex(streams)),quality(type(streams,'p2p','http','usenet','stremio-usenet','debrid'),'Unknown')) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []"
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []"
       }
     ],
     "preferredStreamExpressions": [

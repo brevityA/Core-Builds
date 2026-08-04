@@ -16,7 +16,7 @@ A standalone quality scoring and filtering layer for AIOStreams — built around
 
 | File | Synced URL Field | Count | Purpose |
 |---|---|---|---|
-| `core-builds-eses.json` | `syncedExcludedStreamExpressionUrls` | 83 | Full fleet ESE superset — hard kills, quality gates, flood guards, and LABS expressions |
+| `core-builds-eses.json` | `syncedExcludedStreamExpressionUrls` | 81 | Full fleet ESE superset — hard kills, quality gates, flood guards, Labs expressions, and late episode-pack fallbacks |
 | `core-builds-pses.json` | `syncedPreferredStreamExpressionUrls` | 163 | All quality tiers — CB static, IQR Tukey fence, Hybrid TorBox-priority, pins, boosters, anime |
 | `core-builds-ises.json` | `syncedIncludedStreamExpressionUrls` | 8 | Cached passthrough, Library, REPACK/PROPER, SeaDex, English language, digitalRelease bypass |
 | `ranked-regex-patterns.json` | `syncedRankedRegexUrls` | 107 | Release group scoring — 10-tier system (+100 to −200) |

@@ -5,7 +5,7 @@ description: "How Core Builds PSEs, ESEs, and ISEs work — the IQR Tukey fence,
 
 The Core Builds Expression Layer is the set of Stream Expressions (SEL) deployed across all active templates. It is what separates Core Builds from a default AIOStreams install.
 
-The fleet currently deploys **254 unique expressions** across **42 active templates** — 83 unique ESEs, 163 unique PSEs, and 8 unique ISEs. Standard templates run 27–31 ESEs; Lite variants run 13–17 (hard kills only — quality gates removed).
+The fleet deploys a curated set of ESEs, ISEs, and PSEs across active templates. Standard templates use the full quality gate stack; Lite variants keep safety filters while removing selected quality gates for broader coverage.
 
 ## Expression Types
 
@@ -21,7 +21,7 @@ A stream matched by an ESE never reaches PSE scoring. ISE-matched streams jump t
 
 ## ESEs — The Kill Stack
 
-Standard templates run **27–31 ESEs** depending on template type. Lite templates run **13–17** (hard kills only — quality gates removed). The Stream Labs Nightly template runs the most at 42 ESEs.
+Standard templates run the full ESE quality stack; Lite templates retain safety filters while removing selected quality gates. The exact count varies by device, service, and template family.
 
 ### Universal ESEs (all 42 templates)
 
@@ -31,7 +31,7 @@ These run on every template in the fleet:
 |---|---|
 | Info & Other Unwanted | Removes info-type streams, Usenet samples (via `-sample` keyword and `releaseGroup`), non-sample Usenet streams, and streams with prohibited (🚫) messages. Replaces Bad NZBs with broader coverage. |
 | Hard CAM Kill | Removes camera recordings: CAM, SCR, TS (Telesync), TC, and HC HD-Rip quality levels. |
-| ongoingSeasonPack | On ongoing series, kills season packs when individual episode streams exist — prevents downloading entire seasons mid-air. Uses `daysSinceLastAired` and `daysUntilNextEpisode` to detect airing status. |
+| Late Pack Fallback | Runs last. It hides a multi-episode file or ambiguous season pack only after **three playable single-episode results have survived** every other filter. It never deliberately turns a valid episode request into zero streams. |
 
 ### Near-Universal ESEs (30–41 templates)
 
@@ -40,11 +40,9 @@ These run on almost all templates — some are omitted on Anime or Lite variants
 | ESE | What it does | Coverage |
 |---|---|---|
 | RD Copyright (per DMM) | Hides Real-Debrid copyright-blocked streams (WEB-DL/WEBRip flagged by RD's filter). | 40/42 |
-| Kill Ambiguous Packs | Removes packs with ambiguous season/episode metadata when clean single-episode results exist. | 39/42 |
-| Kill Multi-Episode | Removes multi-episode files on single-episode queries when per-episode streams are available. | 36/42 |
+| Late Pack Fallback | Keeps episode packs available as a fallback; only suppresses them after three surviving standalone episode results are available. Anime remains exempt. | Current standard templates |
 | AI Upscale Exclusion | Removes AI-upscaled streams from non-library, non-SeaDex results. | 35/42 |
 | Foreign Language Kill | Removes non-English foreign-language-only streams on movie/series queries. Anime queries are exempt. | 35/42 |
-| Hard Season Pack Kill | Kills season packs when singles exist; ended shows (2yr+) with under 3 singles keep packs. Anime exempt. | 35/42 |
 | Usenet Propagation Guard | Suppresses Usenet NZBs younger than 2 hours when propagated alternatives exist — avoids corrupt early-propagation grabs. | 35/42 |
 | Hard External Kill | Removes YouTube rips and all external-type streams. | 34/42 |
 | Extra SeaDex | Hides excess SeaDex results beyond the best when better-ranked alternatives are available. | 33/42 |
@@ -77,7 +75,6 @@ These run only on standard templates — they can filter legitimate content on t
 | DV-Only Kill | Removes Dolby Vision-only streams for devices without DV support (Samsung TVs, Apple TV Nightly). | 9 |
 | 3D Content Kill | Removes 3D content — not playable on most modern setups. | 8 |
 | Hard YouTube Kill | Removes YouTube source streams entirely. | 8 |
-| Kill Season Packs | Removes full season packs on episode queries when individual episode results are available. | 7 |
 
 ### LABS ESEs (Nightly only)
 

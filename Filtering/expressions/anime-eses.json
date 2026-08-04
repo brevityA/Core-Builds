@@ -1,18 +1,5 @@
 [
   {
-    "expression": "/* CB | Kill Season Packs When Episodes Exist */ (latestSeason >= 3 and count(negate(streams, seasonPack(streams))) >= 3) ? seasonPack(streams) : []",
-    "enabled": true,
-    "templates": [
-      "Anime",
-      "Anime 4K",
-      "Anime 4K Labs",
-      "Anime 4K Lite",
-      "Anime Dub",
-      "Anime Dub Lite",
-      "Anime Lite"
-    ]
-  },
-  {
     "expression": "/* CB | Non-Anime Query Guard */ (queryType == 'movie' or queryType == 'series') and not isAnime ? streams : []",
     "enabled": true,
     "templates": [
@@ -21,5 +8,13 @@
       "Anime 4K Labs",
       "Anime Dub"
     ]
+  },
+  {
+    "expression": "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []",
+    "enabled": true
+  },
+  {
+    "expression": "/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []",
+    "enabled": true
   }
 ]

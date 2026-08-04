@@ -255,6 +255,20 @@ function buildServices(input) {
   ];
 }
 
+// Pack and multi-episode results are valid fallbacks for a requested episode.
+//
+// These expressions must be appended *after* quality, cache, P2P, and result-cap
+// ESEs. An earlier version removed packs before later filters could remove the
+// supposedly better single-episode candidates, which could leave a request with
+// no playable streams at all. AIOStreams' season/episode matcher already checks
+// whether a pack contains the requested episode.
+function lateEpisodePackFallbackEses() {
+  return [
+    { enabled:true, expression:"/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? multiEpisode(streams) : []" },
+    { enabled:true, expression:"/* CB | Late Pack Fallback — hide ambiguous season packs only when 3 playable singles remain */ (queryType == 'series' and not isAnime and count(negate(merge(multiEpisode(streams),seasonPack(streams,'seasonPack')),streams)) >= 3) ? seasonPack(streams,'onlySeasons') : []" },
+  ];
+}
+
 function buildEses(input) {
   const out = [];
   const dev = input.device, is1080 = input.resolution === '1080p';
@@ -273,7 +287,7 @@ function buildEses(input) {
   }
 
   if (input.service === 'p2p') {
-    out.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" }, { enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
+    out.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" }, { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" });
     out.push({ enabled:true, expression:"/* Auto-Hide SD */ count(resolution(streams,'1080p'))>=5 and count(resolution(streams,'720p'))>=5 ? resolution(streams,'480p','360p','SD') : []" });
     out.push({ enabled:true, expression:"/* Auto-Hide 720p */ count(resolution(streams,'1080p'))>=15 or count(resolution(streams,'2160p'))>=15 ? resolution(streams,'720p') : []" });
     if (input.foreignLangKill !== false && content !== 'anime') {
@@ -289,6 +303,7 @@ function buildEses(input) {
       out.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
     }
     { const ae = generateAgeRatingESE(input.ageLimit); if (ae) out.push(ae); }
+    out.push(...lateEpisodePackFallbackEses());
     return out;
   }
 
@@ -307,11 +322,6 @@ function buildEses(input) {
     { enabled:true, expression:"/* CB | Hard CAM Kill */ quality(streams,'CAM','SCR','TS','TC','HC HD-Rip')" },
     { enabled:true, expression:"/* CB | Hard External Kill */ type(streams,'external')" },
     { enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" },
-    { enabled:true, expression:"/*ongoingSeasonPack*/ ((queryType=='series' or queryType=='anime.series') and ongoingSeason and (daysSinceLastAired <-1 or daysUntilNextEpisode>=0))?seasonPack(streams,'onlySeasons'):[]" },
-    { enabled:true, expression:"/* CB | Hard Season Pack Kill + Older-Show Pack Pass */ (queryType=='series' and not isAnime and ((daysSinceLastAired < 730 and count(negate(streams,seasonPack(streams))) >= 1) or count(negate(streams,seasonPack(streams))) >= 3)) ? seasonPack(streams) : []" },
-    { enabled:true, expression:"/* CB | Kill Ambiguous Packs When Non-Pack Exist */ count(negate(streams, seasonPack(streams))) > 0 ? seasonPack(streams, 'onlySeasons') : []" },
-    { enabled:true, expression:"/* CB | Kill Multi-Episode When Singles Exist */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? negate(multiEpisode(streams), seasonPack(streams)) : []) : []" },
-    { enabled:true, expression:"/* Clutter-Free Single Episode Booster */ (queryType == 'series' or queryType == 'anime.series') ? (count(negate(streams, multiEpisode(streams))) >= 3 ? multiEpisode(streams) : []) : []" },
     { enabled:true, expression:"/*Extra SeaDex*/ count(seadex(streams,'best'))>1 or count(negate(seadex(streams,'best'),seadex(streams)))>1 ? merge(slice(negate(seadex(streams,'best'),seadex(streams)),1),slice(seadex(streams,'best'),1)) : []" },
     { enabled:true, expression:"/*Bad 4k Anime*/ (isAnime and originalLanguage == 'Japanese' and count(quality(resolution(cached(streams),'2160p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'2160p'))) == 0) ? negate(merge(library(streams),seadex(streams)),resolution(streams,'2160p')) : []" },
     { enabled:true, expression:"/*Upscaled 4k*/ (queryType=='movie' or queryType=='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'))==0 ? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')) : []" },
@@ -342,6 +352,7 @@ function buildEses(input) {
   }
   const ageEse = generateAgeRatingESE(input.ageLimit);
   if (ageEse) out.push(ageEse);
+  out.push(...lateEpisodePackFallbackEses());
   return out;
 }
 
@@ -411,7 +422,6 @@ function generateNuvioTemplate(input, options = {}) {
   const eses = [];
   eses.push({ enabled:true, expression:"/* CB | Hard YouTube Kill */ type(streams,'youtube','external')" });
   eses.push({ enabled:true, expression:"/* CB | 3D Content Kill */ visualTag(streams,'3D','H-OU','H-SBS')" });
-  eses.push({ enabled:true, expression:"/* CB | Kill Season Packs When Episodes Exist */ count(negate(streams,seasonPack(streams)))>=10?seasonPack(streams):[]" });
   eses.push({ enabled:true, expression:"/* Auto-Hide SD */ count(resolution(streams,'1080p'))>=5 and count(resolution(streams,'720p'))>=5 ? resolution(streams,'480p','360p','SD') : []" });
   eses.push({ enabled:true, expression:"/* Auto-Hide 720p */ count(resolution(streams,'1080p'))>=15 or count(resolution(streams,'2160p'))>=15 ? resolution(streams,'720p') : []" });
   if (input.foreignLangKill !== false) {
@@ -425,6 +435,7 @@ function generateNuvioTemplate(input, options = {}) {
     eses.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
   }
   { const ae = generateAgeRatingESE(input.ageLimit); if (ae) eses.push(ae); }
+  eses.push(...lateEpisodePackFallbackEses());
 
   const pses = [];
   const langs = input.langs || [];
