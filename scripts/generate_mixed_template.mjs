@@ -18,7 +18,7 @@ tpl.metadata = {
   id: 'brevity.core-nexus-mixed',
   name: 'Core Nexus Mixed',
   description:
-    'Adaptive multi-resolution build for niche and mixed libraries. No hard resolution caps — 4K, 1440p, 1080p, 720p and SD tiers all stay eligible and are ranked by a cached × quality blend (availability first, encode quality second, resolution third). 4K BluRay REMUX and HDR WEB-DL tiers sit above the 1080p ladder, with 576p/480p niche fallbacks for classic and rare content that never surfaces in capped templates. Full ranked regex scoring (Common + UHD tiers), live-synced ESEs/PSEs, and a blended dynamic-fetch exit. Pairs with any device profile.',
+    'Adaptive multi-resolution build for niche and mixed libraries. No hard resolution caps — 4K, 1440p, 1080p, 720p and SD tiers all stay eligible and are ranked by a cached × quality blend (availability first, encode quality second, resolution third). 4K BluRay REMUX and HDR WEB-DL tiers sit above the 1080p ladder, with 576p/480p niche fallbacks for classic and rare content that never surfaces in capped templates. Full ranked regex scoring (Common + UHD tiers), local ESE/PSE rules, and a blended dynamic-fetch exit. Pairs with any device profile.',
   version: '1.0.0',
   category: 'Mixed',
   sourceUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-mixed.json',
@@ -74,6 +74,10 @@ c.dynamicAddonFetching = {
   enabled: true,
   condition: 'count(cached(resolution(totalStreams, "1080p"))) >= 12 or count(cached(resolution(totalStreams, "2160p"))) >= 6 or totalTimeTaken > 6000',
 };
+
+// A single Dynamic early-exit strategy is already enough for this explicit
+// advanced template. Never restore the inherited Groups scheduler as well.
+c.groups = { enabled: false, groupings: [] };
 
 writeFileSync('Templates/Torbox/Single/core-nexus-mixed.json', JSON.stringify(tpl, null, 2) + '\n');
 console.log('Wrote core-nexus-mixed.json —',

@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-// Vidhin05 upstream drift watch.
+// Vidhin05 upstream regex drift watch.
 //
-// 41/48 active templates — and every configurator-generated template — live-sync
-// ranked regex + ranked stream expressions from Vidhin05/Releases-Regex@main, and
-// elfhosted validates regex patterns against that file by exact string equality.
-// Any upstream push silently changes ranking for every Core Builds user.
+// Core Builds uses a reviewed regex snapshot for host compatibility. It does
+// not use synced stream expressions; expression URLs are intentionally absent
+// from every generated and maintained template.
 //
-// This script compares the live upstream files against the pinned snapshots in
-// Filtering/upstream/ and reports drift.
+// This script compares the live upstream regex file against the pinned snapshot
+// in Filtering/upstream/ and reports drift.
 //
 //   node scripts/check_upstream_drift.mjs            — check, exit 1 on drift
 //   node scripts/check_upstream_drift.mjs --update   — re-pin snapshots after review
@@ -25,12 +24,6 @@ const TARGETS = [
     url: 'https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json',
     snapshot: resolve(root, 'Filtering/upstream/vidhin05-regexes.snapshot.json'),
     key: entry => entry.name || entry.pattern?.slice(0, 80) || JSON.stringify(entry).slice(0, 80),
-  },
-  {
-    label: 'ranked stream expressions',
-    url: 'https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json',
-    snapshot: resolve(root, 'Filtering/upstream/vidhin05-expressions.snapshot.json'),
-    key: entry => `${(entry.expression || '').slice(0, 90)}@${entry.score}`,
   },
 ];
 
@@ -113,8 +106,8 @@ if (update) {
 }
 if (drifted) {
   console.log('\nDrift detected. Review, then re-pin with: node scripts/check_upstream_drift.mjs --update');
-  console.log('Templates live-sync upstream — behaviour changes immediately whether we pin or not;');
-  console.log('the snapshot exists so the change is a reviewed event, not a silent one.');
+  console.log('Review the regex snapshot before it is used in a Core Builds release.');
+  console.log('Synced stream expressions remain prohibited regardless of regex snapshot status.');
   process.exit(1);
 }
 if (unreachable) {

@@ -21,7 +21,7 @@ data["metadata"]["description"] = (
     "DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. "
     "AV1 hard-excluded (no hardware decoder on the A15 chip — severe performance hit). "
     "DD+ Atmos is the native top audio format. "
-    "2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, TorBox Search, Comet, Zilean)."
+    "2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, Comet, Zilean)."
 )
 data["metadata"]["version"] = "0.1.0"
 data["metadata"]["sourceUrl"] = (

@@ -36,7 +36,7 @@ Without an explicit `resources` override, AIOStreams uses the addon's default `S
 | `seadex` | `seadex.ts` | `[stream]` | No | No override needed |
 | `animeTosho` | `animetosho.ts` | `[stream]` | No | No override needed |
 | `nekobt` | `nekoBt.ts` | `[stream]` | No | No override needed |
-| `torbox-search` | `torboxSearch.ts` | `[stream]` | No | No override needed |
+| `torbox-search` | Legacy built-in preset, v2.31.1 lane only | `[stream]` | No | Removed in v2.32; the separate Newznab option labelled TorBox Search needs its own endpoint/key validation |
 | `newznab` | `newznab.ts` | `[stream]` | No | No override needed |
 | `opensubtitles-v3-plus` | — | `[subtitles]` | No | Keep `resources: ['subtitles']` |
 | `aiosubtitle` | `aiosubtitle.ts` | `[subtitles]` | No | No override needed |
@@ -68,7 +68,7 @@ The `library` preset intentionally exposes catalog and meta — this is the TorB
 
 ### Stream-only by default — no override required
 
-`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `hdhub`, `knaben`, `torrents-db`, `seadex`, `animeTosho`, `nekobt`, `torbox-search`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
+`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `hdhub`, `knaben`, `torrents-db`, `seadex`, `animeTosho`, `nekobt`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
 
 ### Default-on scrapers (v2.9.4+)
 
@@ -80,6 +80,10 @@ The `library` preset intentionally exposes catalog and meta — this is the TorB
 Both are toggleable. Go to **Addons** in your AIOStreams dashboard to disable either one.
 
 ---
+
+<Warning>
+**AIOStreams v2.32 retired the legacy `torbox-search` preset ID.** Upstream still lists a separate Newznab option labelled TorBox Search. It is not a settings-compatible automatic rename: use the v2.31 compatibility lane for legacy templates, or validate the Newznab endpoint/key path before a v2.32 migration.
+</Warning>
 
 ## Incident Log
 
