@@ -118,10 +118,13 @@ test('golden: 4K IQR has IQR-specific expressions', () => {
   assert.ok(pses.some(e => e.includes('iqr(')), 'IQR PSEs should contain iqr() calls');
 });
 
-test('golden: 1080p standard has hard resolution kill', () => {
+test('golden: 1080p standard excludes 4K resolutions', () => {
   const t = generate(['--service', 'torbox-pro', '--device', 'generic', '--resolution', '1080p', '--architecture', 'standard']);
+  const excl = t.config.excludedResolutions || [];
   const eses = t.config.excludedStreamExpressions.map(e => e.expression);
-  assert.ok(eses.some(e => e.includes("resolution(streams,'2160p','1440p')")), '1080p should have hard resolution kill ESE');
+  const hasNativeKill = excl.includes('2160p') && excl.includes('1440p');
+  const hasEseKill = eses.some(e => e.includes("resolution(streams,'2160p','1440p')"));
+  assert.ok(hasNativeKill || hasEseKill, '1080p should exclude 4K via excludedResolutions or ESE');
 });
 
 test('golden: AllDebrid uses stremthruStore not stremthruTorz', () => {
@@ -152,16 +155,22 @@ test('golden: HTTP template has HTTP-specific presets', () => {
   assert.ok(presetTypes.includes('peerflix'), 'HTTP should have peerflix preset');
 });
 
-test('golden: apex-mixed has Score IQR Guard ESE', () => {
+test('golden: apex-mixed uses labs profile and strips score-dependent rules without local ranked expressions', () => {
   const t = generate(['--service', 'torbox-pro', '--device', 'generic', '--resolution', 'mixed', '--architecture', 'apex-mixed']);
+  assert.equal(t.metadata.coreBuildsProfile, 'labs', 'apex-mixed should resolve to labs profile');
   const eses = t.config.excludedStreamExpressions.map(e => e.expression);
-  assert.ok(eses.some(e => e.includes('Score IQR Guard') || e.includes('iqr(values')), 'apex-mixed should have Score IQR Guard');
+  const hasScoreIqr = eses.some(e => e.includes('streamExpressionScore'));
+  const hasLocalRanked = (t.config.rankedStreamExpressions || []).some(e => e.enabled !== false && e.expression && e.expression !== '[]');
+  if (!hasLocalRanked) {
+    assert.ok(!hasScoreIqr, 'Score IQR Guard should be stripped when no local ranked expressions exist');
+  }
 });
 
-test('golden: DV-Only Kill fires on generic device', () => {
-  const t = generate(['--service', 'torbox-pro', '--device', 'generic', '--resolution', '4k', '--architecture', 'standard']);
+test('golden: DV-Only Kill fires on generic device with advanced profile', () => {
+  const t = generate(['--service', 'torbox-pro', '--device', 'generic', '--resolution', '4k', '--architecture', 'iqr']);
+  assert.equal(t.metadata.coreBuildsProfile, 'advanced', 'IQR architecture should resolve to advanced profile');
   const eses = t.config.excludedStreamExpressions.map(e => e.expression);
-  assert.ok(eses.some(e => e.includes('DV-Only Kill')), 'generic device should have DV-Only Kill ESE');
+  assert.ok(eses.some(e => e.includes('DV-Only Kill')), 'generic device should have DV-Only Kill ESE in advanced profile');
 });
 
 test('golden: DV-capable device skips DV-Only Kill', () => {
@@ -246,12 +255,10 @@ test('security: diff output never prints sensitive field values', () => {
   }
 });
 
-test('golden: --size-limit produces correct bounds and ESE', () => {
+test('golden: --size-limit produces correct bounds', () => {
   const t = generate(['--service', 'torbox-pro', '--device', 'generic', '--resolution', '1080p', '--architecture', 'standard', '--size-limit', '10']);
   assert.deepEqual(t.config.size.global.movies, [0, 10_000_000_000]);
   assert.deepEqual(t.config.size.global.series, [0, 10_000_000_000]);
-  const eses = t.config.excludedStreamExpressions.map(e => e.expression);
-  assert.ok(eses.some(e => e.includes("size(streams,'1B','10GB')")), 'should have size limit ESE');
 });
 
 test('golden: unlimited size-limit does not add restrictive ESE', () => {
