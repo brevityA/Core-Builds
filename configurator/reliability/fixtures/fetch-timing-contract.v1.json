@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Synthetic provider timing contract. These are product-level mocks, not measurements of live providers.",
+  "scenarios": [
+    {
+      "id": "default-waits-for-later-completed-source",
+      "strategy": "default",
+      "timeoutMs": 6000,
+      "providers": [
+        { "id": "fast", "responseMs": 250, "streamIds": ["fast-1080p"] },
+        { "id": "later-quality", "responseMs": 4200, "streamIds": ["later-4k"] },
+        { "id": "timeout", "responseMs": 7000, "streamIds": ["too-late"] }
+      ],
+      "expected": {
+        "returnedStreamIds": ["fast-1080p", "later-4k"],
+        "timedOutProviders": ["timeout"],
+        "earlyExit": false
+      }
+    },
+    {
+      "id": "metadata-delay-consumes-budget-visibly",
+      "strategy": "default",
+      "timeoutMs": 6000,
+      "providers": [
+        { "id": "metadata-delayed", "metadataMs": 5800, "responseMs": 500, "streamIds": ["late-after-metadata"] },
+        { "id": "healthy", "responseMs": 400, "streamIds": ["healthy"] }
+      ],
+      "expected": {
+        "returnedStreamIds": ["healthy"],
+        "timedOutProviders": ["metadata-delayed"],
+        "earlyExit": false
+      }
+    },
+    {
+      "id": "dynamic-is-explicit-coverage-tradeoff",
+      "strategy": "dynamic",
+      "timeoutMs": 6000,
+      "exitWhenStreamCountAtLeast": 1,
+      "providers": [
+        { "id": "fast", "responseMs": 250, "streamIds": ["fast-1080p"] },
+        { "id": "later-quality", "responseMs": 4200, "streamIds": ["later-4k"] }
+      ],
+      "expected": {
+        "returnedStreamIds": ["fast-1080p"],
+        "timedOutProviders": [],
+        "earlyExit": true,
+        "skippedProviders": ["later-quality"]
+      }
+    },
+    {
+      "id": "sequential-groups-can-skip-fallback",
+      "strategy": "groups-sequential",
+      "timeoutMs": 6000,
+      "exitWhenStreamCountAtLeast": 1,
+      "groups": [
+        ["primary"],
+        ["fallback"]
+      ],
+      "providers": [
+        { "id": "primary", "responseMs": 300, "streamIds": ["primary-result"] },
+        { "id": "fallback", "responseMs": 500, "streamIds": ["fallback-result"] }
+      ],
+      "expected": {
+        "returnedStreamIds": ["primary-result"],
+        "timedOutProviders": [],
+        "earlyExit": true,
+        "skippedProviders": ["fallback"]
+      }
+    },
+    {
+      "id": "unassigned-provider-is-never-silent",
+      "strategy": "default",
+      "timeoutMs": 6000,
+      "providers": [
+        { "id": "assigned", "responseMs": 100, "streamIds": ["assigned-result"], "assigned": true },
+        { "id": "unassigned", "responseMs": 100, "streamIds": ["must-not-appear"], "assigned": false }
+      ],
+      "expected": {
+        "returnedStreamIds": ["assigned-result"],
+        "timedOutProviders": [],
+        "earlyExit": false,
+        "warnings": ["unassigned"]
+      }
+    }
+  ]
+}
