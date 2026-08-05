@@ -26,6 +26,7 @@ import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
+import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -1624,6 +1625,7 @@ function render() {
           <summary class="rv-accord-hdr"><span class="rv-accord-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Tools<span class="rv-arr">›</span></summary>
           <div class="rv-accord-body" style="display:flex;flex-direction:column;gap:8px">
             <button data-action="open-troubleshooter" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid var(--th-yellow-border);background:var(--th-yellow-bg);color:var(--th-yellow);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🔧 Troubleshooter — Fix Common Issues</button>
+            <button data-action="open-feedback-report" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🧾 Copy Safe Feedback Report</button>
             <button class="btn-td" data-action="test-drive">${ICO.eye(15,'currentColor')} Test Drive — Preview Your Streams</button>
           </div>
         </details>
@@ -1634,6 +1636,7 @@ function render() {
         </div>
         ${sizeLimitHtml()}
         <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
+        <button data-action="open-feedback-report" style="width:100%;margin-top:8px;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer">🧾 Need help? Copy a safe feedback report</button>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button data-action="share-config" style="flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
           <button class="btn-aio" data-action="create-import" id="btnImport" style="flex:1;margin-top:0;padding:11px;font-size:.82rem">
@@ -2508,6 +2511,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'open-fast-lane') showFastLane();
     if (action === 'open-express-lane') showExpressLane();
     if (action === 'open-diagnostics') showDiagnosticsModal();
+    if (action === 'open-feedback-report') showFeedbackReportModal();
     if (action === 'open-additional-services') showAdditionalServicesPicker();
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
@@ -6246,6 +6250,63 @@ function buildSanitizedDiagnostics() {
     hostCompatibility: hosts
   };
 }
+function feedbackReportContext() {
+  const target = outputProfileContext().aiostreamsVersion;
+  return {
+    device: label('device', S.device) || S.device || 'Not selected',
+    service: label('service', S.service) || S.service || 'Not selected',
+    cacheMode: S.cacheMode === 'cached' ? 'Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed',
+    resolution: label('resolution', S.resolution) || S.resolution || 'Not selected',
+    host: HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'Not selected',
+    aiostreamsVersion: target,
+    profile: OUTPUT_PROFILE_INFO[activeOutputProfile()]?.label || activeOutputProfile(),
+  };
+}
+
+function showFeedbackReportModal() {
+  document.getElementById('feedbackReportModal')?.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'feedbackReportModal';
+  overlay.className = 'fastlane-overlay';
+  overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="feedbackReportTitle" style="max-width:620px">
+    <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Safe support report</div><div class="fastlane-title" id="feedbackReportTitle">Copy a sanitized feedback report</div><div class="fastlane-sub">Only share the copied text. This tool never includes API keys, passwords, JSON, UUIDs, manifest URLs, or raw configuration data.</div></div><button class="fastlane-close" id="feedbackReportClose" aria-label="Close">✕</button></div>
+    <div style="padding:0 20px 18px;display:flex;flex-direction:column;gap:11px">
+      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Content type<select id="feedbackContentType" class="fastlane-field" style="margin-top:5px"><option value="Series">Series</option><option value="Movie">Movie</option><option value="Anime">Anime</option><option value="Other / not sure">Other / not sure</option></select></label>
+      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Exact title + episode<input id="feedbackTitleEpisode" class="fastlane-field" maxlength="160" placeholder="Example: Title S02E03" style="margin-top:5px"></label>
+      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Did any AIOStreams addon return streams?<select id="feedbackAddonStreams" class="fastlane-field" style="margin-top:5px"><option value="Not sure">Not sure</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
+      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Visible error text, if any<textarea id="feedbackVisibleError" maxlength="240" placeholder="Paste only the visible error text — URLs are redacted" style="margin-top:5px;width:100%;min-height:70px;resize:vertical;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px;font:inherit"></textarea></label>
+      <pre id="feedbackReportPreview" class="diag-pre" style="margin:0;white-space:pre-wrap"></pre>
+      <div style="display:flex;gap:8px"><button id="feedbackReportCopy" class="fastlane-go" style="margin:0;flex:1">Copy sanitized report</button><button id="feedbackReportCancel" class="fastlane-close" style="position:static;width:auto;height:auto;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px">Cancel</button></div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  const readReport = () => buildFeedbackReport(feedbackReportContext(), {
+    contentType: document.getElementById('feedbackContentType')?.value,
+    titleAndEpisode: document.getElementById('feedbackTitleEpisode')?.value,
+    addonReturnedStreams: document.getElementById('feedbackAddonStreams')?.value,
+    visibleError: document.getElementById('feedbackVisibleError')?.value,
+  });
+  const refresh = () => { document.getElementById('feedbackReportPreview').textContent = readReport(); };
+  overlay.querySelectorAll('input, select, textarea').forEach(input => input.addEventListener('input', refresh));
+  overlay.querySelectorAll('select').forEach(input => input.addEventListener('change', refresh));
+  const close = () => overlay.remove();
+  overlay.querySelector('#feedbackReportClose').addEventListener('click', close);
+  overlay.querySelector('#feedbackReportCancel').addEventListener('click', close);
+  overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+  overlay.querySelector('#feedbackReportCopy').addEventListener('click', async () => {
+    const report = readReport();
+    try {
+      await navigator.clipboard.writeText(report);
+      overlay.querySelector('#feedbackReportCopy').textContent = '✓ Copied — paste only this text';
+    } catch {
+      overlay.querySelector('#feedbackReportCopy').textContent = 'Clipboard unavailable — select the preview text';
+    }
+  });
+  refresh();
+  overlay.querySelector('#feedbackTitleEpisode').focus();
+}
+
 function showDiagnosticsModal() {
   document.getElementById('diagnosticsModal')?.remove();
   const data=buildSanitizedDiagnostics();
