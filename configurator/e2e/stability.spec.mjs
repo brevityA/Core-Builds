@@ -49,7 +49,7 @@ test('Quick Install creates a raw manifest without TMDB', async ({ page }) => {
   expect(config.titleMatching.enabled).toBe(false);
   expect(config.yearMatching.enabled).toBe(false);
   expect(config.digitalReleaseFilter.enabled).toBe(false);
-  expect(config.bitrate.useMetadataRuntime).toBe(false);
+  expect(config.bitrate?.useMetadataRuntime ?? false).toBe(false);
   expect(config.includedStreamExpressions.some(item => String(item.expression).includes('digitalRelease Bypass'))).toBe(false);
   await expect(page.locator('#mUrlVal')).toContainText(`/stremio/${UUID}/encrypted-password/manifest.json`);
   await expect(page.locator('#mFmtTabs')).toContainText('Manifest URL');

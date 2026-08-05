@@ -2,7 +2,7 @@
   "metadata": {
     "id": "brevity.core-nexus-hybrid-lite",
     "name": "Core Nexus Hybrid Lite",
-    "description": "A 1080p SDR hybrid build for TorBox users who also run a Usenet indexer. Combines TorBox's Usenet and torrent cache with NZBGeek for maximum source diversity. Unlike other builds, shows both cached and uncached streams — uncached streams are downloaded by TorBox before playback begins. Targets 1080p and 720p only — 4K and HDR are excluded. Blocks BluRay and Remux for low-end hardware compatibility. File range 1 GB–60 GB, 1080p capped at 25 GB. NZBGeek API key required — enter your key in the NZBGeek preset before saving. Core Builds SEL stack with live-synced ESEs, PSEs, and regex. Relaxed filtering — quality gates removed, more results shown.",
+    "description": "A 1080p SDR hybrid build for TorBox users who also run a Usenet indexer. Combines TorBox's Usenet and torrent cache with NZBGeek for maximum source diversity. Unlike other builds, shows both cached and uncached streams — uncached streams are downloaded by TorBox before playback begins. Targets 1080p and 720p only — 4K and HDR are excluded. Blocks BluRay and Remux for low-end hardware compatibility. File range 1 GB–60 GB, 1080p capped at 25 GB. NZBGeek API key required — enter your key in the NZBGeek preset before saving. Local Core Builds SEL stack and regex policy. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "2.10.10",
@@ -10,7 +10,12 @@
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "coreBuildsCompatibility": {
+      "legacyTorboxSearch": true,
+      "maximumAIOStreamsVersion": "2.31.1",
+      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+    }
   },
   "config": {
     "trusted": false,
@@ -1163,32 +1168,9 @@
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 25"
     },
     "groups": {
-      "enabled": true,
+      "enabled": false,
       "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "nx-fix-04",
-            "67c",
-            "nx-fix-02",
-            "nx-fix-01",
-            "01c9a4fd-aedf-46ff-89d5-d58cc597dd17"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "c5d54fb3-6635-4dad-9784-922bd8b25bc6",
-            "tb-nzb-1",
-            "dd458151-1e34-4bd3-aa2c-349e4da371bf",
-            "tam-knaben",
-            "5f6"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -1198,10 +1180,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1275,10 +1253,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -1346,10 +1320,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1427,10 +1397,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "service",
           "direction": "desc"
         },
@@ -1494,10 +1460,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1568,10 +1530,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1646,10 +1604,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1731,10 +1685,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "service",
           "direction": "desc"
         },
@@ -1802,10 +1752,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -2503,8 +2449,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    "syncedRankedStreamExpressionUrls": []
   }
 }

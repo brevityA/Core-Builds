@@ -55,6 +55,8 @@ const BASE = {
   maxFailoverNzbs: 3,
   quickStart: false,
   simpleMode: false,
+  outputProfile: 'auto',
+  aiostreamsVersion: '2.31.1',
   tmdbToken: '',
   tmdbApiKey: '',
 };
@@ -72,6 +74,9 @@ const MATRIX = [
   { name: 'easynews-1080p', state: { service: 'easynews', multiServices: ['easynews'], resolution: '1080p' } },
   { name: 'p2p-1080p', state: { service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, resolution: '1080p' } },
   { name: 'http-1080p', state: { service: 'http', multiServices: ['http'], resolution: '1080p' } },
+  { name: 'core-stable-torbox-1080p', profile: 'stable', state: { resolution: '1080p', simpleMode: true } },
+  { name: 'core-stable-torbox-4k', profile: 'stable', state: { resolution: '4k', simpleMode: true } },
+  { name: 'core-balanced-torbox-1080p', profile: 'balanced', state: { resolution: '1080p', outputProfile: 'balanced' } },
 ];
 
 for (const combo of MATRIX) {
@@ -83,6 +88,30 @@ for (const combo of MATRIX) {
     expect(tpl, 'buildFinal() returned nothing').toBeTruthy();
     expect(tpl.config, 'generated template has no config').toBeTruthy();
     expect(tpl.metadata?.generatedAt, 'generatedAt must be stripped for golden stability').toBeUndefined();
+    const expectedProfile = combo.profile || (state.pseArch === 'apex-mixed' ? 'labs' : state.pseArch === 'iqr' ? 'advanced' : 'balanced');
+    expect(tpl.metadata?.coreBuildsProfile, 'generated output must identify its output profile').toBe(expectedProfile);
+    for (const key of [
+      'syncedExcludedStreamExpressionUrls',
+      'syncedIncludedStreamExpressionUrls',
+      'syncedPreferredStreamExpressionUrls',
+      'syncedRankedStreamExpressionUrls',
+    ]) {
+      expect(tpl.config[key] || [], `${combo.name} must not emit ${key}`).toEqual([]);
+    }
+
+    if (state.aiostreamsVersion !== '2.31.1') {
+      expect(tpl.config.presets.some(preset => preset.type === 'torbox-search'), `${combo.name} must not emit legacy TorBox Search outside the v2.31.1 lane`).toBe(false);
+    }
+
+    if (expectedProfile === 'stable') {
+      expect(tpl.config.syncedRankedRegexUrls || []).toEqual([]);
+      expect(tpl.config.syncedRankedStreamExpressionUrls || []).toEqual([]);
+      expect(tpl.config.groups?.enabled).toBe(false);
+      expect(tpl.config.dynamicAddonFetching?.enabled).toBe(false);
+      expect(tpl.config.excludedStreamExpressions || []).toHaveLength(1);
+      expect(tpl.config.resultLimits?.mode).toBe('independent');
+      expect(tpl.config.hideErrors).toBe(false);
+    }
 
     if (['p2p', 'http'].includes(state.service)) {
       const peerflix = tpl.config.presets.find(preset => preset.type === 'peerflix');

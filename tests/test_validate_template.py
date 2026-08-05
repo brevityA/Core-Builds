@@ -99,6 +99,69 @@ class TestMetadata:
 
 # ── Sort Criteria ─────────────────────────────────────────────
 
+class TestLocalExpressionPolicy:
+    def test_core_template_rejects_synced_expression_urls(self, write_template, base_template):
+        t = base_template(syncedRankedStreamExpressionUrls=["https://example.invalid/expressions.json"])
+        t["metadata"]["author"] = "Branding-Brevity"
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert any("synced stream-expression URLs are prohibited" in error for error in errors)
+
+    def test_core_template_rejects_remote_score_rules_without_local_ranked_expression(self, write_template, base_template):
+        t = base_template(
+            excludedStreamExpressions=[{"expression": "streamExpressionScore(streams, 1)"}],
+            sortCriteria={"global": [{"key": "streamExpressionScore"}]},
+        )
+        t["metadata"]["author"] = "Branding-Brevity"
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert any("score-dependent SEL requires local ranked expressions" in error for error in errors)
+        assert any("streamExpressionScore sort requires local ranked expressions" in error for error in errors)
+
+    def test_local_ranked_expression_allows_local_score_rules(self, write_template, base_template):
+        t = base_template(
+            rankedStreamExpressions=[{"enabled": True, "expression": "quality(streams, 'WEB-DL')", "score": 1}],
+            excludedStreamExpressions=[{"expression": "streamExpressionScore(streams, 1)"}],
+            sortCriteria={"global": [{"key": "streamExpressionScore"}]},
+        )
+        t["metadata"]["author"] = "Branding-Brevity"
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert not any("local ranked expressions" in error for error in errors)
+
+    def test_core_template_rejects_stacked_groups_and_dynamic_fetching(self, write_template, base_template):
+        t = base_template(
+            groups={"enabled": True, "groupings": []},
+            dynamicAddonFetching={"enabled": True, "condition": "true"},
+        )
+        t["metadata"]["author"] = "Branding-Brevity"
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert any("Groups and Dynamic fetching cannot both be enabled" in error for error in errors)
+
+    def test_core_template_rejects_ungated_legacy_torbox_search_preset(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "torbox-search", "instanceId": "legacy", "enabled": False, "options": {}
+        }])
+        t["metadata"]["author"] = "Branding-Brevity"
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert any("requires coreBuildsCompatibility" in error for error in errors)
+
+    def test_core_template_accepts_explicit_v231_legacy_torbox_search_lane(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "torbox-search", "instanceId": "legacy", "enabled": False, "options": {}
+        }])
+        t["metadata"] = {
+            "version": "1.0.0", "name": "Legacy", "description": "Legacy", "author": "Branding-Brevity", "category": "Debrid",
+            "coreBuildsCompatibility": {"legacyTorboxSearch": True, "maximumAIOStreamsVersion": "2.31.1"},
+        }
+        path = write_template(t)
+        errors, _, passes = validate_template(path)
+        assert not any("legacy torbox-search" in error for error in errors)
+        assert any("explicitly limited to the v2.31.1" in item for item in passes)
+
+
 class TestSortCriteria:
     def test_valid_sort_keys_pass(self, write_template, base_template):
         t = base_template(sortCriteria={
@@ -192,7 +255,7 @@ class TestPresets:
 
     @pytest.mark.parametrize("preset_type", [
         "hdhub", "torrents-db", "sootio", "neko-bt",
-        "animetosho", "dmm-cast", "easynews", "davex",
+        "animetosho", "dmm-cast", "easynews", "easynewsPlusPlus", "easynews-search", "tmdb-addon", "davex",
     ])
     def test_current_suite_preset_types_are_known(self, preset_type, write_template, base_template):
         t = base_template(presets=[{
@@ -549,6 +612,14 @@ class TestStreamExpressions:
         path = write_template(t)
         _, warnings, _ = validate_template(path)
         assert any("0Cached ISE missing" in w for w in warnings)
+
+    def test_core_stable_without_zero_cached_ise_is_an_explicit_pass(self, write_template, base_template):
+        t = base_template(includedStreamExpressions=[])
+        t["metadata"]["coreBuildsProfile"] = "stable"
+        path = write_template(t)
+        _, warnings, passes = validate_template(path)
+        assert not any("0Cached ISE missing" in w for w in warnings)
+        assert any("Core Stable intentionally uses native availability policy" in p for p in passes)
 
     def test_ise_ese_pse_counts_in_passes(self, write_template, base_template):
         t = base_template(

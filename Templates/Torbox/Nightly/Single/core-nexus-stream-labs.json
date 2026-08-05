@@ -48,7 +48,12 @@
         "id": "enableAnime",
         "name": "Enable SeaDex (anime quality)"
       }
-    ]
+    ],
+    "coreBuildsCompatibility": {
+      "legacyTorboxSearch": true,
+      "maximumAIOStreamsVersion": "2.31.1",
+      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+    }
   },
   "config": {
     "trusted": false,
@@ -294,36 +299,12 @@
         "enabled": true
       },
       {
-        "expression": "/*Bad 4k Anime*/ (isAnime and originalLanguage == 'Japanese' and count(quality(resolution(cached(streams), '2160p'), 'Bluray REMUX')) == 0 and count(seadex(resolution(streams, '2160p'))) == 0 and count(rseMatched(resolution(cached(streams), '2160p'), 'BD T1', 'BD T2', 'BD T3', 'BD T4', 'BD T5', 'BD T6', 'BD T7', 'BD T8', 'Anime BD T1', 'Anime BD T2', 'Anime BD T3', 'Remux T1', 'Remux T2', 'Remux T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'Web T1', 'Web T2', 'Web T3', 'Web T4', 'Web T5', 'Web T6')) == 0) ? negate(merge(library(streams), seadex(streams)), resolution(streams, '2160p')) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/*Upscaled 4k*/ (queryType=='movie' or queryType=='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(rseMatched(resolution(streams, '2160p'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'UHD Bluray T2', 'UHD Bluray T3', 'HD Bluray T1', 'HD Bluray T2', 'HD Bluray T3', 'Radarr UHD Bluray T1', 'Radarr UHD Bluray T2', 'Radarr UHD Bluray T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'DE Web T1', 'DE Web T2', 'DE Web T3', 'DE Web Scene', 'Web T1', 'Web T2', 'Web T3', 'Web Scene')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/*Bad 4k Bluray — tier-guarded*/ (queryType=='movie' or queryType=='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'2160p'))) == 0 and count(rseMatched(resolution(streams, '2160p'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'UHD Bluray T2', 'UHD Bluray T3', 'HD Bluray T1', 'HD Bluray T2', 'HD Bluray T3', 'Radarr UHD Bluray T1', 'Radarr UHD Bluray T2', 'Radarr UHD Bluray T3', 'Radarr Remux T1', 'Sonarr Remux T1', 'Radarr Remux T2', 'Sonarr Remux T2')) == 0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/*Bad 1080P Bluray — tier-guarded*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(quality(resolution(streams,'1080p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'1080p'))) == 0 and count(rseMatched(quality(resolution(streams,'1080p'),'Bluray'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'HD Bluray T1', 'UHD Bluray T2', 'HD Bluray T2', 'UHD Bluray T3', 'HD Bluray T3', 'Radarr HD Bluray T1', 'Sonarr HD Bluray T1', 'Radarr HD Bluray T2', 'Sonarr HD Bluray T2', 'Radarr Remux T1', 'Sonarr Remux T1')) == 0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []",
-        "enabled": true
-      },
-      {
         "expression": "/*Info & Other Unwanted*/ merge(type(streams, 'info'), releaseGroup(type(streams,'usenet','stremio-usenet'),'sample'), type(keyword(streams, 'all', '-sample'), 'usenet', 'stremio-usenet'), message(type(streams,'usenet','stremio-usenet'),'includes','🚫'))",
         "enabled": true
       },
       {
         "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
         "enabled": true
-      },
-      {
-        "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
-        "enabled": true
-      },
-      {
-        "expression": "/* LABS v0.8.0 | Score IQR Guard — adaptive low-score filter using values(seScore) IQR fence */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
-        "enabled": false
       },
       {
         "expression": "/*Bitrate Floor — 1080p REMUX AV1 kill (AV1 never appears on a Blu-ray disc) — animation+short-content exempt*/ (isAnime or 'Animation' in genres or (runtime > 0 and runtime < 25)) ? [] : (negate(merge(library(streams), seadex(streams)), encode(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 'AV1')))",
@@ -434,14 +415,6 @@
       {
         "expression": "/* LABS v0.6.0 | IMAX pin — native visualTag() replaces regex pattern */ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
         "enabled": true
-      },
-      {
-        "enabled": true,
-        "expression": "/* LABS | T1 Pattern Pin — Vidhin05 tier detection beyond hand-listed release groups */ pin(rseMatched(streams,'Radarr Remux T1','Sonarr Remux T1','Radarr HD Bluray T1','Sonarr HD Bluray T1','Web T1'),'top')"
-      },
-      {
-        "enabled": true,
-        "expression": "/* LABS S+ Tier | T1-matched 1080p Remux — pattern-verified elite above generic remux */ rseMatched(quality(resolution(streams,'1080p'),'Bluray REMUX'),'Radarr Remux T1','Sonarr Remux T1')"
       },
       {
         "expression": "/* S-Tier 1080p | BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '1080p')",
@@ -1250,31 +1223,9 @@
       "condition": "count(resolution(totalCachedStreams, '1080p')) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     },
     "groups": {
-      "enabled": true,
+      "enabled": false,
       "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "nx-fix-04",
-            "tam-seadex",
-            "67c",
-            "nx-fix-02",
-            "nx-fix-01"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4",
-            "3cb9b60c-eee4-4622-a992-62dd746bab58",
-            "8b334f9b-e5c2-4061-bc3d-305d1d0c422f",
-            "tam-knaben"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -1284,10 +1235,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1357,10 +1304,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -1424,10 +1367,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1501,10 +1440,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -1564,10 +1499,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1634,10 +1565,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1708,10 +1635,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1789,10 +1712,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -1856,10 +1775,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -2545,8 +2460,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    "syncedRankedStreamExpressionUrls": []
   }
 }

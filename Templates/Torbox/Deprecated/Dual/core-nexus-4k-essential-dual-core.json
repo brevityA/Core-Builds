@@ -2,13 +2,18 @@
   "metadata": {
     "id": "core-nexus-4k-dual-core",
     "name": "Core Nexus 4K Essential Dual Core",
-    "description": "A 4K dual-service build for TorBox Essential and Real-Debrid users. Identical to the 4K Dual Core flagship but with Usenet removed -- compatible with TorBox Essential plan which does not include Usenet access. TorBox handles torrent caching and uncached traffic. Real-Debrid serves cached streams only. Targets 2160p with Dolby Vision, HDR10+, and HDR10 priority. Enforces 7.1 surround preference, TrueHD/Atmos/DTS:X audio chain, and AV1/HEVC encode priority. File range 5 GB-150 GB to accommodate full BluRay REMUX. SeaDex best-release enforced for anime. Tamtaro SEL stack with live-synced ESEs, PSEs, and regex. Expanded RD Infringing File Scrub covering the full May 2026 keyword blocklist. Designed for Nvidia Shield, Apple TV 4K, and high-end OLED/QLED displays.",
+    "description": "A 4K dual-service build for TorBox Essential and Real-Debrid users. Identical to the 4K Dual Core flagship but with Usenet removed -- compatible with TorBox Essential plan which does not include Usenet access. TorBox handles torrent caching and uncached traffic. Real-Debrid serves cached streams only. Targets 2160p with Dolby Vision, HDR10+, and HDR10 priority. Enforces 7.1 surround preference, TrueHD/Atmos/DTS:X audio chain, and AV1/HEVC encode priority. File range 5 GB-150 GB to accommodate full BluRay REMUX. SeaDex best-release enforced for anime. Local Core Builds SEL stack and regex policy. Expanded RD Infringing File Scrub covering the full May 2026 keyword blocklist. Designed for Nvidia Shield, Apple TV 4K, and high-end OLED/QLED displays.",
     "source": "external",
     "author": "Branding_Brevity",
     "version": "2.1.8",
     "category": "Debrid",
     "serviceRequired": false,
-    "setToSaveInstallMenu": true
+    "setToSaveInstallMenu": true,
+    "coreBuildsCompatibility": {
+      "legacyTorboxSearch": true,
+      "maximumAIOStreamsVersion": "2.31.1",
+      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+    }
   },
   "config": {
     "services": [
@@ -293,10 +298,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -344,10 +345,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -392,10 +389,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -464,14 +457,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -789,9 +774,7 @@
     "syncedRankedRegexUrls": [],
     "syncedPreferredStreamExpressionUrls": [],
     "syncedExcludedStreamExpressionUrls": [],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
+    "syncedIncludedStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "enhanceResults": true,
@@ -826,22 +809,6 @@
       },
       {
         "expression": "/* RD Infringing File Scrub */ service(streams, 'realdebrid') and negate(quality(streams, 'BluRay REMUX', 'BluRay'), streams) and keyword(streams, 'all', 'WEB-DL', 'WEBRip', 'AMZN', 'DSNP', 'HULU', 'NF', 'CR', 'PCOK', 'PMTP', 'ATVP', 'MAX', 'SHO', 'CRAV', 'STAN', 'BCORE', 'YTS', 'RARBG')",
-        "enabled": true
-      },
-      {
-        "expression": "/*Upscaled 4k*/(queryType=='movie' or queryType =='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(rseMatched(resolution(streams, '2160p'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'HD Bluray T1', 'UHD Bluray T2', 'HD Bluray T2', 'UHD Bluray T3', 'HD Bluray T3', 'DE Web T1', 'DE Web T2', 'DE Web T3', 'DE Web Scene', 'Web T1', 'Web T2', 'Web T3', 'Web Scene')) == 0? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')):[]",
-        "enabled": true
-      },
-      {
-        "expression": "/*Bad 4k Anime*/ (isAnime and originalLanguage == 'Japanese' and count(quality(resolution(cached(streams), '2160p'), 'Bluray REMUX')) == 0 and count(seadex(resolution(streams, '2160p'))) == 0 and count(rseMatched(resolution(streams, '2160p'), 'BD T1', 'BD T2', 'BD T3', 'BD T4', 'BD T5', 'BD T6', 'BD T7', 'BD T8', 'Remux T1', 'Remux T2', 'Remux T3', 'Web T1', 'Web T2', 'Web T3', 'Web T4', 'Web T5', 'Web T6')) == 0 )? negate(merge(library(streams), seadex(streams)), resolution(streams, '2160p')) : []",
-        "enabled": true
-      },
-      {
-        "expression": "/*Bad 4k Bluray*/(queryType=='movie' or queryType =='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX')) == 0 and count(rseMatched(resolution(streams, '2160p'), 'DE Bluray T1', 'DE Bluray T2', 'DE Bluray T3', 'UHD Bluray T1', 'HD Bluray T1', 'UHD Bluray T2', 'HD Bluray T2', 'UHD Bluray T3', 'HD Bluray T3')) == 0? negate(merge(seadex(streams),library(streams)),resolution(quality(streams, 'Bluray'),'2160p')):[]",
-        "enabled": true
-      },
-      {
-        "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
         "enabled": true
       },
       {
@@ -1145,30 +1112,9 @@
       "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 8 and count(cached(releaseGroup(totalStreams, \"CtrlHD\", \"Ember\", \"Judas\", \"Goki\", \"KITSUNE\", \"NOMA\"))) >= 2"
     },
     "groups": {
-      "enabled": true,
+      "enabled": false,
       "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "5f6",
-            "nx-fix-01",
-            "nx-fix-02",
-            "nx-fix-04"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "tam-seadex",
-            "tam-knaben",
-            "tam-mf",
-            "os-v3-hash"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "groupings": []
     },
     "proxy": {
       "id": "mediaflow",
