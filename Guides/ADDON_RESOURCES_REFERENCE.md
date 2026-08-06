@@ -59,9 +59,13 @@ The `library` preset intentionally exposes catalog+meta — this is the TorBox l
 
 ### Stream-only by default — no override required
 
-`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `knaben`, `seadex`, `animeTosho`, `nekobt`, `torbox-search`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
+`comet`, `zilean`, `stremthruTorz`, `torrent-galaxy`, `eztv`, `knaben`, `seadex`, `animeTosho`, `nekobt`, `newznab` — these all default to stream-only. Setting `resources: ['stream']` explicitly is harmless but not required.
 
 ---
+
+<Warning>
+**AIOStreams v2.32 retired the legacy `torbox-search` preset ID.** Upstream still lists a separate Newznab option labelled TorBox Search. It is not a settings-compatible automatic rename: use the v2.31 compatibility lane for legacy templates, or validate the Newznab endpoint/key path before a v2.32 migration.
+</Warning>
 
 ## Incident Log
 

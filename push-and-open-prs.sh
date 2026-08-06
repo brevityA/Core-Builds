@@ -251,7 +251,6 @@ apply_files "$PATCH" \
   .github/workflows/upstream-drift-watch.yml \
   scripts/check_upstream_drift.mjs \
   Filtering/upstream/README.md \
-  Filtering/upstream/vidhin05-expressions.snapshot.json \
   Filtering/upstream/vidhin05-regexes.snapshot.json
 
 git add -A

@@ -1,8 +1,8 @@
 name: Upstream Drift Watch
 
-# Compares the live Vidhin05/Releases-Regex files (which all active templates
-# live-sync) against the pinned snapshots in Filtering/upstream/. Opens a single
-# tracking issue on drift so the change becomes a reviewed event.
+# Compares the reviewed live Vidhin05 regex source against the pinned snapshot
+# in Filtering/upstream/. Core Builds does not use synced stream expressions.
+# Opens a single tracking issue on regex drift so the change becomes reviewed.
 #
 # Soft-fails on upstream outage (script exit 0 with warning) so network blips
 # never spam issues.
@@ -49,9 +49,9 @@ jobs:
           BODY=$(printf '%s\n' \
             '## ⚠️ Vidhin05 upstream drift detected' \
             '' \
-            'The ranked regex / ranked expression files that all active templates live-sync have changed relative to our pinned snapshots in `Filtering/upstream/`.' \
+            'The reviewed ranked regex source has changed relative to the pinned snapshot in `Filtering/upstream/`.' \
             '' \
-            'Template behaviour changes immediately whether we act or not — this issue exists so the change is reviewed.' \
+            'Synced stream expressions are prohibited. This issue exists only so any regex change is reviewed before it is adopted.' \
             '' \
             '```' "$REPORT" '```' \
             '' \

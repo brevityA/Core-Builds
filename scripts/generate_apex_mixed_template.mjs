@@ -62,6 +62,10 @@ c.dynamicAddonFetching = {
   condition: "count(cached(resolution(totalStreams,'2160p'))) >= 8 or count(cached(resolution(totalStreams,'1080p'))) >= 12 or totalTimeTaken > 6000",
 };
 
+// A single Dynamic early-exit strategy is already enough for this explicit
+// advanced template. Never restore the inherited Groups scheduler as well.
+c.groups = { enabled: false, groupings: [] };
+
 writeFileSync(
   'Templates/Torbox/Nightly/Single/core-nexus-4k-apex-mixed.json',
   JSON.stringify(src, null, 2) + '\n'

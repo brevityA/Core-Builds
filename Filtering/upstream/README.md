@@ -1,34 +1,36 @@
 # Upstream snapshots — Vidhin05/Releases-Regex
 
-These files are **pinned snapshots of third-party upstream**, not Core Builds content:
+These files are **reviewed third-party regex snapshots**, not Core Builds content.
 
 | Snapshot | Upstream |
 |---|---|
 | `vidhin05-regexes.snapshot.json` | [`Vidhin05/Releases-Regex@main/English/regexes.json`](https://github.com/Vidhin05/Releases-Regex/blob/main/English/regexes.json) |
-| `vidhin05-expressions.snapshot.json` | [`Vidhin05/Releases-Regex@main/English/expressions.json`](https://github.com/Vidhin05/Releases-Regex/blob/main/English/expressions.json) |
 
-## Why they exist
+## Local-expression policy
 
-41/48 active templates — and every configurator-generated template — live-sync ranked
-regex and ranked stream expressions from these upstream URLs, and elfhosted validates
-regex patterns against `regexes.json` by **exact string equality**. Any push upstream
-changes ranking for every Core Builds user immediately.
+Core Builds does **not** use synced stream-expression URLs. In particular, it must not
+ship values in any of these fields:
 
-The templates sync `@main` regardless of what we do here, so these snapshots don't
-*pin* behaviour — they make upstream changes a **reviewed event**: the
-`upstream-drift-watch.yml` workflow compares live upstream against these files daily
-and opens an issue on drift, so we can review changes, re-generate affected templates,
-and update `Filtering/ranked-regex-patterns.json` (the inline Core Builds subset that
-must keep matching the whitelist) instead of finding out from user reports.
+- `syncedRankedStreamExpressionUrls`
+- `syncedPreferredStreamExpressionUrls`
+- `syncedIncludedStreamExpressionUrls`
+- `syncedExcludedStreamExpressionUrls`
 
-## Checking and updating
+Local expressions and any local ranked-expression tiers must be committed directly to
+the template and validated before release.
+
+## Why the regex snapshot exists
+
+Some host configurations validate regex patterns against upstream content. The snapshot
+makes an upstream regex change a reviewed event rather than a silent dependency change.
+It does not authorise synced stream expressions or external SEL runtime dependencies.
+
+## Checking and updating the regex snapshot
 
 ```bash
-node scripts/check_upstream_drift.mjs            # compare live upstream vs snapshots
-node scripts/check_upstream_drift.mjs --update   # re-pin after reviewing the drift
+node scripts/check_upstream_drift.mjs            # compare live regexes vs snapshot
+node scripts/check_upstream_drift.mjs --update   # re-pin after review
 ```
 
-After `--update`: review `git diff`, commit the snapshots, and check whether
-`Filtering/ranked-regex-patterns.json` needs re-syncing with any renamed/changed
-whitelist patterns (drifted pattern strings cause "X/183 regexes not allowed" import
-errors on elfhosted).
+After `--update`, review `git diff` and confirm whether
+`Filtering/ranked-regex-patterns.json` needs a deliberate local update.
