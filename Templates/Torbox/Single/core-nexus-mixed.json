@@ -2,7 +2,7 @@
   "metadata": {
     "id": "brevity.core-nexus-mixed",
     "name": "Core Nexus Mixed",
-    "description": "Adaptive multi-resolution build for niche and mixed libraries. No hard resolution caps — 4K, 1440p, 1080p, 720p and SD tiers all stay eligible and are ranked by a cached × quality blend (availability first, encode quality second, resolution third). 4K BluRay REMUX and HDR WEB-DL tiers sit above the 1080p ladder, with 576p/480p niche fallbacks for classic and rare content that never surfaces in capped templates. Full ranked regex scoring (Common + UHD tiers), live-synced ESEs/PSEs, and a blended dynamic-fetch exit. Pairs with any device profile.",
+    "description": "Adaptive multi-resolution build for niche and mixed libraries. No hard resolution caps — 4K, 1440p, 1080p, 720p and SD tiers all stay eligible and are ranked by a cached × quality blend (availability first, encode quality second, resolution third). 4K BluRay REMUX and HDR WEB-DL tiers sit above the 1080p ladder, with 576p/480p niche fallbacks for classic and rare content that never surfaces in capped templates. Full ranked regex scoring (Common + UHD tiers), local ESE/PSE rules, and a blended dynamic-fetch exit. Pairs with any device profile.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "1.0.1",
@@ -10,7 +10,12 @@
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-mixed.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "coreBuildsCompatibility": {
+      "legacyTorboxSearch": true,
+      "maximumAIOStreamsVersion": "2.31.1",
+      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+    }
   },
   "config": {
     "trusted": false,
@@ -282,10 +287,6 @@
       },
       {
         "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-        "enabled": true
-      },
-      {
-        "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
         "enabled": true
       },
       {
@@ -1243,31 +1244,9 @@
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 12 or count(cached(resolution(totalStreams, \"2160p\"))) >= 6 or totalTimeTaken > 6000"
     },
     "groups": {
-      "enabled": true,
+      "enabled": false,
       "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "nx-fix-04",
-            "67c",
-            "nx-fix-02",
-            "nx-fix-01",
-            "d5f1ff1d-b8f5-4ade-a922-357a0c02e8b4"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "3cb9b60c-eee4-4622-a992-62dd746bab58",
-            "8b334f9b-e5c2-4061-bc3d-305d1d0c422f",
-            "tam-knaben",
-            "nx-tdb-1"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -1277,10 +1256,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1350,10 +1325,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -1417,10 +1388,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1494,10 +1461,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -1557,10 +1520,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1627,10 +1586,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1701,10 +1656,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -2373,8 +2324,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    "syncedRankedStreamExpressionUrls": []
   }
 }

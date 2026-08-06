@@ -11,7 +11,12 @@
       "serviceRequired": false,
       "setToSaveInstallMenu": true,
       "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json",
-      "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+      "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+      "coreBuildsCompatibility": {
+        "legacyTorboxSearch": true,
+        "maximumAIOStreamsVersion": "2.31.1",
+        "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+      }
     },
     "config": {
       "trusted": false,
@@ -275,14 +280,6 @@
         },
         {
           "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-          "enabled": true
-        },
-        {
-          "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
-          "enabled": true
-        },
-        {
-          "expression": "/* Score IQR Guard */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
           "enabled": true
         },
         {
@@ -1268,16 +1265,8 @@
         "condition": "count(cached(resolution(totalStreams,'2160p'))) >= 5 or totalTimeTaken > 5000"
       },
       "groups": {
-        "enabled": true,
-        "groupings": [
-          {
-            "addons": [
-              "nx-fix-02",
-              "nx-fix-01"
-            ],
-            "condition": "count(cached(previousStreams)) < 3"
-          }
-        ]
+        "enabled": false,
+        "groupings": []
       },
       "sortCriteria": {
         "global": [
@@ -1287,10 +1276,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -1356,10 +1341,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "seadex",
             "direction": "desc"
           },
@@ -1419,10 +1400,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -1492,10 +1469,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "library",
             "direction": "desc"
           },
@@ -1551,10 +1524,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -1617,10 +1586,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -1687,10 +1652,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -2336,9 +2297,7 @@
       "syncedRankedRegexUrls": [
         "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
       ],
-      "syncedRankedStreamExpressionUrls": [
-        "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-      ]
+      "syncedRankedStreamExpressionUrls": []
     }
   },
   {
@@ -2353,7 +2312,12 @@
       "serviceRequired": false,
       "setToSaveInstallMenu": true,
       "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json",
-      "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+      "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+      "coreBuildsCompatibility": {
+        "legacyTorboxSearch": true,
+        "maximumAIOStreamsVersion": "2.31.1",
+        "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+      }
     },
     "config": {
       "trusted": false,
@@ -2624,10 +2588,6 @@
         },
         {
           "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-          "enabled": true
-        },
-        {
-          "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
           "enabled": true
         },
         {
@@ -3553,16 +3513,8 @@
         "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 15"
       },
       "groups": {
-        "enabled": true,
-        "groupings": [
-          {
-            "addons": [
-              "nx-fix-02",
-              "nx-fix-01"
-            ],
-            "condition": "count(cached(previousStreams)) < 3"
-          }
-        ]
+        "enabled": false,
+        "groupings": []
       },
       "sortCriteria": {
         "global": [
@@ -3572,10 +3524,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -3641,10 +3589,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "seadex",
             "direction": "desc"
           },
@@ -3704,10 +3648,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -3777,10 +3717,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "library",
             "direction": "desc"
           },
@@ -3836,10 +3772,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -3902,10 +3834,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -3972,10 +3900,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -4640,9 +4564,7 @@
       "syncedRankedRegexUrls": [
         "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
       ],
-      "syncedRankedStreamExpressionUrls": [
-        "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-      ]
+      "syncedRankedStreamExpressionUrls": []
     }
   },
   {
@@ -4655,7 +4577,12 @@
       "version": "2.8.16",
       "category": "Anime",
       "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json",
-      "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+      "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+      "coreBuildsCompatibility": {
+        "legacyTorboxSearch": true,
+        "maximumAIOStreamsVersion": "2.31.1",
+        "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+      }
     },
     "config": {
       "addonName": "Core Nexus Anime 4K",
@@ -5144,10 +5071,6 @@
           "enabled": true
         },
         {
-          "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
-          "enabled": true
-        },
-        {
           "expression": "/*Extra Cached (HQ)*/ merge( slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray REMUX'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'Bluray'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEB-DL'),'Unknown'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'2160p','1440p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'1080p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'720p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'576p','480p'), 3), slice(resolution(quality(negate(merge((library(streams)),uncached(streams)),streams),'WEBRip'),'Unknown'), 3))",
           "enabled": true
         },
@@ -5298,16 +5221,8 @@
         "showFilterStatsOnNoStreams": true
       },
       "groups": {
-        "enabled": true,
-        "groupings": [
-          {
-            "addons": [
-              "60f24567-7539-4a79-afe1-e8fb2ffd3c13",
-              "0a1bc005-3cad-44d6-a403-06ff7ad6764f"
-            ],
-            "condition": "count(cached(previousStreams)) < 3"
-          }
-        ]
+        "enabled": false,
+        "groupings": []
       },
       "precacheSelector": "count(cached(streams)) == 0 ? slice(uncached(type(streams, 'debrid')), 0, 1) : []",
       "precacheSingleStream": true,
@@ -5444,10 +5359,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "resolution",
             "direction": "desc"
           },
@@ -5507,10 +5418,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -5576,10 +5483,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "library",
             "direction": "desc"
           },
@@ -5639,10 +5542,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -5708,10 +5607,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "library",
             "direction": "desc"
           },
@@ -5771,10 +5666,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
@@ -5844,10 +5735,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "library",
             "direction": "desc"
           },
@@ -5914,10 +5801,6 @@
             "direction": "desc"
           },
           {
-            "key": "streamExpressionScore",
-            "direction": "desc"
-          },
-          {
             "key": "library",
             "direction": "desc"
           },
@@ -5977,10 +5860,6 @@
           },
           {
             "key": "streamExpressionMatched",
-            "direction": "desc"
-          },
-          {
-            "key": "streamExpressionScore",
             "direction": "desc"
           },
           {
