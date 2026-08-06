@@ -18,3 +18,4 @@ export {
   findFeatureConflicts,
   validateOutputProfileBudget,
 } from './feature-conflict-policy.js';
+export { sanitizeFeedbackText, buildFeedbackReport } from './feedback-report-policy.js';
