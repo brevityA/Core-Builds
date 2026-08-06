@@ -186,10 +186,10 @@ function buildPresets(input) {
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(creds.streamnzb ? { url:creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(hasDebridio ? [
+    ...(hasDebridio && creds.debridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(creds.debridio ? { apiKey:creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
-    ...(multiServices.includes('debrider') ? [
+    ...(multiServices.includes('debrider') && creds.debrider ? [
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(creds.debrider ? { apiKey:creds.debrider } : {}) }, resources:['stream'] },
     ] : []),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {

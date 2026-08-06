@@ -3163,10 +3163,10 @@ function presets() {
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(hasDebridio ? [
+    ...(hasDebridio && S.creds.debridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
-    ...(S.multiServices.includes('debrider') ? [
+    ...(S.multiServices.includes('debrider') && S.creds.debrider ? [
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(S.creds.debrider ? { apiKey:S.creds.debrider } : {}) }, resources:['stream'] },
     ] : []),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
@@ -5637,6 +5637,8 @@ async function preflightCheck() {
   if (S.multiServices.includes('easynews') && !S.creds.easynews) warns.push('EasyNews selected but no username entered');
   if (S.multiServices.includes('easynews') && !S.creds.easynewsPass) warns.push('EasyNews selected but no password entered');
   if (S.multiServices.includes('nzbgeek') && !S.creds.nzbgeek) warns.push('NZBGeek selected but no API key entered');
+  if (S.multiServices.includes('debridio') && !S.creds.debridio) warns.push('Debridio selected but no API key entered — its preset is omitted until a key is added');
+  if (S.multiServices.includes('debrider') && !S.creds.debrider) warns.push('Debrider selected but no API key entered — its preset is omitted until a key is added');
   if (S.multiServices.includes('streamnzb') && !S.creds.streamnzb) warns.push('StreamNZB selected but no manifest URL entered');
   if (S.audio === 'lossless' && DEVICE_FORCE_LIMITED_AUDIO.has(S.device)) warns.push('Lossless audio selected but this device profile does not reliably support passthrough');
   try {
@@ -5706,7 +5708,7 @@ const EXPRESS_SERVICES = [
 function showExpressLane() {
   document.getElementById('expressLaneModal')?.remove();
   const svc = (S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro';
-  const state = { service: svc, target: 'app' };
+  const state = { service: svc, target: 'app', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])] };
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
@@ -5717,6 +5719,24 @@ function showExpressLane() {
     if (service === 'easynews') return credInput('easynews') + credInput('easynewsPass');
     return credInput(service === 'torbox-pro' ? 'torbox' : service);
   };
+  // Extra services that need a credential when added via the popout.
+  const EXTRA_CRED = { debridio:'debridio', debrider:'debrider', nzbgeek:'nzbgeek', streamnzb:'streamnzb' };
+  const renderCreds = () => {
+    const prim = credArea(state.service);
+    const extraCreds = [
+      ...state.extras.filter(v => v !== state.service).map(v => EXTRA_CRED[v]).filter(Boolean).map(credInput),
+      ...state.scrapers.map(sid => (OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid) || {}).credKey).filter(Boolean).map(credInput),
+    ].join('');
+    const extraBlock = extraCreds ? `<div style="margin-top:8px;border-top:1px dashed rgba(255,255,255,.12);padding-top:8px">${extraCreds}</div>` : '';
+    return prim + extraBlock;
+  };
+  // Re-render #expressCreds while preserving typed values across re-renders.
+  const renderCredsInto = () => {
+    const drafts = {};
+    document.querySelectorAll('#expressLaneModal [data-express-cred]').forEach(i => { drafts[i.dataset.expressCred] = i.value; });
+    document.getElementById('expressCreds').innerHTML = renderCreds();
+    document.querySelectorAll('#expressLaneModal [data-express-cred]').forEach(i => { const v = drafts[i.dataset.expressCred]; if (v !== undefined) i.value = v; });
+  };
   const overlay = document.createElement('div');
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
@@ -5724,7 +5744,8 @@ function showExpressLane() {
     <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Core Builds picks sensible defaults — fine-tune any of it later in Advanced.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
     <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
       <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      <div id="expressCreds">${credArea(state.service)}</div>
+      <div id="expressCreds">${renderCreds()}</div>
+      <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · Install to</div>
       <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['manifest','Manifest URL','Use in Stremio, WuPlay or Nuvio']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
@@ -5750,7 +5771,8 @@ function showExpressLane() {
     if (svcBtn) {
       state.service = svcBtn.dataset.expressService;
       overlay.querySelectorAll('[data-express-service]').forEach(b => b.classList.toggle('active', b.dataset.expressService === state.service));
-      document.getElementById('expressCreds').innerHTML = credArea(state.service);
+      state.extras = state.extras.filter(v => v !== state.service);
+      renderCredsInto();
       return;
     }
     const tgtBtn = e.target.closest('[data-express-target]');
@@ -5759,6 +5781,20 @@ function showExpressLane() {
       overlay.querySelectorAll('[data-express-target]').forEach(b => b.classList.toggle('active', b.dataset.expressTarget === state.target));
       const box = document.getElementById('expressStremio');
       if (box) box.style.display = state.target === 'app' ? '' : 'none';
+      return;
+    }
+    if (e.target.closest('#expressExtrasBtn')) {
+      showAdditionalServicesPicker({
+        services: state.extras,
+        scrapers: state.scrapers,
+        onApply: (sv, sc) => {
+          state.extras = sv.filter(v => v !== state.service);
+          state.scrapers = sc;
+          renderCredsInto();
+          const c = document.getElementById('expressExtrasCount');
+          if (c) c.textContent = (state.extras.length + state.scrapers.length) ? `${state.extras.length + state.scrapers.length} selected` : '';
+        },
+      });
       return;
     }
     if (e.target.closest('#expressGo')) {
@@ -5771,6 +5807,7 @@ function showExpressLane() {
         fullStack: document.getElementById('expressFullStack')?.checked !== false,
         clean: document.getElementById('expressClean')?.checked === true,
         tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
+        extras: { services: state.extras, scrapers: state.scrapers },
       };
       const goBtn = document.getElementById('expressGo');
       if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
@@ -5790,7 +5827,13 @@ async function runExpressInstall(p) {
   applyQuickProfile('balanced');
   S.service = p.service;
   S.p2pEnabled = isFree;
-  S.multiServices = isFree ? ['p2p'] : [p.service];
+  const extrasSvc = p.extras?.services || [];
+  const extrasScr = p.extras?.scrapers || [];
+  S.multiServices = [...new Set([...(isFree ? ['p2p'] : [p.service]), ...extrasSvc])];
+  S.optionalScrapers = extrasScr;
+  S.p2pEnabled = isFree || extrasSvc.includes('p2p');
+  // Extra services push the config into multi-service mode so their presets emit.
+  S.service = deriveService() || S.service;
   S.content = 'all';
   S.installMode = 'direct';
   S.quickStart = true;
