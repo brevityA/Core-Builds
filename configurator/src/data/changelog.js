@@ -1,4 +1,18 @@
 export const CHANGELOG = [
+  { v:'2.90', date:'Aug 6 2026', items:[
+    'AIOStreams v2.32 compatibility — the legacy built-in torbox-search preset is removed from all generated configs and all 72 static templates (the TorBox Search API was shut down; saving a config that still includes it fails on v2.32+ hosts). No automatic conversion to the generic Newznab option is performed.',
+    'Templates/Legacy/v2.31.1/ — explicit compatibility lane preserving the 15 previously-enabled templates with torbox-search for hosts still on AIOStreams 2.31.1 or older.',
+    'Minimum AIOStreams version raised to 2.32.0 — host auto-select and version floor now match the current public host fleet (all stable instances are v2.32.x).',
+    'Template size budget — the validator now measures the compact config payload (what is POSTed on save) and errors above 100 KB / warns above 90 KB against the AIOStreams 102,400-byte hard limit; oversized templates are trimmed to stay under budget.',
+    'Legacy torbox-search CI gates — the template validator rejects torbox-search outside the Legacy lane and the configurator test suite fails if the generators ever emit it again.',
+    'Newznab/Torznab presets use the v2.32 single-endpoint shape — full api.url (usually ending in /api) with apiKey inside the api object; legacy newznabUrl/apiPath/checkOwned/seasonPackStrategy options are no longer emitted. The validator flags any remaining legacy NAB keys and any preset pointing at the shut-down TorBox Search API.',
+    'Pre-install payload guard — Direct Install now blocks configs over AIOStreams\u2019 100 KB (102,400-byte) save limit with a clear message instead of a generic 413 error.',
+    'Docs links consolidated on corebuilds-docs.docsalot.dev — README, configurator footer, tools page, and generated docs no longer point at the stale mintlify mirror.',
+    'Express Install lane — one-click two-step install (pick debrid → connect Stremio or grab the manifest) with Balanced defaults and Full-Stack AIOMetadata + Cinemeta patch by default. Reuses the shared install pipeline; no new machinery.',
+    'Core Score — every stream in Test Drive now shows an explainable 0–100 quality badge (quality tier, bitrate vs IQR fence, resolution fit, HDR, source trust, seeders, freshness) with a tap-to-open breakdown of every gate. Flagship formatters add a branded Core {score} badge.',
+    'Fixed: Debridio/Debrider config reject — the presets were emitted enabled without their required API key, so AIOStreams rejected the config (\"debridioApiKey is required, got undefined\"). They are now omitted until a key is entered, with a preflight warning.',
+    'Express Install — added an \"Additional services & scrapers\" popout (Debridio, Debrider, Usenet, indexers) mirroring Quick Install, with credentials folding into the same flow.',
+  ]},
   { v:'2.89', date:'Aug 4 2026', items:[
     'Fixed: episode-pack availability — multi-episode and season-pack streams were removed too early, before cache and quality filters ran; when those filters eliminated single-episode alternatives, valid requests could return zero streams. Packs are now hidden only after three playable standalone episodes survive all filtering.',
     'Fixed: Core Tools hub restored — the complete tools page is back after a truncated deployment removed cards and closing markup',

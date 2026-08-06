@@ -29,11 +29,11 @@
   <a href="https://www.reddit.com/r/CoreBuilds/">
     <img src="https://img.shields.io/badge/REDDIT-r%2FCoreBuilds-FF4500?style=for-the-badge&logo=reddit&logoColor=white&labelColor=1a1f27" alt="Reddit"/>
   </a>
-  <a href="https://core-builds.mintlify.app/roadmap">
+  <a href="https://corebuilds-docs.docsalot.dev/roadmap">
     <img src="https://img.shields.io/badge/ROADMAP-What's_Next-00d4ff?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Roadmap"/>
   </a>
-  <a href="https://core-builds.mintlify.app">
-    <img src="https://img.shields.io/badge/DOCS-core--builds.mintlify.app-00d4ff?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
+  <a href="https://corebuilds-docs.docsalot.dev">
+    <img src="https://img.shields.io/badge/DOCS-corebuilds-docs.docsalot.dev-00d4ff?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
   </a>
   <a href="https://discord.gg/ZvjnKbrq">
     <img src="https://img.shields.io/badge/DISCORD-Join_Us-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1a1f27" alt="Discord"/>
@@ -48,7 +48,7 @@
 
 <p align="center">
   Template directory, import links, and full documentation have moved to<br/>
-  <a href="https://core-builds.mintlify.app/template-directory"><b>core-builds.mintlify.app</b></a>
+  <a href="https://corebuilds-docs.docsalot.dev/templates/directory"><b>corebuilds-docs.docsalot.dev</b></a>
 </p>
 
 > 🚀 **These templates are built for [TorBox](https://torbox.app/subscription?referral=d1ccddb0-f094-45ca-b52b-942a2635855e).** Use the referral link above and get **up to 84 extra days free** depending on the plan — and support this project.
@@ -72,6 +72,10 @@
 ### Don't know which to choose?
 
 ```
+First install, import troubleshooting, or want the smallest predictable setup?
+├── Want 4K? → Core Stable 4K
+└── 1080p? → Core Stable 1080p
+
 TorBox Pro?
 ├── Got NZBGeek/Usenet indexer?
 │   ├── Want 4K? → 4K Hybrid
@@ -95,6 +99,19 @@ Watching anime?
 
 Getting too few results / low-overhead host? → use the Lite variant of any template above
 ```
+
+---
+
+### 🟢 Core Stable — predictable baseline
+
+> Start here for a first install, import troubleshooting, or a conservative setup. Core Stable uses no remote SEL/regex sync, no add-on groups, no dynamic early fetch exit, one native result-limit policy, and visible diagnostics. It deliberately keeps valid season and multi-episode packs available.
+
+| Template | Res | Import URL |
+|---|---|---|
+| **Core Stable 1080p · TorBox** | 1080p + 720p fallback | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Stable/core-stable-torbox-1080p.json` |
+| **Core Stable 4K · TorBox** | 4K + 1080p fallback | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Stable/core-stable-torbox-4k.json` |
+
+> Need additional local scoring, IQR, or experimental fetching behaviour? Choose a named Balanced, Advanced, or Labs output profile in the Configurator rather than layering extra rules over a Stable template.
 
 ---
 
@@ -216,7 +233,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | [Prism TorBox Essential 1080p](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) | MightyIcyy | Essential | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) |
 | [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) | RB3 | TorBox Pro + RD | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) · [README](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/README.md) |
 
-> Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
+> Community templates are not Core Builds-maintained profiles. A community template that uses synced stream-expression URLs is not compatible with the Core Builds local-expression policy and may fail on public hosts. Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
 
 ---
 
@@ -256,7 +273,8 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 46 active templates — 33 stable (25 standard + 8 Lite) + 7 Nightly + 6 Labs |
+| [`Templates/Stable/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Stable) | Core Stable baseline templates — minimal local filtering and predictable fetch behaviour |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | Curated TorBox, device, Lite, Nightly, and Labs templates |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
@@ -268,17 +286,17 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 ## 📖 Documentation
 
-Full docs at **[core-builds.mintlify.app](https://core-builds.mintlify.app)**
+Full docs at **[corebuilds-docs.docsalot.dev](https://corebuilds-docs.docsalot.dev)**
 
 | Guide | Link |
 |---|---|
-| Quick Start | [Docs → Quick Start](https://core-builds.mintlify.app/quick-start) |
-| Import a template | [Docs → Importing a Template](https://core-builds.mintlify.app/importing) |
-| Which template? | [Docs → Which Template?](https://core-builds.mintlify.app/which-template) |
-| Formatters | [Docs → Formatters](https://core-builds.mintlify.app/formatters) |
-| Device profiles | [Docs → Device Profiles](https://core-builds.mintlify.app/device-profiles) |
-| Troubleshooting | [Docs → Troubleshooting](https://core-builds.mintlify.app/troubleshooting) |
-| FAQ | [Docs → FAQ](https://core-builds.mintlify.app/faq) |
+| Quick Start | [Docs → Quick Start](https://corebuilds-docs.docsalot.dev/getting-started/quick-start) |
+| Import a template | [Docs → Importing a Template](https://corebuilds-docs.docsalot.dev/guides/importing-templates) |
+| Which template? | [Docs → Which Template?](https://corebuilds-docs.docsalot.dev/guides/choosing-a-template) |
+| Formatters | [Docs → Formatters](https://corebuilds-docs.docsalot.dev/guides/formatters) |
+| Device profiles | [Docs → Device Profiles](https://corebuilds-docs.docsalot.dev/guides/device-profiles) |
+| Troubleshooting | [Docs → Troubleshooting](https://corebuilds-docs.docsalot.dev/support/troubleshooting) |
+| FAQ | [Docs → FAQ](https://corebuilds-docs.docsalot.dev/support/faq) |
 
 ---
 

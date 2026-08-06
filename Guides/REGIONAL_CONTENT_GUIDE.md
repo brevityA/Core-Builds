@@ -8,7 +8,7 @@ How to get regional and non-English content appearing in Stremio's **Discover** 
 
 The **Discover** tab in Stremio is populated by addon **catalogs**, not stream sources. Core Builds templates control how streams are filtered and sorted — they don't add catalog content to Discover. Regional titles show up in Discover only when an addon that provides regional catalogs is installed.
 
-AIOStreams and stream addons (Comet, Zilean, TorBox Search) are **stream-only** — they have no catalog/Discover output. You need a separate catalog addon.
+AIOStreams and stream addons (Comet, Zilean) are **stream-only** — they have no catalog/Discover output. You need a separate catalog addon. (The legacy TorBox Search addon was removed in AIOStreams v2.32.)
 
 ---
 

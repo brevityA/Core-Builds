@@ -393,7 +393,7 @@ Templates are JSON files validated against the AIOStreams schema. Key fields:
 - `sortCriteria` entries must use `"direction"` (not `"order"`) — AIOStreams rejects `"order"` on import
 - `addonLogo` URL must use `/refs/heads/main/` not `/main/` — the short form breaks on stale CDN caches
 - `stremthruTorz` is TorBox-specific; `stremthruStore` is for other debrid services (AllDebrid, RD)
-- `torbox-search` is a valid TorBox-wrapped search addon — it is not removed or broken
+- `torbox-search` (legacy built-in) — **REMOVED in AIOStreams v2.32** (TorBox Search API shut down). Saving a config that includes it fails on v2.32+ hosts. Preserve it only in the explicit `Templates/Legacy/v2.31.1/` compatibility lane; never emit it from generators or other maintained templates. No automatic conversion to the generic Newznab option.
 - `syncedRankedRegexUrls` is **allowed** on public instances (elfhosted, fortheweak.cloud) and is used to serve `rankedRegexPatterns` content from Vidhin05. The real elfhosted blocker is **inline lookahead/lookbehind regex** (`(?=...)`, `(?!...)`, `(?<=...)`, `(?<!...)`) in any regex field — keep inline patterns lookahead-free
 
 ## Known Preset Types
@@ -402,8 +402,9 @@ Preset `type` values confirmed in AIOStreams source (as of v2.31.0+):
 
 **Preset categories:** `streams`, `subtitles`, `meta_catalogs`, `misc` (enum `PresetCategory`)
 
-**Debrid/service:** `stremthruTorz`, `stremthruStore`, `torbox-search`, `sootio`, `peerflix`
-- `torbox` — **DEPRECATED** (removed/disabled v2.30.2); use `torbox-search`
+**Debrid/service:** `stremthruTorz`, `stremthruStore`, `sootio`, `peerflix`
+- `torbox` — **DEPRECATED** (removed/disabled v2.30.2)
+- `torbox-search` — **REMOVED in v2.32.0** (API shut down); legacy-lane only (`Templates/Legacy/v2.31.1/`)
 
 **Scrapers:** `comet`, `mediafusion`, `jackettio`, `prowlarr`, `jackett`, `knaben`, `torrentio`, `debridio`, `meteor`, `torrent-galaxy`, `zilean`, `hdhub`, `eztv`, `torrents-db`, `streamfusion`, `baguettio`, `flix-streams`, `brazuca-torrents`, `yastream`, `bitmagnet`, `dmm-cast`, `torznab`, `nuvio-streams`
 
