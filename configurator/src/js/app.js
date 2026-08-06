@@ -23,11 +23,12 @@ import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
 import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
 import { iqrExpression } from '../core/iqr-expression.js';
 import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
+import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.89';
+const CONFIGURATOR_VERSION = '2.90';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -66,6 +67,20 @@ function orderedHostEntries() {
 }
 function rememberGoodHost(host) {
   try { if (host) localStorage.setItem('coreBuildLastGoodHost', host); } catch(e) {}
+}
+// AIOStreams' express.json() body parser has a hardcoded 100 KB (102,400-byte)
+// request limit (verified in upstream packages/server/src/app.ts). The payload
+// POSTed to /api/v1/user is the compact serialized config — guard it before
+// any Direct Install so the user gets a clear message instead of a 413.
+const AIOSTREAMS_PAYLOAD_LIMIT = 102400;
+const AIOSTREAMS_PAYLOAD_WARN = 90000;
+function payloadSizeGuard(cfg) {
+  let bytes = 0;
+  try { bytes = new TextEncoder().encode(JSON.stringify(cfg)).length; } catch(e) { bytes = JSON.stringify(cfg).length; }
+  return { over: bytes > AIOSTREAMS_PAYLOAD_LIMIT, near: bytes > AIOSTREAMS_PAYLOAD_WARN, bytes, kb: Math.round(bytes/1024) };
+}
+function payloadTooLargeHtml(sz) {
+  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Config too large for AIOStreams</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${sz.kb} KB exceeds AIOStreams' 100 KB (102,400-byte) save limit. Trim filters (e.g. fewer optional scrapers), use a Lite template, or export the JSON and trim it manually.</div></div>`;
 }
 async function selectHealthyHost(timeout=4000) {
   const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
@@ -1310,7 +1325,7 @@ function splashHtml() {
     <div class="hybrid-topbar splash-anim splash-anim-d1">
       <div class="hybrid-mini-brand">CORE <b>BUILDS</b></div>
       <div class="hybrid-toplinks">
-        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer">Templates</a>
+        <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer">Templates</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a>
         <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer">Discord</a>
@@ -1366,6 +1381,7 @@ function splashHtml() {
 
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4">
+      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, connect Stremio, and install — about 30 seconds.</div></div></div>
       <div class="splash-door fastlane-door" data-action="open-fast-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.rocket(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Quick Install <span class="splash-door-tag fastlane-badge">Fastest</span></div><div class="splash-door-desc">Choose an app, service, and performance profile — then install in one short flow.</div></div></div>
       <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
       <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
@@ -1382,7 +1398,7 @@ function splashHtml() {
 
     <div class="splash-tertiary splash-anim splash-anim-d6">
       <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
-      <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Browse Templates</a>
+      <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Browse Templates</a>
       <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
       <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">GitHub</a>
       <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Core Crew</a>
@@ -1697,7 +1713,7 @@ function render() {
             </div>
           </div>
           <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 16px">
-            <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">
+            <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
             </a>
@@ -2379,6 +2395,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'close-and-next') { closeAdvancedDrawer(); if (step < STEPS && S.multiServices.length > 0) { step++; pushStep(); saveState(); render(); window.scrollTo(0,0); } }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showFastLane();
+    if (action === 'open-express-lane') showExpressLane();
     if (action === 'open-diagnostics') showDiagnosticsModal();
     if (action === 'open-additional-services') showAdditionalServicesPicker();
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
@@ -3141,7 +3158,7 @@ function presets() {
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
     ...(isNzbgeek && S.creds.nzbgeek ? [
-      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', newznabUrl:'https://api.nzbgeek.info', apiPath:'/api', apiKey:S.creds.nzbgeek, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } },
+      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
@@ -3166,7 +3183,7 @@ function presets() {
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, newznabUrl:d.apiUrl, apiPath:d.apiPath, apiKey:S.creds[d.credKey] || '', timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } };
+      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
       { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
@@ -3190,7 +3207,9 @@ function presets() {
     ...subtitlePresets(),
     ...catalogPresets()
   ];
-  if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  // The legacy built-in torbox-search preset was removed in AIOStreams v2.32
+  // (TorBox Search API shut down). Emitting it — even disabled — makes the
+  // config fail to save on v2.32+ hosts, so it is never generated here.
   return list;
 }
 
@@ -3887,9 +3906,9 @@ function parseTemplateToState(tpl) {
   });
   st.creds = creds;
 
-  // NZBGeek from presets
-  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.newznabUrl||'').includes('nzbgeek'));
-  if (nzbg && nzbg.options && nzbg.options.apiKey) creds.nzbgeek = nzbg.options.apiKey;
+  // NZBGeek from presets (v2.32 api shape)
+  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.api?.url||'').includes('nzbgeek'));
+  if (nzbg && nzbg.options && nzbg.options.api && nzbg.options.api.apiKey) creds.nzbgeek = nzbg.options.api.apiKey;
 
   // Resolution: check requiredResolutions, excludedResolutions, and ESEs
   const req = c.requiredResolutions || [];
@@ -4037,9 +4056,9 @@ function parseTemplateToState(tpl) {
     st.proxiedServices = [];
   }
 
-  // Optional Scrapers
-  const optScrapers = enabledPresets.filter(p => p.type === 'newznab' && p.options && p.options.newznabUrl).map(p => {
-    const d = OPTIONAL_SCRAPER_DEFS.find(x => x.apiUrl && p.options.newznabUrl.toLowerCase().includes(x.apiUrl.toLowerCase()));
+  // Optional Scrapers (v2.32 api shape)
+  const optScrapers = enabledPresets.filter(p => p.type === 'newznab' && p.options && p.options.api?.url).map(p => {
+    const d = OPTIONAL_SCRAPER_DEFS.find(x => x.apiUrl && p.options.api.url.toLowerCase().includes(x.apiUrl.toLowerCase()));
     return d ? d.id : null;
   }).filter(Boolean);
   st.optionalScrapers = optScrapers;
@@ -4430,13 +4449,33 @@ function showTestDriveModal() {
       }
 
       const cleanDSL = str => (str || '').replace(/\{stream\.\w+(::[^}]*)?\}/g, '').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+
+      // ── Core Score: brand the results with an explainable quality number ──
+      const scored = streams.map(s => {
+        const cs = scoreFormattedStream(s);
+        const b = cs.breakdown;
+        const rows = Object.entries(b)
+          .filter(([, p]) => p.points !== null)
+          .map(([, p]) => `<div class="cs-row"><span class="cs-row-lab">${p.label}</span><span class="cs-row-bar"><i style="width:${p.points}%;background:${p.points >= 75 ? '#3fb950' : p.points >= 50 ? '#fbbf24' : '#f87171'}"></i></span><span class="cs-row-val">${p.points}</span><span class="cs-row-note">${esc(p.note)}</span></div>`)
+          .join('');
+        const gates = cs.gates.map(g => `<div class="cs-gate ${g.passed ? 'ok' : 'bad'}">${g.passed ? '✓' : '✗'} ${g.name} — ${esc(g.note)}</div>`).join('');
+        return { s, cs, rows, gates };
+      });
+
       resultsEl.innerHTML = `
         <div class="td-count">${streams.length} stream${streams.length !== 1 ? 's' : ''} returned</div>
         <div class="td-results">
-          ${streams.map(s => `<div class="td-stream">
-            <div class="td-stream-name">${esc(cleanDSL(s.name))}</div>
-            ${s.description ? `<div class="td-stream-desc">${esc(cleanDSL(s.description))}</div>` : ''}
-          </div>`).join('')}
+          ${scored.map(({ s, cs, rows, gates }) => `
+            <div class="td-stream">
+              <div class="td-stream-name">${esc(cleanDSL(s.name))} <span class="cs-badge" style="background:${cs.score >= 75 ? 'rgba(63,185,80,.14)' : cs.score >= 50 ? 'rgba(251,191,36,.14)' : 'rgba(248,113,113,.14)'};color:${cs.score >= 75 ? '#3fb950' : cs.score >= 50 ? '#fbbf24' : '#f87171'}" title="Core Score — tap the name for the full breakdown">${cs.rank} Core ${cs.score}</span></div>
+              ${s.description ? `<div class="td-stream-desc">${esc(cleanDSL(s.description))}</div>` : ''}
+              <details class="cs-explain"><summary>Why Core ${cs.score}?</summary>
+                <div class="cs-summary">${esc(cs.summary)}</div>
+                <div class="cs-rows">${rows}</div>
+                <div class="cs-gates">${gates}</div>
+                ${cs.partial ? `<div class="cs-partial">Score computed from the formatted stream line. The full score (bitrate/IQR, parsed fields) is applied in your actual config.</div>` : ''}
+              </details>
+            </div>`).join('')}
         </div>
       `;
     } catch(err) {
@@ -4596,7 +4635,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         </div>
       </details>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px">
-        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
+        <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="community-link">Core Crew</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="community-link">GitHub</a>
         <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="community-link">Discord</a>
@@ -5448,7 +5487,7 @@ const TROUBLESHOOT_TREE = {
     q: 'Common causes of "Invalid input":',
     tips: [
       '📋 <b>Corrupted JSON</b> — If you hand-edited the template, a missing comma or bracket breaks parsing. Re-export from the configurator.',
-      '🏷️ <b>Unknown preset type</b> — Old templates may reference removed presets (e.g. "torbox" was deprecated in v2.30.2, replaced by "torbox-search"). Re-generate your template.',
+      '🏷️ <b>Unknown preset type</b> — Old templates may reference removed presets ("torbox" was deprecated in v2.30.2; the legacy "torbox-search" built-in was removed in v2.32.0). Re-generate your template.',
       '📏 <b>Schema mismatch</b> — AIOStreams schema evolves. Templates from older configurator versions may use fields that changed. Upgrade by re-generating.',
     ],
     action: { label: 'Re-generate with latest configurator', key: '_regen', desc: 'Rebuilds your template with current schema' }
@@ -5647,6 +5686,126 @@ function showAdditionalServicesPicker(options={}) {
     if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
   });
   document.getElementById('extraClose').focus();
+}
+
+// ── Express Install lane ────────────────────────────────────────────────
+// A minimal two-step, one-click install (Duck Streams / QuackStart pattern):
+// pick a debrid service + key, connect Stremio (or grab the manifest), go.
+// It reuses the full install pipeline (simpleInstall → host auto-select →
+// POST → pushToStremio → Full-Stack AIOMetadata+Cinemeta) with Balanced
+// defaults so novices get a working setup in ~30 seconds.
+const EXPRESS_SERVICES = [
+  ['torbox-pro','TorBox','Debrid · fast cache'],
+  ['realdebrid','Real-Debrid','Debrid · large library'],
+  ['alldebrid','AllDebrid','Debrid · uncached-friendly'],
+  ['premiumize','Premiumize','Debrid · generous quota'],
+  ['easynews','EasyNews','Usenet · NZB access'],
+  ['p2p','Free / P2P','No account required'],
+];
+
+function showExpressLane() {
+  document.getElementById('expressLaneModal')?.remove();
+  const svc = (S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro';
+  const state = { service: svc, target: 'app' };
+  const credInput = (key) => {
+    const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
+    const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
+    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"></div>`;
+  };
+  const credArea = (service) => {
+    if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
+    if (service === 'easynews') return credInput('easynews') + credInput('easynewsPass');
+    return credInput(service === 'torbox-pro' ? 'torbox' : service);
+  };
+  const overlay = document.createElement('div');
+  overlay.id = 'expressLaneModal';
+  overlay.className = 'fastlane-overlay';
+  overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="expressTitle" style="max-width:640px">
+    <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Core Builds picks sensible defaults — fine-tune any of it later in Advanced.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
+    <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
+      <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div id="expressCreds">${credArea(state.service)}</div>
+    </div>
+    <div class="fastlane-section"><div class="fastlane-label">2 · Install to</div>
+      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['manifest','Manifest URL','Use in Stremio, WuPlay or Nuvio']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
+          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
+        </div>
+        <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
+      </div>
+    </div>
+    <details style="margin:0 22px 8px;font-size:.74rem"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Full stack</b><br><span style="color:#8b949e">Install AIOMetadata + patch Cinemeta for better posters and catalogs.</span></span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Clean reinstall</b><br><span style="color:#8b949e">Remove previous Core Builds addons from your Stremio account.</span></span></label>
+      <div style="margin-top:8px"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
+    </details>
+    <div style="padding:0 22px 18px"><button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay || e.target.closest('#expressClose')) { overlay.remove(); return; }
+    const svcBtn = e.target.closest('[data-express-service]');
+    if (svcBtn) {
+      state.service = svcBtn.dataset.expressService;
+      overlay.querySelectorAll('[data-express-service]').forEach(b => b.classList.toggle('active', b.dataset.expressService === state.service));
+      document.getElementById('expressCreds').innerHTML = credArea(state.service);
+      return;
+    }
+    const tgtBtn = e.target.closest('[data-express-target]');
+    if (tgtBtn) {
+      state.target = tgtBtn.dataset.expressTarget;
+      overlay.querySelectorAll('[data-express-target]').forEach(b => b.classList.toggle('active', b.dataset.expressTarget === state.target));
+      const box = document.getElementById('expressStremio');
+      if (box) box.style.display = state.target === 'app' ? '' : 'none';
+      return;
+    }
+    if (e.target.closest('#expressGo')) {
+      const payload = {
+        service: state.service,
+        target: state.target,
+        creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
+        stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
+        stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
+        fullStack: document.getElementById('expressFullStack')?.checked !== false,
+        clean: document.getElementById('expressClean')?.checked === true,
+        tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
+      };
+      const goBtn = document.getElementById('expressGo');
+      if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
+      runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; goBtn.textContent = 'Install in ~30 seconds'; } });
+    }
+  });
+  document.getElementById('expressClose').focus();
+}
+
+async function runExpressInstall(p) {
+  const isFree = p.service === 'p2p';
+  if (!isFree && !Object.values(p.creds).some(v => v)) { showToast('Enter your API key first', true); return; }
+  if (p.target === 'app' && !isFree) {
+    if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
+    S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
+  }
+  applyQuickProfile('balanced');
+  S.service = p.service;
+  S.p2pEnabled = isFree;
+  S.multiServices = isFree ? ['p2p'] : [p.service];
+  S.content = 'all';
+  S.installMode = 'direct';
+  S.quickStart = true;
+  Object.assign(S.creds, p.creds);
+  S.patchCinemeta = p.fullStack;
+  S.installAIOMeta = p.fullStack;
+  S.cleanInstall = p.clean;
+  if (p.tmdb) { S.tmdbToken = p.tmdb; S.tmdbApiKey = p.tmdb; }
+  saveState();
+  try {
+    // Renders progress + result into the modal's #aioResult.
+    await simpleInstall(p.target === 'app' ? 'app' : 'manifest');
+  } catch (err) {
+    showToast('Install failed: ' + (err?.message || err), true);
+  }
 }
 
 function showFastLane() {
@@ -5908,6 +6067,8 @@ async function simpleInstall(target) {
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
   const cfg = buildFinal().config;
+  const sz = payloadSizeGuard(cfg);
+  if (sz.over) { btn.disabled = false; btn.innerHTML = 'Install'; result.innerHTML = payloadTooLargeHtml(sz); return; }
   const _allHosts = orderedHostEntries();
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
@@ -6331,6 +6492,8 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     const cfg = buildFinal().config;
+    const sz = payloadSizeGuard(cfg);
+    if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
     const existingUuid = validateUuid(uuid) ? uuid : null;
     const fastest = await selectHealthyHost(4000).catch(() => null);
     if (!fastest) { logError('deploy', 'All hosts unreachable', { service: S.service, host: S.instanceHost }); resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
@@ -6408,7 +6571,10 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     try {
-      const res = await writeHostFetch(base, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: buildFinal().config, password: pwd }) }, 8000);
+      const cfg = buildFinal().config;
+      const sz = payloadSizeGuard(cfg);
+      if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
+      const res = await writeHostFetch(base, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
@@ -6462,6 +6628,18 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     diagnostics() {
       return buildSanitizedDiagnostics();
+    },
+    setState(overrides) {
+      Object.assign(S, overrides || {});
+      if (overrides && overrides.creds) Object.assign(S.creds, overrides.creds);
+      return true;
+    },
+    openTestDrive() {
+      showTestDriveModal();
+      return true;
+    },
+    coreScore(stream, ctx) {
+      return scoreStream(stream, ctx);
     },
   };
 }

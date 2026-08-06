@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-essential-labs",
     "name": "Core Nexus Essential Labs",
-    "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. 1080p build. Template directives: TorBox Search and exit thresholds configurable at import. v0.4.0: Private Tracker Kill, DAF fix, catalog-guarded Unknown Resolution/Quality Kills.",
+    "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache only. 1080p build. Template directives: exit thresholds configurable at import. v0.4.0: Private Tracker Kill, DAF fix, catalog-guarded Unknown Resolution/Quality Kills.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "0.4.1",
@@ -46,7 +46,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Essential Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs — TorBox debrid-only, no external scrapers. CB PSEs · Private Tracker Kill · catalog-guarded Unknown Kills · TorBox Search toggle + configurable exit thresholds at import.",
+    "addonDescription": "Nightly Labs — TorBox debrid-only, no external scrapers. CB PSEs · Private Tracker Kill · catalog-guarded Unknown Kills · configurable exit thresholds at import",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
@@ -214,7 +214,6 @@
         "pattern": "/\\b(BHDStudio)\\b/i"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1186,10 +1185,6 @@
       "enabled": true,
       "condition": "count(resolution(totalCachedStreams, '1080p')) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     },
-    "groups": {
-      "enabled": false,
-      "groupings": []
-    },
     "sortCriteria": {
       "global": [
         {
@@ -2140,24 +2135,6 @@
             "en"
           ]
         }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        },
-        "__if": "inputs.enableTorboxSearch"
       }
     ],
     "catalogModifications": [

@@ -1,6 +1,6 @@
 {
   "name": "core-builds",
-  "version": "2.89.0",
+  "version": "2.90.0",
   "description": "CLI for generating, validating, and diffing AIOStreams templates",
   "type": "module",
   "bin": {

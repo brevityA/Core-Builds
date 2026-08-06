@@ -532,10 +532,6 @@
       "enabled": true,
       "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 8 and count(cached(releaseGroup(totalStreams, \"CtrlHD\", \"Ember\", \"Judas\", \"Goki\", \"KITSUNE\", \"NOMA\"))) >= 2"
     },
-    "groups": {
-      "enabled": false,
-      "groupings": []
-    },
     "sortCriteria": {
       "global": [
         {
@@ -808,23 +804,6 @@
     ],
     "presets": [
       {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 5000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
-      },
-      {
         "type": "stremthruTorz",
         "instanceId": "67c",
         "enabled": true,
@@ -849,8 +828,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -859,11 +836,13 @@
           ],
           "searchMode": "both",
           "paginate": false,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {

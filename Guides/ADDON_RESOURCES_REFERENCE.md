@@ -31,7 +31,7 @@ Without an explicit `resources` override, AIOStreams uses the addon's default `S
 | `seadex` | `seadex.ts` | `[stream]` | No | No override needed |
 | `animeTosho` | `animetosho.ts` | `[stream]` | No | No override needed |
 | `nekobt` | `nekoBt.ts` | `[stream]` | No | No override needed |
-| `torbox-search` | `torboxSearch.ts` | `[stream]` | No | No override needed |
+| `torbox-search` | `torboxSearch.ts` | `[stream]` | No | **REMOVED in AIOStreams v2.32** (API shut down) — legacy lane only |
 | `newznab` | `newznab.ts` | `[stream]` | No | No override needed |
 | `opensubtitles-v3-plus` | — | `[subtitles]` | No | Keep `resources: ['subtitles']` |
 | `aiosubtitle` | `aiosubtitle.ts` | `[subtitles]` | No | No override needed |

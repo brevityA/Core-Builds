@@ -177,7 +177,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedIncludedStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
     ],
@@ -413,7 +412,6 @@
           "name": "Secondary",
           "addons": [
             "67c",
-            "5f6",
             "os-v3-hash"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
@@ -755,23 +753,6 @@
         "resources": [
           "stream"
         ]
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 3500,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       },
       {
         "type": "opensubtitles-v3-plus",

@@ -181,7 +181,7 @@ function buildPresets(input) {
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
     ...(isNzbgeek && creds.nzbgeek ? [
-      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', newznabUrl:'https://api.nzbgeek.info', apiPath:'/api', apiKey:creds.nzbgeek, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } },
+      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(creds.streamnzb ? { url:creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
@@ -205,7 +205,7 @@ function buildPresets(input) {
     }).filter(Boolean),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, newznabUrl:d.apiUrl, apiPath:d.apiPath, apiKey:creds[d.credKey] || '', timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } };
+      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
       { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
@@ -229,7 +229,8 @@ function buildPresets(input) {
     ...buildSubtitlePresets(input),
     ...buildCatalogPresets(input)
   ];
-  if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  // The legacy built-in torbox-search preset was removed in AIOStreams v2.32
+  // (TorBox Search API shut down); emitting it fails saves on v2.32+ hosts.
   return list;
 }
 

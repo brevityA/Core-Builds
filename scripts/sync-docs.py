@@ -390,7 +390,7 @@ ROOT_ROADMAP_BEGIN = "<!-- AUTO:ROOT_COMPLETED:BEGIN -->"
 ROOT_ROADMAP_END = "<!-- AUTO:ROOT_COMPLETED:END -->"
 TOOLS_WN_BEGIN = "<!-- AUTO:TOOLS_WHATSNEW:BEGIN -->"
 TOOLS_WN_END = "<!-- AUTO:TOOLS_WHATSNEW:END -->"
-DOCS_BASE = "https://core-builds.mintlify.app"
+DOCS_BASE = "https://corebuilds-docs.docsalot.dev"
 REPO_BASE = "https://github.com/brevityA/Core-Builds"
 ROOT_ROADMAP_BEGIN = "<!-- AUTO:ROOT_COMPLETED:BEGIN -->"
 ROOT_ROADMAP_END = "<!-- AUTO:ROOT_COMPLETED:END -->"
@@ -433,7 +433,7 @@ def gen_tools_whatsnew(cfg_entries, limit=3, per_version=6):
         'rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)">'
         '<a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);'
         'text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; '
-        '<a href="https://core-builds.mintlify.app/changelog" style="color:var(--th-accent);'
+        '<a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);'
         'text-decoration:none">suite changelog →</a></span></div>'
     )
     return (
@@ -614,7 +614,7 @@ def gen_tools_whatsnew(cfg_entries, limit=4, per_version=4):
         'rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)">'
         '<a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);'
         'text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; '
-        '<a href="https://core-builds.mintlify.app/changelog" style="color:var(--th-accent);'
+        '<a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);'
         'text-decoration:none">suite changelog →</a></span></div>'
     )
     return (

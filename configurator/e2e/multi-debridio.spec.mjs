@@ -31,7 +31,7 @@ test('multi-service output includes Debridio and selected Usenet Crawler', async
   expect(debridio.options.apiKey).toBe('test-debridio-key');
   expect(crawler, 'Usenet Crawler must survive optional-scraper generation').toBeTruthy();
   expect(crawler.type).toBe('newznab');
-  expect(crawler.options.apiKey).toBe('test-usenet-crawler-key');
+  expect(crawler.options.api.apiKey).toBe('test-usenet-crawler-key');
   expect(diagnostics.settings.optionalScrapers).toEqual(['usenetcrawler']);
   expect(JSON.stringify(diagnostics)).not.toContain('test-usenet-crawler-key');
 });

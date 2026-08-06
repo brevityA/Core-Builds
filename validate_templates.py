@@ -120,6 +120,58 @@ def validate_template(fpath):
     c = t.get('config', t)
     meta = t.get('metadata', {})
 
+    # ── Removed preset gate (AIOStreams v2.32) ────────────────
+    # The legacy built-in torbox-search preset was removed in AIOStreams v2.32
+    # (TorBox Search API shut down); saving a config that still includes it
+    # fails. Only the explicit Templates/Legacy/v2.31.1 lane may keep it.
+    is_core = 'Templates' in path.parts
+    is_legacy = 'Legacy' in path.parts
+    presets_list = c.get('presets', []) if isinstance(c, dict) else []
+    has_torbox = any(
+        isinstance(p, dict) and p.get('type') == 'torbox-search'
+        for p in presets_list
+    )
+    if has_torbox:
+        if is_core and not is_legacy:
+            err(name, "contains removed preset 'torbox-search' — removed in AIOStreams v2.32 (configs fail to save); use Templates/Legacy/v2.31.1/ for the legacy lane")
+        elif is_core:
+            ok(name, "legacy 'torbox-search' preset confined to the explicit Legacy lane")
+        else:
+            warn(name, "contains legacy 'torbox-search' preset (community template — not Core-owned)")
+
+    # ── Newznab/Torznab option shape (AIOStreams v2.32) ──────────
+    # v2.32 folded newznabUrl + apiPath + apiKey into a single `api` object
+    # holding the full endpoint URL (usually ending in /api).
+    nab_types = {'newznab', 'torznab', 'nzbhydra'}
+    for p in presets_list:
+        if not isinstance(p, dict) or p.get('type') not in nab_types:
+            continue
+        o = p.get('options') or {}
+        if any(k in o for k in ('newznabUrl', 'torznabUrl', 'nzbhydraUrl', 'apiPath', 'checkOwned', 'seasonPackStrategy')):
+            if is_core and not is_legacy:
+                warn(name, f"preset '{p.get('type')}': legacy NAB options (newznabUrl/apiPath/checkOwned/seasonPackStrategy) — v2.32 uses api.url + seasonEpisodeStrategy")
+            else:
+                warn(name, f"preset '{p.get('type')}': legacy NAB option keys present")
+        api_url = ''
+        if isinstance(o.get('api'), dict):
+            api_url = str(o.get('api', {}).get('url') or '')
+        elif isinstance(o.get('url'), str):
+            api_url = o.get('url')
+        if 'torbox.app' in api_url and 'newznab' in api_url:
+            warn(name, f"preset '{p.get('type')}' points at the shut-down TorBox Search API ({api_url}) — no availability claim until an authorised endpoint/import test")
+
+    # ── Size budget (AIOStreams hardcoded 102,400-byte save limit) ──
+    # The limit applies to the compact serialized config POSTed to
+    # /api/v1/user, not the pretty-printed file on disk.
+    if is_core and not is_legacy and isinstance(c, dict):
+        compact = len(json.dumps(c, separators=(',', ':')))
+        if compact > 100_000:
+            err(name, f"config payload {compact:,} B > 100,000 B — AIOStreams save limit is 102,400 B; trim to keep margin")
+        elif compact > 90_000:
+            warn(name, f"config payload {compact:,} B > 90,000 B — close to the 102,400 B AIOStreams save limit")
+        else:
+            ok(name, f"config payload {compact:,} B within size budget")
+
     # ── Metadata ─────────────────────────────────────────────
     if not meta.get('version'):
         warn(name, "metadata.version missing")
