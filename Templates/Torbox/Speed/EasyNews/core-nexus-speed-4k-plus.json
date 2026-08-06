@@ -2,7 +2,7 @@
   "metadata": {
     "id": "brevity.core-nexus-speed-4k-plus",
     "name": "Core Nexus Speed 4K+",
-    "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, TorBox Search, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
+    "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "2.10.10",
@@ -10,7 +10,12 @@
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "coreBuildsCompatibility": {
+      "legacyTorboxSearch": true,
+      "maximumAIOStreamsVersion": "2.31.1",
+      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+    }
   },
   "config": {
     "services": [
@@ -211,9 +216,6 @@
         "enabled": false,
         "options": {
           "name": "NZBGeek",
-          "newznabUrl": "https://api.nzbgeek.info",
-          "apiPath": "/api",
-          "apiKey": "<template_placeholder>",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -222,7 +224,11 @@
           ],
           "searchMode": "both",
           "paginate": true,
-          "useMultipleInstances": false
+          "useMultipleInstances": false,
+          "api": {
+            "url": "https://api.nzbgeek.info/api",
+            "apiKey": "<template_placeholder>"
+          }
         }
       },
       {
@@ -303,23 +309,6 @@
             "en"
           ]
         }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       }
     ],
     "formatter": {
@@ -374,10 +363,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -447,10 +432,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -514,10 +495,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -591,10 +568,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -654,10 +627,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -724,10 +693,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -798,10 +763,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -879,10 +840,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -946,10 +903,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1544,7 +1497,6 @@
         "pattern": "/\\b(FraMeSToR)\\b/"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1618,10 +1570,6 @@
       },
       {
         "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-        "enabled": true
-      },
-      {
-        "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
         "enabled": true
       },
       {
@@ -2289,28 +2237,9 @@
       "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 8 or count(cached(resolution(totalStreams, \"1080p\"))) >= 10"
     },
     "groups": {
-      "enabled": true,
+      "enabled": false,
       "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "nx-fix-04",
-            "easynews-1",
-            "nx-fix-01"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "f03ac4fa-476b-42b3-b8ab-42fb829e80d1",
-            "10e1f154-ad4c-4fbc-aea0-f90848dbb143",
-            "fa590424-61b0-4042-b3ee-36e1146aa075"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "groupings": []
     },
     "proxy": {
       "id": "mediaflow",
@@ -2435,8 +2364,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    "syncedRankedStreamExpressionUrls": []
   }
 }

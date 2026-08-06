@@ -69,3 +69,22 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .fastlane-backup-link{display:inline-block;margin-top:5px;color:#67e8f9;text-decoration:none;font-size:.66rem;font-weight:800}
 .fastlane-backup-link:hover,.fastlane-backup-link:focus-visible{text-decoration:underline;outline:none}
 [data-theme='light'] .fastlane-backup-link{color:#075ebd}
+
+/* ── Core Score (explainable quality number) ───────────────────────── */
+.td-stream{position:relative}
+.cs-badge{display:inline-block;font-size:.64rem;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:1px;letter-spacing:.02em}
+.cs-explain{margin-top:8px;border:1px solid var(--line,rgba(255,255,255,.08));border-radius:8px;background:rgba(0,0,0,.18)}
+.cs-explain summary{cursor:pointer;font-size:.7rem;font-weight:800;color:#00d4ff;padding:8px 10px;letter-spacing:.04em;text-transform:uppercase}
+.cs-summary{font-size:.74rem;color:#c9d5df;padding:2px 10px 6px;line-height:1.5}
+.cs-rows{padding:2px 10px 6px;display:flex;flex-direction:column;gap:4px}
+.cs-row{display:grid;grid-template-columns:110px 1fr 30px 70px;gap:8px;align-items:center;font-size:.68rem}
+.cs-row-lab{color:#8b949e;font-weight:700;text-align:right}
+.cs-row-bar{height:6px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.cs-row-bar i{display:block;height:100%;border-radius:99px}
+.cs-row-val{color:#e6edf3;font-weight:800;font-variant-numeric:tabular-nums}
+.cs-row-note{color:#6b7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-gates{padding:2px 10px 8px;display:flex;flex-direction:column;gap:3px}
+.cs-gate{font-size:.66rem;font-weight:700;color:#8b949e}
+.cs-gate.ok{color:#3fb950}
+.cs-gate.bad{color:#f87171}
+.cs-partial{font-size:.66rem;color:#6b7280;font-style:italic;padding:0 10px 8px}

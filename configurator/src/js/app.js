@@ -23,11 +23,14 @@ import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
 import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
 import { iqrExpression } from '../core/iqr-expression.js';
 import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
+import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
+import { AIOSTREAMS_COMPATIBILITY_TARGETS, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
+import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.89';
+const CONFIGURATOR_VERSION = '2.90';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -67,6 +70,20 @@ function orderedHostEntries() {
 function rememberGoodHost(host) {
   try { if (host) localStorage.setItem('coreBuildLastGoodHost', host); } catch(e) {}
 }
+// AIOStreams' express.json() body parser has a hardcoded 100 KB (102,400-byte)
+// request limit (verified in upstream packages/server/src/app.ts). The payload
+// POSTed to /api/v1/user is the compact serialized config — guard it before
+// any Direct Install so the user gets a clear message instead of a 413.
+const AIOSTREAMS_PAYLOAD_LIMIT = 102400;
+const AIOSTREAMS_PAYLOAD_WARN = 90000;
+function payloadSizeGuard(cfg) {
+  let bytes = 0;
+  try { bytes = new TextEncoder().encode(JSON.stringify(cfg)).length; } catch(e) { bytes = JSON.stringify(cfg).length; }
+  return { over: bytes > AIOSTREAMS_PAYLOAD_LIMIT, near: bytes > AIOSTREAMS_PAYLOAD_WARN, bytes, kb: Math.round(bytes/1024) };
+}
+function payloadTooLargeHtml(sz) {
+  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Config too large for AIOStreams</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${sz.kb} KB exceeds AIOStreams' 100 KB (102,400-byte) save limit. Trim filters (e.g. fewer optional scrapers), use a Lite template, or export the JSON and trim it manually.</div></div>`;
+}
 async function selectHealthyHost(timeout=4000) {
   const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
   const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree));
@@ -94,7 +111,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:'2.32.0', installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 const SENSITIVE_TOP_LEVEL_KEYS = new Set(['instancePassword', 'basePassword', 'stremioPassword']);
 const SENSITIVE_KEY_TOKENS = ['password', 'apikey', 'api_key', 'token', 'secret', 'credential', 'auth'];
 
@@ -219,7 +236,7 @@ const RADIO_ALLOWED = (() => {
 })();
 
 /* STATE MANAGEMENT */
-const STATE_SCHEMA = 2;
+const STATE_SCHEMA = 4;
 function migrateState(input) {
   const d={...(input||{})}, schema=Number(d._schema||0);
   if(schema<1){
@@ -234,6 +251,12 @@ function migrateState(input) {
     if(!['matchingFile','matchingIndex','firstFile'].includes(d.autoPlayMethod)) d.autoPlayMethod='matchingFile';
     if(![4000,6000,8000,10000].includes(Number(d.addonTimeout))) d.addonTimeout=6000;
   }
+  if(schema<3){
+    if(!['auto', ...OUTPUT_PROFILES].includes(d.outputProfile)) d.outputProfile='auto';
+  }
+  if(schema<4){
+    if(!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(d.aiostreamsVersion)) d.aiostreamsVersion='2.32.0';
+  }
   d._schema=STATE_SCHEMA; return d;
 }
 function saveState() {
@@ -246,7 +269,7 @@ function saveState() {
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
   try {
     const pub = {};
@@ -272,6 +295,8 @@ function sanitizeSharedConfig(d) {
   pick('cacheMode',    v => ['mixed','cached','uncached'].includes(v));
   pick('streamPool',   v => ['normal','large','max'].includes(v));
   pick('pseArch',      v => ['standard','iqr','apex-mixed'].includes(v));
+  pick('outputProfile', v => ['auto', ...OUTPUT_PROFILES].includes(v));
+  pick('aiostreamsVersion', v => AIOSTREAMS_COMPATIBILITY_TARGETS.includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
   pick('ageLimit',     v => AGE_RATINGS.some(r => r.v === v));
   pick('libraryBoost', v => ['none','default','strong'].includes(v));
@@ -923,6 +948,104 @@ function renderCacheMode() {
   </div>`;
 }
 
+function outputProfileContext() {
+  return {
+    outputProfile: S.outputProfile || 'auto',
+    simpleMode: Boolean(S.simpleMode),
+    quickStart: Boolean(S.quickStart),
+    pseArch: S.pseArch || 'standard',
+    service: S.service,
+    multiServices: [...(S.multiServices || [])],
+    optionalScrapers: [...(S.optionalScrapers || [])],
+    resolution: S.resolution,
+    content: S.content,
+    langs: [...(S.langs || [])],
+    langExclusive: Boolean(S.langExclusive),
+    sizeLimit: S.sizeLimit,
+    bandwidthMbps: Number(S.bandwidthMbps) || 0,
+    cacheMode: S.cacheMode,
+    aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0',
+  };
+}
+
+function activeOutputProfile() {
+  return resolveOutputProfile(outputProfileContext());
+}
+
+function renderOutputProfilePicker({ compact=false } = {}) {
+  const active = activeOutputProfile();
+  const choices = compact ? ['stable', 'balanced'] : ['stable', 'balanced', 'advanced', 'labs'];
+  const palette = {
+    stable: ['#34d399', 'rgba(52,211,153,.09)', 'rgba(52,211,153,.28)'],
+    balanced: ['#00d4ff', 'rgba(0,212,255,.09)', 'rgba(0,212,255,.28)'],
+    advanced: ['#a78bfa', 'rgba(167,139,250,.09)', 'rgba(167,139,250,.28)'],
+    labs: ['#fbbf24', 'rgba(251,191,36,.09)', 'rgba(251,191,36,.28)'],
+  };
+  const cards = choices.map(profile => {
+    const [color, bg, border] = palette[profile];
+    const info = OUTPUT_PROFILE_INFO[profile];
+    const on = active === profile;
+    return `<button type="button" data-action="set-output-profile" data-val="${profile}" aria-pressed="${on}" style="text-align:left;padding:9px 10px;border-radius:9px;border:1px solid ${on ? border : 'rgba(255,255,255,.08)'};background:${on ? bg : 'rgba(255,255,255,.015)'};color:#e6edf3;cursor:pointer;min-width:0;flex:1;transition:all .15s">
+      <span style="display:block;font-size:.73rem;font-weight:800;color:${on ? color : '#9ca3af'}">${info.label}${on ? ' ✓' : ''}</span>
+      <span style="display:block;font-size:.62rem;line-height:1.35;color:${on ? '#c9d1d9' : '#6b7280'};margin-top:3px">${info.description}</span>
+    </button>`;
+  }).join('');
+  const flowDefault = S.simpleMode || S.quickStart ? 'Core Stable' : (S.pseArch === 'apex-mixed' ? 'Labs' : S.pseArch === 'iqr' ? 'Advanced' : 'Balanced');
+  const target = AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0';
+  const targetNote = target === '2.31.1'
+    ? 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.'
+    : target === '2.32.0'
+      ? 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.'
+      : 'Unknown target: old TorBox Search is removed rather than assumed portable.';
+  const targetControl = `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)"><label style="display:block;font-size:.64rem;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">AIOStreams compatibility target</label><select data-action="set-aiostreams-target" style="width:100%;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 8px;font-size:.72rem"><option value="2.31.1" ${target === '2.31.1' ? 'selected' : ''}>2.31.1 — legacy TorBox Search compatibility lane</option><option value="2.32.0" ${target === '2.32.0' ? 'selected' : ''}>2.32.0 — remove legacy preset; Newznab migration review</option><option value="unknown" ${target === 'unknown' ? 'selected' : ''}>Unknown / older — do not assume legacy preset support</option></select><div style="font-size:.62rem;line-height:1.4;color:#6b7280;margin-top:5px">${targetNote}</div></div>`;
+  const reset = S.outputProfile && S.outputProfile !== 'auto'
+    ? `<button type="button" data-action="set-output-profile" data-val="auto" style="margin-top:7px;padding:0;border:0;background:none;color:#6b7280;font-size:.66rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px">Use this flow’s default (${flowDefault})</button>`
+    : `<span style="display:block;margin-top:7px;color:#4b5563;font-size:.66rem">This flow defaults to ${flowDefault}.</span>`;
+  return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:8px;margin-top:10px">
+    <div style="display:flex;align-items:center;gap:7px"><span style="font-size:.76rem;font-weight:800;color:#9ca3af;letter-spacing:.04em;text-transform:uppercase">Output profile</span><span style="font-size:.62rem;font-weight:700;color:${palette[active][0]};padding:2px 6px;border-radius:4px;background:${palette[active][1]};border:1px solid ${palette[active][2]}">${OUTPUT_PROFILE_INFO[active].shortLabel}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(${compact ? 2 : 2},minmax(0,1fr));gap:6px">${cards}</div>
+    ${active === 'stable' ? `<div style="font-size:.66rem;line-height:1.45;color:#8b949e">No remote scoring or synced rules. Groups, dynamic fetch exit, background prefetch, and autoplay are disabled so import and stream problems are easier to reproduce. Stream-pool and quality-first tuning are not exported in this profile.</div>` : ''}
+    ${active === 'labs' ? `<div style="font-size:.66rem;line-height:1.45;color:#fbbf24">Labs uses experimental behaviour. Review every warning before installing.</div>` : ''}
+    ${targetControl}
+    ${reset}
+  </div>`;
+}
+
+function outputProfileAudit(template) {
+  const built = template || buildFinal();
+  const profile = activeOutputProfile();
+  const complexity = inspectTemplateComplexity(built);
+  const conflicts = findFeatureConflicts(built);
+  const budget = validateOutputProfileBudget(built, profile);
+  return { profile, complexity, conflicts, budget };
+}
+
+function outputProfileAuditHtml() {
+  const audit = outputProfileAudit();
+  const profile = OUTPUT_PROFILE_INFO[audit.profile];
+  const color = { stable:'#34d399', balanced:'#00d4ff', advanced:'#a78bfa', labs:'#fbbf24' }[audit.profile];
+  const c = audit.complexity;
+  const counts = [
+    `ESE ${c.expressions.excluded}`,
+    `ISE ${c.expressions.included}`,
+    `PSE ${c.expressions.preferred}`,
+    `Remote ${c.remoteDependencies.syncedSelUrls + c.remoteDependencies.syncedRegexUrls}`,
+    `Add-ons ${c.runtime.enabledPresets}`,
+  ];
+  const visibleIssues = audit.conflicts.slice(0, 4);
+  const budgetLine = audit.budget.ok
+    ? `<span style="color:#34d399">Within ${profile.shortLabel} complexity budget</span>`
+    : `<span style="color:#fbbf24">${audit.budget.violations.length} ${profile.shortLabel.toLowerCase()} budget check${audit.budget.violations.length === 1 ? '' : 's'} exceeded</span>`;
+  const issueHtml = visibleIssues.length
+    ? `<div style="margin-top:7px;display:flex;flex-direction:column;gap:4px">${visibleIssues.map(item => `<div style="font-size:.67rem;line-height:1.4;color:${item.severity === 'error' ? '#f87171' : '#fbbf24'}">${item.severity === 'error' ? '✕' : '⚠'} <b>${item.title}</b> — ${item.message}</div>`).join('')}${audit.conflicts.length > visibleIssues.length ? `<div style="font-size:.64rem;color:#6b7280">+${audit.conflicts.length - visibleIssues.length} more conflict check${audit.conflicts.length - visibleIssues.length === 1 ? '' : 's'} in diagnostics</div>` : ''}</div>`
+    : `<div style="margin-top:7px;font-size:.67rem;color:#34d399">✓ No conflicting rule stacks detected.</div>`;
+  return `<div style="margin-top:9px;padding:11px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08)">
+    <div style="display:flex;align-items:center;gap:7px"><span style="font-size:.74rem;font-weight:800;color:${color}">${profile.label}</span><span style="font-size:.64rem;color:#6b7280">Template complexity</span><span style="margin-left:auto;font-size:.63rem;font-weight:700">${budgetLine}</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px">${counts.map(count => `<span style="font-size:.62rem;color:#9ca3af;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:2px 5px">${count}</span>`).join('')}</div>
+    ${issueHtml}
+  </div>`;
+}
+
 function renderAdvancedPanel() {
   const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   const reachedReview = (localStorage.getItem('coreBuildStep') && parseInt(localStorage.getItem('coreBuildStep'), 10) === STEPS);
@@ -968,6 +1091,7 @@ function renderAdvancedPanel() {
       </div>
     </div>
     <div style="padding:18px 20px;display:flex;flex-direction:column;gap:20px">
+      ${renderOutputProfilePicker()}
 
       <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Limited</strong> excludes lossless formats (TrueHD, DTS-HD MA) that need high bandwidth. <strong>Full</strong> includes everything for home theater setups with proper receivers.')}</div>
@@ -1310,7 +1434,7 @@ function splashHtml() {
     <div class="hybrid-topbar splash-anim splash-anim-d1">
       <div class="hybrid-mini-brand">CORE <b>BUILDS</b></div>
       <div class="hybrid-toplinks">
-        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer">Templates</a>
+        <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer">Templates</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a>
         <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer">Discord</a>
@@ -1366,6 +1490,7 @@ function splashHtml() {
 
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4">
+      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, connect Stremio, and install — about 30 seconds.</div></div></div>
       <div class="splash-door fastlane-door" data-action="open-fast-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.rocket(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Quick Install <span class="splash-door-tag fastlane-badge">Fastest</span></div><div class="splash-door-desc">Choose an app, service, and performance profile — then install in one short flow.</div></div></div>
       <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
       <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
@@ -1382,7 +1507,7 @@ function splashHtml() {
 
     <div class="splash-tertiary splash-anim splash-anim-d6">
       <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
-      <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Browse Templates</a>
+      <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Browse Templates</a>
       <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
       <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">GitHub</a>
       <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Core Crew</a>
@@ -1487,6 +1612,8 @@ function render() {
             ].filter(Boolean).join(' · ')}</div>
           </div>` : ''}
         </div>
+        ${renderOutputProfilePicker()}
+        ${outputProfileAuditHtml()}
         ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
         ${(() => { const h = templateHealthCheck(); return h.length ? `<div class="th-alert th-alert-red" style="margin-top:6px"><div style="font-size:.68rem;font-weight:700;color:var(--th-red);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:var(--th-tx2);line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:var(--th-red);flex-shrink:0">${ICO.warn(12,'currentColor')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div class="th-alert th-alert-green" style="margin-top:6px;font-weight:600">${ICO.check(12,'currentColor')} Template looks good</div>`; })()}
         ${healthScoreHtml()}
@@ -1697,7 +1824,7 @@ function render() {
             </div>
           </div>
           <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 16px">
-            <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">
+            <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
             </a>
@@ -2349,16 +2476,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'quick-start') {
       const preset = (e.target.closest('[data-preset]') || e.target).dataset.preset;
       if (preset === 'http') {
-        Object.assign(S, { service:'http', multiServices:['http'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        Object.assign(S, { service:'http', multiServices:['http'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true, outputProfile:'auto' });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = STEPS; pushStep(); render(); window.scrollTo(0,0);
       } else if (preset === 'p2p') {
-        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:true, quickStart:true, simpleMode:true });
+        Object.assign(S, { service:'p2p', multiServices:['p2p'], resolution:'1080p', audio:'limited', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:true, quickStart:true, simpleMode:true, outputProfile:'auto' });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 5; pushStep(); render(); window.scrollTo(0,0);
       } else {
-        if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
-        else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true });
+        if (preset === '1080p') Object.assign(S, { resolution:'1080p', audio:'standard', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true, outputProfile:'auto' });
+        else Object.assign(S, { resolution:'4k', audio:'lossless', content:'all', formatter:'family-v4', matchMode:'balanced', p2pEnabled:false, quickStart:true, simpleMode:true, outputProfile:'auto' });
         saveState(); document.getElementById('main').classList.remove('nav-back');
         step = 1; pushStep(); render(); window.scrollTo(0,0);
       }
@@ -2379,12 +2506,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'close-and-next') { closeAdvancedDrawer(); if (step < STEPS && S.multiServices.length > 0) { step++; pushStep(); saveState(); render(); window.scrollTo(0,0); } }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showFastLane();
+    if (action === 'open-express-lane') showExpressLane();
     if (action === 'open-diagnostics') showDiagnosticsModal();
     if (action === 'open-additional-services') showAdditionalServicesPicker();
-    if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'show-full-review') { S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
+    if (action === 'show-full-review') { S.outputProfile = activeOutputProfile(); S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
     if (action === 'set-simple-fmt') { S.formatter = el.dataset.val; saveState(); render(); }
+    if (action === 'set-output-profile') {
+      const requested = el.dataset.val;
+      if (requested && ['auto', ...OUTPUT_PROFILES].includes(requested)) {
+        S.outputProfile = requested;
+        saveState(); render();
+        const active = activeOutputProfile();
+        showToast(`${OUTPUT_PROFILE_INFO[active].label} output selected`);
+      }
+    }
     if (action === 'set-simple-match') { S.matchMode = el.dataset.val; saveState(); render(); }
     if (action === 'set-simple-cache') { S.cacheMode = el.dataset.val; saveState(); render(); }
     if (action === 'set-simple-pool') { S.streamPool = el.dataset.val; saveState(); render(); }
@@ -2404,7 +2541,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'create-stremio-account') createRandomStremioAccount();
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'quick-reinstall') { S.simpleMode = true; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
+    if (action === 'quick-reinstall') { S.simpleMode = true; S.outputProfile='auto'; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'update-template') { showUpdateTemplateModal(); }
@@ -2823,6 +2960,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle inputs and changes
   document.addEventListener('change', (e) => {
+    if (e.target.dataset.action === 'set-aiostreams-target') {
+      const target = e.target.value;
+      if (!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(target)) return;
+      S.aiostreamsVersion = target;
+      saveState();
+      render();
+      showToast(target === '2.31.1' ? 'Using v2.31.1 legacy compatibility lane' : 'Legacy TorBox Search preset removed for this target');
+      return;
+    }
     if (e.target.dataset.action === 'update-radio') {
       const k = e.target.dataset.key;
       const v = e.target.value;
@@ -3141,15 +3287,15 @@ function presets() {
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
     ...(isNzbgeek && S.creds.nzbgeek ? [
-      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', newznabUrl:'https://api.nzbgeek.info', apiPath:'/api', apiKey:S.creds.nzbgeek, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } },
+      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(hasDebridio ? [
+    ...(hasDebridio && S.creds.debridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
-    ...(S.multiServices.includes('debrider') ? [
+    ...(S.multiServices.includes('debrider') && S.creds.debrider ? [
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(S.creds.debrider ? { apiKey:S.creds.debrider } : {}) }, resources:['stream'] },
     ] : []),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
@@ -3166,7 +3312,7 @@ function presets() {
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, newznabUrl:d.apiUrl, apiPath:d.apiPath, apiKey:S.creds[d.credKey] || '', timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } };
+      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
       { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
@@ -3190,7 +3336,9 @@ function presets() {
     ...subtitlePresets(),
     ...catalogPresets()
   ];
-  if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  // The legacy built-in torbox-search preset was removed in AIOStreams v2.32
+  // (TorBox Search API shut down). Emitting it — even disabled — makes the
+  // config fail to save on v2.32+ hosts, so it is never generated here.
   return list;
 }
 
@@ -3419,7 +3567,6 @@ function build() {
     nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(S.maxFailoverNzbs)||3 } : { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
-    syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
     presets: activePresets, services: services(),
   };
 
@@ -3478,7 +3625,7 @@ function build() {
   };
 
   const result = {
-    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', version: '0.1.0', category: (S.service==='p2p'?'P2P':S.service==='http'?'HTTP':'Debrid'), serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
+    metadata: { id: 'core-custom-' + sid(), name, description: `Custom template generated by Core Builds Configurator.`, source: 'external', author:'Branding-Brevity', version: '0.1.0', category: (S.service==='p2p'?'P2P':S.service==='http'?'HTTP':'Debrid'), serviceRequired: false, setToSaveInstallMenu: true, sourceUrl: 'https://github.com/brevityA/Core-Builds', changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md' },
     config: cfg
   };
 
@@ -3545,12 +3692,13 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
 function buildFinal() {
   try {
     const tpl = build();
-    const result = assembleTemplate(tpl, {
+    const assembled = assembleTemplate(tpl, {
       metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
       disabledAddons: _disabledAddons,
       presetMatchesAddon,
       migrationKeep: S._migrationKeep,
     });
+    const result = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
     _cachedBuildResult = result;
     return result;
   } catch (err) {
@@ -3564,7 +3712,7 @@ const PARTIAL_EXPORT_FIELDS = {
   sorting: ['sortCriteria','deduplicator','resultLimits'],
   services: ['services','presets','groups'],
   device: ['excludedResolutions','includedResolutions','requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes','excludedAudioTags','preferredAudioTags','preferredAudioChannels','preferredVisualTags','size','bitrate'],
-  filtering: ['excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages','excludedQualities','includedQualities','requiredQualities','preferredQualities','excludedVisualTags','includedVisualTags','requiredVisualTags','excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions','syncedExcludedStreamExpressionUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedRankedStreamExpressionUrls','excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns','syncedExcludedRegexUrls','syncedRankedRegexUrls','titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter'],
+  filtering: ['excludedLanguages','includedLanguages','requiredLanguages','preferredLanguages','excludedQualities','includedQualities','requiredQualities','preferredQualities','excludedVisualTags','includedVisualTags','requiredVisualTags','excludedStreamExpressions','includedStreamExpressions','requiredStreamExpressions','preferredStreamExpressions','rankedStreamExpressions','excludedRegexPatterns','rankedRegexPatterns','preferredRegexPatterns','syncedExcludedRegexUrls','syncedRankedRegexUrls','titleMatching','yearMatching','seasonEpisodeMatching','digitalReleaseFilter'],
 };
 
 function downloadJsonFile(payload, filename) {
@@ -3823,8 +3971,10 @@ function parseTemplateToState(tpl) {
     name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
     exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
-    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false
+    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false, outputProfile: 'auto', aiostreamsVersion: '2.32.0'
   };
+  if (OUTPUT_PROFILES.includes(tpl?.metadata?.coreBuildsProfile)) st.outputProfile = tpl.metadata.coreBuildsProfile;
+  if (AIOSTREAMS_COMPATIBILITY_TARGETS.includes(tpl?.metadata?.coreBuildsAIOStreamsTarget)) st.aiostreamsVersion = tpl.metadata.coreBuildsAIOStreamsTarget;
 
   const presets = c.presets || [];
   const enabledPresets = presets.filter(p => p.enabled);
@@ -3887,9 +4037,9 @@ function parseTemplateToState(tpl) {
   });
   st.creds = creds;
 
-  // NZBGeek from presets
-  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.newznabUrl||'').includes('nzbgeek'));
-  if (nzbg && nzbg.options && nzbg.options.apiKey) creds.nzbgeek = nzbg.options.apiKey;
+  // NZBGeek from presets (v2.32 api shape)
+  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.api?.url||'').includes('nzbgeek'));
+  if (nzbg && nzbg.options && nzbg.options.api && nzbg.options.api.apiKey) creds.nzbgeek = nzbg.options.api.apiKey;
 
   // Resolution: check requiredResolutions, excludedResolutions, and ESEs
   const req = c.requiredResolutions || [];
@@ -4037,9 +4187,9 @@ function parseTemplateToState(tpl) {
     st.proxiedServices = [];
   }
 
-  // Optional Scrapers
-  const optScrapers = enabledPresets.filter(p => p.type === 'newznab' && p.options && p.options.newznabUrl).map(p => {
-    const d = OPTIONAL_SCRAPER_DEFS.find(x => x.apiUrl && p.options.newznabUrl.toLowerCase().includes(x.apiUrl.toLowerCase()));
+  // Optional Scrapers (v2.32 api shape)
+  const optScrapers = enabledPresets.filter(p => p.type === 'newznab' && p.options && p.options.api?.url).map(p => {
+    const d = OPTIONAL_SCRAPER_DEFS.find(x => x.apiUrl && p.options.api.url.toLowerCase().includes(x.apiUrl.toLowerCase()));
     return d ? d.id : null;
   }).filter(Boolean);
   st.optionalScrapers = optScrapers;
@@ -4136,7 +4286,7 @@ function diffConfigs(oldCfg, newCfg) {
   return sections;
 }
 
-function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel) {
+function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConflicts = []) {
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const ex = document.getElementById('diffModal');
   if (ex) ex.remove();
@@ -4172,12 +4322,21 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel) {
   if (parsed.resolution) detected.push(esc(parsed.resolution));
   if (parsed.audio) detected.push(esc(parsed.audio));
 
+  const visibleImportedConflicts = importedConflicts.filter(item => item.severity !== 'info').slice(0, 4);
+  const importedConflictHtml = visibleImportedConflicts.length
+    ? '<div style="margin-bottom:10px;padding:10px 11px;border-radius:8px;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.22)"><div style="font-size:.68rem;font-weight:800;color:#fbbf24;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">Existing template conflicts</div>'
+      + visibleImportedConflicts.map(item => '<div style="font-size:.67rem;line-height:1.45;color:'+(item.severity === 'error' ? '#f87171' : '#fbbf24')+';margin-top:3px">'+(item.severity === 'error' ? '✕' : '⚠')+' <b>'+esc(item.title)+'</b> — '+esc(item.message)+'</div>').join('')
+      + (importedConflicts.length > visibleImportedConflicts.length ? '<div style="font-size:.64rem;color:#8b949e;margin-top:5px">+'+(importedConflicts.length-visibleImportedConflicts.length)+' more safe conflict check(s) in diagnostics after migration.</div>' : '')
+      + '</div>'
+    : '';
+
   overlay.innerHTML = '<div class="df-box">'
     + '<div class="df-hdr"><span class="df-hdr-title">'+ICO.shuffle(18,'#00d4ff')+' Template Migration</span>'
     + '<button id="dfClose" style="background:none;border:none;color:#8b949e;font-size:1.3rem;cursor:pointer;padding:4px 8px;line-height:1" aria-label="Close">&times;</button></div>'
     + '<div class="df-body">'
     + '<div style="font-size:.72rem;color:#8b949e;margin-bottom:12px;line-height:1.5">'
     + 'Detected <strong style="color:#e6edf3">'+detected.join(' / ')+'</strong>'+(parsed.name ? ' &mdash; <strong style="color:#e6edf3">'+esc(parsed.name)+'</strong>' : '')+'. Here\'s what changes when you upgrade to the latest configurator logic.</div>'
+    + importedConflictHtml
     + '<div class="df-summary">'
     + '<div class="df-stat"><div class="df-stat-num" style="color:#34d399">'+totalAdded+'</div><div class="df-stat-label">Added</div></div>'
     + '<div class="df-stat"><div class="df-stat-num" style="color:#f87171">'+totalRemoved+'</div><div class="df-stat-label">Removed</div></div>'
@@ -4227,7 +4386,7 @@ function showUpdateTemplateModal() {
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Update Existing Setup" style="max-width:480px">
       <button class="modal-close" id="updTplClose" aria-label="Close">×</button>
       <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Setup</div>
-      <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll show you exactly what changes before upgrading to the latest sort logic, regex patterns, and formatters.</div>
+      <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll show you exactly what changes before upgrading to the latest sort logic, regex patterns, and formatters, and flag safe rule conflicts before you apply anything.</div>
       <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.72rem;color:#8b949e;line-height:1.5">
         <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — all rebuilt with the latest configurator logic.<br>
         <strong style="color:#00d4ff">What's preserved:</strong> Your service, credentials, resolution, audio, and content preferences are detected and kept.
@@ -4260,6 +4419,7 @@ function showUpdateTemplateModal() {
       if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
 
       const oldCfg = tpl.config || tpl;
+      const importedConflicts = findFeatureConflicts(tpl);
 
       // Build a preview from temporary state; do not commit until the user confirms.
       const savedState = JSON.parse(JSON.stringify(S));
@@ -4269,7 +4429,7 @@ function showUpdateTemplateModal() {
       S.formatter = 'family-v4'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
       S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
       S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
-      S.streamPool = 'normal';
+      S.streamPool = 'normal'; S.outputProfile = 'auto';
       S.subtitleAddons = ['aiosubtitle']; S.subtitleLangs = ['en']; S.catalogs = ['tmdb-addon'];
       S.dedupMerge = false; S.proxyEnabled = false; S.proxiedServices = []; S.optionalScrapers = [];
       const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',subdl:''};
@@ -4319,7 +4479,7 @@ function showUpdateTemplateModal() {
         }, () => {
           cancelUpdate(session);
           showToast('Migration cancelled — no changes applied', true);
-        });
+        }, importedConflicts);
       }, 160);
     } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
   }
@@ -4430,13 +4590,33 @@ function showTestDriveModal() {
       }
 
       const cleanDSL = str => (str || '').replace(/\{stream\.\w+(::[^}]*)?\}/g, '').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+
+      // ── Core Score: brand the results with an explainable quality number ──
+      const scored = streams.map(s => {
+        const cs = scoreFormattedStream(s);
+        const b = cs.breakdown;
+        const rows = Object.entries(b)
+          .filter(([, p]) => p.points !== null)
+          .map(([, p]) => `<div class="cs-row"><span class="cs-row-lab">${p.label}</span><span class="cs-row-bar"><i style="width:${p.points}%;background:${p.points >= 75 ? '#3fb950' : p.points >= 50 ? '#fbbf24' : '#f87171'}"></i></span><span class="cs-row-val">${p.points}</span><span class="cs-row-note">${esc(p.note)}</span></div>`)
+          .join('');
+        const gates = cs.gates.map(g => `<div class="cs-gate ${g.passed ? 'ok' : 'bad'}">${g.passed ? '✓' : '✗'} ${g.name} — ${esc(g.note)}</div>`).join('');
+        return { s, cs, rows, gates };
+      });
+
       resultsEl.innerHTML = `
         <div class="td-count">${streams.length} stream${streams.length !== 1 ? 's' : ''} returned</div>
         <div class="td-results">
-          ${streams.map(s => `<div class="td-stream">
-            <div class="td-stream-name">${esc(cleanDSL(s.name))}</div>
-            ${s.description ? `<div class="td-stream-desc">${esc(cleanDSL(s.description))}</div>` : ''}
-          </div>`).join('')}
+          ${scored.map(({ s, cs, rows, gates }) => `
+            <div class="td-stream">
+              <div class="td-stream-name">${esc(cleanDSL(s.name))} <span class="cs-badge" style="background:${cs.score >= 75 ? 'rgba(63,185,80,.14)' : cs.score >= 50 ? 'rgba(251,191,36,.14)' : 'rgba(248,113,113,.14)'};color:${cs.score >= 75 ? '#3fb950' : cs.score >= 50 ? '#fbbf24' : '#f87171'}" title="Core Score — tap the name for the full breakdown">${cs.rank} Core ${cs.score}</span></div>
+              ${s.description ? `<div class="td-stream-desc">${esc(cleanDSL(s.description))}</div>` : ''}
+              <details class="cs-explain"><summary>Why Core ${cs.score}?</summary>
+                <div class="cs-summary">${esc(cs.summary)}</div>
+                <div class="cs-rows">${rows}</div>
+                <div class="cs-gates">${gates}</div>
+                ${cs.partial ? `<div class="cs-partial">Score computed from the formatted stream line. The full score (bitrate/IQR, parsed fields) is applied in your actual config.</div>` : ''}
+              </details>
+            </div>`).join('')}
         </div>
       `;
     } catch(err) {
@@ -4596,7 +4776,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         </div>
       </details>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px">
-        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
+        <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="community-link">Core Crew</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="community-link">GitHub</a>
         <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="community-link">Discord</a>
@@ -4900,6 +5080,8 @@ function simpleFinishHtml() {
       <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:16px 0">
         ${bits.map(([i2, t]) => `<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.16);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:#9ca3af">${i2} ${t}</span>`).join('')}
       </div>
+      ${renderOutputProfilePicker({ compact:true })}
+      ${outputProfileAuditHtml()}
       ${(() => { const hint = DEVICE_BANDWIDTH_HINTS[S.device]; if (!hint) return ''; const bw = calculateBitrateLimit(hint.recommended); return `<div style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">📶</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#9ca3af">Bandwidth hint for your device</div><div style="font-size:.68rem;color:#6b7280;line-height:1.4">Recommended: <strong style="color:#00d4ff">${hint.recommended} Mbps+</strong> — ${hint.reason}. Safe bitrate cap: <strong style="color:#e6edf3">${bw.label}</strong> (${bw.description})</div></div></div>`; })()}
       ${needed.length ? `<div style="margin-bottom:14px">
         ${needed.map(inp => `
@@ -5123,9 +5305,16 @@ function promptPassword() {
 function templateHealthCheck() {
   const warns = [];
   if (S.resolution === '1080p') {
-    const ec = eses();
-    const has1080pGuard = ec.some(e => e.expression && /resolution\s*\(\s*streams\s*,\s*'2160p'/.test(e.expression) && e.enabled !== false);
-    if (!has1080pGuard) warns.push('1080p template missing 2160p exclusion ESE — 4K streams may leak through');
+    const profile = activeOutputProfile();
+    if (profile === 'stable' || profile === 'balanced') {
+      const cfg = buildFinal().config;
+      const excluded = cfg.excludedResolutions || [];
+      if (!excluded.includes('2160p') || !excluded.includes('1440p')) warns.push('1080p profile is missing native 4K/1440p exclusions — higher-resolution streams may leak through');
+    } else {
+      const ec = eses();
+      const has1080pGuard = ec.some(e => e.expression && /resolution\s*\(\s*streams\s*,\s*'2160p'/.test(e.expression) && e.enabled !== false);
+      if (!has1080pGuard) warns.push('1080p template missing 2160p exclusion ESE — 4K streams may leak through');
+    }
   }
   if ((S.service === 'easynews' || S.multiServices.includes('easynews')) && (!S.creds.easynews || !S.creds.easynewsPass)) {
     warns.push('EasyNews selected but username or password is missing — Usenet streams won\'t load');
@@ -5144,10 +5333,32 @@ function templateHealthCheck() {
 // ── Template Health Score (unique to Core Builds) ──────────────────
 
 function calculateHealthScore(prebuilt) {
-  const cfg = (prebuilt || buildFinal()).config;
+  const built = prebuilt || buildFinal();
+  const cfg = built.config;
   const breakdown = [];
   let score = 0, max = 0;
   const check = (label, maxPts, pts, reason) => { max += maxPts; score += Math.min(pts, maxPts); breakdown.push({ label, points: Math.min(pts, maxPts), max: maxPts, reason }); };
+
+  if ((built.metadata?.coreBuildsProfile || activeOutputProfile()) === 'stable') {
+    const complexity = inspectTemplateComplexity(built);
+    const conflicts = findFeatureConflicts(built);
+    const budget = validateOutputProfileBudget(built, 'stable');
+    const sortKeys = (cfg.sortCriteria?.global || []).map(item => item.key);
+    check('Stable complexity budget', 35, budget.ok ? 35 : 0, budget.ok ? 'No remote sync, groups, or dynamic exit' : `${budget.violations.length} budget check(s) exceeded`);
+    check('Conflict checks', 25, conflicts.length ? 0 : 25, conflicts.length ? `${conflicts.length} conflict check(s) need review` : 'No redundant or contradictory rule stack');
+    check('Device-safe native filters', 15, (cfg.excludedQualities?.length && cfg.preferredResolutions?.length) ? 15 : 6, 'Native quality and resolution policy');
+    check('Predictable sort', 10, sortKeys.includes('resolution') && sortKeys.includes('quality') ? 10 : 4, 'Resolution and quality are explicit');
+    check('Observable errors', 10, cfg.hideErrors === false && cfg.statistics?.enabled ? 10 : 3, 'Errors and timings stay visible');
+    check('Distinct baseline coverage', 5, complexity.runtime.enabledPresets >= 3 ? 5 : 2, `${complexity.runtime.enabledPresets} enabled preset(s)`);
+    const finalScore = Math.min(score, 100);
+    return {
+      score: finalScore,
+      maxScore: 100,
+      grade: finalScore >= 90 ? 'A' : finalScore >= 75 ? 'B' : finalScore >= 60 ? 'C' : 'D',
+      summary: finalScore >= 90 ? 'Core Stable contract met' : finalScore >= 75 ? 'Core Stable needs a minor review' : 'Core Stable needs attention before install',
+      breakdown,
+    };
+  }
 
   // 1. Sort criteria coverage (20)
   const sortKeys = (cfg.sortCriteria?.global || []).map(k => k.key);
@@ -5448,7 +5659,7 @@ const TROUBLESHOOT_TREE = {
     q: 'Common causes of "Invalid input":',
     tips: [
       '📋 <b>Corrupted JSON</b> — If you hand-edited the template, a missing comma or bracket breaks parsing. Re-export from the configurator.',
-      '🏷️ <b>Unknown preset type</b> — Old templates may reference removed presets (e.g. "torbox" was deprecated in v2.30.2, replaced by "torbox-search"). Re-generate your template.',
+      '🏷️ <b>Unknown or legacy preset</b> — "torbox" was deprecated in v2.30.2 and the legacy "torbox-search" built-in was removed in AIOStreams v2.32. Use the v2.31 compatibility lane or validate a separate Newznab endpoint before migration.',
       '📏 <b>Schema mismatch</b> — AIOStreams schema evolves. Templates from older configurator versions may use fields that changed. Upgrade by re-generating.',
     ],
     action: { label: 'Re-generate with latest configurator', key: '_regen', desc: 'Rebuilds your template with current schema' }
@@ -5598,6 +5809,8 @@ async function preflightCheck() {
   if (S.multiServices.includes('easynews') && !S.creds.easynews) warns.push('EasyNews selected but no username entered');
   if (S.multiServices.includes('easynews') && !S.creds.easynewsPass) warns.push('EasyNews selected but no password entered');
   if (S.multiServices.includes('nzbgeek') && !S.creds.nzbgeek) warns.push('NZBGeek selected but no API key entered');
+  if (S.multiServices.includes('debridio') && !S.creds.debridio) warns.push('Debridio selected but no API key entered — its preset is omitted until a key is added');
+  if (S.multiServices.includes('debrider') && !S.creds.debrider) warns.push('Debrider selected but no API key entered — its preset is omitted until a key is added');
   if (S.multiServices.includes('streamnzb') && !S.creds.streamnzb) warns.push('StreamNZB selected but no manifest URL entered');
   if (S.audio === 'lossless' && DEVICE_FORCE_LIMITED_AUDIO.has(S.device)) warns.push('Lossless audio selected but this device profile does not reliably support passthrough');
   try {
@@ -5606,6 +5819,14 @@ async function preflightCheck() {
     const names=(cfg?.presets||[]).map(p=>p.name).filter(Boolean), duplicates=[...new Set(names.filter((n,i)=>names.indexOf(n)!==i))];
     if (duplicates.length) warns.push('Duplicate preset names detected: '+duplicates.slice(0,3).join(', '));
     const health=templateHealthCheck(); health.forEach(w=>{if(!warns.includes(w))warns.push(w);});
+    const profileAudit = outputProfileAudit();
+    if (!profileAudit.budget.ok) {
+      warns.push(`${OUTPUT_PROFILE_INFO[profileAudit.profile].label} complexity budget exceeded — review the profile warnings before installing`);
+    }
+    profileAudit.conflicts.filter(item => item.severity !== 'info').slice(0, 3).forEach(item => {
+      const message = `${item.title}: ${item.message}`;
+      if (!warns.includes(message)) warns.push(message);
+    });
     const compat=hostCompatCheck();
     const selected=S.instanceHost && compat[S.instanceHost];
     if (selected?.status==='err') warns.push((selected.label||S.instanceHost)+' host compatibility check is blocked');
@@ -5647,6 +5868,167 @@ function showAdditionalServicesPicker(options={}) {
     if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
   });
   document.getElementById('extraClose').focus();
+}
+
+// ── Express Install lane ────────────────────────────────────────────────
+// A minimal two-step, one-click install (Duck Streams / QuackStart pattern):
+// pick a debrid service + key, connect Stremio (or grab the manifest), go.
+// It reuses the full install pipeline (simpleInstall → host auto-select →
+// POST → pushToStremio → Full-Stack AIOMetadata+Cinemeta) with Balanced
+// defaults so novices get a working setup in ~30 seconds.
+const EXPRESS_SERVICES = [
+  ['torbox-pro','TorBox','Debrid · fast cache'],
+  ['realdebrid','Real-Debrid','Debrid · large library'],
+  ['alldebrid','AllDebrid','Debrid · uncached-friendly'],
+  ['premiumize','Premiumize','Debrid · generous quota'],
+  ['easynews','EasyNews','Usenet · NZB access'],
+  ['p2p','Free / P2P','No account required'],
+];
+
+function showExpressLane() {
+  document.getElementById('expressLaneModal')?.remove();
+  const svc = (S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro';
+  const state = { service: svc, target: 'app', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])] };
+  const credInput = (key) => {
+    const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
+    const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
+    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"></div>`;
+  };
+  const credArea = (service) => {
+    if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
+    if (service === 'easynews') return credInput('easynews') + credInput('easynewsPass');
+    return credInput(service === 'torbox-pro' ? 'torbox' : service);
+  };
+  // Extra services that need a credential when added via the popout.
+  const EXTRA_CRED = { debridio:'debridio', debrider:'debrider', nzbgeek:'nzbgeek', streamnzb:'streamnzb' };
+  const renderCreds = () => {
+    const prim = credArea(state.service);
+    const extraCreds = [
+      ...state.extras.filter(v => v !== state.service).map(v => EXTRA_CRED[v]).filter(Boolean).map(credInput),
+      ...state.scrapers.map(sid => (OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid) || {}).credKey).filter(Boolean).map(credInput),
+    ].join('');
+    const extraBlock = extraCreds ? `<div style="margin-top:8px;border-top:1px dashed rgba(255,255,255,.12);padding-top:8px">${extraCreds}</div>` : '';
+    return prim + extraBlock;
+  };
+  // Re-render #expressCreds while preserving typed values across re-renders.
+  const renderCredsInto = () => {
+    const drafts = {};
+    document.querySelectorAll('#expressLaneModal [data-express-cred]').forEach(i => { drafts[i.dataset.expressCred] = i.value; });
+    document.getElementById('expressCreds').innerHTML = renderCreds();
+    document.querySelectorAll('#expressLaneModal [data-express-cred]').forEach(i => { const v = drafts[i.dataset.expressCred]; if (v !== undefined) i.value = v; });
+  };
+  const overlay = document.createElement('div');
+  overlay.id = 'expressLaneModal';
+  overlay.className = 'fastlane-overlay';
+  overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="expressTitle" style="max-width:640px">
+    <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Core Builds picks sensible defaults — fine-tune any of it later in Advanced.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
+    <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
+      <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div id="expressCreds">${renderCreds()}</div>
+      <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
+    </div>
+    <div class="fastlane-section"><div class="fastlane-label">2 · Install to</div>
+      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['manifest','Manifest URL','Use in Stremio, WuPlay or Nuvio']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
+          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
+        </div>
+        <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
+      </div>
+    </div>
+    <details style="margin:0 22px 8px;font-size:.74rem"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Full stack</b><br><span style="color:#8b949e">Install AIOMetadata + patch Cinemeta for better posters and catalogs.</span></span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Clean reinstall</b><br><span style="color:#8b949e">Remove previous Core Builds addons from your Stremio account.</span></span></label>
+      <div style="margin-top:8px"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
+    </details>
+    <div style="padding:0 22px 18px"><button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay || e.target.closest('#expressClose')) { overlay.remove(); return; }
+    const svcBtn = e.target.closest('[data-express-service]');
+    if (svcBtn) {
+      state.service = svcBtn.dataset.expressService;
+      overlay.querySelectorAll('[data-express-service]').forEach(b => b.classList.toggle('active', b.dataset.expressService === state.service));
+      state.extras = state.extras.filter(v => v !== state.service);
+      renderCredsInto();
+      return;
+    }
+    const tgtBtn = e.target.closest('[data-express-target]');
+    if (tgtBtn) {
+      state.target = tgtBtn.dataset.expressTarget;
+      overlay.querySelectorAll('[data-express-target]').forEach(b => b.classList.toggle('active', b.dataset.expressTarget === state.target));
+      const box = document.getElementById('expressStremio');
+      if (box) box.style.display = state.target === 'app' ? '' : 'none';
+      return;
+    }
+    if (e.target.closest('#expressExtrasBtn')) {
+      showAdditionalServicesPicker({
+        services: state.extras,
+        scrapers: state.scrapers,
+        onApply: (sv, sc) => {
+          state.extras = sv.filter(v => v !== state.service);
+          state.scrapers = sc;
+          renderCredsInto();
+          const c = document.getElementById('expressExtrasCount');
+          if (c) c.textContent = (state.extras.length + state.scrapers.length) ? `${state.extras.length + state.scrapers.length} selected` : '';
+        },
+      });
+      return;
+    }
+    if (e.target.closest('#expressGo')) {
+      const payload = {
+        service: state.service,
+        target: state.target,
+        creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
+        stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
+        stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
+        fullStack: document.getElementById('expressFullStack')?.checked !== false,
+        clean: document.getElementById('expressClean')?.checked === true,
+        tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
+        extras: { services: state.extras, scrapers: state.scrapers },
+      };
+      const goBtn = document.getElementById('expressGo');
+      if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
+      runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; goBtn.textContent = 'Install in ~30 seconds'; } });
+    }
+  });
+  document.getElementById('expressClose').focus();
+}
+
+async function runExpressInstall(p) {
+  const isFree = p.service === 'p2p';
+  if (!isFree && !Object.values(p.creds).some(v => v)) { showToast('Enter your API key first', true); return; }
+  if (p.target === 'app' && !isFree) {
+    if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
+    S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
+  }
+  applyQuickProfile('balanced');
+  S.service = p.service;
+  S.p2pEnabled = isFree;
+  const extrasSvc = p.extras?.services || [];
+  const extrasScr = p.extras?.scrapers || [];
+  S.multiServices = [...new Set([...(isFree ? ['p2p'] : [p.service]), ...extrasSvc])];
+  S.optionalScrapers = extrasScr;
+  S.p2pEnabled = isFree || extrasSvc.includes('p2p');
+  // Extra services push the config into multi-service mode so their presets emit.
+  S.service = deriveService() || S.service;
+  S.content = 'all';
+  S.installMode = 'direct';
+  S.quickStart = true;
+  Object.assign(S.creds, p.creds);
+  S.patchCinemeta = p.fullStack;
+  S.installAIOMeta = p.fullStack;
+  S.cleanInstall = p.clean;
+  if (p.tmdb) { S.tmdbToken = p.tmdb; S.tmdbApiKey = p.tmdb; }
+  saveState();
+  try {
+    // Renders progress + result into the modal's #aioResult.
+    await simpleInstall(p.target === 'app' ? 'app' : 'manifest');
+  } catch (err) {
+    showToast('Install failed: ' + (err?.message || err), true);
+  }
 }
 
 function showFastLane() {
@@ -5824,7 +6206,7 @@ function showFastLane() {
       S.optionalScrapers = [...state.scrapers];
       S.service = deriveService();
       S.p2pEnabled = S.multiServices.includes('p2p');
-      S.simpleMode = true; S.quickStart = true;
+      S.simpleMode = true; S.quickStart = true; S.outputProfile = 'auto';
       applyQuickProfile(state.profile);
       S.cleanInstall = document.getElementById('flClean')?.checked || false;
       S.patchCinemeta = document.getElementById('flPatchCinemeta')?.checked !== false;
@@ -5848,15 +6230,19 @@ function showFastLane() {
 
 function buildSanitizedDiagnostics() {
   const hosts = (()=>{ try{return hostCompatCheck();}catch(e){return null;} })();
+  const profileAudit = (()=>{ try{return outputProfileAudit();}catch(e){return null;} })();
   return {
     coreBuildsVersion: CONFIGURATOR_VERSION,
     createdAt: new Date().toISOString(),
     browser: navigator.userAgent,
     viewport: `${window.innerWidth}x${window.innerHeight}`,
     online: navigator.onLine,
-    settings: { service:S.service, multiServices:S.multiServices, optionalScrapers:S.optionalScrapers, device:S.device, resolution:S.resolution, audio:S.audio, cacheMode:S.cacheMode, streamPool:S.streamPool, formatter:S.formatter, installMode:S.installMode, instanceHost:S.instanceHost, quickProfile:S.quickProfile },
+    settings: { service:S.service, multiServices:S.multiServices, optionalScrapers:S.optionalScrapers, device:S.device, resolution:S.resolution, audio:S.audio, cacheMode:S.cacheMode, streamPool:S.streamPool, formatter:S.formatter, installMode:S.installMode, instanceHost:S.instanceHost, quickProfile:S.quickProfile, outputProfile:activeOutputProfile(), aiostreamsVersion:outputProfileContext().aiostreamsVersion },
     credentialPresence: Object.fromEntries(Object.entries(S.creds||{}).map(([k,v])=>[k,Boolean(v)])),
     templateWarnings: (()=>{try{return templateHealthCheck();}catch(e){return [e.message];}})(),
+    templateComplexity: profileAudit?.complexity || null,
+    templateConflicts: profileAudit?.conflicts?.map(({id,severity,title,fields}) => ({id,severity,title,fields})) || [],
+    outputProfileBudget: profileAudit ? { profile:profileAudit.profile, ok:profileAudit.budget.ok, violations:profileAudit.budget.violations.map(({key,actual,allowed}) => ({key,actual,allowed})) } : null,
     hostCompatibility: hosts
   };
 }
@@ -5908,6 +6294,8 @@ async function simpleInstall(target) {
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
   const cfg = buildFinal().config;
+  const sz = payloadSizeGuard(cfg);
+  if (sz.over) { btn.disabled = false; btn.innerHTML = 'Install'; result.innerHTML = payloadTooLargeHtml(sz); return; }
   const _allHosts = orderedHostEntries();
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
@@ -6331,6 +6719,8 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     const cfg = buildFinal().config;
+    const sz = payloadSizeGuard(cfg);
+    if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
     const existingUuid = validateUuid(uuid) ? uuid : null;
     const fastest = await selectHealthyHost(4000).catch(() => null);
     if (!fastest) { logError('deploy', 'All hosts unreachable', { service: S.service, host: S.instanceHost }); resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
@@ -6408,7 +6798,10 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     try {
-      const res = await writeHostFetch(base, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: buildFinal().config, password: pwd }) }, 8000);
+      const cfg = buildFinal().config;
+      const sz = payloadSizeGuard(cfg);
+      if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
+      const res = await writeHostFetch(base, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
@@ -6447,12 +6840,12 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
         deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
         presets: presets(),
         defaultTimeout: Number(S.addonTimeout) || 6000,
-        assemble: () => assembleTemplate(build(), {
+        assemble: () => applyOutputProfile(assembleTemplate(build(), {
           metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
           disabledAddons: _disabledAddons,
           presetMatchesAddon,
           migrationKeep: S._migrationKeep,
-        }),
+        }), activeOutputProfile(), outputProfileContext()),
       });
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp
@@ -6462,6 +6855,18 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     diagnostics() {
       return buildSanitizedDiagnostics();
+    },
+    setState(overrides) {
+      Object.assign(S, overrides || {});
+      if (overrides && overrides.creds) Object.assign(S.creds, overrides.creds);
+      return true;
+    },
+    openTestDrive() {
+      showTestDriveModal();
+      return true;
+    },
+    coreScore(stream, ctx) {
+      return scoreStream(stream, ctx);
     },
   };
 }

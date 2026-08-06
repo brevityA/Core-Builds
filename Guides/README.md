@@ -407,7 +407,7 @@ AIOStreams v2.28+ supports a parent/child config system. A "parent" config lives
 
 | Category | Contents |
 |---|---|
-| **Presets** | Library, Zilean, SeaDex, StremThru Torz, Meteor, Comet, MediaFusion, HdHub, EZTV, Torrent Galaxy, Knaben, AIOSubtitle, TorBox Search — all 13, pre-tuned |
+| **Presets** | Library, Zilean, SeaDex, StremThru Torz, Meteor, Comet, MediaFusion, HdHub, EZTV, Torrent Galaxy, Knaben, AIOSubtitle — all 12, pre-tuned (legacy TorBox Search removed in v2.32) |
 | **Formatter** | Full Core Syntax formatter with all definitions |
 | **Sort criteria** | 12-key sort order (cached → expression score → seeders → bitrate → …) |
 | **Deduplicator** | Smart dedup with seeder/age tiebreakers |

@@ -188,7 +188,6 @@
         "pattern": "/\\b(FraMeSToR)\\b/"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -274,14 +273,6 @@
       },
       {
         "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-        "enabled": true
-      },
-      {
-        "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
-        "enabled": true
-      },
-      {
-        "expression": "/* Score IQR Guard */ count(negate(merge(library(streams), seadex(streams)), merge(cached(streams), type(streams, 'p2p', 'http')))) >= 8 ? streamExpressionScore(negate(merge(library(streams), seadex(streams)), streams), -1000000, q1(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore')) - 1.5 * iqr(values(negate(merge(library(streams), seadex(streams)), streams), 'seScore'))) : []",
         "enabled": true
       },
       {
@@ -1263,26 +1254,8 @@
       "condition": "count(cached(resolution(totalStreams,'2160p'))) >= 8 or totalTimeTaken > 6000"
     },
     "groups": {
-      "enabled": true,
-      "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "67c",
-            "tb-nzb-1"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "nx-tdb-1",
-            "5f6"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "enabled": false,
+      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -1292,10 +1265,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1365,10 +1334,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -1432,10 +1397,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1509,10 +1470,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -1572,10 +1529,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1642,10 +1595,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1716,10 +1665,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -2218,8 +2163,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -2228,11 +2171,13 @@
           ],
           "searchMode": "auto",
           "paginate": true,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {
@@ -2318,23 +2263,6 @@
             "en"
           ]
         }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       }
     ],
     "catalogModifications": [],
@@ -2386,8 +2314,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    "syncedRankedStreamExpressionUrls": []
   }
 }

@@ -216,23 +216,6 @@
         ]
       },
       {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
-      },
-      {
         "type": "stremthruTorz",
         "enabled": true,
         "options": {
@@ -300,10 +283,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "resolution",
           "direction": "desc"
         },
@@ -355,10 +334,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -416,10 +391,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -471,10 +442,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -532,10 +499,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -587,10 +550,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -648,10 +607,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -703,10 +658,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -764,10 +715,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -819,10 +766,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -880,10 +823,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "library",
           "direction": "desc"
         },
@@ -935,10 +874,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1240,13 +1175,8 @@
       }
     ],
     "syncedRankedRegexUrls": [],
-    "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
-    ],
-    "syncedExcludedStreamExpressionUrls": [],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
+    "syncedPreferredStreamExpressionUrls": [],
+    "syncedIncludedStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
@@ -1637,29 +1567,8 @@
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 5"
     },
     "groups": {
-      "enabled": true,
-      "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "nx-fix-04",
-            "nx-fix-01",
-            "1fa89382-5938-4d6e-bcba-a1aa9fc88a95",
-            "0ab6579f-d9f5-4701-9104-2e0a5a5cc786"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "os-v3-hash",
-            "50eedd41-12ee-454c-b1c5-0d9d6ccca030",
-            "0d342c11-f3ec-4f4c-aa28-a4a4e5771ccd"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "enabled": false,
+      "groupings": []
     },
     "proxy": {
       "id": "mediaflow",

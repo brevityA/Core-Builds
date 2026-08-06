@@ -194,7 +194,6 @@
         "pattern": "/\\b(BHDStudio)\\b/i"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1163,32 +1162,8 @@
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 25"
     },
     "groups": {
-      "enabled": true,
-      "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "nx-fix-04",
-            "67c",
-            "nx-fix-02",
-            "nx-fix-01",
-            "01c9a4fd-aedf-46ff-89d5-d58cc597dd17"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "c5d54fb3-6635-4dad-9784-922bd8b25bc6",
-            "tb-nzb-1",
-            "dd458151-1e34-4bd3-aa2c-349e4da371bf",
-            "tam-knaben",
-            "5f6"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "enabled": false,
+      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -1198,10 +1173,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1275,10 +1246,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -1346,10 +1313,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1427,10 +1390,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "service",
           "direction": "desc"
         },
@@ -1494,10 +1453,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1568,10 +1523,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1646,10 +1597,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1731,10 +1678,6 @@
           "direction": "desc"
         },
         {
-          "key": "streamExpressionScore",
-          "direction": "desc"
-        },
-        {
           "key": "service",
           "direction": "desc"
         },
@@ -1802,10 +1745,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -2262,8 +2201,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -2272,11 +2209,13 @@
           ],
           "searchMode": "auto",
           "paginate": true,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {
@@ -2285,9 +2224,6 @@
         "enabled": false,
         "options": {
           "name": "NZBGeek",
-          "newznabUrl": "https://api.nzbgeek.info",
-          "apiPath": "/api",
-          "apiKey": "<template_placeholder>",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -2296,8 +2232,11 @@
           ],
           "searchMode": "auto",
           "paginate": true,
-          "checkOwned": false,
-          "useMultipleInstances": false
+          "useMultipleInstances": false,
+          "api": {
+            "url": "https://api.nzbgeek.info/api",
+            "apiKey": "<template_placeholder>"
+          }
         }
       },
       {
@@ -2369,22 +2308,6 @@
           "languages": [
             "en"
           ]
-        }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": true,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
         }
       }
     ],
@@ -2503,8 +2426,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ]
+    "syncedRankedStreamExpressionUrls": []
   }
 }
