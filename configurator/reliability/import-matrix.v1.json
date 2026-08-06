@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Sanitized manual import gate for Reliable Configurator V3. Never record credentials, user URLs, UUIDs, passwords, or manifest links.",
+  "lanes": [
+    {
+      "id": "v231-local-json",
+      "status": "pending",
+      "version": "2.31.1",
+      "hostClass": "public-host",
+      "delivery": "local-json",
+      "client": "stremio",
+      "profile": "reliable-v3-stable",
+      "expected": "Downloaded JSON opens, validates, saves, and displays visible statistics."
+    },
+    {
+      "id": "v232-local-json",
+      "status": "pending",
+      "version": "2.32.0",
+      "hostClass": "public-host",
+      "delivery": "local-json",
+      "client": "stremio",
+      "profile": "reliable-v3-stable",
+      "expected": "Downloaded JSON opens, validates, saves, and displays visible statistics."
+    },
+    {
+      "id": "v231-import-url",
+      "status": "blocked",
+      "requires": ["v231-local-json"],
+      "version": "2.31.1",
+      "hostClass": "public-host",
+      "delivery": "import-url",
+      "client": "stremio",
+      "profile": "reliable-v3-stable",
+      "expected": "Only test after local JSON passes; record route outcome without recording the URL."
+    },
+    {
+      "id": "v232-newznab-torbox-search-endpoint",
+      "status": "blocked",
+      "requires": ["v232-local-json"],
+      "version": "2.32.0",
+      "hostClass": "public-host",
+      "delivery": "local-json",
+      "client": "stremio",
+      "profile": "legacy-torbox-search-to-newznab",
+      "expected": "Manual, authorised Newznab endpoint/key test only. The legacy torbox-search preset is not auto-renamed; record no endpoint URL or key."
+    },
+    {
+      "id": "v232-import-url",
+      "status": "blocked",
+      "requires": ["v232-local-json"],
+      "version": "2.32.0",
+      "hostClass": "public-host",
+      "delivery": "import-url",
+      "client": "stremio",
+      "profile": "reliable-v3-stable",
+      "expected": "Only test after local JSON passes; record route outcome without recording the URL."
+    },
+    {
+      "id": "v231-direct-install",
+      "status": "blocked",
+      "requires": ["v231-local-json", "v231-import-url"],
+      "version": "2.31.1",
+      "hostClass": "public-host",
+      "delivery": "direct-install",
+      "client": "stremio",
+      "profile": "reliable-v3-stable",
+      "expected": "Only test after both lower-risk delivery routes pass."
+    },
+    {
+      "id": "v232-direct-install",
+      "status": "blocked",
+      "requires": ["v232-local-json", "v232-import-url"],
+      "version": "2.32.0",
+      "hostClass": "public-host",
+      "delivery": "direct-install",
+      "client": "stremio",
+      "profile": "reliable-v3-stable",
+      "expected": "Only test after both lower-risk delivery routes pass."
+    }
+  ]
+}
