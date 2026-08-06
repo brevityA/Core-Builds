@@ -8,7 +8,12 @@
     "version": "1.0.10",
     "category": "Debrid",
     "serviceRequired": false,
-    "setToSaveInstallMenu": true
+    "setToSaveInstallMenu": true,
+    "coreBuildsCompatibility": {
+      "legacyTorboxSearch": true,
+      "maximumAIOStreamsVersion": "2.31.1",
+      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
+    }
   },
   "config": {
     "trusted": false,
@@ -154,15 +159,9 @@
     "excludedRegexPatterns": [],
     "preferredRegexPatterns": [],
     "syncedRankedRegexUrls": [],
-    "syncedPreferredStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-PSEs.json"
-    ],
-    "syncedExcludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ESEs-extended.json"
-    ],
-    "syncedIncludedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
-    ],
+    "syncedPreferredStreamExpressionUrls": [],
+    "syncedExcludedStreamExpressionUrls": [],
+    "syncedIncludedStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "enhanceResults": true,
@@ -215,10 +214,6 @@
       },
       {
         "expression": "/*Kill Dead Uncached Torrents*/ seeders(uncached(type(streams, 'debrid', 'p2p')), 0, 0)",
-        "enabled": true
-      },
-      {
-        "expression": "/*Low SEL Score*/ count(streamExpressionScore(negate(merge(library(streams), seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50))<10?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50)",
         "enabled": true
       },
       {
@@ -528,10 +523,6 @@
       "enabled": true,
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 8"
     },
-    "groups": {
-      "enabled": false,
-      "groupings": []
-    },
     "sortCriteria": {
       "global": [
         {
@@ -552,10 +543,6 @@
         },
         {
           "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -609,10 +596,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -825,23 +808,6 @@
         }
       },
       {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 5000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
-      },
-      {
         "type": "stremthruTorz",
         "instanceId": "67c",
         "enabled": true,
@@ -866,8 +832,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -876,11 +840,13 @@
           ],
           "searchMode": "both",
           "paginate": false,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {

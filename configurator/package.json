@@ -1,6 +1,6 @@
 {
   "name": "core-builds-configurator",
-  "version": "2.89.0",
+  "version": "2.90.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,9 @@
     "validate": "node scripts/validate.mjs",
     "build": "node scripts/build.mjs",
     "test:e2e": "playwright test",
+    "test:upstream-selector": "node scripts/run-upstream-selector-contract.mjs",
+    "test:upstream-v232-nab": "node scripts/run-v232-nab-migration-contract.mjs",
+    "validate:import-matrix": "node scripts/validate-import-matrix.mjs",
     "release": "npm test && npm run validate && npm run build"
   },
   "devDependencies": {

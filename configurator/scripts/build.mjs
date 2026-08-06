@@ -50,10 +50,51 @@ if (!webHtml.includes(`app.js?v=${assetVersions.js}`) || !webHtml.includes(`app.
 }
 await writeFile(resolve(web, 'index.html'), webHtml);
 
+// Build the Reliable Configurator V3 rebuild page (if source exists).
+import { access, constants } from 'node:fs/promises';
+const rebuildSrc = resolve(src, 'rebuild');
+try {
+  await access(resolve(rebuildSrc, 'app.js'), constants.R_OK);
+  const rebuildOut = resolve(web, 'rebuild');
+  const rebuildAssets = resolve(rebuildOut, 'assets');
+  await mkdir(rebuildAssets, { recursive: true });
+
+  const rebuildJsOut = resolve(rebuildAssets, 'app.js');
+  await build({
+    entryPoints: [resolve(rebuildSrc, 'app.js')],
+    outfile: rebuildJsOut,
+    bundle: true,
+    minify: true,
+    format: 'iife',
+    target: ['es2020'],
+    legalComments: 'none',
+    charset: 'utf8',
+  });
+
+  const rebuildCssRaw = await readFile(resolve(rebuildSrc, 'styles.css'), 'utf8');
+  const { code: rebuildCss } = await transform(rebuildCssRaw, { loader: 'css', minify: true, target: 'es2020' });
+  await writeFile(resolve(rebuildAssets, 'styles.css'), rebuildCss);
+
+  const rebuildJs = await readFile(rebuildJsOut, 'utf8');
+  const rebuildVersions = { css: digest(rebuildCss), js: digest(rebuildJs) };
+
+  const rebuildShell = await readFile(resolve(rebuildSrc, 'index.html'), 'utf8');
+  const rebuildHtml = rebuildShell
+    .replace('<link rel="stylesheet" href="./styles.css">', `<link rel="stylesheet" href="./assets/styles.css?v=${rebuildVersions.css}">`)
+    .replace('<script type="module" src="./app.js"></script>', `<script defer src="./assets/app.js?v=${rebuildVersions.js}"></script>`);
+  await writeFile(resolve(rebuildOut, 'index.html'), rebuildHtml);
+  console.log(`Built rebuild page: ${rebuildJs.length} JS bytes, ${rebuildCss.length} CSS bytes`);
+} catch {
+  // rebuild source not present on this branch — skip
+}
+
 // Publish the independent static utilities beside the Configurator.
 const skipBuild = (src) => { const s = src.replace(/\\/g, '/'); return s.includes('/node_modules/') || s.includes('/.git/'); };
 await cp(resolve(repoRoot, 'account-tools'), resolve(web, 'account-tools'), { recursive: true, filter: (s) => !skipBuild(s) });
 await cp(resolve(repoRoot, 'tools'), resolve(web, 'tools'), { recursive: true, filter: (s) => !skipBuild(s) });
+// Reliability-first V3 candidate is published beside the legacy Configurator
+// for local review. It remains a separate route until its release gates pass.
+try { await cp(resolve(src, 'rebuild'), resolve(web, 'rebuild'), { recursive: true, filter: (s) => !skipBuild(s) }); } catch {}
 
 const standalone = shell
   .replace(sourceStyleLinks, () => `<style>${css}</style>`)

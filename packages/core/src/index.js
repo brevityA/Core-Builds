@@ -1,4 +1,5 @@
 export { generateTemplate } from './generate-template.js';
+export { AIOSTREAMS_COMPATIBILITY_TARGETS, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from './output-profile-policy.js';
 export { assembleTemplate, ALLOWED_MIGRATION_FIELDS } from './assemble-template.js';
 export { sanitizeAioEnumArrays } from './schema.js';
 export { templateInput, hasTmdbCredentials, bandwidthCapMbps } from './input.js';

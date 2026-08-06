@@ -177,10 +177,7 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedIncludedStreamExpressionUrls": [],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ],
+    "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -408,7 +405,6 @@
           "name": "Primary",
           "addons": [
             "nx-fix-04",
-            "5f6",
             "67c",
             "056a72e1-ca17-45c8-8ae5-50aab2de7624",
             "nx-fix-01",
@@ -721,23 +717,6 @@
         }
       },
       {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
-      },
-      {
         "type": "stremthruTorz",
         "instanceId": "67c",
         "enabled": true,
@@ -841,8 +820,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -851,11 +828,13 @@
           ],
           "searchMode": "both",
           "paginate": false,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {
@@ -864,8 +843,6 @@
         "enabled": true,
         "options": {
           "name": "NZBGeek",
-          "newznabUrl": "https://api.nzbgeek.info/",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -878,9 +855,11 @@
           "services": [
             "torbox"
           ],
-          "checkOwned": true,
-          "apiKey": "<template_placeholder>",
-          "url": "https://api.nzbgeek.info"
+          "url": "https://api.nzbgeek.info",
+          "api": {
+            "url": "https://api.nzbgeek.info/api",
+            "apiKey": "<template_placeholder>"
+          }
         },
         "category": "Usenet"
       },

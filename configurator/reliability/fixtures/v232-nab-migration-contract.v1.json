@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "upstreamTarget": {
+    "version": "2.32.0",
+    "tag": "v2.32.0",
+    "commit": "57f5a3e"
+  },
+  "purpose": "Verify the upstream v2.32 legacy Newznab URL/apiPath migration and prove that the separate legacy torbox-search preset is not auto-renamed. No credentials or network requests.",
+  "input": {
+    "presets": [
+      {
+        "type": "newznab",
+        "instanceId": "fixture-newznab",
+        "enabled": true,
+        "options": {
+          "newznabUrl": "https://fixture.invalid/newznab",
+          "apiPath": "/api",
+          "seasonPackStrategy": "episodeOnly"
+        }
+      },
+      {
+        "type": "torbox-search",
+        "instanceId": "fixture-legacy-torbox-search",
+        "enabled": false,
+        "options": {
+          "sources": ["torrent", "usenet"]
+        }
+      }
+    ]
+  },
+  "expected": {
+    "type": "newznab",
+    "instanceId": "fixture-newznab",
+    "options": {
+      "api": {
+        "url": "https://fixture.invalid/newznab/api"
+      },
+      "seasonEpisodeStrategy": "episode"
+    },
+    "removedOptionKeys": ["newznabUrl", "apiPath", "seasonPackStrategy"],
+    "legacyTorboxSearch": {
+      "instanceId": "fixture-legacy-torbox-search",
+      "type": "torbox-search",
+      "manualMigrationRequired": true
+    }
+  }
+}

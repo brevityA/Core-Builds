@@ -20,7 +20,8 @@ async function mockAioStreams(page, capture) {
     const request = route.request();
     const url = request.url();
     if (url.includes('/api/v1/status')) {
-      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { version: '2.31.1' } }) });
+      // Must satisfy MIN_AIOSTREAMS_VERSION (2.32.0) — the host-probe floor.
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { version: '2.32.1' } }) });
     }
     if (url.includes('/api/v1/user') && request.method() === 'POST') {
       capture.push(JSON.parse(request.postData() || '{}'));
@@ -49,7 +50,7 @@ test('Quick Install creates a raw manifest without TMDB', async ({ page }) => {
   expect(config.titleMatching.enabled).toBe(false);
   expect(config.yearMatching.enabled).toBe(false);
   expect(config.digitalReleaseFilter.enabled).toBe(false);
-  expect(config.bitrate.useMetadataRuntime).toBe(false);
+  expect(config.bitrate?.useMetadataRuntime ?? false).toBe(false);
   expect(config.includedStreamExpressions.some(item => String(item.expression).includes('digitalRelease Bypass'))).toBe(false);
   await expect(page.locator('#mUrlVal')).toContainText(`/stremio/${UUID}/encrypted-password/manifest.json`);
   await expect(page.locator('#mFmtTabs')).toContainText('Manifest URL');

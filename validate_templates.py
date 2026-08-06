@@ -51,13 +51,32 @@ VALID = {
         'debridio','jackett','prowlarr','torrentio','torznab','custom',
         # Current AIOStreams/community preset identifiers used by the template suite.
         'hdhub','torrents-db','sootio','peerflix','subdl','neko-bt','animetosho','dmm-cast',
-        'easynews','davex','nzbhydra','usenet-streamer','streamnzb'
+        'easynews','easynewsPlusPlus','easynews-search','davex','nzbhydra','usenet-streamer','streamnzb','tmdb-addon'
     },
     'autoplay_attributes': {
         'service','addon','proxied','resolution','quality','encode','audioTags',
         'visualTags','languages','releaseGroup','type','infoHash','size'
     },
     'cache_and_play_types': {'usenet','torrent'},
+}
+
+# Core Builds emits local stream expressions only. AIOStreams hosts can reject
+# remote synced expression URLs, and remote score changes make output behaviour
+# drift after import.
+SYNCED_EXPRESSION_FIELDS = (
+    'syncedExcludedStreamExpressionUrls',
+    'syncedIncludedStreamExpressionUrls',
+    'syncedPreferredStreamExpressionUrls',
+    'syncedRankedStreamExpressionUrls',
+)
+
+# v2.32 marks the legacy `torbox-search` preset ID removed. Upstream also
+# exposes a separate Newznab option labelled TorBox Search, so this is not a
+# settings-compatible automatic rename. Core templates may retain the legacy ID
+# only when explicitly marked as a v2.31 compatibility artifact.
+LEGACY_TORBOX_SEARCH_COMPATIBILITY = {
+    'legacyTorboxSearch': True,
+    'maximumAIOStreamsVersion': '2.31.1',
 }
 
 # Intentional language policies reviewed by maintainers. New combinations still warn.
@@ -119,6 +138,59 @@ def validate_template(fpath):
 
     c = t.get('config', t)
     meta = t.get('metadata', {})
+    is_core_stable = meta.get('coreBuildsProfile') == 'stable'
+
+    # ── Removed preset gate (AIOStreams v2.32) ────────────────
+    # The legacy built-in torbox-search preset was removed in AIOStreams v2.32
+    # (TorBox Search API shut down); saving a config that still includes it
+    # fails. Only the explicit Templates/Legacy/v2.31.1 lane may keep it.
+    is_core = 'Templates' in path.parts
+    is_legacy = 'Legacy' in path.parts
+    presets_list = c.get('presets', []) if isinstance(c, dict) else []
+    has_torbox = any(
+        isinstance(p, dict) and p.get('type') == 'torbox-search'
+        for p in presets_list
+    )
+    if has_torbox:
+        if is_core and not is_legacy:
+            err(name, "contains removed preset 'torbox-search' — removed in AIOStreams v2.32 (configs fail to save); use Templates/Legacy/v2.31.1/ for the legacy lane")
+        elif is_core:
+            ok(name, "legacy 'torbox-search' preset confined to the explicit Legacy lane")
+        else:
+            warn(name, "contains legacy 'torbox-search' preset (community template — not Core-owned)")
+
+    # ── Newznab/Torznab option shape (AIOStreams v2.32) ──────────
+    # v2.32 folded newznabUrl + apiPath + apiKey into a single `api` object
+    # holding the full endpoint URL (usually ending in /api).
+    nab_types = {'newznab', 'torznab', 'nzbhydra'}
+    for p in presets_list:
+        if not isinstance(p, dict) or p.get('type') not in nab_types:
+            continue
+        o = p.get('options') or {}
+        if any(k in o for k in ('newznabUrl', 'torznabUrl', 'nzbhydraUrl', 'apiPath', 'checkOwned', 'seasonPackStrategy')):
+            if is_core and not is_legacy:
+                warn(name, f"preset '{p.get('type')}': legacy NAB options (newznabUrl/apiPath/checkOwned/seasonPackStrategy) — v2.32 uses api.url + seasonEpisodeStrategy")
+            else:
+                warn(name, f"preset '{p.get('type')}': legacy NAB option keys present")
+        api_url = ''
+        if isinstance(o.get('api'), dict):
+            api_url = str(o.get('api', {}).get('url') or '')
+        elif isinstance(o.get('url'), str):
+            api_url = o.get('url')
+        if 'torbox.app' in api_url and 'newznab' in api_url:
+            warn(name, f"preset '{p.get('type')}' points at the shut-down TorBox Search API ({api_url}) — no availability claim until an authorised endpoint/import test")
+
+    # ── Size budget (AIOStreams hardcoded 102,400-byte save limit) ──
+    # The limit applies to the compact serialized config POSTed to
+    # /api/v1/user, not the pretty-printed file on disk.
+    if is_core and not is_legacy and isinstance(c, dict):
+        compact = len(json.dumps(c, separators=(',', ':')))
+        if compact > 100_000:
+            err(name, f"config payload {compact:,} B > 100,000 B — AIOStreams save limit is 102,400 B; trim to keep margin")
+        elif compact > 90_000:
+            warn(name, f"config payload {compact:,} B > 90,000 B — close to the 102,400 B AIOStreams save limit")
+        else:
+            ok(name, f"config payload {compact:,} B within size budget")
 
     # ── Metadata ─────────────────────────────────────────────
     if not meta.get('version'):
@@ -127,6 +199,39 @@ def validate_template(fpath):
         if not meta.get(required_field):
             warn(name, f"metadata.{required_field} missing — required by AIOStreams")
 
+    is_core_builds_template = (
+        ('Templates' in path.parts and 'Community-Templates' not in path.parts)
+        or meta.get('author') == 'Branding-Brevity'
+    )
+    if is_core_builds_template:
+        synced = [field for field in SYNCED_EXPRESSION_FIELDS if c.get(field)]
+        if synced:
+            err(name, f"synced stream-expression URLs are prohibited by Core Builds local-expression policy: {synced}")
+
+        ranked = c.get('rankedStreamExpressions', []) or []
+        has_local_ranked = any(
+            isinstance(entry, dict)
+            and entry.get('enabled', True) is not False
+            and str(entry.get('expression', '')).strip() not in ('', '[]')
+            for entry in ranked
+        )
+        all_expression_lists = (
+            c.get('excludedStreamExpressions', []) or []
+        ) + (
+            c.get('includedStreamExpressions', []) or []
+        ) + (
+            c.get('requiredStreamExpressions', []) or []
+        ) + (
+            c.get('preferredStreamExpressions', []) or []
+        )
+        score_dependent = [
+            entry for entry in all_expression_lists
+            if 'streamExpressionScore(' in (entry.get('expression', '') if isinstance(entry, dict) else str(entry))
+            or 'rseMatched(' in (entry.get('expression', '') if isinstance(entry, dict) else str(entry))
+        ]
+        if score_dependent and not has_local_ranked:
+            err(name, "score-dependent SEL requires local ranked expressions; synced expressions are prohibited")
+
     # ── Sort criteria ─────────────────────────────────────────
     for scope, sort_list in c.get('sortCriteria', {}).items():
         bad_keys = [s['key'] for s in sort_list if s.get('key') not in VALID['sort_keys']]
@@ -134,6 +239,17 @@ def validate_template(fpath):
             err(name, f"sortCriteria.{scope}: invalid keys {bad_keys}")
         else:
             ok(name, f"sortCriteria.{scope}: {len(sort_list)} keys valid")
+
+    if is_core_builds_template and not has_local_ranked:
+        has_score_sort = any(
+            entry.get('key') == 'streamExpressionScore'
+            for sort_list in c.get('sortCriteria', {}).values()
+            if isinstance(sort_list, list)
+            for entry in sort_list
+            if isinstance(entry, dict)
+        )
+        if has_score_sort:
+            err(name, "streamExpressionScore sort requires local ranked expressions; synced expressions are prohibited")
 
     # ── Preference/exclusion lists ────────────────────────────
     checks = [
@@ -168,6 +284,12 @@ def validate_template(fpath):
     for p in c.get('presets', []):
         ptype = p.get('type', '')
         pid   = p.get('instanceId', '')
+        if is_core_builds_template and ptype == 'torbox-search':
+            compatibility = meta.get('coreBuildsCompatibility', {}) if isinstance(meta, dict) else {}
+            if all(compatibility.get(key) == value for key, value in LEGACY_TORBOX_SEARCH_COMPATIBILITY.items()):
+                ok(name, "legacy torbox-search is explicitly limited to the v2.31.1 compatibility lane")
+            else:
+                err(name, "legacy torbox-search requires coreBuildsCompatibility legacyTorboxSearch=true and maximumAIOStreamsVersion='2.31.1'; v2.32 must use an explicit Newznab migration")
         if not pid:
             err(name, f"preset '{ptype}': instanceId is required even when disabled")
         elif pid in seen_preset_ids:
@@ -206,6 +328,10 @@ def validate_template(fpath):
 
     # ── Groups ────────────────────────────────────────────────
     groups = c.get('groups', {})
+    dynamic_fetching = c.get('dynamicAddonFetching', {})
+    if (is_core_builds_template and groups.get('enabled')
+            and dynamic_fetching.get('enabled')):
+        err(name, "Groups and Dynamic fetching cannot both be enabled in a Core Builds template")
     if groups.get('enabled'):
         for g in groups.get('groups', []):
             ids = g.get('addonInstanceIds', [])
@@ -303,7 +429,9 @@ def validate_template(fpath):
 
     has_zero_cached = any('0Cached' in e.get('expression', '')
                           for e in c.get('includedStreamExpressions', []))
-    if not has_zero_cached and name not in REVIEWED_NO_ZERO_CACHED:
+    if not has_zero_cached and is_core_stable:
+        ok(name, "Core Stable intentionally uses native availability policy instead of a 0Cached ISE")
+    elif not has_zero_cached and name not in REVIEWED_NO_ZERO_CACHED:
         warn(name, "0Cached ISE missing — no fallback when nothing is cached")
     elif not has_zero_cached:
         ok(name, "0Cached ISE exception reviewed for parent/base config")

@@ -177,10 +177,7 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedIncludedStreamExpressionUrls": [],
-    "syncedRankedStreamExpressionUrls": [
-      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json"
-    ],
+    "syncedRankedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -397,28 +394,8 @@
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 8 or totalTimeTaken > 12000"
     },
     "groups": {
-      "enabled": true,
-      "behaviour": "sequential",
-      "groupings": [
-        {
-          "name": "Primary",
-          "addons": [
-            "nx-fix-04",
-            "nx-fix-01",
-            "pers-comet-tb"
-          ],
-          "condition": "true"
-        },
-        {
-          "name": "Secondary",
-          "addons": [
-            "67c",
-            "5f6",
-            "os-v3-hash"
-          ],
-          "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
-        }
-      ]
+      "enabled": false,
+      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -755,23 +732,6 @@
         "resources": [
           "stream"
         ]
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 3500,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       },
       {
         "type": "opensubtitles-v3-plus",

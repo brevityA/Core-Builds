@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Deterministic no-credential selector contract for Core Builds Reliable Configurator V3.",
+  "upstreamTargets": {
+    "2.31.1": {
+      "tag": "v2.31.1",
+      "commit": "ccc25bc",
+      "status": "verified-v1-target"
+    },
+    "2.32.0": {
+      "tag": "v2.32.0",
+      "commit": "57f5a3e",
+      "status": "compatibility-review"
+    }
+  },
+  "context": {
+    "queryType": "series",
+    "isAnime": false,
+    "season": 1,
+    "episode": 1,
+    "genres": [],
+    "title": "Fixture Series",
+    "year": 2024,
+    "yearEnd": 0,
+    "daysSinceRelease": 14,
+    "runtime": 45,
+    "absoluteEpisode": -1,
+    "originalLanguage": "English",
+    "hasSeaDex": false,
+    "hasNextEpisode": false,
+    "daysUntilNextEpisode": -1,
+    "daysSinceFirstAired": -1,
+    "daysSinceLastAired": -1,
+    "latestSeason": 1
+  },
+  "streams": [
+    {
+      "id": "single-cached",
+      "type": "debrid",
+      "addon": {
+        "preset": { "id": "fixture-source", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture Source",
+        "timeout": 1000
+      },
+      "service": { "id": "torbox", "cached": true },
+      "parsedFile": {
+        "title": "Fixture Series",
+        "year": "2024",
+        "seasons": [1],
+        "episodes": [1],
+        "resolution": "1080p",
+        "quality": "WEB-DL",
+        "encode": "HEVC",
+        "releaseGroup": "FIXTURE",
+        "visualTags": ["HDR10"],
+        "audioTags": ["DD+"],
+        "audioChannels": ["5.1"],
+        "languages": ["English"],
+        "subtitles": []
+      },
+      "size": 2000000000,
+      "filename": "fixture.series.s01e01.1080p.mkv"
+    },
+    {
+      "id": "multi-episode-pack",
+      "type": "debrid",
+      "addon": {
+        "preset": { "id": "fixture-source", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture Source",
+        "timeout": 1000
+      },
+      "service": { "id": "torbox", "cached": true },
+      "parsedFile": {
+        "title": "Fixture Series",
+        "year": "2024",
+        "seasons": [1],
+        "episodes": [1, 2, 3],
+        "resolution": "1080p",
+        "quality": "WEB-DL",
+        "encode": "HEVC",
+        "releaseGroup": "FIXTURE",
+        "visualTags": ["HDR10"],
+        "audioTags": ["DD+"],
+        "audioChannels": ["5.1"],
+        "languages": ["Unknown"],
+        "subtitles": []
+      },
+      "size": 6000000000,
+      "filename": "fixture.series.s01e01-e03.1080p.mkv"
+    },
+    {
+      "id": "season-pack-only",
+      "type": "debrid",
+      "addon": {
+        "preset": { "id": "fixture-source", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture Source",
+        "timeout": 1000
+      },
+      "service": { "id": "torbox", "cached": false },
+      "parsedFile": {
+        "title": "Fixture Series",
+        "year": "2024",
+        "seasons": [1],
+        "seasonPack": true,
+        "resolution": "1080p",
+        "quality": "WEB-DL",
+        "encode": "HEVC",
+        "releaseGroup": "FIXTURE",
+        "visualTags": ["HDR10"],
+        "audioTags": ["DD+"],
+        "audioChannels": ["5.1"],
+        "languages": ["English"],
+        "subtitles": []
+      },
+      "filename": "fixture.series.s01.complete.1080p.mkv"
+    },
+    {
+      "id": "anime-season-pack",
+      "type": "debrid",
+      "addon": {
+        "preset": { "id": "fixture-source", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture Source",
+        "timeout": 1000
+      },
+      "service": { "id": "torbox", "cached": true },
+      "parsedFile": {
+        "title": "Fixture Anime",
+        "year": "2024",
+        "seasons": [1],
+        "seasonPack": true,
+        "resolution": "1080p",
+        "quality": "WEB-DL",
+        "encode": "HEVC",
+        "releaseGroup": "ANIME",
+        "visualTags": [],
+        "audioTags": ["AAC"],
+        "audioChannels": ["2.0"],
+        "languages": ["Japanese"],
+        "subtitles": []
+      },
+      "filename": "fixture.anime.s01.complete.1080p.mkv"
+    },
+    {
+      "id": "missing-release-group-and-size",
+      "type": "debrid",
+      "addon": {
+        "preset": { "id": "fixture-source", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture Source",
+        "timeout": 1000
+      },
+      "service": { "id": "torbox", "cached": true },
+      "parsedFile": {
+        "title": "Fixture Series",
+        "year": "2024",
+        "seasons": [1],
+        "episodes": [1],
+        "resolution": "720p",
+        "quality": "WEBRip",
+        "encode": "AVC",
+        "visualTags": [],
+        "audioTags": ["AAC"],
+        "audioChannels": ["2.0"],
+        "languages": ["Unknown"],
+        "subtitles": []
+      },
+      "filename": "fixture.series.s01e01.720p.untagged.mkv"
+    },
+    {
+      "id": "external-stream",
+      "type": "external",
+      "addon": {
+        "preset": { "id": "fixture-external", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture External",
+        "timeout": 1000
+      },
+      "parsedFile": {
+        "title": "Fixture External",
+        "resolution": "Unknown",
+        "quality": "Unknown",
+        "audioChannels": [],
+        "visualTags": [],
+        "audioTags": [],
+        "languages": [],
+        "subtitles": []
+      },
+      "filename": "fixture.external"
+    },
+    {
+      "id": "youtube-stream",
+      "type": "youtube",
+      "addon": {
+        "preset": { "id": "fixture-youtube", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture YouTube",
+        "timeout": 1000
+      },
+      "parsedFile": {
+        "title": "Fixture YouTube",
+        "resolution": "Unknown",
+        "quality": "Unknown",
+        "audioChannels": [],
+        "visualTags": [],
+        "audioTags": [],
+        "languages": [],
+        "subtitles": []
+      },
+      "filename": "fixture.youtube"
+    },
+    {
+      "id": "id-matched-stream",
+      "type": "debrid",
+      "addon": {
+        "preset": { "id": "fixture-source", "type": "fixture", "options": {} },
+        "manifestUrl": "https://fixture.invalid/manifest.json",
+        "enabled": true,
+        "name": "Fixture Source",
+        "timeout": 1000
+      },
+      "service": { "id": "torbox", "cached": true },
+      "idMatched": true,
+      "parsedFile": {
+        "title": "Fixture Series",
+        "year": "2024",
+        "seasons": [1],
+        "episodes": [1],
+        "resolution": "1080p",
+        "quality": "WEB-DL",
+        "encode": "HEVC",
+        "releaseGroup": "MATCHED",
+        "visualTags": ["HDR10"],
+        "audioTags": ["DD+"],
+        "audioChannels": ["5.1"],
+        "languages": ["English"],
+        "subtitles": []
+      },
+      "filename": "fixture.series.s01e01.id-matched.mkv"
+    }
+  ],
+  "selectors": [
+    {
+      "id": "external-and-youtube-selection",
+      "expression": "type(streams,'external','youtube')",
+      "expected": {
+        "2.31.1": { "status": "ok", "streamIds": ["external-stream", "youtube-stream"] },
+        "2.32.0": { "status": "ok", "streamIds": ["external-stream", "youtube-stream"] }
+      }
+    },
+    {
+      "id": "multi-episode-detection",
+      "expression": "multiEpisode(streams)",
+      "expected": {
+        "2.31.1": { "status": "ok", "streamIds": ["multi-episode-pack"] },
+        "2.32.0": { "status": "ok", "streamIds": ["multi-episode-pack"] }
+      }
+    },
+    {
+      "id": "season-pack-detection",
+      "expression": "seasonPack(streams,'onlySeasons')",
+      "expected": {
+        "2.31.1": { "status": "ok", "streamIds": ["season-pack-only", "anime-season-pack"] },
+        "2.32.0": { "status": "ok", "streamIds": ["season-pack-only", "anime-season-pack"] }
+      }
+    },
+    {
+      "id": "unknown-language-detection",
+      "expression": "language(streams,'Unknown')",
+      "expected": {
+        "2.31.1": { "status": "ok", "streamIds": ["multi-episode-pack", "missing-release-group-and-size", "external-stream", "youtube-stream"] },
+        "2.32.0": { "status": "ok", "streamIds": ["multi-episode-pack", "missing-release-group-and-size", "external-stream", "youtube-stream"] }
+      }
+    },
+    {
+      "id": "release-group-is-not-inferred",
+      "expression": "releaseGroup(streams)",
+      "expected": {
+        "2.31.1": { "status": "ok", "streamIds": ["single-cached", "multi-episode-pack", "season-pack-only", "anime-season-pack", "id-matched-stream"] },
+        "2.32.0": { "status": "ok", "streamIds": ["single-cached", "multi-episode-pack", "season-pack-only", "anime-season-pack", "id-matched-stream"] }
+      }
+    },
+    {
+      "id": "id-matched-version-gate",
+      "expression": "idMatched(streams)",
+      "expected": {
+        "2.31.1": { "status": "error", "errorIncludes": "idMatched" },
+        "2.32.0": { "status": "ok", "streamIds": ["id-matched-stream"] }
+      }
+    }
+  ]
+}

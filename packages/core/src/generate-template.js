@@ -20,6 +20,7 @@ import { sanitizeAioEnumArrays } from './schema.js';
 import { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
 import { requireNuvioInstantHost } from './nuvio-hosts.js';
 import { NUVIO_ADDONS } from './nuvio-torbox-instant.js';
+import { applyOutputProfile, resolveOutputProfile } from './output-profile-policy.js';
 
 const EXCLUDED_REGEX = ["/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/\\b(beAst|COLLECTiVE|EPiC|iVy|KiNGDOM|LUCY|Scene|SUNSCREEN)\\b/","/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i","/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"];
 
@@ -181,15 +182,15 @@ function buildPresets(input) {
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
     ...(isNzbgeek && creds.nzbgeek ? [
-      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', newznabUrl:'https://api.nzbgeek.info', apiPath:'/api', apiKey:creds.nzbgeek, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } },
+      { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(creds.streamnzb ? { url:creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(hasDebridio ? [
+    ...(hasDebridio && creds.debridio ? [
       { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(creds.debridio ? { apiKey:creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
-    ...(multiServices.includes('debrider') ? [
+    ...(multiServices.includes('debrider') && creds.debrider ? [
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(creds.debrider ? { apiKey:creds.debrider } : {}) }, resources:['stream'] },
     ] : []),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
@@ -205,7 +206,7 @@ function buildPresets(input) {
     }).filter(Boolean),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, newznabUrl:d.apiUrl, apiPath:d.apiPath, apiKey:creds[d.credKey] || '', timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonPackStrategy:'episodeOnly', paginate:true, checkOwned:false, useMultipleInstances:false } };
+      return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
       { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
@@ -229,7 +230,8 @@ function buildPresets(input) {
     ...buildSubtitlePresets(input),
     ...buildCatalogPresets(input)
   ];
-  if (!useStore && !isP2P && !isEasynews && !multiHasEasynews && !isDebridio) list.push({ type:'torbox-search', instanceId:'5f6', enabled:false, options:{ name:'TorBox Search', timeout:4000, sources:['torrent','usenet'], mediaTypes:[], userSearchEngines:false, onlyShowUserSearchResults:false, useMultipleInstances:false } });
+  // The legacy built-in torbox-search preset was removed in AIOStreams v2.32
+  // (TorBox Search API shut down); emitting it fails saves on v2.32+ hosts.
   return list;
 }
 
@@ -491,7 +493,6 @@ function generateNuvioTemplate(input, options = {}) {
     nzbFailover: { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
-    syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
     presets: activePresets,
     services: buildNuvioServices(),
     excludedResolutions: rc.excludedResolutions, includedResolutions: rc.includedResolutions, requiredResolutions: rc.requiredResolutions, preferredResolutions: rc.preferredResolutions,
@@ -539,7 +540,7 @@ function generateNuvioTemplate(input, options = {}) {
     metadata: {
       id: metadataId, name,
       description: 'Connect TorBox in Nuvio Connected Services. Do not enter a TorBox API key in AIOStreams.',
-      source: 'external', version: '0.1.0', category: 'P2P',
+      source: 'external', author: 'Branding-Brevity', version: '0.1.0', category: 'P2P',
       serviceRequired: false, setToSaveInstallMenu: true,
       sourceUrl: 'https://github.com/brevityA/Core-Builds',
       changelogUrl: 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md',
@@ -586,10 +587,20 @@ export function generateTemplate(rawInput = {}, options = {}) {
     multiServices: rawInput.multiServices || [],
     optionalScrapers: rawInput.optionalScrapers || [],
     formatter: rawInput.formatter || 'family-v4',
+    outputProfile: String(rawInput.outputProfile || 'auto'),
+    aiostreamsVersion: String(rawInput.aiostreamsVersion || '2.31.1'),
+    simpleMode: Boolean(rawInput.simpleMode),
+    quickStart: Boolean(rawInput.quickStart),
   };
 
   if (rawInput.route === 'nuvio-torbox-instant') {
-    return generateNuvioTemplate(input, options);
+    // Nuvio has its own specialised topology, but still inherits the global
+    // no-synced-expression rule. Apply the non-destructive Advanced policy.
+    return applyOutputProfile(
+      generateNuvioTemplate(input, options),
+      'advanced',
+      { ...input, pseArch: input.architecture, outputProfile: 'advanced' },
+    );
   }
 
   const deviceAv1Safe = options.deviceAv1Safe || new Set();
@@ -645,7 +656,6 @@ export function generateTemplate(rawInput = {}, options = {}) {
     nzbFailover: input.nzbFailover ? { enabled:true, position:input.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(input.maxFailoverNzbs)||3 } : { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
-    syncedRankedStreamExpressionUrls: ['https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json'],
     presets: activePresets, services: buildServices(input),
   };
 
@@ -709,6 +719,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
       name,
       description: 'Custom template generated by Core Builds Configurator.',
       source: 'external',
+      author: 'Branding-Brevity',
       version: '0.1.0',
       category: (input.service==='p2p'?'P2P':input.service==='http'?'HTTP':'Debrid'),
       serviceRequired: false,
@@ -735,5 +746,22 @@ export function generateTemplate(rawInput = {}, options = {}) {
 
   result.config = sanitizeAioEnumArrays(result.config);
 
-  return result;
+  const profileContext = {
+    outputProfile: input.outputProfile,
+    simpleMode: input.simpleMode,
+    quickStart: input.quickStart,
+    pseArch: input.architecture,
+    service: input.service,
+    multiServices: input.multiServices,
+    optionalScrapers: input.optionalScrapers,
+    resolution: input.resolution,
+    content: input.content,
+    langs: input.langs,
+    langExclusive: Boolean(input.langExclusive),
+    sizeLimit: input.sizeLimit,
+    bandwidthMbps: input.bandwidthMbps,
+    cacheMode: input.cacheMode,
+    aiostreamsVersion: input.aiostreamsVersion,
+  };
+  return applyOutputProfile(result, resolveOutputProfile(profileContext), profileContext);
 }
