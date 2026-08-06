@@ -54,6 +54,9 @@ await writeFile(resolve(web, 'index.html'), webHtml);
 const skipBuild = (src) => { const s = src.replace(/\\/g, '/'); return s.includes('/node_modules/') || s.includes('/.git/'); };
 await cp(resolve(repoRoot, 'account-tools'), resolve(web, 'account-tools'), { recursive: true, filter: (s) => !skipBuild(s) });
 await cp(resolve(repoRoot, 'tools'), resolve(web, 'tools'), { recursive: true, filter: (s) => !skipBuild(s) });
+// Reliability-first V3 candidate is published beside the legacy Configurator
+// for local review. It remains a separate route until its release gates pass.
+try { await cp(resolve(src, 'rebuild'), resolve(web, 'rebuild'), { recursive: true, filter: (s) => !skipBuild(s) }); } catch {}
 
 const standalone = shell
   .replace(sourceStyleLinks, () => `<style>${css}</style>`)

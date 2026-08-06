@@ -72,6 +72,10 @@
 ### Don't know which to choose?
 
 ```
+First install, import troubleshooting, or want the smallest predictable setup?
+├── Want 4K? → Core Stable 4K
+└── 1080p? → Core Stable 1080p
+
 TorBox Pro?
 ├── Got NZBGeek/Usenet indexer?
 │   ├── Want 4K? → 4K Hybrid
@@ -95,6 +99,19 @@ Watching anime?
 
 Getting too few results / low-overhead host? → use the Lite variant of any template above
 ```
+
+---
+
+### 🟢 Core Stable — predictable baseline
+
+> Start here for a first install, import troubleshooting, or a conservative setup. Core Stable uses no remote SEL/regex sync, no add-on groups, no dynamic early fetch exit, one native result-limit policy, and visible diagnostics. It deliberately keeps valid season and multi-episode packs available.
+
+| Template | Res | Import URL |
+|---|---|---|
+| **Core Stable 1080p · TorBox** | 1080p + 720p fallback | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Stable/core-stable-torbox-1080p.json` |
+| **Core Stable 4K · TorBox** | 4K + 1080p fallback | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Stable/core-stable-torbox-4k.json` |
+
+> Need additional local scoring, IQR, or experimental fetching behaviour? Choose a named Balanced, Advanced, or Labs output profile in the Configurator rather than layering extra rules over a Stable template.
 
 ---
 
@@ -216,7 +233,7 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 | [Prism TorBox Essential 1080p](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) | MightyIcyy | Essential | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json) |
 | [RB3 TorBox Pro + RD Hybrid](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) | RB3 | TorBox Pro + RD | [↓ JSON](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Community-Templates/Templates/RB3/rb3-hybrid/rb3-torbox-pro-rd-hybrid.json) · [README](https://github.com/brevityA/Core-Builds/blob/main/Community-Templates/Templates/RB3/rb3-hybrid/README.md) |
 
-> Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
+> Community templates are not Core Builds-maintained profiles. A community template that uses synced stream-expression URLs is not compatible with the Core Builds local-expression policy and may fail on public hosts. Want your template listed? Open a PR to `Community-Templates/` with your JSON and a README.
 
 ---
 
@@ -256,7 +273,8 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
-| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | 46 active templates — 33 stable (25 standard + 8 Lite) + 7 Nightly + 6 Labs |
+| [`Templates/Stable/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Stable) | Core Stable baseline templates — minimal local filtering and predictable fetch behaviour |
+| [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | Curated TorBox, device, Lite, Nightly, and Labs templates |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
