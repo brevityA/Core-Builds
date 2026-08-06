@@ -43,6 +43,12 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Core Score" icon="bolt">
     every stream in Test Drive now shows an explainable 0–100 quality badge (quality tier, bitrate vs IQR fence, resolution fit, HDR, source trust, seeders, freshness) with a tap-to-open breakdown of every gate. Flagship formatters add a branded Core {score} badge.
   </Card>
+  <Card title="Fixed: Debridio/Debrider config reject" icon="shield-check">
+    the presets were emitted enabled without their required API key, so AIOStreams rejected the config (\'debridioApiKey is required, got undefined\'). They are now omitted until a key is entered, with a preflight warning.
+  </Card>
+  <Card title="Express Install" icon="sliders">
+    added an \'Additional services & scrapers\' popout (Debridio, Debrider, Usenet, indexers) mirroring Quick Install, with credentials folding into the same flow.
+  </Card>
 </CardGroup>
 
 ---

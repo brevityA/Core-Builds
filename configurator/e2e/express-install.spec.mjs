@@ -120,3 +120,53 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   expect(posted).toHaveLength(1);
   expect(JSON.stringify(posted[0].config)).not.toContain('torbox-search');
 });
+
+test('Express "Additional services & scrapers" popout adds Debridio + folds its key into the config', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  const errors = await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  // Open the extras popout, pick Debridio, apply
+  await page.locator('#expressExtrasBtn').click();
+  await expect(page.locator('#additionalServicesModal')).toBeVisible();
+  await page.locator('[data-extra-service="debridio"]').click();
+  await page.locator('#extraApply').click();
+  // Debridio credential field should now be in the express modal
+  await expect(page.locator('[data-express-cred="debridio"]')).toBeVisible();
+  await page.locator('[data-express-cred="debridio"]').fill('test-debridio-key');
+  await page.locator('#stremioEmailInline').fill('test@stremio.com');
+  await page.locator('#stremioPasswordInline').fill('test-password');
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 30000 });
+  expect(posted).toHaveLength(1);
+  const config = posted[0].config;
+  const debridio = config.presets.find(p => p.type === 'debridio');
+  expect(debridio, 'Debridio preset should be emitted (key entered)').toBeTruthy();
+  expect(debridio.options.apiKey).toBe('test-debridio-key');
+  expect(JSON.stringify(config)).not.toContain('torbox-search');
+  expect(errors).toEqual([]);
+});
+
+test('Express without a Debridio key omits the preset (no config reject)', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('#expressExtrasBtn').click();
+  await page.locator('[data-extra-service="debridio"]').click();
+  await page.locator('#extraApply').click();
+  // keyless — install with only the torbox key
+  await page.locator('#stremioEmailInline').fill('test@stremio.com');
+  await page.locator('#stremioPasswordInline').fill('test-password');
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 30000 });
+  const config = posted[0].config;
+  expect(config.presets.some(p => p.type === 'debridio')).toBe(false);
+  expect(JSON.stringify(config)).not.toContain('debridioApiKey');
+});

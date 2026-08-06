@@ -10,6 +10,8 @@ export const CHANGELOG = [
     'Docs links consolidated on corebuilds-docs.docsalot.dev — README, configurator footer, tools page, and generated docs no longer point at the stale mintlify mirror.',
     'Express Install lane — one-click two-step install (pick debrid → connect Stremio or grab the manifest) with Balanced defaults and Full-Stack AIOMetadata + Cinemeta patch by default. Reuses the shared install pipeline; no new machinery.',
     'Core Score — every stream in Test Drive now shows an explainable 0–100 quality badge (quality tier, bitrate vs IQR fence, resolution fit, HDR, source trust, seeders, freshness) with a tap-to-open breakdown of every gate. Flagship formatters add a branded Core {score} badge.',
+    'Fixed: Debridio/Debrider config reject — the presets were emitted enabled without their required API key, so AIOStreams rejected the config (\"debridioApiKey is required, got undefined\"). They are now omitted until a key is entered, with a preflight warning.',
+    'Express Install — added an \"Additional services & scrapers\" popout (Debridio, Debrider, Usenet, indexers) mirroring Quick Install, with credentials folding into the same flow.',
   ]},
   { v:'2.89', date:'Aug 4 2026', items:[
     'Fixed: episode-pack availability — multi-episode and season-pack streams were removed too early, before cache and quality filters ran; when those filters eliminated single-episode alternatives, valid requests could return zero streams. Packs are now hidden only after three playable standalone episodes survive all filtering.',
