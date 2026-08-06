@@ -2,7 +2,7 @@
   "metadata": {
     "id": "brevity.core-nexus-samsung-tv",
     "name": "Core Nexus Samsung TV",
-    "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p · TorBox Essential · Library, TorBox Search, Comet, Zilean).",
+    "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p · TorBox Essential · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "0.3.9",
@@ -184,7 +184,6 @@
         "pattern": "/\\b(BHDStudio)\\b/i"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1197,10 +1196,6 @@
     "dynamicAddonFetching": {
       "enabled": true,
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
-    },
-    "groups": {
-      "enabled": false,
-      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -2304,23 +2299,6 @@
           "languages": [
             "en"
           ]
-        }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 3000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
         }
       }
     ],

@@ -29,5 +29,5 @@ test('multi-service generation keeps Debridio and an optional Usenet Crawler pre
   assert.ok(crawler, 'Usenet Crawler must be emitted from optionalScrapers');
   assert.equal(crawler.type, 'newznab');
   assert.equal(crawler.options.name, 'Usenet Crawler');
-  assert.equal(crawler.options.apiKey, 'test-usenet-crawler-key');
+  assert.equal(crawler.options.api.apiKey, 'test-usenet-crawler-key');
 });

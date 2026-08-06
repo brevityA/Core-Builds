@@ -211,9 +211,6 @@
         "enabled": false,
         "options": {
           "name": "NZBGeek",
-          "newznabUrl": "https://api.nzbgeek.info",
-          "apiPath": "/api",
-          "apiKey": "<template_placeholder>",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -222,7 +219,11 @@
           ],
           "searchMode": "both",
           "paginate": true,
-          "useMultipleInstances": false
+          "useMultipleInstances": false,
+          "api": {
+            "url": "https://api.nzbgeek.info/api",
+            "apiKey": "<template_placeholder>"
+          }
         }
       },
       {
@@ -259,23 +260,6 @@
         "resources": [
           "stream"
         ]
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
       },
       {
         "type": "sootio",
@@ -1522,7 +1506,6 @@
         "pattern": "/\\b(BHDStudio)\\b/i"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,

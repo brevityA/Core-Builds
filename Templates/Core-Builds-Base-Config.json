@@ -230,7 +230,7 @@
             "anime"
           ],
           "searchMode": "auto",
-          "seasonPackStrategy": "episodeOnly",
+          "seasonEpisodeStrategy": "episode",
           "paginate": true,
           "useMultipleInstances": false
         },

@@ -80,7 +80,7 @@ const checks = {
   'single current release': CHANGELOG[0]?.v === appVer && !CHANGELOG.some(x => x.v === '2.76'),
   'version consistency': appVer === CHANGELOG[0]?.v && pkg.version.startsWith(appVer + '.') && versions.configurator === pkg.version,
   'host metadata coverage': hostKeys.every(k => HOST_META[k]),
-  'minimum host version': MIN_AIOSTREAMS_VERSION === '2.31.1',
+  'minimum host version': MIN_AIOSTREAMS_VERSION === '2.32.0',
   'device defaults': ['generic','appletv-new','shield','chromecast','onn'].every(k => k in DEVICE_AUDIO_DEFAULTS),
   'device grid layout': app.includes('class="device-grid"') && app.includes('class="device-card"') && app.includes('class="device-help-banner"') && !app.includes('id="devScroll"'),
   'Apple TV AV1 conservative': !DEVICE_AV1_SAFE.has('appletv-new'),

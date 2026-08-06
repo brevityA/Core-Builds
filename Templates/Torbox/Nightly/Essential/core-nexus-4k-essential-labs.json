@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-4k-essential-labs",
     "name": "Core Nexus 4K Essential Labs",
-    "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache + TorBox Search only. 4K build. Template directives: TorBox Search and exit thresholds configurable at import. Based on 4K Essential v0.5.0. v0.4.0: Private Tracker Kill, DAF fix, catalog-guarded Unknown Resolution/Quality Kills.",
+    "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache only. 4K build. Template directives: exit thresholds configurable at import. Based on 4K Essential v0.5.0. v0.4.0: Private Tracker Kill, DAF fix, catalog-guarded Unknown Resolution/Quality Kills.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "0.6.1",
@@ -46,7 +46,7 @@
     "showChanges": true,
     "addonName": "Core Nexus 4K Essential Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs — TorBox debrid-only, no external scrapers. 4K IQR PSEs · Private Tracker Kill · catalog-guarded Unknown Kills · TorBox Search toggle + configurable exit thresholds at import.",
+    "addonDescription": "Nightly Labs — TorBox debrid-only, no external scrapers. 4K IQR PSEs · Private Tracker Kill · catalog-guarded Unknown Kills · configurable exit thresholds at import",
     "appliedTemplates": [
       {
         "id": "core-nexus-4k-ht-torbox",
@@ -214,7 +214,6 @@
         "pattern": "/\\b(FraMeSToR)\\b/"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1255,10 +1254,6 @@
       "enabled": true,
       "condition": "count(resolution(totalCachedStreams, '2160p')) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     },
-    "groups": {
-      "enabled": false,
-      "groupings": []
-    },
     "sortCriteria": {
       "global": [
         {
@@ -2226,23 +2221,6 @@
             "en"
           ]
         }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        },
-        "__if": "inputs.enableTorboxSearch"
       }
     ],
     "addonCategoryColors": {

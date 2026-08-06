@@ -97,23 +97,6 @@
         "category": "Debrid"
       },
       {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
-        }
-      },
-      {
         "type": "stremthruTorz",
         "instanceId": "67c",
         "enabled": false,
@@ -200,8 +183,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -210,11 +191,13 @@
           ],
           "searchMode": "both",
           "paginate": false,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {
@@ -811,8 +794,6 @@
       }
     ],
     "syncedRankedRegexUrls": [],
-    "syncedPreferredStreamExpressionUrls": [],
-    "syncedExcludedStreamExpressionUrls": [],
     "syncedIncludedStreamExpressionUrls": [
       "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-ISEs.json"
     ],
@@ -1175,7 +1156,6 @@
         {
           "name": "Primary",
           "addons": [
-            "5f6",
             "nx-fix-01",
             "nx-fix-02",
             "nx-fix-04",

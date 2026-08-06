@@ -2,7 +2,7 @@
   "metadata": {
     "id": "brevity.core-nexus-speed-4k-plus",
     "name": "Core Nexus Speed 4K+",
-    "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, TorBox Search, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
+    "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "2.10.10",
@@ -211,9 +211,6 @@
         "enabled": false,
         "options": {
           "name": "NZBGeek",
-          "newznabUrl": "https://api.nzbgeek.info",
-          "apiPath": "/api",
-          "apiKey": "<template_placeholder>",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -222,7 +219,11 @@
           ],
           "searchMode": "both",
           "paginate": true,
-          "useMultipleInstances": false
+          "useMultipleInstances": false,
+          "api": {
+            "url": "https://api.nzbgeek.info/api",
+            "apiKey": "<template_placeholder>"
+          }
         }
       },
       {
@@ -302,23 +303,6 @@
           "languages": [
             "en"
           ]
-        }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
         }
       }
     ],
@@ -1544,7 +1528,6 @@
         "pattern": "/\\b(FraMeSToR)\\b/"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,

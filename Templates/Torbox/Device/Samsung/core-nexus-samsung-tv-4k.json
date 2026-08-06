@@ -190,7 +190,6 @@
         "pattern": "/\\b(FraMeSToR)\\b/"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1227,10 +1226,6 @@
     "dynamicAddonFetching": {
       "enabled": true,
       "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20"
-    },
-    "groups": {
-      "enabled": false,
-      "groupings": []
     },
     "sortCriteria": {
       "global": [
@@ -2334,23 +2329,6 @@
           "languages": [
             "en"
           ]
-        }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": false,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 3000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
         }
       }
     ],

@@ -188,7 +188,6 @@
         "pattern": "/\\b(FraMeSToR)\\b/"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1277,8 +1276,7 @@
         {
           "name": "Secondary",
           "addons": [
-            "nx-tdb-1",
-            "5f6"
+            "nx-tdb-1"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
@@ -2218,8 +2216,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -2228,11 +2224,13 @@
           ],
           "searchMode": "auto",
           "paginate": true,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {
@@ -2317,23 +2315,6 @@
           "languages": [
             "en"
           ]
-        }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "torrent",
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": false,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
         }
       }
     ],

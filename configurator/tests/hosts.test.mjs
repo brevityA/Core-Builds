@@ -7,7 +7,7 @@ test('every host has metadata', () => {
 });
 
 test('automatic compatibility policy remains explicit', () => {
-  assert.equal(MIN_AIOSTREAMS_VERSION, '2.31.1');
+  assert.equal(MIN_AIOSTREAMS_VERSION, '2.32.0');
   assert.equal(HOST_META.elfhosted.blocksFree, true);
   assert.equal(HOST_META.viren.channel, 'nightly');
   assert.ok(HOST_META.omni.priority > HOST_META.fortheweak.priority);

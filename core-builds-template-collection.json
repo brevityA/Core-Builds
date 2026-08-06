@@ -2285,23 +2285,6 @@
               "en"
             ]
           }
-        },
-        {
-          "type": "torbox-search",
-          "instanceId": "5f6",
-          "enabled": false,
-          "options": {
-            "name": "TorBox Search",
-            "timeout": 4000,
-            "sources": [
-              "torrent",
-              "usenet"
-            ],
-            "mediaTypes": [],
-            "userSearchEngines": false,
-            "onlyShowUserSearchResults": false,
-            "useMultipleInstances": false
-          }
         }
       ],
       "catalogModifications": [],
@@ -4540,23 +4523,6 @@
               "en"
             ]
           }
-        },
-        {
-          "type": "torbox-search",
-          "instanceId": "5f6",
-          "enabled": false,
-          "options": {
-            "name": "TorBox Search",
-            "timeout": 4000,
-            "sources": [
-              "torrent",
-              "usenet"
-            ],
-            "mediaTypes": [],
-            "userSearchEngines": false,
-            "onlyShowUserSearchResults": false,
-            "useMultipleInstances": false
-          }
         }
       ],
       "catalogModifications": [
@@ -5004,23 +4970,6 @@
               "en"
             ]
           }
-        },
-        {
-          "type": "torbox-search",
-          "enabled": false,
-          "options": {
-            "name": "TorBox Search",
-            "timeout": 4000,
-            "sources": [
-              "torrent",
-              "usenet"
-            ],
-            "mediaTypes": [],
-            "userSearchEngines": false,
-            "onlyShowUserSearchResults": false,
-            "useMultipleInstances": false
-          },
-          "instanceId": "c36afad7-a595-41ce-a431-ddde1a26c5ce"
         }
       ],
       "preferredStreamTypes": [

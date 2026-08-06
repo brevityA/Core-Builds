@@ -194,7 +194,6 @@
         "pattern": "/\\b(BHDStudio)\\b/i"
       }
     ],
-    "syncedExcludedStreamExpressionUrls": [],
     "requiredReleaseGroups": [],
     "includeSeederRange": [
       0,
@@ -1232,8 +1231,7 @@
             "tb-nzb-1",
             "dd458151-1e34-4bd3-aa2c-349e4da371bf",
             "tam-knaben",
-            "nx-tdb-1",
-            "5f6"
+            "nx-tdb-1"
           ],
           "condition": "count(cached(totalStreams)) < 4 or totalTimeTaken > 6000"
         }
@@ -2329,8 +2327,6 @@
         "enabled": true,
         "options": {
           "name": "Searchⁿᶻᵇ",
-          "newznabUrl": "https://search-api.torbox.app/newznab",
-          "apiPath": "/api",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -2339,11 +2335,13 @@
           ],
           "searchMode": "auto",
           "paginate": true,
-          "checkOwned": true,
           "useMultipleInstances": false,
           "services": [
             "torbox"
-          ]
+          ],
+          "api": {
+            "url": "https://search-api.torbox.app/newznab/api"
+          }
         }
       },
       {
@@ -2352,9 +2350,6 @@
         "enabled": false,
         "options": {
           "name": "NZBGeek",
-          "newznabUrl": "https://api.nzbgeek.info",
-          "apiPath": "/api",
-          "apiKey": "<template_placeholder>",
           "timeout": 5000,
           "mediaTypes": [
             "movie",
@@ -2363,8 +2358,11 @@
           ],
           "searchMode": "auto",
           "paginate": true,
-          "checkOwned": false,
-          "useMultipleInstances": false
+          "useMultipleInstances": false,
+          "api": {
+            "url": "https://api.nzbgeek.info/api",
+            "apiKey": "<template_placeholder>"
+          }
         }
       },
       {
@@ -2449,22 +2447,6 @@
           "languages": [
             "en"
           ]
-        }
-      },
-      {
-        "type": "torbox-search",
-        "instanceId": "5f6",
-        "enabled": true,
-        "options": {
-          "name": "TorBox Search",
-          "timeout": 4000,
-          "sources": [
-            "usenet"
-          ],
-          "mediaTypes": [],
-          "userSearchEngines": true,
-          "onlyShowUserSearchResults": false,
-          "useMultipleInstances": false
         }
       }
     ],
