@@ -24,6 +24,7 @@ import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
 import { iqrExpression } from '../core/iqr-expression.js';
 import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
+import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from '../core/update-check.js';
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
@@ -51,6 +52,20 @@ let _savedStep = 0;
 let _disabledAddons = new Set();
 let _lastInstall = { target: 'app', pwd: '' };
 let _lastAddonKey = '';
+let _pendingUpdate = null;
+function storeTemplateMeta(tpl) {
+  try {
+    const meta = normalizeTemplateMeta((tpl && tpl.metadata) || {});
+    if (meta) { meta.ts = Date.now(); localStorage.setItem('coreBuildLastTemplate', JSON.stringify(meta)); }
+  } catch(e) {}
+}
+function getStoredTemplateMeta() {
+  try { return JSON.parse(localStorage.getItem('coreBuildLastTemplate') || 'null'); } catch(e) { return null; }
+}
+function savePreUpdateSnapshot() {
+  // Capture the pre-update state so 'Revert' can restore it (newest backup).
+  try { saveBackup(); } catch(e) {}
+}
 const _simulateAddonFail = (() => { try { return new URLSearchParams(location.search).get('simulateAddonFail'); } catch(e){ return null; } })();
 let pasteMode = false;
 function hostEntries() { return Object.entries(HOST_BASE_URLS).map(([k,u]) => [HOST_LABEL_MAP[k]||k, u]); }
@@ -165,6 +180,7 @@ const DEFS = [
       { v:'realdebrid',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><path d="M15 22h14M22 15v14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round"/><circle cx="22" cy="22" r="5" stroke="#10b981" stroke-width="1.2" fill="none"/><text x="22" y="42" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="800" letter-spacing=".3">RD</text></svg>', name:'Real-Debrid', desc:'Real-Debrid subscribers<br><span style="color:#dc2626;font-size:.8em">e.g. Core Nexus RD</span>' },
       { v:'alldebrid',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M22 6L38 34H6Z" stroke="#f97316" stroke-width="1.5" fill="#f97316" fill-opacity=".06" stroke-linejoin="round"/><path d="M22 16v10M22 30v.5" stroke="#f97316" stroke-width="2" stroke-linecap="round"/><text x="22" y="41" text-anchor="middle" fill="#f97316" font-size="4.5" font-weight="800" letter-spacing=".3">AD</text></svg>', name:'AllDebrid', desc:'AllDebrid subscribers<br><span style="color:#ea580c;font-size:.8em">e.g. Core Nexus AllDebrid · 4K AllDebrid</span>' },
       { v:'easynews',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="24" rx="4" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><path d="M12 18l10 6 10-6" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28l6-4M32 28l-6-4" stroke="#06b6d4" stroke-width="1.2" stroke-linecap="round"/><text x="22" y="9" text-anchor="middle" fill="#06b6d4" font-size="4" font-weight="700" letter-spacing=".3">EN</text></svg>', name:'EasyNews', desc:'Usenet — username &amp; password<br><span style="color:#0ea5e9;font-size:.8em">e.g. Speed EasyNews · Speed 4K+</span>' },
+      { v:'usenet',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="24" rx="4" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".06"/><path d="M12 18l10 6 10-6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28l6-4M32 28l-6-4" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="34" r="2.5" stroke="#22c55e" stroke-width="1.2" fill="#22c55e" fill-opacity=".2"/><text x="22" y="9" text-anchor="middle" fill="#22c55e" font-size="4" font-weight="700" letter-spacing=".3">NZB</text></svg>', name:'Usenet Only', desc:'No debrid — EasyNews + indexers + built-in NNTP<br><span style="color:#22c55e;font-size:.8em">privacy-first · no torrents</span>' },
       { v:'premiumize',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="8" stroke="#a78bfa" stroke-width="1.5" fill="#a78bfa" fill-opacity=".06"/><path d="M16 22l4 4 8-8" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="14" r="2" fill="#a78bfa" fill-opacity=".4"/></svg>', name:'Premiumize', desc:'Premiumize subscribers<br><span style="color:#d97706;font-size:.8em">e.g. Core Nexus Premiumize</span>' },
       { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="24" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="7" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">multi-debrid aggregator service</span>' },
       { v:'debridlink',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M18 18l-4 4a5.66 5.66 0 008 8l4-4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M26 26l4-4a5.66 5.66 0 00-8-8l-4 4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="22" cy="22" r="14" stroke="#3b82f6" stroke-width="1" fill="#3b82f6" fill-opacity=".04" stroke-dasharray="3 3"/></svg>', name:'Debrid-Link', desc:'Debrid-Link subscribers<br><span style="color:#0284c7;font-size:.8em">e.g. Core Nexus Debrid-Link</span>' },
@@ -460,7 +476,7 @@ function clearState() {
 function pushStep() { try { history.pushState({ step: step }, ''); } catch(e) {} }
 
 function deriveService() {
-  const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
+  const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','usenet','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
   const primary = S.multiServices.filter(s => PRIMARY.includes(s));
   if (primary.length > 1) return 'multi';
   if (primary.length === 1) return primary[0];
@@ -1489,6 +1505,7 @@ function splashHtml() {
       </div>
     </div>
 
+    ${hadSavedState ? '' : remoteUpdateBannerHtml()}
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4">
       <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, connect Stremio, and install — about 30 seconds.</div></div></div>
@@ -2170,6 +2187,8 @@ function tutClose(){
 window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  checkForTemplateUpdate();
+  setInterval(checkForTemplateUpdate, 60 * 60 * 1000);
   initErrorLogger();
   initContactWidget(() => ({
     service: S.service === 'multi' ? 'multi' : S.service,
@@ -2510,6 +2529,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showFastLane();
     if (action === 'open-express-lane') showExpressLane();
+    if (action === 'update-now') applyRemoteUpdate();
+    if (action === 'revert-update') revertToPrevious();
     if (action === 'open-diagnostics') showDiagnosticsModal();
     if (action === 'open-additional-services') showAdditionalServicesPicker();
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
@@ -3193,7 +3214,9 @@ function getDebridInputs() {
   if (m.includes('premiumize')) ids.push('premiumize');
   if (m.includes('debridlink')) ids.push('debridlink');
   if (m.includes('offcloud'))   ids.push('offcloud');
-  if (m.includes('easynews'))   { ids.push('easynews'); ids.push('easynewsPass'); }
+  if (m.includes('easynews') || m.includes('usenet'))   { ids.push('easynews'); ids.push('easynewsPass'); }
+  if (m.includes('nzbgeek') || m.includes('usenet')) ids.push('nzbgeek');
+  if (m.includes('nzbhydra') || m.includes('usenet')) { ids.push('nzbhydra'); ids.push('nzbhydraApiKey'); }
   if (m.includes('debridio'))   ids.push('debridio');
   if (m.includes('debrider'))   ids.push('debrider');
   if (m.includes('easydebrid')) ids.push('easydebrid');
@@ -3243,7 +3266,7 @@ function defaultName() {
   const svcName = {'torbox-pro':'TorBox','torbox-ess':'TorBox Essential','alldebrid':'AllDebrid','realdebrid':'Real-Debrid','premiumize':'Premiumize','debridlink':'Debrid-Link','offcloud':'Offcloud','easynews':'EasyNews','p2p':'P2P','http':'HTTP','debridio':'Debridio','debrider':'Debrider'}[svc] || '';
   if (svc === 'multi') {
     const names = {'alldebrid':'AllDebrid','realdebrid':'RD','premiumize':'Premiumize','debridlink':'DL','offcloud':'Offcloud','easynews':'EasyNews','torbox-pro':'TorBox','torbox-ess':'TB Essential','debridio':'Debridio','debrider':'Debrider','easydebrid':'EasyDebrid','pikpak':'PikPak','seedr':'Seedr'};
-    const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
+    const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','usenet','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
     const mainSvcs = S.multiServices.filter(s => PRIMARY.includes(s));
     const svcStr = mainSvcs.length <= 3 ? mainSvcs.map(s => names[s] || s).join(' + ') : mainSvcs.slice(0,2).map(s => names[s] || s).join(' + ') + ` +${mainSvcs.length - 2}`;
     return `Core Nexus${resSuffix}${devLabel ? ' · ' + devLabel : ''} — ${svcStr}`.trim();
@@ -3256,9 +3279,29 @@ function presets() {
   const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio';
   const hasDebridio = isDebridio || (isMulti && S.multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
+  const isUsenet = svc === 'usenet' || (isMulti && S.multiServices.includes('usenet'));
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && S.multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && S.multiServices.includes('streamnzb');
+  if (isUsenet) {
+    const usenetList = [
+      ...(isEasynews || multiHasEasynews || isUsenet ? [
+        { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
+        { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      ] : []),
+      ...(isNzbgeek && S.creds.nzbgeek ? [
+        { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
+      ] : []),
+      ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && (x.presetType === 'newznab' || x.presetType === 'nzbhydra'))).map(sid => {
+        const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+        if (d.presetType === 'nzbhydra') return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', paginate:true, useMultipleInstances:false } };
+        return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
+      }),
+      ...subtitlePresets(),
+      ...catalogPresets(),
+    ];
+    return usenetList;
+  }
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
   if (isHttp) return [
     { type:'sootio', instanceId:'sootio-core-builds', enabled:true, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
@@ -3286,7 +3329,7 @@ function presets() {
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
     ...storeSlot,
-    ...(isEasynews || multiHasEasynews ? [
+    ...(isEasynews || multiHasEasynews || isUsenet ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
@@ -3314,8 +3357,9 @@ function presets() {
       if (d.id === 'prowlarr') return { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', timeout:10000, ...(S.creds.prowlarr ? { apiKey:S.creds.prowlarr } : {}) }, resources:['stream'] };
       return null;
     }).filter(Boolean),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab' || x.presetType === 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      if (d.presetType === 'nzbhydra') return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', paginate:true, useMultipleInstances:false } };
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
@@ -3359,11 +3403,12 @@ function services() {
     {id:'easydebrid', enabled: svc==='easydebrid' || (isMulti && m.includes('easydebrid')), credentials:cred('easydebrid')},
     {id:'pikpak', enabled: svc==='pikpak' || (isMulti && m.includes('pikpak')), credentials:cred('pikpak')},
     {id:'seedr', enabled: svc==='seedr' || (isMulti && m.includes('seedr')), credentials:cred('seedr')},
-    {id:'easynews', enabled: svc==='easynews' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || (isMulti && m.includes('easynews'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
+    {id:'easynews', enabled: svc==='easynews' || svc==='usenet' || (isMulti && m.includes('easynews')) || (isMulti && m.includes('usenet')), credentials: (svc==='easynews' || svc==='usenet' || (isMulti && m.includes('easynews')) || (isMulti && m.includes('usenet'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
+    {id:'stremio_nntp', enabled: svc==='usenet' || (isMulti && m.includes('usenet')), credentials:{}}, {id:'aiostreams', enabled: svc==='usenet' || (isMulti && m.includes('usenet')), credentials:{}},
     {id:'putio', enabled: false, credentials:{}},
     {id:'debrider', enabled: svc==='debrider' || (isMulti && m.includes('debrider')), credentials:cred('debrider')},
     {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}},
-    {id:'stremio_nntp', enabled: false, credentials:{}}, {id:'aiostreams', enabled: false, credentials:{}}
+    
   ];
 }
 
@@ -4380,6 +4425,142 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
   overlay.addEventListener('click', e => { if (e.target === overlay) close(onCancel); });
 }
 
+function upgradeToTemplate(tpl, opts = {}) {
+  // Shared apply core: parse -> preview -> diff -> commit (used by the Update
+  // modal and by one-click remote updates). Never touches credentials beyond
+  // what the template itself carries; pre-update state is backed up for Revert.
+  storeTemplateMeta(tpl);
+  savePreUpdateSnapshot();
+  const oldCfg = tpl.config || tpl;
+  const importedConflicts = findFeatureConflicts(tpl);
+  const savedState = JSON.parse(JSON.stringify(S));
+  const session = createUpdateSession(S, parseTemplateToState(tpl));
+  const parsed = parseTemplateToState(tpl);
+  S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
+  S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
+  S.formatter = 'family-v4'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
+  S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
+  S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
+  S.streamPool = 'normal'; S.outputProfile = 'auto';
+  S.subtitleAddons = ['aiosubtitle']; S.subtitleLangs = ['en']; S.catalogs = ['tmdb-addon'];
+  S.dedupMerge = false; S.proxyEnabled = false; S.proxiedServices = []; S.optionalScrapers = [];
+  const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',subdl:''};
+  Object.assign(S, parsed);
+  S.creds = Object.assign(defaultCreds, parsed.creds || {});
+  S.simpleMode = false;
+  let newTpl, newCfg;
+  try {
+    newTpl = build();
+    newCfg = newTpl.config || newTpl;
+  } catch(buildErr) {
+    Object.assign(S, savedState);
+    showToast('Preview generation failed: ' + buildErr.message, true);
+    return;
+  }
+  Object.assign(S, savedState);
+  if (typeof opts.onClose === 'function') opts.onClose();
+  showDiffModal(oldCfg, newCfg, parsed, (selectedKeys, offeredKeys = new Set()) => {
+    const SECTION_FIELDS = {
+      pses: ['preferredStreamExpressions'],
+      eses: ['excludedStreamExpressions'],
+      ises: ['includedStreamExpressions'],
+      ranked_regex: ['rankedRegexPatterns'],
+      pref_regex: ['preferredRegexPatterns'],
+      excl_regex: ['excludedRegexPatterns'],
+      sort: ['sortCriteria'],
+      settings: ['deduplicator','formatter','dynamicAddonFetching','maxResults','syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls']
+    };
+    const keep = {};
+    for (const [key, fields] of Object.entries(SECTION_FIELDS)) {
+      if (offeredKeys.has(key) && !selectedKeys.has(key)) {
+        fields.forEach(f => { if (oldCfg[f] !== undefined) keep[f] = oldCfg[f]; });
+      }
+    }
+    commitUpdate(session, parsed);
+    Object.assign(S, parsed);
+    S._migrationKeep = Object.keys(keep).length ? keep : null;
+    saveState();
+    _pendingUpdate = null;
+    const m = getStoredTemplateMeta();
+    if (m && tpl.metadata && tpl.metadata.sourceUrl && tpl.metadata.sourceUrl === m.sourceUrl && tpl.metadata.version) {
+      m.version = String(tpl.metadata.version); m.ts = Date.now();
+      try { localStorage.setItem('coreBuildLastTemplate', JSON.stringify(m)); } catch(e) {}
+    }
+    const skipped = Object.keys(SECTION_FIELDS).filter(k => offeredKeys.has(k) && !selectedKeys.has(k)).length;
+    step = STEPS;
+    pushStep(); render(); window.scrollTo(0,0);
+    showToast(skipped ? 'Template upgraded — '+selectedKeys.size+' section'+(selectedKeys.size!==1?'s':'')+' applied, '+skipped+' kept from original' : 'Template upgraded — review settings and generate your new template');
+  }, () => {
+    cancelUpdate(session);
+    showToast('Migration cancelled — no changes applied', true);
+  }, importedConflicts);
+}
+
+function remoteUpdateBannerHtml() {
+  if (!_pendingUpdate) return '';
+  const p = _pendingUpdate;
+  const ch = p.changelog && p.changelog.length ? `<ul style="margin:6px 0 0;padding-left:16px">${p.changelog.map(e=>`<li style="font-size:.7rem;color:#8b949e;margin:2px 0"><b style="color:#00d4ff">v${e.version}</b>${e.body.length?` — ${e.body.slice(0,3).join(' · ')}`:''}</li>`).join('')}</ul>` : '';
+  return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.1rem">🔄</span>
+      <div style="flex:1">
+        <div style="font-size:.78rem;font-weight:700;color:#00d4ff">Update available: v${p.from} → v${p.to}</div>
+        <div style="font-size:.7rem;color:#8b949e">${p.name ? escH(p.name) + ' ' : ''}has a newer version${ch ? '' : ' — update or rebuild to get it.'}</div>
+        ${ch}
+      </div>
+      <button data-action="update-now" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.1);color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer">Update →</button>
+      <button data-action="revert-update" title="Revert to your previous version (kept as a backup)" style="padding:6px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#8b949e;font-size:.68rem;font-weight:700;cursor:pointer">Revert</button>
+      <button data-action="start-fresh" style="padding:6px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#8b949e;font-size:.68rem;font-weight:700;cursor:pointer">Rebuild</button>
+    </div>
+  </div>`;
+}
+
+async function checkForTemplateUpdate(force = false) {
+  try {
+    if (!force && new URLSearchParams(location.search).get('cb-e2e') === '1') return;
+    const meta = getStoredTemplateMeta();
+    if (!meta || !meta.sourceUrl) return;
+    const now = Date.now();
+    const last = Number(localStorage.getItem('cbUpdCheckTs') || 0);
+    if (!shouldCheck(now, last, 60 * 60 * 1000)) return;
+    localStorage.setItem('cbUpdCheckTs', String(now));
+    let remote;
+    try {
+      const res = await fetchWithTimeout(meta.sourceUrl, { method: 'GET' }, 6000);
+      if (!res.ok) return;
+      remote = await res.json();
+    } catch(e) { return; } // fail silent offline
+    const rv = remote && remote.metadata && remote.metadata.version;
+    if (!rv || !isNewer(rv, meta.version)) return;
+    let changelog = [];
+    if (meta.changelogUrl) {
+      try {
+        const cres = await fetchWithTimeout(meta.changelogUrl, { method: 'GET' }, 6000);
+        if (cres.ok) changelog = parseChangelogRange(await cres.text(), meta.version, rv);
+      } catch(e) {}
+    }
+    _pendingUpdate = { sourceUrl: meta.sourceUrl, from: meta.version, to: rv, changelog, name: meta.name };
+    render();
+  } catch(e) {}
+}
+
+async function applyRemoteUpdate() {
+  const p = _pendingUpdate;
+  if (!p) return;
+  try {
+    const res = await fetchWithTimeout(p.sourceUrl, { method: 'GET' }, 8000);
+    if (!res.ok) { showToast('Could not fetch the update', true); return; }
+    const tpl = await res.json();
+    if (!tpl || !tpl.config) { showToast('Update file is invalid', true); return; }
+    upgradeToTemplate(tpl, {});
+  } catch(e) { showToast('Update failed: ' + (e.message || e), true); }
+}
+
+function revertToPrevious() {
+  _pendingUpdate = null;
+  restoreBackup(0);
+}
+
 function showUpdateTemplateModal() {
   const ex = document.getElementById('updateTplModal');
   if (ex) ex.remove();
@@ -4422,69 +4603,9 @@ function showUpdateTemplateModal() {
       const parsed = parseTemplateToState(tpl);
       if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
 
-      const oldCfg = tpl.config || tpl;
-      const importedConflicts = findFeatureConflicts(tpl);
-
       // Build a preview from temporary state; do not commit until the user confirms.
-      const savedState = JSON.parse(JSON.stringify(S));
-      const session = createUpdateSession(S, parsed);
-      S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
-      S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
-      S.formatter = 'family-v4'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
-      S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
-      S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
-      S.streamPool = 'normal'; S.outputProfile = 'auto';
-      S.subtitleAddons = ['aiosubtitle']; S.subtitleLangs = ['en']; S.catalogs = ['tmdb-addon'];
-      S.dedupMerge = false; S.proxyEnabled = false; S.proxiedServices = []; S.optionalScrapers = [];
-      const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',subdl:''};
-      Object.assign(S, parsed);
-      S.creds = Object.assign(defaultCreds, parsed.creds || {});
-      S.simpleMode = false;
-      let newTpl, newCfg;
-      try {
-        newTpl = build();
-        newCfg = newTpl.config || newTpl;
-      } catch(buildErr) {
-        Object.assign(S, savedState);
-        errEl.textContent = 'Preview generation failed: ' + buildErr.message;
-        errEl.style.display = '';
-        return;
-      }
-      Object.assign(S, savedState);
-
-      overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
-      setTimeout(() => {
-        overlay.remove();
-        showDiffModal(oldCfg, newCfg, parsed, (selectedKeys, offeredKeys = new Set()) => {
-          const SECTION_FIELDS = {
-            pses: ['preferredStreamExpressions'],
-            eses: ['excludedStreamExpressions'],
-            ises: ['includedStreamExpressions'],
-            ranked_regex: ['rankedRegexPatterns'],
-            pref_regex: ['preferredRegexPatterns'],
-            excl_regex: ['excludedRegexPatterns'],
-            sort: ['sortCriteria'],
-            settings: ['deduplicator','formatter','dynamicAddonFetching','maxResults','syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls']
-          };
-          const keep = {};
-          for (const [key, fields] of Object.entries(SECTION_FIELDS)) {
-            if (offeredKeys.has(key) && !selectedKeys.has(key)) {
-              fields.forEach(f => { if (oldCfg[f] !== undefined) keep[f] = oldCfg[f]; });
-            }
-          }
-          commitUpdate(session, parsed);
-          Object.assign(S, parsed);
-          S._migrationKeep = Object.keys(keep).length ? keep : null;
-          saveState();
-          const skipped = Object.keys(SECTION_FIELDS).filter(k => offeredKeys.has(k) && !selectedKeys.has(k)).length;
-          step = STEPS;
-          pushStep(); render(); window.scrollTo(0,0);
-          showToast(skipped ? 'Template upgraded — '+selectedKeys.size+' section'+(selectedKeys.size!==1?'s':'')+' applied, '+skipped+' kept from original' : 'Template upgraded — review settings and generate your new template');
-        }, () => {
-          cancelUpdate(session);
-          showToast('Migration cancelled — no changes applied', true);
-        }, importedConflicts);
-      }, 160);
+      upgradeToTemplate(tpl, { onClose: () => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 150); } });
+      return;
     } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
   }
 
@@ -5497,8 +5618,9 @@ function checkTemplateVersion() {
 }
 
 function versionBannerHtml() {
+  const remote = remoteUpdateBannerHtml();
   const v = checkTemplateVersion();
-  if (!v || !v.outdated) return '';
+  if (!v || !v.outdated) return remote;
   return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);margin-bottom:12px;display:flex;align-items:center;gap:10px">
     <span style="font-size:1.1rem">🔄</span>
     <div style="flex:1">
@@ -5587,7 +5709,9 @@ function hostCompatHtml() {
     const issues = h.issues.length ? `<div class="hc-detail">${h.issues.map(i => `<div class="hc-issue"><span class="hc-issue-ico" style="color:${statusColor[h.status]}">${h.status==='err'?'✕':'⚠'}</span><span>${i}</span></div>`).join('')}</div>` : '';
     return `<div class="hc-row">${badge}<span class="hc-name">${h.label}</span><span class="hc-status" style="color:${statusColor[h.status]}">${statusLabel[h.status]}</span></div>${issues}`;
   }).join('');
-  return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}</div></div>`;
+  const hasNonWhitelisted = Object.values(hosts).some(h => h.issues.some(i => i.includes('not on the host allowlist')));
+  const stripBtn = hasNonWhitelisted ? `<button data-action="strip-regex" style="margin-top:8px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.74rem;font-weight:700;cursor:pointer">Strip non-allowlisted regex patterns</button>` : '';
+  return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}${stripBtn}</div></div>`;
 }
 
 const TROUBLESHOOT_TREE = {
@@ -5886,6 +6010,7 @@ const EXPRESS_SERVICES = [
   ['alldebrid','AllDebrid','Debrid · uncached-friendly'],
   ['premiumize','Premiumize','Debrid · generous quota'],
   ['easynews','EasyNews','Usenet · NZB access'],
+  ['usenet','Usenet Only','No debrid · NNTP + indexers'],
   ['p2p','Free / P2P','No account required'],
 ];
 
@@ -5901,6 +6026,7 @@ function showExpressLane() {
   const credArea = (service) => {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
     if (service === 'easynews') return credInput('easynews') + credInput('easynewsPass');
+    if (service === 'usenet') return credInput('easynews') + credInput('easynewsPass') + credInput('nzbgeek') + credInput('nzbhydra') + credInput('nzbhydraApiKey') + `<div style="margin:8px 2px 2px;font-size:.68rem;color:#6b7280">Optional: DrunkenSlug, NZBFinder, NZBnoob (Advanced → Additional services) or point NZBHydra2 at all your indexers.</div>`;
     return credInput(service === 'torbox-pro' ? 'torbox' : service);
   };
   // Extra services that need a credential when added via the popout.
@@ -6928,6 +7054,9 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     coreScore(stream, ctx) {
       return scoreStream(stream, ctx);
+    },
+    checkUpdate() {
+      return checkForTemplateUpdate(true);
     },
   };
 }

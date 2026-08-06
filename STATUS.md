@@ -68,6 +68,12 @@ To enable the Core Builds Filtering System synced URLs on a self-hosted instance
 WHITELISTED_SYNCED_URLS=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-eses.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-pses.json,https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/core-builds-ises.json
 ```
 
+**Preload the Core Builds template collection** so users always see up-to-date templates (AIOStreams auto-refreshes it):
+```env
+TEMPLATE_URLS=["https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-builds-template-collection.json"]
+```
+The collection is generated from the active suite (`python3 scripts/sync_template_collection.py`) and CI-guarded so it never goes stale.
+
 ---
 
 ## ➕ Missing an Instance?

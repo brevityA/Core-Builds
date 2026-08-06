@@ -579,13 +579,13 @@ Full 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD
 
 ### TorBox-only Speed Templates
 
-No EasyNews required. The v2.31.1 compatibility lane uses Library + Zilean + the legacy `torbox-search` preset. AIOStreams v2.32 removes that preset; the separate Newznab endpoint path needs its own endpoint/key validation before migration. Uses a Dynamic early exit at 3 cached streams or 4 seconds; this is a speed trade-off, not the Stable baseline.
+No EasyNews required. Library + Zilean + TorBox Search. Exits as soon as 3 cached streams are found or 4 seconds elapse — faster than the full Essential stack, broader than Flash.
 
 | | Speed 4K | Speed |
 |---|---|---|
 | **Resolution** | 4K + 1080p | 1080p · 720p fallback |
 | **Requires** | TorBox Essential | TorBox Essential |
-| **Presets (v2.31.1 lane)** | Library · Zilean · legacy torbox-search | Library · Zilean · legacy torbox-search |
+| **Presets** | Library · Zilean · TorBox Search | Library · Zilean · TorBox Search |
 | **Exit condition** | 3 cached 4K or 4s | 3 cached 1080p or 4s |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json` | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json` |
 

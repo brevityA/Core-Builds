@@ -337,9 +337,6 @@ config["dynamicAddonFetching"] = {
     "enabled": True,
     "condition": "count(cached(resolution(totalStreams,'2160p'))) >= 5 or totalTimeTaken > 5000",
 }
-# Keep Dynamic as the one explicit Labs early-exit behaviour. Do not inherit a
-# Groups scheduler from the Apex source template as well.
-config["groups"] = {"enabled": False, "groupings": []}
 
 # ---------------------------------------------------------------------------
 # Assemble final template

@@ -13,6 +13,8 @@ export const PROVIDER_CREDENTIALS = {
   pikpak:        { label: 'PikPak API Key',         placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://mypikpak.com/', linkLabel: 'Open account' },
   seedr:         { label: 'Seedr API Key',          placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://www.seedr.cc/', linkLabel: 'Open account' },
   debrider:      { label: 'Debrider API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://debrider.io/', linkLabel: 'Open dashboard' },
+  nzbhydra:      { label: 'NZBHydra2 URL',           placeholder: 'https://your-nzbhydra2-instance', url: '', linkLabel: 'Your self-hosted NZBHydra2' },
+  nzbhydraApiKey:{ label: 'NZBHydra2 API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', url: '', linkLabel: 'Generate API key in NZBHydra2' },
   streamnzb:     { label: 'StreamNZB Manifest URL', placeholder: 'https://your-streamnzb-instance/manifest.json', url: '', linkLabel: 'Use your manifest URL' },
   nzbnoob:       { label: 'NZBnoob API Key',        placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://nzbnoob.com', linkLabel: 'Get key' },
   althub:        { label: 'altHUB API Key',          placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://althub.co.za', linkLabel: 'Get key' },

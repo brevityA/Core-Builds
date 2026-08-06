@@ -23,11 +23,11 @@ jobs:
           import sys
           import os
 
-          # Core Builds permits a reviewed regex snapshot only. Synced stream
-          # expressions are prohibited and must never be fetched into this repo.
           sources = {
               "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json":
                   "Regex/vidhin05-regexes.json",
+              "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/expressions.json":
+                  "Regex/vidhin05-expressions.json",
           }
 
           errors = 0
@@ -68,13 +68,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: sync upstream Vidhin05 regex"
-          title: "🔄 Sync upstream regex"
+          title: "🔄 Sync upstream regex & expressions"
           body: |
-            Automated weekly sync of the reviewed upstream regex snapshot:
+            Automated weekly sync of upstream rule sets:
 
             - `Regex/vidhin05-regexes.json` — Vidhin05 ranked regex
+            - `Regex/vidhin05-expressions.json` — Vidhin05 ranked expressions
 
-            Core Builds does not use synced stream expressions. Review regex diffs before merging to confirm they align with Core Builds logic.
+            Review diffs before merging to confirm upstream changes align with Core Builds logic.
           branch: sync-upstream-rules
           base: main
           labels: "automated-pr,regex,chore"

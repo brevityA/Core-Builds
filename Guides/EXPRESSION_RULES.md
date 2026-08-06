@@ -11,7 +11,7 @@ Reference for writing and validating Stream Expression Language (SEL) expression
 | `preferredStreamExpressions` (PSE) | Rank streams — returns streams to show in priority order | Per tier, highest first |
 | `excludedStreamExpressions` (ESE) | Remove streams — returns streams to exclude | Each active expression |
 | `includedStreamExpressions` (ISE) | Passthrough streams — returns streams to exempt from exclusion | Each active expression |
-| `rankedStreamExpressions` (RSE) | Define named local tiers referenced by `rseMatched()` | Named, inline only |
+| `rankedStreamExpressions` (RSE) | Define named tiers referenced by `rseMatched()` | Named, loaded externally |
 
 ---
 
@@ -69,13 +69,15 @@ for f in glob.glob('Templates/Torbox/**/*.json', recursive=True):
 
 ## Rule 2 — No `rseMatched` With Tier Names in Inline Expressions
 
-`rseMatched(streams, 'Tier Name', ...)` is valid only when every referenced tier is defined in a local inline `rankedStreamExpressions` entry in the same template. Core Builds does **not** use synced stream-expression URLs.
+`rseMatched(streams, 'Tier Name', ...)` references RSE tier names that are loaded from `syncedRankedStreamExpressionUrls`. On public AIOStreams instances (elfhosted, fortheweak.cloud), that URL is blocked — the RSE tiers are never defined — and any `rseMatched` call with a tier name throws:
 
-If a template has no local ranked-expression definition, any tier-name `rseMatched()` call is invalid and must be removed or replaced with native properties.
+```
+Invalid stream expression: /*expression label*/...
+```
 
-**Bad (no local ranked tier definitions):**
+**Bad (broken on public instances):**
 ```js
-// ❌ Requires external or missing tier definitions
+// ❌ References RSE tier names that may not be loaded
 count(rseMatched(resolution(streams, '2160p'), 'BD T1', 'Remux T1', 'Web T1')) == 0
 ```
 
@@ -100,36 +102,19 @@ for e in expressions:
 
 ---
 
-## Rule 3 — No Synced Stream-Expression URLs
+## Rule 3 — Synced URL Blocking on Public Instances
 
-Core Builds uses **local stream expressions only**. Do not add a URL to any synced stream-expression field, even when an individual host currently accepts it. Public-host allowlists and upstream changes make imports and playback behaviour non-reproducible.
+Public AIOStreams instances block certain external URLs in synced config fields:
 
-| Field | Core Builds policy | Safe alternative |
+| Field | Blocked on public | Safe alternative |
 |---|---|---|
-| `syncedRankedStreamExpressionUrls` | ✗ Prohibited | Define a small local RSE, or remove score-dependent logic |
-| `syncedPreferredStreamExpressionUrls` | ✗ Prohibited | Keep the PSE inline in `preferredStreamExpressions` |
-| `syncedIncludedStreamExpressionUrls` | ✗ Prohibited | Keep the ISE inline in `includedStreamExpressions` |
-| `syncedExcludedStreamExpressionUrls` | ✗ Prohibited | Keep the ESE inline in `excludedStreamExpressions` |
+| `syncedRankedRegexUrls` | ✗ Always blocked | Embed patterns inline in `rankedRegexPatterns` |
+| `syncedRankedStreamExpressionUrls` (Vidhin05) | ✗ Blocked | Remove; inline RSE tiers or remove `rseMatched` references |
+| `syncedPreferredStreamExpressionUrls` (Core Builds PSEs) | ⚠ Works if RSE URL works | Keep; but fix any `rseMatched` in synced PSEs |
+| `syncedIncludedStreamExpressionUrls` (Core Builds ISEs) | ✓ Works | Keep |
+| `syncedRankedRegexUrls` (jsdelivr CDN) | ✓ Works | Safe to use |
 
-**Key constraint:** when there is no local `rankedStreamExpressions` definition, do not use `rseMatched()` or `streamExpressionScore()` in any selector or sort order.
-
-This rule is specifically about stream-expression URLs. Treat remote regex sources as a separate, explicit host-compatibility decision; they must never silently restore a synced stream-expression dependency.
-
----
-
-## Rule 3A — Do Not Combine Groups and Dynamic Fetching
-
-Groups and Dynamic fetching are both **early-exit fetch schedulers**. Groups can avoid starting a later source group; Dynamic can return before remaining sources finish. Combining them makes availability dependent on source timing and makes a missing stream difficult to reproduce.
-
-Core Builds policy:
-
-```text
-Stable / Balanced: Groups off, Dynamic off
-Advanced / Labs: at most one early-exit mechanism, explicitly labelled
-Maintained static templates: Groups + Dynamic together is prohibited
-```
-
-If an older template has both enabled, remove the Groups scheduler first and retain only the explicitly documented Dynamic condition until a measured replacement is available.
+**Key constraint:** If `syncedRankedStreamExpressionUrls` is blocked and synced PSEs call `rseMatched(streams, 'tier_name')`, every one of those PSEs will fail.
 
 ---
 
