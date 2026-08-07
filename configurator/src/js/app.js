@@ -6202,12 +6202,21 @@ async function runExpressInstall(p) {
       const manifestUrl = await uploadTemplateForImport(JSON.stringify(tmpl));
       if (manifestUrl) {
         saveLastGen();
-        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Nuvio template ready</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 10px">Add this manifest URL in Nuvio (or tap an instance to import it):</div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div>${instanceChips(manifestUrl)}</div>`;
+        const safeUrl = manifestUrl.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Nuvio template ready</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 10px">Add this manifest URL in Nuvio (or tap an instance to import it):</div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${safeUrl}">${safeUrl}</div>${instanceChips(manifestUrl)}</div>`;
       } else {
         result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not create a Nuvio import link</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 2px">Export the JSON and import it manually.</div><button data-action="generate-dl" style="margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div>';
       }
     } catch (err) {
-      result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Nuvio generation failed</strong><div style="color:#6b7280;font-size:.78rem">' + (err?.message || err) + '</div></div>';
+      const errDiv = document.createElement('div');
+      errDiv.className = 'import-success import-error';
+      errDiv.style.cssText = 'margin-top:12px';
+      errDiv.innerHTML = '<strong style="color:#f87171">Nuvio generation failed</strong>';
+      const detail = document.createElement('div');
+      detail.style.cssText = 'color:#6b7280;font-size:.78rem';
+      detail.textContent = String(err?.message || err);
+      errDiv.appendChild(detail);
+      result.replaceChildren(errDiv);
     }
     return;
   }
