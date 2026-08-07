@@ -31,3 +31,4 @@ def base_template():
         config.update(config_overrides)
         return {"metadata": {"version": "1.0.0"}, "config": config}
     return _make
+

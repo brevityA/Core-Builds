@@ -49,6 +49,12 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Express Install" icon="sliders">
     added an \'Additional services & scrapers\' popout (Debridio, Debrider, Usenet, indexers) mirroring Quick Install, with credentials folding into the same flow.
   </Card>
+  <Card title="Stronger update system" icon="gauge">
+    live check for newer template versions (cached, rate-limited, fail-silent offline, credential-free), a one-click \'Update\' that pulls the latest template through the diff/apply flow, a changelog excerpt in the update banner, and a Revert action (pre-update state is backed up). The host-preload template collection is now generated from the active suite (scripts/sync_template_collection.py) and CI-guarded so it never goes stale (TEMPLATE_URLS documented in STATUS.md).
+  </Card>
+  <Card title="Fixed: regex whitelist confusion (#658)" icon="wand">
+    the host-compatibility check now names the regex patterns not on the ElfHosted/ForTheWeak allowlist (from the Vidhin05 snapshot) and offers a one-click \'Strip non-allowlisted regex patterns\' action, so users no longer see \'remove those 6\' with no idea which or how.
+  </Card>
 </CardGroup>
 
 ---

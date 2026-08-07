@@ -1052,6 +1052,16 @@
         "credentials": {}
       },
       {
+        "id": "stremio_nntp",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
+        "id": "aiostreams",
+        "enabled": false,
+        "credentials": {}
+      },
+      {
         "id": "putio",
         "enabled": false,
         "credentials": {}
@@ -1073,16 +1083,6 @@
       },
       {
         "id": "stremthru_newz",
-        "enabled": false,
-        "credentials": {}
-      },
-      {
-        "id": "stremio_nntp",
-        "enabled": false,
-        "credentials": {}
-      },
-      {
-        "id": "aiostreams",
         "enabled": false,
         "credentials": {}
       }

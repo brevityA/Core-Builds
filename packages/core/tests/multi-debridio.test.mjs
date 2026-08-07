@@ -63,3 +63,4 @@ test('Debridio IS emitted enabled+keyed when its API key is present', () => {
   assert.equal(debridio.enabled, true);
   assert.equal(debridio.options.apiKey, 'test-debridio-key');
 });
+
