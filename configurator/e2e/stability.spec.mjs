@@ -34,15 +34,15 @@ async function mockAioStreams(page, capture) {
   });
 }
 
-test('Quick Install creates a raw manifest without TMDB', async ({ page }) => {
+test('Express Install creates a raw manifest without TMDB', async ({ page }) => {
   const posted = [];
   await mockAioStreams(page, posted);
   const errors = await fresh(page);
-  await page.locator('[data-action="open-fast-lane"]').click();
-  await page.locator('[data-fl-target="manifest"]').click();
-  await page.locator('[data-fl-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-target="manifest"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
   page.on('dialog', dialog => dialog.accept());
-  await page.locator('#btnAutoCreate').click();
+  await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible();
   expect(posted).toHaveLength(1);
