@@ -24,4 +24,6 @@ export const PROVIDER_CREDENTIALS = {
   subdl:         { label: 'SubDL API Key',           placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://subdl.com/panel/api', linkLabel: 'Get key' },
   tmdbToken:     { label: 'TMDB Read Access Token',  placeholder: 'eyJhbGciOiJSUzI1NiJ9…',              url: 'https://www.themoviedb.org/settings/api', linkLabel: 'Get key' },
   tmdbApiKey:    { label: 'TMDB API Key',            placeholder: 'abc123def456…',                       url: 'https://www.themoviedb.org/settings/api', linkLabel: 'Get key' },
+  nzbhydra:      { label: 'NZBHydra2 URL',           placeholder: 'http://localhost:5076',                url: 'https://github.com/theotherp/nzbhydra2', linkLabel: 'GitHub' },
+  nzbhydraApiKey:{ label: 'NZBHydra2 API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://github.com/theotherp/nzbhydra2', linkLabel: 'GitHub' },
 };

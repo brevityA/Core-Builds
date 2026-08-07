@@ -8,4 +8,5 @@ export const OPTIONAL_SCRAPER_DEFS = [
   { id:'usenetcrawler', label:'Usenet Crawler', desc:'Newznab indexer · 5k free API/day', presetType:'newznab', cat:'usenet', color:'#a78bfa', credKey:'usenetcrawler', apiUrl:'https://www.usenet-crawler.com/api' },
   { id:'drunkenslug', label:'DrunkenSlug', desc:'Popular Newznab indexer', presetType:'newznab', cat:'usenet', color:'#f97316', credKey:'drunkenslug', apiUrl:'https://drunkenslug.com/api' },
   { id:'nzbfinder', label:'NZBFinder', desc:'Newznab indexer · generous free tier', presetType:'newznab', cat:'usenet', color:'#06b6d4', credKey:'nzbfinder', apiUrl:'https://nzbfinder.ws/api' },
+  { id:'nzbhydra', label:'NZBHydra2', desc:'Usenet meta-search — aggregates all your indexers', presetType:'nzbhydra', cat:'usenet', color:'#10b981', credKey:'nzbhydra' },
 ];

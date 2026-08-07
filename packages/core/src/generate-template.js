@@ -142,7 +142,7 @@ function buildPresets(input) {
   const multiServices = input.multiServices || [];
   const optionalScrapers = input.optionalScrapers || [];
   const content = input.content || 'all';
-  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio';
+  const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio', isUsenet = svc === 'usenet';
   const hasDebridio = isDebridio || (isMulti && multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && multiServices.includes('easynews');
   const hasExtraHttp = isMulti && multiServices.includes('http') && !isHttp;
@@ -161,6 +161,26 @@ function buildPresets(input) {
     ...buildCatalogPresets(input)
   ];
 
+  if (isUsenet) {
+    const usenetList = [
+      { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+      { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      ...(creds.nzbgeek ? [{ type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } }] : []),
+      ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+        const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+        return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
+      }),
+      ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+        const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+        return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', url:creds.nzbhydra || '', apiKey:creds.nzbhydraApiKey || '', timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
+      }),
+      ...buildSubtitlePresets(input),
+      ...buildCatalogPresets(input)
+    ];
+    return usenetList;
+  }
+
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr'};
   const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
   const multiHasTorbox = isMulti && (multiServices.includes('torbox-pro') || multiServices.includes('torbox-ess'));
@@ -168,7 +188,7 @@ function buildPresets(input) {
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews || isDebridio ? []
+    : isP2P || isEasynews || isDebridio || isUsenet ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
@@ -177,7 +197,7 @@ function buildPresets(input) {
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
     ...storeSlot,
-    ...(isEasynews || multiHasEasynews ? [
+    ...(isEasynews || multiHasEasynews || isUsenet ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
@@ -198,12 +218,15 @@ function buildPresets(input) {
       if (sid === 'zilean') return null;
       return null;
     }).filter(Boolean),
-    ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl)).map(sid => {
+    ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       if (d.id === 'jackett') return { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', timeout:10000, ...(creds.jackett ? { apiKey:creds.jackett } : {}) }, resources:['stream'] };
       if (d.id === 'prowlarr') return { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', timeout:10000, ...(creds.prowlarr ? { apiKey:creds.prowlarr } : {}) }, resources:['stream'] };
       return null;
     }).filter(Boolean),
+    ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+      return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', url:creds.nzbhydra || '', apiKey:creds.nzbhydraApiKey || '', timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
+    }),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
@@ -249,8 +272,8 @@ function buildServices(input) {
     {id:'easydebrid', enabled: svc==='easydebrid' || (isMulti && m.includes('easydebrid')), credentials:cred('easydebrid')},
     {id:'pikpak', enabled: svc==='pikpak' || (isMulti && m.includes('pikpak')), credentials:cred('pikpak')},
     {id:'seedr', enabled: svc==='seedr' || (isMulti && m.includes('seedr')), credentials:cred('seedr')},
-    {id:'easynews', enabled: svc==='easynews' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || (isMulti && m.includes('easynews'))) && creds.easynews ? { username:creds.easynews, password:creds.easynewsPass||'' } : {}},
-    {id:'stremio_nntp', enabled: false, credentials:{}}, {id:'aiostreams', enabled: false, credentials:{}},
+    {id:'easynews', enabled: svc==='easynews' || svc==='usenet' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || svc==='usenet' || (isMulti && m.includes('easynews'))) && creds.easynews ? { username:creds.easynews, password:creds.easynewsPass||'' } : {}},
+    {id:'stremio_nntp', enabled: svc==='usenet', credentials:{}}, {id:'aiostreams', enabled: svc==='usenet', credentials:{}},
     {id:'putio', enabled: false, credentials:{}},
     {id:'debrider', enabled: svc==='debrider' || (isMulti && m.includes('debrider')), credentials:cred('debrider')},
     {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}},

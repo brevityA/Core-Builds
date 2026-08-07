@@ -64,3 +64,47 @@ test('Debridio IS emitted enabled+keyed when its API key is present', () => {
   assert.equal(debridio.options.apiKey, 'test-debridio-key');
 });
 
+test('Usenet Only service enables stremio_nntp + aiostreams and includes EasyNews presets', () => {
+  const template = generateTemplate({
+    service: 'usenet',
+    credentials: { easynews: 'test-user', easynewsPass: 'test-pass', nzbgeek: 'test-nzbgeek-key' },
+    device: 'generic',
+    resolution: '4k',
+    architecture: 'standard',
+    content: 'all',
+  });
+  const types = template.config.presets.map(p => p.type);
+  assert.ok(types.includes('easynewsPlusPlus'), 'EasyNews++ preset must be present');
+  assert.ok(types.includes('easynews-search'), 'EasyNews Search preset must be present');
+  assert.ok(types.includes('newznab'), 'NZBGeek (newznab) preset must be present');
+  assert.ok(types.includes('library'), 'Library preset must be present');
+
+  const svcIds = template.config.services.map(s => s.id);
+  const nntp = template.config.services.find(s => s.id === 'stremio_nntp');
+  const aio = template.config.services.find(s => s.id === 'aiostreams');
+  assert.ok(nntp, 'stremio_nntp service must be present');
+  assert.equal(nntp.enabled, true, 'stremio_nntp must be enabled for usenet');
+  assert.ok(aio, 'aiostreams service must be present');
+  assert.equal(aio.enabled, true, 'aiostreams must be enabled for usenet');
+
+  const en = template.config.services.find(s => s.id === 'easynews');
+  assert.equal(en.enabled, true, 'easynews service must be enabled for usenet');
+  assert.equal(en.credentials.username, 'test-user');
+});
+
+test('Usenet Only does not include debrid store presets', () => {
+  const template = generateTemplate({
+    service: 'usenet',
+    credentials: { easynews: 'test-user', easynewsPass: 'test-pass' },
+    device: 'generic',
+    resolution: '1080p',
+    architecture: 'standard',
+    content: 'all',
+  });
+  const types = template.config.presets.map(p => p.type);
+  assert.ok(!types.includes('stremthruTorz'), 'StremThru Torz must not appear in usenet-only');
+  assert.ok(!types.includes('stremthruStore'), 'StremThru Store must not appear in usenet-only');
+  assert.ok(!types.includes('comet'), 'Comet must not appear in usenet-only');
+  assert.ok(!types.includes('torrentio'), 'Torrentio must not appear in usenet-only');
+});
+

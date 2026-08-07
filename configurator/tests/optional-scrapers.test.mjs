@@ -31,8 +31,11 @@ test('jackett and prowlarr route to the credKey-without-apiUrl branch', () => {
 });
 
 test('presets() guard for jackett/prowlarr uses credKey && !apiUrl (regression: PR #557 fix lost in v2.84)', () => {
-  // The fixed filter — must be present.
-  assert.match(app, /OPTIONAL_SCRAPER_DEFS\.find\(x => x\.id === sid && x\.credKey && !x\.apiUrl\)/);
+  // The fixed filter — must be present (may additionally exclude nzbhydra presetType).
+  assert.ok(
+    app.includes('x.credKey && !x.apiUrl') || app.includes("x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra'"),
+    'jackett/prowlarr filter must use credKey && !apiUrl guard'
+  );
   // The broken filter from the regression — must NOT be present anywhere.
   assert.ok(!app.includes('x.credKey && x.apiUrl'),
     'broken filter "x.credKey && x.apiUrl" found — jackett/prowlarr presets would never generate');
