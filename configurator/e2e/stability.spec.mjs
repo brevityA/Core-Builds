@@ -78,7 +78,7 @@ test('Advanced extras carousel is multi-select while short routes stay compact',
   const errors = await fresh(page);
   await page.locator('[data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
-  await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(15);
+  await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(16);
   await page.locator('[data-svc-id="p2p"]').click();
   await page.locator('[data-scraper-id="nzbnoob"]').click();
   await expect(page.locator('#extrasCarouselCount')).toHaveText('2 selected');
