@@ -180,7 +180,6 @@ const DEFS = [
       { v:'realdebrid',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><path d="M15 22h14M22 15v14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round"/><circle cx="22" cy="22" r="5" stroke="#10b981" stroke-width="1.2" fill="none"/><text x="22" y="42" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="800" letter-spacing=".3">RD</text></svg>', name:'Real-Debrid', desc:'Real-Debrid subscribers<br><span style="color:#dc2626;font-size:.8em">e.g. Core Nexus RD</span>' },
       { v:'alldebrid',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M22 6L38 34H6Z" stroke="#f97316" stroke-width="1.5" fill="#f97316" fill-opacity=".06" stroke-linejoin="round"/><path d="M22 16v10M22 30v.5" stroke="#f97316" stroke-width="2" stroke-linecap="round"/><text x="22" y="41" text-anchor="middle" fill="#f97316" font-size="4.5" font-weight="800" letter-spacing=".3">AD</text></svg>', name:'AllDebrid', desc:'AllDebrid subscribers<br><span style="color:#ea580c;font-size:.8em">e.g. Core Nexus AllDebrid · 4K AllDebrid</span>' },
       { v:'easynews',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="24" rx="4" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><path d="M12 18l10 6 10-6" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28l6-4M32 28l-6-4" stroke="#06b6d4" stroke-width="1.2" stroke-linecap="round"/><text x="22" y="9" text-anchor="middle" fill="#06b6d4" font-size="4" font-weight="700" letter-spacing=".3">EN</text></svg>', name:'EasyNews', desc:'Usenet — username &amp; password<br><span style="color:#0ea5e9;font-size:.8em">e.g. Speed EasyNews · Speed 4K+</span>' },
-      { v:'usenet',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="24" rx="4" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".06"/><path d="M12 18l10 6 10-6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28l6-4M32 28l-6-4" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="34" r="2.5" stroke="#22c55e" stroke-width="1.2" fill="#22c55e" fill-opacity=".2"/><text x="22" y="9" text-anchor="middle" fill="#22c55e" font-size="4" font-weight="700" letter-spacing=".3">NZB</text></svg>', name:'Usenet Only', desc:'No debrid — EasyNews + indexers + built-in NNTP<br><span style="color:#22c55e;font-size:.8em">privacy-first · no torrents</span>' },
       { v:'premiumize',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="8" stroke="#a78bfa" stroke-width="1.5" fill="#a78bfa" fill-opacity=".06"/><path d="M16 22l4 4 8-8" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="14" r="2" fill="#a78bfa" fill-opacity=".4"/></svg>', name:'Premiumize', desc:'Premiumize subscribers<br><span style="color:#d97706;font-size:.8em">e.g. Core Nexus Premiumize</span>' },
       { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="24" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="7" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">multi-debrid aggregator service</span>' },
       { v:'debridlink',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M18 18l-4 4a5.66 5.66 0 008 8l4-4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M26 26l4-4a5.66 5.66 0 00-8-8l-4 4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="22" cy="22" r="14" stroke="#3b82f6" stroke-width="1" fill="#3b82f6" fill-opacity=".04" stroke-dasharray="3 3"/></svg>', name:'Debrid-Link', desc:'Debrid-Link subscribers<br><span style="color:#0284c7;font-size:.8em">e.g. Core Nexus Debrid-Link</span>' },
@@ -476,7 +475,7 @@ function clearState() {
 function pushStep() { try { history.pushState({ step: step }, ''); } catch(e) {} }
 
 function deriveService() {
-  const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','usenet','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
+  const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
   const primary = S.multiServices.filter(s => PRIMARY.includes(s));
   if (primary.length > 1) return 'multi';
   if (primary.length === 1) return primary[0];
@@ -3214,9 +3213,8 @@ function getDebridInputs() {
   if (m.includes('premiumize')) ids.push('premiumize');
   if (m.includes('debridlink')) ids.push('debridlink');
   if (m.includes('offcloud'))   ids.push('offcloud');
-  if (m.includes('easynews') || m.includes('usenet'))   { ids.push('easynews'); ids.push('easynewsPass'); }
-  if (m.includes('nzbgeek') || m.includes('usenet')) ids.push('nzbgeek');
-  if (m.includes('nzbhydra') || m.includes('usenet')) { ids.push('nzbhydra'); ids.push('nzbhydraApiKey'); }
+  if (m.includes('easynews'))   { ids.push('easynews'); ids.push('easynewsPass'); }
+  if (m.includes('nzbgeek')) ids.push('nzbgeek');
   if (m.includes('debridio'))   ids.push('debridio');
   if (m.includes('debrider'))   ids.push('debrider');
   if (m.includes('easydebrid')) ids.push('easydebrid');
@@ -3266,7 +3264,7 @@ function defaultName() {
   const svcName = {'torbox-pro':'TorBox','torbox-ess':'TorBox Essential','alldebrid':'AllDebrid','realdebrid':'Real-Debrid','premiumize':'Premiumize','debridlink':'Debrid-Link','offcloud':'Offcloud','easynews':'EasyNews','p2p':'P2P','http':'HTTP','debridio':'Debridio','debrider':'Debrider'}[svc] || '';
   if (svc === 'multi') {
     const names = {'alldebrid':'AllDebrid','realdebrid':'RD','premiumize':'Premiumize','debridlink':'DL','offcloud':'Offcloud','easynews':'EasyNews','torbox-pro':'TorBox','torbox-ess':'TB Essential','debridio':'Debridio','debrider':'Debrider','easydebrid':'EasyDebrid','pikpak':'PikPak','seedr':'Seedr'};
-    const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','usenet','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
+    const PRIMARY = ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','debridio','debrider','easydebrid','pikpak','seedr'];
     const mainSvcs = S.multiServices.filter(s => PRIMARY.includes(s));
     const svcStr = mainSvcs.length <= 3 ? mainSvcs.map(s => names[s] || s).join(' + ') : mainSvcs.slice(0,2).map(s => names[s] || s).join(' + ') + ` +${mainSvcs.length - 2}`;
     return `Core Nexus${resSuffix}${devLabel ? ' · ' + devLabel : ''} — ${svcStr}`.trim();
@@ -3279,29 +3277,9 @@ function presets() {
   const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio';
   const hasDebridio = isDebridio || (isMulti && S.multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
-  const isUsenet = svc === 'usenet' || (isMulti && S.multiServices.includes('usenet'));
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && S.multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && S.multiServices.includes('streamnzb');
-  if (isUsenet) {
-    const usenetList = [
-      ...(isEasynews || multiHasEasynews || isUsenet ? [
-        { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
-        { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
-      ] : []),
-      ...(isNzbgeek && S.creds.nzbgeek ? [
-        { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
-      ] : []),
-      ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && (x.presetType === 'newznab' || x.presetType === 'nzbhydra'))).map(sid => {
-        const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-        if (d.presetType === 'nzbhydra') return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', paginate:true, useMultipleInstances:false } };
-        return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
-      }),
-      ...subtitlePresets(),
-      ...catalogPresets(),
-    ];
-    return usenetList;
-  }
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
   if (isHttp) return [
     { type:'sootio', instanceId:'sootio-core-builds', enabled:true, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
@@ -3329,7 +3307,7 @@ function presets() {
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
     ...storeSlot,
-    ...(isEasynews || multiHasEasynews || isUsenet ? [
+    ...(isEasynews || multiHasEasynews ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
     ] : []),
@@ -3357,9 +3335,8 @@ function presets() {
       if (d.id === 'prowlarr') return { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', timeout:10000, ...(S.creds.prowlarr ? { apiKey:S.creds.prowlarr } : {}) }, resources:['stream'] };
       return null;
     }).filter(Boolean),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab' || x.presetType === 'nzbhydra')).map(sid => {
+    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      if (d.presetType === 'nzbhydra') return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', paginate:true, useMultipleInstances:false } };
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
@@ -3403,8 +3380,8 @@ function services() {
     {id:'easydebrid', enabled: svc==='easydebrid' || (isMulti && m.includes('easydebrid')), credentials:cred('easydebrid')},
     {id:'pikpak', enabled: svc==='pikpak' || (isMulti && m.includes('pikpak')), credentials:cred('pikpak')},
     {id:'seedr', enabled: svc==='seedr' || (isMulti && m.includes('seedr')), credentials:cred('seedr')},
-    {id:'easynews', enabled: svc==='easynews' || svc==='usenet' || (isMulti && m.includes('easynews')) || (isMulti && m.includes('usenet')), credentials: (svc==='easynews' || svc==='usenet' || (isMulti && m.includes('easynews')) || (isMulti && m.includes('usenet'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
-    {id:'stremio_nntp', enabled: svc==='usenet' || (isMulti && m.includes('usenet')), credentials:{}}, {id:'aiostreams', enabled: svc==='usenet' || (isMulti && m.includes('usenet')), credentials:{}},
+    {id:'easynews', enabled: svc==='easynews' || (isMulti && m.includes('easynews')), credentials: (svc==='easynews' || (isMulti && m.includes('easynews'))) && S.creds.easynews ? { username:S.creds.easynews, password:S.creds.easynewsPass||'' } : {}},
+    {id:'stremio_nntp', enabled: false, credentials:{}}, {id:'aiostreams', enabled: false, credentials:{}},
     {id:'putio', enabled: false, credentials:{}},
     {id:'debrider', enabled: svc==='debrider' || (isMulti && m.includes('debrider')), credentials:cred('debrider')},
     {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}},
@@ -6010,7 +5987,6 @@ const EXPRESS_SERVICES = [
   ['alldebrid','AllDebrid','Debrid · uncached-friendly'],
   ['premiumize','Premiumize','Debrid · generous quota'],
   ['easynews','EasyNews','Usenet · NZB access'],
-  ['usenet','Usenet Only','No debrid · NNTP + indexers'],
   ['p2p','Free / P2P','No account required'],
 ];
 
@@ -6026,7 +6002,6 @@ function showExpressLane() {
   const credArea = (service) => {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
     if (service === 'easynews') return credInput('easynews') + credInput('easynewsPass');
-    if (service === 'usenet') return credInput('easynews') + credInput('easynewsPass') + credInput('nzbgeek') + credInput('nzbhydra') + credInput('nzbhydraApiKey') + `<div style="margin:8px 2px 2px;font-size:.68rem;color:#6b7280">Optional: DrunkenSlug, NZBFinder, NZBnoob (Advanced → Additional services) or point NZBHydra2 at all your indexers.</div>`;
     return credInput(service === 'torbox-pro' ? 'torbox' : service);
   };
   // Extra services that need a credential when added via the popout.
