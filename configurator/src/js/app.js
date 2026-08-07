@@ -1508,8 +1508,7 @@ function splashHtml() {
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4">
-      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, connect Stremio, and install — about 30 seconds.</div></div></div>
-      <div class="splash-door fastlane-door" data-action="open-fast-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.rocket(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Quick Install <span class="splash-door-tag fastlane-badge">Fastest</span></div><div class="splash-door-desc">Choose an app, service, and performance profile — then install in one short flow.</div></div></div>
+      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, profile, and device — install in about 30 seconds.</div></div></div>
       <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
       <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
     </div>
@@ -2112,7 +2111,7 @@ const TUT_STEPS = [
   {
     id:'quick', badge:'Step 4 of 7', title:'Quick Install',
     desc:'Quick Install asks only what is required. Choose Stremio, Nuvio, WuPlay, or another app; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
-    target:'.splash-doors [data-action="open-fast-lane"]', arrow:'top', nextLabel:'Next'
+    target:'.splash-doors [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
   },
   {
     id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Advanced Builder',
@@ -2127,7 +2126,7 @@ const TUT_STEPS = [
   {
     id:'start', badge:'Step 7 of 7', title:'Ready to Build',
     desc:'For most people, start with <strong>Quick Install</strong>. Choose Guided Setup if you want help with each decision, or Advanced Builder when you already know the exact formats and filters you need.',
-    target:'.splash-doors [data-action="open-fast-lane"]', arrow:'top', nextLabel:'Open Quick Install'
+    target:'.splash-doors [data-action="open-express-lane"]', arrow:'top', nextLabel:'Open Express Install'
   },
 ];
 let _tutStep = -1;
@@ -6017,7 +6016,7 @@ const EXPRESS_SERVICES = [
 function showExpressLane() {
   document.getElementById('expressLaneModal')?.remove();
   const svc = (S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro';
-  const state = { service: svc, target: 'app', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])] };
+  const state = { service: svc, target: 'app', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])] };
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
@@ -6058,7 +6057,7 @@ function showExpressLane() {
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · Install to</div>
-      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['manifest','Manifest URL','Use in Stremio, WuPlay or Nuvio']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
         <div style="display:flex;gap:8px;margin-top:10px">
           <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
@@ -6068,6 +6067,15 @@ function showExpressLane() {
       </div>
     </div>
     <details style="margin:0 22px 8px;font-size:.74rem"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
+      <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Performance profile</div>
+        <div class="fastlane-grid services" style="grid-template-columns:repeat(3,1fr)">${[['fast','Fast','1080p · cached first'],['balanced','Balanced','4K · sensible pool'],['maximum','Maximum','4K · largest pool']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      </div>
+      <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
+        <div class="fastlane-grid services" style="grid-template-columns:repeat(4,1fr)">${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
+      </div>
+      <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
+        <div class="fastlane-grid services" style="grid-template-columns:repeat(3,1fr)">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      </div>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Full stack</b><br><span style="color:#8b949e">Install AIOMetadata + patch Cinemeta for better posters and catalogs.</span></span></label>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Clean reinstall</b><br><span style="color:#8b949e">Remove previous Core Builds addons from your Stremio account.</span></span></label>
       <div style="margin-top:8px"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
@@ -6091,6 +6099,24 @@ function showExpressLane() {
       overlay.querySelectorAll('[data-express-target]').forEach(b => b.classList.toggle('active', b.dataset.expressTarget === state.target));
       const box = document.getElementById('expressStremio');
       if (box) box.style.display = state.target === 'app' ? '' : 'none';
+      return;
+    }
+    const profBtn = e.target.closest('[data-express-profile]');
+    if (profBtn) {
+      state.profile = profBtn.dataset.expressProfile;
+      overlay.querySelectorAll('[data-express-profile]').forEach(b => b.classList.toggle('active', b.dataset.expressProfile === state.profile));
+      return;
+    }
+    const devBtn = e.target.closest('[data-express-device]');
+    if (devBtn) {
+      state.device = devBtn.dataset.expressDevice;
+      overlay.querySelectorAll('[data-express-device]').forEach(b => b.classList.toggle('active', b.dataset.expressDevice === state.device));
+      return;
+    }
+    const resBtn = e.target.closest('[data-express-res]');
+    if (resBtn) {
+      state.resolution = resBtn.dataset.expressRes;
+      overlay.querySelectorAll('[data-express-res]').forEach(b => b.classList.toggle('active', b.dataset.expressRes === state.resolution));
       return;
     }
     if (e.target.closest('#expressExtrasBtn')) {
@@ -6118,6 +6144,7 @@ function showExpressLane() {
         clean: document.getElementById('expressClean')?.checked === true,
         tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
         extras: { services: state.extras, scrapers: state.scrapers },
+        profile: state.profile, device: state.device, resolution: state.resolution,
       };
       const goBtn = document.getElementById('expressGo');
       if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
@@ -6134,7 +6161,9 @@ async function runExpressInstall(p) {
     if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
     S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
   }
-  applyQuickProfile('balanced');
+  applyQuickProfile(p.profile || 'balanced');
+  if (p.device) S.device = p.device;
+  if (p.resolution) S.resolution = p.resolution;
   S.service = p.service;
   S.p2pEnabled = isFree;
   const extrasSvc = p.extras?.services || [];
@@ -6152,6 +6181,37 @@ async function runExpressInstall(p) {
   S.installAIOMeta = p.fullStack;
   S.cleanInstall = p.clean;
   if (p.tmdb) { S.tmdbToken = p.tmdb; S.tmdbApiKey = p.tmdb; }
+  // Route targets: app -> Direct Install; nuvio/wuplay/manifest -> manifest URL
+  // (nuvio uses the dedicated instant route so its template is Nuvio-shaped).
+  if (p.target === 'nuvio') {
+    S.installMode = 'manifest';
+    saveState();
+    const btn = document.getElementById('btnAutoCreate');
+    const result = document.getElementById('aioResult');
+    try {
+      const nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
+      if (!nuvioHost) { result.innerHTML='<div class="td-error">No compatible Nuvio host found.</div>'; return; }
+      const tmpl = generateTemplate({
+        route: 'nuvio-torbox-instant', device: p.device || 'generic', resolution: p.resolution || '1080p',
+        host: nuvioHost, formatter: 'family-v4', langs: S.langs || ['English'], foreignLangKill: S.foreignLangKill !== false,
+        tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
+      }, {
+        host: nuvioHost,
+        deviceAv1Safe: DEVICE_AV1_SAFE, deviceDvSafe: DEVICE_DV_SAFE, deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
+      });
+      const manifestUrl = await uploadTemplateForImport(JSON.stringify(tmpl));
+      if (manifestUrl) {
+        saveLastGen();
+        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Nuvio template ready</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 10px">Add this manifest URL in Nuvio (or tap an instance to import it):</div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div>${instanceChips(manifestUrl)}</div>`;
+      } else {
+        result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not create a Nuvio import link</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 2px">Export the JSON and import it manually.</div><button data-action="generate-dl" style="margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div>';
+      }
+    } catch (err) {
+      result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Nuvio generation failed</strong><div style="color:#6b7280;font-size:.78rem">' + (err?.message || err) + '</div></div>';
+    }
+    return;
+  }
+  S.installMode = p.target === 'app' ? 'direct' : 'manifest';
   saveState();
   try {
     // Renders progress + result into the modal's #aioResult.

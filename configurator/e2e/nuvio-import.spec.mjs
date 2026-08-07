@@ -33,12 +33,12 @@ test('Nuvio import falls through to dpaste when the worker and paste.rs are unav
     content: 'all', tmdbToken: 'NUVIO_TMDB_TOKEN_MUST_NOT_LEAK', tmdbApiKey: '',
   }));
 
-  await page.locator('[data-action="open-fast-lane"]').click();
-  await page.locator('[data-fl-target="nuvio"]').click();
-  await page.locator('#btnAutoCreate').click();
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-target="nuvio"]').click();
+  await page.locator('#expressGo').click();
 
-  await expect(page.locator('#aioResult')).toContainText('Tap a host to import your Nuvio template');
-  await expect(page.locator('#aioResult')).toContainText('TMDB credential was removed from this public import link');
+  await expect(page.locator('#aioResult')).toContainText('Nuvio template ready');
+  await expect(page.locator('#aioResult')).toContainText('https://dpaste.com/nuvio-fallback.txt');
   await expect(page.locator('#aioResult')).toContainText('https://dpaste.com/nuvio-fallback.txt');
   expect(requests).toEqual(['worker', 'paste.rs', 'dpaste']);
   expect(uploadedTemplate).not.toContain('NUVIO_TMDB_TOKEN_MUST_NOT_LEAK');
