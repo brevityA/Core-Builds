@@ -2,10 +2,56 @@
  * SEL expression structural validator.
  *
  * Validates SEL (Stream Expression Language) expressions used by AIOStreams.
- * Checks parentheses balance, ternary syntax, string literals, and entry shape.
+ * Checks parentheses balance, ternary syntax, string literals, entry shape,
+ * function existence (against the upstream parser registry), and length
+ * headroom vs the host per-expression limit.
  *
  * No browser globals, no credentials, no UI state.
  */
+
+// Upstream SEL function registry — verified against Viren070/AIOStreams@main
+// packages/core/src/parser/streamExpression.ts (this.parser.functions.* +
+// dispatch cases + the expr-eval math allowlist). Anything not here is an
+// invalid expression on every host (e.g. `private(...)` shipped in 8 Labs
+// templates — audit 2026-08-08).
+export const SEL_FUNCTIONS = new Set([
+  'addon','age','audioChannel','audioChannels','audioTag','avg','bitrate',
+  'cached','count','duration','encode','filename','folderName','folderSize',
+  'idMatched','indexer','iqr','keyword','keywords','kurtosis','language',
+  'library','max','mean','median','merge','message','min','mode',
+  'multiEpisode','negate','passthrough','perGroup','percentile','pin','q1',
+  'q2','q3','quality','range','regexMatched','regexMatchedInRange',
+  'regexScore','releaseGroup','resolution','rseMatched','seMatched',
+  'seMatchedInRange','seScore','seadex','seasonPack','seeders','service',
+  'size','skewness','slice','stddev','streamExpressionScore','subtitle',
+  'subtitles','sum','type','uncached','values','variance','visualTag',
+  // expr-eval math allowlist (true entries in the parser's math config)
+  'sqrt','ceil','floor','round','trunc','random','in',
+]);
+
+// Upstream default per-expression limit (MAX_SEL_LENGTH) and Core's safety
+// margins: error above FAIL, warn above WARN.
+export const SEL_MAX_LENGTH = 3000;
+export const SEL_FAIL_LENGTH = 2800;
+export const SEL_WARN_LENGTH = 2400;
+
+const FN_RE = /([A-Za-z][A-Za-z0-9]*)\s*\(/g;
+const NON_FN = new Set(['if','and','or','not','true','false']);
+
+// Callables in `expr` that are not valid upstream SEL functions.
+export function unknownSelFunctions(expr) {
+  if (typeof expr !== 'string') return [];
+  const clean = stripStringsAndComments(expr).value || '';
+  const out = new Set();
+  FN_RE.lastIndex = 0;
+  let m;
+  while ((m = FN_RE.exec(clean))) {
+    const fn = m[1];
+    if (SEL_FUNCTIONS.has(fn) || NON_FN.has(fn)) continue;
+    out.add(fn);
+  }
+  return [...out];
+}
 
 export function validateExpression(expr) {
   if (typeof expr !== 'string') return { valid: false, error: 'Expression must be a string' };
@@ -24,6 +70,16 @@ export function validateExpression(expr) {
 
   const colonCheck = checkStrayColons(clean);
   if (colonCheck) return { valid: false, error: colonCheck };
+
+  const unknown = unknownSelFunctions(trimmed);
+  if (unknown.length) return { valid: false, error: `Unknown SEL function(s): ${unknown.join(', ')}` };
+
+  if (trimmed.length > SEL_FAIL_LENGTH) {
+    return { valid: false, error: `Expression length ${trimmed.length} exceeds ${SEL_FAIL_LENGTH} (host limit ${SEL_MAX_LENGTH})` };
+  }
+  if (trimmed.length > SEL_WARN_LENGTH) {
+    return { valid: true, warn: `Expression length ${trimmed.length} is near the ${SEL_MAX_LENGTH} host limit`, unknown, length: trimmed.length };
+  }
 
   return { valid: true };
 }
