@@ -954,7 +954,7 @@
       {
         "originalName": "Anime BD T2",
         "name": "Anime BD T2",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Aergia|Arid|koala|Lulu|Vodes|YURI)\\]|-(Aergia(?!-raws)|Arid|koala|Lulu|YURI)\\b|\\b(Arg0|FateSucks|hchcsen|hydes|JOHNTiTOR|JySzE|Kulot|LostYears|Meakes|WAP|ZeroBuild)\\b|^(?=.*\\b(PMR)\\b)(?=.*\\b(Remux)\\b))|-Orphan\\b|(?<!Not)-Vodes\\b).*/i",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Aergia|Arid|koala|Lulu|Vodes|YURI)\\]|-(Aergia(?!-raws)|Arid|koala|Lulu|YURI)\\b|\\b(Arg0|BlackRose|FateSucks|hchcsen|hydes|JOHNTiTOR|JySzE|Kulot|LostYears|Meakes|WAP|ZeroBuild)\\b|-Orphan\\b|(?<!Not)-Vodes\\b)).*/i",
         "score": 60
       },
       {
@@ -966,7 +966,7 @@
       {
         "originalName": "Anime BD T3",
         "name": "Anime BD T3",
-        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(ARC|cappybara|CRUCiBLE|Doc|fig|Headpatter|Legion|Mehul|Mysteria|RaiN|RUDY|Serendipity|sgt|uba)\\]|-(ARC|cappybara|CRUCiBLE|Doc|fig|Headpatter|Legion|Mehul|Mysteria|RaiN|RUDY|Serendipity|sgt|uba)\\b|\\b(BBT-RMX|ChucksMux|CUNNY|Cunnysseur|Inka-Subs|LaCroiX|MTBB|Netaro|Noiy|npz|NTRX|Okay-Subs|P9|RMX|Sekkon|SubsMix)\\b)).*/i",
+        "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(ARC|cappybara|CRUCiBLE|Doc|fig|Headpatter|Legion|Mehul|Mysteria|RaiN|RUDY|Serendipity|sgt|uba)\\]|-(ARC|cappybara|CRUCiBLE|Doc|fig|Headpatter|Legion|Mehul|Mysteria|RaiN|RUDY|Serendipity|sgt|uba)\\b|\\b(BBT-RMX|ChucksMux|CUNNY|Cunnysseur|Inka-Subs|LaCroiX|MTBB|nekotan|Netaro|Noiy|npz|NTRX|Okay-Subs|P9|RMX|Sekkon|SubsMix|Sylvar|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|^(?=.*\\b(PMR)\\b)(?=.*\\b(Remux)\\b)|-ZR-)).*/i",
         "score": 60
       },
       {
@@ -1098,13 +1098,13 @@
       {
         "originalName": "Radarr Bad Dual Groups",
         "name": "Radarr Bad Dual Groups",
-        "pattern": "/\\b(alfaHD.*|BAT|BlackBit|BNd|C\\.A\\.A|Cory|CYPHER|EniaHD|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|MGE|MLH|N3G4N|ONLYMOViE|PD|PTHome|RiPER|RK|SiGLA|Tars|TM|tokar86a|TURG|TvR|vnlls|WTV|XiQUEXiQUE|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
+        "pattern": "/\\b(alfaHD.*|BAT|BlackBit|BNd|C\\.A\\.A|C76|Cory|CYPHER|EniaHD|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|MGE|MLH|N3G4N|ONLYMOViE|PD|PTHome|RiPER|RK|SiGLA|Tars|TM|tokar86a|TURG|TvR|vnlls|WTV|XiQUEXiQUE|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
         "score": -50
       },
       {
         "originalName": "Sonarr Bad Dual Groups",
         "name": "Sonarr Bad Dual Groups",
-        "pattern": "/\\b(alfaHD.*|BAT|CYPHER|MLH|XiQUEXiQUE|BiOMA|BlackBit|BNd|C\\.A\\.A|Cory|EniaHD|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|N3G4N|PD|PTHome|RiPER|RK|SiGLA|Tars|tokar86a|TURG|vnlls|WTV|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
+        "pattern": "/\\b(alfaHD.*|BAT|BiOMA|BlackBit|BNd|C\\.A\\.A|C76|Cory|CYPHER|EniaHD|EXTREME|FF|FOXX|G4RiS|GUEIRA|LCD|MLH|N3G4N|PD|PTHome|RiPER|RK|SiGLA|Tars|tokar86a|TURG|vnlls|WTV|XiQUEXiQUE|Yatogam1|YusukeFLA|ZigZag|ZNM)\\b/i",
         "score": -50
       },
       {
@@ -1116,12 +1116,6 @@
       {
         "originalName": "LQ (Radarr)",
         "name": "LQ (Radarr)",
-        "score": -75
-      },
-      {
-        "originalName": "LQ (Radarr)",
-        "name": "LQ (Radarr) [B]",
-        "pattern": "/\\b(24xHD|41RGB|4K4U|AOC|AROMA|aXXo|AZAZE|BARC0DE|BAUCKLEY|BdC|BTM|C1NEM4|C4K|CDDHD|CHAOS|CHD|CHX|CiNE|CREATiVE24|CrEwSaDe|CTFOH|d3g|DDR|DepraveD|DNL|DRX|EuReKA|EVO|FaNGDiNG0|Feranki1980|FGT|FMD|FRDS|FZHD|GalaxyRG|GHD|GHOSTS|GPTHD|HDHUB4U|HDS|HDT|HDTime|HDWinG|HiQVE|iNTENSO|iPlanet|jennaortega(UHD)?|JFF|KC|KIRA|L0SERNIGHT|LAMA|Leffe|Liber8|LiGaS|MarkII|MeGusta|Mesc|mHD|mSD|MTeam|MT|MySiLU|nhanc3|NhaNc3|nHD|nikt0|nSD|OFT|PATOMiEL|PRODJi|PSA|PTNK|RARBG|RDN|Rifftrax|RU4HD|SANTi|SasukeducK|SHD|ShieldBearer|STUTTERSHIT|TBS|TEKNO3D|TG|Tigole|TIKO|VIDEOHOLE|VISIONPLUSHDR(-X|1000)?|WAF|WiKi|worldmkv|x0r|XLF|YIFY|YTS(.(MX|LT|AG))?|Zero00|Zeus)\\b|Pahe(\\.(ph|in))?\\b|\\bx265-E/i",
         "score": -75
       },
       {
