@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isAllowed, nonWhitelistedPatterns, stripNonWhitelisted, REGEX_FIELDS } from '../src/core/regex-whitelist.js';
+import { isAllowed, hasLookbehind, nonWhitelistedPatterns, stripNonWhitelisted, REGEX_FIELDS } from '../src/core/regex-whitelist.js';
+import { REGEX_ALLOWLIST } from '../src/data/regex-allowlist.js';
 
 // Radarr Remux T1 is on the allowlist (from the snapshot).
 const ALLOWED_PAT = "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|ATELiER|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i";
@@ -50,4 +51,33 @@ test('string-form patterns are handled and named by index', () => {
 
 test('REGEX_FIELDS covers the four regex-bearing config fields', () => {
   assert.deepEqual(REGEX_FIELDS.sort(), ['excludedRegexPatterns', 'preferredRegexPatterns', 'rankedRegexPatterns', 'regexOverrides'].sort());
+});
+
+test('lookbehind patterns are flagged and stripped even when on the allowlist', () => {
+  // Anime BD T1 is ON the allowlist but uses inline lookbehind (the documented
+  // ElfHosted blocker) — it must be flagged and stripped.
+  const ANIME_LB = Object.keys(REGEX_ALLOWLIST).find(k => REGEX_ALLOWLIST[k] === 'Anime BD T1');
+  assert.ok(ANIME_LB, 'fixture must exist on the allowlist');
+  assert.equal(isAllowed(ANIME_LB), true, 'fixture must be on the allowlist');
+  assert.equal(hasLookbehind(ANIME_LB), true, 'fixture must use lookbehind');
+  const cfg = { rankedRegexPatterns: [{ name: 'Anime BD T1', pattern: ANIME_LB }] };
+  const offenders = nonWhitelistedPatterns(cfg);
+  assert.equal(offenders.length, 1);
+  assert.ok(offenders[0].reason.includes('lookbehind'), offenders[0].reason);
+  const next = stripNonWhitelisted(cfg);
+  assert.equal(next.rankedRegexPatterns.length, 0);
+});
+
+test('nonWhitelistedPatterns reports a reason for each offender', () => {
+  const LOOKBEHIND_ON_ALLOWLIST = Object.keys(REGEX_ALLOWLIST).find(k => REGEX_ALLOWLIST[k] === 'Anime BD T2');
+  const cfg = {
+    rankedRegexPatterns: [
+      { name: 'NotOnList', pattern: '/^custom-bad$/i' },
+      { name: 'Anime BD T2', pattern: LOOKBEHIND_ON_ALLOWLIST },
+    ],
+  };
+  const offenders = nonWhitelistedPatterns(cfg);
+  assert.equal(offenders.length, 2);
+  assert.ok(offenders.some(o => o.reason.includes('allowlist')));
+  assert.ok(offenders.some(o => o.reason.includes('lookbehind')));
 });
