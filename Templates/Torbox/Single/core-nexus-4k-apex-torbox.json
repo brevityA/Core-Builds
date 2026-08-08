@@ -1982,29 +1982,6 @@
         "category": "Debrid"
       },
       {
-        "type": "dmm-cast",
-        "instanceId": "dmm-cast-1",
-        "enabled": false,
-        "options": {
-          "name": "DMM Cast",
-          "timeout": 5000,
-          "resources": [
-            "stream"
-          ],
-          "mediaTypes": [
-            "movie",
-            "series",
-            "anime"
-          ],
-          "skipProcessing": true,
-          "useMultipleInstances": false
-        },
-        "category": "Debrid",
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "zilean",
         "instanceId": "nx-fix-04",
         "enabled": false,

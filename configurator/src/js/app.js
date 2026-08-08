@@ -18,6 +18,7 @@ import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
 import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
+import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
 import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
@@ -2530,6 +2531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'open-express-lane') showExpressLane();
     if (action === 'update-now') applyRemoteUpdate();
     if (action === 'revert-update') revertToPrevious();
+    if (action === 'strip-regex') stripNonWhitelistedRegex();
     if (action === 'open-diagnostics') showDiagnosticsModal();
     if (action === 'open-additional-services') showAdditionalServicesPicker();
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
@@ -5663,6 +5665,18 @@ function hostCompatCheck() {
     hosts.fortheweak.issues.push(ftwBlocked.length + ' regex pattern' + (ftwBlocked.length>1?'s':'') + ' blocked on fortheweak: ' + ftwBlocked.map(r=>r.name).slice(0,4).join(', ') + (ftwBlocked.length>4?'…':''));
     hosts.fortheweak.status = 'err';
   }
+  // Regex patterns rejected by hosts: not on the Vidhin05 allowlist, or
+  // using inline lookbehind (the documented ElfHosted blocker).
+  const regexOffenders = nonWhitelistedPatterns(cfg);
+  if (regexOffenders.length) {
+    const names = regexOffenders.slice(0, 6).map(o => o.name).join(', ') + (regexOffenders.length > 6 ? '…' : '');
+    const reasons = regexOffenders.slice(0, 3).map(o => o.reason).join(', ');
+    const msg = regexOffenders.length + ' regex pattern' + (regexOffenders.length>1?'s':'') + ' not allowed on this host (' + reasons + '): ' + names;
+    hosts.elfhosted.issues.push(msg);
+    hosts.elfhosted.status = 'err';
+    hosts.fortheweak.issues.push(msg);
+    hosts.fortheweak.status = 'err';
+  }
   const allExprs = [
     ...(cfg.excludedStreamExpressions||[]),
     ...(cfg.includedStreamExpressions||[]),
@@ -5696,6 +5710,25 @@ function hostCompatCheck() {
   return hosts;
 }
 
+function stripNonWhitelistedRegex() {
+  try {
+    const cfg = buildFinal().config;
+    const before = nonWhitelistedPatterns(cfg);
+    if (!before.length) { showToast('No host-blocked regex patterns to strip'); return; }
+    const next = stripNonWhitelisted(cfg);
+    const parsed = parseTemplateToState({ config: next });
+    if (parsed) {
+      Object.assign(S, parsed);
+      S.creds = Object.assign({torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',subdl:''}, parsed.creds || {});
+    } else {
+      showToast('Could not rebuild from cleaned config — stripping only for this export', true);
+    }
+    saveState(); render();
+    const detail = before.slice(0, 5).map(o => o.name + ' (' + o.reason + ')').join(', ') + (before.length>5?'…':'');
+    showToast('Stripped ' + before.length + ' host-blocked regex pattern' + (before.length>1?'s':'') + ': ' + detail);
+  } catch(e) { showToast('Could not strip patterns: ' + e.message, true); }
+}
+
 function hostCompatHtml() {
   const hosts = hostCompatCheck();
   const order = ['selfhosted','elfhosted','fortheweak'];
@@ -5708,8 +5741,8 @@ function hostCompatHtml() {
     const issues = h.issues.length ? `<div class="hc-detail">${h.issues.map(i => `<div class="hc-issue"><span class="hc-issue-ico" style="color:${statusColor[h.status]}">${h.status==='err'?'✕':'⚠'}</span><span>${i}</span></div>`).join('')}</div>` : '';
     return `<div class="hc-row">${badge}<span class="hc-name">${h.label}</span><span class="hc-status" style="color:${statusColor[h.status]}">${statusLabel[h.status]}</span></div>${issues}`;
   }).join('');
-  const hasNonWhitelisted = Object.values(hosts).some(h => h.issues.some(i => i.includes('not on the host allowlist')));
-  const stripBtn = hasNonWhitelisted ? `<button data-action="strip-regex" style="margin-top:8px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.74rem;font-weight:700;cursor:pointer">Strip non-allowlisted regex patterns</button>` : '';
+  const hasNonWhitelisted = Object.values(hosts).some(h => h.issues.some(i => i.includes('not allowed on this host')));
+  const stripBtn = hasNonWhitelisted ? `<button data-action="strip-regex" style="margin-top:8px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.74rem;font-weight:700;cursor:pointer">Strip host-blocked regex patterns</button>` : '';
   return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}${stripBtn}</div></div>`;
 }
 
