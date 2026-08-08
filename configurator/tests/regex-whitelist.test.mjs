@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { isAllowed, nonWhitelistedPatterns, stripNonWhitelisted, REGEX_FIELDS } from '../src/core/regex-whitelist.js';
 
 // Radarr Remux T1 is on the allowlist (from the snapshot).
-const ALLOWED_PAT = '/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i';
+const ALLOWED_PAT = "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|ATELiER|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i";
 const BAD_PAT = '/^custom-core-pattern-not-on-allowlist$/i';
 
 test('isAllowed matches normalized patterns', () => {
