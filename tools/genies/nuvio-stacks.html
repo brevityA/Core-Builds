@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvio Stack Genie — ✨ Guided Profiles & Add-ons (Prototype · family build)</title>
+<style>
+  :root{
+    --bg:#0d1017; --card:#151923; --card2:#111720; --panel:#0e1621;
+    --line:rgba(255,255,255,.06); --line2:rgba(255,255,255,.09);
+    --tx:#e4e7ed; --sub:#8b949e; --dim:#667487; --faint:#4b5563;
+    --ac:#00d4ff; --ac-hi:#67e8f9; --ac-bg:rgba(0,212,255,.08); --ac-br:rgba(0,212,255,.18);
+    --ac-strong:var(--ac); --ac-ink:#04202b;
+    --cta:linear-gradient(135deg,#00abd3,#00d4ff);
+    --serif:Georgia,"Times New Roman",serif;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d1017 var(--bg);background:radial-gradient(ellipse at 15% 15%,rgba(var(--ac-rgb,0,212,255),.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,.05) 0%,transparent 45%);background-attachment:fixed;color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
+  .wrap{width:100%;max-width:600px;display:flex;flex-direction:column;gap:14px;flex:1}
+  .kicker{font-size:.58rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--ac-hi)}
+  .hdr{display:flex;align-items:center;gap:10px;padding:4px 2px}
+  .hdr .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--ac-bg),transparent);border:1px solid var(--ac-br);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--ac);font-size:15px;overflow:hidden;flex-shrink:0}
+  .hdr .logo img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+  .hdr .t{font-size:.88rem;font-weight:800;letter-spacing:-.01em}
+  .hdr .st{font-size:.62rem;color:var(--sub)}
+  .hdr .spacer{flex:1}
+  .pill{font-size:.6rem;font-weight:800;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.22);padding:4px 10px;border-radius:99px;white-space:nowrap}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative}
+  .exit{position:absolute;top:12px;right:14px;font-size:.62rem;color:var(--faint);cursor:pointer;text-decoration:underline;text-underline-offset:2px;z-index:2}
+  .exit:hover{color:var(--sub)}
+  /* ---- splash ---- */
+  .splash{padding:26px 20px 22px}
+  .splash .kicker{margin-bottom:8px}
+  .splash h1{font-family:var(--serif);font-size:1.9rem;letter-spacing:-.03em;line-height:1.16;margin-bottom:8px;font-weight:400}
+  .splash h1 em{color:var(--ac)}
+  .splash .lede{color:#7e8b9c;font-size:.78rem;line-height:1.55;max-width:440px}
+  .reassure{margin:14px 0 0;font-size:.68rem;color:var(--green);background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;padding:10px 12px;line-height:1.55;text-align:left}
+  .doors{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+  .door{position:relative;display:block;min-height:104px;padding:14px;border-radius:14px;background:linear-gradient(150deg,#121c29,#0d141e);border:1px solid var(--line2);cursor:pointer;transition:.15s;text-align:left;width:100%;color:var(--tx);font-family:inherit;overflow:hidden}
+  .door:hover{border-color:var(--ac-br);transform:translateY(-1px)}
+  .door::after{content:'→';position:absolute;right:13px;bottom:10px;color:#526174;font-size:1rem;transition:.2s}
+  .door:hover::after{color:var(--ac);transform:translateX(3px)}
+  .door .ic{width:33px;height:33px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.05);border:1px solid var(--line2);margin-bottom:16px}
+  .door .ic img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+  .door .tt{font-size:.78rem;font-weight:700}
+  .door .dd{font-size:.6rem;color:#667487;margin-top:3px;line-height:1.4;max-width:150px}
+  .door .tag{position:absolute;top:12px;right:12px;font-size:.52rem;font-weight:900;letter-spacing:.06em;padding:3px 7px;border-radius:99px}
+  .door.genie{grid-column:span 2;background:radial-gradient(circle at 100% 0,rgba(var(--ac-rgb,0,212,255),.16),transparent 48%),linear-gradient(145deg,#123342,#111c29);border-color:var(--ac-br)}
+  .door.genie .tt{font-size:.95rem}
+  .door.genie .dd{color:#7893a4;max-width:320px}
+  .door.genie .tag{color:var(--ac-ink);background:var(--cta);border:0}
+  @media(max-width:520px){.doors{grid-template-columns:1fr}.door.genie{grid-column:auto}}
+  .skip{margin-top:14px;text-align:left;font-size:.62rem;color:var(--faint);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .skip:hover{color:var(--sub)}
+  /* ---- chat ---- */
+  .chat{display:flex;flex-direction:column;gap:10px;min-height:340px}
+  .row{display:flex;gap:9px;align-items:flex-start}
+  .row .av{width:30px;height:30px;border-radius:9px;background:var(--ac-bg);border:1px solid var(--ac-br);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden;color:var(--ac);font-weight:800;font-size:12px}
+  .row .av img{width:100%;height:100%;object-fit:cover}
+  .bub{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:.82rem;line-height:1.55;max-width:92%}
+  .bub b{color:var(--ac)}
+  .qb{font-size:.95rem;font-weight:700;letter-spacing:-.01em}
+  .qb b{color:var(--tx)}
+  .why{font-size:.6rem;color:var(--dim);margin-top:3px}
+  .row.user{flex-direction:row-reverse}
+  .row.user .av{background:rgba(255,255,255,.05);border-color:var(--line2)}
+  .row.user .bub{background:var(--ac-bg);border-color:var(--ac-br)}
+  .typing{display:inline-flex;gap:4px;padding:4px 2px;cursor:pointer}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--sub);animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .cgrid.single{grid-template-columns:1fr}
+  @media(max-width:560px){.cgrid{grid-template-columns:1fr}}
+  .choice{position:relative;border:1px solid var(--line2);background:var(--panel);color:#8693a3;border-radius:12px;padding:10px 11px;cursor:pointer;text-align:left;transition:.15s;min-height:52px;font-family:inherit}
+  .choice:hover{border-color:var(--ac-br);background:#12202c}
+  .choice.sel{border-color:var(--ac-strong);background:var(--ac-bg);color:#dce8ef;box-shadow:inset 3px 0 var(--ac)}
+  .choice b{display:block;font-size:.74rem;font-weight:700;color:#c2cdd9}
+  .choice.sel b{color:#eaf7ff}
+  .choice b img{width:15px;height:15px;border-radius:4px;vertical-align:-2.5px;margin-right:7px}
+  .choice span{display:block;color:#667487;font-size:.58rem;margin-top:2px;line-height:1.35}
+  .choice.sel span{color:#7893a4}
+  .choice .rec{position:absolute;top:8px;right:8px;font-size:.5rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--ac-hi);background:var(--ac-bg);border:1px solid var(--ac-br);border-radius:99px;padding:1px 6px}
+  .choice.info{grid-column:1/-1;border-style:dashed;min-height:0;color:var(--sub)}
+  .choice.info b{color:var(--sub)}
+  .frozen .choice{pointer-events:none;opacity:.38}
+  .frozen .choice.sel{opacity:1}
+  .frozen input{pointer-events:none}
+  .qgl{font-size:.58rem;font-weight:800;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;margin:12px 0 2px}
+  .go-btn{display:block;width:100%;min-height:44px;margin-top:10px;border:0;border-radius:11px;background:var(--cta);color:var(--ac-ink);font-size:.82rem;font-weight:900;cursor:not-allowed;opacity:.35;font-family:inherit;transition:.15s}
+  .go-btn.ready{opacity:1;cursor:pointer;box-shadow:0 8px 28px rgba(var(--ac-rgb,0,212,255),.22)}
+  .namein{flex:1;min-width:0;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:10px 12px;font-size:16px;font-family:inherit;outline:none}
+  .namein:focus{border-color:var(--ac-strong);box-shadow:0 0 0 3px var(--ac-bg)}
+  .namego{border:0;border-radius:10px;padding:0 16px;background:var(--cta);color:var(--ac-ink);font-size:.78rem;font-weight:900;cursor:pointer;font-family:inherit}
+  .multi-hint{font-size:.6rem;color:var(--dim);margin-top:8px;line-height:1.5}
+  /* ---- stepper ---- */
+  .stepper{display:flex;gap:6px;margin-top:12px}
+  .seg{flex:1}
+  .seg i{display:block;height:3px;border-radius:99px;background:rgba(255,255,255,.08);transition:.25s}
+  .seg span{display:block;margin-top:5px;font-size:.5rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);transition:.25s;text-align:center}
+  .seg.on i{background:var(--ac);box-shadow:0 0 8px var(--ac-br)}
+  .seg.on span{color:var(--ac-hi)}
+  /* ---- watch-me ---- */
+  .wm{display:flex;flex-direction:column;gap:10px}
+  .wm h3{font-family:var(--serif);font-size:1.25rem;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;font-weight:400}
+  .wm h3 b{color:var(--ac);font-weight:400}
+  .step{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:11px 13px;opacity:.5;transition:.3s}
+  .step.active{opacity:1;border-color:var(--ac-br);background:var(--ac-bg)}
+  .step.done{opacity:1;border-color:rgba(52,211,153,.25)}
+  .step.warn{opacity:1;border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.05)}
+  .step.warn .spin{border-color:rgba(251,191,36,.4);border-top-color:var(--amber)}
+  .step .st-ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--sub)}
+  .step.done .st-ic{background:rgba(52,211,153,.13);border-color:rgba(52,211,153,.35);color:var(--green)}
+  .step.active .st-ic{background:var(--ac-bg);border-color:var(--ac-br);color:var(--ac)}
+  .step.warn .st-ic{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:var(--amber)}
+  .step .st-t{font-size:.76rem;font-weight:700}
+  .step .st-t .info{font-size:.58rem;color:var(--faint);cursor:help;margin-left:4px}
+  .step .st-d{font-size:.62rem;color:var(--sub);margin-top:1px}
+  .step .spin{margin-left:auto;width:16px;height:16px;border:2px solid var(--ac-br);border-top-color:var(--ac);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  /* ---- key hand-off ---- */
+  .keybox{margin-top:2px;background:var(--ac-bg);border:1px dashed var(--ac-br);border-radius:12px;padding:13px 14px}
+  .keybox .kt{font-size:.8rem;font-weight:800;display:flex;align-items:center;gap:7px}
+  .keybox .kd{font-size:.66rem;color:var(--sub);margin:6px 0 10px;line-height:1.55}
+  .keybox input{width:100%;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:11px 12px;font-size:16px;font-family:inherit;outline:none}
+  .keybox input:focus{border-color:var(--ac-strong);box-shadow:0 0 0 3px var(--ac-bg)}
+  .keywarn{display:none;font-size:.66rem;color:var(--red);margin-top:7px;line-height:1.45}
+  .keywarn.show{display:block}
+  .keybox .kbtns{display:flex;gap:10px;margin-top:10px;align-items:center}
+  .keybox .kgo{flex:1;min-height:44px;background:var(--cta);color:var(--ac-ink);border:0;border-radius:10px;font-size:.8rem;font-weight:900;cursor:pointer;font-family:inherit}
+  .keybox .kskip{font-size:.62rem;color:var(--faint);text-decoration:underline;cursor:pointer;white-space:nowrap}
+  .keybox .kskip:hover{color:var(--sub)}
+  .keybox.accepted{border-color:rgba(52,211,153,.5);border-style:solid;background:rgba(52,211,153,.05)}
+  .keybox.accepted .kt{color:var(--green)}
+  .keybox.accepted .kgo{background:linear-gradient(135deg,#1fae74,#34d399)}
+  .keybox.accepted .keywarn,.keybox.accepted .kskip{display:none}
+  /* ---- success / shared content blocks ---- */
+  .succ{padding:24px 18px}
+  .succ .kicker{display:block;text-align:center}
+  .succ .big{font-size:40px;text-align:center;margin:8px 0 6px}
+  .succ h2{font-family:var(--serif);font-size:1.5rem;letter-spacing:-.03em;text-align:center;margin-bottom:6px;font-weight:400}
+  .succ>p{color:#7e8b9c;font-size:.74rem;line-height:1.55;text-align:center;max-width:420px;margin:0 auto}
+  .summary,.planblk,.appbox,.pcard{text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.72rem;line-height:1.7}
+  .summary{margin:14px 0}.appbox{margin:0 0 12px}.planblk{margin-top:10px}
+  .summary b,.planblk b{color:var(--ac)}
+  .planblk .pt,.appbox .ab-t{font-size:.58rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--ac-hi);margin-bottom:6px}
+  .planblk .pi{display:flex;gap:7px;align-items:baseline}
+  .planblk .pi .n{color:var(--dim);font-size:.66rem;min-width:14px;font-weight:700}
+  .appbox ol{margin-left:18px}
+  .appbox li{margin-bottom:3px}
+  .appbox .manifest{background:#111720;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-family:ui-monospace,monospace;font-size:.62rem;color:#7a8194;margin-top:8px;word-break:break-all}
+  .native{font-size:.56rem;font-weight:800;color:rgba(52,211,153,.9);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:99px;padding:0 6px;white-space:nowrap}
+  .qrr{display:flex;gap:12px;align-items:center;margin-top:10px}
+  .qrr .qd{font-size:.62rem;color:var(--sub);line-height:1.5}
+  .guide{text-align:left;margin:14px 0}
+  .gphase{font-size:.58rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--ac-hi);margin:14px 2px 7px;display:flex;align-items:center;gap:7px}
+  .gphase:first-child{margin-top:0}
+  .gphase .gb{background:var(--ac-bg);border:1px solid var(--ac-br);border-radius:6px;padding:1px 7px;font-size:.6rem}
+  .gstep{display:flex;gap:10px;align-items:flex-start;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:.15s}
+  .gstep:hover{border-color:var(--ac-br)}
+  .gstep .cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--dim);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:.15s}
+  .gstep.tick{opacity:.55}
+  .gstep.tick .cb{background:var(--ac);border-color:var(--ac);color:var(--ac-ink)}
+  .gstep .gt{font-size:.74rem;line-height:1.5}
+  .gstep .gt b{color:var(--ac)}
+  .gstep .gt .tab{color:var(--amber);font-weight:700}
+  .gtally{text-align:center;font-size:.66rem;color:var(--sub);margin:8px 0 0}
+  .btns{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+  .btn{border-radius:11px;padding:13px;font-size:.85rem;font-weight:800;cursor:pointer;border:0;text-align:center;transition:.15s;font-family:inherit}
+  .btn.primary{background:var(--cta);color:var(--ac-ink)}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:#101923;border:1px solid rgba(255,255,255,.11);color:#8492a3}
+  .btn.ghost:hover{border-color:var(--sub)}
+  .btn.undo{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+  .hint{font-size:.62rem;color:var(--faint);margin-top:12px;line-height:1.6;text-align:center}
+  .foot{text-align:center;font-size:.56rem;color:var(--faint);padding:6px 0 2px}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2230;border:1px solid var(--ac-br);color:var(--tx);font-size:.72rem;font-weight:600;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .succ:not(.hidden) .big{animation:pop .5s ease-out}
+  .succ:not(.hidden) .summary{animation:rise .35s .05s ease-out both}
+  .succ:not(.hidden) .appbox,.succ:not(.hidden) .pcard,.succ:not(.hidden) .guide{animation:rise .35s .12s ease-out both}
+  .succ:not(.hidden) .btns{animation:rise .35s .2s ease-out both}
+  @media (prefers-reduced-motion: reduce){
+    .typing span,.spin{animation:none!important}
+    .step,.choice,.door,.btn{transition:none!important}
+    .succ .big,.succ .summary,.succ .appbox,.succ .pcard,.succ .guide,.succ .btns{animation:none!important}
+  }
+
+
+    :root{ --bg:#0d0d1a; --card:#141226; --card2:#100f1e; --panel:#131126;
+      --ac:#9b8cff; --ac-hi:#b3a8ff; --ac-bg:rgba(155,140,255,.12); --ac-br:rgba(155,140,255,.36); --ac-rgb:155,140,255; --ac-ink:#0d0d1a;
+      --cta:linear-gradient(135deg,#22d3ee,#a855f7);
+      --serif:Inter,system-ui,sans-serif; }
+    body{background:radial-gradient(900px 420px at 15% 0%,rgba(34,211,238,.09),transparent 60%),radial-gradient(900px 480px at 85% 10%,rgba(168,85,247,.14),transparent 60%),var(--bg)}
+    .gradtext{background:var(--cta);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .succ h2{background:var(--cta);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .pcard{margin:14px 0 0}
+    .pcard .ph{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+    .pcard .ph .pi{font-size:20px}
+    .pcard .ph .pn{font-size:.9rem;font-weight:800}
+    .pcard .ph .pd{font-size:.62rem;color:var(--dim);margin-left:auto}
+    .pcard .why2{font-size:.66rem;color:var(--sub);line-height:1.5;margin-bottom:9px}
+    .srow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-bottom:6px}
+    .srow .sn{width:19px;height:19px;border-radius:50%;background:var(--ac-bg);border:1px solid var(--ac-br);color:var(--ac);font-size:.6rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .srow .st2{font-size:.76rem;font-weight:700}
+    .srow .sd{font-size:.62rem;color:var(--sub);margin-top:1px}
+    .srow .acts{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+    .mini{font-size:.6rem;font-weight:800;padding:6px 10px;border-radius:8px;border:1px solid var(--ac-br);background:var(--ac-bg);color:var(--ac);cursor:pointer;text-decoration:none;white-space:nowrap}
+    .mini.ghost{background:transparent;border-color:var(--line2);color:var(--sub)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="logo"><img alt="Nuvio" style="box-shadow:0 2px 14px rgba(34,211,238,.25)" src="data:image/png;base64,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"></div>
+    <div><div class="t">Nuvio · Stack Genie</div><div class="st">Profiles & add-on stacks · prototype</div></div>
+    <div class="spacer"></div>
+    <div class="pill">● Designs it — you install it</div>
+  </div>
+
+  <div class="card splash" id="splash">
+    <div class="kicker">profiles &amp; stack planner</div>
+    <h1>Nuvio's superpower is profiles.<br>Let's set yours up <em>properly</em>.</h1>
+    <p class="lede">Stremio-compatible, up to 6 profiles, real cross-device sync. I'll ask a few quick questions, then hand you an <b style="color:var(--tx)">ordered add-on stack per profile</b> with one-tap install links — and where to press in nuvio.tv. About 3 minutes.</p>
+    <div class="reassure">🛡️ <b>Read-only by design.</b> I never touch your Nuvio account. You install everything yourself from your dashboard — each stack is an ordered list you control, and add-ons remove in one tap.</div>
+    <div class="doors">
+      <button class="door genie" id="doorGenie">
+        <span class="tag">Start here</span>
+        <div class="ic">🧞</div>
+        <div class="tt">✨ Guided Setup — design my profiles</div>
+        <div class="dd">A few quick questions → profile plan → per-addon install links + checklist</div>
+      </button>
+      <button class="door" onclick="quickPlan()"><div class="ic">📋</div><div class="tt">Just the checklist</div><div class="dd">Sensible defaults — one good profile, stream engine + metadata + subs</div></button>
+      <button class="door" onclick="proto('This would open nuvio.tv in a new tab.')"><div class="ic">🌐</div><div class="tt">Open nuvio.tv dashboard</div><div class="dd">You know what you're doing — straight to it</div></button>
+    </div>
+    <div class="skip" onclick="proto('Migrating from Stremio? Nuvio has a free migration tool — run it first, then this genie.')">Coming from Stremio? Migration tool first →</div>
+</div>
+  <div class="card hidden" id="chatCard">
+    <span class="exit" role="button" aria-label="Exit" onclick="proto('Exit — in the real version your answers are kept.')">✕ exit — your answers are kept</span>
+    <div class="chat" id="chat" role="log" aria-live="polite"></div>
+    <div class="stepper" id="stepper"></div>
+  </div>
+  <div class="card hidden" id="wmCard"><span class="exit" role="button" aria-label="Exit" onclick="proto('Exit — in the real version your answers are kept.')">✕ exit</span>
+    <div class="wm">
+      <div class="kicker">building</div>
+      <h3>“<b>your <span id="wmName">Nuvio setup</span>…</b>”</h3>
+      <p style="font-size:.68rem;color:var(--sub);margin:-2px 0 4px">Everything I'm doing, as I do it — nothing needed from you until the key step:</p>
+      <div class="kicker" id="wmStepLine" style="margin-bottom:6px">Step 1 of 4</div>
+      <div class="step" id="wm1"><div class="st-ic">1</div><div><div class="st-t">Planning your profiles <span class="info" title="Profiles beat compromise — each keeps its own add-ons, history and PIN.">ⓘ</span></div><div class="st-d" id="wm1d">Who watches what, and what must never mix</div></div><div class="spin"></div></div><div class="step" id="wm2"><div class="st-ic">2</div><div><div class="st-t">Choosing each profile's stack <span class="info" title="Nuvio syncs this order (sort_order) to every device.">ⓘ</span></div><div class="st-d" id="wm2d">Stream engine, metadata, extras — in install order</div></div></div><div class="step" id="wm3"><div class="st-ic">3</div><div><div class="st-t">Generating install links <span class="info" title="Verified in Nuvio source: DeepLinkParser → AddonInstall.">ⓘ</span></div><div class="st-d" id="wm3d">nuvio:// deep links — tap to install, straight from the page</div></div></div><div class="step" id="wm4"><div class="st-ic">4</div><div><div class="st-t">Writing your checklist</div><div class="st-d" id="wm4d">Per device: TV sign-in, sync, finishing touches</div></div></div>
+      
+    </div>
+    <div class="hint">⚠️ <b>Prototype</b> — the real version verifies each manifest URL resolves before handing you the link, and remembers your stacks for next time.</div></div>
+  <div class="card succ hidden" id="succCard">
+    <span class="exit" role="button" aria-label="Exit" onclick="proto('This would open nuvio.tv.')">✕ open dashboard</span>
+    <span class="kicker">done</span>
+    <div class="big">✨</div>
+    <h2>Your Nuvio setup, mapped</h2>
+    <p id="succSub"></p>
+    <div id="profileCards"></div>
+    <div class="gphase" style="margin-top:16px">📋 Setup checklist</div>
+    <div class="guide" id="guide"></div>
+    <div class="gtally" id="gtally"></div>
+    <div class="btns">
+      <button class="btn primary" onclick="proto('This would open nuvio.tv in a new tab.')">🌐 Open nuvio.tv dashboard</button>
+      <button class="btn ghost" onclick="copyGuide()">📋 Copy whole plan as checklist</button>
+      <button class="btn ghost" onclick="downloadGuide()">⬇️ Download plan (.md)</button>
+      <button class="btn ghost" onclick="copyShareLink()">🔗 Copy share link</button>
+      <button class="btn ghost" onclick="restart()">↩️ Start over — different answers</button>
+    </div>
+    <div class="hint">Tip: Nuvio syncs add-ons across your devices once you're signed in — do this once, on nuvio.tv, and it follows you to every TV. The 🧞 button on each add-on uses Nuvio's deep-link install (works on a device with Nuvio installed).</div>
+</div>
+  <div class="foot">Nuvio Stack Genie · family build 2026-08-09 · shared kit v1.1 · nuvio:// deep-links (DeepLinkParser-verified) · sort_order-aware stacks</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+  'use strict';
+  const chat = document.getElementById('chat');
+  const stepperEl = document.getElementById('stepper');
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const APP_PRE = (new URLSearchParams(location.search).get('app') || '').toLowerCase();
+
+  // ---- failure containment: a glitch must never strand the user ----
+  let __failed = false;
+  function flowFail(err){
+    if (__failed) return; __failed = true;
+    console.error('[genie]', err);
+    const box = document.createElement('div');
+    box.className = 'keybox';
+    box.style.borderColor = 'rgba(248,113,113,.45)';
+    box.innerHTML = `<div class="kt">😵 Something glitched on my end.</div><div class="kd">Nothing was changed — your settings and backups are untouched. Restart the guided setup, or head to ${TOOL.failSafeTarget} directly.</div><div class="kbtns"><button class="kgo" data-r="1">⟲ Restart guided setup</button><span class="kskip" data-b="1">${TOOL.failSafeLabel} →</span></div>`;
+    box.querySelector('[data-r]').onclick = ()=>location.reload();
+    box.querySelector('[data-b]').onclick = ()=>TOOL.failSafeGo();
+    const chatCard = document.getElementById('chatCard'), wmCard = document.getElementById('wmCard');
+    if (!chatCard.classList.contains('hidden')) { chat.appendChild(box); chat.scrollTop = chat.scrollHeight; }
+    else if (!wmCard.classList.contains('hidden')) wmCard.querySelector('.wm').appendChild(box);
+    else document.querySelector('.wrap').appendChild(box);
+  }
+  window.addEventListener('error', e => flowFail(e.error || e.message));
+  window.addEventListener('unhandledrejection', e => flowFail(e.reason));
+  function proto(msg){ alert('(prototype) ' + msg); }
+  function toast(msg){ const t=document.getElementById('toast'); if(!t){ proto(msg); return; } t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
+
+  // ---- dom + text helpers ----
+  function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+  function escH(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function AV(){ return TOOL.avatarHtml; }
+  function typeIn(){ return new Promise(r=>{ const t=el(`<div class="row"><div class="av">${AV()}</div><div class="bub"><span class="typing" title="tap to skip"><span></span><span></span><span></span></span></div></div>`); let done=false; const fin=()=>{ if(done) return; done=true; t.remove(); r(); }; t.onclick=fin; chat.appendChild(t); chat.scrollTop=chat.scrollHeight; setTimeout(fin, REDUCED?60:(330+Math.random()*340)); }); }
+  function say(html){ return new Promise(r=>{ const b=el(`<div class="row"><div class="av">${AV()}</div><div class="bub">${html}</div></div>`); chat.appendChild(b); chat.scrollTop=chat.scrollHeight; setTimeout(r, REDUCED?80:350); }); }
+  function echoUser(text){ const b=el(`<div class="row user"><div class="av">🙂</div><div class="bub">${escH(text)}</div></div>`); chat.appendChild(b); chat.scrollTop=chat.scrollHeight; }
+  function freeze(row){ row.classList.add('frozen'); }
+  function choiceBtn([label,desc,tag,icon],i){
+    const ic = icon ? `<img alt="" style="width:15px;height:15px;border-radius:4px;vertical-align:-2.5px;margin-right:7px" src="${icon}">` : '';
+    return `<button class="choice" data-i="${i}">${tag?`<span class="rec">${tag}</span>`:''}<b>${ic}${label}</b><span>${desc}</span></button>`;
+  }
+
+  // ---- widgets: single-choice cards (+optional info/help chips), multi-select cards, two-group, free-text ----
+  function askCards(html, items, opts){ opts = opts||{}; return new Promise(r=>{
+    let done = false;
+    const c=el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}<div class="cgrid${opts.single?' single':''}">${items.map(choiceBtn).join('')}${opts.info?`<button class="choice info" data-info="1"><b>${opts.info[0]}</b><span>${opts.info[1]||''}</span></button>`:''}${opts.help?`<button class="choice info" data-help="1"><b>${opts.help[0]}</b><span>${opts.help[1]||''}</span></button>`:''}</div></div></div>`);
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+    const finish=(v,btn)=>{ if(done) return; done=true; if(btn){ c.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel')); btn.classList.add('sel'); } setTimeout(()=>{ freeze(c); r(v); }, REDUCED?60:220); };
+    c.querySelectorAll('.choice[data-i]').forEach(b=>b.onclick=()=>finish(+b.dataset.i, b));
+    if (opts.info) c.querySelector('[data-info]').onclick=()=>{ if(done) return; done=true; freeze(c); r('INFO'); };
+    if (opts.help) c.querySelector('[data-help]').onclick=()=>{ if(done) return; done=true; freeze(c); r('HELP'); };
+  }); }
+  function askMulti(html, items, prechecked){ return new Promise(r=>{
+    let done = false;
+    const picked = new Set(prechecked||[]);
+    const c=el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}<div class="cgrid" data-multi>${items.map((it,i)=>choiceBtn(it!==null&&typeof it==='object'?it:[it,''],i).replace('class="choice"', `class="choice${picked.has(i)?' sel':''}"`)).join('')}</div><button class="go-btn ready" data-go="1">These →</button><div class="multi-hint">Pick all that apply — tap <b style="color:var(--green)">These →</b> when you're happy.</div></div></div>`);
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+    c.querySelectorAll('.choice[data-i]').forEach(b=>b.onclick=()=>{ if(done) return; const i=+b.dataset.i; if(picked.has(i)){picked.delete(i);b.classList.remove('sel');} else {picked.add(i);b.classList.add('sel');} });
+    c.querySelector('[data-go]').onclick=()=>{ if(done) return; done=true; freeze(c); r([...picked].sort((a,b)=>a-b)); };
+  }); }
+  function askTwo(html, labelA, groupA, labelB, groupB, preB){ return new Promise(r=>{
+    let done = false;
+    const sel = [null, (preB!=null ? preB : null)];
+    const c = el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}
+      <div class="qgl">${labelA}</div><div class="cgrid" data-g="0">${groupA.map(choiceBtn).join('')}</div>
+      <div class="qgl">${labelB}${preB!=null?' <span style="color:var(--ac);text-transform:none;letter-spacing:0">(pre-filled from your link)</span>':''}</div><div class="cgrid" data-g="1">${groupB.map(choiceBtn).join('')}</div>
+      <button class="go-btn" data-go="1">Continue →</button></div></div>`);
+    const arm = ()=>{ if (sel[0]!==null && sel[1]!==null) c.querySelector('[data-go]').classList.add('ready'); };
+    c.querySelectorAll('.cgrid').forEach(g=>{
+      const gi = +g.dataset.g;
+      g.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+        if (done) return;
+        g.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+        sel[gi] = +b.dataset.i; arm();
+      });
+      if (gi===1 && preB!=null){ g.querySelectorAll('.choice')[preB].classList.add('sel'); }
+    });
+    arm();
+    c.querySelector('[data-go]').onclick=()=>{ if (done || sel[0]===null || sel[1]===null) return; done=true; freeze(c); r(sel); };
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+  }); }
+  function askName(html, defValue){ return new Promise(r=>{
+    let done = false;
+    const c = el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}
+      <div style="margin-top:10px;display:flex;gap:8px"><input class="namein" type="text" maxlength="24" value="${escH(defValue)}"><button class="namego" data-go="1">Save</button></div>
+      <div class="multi-hint">This is the name you'll see in your app's addon list — make it yours.</div></div></div>`);
+    const inp = c.querySelector('.namein'), go = c.querySelector('[data-go]');
+    const finish = ()=>{ if (done) return; done=true; const v = inp.value.trim() || defValue; inp.disabled = true; go.style.display='none'; freeze(c); r(v); };
+    go.onclick = finish;
+    inp.addEventListener('keydown', e=>{ if (e.key === 'Enter') finish(); });
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+    setTimeout(()=>{ try{ inp.focus(); inp.select(); }catch(e){} }, 150);
+  }); }
+  // unified restart: confirm, then CLEAR any shared-plan hash so we actually land on a fresh start
+  function g_restart(msg){
+    if (confirm(msg || 'Start over with a fresh setup?\n\n(Safe — nothing was changed on any account.)')){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){ location.hash=''; } location.reload(); }
+  }
+  // "what actually changed?" — labeled fingerprint diff for edit loops
+  function fpDiff(before, after, labelMap){
+    const diffs = [];
+    for (const k of Object.keys(after)){
+      const b = JSON.stringify(before[k]), a = JSON.stringify(after[k]);
+      if (b !== a) diffs.push((labelMap||{})[k] || k);
+    }
+    return diffs.length ? 'Changed: ' + diffs.join(', ') : null;
+  }
+  // rough "N steps ≈ M minutes" for guide-shaped results
+  function estMinutes(steps){ return Math.max(4, Math.round(steps*0.35)); }
+
+  function setStep(n){ stepperEl.innerHTML = TOOL.steps.map((l,i)=>`<div class="seg${i<n?' on':''}"><i></i><span>${l}</span></div>`).join(''); }
+
+  // ---- generic watch-me sequencer (shared) ----
+  function wmRun(stepIds, opt){
+    document.getElementById('wmCard').classList.remove('hidden');
+    let i = 0;
+    function next(){
+      if(i>0){ const prev=document.getElementById(stepIds[i-1]); prev.classList.remove('active'); prev.classList.remove('warn'); prev.classList.add('done'); prev.querySelector('.spin')?.remove(); const ic=prev.querySelector('.st-ic'); if(ic) ic.textContent='✓'; }
+      if(i>=stepIds.length){ document.getElementById('wmCard').classList.add('hidden'); opt.onDone && opt.onDone(); return; }
+      const s=document.getElementById(stepIds[i]); s.classList.add('active');
+      opt.onStep && opt.onStep(i);
+      if (opt.pauseIf && opt.pauseIf(i)){
+        opt.onPause && opt.onPause();
+        (function wait(){ if (opt.resumeWhen && opt.resumeWhen()){ opt.onResume && opt.onResume(); setTimeout(next, opt.resumeDelay||600); return; } setTimeout(wait, 200); })();
+        i = i + 1;   // resume lands on the step AFTER the pause
+        return;
+      }
+      setTimeout(next, opt.stepDurs[i]);
+      i++;
+    }
+    next();
+  }
+
+  // ---- shareable plan (config-as-URL) ----
+  function b64urlEncode(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  function b64urlDecode(s){ try{ return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'_'))))); }catch(e){ return null; } }
+  function copyShareLink(){
+    const url = location.href.split('#')[0] + '#p=' + b64urlEncode(JSON.stringify(TOOL.sharePayload()));
+    const done = ()=>toast('Share link copied — the plan travels inside the URL');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(done); else done();
+  }
+  function writeShareHash(){ try{ history.replaceState(null,'','#p='+b64urlEncode(JSON.stringify(TOOL.sharePayload()))); }catch(e){} }
+  function detectSharedPlan(){
+    const h = location.hash || '';
+    if (!h.startsWith('#p=')) return;
+    const pre = b64urlDecode(h.slice(3));
+    if (!pre || pre.g !== TOOL.brand || !TOOL.validShared(pre)) return;
+    const doors = document.querySelector('#splash .doors');
+    if (!doors) return;
+    const door = el(`<button class="door" id="doorShared"><div class="ic">📂</div><div><div class="tt">Open the shared plan</div><div class="dd">${TOOL.sharedDesc(pre)} · shared with you</div></div><span class="tag" style="color:var(--ac);background:var(--ac-bg);border:1px solid var(--ac-br)">SHARED</span></button>`);
+    doors.prepend(door);
+    door.onclick = ()=>TOOL.openShared(pre);
+  }
+  document.addEventListener('DOMContentLoaded', detectSharedPlan);
+
+  // ════ Nuvio stack genie — domain logic ════
+  const TOOL = {
+    brand:'nv',
+    avatarHtml:'<img alt="" src="data:image/png;base64,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">',
+    steps:['House','Content','Source','Devices','Plan'],
+    failSafeTarget:'nuvio.tv', failSafeLabel:'Open the dashboard',
+    failSafeGo:()=>proto('This would open nuvio.tv.'),
+    sharePayload:()=>({g:'nv',content:state.content,house:state.house,service:state.service,devices:state.devices}),
+    validShared:p=>!!p.house,
+    sharedDesc:p=>escH(p.house)+' profiles · '+escH(p.service||''),
+    openShared:pre=>{
+      Object.assign(state, pre);
+      PLAN = buildPlan();
+      document.getElementById('splash').classList.add('hidden');
+      showSuccess();
+      const note = document.createElement('div');
+      note.className = 'planblk';
+      note.style.cssText = 'margin:0 0 10px';
+      note.innerHTML = '<b>📂 Shared plan.</b> Nothing was installed — install the stacks yourself from your own dashboard.';
+      document.getElementById('profileCards').prepend(note);
+    }
+  };
+  const state = { content:null, house:null, service:null, devices:[] };
+  let PLAN = null;
+
+  const HOUSE_CARDS = [
+    ['🙋 Just me','One profile, full stack'],
+    ['💑 Me + partner / household','Two profiles — separate history & recs'],
+    ['🧸 Kids in the house too','Lean kids profile + PIN on adults'],
+    ['👨‍👩‍👧‍👦 Full mixed household','Main · kids · den/guests (≤6 total)']
+  ];
+  const CONTENT_CARDS = [
+    ['🎬 Movies','Deep catalogue + new releases'],
+    ['📺 Series','Season packs & episode matching'],
+    ['⛩️ Anime','AniList tracking + discovery'],
+    ['🌍 A bit of everything','Balanced stacks','popular']
+  ];
+  const SERVICE_CARDS = [
+    ['⚡ TorBox','Fast, modern, great value','popular'],
+    ['🔥 Real-Debrid','The veteran — enormous cache'],
+    ['💎 AllDebrid','Solid all-rounder'],
+    ['🛡️ Premiumize','Premium + bundled extras'],
+    ['🔗 DebridLink','Simple and cheap'],
+    ['🙅 None (free)','P2P — no account needed']
+  ];
+  const DEVICE_CARDS = [
+    ['📺 Android TV / Google TV','The primary couch screen'],
+    ['🔥 Fire TV','Sideload, then sync'],
+    ['📱 Phone / tablet','Manage addons from here too'],
+    ['💻 Desktop','Alpha — testers only']
+  ];
+
+  async function askHouseQ(n){ state.house = ['solo','couple','kids','full'][await askCards(`<div class="qb">${n||'Who watches on this setup?'}</div><div class="why">Nuvio profiles keep every viewer\'s history & recs separate.</div>`, HOUSE_CARDS)]; }
+  async function askContentQ(n){ state.content = ['movies','series','anime','mixed'][await askCards(`<div class="qb">${n||'What gets watched most?'}</div><div class="why">Shapes each profile\'s catalog add-ons.</div>`, CONTENT_CARDS)]; }
+  async function askServiceQ(n){
+    let head = `<div class="qb">${n||'Debrid account?'}</div><div class="why">Powers instant cached streams. No account? The free route works too.</div>`;
+    while (true){
+      const i = await askCards(head, SERVICE_CARDS, {info:['🤔 What\'s a debrid?','30-second explainer, zero sales pitch'], help:['🧭 Help me choose','My honest two-line shortcut']});
+      if (i === 'INFO'){ await typeIn(); await say('A <b>debrid service</b> downloads torrents/usenet on <i>their</i> servers instead of yours — instant, private streams of cached files for ~$3–5/month. The single biggest quality upgrade. Free P2P works too — slower starts, and you\'ll want a VPN for privacy.'); head = '<div class="qb">So — got one, or going free?</div>'; continue; }
+      if (i === 'HELP'){ await typeIn(); await say('Shortcut: ⚡ <b>TorBox</b> — value speed-demon. 🔥 <b>Real-Debrid</b> — the giant cache, supported everywhere. 🛡️ <b>Premiumize</b> — extras beyond streams. Budget? <b>🙅 Free P2P</b> genuinely works. Still torn → TorBox.'); head = '<div class="qb">So — which one?</div>'; continue; }
+      state.service = ['torbox','realdebrid','alldebrid','premiumize','debridlink','none'][i];
+      break;
+    }
+  }
+  async function askDevicesQ(n){
+    const opts = ['androidtv','firetv','phone','desktop'];
+    const pre = state.devices.length ? state.devices.map(d=>opts.indexOf(d)) : [0];
+    const q = await askMulti(`<div class="qb">${n||'Where will you run Nuvio?'}</div><div class="why">Sets up the sync story + QR sign-in order for each screen.</div>`, DEVICE_CARDS, pre);
+    state.devices = opts.filter((d,i)=>q.includes(i));
+  }
+
+  async function startGenie(){
+    try{
+      document.getElementById('splash').classList.add('hidden');
+      document.getElementById('chatCard').classList.remove('hidden');
+      setStep(1);
+      await typeIn();
+      await say('Hi! I\'m the Nuvio stack genie 👋 Nuvio\'s big trick is <b>real profiles with proper sync</b> — up to six, each with its own add-ons. Let\'s design yours properly. A few quick questions:');
+      await typeIn();
+      await askHouseQ('1 — Who watches on this setup?');    setStep(2); await typeIn();
+      await askContentQ('2 — What gets watched most?');     setStep(3); await typeIn();
+      await askServiceQ('3 — Debrid account?');             setStep(4); await typeIn();
+      await askDevicesQ('4 — Where will you run Nuvio?');   setStep(5); await typeIn();
+      PLAN = buildPlan();
+      await planLoop();
+      await say('One sec while I put your install links and checklist together… 🧞');
+      await new Promise(r=>setTimeout(r, REDUCED?150:550));
+      document.getElementById('chatCard').classList.add('hidden');
+      runWatchMe();
+    }catch(e){ flowFail(e); }
+  }
+  async function planLoop(){
+    while (true){
+      await say('Here\'s the setup I\'d build:' + planSummaryHtml());
+      await typeIn();
+      const ok = await askCards('<div class="qb">Happy with this plan?</div>', [['🧞 Looks good — build my stacks','Per-profile stacks + checklist'],['✏️ Let me change a pick','Redo any question']], {single:true});
+      if (ok === 0) break;
+      await typeIn();
+      const before = {Who:state.house, What:state.content, Service:state.service, Devices:state.devices.slice().sort().join('+')};
+      const w = await askCards('<div class="qb">Which should we redo?</div>', [['👥 Who watches','Profile topology'],['🎬 What you watch','Catalog add-ons'],['⚡ Debrid / service','Stream engine source'],['📺 Devices','Sync & sign-in order']], {single:true});
+      await typeIn();
+      if (w === 0) await askHouseQ();
+      else if (w === 1) await askContentQ();
+      else if (w === 2) await askServiceQ();
+      else await askDevicesQ();
+      PLAN = buildPlan();
+      const after = {Who:state.house, What:state.content, Service:state.service, Devices:state.devices.slice().sort().join('+')};
+      const d = fpDiff(before, after);
+      await say((d ? d + ' — ' : 'No change — ') + 'here\'s the plan 👇');
+      await typeIn();
+    }
+  }
+
+  function quickPlan(){
+    state.content='mixed'; state.house='solo'; state.service='torbox'; state.devices=['androidtv'];
+    PLAN = buildPlan();
+    document.getElementById('splash').classList.add('hidden');
+    runWatchMe();
+  }
+
+  // ---------- decision engine (parity with v2.2, verified 16/16) ----------
+  const ADDONS = {
+    aiometa:    { name:'AIOMetadata',        why:'Rich metadata + ratings cards', host:'aiometadata.example.com', note:'install FIRST — populates art & info' },
+    tmdbmeta:   { name:'TMDB addon',         why:'Metadata fallback / alternative', host:'tmdb-addon.example.com', note:'alternative to AIOMetadata' },
+    corebuild:  { name:'Core Builds · AIOStreams', why:'Your stream engine — filtered, formatted, scored', host:'aiostreams.example.com', note:'configure first (🧞 the Core Builds genie does this part)' },
+    anime:      { name:'AniList catalogs',   why:'Anime tracking & discovery rows', host:'anilist.example.com', note:null },
+    watchly:    { name:'Watchly',            why:'“Because you watched…” recommendation rows', host:'watchly.example.com', note:null },
+    subs:       { name:'OpenSubtitles v3',   why:'Subtitle coverage for everything', host:'opensubtitles.example.com', note:null }
+  };
+  function deepLink(host){ return 'nuvio://' + host + '/stremio/…/manifest.json'; }
+  function manifestUrl(host){ return 'https://' + host + '/stremio/…/manifest.json'; }
+  function stackFor(kind, content){
+    const stack = [
+      { key: content==='anime' ? 'tmdbmeta' : 'aiometa' },
+      { key: 'corebuild' },
+    ];
+    if (content==='anime' || content==='mixed') stack.push({ key:'anime' });
+    if (kind!=='kids') stack.push({ key:'watchly' });
+    stack.push({ key:'subs' });
+    return stack.map(s=>({ key: s.key, ...ADDONS[s.key] }));
+  }
+  function buildPlan(){
+    const profiles = [{ kind:'main', icon:'🎬', name:'Main', desc:'your everyday profile', why:'Full stack. This is the one that lives on the TV home.' }];
+    if (state.house==='couple') profiles.push({ kind:'main', icon:'💑', name:'Partner', desc:'their own history & recs', why:'Same stack, separate history. Profiles beat compromise.' });
+    if (state.house==='kids' || state.house==='full') profiles.push({ kind:'kids', icon:'🧸', name:'Kids', desc:'lean stack, no adult rows', why:'Only family-friendly catalogs + streams. No recommendation drift, no adult rows.' });
+    if (state.house==='full') profiles.push({ kind:'main', icon:'🛋️', name:'Den / Guests', desc:'shareable, resettable', why:'Keep the living-room profile separate — reset it any time without touching yours.' });
+    profiles.forEach(p=>p.stack = stackFor(p.kind, p.kind==='kids' ? (state.content==='movies'?'mixed':state.content) : state.content));
+    const SVC = {torbox:'TorBox', realdebrid:'Real-Debrid', alldebrid:'AllDebrid', premiumize:'Premiumize', debridlink:'DebridLink', none:'Free (P2P)'};
+    return { profiles, service: SVC[state.service], serviceKey: state.service, devices: state.devices };
+  }
+  function planSummaryHtml(){
+    const p = PLAN;
+    let h = '<div class="planblk"><div class="pt">👤 Profiles (' + p.profiles.length + ' of 6)</div>' + p.profiles.map(pr=>`<div class="pi"><span class="n">${pr.icon}</span><span><b>${pr.name}</b> — ${pr.desc} · ${pr.stack.length} add-ons</span></div>`).join('') + '</div>';
+    h += '<div class="planblk"><div class="pt">📦 Stack order (same shape per profile)</div>' + p.profiles[0].stack.map((a,i)=>`<div class="pi"><span class="n">${i+1}</span><span>${a.name}${i===1?' <b>· '+p.service+'</b>':''}</span></div>`).join('') + '</div>';
+    return h;
+  }
+  function runWatchMe(){
+    wmRun(['wm1','wm2','wm3','wm4'], {
+      stepDurs: REDUCED ? [450,450,450,350] : [1400,1500,1300,1000],
+      onStep(i){ const l=document.getElementById('wmStepLine'); if(l) l.textContent='Step '+(i+1)+' of 4'; },
+      onDone(){ showSuccess(); }
+    });
+  }
+  function showSuccess(){
+    document.getElementById('succCard').classList.remove('hidden');
+    writeShareHash();
+    const nSteps = guideSteps().length;
+    const subEl = document.getElementById('succSub');
+    if (subEl) subEl.innerHTML = `Install the add-ons in order (top → bottom — Nuvio keeps this exact order). <b>${PLAN.profiles.length} profile${PLAN.profiles.length>1?'s':''}, ${guideSteps().length} steps, about ${estMinutes(nSteps)} minutes.</b> Everything below is a tap or a copy.`;
+    const pc = document.getElementById('profileCards');
+    pc.innerHTML = PLAN.profiles.map((pr,pi)=>`
+      <div class="pcard">
+        <div class="ph"><span class="pi">${pr.icon}</span><span class="pn">${escH(pr.name)}</span><span class="pd">${escH(pr.desc)}</span></div>
+        <div class="why2">${escH(pr.why)}</div>
+        ${pr.stack.map((a,i)=>`
+          <div class="srow">
+            <span class="sn">${i+1}</span>
+            <div><div class="st2">${a.name}${i===1?' · <span style="color:var(--ac)">'+escH(PLAN.service)+'</span>':''}</div><div class="sd">${a.why}${a.note?' · <span style="color:var(--dim)">'+a.note+'</span>':''} ${manifestHealthHtml('mh-'+pi+'-'+i)}</div></div>
+            <div class="acts">
+              <a class="mini" href="${deepLink(a.host)}" onclick="proto('nuvio:// deep link — on a Nuvio device this opens the add-on install prompt.');return false">🧞 Install</a>
+              <button class="mini ghost" onclick="copyText('${manifestUrl(a.host)}')">📋 URL</button>
+            </div>
+          </div>`).join('')}
+      </div>`).join('');
+    renderGuide();
+    updateTally();
+    // live manifest verification for every stack row (research: 'addon down/host rejects' is the recurring failure)
+    PLAN.profiles.forEach((pr,pi)=>pr.stack.forEach((a,i)=>verifyManifest('mh-'+pi+'-'+i, a.host)));
+  }
+  // research finding: endpoint death/instance rejection is the recurring community failure — verify, don't assume
+  function manifestHealthHtml(id){ return `<span class="mh" id="${id}" style="font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--dim)">…checking</span>`; }
+  async function verifyManifest(elId, host){
+    const elx = document.getElementById(elId); if (!elx) return;
+    const ok = t => { elx.textContent='● live'; elx.style.color='var(--green)'; elx.style.borderColor='rgba(52,211,153,.35)'; elx.title=t; };
+    const bad = t => { elx.textContent='● unreachable'; elx.style.color='var(--amber)'; elx.style.borderColor='rgba(251,191,36,.35)'; elx.title=t; };
+    if (/example\.com$/.test(host)){ // prototype hostnames are placeholders by design
+      elx.textContent='● demo link'; elx.style.color='var(--dim)';
+      elx.title='Placeholder URL in this prototype — the wired build runs the live manifest check here before handing you the link.';
+      return;
+    }
+    const ctrl = new AbortController();
+    const to = setTimeout(()=>ctrl.abort(), 4000);
+    try{
+      const r = await fetch(manifestUrl(host), { signal: ctrl.signal, cache:'no-store' });
+      clearTimeout(to);
+      if (r.ok){
+        const j = await r.json().catch(()=>null);
+        if (j && (j.resources || j.catalogs || j.id)) ok('Manifest verified live');
+        else { elx.textContent='● responded oddly'; elx.style.color='var(--amber)'; elx.title='200 but no manifest-shaped body — check the link'; }
+      } else bad('HTTP '+r.status+' — swap to a fallback instance');
+    }catch(e){ clearTimeout(to); bad('Host unreachable/timed out — swap to a fallback instance'); }
+  }
+
+  function copyText(t){
+    if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>toast('Manifest URL copied')).catch(()=>toast('Copy failed')); }
+    else toast('Copy failed — use the checklist');
+  }
+  function guideSteps(){
+    const steps = [];
+    steps.push('Create your free Nuvio account at <b>nuvio.tv</b> <span style="color:var(--faint)">(a privacy-focused aliased email is fine)</span>.');
+    steps.push('On the TV: open Nuvio → scan the <b>QR code</b> → sign in &amp; approve on your phone. Profiles then appear.');
+    steps.push(`Create your profiles in the dashboard: <b>${PLAN.profiles.map(p=>p.name).join('</b>, <b>')}</b>.${PLAN.profiles.length>1?' Give each its own add-ons (don\'t just inherit) — that\'s the point of profiles.':''}`);
+    PLAN.profiles.forEach(pr=>{
+      steps.push(`For <b>${pr.name}</b>: install the stack <b>in the order shown above</b> — use the 🧞 install link or paste each 📋 URL into <span class="tab">Settings → Addons → Add by URL</span>. Nuvio keeps this order.`);
+    });
+    if (PLAN.serviceKey!=='none'){
+      steps.push(`For the <b>Core Builds</b> add-on in the stack: run it through the Core Builds genie/configurator FIRST (that\'s where your ${PLAN.service} key goes in — client-side, never stored by us), then install the manifest it hands you.`);
+    } else {
+      steps.push('You chose the free route — the Core Builds add-on is configured with P2P sources. No keys involved.');
+    }
+    if (PLAN.devices.includes('phone')) steps.push('Phone app is your remote: manage add-ons there once, and they push to every signed-in TV on refresh.');
+    if (state.house==='kids'||state.house==='full') steps.push('🔒 Kids safety: set a <b>PIN on the adult profiles</b> (not the kids one). Kids profile keeps only family-rated rows from its lean stack.');
+    steps.push('Home stays ordered: on phone/tablet → Settings → <b>Home Layout</b> (Catalogs &amp; Collections); on TV/web → Manage Addons → <b>Reorder home catalogs</b> → enable <b>“Follow addons order”</b>. Your stack order then rules the rows.');
+    steps.push('Done — open the TV app. Add-on changes sync across devices automatically.');
+    steps.push('<span style="color:var(--faint)">Power lane, later: Cloudstream plugin repos (community index at nuvioplugin.com) add free scraper sources; keep them below metadata in the addon order.</span>');
+    return steps;
+  }
+  function renderGuide(){
+    document.getElementById('guide').innerHTML = guideSteps().map((s,i)=>
+      `<div class="gstep" onclick="tick(this)"><div class="cb">✓</div><div class="gt"><span style="color:var(--dim);font-weight:700">${i+1}.</span> ${s}</div></div>`).join('');
+  }
+  function tick(elm){ elm.classList.toggle('tick'); updateTally(); }
+  function updateTally(){
+    const total = document.querySelectorAll('.gstep').length;
+    const done = document.querySelectorAll('.gstep.tick').length;
+    document.getElementById('gtally').textContent = done===total ? '🎉 All done — enjoy Nuvio!' : `${done}/${total} steps done`;
+  }
+  function guideMarkdown(){
+    let md = '# Nuvio setup plan (Stack Genie)\n';
+    md += `Profiles: ${PLAN.profiles.map(p=>p.name).join(' · ')} · stream service: ${PLAN.service}\n\n`;
+    PLAN.profiles.forEach(pr=>{
+      md += `## ${pr.icon} ${pr.name} — ${pr.desc}\n${pr.why}\n`;
+      pr.stack.forEach((a,i)=>{ md += `${i+1}. **${a.name}** — ${a.why}\n   - manifest: \`${manifestUrl(a.host)}\`\n   - install: ${deepLink(a.host)}\n`; });
+      md += '\n';
+    });
+    md += '## Checklist\n';
+    guideSteps().forEach((s,i)=>{ md += `- [ ] ${i+1}. ${s.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&')}\n`; });
+    return md;
+  }
+  function copyGuide(){
+    const txt = guideMarkdown();
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(()=>toast('Plan copied')).catch(()=>clipboardFallback(txt));
+    } else clipboardFallback(txt);
+  }
+  function clipboardFallback(txt){
+    const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('Plan copied'); }catch(e){ toast('Copy failed — download instead'); }
+    ta.remove();
+  }
+  function downloadGuide(){
+    if (!PLAN) return;
+    const blob = new Blob([guideMarkdown()], {type:'text/markdown'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'nuvio-setup-plan.md';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    toast('Plan downloaded');
+  }
+  function restart(){ g_restart(); }
+  document.getElementById('doorGenie').addEventListener('click', startGenie);
+
+</script>
+</body>
+</html>
