@@ -2568,6 +2568,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'quick-reinstall') { S.simpleMode = true; S.outputProfile='auto'; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
+    // Quick rebuild: re-run the current template against the latest configurator WITHOUT wiping user settings.
+    // Fixes the "Rebuild loop" (banner returned after rebuild): start-fresh cleared state but never stamped
+    // coreBuildLastGen, so the outdated banner re-appeared forever. This stamps + keeps S.
+    if (action === 'quick-rebuild') {
+      if (!S.service) { showToast('Nothing to rebuild yet — pick your debrid service first', true); return; }
+      saveLastGen();
+      render();
+      showToast(`Rebuilt at v${TEMPLATE_VERSION} with your settings kept. Download/copy and re-import on your host to apply.`);
+      window.scrollTo(0,0);
+    }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'update-template') { showUpdateTemplateModal(); }
     if (action === 'test-drive') { showTestDriveModal(); }
@@ -5629,7 +5639,7 @@ function versionBannerHtml() {
       <div style="font-size:.78rem;font-weight:700;color:#00d4ff">Update Available</div>
       <div style="font-size:.7rem;color:#8b949e">${v.message}${v.daysOld ? ` · ${v.daysOld} days old` : ''}</div>
     </div>
-    <button data-action="start-fresh" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer">Rebuild →</button>
+    <button data-action="quick-rebuild" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer">Rebuild — keep settings →</button>
   </div>`;
 }
 
