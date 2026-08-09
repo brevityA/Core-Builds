@@ -135,19 +135,20 @@ async function resolveInstallHost(timeout=4000) {
   return selectHealthyHost(timeout);
 }
 
-// name host-selection failures for UI (unreachable / outdated / free-blocked)
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
 function hostErrorHtml(raw) {
   const m = String(raw||'');
   if (m.startsWith('HOST_BLOCKS_FREE:')) {
-    const h = m.split(':')[1];
+    const h = escHtml(m.split(':')[1]);
     return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} doesn't allow free/P2P configs</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Pick a host that supports free sources (Advanced → Hosts, or set the host to Auto), or use a debrid service.</div></div>`;
   }
   if (m.startsWith('HOST_OUTDATED:')) {
     const [,h,v] = m.split(':');
-    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} is running AIOStreams v${v} (needs ≥ 2.32.0)</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">That host is behind the current floor. Switch to Auto (fastest healthy host), pick an updated host, or ask the host admin to update.</div></div>`;
+    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${escHtml(h)} is running AIOStreams v${escHtml(v)} (needs ≥ 2.32.0)</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">That host is behind the current floor. Switch to Auto (fastest healthy host), pick an updated host, or ask the host admin to update.</div></div>`;
   }
   if (m.startsWith('HOST_UNREACHABLE:')) {
-    const h = m.slice('HOST_UNREACHABLE:'.length);
+    const h = escHtml(m.slice('HOST_UNREACHABLE:'.length));
     return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} isn't answering</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Your chosen host didn't respond in time. Switch Host to Auto to let Core Builds pick the fastest healthy host, or try again shortly.</div></div>`;
   }
   return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`;
@@ -6154,7 +6155,7 @@ function showExpressLane() {
         <label for="expressHost" style="font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#566372;white-space:nowrap">AIOStreams host</label>
         <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
           <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
-          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${k}"${S.instanceHost===k?' selected':''}>${HOST_LABEL_MAP[k]||k}${HOST_META[k]&&HOST_META[k].channel==='nightly'?' (nightly)':''}</option>`).join('')}
+          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(HOST_LABEL_MAP[k]||k)}${HOST_META[k]&&HOST_META[k].channel==='nightly'?' (nightly)':''}</option>`).join('')}
           <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
         </select>
       </div>
