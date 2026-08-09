@@ -20,7 +20,8 @@ test('explicit dropdown selection probes ONLY that host; auto keeps the health p
 });
 
 test('no write path silently probes all hosts anymore (the silent-failover bug)', () => {
-  assert.doesNotMatch(app, /await selectHealthyHost\(4000\)/, 'every install/write path must go through resolveInstallHost');
+  const direct = (app.match(/await selectHealthyHost\(4000\)/g) || []).length;
+  assert.equal(direct, 1, 'the ONLY direct fastest-probe call in the app is the self-heal fallback inside quick-rebuild');
   const count = (app.match(/await resolveInstallHost\(4000\)/g) || []).length;
   assert.ok(count >= 3, `expected ≥3 honored call sites (direct, express, update wizard), got ${count}`);
 });
@@ -45,4 +46,22 @@ test('custom/self-hosted explicit selection requires a URL and is version-gated 
   assert.ok(m);
   assert.match(m[0], /S\.instanceUrl/);
   assert.match(m[0], /checkHostVersion\(S\.instanceUrl/);
+});
+
+test('quick-rebuild self-heals dead/outdated/unsupported hosts with notification (18-B)', () => {
+  const m = app.match(/if \(action === 'quick-rebuild'\) \{([\s\S]*?)\n    \}/);
+  assert.ok(m);
+  assert.match(m[1], /resolveInstallHost\(4000\)/, 'rebuilds probe the chosen host');
+  assert.match(m[1], /selectHealthyHost\(4000\)/, 'dead explicit host falls back to the fastest-healthy probe');
+  assert.match(m[1], /healedFrom/, 'heal is recorded');
+  assert.match(m[1], /was down — rebuilt on/, 'the heal is announced (never silent)');
+});
+
+test('express lane shows a live host-health chip (probe on open + on change)', () => {
+  assert.match(app, /id="expressHostChip"/);
+  assert.match(app, /async function probeHostDetail\(url, timeout=4000\)/);
+  assert.match(app, /addEventListener\('change'/); assert.match(app, /probeExpressHost\(\)/, 'host chip probe wired on change + on open');
+  const d = app.match(/async function probeHostDetail\(url, timeout=4000\) \{([\s\S]*?)\n\}/);
+  assert.match(d[1], /catch\(/, 'UI probes never throw');
+  assert.match(d[1], /'outdated'/, 'UI probes flag sub-floor versions');
 });

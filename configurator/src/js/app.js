@@ -116,6 +116,18 @@ async function checkHostVersion(baseUrl, timeout, hostKeyOrLabel) {
   return baseUrl;
 }
 
+// read-only health probe for UI (never throws — returns structured detail)
+async function probeHostDetail(url, timeout=4000) {
+  const t0 = performance.now();
+  const res = await raceHostFetch(url, '/api/v1/status', { method:'GET' }, timeout).catch(() => null);
+  const ms = Math.round(performance.now() - t0);
+  if (!res || !res.ok) return { ok:false, ms, reason:'down' };
+  const payload = await res.clone().json().catch(() => null);
+  const version = payload?.data?.version || payload?.version || '';
+  if (version && !versionAtLeast(version, MIN_AIOSTREAMS_VERSION)) return { ok:false, ms, version, reason:'outdated' };
+  return { ok:true, ms, version, degraded: ms > 2500 };
+}
+
 // resolveInstallHost: an explicit dropdown selection is honored exactly (no silent
 // failover to another host — picked Omni, gets Omni, or gets told why not). 'auto'
 // keeps today's fastest-healthy probe.
@@ -136,6 +148,25 @@ async function resolveInstallHost(timeout=4000) {
 }
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+let _expressProbeSeq = 0;
+async function probeExpressHost() {
+  const chip = document.getElementById('expressHostChip');
+  const sel = document.getElementById('expressHost');
+  if (!chip || !sel) return;
+  const seq = ++_expressProbeSeq;
+  if (sel.value === 'auto') { chip.textContent = 'auto — will pick fastest healthy'; chip.style.color=''; chip.style.borderColor=''; return; }
+  const url = sel.value === 'custom' ? S.instanceUrl : HOST_BASE_URLS[sel.value];
+  if (!url) { chip.textContent = 'custom — set URL in Advanced'; chip.style.color='#fbbf24'; chip.style.borderColor='rgba(251,191,36,.3)'; return; }
+  chip.textContent = '…checking';
+  chip.style.color=''; chip.style.borderColor='';
+  const d = await probeHostDetail(url, 4000);
+  if (seq !== _expressProbeSeq) return;
+  if (d.ok && !d.degraded)      { chip.textContent = `● healthy${d.version?' v'+d.version:''} · ${d.ms}ms`; chip.style.color='#34d399'; chip.style.borderColor='rgba(52,211,153,.35)'; }
+  else if (d.ok)                { chip.textContent = `● slow · ${d.ms}ms`; chip.style.color='#fbbf24'; chip.style.borderColor='rgba(251,191,36,.35)'; }
+  else if (d.reason==='outdated'){ chip.textContent = `● outdated ${d.version?'v'+d.version:''}`; chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; }
+  else { chip.textContent = '● down'; chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; }
+}
 
 function hostErrorHtml(raw) {
   const m = String(raw||'');
@@ -2624,12 +2655,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Quick rebuild: re-run the current template against the latest configurator WITHOUT wiping user settings.
     // Fixes the "Rebuild loop" (banner returned after rebuild): start-fresh cleared state but never stamped
     // coreBuildLastGen, so the outdated banner re-appeared forever. This stamps + keeps S.
+    // Patch 18-B: quick-rebuild is now SELF-HEALING — probe the chosen host; if it's
+    // down/outdated/blocked, rebuild onto the healthiest fallback and say so out loud.
+    // (Install-time paths with explicit picks still fail loudly instead of failing over;
+    // rebuild-time is where automatic healing is welcomed.)
     if (action === 'quick-rebuild') {
       if (!S.service) { showToast('Nothing to rebuild yet — pick your debrid service first', true); return; }
-      saveLastGen();
-      render();
-      showToast(`Rebuilt at v${TEMPLATE_VERSION} with your settings kept. Download/copy and re-import on your host to apply.`);
-      window.scrollTo(0,0);
+      (async () => {
+        const pick = await resolveInstallHost(4000).then(h=>({host:h})).catch(async e=>{
+          const m = String(e?.message||'');
+          if (!m.startsWith('HOST_')) return { host:null, err:m };
+          const healed = await selectHealthyHost(4000).catch(()=>null);
+          if (healed) return { host:healed, healedFrom:m };
+          return { host:null, err:m };
+        });
+        if (!pick.host) { showToast('Your host is unreachable and no healthy fallback answered — try again in a few minutes', true); return; }
+        if (pick.healedFrom) {
+          const hit = Object.entries(HOST_BASE_URLS).find(([,u])=>u===pick.host);
+          const oldName = pick.healedFrom.split(':')[1] || 'Your host';
+          if (hit) S.instanceHost = hit[0]; else S.instanceHost = 'auto';
+          saveLastGen();
+          render();
+          showToast(`${oldName} was down — rebuilt on ${hit ? (HOST_LABEL_MAP[hit[0]]||hit[0]) : pick.host} at v${TEMPLATE_VERSION}. Settings kept; Download/copy to apply.`);
+          window.scrollTo(0,0);
+          return;
+        }
+        saveLastGen();
+        render();
+        showToast(`Rebuilt at v${TEMPLATE_VERSION} with your settings kept. Download/copy and re-import on your host to apply.`);
+        window.scrollTo(0,0);
+      })();
     }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'update-template') { showUpdateTemplateModal(); }
@@ -6157,6 +6212,7 @@ function showExpressLane() {
       <div id="expressCreds">${renderCreds()}</div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:10px" title="An explicitly picked host is honored exactly — no silent failover to another host.">
         <label for="expressHost" style="font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#566372;white-space:nowrap">AIOStreams host</label>
+        <span id="expressHostChip" style="flex-shrink:0;font-size:.58rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.12);color:#6b7280;white-space:nowrap">…</span>
         <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
           <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
           ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(HOST_LABEL_MAP[k]||k)}${HOST_META[k]&&HOST_META[k].channel==='nightly'?' (nightly)':''}</option>`).join('')}
@@ -6192,6 +6248,8 @@ function showExpressLane() {
     <div style="padding:0 22px 18px"><button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
   </div>`;
   document.body.appendChild(overlay);
+  document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); });
+  probeExpressHost();
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose')) { overlay.remove(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
