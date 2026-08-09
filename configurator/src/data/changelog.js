@@ -1,4 +1,7 @@
 export const CHANGELOG = [
+  { v:'2.91', date:'Aug 9 2026', items:[
+    'Fixed: "Rebuild loop" — the version banner\'s Rebuild button wiped all settings but never stamped the current version, so the outdated banner returned after every rebuild. Now keeps settings, stamps the version, and toasts the user to download + re-import.',
+  ]},
   { v:'2.90', date:'Aug 6 2026', items:[
     'AIOStreams v2.32 compatibility — the legacy built-in torbox-search preset is removed from all generated configs and all 72 static templates (the TorBox Search API was shut down; saving a config that still includes it fails on v2.32+ hosts). No automatic conversion to the generic Newznab option is performed.',
     'Templates/Legacy/v2.31.1/ — explicit compatibility lane preserving the 15 previously-enabled templates with torbox-search for hosts still on AIOStreams 2.31.1 or older.',
