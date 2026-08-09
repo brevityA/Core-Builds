@@ -83,12 +83,6 @@ ese_02 = apex_ese_by_label("/*Usenet Propagation Guard*/")
 # 3  AI Upscale Exclusion (stable Apex)
 ese_03 = apex_ese_by_label("/*AI Upscale Exclusion*/")
 
-# 4a Core Builds SEL Setup marker (stable Apex)
-ese_04a = apex_ese_by_label("/*Core Builds SEL Setup*/")
-
-# 4b Standard ESE (stable Apex)
-ese_04b = apex_ese_by_label("/*Standard ESE v1.2.8")
-
 # 5  No Sootio Library (from Labs v0.8.6)
 ese_05 = {"expression": "/*No Sootio Library*/ addon(library(streams), 'Sootio')", "enabled": True}
 
@@ -215,7 +209,6 @@ ese_28 = {
 
 excluded_stream_expressions = [
     ese_01, ese_02, ese_03,
-    ese_04a, ese_04b,
     ese_05,
     ese_06, ese_07, ese_08, ese_09,
     ese_10, ese_11, ese_12, ese_13, ese_14, ese_15,

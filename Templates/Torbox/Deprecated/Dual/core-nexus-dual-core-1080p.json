@@ -258,10 +258,6 @@
         "enabled": true
       },
       {
-        "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-        "enabled": true
-      },
-      {
         "expression": "/* RD Infringing File Scrub */ service(streams, 'realdebrid') and negate(quality(streams, 'BluRay REMUX', 'BluRay'), streams) and keyword(streams, 'all', 'WEB-DL', 'WEBRip', 'AMZN', 'DSNP', 'HULU', 'NF', 'CR', 'PCOK', 'PMTP', 'ATVP', 'MAX', 'SHO', 'CRAV', 'STAN', 'BCORE', 'YTS', 'RARBG')",
         "enabled": true
       },

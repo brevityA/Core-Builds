@@ -219,10 +219,6 @@
         "enabled": true
       },
       {
-        "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
-        "enabled": false
-      },
-      {
         "expression": "/*AI Upscale Exclusion*/ keyword(negate(merge(library(streams),seadex(streams)),streams),'all','topaz','ai-upscale','aiupscale','upscaled','neural','enhancedai')",
         "enabled": true
       },
@@ -354,10 +350,6 @@
       }
     ],
     "includedStreamExpressions": [
-      {
-        "expression": "/*Part of Tamtaro SEL Setup*/[]",
-        "enabled": true
-      },
       {
         "expression": "/*ISE v1.2.3* [git.tamtaro.de]*/[]",
         "enabled": true
