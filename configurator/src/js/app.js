@@ -101,6 +101,90 @@ function payloadSizeGuard(cfg) {
 function payloadTooLargeHtml(sz) {
   return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Config too large for AIOStreams</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${sz.kb} KB exceeds AIOStreams' 100 KB (102,400-byte) save limit. Trim filters (e.g. fewer optional scrapers), use a Lite template, or export the JSON and trim it manually.</div></div>`;
 }
+// ── Host selection honoring (Patch 14 rebuild, 2026-08-09) ─────────────────────
+// checkHostVersion: probe ONE host — reachable + version floor. Throws named
+// errors the UI maps to user-readable messages (e.g. Omni legacy v2.30.6 < 2.32.0).
+async function checkHostVersion(baseUrl, timeout, hostKeyOrLabel) {
+  const label = HOST_LABEL_MAP[hostKeyOrLabel] || hostKeyOrLabel || baseUrl;
+  const res = await raceHostFetch(baseUrl, '/api/v1/status', { method:'GET' }, timeout).catch(() => null);
+  if (!res || !res.ok) throw new Error(`HOST_UNREACHABLE:${label}`);
+  const payload = await res.clone().json().catch(() => null);
+  const version = payload?.data?.version || payload?.version || '';
+  if (version && !versionAtLeast(version, MIN_AIOSTREAMS_VERSION)) {
+    throw new Error(`HOST_OUTDATED:${label}:${version}`);
+  }
+  return baseUrl;
+}
+
+// read-only health probe for UI (never throws — returns structured detail)
+async function probeHostDetail(url, timeout=4000) {
+  const t0 = performance.now();
+  const res = await raceHostFetch(url, '/api/v1/status', { method:'GET' }, timeout).catch(() => null);
+  const ms = Math.round(performance.now() - t0);
+  if (!res || !res.ok) return { ok:false, ms, reason:'down' };
+  const payload = await res.clone().json().catch(() => null);
+  const version = payload?.data?.version || payload?.version || '';
+  if (version && !versionAtLeast(version, MIN_AIOSTREAMS_VERSION)) return { ok:false, ms, version, reason:'outdated' };
+  return { ok:true, ms, version, degraded: ms > 2500 };
+}
+
+// resolveInstallHost: an explicit dropdown selection is honored exactly (no silent
+// failover to another host — picked Omni, gets Omni, or gets told why not). 'auto'
+// keeps today's fastest-healthy probe.
+async function resolveInstallHost(timeout=4000) {
+  const key = S.instanceHost;
+  const isFree = (S.service==='p2p' || S.service==='http');
+  if (key && key !== 'auto') {
+    if (key === 'custom') {
+      if (!S.instanceUrl) throw new Error('HOST_UNREACHABLE:custom URL (set it in Advanced → Hosts → Custom / Self-hosted)');
+      return checkHostVersion(S.instanceUrl, timeout, 'custom host');
+    }
+    const url = HOST_BASE_URLS[key];
+    if (!url) throw new Error('HOST_UNREACHABLE:'+key);
+    if (isFree && HOST_META[key]?.blocksFree) throw new Error(`HOST_BLOCKS_FREE:${HOST_LABEL_MAP[key]||key}`);
+    return checkHostVersion(url, timeout, key);
+  }
+  return selectHealthyHost(timeout);
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+let _expressProbeSeq = 0;
+async function probeExpressHost() {
+  const chip = document.getElementById('expressHostChip');
+  const sel = document.getElementById('expressHost');
+  if (!chip || !sel) return;
+  const seq = ++_expressProbeSeq;
+  if (sel.value === 'auto') { chip.textContent = 'auto — will pick fastest healthy'; chip.style.color=''; chip.style.borderColor=''; return; }
+  const url = sel.value === 'custom' ? S.instanceUrl : HOST_BASE_URLS[sel.value];
+  if (!url) { chip.textContent = 'custom — set URL in Advanced'; chip.style.color='#fbbf24'; chip.style.borderColor='rgba(251,191,36,.3)'; return; }
+  chip.textContent = '…checking';
+  chip.style.color=''; chip.style.borderColor='';
+  const d = await probeHostDetail(url, 4000);
+  if (seq !== _expressProbeSeq) return;
+  if (d.ok && !d.degraded)      { chip.textContent = `● healthy${d.version?' v'+d.version:''} · ${d.ms}ms`; chip.style.color='#34d399'; chip.style.borderColor='rgba(52,211,153,.35)'; }
+  else if (d.ok)                { chip.textContent = `● slow · ${d.ms}ms`; chip.style.color='#fbbf24'; chip.style.borderColor='rgba(251,191,36,.35)'; }
+  else if (d.reason==='outdated'){ chip.textContent = `● outdated ${d.version?'v'+d.version:''}`; chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; }
+  else { chip.textContent = '● down'; chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; }
+}
+
+function hostErrorHtml(raw) {
+  const m = String(raw||'');
+  if (m.startsWith('HOST_BLOCKS_FREE:')) {
+    const h = escHtml(m.split(':')[1]);
+    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} doesn't allow free/P2P configs</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Pick a host that supports free sources (Advanced → Hosts, or set the host to Auto), or use a debrid service.</div></div>`;
+  }
+  if (m.startsWith('HOST_OUTDATED:')) {
+    const [,h,v] = m.split(':');
+    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${escHtml(h)} is running AIOStreams v${escHtml(v)} (needs ≥ 2.32.0)</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">That host is behind the current floor. Switch to Auto (fastest healthy host), pick an updated host, or ask the host admin to update.</div></div>`;
+  }
+  if (m.startsWith('HOST_UNREACHABLE:')) {
+    const h = escHtml(m.slice('HOST_UNREACHABLE:'.length));
+    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} isn't answering</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Your chosen host didn't respond in time. Switch Host to Auto to let Core Builds pick the fastest healthy host, or try again shortly.</div></div>`;
+  }
+  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`;
+}
+
 async function selectHealthyHost(timeout=4000) {
   const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
   const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree));
@@ -2571,12 +2655,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Quick rebuild: re-run the current template against the latest configurator WITHOUT wiping user settings.
     // Fixes the "Rebuild loop" (banner returned after rebuild): start-fresh cleared state but never stamped
     // coreBuildLastGen, so the outdated banner re-appeared forever. This stamps + keeps S.
+    // Patch 18-B: quick-rebuild is now SELF-HEALING — probe the chosen host; if it's
+    // down/outdated/blocked, rebuild onto the healthiest fallback and say so out loud.
+    // (Install-time paths with explicit picks still fail loudly instead of failing over;
+    // rebuild-time is where automatic healing is welcomed.)
     if (action === 'quick-rebuild') {
       if (!S.service) { showToast('Nothing to rebuild yet — pick your debrid service first', true); return; }
-      saveLastGen();
-      render();
-      showToast(`Rebuilt at v${TEMPLATE_VERSION} with your settings kept. Download/copy and re-import on your host to apply.`);
-      window.scrollTo(0,0);
+      (async () => {
+        const pick = await resolveInstallHost(4000).then(h=>({host:h})).catch(async e=>{
+          const m = String(e?.message||'');
+          if (!m.startsWith('HOST_')) return { host:null, err:m };
+          const healed = await selectHealthyHost(4000).catch(()=>null);
+          if (healed) return { host:healed, healedFrom:m };
+          return { host:null, err:m };
+        });
+        if (!pick.host) { showToast('Your host is unreachable and no healthy fallback answered — try again in a few minutes', true); return; }
+        if (pick.healedFrom) {
+          const hit = Object.entries(HOST_BASE_URLS).find(([,u])=>u===pick.host);
+          const oldName = pick.healedFrom.split(':')[1] || 'Your host';
+          if (hit) S.instanceHost = hit[0]; else S.instanceHost = 'auto';
+          saveLastGen();
+          render();
+          showToast(`${oldName} was down — rebuilt on ${hit ? (HOST_LABEL_MAP[hit[0]]||hit[0]) : pick.host} at v${TEMPLATE_VERSION}. Settings kept; Download/copy to apply.`);
+          window.scrollTo(0,0);
+          return;
+        }
+        saveLastGen();
+        render();
+        showToast(`Rebuilt at v${TEMPLATE_VERSION} with your settings kept. Download/copy and re-import on your host to apply.`);
+        window.scrollTo(0,0);
+      })();
     }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'update-template') { showUpdateTemplateModal(); }
@@ -4688,7 +4796,7 @@ function showTestDriveModal() {
       const tempPwd = makePwd();
 
       // Prefer the last known-good host; fall back to racing the remaining hosts.
-      const fastest = await selectHealthyHost(4000);
+      const fastest = await resolveInstallHost(4000);
 
       // Upload config
       const uploadRes = await writeHostFetch(fastest, '/api/v1/user', {
@@ -4757,7 +4865,11 @@ function showTestDriveModal() {
         </div>
       `;
     } catch(err) {
-      resultsEl.innerHTML = `<div class="td-error">${ICO.warn(13,'#f87171')} ${esc(err.message || 'Something went wrong')}</div>`;
+      if (err.message && err.message.startsWith('HOST_')) {
+        resultsEl.innerHTML = hostErrorHtml(err.message);
+      } else {
+        resultsEl.innerHTML = `<div class="td-error">${ICO.warn(13,'#f87171')} ${esc(err.message || 'Something went wrong')}</div>`;
+      }
     }
   }
 
@@ -6098,6 +6210,15 @@ function showExpressLane() {
     <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
       <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressCreds">${renderCreds()}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px" title="An explicitly picked host is honored exactly — no silent failover to another host.">
+        <label for="expressHost" style="font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#566372;white-space:nowrap">AIOStreams host</label>
+        <span id="expressHostChip" style="flex-shrink:0;font-size:.58rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.12);color:#6b7280;white-space:nowrap">…</span>
+        <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
+          <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
+          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(HOST_LABEL_MAP[k]||k)}${HOST_META[k]&&HOST_META[k].channel==='nightly'?' (nightly)':''}</option>`).join('')}
+          <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
+        </select>
+      </div>
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · Install to</div>
@@ -6127,6 +6248,8 @@ function showExpressLane() {
     <div style="padding:0 22px 18px"><button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
   </div>`;
   document.body.appendChild(overlay);
+  document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); });
+  probeExpressHost();
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose')) { overlay.remove(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
@@ -6190,6 +6313,11 @@ function showExpressLane() {
         extras: { services: state.extras, scrapers: state.scrapers },
         profile: state.profile, device: state.device, resolution: state.resolution,
       };
+      const hostSel = document.getElementById('expressHost');
+      if (hostSel) {
+        S.instanceHost = hostSel.value;   // explicit host choice is honored — resolveInstallHost() never silently fails over
+        saveState();
+      }
       const goBtn = document.getElementById('expressGo');
       if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
       runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; goBtn.textContent = 'Install in ~30 seconds'; } });
@@ -6601,7 +6729,7 @@ async function simpleInstall(target) {
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
   try {
-    const fastest = await selectHealthyHost(4000);
+    const fastest = await resolveInstallHost(4000);
     const res = await writeHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {
@@ -6647,6 +6775,11 @@ async function simpleInstall(target) {
       return;
     }
   } catch(e) {
+    if (e.message && e.message.startsWith('HOST_')) {
+      btn.disabled = false; btn.innerHTML = origHtml;
+      result.innerHTML = hostErrorHtml(e.message);
+      return;
+    }
     const isApiError = e.message && e.message.startsWith('API_ERROR:');
     const apiDetail = isApiError ? e.message.slice(10) : '';
     if (isApiError) {
@@ -7022,8 +7155,15 @@ async function openInAIOStreams() {
     const sz = payloadSizeGuard(cfg);
     if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
     const existingUuid = validateUuid(uuid) ? uuid : null;
-    const fastest = await selectHealthyHost(4000).catch(() => null);
-    if (!fastest) { logError('deploy', 'All hosts unreachable', { service: S.service, host: S.instanceHost }); resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
+    const hostPick = await resolveInstallHost(4000).then(h=>({host:h,err:null})).catch(e=>({host:null,err:e}));
+    const fastest = hostPick.host;
+    if (!fastest) {
+      const msg = hostPick.err?.message || '';
+      logError('deploy', msg || 'All hosts unreachable', { service: S.service, host: S.instanceHost });
+      resetBtn(origHtml);
+      result.innerHTML = hostErrorHtml(msg);
+      return;
+    }
     rememberGoodHost(fastest);
     const attempt = async (id) => {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
@@ -7098,19 +7238,25 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     try {
+      const resolvedBase = await resolveInstallHost(4000);
       const cfg = buildFinal().config;
       const sz = payloadSizeGuard(cfg);
       if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
-      const res = await writeHostFetch(base, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
+      const res = await writeHostFetch(resolvedBase, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
         const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         resetBtn(origHtml);
-        showManifestModal(`${base}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
+        showManifestModal(`${resolvedBase}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');
     } catch(e) {
+      if (e.message && e.message.startsWith('HOST_')) {
+        resetBtn(origHtml);
+        result.innerHTML = hostErrorHtml(e.message);
+        return;
+      }
       logError('deploy', 'Connection failed to host', { host: S.instanceHost, error: e.message });
       resetBtn(origHtml);
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Host timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;

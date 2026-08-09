@@ -1,6 +1,8 @@
 export const CHANGELOG = [
   { v:'2.91', date:'Aug 9 2026', items:[
     'Fixed: "Rebuild loop" — the version banner\'s Rebuild button wiped all settings but never stamped the current version, so the outdated banner returned after every rebuild. Now keeps settings, stamps the version, and toasts the user to download + re-import.',
+    'Fixed: explicit AIOStreams host selection is now honored — picking a specific host (e.g. Omni, ForTheWeak) no longer silently fails over to a different host. Outdated hosts (< v2.32.0) get a clear version-gate error with remediation steps.',
+    'Express Install now shows a visible AIOStreams host dropdown (prefilled from Advanced), so the host choice is explicit from the start.',
   ]},
   { v:'2.90', date:'Aug 6 2026', items:[
     'AIOStreams v2.32 compatibility — the legacy built-in torbox-search preset is removed from all generated configs and all 72 static templates (the TorBox Search API was shut down; saving a config that still includes it fails on v2.32+ hosts). No automatic conversion to the generic Newznab option is performed.',
