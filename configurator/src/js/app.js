@@ -101,6 +101,58 @@ function payloadSizeGuard(cfg) {
 function payloadTooLargeHtml(sz) {
   return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Config too large for AIOStreams</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${sz.kb} KB exceeds AIOStreams' 100 KB (102,400-byte) save limit. Trim filters (e.g. fewer optional scrapers), use a Lite template, or export the JSON and trim it manually.</div></div>`;
 }
+// ── Host selection honoring (Patch 14 rebuild, 2026-08-09) ─────────────────────
+// checkHostVersion: probe ONE host — reachable + version floor. Throws named
+// errors the UI maps to user-readable messages (e.g. Omni legacy v2.30.6 < 2.32.0).
+async function checkHostVersion(baseUrl, timeout, hostKeyOrLabel) {
+  const label = HOST_LABEL_MAP[hostKeyOrLabel] || hostKeyOrLabel || baseUrl;
+  const res = await raceHostFetch(baseUrl, '/api/v1/status', { method:'GET' }, timeout).catch(() => null);
+  if (!res || !res.ok) throw new Error(`HOST_UNREACHABLE:${label}`);
+  const payload = await res.clone().json().catch(() => null);
+  const version = payload?.data?.version || payload?.version || '';
+  if (version && !versionAtLeast(version, MIN_AIOSTREAMS_VERSION)) {
+    throw new Error(`HOST_OUTDATED:${label}:${version}`);
+  }
+  return baseUrl;
+}
+
+// resolveInstallHost: an explicit dropdown selection is honored exactly (no silent
+// failover to another host — picked Omni, gets Omni, or gets told why not). 'auto'
+// keeps today's fastest-healthy probe.
+async function resolveInstallHost(timeout=4000) {
+  const key = S.instanceHost;
+  const isFree = (S.service==='p2p' || S.service==='http');
+  if (key && key !== 'auto') {
+    if (key === 'custom') {
+      if (!S.instanceUrl) throw new Error('HOST_UNREACHABLE:custom URL (set it in Advanced → Hosts → Custom / Self-hosted)');
+      return checkHostVersion(S.instanceUrl, timeout, 'custom host');
+    }
+    const url = HOST_BASE_URLS[key];
+    if (!url) throw new Error('HOST_UNREACHABLE:'+key);
+    if (isFree && HOST_META[key]?.blocksFree) throw new Error(`HOST_BLOCKS_FREE:${HOST_LABEL_MAP[key]||key}`);
+    return checkHostVersion(url, timeout, key);
+  }
+  return selectHealthyHost(timeout);
+}
+
+// name host-selection failures for UI (unreachable / outdated / free-blocked)
+function hostErrorHtml(raw) {
+  const m = String(raw||'');
+  if (m.startsWith('HOST_BLOCKS_FREE:')) {
+    const h = m.split(':')[1];
+    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} doesn't allow free/P2P configs</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Pick a host that supports free sources (Advanced → Hosts, or set the host to Auto), or use a debrid service.</div></div>`;
+  }
+  if (m.startsWith('HOST_OUTDATED:')) {
+    const [,h,v] = m.split(':');
+    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} is running AIOStreams v${v} (needs ≥ 2.32.0)</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">That host is behind the current floor. Switch to Auto (fastest healthy host), pick an updated host, or ask the host admin to update.</div></div>`;
+  }
+  if (m.startsWith('HOST_UNREACHABLE:')) {
+    const h = m.slice('HOST_UNREACHABLE:'.length);
+    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} isn't answering</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Your chosen host didn't respond in time. Switch Host to Auto to let Core Builds pick the fastest healthy host, or try again shortly.</div></div>`;
+  }
+  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`;
+}
+
 async function selectHealthyHost(timeout=4000) {
   const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
   const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree));
@@ -4688,7 +4740,7 @@ function showTestDriveModal() {
       const tempPwd = makePwd();
 
       // Prefer the last known-good host; fall back to racing the remaining hosts.
-      const fastest = await selectHealthyHost(4000);
+      const fastest = await resolveInstallHost(4000);
 
       // Upload config
       const uploadRes = await writeHostFetch(fastest, '/api/v1/user', {
@@ -6098,6 +6150,14 @@ function showExpressLane() {
     <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
       <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressCreds">${renderCreds()}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px" title="An explicitly picked host is honored exactly — no silent failover to another host.">
+        <label for="expressHost" style="font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#566372;white-space:nowrap">AIOStreams host</label>
+        <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
+          <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
+          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${k}"${S.instanceHost===k?' selected':''}>${HOST_LABEL_MAP[k]||k}${HOST_META[k]&&HOST_META[k].channel==='nightly'?' (nightly)':''}</option>`).join('')}
+          <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
+        </select>
+      </div>
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · Install to</div>
@@ -6190,6 +6250,11 @@ function showExpressLane() {
         extras: { services: state.extras, scrapers: state.scrapers },
         profile: state.profile, device: state.device, resolution: state.resolution,
       };
+      const hostSel = document.getElementById('expressHost');
+      if (hostSel) {
+        S.instanceHost = hostSel.value;   // explicit host choice is honored — resolveInstallHost() never silently fails over
+        saveState();
+      }
       const goBtn = document.getElementById('expressGo');
       if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
       runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; goBtn.textContent = 'Install in ~30 seconds'; } });
@@ -6601,7 +6666,7 @@ async function simpleInstall(target) {
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
   try {
-    const fastest = await selectHealthyHost(4000);
+    const fastest = await resolveInstallHost(4000);
     const res = await writeHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {
@@ -6647,6 +6712,11 @@ async function simpleInstall(target) {
       return;
     }
   } catch(e) {
+    if (e.message && e.message.startsWith('HOST_')) {
+      btn.disabled = false; btn.innerHTML = origHtml;
+      result.innerHTML = hostErrorHtml(e.message);
+      return;
+    }
     const isApiError = e.message && e.message.startsWith('API_ERROR:');
     const apiDetail = isApiError ? e.message.slice(10) : '';
     if (isApiError) {
@@ -7022,8 +7092,15 @@ async function openInAIOStreams() {
     const sz = payloadSizeGuard(cfg);
     if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
     const existingUuid = validateUuid(uuid) ? uuid : null;
-    const fastest = await selectHealthyHost(4000).catch(() => null);
-    if (!fastest) { logError('deploy', 'All hosts unreachable', { service: S.service, host: S.instanceHost }); resetBtn(origHtml); result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`; return; }
+    const hostPick = await resolveInstallHost(4000).then(h=>({host:h,err:null})).catch(e=>({host:null,err:e}));
+    const fastest = hostPick.host;
+    if (!fastest) {
+      const msg = hostPick.err?.message || '';
+      logError('deploy', msg || 'All hosts unreachable', { service: S.service, host: S.instanceHost });
+      resetBtn(origHtml);
+      result.innerHTML = hostErrorHtml(msg);
+      return;
+    }
     rememberGoodHost(fastest);
     const attempt = async (id) => {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
