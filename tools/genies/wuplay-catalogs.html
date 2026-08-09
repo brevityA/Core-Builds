@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WuPlay Catalog Genie — ✨ Guided Home Setup (Prototype · family build)</title>
+<style>
+  :root{
+    --bg:#0d1017; --card:#151923; --card2:#111720; --panel:#0e1621;
+    --line:rgba(255,255,255,.06); --line2:rgba(255,255,255,.09);
+    --tx:#e4e7ed; --sub:#8b949e; --dim:#667487; --faint:#4b5563;
+    --ac:#00d4ff; --ac-hi:#67e8f9; --ac-bg:rgba(0,212,255,.08); --ac-br:rgba(0,212,255,.18);
+    --ac-strong:var(--ac); --ac-ink:#04202b;
+    --cta:linear-gradient(135deg,#00abd3,#00d4ff);
+    --serif:Georgia,"Times New Roman",serif;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d1017 var(--bg);background:radial-gradient(ellipse at 15% 15%,rgba(var(--ac-rgb,0,212,255),.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,.05) 0%,transparent 45%);background-attachment:fixed;color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 20px}
+  .wrap{width:100%;max-width:600px;display:flex;flex-direction:column;gap:14px;flex:1}
+  .kicker{font-size:.58rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--ac-hi)}
+  .hdr{display:flex;align-items:center;gap:10px;padding:4px 2px}
+  .hdr .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--ac-bg),transparent);border:1px solid var(--ac-br);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--ac);font-size:15px;overflow:hidden;flex-shrink:0}
+  .hdr .logo img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+  .hdr .t{font-size:.88rem;font-weight:800;letter-spacing:-.01em}
+  .hdr .st{font-size:.62rem;color:var(--sub)}
+  .hdr .spacer{flex:1}
+  .pill{font-size:.6rem;font-weight:800;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.22);padding:4px 10px;border-radius:99px;white-space:nowrap}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative}
+  .exit{position:absolute;top:12px;right:14px;font-size:.62rem;color:var(--faint);cursor:pointer;text-decoration:underline;text-underline-offset:2px;z-index:2}
+  .exit:hover{color:var(--sub)}
+  /* ---- splash ---- */
+  .splash{padding:26px 20px 22px}
+  .splash .kicker{margin-bottom:8px}
+  .splash h1{font-family:var(--serif);font-size:1.9rem;letter-spacing:-.03em;line-height:1.16;margin-bottom:8px;font-weight:400}
+  .splash h1 em{color:var(--ac)}
+  .splash .lede{color:#7e8b9c;font-size:.78rem;line-height:1.55;max-width:440px}
+  .reassure{margin:14px 0 0;font-size:.68rem;color:var(--green);background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;padding:10px 12px;line-height:1.55;text-align:left}
+  .doors{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+  .door{position:relative;display:block;min-height:104px;padding:14px;border-radius:14px;background:linear-gradient(150deg,#121c29,#0d141e);border:1px solid var(--line2);cursor:pointer;transition:.15s;text-align:left;width:100%;color:var(--tx);font-family:inherit;overflow:hidden}
+  .door:hover{border-color:var(--ac-br);transform:translateY(-1px)}
+  .door::after{content:'→';position:absolute;right:13px;bottom:10px;color:#526174;font-size:1rem;transition:.2s}
+  .door:hover::after{color:var(--ac);transform:translateX(3px)}
+  .door .ic{width:33px;height:33px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.05);border:1px solid var(--line2);margin-bottom:16px}
+  .door .ic img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+  .door .tt{font-size:.78rem;font-weight:700}
+  .door .dd{font-size:.6rem;color:#667487;margin-top:3px;line-height:1.4;max-width:150px}
+  .door .tag{position:absolute;top:12px;right:12px;font-size:.52rem;font-weight:900;letter-spacing:.06em;padding:3px 7px;border-radius:99px}
+  .door.genie{grid-column:span 2;background:radial-gradient(circle at 100% 0,rgba(var(--ac-rgb,0,212,255),.16),transparent 48%),linear-gradient(145deg,#123342,#111c29);border-color:var(--ac-br)}
+  .door.genie .tt{font-size:.95rem}
+  .door.genie .dd{color:#7893a4;max-width:320px}
+  .door.genie .tag{color:var(--ac-ink);background:var(--cta);border:0}
+  @media(max-width:520px){.doors{grid-template-columns:1fr}.door.genie{grid-column:auto}}
+  .skip{margin-top:14px;text-align:left;font-size:.62rem;color:var(--faint);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .skip:hover{color:var(--sub)}
+  /* ---- chat ---- */
+  .chat{display:flex;flex-direction:column;gap:10px;min-height:340px}
+  .row{display:flex;gap:9px;align-items:flex-start}
+  .row .av{width:30px;height:30px;border-radius:9px;background:var(--ac-bg);border:1px solid var(--ac-br);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden;color:var(--ac);font-weight:800;font-size:12px}
+  .row .av img{width:100%;height:100%;object-fit:cover}
+  .bub{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:.82rem;line-height:1.55;max-width:92%}
+  .bub b{color:var(--ac)}
+  .qb{font-size:.95rem;font-weight:700;letter-spacing:-.01em}
+  .qb b{color:var(--tx)}
+  .why{font-size:.6rem;color:var(--dim);margin-top:3px}
+  .row.user{flex-direction:row-reverse}
+  .row.user .av{background:rgba(255,255,255,.05);border-color:var(--line2)}
+  .row.user .bub{background:var(--ac-bg);border-color:var(--ac-br)}
+  .typing{display:inline-flex;gap:4px;padding:4px 2px;cursor:pointer}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--sub);animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .cgrid.single{grid-template-columns:1fr}
+  @media(max-width:560px){.cgrid{grid-template-columns:1fr}}
+  .choice{position:relative;border:1px solid var(--line2);background:var(--panel);color:#8693a3;border-radius:12px;padding:10px 11px;cursor:pointer;text-align:left;transition:.15s;min-height:52px;font-family:inherit}
+  .choice:hover{border-color:var(--ac-br);background:#12202c}
+  .choice.sel{border-color:var(--ac-strong);background:var(--ac-bg);color:#dce8ef;box-shadow:inset 3px 0 var(--ac)}
+  .choice b{display:block;font-size:.74rem;font-weight:700;color:#c2cdd9}
+  .choice.sel b{color:#eaf7ff}
+  .choice b img{width:15px;height:15px;border-radius:4px;vertical-align:-2.5px;margin-right:7px}
+  .choice span{display:block;color:#667487;font-size:.58rem;margin-top:2px;line-height:1.35}
+  .choice.sel span{color:#7893a4}
+  .choice .rec{position:absolute;top:8px;right:8px;font-size:.5rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--ac-hi);background:var(--ac-bg);border:1px solid var(--ac-br);border-radius:99px;padding:1px 6px}
+  .choice.info{grid-column:1/-1;border-style:dashed;min-height:0;color:var(--sub)}
+  .choice.info b{color:var(--sub)}
+  .frozen .choice{pointer-events:none;opacity:.38}
+  .frozen .choice.sel{opacity:1}
+  .frozen input{pointer-events:none}
+  .qgl{font-size:.58rem;font-weight:800;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;margin:12px 0 2px}
+  .go-btn{display:block;width:100%;min-height:44px;margin-top:10px;border:0;border-radius:11px;background:var(--cta);color:var(--ac-ink);font-size:.82rem;font-weight:900;cursor:not-allowed;opacity:.35;font-family:inherit;transition:.15s}
+  .go-btn.ready{opacity:1;cursor:pointer;box-shadow:0 8px 28px rgba(var(--ac-rgb,0,212,255),.22)}
+  .namein{flex:1;min-width:0;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:10px 12px;font-size:16px;font-family:inherit;outline:none}
+  .namein:focus{border-color:var(--ac-strong);box-shadow:0 0 0 3px var(--ac-bg)}
+  .namego{border:0;border-radius:10px;padding:0 16px;background:var(--cta);color:var(--ac-ink);font-size:.78rem;font-weight:900;cursor:pointer;font-family:inherit}
+  .multi-hint{font-size:.6rem;color:var(--dim);margin-top:8px;line-height:1.5}
+  /* ---- stepper ---- */
+  .stepper{display:flex;gap:6px;margin-top:12px}
+  .seg{flex:1}
+  .seg i{display:block;height:3px;border-radius:99px;background:rgba(255,255,255,.08);transition:.25s}
+  .seg span{display:block;margin-top:5px;font-size:.5rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);transition:.25s;text-align:center}
+  .seg.on i{background:var(--ac);box-shadow:0 0 8px var(--ac-br)}
+  .seg.on span{color:var(--ac-hi)}
+  /* ---- watch-me ---- */
+  .wm{display:flex;flex-direction:column;gap:10px}
+  .wm h3{font-family:var(--serif);font-size:1.25rem;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;font-weight:400}
+  .wm h3 b{color:var(--ac);font-weight:400}
+  .step{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:11px 13px;opacity:.5;transition:.3s}
+  .step.active{opacity:1;border-color:var(--ac-br);background:var(--ac-bg)}
+  .step.done{opacity:1;border-color:rgba(52,211,153,.25)}
+  .step.warn{opacity:1;border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.05)}
+  .step.warn .spin{border-color:rgba(251,191,36,.4);border-top-color:var(--amber)}
+  .step .st-ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--sub)}
+  .step.done .st-ic{background:rgba(52,211,153,.13);border-color:rgba(52,211,153,.35);color:var(--green)}
+  .step.active .st-ic{background:var(--ac-bg);border-color:var(--ac-br);color:var(--ac)}
+  .step.warn .st-ic{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:var(--amber)}
+  .step .st-t{font-size:.76rem;font-weight:700}
+  .step .st-t .info{font-size:.58rem;color:var(--faint);cursor:help;margin-left:4px}
+  .step .st-d{font-size:.62rem;color:var(--sub);margin-top:1px}
+  .step .spin{margin-left:auto;width:16px;height:16px;border:2px solid var(--ac-br);border-top-color:var(--ac);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  /* ---- key hand-off ---- */
+  .keybox{margin-top:2px;background:var(--ac-bg);border:1px dashed var(--ac-br);border-radius:12px;padding:13px 14px}
+  .keybox .kt{font-size:.8rem;font-weight:800;display:flex;align-items:center;gap:7px}
+  .keybox .kd{font-size:.66rem;color:var(--sub);margin:6px 0 10px;line-height:1.55}
+  .keybox input{width:100%;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:11px 12px;font-size:16px;font-family:inherit;outline:none}
+  .keybox input:focus{border-color:var(--ac-strong);box-shadow:0 0 0 3px var(--ac-bg)}
+  .keywarn{display:none;font-size:.66rem;color:var(--red);margin-top:7px;line-height:1.45}
+  .keywarn.show{display:block}
+  .keybox .kbtns{display:flex;gap:10px;margin-top:10px;align-items:center}
+  .keybox .kgo{flex:1;min-height:44px;background:var(--cta);color:var(--ac-ink);border:0;border-radius:10px;font-size:.8rem;font-weight:900;cursor:pointer;font-family:inherit}
+  .keybox .kskip{font-size:.62rem;color:var(--faint);text-decoration:underline;cursor:pointer;white-space:nowrap}
+  .keybox .kskip:hover{color:var(--sub)}
+  .keybox.accepted{border-color:rgba(52,211,153,.5);border-style:solid;background:rgba(52,211,153,.05)}
+  .keybox.accepted .kt{color:var(--green)}
+  .keybox.accepted .kgo{background:linear-gradient(135deg,#1fae74,#34d399)}
+  .keybox.accepted .keywarn,.keybox.accepted .kskip{display:none}
+  /* ---- success / shared content blocks ---- */
+  .succ{padding:24px 18px}
+  .succ .kicker{display:block;text-align:center}
+  .succ .big{font-size:40px;text-align:center;margin:8px 0 6px}
+  .succ h2{font-family:var(--serif);font-size:1.5rem;letter-spacing:-.03em;text-align:center;margin-bottom:6px;font-weight:400}
+  .succ>p{color:#7e8b9c;font-size:.74rem;line-height:1.55;text-align:center;max-width:420px;margin:0 auto}
+  .summary,.planblk,.appbox,.pcard{text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.72rem;line-height:1.7}
+  .summary{margin:14px 0}.appbox{margin:0 0 12px}.planblk{margin-top:10px}
+  .summary b,.planblk b{color:var(--ac)}
+  .planblk .pt,.appbox .ab-t{font-size:.58rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--ac-hi);margin-bottom:6px}
+  .planblk .pi{display:flex;gap:7px;align-items:baseline}
+  .planblk .pi .n{color:var(--dim);font-size:.66rem;min-width:14px;font-weight:700}
+  .appbox ol{margin-left:18px}
+  .appbox li{margin-bottom:3px}
+  .appbox .manifest{background:#111720;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-family:ui-monospace,monospace;font-size:.62rem;color:#7a8194;margin-top:8px;word-break:break-all}
+  .native{font-size:.56rem;font-weight:800;color:rgba(52,211,153,.9);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:99px;padding:0 6px;white-space:nowrap}
+  .qrr{display:flex;gap:12px;align-items:center;margin-top:10px}
+  .qrr .qd{font-size:.62rem;color:var(--sub);line-height:1.5}
+  .guide{text-align:left;margin:14px 0}
+  .gphase{font-size:.58rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--ac-hi);margin:14px 2px 7px;display:flex;align-items:center;gap:7px}
+  .gphase:first-child{margin-top:0}
+  .gphase .gb{background:var(--ac-bg);border:1px solid var(--ac-br);border-radius:6px;padding:1px 7px;font-size:.6rem}
+  .gstep{display:flex;gap:10px;align-items:flex-start;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:.15s}
+  .gstep:hover{border-color:var(--ac-br)}
+  .gstep .cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--dim);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:.15s}
+  .gstep.tick{opacity:.55}
+  .gstep.tick .cb{background:var(--ac);border-color:var(--ac);color:var(--ac-ink)}
+  .gstep .gt{font-size:.74rem;line-height:1.5}
+  .gstep .gt b{color:var(--ac)}
+  .gstep .gt .tab{color:var(--amber);font-weight:700}
+  .gtally{text-align:center;font-size:.66rem;color:var(--sub);margin:8px 0 0}
+  .btns{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+  .btn{border-radius:11px;padding:13px;font-size:.85rem;font-weight:800;cursor:pointer;border:0;text-align:center;transition:.15s;font-family:inherit}
+  .btn.primary{background:var(--cta);color:var(--ac-ink)}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:#101923;border:1px solid rgba(255,255,255,.11);color:#8492a3}
+  .btn.ghost:hover{border-color:var(--sub)}
+  .btn.undo{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+  .hint{font-size:.62rem;color:var(--faint);margin-top:12px;line-height:1.6;text-align:center}
+  .foot{text-align:center;font-size:.56rem;color:var(--faint);padding:6px 0 2px}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2230;border:1px solid var(--ac-br);color:var(--tx);font-size:.72rem;font-weight:600;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .succ:not(.hidden) .big{animation:pop .5s ease-out}
+  .succ:not(.hidden) .summary{animation:rise .35s .05s ease-out both}
+  .succ:not(.hidden) .appbox,.succ:not(.hidden) .pcard,.succ:not(.hidden) .guide{animation:rise .35s .12s ease-out both}
+  .succ:not(.hidden) .btns{animation:rise .35s .2s ease-out both}
+  @media (prefers-reduced-motion: reduce){
+    .typing span,.spin{animation:none!important}
+    .step,.choice,.door,.btn{transition:none!important}
+    .succ .big,.succ .summary,.succ .appbox,.succ .pcard,.succ .guide,.succ .btns{animation:none!important}
+  }
+
+
+    :root{ --bg:#0b0b10; --card:#131318; --card2:#0e0e13; --panel:#101017;
+      --ac:#e9e7f2; --ac-hi:#cdcbe0; --ac-bg:rgba(233,231,242,.10); --ac-br:rgba(233,231,242,.32); --ac-rgb:233,231,242; --ac-ink:#0b0b10;
+      --cta:linear-gradient(135deg,#e9e7f2,#c9c7d6);
+      --serif:Montserrat,Inter,system-ui,sans-serif; }
+    body{background:radial-gradient(1100px 480px at 50% -10%,rgba(255,255,255,.045),transparent),var(--bg)}
+    :root{ --ac:#e9e7f2; }
+    .swrow{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:16px}
+    .swrow .swlbl{font-size:.6rem;color:var(--faint)}
+    .sw{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:.15s}
+    .sw:hover{transform:scale(1.12)}
+    .sw.sel{border-color:#fff;box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px rgba(255,255,255,.5)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="logo"><img alt="WuPlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAMAAAD6TlWYAAADAFBMVEUAAAAAAAAAAABmZmalpaV2dnYxMTGzs7NgYGCMjIx+fn5aWlpwcHDGxsZ8fHxSUlLU1NS8vLyoqKg9PT1fX1/Jycnd3d2EhIQcHBzOzs43Nze2trZra2uTk5NDQ0MTExPHx8eurq5sbGySkpK0tLQNDQ1bW1uAgIBTU1MqKiqLi4tRUVF0dHSpqanExMTk5ORdXV3V1dXg4OC1tbXz8/NpaWmioqJ/f3/Nzc1zc3MGBgbMzMwXFxeenp6RkZFxcXEuLi5BQUFOTk5FRUWdnZ0ZGRne3t6fn59ISEiysrIbGxuUlJRvb28fHx8/Pz/h4eGVlZWWlpZHR0esrKxVVVWjo6MHBwegoKBhYWG+vr5kZGRMTEy6urqbm5sUFBTZ2dnCwsJ5eXkWFhbb29t4eHhNTU1tbW2CgoJ3d3dcXFyIiIgrKyvw8PCGhoaBgYFXV1fr6+smJiZiYmJjY2NlZWUJCQm7u7tYWFiHh4f8/Pw8PDzY2NiPj4/t7e0oKCh7e3teXl4QEBChoaEzMzP4+PiOjo47Ozutra1QUFDR0dEMDAxGRkavr69AQEBUVFSYmJg0NDT5+fnS0tKZmZkgICDl5eXo6OgjIyMPDw8nJyfs7OwtLS3y8vL19fUwMDDq6uolJSUEBASJiYn29vZubm4KCgrPz8+np6d6enpLS0v09PQvLy/j4+MeHh7a2toVFRX6+vo1NTU4ODj9/f2cnJxqamrLy8s6Ojr///+ampr+/v45OTk2Njb7+/sICAgFBQXKyspJSUmqqqpCQkLX19cSEhLQ0NALCwsYGBgdHR3i4uKwsLBPT099fX1oaGiXl5empqYaGhrf39/BwcHAwMCNjY3x8fEsLCwpKSnu7u7IyMgDAwO/v79ZWVm5ubnDw8MBAQG9vb1KSkqrq6uxsbEhISHm5uaFhYW3t7dWVlYODg7T09PW1tYRERGkpKR1dXUCAgJEREQkJCTp6env7+/39/cyMjJnZ2eDg4Pn5+ciIiKKiorc3Ny4uLjFxcUAAACzh0DRAAAAA3RSTlP58OIa2+5oAAAOyUlEQVR42u3diV9VRRsHcLTt7X3bNVNbaJFcMk3RTDPFjFLfSEVDLKUUXBHUFHdUEk1wVzbFhaugiAuuNRGLWwKiKKKCXKSLICGKXBW0BXteP/KWipfLPefMmTMzd35/wJnH7+fiOWfOPDM2deuIKEhdGxsQURAbmzoCQUnqUA5oMOoNAlBKSv8Ij7968WbZrz9eKSi8lZ97KjM3L+3E8WM3j/6UlSIAa07yz0EH0/88sO/k9bMxCchU1pzd+v2evTtjEwVgtWzbsjl608atG5BFWZezfn+2QQBWRRdx7nTukTVIYsozj90QgLFrIwsrVyGZWX3pt6xE6wUMi08/sBUpzS83Q60SsPT8iuXLEJYULdlibYBBi9OCdyN8WV28SG89gBnnFsYg7Lm1wDoAA+d/dxKpk+J53AMmrZ37O1Iv/t9e4BrQb3Y+Ujnls/gFnDljOiKQnKtcAhqnFcQgMpk6JYo7QP3kSYhgcnbyBegzMQCRTUwkR4B+E7Yj8jkRxgmg/psApEkOj+cBUD/2EtIq6/azD7ggH2mYqTcZB1xbgDSON8uAJV5jkOYZzS7gqOmIhhxnFNAzDVGS4ywCRo0sR9TkNHuAu3IQTRnBGKDBaweiK8OZApzzF6IuwxgC9PCnzw+NyWYFMKIQURn3FDYAF19HlKaQBUD9b4jeDKEfMOJrRHMW0Q54sIhqP/RVEt2AkcsQ5VlCM6BuMKI/w+gFdBvEgB8K8aEVcMshxERmUAr45Rg2/FBcFpWAXyBmMpBGwJGIocynD/BXlvzQdOoAVyC24koZ4ADG/NBlF6oAP0fMpT9FgLp+7PmhQzpqAA0FiMU4UwN4hUk/lEsL4Ods+qGK8XQA9lX9X6rW/FgfKgBHq6zXe8ZnTjeiVVlbGDKUAkAPtb8Bxd4ZxviprwoX36w94Gy1/f5pRI/4bxz2qxdoDnhQZb8zGfcM9gP2/oiYMI0BV6q99Kra14tRuOdrh2kL2Ku32vffi9W/GHicwXr9npoC6jJVf4Dp8cCg1z7Bef2PjVoCfqTN57PuuRifpedpCDicwMvCh6YGTppwBNsAI7QD7Ia0Arz9X+FoXHevUzqtAIPGaQgI4IBpAuN6qlaAuUhTQIDN+7B831yqEaAX0hoQjF0/xjDCRG0AjyLtAQEcuygf4QNNADuHUAEIEN9T6Qjvd9IA0HgLUQII0F/hf4W9kzUA7IjoAQSXIYoeaTY4kQd0QDQBAmz7sULBEN2JAxreowwQYJ6Cia504oBTEHWAAK6yW2pHkwbchWgEhJIOMp8M3iUNGEAnIMAf8j6vTiIM6IFoBQRwljNBeYksYOpqigFB176d5CHco0gCGuwRzYAASyWv0m47lCTgZEQ5ICyWOsTWDIKAiVupB4Q2EocITiUIOAXRDzhC4hBFTuQAs6cyAPgOxYDk16HKAJTarBK8jRhgN+J+cro5pH43bt2LGGAOC4ClUpcu9E4hBXgUsQAoudu2soQQYNJ0FgDXSx7ispEQ4GxEP+C8POlDtCL0LpzoTj3gSlmrtd8mBDgBUQ7YqeM6WUN0IQOY1JpywPnLZQ7RkgygK6Ia8Ib8XR7fIgKob0MzYEYL+XvzT21OBLAZohcwMF3JOomQMBKAulb0AnZXtjShjQ8JwF2IVsDwEwpHWGggAVhIKeDQpmuUjuABBACdEJ2Ab2J4uD9IArCLZoDmnjG64dhk70woAcDA1hQCRgzGcpZfgB0BwFGIOkC7MkzL9NXYCa86oEsOdYDN3AndpbAAeiLKAOc0wXb9olICgHM1BDTxUSnoDYx9w61AfUDdKg0Bv6xeXNTrWI+TjCQAOExDP/RptdoWvI/18nFOBAA1PQ7k/m3+sl/DfPlX9eoD2gZrCYheuVuJm9dZ3FdPB/UBx2rqh478PV2nc8XfHr8hVH1AXRNtAdG6L+78mXV/VYVrq9LwXw3QUftdtd0HzHr5/QQ1rtyDAOB8xG8qgQCgPceAkQQAk8fx63emhACgcwK/gKod8XUv4B5+/UJiCQD6fcUv4FwgADhnB7d+7WxJAE7k9wfoAQQAja9x6/d7CQnAn0O4BTwHJAA9ufXLBCKAL3ELmEUG8EVe/Y4BEcCktpz65QAZwNByPv0S1hICPMfpD7AlEALswqefPRACTPqFS78iN1KA24J59KtoDKQAszbwCDgRiAHu59FvNJADHMKhXz8gCPg2f36ngCBgVAB3fm38SAKWtubNr5EbkARMreDM77AjEAXsxplfQEMgC9ieL79BfkAY8E+u/A7ogDTgAZ78pgAQB/yeH7644UAe0K83N369z4MGgKHXefFL6wVaAIZzMp/v3wFAE8D4GC78Ds8DjQC7T+Xh7tEiCrQCvMjD5EtjAM0AbzLPd2gCgIaAZYzzlb/gBpoCvsA037q+2wC0BVzBMJ/vGxcAtAY8wSxfg+iVANoDFrCpd31SMz8AGgALWeTb1/QaaJ8qwGLW8No9H70zCoAawHymnlnc+83u5QKU5A6gIZcRO9/K/NNjHeyAotwBNJ6i02uH/5ryVeNCgttuX75v0ADv+o1DU4xAWe4A6jOpcou7fnLjwhll7zjHe4Y2TEmJLbXzcUkyAJ2h7U943HvvDn9l/FBgJlU3kYFU4MVc7nI1yA7YShVgnvZ6wXmvz0wC9lIF2FPr317auSBgM1WA/TTlaxAdCsxG88mE3QMnJwGwDqhds/+VesB2qgCnaKNX8ZwDABeAIzXxK/4BgBNALVa3bRwGwA3gZOJ8vtF2wBGg827Cfs/OBOAJcNcaonxnvgDgC3DLGJJ+A7OBN8CIdQT9vAG4A7Qld5TwuIvAISAcJuUXEA5cApLatahnGPAJOIOM33EDcAoYScTvGACvgD1I+I0EfgEvENgAORI4Biz9XXW/9sAzYOAzavu1BK4BDQvF64ciQBihrt8S4B1Q3V3gi/XcA25R8zb8TCBwDxik4m24vDnwD9jpefUAm4EVAMJg1fxOg1UATlDL7z2wDsDmq1VaN+RpJYAuKnX97wUrAQR1Vqnmg9UAqrK8IyHbegBvqAH4G1gPoNtZ/H7BflYEqFeh3+stsCJAGI7dLwesCnAX9q07frIuwKG4jyOwB+sChE14/ZbdsDbAp/GuEuwJ1gYYhvdBpp7VAcLXWJcRqVOw7Zt90uZ+mEgn4Gz6p1HrX75z8X31qATchtFvlRpnucX/8zcSU49GwE4YO9e98Nc686N7rl8ZSCEgfIPNrx32aZjEp+4//tiVRsAMbGuln8Rcp+HpQ9VGOEEjIAzCBViGt8w5D55enq+nEXAUrjbCVJxFZqww0ceSZ6QRMPkMfZ/iwp4wefb7LSoBYQAewK74KuzRyPQQlALuxOLnj21PuvAmNY1BKWDyZSyriTBtDDa0Rc1NfJQCwl4cgAPwFJdeaWYMWgFjcTwK/gdHaQsamR2DVkD4HMN6NgyvIdc2xSE2AR2UA25X3I3u51Xr7v7UAoLyY0qVrufQ129Q+yD0Ap5XDLheWU3TnrVo3TW1gC6KD+l7WklF469YNsiL1AIqntSqUNATHDhrHGIe0E7hUsHV8mcSxi63eBSKAcFDGWBbH5nF7JQym0YzYGA7RYADZb639ZF0rg7NgNBSEeAHsirpWiRtFKoB7RSduD5CRh3Gb6WOQjUgdFQC+JKMOrwRX4BhSjq/Jksvw3EZZ4CKTlnaL70MGZNolAMaFEys7pRexhLuAOEt+YBZ0ss4zh+grpVcv6kyulsn8gcIu2SvTJWxuWJn6We82xsoB5T9hdNfzu6U/+YQUG7nTYKsBvUl/AHC6+RuIrdT/yR3gD4b5QHGy5xMeKGCM0CYI2/Z/ma5xaz8jjNAeJnUq9zf+XAjX4BJlXIAhyuoJym9iCdAeV/olDUJN3zDnyNA+IDYhOrd/FTMEaBda2JT+vdk/nZuAKEbwY9Kd2Mb7csLIDwuvcUBx4HT1/bwAthJ8kKFCjzn1Ewz37pHSTdy7YAQvkGq4GI8tbn8y1wLeBNmAKXPt4/GVV2pmbc7hgAlt7I/i6++tZt4AJT63+B2nJ2aPXLYB4RwaV8dx+A98Kd9MPOAUk+tGoW3SKfTJqaFXmQKEFpIAvwEd5lzHntgjEEGpgCNkk7QXZ6MvdCL1Se6vmXrFwilUjaL37ESf6VhHX3VeNgkBgjZUo5Oe0KNWlOXJNwd4ZILa4DQTcLeWofVqXbRrb8H8H0UmAMEVwnfhlNVqvf/HSTfZwGDgPCU5YKPqFWw3ZsfPfbyZhdgEhD6Wgy4D6wk0gDhYUsB13gKQFPR21sqOEUAmoyPpZsblYcJQNMzM5kkm645BATbRpYBNhKANb3UPWkR4O6DArCmRzHLWrJvCcCa4mfRb3DZUgFYU6IKLVoGLgBrzruWCM4TgMre6v4SgGbyqwWC/QWgmVjQTvdxogA0k82190F0EIDm0rzWFc27swWgucQWW/19RBkg6FfUJthVAJrPQztq+SMOF4DmM62WVojnBWAtGVpgXrCPAKwtT+xQq3PJSgBhkdl1H+WeArC2lJi9G08PE4C15twRM4J5AtCCh+oTKnZ/WQMgQLMitRoQrQQQOv8YR36xDE+AAOdrnl5oLwAtiV3TcusSxA0I4HSgpoWYQwSgZXGuoTUGeQtAy5I4sYaG6b4C0MIEdjDd6b6wVABamIbrTd5NLmUJQEtzzWuVCcGzkwWgxUk5beoF+fFEAWhxej1l4nbypIMAlDDHUD/ggfe78q4CUEL054sf2MPkMQcBKCWe3tOrtzJ5lAhAKXEblldtIchXRw0CUNpLcvRf928rZl9PAEpMvPf9+3s/t1QASkzpo96XxtyzS1RhY50AlJrmZcX3HHs2qb+tAJScjP0zDv/zH+LlEdkCUHrsgvrveaaoaj+T8q/rXzAIQBlx3N+0SYPVVduYfOqgE4CyELOulj28MeT2w/X2fI/PUn0EoJxE/XzBeVbaVveAgMzB7c8vjejs52IUgDLemx3XLt770EOPPLLX9ctpoW7JSUaDAJSTxFjHDMfSZBedUfwCOU8dGxuBoCQ2NnXriChI3f8BU1s4r/KBgwEAAAAASUVORK5CYII="></div>
+    <div><div class="t">WuPlay · Catalog Genie</div><div class="st">Home & hub setup · prototype</div></div>
+    <div class="spacer"></div>
+    <div class="pill">● Read-only — you do the tapping</div>
+  </div>
+
+  <div class="card splash" id="splash">
+    <div class="kicker">catalog &amp; hub designer</div>
+    <h1>WuPlay already has the parts.<br>I'll help you <em>arrange</em> them.</h1>
+    <p class="lede">Since WuPlay v0.5, catalogs are built in — trending, genres, studios, collections, Trakt, MDBList. What's missing is a <b style="color:var(--tx)">thought-out home</b>: which rows, which hubs, in what order. I'll design yours from a few quick questions, then hand you a tap-by-tap guide.</p>
+    <div class="reassure">🛡️ <b>Pure setup assistant.</b> I never touch your WuPlay profile — you stay in the configurator the whole time, and every change is removable in one tap.</div>
+    <div class="doors">
+      <button class="door genie" id="doorGenie">
+        <span class="tag">Start here</span>
+        <div class="ic">🧞</div>
+        <div class="tt">✨ Guided Setup — design my home</div>
+        <div class="dd">A few quick questions → a home-screen plan → your tap-by-tap guide</div>
+      </button>
+      <button class="door" onclick="quickPlan()"><div class="ic">📋</div><div class="tt">Just the checklist</div><div class="dd">Sensible defaults — movies + series, native presets, no fuss</div></button>
+      <button class="door" onclick="proto('This would open your WuPlay web configurator (config.wuplay.app).')"><div class="ic">⚙️</div><div class="tt">Open the configurator</div><div class="dd">You already know what you're doing — straight to it</div></button>
+    </div>
+    <div class="swrow" id="swatches">
+      <span class="swlbl">Match your WuPlay theme color:</span>
+      <button class="sw sel" data-a="white"  style="background:#e9e7f2" title="White (default)" aria-label="White accent"></button>
+      <button class="sw" data-a="violet" style="background:#a78bfa" title="Violet" aria-label="Violet accent"></button>
+      <button class="sw" data-a="cyan"   style="background:#22d3ee" title="Cyan" aria-label="Cyan accent"></button>
+      <button class="sw" data-a="rose"   style="background:#f472b6" title="Rose" aria-label="Rose accent"></button>
+      <button class="sw" data-a="amber"  style="background:#fbbf24" title="Amber" aria-label="Amber accent"></button>
+    </div>
+    <div class="skip" onclick="proto('This drops you into the normal configurator tabs — genie skipped.')">Skip — I'll arrange my own catalogs →</div>
+</div>
+  <div class="card hidden" id="chatCard">
+    <span class="exit" role="button" aria-label="Exit" onclick="proto('Exit — in the real version this keeps your answers for later.')">✕ exit — your answers are kept</span>
+    <div class="chat" id="chat" role="log" aria-live="polite"></div>
+    <div class="stepper" id="stepper"></div>
+  </div>
+  <div class="card hidden" id="wmCard"><span class="exit" role="button" aria-label="Exit" onclick="proto('Exit — in the real version your answers are kept.')">✕ exit</span>
+    <div class="wm">
+      <div class="kicker">building</div>
+      <h3>“<b>your <span id="wmName">WuPlay home</span>…</b>”</h3>
+      <p style="font-size:.68rem;color:var(--sub);margin:-2px 0 4px">Everything I'm doing, as I do it — nothing needed from you until the key step:</p>
+      <div class="kicker" id="wmStepLine" style="margin-bottom:6px">Step 1 of 4</div>
+      <div class="step" id="wm1"><div class="st-ic">1</div><div><div class="st-t">Reading your add-ons <span class="info" title="Read-only peek at what's installed — nothing is changed.">ⓘ</span></div><div class="st-d" id="wm1d">Finding which catalogs your profile and add-ons offer</div></div><div class="spin"></div></div><div class="step" id="wm2"><div class="st-ic">2</div><div><div class="st-t">Ordering your Home &amp; Discover rows</div><div class="st-d" id="wm2d">Native presets first — best one remote-press away</div></div></div><div class="step" id="wm3"><div class="st-ic">3</div><div><div class="st-t">Designing your hubs</div><div class="st-d" id="wm3d">Built-in families first: services, genres, studios, collections</div></div></div><div class="step" id="wm4"><div class="st-ic">4</div><div><div class="st-t">Writing your tap-by-tap guide</div><div class="st-d" id="wm4d">Matched to the real configurator screens (v0.8.x)</div></div></div>
+      
+    </div>
+    <div class="hint">⚠️ <b>Prototype</b> — the real version reads your profile (read-only) to pre-fill the guide. It never writes: you apply the guide yourself.</div></div>
+  <div class="card succ hidden" id="succCard">
+    <span class="exit" role="button" aria-label="Exit" onclick="proto('This would open the configurator.')">✕ open configurator</span>
+    <span class="kicker">done</span>
+    <div class="big">✨</div>
+    <h2>Your home-screen plan is ready</h2>
+    <p id="succSub"></p>
+    <div class="guide" id="guide"></div>
+    <div class="gtally" id="gtally"></div>
+    <div class="btns">
+      <button class="btn primary" onclick="proto('This would open config.wuplay.app in a new tab, guide pinned beside it.')">🚀 Open WuPlay configurator</button>
+      <button class="btn ghost" onclick="copyGuide()">📋 Copy guide as checklist</button>
+      <button class="btn ghost" onclick="downloadGuide()">⬇️ Download guide (.md)</button>
+      <button class="btn ghost" onclick="exportPlanJson()">⤓ Export plan (.json) — sync-shaped, import-ready</button>
+      <button class="btn ghost" onclick="copyShareLink()">🔗 Copy share link</button>
+      <button class="btn ghost" onclick="restart()">↩️ Start over — different answers</button>
+    </div>
+    <div class="hint">Tip: in the <b style="color:var(--sub)">Catalogs</b> tab (called <b style="color:var(--sub)">Layout</b> on newer versions), <b style="color:var(--sub)">Reorder</b> lets you drag Home rows into my recommended order any time. Hub cards can be edited later — no delete-and-redo needed.<br><br>🚧 <b style="color:var(--sub)">Heads-up:</b> WuPlay has announced hub/screen <b style="color:var(--sub)">sharing</b> is coming. The <b style="color:var(--sub)">⤓ Export plan (.json)</b> button above mirrors their internal sync shape (catalogs, hubs, screens, row order) — so this design should become a one-tap import when that lands.</div>
+</div>
+  <div class="foot">WuPlay Catalog Genie · family build 2026-08-09 · shared kit v1.1 · APK-verified rows (v0.8.1) · share-ready .json export</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+  'use strict';
+  const chat = document.getElementById('chat');
+  const stepperEl = document.getElementById('stepper');
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const APP_PRE = (new URLSearchParams(location.search).get('app') || '').toLowerCase();
+
+  // ---- failure containment: a glitch must never strand the user ----
+  let __failed = false;
+  function flowFail(err){
+    if (__failed) return; __failed = true;
+    console.error('[genie]', err);
+    const box = document.createElement('div');
+    box.className = 'keybox';
+    box.style.borderColor = 'rgba(248,113,113,.45)';
+    box.innerHTML = `<div class="kt">😵 Something glitched on my end.</div><div class="kd">Nothing was changed — your settings and backups are untouched. Restart the guided setup, or head to ${TOOL.failSafeTarget} directly.</div><div class="kbtns"><button class="kgo" data-r="1">⟲ Restart guided setup</button><span class="kskip" data-b="1">${TOOL.failSafeLabel} →</span></div>`;
+    box.querySelector('[data-r]').onclick = ()=>location.reload();
+    box.querySelector('[data-b]').onclick = ()=>TOOL.failSafeGo();
+    const chatCard = document.getElementById('chatCard'), wmCard = document.getElementById('wmCard');
+    if (!chatCard.classList.contains('hidden')) { chat.appendChild(box); chat.scrollTop = chat.scrollHeight; }
+    else if (!wmCard.classList.contains('hidden')) wmCard.querySelector('.wm').appendChild(box);
+    else document.querySelector('.wrap').appendChild(box);
+  }
+  window.addEventListener('error', e => flowFail(e.error || e.message));
+  window.addEventListener('unhandledrejection', e => flowFail(e.reason));
+  function proto(msg){ alert('(prototype) ' + msg); }
+  function toast(msg){ const t=document.getElementById('toast'); if(!t){ proto(msg); return; } t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
+
+  // ---- dom + text helpers ----
+  function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+  function escH(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function AV(){ return TOOL.avatarHtml; }
+  function typeIn(){ return new Promise(r=>{ const t=el(`<div class="row"><div class="av">${AV()}</div><div class="bub"><span class="typing" title="tap to skip"><span></span><span></span><span></span></span></div></div>`); let done=false; const fin=()=>{ if(done) return; done=true; t.remove(); r(); }; t.onclick=fin; chat.appendChild(t); chat.scrollTop=chat.scrollHeight; setTimeout(fin, REDUCED?60:(330+Math.random()*340)); }); }
+  function say(html){ return new Promise(r=>{ const b=el(`<div class="row"><div class="av">${AV()}</div><div class="bub">${html}</div></div>`); chat.appendChild(b); chat.scrollTop=chat.scrollHeight; setTimeout(r, REDUCED?80:350); }); }
+  function echoUser(text){ const b=el(`<div class="row user"><div class="av">🙂</div><div class="bub">${escH(text)}</div></div>`); chat.appendChild(b); chat.scrollTop=chat.scrollHeight; }
+  function freeze(row){ row.classList.add('frozen'); }
+  function choiceBtn([label,desc,tag,icon],i){
+    const ic = icon ? `<img alt="" style="width:15px;height:15px;border-radius:4px;vertical-align:-2.5px;margin-right:7px" src="${icon}">` : '';
+    return `<button class="choice" data-i="${i}">${tag?`<span class="rec">${tag}</span>`:''}<b>${ic}${label}</b><span>${desc}</span></button>`;
+  }
+
+  // ---- widgets: single-choice cards (+optional info/help chips), multi-select cards, two-group, free-text ----
+  function askCards(html, items, opts){ opts = opts||{}; return new Promise(r=>{
+    let done = false;
+    const c=el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}<div class="cgrid${opts.single?' single':''}">${items.map(choiceBtn).join('')}${opts.info?`<button class="choice info" data-info="1"><b>${opts.info[0]}</b><span>${opts.info[1]||''}</span></button>`:''}${opts.help?`<button class="choice info" data-help="1"><b>${opts.help[0]}</b><span>${opts.help[1]||''}</span></button>`:''}</div></div></div>`);
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+    const finish=(v,btn)=>{ if(done) return; done=true; if(btn){ c.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel')); btn.classList.add('sel'); } setTimeout(()=>{ freeze(c); r(v); }, REDUCED?60:220); };
+    c.querySelectorAll('.choice[data-i]').forEach(b=>b.onclick=()=>finish(+b.dataset.i, b));
+    if (opts.info) c.querySelector('[data-info]').onclick=()=>{ if(done) return; done=true; freeze(c); r('INFO'); };
+    if (opts.help) c.querySelector('[data-help]').onclick=()=>{ if(done) return; done=true; freeze(c); r('HELP'); };
+  }); }
+  function askMulti(html, items, prechecked){ return new Promise(r=>{
+    let done = false;
+    const picked = new Set(prechecked||[]);
+    const c=el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}<div class="cgrid" data-multi>${items.map((it,i)=>choiceBtn(it!==null&&typeof it==='object'?it:[it,''],i).replace('class="choice"', `class="choice${picked.has(i)?' sel':''}"`)).join('')}</div><button class="go-btn ready" data-go="1">These →</button><div class="multi-hint">Pick all that apply — tap <b style="color:var(--green)">These →</b> when you're happy.</div></div></div>`);
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+    c.querySelectorAll('.choice[data-i]').forEach(b=>b.onclick=()=>{ if(done) return; const i=+b.dataset.i; if(picked.has(i)){picked.delete(i);b.classList.remove('sel');} else {picked.add(i);b.classList.add('sel');} });
+    c.querySelector('[data-go]').onclick=()=>{ if(done) return; done=true; freeze(c); r([...picked].sort((a,b)=>a-b)); };
+  }); }
+  function askTwo(html, labelA, groupA, labelB, groupB, preB){ return new Promise(r=>{
+    let done = false;
+    const sel = [null, (preB!=null ? preB : null)];
+    const c = el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}
+      <div class="qgl">${labelA}</div><div class="cgrid" data-g="0">${groupA.map(choiceBtn).join('')}</div>
+      <div class="qgl">${labelB}${preB!=null?' <span style="color:var(--ac);text-transform:none;letter-spacing:0">(pre-filled from your link)</span>':''}</div><div class="cgrid" data-g="1">${groupB.map(choiceBtn).join('')}</div>
+      <button class="go-btn" data-go="1">Continue →</button></div></div>`);
+    const arm = ()=>{ if (sel[0]!==null && sel[1]!==null) c.querySelector('[data-go]').classList.add('ready'); };
+    c.querySelectorAll('.cgrid').forEach(g=>{
+      const gi = +g.dataset.g;
+      g.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+        if (done) return;
+        g.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+        sel[gi] = +b.dataset.i; arm();
+      });
+      if (gi===1 && preB!=null){ g.querySelectorAll('.choice')[preB].classList.add('sel'); }
+    });
+    arm();
+    c.querySelector('[data-go]').onclick=()=>{ if (done || sel[0]===null || sel[1]===null) return; done=true; freeze(c); r(sel); };
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+  }); }
+  function askName(html, defValue){ return new Promise(r=>{
+    let done = false;
+    const c = el(`<div class="row"><div class="av">${AV()}</div><div class="bub" style="flex:1">${html}
+      <div style="margin-top:10px;display:flex;gap:8px"><input class="namein" type="text" maxlength="24" value="${escH(defValue)}"><button class="namego" data-go="1">Save</button></div>
+      <div class="multi-hint">This is the name you'll see in your app's addon list — make it yours.</div></div></div>`);
+    const inp = c.querySelector('.namein'), go = c.querySelector('[data-go]');
+    const finish = ()=>{ if (done) return; done=true; const v = inp.value.trim() || defValue; inp.disabled = true; go.style.display='none'; freeze(c); r(v); };
+    go.onclick = finish;
+    inp.addEventListener('keydown', e=>{ if (e.key === 'Enter') finish(); });
+    chat.appendChild(c); chat.scrollTop=chat.scrollHeight;
+    setTimeout(()=>{ try{ inp.focus(); inp.select(); }catch(e){} }, 150);
+  }); }
+  // unified restart: confirm, then CLEAR any shared-plan hash so we actually land on a fresh start
+  function g_restart(msg){
+    if (confirm(msg || 'Start over with a fresh setup?\n\n(Safe — nothing was changed on any account.)')){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){ location.hash=''; } location.reload(); }
+  }
+  // "what actually changed?" — labeled fingerprint diff for edit loops
+  function fpDiff(before, after, labelMap){
+    const diffs = [];
+    for (const k of Object.keys(after)){
+      const b = JSON.stringify(before[k]), a = JSON.stringify(after[k]);
+      if (b !== a) diffs.push((labelMap||{})[k] || k);
+    }
+    return diffs.length ? 'Changed: ' + diffs.join(', ') : null;
+  }
+  // rough "N steps ≈ M minutes" for guide-shaped results
+  function estMinutes(steps){ return Math.max(4, Math.round(steps*0.35)); }
+
+  function setStep(n){ stepperEl.innerHTML = TOOL.steps.map((l,i)=>`<div class="seg${i<n?' on':''}"><i></i><span>${l}</span></div>`).join(''); }
+
+  // ---- generic watch-me sequencer (shared) ----
+  function wmRun(stepIds, opt){
+    document.getElementById('wmCard').classList.remove('hidden');
+    let i = 0;
+    function next(){
+      if(i>0){ const prev=document.getElementById(stepIds[i-1]); prev.classList.remove('active'); prev.classList.remove('warn'); prev.classList.add('done'); prev.querySelector('.spin')?.remove(); const ic=prev.querySelector('.st-ic'); if(ic) ic.textContent='✓'; }
+      if(i>=stepIds.length){ document.getElementById('wmCard').classList.add('hidden'); opt.onDone && opt.onDone(); return; }
+      const s=document.getElementById(stepIds[i]); s.classList.add('active');
+      opt.onStep && opt.onStep(i);
+      if (opt.pauseIf && opt.pauseIf(i)){
+        opt.onPause && opt.onPause();
+        (function wait(){ if (opt.resumeWhen && opt.resumeWhen()){ opt.onResume && opt.onResume(); setTimeout(next, opt.resumeDelay||600); return; } setTimeout(wait, 200); })();
+        i = i + 1;   // resume lands on the step AFTER the pause
+        return;
+      }
+      setTimeout(next, opt.stepDurs[i]);
+      i++;
+    }
+    next();
+  }
+
+  // ---- shareable plan (config-as-URL) ----
+  function b64urlEncode(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  function b64urlDecode(s){ try{ return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))))); }catch(e){ return null; } }
+  function copyShareLink(){
+    const url = location.href.split('#')[0] + '#p=' + b64urlEncode(JSON.stringify(TOOL.sharePayload()));
+    const done = ()=>toast('Share link copied — the plan travels inside the URL');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(done); else done();
+  }
+  function writeShareHash(){ try{ history.replaceState(null,'','#p='+b64urlEncode(JSON.stringify(TOOL.sharePayload()))); }catch(e){} }
+  function detectSharedPlan(){
+    const h = location.hash || '';
+    if (!h.startsWith('#p=')) return;
+    const pre = b64urlDecode(h.slice(3));
+    if (!pre || pre.g !== TOOL.brand || !TOOL.validShared(pre)) return;
+    const doors = document.querySelector('#splash .doors');
+    if (!doors) return;
+    const door = el(`<button class="door" id="doorShared"><div class="ic">📂</div><div><div class="tt">Open the shared plan</div><div class="dd">${TOOL.sharedDesc(pre)} · shared with you</div></div><span class="tag" style="color:var(--ac);background:var(--ac-bg);border:1px solid var(--ac-br)">SHARED</span></button>`);
+    doors.prepend(door);
+    door.onclick = ()=>TOOL.openShared(pre);
+  }
+  document.addEventListener('DOMContentLoaded', detectSharedPlan);
+
+  // ════ WuPlay catalog genie — domain logic ════
+  const TOOL = {
+    brand:'wp',
+    avatarHtml:'<img alt="" src="data:image/png;base64,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">',
+    steps:['Content','Sources','Look','Extras','Plan'],
+    failSafeTarget:'the WuPlay configurator', failSafeLabel:'Open the configurator',
+    failSafeGo:()=>proto('This would open config.wuplay.app.'),
+    sharePayload:()=>({g:'wp',content:state.content,sources:state.sources,style:state.style,extras:state.extras}),
+    validShared:p=>!!p.content,
+    sharedDesc:p=>escH(p.content)+' home design · '+((p.sources||[]).length)+' sources',
+    openShared:pre=>{
+      Object.assign(state, pre);
+      PLAN = buildPlan();
+      document.getElementById('splash').classList.add('hidden');
+      showSuccess();
+      const note = document.createElement('div');
+      note.className = 'planblk';
+      note.style.cssText = 'margin:0 0 6px';
+      note.innerHTML = '<b>📂 Shared plan.</b> Nothing was applied — this is a design someone shared. Follow the steps in your own configurator to use it.';
+      document.getElementById('guide').prepend(note);
+    }
+  };
+  const state = { content:null, sources:[], style:null, extras:[] };
+  let PLAN = null;
+  // research finding T4: WuPlay betas move tabs fast (Layout→Catalogs shipped mid-beta) — every guide carries its verified-against stamp
+  const VERIFIED_AGAINST = 'v0.8.1-beta';
+  const VERIFIED_DATE = '2026-08-09';
+
+  // accent picker — WuPlay's own per-profile theme-color model
+  const ACCENTS = { white:['#e9e7f2','#c9c7d6'], violet:['#a78bfa','#7c3aed'], cyan:['#22d3ee','#0ea5e9'], rose:['#f472b6','#db2777'], amber:['#fbbf24','#d97706'] };
+  function hexRgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+  window.setAccent = function(k){
+    const acc = ACCENTS[k] || ACCENTS.white;
+    const [r,g,b] = hexRgb(acc[0]);
+    const root = document.documentElement.style;
+    root.setProperty('--ac', acc[0]); root.setProperty('--ac-hi', acc[1]);
+    root.setProperty('--ac-rgb', `${r},${g},${b}`);
+    root.setProperty('--ac-bg', `rgba(${r},${g},${b},.12)`); root.setProperty('--ac-br', `rgba(${r},${g},${b},.36)`);
+    root.setProperty('--cta', `linear-gradient(135deg,${acc[0]},${acc[1]})`);
+  };
+  document.querySelectorAll('#swatches .sw').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#swatches .sw').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel'); setAccent(b.dataset.a);
+  });
+
+  const CONTENT_CARDS = [
+    ['🎬 Movies','Deep catalogue + new releases'],
+    ['📺 Shows','Season packs & episode matching'],
+    ['⛩️ Anime','Sub-first discovery rows'],
+    ['🌍 A bit of everything','Balanced home','popular']
+  ];
+  const SOURCE_CARDS = [
+    ['🎞️ WuPlay built-in presets','Trending · popular · top rated — no add-ons needed','built-in'],
+    ['📡 Streaming services','Netflix, Disney+, Prime… (native)'],
+    ['⛩️ Anime (AniList add-on)','The one case for an add-on catalog'],
+    ['📈 Trakt','Watchlist · recs · history (native)'],
+    ['🗂️ MDBList','Community lists & collections'],
+    ['🔑 Keyword rows','Custom TMDB include/exclude filters']
+  ];
+  const STYLE_CARDS = [
+    ['🖼️ Poster rows','Clean — one row per catalog'],
+    ['▦ Grid walls','Lots on screen at once'],
+    ['🌆 Landscape banners','Wide, cinematic covers'],
+    ['🤷 You pick','I\'ll choose tasteful defaults']
+  ];
+  const EXTRA_CARDS = [
+    ['🧸 Kids-safe space','Own hub + screen, age gates on'],
+    ['▶️ Continue Watching pinned','Resume one press away'],
+    ['🔎 Discover gets own rows','A different flavour for the second tab'],
+    ['🙅 Keep it minimal','Less is more']
+  ];
+
+  async function askContentQ(n){
+    state.content = ['movies','series','anime','mixed'][await askCards(`<div class="qb">${n||'What do you watch most?'}</div><div class="why">Why I ask: it anchors your row order and hubs.</div>`, CONTENT_CARDS)];
+  }
+  async function askSourcesQ(n){
+    const pre = state.sources.length ? state.sources : (state.content==='anime' ? [0,2] : [0,1]);
+    state.sources = await askMulti(`<div class="qb">${n||'Which sources should power your rows?'}</div><div class="why">WuPlay\'s built-ins need no add-ons. Your stream add-on only feeds the player.</div>`, SOURCE_CARDS, pre);
+  }
+  async function askStyleQ(n){
+    state.style = ['poster','grid','landscape','auto'][await askCards(`<div class="qb">${n||'How should it look on your TV?'}</div><div class="why">Sets hub layout + cover shape.</div>`, STYLE_CARDS)];
+  }
+  async function askExtrasQ(n){
+    state.extras = await askMulti(`<div class="qb">${n||'Any finishing touches?'}</div>`, EXTRA_CARDS, state.extras.length?state.extras:[1]);
+  }
+
+  async function startGenie(){
+    try{
+      document.getElementById('splash').classList.add('hidden');
+      document.getElementById('chatCard').classList.remove('hidden');
+      setStep(1);
+      await typeIn();
+      await say('Hi! I\'m your WuPlay catalog genie 👋 Quick heads-up: your streams come from add-ons (like a Core Build), but <b>catalogs are built into WuPlay itself</b> — I\'m here to arrange them into a home you\'ll love. A few quick questions:');
+      await typeIn();
+      await askContentQ('1 — What do you watch most?');   setStep(2); await typeIn();
+      await askSourcesQ('2 — Which sources power your rows?'); setStep(3); await typeIn();
+      await askStyleQ('3 — How should it look?');      setStep(4); await typeIn();
+      await askExtrasQ('4 — Any finishing touches?');  setStep(5); await typeIn();
+      PLAN = buildPlan();
+      await planLoop();
+      await say('Give me a moment while I turn that into your personal tap-by-tap guide… 🧞');
+      await new Promise(r=>setTimeout(r, REDUCED?150:550));
+      document.getElementById('chatCard').classList.add('hidden');
+      runWatchMe();
+    }catch(e){ flowFail(e); }
+  }
+  async function planLoop(){
+    while (true){
+      await say('Here\'s the plan:' + planSummaryHtml());
+      await typeIn();
+      const ok = await askCards('<div class="qb">Happy with this plan?</div>', [['🧞 Looks good — build my guide','I write your tap-by-tap guide'],['✏️ Let me change a pick','Redo any question']], {single:true});
+      if (ok === 0) break;
+      await typeIn();
+      const before = {Content:state.content, Sources:state.sources.slice().sort().join('+'), Look:state.style, Extras:state.extras.slice().sort().join('+')};
+      const w = await askCards('<div class="qb">Which should we redo?</div>', [['🎬 What I watch','Anchors rows & hubs'],['📦 Row sources','Built-ins · Trakt · MDBList'],['🖼️ Look & feel','Rows vs grids vs banners'],['✨ Finishing touches','Kids · Discover · minimal']], {single:true});
+      await typeIn();
+      if (w === 0) await askContentQ(null);
+      else if (w === 1) await askSourcesQ(null);
+      else if (w === 2) await askStyleQ(null);
+      else await askExtrasQ(null);
+      PLAN = buildPlan();
+      const after = {Content:state.content, Sources:state.sources.slice().sort().join('+'), Look:state.style, Extras:state.extras.slice().sort().join('+')};
+      const d = fpDiff(before, after);
+      await say((d ? d + ' — ' : 'No change — ') + 'here\'s the plan 👇');
+      await typeIn();
+    }
+  }
+
+  function quickPlan(){
+    state.content='mixed'; state.sources=[0,1]; state.style='auto'; state.extras=[1];
+    PLAN = buildPlan();
+    document.getElementById('splash').classList.add('hidden');
+    runWatchMe();
+  }
+
+  // ---------- decision engine (unchanged from APK-verified v4.1) ----------
+  const SRC = { NATIVE:0, STREAM:1, ANIME:2, TRAKT:3, MDBLIST:4, KEYWORD:5 };
+  const EX  = { KIDS:0, CONTINUE:1, DISCOVER:2, MINIMAL:3 };
+  function has(src){ return state.sources.includes(src); }
+  function wants(ex){ return state.extras.includes(ex); }
+  function styleLabel(){ const s = state.style==='auto' ? 'poster' : state.style; return {poster:'Poster rows', grid:'Grid walls', landscape:'Landscape banners'}[s]; }
+  function hubCover(){ const s = state.style==='auto' ? 'poster' : state.style; return s==='landscape' ? 'Landscape' : 'Poster'; }
+  function buildPlan(){
+    if (!state.sources.length) state.sources = [SRC.NATIVE, SRC.STREAM];
+    const c = state.content;
+    const kind = c==='mixed' ? {anime:true, movies:true, series:true}
+      : c==='anime' ? {anime:true, movies:false, series:false}
+      : {anime:false, movies:c==='movies', series:c==='series'};
+    return compose(kind);
+  }
+  function compose(kind){
+    const home = [], discover = [], hubs = [], screens = [], trakt = [];
+    const minimal = wants(EX.MINIMAL);
+    if (wants(EX.CONTINUE)) home.push({name:'Continue Watching (built-in)', src:'wuplay'});
+    if (has(SRC.TRAKT)) home.push({name:'Trakt · Watchlist', src:'trakt'});
+    if (kind.anime && !kind.movies && !kind.series){
+      home.push({name:'Trending Anime', src:'anime'});
+      home.push({name:'Top Airing', src:'anime'});
+      if (has(SRC.NATIVE)) home.push({name:'Popular Animation (native preset)', src:'native'});
+    } else {
+      if (has(SRC.NATIVE) && kind.movies) home.push({name:'Trending Movies (native preset)', src:'native'});
+      if (has(SRC.NATIVE) && kind.series) home.push({name:'Trending Shows (native preset)', src:'native'});
+      if (has(SRC.NATIVE) && kind.movies) home.push({name:'Popular Movies (native preset)', src:'native'});
+      if (has(SRC.NATIVE) && kind.series) home.push({name:'Popular Shows (native preset)', src:'native'});
+      if (kind.anime && has(SRC.ANIME)) home.push({name:'Trending Anime', src:'anime'});
+    }
+    if (has(SRC.STREAM) && !minimal) home.push({name:'Your services row (Netflix, Disney+… picks)', src:'stream'});
+    if (has(SRC.MDBLIST)) home.push({name:'MDBList · Community picks', src:'mdblist'});
+    if (has(SRC.KEYWORD)) home.push({name:'✨ For You — keyword-tuned', src:'keyword'});
+    if (wants(EX.DISCOVER) && !minimal){
+      if (has(SRC.TRAKT)) discover.push({name:'Trakt · Recommended for You', src:'trakt'});
+      if (has(SRC.MDBLIST)) discover.push({name:'MDBList · Award Winners & Collections', src:'mdblist'});
+      if (has(SRC.NATIVE)) discover.push({name:'Top Rated (native preset)', src:'native'});
+      if (has(SRC.KEYWORD)) discover.push({name:'🔑 A second keyword cut (e.g. “80s” · “space opera”)', src:'keyword'});
+      if (has(SRC.ANIME) && kind.anime) discover.push({name:'Seasonal Anime', src:'anime'});
+      if (!discover.length) discover.push({name:'Popular Classics (native preset)', src:'native'});
+    }
+    if (!minimal){
+      if (has(SRC.STREAM)) hubs.push({name:'Streaming Services', icon:'📡', builtin:true, systemKey:'streaming', cards:['Netflix','Disney+','Prime Video','etc. — toggle your real subscriptions']});
+      hubs.push({name:'Genres', icon:'🎭', builtin:true, systemKey:'genres', cards:['Action','Comedy','Sci‑Fi','Horror','…your genres, your order']});
+      if (kind.movies){ hubs.push({name:'Movie Collections', icon:'🎞️', builtin:true, systemKey:'collections', cards:['Harry Potter','Marvel','Bond','before‑bed trilogies…']}); }
+      if (kind.movies || kind.series) hubs.push({name:'Studios', icon:'🏛️', builtin:true, systemKey:'studios', cards:['A24','Marvel','Studio Ghibli','HBO']});
+      if (kind.anime && has(SRC.ANIME)) hubs.push({name:'Anime', icon:'⛩️', cards:['Trending Anime','Top Airing','Seasonal', has(SRC.MDBLIST)?'MDBList · Anime Collections':'All-Time Favourites']});
+      if (wants(EX.KIDS)) hubs.push({name:'Kids', icon:'🧸', cards:['Trending Family Movies','Popular Kids Shows','Animated Films','Recently Added (Kids)']});
+    }
+    if (wants(EX.KIDS)) screens.push({name:'Kids', icon:'🧸', type:'Hub: Kids', note:'age'});
+    if (kind.anime && !kind.movies && !kind.series && !minimal) screens.push({name:'Anime', icon:'⛩️', type:'Hub: Anime'});
+    else if (kind.movies && kind.series && !minimal) screens.push({name:'Movies', icon:'🎬', type:'Hub: Genres'});
+    if (has(SRC.TRAKT) || wants(EX.CONTINUE)) trakt.push('connect + native lists');
+    return {home, discover, hubs, screens, trakt, minimal};
+  }
+  function planSummaryHtml(){
+    const p = PLAN;
+    let h = '<div class="planblk"><div class="pt">🏠 Home rows (top → bottom)</div>' + p.home.slice(0,6).map((r,i)=>`<div class="pi"><span class="n">${i+1}</span><span>${r.name} ${r.src==='native'||r.src==='wuplay'?'<span class="native">built-in</span>':''}</span></div>`).join('') + '</div>';
+    if (p.discover.length) h += '<div class="planblk"><div class="pt">🔎 Discover rows</div>' + p.discover.map((r,i)=>`<div class="pi"><span class="n">${i+1}</span><span>${r.name}</span></div>`).join('') + '</div>';
+    if (p.hubs.length) h += '<div class="planblk"><div class="pt">✨ Hubs — '+styleLabel()+'</div>' + p.hubs.map(hub=>`<div class="pi"><span class="n">${hub.icon}</span><span><b>${hub.name}</b> ${hub.builtin?'<span class="native">built-in</span>':'custom'} · ${hub.cards.length} cards · covers: ${hubCover().toLowerCase()}</span></div>`).join('') + '</div>';
+    if (p.screens.length) h += '<div class="planblk"><div class="pt">📺 Extra screens</div>' + p.screens.map(s=>`<div class="pi"><span class="n">${s.icon}</span><span><b>${s.name}</b> screen → mirrors the <b>${s.type.replace('Hub: ','')}</b> hub</span></div>`).join('') + '</div>';
+    return h;
+  }
+  function runWatchMe(){
+    wmRun(['wm1','wm2','wm3','wm4'], {
+      stepDurs: REDUCED ? [450,450,450,350] : [1500,1400,1500,1200],
+      onStep(i){ const l=document.getElementById('wmStepLine'); if(l) l.textContent='Step '+(i+1)+' of 4'; },
+      onDone(){ showSuccess(); }
+    });
+  }
+  function guideData(){
+    const p = PLAN;
+    const phases = [];
+    const stepsA = [];
+    stepsA.push('Open your <b>WuPlay web configurator</b> (from the app: Edit Profile → key/QR) and go to the <span class="tab">Catalogs</span> tab — called <span class="tab">Layout</span> on newer app versions.');
+    stepsA.push('Heads-up: since v0.5, WuPlay has <b>built-in catalogs</b> — presets, TMDB (with filters incl. networks), keyword, movie collections, Trakt, MDBList, streaming services. No catalog add-ons needed; they still aren\'t placed on your screens automatically — that\'s what we\'re fixing.');
+    p.home.forEach((r,i)=>{
+      const where = r.src==='wuplay' ? 'built-in <b>My Stuff → Continue Watching</b>' : r.src==='trakt' ? '<b>Trakt</b> source (native)' : r.src==='mdblist' ? '<b>MDBList</b> source' : r.src==='stream' ? 'preset → <b>Streaming Services</b> → pick your subscriptions' : r.src==='anime' ? 'add-on catalog → your <b>anime add-on</b>' : r.src==='keyword' ? '<b>Keyword</b> → TMDB base, add your include keywords' : 'preset → <b>TMDB</b>';
+      stepsA.push(`<b>Add</b> → ${where} → “${r.name}” → switch on <b>Show on Home</b> → <b>Save</b>. <span style="color:var(--faint)">(Home row ${i+1})</span>`);
+    });
+    if (p.discover.length) p.discover.forEach((r)=>{ stepsA.push(`<b>Add</b> → “${r.name}” → switch on <b>Show on Discover</b> → <b>Save</b>. <span style="color:var(--faint)">(tip: sort “Random” keeps Discover fresh)</span>`); });
+    stepsA.push('Back in <span class="tab">Catalogs</span>, tap <b>Reorder</b> and drag Home rows into the plan\'s order (top of plan = top of Home).');
+    phases.push({label:'Phase 1 · Catalogs / Layout → Home & Discover rows', steps:stepsA});
+    if (p.hubs.length){
+      const stepsB = [];
+      p.hubs.forEach(h=>{
+        if (h.builtin) stepsB.push(`<span class="tab">Hubs</span> tab (Web Config → Hubs) → enable the built-in <b>${h.name}</b> hub ${h.icon} → open it and toggle/order its cards: <b>${h.cards.join('</b>, <b>')}</b>. Cards stay editable later — no delete-and-redo.`);
+        else {
+          stepsB.push(`<span class="tab">Hubs</span> tab → <b>Add</b> → name it <b>“${h.name}”</b> ${h.icon} → layout <b>${styleLabel()}</b> → cover shape <b>${hubCover()}</b> → <b>Save</b>.`);
+          stepsB.push(`In <b>${h.name}</b> → Cards: enable <b>${h.cards.join('</b>, <b>')}</b> — drag into that order. The catalog order you set applies to every card.`);
+          stepsB.push(`Optional: give the <b>${h.name}</b> hub card a cover image (Upload or From URL) — ${hubCover().toLowerCase()} art looks best.`);
+        }
+      });
+      phases.push({label:'Phase 2 · Hubs (built-in families first)', steps:stepsB});
+    }
+    const kids = p.screens.find(s=>s.note==='age');
+    if (p.screens.length || kids){
+      const stepsC = [];
+      if (kids) stepsC.push('<b>Kids safety first:</b> <span class="tab">Settings</span> → <b>Age Restrictions</b> → set both Movies &amp; Shows max to <b>Older Kids</b> and keep <b>“include titles without a rating” OFF</b>. (Also see Settings → Content Filters for keyword/genre bans.)');
+      p.screens.forEach(s=>{
+        stepsC.push(`<span class="tab">Screens</span> tab → <b>Add</b> → name <b>“${s.name}”</b>, icon ${s.icon} → Type: <b>Hub</b> → choose the <b>${s.type.replace('Hub: ','')}</b> hub → <b>Save</b>.`);
+      });
+      stepsC.push('You can have up to 10 screens — customs appear beside Home and Discover on the TV.');
+      phases.push({label:'Phase 3 · Extra screens &amp; kids safety', steps:stepsC});
+    }
+    if (p.trakt.length){
+      phases.push({label:'Phase 4 · Trakt (optional, recommended)', steps:[
+        '<span class="tab">Trakt</span> tab → <b>Connect to Trakt</b> → approve in the browser.',
+        'Toggle on the pieces you want: <b>Watchlist</b> · <b>Continue Watching</b> · <b>Watch History</b> · <b>Personal Lists</b> · <b>Recommendations</b> → <b>Sync Now</b>.',
+        'Scrobbling runs through Trakt automatically once connected. Long-press a show in Continue Watching to <b>drop</b> it — removes it from the row and the schedule.',
+      ]});
+    }
+    phases.push({label:'Final · Check it on the TV', steps:[
+      'Open WuPlay on your TV — rows, hubs and screens appear once the profile syncs (usually under a minute).',
+      'Your stream add-ons (like a Core Build) keep feeding the player; their order in the configurator is exactly the order the picker shows them.',
+      'Anything you don\'t love? Remove the row or hub in the configurator — everything here is reversible.',
+    ]});
+    return phases;
+  }
+  function planJson(){
+    const p = PLAN;
+    const SRCMAP = { wuplay:'builtin-mystuff', native:'preset', stream:'streamingServices', anime:'addon', trakt:'trakt', mdblist:'mdblist', keyword:'keyword' };  // source ids verified in v0.8.1 dex strings: preset/tmdb/keyword/mdblist/trakt/collections
+    const mediaFor = state.content==='series' ? 'series' : state.content==='movies' ? 'movie' : 'all';
+    const catalogs = [];
+    p.home.forEach((r,i)=>catalogs.push({
+      name: r.name, source: SRCMAP[r.src] || 'tmdb-preset', sourceId: null, sourceMeta: r.src==='native' ? {provider:'tmdb'} : {},
+      mediaType: mediaFor, sort: 'default', homeOrder: i, discoverOrder: null, showHome: true, showDiscover: false
+    }));
+    p.discover.forEach((r,i)=>catalogs.push({
+      name: r.name, source: SRCMAP[r.src] || 'tmdb-preset', sourceId: null, sourceMeta: {},
+      mediaType: mediaFor, sort: 'random', homeOrder: null, discoverOrder: i, showHome: false, showDiscover: true
+    }));
+    return {
+      format: 'wuplay-home-plan', planVersion: 1,
+      generatedBy: 'WuPlay Catalog Genie (prototype)', generatedAt: new Date().toISOString(),
+      style: state.style==='auto' ? 'poster' : state.style,
+      note: 'Structured to mirror WuPlay\'s sync model (catalogs/homeOrder/discoverOrder, hubs, screens, layout rows) so it can adopt the official share format when it ships.',
+      plan: {
+        catalogs,
+        hubs: p.hubs.map((h,i)=>({ name: h.name, systemKey: h.systemKey || null, builtin: !!h.builtin, position: i, detailViewType: (state.style==='landscape'?'landscape':'poster'), cards: h.cards })),
+        screens: p.screens.map((s,i)=>({ name: s.name, icon: s.icon, viewType: 'hub', hubName: s.type.replace('Hub: ',''), position: i, visible: true })),
+        layout: [{ layoutType: 'home', rowOrder: p.home.map(r=>r.name) }, { layoutType: 'discover', rowOrder: p.discover.map(r=>r.name) }],
+        trakt: p.trakt.length ? { connect: true, toggles: ['watchlist','continueWatching','watchHistory','personalLists','recommendations'] } : { connect: false }
+      }
+    };
+  }
+  function exportPlanJson(){
+    if (!PLAN) return;
+    const blob = new Blob([JSON.stringify(planJson(), null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'wuplay-home-plan.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    toast('Plan exported — keep it for WuPlay\'s upcoming import/sharing');
+  }
+  function showSuccess(){
+    document.getElementById('succCard').classList.remove('hidden');
+    writeShareHash();
+    const nSteps = guideData().reduce((a,p)=>a+p.steps.length,0);
+    const subEl = document.getElementById('succSub');
+    if (subEl) subEl.innerHTML = `Follow these steps in your WuPlay web configurator — <b>${nSteps} steps, about ${estMinutes(nSteps)} minutes</b> — ticking them off as you go. Every row or hub is removable again in one tap.`;
+    const g = document.getElementById('guide');
+    let n = 0;
+    g.innerHTML = `<div class="planblk" style="margin:0 0 4px"><span class="native">✅ verified against WuPlay ${VERIFIED_AGAINST}</span> <span style="color:var(--dim)">configurator screens checked ${VERIFIED_DATE} — if a tab name moved in a newer beta, look for the same words in the sidebar.</span></div>` + guideData().map(ph =>
+      `<div class="gphase"><span class="gb">${ph.label.split('·')[0].trim()}</span>${ph.label.split('·')[1]||''}</div>` +
+      ph.steps.map(s=>{ n++; return `<div class="gstep" onclick="tick(this)"><div class="cb">✓</div><div class="gt"><span style="color:var(--dim);font-weight:700">${n}.</span> ${s}</div></div>`; }).join('')
+    ).join('');
+    updateTally();
+  }
+  function tick(elm){ elm.classList.toggle('tick'); updateTally(); }
+  function updateTally(){
+    const total = document.querySelectorAll('.gstep').length;
+    const done = document.querySelectorAll('.gstep.tick').length;
+    document.getElementById('gtally').textContent = done===total ? '🎉 All done — enjoy your new home screen!' : `${done}/${total} steps done`;
+  }
+  function guideMarkdown(){
+    const p = PLAN;
+    let md = '# WuPlay Home — setup guide (Catalog Genie)\n';
+    md += `Plan: ${state.content||'mixed'} · style ${styleLabel()} · generated by the WuPlay Catalog Genie prototype\n`;
+    md += 'Note: WuPlay catalogs are built-in (v0.5+); "Catalogs" tab = "Layout" on newer versions. Add-on catalogs only needed for anime.\n';
+    md += `Verified against WuPlay ${VERIFIED_AGAINST} (${VERIFIED_DATE}).\n\n`;
+    md += '## Home rows (top → bottom)\n' + p.home.map((r,i)=>`${i+1}. ${r.name}`).join('\n') + '\n\n';
+    if (p.discover.length) md += '## Discover rows\n' + p.discover.map((r,i)=>`${i+1}. ${r.name}`).join('\n') + '\n\n';
+    if (p.hubs.length) md += '## Hubs ('+styleLabel()+' · covers: '+hubCover().toLowerCase()+')\n' + p.hubs.map(h=>`- ${h.icon} **${h.name}**${h.builtin?' (built-in)':''}: ${h.cards.join(' → ')}`).join('\n') + '\n\n';
+    let n = 0;
+    guideData().forEach(ph=>{
+      md += `\n## ${ph.label}\n`;
+      ph.steps.forEach(s=>{ n++; let t=s; while(/<[^>]+>/.test(t)) t=t.replace(/<[^>]+>/g,''); md += `- [ ] ${n}. ${t.replace(/&amp;/g,'&')}\n`; });
+    });
+    return md;
+  }
+  function copyGuide(){
+    const txt = guideMarkdown();
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(()=>toast('Guide copied — paste it anywhere')).catch(()=>clipboardFallback(txt));
+    } else clipboardFallback(txt);
+  }
+  function clipboardFallback(txt){
+    const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('Guide copied'); }catch(e){ toast('Copy failed — try Download instead'); }
+    ta.remove();
+  }
+  function downloadGuide(){
+    if (!PLAN) return;
+    const blob = new Blob([guideMarkdown()], {type:'text/markdown'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'wuplay-home-setup-guide.md';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    toast('Guide downloaded');
+  }
+  function restart(){ g_restart(); }
+  document.getElementById('doorGenie').addEventListener('click', startGenie);
+
+</script>
+</body>
+</html>
