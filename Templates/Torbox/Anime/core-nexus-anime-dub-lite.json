@@ -427,19 +427,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Core Builds SEL Setup*/[]",
-        "enabled": true
-      },
-      {
-        "expression": "/*Standard ESE v2.0*/[]",
-        "enabled": true
-      },
-      {
         "expression": "/*Info & Other Unwanted*/ merge(type(streams, 'info'), releaseGroup(type(streams,'usenet','stremio-usenet'),'sample'), type(keyword(streams, 'all', '-sample'), 'usenet', 'stremio-usenet'), message(type(streams,'usenet','stremio-usenet'),'includes','🚫'))",
-        "enabled": true
-      },
-      {
-        "expression": "/*RD Copyright (per DMM)*/ service( keyword(streams, 'all', 'web-dl', 'webrip', 'bdrip', 'hdrip', 'dvdrip', 'bluray.x264', 'hdtv.x264', 'hdtv.xvid', 'web.x264', 'web.h264'), 'realdebrid')",
         "enabled": true
       },
       {
@@ -510,14 +498,6 @@
       }
     ],
     "includedStreamExpressions": [
-      {
-        "expression": "/*Core Builds SEL Setup*/[]",
-        "enabled": true
-      },
-      {
-        "expression": "/*ISE v1.2.3*/[]",
-        "enabled": true
-      },
       {
         "expression": "/*SeaDex*/merge(count(addon(cached(streams),'SeaDex'))>0?passthrough(addon(streams,'SeaDex'),'title','year'):passthrough(seadex(streams),'title','year'),queryType=='anime.movie'?passthrough(seadex(streams),'episode'):[])",
         "enabled": true
