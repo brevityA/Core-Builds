@@ -195,3 +195,42 @@ test('concurrent requests retain their own allowed CORS origin', async () => {
   assert.equal(firstResponse.headers.get('access-control-allow-origin'), 'http://localhost:3000');
   assert.equal(second.headers.get('access-control-allow-origin'), 'http://localhost:8080');
 });
+
+test('paste retrieval (/t/) allows any origin (Access-Control-Allow-Origin: *)', async () => {
+  let upstream;
+  global.fetch = async (input, init) => {
+    upstream = input;
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const env = makeEnv();
+  await env.TEMPLATES.put('t:abc123', JSON.stringify({ metadata: { id: 'x', name: 'x', version: '0.0.1' }, config: { addonName: 'x' } }));
+  const request = new Request('https://proxy.example/t/abc123', {
+    method: 'GET',
+    headers: { 'Origin': 'https://aio.atbphosting.com' },
+  });
+  const response = await worker.fetch(request, env);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Access-Control-Allow-Origin'), '*');
+});
+
+test('proxy GET allows any origin (Access-Control-Allow-Origin: *)', async () => {
+  global.fetch = async () => new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  const request = new Request('https://proxy.example/proxy/api/v1/status?host=https%3A%2F%2Faiostreams.elfhosted.com', {
+    method: 'GET',
+    headers: { 'Origin': 'https://aio.atbphosting.com' },
+  });
+  const response = await worker.fetch(request, {});
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Access-Control-Allow-Origin'), '*');
+});
+
+test('contact POST keeps strict CORS echo (no wildcard)', async () => {
+  const request = new Request('https://proxy.example/contact', {
+    method: 'POST',
+    headers: { 'Origin': 'https://aio.atbphosting.com', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'a', email: 'a@b.c', category: 'Feedback', message: 'hello' }),
+  });
+  // contact not configured -> 500, but the CORS header must NOT be '*'
+  const response = await worker.fetch(request, {});
+  assert.notEqual(response.headers.get('Access-Control-Allow-Origin'), '*');
+});

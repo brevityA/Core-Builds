@@ -115,13 +115,13 @@ test('SEL_POLICY_DATA architecture PSE counts match baseline expectations', () =
   assert.equal(SEL_POLICY_DATA.standard.preferredStreamExpressions.length, 16);
   assert.equal(SEL_POLICY_DATA['standard-4k'].preferredStreamExpressions.length, 20);
   assert.equal(SEL_POLICY_DATA.iqr.preferredStreamExpressions.length, 23);
-  assert.equal(SEL_POLICY_DATA['apex-mixed'].preferredStreamExpressions.length, 37);
+  assert.equal(SEL_POLICY_DATA['apex-mixed'].preferredStreamExpressions.length, 36);
   assert.equal(SEL_POLICY_DATA['mixed-standard'].preferredStreamExpressions.length, 21);
-  assert.equal(SEL_POLICY_DATA['mixed-apex-mixed'].preferredStreamExpressions.length, 37);
+  assert.equal(SEL_POLICY_DATA['mixed-apex-mixed'].preferredStreamExpressions.length, 36);
 });
 
-test('APEX_MIXED_PSES is sourced from the nightly template (35 entries)', () => {
-  assert.equal(APEX_MIXED_PSES.length, 35);
+test('APEX_MIXED_PSES is sourced from the nightly template (34 entries)', () => {
+  assert.equal(APEX_MIXED_PSES.length, 34);
   assert.notEqual(APEX_MIXED_PSES.length, SEL_POLICY_DATA['apex-mixed'].preferredStreamExpressions.length,
     'APEX_MIXED_PSES should differ from golden fixture apex-mixed PSEs');
 });

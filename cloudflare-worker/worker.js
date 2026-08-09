@@ -93,11 +93,19 @@ const ALLOWED_ORIGINS = new Set([
   'http://127.0.0.1:8080',
 ]);
 
-function corsHeaders(request) {
+function corsHeaders(request, publicRead = false) {
   const origin = request?.headers?.get('Origin') || '';
-  const allowed = ALLOWED_ORIGINS.has(origin) ? origin : 'https://brevitya.github.io';
+  // Public read endpoints (paste retrieval /t/, proxy GETs) are fetched by
+  // OTHER origins' web apps (any public AIOStreams host importing a template).
+  // Echoing only allowlisted origins breaks that (browser CORS rejects when the
+  // echoed origin != the requesting origin -> "Load failed" on import). For
+  // these, allow any origin. Mutating/private endpoints keep the strict echo.
+  let allowed;
+  if (publicRead) allowed = '*';
+  else allowed = ALLOWED_ORIGINS.has(origin) ? origin : 'https://brevitya.github.io';
   return {
     'Access-Control-Allow-Origin': allowed,
+    ...(publicRead ? {} : {}),
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
@@ -205,11 +213,19 @@ export default {
     // overwritten while an earlier async request is awaiting KV/upstream I/O.
     const cors = corsHeaders(request);
     const respond = (status, payload) => json(status, payload, cors);
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: cors });
-    }
-
+    // Public read endpoints (paste retrieval + proxy GETs) must be fetchable by
+    // ANY origin's web app (public AIOStreams hosts importing a template), so
+    // they get Access-Control-Allow-Origin: *. Computed per request.
     const url = new URL(request.url);
+    const isPublicRead = request.method === 'GET' &&
+      (url.pathname.startsWith('/t/') || url.pathname.startsWith('/proxy'));
+    const publicCors = isPublicRead ? corsHeaders(request, true) : null;
+    const respondPublic = (status, payload, hdrs = {}) =>
+      json(status, payload, publicCors || cors, hdrs);
+    if (request.method === 'OPTIONS') {
+      // Preflight must mirror what the actual request would get.
+      return new Response(null, { headers: isPublicRead ? publicCors : cors });
+    }
 
     // --- Counter: return all stats ---
     if (url.pathname === '/api/stats' && request.method === 'GET') {
@@ -377,7 +393,7 @@ export default {
       if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_viewed');
       // no-store: pastes can carry a user's config — never let a shared CDN cache them.
       return new Response(val, {
-        headers: { 'Content-Type': 'application/json', ...cors, ...NO_STORE },
+        headers: { 'Content-Type': 'application/json', ...publicCors, ...NO_STORE },
       });
     }
 
@@ -462,7 +478,7 @@ export default {
       status: upstreamRes.status,
       headers: {
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
-        ...cors,
+        ...(publicCors || cors),
         ...NO_STORE,
       },
     });

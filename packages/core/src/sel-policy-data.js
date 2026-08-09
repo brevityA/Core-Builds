@@ -106,10 +106,6 @@ export const APEX_MIXED_PSES = [
     "enabled": true
   },
   {
-    "expression": "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 5), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
-    "enabled": true
-  },
-  {
     "expression": "/* Audio channel priority */ audioTag(streams, 'Atmos', 'DTS:X', 'TrueHD', 'DTS-HD MA', 'FLAC')",
     "enabled": true
   },
@@ -941,10 +937,6 @@ export const SEL_POLICY_DATA = {
         "enabled": true
       },
       {
-        "expression": "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 5), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
-        "enabled": true
-      },
-      {
         "expression": "/* Audio channel priority */ audioTag(streams, 'Atmos', 'DTS:X', 'TrueHD', 'DTS-HD MA', 'FLAC')",
         "enabled": true
       },
@@ -1466,10 +1458,6 @@ export const SEL_POLICY_DATA = {
       },
       {
         "expression": "/*IMAX pin*/ count(visualTag(streams, 'IMAX')) > 0 ? pin(visualTag(streams, 'IMAX'), 'top') : []",
-        "enabled": true
-      },
-      {
-        "expression": "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')), 'resolution', 5), negate(merge(library(streams), uncached(streams)), quality(streams, 'Bluray REMUX', 'Bluray', 'WEB-DL', 'WEBRip')))",
         "enabled": true
       },
       {
