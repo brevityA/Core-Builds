@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateExpression, validateEntry, validateExpressionList, validateSelPolicy } from '../src/core/sel-expression-parser.js';
+import { validateExpression, validateEntry, validateExpressionList, validateSelPolicy, unknownSelFunctions } from '../src/core/sel-expression-parser.js';
 import { SEL_POLICY_DATA, APEX_MIXED_PSES } from '../src/core/sel-policy-data.js';
 import { buildApexIqr4kPses, buildApexIqr1080Pses } from '../src/core/apex-policy.js';
 import { buildStandard4kPses, buildStandard1080Pses, buildMixedPses, buildDefaultPses } from '../src/core/standard-policy.js';
@@ -20,7 +20,7 @@ test('accepts ternary expression', () => {
 });
 
 test('accepts nested ternary expression', () => {
-  assert.deepEqual(validateExpression("count(a)>=4?x(a):count(a)>0?y(a):[]"), { valid: true });
+  assert.deepEqual(validateExpression("count(streams)>=4?bitrate(streams,1,2):count(streams)>0?cached(streams):[]"), { valid: true });
 });
 
 test('accepts expression with block comment label', () => {
@@ -174,7 +174,7 @@ test('rejects arrays as policy input', () => {
 test('reports errors per expression list key', () => {
   const errors = validateSelPolicy({
     preferredStreamExpressions: [{ expression: '', enabled: true }],
-    excludedStreamExpressions: [{ expression: "ok(streams)", enabled: true }],
+    excludedStreamExpressions: [{ expression: "cached(streams)", enabled: true }],
   });
   assert.ok('preferredStreamExpressions' in errors);
   assert.ok(!('excludedStreamExpressions' in errors));
@@ -273,6 +273,56 @@ test('DV-enabled build variants produce valid expressions', () => {
     for (let i = 0; i < pses.length; i++) {
       const r = validateExpression(pses[i].expression);
       assert.equal(r.valid, true, `DV variant PSE[${i}] invalid: ${r.error}`);
+    }
+  }
+});
+
+// ── New (audit 2026-08-08): upstream function existence + length headroom ──
+
+test('unknownSelFunctions flags invalid fns and ignores comments/strings', () => {
+  assert.deepEqual(unknownSelFunctions("/*label*/ private(uncached(streams))"), ['private']);
+  assert.deepEqual(unknownSelFunctions("floor(q2(values(streams,'seeders'))*0.25)"), [], 'floor/q2/values are valid');
+  assert.deepEqual(unknownSelFunctions("count(streams)>=4?bitrate(streams,1,2):[]"), []);
+  // strings and comments must not produce false positives
+  assert.deepEqual(unknownSelFunctions("/* uses the word private() in a comment */ regexMatched(streams,'LQ (Radarr)')"), []);
+});
+
+test('validateExpression rejects unknown functions', () => {
+  const r = validateExpression("/*LABS*/ private(uncached(streams))");
+  assert.equal(r.valid, false);
+  assert.match(r.error, /Unknown SEL function/);
+});
+
+test('validateExpression rejects expressions over the fail length', () => {
+  const long = ('cached(streams) and '.repeat(300)) + 'cached(streams)'; // ~7200 chars, valid SEL
+  const r = validateExpression('/*x*/ ' + long);
+  assert.equal(r.valid, false);
+  assert.match(r.error, /length/i);
+});
+
+test('validateExpression warns (still valid) near the host limit', () => {
+  const long = ('cached(streams) and '.repeat(125)) + 'cached(streams)'; // ~2400 chars, valid SEL
+  const r = validateExpression('/*x*/ ' + long);
+  assert.equal(r.valid, true);
+  assert.ok(r.warn && /near/i.test(r.warn));
+});
+
+test('every real SEL_POLICY_DATA / apex / standard expression passes the new checks', () => {
+  for (const [target, data] of Object.entries(SEL_POLICY_DATA)) {
+    for (const key of ['preferredStreamExpressions', 'includedStreamExpressions', 'excludedStreamExpressions']) {
+      for (let i = 0; i < (data[key] || []).length; i++) {
+        const expr = data[key][i].expression;
+        if (!expr || !expr.trim()) continue;
+        const r = validateExpression(expr);
+        assert.equal(r.valid, true, `${target} ${key}[${i}]: ${r.error || r.warn || ''}`);
+      }
+    }
+  }
+  const opts = { dv: false, audio: 'limited', forceLimitedAudio: false, supportsAv1: false };
+  for (const build of [buildApexIqr4kPses, buildApexIqr1080Pses, buildStandard4kPses, buildStandard1080Pses, buildMixedPses, buildDefaultPses]) {
+    for (const pse of build(opts)) {
+      const r = validateExpression(pse.expression);
+      assert.equal(r.valid, true, `${pse.expression.slice(0, 60)}: ${r.error || r.warn || ''}`);
     }
   }
 });

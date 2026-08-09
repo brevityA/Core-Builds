@@ -70,6 +70,69 @@ SYNCED_EXPRESSION_FIELDS = (
     'syncedRankedStreamExpressionUrls',
 )
 
+# ── Upstream SEL function registry ────────────────────────────────
+# Every callable Core may emit, verified against Viren070/AIOStreams@main
+# packages/core/src/parser/streamExpression.ts (this.parser.functions.* +
+# dispatch cases + the expr-eval math allowlist). Anything not in this set is
+# an invalid expression on every AIOStreams host (e.g. `private(...)` was
+# shipped in 8 Labs templates — see audit 2026-08-08).
+SEL_FUNCTIONS = {
+    'addon','age','audioChannel','audioChannels','audioTag','avg','bitrate',
+    'cached','count','duration','encode','filename','folderName','folderSize',
+    'idMatched','indexer','iqr','keyword','keywords','kurtosis','language',
+    'library','max','mean','median','merge','message','min','mode',
+    'multiEpisode','negate','passthrough','perGroup','percentile','pin','q1',
+    'q2','q3','quality','range','regexMatched','regexMatchedInRange',
+    'regexScore','releaseGroup','resolution','rseMatched','seMatched',
+    'seMatchedInRange','seScore','seadex','seasonPack','seeders','service',
+    'size','skewness','slice','stddev','streamExpressionScore','subtitle',
+    'subtitles','sum','type','uncached','values','variance','visualTag',
+    # expr-eval math allowlist (true entries in the parser's math config)
+    'sqrt','ceil','floor','round','trunc','random','in',
+}
+# Core Builds own safety margins vs the upstream default limits
+# (maxExpressionLength=3000, maxExpressions=200, maxExpressionCharacters=50000)
+SEL_MAX_LENGTH = 3000
+SEL_FAIL_LENGTH = 2800      # error above this (headroom below the hard 3000)
+SEL_WARN_LENGTH = 2400      # warn above this
+
+import re as _re
+_SEL_FN_RE = _re.compile(r'([A-Za-z][A-Za-z0-9]*)\s*\(')
+_SEL_COMMENT_RE = _re.compile(r'/\*[\s\S]*?\*/')
+_SEL_STR_RE = _re.compile(r"'(?:\\.|[^'\\])*'")
+_SEL_DSTR_RE = _re.compile(r'"(?:\\.|[^"\\])*"')
+
+def _sel_unknown_functions(expression):
+    """Return callables in `expression` that are not valid upstream SEL."""
+    if not isinstance(expression, str):
+        return []
+    clean = _SEL_COMMENT_RE.sub(' ', expression)
+    clean = _SEL_STR_RE.sub("''", clean)
+    clean = _SEL_DSTR_RE.sub('""', clean)
+    out = []
+    for m in _SEL_FN_RE.finditer(clean):
+        fn = m.group(1)
+        if fn in SEL_FUNCTIONS or fn in ('if', 'and', 'or', 'not', 'true', 'false'):
+            continue
+        if fn not in out:
+            out.append(fn)
+    return out
+
+def _validate_sel_functions(expression_lists, name, err, warn):
+    """Check every expression for unknown functions and length headroom."""
+    for entry in expression_lists:
+        expr = entry.get('expression', '') if isinstance(entry, dict) else str(entry)
+        if not expr or not expr.strip():
+            continue
+        unknown = _sel_unknown_functions(expr)
+        if unknown:
+            err(name, f"SEL unknown function(s) {unknown} — invalid on AIOStreams hosts: {expr[:70]}\u2026")
+        length = len(expr)
+        if length > SEL_FAIL_LENGTH:
+            err(name, f"SEL length {length} > {SEL_FAIL_LENGTH} (hard limit {SEL_MAX_LENGTH}) \u2014 refactor: {expr[:60]}\u2026")
+        elif length > SEL_WARN_LENGTH:
+            warn(name, f"SEL length {length} > {SEL_WARN_LENGTH} \u2014 near the {SEL_MAX_LENGTH} host limit: {expr[:60]}\u2026")
+
 # v2.32 marks the legacy `torbox-search` preset ID removed. Upstream also
 # exposes a separate Newznab option labelled TorBox Search, so this is not a
 # settings-compatible automatic rename. Core templates may retain the legacy ID
@@ -231,6 +294,9 @@ def validate_template(fpath):
         ]
         if score_dependent and not has_local_ranked:
             err(name, "score-dependent SEL requires local ranked expressions; synced expressions are prohibited")
+
+        # ── SEL function existence + length headroom (audit 2026-08-08) ──
+        _validate_sel_functions(all_expression_lists, name, err, warn)
 
     # ── Sort criteria ─────────────────────────────────────────
     for scope, sort_list in c.get('sortCriteria', {}).items():
