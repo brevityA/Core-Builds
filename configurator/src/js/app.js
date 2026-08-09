@@ -4810,7 +4810,11 @@ function showTestDriveModal() {
         </div>
       `;
     } catch(err) {
-      resultsEl.innerHTML = `<div class="td-error">${ICO.warn(13,'#f87171')} ${esc(err.message || 'Something went wrong')}</div>`;
+      if (err.message && err.message.startsWith('HOST_')) {
+        resultsEl.innerHTML = hostErrorHtml(err.message);
+      } else {
+        resultsEl.innerHTML = `<div class="td-error">${ICO.warn(13,'#f87171')} ${esc(err.message || 'Something went wrong')}</div>`;
+      }
     }
   }
 
@@ -7176,19 +7180,25 @@ async function openInAIOStreams() {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
     try {
+      const resolvedBase = await resolveInstallHost(4000);
       const cfg = buildFinal().config;
       const sz = payloadSizeGuard(cfg);
       if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
-      const res = await writeHostFetch(base, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
+      const res = await writeHostFetch(resolvedBase, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
         const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         resetBtn(origHtml);
-        showManifestModal(`${base}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
+        showManifestModal(`${resolvedBase}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');
     } catch(e) {
+      if (e.message && e.message.startsWith('HOST_')) {
+        resetBtn(origHtml);
+        result.innerHTML = hostErrorHtml(e.message);
+        return;
+      }
       logError('deploy', 'Connection failed to host', { host: S.instanceHost, error: e.message });
       resetBtn(origHtml);
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Host timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
