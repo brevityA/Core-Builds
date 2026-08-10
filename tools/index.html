@@ -320,9 +320,13 @@ body{
   <!-- What's New -->
   <div class="inline-card" style="margin-top:16px">
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
-    <h3>🆕 What's New — v2.90</h3>
+    <h3>🆕 What's New — v2.91</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.91 · Aug 9 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: "Rebuild loop" — the version banner's Rebuild button wiped all settings but never stamped the current version, so the outdated banner returned after every rebuild. Now keeps settings, stamps the version, and toasts the user to download + re-import.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: explicit AIOStreams host selection is now honored — picking a specific host (e.g. Omni, ForTheWeak) no longer silently fails over to a different host. Outdated hosts (&lt; v2.32.0) get a clear version-gate error with remediation steps.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Express Install now shows a visible AIOStreams host dropdown (prefilled from Advanced), so the host choice is explicit from the start.</span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.90 · Aug 6 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">AIOStreams v2.32 compatibility — the legacy built-in torbox-search preset is removed from all generated configs and all 72 static templates (the TorBox Search API was shut down; saving a config that still includes it fails on v2.32+ hosts). No automatic conversion to the generic Newznab option is performed.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Templates/Legacy/v2.31.1/ — explicit compatibility lane preserving the 15 previously-enabled templates with torbox-search for hosts still on AIOStreams 2.31.1 or older.</span></div>
@@ -336,11 +340,6 @@ body{
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Debridio missing in multi-service configurations — preset now emits when multiServices includes debridio (#639)</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Peerflix schema rejection — useMultipleInstances added to all generated presets</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Import safety — credentials stripped from all public paste uploads before leaving the browser</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.87 · Aug 2 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Nuvio + TorBox Instant Quick Install — dedicated flow generates a P2P-only template with device/resolution/host pickers and TorBox Connected Services warning</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Nuvio TorBox Instant CLI route — core-builds generate --route nuvio-torbox-instant --host fortheweak --device shield --resolution 4k</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Nuvio host capability metadata — supportsNuvioInstant flag on all hosts; ElfHosted correctly blocked</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info</span></div>
     </div>
 <!-- AUTO:TOOLS_WHATSNEW:END -->
   </div>
