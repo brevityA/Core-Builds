@@ -439,7 +439,7 @@
 
   // ---- shareable plan (config-as-URL) ----
   function b64urlEncode(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
-  function b64urlDecode(s){ try{ return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'_'))))); }catch(e){ return null; } }
+  function b64urlDecode(s){ try{ return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))))); }catch(e){ return null; } }
   function copyShareLink(){
     const url = location.href.split('#')[0] + '#p=' + b64urlEncode(JSON.stringify(TOOL.sharePayload()));
     const done = ()=>toast('Share link copied — the plan travels inside the URL');
@@ -782,7 +782,7 @@
     let n = 0;
     guideData().forEach(ph=>{
       md += `\n## ${ph.label}\n`;
-      ph.steps.forEach(s=>{ n++; md += `- [ ] ${n}. ${s.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&')}\n`; });
+      ph.steps.forEach(s=>{ n++; let t=s; for(let p='';p!==t;){p=t;t=t.replace(/<[^>]+>/g,'');} md += `- [ ] ${n}. ${t.replace(/&amp;/g,'&')}\n`; });
     });
     return md;
   }
