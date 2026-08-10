@@ -77,6 +77,8 @@ const ALLOWED_HOSTS = new Set([
   'https://aio.atbphosting.com',
   'https://aiostreams.12312023.xyz',
   'https://aiostreams-stable.forthewizards.uk',
+  // WuPlay genie lane: read probes + (post-dev-blessing) profile-sync writes.
+  'https://api.wuplay.app',
 ]);
 
 const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
@@ -439,9 +441,12 @@ export default {
       if (reqBody === null) return respond(413, { error: 'request too large' });
     }
 
+    const fwdHeaders = { 'Content-Type': request.headers.get('Content-Type') || 'application/json' };
+    const auth = request.headers.get('Authorization');
+    if (auth) fwdHeaders['Authorization'] = auth;   // forward-pass only when caller set it (WuPlay device tokens)
     const upstreamReq = new Request(upstreamUrl, {
       method: request.method,
-      headers: { 'Content-Type': request.headers.get('Content-Type') || 'application/json' },
+      headers: fwdHeaders,
       body: reqBody,
       signal: AbortSignal.timeout(PROXY_TIMEOUT_MS),
     });
