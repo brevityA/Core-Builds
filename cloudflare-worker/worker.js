@@ -77,6 +77,8 @@ const ALLOWED_HOSTS = new Set([
   'https://aio.atbphosting.com',
   'https://aiostreams.12312023.xyz',
   'https://aiostreams-stable.forthewizards.uk',
+  // WuPlay genie lane: read probes + (post-dev-blessing) profile-sync writes.
+  'https://api.wuplay.app',
 ]);
 
 const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
@@ -107,7 +109,7 @@ function corsHeaders(request, publicRead = false) {
     'Access-Control-Allow-Origin': allowed,
     ...(publicRead ? {} : {}),
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
   };
@@ -115,6 +117,11 @@ function corsHeaders(request, publicRead = false) {
 
 const PASTE_TTL = 30 * 24 * 60 * 60; // 30 days
 const PASTE_MAX_SIZE = 512 * 1024; // 512 KB
+
+const SECURE_DOC_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+};
 
 function json(status, body, cors = {}) {
   // Allow callers to pass response headers via a `headers` field without them leaking
@@ -128,7 +135,7 @@ function json(status, body, cors = {}) {
   }
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...cors, ...(extraHeaders || {}) },
+    headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, ...(extraHeaders || {}) },
   });
 }
 
@@ -393,7 +400,7 @@ export default {
       if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_viewed');
       // no-store: pastes can carry a user's config — never let a shared CDN cache them.
       return new Response(val, {
-        headers: { 'Content-Type': 'application/json', ...publicCors, ...NO_STORE },
+        headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...publicCors, ...NO_STORE },
       });
     }
 
@@ -439,9 +446,12 @@ export default {
       if (reqBody === null) return respond(413, { error: 'request too large' });
     }
 
+    const fwdHeaders = { 'Content-Type': request.headers.get('Content-Type') || 'application/json' };
+    const auth = request.headers.get('Authorization');
+    if (auth) fwdHeaders['Authorization'] = auth;   // forward-pass only when caller set it (WuPlay device tokens)
     const upstreamReq = new Request(upstreamUrl, {
       method: request.method,
-      headers: { 'Content-Type': request.headers.get('Content-Type') || 'application/json' },
+      headers: fwdHeaders,
       body: reqBody,
       signal: AbortSignal.timeout(PROXY_TIMEOUT_MS),
     });
@@ -477,6 +487,7 @@ export default {
     return new Response(resBody, {
       status: upstreamRes.status,
       headers: {
+        ...SECURE_DOC_HEADERS,
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
         ...(publicCors || cors),
         ...NO_STORE,

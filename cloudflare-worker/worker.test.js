@@ -234,3 +234,55 @@ test('contact POST keeps strict CORS echo (no wildcard)', async () => {
   const response = await worker.fetch(request, {});
   assert.notEqual(response.headers.get('Access-Control-Allow-Origin'), '*');
 });
+
+
+test('proxy: api.wuplay.app is allowlisted and forwards Authorization when set (genie lane)', async () => {
+  let upstreamUrl; let upstreamHeaders;
+  global.fetch = async (input, init) => {
+    upstreamUrl = String(input.url || input);
+    upstreamHeaders = (input && input.headers) ? { Authorization: input.headers.get('Authorization') } : (init?.headers || {});
+    return new Response('{"latestVersionName":"0.8.1"}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const res = await worker.fetch(new Request(
+    'https://w.example/proxy/app/version?host=' + encodeURIComponent('https://api.wuplay.app'),
+    { method: 'GET', headers: { Authorization: 'Bearer tok-123' } }
+  ), { }, {}); // no env needed on the happy path
+  assert.equal(res.status, 200);
+  assert.ok(upstreamUrl.startsWith('https://api.wuplay.app/'), 'upstream targets api.wuplay.app');
+  assert.equal(upstreamHeaders['Authorization'], 'Bearer tok-123', 'device token forwarded untouched');
+});
+
+test('proxy: must not invent an Authorization header when the caller sent none', async () => {
+  let upstreamHeaders;
+  global.fetch = async (input, init) => {
+    upstreamHeaders = (input && input.headers) ? { Authorization: input.headers.get('Authorization') } : (init?.headers || {});
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const res = await worker.fetch(new Request(
+    'https://w.example/proxy/api/v1/status?host=' + encodeURIComponent('https://aiostreams.elfhosted.com'),
+    { method: 'GET' }
+  ), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, {});
+  assert.equal(res.status, 200);
+  assert.equal(upstreamHeaders?.Authorization, null, 'no auth header invented');
+});
+
+test('proxy OPTIONS preflight advertises Authorization in Allow-Headers', async () => {
+  const res = await worker.fetch(new Request(
+    'https://w.example/proxy/app/version?host=' + encodeURIComponent('https://api.wuplay.app'),
+    { method: 'OPTIONS', headers: { Origin: 'https://example.com' } }
+  ), {}, {});
+  assert.equal(res.status, 200);
+  const allow = res.headers.get('Access-Control-Allow-Headers');
+  assert.ok(allow && allow.includes('Authorization'), 'preflight must advertise Authorization');
+});
+
+test('all JSON/paste/proxy responses carry nosniff + no-referrer', async () => {
+  const pastes = {};
+  const env = { TEMPLATES: { put: async (k,v)=>{pastes[k]=v;}, get: async (k)=>pastes[k]||null }, STATS: undefined, RATELIMIT: undefined };
+  const create = await worker.fetch(new Request('https://w.example/paste', { method:'POST', headers:{ 'Content-Type':'application/json', Origin:'https://brevitya.github.io' }, body:'{"a":1}' }), env, { waitUntil: ()=>{} });
+  assert.equal(create.headers.get('X-Content-Type-Options'), 'nosniff');
+  const { url } = await create.json();
+  const read = await worker.fetch(new Request(url, { method:'GET' }), env, { waitUntil: ()=>{} });
+  assert.equal(read.headers.get('X-Content-Type-Options'), 'nosniff');
+  assert.equal(read.headers.get('Referrer-Policy'), 'no-referrer');
+});
