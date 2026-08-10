@@ -109,7 +109,7 @@ function corsHeaders(request, publicRead = false) {
     'Access-Control-Allow-Origin': allowed,
     ...(publicRead ? {} : {}),
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
   };

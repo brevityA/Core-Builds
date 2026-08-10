@@ -265,3 +265,13 @@ test('proxy: must not invent an Authorization header when the caller sent none',
   assert.equal(res.status, 200);
   assert.equal(upstreamHeaders?.Authorization, null, 'no auth header invented');
 });
+
+test('proxy OPTIONS preflight advertises Authorization in Allow-Headers', async () => {
+  const res = await worker.fetch(new Request(
+    'https://w.example/proxy/app/version?host=' + encodeURIComponent('https://api.wuplay.app'),
+    { method: 'OPTIONS', headers: { Origin: 'https://example.com' } }
+  ), {}, {});
+  assert.equal(res.status, 200);
+  const allow = res.headers.get('Access-Control-Allow-Headers');
+  assert.ok(allow && allow.includes('Authorization'), 'preflight must advertise Authorization');
+});
