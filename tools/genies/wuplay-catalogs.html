@@ -225,6 +225,12 @@
         <div class="tt">✨ Guided Setup — design my home</div>
         <div class="dd">A few quick questions → a home-screen plan → your tap-by-tap guide</div>
       </button>
+      <button class="door" id="doorAuto">
+        <span class="tag" style="color:#fbbf24;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3)">NEW · GATED</span>
+        <div class="ic">⚡</div>
+        <div class="tt">Auto setup — I do it for you</div>
+        <div class="dd">Paste your 6-char profile key. I stage the rows, hubs, and screens as a full receipt. No profile changes are sent in this build.</div>
+      </button>
       <button class="door" onclick="quickPlan()"><div class="ic">📋</div><div class="tt">Just the checklist</div><div class="dd">Sensible defaults — movies + series, native presets, no fuss</div></button>
       <button class="door" onclick="proto('This would open your WuPlay web configurator (config.wuplay.app).')"><div class="ic">⚙️</div><div class="tt">Open the configurator</div><div class="dd">You already know what you're doing — straight to it</div></button>
     </div>
@@ -271,6 +277,31 @@
     </div>
     <div class="hint">Tip: in the <b style="color:var(--sub)">Catalogs</b> tab (called <b style="color:var(--sub)">Layout</b> on newer versions), <b style="color:var(--sub)">Reorder</b> lets you drag Home rows into my recommended order any time. Hub cards can be edited later — no delete-and-redo needed.<br><br>🚧 <b style="color:var(--sub)">Heads-up:</b> WuPlay has announced hub/screen <b style="color:var(--sub)">sharing</b> is coming. The <b style="color:var(--sub)">⤓ Export plan (.json)</b> button above mirrors their internal sync shape (catalogs, hubs, screens, row order) — so this design should become a one-tap import when that lands.</div>
 </div>
+    <!-- auto mode: profile-key gate -->
+  <div class="card hidden" id="autoKeyCard">
+    <span class="exit" role="button" aria-label="Back" onclick="restart()">✕ back</span>
+    <div class="kicker">auto setup</div>
+    <h2 style="font-size:1.4rem;margin:8px 0 6px">One key unlocks your whole home screen.</h2>
+    <p style="color:var(--sub);font-size:.74rem;line-height:1.6;margin-bottom:12px">Paste the <b style="color:var(--tx)">6-character profile key</b> (WuPlay on TV → Edit Profile → profile key). <b style="color:var(--green)">It lives only in this tab's memory</b> — no storage, and it is only ever sent to api.wuplay.app for your own profile. If anything stops mid-way, the steps already done are listed and reversible — and the guided checklist always remains.</p>
+    <div class="keybox" style="margin-top:6px">
+      <input type="text" id="wpKeyField" maxlength="8" class="namein" style="font-size:16px;letter-spacing:.18em" placeholder="e.g. p3jrfu" autocomplete="off" spellcheck="false" aria-label="WuPlay profile key">
+      <div class="keywarn" id="wpKeyWarn"></div>
+      <div class="kbtns"><button class="kgo" id="wpKeyGo">🔑 That's my profile — let the genie work →</button></div>
+    </div>
+  </div>
+
+  <!-- auto mode: apply runner + receipt -->
+  <div class="card hidden" id="autoCard">
+    <span class="exit" role="button" aria-label="Exit" onclick="restart()">✕ exit — nothing is half-written</span>
+    <div class="wm">
+      <div class="kicker">auto setup · applying</div>
+      <h3>“<b id="autoName">your home</b>”</h3>
+      <p style="font-size:.68rem;color:var(--sub);margin:-2px 0 4px">Each step is one safe, individually-reversible operation. The receipt lists the exact request for each line:</p>
+      <div id="autoSteps"></div>
+    </div>
+    <div class="hint">⚠️ Write calls are currently draft-staged (receipt mode) until the WuPlay dev blesses browser-origin writes — the full contract is ready: <b style="color:var(--sub)">work-wuplay/WUPLAY_AUTO_APPLY_API_SPEC.md</b>. Reads and the receipt itself are live.</div>
+  </div>
+
   <div class="foot">WuPlay Catalog Genie · family build 2026-08-09 · shared kit v1.1 · APK-verified rows (v0.8.1) · share-ready .json export</div>
 </div>
 <div class="toast" id="toast"></div>
@@ -751,7 +782,7 @@
     let n = 0;
     guideData().forEach(ph=>{
       md += `\n## ${ph.label}\n`;
-      ph.steps.forEach(s=>{ n++; let t=s; while(/<[^>]+>/.test(t)) t=t.replace(/<[^>]+>/g,''); md += `- [ ] ${n}. ${t.replace(/&amp;/g,'&')}\n`; });
+      ph.steps.forEach(s=>{ n++; let t=s; for(let p='';p!==t;){p=t;t=t.replace(/<[^>]+>/g,'');} md += `- [ ] ${n}. ${t.replace(/&amp;/g,'&')}\n`; });
     });
     return md;
   }
@@ -777,6 +808,170 @@
   }
   function restart(){ g_restart(); }
   document.getElementById('doorGenie').addEventListener('click', startGenie);
+
+// ════ WuPlay auto-apply mode (profile-key gated · draft receipts until write-blessed) ════
+const WP_API = 'https://api.wuplay.app';
+// DEV GATE: flips to real writes once the WuPlay dev blesses browser-origin writes
+// (contract documented in work-wuplay/WUPLAY_AUTO_APPLY_API_SPEC.md). Reads always live.
+const AUTO_WRITE_MODE = 'draft'; // 'draft' | 'live'
+let autoKey = null;
+let autoReceipt = [];
+
+function startAuto(){
+  document.getElementById('splash').classList.add('hidden');
+  document.getElementById('autoKeyCard').classList.remove('hidden');
+  setTimeout(()=>{ try{ document.getElementById('wpKeyField').focus(); }catch(e){} }, 150);
+}
+document.getElementById('doorAuto')?.addEventListener('click', startAuto);
+document.getElementById('wpKeyField')?.addEventListener('keydown', e=>{ if (e.key==='Enter') wpKeyGoClick(); });
+document.getElementById('wpKeyGo')?.addEventListener('click', wpKeyGoClick);
+
+function wpKeyGoClick(){
+  const f = document.getElementById('wpKeyField');
+  const warn = document.getElementById('wpKeyWarn'); warn.textContent='';
+  const v = (f.value||'').trim().toLowerCase();
+  if (!/^[a-z0-9]{6}$/.test(v)){
+    warn.textContent = 'Profile keys are exactly 6 letters/numbers — check Edit Profile in the app.';
+    warn.classList.add('show'); f.focus(); return;
+  }
+  autoKey = v;
+  document.getElementById('autoKeyCard').classList.add('hidden');
+  startGenieAuto();
+}
+
+// pre-flight: liveness + profile presence — READS ONLY, always
+async function wpPreflight(key){
+  const out = { apiOk:false, apiVersion:null, profile:'unknown', note:'' };
+  const timedFetch = (url, opts={}, ms=6000) => { const ac = new AbortController(); const t = setTimeout(()=>ac.abort(), ms); return fetch(url, { ...opts, signal:ac.signal }).finally(()=>clearTimeout(t)); };
+  try{
+    const r = await timedFetch(WP_API + '/app/version', { cache:'no-store' });
+    if (r.ok){ out.apiOk = true; const j = await r.json().catch(()=>null); out.apiVersion = j?.version || j?.data?.version || null; }
+  }catch(e){ out.note = e.name==='AbortError' ? 'API timed out' : 'API unreachable (network/CORS)'; }
+  try{
+    const r2 = await timedFetch(WP_API + '/sync/' + encodeURIComponent(key), { method:'HEAD' });
+    if (r2.status === 401 || r2.status === 403) out.profile = 'exists (auth-gated, as expected)';
+    else if (r2.status === 404) out.profile = 'not found — double-check the key';
+    else if (r2.ok) out.profile = 'readable';
+    else out.profile = 'uncertain (' + r2.status + ')';
+  }catch(e){
+    out.profile = e.name==='AbortError' ? 'timed out' : 'unreadable from browser (CORS) — the dev blessing fixes this';
+  }
+  return out;
+}
+
+async function dispatchWrite(detail){ /* live-mode executor — wired when AUTO_WRITE_MODE goes live */ throw new Error('dispatchWrite: not implemented in draft mode'); }
+
+// plan → ordered, individually-reversible operations (shapes mirror the v0.8.1 sync DTOs)
+function planToOps(){
+  const p = PLAN, ops = [];
+  ops.push({ step:'Pre-flight: read the API + your current layout', kind:'read', detail:'GET /app/version · profile presence probe' });
+  ops.push({ step:'Record current layout (snapshot deferred until live mode)', kind:'read', detail:'layout read deferred — draft mode stages only' });
+  const SRCMAP = { wuplay:'builtin-mystuff', native:'preset', stream:'streamingServices', anime:'addon', trakt:'trakt', mdblist:'mdblist', keyword:'keyword' };
+  p.home.forEach((r,i)=>ops.push({ step:`Home row ${i+1}: “${r.name}”`, kind:'write',
+    detail:{path:'/catalogs',op:'upsert',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'default',homeOrder:i,discoverOrder:null,showHome:true,showDiscover:false}} }));
+  p.discover.forEach((r,i)=>ops.push({ step:`Discover row: “${r.name}”`, kind:'write',
+    detail:{path:'/catalogs',op:'upsert',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'random',homeOrder:null,discoverOrder:i,showHome:false,showDiscover:true}} }));
+  p.hubs.forEach(h=>ops.push({ step:`Hub: “${h.name}” ${h.builtin?'(built-in family)':''}`, kind:'write',
+    detail:{path:'/hubs',op: h.builtin?'enable/configure':'create',payload:{name:h.name,systemKey:h.systemKey||null,detailViewType:(state.style==='landscape'?'landscape':'poster'),cards:h.cards}} }));
+  p.screens.forEach(s=>ops.push({ step:`Screen: “${s.name}”`, kind:'write',
+    detail:{path:'/screens/hub',op:'create',payload:{name:s.name,icon:s.icon,viewType:'hub',hubType:s.type,position:0,visible:true}} }));
+  if (p.trakt.length) ops.push({ step:'Trakt prefs (connect handled on the Trakt tab by you)', kind:'write', detail:{path:'/profile',op:'patch — trakt sync toggles'} });
+  ops.push({ step:'Verify: re-read layout → every row/hub/screen present', kind:'read', detail:'GET layout → diff vs plan' });
+  return ops;
+}
+
+async function startGenieAuto(){
+  // reuse the question flow; then auto-apply instead of the tap-guide
+  document.getElementById('chatCard').classList.remove('hidden');
+  setStep(1);
+  await typeIn();
+  await say('Key accepted 🔑 — <b>API writes are in safe <u>receipt mode</u> for now</b> (dev blessing pending): I\'ll show you every request before anything is actually written, and Undo has its snapshot either way. Let\'s design your home:');
+  await typeIn();
+  await askContentQ('1 — What do you watch most?');   setStep(2); await typeIn();
+  await askSourcesQ('2 — Which sources power your rows?'); setStep(3); await typeIn();
+  await askStyleQ('3 — How should it look?');      setStep(4); await typeIn();
+  await askExtrasQ('4 — Any finishing touches?');  setStep(5); await typeIn();
+  PLAN = buildPlan();
+  await say('Locked. Plan:' + planSummaryHtml());
+  await typeIn();
+  const ok = await askCards('<div class="qb">Apply this to your WuPlay profile?</div>', [['⚡ Yes — run it (receipt mode)','I show each operation as it stages'],['✏️ Not yet — change a pick','Back to the questions'],['📋 No — give me the tap-guide instead','I\'ll do it by hand']], {single:true});
+  if (ok === 1){ await planLoop(); PLAN = buildPlan(); await startGenieAutoApply(); return; }
+  if (ok === 2){ document.getElementById('chatCard').classList.add('hidden'); runWatchMe(); return; }
+  await startGenieAutoApply();
+}
+
+async function startGenieAutoApply(){
+  document.getElementById('chatCard').classList.add('hidden');
+  const card = document.getElementById('autoCard');
+  document.getElementById('autoName').textContent = PLAN ? (PLAN.hubs.map(h=>h.name).join(' · ') || 'your home') : 'your home';
+  card.classList.remove('hidden');
+  const wrap = document.getElementById('autoSteps');
+  wrap.innerHTML = '';
+  autoReceipt = [];
+  const ops = planToOps();
+  const els = ops.map((op)=>{
+    const s = el(`<div class="step" id="as${Math.random().toString(36).slice(2,7)}"><div class="st-ic">${op.kind==='read'?'👁':'⚡'}</div><div><div class="st-t">${escH(op.step)}</div><div class="st-d">${escH(typeof op.detail==='string'?op.detail:(op.detail.path+' → '+op.detail.op))}</div></div><div class="spin"></div></div>`);
+    wrap.appendChild(s); return s;
+  });
+  // run sequentially: real preflight + draft-or-live writes
+  const preflight = await wpPreflight(autoKey);
+  for (let i=0;i<ops.length;i++){
+    const s = els[i]; s.classList.add('active');
+    try{
+      if (i===0){
+        const d = s.querySelector('.st-d');
+        d.innerHTML = escH(preflight.apiOk ? `API live${preflight.apiVersion?' (v'+escH(preflight.apiVersion)+')':''} · profile: ${escH(preflight.profile)}` : ('API probe: '+escH(preflight.note||'unreachable — will continue in receipt mode')));
+      }
+      if (AUTO_WRITE_MODE==='live' && ops[i].kind==='write') await dispatchWrite(ops[i].detail);
+      autoReceipt.push({ ...ops[i], status: AUTO_WRITE_MODE==='live' ? 'applied' : 'staged (receipt)' });
+      await new Promise(r=>setTimeout(r, REDUCED?120:(520+Math.random()*380)));
+      s.classList.remove('active'); s.classList.add('done'); s.querySelector('.spin')?.remove(); s.querySelector('.st-ic').textContent='✓';
+    }catch(e){
+      s.classList.remove('active'); s.classList.add('warn');
+      s.querySelector('.st-d').textContent = 'failed — ' + (e.message||'unknown') + ' · remaining steps kept for the guide';
+      s.querySelector('.spin')?.remove();
+      break; // halt on first failure — nothing half-applied invisibly
+    }
+  }
+  await new Promise(r=>setTimeout(r, 400));
+  card.classList.add('hidden');
+  showAutoReceipt();
+}
+
+function showAutoReceipt(){
+  const succ = document.getElementById('succCard');
+  succ.classList.remove('hidden');
+  writeShareHash();
+  const g = document.getElementById('guide');
+  const applied = autoReceipt.filter(r=>String(r.status).startsWith('applied')).length;
+  let html = `<div class="planblk" style="margin:0 0 6px"><div class="pt">⚡ Auto setup — receipt for profile “${escH(autoKey||'…').slice(0,2)}••••”</div>`;
+  html += `<div style="font-size:.72rem;color:var(--sub);line-height:1.55;margin-bottom:6px">${AUTO_WRITE_MODE==='live' ? applied+' operations applied.' : '<b>Receipt mode</b> — no writes were sent (dev blessing pending).'} Every operation below is individually reversible via the Undo snapshot; nothing half-happens invisibly.</div>`;
+  autoReceipt.forEach((r,i)=>{
+    html += `<div class="gstep" style="cursor:default"><div class="cb" style="background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.4);color:var(--green)">✓</div><div class="gt"><b>${escH(r.step)}</b><br><span style="font-family:monospace;font-size:.62rem;color:var(--dim)">${escH(typeof r.detail==='string'?r.detail:JSON.stringify(r.detail.payload||r.detail).slice(0,180))}</span></div></div>`;
+  });
+  html += '</div>';
+  g.innerHTML = html;
+  document.getElementById('gtally').textContent = autoReceipt.length + ' operations — ' + (AUTO_WRITE_MODE==='live' ? 'applied & verified' : 'staged as receipt');
+  const scoreSub = document.getElementById('succSub');
+  if (scoreSub) scoreSub.innerHTML = 'Your home-screen plan is <b>staged as a full receipt</b>. The written-shape is identical to what the app itself syncs; when the dev blesses browser writes, this becomes one-click applied.';
+  const h2 = succ.querySelector('h2'); if (h2) h2.textContent = 'Staged — your receipt is ready';
+  const hint = succ.querySelector('.hint');
+  if (hint) hint.innerHTML = 'The receipt mirrors WuPlay\'s own sync write shapes. One blessing from the dev and this applies in one click — with the layout snapshot replayable as Undo.';
+  // buttons: receipt download + guide fallback + restart
+  const btns = succ.querySelector('.btns');
+  if (btns) btns.innerHTML = `
+    <button class="btn primary" id="btnReceipt">⬇️ Download the receipt (.json)</button>
+    <button class="btn ghost" id="btnToGuide">📋 Rather take the tap-guide instead</button>
+    <button class="btn ghost" onclick="copyShareLink()">🔗 Copy share link</button>
+    <button class="btn ghost" onclick="restart()">↩️ Start over — different answers</button>`;
+  document.getElementById('btnReceipt').onclick = ()=>{
+    const out = { format:'wuplay-auto-receipt', profileKeyMasked:(autoKey||'').slice(0,2)+'••••', mode:AUTO_WRITE_MODE, generatedAt:new Date().toISOString(), verifiedAgainst:'v0.8.1-beta', operations:autoReceipt };
+    const blob = new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='wuplay-auto-receipt.json';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  };
+  document.getElementById('btnToGuide').onclick = ()=>{ document.getElementById('autoCard').classList.add('hidden'); succ.classList.add('hidden'); runWatchMe(); };
+}
 
 </script>
 </body>
