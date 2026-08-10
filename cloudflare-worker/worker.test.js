@@ -282,7 +282,7 @@ test('all JSON/paste/proxy responses carry nosniff + no-referrer', async () => {
   const create = await worker.fetch(new Request('https://w.example/paste', { method:'POST', headers:{ 'Content-Type':'application/json', Origin:'https://brevitya.github.io' }, body:'{"a":1}' }), env, { waitUntil: ()=>{} });
   assert.equal(create.headers.get('X-Content-Type-Options'), 'nosniff');
   const { url } = await create.json();
-  const read = await worker.fetch(new Request(url.replace('https://w.example','https://w.example'), { method:'GET' }), env, { waitUntil: ()=>{} });
+  const read = await worker.fetch(new Request(url, { method:'GET' }), env, { waitUntil: ()=>{} });
   assert.equal(read.headers.get('X-Content-Type-Options'), 'nosniff');
   assert.equal(read.headers.get('Referrer-Policy'), 'no-referrer');
 });
