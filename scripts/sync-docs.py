@@ -557,8 +557,8 @@ def gen_whats_new_page(cfg_entries, limit=4):
             title = title.strip() or f"Update {i + 1}"
             body = rest.strip() or item
             icon = icon_cycle[i % len(icon_cycle)]
-            safe_title = title.replace('"', "'")
-            safe_body = body.replace('"', "'")
+            safe_title = title.replace('"', "'").replace("<", "&lt;").replace(">", "&gt;")
+            safe_body = body.replace('"', "'").replace("<", "&lt;").replace(">", "&gt;")
             cards.append(f'  <Card title="{safe_title}" icon="{icon}">\n    {safe_body}\n  </Card>')
         cardgroup = f'<CardGroup cols={{2}}>\n' + "\n".join(cards) + "\n</CardGroup>"
         blocks.append(f"## Configurator v{e['v']} ({e['date']})\n\n{cardgroup}")
