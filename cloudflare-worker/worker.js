@@ -118,6 +118,11 @@ function corsHeaders(request, publicRead = false) {
 const PASTE_TTL = 30 * 24 * 60 * 60; // 30 days
 const PASTE_MAX_SIZE = 512 * 1024; // 512 KB
 
+const SECURE_DOC_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+};
+
 function json(status, body, cors = {}) {
   // Allow callers to pass response headers via a `headers` field without them leaking
   // into the JSON body (used for Cache-Control / no-store on sensitive/mutating routes).
@@ -130,7 +135,7 @@ function json(status, body, cors = {}) {
   }
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...cors, ...(extraHeaders || {}) },
+    headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, ...(extraHeaders || {}) },
   });
 }
 
@@ -395,7 +400,7 @@ export default {
       if (env.STATS) bgIncrement(ctx, env.STATS, 'pastes_viewed');
       // no-store: pastes can carry a user's config — never let a shared CDN cache them.
       return new Response(val, {
-        headers: { 'Content-Type': 'application/json', ...publicCors, ...NO_STORE },
+        headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...publicCors, ...NO_STORE },
       });
     }
 
@@ -482,6 +487,7 @@ export default {
     return new Response(resBody, {
       status: upstreamRes.status,
       headers: {
+        ...SECURE_DOC_HEADERS,
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
         ...(publicCors || cors),
         ...NO_STORE,
