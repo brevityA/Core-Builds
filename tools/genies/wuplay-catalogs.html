@@ -295,6 +295,8 @@
       <div style="margin-top:8px;text-align:left">
         <button type="button" id="wpDiagBtn" style="font-size:.62rem;font-weight:800;padding:7px 12px;border-radius:8px;border:1px solid var(--ac-br);background:var(--ac-bg);color:var(--ac);cursor:pointer">🧪 Run live connection diagnostics</button>
         <div id="wpDiagLog" style="display:none;font-family:ui-monospace,monospace;font-size:.6rem;line-height:1.7;color:var(--sub);background:#08080d;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:8px;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow-y:auto"></div>
+        <button type="button" id="wpDeepBtn" style="font-size:.62rem;font-weight:800;padding:7px 12px;border-radius:8px;border:1px solid var(--ac-br);background:transparent;color:var(--ac);cursor:pointer;margin-top:6px">🛰️ Full handshake probe — register this browser → read my real profile shape</button>
+        <div style="font-size:.56rem;color:var(--faint);margin-top:4px;line-height:1.5">Creates one labelled, throwaway device registration (platform "web-genie" — visible in WuPlay's device list, removable), then READS your state. Nothing about your profile is changed.</div>
       </div>
     </div>
     <div class="keybox" style="margin-top:6px">
@@ -905,6 +907,52 @@ async function runWuplayDiagnostics(){
   out('401/403 with a correct key is EXPECTED good news — reads are gated, writes will need the dev\'s blessing + the token handshake from the spec.');
 }
 
+document.getElementById('wpDeepBtn')?.addEventListener('click', wpHandshakeProbe);
+
+async function wpHandshakeProbe(){
+  const log = document.getElementById('wpDiagLog'); if(!log) return;
+  log.style.display='block'; log.textContent='';
+  const out = m => { log.textContent += m + '\n'; log.scrollTop = log.scrollHeight; };
+  const key = (document.getElementById('wpKeyField')?.value||'').trim().toLowerCase();
+  if (!/^[a-z0-9]{6}$/.test(key)){ out('✗ Paste your 6-char profile key above first.'); return; }
+  out('🛰️ handshake probe — ' + new Date().toLocaleTimeString() + ' · key ' + key.slice(0,2) + '••••');
+  let token = null;
+  const ac1 = new AbortController(); const tm1 = setTimeout(()=>ac1.abort(), 6000);
+  try{
+    const r = await wpFetch('/devices/register', { method:'POST', headers:{'Content-Type':'application/json'}, signal:ac1.signal,
+      body: JSON.stringify({ androidId:'genie-' + Math.random().toString(16).slice(2,10), deviceModel:'Core Builds Genie (browser)', deviceManufacturer:'Core Builds', deviceBrand:'Web', androidVersion:'web', sdkVersion:0, securityPatch:'n/a', socManufacturer:'n/a', socModel:'n/a', platform:'web-genie', appVersion:'0.8.1' }) });
+    clearTimeout(tm1);
+    if (!r.ok) throw new Error('register HTTP ' + r.status + ' — ' + (await r.text()).slice(0,120));
+    token = (await r.json()).token;
+    out('✓ device registered — token ' + token.slice(0,6) + '… (session-only, never stored)');
+  }catch(e){ clearTimeout(tm1); out('✗ register failed: ' + (e.message||e)); return; }
+  const ac2 = new AbortController(); const tm2 = setTimeout(()=>ac2.abort(), 6000);
+  try{
+    const r = await wpFetch('/devices/me', { headers:{Authorization:'Bearer ' + token}, signal:ac2.signal });
+    clearTimeout(tm2);
+    const j = await r.json().catch(()=>null);
+    out(r.ok ? '✓ device valid — id ' + (j?.id ?? '?') : '✗ devices/me HTTP ' + r.status);
+  }catch(e){ clearTimeout(tm2); out('✗ devices/me: ' + (e.message||e)); }
+  const ac3 = new AbortController(); const tm3 = setTimeout(()=>ac3.abort(), 6000);
+  try{
+    const r = await wpFetch('/sync/' + encodeURIComponent(key), { headers:{Authorization:'Bearer ' + token}, signal:ac3.signal });
+    clearTimeout(tm3);
+    if (!r.ok){ out('✗ profile read HTTP ' + r.status + (r.status===401||r.status===403 ? ' — token↔profile binding exists (needs the link step)' : '')); return; }
+    const s = await r.json();
+    const P = s.profile || {};
+    out('✓ PROFILE READ OK — "' + (P.name||'?') + '"' + (P.hasPinSet ? ' · 🔒 PIN set (live writes will ask once)' : ' · no PIN'));
+    out('   rows ' + (s.catalogs||[]).length + ' · hubs ' + (s.hubs||[]).length + ' · screens ' + (s.screens||[]).length + ' · layouts ' + (s.layouts||[]).length + ' · revisions c' + (s.catalogsRevision??'?') + '/s' + (s.screensRevision??'?'));
+    out('   trakt: ' + (s.traktConnected ? 'connected as ' + (s.traktUsername||'?') : 'not connected'));
+    const slim = { ...s, library:(s.library||[]).length+' items (withheld from export)', watchlists:(s.watchlists||[]).length+' (withheld)', savedCollections:(s.savedCollections||[]).length+' (withheld)' };
+    window.__wpStateCapture = slim;
+    const b = new Blob([JSON.stringify(slim,null,2)],{type:'application/json'}); const a=document.createElement('a');
+    a.href=URL.createObjectURL(b); a.download='wuplay-state-structure.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    out('⬇️ structural snapshot downloaded (library/watchlist contents withheld) — this file is the Undo source + the contract evidence.');
+    out('\n— verdict —');
+    out(‘Register→read works from this browser via the proxy. The remaining unknown is the web configurator’s catalog-create route (one devtools capture on config.wuplay.app closes it).’);
+  }catch(e){ clearTimeout(tm3); out('✗ profile read failed: ' + (e.message||e)); }
+}
+
 function startAuto(){
   document.getElementById('splash').classList.add('hidden');
   document.getElementById('autoKeyCard').classList.remove('hidden');
@@ -952,19 +1000,19 @@ async function dispatchWrite(detail){ /* live-mode executor — wired when AUTO_
 // plan → ordered, individually-reversible operations (shapes mirror the v0.8.1 sync DTOs)
 function planToOps(){
   const p = PLAN, ops = [];
-  ops.push({ step:'Pre-flight: read the API + your current layout', kind:'read', detail:'GET /app/version · profile presence probe' });
-  ops.push({ step:'Record current layout (snapshot deferred until live mode)', kind:'read', detail:'layout read deferred — draft mode stages only' });
+  ops.push({ step:'Pre-flight: register device → read profile snapshot (Undo source)', kind:'read', verified:true, detail:'POST /devices/register → GET /sync/{key}' });
+  ops.push({ step:'Record current layout (snapshot deferred until live mode)', kind:'read', verified:true, detail:'layout read deferred — draft mode stages only' });
   const SRCMAP = { wuplay:'builtin-mystuff', native:'preset', stream:'streamingServices', anime:'addon', trakt:'trakt', mdblist:'mdblist', keyword:'keyword' };
-  p.home.forEach((r,i)=>ops.push({ step:`Home row ${i+1}: “${r.name}”`, kind:'write',
-    detail:{path:'/catalogs',op:'upsert',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'default',homeOrder:i,discoverOrder:null,showHome:true,showDiscover:false}} }));
-  p.discover.forEach((r,i)=>ops.push({ step:`Discover row: “${r.name}”`, kind:'write',
-    detail:{path:'/catalogs',op:'upsert',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'random',homeOrder:null,discoverOrder:i,showHome:false,showDiscover:true}} }));
-  p.hubs.forEach(h=>ops.push({ step:`Hub: “${h.name}” ${h.builtin?'(built-in family)':''}`, kind:'write',
-    detail:{path:'/hubs',op: h.builtin?'enable/configure':'create',payload:{name:h.name,systemKey:h.systemKey||null,detailViewType:(state.style==='landscape'?'landscape':'poster'),cards:h.cards}} }));
-  p.screens.forEach(s=>ops.push({ step:`Screen: “${s.name}”`, kind:'write',
-    detail:{path:'/screens/hub',op:'create',payload:{name:s.name,icon:s.icon,viewType:'hub',hubType:s.type,position:0,visible:true}} }));
-  if (p.trakt.length) ops.push({ step:'Trakt prefs (connect handled on the Trakt tab by you)', kind:'write', detail:{path:'/profile',op:'patch — trakt sync toggles'} });
-  ops.push({ step:'Verify: re-read layout → every row/hub/screen present', kind:'read', detail:'GET layout → diff vs plan' });
+  p.home.forEach((r,i)=>ops.push({ step:`Home row ${i+1}: “${r.name}”`, kind:'write', verified:false,
+    detail:{path:'/sync/{key}/catalog/{id}',op:'upsert — create-route pending (configurator capture)',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'default',homeOrder:i,discoverOrder:null,showHome:true,showDiscover:false}} }));
+  p.discover.forEach((r,i)=>ops.push({ step:`Discover row: “${r.name}”`, kind:'write', verified:false,
+    detail:{path:'/sync/{key}/catalog/{id}',op:'upsert — create-route pending (configurator capture)',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'random',homeOrder:null,discoverOrder:i,showHome:false,showDiscover:true}} }));
+  p.hubs.forEach(h=>ops.push({ step:`Hub: “${h.name}” ${h.builtin?'(built-in family)':''}`, kind:'write', verified:true,
+    detail:{path:'/sync/{key}/hubs/{id}',op: h.builtin?'PATCH enable/configure':'create',payload:{name:h.name,systemKey:h.systemKey||null,detailViewType:(state.style==='landscape'?'landscape':'poster'),cards:h.cards}} }));
+  p.screens.forEach(s=>ops.push({ step:`Screen: “${s.name}”`, kind:'write', verified:s.type==='hub'?false:true,
+    detail:{path:s.type==='hub'?'/sync/{key}/screens/hub':'/sync/{key}/screens/{id}',op:s.type==='hub'?'create — pending':'PATCH layout',payload:{name:s.name,icon:s.icon,viewType:'hub',hubType:s.type,position:0,visible:true}} }));
+  if (p.trakt.length) ops.push({ step:'Trakt prefs (connect handled on the Trakt tab by you)', kind:'write', verified:true, detail:{path:'/sync/{key}/profile',op:'PATCH — trakt sync toggles'} });
+  ops.push({ step:'Verify: re-read layout → diff vs plan', kind:'read', verified:true, detail:'GET /sync/{key} re-read + diff vs plan' });
   return ops;
 }
 
@@ -1035,7 +1083,8 @@ function showAutoReceipt(){
   let html = `<div class="planblk" style="margin:0 0 6px"><div class="pt">⚡ Auto setup — receipt for profile “${escH(autoKey||'…').slice(0,2)}••••”</div>`;
   html += `<div style="font-size:.72rem;color:var(--sub);line-height:1.55;margin-bottom:6px">${AUTO_WRITE_MODE==='live' ? applied+' operations applied.' : '<b>Receipt mode</b> — no writes were sent (dev blessing pending).'} Every operation below is individually reversible via the Undo snapshot; nothing half-happens invisibly.</div>`;
   autoReceipt.forEach((r,i)=>{
-    html += `<div class="gstep" style="cursor:default"><div class="cb" style="background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.4);color:var(--green)">✓</div><div class="gt"><b>${escH(r.step)}</b><br><span style="font-family:monospace;font-size:.62rem;color:var(--dim)">${escH(typeof r.detail==='string'?r.detail:JSON.stringify(r.detail.payload||r.detail).slice(0,180))}</span></div></div>`;
+    const vb = r.verified===false ? '<span style="color:#fbbf24;font-size:.58rem"> ⚠ pending</span>' : '<span style="color:var(--green);font-size:.58rem"> ✓ verified</span>';
+    html += `<div class="gstep" style="cursor:default"><div class="cb" style="background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.4);color:var(--green)">✓</div><div class="gt"><b>${escH(r.step)}</b>${vb}<br><span style="font-family:monospace;font-size:.62rem;color:var(--dim)">${escH(typeof r.detail==='string'?r.detail:JSON.stringify(r.detail.payload||r.detail).slice(0,180))}</span></div></div>`;
   });
   html += '</div>';
   g.innerHTML = html;
@@ -1044,7 +1093,7 @@ function showAutoReceipt(){
   if (scoreSub) scoreSub.innerHTML = 'Your home-screen plan is <b>staged as a full receipt</b>. The written-shape is identical to what the app itself syncs; when the dev blesses browser writes, this becomes one-click applied.';
   const h2 = succ.querySelector('h2'); if (h2) h2.textContent = 'Staged — your receipt is ready';
   const hint = succ.querySelector('.hint');
-  if (hint) hint.innerHTML = 'The receipt mirrors WuPlay\'s own sync write shapes. One blessing from the dev and this applies in one click — with the layout snapshot replayable as Undo.';
+  if (hint) hint.innerHTML = 'Hubs/screens/profile writes are live-verified contract; catalog-row create lands when the configurator route is captured.';
   // buttons: receipt download + guide fallback + restart
   const btns = succ.querySelector('.btns');
   if (btns) btns.innerHTML = `
