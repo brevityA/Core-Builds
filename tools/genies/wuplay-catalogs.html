@@ -298,7 +298,7 @@
       </div>
     </div>
     <div class="keybox" style="margin-top:6px">
-      <input type="text" id="wpKeyField" maxlength="8" class="namein" style="font-size:16px;letter-spacing:.18em" placeholder="e.g. demo4u" autocomplete="off" spellcheck="false" aria-label="WuPlay profile key">
+      <input type="text" id="wpKeyField" maxlength="6" class="namein" style="font-size:16px;letter-spacing:.18em" placeholder="e.g. demo4u" autocomplete="off" spellcheck="false" aria-label="WuPlay profile key">
       <div class="keywarn" id="wpKeyWarn"></div>
       <div class="kbtns"><button class="kgo" id="wpKeyGo">🔑 That's my profile — let the genie work →</button></div>
     </div>
@@ -846,12 +846,14 @@ async function testProxy(){
   if (!st) return;
   if (!base){ st.textContent='Proxy off — requests go direct to api.wuplay.app (browser CORS may gate reads).'; st.style.color='var(--dim)'; return; }
   st.textContent='Testing…'; st.style.color='var(--dim)';
+  const ac = new AbortController(); const tm = setTimeout(()=>ac.abort(), 6000);
   try{
-    const r = await wpFetch('/app/version', { cache:'no-store' });
+    const r = await wpFetch('/app/version', { cache:'no-store', signal:ac.signal });
+    clearTimeout(tm);
     if (r.ok){ st.innerHTML=`✓ proxy up — api.wuplay.app reachable through it (<b style='color:var(--green)'>OK</b>)`; st.style.color='var(--green)'; }
     else if (r.status===403){ st.textContent='✗ proxy answer 403 — api.wuplay.app needs adding to the worker\'s ALLOWED_HOSTS (one line) + redeploy'; st.style.color='#fbbf24'; }
     else { st.textContent='✗ proxy answered '+r.status; st.style.color='#fbbf24'; }
-  }catch(e){ st.textContent='✗ proxy unreachable — '+(e&&e.message?e.message:'network'); st.style.color='#f87171'; }
+  }catch(e){ clearTimeout(tm); st.textContent='✗ proxy unreachable — '+(e&&e.message?e.message:'network'); st.style.color='#f87171'; }
 }
 document.getElementById('wpProxyTest')?.addEventListener('click', testProxy);
 document.getElementById('wpDiagBtn')?.addEventListener('click', runWuplayDiagnostics);
@@ -863,6 +865,7 @@ async function runWuplayDiagnostics(){
   const out = m => { log.textContent += m + '\n'; log.scrollTop = log.scrollHeight; };
   const key = (document.getElementById('wpKeyField')?.value||'').trim().toLowerCase() || 'XXXXXX';
   const useProxy = !!document.getElementById('wpUseProxy')?.checked;
+  const diagSignal = () => { const ac = new AbortController(); setTimeout(()=>ac.abort(), 6000); return ac.signal; };
   const t = async (label, fn) => {
     const t0 = performance.now();
     try { const v = await fn(); out(`✓ ${label} — ${v} (${Math.round(performance.now()-t0)}ms)`); return v; }
@@ -870,20 +873,20 @@ async function runWuplayDiagnostics(){
   };
   out('🧪 diagnostics — ' + new Date().toLocaleTimeString() + ' · key ' + (key.length===6 ? key.slice(0,2)+'••••' : '(not set)') + ' · proxy ' + (useProxy?'ON':'OFF'));
   await t('direct GET /app/version (browser CORS honesty check)', async()=>{
-    const r = await fetch(WP_API + '/app/version', { cache:'no-store' });
+    const r = await fetch(WP_API + '/app/version', { cache:'no-store', signal:diagSignal() });
     if (!r.ok) throw new Error('HTTP '+r.status);
     const j = await r.json();
     return 'reachable, live version v' + (j.latestVersionName||j.version||'?');
   });
   if (key.length === 6){
     await t('profile read: GET /sync/{key} (no auth)', async()=>{
-      const r = await fetch(WP_API + '/sync/' + encodeURIComponent(key), { cache:'no-store' });
+      const r = await fetch(WP_API + '/sync/' + encodeURIComponent(key), { cache:'no-store', signal:diagSignal() });
       if (r.status===401||r.status===403) return 'auth-gated ('+r.status+') — needs the device-token handshake (expected)';
       if (r.status===404) throw new Error('profile not found (404) — check the key');
       return 'responded '+r.status;
     });
     await t('profile read with key-as-Bearer (tests if the key IS the credential)', async()=>{
-      const r = await fetch(WP_API + '/sync/' + encodeURIComponent(key), { headers:{Authorization:'Bearer '+key} });
+      const r = await fetch(WP_API + '/sync/' + encodeURIComponent(key), { headers:{Authorization:'Bearer '+key}, signal:diagSignal() });
       if (r.status===401||r.status===403) return 'declined ('+r.status+') — key is visual, real auth is the device token';
       if (r.ok) return '✨ KEY WORKS AS BEARER — direct mode possible without register';
       return 'responded '+r.status;
@@ -891,7 +894,7 @@ async function runWuplayDiagnostics(){
   } else out('(skip profile probes — paste your 6-char key above first)');
   await t('via proxy: GET /app/version', async()=>{
     const base = (document.getElementById('wpProxyUrl').value||'').replace(/\/+$/,'');
-    const r = await fetch(base + '/proxy/app/version?host=' + encodeURIComponent(WP_API));
+    const r = await fetch(base + '/proxy/app/version?host=' + encodeURIComponent(WP_API), { signal:diagSignal() });
     if (r.ok) return 'proxy live ✓';
     if (r.status===403) throw new Error('403 — add api.wuplay.app to ALLOWED_HOSTS in the worker');
     return 'answered '+r.status;
