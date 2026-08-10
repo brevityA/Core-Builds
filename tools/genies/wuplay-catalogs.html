@@ -283,8 +283,22 @@
     <div class="kicker">auto setup</div>
     <h2 style="font-size:1.4rem;margin:8px 0 6px">One key unlocks your whole home screen.</h2>
     <p style="color:var(--sub);font-size:.74rem;line-height:1.6;margin-bottom:12px">Paste the <b style="color:var(--tx)">6-character profile key</b> (WuPlay on TV → Edit Profile → profile key). <b style="color:var(--green)">It lives only in this tab's memory</b> — no storage, and it is only ever sent to api.wuplay.app for your own profile. If anything stops mid-way, the steps already done are listed and reversible — and the guided checklist always remains.</p>
+    <div style="margin:10px 0 2px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card2)">
+      <label style="display:block;font-size:.66rem;color:var(--sub);cursor:pointer;line-height:1.55">
+        <input type="checkbox" id="wpUseProxy" checked style="accent-color:var(--ac);vertical-align:-2px"> Route requests through the <b style="color:var(--tx)">Core Builds CORS proxy</b> — bypasses browser CORS blocks
+      </label>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input type="text" id="wpProxyUrl" class="namein" style="font-size:12px" value="https://core-builds-cors-proxy.tlorenzato26.workers.dev" spellcheck="false" aria-label="Proxy worker URL">
+        <button class="namego" id="wpProxyTest" type="button" style="white-space:nowrap">Test →</button>
+      </div>
+      <div id="wpProxyStatus" style="font-size:.64rem;color:var(--dim);margin-top:6px;line-height:1.5"></div>
+      <div style="margin-top:8px;text-align:left">
+        <button type="button" id="wpDiagBtn" style="font-size:.62rem;font-weight:800;padding:7px 12px;border-radius:8px;border:1px solid var(--ac-br);background:var(--ac-bg);color:var(--ac);cursor:pointer">🧪 Run live connection diagnostics</button>
+        <div id="wpDiagLog" style="display:none;font-family:ui-monospace,monospace;font-size:.6rem;line-height:1.7;color:var(--sub);background:#08080d;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:8px;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow-y:auto"></div>
+      </div>
+    </div>
     <div class="keybox" style="margin-top:6px">
-      <input type="text" id="wpKeyField" maxlength="8" class="namein" style="font-size:16px;letter-spacing:.18em" placeholder="e.g. demo4u" autocomplete="off" spellcheck="false" aria-label="WuPlay profile key">
+      <input type="text" id="wpKeyField" maxlength="6" class="namein" style="font-size:16px;letter-spacing:.18em" placeholder="e.g. demo4u" autocomplete="off" spellcheck="false" aria-label="WuPlay profile key">
       <div class="keywarn" id="wpKeyWarn"></div>
       <div class="kbtns"><button class="kgo" id="wpKeyGo">🔑 That's my profile — let the genie work →</button></div>
     </div>
@@ -817,6 +831,80 @@ const AUTO_WRITE_MODE = 'draft'; // 'draft' | 'live'
 let autoKey = null;
 let autoReceipt = [];
 
+function proxyBase(){ const i=document.getElementById('wpProxyUrl'); return (i && document.getElementById('wpUseProxy')?.checked) ? i.value.replace(/\/+$/,'') : null; }
+async function wpFetch(path, init){
+  const base = proxyBase();
+  if (base){
+    const u = new URL(path.startsWith('/') ? path : '/'+path, WP_API);
+    const px = `${base}/proxy${u.pathname}?host=${encodeURIComponent(u.origin)}`;
+    return fetch(px, init);
+  }
+  return fetch(WP_API + path, init);
+}
+async function testProxy(){
+  const st = document.getElementById('wpProxyStatus'); const base = proxyBase();
+  if (!st) return;
+  if (!base){ st.textContent='Proxy off — requests go direct to api.wuplay.app (browser CORS may gate reads).'; st.style.color='var(--dim)'; return; }
+  st.textContent='Testing…'; st.style.color='var(--dim)';
+  const ac = new AbortController(); const tm = setTimeout(()=>ac.abort(), 6000);
+  try{
+    const r = await wpFetch('/app/version', { cache:'no-store', signal:ac.signal });
+    clearTimeout(tm);
+    if (r.ok){ st.innerHTML=`✓ proxy up — api.wuplay.app reachable through it (<b style='color:var(--green)'>OK</b>)`; st.style.color='var(--green)'; }
+    else if (r.status===403){ st.textContent='✗ proxy answer 403 — api.wuplay.app needs adding to the worker\'s ALLOWED_HOSTS (one line) + redeploy'; st.style.color='#fbbf24'; }
+    else { st.textContent='✗ proxy answered '+r.status; st.style.color='#fbbf24'; }
+  }catch(e){ clearTimeout(tm); st.textContent='✗ proxy unreachable — '+(e&&e.message?e.message:'network'); st.style.color='#f87171'; }
+}
+document.getElementById('wpProxyTest')?.addEventListener('click', testProxy);
+document.getElementById('wpDiagBtn')?.addEventListener('click', runWuplayDiagnostics);
+document.getElementById('wpUseProxy')?.addEventListener('change', testProxy);
+
+async function runWuplayDiagnostics(){
+  const log = document.getElementById('wpDiagLog'); if(!log) return;
+  log.style.display='block'; log.textContent='';
+  const out = m => { log.textContent += m + '\n'; log.scrollTop = log.scrollHeight; };
+  const key = (document.getElementById('wpKeyField')?.value||'').trim().toLowerCase() || 'XXXXXX';
+  const useProxy = !!document.getElementById('wpUseProxy')?.checked;
+  const diagSignal = () => { const ac = new AbortController(); setTimeout(()=>ac.abort(), 6000); return ac.signal; };
+  const t = async (label, fn) => {
+    const t0 = performance.now();
+    try { const v = await fn(); out(`✓ ${label} — ${v} (${Math.round(performance.now()-t0)}ms)`); return v; }
+    catch(e){ out(`✗ ${label} — ${e.name||''} ${e.message||'failed'} (${Math.round(performance.now()-t0)}ms)`); return null; }
+  };
+  out('🧪 diagnostics — ' + new Date().toLocaleTimeString() + ' · key ' + (key.length===6 ? key.slice(0,2)+'••••' : '(not set)') + ' · proxy ' + (useProxy?'ON':'OFF'));
+  await t('direct GET /app/version (browser CORS honesty check)', async()=>{
+    const r = await fetch(WP_API + '/app/version', { cache:'no-store', signal:diagSignal() });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const j = await r.json();
+    return 'reachable, live version v' + (j.latestVersionName||j.version||'?');
+  });
+  if (key.length === 6){
+    await t('profile read: GET /sync/{key} (no auth)', async()=>{
+      const r = await fetch(WP_API + '/sync/' + encodeURIComponent(key), { cache:'no-store', signal:diagSignal() });
+      if (r.status===401||r.status===403) return 'auth-gated ('+r.status+') — needs the device-token handshake (expected)';
+      if (r.status===404) throw new Error('profile not found (404) — check the key');
+      return 'responded '+r.status;
+    });
+    await t('profile read with key-as-Bearer (tests if the key IS the credential)', async()=>{
+      const r = await fetch(WP_API + '/sync/' + encodeURIComponent(key), { headers:{Authorization:'Bearer '+key}, signal:diagSignal() });
+      if (r.status===401||r.status===403) return 'declined ('+r.status+') — key is visual, real auth is the device token';
+      if (r.ok) return '✨ KEY WORKS AS BEARER — direct mode possible without register';
+      return 'responded '+r.status;
+    });
+  } else out('(skip profile probes — paste your 6-char key above first)');
+  await t('via proxy: GET /app/version', async()=>{
+    const base = (document.getElementById('wpProxyUrl').value||'').replace(/\/+$/,'');
+    const r = await fetch(base + '/proxy/app/version?host=' + encodeURIComponent(WP_API), { signal:diagSignal() });
+    if (r.ok) return 'proxy live ✓';
+    if (r.status===403) throw new Error('403 — add api.wuplay.app to ALLOWED_HOSTS in the worker');
+    return 'answered '+r.status;
+  });
+  out('\n— verdict —');
+  out('If the direct reads came back ✓ → auto setup won\'t need the proxy for reads.');
+  out('If you saw CORS errors / "Failed to fetch" → the proxy carries it (and needs the host allowlisted).');
+  out('401/403 with a correct key is EXPECTED good news — reads are gated, writes will need the dev\'s blessing + the token handshake from the spec.');
+}
+
 function startAuto(){
   document.getElementById('splash').classList.add('hidden');
   document.getElementById('autoKeyCard').classList.remove('hidden');
@@ -842,13 +930,13 @@ function wpKeyGoClick(){
 // pre-flight: liveness + profile presence — READS ONLY, always
 async function wpPreflight(key){
   const out = { apiOk:false, apiVersion:null, profile:'unknown', note:'' };
-  const timedFetch = (url, opts={}, ms=6000) => { const ac = new AbortController(); const t = setTimeout(()=>ac.abort(), ms); return fetch(url, { ...opts, signal:ac.signal }).finally(()=>clearTimeout(t)); };
+  const timedWpFetch = (path, opts={}, ms=6000) => { const ac = new AbortController(); const t = setTimeout(()=>ac.abort(), ms); return wpFetch(path, { ...opts, signal:ac.signal }).finally(()=>clearTimeout(t)); };
   try{
-    const r = await timedFetch(WP_API + '/app/version', { cache:'no-store' });
+    const r = await timedWpFetch('/app/version', { cache:'no-store' });
     if (r.ok){ out.apiOk = true; const j = await r.json().catch(()=>null); out.apiVersion = j?.version || j?.data?.version || null; }
   }catch(e){ out.note = e.name==='AbortError' ? 'API timed out' : 'API unreachable (network/CORS)'; }
   try{
-    const r2 = await timedFetch(WP_API + '/sync/' + encodeURIComponent(key), { method:'HEAD' });
+    const r2 = await timedWpFetch('/sync/' + encodeURIComponent(key), { method:'HEAD' });
     if (r2.status === 401 || r2.status === 403) out.profile = 'exists (auth-gated, as expected)';
     else if (r2.status === 404) out.profile = 'not found — double-check the key';
     else if (r2.ok) out.profile = 'readable';
