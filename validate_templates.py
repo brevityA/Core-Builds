@@ -222,6 +222,19 @@ def validate_template(fpath):
         else:
             warn(name, "contains legacy 'torbox-search' preset (community template — not Core-owned)")
 
+    # ── regexOverrides entry shape (strict-schema hosts — issue #671) ─────────
+    # Every override entry requires string `pattern` + `name` and numeric `score`.
+    # A score-only stub (pattern removed during a whitelist sync) fails host-side
+    # save with 'regexOverrides.N.pattern: Invalid input: expected string, received undefined'.
+    overrides = c.get('regexOverrides', []) if isinstance(c, dict) else []
+    if isinstance(overrides, list):
+        for i, o in enumerate(overrides):
+            if (not isinstance(o, dict)
+                    or not isinstance(o.get('pattern'), str)
+                    or not isinstance(o.get('name'), str)
+                    or not isinstance(o.get('score'), (int, float))):
+                err(name, f"regexOverrides[{i}] malformed — needs string pattern + name and numeric score (yeb's-class hosts reject score-only stubs; #671)")
+
     # ── Newznab/Torznab option shape (AIOStreams v2.32) ──────────
     # v2.32 folded newznabUrl + apiPath + apiKey into a single `api` object
     # holding the full endpoint URL (usually ending in /api).

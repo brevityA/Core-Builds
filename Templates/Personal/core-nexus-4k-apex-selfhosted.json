@@ -672,11 +672,6 @@
         "score": 80
       },
       {
-        "originalName": "LQ (Radarr)",
-        "name": "LQ (Radarr)",
-        "score": -75
-      },
-      {
         "originalName": "LQ (Sonarr)",
         "name": "LQ (Sonarr)",
         "pattern": "/\\b(iVy)\\b/",
