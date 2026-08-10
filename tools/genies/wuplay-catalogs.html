@@ -943,13 +943,13 @@ async function wpHandshakeProbe(){
     out('✓ PROFILE READ OK — "' + (P.name||'?') + '"' + (P.hasPinSet ? ' · 🔒 PIN set (live writes will ask once)' : ' · no PIN'));
     out('   rows ' + (s.catalogs||[]).length + ' · hubs ' + (s.hubs||[]).length + ' · screens ' + (s.screens||[]).length + ' · layouts ' + (s.layouts||[]).length + ' · revisions c' + (s.catalogsRevision??'?') + '/s' + (s.screensRevision??'?'));
     out('   trakt: ' + (s.traktConnected ? 'connected as ' + (s.traktUsername||'?') : 'not connected'));
-    const slim = { ...s, library:(s.library||[]).length+' items (withheld from export)', watchlists:(s.watchlists||[]).length+' (withheld)', savedCollections:(s.savedCollections||[]).length+' (withheld)' };
+    const slim = { catalogs:(s.catalogs||[]).length, hubs:(s.hubs||[]).length, screens:(s.screens||[]).length, layouts:(s.layouts||[]).length, catalogsRevision:s.catalogsRevision??null, screensRevision:s.screensRevision??null, traktConnected:!!s.traktConnected, library:(s.library||[]).length+' items (withheld)', watchlists:(s.watchlists||[]).length+' (withheld)', savedCollections:(s.savedCollections||[]).length+' (withheld)' };
     window.__wpStateCapture = slim;
     const b = new Blob([JSON.stringify(slim,null,2)],{type:'application/json'}); const a=document.createElement('a');
     a.href=URL.createObjectURL(b); a.download='wuplay-state-structure.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
     out('⬇️ structural snapshot downloaded (library/watchlist contents withheld) — this file is the Undo source + the contract evidence.');
     out('\n— verdict —');
-    out(‘Register→read works from this browser via the proxy. The remaining unknown is the web configurator’s catalog-create route (one devtools capture on config.wuplay.app closes it).’);
+    out('Register→read works from this browser via the proxy. The remaining unknown is the web configurator\'s catalog-create route (one devtools capture on config.wuplay.app closes it).');
   }catch(e){ clearTimeout(tm3); out('✗ profile read failed: ' + (e.message||e)); }
 }
 
@@ -1007,8 +1007,8 @@ function planToOps(){
     detail:{path:'/sync/{key}/catalog/{id}',op:'upsert — create-route pending (configurator capture)',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'default',homeOrder:i,discoverOrder:null,showHome:true,showDiscover:false}} }));
   p.discover.forEach((r,i)=>ops.push({ step:`Discover row: “${r.name}”`, kind:'write', verified:false,
     detail:{path:'/sync/{key}/catalog/{id}',op:'upsert — create-route pending (configurator capture)',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'random',homeOrder:null,discoverOrder:i,showHome:false,showDiscover:true}} }));
-  p.hubs.forEach(h=>ops.push({ step:`Hub: “${h.name}” ${h.builtin?'(built-in family)':''}`, kind:'write', verified:true,
-    detail:{path:'/sync/{key}/hubs/{id}',op: h.builtin?'PATCH enable/configure':'create',payload:{name:h.name,systemKey:h.systemKey||null,detailViewType:(state.style==='landscape'?'landscape':'poster'),cards:h.cards}} }));
+  p.hubs.forEach(h=>ops.push({ step:`Hub: “${h.name}” ${h.builtin?'(built-in family)':''}`, kind:'write', verified:!!h.builtin,
+    detail:{path:'/sync/{key}/hubs/{id}',op: h.builtin?'PATCH enable/configure':'create — pending',payload:{name:h.name,systemKey:h.systemKey||null,detailViewType:(state.style==='landscape'?'landscape':'poster'),cards:h.cards}} }));
   p.screens.forEach(s=>ops.push({ step:`Screen: “${s.name}”`, kind:'write', verified:s.type==='hub'?false:true,
     detail:{path:s.type==='hub'?'/sync/{key}/screens/hub':'/sync/{key}/screens/{id}',op:s.type==='hub'?'create — pending':'PATCH layout',payload:{name:s.name,icon:s.icon,viewType:'hub',hubType:s.type,position:0,visible:true}} }));
   if (p.trakt.length) ops.push({ step:'Trakt prefs (connect handled on the Trakt tab by you)', kind:'write', verified:true, detail:{path:'/sync/{key}/profile',op:'PATCH — trakt sync toggles'} });
@@ -1093,7 +1093,7 @@ function showAutoReceipt(){
   if (scoreSub) scoreSub.innerHTML = 'Your home-screen plan is <b>staged as a full receipt</b>. The written-shape is identical to what the app itself syncs; when the dev blesses browser writes, this becomes one-click applied.';
   const h2 = succ.querySelector('h2'); if (h2) h2.textContent = 'Staged — your receipt is ready';
   const hint = succ.querySelector('.hint');
-  if (hint) hint.innerHTML = 'Hubs/screens/profile writes are live-verified contract; catalog-row create lands when the configurator route is captured.';
+  if (hint) hint.innerHTML = 'Hub update/screen layout/profile writes are live-verified; hub create + catalog-row create land when the configurator routes are captured.';
   // buttons: receipt download + guide fallback + restart
   const btns = succ.querySelector('.btns');
   if (btns) btns.innerHTML = `
