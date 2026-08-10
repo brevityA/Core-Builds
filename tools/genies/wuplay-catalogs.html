@@ -229,7 +229,7 @@
         <span class="tag" style="color:#fbbf24;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3)">NEW · GATED</span>
         <div class="ic">⚡</div>
         <div class="tt">Auto setup — I do it for you</div>
-        <div class="dd">Paste your 6-char profile key. I write the rows, hubs and screens to WuPlay directly — full receipt + one-tap undo. Nothing else changes.</div>
+        <div class="dd">Paste your 6-char profile key. I stage the rows, hubs, and screens as a full receipt. No profile changes are sent in this build.</div>
       </button>
       <button class="door" onclick="quickPlan()"><div class="ic">📋</div><div class="tt">Just the checklist</div><div class="dd">Sensible defaults — movies + series, native presets, no fuss</div></button>
       <button class="door" onclick="proto('This would open your WuPlay web configurator (config.wuplay.app).')"><div class="ic">⚙️</div><div class="tt">Open the configurator</div><div class="dd">You already know what you're doing — straight to it</div></button>
@@ -842,28 +842,30 @@ function wpKeyGoClick(){
 // pre-flight: liveness + profile presence — READS ONLY, always
 async function wpPreflight(key){
   const out = { apiOk:false, apiVersion:null, profile:'unknown', note:'' };
+  const timedFetch = (url, opts={}, ms=6000) => { const ac = new AbortController(); const t = setTimeout(()=>ac.abort(), ms); return fetch(url, { ...opts, signal:ac.signal }).finally(()=>clearTimeout(t)); };
   try{
-    const r = await fetch(WP_API + '/app/version', { cache:'no-store' });
+    const r = await timedFetch(WP_API + '/app/version', { cache:'no-store' });
     if (r.ok){ out.apiOk = true; const j = await r.json().catch(()=>null); out.apiVersion = j?.version || j?.data?.version || null; }
-  }catch(e){ out.note = 'API unreachable (network/CORS)'; }
-  // profile presence probe: HEAD /sync/{key} (app uses this for unlink checks). Key in path is the app's own scheme.
+  }catch(e){ out.note = e.name==='AbortError' ? 'API timed out' : 'API unreachable (network/CORS)'; }
   try{
-    const r2 = await fetch(WP_API + '/sync/' + encodeURIComponent(key), { method:'HEAD' });
+    const r2 = await timedFetch(WP_API + '/sync/' + encodeURIComponent(key), { method:'HEAD' });
     if (r2.status === 401 || r2.status === 403) out.profile = 'exists (auth-gated, as expected)';
     else if (r2.status === 404) out.profile = 'not found — double-check the key';
     else if (r2.ok) out.profile = 'readable';
     else out.profile = 'uncertain (' + r2.status + ')';
   }catch(e){
-    out.profile = 'unreadable from browser (CORS) — the dev blessing fixes this';
+    out.profile = e.name==='AbortError' ? 'timed out' : 'unreadable from browser (CORS) — the dev blessing fixes this';
   }
   return out;
 }
 
+async function dispatchWrite(detail){ /* live-mode executor — wired when AUTO_WRITE_MODE goes live */ throw new Error('dispatchWrite: not implemented in draft mode'); }
+
 // plan → ordered, individually-reversible operations (shapes mirror the v0.8.1 sync DTOs)
 function planToOps(){
   const p = PLAN, ops = [];
-  ops.push({ step:'Pre-flight: read the API + your current layout', kind:'read', detail:'GET /app/version · current catalogs/hubs/screens' });
-  ops.push({ step:'Snapshot your current layout (for one-tap Undo)', kind:'read', detail:'GET sync state → local snapshot only' });
+  ops.push({ step:'Pre-flight: read the API + your current layout', kind:'read', detail:'GET /app/version · profile presence probe' });
+  ops.push({ step:'Record current layout (snapshot deferred until live mode)', kind:'read', detail:'layout read deferred — draft mode stages only' });
   const SRCMAP = { wuplay:'builtin-mystuff', native:'preset', stream:'streamingServices', anime:'addon', trakt:'trakt', mdblist:'mdblist', keyword:'keyword' };
   p.home.forEach((r,i)=>ops.push({ step:`Home row ${i+1}: “${r.name}”`, kind:'write',
     detail:{path:'/catalogs',op:'upsert',payload:{name:r.name,source:SRCMAP[r.src]||'preset',sourceId:null,sourceMeta:{},mediaType:'all',sort:'default',homeOrder:i,discoverOrder:null,showHome:true,showDiscover:false}} }));
@@ -905,6 +907,7 @@ async function startGenieAutoApply(){
   card.classList.remove('hidden');
   const wrap = document.getElementById('autoSteps');
   wrap.innerHTML = '';
+  autoReceipt = [];
   const ops = planToOps();
   const els = ops.map((op)=>{
     const s = el(`<div class="step" id="as${Math.random().toString(36).slice(2,7)}"><div class="st-ic">${op.kind==='read'?'👁':'⚡'}</div><div><div class="st-t">${escH(op.step)}</div><div class="st-d">${escH(typeof op.detail==='string'?op.detail:(op.detail.path+' → '+op.detail.op))}</div></div><div class="spin"></div></div>`);
@@ -919,6 +922,7 @@ async function startGenieAutoApply(){
         const d = s.querySelector('.st-d');
         d.innerHTML = escH(preflight.apiOk ? `API live${preflight.apiVersion?' (v'+escH(preflight.apiVersion)+')':''} · profile: ${escH(preflight.profile)}` : ('API probe: '+escH(preflight.note||'unreachable — will continue in receipt mode')));
       }
+      if (AUTO_WRITE_MODE==='live' && ops[i].kind==='write') await dispatchWrite(ops[i].detail);
       autoReceipt.push({ ...ops[i], status: AUTO_WRITE_MODE==='live' ? 'applied' : 'staged (receipt)' });
       await new Promise(r=>setTimeout(r, REDUCED?120:(520+Math.random()*380)));
       s.classList.remove('active'); s.classList.add('done'); s.querySelector('.spin')?.remove(); s.querySelector('.st-ic').textContent='✓';
