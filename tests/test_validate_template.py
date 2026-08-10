@@ -741,3 +741,23 @@ class TestStaticTemplateFiles:
             if self.TAMTARO_FRAGMENT in text:
                 bad.append(str(f.relative_to(self.REPO_ROOT)))
         assert not bad, "Templates with stale Tam-Taro synced URL:\n" + "\n".join(bad)
+
+class TestRegexOverrideShape:
+    """#671 guard: score-only stubs in regexOverrides fail host-side saves."""
+
+    def test_validator_rule_exists(self):
+        src = Path('validate_templates.py').read_text()
+        assert 'regexOverrides' in src and "o.get('pattern')" in src
+
+    def test_no_template_has_patternless_override(self):
+        bad = []
+        for fp in Path('Templates').rglob('*.json'):
+            try:
+                t = json.loads(fp.read_text())
+            except Exception:
+                continue
+            cfg = t.get('config') or t
+            for i, o in enumerate(cfg.get('regexOverrides') or []):
+                if not isinstance(o, dict) or not isinstance(o.get('pattern'), str) or not isinstance(o.get('name'), str) or not isinstance(o.get('score'), (int, float)):
+                    bad.append(f"{fp}[{i}]")
+        assert not bad, 'malformed regexOverrides entries: ' + ', '.join(bad[:5])
