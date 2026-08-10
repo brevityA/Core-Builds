@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v2.90"
+title: "What's New — Configurator v2.91"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.90 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.91 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.90**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.91**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v2.91 (Aug 9 2026)
+
+<CardGroup cols={2}>
+  <Card title="Fixed: 'Rebuild loop'" icon="sparkles">
+    the version banner's Rebuild button wiped all settings but never stamped the current version, so the outdated banner returned after every rebuild. Now keeps settings, stamps the version, and toasts the user to download + re-import.
+  </Card>
+  <Card title="Fixed: explicit AIOStreams host selection is now honored" icon="bolt">
+    picking a specific host (e.g. Omni, ForTheWeak) no longer silently fails over to a different host. Outdated hosts (< v2.32.0) get a clear version-gate error with remediation steps.
+  </Card>
+  <Card title="Express Install now shows a visible AIOStreams host dropdown (prefilled from Advanced), so the host choice is explicit from the start." icon="shield-check">
+    Express Install now shows a visible AIOStreams host dropdown (prefilled from Advanced), so the host choice is explicit from the start.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.90 (Aug 6 2026)
 
@@ -101,57 +117,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="New CI workflow for shared core, CLI, account-tools, and Worker test suites" icon="bug">
     New CI workflow for shared core, CLI, account-tools, and Worker test suites
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.87 (Aug 2 2026)
-
-<CardGroup cols={2}>
-  <Card title="Nuvio + TorBox Instant Quick Install" icon="sparkles">
-    dedicated flow generates a P2P-only template with device/resolution/host pickers and TorBox Connected Services warning
-  </Card>
-  <Card title="Nuvio TorBox Instant CLI route" icon="bolt">
-    core-builds generate --route nuvio-torbox-instant --host fortheweak --device shield --resolution 4k
-  </Card>
-  <Card title="Nuvio host capability metadata" icon="shield-check">
-    supportsNuvioInstant flag on all hosts; ElfHosted correctly blocked
-  </Card>
-  <Card title="Core Builds CLI published to npm" icon="sliders">
-    npm install -g core-builds for generate, validate, diff, and info
-  </Card>
-  <Card title="Account Manager mutations" icon="gauge">
-    addon reorder, removal, backup restore, and bounded undo with stale-state detection
-  </Card>
-  <Card title="Capability-based device profiles" icon="wand">
-    Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS, Sony / Google TV, and Generic 4K HDR TV with device-specific warnings and help text
-  </Card>
-  <Card title="Matching Core Builds SVG device icons replace temporary emoji icons in the device picker" icon="layers">
-    Matching Core Builds SVG device icons replace temporary emoji icons in the device picker
-  </Card>
-  <Card title="Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text" icon="bug">
-    Expanded desktop and mobile Playwright E2E coverage for device card visibility, selection, keyboard, icons, and help text
-  </Card>
-  <Card title="Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum" icon="sparkles">
-    Fixed: Max File Size control was setting the selected limit as the minimum size; now correctly caps at the selected maximum
-  </Card>
-  <Card title="Fixed: Legacy unversioned local snapshots no longer show a false 'Update Available' banner" icon="bolt">
-    Fixed: Legacy unversioned local snapshots no longer show a false 'Update Available' banner
-  </Card>
-  <Card title="Fixed: Template updates no longer mutate the active configuration before confirmation" icon="shield-check">
-    Fixed: Template updates no longer mutate the active configuration before confirmation
-  </Card>
-  <Card title="Fixed: Feedback messages now report current live setup context instead of stale saved state" icon="sliders">
-    Fixed: Feedback messages now report current live setup context instead of stale saved state
-  </Card>
-  <Card title="Fixed: Fine-Tune interaction and focus regressions are covered by browser tests" icon="gauge">
-    Fixed: Fine-Tune interaction and focus regressions are covered by browser tests
-  </Card>
-  <Card title="SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules" icon="wand">
-    SEL generation now uses shared Standard, IQR, Apex, and Apex Mixed policy modules
-  </Card>
-  <Card title="CodeQL now uses the repository configuration and excludes generated bundles while scanning source code" icon="layers">
-    CodeQL now uses the repository configuration and excludes generated bundles while scanning source code
   </Card>
 </CardGroup>
