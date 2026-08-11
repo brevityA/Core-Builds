@@ -391,7 +391,7 @@ $('#btnLive').onclick = async () => {
   const out = $('#liveOut');
   const strip = !$('#liveSendCreds').checked;
   const autoHeal = !!$('#liveAutoHeal') && $('#liveAutoHeal').checked;
-  const pw = 'audit-' + Math.random().toString(36).slice(2, 10);
+  const pw = 'audit-' + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => b.toString(36).padStart(2,'0')).join('').slice(0,8);
   $('#btnLive').disabled = true; $('#btnFixed').classList.add('hidden'); $('#btnReport').classList.add('hidden');
   healLog = [];
   let work = JSON.parse(JSON.stringify(auditCfg));
