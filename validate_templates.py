@@ -284,6 +284,8 @@ def validate_template(fpath):
         for field in req:
             if field not in o:
                 err(name, f"enabled preset '{o.get('name') or p.get('type')}' ({p.get('type')}) missing required option '{field}' (v2.33+ validation floor)")
+            elif isinstance(o[field], str) and o[field].strip() == '':
+                warn(name, f"enabled preset '{o.get('name') or p.get('type')}' ({p.get('type')}) has required option '{field}' present but blank — present-but-empty still rejects on the strict validator (CodeRabbit point, PR #686)")
 
     # ── SeaDex/Sootio service dependency (v2.33) ──
     # These presets require a torrent-capable paid service or HTTP provider; enabled in a

@@ -225,6 +225,7 @@ function* flatOpts(o, prefix=''){
   }
 }
 function staticAudit(cfg){
+  cfg = (cfg && typeof cfg === 'object' && !Array.isArray(cfg)) ? cfg : {};
   const findings = [];
   const presets = Array.isArray(cfg.presets) ? cfg.presets : [];
   const services = Array.isArray(cfg.services) ? cfg.services : [];
