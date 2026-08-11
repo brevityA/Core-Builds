@@ -50,6 +50,19 @@ function sanitizePreset(preset) {
   return clean;
 }
 
+// True when an options object holds a credential-shaped key with a real value
+// (non-empty string incl. '<template_placeholder>'). The public RPDB free-tier id
+// is already excepted inside isSensitiveKey's call-site rules.
+function hasCredentialOption(o) {
+  if (!o || typeof o !== 'object') return false;
+  for (const [k, v] of Object.entries(o)) {
+    if (k === 'credentials') continue;   // service rows are capability records, handled generically
+    if (isSensitiveKey(k) && typeof v === 'string' && v.trim() !== '') return true;
+    if (v && typeof v === 'object' && hasCredentialOption(v)) return true;
+  }
+  return false;
+}
+
 /**
  * Return a credential-free clone suitable for a public import URL.
  *
@@ -57,11 +70,26 @@ function sanitizePreset(preset) {
  * @returns {object} A new, sanitized template. The input is never mutated.
  */
 export function sanitizeTemplateForRemoteImport(template) {
+  // Patch 33 (Brisk field report, 2026-08-11): snapshot which ENABLED presets carry
+  // credential-shaped options BEFORE stripping. After sanitizeValue removes the
+  // credential, such a preset can no longer satisfy AIOStreams' required-option
+  // validation ("Option X is required, got undefined") — share it disabled instead.
+  const keyedEnabled = new Set();
+  const rawPresets = template?.config?.presets;
+  if (Array.isArray(rawPresets)) {
+    rawPresets.forEach((p, i) => {
+      if (p?.enabled === true && p?.options && hasCredentialOption(p.options)) keyedEnabled.add(i);
+    });
+  }
   const result = sanitizeValue(clone(template || {}));
   const config = result?.config;
 
   if (config && Array.isArray(config.presets)) {
-    config.presets = config.presets.map(sanitizePreset);
+    config.presets = config.presets.map((p, i) => {
+      const clean = sanitizePreset(p);
+      if (keyedEnabled.has(i)) clean.enabled = false;
+      return clean;
+    });
   }
 
   // `parentConfig` is emitted at the template root by the current assembly

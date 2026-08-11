@@ -148,11 +148,14 @@ test('golden: P2P template has p2p-specific config', () => {
   assert.ok(presetTypes.includes('torrentio'), 'P2P should have torrentio preset');
 });
 
-test('golden: HTTP template has HTTP-specific presets', () => {
+test('golden: HTTP template has HTTP-specific presets (v2.33)', () => {
   const t = generate(['--service', 'http', '--device', 'generic', '--resolution', '1080p', '--architecture', 'standard']);
   const presetTypes = t.config.presets.map(p => p.type);
-  assert.ok(presetTypes.includes('sootio'), 'HTTP should have sootio preset');
   assert.ok(presetTypes.includes('peerflix'), 'HTTP should have peerflix preset');
+  // v2.33+: Sootio hard-requires a debrid/usenet service or HTTP stream provider — a pure
+  // HTTP route can never satisfy it, so it must never ship ENABLED (or is omitted outright).
+  const sootio = t.config.presets.find(p => p.type === 'sootio');
+  assert.ok(!sootio || sootio.enabled === false, `Sootio must not be enabled on pure-HTTP (v2.33 rejects: "requires at least one usable service or HTTP stream provider")`);
 });
 
 test('golden: apex-mixed uses labs profile and strips score-dependent rules without local ranked expressions', () => {

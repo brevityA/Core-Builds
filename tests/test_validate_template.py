@@ -286,7 +286,7 @@ class TestPresets:
     def test_peerflix_accepts_explicit_false_use_multiple_instances(self, write_template, base_template):
         t = base_template(presets=[{
             "type": "peerflix", "instanceId": "p1", "enabled": True,
-            "options": {"name": "Peerflix", "timeout": 7000, "useMultipleInstances": False}
+            "options": {"name": "Peerflix", "timeout": 7000, "useMultipleInstances": False, "showTorrentLinks": False}
         }])
         path = write_template(t)
         errors, _, _ = validate_template(path)

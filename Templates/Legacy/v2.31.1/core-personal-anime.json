@@ -862,7 +862,7 @@
       {
         "type": "newznab",
         "instanceId": "nzbgeek-01",
-        "enabled": true,
+        "enabled": false,
         "options": {
           "name": "NZBGeek",
           "newznabUrl": "https://api.nzbgeek.info/",
@@ -880,7 +880,6 @@
             "torbox"
           ],
           "checkOwned": true,
-          "apiKey": "<template_placeholder>",
           "url": "https://api.nzbgeek.info"
         },
         "category": "Usenet"
@@ -936,12 +935,11 @@
       },
       {
         "type": "debridio",
-        "enabled": true,
+        "enabled": false,
         "instanceId": "25e4aea8-830b-4053-80d2-5fcde05183fc",
         "options": {
           "name": "Debridio",
-          "timeout": 5000,
-          "apiKey": "<template_placeholder>"
+          "timeout": 5000
         }
       },
       {
