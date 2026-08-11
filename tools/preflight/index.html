@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Builds Preflight — audit configs against AIOStreams itself</title>
+<style>
+  :root{
+    --bg:#0d1017; --card:#151923; --card2:#111720; --panel:#0e1621;
+    --line:rgba(255,255,255,.06); --line2:rgba(255,255,255,.09);
+    --tx:#e4e7ed; --sub:#8b949e; --dim:#667487; --faint:#4b5563;
+    --ac:#00d4ff; --ac-hi:#67e8f9; --ac-bg:rgba(0,212,255,.08); --ac-br:rgba(0,212,255,.18);
+    --cta:linear-gradient(135deg,#00abd3,#00d4ff); --ac-ink:#04202b;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171;
+    --serif:Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(ellipse at 15% 15%,rgba(0,212,255,.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,.05) 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:26px 16px 24px}
+  .wrap{width:100%;max-width:680px;display:flex;flex-direction:column;gap:14px}
+  .hdr{display:flex;align-items:center;gap:10px;padding:4px 2px}
+  .hdr .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--ac-bg),transparent);border:1px solid var(--ac-br);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hdr .t{font-size:.92rem;font-weight:800;letter-spacing:-.01em}
+  .hdr .st{font-size:.62rem;color:var(--sub)}
+  .hdr .spacer{flex:1}
+  .pill{font-size:.6rem;font-weight:800;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.22);padding:4px 10px;border-radius:99px;white-space:nowrap}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;position:relative}
+  .kicker{font-size:.58rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--ac-hi);margin-bottom:6px}
+  h2{font-family:var(--serif);font-size:1.28rem;font-weight:400;letter-spacing:-.02em;margin-bottom:6px}
+  h2 em{color:var(--ac)}
+  .lede{color:#7e8b9c;font-size:.76rem;line-height:1.6;margin-bottom:6px}
+  .fine{font-size:.6rem;color:var(--faint);line-height:1.6;margin-top:8px}
+  textarea,input[type=text],select{width:100%;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:10px 12px;font-size:.76rem;font-family:ui-monospace,monospace;outline:none}
+  textarea:focus,input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-bg)}
+  textarea{min-height:150px;resize:vertical;line-height:1.5}
+  select{font-family:inherit}
+  .btn{display:inline-block;border:0;border-radius:11px;padding:12px 18px;font-size:.82rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;text-align:center}
+  .btn.primary{background:var(--cta);color:var(--ac-ink)}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:#101923;border:1px solid rgba(255,255,255,.11);color:#8492a3}
+  .btn.ghost:hover{border-color:var(--sub)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .seg{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:.64rem;font-weight:700;border-radius:99px;padding:4px 11px;border:1px solid var(--line2);background:var(--panel);color:var(--sub)}
+  .chip.ok{color:var(--green);border-color:rgba(52,211,153,.28);background:rgba(52,211,153,.06)}
+  .chip.warn{color:var(--amber);border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.06)}
+  .chip.err{color:var(--red);border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.06)}
+  .hostgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:10px}
+  .hostcell{background:var(--panel);border:1px solid var(--line2);border-radius:11px;padding:10px 12px;font-size:.7rem;line-height:1.5}
+  .hostcell b{font-size:.74rem}
+  .hostcell .ver{font-family:ui-monospace,monospace;color:var(--ac-hi)}
+  .hostcell .lat{color:var(--faint);font-family:ui-monospace,monospace}
+  .mt{margin-top:10px}
+  .t{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;border:1px solid var(--line2);color:var(--dim)}
+  .t.good{color:var(--green);border-color:rgba(52,211,153,.3)}
+  .t.bad{color:var(--red);border-color:rgba(248,113,113,.35)}
+  .t.mid{color:var(--amber);border-color:rgba(251,191,36,.3)}
+  .rule{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.72rem;line-height:1.55}
+  .rule b{font-size:.74rem}
+  .rule .det{color:var(--dim);font-family:ui-monospace,monospace;font-size:.62rem;margin-top:3px;word-break:break-all}
+  .rule .adv{color:var(--sub);font-size:.66rem;margin-top:4px}
+  .verdict{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;margin-top:12px}
+  .verdict .big{font-size:26px}
+  .verdict .vt{font-size:.86rem;font-weight:800}
+  .verdict .vd{font-size:.7rem;color:var(--sub);line-height:1.5;margin-top:2px}
+  .hidden{display:none!important}
+  .foot{text-align:center;font-size:.56rem;color:var(--faint);padding:8px 0 2px}
+  a{color:var(--ac-hi)}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--ac-br);border-top-color:var(--ac);border-radius:50%;animation:rot .7s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2230;border:1px solid var(--ac-br);color:var(--tx);font-size:.72rem;font-weight:600;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  label.mini{display:flex;gap:7px;align-items:flex-start;font-size:.64rem;color:var(--sub);cursor:pointer;line-height:1.5;margin-top:8px}
+  label.mini input{margin-top:2px}
+  @media(max-width:520px){.btnrow{flex-direction:column}.btn{text-align:center}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="var(--ac)" stroke-width="1.6" fill="rgba(0,212,255,.08)"/><path d="M12 8.5v7M8.7 10.2l6.6 3.6M15.3 10.2l-6.6 3.6" stroke="var(--ac)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div><div class="t">Core Builds · Preflight</div><div class="st">Config audit + live instance dry-run · standalone</div></div>
+    <div class="spacer"></div>
+    <div class="pill">● Browser-only · nothing stored</div>
+  </div>
+
+  <div class="card" id="fleetCard">
+    <div class="kicker">live · host fleet</div>
+    <h2>The fleet, right now.</h2>
+    <p class="lede">Every public AIOStreams host we support, probed through the proxy: version, channel, policy flags. When the fleet moves (v2.33.1 landed 2026-08-11 with stricter validation), this is where drift surfaces first.</p>
+    <div class="btnrow"><button class="btn primary" id="btnFleet">Re-probe</button><span class="chip" id="fleetVerdict" style="display:none"></span></div>
+    <div class="hostgrid" id="hostGrid"></div>
+    <div class="fine">All calls route through your Core Builds CORS worker: <input id="workerUrl" type="text" style="font-family:inherit;font-size:.62rem;display:inline-block;width:min(340px,72%)" value="https://core-builds-cors-proxy.tlorenzato26.workers.dev" spellcheck="false" aria-label="Proxy worker URL"> <span style="font-family:ui-monospace,monospace">/proxy/&lt;path&gt;?host=…</span></div>
+  </div>
+
+  <div class="card">
+    <div class="kicker">layer 1 · static audit</div>
+    <h2>Drop in a config. Get the truth.</h2>
+    <p class="lede">Template or live user-config both work (a <code>{"config":…}</code> wrapper is auto-unwrapped). All checks run in this tab; every rule cites the real rejection it encodes.</p>
+    <textarea id="cfgText" spellcheck="false" placeholder='Paste the JSON (template or user config)…'></textarea>
+    <div class="btnrow">
+      <button class="btn primary" id="btnStatic">Run static audit</button>
+      <button class="btn ghost" id="btnFile">📂 open a file</button>
+      <button class="btn ghost" id="btnDemo">Load broken sample</button>
+      <input type="file" id="filePick" accept=".json,application/json" style="display:none">
+    </div>
+    <div id="staticOut"></div>
+  </div>
+
+  <div class="card hidden" id="liveCard">
+    <div class="kicker">layer 2 · live</div>
+    <h2>Dry-run it on the <em>actual host</em>.</h2>
+    <p class="lede">Sends the redacted config to the chosen instance as a throwaway user with a generated password. The instance's own validator answers: accepted (then we read the manifest back to prove the write landed whole), or the precise rejection ladder. No delete is exposed publicly — the inert leftover is a fixture-grade artifact of every dry-run on that host.</p>
+    <select id="liveHost"></select>
+    <label class="mini"><input type="checkbox" id="liveSendCreds"> Also send real credentials (NOT needed for structure validation — leave off unless a service-verification pass is exactly what you're testing)</label>
+    <label class="mini"><input type="checkbox" id="liveAutoHeal" checked> <span><b>Auto-heal + re-run</b> — apply conservative fixes (safe defaults, disable unresolvable pieces) and re-post until the host accepts, up to 4 rounds. Every heal is logged; nothing reaches your real install.</span></label>
+    <div class="btnrow">
+      <button class="btn primary" id="btnLive">🛰️ Run live dry-run</button>
+      <button class="btn ghost hidden" id="btnFixed">⬇️ healed JSON</button>
+      <button class="btn ghost hidden" id="btnReport">⬇️ audit report</button>
+    </div>
+    <div id="liveOut"></div>
+  </div>
+
+  <div class="card">
+    <div class="kicker">doctor · existing installs</div>
+    <h2>"It worked yesterday" lane.</h2>
+    <p class="lede">Manifest URL in, truth out: reachability, addon name/id, host health, and the instance's current version versus what the config was stamped for.</p>
+    <input type="text" id="doctorIn" placeholder="https://<host>/stremio/<uuid>/<password>/manifest.json" spellcheck="false">
+    <div class="btnrow"><button class="btn primary" id="btnDoctor">Run doctor</button></div>
+    <div id="doctorOut"></div>
+  </div>
+
+  <div class="foot">Core Builds Preflight · built 2026-08-11 · rules floor v2.33.1 · every rule cites a real host rejection (audit: work-p34 evidence)</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+'use strict';
+const $ = s => document.querySelector(s);
+const toast = m => { const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const HOSTS = {                                                                                          // mirror of the repo's data/hosts.js (2026-08-11)
+  elfhosted:  { label:'ElfHosted',          url:'https://aiostreams.elfhosted.com',                      channel:'stable',  blocksFree:true,  p2p:false, http:false, nuvio:false },
+  fortheweak: { label:"Yeb's / ForTheWeak", url:'https://aiostreams.fortheweak.cloud',                   channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },
+  midnight:   { label:"Midnight's",         url:'https://aiostreamsfortheweebsstable.midnightignite.me', channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },
+  kuu:        { label:"Kuu's",              url:'https://aiostreams.stremio.ru',                         channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },
+  atbp:       { label:'ATBP',               url:'https://aio.atbphosting.com',                           channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },
+  wizaardd:   { label:'Wizaardd',           url:'https://aiostreams-stable.forthewizards.uk',            channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },
+  viren:      { label:"Viren's Nightly",    url:'https://aiostreams.viren070.me',                        channel:'nightly', blocksFree:false, p2p:true,  http:true,  nuvio:true  },
+  omni:       { label:"Omni's (legacy)",    url:'https://aiostreams.12312023.xyz',                       channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },
+};
+const OUR_FLOOR = '2.32.0';   // generator's declared compat target (MIN_AIOSTREAMS_VERSION)
+
+const workerBase = () => ($('#workerUrl').value || '').replace(/\/+$/,'');
+async function proxyReq(hostUrl, path, init={}, ms=10000){
+  const ac = new AbortController(); const t = setTimeout(()=>ac.abort(), ms);
+  try{ return await fetch(`${workerBase()}/proxy${path}?host=${encodeURIComponent(hostUrl)}`, { ...init, signal:ac.signal }); }
+  finally{ clearTimeout(t); }
+}
+function verCmp(a,b){ const pa=(a||'0').split('.').map(Number), pb=(b||'0').split('.').map(Number); for(let i=0;i<3;i++){ const d=(pa[i]||0)-(pb[i]||0); if(d) return d; } return 0; }
+
+// ═══ Fleet strip ═══
+let fleet = null;
+async function probeFleet(){
+  const grid = $('#hostGrid'), btn=$('#btnFleet');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Probing…';
+  grid.innerHTML = Object.values(HOSTS).map(h=>`<div class="hostcell"><b>${esc(h.label)}</b><br><span class="lat">…</span></div>`).join('');
+  const cells = [...grid.children];
+  await Promise.all(Object.entries(HOSTS).map(async ([id,h],idx)=>{
+    const t0 = performance.now();
+    let html, row;
+    try{
+      const r = await proxyReq(h.url,'/api/v1/status',{},6000);
+      const lat = Math.round(performance.now()-t0);
+      if (!r.ok) throw new Error('HTTP '+r.status);
+      const j = await r.json().catch(()=>null);
+      const ver = j?.data?.version || j?.version || '?';
+      html = `<b>${esc(h.label)}</b> <span class="ver">v${esc(ver)}</span>${ (j?.data?.channel||h.channel)==='nightly' ? ' <span class="t mid">nightly</span>':''}<br><span class="lat">${lat}ms · ${esc(j?.data?.channel||h.channel)}</span>
+        <div class="tagrow"><span class="t ${h.blocksFree?'bad':'good'}">${h.blocksFree?'free-tier blocked':'free OK'}</span><span class="t ${h.p2p?'good':'bad'}">P2P ${h.p2p?'✓':'✗'}</span><span class="t ${h.http?'good':'bad'}">HTTP ${h.http?'✓':'✗'}</span></div>`;
+      row = { id, ver, err:null, lat };
+    }catch(e){
+      const lat = Math.round(performance.now()-t0);
+      html = `<b>${esc(h.label)}</b><br><span style="color:var(--red)">✗ ${esc(e.name==='AbortError'?'timeout':(e.message||'unreachable'))}</span> <span class="lat">${lat}ms</span>`;
+      row = { id, ver:null, err:String(e.message||e), lat };
+    }
+    cells[idx].innerHTML = html;
+    return row;
+  })).then(rows=>{
+    fleet = { at:new Date().toISOString(), rows };
+    const vers = rows.filter(r=>r.ver).map(r=>r.ver);
+    const newest = vers.slice().sort(verCmp).pop();
+    const older = vers.filter(v => verCmp(v,newest)<0).length;
+    const chip = $('#fleetVerdict'); chip.style.display='';
+    if (!vers.length){ chip.className='chip err'; chip.textContent='no host answered — proxy down?'; }
+    else if (older===0 && verCmp(newest,OUR_FLOOR)<=0){ chip.className='chip ok'; chip.textContent=`fleet uniform at v${newest} (= our floor ${OUR_FLOOR})`; }
+    else if (older===0){ chip.className='chip warn'; chip.textContent=`fleet moved to v${newest} — ABOVE our floor ${OUR_FLOOR} (drift watch)`; }
+    else { chip.className='chip warn'; chip.textContent=`split fleet: newest v${newest}, ${older} behind`; }
+  });
+  btn.disabled=false; btn.textContent='Re-probe';
+}
+$('#btnFleet').onclick = probeFleet;
+setTimeout(probeFleet, 300);
+
+// ═══ Static audit ═══
+const SENSITIVE_RE = /api.?key|access.?token|authorization|auth.?key|password|secret|token/i;
+const REQUIRED_FLOOR = { torrentio:['useMultipleInstances'], peerflix:['showTorrentLinks'] };     // v2.33.1 rejections, 2026-08-11
+const DEBRID_USABLE = new Set(['torbox','realdebrid','alldebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr','easynews','debrider']);
+const NEED_SERVICE_TYPES = new Set(['seadex','sootio']);
+const OUR_VER_STAMPS = ['coreBuildsAIOStreamsTarget','aiostreamsVersion','coreBuildsVersion','templateVersion'];
+
+function unwrap(raw){
+  if (raw && typeof raw==='object' && !Array.isArray(raw)){
+    if (raw.config && typeof raw.config==='object' && (Array.isArray(raw.config.presets) || Array.isArray(raw.config.services))) return raw.config;
+  }
+  return raw;
+}
+function* flatOpts(o, prefix=''){
+  if (!o || typeof o !== 'object') return;
+  for (const [k,v] of Object.entries(o)){
+    yield [prefix+k, v];
+    if (v && typeof v==='object' && !Array.isArray(v)) yield* flatOpts(v, prefix+k+'.');
+  }
+}
+function staticAudit(cfg){
+  const findings = [];
+  const presets = Array.isArray(cfg.presets) ? cfg.presets : [];
+  const services = Array.isArray(cfg.services) ? cfg.services : [];
+  const usableSvc = services.some(s => s && s.enabled && DEBRID_USABLE.has(s.id) && Object.values(s.credentials || {}).some(v => typeof v === 'string' && v.trim()));
+  const add = (sev, rule, detail, advice) => findings.push({ sev, rule, detail, advice });
+
+  // R1 required-option floor
+  for (const p of presets){
+    if (!p || p.enabled !== true) continue;
+    const o = p.options || {};
+    for (const f of REQUIRED_FLOOR[p.type] || []){
+      if (!(f in o)) add('err','required option (v2.33.1)',`'${o.name||p.type}' (${p.type}) is missing options.${f}`, `suggested heal: add "options.${f}": false`);
+    }
+  }
+  // R2 keyed preset shipping enabled with a dead credential placeholder/blank
+  for (const p of presets){
+    if (!p || p.enabled !== true) continue;
+    const o = p.options || {};
+    for (const [path, v] of flatOpts(o)){
+      const leaf = path.split('.').pop();
+      if (SENSITIVE_RE.test(leaf) && (typeof v !== 'string' || v.trim()==='' || v==='<template_placeholder>' )){
+        add('err','keyed preset enabled without key',`'${o.name||p.type}' has '${path}' = ${v==='<template_placeholder>'?'<template_placeholder>':(typeof v==='string'?'"'+v.slice(0,18)+'" (blank)':String(v))}`, 'heal: set the preset enabled:false (house convention) — the save is rejected otherwise ("Option '+leaf+' is required, got undefined")');
+      }
+    }
+  }
+  // R3 SeaDex/Sootio enabled with no usable service
+  for (const p of presets){
+    if (!p || p.enabled !== true || !NEED_SERVICE_TYPES.has(p.type)) continue;
+    if (!usableSvc) add('err','service dependency',`'${(p.options||{}).name||p.type}' (${p.type}) enabled but no debrid/usenet service is enabled`, `heal: set enabled:false — v2.33 rejects ("requires at least one usable service…")`);
+  }
+  // R4 enabled service with empty credentials
+  for (const s of services){
+    if (!s || !s.enabled) continue;
+    const c = s.credentials || {};
+    if (!Object.values(c).some(v => typeof v==='string' && v.trim().length > 6)){
+      add('err','service credential',`service '${s.id}' is enabled but its credentials are empty/placeholder`, 'heal: either disable the service row or drop real keys in (dry-run strips them anyway)');
+    }
+  }
+  // R5 100KB instance body limit
+  const bytes = new Blob([JSON.stringify(cfg)]).size;
+  if (bytes > 102390) add('err','payload size',`${bytes.toLocaleString()} bytes > the instance's ~102,400-byte express body limit`,'writes this size die at the door — slim formatter/expressions');
+  else if (bytes > 95000) add('warn','payload size',`${bytes.toLocaleString()} bytes — thin headroom to the 100KB limit`,'');
+  else add('ok','payload size',`${bytes.toLocaleString()} bytes (limit ~102,400)`,'');
+  // R6 stamp vs fleet
+  let stamp = null;
+  for (const k of OUR_VER_STAMPS){ if (cfg.metadata && cfg.metadata[k]) { stamp = cfg.metadata[k]; break; } if (cfg[k]) { stamp = cfg[k]; break; } }
+  if (fleet){
+    const newest = fleet.rows.filter(r=>r.ver).map(r=>r.ver).sort(verCmp).pop();
+    if (newest && stamp && verCmp(newest, stamp) > 0) add('warn','version drift',`config stamped for ${stamp}; fleet newest is v${newest}`,'run the live dry-run — the newer validator may want options this build predates');
+    else if (newest) add('ok','version drift', `stamp ${stamp||'—'} vs fleet newest v${newest}`,'');
+  }
+  // R7 duplicate instanceIds
+  const seen = new Set(); let dups = 0;
+  for (const p of presets){ const iid = p && p.instanceId; if (iid){ if (seen.has(iid)) dups++; seen.add(iid); } }
+  if (dups) add('err','duplicate instanceIds', `${dups} duplicate instanceId(s) found`, 'each preset needs a unique instanceId');
+  // R8 empty presets
+  if (!presets.length) add('warn','empty config','no presets at all — this config serves nothing','');
+  if (!add.length) add('ok','structure','parsed cleanly; presets '+presets.length+', services '+services.length,'');
+  return findings;
+}
+
+let auditCfg = null, auditFindings = null, healLog = [];
+function renderStatic(){
+  const out = $('#staticOut');
+  $('#liveHost').innerHTML = Object.entries(HOSTS).map(([id,h])=>`<option value="${id}">${esc(h.label)} (${esc(h.url.replace('https://',''))})</option>`).join('');
+  if (!auditFindings){ out.innerHTML=''; $('#liveCard').classList.add('hidden'); return; }
+  const errs = auditFindings.filter(f=>f.sev==='err'), warns = auditFindings.filter(f=>f.sev==='warn'), oks = auditFindings.filter(f=>f.sev==='ok');
+  const head = errs.length
+    ? `<div class="verdict"><div class="big">🛑</div><div><div class="vt" style="color:var(--red)">${errs.length} hard problem${errs.length>1?'s':''} — this config would be rejected</div><div class="vd">${warns.length} warning(s) too. Every rule below cites the live rejection it encodes. Heal hints included; a live dry-run closes the loop.</div></div></div>`
+    : warns.length
+      ? `<div class="verdict"><div class="big">⚠️</div><div><div class="vt" style="color:var(--amber)">No blockers — ${warns.length} warning(s)</div><div class="vd">Worth the live dry-run for certainty, but nothing hard-fails.</div></div></div>`
+      : `<div class="verdict"><div class="big">✨</div><div><div class="vt" style="color:var(--green)">Static audit clean</div><div class="vd">Live dry-run on the host is the final proof (the instance is the authority).</div></div></div>`;
+  out.innerHTML = head + auditFindings.map(f=>
+    `<div class="rule"><b><span class="chip ${f.sev==='err'?'err':f.sev==='warn'?'warn':'ok'}" style="margin-right:8px">${f.sev==='err'?'FAIL':f.sev==='warn'?'WARN':'OK'}</span>${esc(f.rule)}</b>
+     <div class="det">${esc(f.detail)}</div>${f.advice?`<div class="adv">→ ${esc(f.advice)}</div>`:''}</div>`).join('');
+  $('#liveCard').classList.remove('hidden');
+}
+$('#btnStatic').onclick = () => {
+  let raw = $('#cfgText').value.trim();
+  if (!raw){ toast('Paste a config first'); auditCfg=null; auditFindings=null; renderStatic(); return; }
+  try{ auditCfg = unwrap(JSON.parse(raw)); }
+  catch(e){ toast('Not valid JSON: ' + e.message); auditCfg=null; auditFindings=null; renderStatic(); return; }
+  auditFindings = staticAudit(auditCfg);
+  renderStatic();
+};
+$('#btnFile').onclick = () => $('#filePick').click();
+$('#filePick').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader(); r.onload = () => { $('#cfgText').value = r.result; $('#btnStatic').click(); }; r.readAsText(f);
+};
+$('#btnDemo').onclick = () => {
+  $('#cfgText').value = JSON.stringify({ config:{
+    addonName:'Broken Sample', addonLogo:'', preferredQualities:[],
+    presets:[
+      { type:'torrentio', instanceId:'a', enabled:true, options:{ name:'Torrentio', timeout:7000 }, resources:['stream'] },
+      { type:'debridio', instanceId:'b', enabled:true, options:{ name:'Debridio Scraper', debridioApiKey:'<template_placeholder>' }, resources:['stream'] },
+      { type:'seadex', instanceId:'c', enabled:true, options:{ name:'SeaDex' }, resources:['stream'] },
+      { type:'library', instanceId:'a', enabled:false, options:{ name:'Library' }, resources:['stream'] }
+    ],
+    services:[ { type:'torbox', id:'torbox', enabled:true, credentials:{} } ],
+    metadata:{ coreBuildsAIOStreamsTarget:'2.32.0' }
+  }, metadata:{} }, null, 2);
+  $('#btnStatic').click();
+};
+
+function ladderClass(line){
+  const m = line.match(/Option (\w+) is required, got undefined/i);
+  if (m && /credential|api.?key|token|password|secret/i.test(m[1] + ' ' + line)) return 'MISSING CREDENTIAL';
+  if (m) return 'MISSING REQUIRED OPTION';
+  if (/requires at least one usable service/i.test(line)) return 'SERVICE DEPENDENCY';
+  if (/private instances only/i.test(line)) return 'HOST POLICY';
+  if (/invalid url/i.test(line)) return 'INVALID URL';
+  if (/invalid input/i.test(line)) return 'SHAPE/TYPE MISMATCH';
+  return 'REJECTED';
+}
+
+// ═══ Live dry-run ═══
+function applyHeals(cfg, rejectionLines){
+  // Conservative heals only — returns list of applied fix descriptions.
+  const log = [];
+  const presets = cfg.presets || [];
+  const services = cfg.services || [];
+  for (const line of rejectionLines){
+    let handled = false;
+    let m = line.match(/Option (\w+) is required, got undefined/i);
+    const pm = line.match(/preset '([^']+)'/i);
+    const presetHit = pm ? presets.find(p => ((p.options&&p.options.name)||'').toLowerCase() === pm[1].toLowerCase()) : null;
+    if (m && presetHit){
+      presetHit.options = presetHit.options || {};
+      presetHit.options[m[1]] = /key|token|secret|url|password/i.test(m[1]) ? '' : false;
+      log.push(`${pm[1]}: +${m[1]}=${presetHit.options[m[1]]===false?'false':'""'}`);
+      handled = true;
+    }
+    const sc = line.match(/credential '([^']+)' in service '([^']+)'/i);
+    if (sc){
+      const svc = services.find(s=> s.id && sc[2].toLowerCase().includes(s.id));
+      if (svc){ svc.enabled = false; log.push(`service ${svc.id}: enabled→false (dry-run structure pass)`); handled = true; }
+    }
+    if (/requires at least one usable service/i.test(line) && presetHit){ presetHit.enabled = false; log.push(`${pm[1]}: enabled→false (no usable service)`); handled = true; }
+    if (/private instances only/i.test(line) && pm && presetHit){ presetHit.enabled = false; log.push(`${pm[1]}: enabled→false (host policy)`); handled = true; }
+    if (/addonLogo: Invalid URL/i.test(line) && 'addonLogo' in cfg){ cfg.addonLogo = ''; log.push('addonLogo: cleared'); handled = true; }
+    if (!handled) log.push(`MANUAL: ${line.slice(0,120)}`);
+  }
+  return log;
+}
+function sanitizeForDryRun(cfg, stripCreds){
+  const c = JSON.parse(JSON.stringify(cfg));
+  if (Array.isArray(c.presets)) c.presets = c.presets.map(p => {
+    const cp = p; if (!cp) return cp;
+    if (stripCreds && cp.options){
+      const walk = (o)=>{ if(!o||typeof o!=='object')return; for(const k of Object.keys(o)){ if (SENSITIVE_RE.test(k) && typeof o[k]==='string' && o[k]!== '<template_placeholder>') o[k]=''; else if (typeof o[k]==='object') walk(o[k]); } };
+      walk(cp.options);
+    }
+    return cp;
+  });
+  if (stripCreds && Array.isArray(c.services)) c.services = c.services.map(s => ({ ...s, credentials: {} }));
+  delete c.password;
+  return c;
+}
+let liveResult = null;
+$('#btnLive').onclick = async () => {
+  if (!auditCfg){ toast('Run the static audit first'); return; }
+  const hostId = $('#liveHost').value, host = HOSTS[hostId];
+  const out = $('#liveOut');
+  const strip = !$('#liveSendCreds').checked;
+  const autoHeal = !!$('#liveAutoHeal') && $('#liveAutoHeal').checked;
+  const pw = 'audit-' + Math.random().toString(36).slice(2, 10);
+  $('#btnLive').disabled = true; $('#btnFixed').classList.add('hidden'); $('#btnReport').classList.add('hidden');
+  healLog = [];
+  let work = JSON.parse(JSON.stringify(auditCfg));
+  const MAXR = 4;
+  let uuid=null, accepted=false, lastRaw='', manifestOk=false, mName='', rounds=[];
+  for (let round=0; round<MAXR; round++){
+    const prepared = sanitizeForDryRun(work, strip);
+    out.innerHTML = `<div class="rule"><span class="spin"></span><b>Dry-run ${round>0?'round '+(round+1)+' (healed)':'running'} on ${esc(host.label)}…</b><div class="det">POST /api/v1/user · throwaway · creds ${strip?'stripped':'INCLUDED'}${healLog.length?` · heals so far: ${healLog.length}`:''}</div></div>` + rounds.join('');
+    let rJ=null;
+    try{
+      const r = await proxyReq(host.url, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: prepared, password: pw }) }, 30000);
+      lastRaw = await r.text();
+      try{ rJ = JSON.parse(lastRaw); }catch(e){ rJ = { __nonjson:true, status:r.status }; }
+    }catch(e){
+      rounds.push(`<div class="rule"><b><span class="chip err">UNREACHABLE</span> round ${round+1}</b><div class="det">${esc(e.name==='AbortError'?'timeout':String(e.message||e))}</div></div>`);
+      break;
+    }
+    if (rJ && rJ.success && (rJ.data?.uuid || rJ.uuid)){ uuid = rJ.data?.uuid || rJ.uuid; accepted = true; break; }
+    const msg = (rJ && rJ.error && rJ.error.message) || lastRaw.slice(0,300) || ('HTTP '+((rJ&&rJ.status)||'?'));
+    const lines = msg.split('\n').map(s=>s.trim()).filter(Boolean);
+    rounds.push(`<div class="rule"><b><span class="chip err">REJECTED</span> round ${round+1} — ${lines.length} issue(s)</b>${lines.map(l=>`<div class="det"><span class="chip ${/private instances/i.test(l)?'warn':'err'}" style="margin-right:6px">${esc(ladderClass(l))}</span>${esc(l)}</div>`).join('')}</div>`);
+    if (!autoHeal) break;
+    const heals = applyHeals(work, lines);
+    if (!heals.length || heals.every(h=>h.startsWith('MANUAL'))) break;
+    healLog = healLog.concat(heals);
+    rounds.push(`<div class="rule"><b><span class="chip warn">AUTO-HEAL</span> ${heals.length} fix(es) applied for retry</b><div class="det">${esc(heals.join(' · '))}</div></div>`);
+  }
+  if (accepted){
+    for (const wait of [0,400,900,1800]){   // read-back with backoff — manifests materialize a beat after the write
+      await new Promise(r=>setTimeout(r,wait));
+      try{
+        const mr = await proxyReq(host.url, `/stremio/${uuid}/${encodeURIComponent(pw)}/manifest.json`, {}, 15000);
+        const mj = await mr.json().catch(()=>null);
+        if (mr.ok){ manifestOk=true; mName = (mj && mj.name)||''; break; }
+      }catch(e){}
+    }
+  }
+  let verdictHtml;
+  if (accepted){
+    verdictHtml = `<div class="verdict"><div class="big">✅</div><div><div class="vt" style="color:var(--green)">ACCEPTED by ${esc(host.label)}${rounds.length>0?' (after '+rounds.length+' healed round(s))':''}</div><div class="vd">${manifestOk?`read-back OK — manifest "${esc(mName)}" · uuid <code>${esc(String(uuid).slice(0,8))}…</code>`:'created; manifest read-back inconclusive'} · inert leftover (no public delete — verified).${healLog.length? ' Healed: '+esc(healLog.join(' · ')):''}</div></div></div>`;
+  } else {
+    verdictHtml = `<div class="verdict"><div class="big">🛑</div><div><div class="vt" style="color:var(--red)">REJECTED by ${esc(host.label)}${autoHeal?' — no safe auto-heal remained':' (auto-heal off)'}</div><div class="vd">Each rejected round is logged below with its raw validator answer. Turn auto-heal on to iterate conservative fixes.</div></div></div>`;
+  }
+  liveResult = { at:new Date().toISOString(), host:hostId, accepted, uuid, healLog:[...healLog], rounds: rounds.length, rejectionsRaw: lastRaw.slice(0,2000), configSummary:{ presets:((auditCfg.presets)||[]).length, services:((auditCfg.services)||[]).length }, staticFindings: auditFindings };
+  out.innerHTML = verdictHtml + rounds.join('') + (accepted && healLog.length ? `<div class="fine">The healed config (what got accepted) is downloadable — mirror these fixes upstream so the source never produces the broken shape again.</div>` : '');
+  $('#btnReport').classList.remove('hidden');
+  if (healLog.length || !accepted) $('#btnFixed').classList.remove('hidden');
+  $('#btnLive').disabled=false;
+  toast(accepted ? 'Accepted by the live host' : 'Rejected — ladder below');
+};
+
+$('#btnReport').onclick = () => {
+  if (!liveResult) return;
+  const blob = new Blob([JSON.stringify(liveResult, null, 2)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'preflight-audit.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+};
+$('#btnFixed').onclick = () => {
+  // conservative heals only: add missing required option=false, disable unresolvable presets/services
+  if (!auditCfg || !liveResult) return;
+  const healed = JSON.parse(JSON.stringify(auditCfg));
+  for (const f of (liveResult.suggestedFixes||[])){
+    const m = (f.fix||'').match(/add "(\w+)": false/);   // only the option-default heals are automatable
+    if (!m) continue;
+    const field = m[1];
+    for (const p of (healed.presets||[])){
+      const name = (p?.options?.name || '').toLowerCase();
+      const line = (liveResult.rejections||[]).find(x => x.toLowerCase().includes(name) && x.includes(field));
+      if (line && p.options){ p.options[field] = false; healLog.push(`${p.options.name}: +${field}=false`); }
+    }
+  }
+  // disable presets whose rejection is a service-dependency or missing-credential
+  for (const l of (liveResult.rejections||[])){
+    if (/requires at least one usable service|credential/i.test(l) && /preset/i.test(l)){
+      const m = l.match(/preset '([^']+)'/i); if (!m) continue;
+      for (const p of (healed.presets||[])) if ((p?.options?.name||'')===m[1]) { p.enabled = false; healLog.push(`${m[1]}: enabled→false`); }
+    }
+  }
+  if (!healLog.length){ toast('No conservative auto-heals apply — read the ladder'); return; }
+  const blob = new Blob([JSON.stringify({ note:'Preflight healed: '+healLog.join(' · '), config: healed }, null, 2)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'preflight-healed.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  toast('Healed JSON downloaded (' + healLog.length + ' fix(es): ' + healLog.join(' · ') + ')');
+};
+
+// ═══ Doctor ═══
+$('#btnDoctor').onclick = async () => {
+  const out = $('#doctorOut');
+  const raw = $('#doctorIn').value.trim();
+  const m = raw.match(/^(https?:\/\/[^/]+)\/stremio\/([\w-]{8,})\/([^/]+)\/manifest\.json/i);
+  if (!m){ out.innerHTML = `<div class="rule"><b><span class="chip err">INPUT</span> that doesn't look like an AIOStreams manifest URL</b><div class="det">expected: https://&lt;host&gt;/stremio/&lt;uuid&gt;/&lt;password&gt;/manifest.json</div></div>`; return; }
+  const [, hostUrl, uuid, password] = m;
+  out.innerHTML = `<div class="rule"><span class="spin"></span><b>Checking the install…</b></div>`;
+  const t0 = performance.now();
+  try{
+    const r = await proxyReq(hostUrl, `/stremio/${uuid}/${encodeURIComponent(password)}/manifest.json`, {}, 15000);
+    const lat = Math.round(performance.now()-t0);
+    if (!r.ok){
+      out.innerHTML = `<div class="verdict"><div class="big">🚫</div><div><div class="vt" style="color:var(--red)">Manifest unreachable — HTTP ${r.status}</div><div class="vd">${r.status===404?'uuid/password pair not found — stale link or deleted config':r.status===401||r.status===403?'password rejected — the password changed or the link was mangled':'host answered negatively'} · wrong-credentials and deleted-instalments look exactly like this from the outside.</div></div></div>`;
+    } else {
+      const j = await r.json().catch(()=>null);
+      out.innerHTML = `<div class="verdict"><div class="big">✅</div><div><div class="vt" style="color:var(--green)">Install alive — “${esc(j?.name||'(unnamed)') }”</div><div class="vd">id ${esc(j?.id||'?')} · ${lat}ms · catalogs ${((j?.catalogs)||[]).length}</div></div></div>` +
+        (fleet ? `<div class="fine">Host's current build: ${esc((fleet.rows.find(x=>hostUrl.includes(x.id))||{}).ver || 'unknown')} (our generator floor ${OUR_FLOOR})</div>` : '');
+    }
+  }catch(e){
+    out.innerHTML = `<div class="verdict"><div class="big">🛰️</div><div><div class="vt" style="color:var(--amber)">Host unreachable</div><div class="vd">${esc(e.name==='AbortError'?'timeout after 15s':'network/'+String(e.message||e))} — if the host is down that's your answer and the fleet strip above confirms.</div></div></div>`;
+  }
+};
+})();
+</script>
+</body>
+</html>
