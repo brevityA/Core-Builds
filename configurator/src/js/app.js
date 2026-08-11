@@ -1700,7 +1700,7 @@ function render() {
               </div>
             </div>`;
           }).join('')}
-          ${S.cacheMode !== 'mixed' ? `<div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">${ICO.antenna(14,'#8b949e')}</span><span class="receipt-row-lbl">cache</span></div><div class="receipt-row-val hl">${S.cacheMode === 'cached' ? 'Cached Only' : 'Uncached Only'}</div></div>` : ''}
+          <div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">${ICO.antenna(14,'#8b949e')}</span><span class="receipt-row-lbl">cache</span></div><div class="receipt-row-val hl">${S.cacheMode === 'cached' ? '⚡ Cached Only — instant play' : S.cacheMode === 'uncached' ? 'Uncached Only' : 'Mixed — cached first, uncached may download'}</div></div>
           ${S.langs && (S.langs.length > 1 || !S.langs.includes('English') || S.langExclusive) ? `<div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">${ICO.globe(14,'#8b949e')}</span><span class="receipt-row-lbl">languages</span></div><div class="receipt-row-val hl">${S.langs.slice(0,3).join(', ')}${S.langs.length>3?` +${S.langs.length-3}`:''}${S.langExclusive?' · Exclusive':''}</div></div>` : ''}
           ${hasApis ? `<div class="receipt-row">
             <div class="receipt-row-left">
@@ -2611,7 +2611,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'close-advanced') closeAdvancedDrawer();
     if (action === 'close-and-next') { closeAdvancedDrawer(); if (step < STEPS && S.multiServices.length > 0) { step++; pushStep(); saveState(); render(); window.scrollTo(0,0); } }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'open-fast-lane') showFastLane();
+    if (action === 'open-fast-lane') showExpressLane();   // legacy Quick-Install action → consolidated Express lane (Patch 32)
     if (action === 'open-express-lane') showExpressLane();
     if (action === 'update-now') applyRemoteUpdate();
     if (action === 'revert-update') revertToPrevious();
@@ -2694,7 +2694,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'tut-start') { tutGo(1); }
-    if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else { tutClose(); showFastLane(); } }
+    if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else { tutClose(); showExpressLane(); } }   // tutorial ends in the consolidated lane
     if (action === 'tut-back') { if (_tutStep > 1) tutGo(_tutStep - 1); }
     if (action === 'tut-close') { tutClose(); }
     if (action === 'open-tutorial') { tutGo(0); }
@@ -6221,7 +6221,13 @@ function showExpressLane() {
       </div>
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
-    <div class="fastlane-section"><div class="fastlane-label">2 · Install to</div>
+    <div class="fastlane-section"><div class="fastlane-label">2 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
+      <div class="fastlane-grid services" style="grid-template-columns:1fr 1fr">
+        <button type="button" class="fastlane-choice${S.cacheMode!=='cached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
+        <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
+      </div>
+    </div>
+    <div class="fastlane-section"><div class="fastlane-label">3 · Install to</div>
       <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
         <div style="display:flex;gap:8px;margin-top:10px">
@@ -6245,11 +6251,27 @@ function showExpressLane() {
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Clean reinstall</b><br><span style="color:#8b949e">Remove previous Core Builds addons from your Stremio account.</span></span></label>
       <div style="margin-top:8px"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
     </details>
-    <div style="padding:0 22px 18px"><button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
+    <div style="padding:0 22px 18px">
+      <div id="expressSummary" style="font-size:.62rem;color:#718093;text-align:center;margin-bottom:8px;line-height:1.6"></div>
+      <button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
   </div>`;
   document.body.appendChild(overlay);
-  document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); });
+  document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); refreshExpressSummary(); });
   probeExpressHost();
+  // Truthful-at-a-glance chorus above the Install button — every pick lands in it.
+  const refreshExpressSummary = () => {
+    const elSum = document.getElementById('expressSummary');
+    if (!elSum) return;
+    const svcName = (EXPRESS_SERVICES.find(([v]) => v === state.service) || [null, state.service || '—'])[1];
+    const profName = { fast:'Fast', balanced:'Balanced', maximum:'Maximum' }[state.profile] || 'Balanced';
+    const resName = { '4k':'4K', '1080p':'1080p', mixed:'Mixed' }[state.resolution] || '4K';
+    const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', manifest:'Manifest URL' }[state.target] || 'Stremio';
+    const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
+    const fsOn = document.getElementById('expressFullStack')?.checked;
+    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span style="color:#a78bfa">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
+  };
+  refreshExpressSummary();
+  document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose')) { overlay.remove(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
@@ -6258,6 +6280,15 @@ function showExpressLane() {
       overlay.querySelectorAll('[data-express-service]').forEach(b => b.classList.toggle('active', b.dataset.expressService === state.service));
       state.extras = state.extras.filter(v => v !== state.service);
       renderCredsInto();
+      refreshExpressSummary();
+      return;
+    }
+    const cacheBtn = e.target.closest('[data-express-cache]');
+    if (cacheBtn) {
+      S.cacheMode = cacheBtn.dataset.expressCache;   // the actual install knob — visible truth
+      saveState();
+      overlay.querySelectorAll('[data-express-cache]').forEach(b => b.classList.toggle('active', b === cacheBtn));
+      refreshExpressSummary();
       return;
     }
     const tgtBtn = e.target.closest('[data-express-target]');
@@ -6266,24 +6297,33 @@ function showExpressLane() {
       overlay.querySelectorAll('[data-express-target]').forEach(b => b.classList.toggle('active', b.dataset.expressTarget === state.target));
       const box = document.getElementById('expressStremio');
       if (box) box.style.display = state.target === 'app' ? '' : 'none';
+      refreshExpressSummary();
       return;
     }
     const profBtn = e.target.closest('[data-express-profile]');
     if (profBtn) {
       state.profile = profBtn.dataset.expressProfile;
       overlay.querySelectorAll('[data-express-profile]').forEach(b => b.classList.toggle('active', b.dataset.expressProfile === state.profile));
+      // Keep the visible "Streams shown" toggle truthful about the profile's own cache semantics
+      // (mirrors applyQuickProfile: fast→cached-only, balanced/maximum→mixed). User can override after.
+      S.cacheMode = state.profile === 'fast' ? 'cached' : 'mixed';
+      saveState();
+      overlay.querySelectorAll('[data-express-cache]').forEach(b => b.classList.toggle('active', b.dataset.expressCache === S.cacheMode));
+      refreshExpressSummary();
       return;
     }
     const devBtn = e.target.closest('[data-express-device]');
     if (devBtn) {
       state.device = devBtn.dataset.expressDevice;
       overlay.querySelectorAll('[data-express-device]').forEach(b => b.classList.toggle('active', b.dataset.expressDevice === state.device));
+      refreshExpressSummary();
       return;
     }
     const resBtn = e.target.closest('[data-express-res]');
     if (resBtn) {
       state.resolution = resBtn.dataset.expressRes;
       overlay.querySelectorAll('[data-express-res]').forEach(b => b.classList.toggle('active', b.dataset.expressRes === state.resolution));
+      refreshExpressSummary();
       return;
     }
     if (e.target.closest('#expressExtrasBtn')) {
@@ -6312,6 +6352,7 @@ function showExpressLane() {
         tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
         extras: { services: state.extras, scrapers: state.scrapers },
         profile: state.profile, device: state.device, resolution: state.resolution,
+        cacheMode: S.cacheMode,
       };
       const hostSel = document.getElementById('expressHost');
       if (hostSel) {
@@ -6334,6 +6375,7 @@ async function runExpressInstall(p) {
     S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
   }
   applyQuickProfile(p.profile || 'balanced');
+  if (p.cacheMode) S.cacheMode = p.cacheMode;   // explicit "Streams shown" pick outranks the profile's bundled default
   if (p.device) S.device = p.device;
   if (p.resolution) S.resolution = p.resolution;
   S.service = p.service;
@@ -6361,7 +6403,19 @@ async function runExpressInstall(p) {
     const btn = document.getElementById('btnAutoCreate');
     const result = document.getElementById('aioResult');
     try {
-      const nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
+      // Patch 14 contract: an explicit host pick is never silently overridden — even by the
+      // Nuvio-instant route. If the pick can't do Nuvio instant, say so instead of swapping.
+      const pickedId = (S.instanceHost && S.instanceHost !== 'auto' && S.instanceHost !== 'custom') ? S.instanceHost : null;
+      const pickedMeta = pickedId ? HOST_META[pickedId] : null;
+      let nuvioHost;
+      if (pickedMeta && pickedMeta.supportsNuvioInstant && pickedMeta.supportsP2P) {
+        nuvioHost = { id: pickedId, ...pickedMeta };
+      } else if (pickedId) {
+        result.innerHTML = `<div class="td-error">${escHtml(HOST_LABEL_MAP[pickedId] || pickedId)} can't do instant Nuvio imports (needs Nuvio-instant + P2P support on the host). Pick a compatible host above, or choose the Nuvio target again after switching.</div>`;
+        return;
+      } else {
+        nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
+      }
       if (!nuvioHost) { result.innerHTML='<div class="td-error">No compatible Nuvio host found.</div>'; return; }
       const tmpl = generateTemplate({
         route: 'nuvio-torbox-instant', device: p.device || 'generic', resolution: p.resolution || '1080p',
@@ -6375,7 +6429,7 @@ async function runExpressInstall(p) {
       if (manifestUrl) {
         saveLastGen();
         const safeUrl = manifestUrl.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Nuvio template ready</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 10px">Add this manifest URL in Nuvio (or tap an instance to import it):</div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${safeUrl}">${safeUrl}</div>${instanceChips(manifestUrl)}</div>`;
+        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 10px">Add this manifest URL in Nuvio (or tap an instance to import it):</div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${safeUrl}">${safeUrl}</div>${instanceChips(manifestUrl)}</div>`;
       } else {
         result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not create a Nuvio import link</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 2px">Export the JSON and import it manually.</div><button data-action="generate-dl" style="margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div>';
       }
