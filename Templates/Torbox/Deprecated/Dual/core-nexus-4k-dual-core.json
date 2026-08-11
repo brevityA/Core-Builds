@@ -167,7 +167,7 @@
       {
         "type": "seadex",
         "instanceId": "tam-seadex",
-        "enabled": true,
+        "enabled": false,
         "options": {
           "name": "SeaDex",
           "timeout": 5000,

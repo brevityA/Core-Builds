@@ -432,15 +432,14 @@
       {
         "type": "debridio",
         "instanceId": "994",
-        "enabled": true,
+        "enabled": false,
         "options": {
           "name": "Debridio Scraper",
           "timeout": 6500,
           "resources": [
             "stream"
           ],
-          "mediaTypes": [],
-          "debridioApiKey": "<template_placeholder>"
+          "mediaTypes": []
         }
       }
     ],

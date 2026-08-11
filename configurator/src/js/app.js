@@ -3413,7 +3413,7 @@ function presets() {
         return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
       ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
-        return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '', timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
+        return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
       ...subtitlePresets(),
       ...catalogPresets()
@@ -3421,8 +3421,9 @@ function presets() {
     return usenetList;
   }
   if (isHttp) return [
-    { type:'sootio', instanceId:'sootio-core-builds', enabled:true, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] },
+    // v2.33+: Sootio validates as debrid/usenet-only — pure-HTTP/p2p routes can't satisfy it
+    { type:'sootio', instanceId:'sootio-core-builds', enabled:false, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
+    { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] },
     { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
@@ -3442,9 +3443,9 @@ function presets() {
 
   const list = [
     { type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
-    ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000 }, resources:['stream'] }] : []),
+    ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
-    { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live', options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },
+    { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
     ...storeSlot,
     ...(isEasynews || multiHasEasynews || isUsenet ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000 }, resources:['stream'] },
@@ -3470,12 +3471,12 @@ function presets() {
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      if (d.id === 'jackett') return { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', timeout:10000, ...(S.creds.jackett ? { apiKey:S.creds.jackett } : {}) }, resources:['stream'] };
-      if (d.id === 'prowlarr') return { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', timeout:10000, ...(S.creds.prowlarr ? { apiKey:S.creds.prowlarr } : {}) }, resources:['stream'] };
+      if (d.id === 'jackett') return S.creds.jackettUrl ? { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', jackettUrl:S.creds.jackettUrl, timeout:10000, ...(S.creds.jackett ? { apiKey:S.creds.jackett } : {}) }, resources:['stream'] } : null;  // v2.33: jackettUrl is REQUIRED — no URL, no preset
+      if (d.id === 'prowlarr') return S.creds.prowlarrUrl ? { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', prowlarrUrl:S.creds.prowlarrUrl, timeout:10000, ...(S.creds.prowlarr ? { apiKey:S.creds.prowlarr } : {}) }, resources:['stream'] } : null;  // v2.33: prowlarrUrl REQUIRED
       return null;
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
-      return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '', timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
+      return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
@@ -3498,8 +3499,8 @@ function presets() {
       { type:'animetosho', instanceId:'nx-at-01', enabled:S.content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:false, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
-    { type:'sootio', instanceId:'sootio-core-builds', enabled:isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
-    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
+    { type:'sootio', instanceId:'sootio-core-builds', enabled:false, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },  // p2p-only: v2.33 rejects Sootio without a usable service/HTTP provider,
+    ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...subtitlePresets(),
     ...catalogPresets()
   ];
@@ -4722,6 +4723,15 @@ function showUpdateTemplateModal() {
       const tpl = obj.config ? obj : { config: obj };
       const parsed = parseTemplateToState(tpl);
       if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
+
+      // Honesty note (Patch 33): keyed presets from the imported config (e.g. a Debridio
+      // scraper) are not regenerated by the rebuild — say so before the user wonders.
+      const keyedPresets = ((tpl.config && tpl.config.presets) || []).filter(p => p?.enabled === true && p?.options
+        && Object.keys(p.options).some(k => /api.?key|access.?token|secret|password|token/i.test(k) && (typeof p.options[k] !== 'string' || p.options[k].trim() === '' || p.options[k] === '<template_placeholder>')));
+      if (keyedPresets.length && infoEl) {
+        infoEl.textContent = 'Heads-up: ' + keyedPresets.map(p => `“${(p.options && p.options.name) || p.type}”`).join(', ') + ' ' + (keyedPresets.length > 1 ? 'need' : 'needs') + ' their own API key — the rebuilt config ships them disabled. Add the key in AIOStreams and re-enable if you use them.';
+        infoEl.style.display = '';
+      }
 
       // Build a preview from temporary state; do not commit until the user confirms.
       upgradeToTemplate(tpl, { onClose: () => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 150); } });
@@ -6223,8 +6233,9 @@ function showExpressLane() {
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
       <div class="fastlane-grid services" style="grid-template-columns:1fr 1fr">
-        <button type="button" class="fastlane-choice${S.cacheMode!=='cached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
+        <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
         <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
+        ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-top:6px">Advanced is set to “Uncached only” — Express will honor it unless you pick here.</div>' : ''}
       </div>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">3 · Install to</div>

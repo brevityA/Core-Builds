@@ -41,9 +41,11 @@ test('presets() guard for jackett/prowlarr uses credKey && !apiUrl (regression: 
     'broken filter "x.credKey && x.apiUrl" found — jackett/prowlarr presets would never generate');
 });
 
-test('jackett and prowlarr preset bodies remain wired with credential passthrough', () => {
-  assert.ok(app.includes("if (d.id === 'jackett') return { type:'jackett', instanceId:'jackett-1'"));
-  assert.ok(app.includes("if (d.id === 'prowlarr') return { type:'prowlarr', instanceId:'prowlarr-1'"));
+test('jackett and prowlarr presets are gated on their instance URL (v2.33 requires it)', () => {
+  assert.ok(app.includes("if (d.id === 'jackett') return S.creds.jackettUrl ? { type:'jackett', instanceId:'jackett-1'"));
+  assert.ok(app.includes("if (d.id === 'prowlarr') return S.creds.prowlarrUrl ? { type:'prowlarr', instanceId:'prowlarr-1'"));
   assert.ok(app.includes('S.creds.jackett'));
   assert.ok(app.includes('S.creds.prowlarr'));
+  assert.ok(app.includes('jackettUrl:S.creds.jackettUrl') && app.includes('prowlarrUrl:S.creds.prowlarrUrl'),
+    'instance URL goes out as jackettUrl/prowlarrUrl — v2.33 names these options required');
 });

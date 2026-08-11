@@ -280,22 +280,8 @@
         "enabled": true,
         "options": {
           "name": "Torrentio",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "seadex",
-        "instanceId": "tam-seadex",
-        "enabled": true,
-        "options": {
-          "name": "SeaDex",
           "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
+          "useMultipleInstances": false
         },
         "resources": [
           "stream"
@@ -363,24 +349,13 @@
         }
       },
       {
-        "type": "sootio",
-        "instanceId": "sootio-core-builds",
-        "enabled": true,
-        "options": {
-          "name": "Sootio",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "peerflix",
         "instanceId": "pflx-1",
         "enabled": true,
         "options": {
           "name": "Peerflix",
           "timeout": 6000,
+          "showTorrentLinks": false,
           "useMultipleInstances": false
         },
         "resources": [

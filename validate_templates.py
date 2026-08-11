@@ -235,6 +235,70 @@ def validate_template(fpath):
                     or not isinstance(o.get('score'), (int, float))):
                 err(name, f"regexOverrides[{i}] malformed — needs string pattern + name and numeric score (yeb's-class hosts reject score-only stubs; #671)")
 
+    # ── Credential placeholders in ENABLED presets (Brisk field report, 2026-08-11) ──
+    # AIOStreams validates required preset options at save/import: an enabled preset
+    # whose credential option is '<template_placeholder>' (or blank) is rejected with
+    # "Option X is required, got undefined". House rule: presets that need a user key
+    # ship DISABLED; the key gate lives in the UI/validator, not a blank string.
+    _CRED_KEY_RE = _re.compile(r'api.?key|access.?token|authorization|auth.?key|password|secret|token', _re.I)
+    def _flat_opts(d, prefix=''):
+        for kk, vv in d.items():
+            path = f'{prefix}{kk}'
+            yield path, vv
+            if isinstance(vv, dict):
+                yield from _flat_opts(vv, path + '.')
+    for p in presets_list:
+        if not isinstance(p, dict) or p.get('enabled') is not True:
+            continue
+        o = p.get('options') or {}
+        if not isinstance(o, dict):
+            continue
+        for opt_path, vv in _flat_opts(o):
+            leaf = opt_path.split('.')[-1]
+            if isinstance(vv, str) and _CRED_KEY_RE.search(leaf) and (vv.strip() == '' or vv == '<template_placeholder>'):
+                err(name, f"enabled preset '{o.get('name') or p.get('type')}' carries unresolved credential option '{opt_path}' — ship keyed presets disabled (debridioApiKey class rejection, 2026-08-11)")
+
+    # ── Required-option floor (AIOStreams v2.33 tightened validation 2026-08-11) ──
+    # The instance rejects configs missing these options outright. Matrix grows as the
+    # live validator teaches us (each entry is a real rejection message observed).
+    _REQUIRED_OPTS_BY_TYPE = {
+        'torrentio': ['useMultipleInstances'],
+        'peerflix': ['showTorrentLinks'],
+        # Classmates from the 2026-08-11 live oracle sweep (each line reproduced there):
+        'torrents-db': ['useMultipleInstances'],
+        'jackett': ['jackettUrl'],
+        'prowlarr': ['prowlarrUrl'],
+        'newznab': ['api'],
+        'nzbhydra': ['api'],
+        'aiosubtitle': ['languages'],
+    }
+    for p in presets_list:
+        if not isinstance(p, dict) or p.get('enabled') is not True:
+            continue
+        if is_legacy:
+            break   # Legacy/ snapshots document older AIOStreams eras by design — floor rules measure today's fleet
+        req = _REQUIRED_OPTS_BY_TYPE.get(p.get('type'))
+        if not req:
+            continue
+        o = p.get('options') or {}
+        for field in req:
+            if field not in o:
+                err(name, f"enabled preset '{o.get('name') or p.get('type')}' ({p.get('type')}) missing required option '{field}' (v2.33+ validation floor)")
+            elif isinstance(o[field], str) and o[field].strip() == '':
+                warn(name, f"enabled preset '{o.get('name') or p.get('type')}' ({p.get('type')}) has required option '{field}' present but blank — present-but-empty still rejects on the strict validator (CodeRabbit point, PR #686)")
+
+    # ── SeaDex/Sootio service dependency (v2.33) ──
+    # These presets require a torrent-capable paid service or HTTP provider; enabled in a
+    # pure p2p/free config → host rejects create ("requires at least one usable service").
+    _NEEDS_SERVICE = {'seadex', 'sootio'}
+    enabled_types = {p.get('type') for p in presets_list if isinstance(p, dict) and p.get('enabled')}
+    svc_list = c.get('services', []) if isinstance(c, dict) else []
+    enabled_svcs = {sv.get('id') for sv in svc_list if isinstance(sv, dict) and sv.get('enabled')}
+    debridish = enabled_svcs & {'torbox','realdebrid','alldebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr','easynews'}
+    for p in presets_list:
+        if isinstance(p, dict) and p.get('enabled') is True and p.get('type') in _NEEDS_SERVICE and not debridish:
+            err(name, f"enabled preset '{(p.get('options') or {}).get('name') or p.get('type')}' requires a torrent-capable service, none enabled (v2.33 rejection class)")
+
     # ── Newznab/Torznab option shape (AIOStreams v2.32) ──────────
     # v2.32 folded newznabUrl + apiPath + apiKey into a single `api` object
     # holding the full endpoint URL (usually ending in /api).
