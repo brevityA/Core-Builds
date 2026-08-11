@@ -967,7 +967,7 @@ async function wpHandshakeProbe(){
   if (!/^[a-z0-9]{6}$/.test(key)){ out('✗ Paste your 6-char profile key above first.'); return; }
   out('🛰️ handshake probe — ' + new Date().toLocaleTimeString() + ' · key ' + key.slice(0,2) + '••••');
   try{
-    autoToken = null; await wpEnsureDevice();
+    await wpEnsureDevice();   // one registration per tab, not per click (token reused across probes/runs)
     out('✓ device registered — token ' + autoToken.slice(0,6) + '… (session-only, labelled "web-genie")');
   }catch(e){ out('✗ register failed: ' + (e.message||e)); return; }
   try{
@@ -1103,7 +1103,7 @@ async function runAutoApply(live){
     const s = el(`<div class="step"><div class="st-ic">${op.sys==='preflight'?'👁':op.sys==='verify'?'🔁':op.auto?'⚡':'📋'}</div><div><div class="st-t">${escH(op.label)}</div><div class="st-d">${escH(op.route || (op.auto ? '' : 'guided — one tap for you at the end'))}</div></div><div class="spin"></div></div>`);
     wrap.appendChild(s); return s;
   });
-  let halted = false;
+  let halted = false, pinBlocked = false;
   for (let i=0;i<ops.length;i++){
     const op = ops[i], s = els[i];
     s.classList.add('active');
@@ -1120,7 +1120,17 @@ async function runAutoApply(live){
         await new Promise(r=>setTimeout(r, REDUCED?90:(300+Math.random()*250)));
         s.classList.remove('active'); s.classList.add('done'); s.querySelector('.spin')?.remove(); s.querySelector('.st-ic').textContent='✓'; continue;
       }
+      if (live && pinBlocked && op.sys!=='preflight' && op.sys!=='verify' && op.auto){
+        op.auto = false; s.querySelector('.st-ic').textContent='📋';
+        s.classList.remove('active'); s.classList.add('warn'); dEl.textContent = 'guided — profile is PIN-locked (unlock in WuPlay or use the guide)';
+        autoReceipt.push({ step:op.label, status:'guided', note:'PIN-locked profile — live writes paused by design' });
+        await new Promise(r=>setTimeout(r, REDUCED?40:120)); continue;
+      }
       const note = await dispatchWrite(op);
+      if (op.sys==='preflight' && live && autoState?.profile?.hasPinSet){
+        pinBlocked = true;
+        autoReceipt.push({ step:'PIN gate', status:'guided', note:'profile “'+(autoState.profile.name||'?')+'” has a PIN — live writes paused; nothing was written' });
+      }
       dEl.textContent = note;
       autoReceipt.push({ step:op.label, status:'applied ✔', note, route:op.route||'', undo: op._undo || null });
       s.classList.remove('active'); s.classList.add('done'); s.querySelector('.spin')?.remove(); s.querySelector('.st-ic').textContent='✓';
