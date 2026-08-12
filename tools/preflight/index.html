@@ -357,7 +357,7 @@ function applyHeals(cfg, rejectionLines){
       presetHit.options = presetHit.options || {};
       const cur = presetHit.options[m[1]];
       const isKeyish = /key|token|secret|url|password/i.test(m[1]);
-      const unresolvedKey = isKeyish && (cur === '<template_placeholder>' || (typeof cur === 'string' && cur.trim() === ''));
+      const unresolvedKey = isKeyish && (cur == null || cur === '<template_placeholder>' || (typeof cur === 'string' && cur.trim() === ''));
       if (unresolvedKey){
         presetHit.enabled = false;
       } else {
