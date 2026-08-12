@@ -1,4 +1,14 @@
 export const CHANGELOG = [
+  { v:'2.92', date:'Aug 12 2026', items:[
+    'AIOStreams v2.33.1 compatibility — Sootio disabled on debrid/HTTP routes (v2.33 requires a usable service), Peerflix gains showTorrentLinks:false + useMultipleInstances:false, SeaDex disabled on P2P-only (rejects without a service), Jackett/Prowlarr require their URL (no URL → no preset), NZBHydra2 uses nested api:{url,apiKey} shape',
+    'Import safety — keyed presets (Debridio, indexers with API keys) that lose their credential during sanitization are now auto-disabled before sharing, preventing "required option undefined" rejects on the receiving host',
+    'Template update honesty — the Rebuild modal now warns when imported presets need their own API key and will ship disabled in the rebuilt config',
+    'Preflight tool — new 4-lane config audit: fleet probe, static analysis, live dry-run with auto-heal, and manifest doctor; downloads healed config or case bundle for support sharing',
+    'Fixed: Preflight download button delivered empty heal data — now stores the exact working copy the host accepted and downloads it directly',
+    'Fixed: Preflight static audit crashed on non-object input (null, array) — now coerces to empty object',
+    'Fixed: validate_templates.py now warns on present-but-blank required options in enabled presets',
+    'Express Install cache toggle visible — "Uncached only" state from Advanced is honored and surfaced',
+  ]},
   { v:'2.91', date:'Aug 9 2026', items:[
     'Fixed: "Rebuild loop" — the version banner\'s Rebuild button wiped all settings but never stamped the current version, so the outdated banner returned after every rebuild. Now keeps settings, stamps the version, and toasts the user to download + re-import.',
     'Fixed: explicit AIOStreams host selection is now honored — picking a specific host (e.g. Omni, ForTheWeak) no longer silently fails over to a different host. Outdated hosts (< v2.32.0) get a clear version-gate error with remediation steps.',
