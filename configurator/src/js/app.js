@@ -2270,6 +2270,8 @@ function tutClose(){
 }
 window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
 document.addEventListener('DOMContentLoaded', () => {
+  let qsEscKey, qsPrevFocus;
+  const closeQuickstart = () => { document.getElementById('qsOverlay')?.classList.remove('open'); if (qsEscKey) { document.removeEventListener('keydown', qsEscKey); qsEscKey = null; } if (qsPrevFocus && qsPrevFocus.focus) { qsPrevFocus.focus(); qsPrevFocus = null; } };
   loadState();
   checkForTemplateUpdate();
   setInterval(checkForTemplateUpdate, 60 * 60 * 1000);
@@ -2690,9 +2692,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'update-template') { showUpdateTemplateModal(); }
     if (action === 'test-drive') { showTestDriveModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
-    if (action === 'open-quickstart') { const qo = document.getElementById('qsOverlay'); qo.classList.add('open'); const prevFocus = document.activeElement; const onQKey = (e) => { if (e.key === 'Escape'){ qo.classList.remove('open'); document.removeEventListener('keydown', onQKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); } }; document.addEventListener('keydown', onQKey); }
-    if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
-    if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { document.getElementById('qsOverlay').classList.remove('open'); }
+    if (action === 'open-quickstart') { const qo = document.getElementById('qsOverlay'); qo.classList.add('open'); qsPrevFocus = document.activeElement; qsEscKey = (e) => { if (e.key === 'Escape') closeQuickstart(); }; document.addEventListener('keydown', qsEscKey); }
+    if (action === 'close-quickstart') { closeQuickstart(); }
+    if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { closeQuickstart(); }
     if (action === 'tut-start') { tutGo(1); }
     if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else { tutClose(); showExpressLane(); } }   // tutorial ends in the consolidated lane
     if (action === 'tut-back') { if (_tutStep > 1) tutGo(_tutStep - 1); }
@@ -5553,11 +5555,11 @@ function promptPassword() {
     });
     manualInput.addEventListener('input', () => { goBtn.disabled = !manualInput.value.trim(); });
     manualInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && manualInput.value.trim()) done(); });
-    const done = () => { overlay.remove(); resolve(mode === 'auto' ? autoPwd : manualInput.value.trim()); };
-    const cancel = () => { overlay.remove(); resolve(null); };
+    const done = () => { cleanupPwd(); overlay.remove(); resolve(mode === 'auto' ? autoPwd : manualInput.value.trim()); };
+    const cancel = () => { cleanupPwd(); overlay.remove(); resolve(null); };
+    const cleanupPwd = bindModalEsc(overlay, cancel);
     goBtn.addEventListener('click', done);
     overlay.querySelector('.pwd-cancel').addEventListener('click', cancel);
-  bindModalEsc(overlay, () => cancel());   // ESC behaves exactly like Cancel (UX polish P2.4)
     overlay.addEventListener('click', (e) => { if (e.target === overlay) cancel(); });
   });
 }
@@ -6155,13 +6157,15 @@ function showAdditionalServicesPicker(options={}) {
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
   document.body.appendChild(overlay);
-  bindModalEsc(overlay, () => overlay.remove());
+  let cleanupExtra;
+  const closeExtra = () => { if (cleanupExtra) cleanupExtra(); overlay.remove(); };
+  cleanupExtra = bindModalEsc(overlay, closeExtra);
   overlay.addEventListener('click',e=>{
-    if(e.target===overlay){overlay.remove();return;}
+    if(e.target===overlay){closeExtra();return;}
     const svc=e.target.closest('[data-extra-service]');if(svc){const id=svc.dataset.extraService;selectedServices.has(id)?selectedServices.delete(id):selectedServices.add(id);svc.classList.toggle('active',selectedServices.has(id));return;}
     const scr=e.target.closest('[data-extra-scraper]');if(scr){const id=scr.dataset.extraScraper;selectedScrapers.has(id)?selectedScrapers.delete(id):selectedScrapers.add(id);scr.classList.toggle('active',selectedScrapers.has(id));return;}
-    if(e.target===overlay||e.target.closest('#extraClose')){overlay.remove();return;}
-    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
+    if(e.target===overlay||e.target.closest('#extraClose')){closeExtra();return;}
+    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);closeExtra();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();closeExtra();render();}
   });
   document.getElementById('extraClose').focus();
 }
@@ -6171,8 +6175,12 @@ function showAdditionalServicesPicker(options={}) {
 // and focus returns to whatever the user was on. Bind once at overlay creation.
 function bindModalEsc(overlay, doClose){
   const prevFocus = document.activeElement;
-  const onKey = (e) => { if (e.key === 'Escape'){ document.removeEventListener('keydown', onKey); doClose(); if (prevFocus && prevFocus.focus) prevFocus.focus(); } };
+  let torn = false;
+  const cleanup = () => { if (torn) return; torn = true; document.removeEventListener('keydown', onKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
+  const teardown = () => { cleanup(); doClose(); };
+  const onKey = (e) => { if (e.key === 'Escape') teardown(); };
   document.addEventListener('keydown', onKey);
+  return cleanup;
 }
 
 // ── Express Install lane ────────────────────────────────────────────────
@@ -6229,8 +6237,6 @@ function showExpressLane() {
   const closeLane = () => { overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
   const expressLaneEscKey = (e) => { if (e.key === 'Escape') closeLane(); };
   document.addEventListener('keydown', expressLaneEscKey);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.closest('#expressClose')) closeLane(); }, { once:false });
-  overlay.dataset.bound = '1';
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="expressTitle" style="max-width:640px">

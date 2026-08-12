@@ -938,7 +938,7 @@ document.getElementById('wpDiagBtn')?.addEventListener('click', runWuplayDiagnos
 document.getElementById('wpDeepBtn')?.addEventListener('click', wpHandshakeProbe);
 
 // ── shared helpers ──
-function maskKey(k){ return (k||'').slice(0,2) + '••••'; }   // one convention everywhere (review P3.8)
+function maskKey(k){ const s = (k||''); return s.length >= 2 ? s.slice(0,2) + '••••' : '(not set)'; }
 
 // ── device + state plumbing (session-memory only; nothing hits storage) ──
 async function wpEnsureDevice(){
