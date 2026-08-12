@@ -355,8 +355,15 @@ function applyHeals(cfg, rejectionLines){
     const presetHit = pm ? presets.find(p => ((p.options&&p.options.name)||'').toLowerCase() === pm[1].toLowerCase()) : null;
     if (m && presetHit){
       presetHit.options = presetHit.options || {};
-      presetHit.options[m[1]] = /key|token|secret|url|password/i.test(m[1]) ? '' : false;
-      log.push(`${pm[1]}: +${m[1]}=${presetHit.options[m[1]]===false?'false':'""'}`);
+      const cur = presetHit.options[m[1]];
+      const isKeyish = /key|token|secret|url|password/i.test(m[1]);
+      const unresolvedKey = isKeyish && (cur == null || cur === '<template_placeholder>' || (typeof cur === 'string' && cur.trim() === ''));
+      if (unresolvedKey){
+        presetHit.enabled = false;
+      } else {
+        presetHit.options[m[1]] = isKeyish ? '' : false;
+      }
+      log.push(`${pm[1]}: ${unresolvedKey ? 'enabled→false (key-shaped option unresolved)' : '+'+m[1]+'=(default)'}`);
       handled = true;
     }
     const sc = line.match(/credential '([^']+)' in service '([^']+)'/i);

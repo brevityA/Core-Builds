@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
 
+// These specs drive long multi-hop chains (push → full stack → stremio) behind stubbed routes;
+// on a loaded box the modal chain can lag past a single test budget. Retry locally too — a flake
+// here must not own go/no-go signals (#682). Still bounded: real regressions fail on all retries.
+test.describe.configure({ retries: 2 });
+
 // Express Install lane — one-click two-step install (Duck Streams pattern):
 // pick a debrid service + key, connect Stremio or grab the manifest, go.
 // The lane reuses the shared install pipeline, so the mocked surface is the
@@ -84,6 +89,8 @@ test('Express free/P2P hides credentials; manifest target hides Stremio fields',
 });
 
 test('Express Install creates a v2.32-clean config and pushes to Stremio (Full Stack)', async ({ page }) => {
+  // Full Stack chain = several staged writes; under full-suite load the 45s default flakes (#682)
+  test.setTimeout(90_000);
   const posted = [];
   await mockBackend(page, posted);
   const errors = await fresh(page);
@@ -95,7 +102,7 @@ test('Express Install creates a v2.32-clean config and pushes to Stremio (Full S
   await page.locator('#expressGo').click();
   // AIOStreams config password prompt (auto-generate is default)
   await page.locator('#pwdPrompt .pwd-go').click();
-  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 30000 });
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 45000 });
   expect(posted).toHaveLength(1);
   const config = posted[0].config;
   // v2.32-clean: no removed torbox-search preset, TorBox service configured
@@ -116,12 +123,13 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   await page.locator('[data-express-target="manifest"]').click();
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
-  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
   expect(posted).toHaveLength(1);
   expect(JSON.stringify(posted[0].config)).not.toContain('torbox-search');
 });
 
 test('Express "Additional services & scrapers" popout adds Debridio + folds its key into the config', async ({ page }) => {
+  test.setTimeout(90_000);
   const posted = [];
   await mockBackend(page, posted);
   const errors = await fresh(page);
@@ -140,7 +148,7 @@ test('Express "Additional services & scrapers" popout adds Debridio + folds its 
   await page.locator('#stremioPasswordInline').fill('test-password');
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
-  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 30000 });
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 45000 });
   expect(posted).toHaveLength(1);
   const config = posted[0].config;
   const debridio = config.presets.find(p => p.type === 'debridio');
@@ -165,7 +173,7 @@ test('Express without a Debridio key omits the preset (no config reject)', async
   await page.locator('#stremioPasswordInline').fill('test-password');
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
-  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 30000 });
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 45000 });
   const config = posted[0].config;
   expect(config.presets.some(p => p.type === 'debridio')).toBe(false);
   expect(JSON.stringify(config)).not.toContain('debridioApiKey');

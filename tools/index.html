@@ -255,18 +255,6 @@ body{
         <span class="tool-link">Open Builder →</span>
       </div>
     </a>
-    <a class="tool-card" href="./preflight/">
-      <div class="tool-idx">Audit</div>
-      <div class="tool-icon red">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z"/><path d="M12 8.5v7M8.7 10.2l6.6 3.6M15.3 10.2l-6.6 3.6"/></svg>
-      </div>
-      <div class="tool-name">Preflight</div>
-      <p class="tool-desc">Static audit + live dry-run on any AIOStreams host. Fleet version probe, auto-heal loop, manifest doctor — every rule cites the real rejection it encodes.</p>
-      <div class="tool-foot">
-        <span class="badge badge-green">✓ Live</span>
-        <span class="tool-link">Open →</span>
-      </div>
-    </a>
   </div>
 
   <!-- Section 3: New tools -->
@@ -332,9 +320,14 @@ body{
   <!-- What's New -->
   <div class="inline-card" style="margin-top:16px">
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
-    <h3>🆕 What's New — v2.91</h3>
+    <h3>🆕 What's New — v2.92</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.92 · Aug 11 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">AIOStreams v2.33.1 adopted same-day — the host fleet hardened its config validation on August 11 (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Express lane truth-in-advertising pass — a visible "Streams shown" toggle (Mixed/⚡Cached only), an always-on install chorus (service → app · profile · resolution · cache mode · host), receipts always show the cache mode, and profile picks no longer stomp an explicit choice. Fixes the "everything downloads to debrid" confusion class.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Nuvio instant path honors your AIOStreams host pick on Express (a compatible pick is used; an incompatible one gets a named, actionable error instead of a silent swap). Tutorial completion and the legacy quick-install lane now land in the consolidated Express lane.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Template imports get safe-credential hygiene everywhere: community templates ship presets that need your API key as disabled-with-a-note, share links never carry keys, and the update tool warns when an imported preset type can't be regenerated without re-adding its key.</span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.91 · Aug 9 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: "Rebuild loop" — the version banner's Rebuild button wiped all settings but never stamped the current version, so the outdated banner returned after every rebuild. Now keeps settings, stamps the version, and toasts the user to download + re-import.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: explicit AIOStreams host selection is now honored — picking a specific host (e.g. Omni, ForTheWeak) no longer silently fails over to a different host. Outdated hosts (&lt; v2.32.0) get a clear version-gate error with remediation steps.</span></div>
@@ -347,11 +340,6 @@ body{
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.89 · Aug 4 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: episode-pack availability — multi-episode and season-pack streams were removed too early, before cache and quality filters ran; when those filters eliminated single-episode alternatives, valid requests could return zero streams. Packs are now hidden only after three playable standalone episodes survive all filtering.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Core Tools hub restored — the complete tools page is back after a truncated deployment removed cards and closing markup</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.88 · Aug 3 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: SubDL language schema rejection — uses singular language field with uppercase provider codes, capped at 5 (#638)</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Debridio missing in multi-service configurations — preset now emits when multiServices includes debridio (#639)</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Peerflix schema rejection — useMultipleInstances added to all generated presets</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Import safety — credentials stripped from all public paste uploads before leaving the browser</span></div>
     </div>
 <!-- AUTO:TOOLS_WHATSNEW:END -->
   </div>
