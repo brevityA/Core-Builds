@@ -468,7 +468,7 @@ $('#btnFixed').onclick = () => {
   a.href = URL.createObjectURL(blob);
   a.download = liveResult.accepted && liveResult.healedConfig ? 'preflight-healed-accepted.json' : 'preflight-case-bundle.json';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-  toast(liveResult.healedConfig ? 'Healed, accepted config downloaded' : 'Case bundle downloaded (rejection evidence + sanitized config)');
+  toast(liveResult.accepted && liveResult.healedConfig ? 'Healed, accepted config downloaded' : 'Case bundle downloaded (rejection evidence + sanitized config)');
 };// ═══ Doctor ═══
 $('#btnDoctor').onclick = async () => {
   const out = $('#doctorOut');
