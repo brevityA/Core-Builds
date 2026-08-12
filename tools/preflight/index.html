@@ -357,12 +357,13 @@ function applyHeals(cfg, rejectionLines){
       presetHit.options = presetHit.options || {};
       const cur = presetHit.options[m[1]];
       const isKeyish = /key|token|secret|url|password/i.test(m[1]);
-      if (isKeyish && (cur === '<template_placeholder>' || (typeof cur === 'string' && cur.trim() === ''))){
-        presetHit.enabled = false;   // unresolved key needs a human; disable rather than blank-fill
+      const unresolvedKey = isKeyish && (cur === '<template_placeholder>' || (typeof cur === 'string' && cur.trim() === ''));
+      if (unresolvedKey){
+        presetHit.enabled = false;
       } else {
         presetHit.options[m[1]] = isKeyish ? '' : false;
       }
-      log.push(`${pm[1]}: ${presetHit.enabled===false ? 'enabled→false (key-shaped option unresolved)' : '+'+m[1]+'=(default)'}`);
+      log.push(`${pm[1]}: ${unresolvedKey ? 'enabled→false (key-shaped option unresolved)' : '+'+m[1]+'=(default)'}`);
       handled = true;
     }
     const sc = line.match(/credential '([^']+)' in service '([^']+)'/i);

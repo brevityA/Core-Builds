@@ -10,7 +10,7 @@
 ### Fixed
 - **juju-class cache confusion** — cache selection is now visible, stated in plain words, and protected from being silently overridden by profile defaults at install time.
 - **Brisk-class config rejection at import** — presets requiring user credentials (Debridio/NZBGeek-type) now ship disabled until a key is added; the share-link sanitizer disables presets whose credentials were stripped; the update lane warns about presets it can't regenerate.
-- **AIOStreams v2.33.1 same-day compatibility** — the host fleet hardened config validation this morning. Generator+validator updated: torrentio carries useMultipleInstances, peerflix carries showTorrentLinks, SeaDex/Sootio gate behind a usable service, jackett/prowlarr emit their required instance URL, NZBHydra2 uses the api object shape.
+- **AIOStreams v2.33.1 same-day compatibility** — the host fleet hardened config validation on August 11. Generator+validator updated: torrentio carries useMultipleInstances, peerflix carries showTorrentLinks, SeaDex/Sootio gate behind a usable service, jackett/prowlarr emit their required instance URL, NZBHydra2 uses the api object shape.
 - **Express honoring the explicit host pick on Nuvio** — compatible picks are used; incompatible picks produce a named, actionable error instead of a silent substitution.
 - **e2e flake quarantine (#682)** — the Express full-stack chain gets bounded budgets + suite-level bounded retries; the Nuvio import spec now expresses the honored-host contract.
 
