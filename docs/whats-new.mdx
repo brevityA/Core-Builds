@@ -1,14 +1,42 @@
 ---
-title: "What's New — Configurator v2.91"
+title: "What's New — Configurator v2.92"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.91 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.92 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.91**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.92**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v2.92 (Aug 11 2026)
+
+<CardGroup cols={2}>
+  <Card title="AIOStreams v2.33.1 adopted same-day" icon="sparkles">
+    the host fleet hardened its config validation this morning (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.
+  </Card>
+  <Card title="Express lane truth-in-advertising pass" icon="bolt">
+    a visible 'Streams shown' toggle (Mixed/⚡Cached only), an always-on install chorus (service → app · profile · resolution · cache mode · host), receipts always show the cache mode, and profile picks no longer stomp an explicit choice. Fixes the 'everything downloads to debrid' confusion class.
+  </Card>
+  <Card title="Nuvio instant path honors your AIOStreams host pick on Express (a compatible pick is used; an incompatible one gets a named, actionable error instead of a silent swap). Tutorial completion and the legacy quick-install lane now land in the consolidated Express lane." icon="shield-check">
+    Nuvio instant path honors your AIOStreams host pick on Express (a compatible pick is used; an incompatible one gets a named, actionable error instead of a silent swap). Tutorial completion and the legacy quick-install lane now land in the consolidated Express lane.
+  </Card>
+  <Card title="Template imports get safe-credential hygiene everywhere: community templates ship presets that need your API key as disabled-with-a-note, share links never carry keys, and the update tool warns when an imported preset type can't be regenerated without re-adding its key." icon="sliders">
+    Template imports get safe-credential hygiene everywhere: community templates ship presets that need your API key as disabled-with-a-note, share links never carry keys, and the update tool warns when an imported preset type can't be regenerated without re-adding its key.
+  </Card>
+  <Card title="New tool: Preflight (tools page)" icon="gauge">
+    audit any template/config offline with rules learned from real host rejections, live dry-run the config against the actual AIOStreams host you target with a bounded auto-heal loop (until the host accepts), read-back proof of complete writes, and a manifest Doctor for existing installs. All of it browser-side through our proxy; nothing stored.
+  </Card>
+  <Card title="WuPlay Catalog Genie gains consent-gated live auto-apply" icon="wand">
+    answers → a snapshot-first, per-step verified write of hub layouts, screen layouts and age gates to your WuPlay profile, one-tap Undo, and an honest tap-guide fallback for anything the API doesn't accept yet. PIN-locked profiles degrade to guided mode explicitly. Handshake probe + diagnostics lane included.
+  </Card>
+  <Card title="Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract." icon="layers">
+    Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.91 (Aug 9 2026)
 
@@ -86,36 +114,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Fixed: Core Tools hub restored" icon="bolt">
     the complete tools page is back after a truncated deployment removed cards and closing markup
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.88 (Aug 3 2026)
-
-<CardGroup cols={2}>
-  <Card title="Fixed: SubDL language schema rejection" icon="sparkles">
-    uses singular language field with uppercase provider codes, capped at 5 (#638)
-  </Card>
-  <Card title="Fixed: Debridio missing in multi-service configurations" icon="bolt">
-    preset now emits when multiServices includes debridio (#639)
-  </Card>
-  <Card title="Fixed: Peerflix schema rejection" icon="shield-check">
-    useMultipleInstances added to all generated presets
-  </Card>
-  <Card title="Import safety" icon="sliders">
-    credentials stripped from all public paste uploads before leaving the browser
-  </Card>
-  <Card title="Worker TEMPLATES KV binding" icon="gauge">
-    wrangler.toml now carries the active KV namespace for paste storage
-  </Card>
-  <Card title="Account Manager promoted to available" icon="wand">
-    tools page card now links directly to the Account Manager
-  </Card>
-  <Card title="Security: replaced Math.random() with crypto.getRandomValues() for session IDs and account generation (CodeQL #408)" icon="layers">
-    Security: replaced Math.random() with crypto.getRandomValues() for session IDs and account generation (CodeQL #408)
-  </Card>
-  <Card title="New CI workflow for shared core, CLI, account-tools, and Worker test suites" icon="bug">
-    New CI workflow for shared core, CLI, account-tools, and Worker test suites
   </Card>
 </CardGroup>

@@ -28,7 +28,7 @@
 [data-theme="light"] .sup-header{border-color:#eaedf0}
 .sup-title{font-weight:800;font-size:1.02rem;color:#e6edf3}
 [data-theme="light"] .sup-title{color:#1f2328}
-.sup-close{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;font-size:.85rem;padding:4px 8px;cursor:pointer;line-height:1}
+.sup-close{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;color:#8b949e;font-size:.9rem;padding:8px 12px;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}   /* UX floor: 40px touch target (2026-08-11) */
 [data-theme="light"] .sup-close{background:rgba(0,0,0,.03);border-color:#d0d7de;color:#57606a}
 
 /* Support Options & Rows */

@@ -33,7 +33,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.91';
+const CONFIGURATOR_VERSION = '2.92';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1592,7 +1592,7 @@ function splashHtml() {
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
-    <div class="splash-doors splash-anim splash-anim-d4">
+    <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
       <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, profile, and device — install in about 30 seconds.</div></div></div>
       <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
       <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
@@ -2254,12 +2254,12 @@ function tutGo(n,reposition=false){
   ov.classList.add('active');tutResetPosition();
   if(s.id==='welcome'){
     welcome.style.display='';spot.style.display='none';tip.style.display='none';back.style.display='';
-    if(!reposition)setTimeout(()=>welcome.querySelector('button')?.focus(),0);
+    if(!reposition && welcome && welcome.offsetParent !== null)setTimeout(()=>welcome.querySelector('button')?.focus(),0);   // only steal focus when the welcome card is actually on screen
     return;
   }
   welcome.style.display='none';
   const el=s.target?document.querySelector(s.target):null;
-  if(s.center||window.innerWidth<720||!el){tutShowCentered(s,n);if(!reposition)setTimeout(()=>document.getElementById('tutNext')?.focus(),0);return;}
+  if(s.center||window.innerWidth<720||!el){tutShowCentered(s,n);if(!reposition)setTimeout(()=>{ const b=document.getElementById('tutNext'); if(b && b.offsetParent!==null) b.focus(); },0);return;}
   el.scrollIntoView({behavior:'auto',block:'center',inline:'nearest'});
   requestAnimationFrame(()=>requestAnimationFrame(()=>{tutPositionTarget(el,s,n);if(!reposition)document.getElementById('tutNext')?.focus();}));
 }
@@ -2690,7 +2690,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'update-template') { showUpdateTemplateModal(); }
     if (action === 'test-drive') { showTestDriveModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
-    if (action === 'open-quickstart') { document.getElementById('qsOverlay').classList.add('open'); }
+    if (action === 'open-quickstart') { const qo = document.getElementById('qsOverlay'); qo.classList.add('open'); const prevFocus = document.activeElement; const onQKey = (e) => { if (e.key === 'Escape'){ qo.classList.remove('open'); document.removeEventListener('keydown', onQKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); } }; document.addEventListener('keydown', onQKey); }
     if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'tut-start') { tutGo(1); }
@@ -5557,6 +5557,7 @@ function promptPassword() {
     const cancel = () => { overlay.remove(); resolve(null); };
     goBtn.addEventListener('click', done);
     overlay.querySelector('.pwd-cancel').addEventListener('click', cancel);
+  bindModalEsc(overlay, () => cancel());   // ESC behaves exactly like Cancel (UX polish P2.4)
     overlay.addEventListener('click', (e) => { if (e.target === overlay) cancel(); });
   });
 }
@@ -6154,13 +6155,24 @@ function showAdditionalServicesPicker(options={}) {
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
   document.body.appendChild(overlay);
+  bindModalEsc(overlay, () => overlay.remove());
   overlay.addEventListener('click',e=>{
+    if(e.target===overlay){overlay.remove();return;}
     const svc=e.target.closest('[data-extra-service]');if(svc){const id=svc.dataset.extraService;selectedServices.has(id)?selectedServices.delete(id):selectedServices.add(id);svc.classList.toggle('active',selectedServices.has(id));return;}
     const scr=e.target.closest('[data-extra-scraper]');if(scr){const id=scr.dataset.extraScraper;selectedScrapers.has(id)?selectedScrapers.delete(id):selectedScrapers.add(id);scr.classList.toggle('active',selectedScrapers.has(id));return;}
     if(e.target===overlay||e.target.closest('#extraClose')){overlay.remove();return;}
     if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
   });
   document.getElementById('extraClose').focus();
+}
+
+// ── Accessibility floor — shared modal ESC + focus-return (UX polish P2.4) ──
+// Every hand-rolled overlay stage gets exactly one behavior: Escape OR backdrop click closes,
+// and focus returns to whatever the user was on. Bind once at overlay creation.
+function bindModalEsc(overlay, doClose){
+  const prevFocus = document.activeElement;
+  const onKey = (e) => { if (e.key === 'Escape'){ document.removeEventListener('keydown', onKey); doClose(); if (prevFocus && prevFocus.focus) prevFocus.focus(); } };
+  document.addEventListener('keydown', onKey);
 }
 
 // ── Express Install lane ────────────────────────────────────────────────
@@ -6213,6 +6225,12 @@ function showExpressLane() {
     document.querySelectorAll('#expressLaneModal [data-express-cred]').forEach(i => { const v = drafts[i.dataset.expressCred]; if (v !== undefined) i.value = v; });
   };
   const overlay = document.createElement('div');
+  const prevFocus = document.activeElement;
+  const closeLane = () => { overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
+  const expressLaneEscKey = (e) => { if (e.key === 'Escape') closeLane(); };
+  document.addEventListener('keydown', expressLaneEscKey);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.closest('#expressClose')) closeLane(); }, { once:false });
+  overlay.dataset.bound = '1';
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="expressTitle" style="max-width:640px">
@@ -6284,7 +6302,7 @@ function showExpressLane() {
   refreshExpressSummary();
   document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
   overlay.addEventListener('click', e => {
-    if (e.target === overlay || e.target.closest('#expressClose')) { overlay.remove(); return; }
+    if (e.target === overlay || e.target.closest('#expressClose')) { closeLane(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
     if (svcBtn) {
       state.service = svcBtn.dataset.expressService;

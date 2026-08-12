@@ -31,9 +31,10 @@ test('Nuvio import falls through to dpaste when the worker and paste.rs are unav
   await page.evaluate(() => window.__coreBuilds.generate({
     service: 'p2p', multiServices: ['p2p'], device: 'generic', resolution: '1080p',
     content: 'all', tmdbToken: 'NUVIO_TMDB_TOKEN_MUST_NOT_LEAK', tmdbApiKey: '',
-    instanceHost: 'auto',
   }));
+
   await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('#expressHost').selectOption('midnight'); // explicit compatible host — Express honors the pick post-#684 (#682)
   await page.locator('[data-express-target="nuvio"]').click();
   await page.locator('#expressGo').click();
 

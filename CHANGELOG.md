@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.6.0 (2026-08-11)
+
+### Added
+- **Preflight audit tool** (Configurator v2.92 · Tools page) — audits any template or live config offline with rules learned from observed host rejections, optionally live-dry-runs it against the chosen AIOStreams host with a bounded auto-heal loop (up to four rounds, re-posting until the instance accepts), proves complete writes with a manifest read-back, and triages existing installs ("worked yesterday" lane). Browser-side via the Core Builds proxy; nothing stored.
+- **WuPlay Catalog Genie: consent-gated live auto-apply** — snapshot capture, per-step verified writes (hub/screen layouts, age gates), one-tap Undo replay, and honest guide fallback for anything the WuPlay API only accepts from its own configurator. PIN-locked profiles degrade to guided mode with an explicit receipt. Includes a browser handshake probe + diagnostics lane.
+- **Express Install: visible "Streams shown" toggle** (Mixed / ⚡ Cached only) with an always-on install chorus line (service → app · profile · resolution · cache mode · host · full-stack), plus receipt clarity for the cache row in every mode.
+
+### Fixed
+- **juju-class cache confusion** — cache selection is now visible, stated in plain words, and protected from being silently overridden by profile defaults at install time.
+- **Brisk-class config rejection at import** — presets requiring user credentials (Debridio/NZBGeek-type) now ship disabled until a key is added; the share-link sanitizer disables presets whose credentials were stripped; the update lane warns about presets it can't regenerate.
+- **AIOStreams v2.33.1 same-day compatibility** — the host fleet hardened config validation this morning. Generator+validator updated: torrentio carries useMultipleInstances, peerflix carries showTorrentLinks, SeaDex/Sootio gate behind a usable service, jackett/prowlarr emit their required instance URL, NZBHydra2 uses the api object shape.
+- **Express honoring the explicit host pick on Nuvio** — compatible picks are used; incompatible picks produce a named, actionable error instead of a silent substitution.
+- **e2e flake quarantine (#682)** — the Express full-stack chain gets bounded budgets + suite-level bounded retries; the Nuvio import spec now expresses the honored-host contract.
+
+### Changed
+- Tutorial completion and the legacy quick-install entry now land in the consolidated Express lane.
+- Validator floors are evidence-cited (every rule quotes the live rejection it encodes) with a required-option matrix across 8 preset types; legacy snapshots stay exempt by design.
+
 ## 3.5.3 (2026-08-04)
 
 ### Fixed

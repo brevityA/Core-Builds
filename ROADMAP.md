@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.6.0 | 2026-08-11 | Preflight audit tool (Configurator v2.92 · Tools page) — audits any template or live config offline with rules learned f… |
 | v3.5.3 | 2026-08-04 | Episode-pack availability — multi-episode and season-pack streams were previously removed by an early exclusion filter b… |
 | v3.5.2 | 2026-08-02 | Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info commands. Same @cor… |
 | v3.5.1 | 2026-07-31 | Capability-based device profiles (Configurator v2.87) — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS,… |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.2.7 | 2026-07-11 | LABS v0.14.0 SEL expressions (6 Labs templates) — seven new expression features across all Labs templates: |
 | v3.2.6 | 2026-07-09 | Configurator v2.30 — 3 new debrid services: EasyDebrid, PikPak, Seedr (all using StremThru Store cache layer). Generated… |
 | v3.2.5 | 2026-07-03 | Template collection file (core-builds-template-collection.json) — operator-facing template catalog for AIOStreams TEMPLA… |
-| v3.2.4 | 2026-07-03 | Sort criteria overhaul (all 42 templates) — rebuilt the sort pipeline based on AIOStreams' stable multi-key sort archite… |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.

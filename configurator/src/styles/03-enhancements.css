@@ -143,3 +143,18 @@
 @media(min-width:1000px){
   .cb-sidebar:not(.sb-hidden)~#themeToggle{top:auto;left:auto;bottom:14px;right:14px}
 }
+
+
+/* ── Accessibility floor (UX polish, 2026-08-11) ── */
+/* 1) focus must be VISIBLE on dark ground (was: near-black auto outline) */
+:focus-visible{ outline:2px solid var(--th-accent,#00d4ff) !important; outline-offset:2px; border-radius:10px; }
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible{ box-shadow:0 0 0 3px rgba(0,212,255,.25) !important; }
+/* 2) modal close/exit affordances meet the 40px touch floor */
+.fastlane-close, .modal-close, .pwd-cancel, .qs-close, .cb-contact-close, .tut-btn, button[aria-label*="Close" i], button[aria-label="✕" i]{ min-width:40px !important; min-height:40px !important; display:inline-flex; align-items:center; justify-content:center; }
+/* 3) skip link — first tab stop jumps straight to the install doors */
+.skip-link{ position:fixed; top:12px; left:-999px; z-index:1000; background:#0e1621; color:var(--th-accent,#00d4ff); padding:10px 16px; border-radius:10px; border:1px solid rgba(0,212,255,.35); font-weight:700; font-size:13px; transition:left .15s; text-decoration:none; }
+.skip-link:focus{ left:12px; }
+/* 4) reduced motion floor */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+}

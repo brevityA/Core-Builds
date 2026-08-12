@@ -901,7 +901,7 @@ async function runWuplayDiagnostics(){
     try { const v = await fn(); out(`✓ ${label} — ${v} (${Math.round(performance.now()-t0)}ms)`); return v; }
     catch(e){ out(`✗ ${label} — ${e.name||''} ${e.message||'failed'} (${Math.round(performance.now()-t0)}ms)`); return null; }
   };
-  out('🧪 diagnostics — ' + new Date().toLocaleTimeString() + ' · key ' + (key.length===6 ? key.slice(0,2)+'••••' : '(not set)') + ' · proxy ' + (useProxy?'ON':'OFF'));
+  out('🧪 diagnostics — ' + new Date().toLocaleTimeString() + ' · key ' + (key.length===6 ? maskKey(key) : '(not set)') + ' · proxy ' + (useProxy?'ON':'OFF'));
   await t('direct GET /app/version (browser CORS honesty check)', async()=>{
     const r = await fetch(WP_API + '/app/version', { cache:'no-store' });
     if (!r.ok) throw new Error('HTTP '+r.status);
@@ -937,6 +937,9 @@ async function runWuplayDiagnostics(){
 document.getElementById('wpDiagBtn')?.addEventListener('click', runWuplayDiagnostics);
 document.getElementById('wpDeepBtn')?.addEventListener('click', wpHandshakeProbe);
 
+// ── shared helpers ──
+function maskKey(k){ return (k||'').slice(0,2) + '••••'; }   // one convention everywhere (review P3.8)
+
 // ── device + state plumbing (session-memory only; nothing hits storage) ──
 async function wpEnsureDevice(){
   if (autoToken) return autoToken;
@@ -965,14 +968,15 @@ async function wpHandshakeProbe(){
   const out = m => { log.textContent += m + '\n'; log.scrollTop = log.scrollHeight; };
   const key = (document.getElementById('wpKeyField')?.value||'').trim().toLowerCase();
   if (!/^[a-z0-9]{6}$/.test(key)){ out('✗ Paste your 6-char profile key above first.'); return; }
-  out('🛰️ handshake probe — ' + new Date().toLocaleTimeString() + ' · key ' + key.slice(0,2) + '••••');
+  out('🛰️ handshake probe — ' + new Date().toLocaleTimeString() + ' · key ' + maskKey(key));
   try{
     await wpEnsureDevice();   // one registration per tab, not per click (token reused across probes/runs)
     out('✓ device registered — token ' + autoToken.slice(0,6) + '… (session-only, labelled "web-genie")');
   }catch(e){ out('✗ register failed: ' + (e.message||e)); return; }
+  let savedKey;
   try{
-    const savedKey = autoKey; autoKey = key;
-    const s = await wpReadState(); autoKey = savedKey;
+    savedKey = autoKey; autoKey = key;
+    const s = await wpReadState();
     const P = s.profile || {};
     out('✓ PROFILE READ OK — “' + (P.name||'?') + '”' + (P.hasPinSet ? ' · 🔒 PIN-locked (writes will need it once)' : ' · no PIN'));
     out('   rows ' + (s.catalogs||[]).length + ' · hubs ' + (s.hubs||[]).length + ' · screens ' + (s.screens||[]).length + ' · layouts ' + (s.layouts||[]).length + ' · revs c' + (s.catalogsRevision??'?') + '/s' + (s.screensRevision??'?'));
@@ -982,6 +986,7 @@ async function wpHandshakeProbe(){
     a.href=URL.createObjectURL(b); a.download='wuplay-state-structure.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
     out('⬇️ structural snapshot downloaded (library contents withheld) — this file is the apply-mode Undo source.');
   }catch(e){ out('✗ profile read failed: ' + (e.message||e)); }
+  finally{ if (savedKey !== undefined) autoKey = savedKey; }   // restore session key on success AND failure (review finding P1.1)
   out('\n— verdict —');
   out('Register→read works from this browser. Catalog-row creation is the last configurator-side contract (WP_ROUTES.catalogWrite).');
 }
@@ -1015,6 +1020,10 @@ function planToOps(){
 }
 
 // ── real dispatcher. Every write is verified by the runner via a final re-read. ──
+// DEGRADATION PROTOCOL (review P1.2): a dispatcher signals "fall back to guided, continue" ONLY
+// by throwing `{ guided:true, message }` — a plain object (not Error). Any other throw halts the
+// run (network/auth failures stop everything safely). Keep it that way; new guided-signalling
+// sites must use the same shape.
 async function dispatchWrite(op){
   switch(op.sys){
     case 'preflight':{
@@ -1198,7 +1207,7 @@ function showAutoReceipt(live){
   const undone    = autoReceipt.filter(r=>r.status==='undone');
   const iconFor = st => st==='failed' ? '✗' : st==='guided' ? '📋' : st==='undone' ? '↩️' : st.includes('verified') ? '✓' : st.startsWith('applied') ? '◐' : '✓';
   const colFor  = st => st==='failed' ? 'var(--red)' : st==='guided' ? 'var(--dim)' : st==='undone' ? 'var(--sub)' : st.startsWith('applied')||st.startsWith('staged') ? 'var(--green)' : 'var(--sub)';
-  let html = `<div class="planblk" style="margin:0 0 6px"><div class="pt">⚡ Auto setup — ${live?'live run':'receipt'} for profile “${escH((autoKey||'…').slice(0,2))}••••”</div>`;
+  let html = `<div class="planblk" style="margin:0 0 6px"><div class="pt">⚡ Auto setup — ${live?'live run':'receipt'} for profile “${escH((maskKey(autoKey||'…')))}”</div>`;
   html += `<div style="font-size:.72rem;color:var(--sub);line-height:1.55;margin-bottom:6px">${
     live ? `<b style="color:var(--green)">${applied.length-undone.length} written for real</b>${undone.length?` (${undone.length} since undone)`:''} · ${guided.length} guided leftover(s) · ${failed.length} failed. Snapshot captured before the first write — Undo replays it.`
          : `<b>Receipt mode</b> — no writes were sent. ${staged.length+guided.length} operations staged; switch to live when ready.`}</div>`;
@@ -1229,7 +1238,7 @@ function showAutoReceipt(live){
   bind('btnUndo', wpUndo);
   bind('btnToGuide', ()=>{ document.getElementById('autoCard').classList.add('hidden'); succ.classList.add('hidden'); runWatchMe(); });
   bind('btnReceipt', ()=>{
-    const out = { format:'wuplay-auto-receipt', version:2, mode: live?'live':'receipt', profileKeyMasked:(autoKey||'').slice(0,2)+'••••', generatedAt:new Date().toISOString(), verifiedAgainst:'v0.8.1-beta (live-probed 2026-08-10)', operations:autoReceipt };
+    const out = { format:'wuplay-auto-receipt', version:2, mode: live?'live':'receipt', profileKeyMasked: maskKey(autoKey||''), generatedAt:new Date().toISOString(), verifiedAgainst:'v0.8.1-beta (live-probed 2026-08-10)', operations:autoReceipt };
     const blob = new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='wuplay-auto-receipt.json';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
