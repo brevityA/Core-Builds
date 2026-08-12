@@ -116,7 +116,7 @@
     <label class="mini"><input type="checkbox" id="liveAutoHeal" checked> <span><b>Auto-heal + re-run</b> — apply conservative fixes (safe defaults, disable unresolvable pieces) and re-post until the host accepts, up to 4 rounds. Every heal is logged; nothing reaches your real install.</span></label>
     <div class="btnrow">
       <button class="btn primary" id="btnLive">🛰️ Run live dry-run</button>
-      <button class="btn ghost hidden" id="btnFixed">⬇️ healed JSON</button>
+      <button class="btn ghost hidden" id="btnFixed">⬇️ result bundle (.json)</button>
       <button class="btn ghost hidden" id="btnReport">⬇️ audit report</button>
     </div>
     <div id="liveOut"></div>
@@ -436,7 +436,7 @@ $('#btnLive').onclick = async () => {
   } else {
     verdictHtml = `<div class="verdict"><div class="big">🛑</div><div><div class="vt" style="color:var(--red)">REJECTED by ${esc(host.label)}${autoHeal?' — no safe auto-heal remained':' (auto-heal off)'}</div><div class="vd">Each rejected round is logged below with its raw validator answer. Turn auto-heal on to iterate conservative fixes.</div></div></div>`;
   }
-  liveResult = { at:new Date().toISOString(), host:hostId, accepted, uuid, healLog:[...healLog], rounds: rounds.length, rejectionsRaw: lastRaw.slice(0,2000), configSummary:{ presets:((auditCfg.presets)||[]).length, services:((auditCfg.services)||[]).length }, staticFindings: auditFindings };
+  liveResult = { at:new Date().toISOString(), host:hostId, accepted, uuid, healLog:[...healLog], rounds: rounds.length, rejectionsRaw: lastRaw.slice(0,2000), healedConfig: healLog.length ? JSON.parse(JSON.stringify(work)) : null, configSummary:{ presets:((auditCfg.presets)||[]).length, services:((auditCfg.services)||[]).length }, staticFindings: auditFindings };
   out.innerHTML = verdictHtml + rounds.join('') + (accepted && healLog.length ? `<div class="fine">The healed config (what got accepted) is downloadable — mirror these fixes upstream so the source never produces the broken shape again.</div>` : '');
   $('#btnReport').classList.remove('hidden');
   if (healLog.length || !accepted) $('#btnFixed').classList.remove('hidden');
@@ -451,34 +451,25 @@ $('#btnReport').onclick = () => {
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
 };
 $('#btnFixed').onclick = () => {
-  // conservative heals only: add missing required option=false, disable unresolvable presets/services
-  if (!auditCfg || !liveResult) return;
-  const healed = JSON.parse(JSON.stringify(auditCfg));
-  for (const f of (liveResult.suggestedFixes||[])){
-    const m = (f.fix||'').match(/add "(\w+)": false/);   // only the option-default heals are automatable
-    if (!m) continue;
-    const field = m[1];
-    for (const p of (healed.presets||[])){
-      const name = (p?.options?.name || '').toLowerCase();
-      const line = (liveResult.rejections||[]).find(x => x.toLowerCase().includes(name) && x.includes(field));
-      if (line && p.options){ p.options[field] = false; healLog.push(`${p.options.name}: +${field}=false`); }
-    }
-  }
-  // disable presets whose rejection is a service-dependency or missing-credential
-  for (const l of (liveResult.rejections||[])){
-    if (/requires at least one usable service|credential/i.test(l) && /preset/i.test(l)){
-      const m = l.match(/preset '([^']+)'/i); if (!m) continue;
-      for (const p of (healed.presets||[])) if ((p?.options?.name||'')===m[1]) { p.enabled = false; healLog.push(`${m[1]}: enabled→false`); }
-    }
-  }
-  if (!healLog.length){ toast('No conservative auto-heals apply — read the ladder'); return; }
-  const blob = new Blob([JSON.stringify({ note:'Preflight healed: '+healLog.join(' · '), config: healed }, null, 2)], { type:'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'preflight-healed.json';
+  if (!liveResult){ toast('Run the live dry-run first'); return; }
+  // Bundle the exact thing the host saw + what we did about it. healedConfig is the WORKING
+  // copy at accept-time (CodeRabbit #686: v1 re-derived heals by guesswork from arrays that
+  // v2 no longer keeps — always download the state that actually posted).
+  const payload = {
+    format: 'preflight-case-bundle', version: 1,
+    at: liveResult.at, host: liveResult.host, accepted: liveResult.accepted, rounds: liveResult.rounds,
+    healsApplied: liveResult.healLog, rejections: liveResult.rejectionsRaw,
+    sanitizedConfig: sanitizeForDryRun(auditCfg, true),
+    ...(liveResult.healedConfig ? { healedConfig: sanitizeForDryRun(liveResult.healedConfig, true) } : {}),
+    staticFindings: liveResult.staticFindings
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = liveResult.accepted && liveResult.healedConfig ? 'preflight-healed-accepted.json' : 'preflight-case-bundle.json';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-  toast('Healed JSON downloaded (' + healLog.length + ' fix(es): ' + healLog.join(' · ') + ')');
-};
-
-// ═══ Doctor ═══
+  toast(liveResult.accepted && liveResult.healedConfig ? 'Healed, accepted config downloaded' : 'Case bundle downloaded (rejection evidence + sanitized config)');
+};// ═══ Doctor ═══
 $('#btnDoctor').onclick = async () => {
   const out = $('#doctorOut');
   const raw = $('#doctorIn').value.trim();
