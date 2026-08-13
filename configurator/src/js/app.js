@@ -1592,10 +1592,11 @@ function splashHtml() {
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
-    <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors" tabindex="-1">
+    <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
       <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, profile, and device — install in about 30 seconds.</div></div></div>
       <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
       <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
+      <a class="splash-door core-tool-door" href="./tools/genies/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Setup Genie <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Newcomer-friendly</span></div><div class="splash-door-desc">The chat-style guided walkthrough, on its own focused page — nothing else on screen.</div></div></a>
     </div>
 
     <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
@@ -1604,6 +1605,7 @@ function splashHtml() {
     <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
     <div class="splash-doors splash-anim splash-anim-d6">
       <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
+      <a class="splash-door core-tool-door" href="./tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
     </div>
 
@@ -2270,8 +2272,6 @@ function tutClose(){
 }
 window.addEventListener('resize',()=>{if(_tutStep>0)tutGo(_tutStep,true);},{passive:true});
 document.addEventListener('DOMContentLoaded', () => {
-  let qsEscKey, qsPrevFocus;
-  const closeQuickstart = () => { document.getElementById('qsOverlay')?.classList.remove('open'); if (qsEscKey) { document.removeEventListener('keydown', qsEscKey); qsEscKey = null; } if (qsPrevFocus && qsPrevFocus.focus) { qsPrevFocus.focus(); qsPrevFocus = null; } };
   loadState();
   checkForTemplateUpdate();
   setInterval(checkForTemplateUpdate, 60 * 60 * 1000);
@@ -2332,9 +2332,52 @@ document.addEventListener('DOMContentLoaded', () => {
     step = S.simpleMode ? STEPS + 1 : STEPS;
     setTimeout(() => showToast('Shared config loaded — review and install'), 300);
   }
+  // Genie hand-off: a Setup Genie / Nuvio Stack Genie finished and dropped the user's picks
+  // (sessionStorage hop, this-tab only, 10-minute freshness). Picks become builder state,
+  // then the express lane (or advanced builder) opens pre-set so the user finishes in place.
+  let _genieRoute = null;
+  try {
+    const raw = sessionStorage.getItem('cb-genie-handoff-v1');
+    if (raw) {
+      sessionStorage.removeItem('cb-genie-handoff-v1');
+      const h = JSON.parse(raw);
+      if (h && h.v === 1 && h.ts && (Date.now() - h.ts) < 10 * 60 * 1000) {
+        const SVC_MAP = { torbox:'torbox', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize', debridlink:'debridlink', none:'free' };
+        const DEV_MAP = { tv:'generic', firestick:'firestick-4kmax', appletv:'appletv-new', pc:'windows', phone:'generic', generic:'generic' };
+        const CONTENT_MAP = { movies:'movies', series:'series', anime:'anime', mixed:'mixed' };
+        if (SVC_MAP[h.service]) {
+          S.service = SVC_MAP[h.service];
+          // merge — never stomp a returning user's other services (review P3)
+          S.multiServices = (Array.isArray(S.multiServices) && S.multiServices.length)
+            ? Array.from(new Set([...S.multiServices, S.service])) : [S.service];
+          if (S.service === 'free') S.p2pEnabled = true;   // free-path convention
+        }
+        if (DEV_MAP[h.device])    { S.device = DEV_MAP[h.device]; }
+        if (CONTENT_MAP[h.content]) S.content = CONTENT_MAP[h.content];
+        if (typeof h.name === 'string' && h.name.trim()) S.name = h.name.trim().slice(0, 24);
+        // Express' free card id is 'p2p' while builder S says 'free' — translate explicitly (review P2);
+        // lane vocabulary is local here so nothing depends on declaration order of EXPRESS_SERVICES.
+        const EXPRESS_SVC_MAP = { torbox:'torbox-pro', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize', none:'p2p' };
+        window.__genieHandoff = { app: ['nuvio','wuplay','manifest'].includes(h.app) ? h.app : 'app',
+          service: EXPRESS_SVC_MAP[h.service] || null };
+        _genieRoute = h.route === 'advanced' ? 'advanced' : 'express';
+      }
+    }
+  } catch(e) { /* handoff is best-effort */ }
   render();
   try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
-  if (!hadSavedState && !_sharedImport && !localStorage.getItem('cb_tut_seen')) {
+  if (_genieRoute) {
+    setTimeout(() => {
+      try {
+        if (_genieRoute === 'advanced') document.querySelector('[data-action="custom-start"]')?.click();
+        else showExpressLane();
+        showToast('Genie hand-off applied — service + device pre-set. Check them before you continue.');
+      } catch(e) { logError('genie-handoff', e.message); }
+    }, 350);
+  }
+  if (!hadSavedState && !_sharedImport && !_genieRoute && !localStorage.getItem('cb_tut_seen')) {
+    // no tutorial over a genie hand-off — the genie IS the onboarding; popping the tour
+    // over the express modal we just opened was the review P1 finding.
     setTimeout(() => tutGo(0), 1000);
   }
   if (COUNTER_URL) {
@@ -2692,9 +2735,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'update-template') { showUpdateTemplateModal(); }
     if (action === 'test-drive') { showTestDriveModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
-    if (action === 'open-quickstart') { const qo = document.getElementById('qsOverlay'); qo.classList.add('open'); qsPrevFocus = document.activeElement; qsEscKey = (e) => { if (e.key === 'Escape') closeQuickstart(); }; document.addEventListener('keydown', qsEscKey); }
-    if (action === 'close-quickstart') { closeQuickstart(); }
-    if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { closeQuickstart(); }
+    if (action === 'open-quickstart') { const qo = document.getElementById('qsOverlay'); qo.classList.add('open'); const prevFocus = document.activeElement; const onQKey = (e) => { if (e.key === 'Escape'){ qo.classList.remove('open'); document.removeEventListener('keydown', onQKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); } }; document.addEventListener('keydown', onQKey); }
+    if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
+    if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'tut-start') { tutGo(1); }
     if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else { tutClose(); showExpressLane(); } }   // tutorial ends in the consolidated lane
     if (action === 'tut-back') { if (_tutStep > 1) tutGo(_tutStep - 1); }
@@ -5555,11 +5598,11 @@ function promptPassword() {
     });
     manualInput.addEventListener('input', () => { goBtn.disabled = !manualInput.value.trim(); });
     manualInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && manualInput.value.trim()) done(); });
-    const done = () => { cleanupPwd(); overlay.remove(); resolve(mode === 'auto' ? autoPwd : manualInput.value.trim()); };
-    const cancel = () => { cleanupPwd(); overlay.remove(); resolve(null); };
-    const cleanupPwd = bindModalEsc(overlay, cancel);
+    const done = () => { overlay.remove(); resolve(mode === 'auto' ? autoPwd : manualInput.value.trim()); };
+    const cancel = () => { overlay.remove(); resolve(null); };
     goBtn.addEventListener('click', done);
     overlay.querySelector('.pwd-cancel').addEventListener('click', cancel);
+  bindModalEsc(overlay, () => cancel());   // ESC behaves exactly like Cancel (UX polish P2.4)
     overlay.addEventListener('click', (e) => { if (e.target === overlay) cancel(); });
   });
 }
@@ -6045,6 +6088,12 @@ function handleDeepLink(hash) {
   if (!hash || hash.startsWith('#cfg=')) return;
   if (hash === '#troubleshooter') { setTimeout(showTroubleshooter, 300); return; }
   if (hash === '#health-score') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; }
+  // Entry deep-links (used by the Genie pages + tools landing). Splash stays the base view;
+  // these call the same handlers the splash doors use, so behavior can't drift apart.
+  if (hash === '#express') { setTimeout(() => document.querySelector('[data-action="open-express-lane"]')?.click(), 250); return; }
+  if (hash === '#advanced') { setTimeout(() => document.querySelector('[data-action="custom-start"]')?.click(), 250); return; }
+  if (hash === '#update') { setTimeout(() => document.querySelector('[data-action="update-template"]')?.click(), 250); return; }
+  if (hash === '#backup') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; } // backup timeline lives on the final/Done screen
 }
 
 function showTroubleshooter() {
@@ -6157,15 +6206,13 @@ function showAdditionalServicesPicker(options={}) {
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
   document.body.appendChild(overlay);
-  let cleanupExtra;
-  const closeExtra = () => { if (cleanupExtra) cleanupExtra(); overlay.remove(); };
-  cleanupExtra = bindModalEsc(overlay, closeExtra);
+  bindModalEsc(overlay, () => overlay.remove());
   overlay.addEventListener('click',e=>{
-    if(e.target===overlay){closeExtra();return;}
+    if(e.target===overlay){overlay.remove();return;}
     const svc=e.target.closest('[data-extra-service]');if(svc){const id=svc.dataset.extraService;selectedServices.has(id)?selectedServices.delete(id):selectedServices.add(id);svc.classList.toggle('active',selectedServices.has(id));return;}
     const scr=e.target.closest('[data-extra-scraper]');if(scr){const id=scr.dataset.extraScraper;selectedScrapers.has(id)?selectedScrapers.delete(id):selectedScrapers.add(id);scr.classList.toggle('active',selectedScrapers.has(id));return;}
-    if(e.target===overlay||e.target.closest('#extraClose')){closeExtra();return;}
-    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);closeExtra();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();closeExtra();render();}
+    if(e.target===overlay||e.target.closest('#extraClose')){overlay.remove();return;}
+    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
   });
   document.getElementById('extraClose').focus();
 }
@@ -6175,12 +6222,8 @@ function showAdditionalServicesPicker(options={}) {
 // and focus returns to whatever the user was on. Bind once at overlay creation.
 function bindModalEsc(overlay, doClose){
   const prevFocus = document.activeElement;
-  let torn = false;
-  const cleanup = () => { if (torn) return; torn = true; document.removeEventListener('keydown', onKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
-  const teardown = () => { cleanup(); doClose(); };
-  const onKey = (e) => { if (e.key === 'Escape') teardown(); };
+  const onKey = (e) => { if (e.key === 'Escape'){ document.removeEventListener('keydown', onKey); doClose(); if (prevFocus && prevFocus.focus) prevFocus.focus(); } };
   document.addEventListener('keydown', onKey);
-  return cleanup;
 }
 
 // ── Express Install lane ────────────────────────────────────────────────
@@ -6201,8 +6244,9 @@ const EXPRESS_SERVICES = [
 
 function showExpressLane() {
   document.getElementById('expressLaneModal')?.remove();
-  const svc = (S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro';
-  const state = { service: svc, target: 'app', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])] };
+  const gh = window.__genieHandoff; window.__genieHandoff = null; // one-shot seed: read both fields, then clear (review P4)
+  const svc = gh?.service || ((S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro');
+  const state = { service: svc, target: gh?.app || 'app', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])] };
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
@@ -6237,6 +6281,8 @@ function showExpressLane() {
   const closeLane = () => { overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
   const expressLaneEscKey = (e) => { if (e.key === 'Escape') closeLane(); };
   document.addEventListener('keydown', expressLaneEscKey);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.closest('#expressClose')) closeLane(); }, { once:false });
+  overlay.dataset.bound = '1';
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="expressTitle" style="max-width:640px">

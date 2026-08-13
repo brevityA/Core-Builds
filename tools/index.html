@@ -285,7 +285,7 @@ body{
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15l6 6m0-6l-6 6"/><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
       </div>
       <div class="tool-name">✨ Guided Setup Genie</div>
-      <p class="tool-desc">Answers a few plain-English questions and builds your Core Build for you — key hand-off, host checks, one-click undo. Stremio, Nuvio &amp; WuPlay targets.</p>
+      <p class="tool-desc">Answers a few plain-English questions, then hands your picks to the full builder — Express lane pre-set, key hand-off, host checks. Nothing installs until you say so. Stremio, Nuvio &amp; WuPlay targets.</p>
       <div class="tool-foot">
         <span class="badge badge-cyan">BETA — works today</span>
         <span class="tool-link">Try it →</span>
@@ -299,7 +299,7 @@ body{
       <div class="tool-name">WuPlay Catalog Genie</div>
       <p class="tool-desc">Designs your WuPlay home: Home/Discover rows, hubs (services · genres · studios · collections), kids-safe screens — then hands you a tap-by-tap guide + an import-ready .json. Read-only by design.</p>
       <div class="tool-foot">
-        <span class="badge" style="background:rgba(167,139,250,.12);color:#a78bfa">PREVIEW — pending full QA</span>
+        <span class="badge" style="background:rgba(167,139,250,.12);color:#a78bfa">BETA — early access · pending dev sign-off</span>
         <span class="tool-link">Explore →</span>
       </div>
     </a>
@@ -309,9 +309,9 @@ body{
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l10 6.5v9L12 24l-10-6.5v-9L12 2z"/><path d="M12 22V12"/><path d="M22 8.5l-10 3.5-10-3.5"/></svg>
       </div>
       <div class="tool-name">Nuvio Stack Genie</div>
-      <p class="tool-desc">Plans your Nuvio profiles &amp; ordered add-on stacks (metadata → stream engine → extras), with one-tap nuvio:// install links, per-addon health chips, and a copyable checklist.</p>
+      <p class="tool-desc">Plans your Nuvio profiles &amp; ordered add-on stacks (metadata → stream engine → extras), with per-addon health chips, a copyable checklist, and one tap into the Core Builds builder to generate the real links.</p>
       <div class="tool-foot">
-        <span class="badge" style="background:rgba(251,191,36,.12);color:#fbbf24">PREVIEW — pending full QA</span>
+        <span class="badge" style="background:rgba(251,191,36,.12);color:#fbbf24">BETA — works today</span>
         <span class="tool-link">Explore →</span>
       </div>
     </a>
@@ -324,7 +324,7 @@ body{
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.92 · Aug 11 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">AIOStreams v2.33.1 adopted same-day — the host fleet hardened its config validation on August 11 (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">AIOStreams v2.33.1 adopted same-day — the host fleet hardened its config validation this morning (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Express lane truth-in-advertising pass — a visible "Streams shown" toggle (Mixed/⚡Cached only), an always-on install chorus (service → app · profile · resolution · cache mode · host), receipts always show the cache mode, and profile picks no longer stomp an explicit choice. Fixes the "everything downloads to debrid" confusion class.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Nuvio instant path honors your AIOStreams host pick on Express (a compatible pick is used; an incompatible one gets a named, actionable error instead of a silent swap). Tutorial completion and the legacy quick-install lane now land in the consolidated Express lane.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Template imports get safe-credential hygiene everywhere: community templates ship presets that need your API key as disabled-with-a-note, share links never carry keys, and the update tool warns when an imported preset type can't be regenerated without re-adding its key.</span></div>
