@@ -14,7 +14,7 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
 
 <CardGroup cols={2}>
   <Card title="AIOStreams v2.33.1 adopted same-day" icon="sparkles">
-    the host fleet hardened its config validation on August 11 (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.
+    the host fleet hardened its config validation on Aug 11 (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.
   </Card>
   <Card title="Express lane truth-in-advertising pass" icon="bolt">
     a visible 'Streams shown' toggle (Mixed/⚡Cached only), an always-on install chorus (service → app · profile · resolution · cache mode · host), receipts always show the cache mode, and profile picks no longer stomp an explicit choice. Fixes the 'everything downloads to debrid' confusion class.
@@ -33,6 +33,9 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract." icon="layers">
     Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract.
+  </Card>
+  <Card title="Genies graduate onto the main page" icon="bug">
+    the Setup Genie door joins 'Choose your route' and the Nuvio Stack Genie joins the Tools row. Both pages dropped their prototype stubs: every button goes somewhere real, and finishing a genie hands your picks to the builder via a sessionStorage hand-off (Express lane opens pre-set — Nuvio/WuPlay pick the right target; a free pick preselects Free/P2P; Debrid-Link routes to Advanced). New deep-links: #express, #advanced, #update, #backup.
   </Card>
 </CardGroup>
 

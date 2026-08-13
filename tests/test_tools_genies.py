@@ -20,6 +20,9 @@ class TestToolsGenies:
             assert 'http://' not in html.replace('https://', ''), 'genie pages must not depend on http assets'
             assert 'doorGenie' in html, f'{name} missing genie entrypoint'
 
-    def test_preview_badges_pending_qa_for_newer_genies(self):
-        assert TOOLS.count('PREVIEW — pending full QA') == 2
+    def test_genie_maturity_badges(self):
+        # WuPlay genie stays early-access (pending dev route sign-off); Nuvio + CB graduated
+        # to BETA with main-page wiring (patch 12). All three must still carry a maturity badge.
+        assert 'BETA — early access · pending dev sign-off' in TOOLS, 'WuPlay genie must stay beta-gated until the dev conversation resolves the write route'
+        assert TOOLS.count('BETA — works today') == 2, 'CB + Nuvio genies carry the works-today beta badge'
         assert 'GUIDED' not in TOOLS.upper() or 'BETA' in TOOLS  # CB genie carries the beta badge
