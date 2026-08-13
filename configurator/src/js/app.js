@@ -2365,7 +2365,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch(e) { /* handoff is best-effort */ }
   render();
-  try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
+  if (!_genieRoute) {
+    try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
+  }
   if (_genieRoute) {
     setTimeout(() => {
       try {
