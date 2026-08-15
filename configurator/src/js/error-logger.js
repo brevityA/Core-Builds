@@ -218,14 +218,16 @@ function sanitizeUrl(url) {
     .slice(0, 300);
 }
 
+// Audit C4 (2026-08-14): the redaction denylist had drifted from the credential registry —
+// nzbhydra / nzbhydraApiKey (shipped v2.90) were missing. Derive from the single source of
+// truth instead of hand-maintaining; a unit test (credentials.test.mjs) now guards the sync.
+import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
+
 const SENSITIVE_KEYS = new Set([
+  ...Object.keys(PROVIDER_CREDENTIALS),
+  // non-provider secrets that share the same channels
   'password', 'stremioPassword', 'instancePassword', 'basePassword',
-  'token', 'tmdbToken', 'authKey', 'apiKey', 'tmdbApiKey',
-  'torbox', 'realdebrid', 'alldebrid', 'premiumize', 'debridlink',
-  'offcloud', 'easynews', 'easynewsPass', 'nzbgeek', 'debridio',
-  'debrider', 'easydebrid', 'pikpak', 'seedr', 'nzbnoob', 'althub',
-  'usenetcrawler', 'drunkenslug', 'nzbfinder', 'jackett', 'prowlarr',
-  'streamnzb', 'subdl',
+  'token', 'authKey', 'apiKey',
 ]);
 
 function sanitizeContext(ctx) {
