@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile, writeFile, mkdir, copyFile, cp } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sourceFingerprint } from './source-fingerprint.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(root, '..');
@@ -11,6 +12,12 @@ const dist = resolve(root, 'dist');
 const web = resolve(dist, 'web');
 const assets = resolve(web, 'assets');
 await mkdir(assets, { recursive: true });
+
+// Fingerprint the tree BEFORE anything reads it. Computing it after the bundle is written
+// would describe the tree as it is at the END of the build: edit a source file mid-build and
+// the stamp would certify a bundle that never contained that edit. Captured here, written
+// only once the build has actually succeeded.
+const buildFingerprint = await sourceFingerprint(root);
 
 const jsOut = resolve(assets, 'app.js');
 await build({
@@ -66,6 +73,17 @@ if (standalone.includes('<script type="module" src="./js/app.js"></script>')) th
 if (standalone.includes("import { ICO }")) throw new Error('Standalone build contains unresolved module imports');
 await writeFile(resolve(dist, 'index.html'), standalone);
 await writeFile(resolve(root, 'index.html'), standalone);
+
+// Stamp the source fingerprint into dist/ so the e2e global setup can prove the served
+// bundle matches the working tree. dist/ is gitignored and therefore survives a branch
+// switch — without this stamp, an e2e run after a checkout silently tests another
+// branch's build. Written last, so it only appears when the build actually completed.
+const stamp = {
+  fingerprint: buildFingerprint,
+  version: pkg.version,
+  builtAt: new Date().toISOString(),
+};
+await writeFile(resolve(web, '.cb-build-stamp.json'), JSON.stringify(stamp, null, 2) + '\n');
 
 console.log(`Built standalone: ${standalone.length} bytes`);
 console.log(`Built web assets: ${js.length} JS bytes, ${css.length} CSS bytes`);
