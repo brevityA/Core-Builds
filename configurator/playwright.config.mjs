@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
+  // Aborts the run if dist/web does not match the working tree. dist/ is gitignored, so it
+  // survives branch switches and the webServer below would otherwise serve another branch's
+  // build without any signal that it had done so.
+  globalSetup: './e2e/global-setup.mjs',
   timeout: 45_000,
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
