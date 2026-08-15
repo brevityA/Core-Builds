@@ -19,6 +19,7 @@ import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
+import { sanitizeDisplayName } from '../core/input-sanitize.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
 import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
@@ -148,6 +149,20 @@ async function resolveInstallHost(timeout=4000) {
 }
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+/**
+ * Stremio's API returns `error` as either a bare string or a structured object.
+ * Passing the object straight to `new Error()` yields the message "[object Object]",
+ * which then gets faithfully escaped and shown to the user as gibberish. Normalise
+ * every Stremio failure through here so the reason survives to the UI.
+ * (Audit C3 second half: the login throws were normalised, the addon-list and
+ * addon-set throws in both install flows were not.)
+ */
+function stremioErrText(raw, fallback) {
+  if (typeof raw === 'string' && raw.trim()) return raw;
+  if (raw && typeof raw.message === 'string' && raw.message.trim()) return raw.message;
+  return fallback;
+}
 
 let _expressProbeSeq = 0;
 async function probeExpressHost() {
@@ -410,7 +425,7 @@ function sanitizeSharedConfig(d) {
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
   if (Array.isArray(d.langs)) { const l = d.langs.filter(v => LANG_OPTS.some(o => o.v === v)); if (l.length) out.langs = l; }
-  if (typeof d.name === 'string') out.name = d.name.replace(/[<>"'&`]/g, '').slice(0, 60);
+  if (typeof d.name === 'string') out.name = sanitizeDisplayName(d.name);
   if (Array.isArray(d.optionalScrapers)) out.optionalScrapers = d.optionalScrapers.filter(v => OPTIONAL_SCRAPER_DEFS.some(x => x.id === v));
   if (Array.isArray(d.subtitleAddons)) out.subtitleAddons = d.subtitleAddons.filter(v => ['aiosubtitle', 'opensubtitles-v3-plus', 'subdl'].includes(v));
   if (Array.isArray(d.subtitleLangs)) out.subtitleLangs = d.subtitleLangs.filter(v => typeof v === 'string' && v.length >= 2 && v.length <= 5);
@@ -1675,7 +1690,7 @@ function render() {
           <div class="receipt-hdr">
             <div class="receipt-hdr-icon">${ICO.bolt(18,'#fbbf24')}</div>
             <div>
-              <div class="receipt-hdr-name">${S.name || auto}</div>
+              <div class="receipt-hdr-name">${escH(S.name || auto)}</div>
               <div class="receipt-hdr-sub">Template ready to generate</div>
             </div>
           </div>
@@ -2354,7 +2369,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (DEV_MAP[h.device])    { S.device = DEV_MAP[h.device]; }
         if (CONTENT_MAP[h.content]) S.content = CONTENT_MAP[h.content];
-        if (typeof h.name === 'string' && h.name.trim()) S.name = h.name.trim().slice(0, 24);
+        if (typeof h.name === 'string' && h.name.trim()) S.name = sanitizeDisplayName(h.name).slice(0, 24);
         // Express' free card id is 'p2p' while builder S says 'free' — translate explicitly (review P2);
         // lane vocabulary is local here so nothing depends on declaration order of EXPRESS_SERVICES.
         const EXPRESS_SVC_MAP = { torbox:'torbox-pro', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize', none:'p2p' };
@@ -2386,7 +2401,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(COUNTER_URL + '/api/stats').then(r => r.json()).then(d => {
       const el = document.getElementById('splashStats');
       if (!el) return;
-      const fmt = n => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : n.toLocaleString();
+      // C2 (audit 2026-08-14): count fields are remote-controlled JSON — coerce & verify
+      // finiteness before formatting; anything else renders a dash, never injected markup.
+      const fmt = n => {
+        const v = Number(n);
+        if (!Number.isFinite(v) || v < 0) return '—';
+        return v >= 1000 ? (v / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : Math.floor(v).toLocaleString();
+      };
       el.innerHTML = `<span class="stat"><span class="stat-val">${fmt(d.visits)}</span> visits</span><span class="stat-dot"></span><span class="stat"><span class="stat-val">${fmt(d.generates)}</span> templates built</span>`;
       el.classList.add('loaded');
     }).catch(() => {});
@@ -3254,7 +3275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('input', (e) => {
     const a = e.target.dataset.action;
-    if (a === 'update-name') S.name = e.target.value.replace(/[<>"'&`]/g, '');
+    if (a === 'update-name') S.name = sanitizeDisplayName(e.target.value);
     else if (a === 'update-cred') {
       S.creds[e.target.dataset.service] = e.target.value;
     }
@@ -4860,6 +4881,10 @@ function showTestDriveModal() {
 
     try {
       const cfg = buildFinal().config;
+      // C5 (audit 2026-08-14): Test Drive uploads the generated config like the other
+      // three write paths — it must carry the same 100KB save-limit guard.
+      const sz = payloadSizeGuard(cfg);
+      if (sz.over) { resultsEl.innerHTML = payloadTooLargeHtml(sz); return; }
       const tempPwd = makePwd();
 
       // Prefer the last known-good host; fall back to racing the remaining hosts.
@@ -5276,24 +5301,26 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       const loginRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'Login', email, password, facebook:false }) });
       const loginData = await loginRes.json();
       const authKey = loginData?.result?.authKey;
-      if (!authKey) throw new Error(loginData?.error || 'Login failed — check your email and password.');
+      if (!authKey) {
+        throw new Error(stremioErrText(loginData?.error, 'Login failed — check your email and password.'));
+      }
       btn.textContent = 'Installing…';
       const getRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionGet', authKey, update:true }) });
       const getData = await getRes.json();
-      if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
+      if (!getData?.result?.addons) throw new Error(stremioErrText(getData?.error, 'Could not fetch your addon list.'));
       const existing = getData.result.addons;
       const already = existing.some(a => a.transportUrl === manifestUrl);
       if (!already) {
         const updated = [...existing, { transportName:'http', transportUrl: manifestUrl, flags:{} }];
         const setRes = await fetch(SAPI, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'AddonCollectionSet', authKey, addons: updated }) });
         const setData = await setRes.json();
-        if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
+        if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'Install failed.'));
       }
       btn.innerHTML = ICO.check(12,'currentColor') + ' Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
       resEl.innerHTML = already ? `<span style="color:#f59e0b">Already in your library.</span>` : `<span style="color:#3fb950">Done — reopen Stremio to see it.</span>`;
     } catch(err) {
       btn.disabled = false; btn.innerHTML = ICO.download(14,'#00d4ff') + ' Log in & Install';
-      resEl.innerHTML = `<span style="color:#f87171">${err.message}</span>`;
+      resEl.innerHTML = `<span style="color:#f87171">${esc(err.message || 'Something went wrong')}</span>`;
     }
   });
 }
@@ -6712,7 +6739,7 @@ function showFastLane() {
           }
         } catch(err) {
           btn.disabled=false; btn.innerHTML='Create &amp; Install →';
-          result.innerHTML=`<div class="td-error">${err.message.replace(/</g,'&lt;')}</div>`;
+          result.innerHTML=`<div class="td-error">${esc(err.message || 'Something went wrong')}</div>`;
         }
         return;
       }
@@ -6912,7 +6939,7 @@ async function simpleInstall(target) {
           return;
         } catch(err) {
           btn.disabled = false; btn.innerHTML = origHtml;
-          result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio login failed</div><div style="font-size:.78rem;color:#8b949e">${err.message}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
+          result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio login failed</div><div style="font-size:.78rem;color:#8b949e">${esc(err.message || 'Something went wrong')}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
           return;
         }
       }
@@ -6984,9 +7011,11 @@ function stremioFetch(url, body, timeoutMs = 15000) {
 async function pushToStremio(manifestUrl, email, password) {
   const loginData = await stremioFetch('https://api.strem.io/api/login', { type:'Login', email, password, facebook:false });
   const authKey = loginData?.result?.authKey;
-  if (!authKey) throw new Error(loginData?.error || 'Login failed — check your email and password.');
+  if (!authKey) {
+        throw new Error(stremioErrText(loginData?.error, 'Login failed — check your email and password.'));
+      }
   const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
-  if (!getData?.result?.addons) throw new Error(getData?.error || 'Could not fetch your addon list.');
+  if (!getData?.result?.addons) throw new Error(stremioErrText(getData?.error, 'Could not fetch your addon list.'));
   const existing = getData.result.addons;
   const already = existing.some(a => a.transportUrl === manifestUrl);
   if (already && !S.cleanInstall) return 'already';
@@ -6995,7 +7024,7 @@ async function pushToStremio(manifestUrl, email, password) {
   const kept = S.cleanInstall ? existing.filter(a => !isKnownAioManifest(a)) : existing.slice();
   if (!kept.some(a => a.transportUrl === manifestUrl)) kept.push({ transportName:'http', transportUrl: manifestUrl, flags:{} });
   const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: kept });
-  if (!setData?.result) throw new Error(setData?.error || 'Install failed.');
+  if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'Install failed.'));
   return S.cleanInstall ? 'replaced' : 'installed';
 }
 

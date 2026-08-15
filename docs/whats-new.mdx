@@ -50,7 +50,10 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract." icon="layers">
     Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract.
   </Card>
-  <Card title="Genies graduate onto the main page" icon="bug">
+  <Card title="Live instance-status cron retired" icon="bug">
+    the docs page is now a guidance snapshot, and live per-host checks live in Preflight (Tools page), which tests your actual host against your actual config instead of a six-hours-stale ping list.
+  </Card>
+  <Card title="Genies graduate onto the main page" icon="sparkles">
     the Setup Genie door joins 'Choose your route' and the Nuvio Stack Genie joins the Tools row. Both pages dropped their prototype stubs: every button goes somewhere real, and finishing a genie hands your picks to the builder via a sessionStorage hand-off (Express lane opens pre-set — Nuvio/WuPlay pick the right target; a free pick preselects Free/P2P; Debrid-Link routes to Advanced). New deep-links: #express, #advanced, #update, #backup.
   </Card>
 </CardGroup>

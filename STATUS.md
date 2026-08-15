@@ -1,6 +1,9 @@
-# AIOStreams Instance Status
+# AIOStreams Instance Status — RETIRED 2026-08-13
 
-Live status for all known public AIOStreams instances. Checked every 30 minutes via GitHub Actions.
+**This snapshot is frozen.** The auto-refresh cron was removed (it was push-broken for weeks
+before that, and its final weeks disagreed with reality during the v2.33.x storm). For a live,
+truthful answer: use **Core Builds → Tools → Preflight** to probe the exact host you target
+against your real config — on demand, with evidence you can keep.
 
 > ⚠️ **Green = host is reachable.** Does not guarantee the instance accepts new configs or that your template will import correctly. Always test with a fresh import.
 

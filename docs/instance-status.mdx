@@ -1,6 +1,6 @@
 ---
 title: "Instance Status"
-description: "Live status of all known public AIOStreams instances. Auto-checked every 6 hours."
+description: "Retired 2026-08-13 — live checks moved into the Core Builds Preflight tool. Tables below are the final snapshot."
 ---
 
 ## Which Instance Should I Use?
@@ -32,16 +32,13 @@ The short answer: **ElfHosted** for most people, **ElfHosted Private** if you hi
 ## Stable Instances
 
 {/* STATUS_STABLE_START */}
-| Instance | Status | URL |
-|---|---|---|
-| **ElfHosted** | 🟢 Online | [aiostreams.elfhosted.com](https://aiostreams.elfhosted.com/stremio/configure) |
-| **Yeb's** | 🟢 Online | [aiostreams.fortheweak.cloud](https://aiostreams.fortheweak.cloud/stremio/configure) |
-| **Midnight's** | 🟢 Online | [aiostreamsfortheweebsstable.midnightignite.me](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure) |
-| **Kuu's** | 🟢 Online | [aiostreams.stremio.ru](https://aiostreams.stremio.ru/stremio/configure) |
-| **ATBP** | 🟢 Online | [aio.atbphosting.com](https://aio.atbphosting.com/stremio/configure) |
-| **Omni's** | 🟢 Online | [aiostreams.12312023.xyz](https://aiostreams.12312023.xyz/stremio/configure) |
-
-*Last checked: 2026-08-07 07:05 UTC*
+<Warning>
+  **Live table retired (2026-08-13).** The every-6-hours auto-refresh was removed: it lived on a
+  fragile write-to-main cron and its last weeks disagreed with reality (hosts shown online that were
+  unreachable). For a live answer now, use **Core Builds → Tools → Preflight** — it probes the
+  exact host you target, against your real config, on demand. Instance guidance below stays —
+  it's timeless advice, not a heartbeat.
+</Warning>
 {/* STATUS_STABLE_END */}
 
 ---
@@ -53,14 +50,10 @@ The short answer: **ElfHosted** for most people, **ElfHosted Private** if you hi
 </Note>
 
 {/* STATUS_NIGHTLY_START */}
-| Instance | Status | URL |
-|---|---|---|
-| **Yeb's Nightly** | 🟢 Online | [aiostreams-nightly.fortheweak.cloud](https://aiostreams-nightly.fortheweak.cloud/stremio/configure) |
-| **Midnight's Nightly** | 🟢 Online | [aiostreamsfortheweebs.midnightignite.me](https://aiostreamsfortheweebs.midnightignite.me/stremio/configure) |
-| **Kuu's Nightly** | 🟢 Online | [aiostreams-nightly.stremio.ru](https://aiostreams-nightly.stremio.ru/stremio/configure) |
-| **Viren's Nightly** | 🟢 Online | [aiostreams.viren070.me](https://aiostreams.viren070.me/stremio/configure) |
-
-*Last checked: 2026-08-07 07:05 UTC*
+<Note>
+  Nightly-instance health is likewise retired here. Nightly instances move fast by design; check
+  your nightly host directly, or run its URL through Preflight before installing Labs builds.
+</Note>
 {/* STATUS_NIGHTLY_END */}
 
 ---

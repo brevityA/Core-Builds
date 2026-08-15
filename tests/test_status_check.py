@@ -1,5 +1,6 @@
 """
-Unit tests for .github/scripts/status_check.py.
+Unit tests for scripts/status_check.py (archived probe logic, kept for the fleet watcher.
+The 6-hour cron that consumed it was retired 2026-08-13; docs/instance-status.mdx is tombstoned).
 All network calls are mocked so tests run fully offline.
 """
 import sys
@@ -10,7 +11,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 # Make the script importable without executing its __main__ block
-sys.path.insert(0, str(Path(__file__).parent.parent / ".github" / "scripts"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 import status_check
 
 
