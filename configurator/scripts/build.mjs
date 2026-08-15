@@ -13,6 +13,12 @@ const web = resolve(dist, 'web');
 const assets = resolve(web, 'assets');
 await mkdir(assets, { recursive: true });
 
+// Fingerprint the tree BEFORE anything reads it. Computing it after the bundle is written
+// would describe the tree as it is at the END of the build: edit a source file mid-build and
+// the stamp would certify a bundle that never contained that edit. Captured here, written
+// only once the build has actually succeeded.
+const buildFingerprint = await sourceFingerprint(root);
+
 const jsOut = resolve(assets, 'app.js');
 await build({
   entryPoints: [resolve(src, 'js/app.js')],
@@ -73,7 +79,7 @@ await writeFile(resolve(root, 'index.html'), standalone);
 // switch — without this stamp, an e2e run after a checkout silently tests another
 // branch's build. Written last, so it only appears when the build actually completed.
 const stamp = {
-  fingerprint: await sourceFingerprint(root),
+  fingerprint: buildFingerprint,
   version: pkg.version,
   builtAt: new Date().toISOString(),
 };
