@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile, writeFile, mkdir, copyFile, cp } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sourceFingerprint } from './source-fingerprint.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(root, '..');
@@ -66,6 +67,17 @@ if (standalone.includes('<script type="module" src="./js/app.js"></script>')) th
 if (standalone.includes("import { ICO }")) throw new Error('Standalone build contains unresolved module imports');
 await writeFile(resolve(dist, 'index.html'), standalone);
 await writeFile(resolve(root, 'index.html'), standalone);
+
+// Stamp the source fingerprint into dist/ so the e2e global setup can prove the served
+// bundle matches the working tree. dist/ is gitignored and therefore survives a branch
+// switch — without this stamp, an e2e run after a checkout silently tests another
+// branch's build. Written last, so it only appears when the build actually completed.
+const stamp = {
+  fingerprint: await sourceFingerprint(root),
+  version: pkg.version,
+  builtAt: new Date().toISOString(),
+};
+await writeFile(resolve(web, '.cb-build-stamp.json'), JSON.stringify(stamp, null, 2) + '\n');
 
 console.log(`Built standalone: ${standalone.length} bytes`);
 console.log(`Built web assets: ${js.length} JS bytes, ${css.length} CSS bytes`);
