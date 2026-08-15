@@ -28,7 +28,12 @@ test('multi-service output includes Debridio and selected Usenet Crawler', async
   const diagnostics = await page.evaluate(() => window.__coreBuilds.diagnostics());
 
   expect(debridio, 'Debridio must survive multi-service generation').toBeTruthy();
-  expect(debridio.options.apiKey).toBe('test-debridio-key');
+  // AIOStreams requires `debridioApiKey`; a bare `apiKey` reads as undefined and the
+  // host rejects the config. This assertion previously pinned the wrong name — the mock
+  // backend does not enforce required options, so the suite stayed green while the
+  // live feature was broken for every user who entered a key.
+  expect(debridio.options.debridioApiKey).toBe('test-debridio-key');
+  expect(debridio.options.apiKey).toBeUndefined();
   expect(crawler, 'Usenet Crawler must survive optional-scraper generation').toBeTruthy();
   expect(crawler.type).toBe('newznab');
   expect(crawler.options.api.apiKey).toBe('test-usenet-crawler-key');

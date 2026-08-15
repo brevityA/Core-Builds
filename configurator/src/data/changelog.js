@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'2.93', date:'Aug 15 2026', items:[
+    'Fixed: Debridio configs were rejected by AIOStreams even when you HAD entered a key ("Option debridioApiKey is required, got undefined"). Core Builds was sending a bare apiKey — an option the Debridio preset never reads — so the host saw its required option as missing. The earlier "omit the preset until a key is entered" change hid this: with no key the preset vanishes, so the rejection only ever reached people actually using Debridio. The option name is now confirmed against the AIOStreams preset source rather than inferred.',
+    'Fixed: the import and "all hosts unreachable" panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it.',
+    'Known issue (documented, not yet changed): the Debrider preset is emitted with a type AIOStreams does not recognise — `debrider` is a service id, not one of the 76 preset ids the host accepts — so the host cannot resolve it. Recorded at the emission site pending a decision on the right fix.',
+  ]},
   { v:'2.92', date:'Aug 11 2026', items:[
     'AIOStreams v2.33.1 adopted same-day — the host fleet hardened its config validation on Aug 11 (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.',
     'Express lane truth-in-advertising pass — a visible "Streams shown" toggle (Mixed/⚡Cached only), an always-on install chorus (service → app · profile · resolution · cache mode · host), receipts always show the cache mode, and profile picks no longer stomp an explicit choice. Fixes the "everything downloads to debrid" confusion class.',

@@ -203,7 +203,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.error{background:linear-gradient(135deg,#1a0a0a,#120000);border-color:rgba(248,113,113,.45);color:#f87171;box-shadow:0 4px 20px rgba(220,38,38,.2)}
 .import-success{background:#061a0e;border:1px solid #2ea043;border-radius:10px;padding:16px;margin-top:12px;font-size:.85rem}
-.import-success strong{color:#3fb950;display:block;margin-bottom:8px;font-size:.95rem}
+/* Direct child only: the block treatment is for the panel heading. A descendant selector
+   here also hit the inline <strong> used for step numbers ("1.") and mid-sentence emphasis
+   ("Services"), forcing each onto its own line and shredding the copy (field report 2026-08-14). */
+.import-success>strong{color:#3fb950;display:block;margin-bottom:8px;font-size:.95rem}
 .manifest-url{background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.78rem;color:#7a8194;word-break:break-all;margin-top:6px;cursor:pointer;transition:border-color .15s}
 .manifest-url:hover{border-color:#00d4ff;color:#00d4ff}
 .notice{background:#0d2317;border:1px solid #2ea043;border-radius:9px;padding:13px 16px;font-size:.83rem;color:#8b949e;margin-top:14px;line-height:1.5}

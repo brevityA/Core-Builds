@@ -34,7 +34,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.92';
+const CONFIGURATOR_VERSION = '2.93';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -3526,9 +3526,19 @@ function presets() {
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
     ...(hasDebridio && S.creds.debridio ? [
-      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { apiKey:S.creds.debridio } : {}) }, resources:['stream'] },
+      // AIOStreams names this option `debridioApiKey`, not a bare `apiKey` (field report
+      // 2026-08-14: "Option debridioApiKey is required, got undefined" fired even WITH a key
+      // entered, because we set an option the preset never reads). Confirmed against the
+      // AIOStreams preset source, where debridioApiKey is declared required.
+      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(S.creds.debridio ? { debridioApiKey:S.creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
     ...(S.multiServices.includes('debrider') && S.creds.debrider ? [
+      // NOTE (2026-08-15): left as a bare `apiKey` deliberately. Verified against AIOStreams
+      // source: `debrider` is NOT in PresetManager.fromId()'s accepted preset ids (76 entries,
+      // debridio* only) and no debrider preset file exists — `debrider` is a *service* id, not
+      // a preset type. So no option name makes this preset valid, and renaming the key would
+      // only dress up an emission the host cannot resolve. Flagged for the owner rather than
+      // silently changed, since removing it is a behaviour decision, not a typo fix.
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(S.creds.debrider ? { apiKey:S.creds.debrider } : {}) }, resources:['stream'] },
     ] : []),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
