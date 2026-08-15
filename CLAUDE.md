@@ -316,7 +316,7 @@ python3 scripts/template_builder.py --only stream  # filter by name
 | `configurator-e2e.yml` | PRs | Playwright E2E tests |
 | `validate.yml` | PRs | Template JSON validation |
 | `tests.yml` | PRs | pytest suite |
-| `status-check.yml` | PRs | Aggregate status check |
+| `status-check.yml` | — | **Retired 2026-08-13** — was the 6-hour instance ping cron (its 'Aggregate status check' label here was wrong; it never gated PRs) |
 | `link-checker.yml` | scheduled | Dead link detection |
 | `sync-upstream.yml` | scheduled | Upstream AIOStreams sync |
 
@@ -440,7 +440,7 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.6.0)
+## Active Template Inventory (as of v3.6.1)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.9.1 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.6.1 (2026-08-13)
+
+### Removed
+- **Live instance-status cron retired** — the every-6-hours auto-check (host → STATUS.md + docs page) was retired after 25 consecutive push failures and a final-weeks correctness split with reality during the v2.33.x storm (hosts marked online that were DNS-dead). The docs page stays as a guidance snapshot; live per-host checks now live in Preflight (Tools page), which probes the exact host against the actual config — on demand, with a downloadable case bundle. Probe logic archived to `scripts/status_check.py` as reference for the planned fleet watcher.
+
 ## 3.6.0 (2026-08-11)
 
 ### Added
