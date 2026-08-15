@@ -153,7 +153,9 @@ test('Express "Additional services & scrapers" popout adds Debridio + folds its 
   const config = posted[0].config;
   const debridio = config.presets.find(p => p.type === 'debridio');
   expect(debridio, 'Debridio preset should be emitted (key entered)').toBeTruthy();
-  expect(debridio.options.apiKey).toBe('test-debridio-key');
+  // See multi-debridio.spec.mjs: AIOStreams requires `debridioApiKey`, not `apiKey`.
+  expect(debridio.options.debridioApiKey).toBe('test-debridio-key');
+  expect(debridio.options.apiKey).toBeUndefined();
   expect(JSON.stringify(config)).not.toContain('torbox-search');
   expect(errors).toEqual([]);
 });

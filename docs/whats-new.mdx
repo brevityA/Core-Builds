@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v2.92"
+title: "What's New — Configurator v2.93"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.92 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.93 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.92**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.93**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v2.93 (Aug 15 2026)
+
+<CardGroup cols={2}>
+  <Card title="Fixed: Debridio configs were rejected by AIOStreams even when you HAD entered a key ('Option debridioApiKey is required, got undefined'). Core Builds was sending a bare apiKey" icon="sparkles">
+    an option the Debridio preset never reads — so the host saw its required option as missing. The earlier 'omit the preset until a key is entered' change hid this: with no key the preset vanishes, so the rejection only ever reached people actually using Debridio. The option name is now confirmed against the AIOStreams preset source rather than inferred.
+  </Card>
+  <Card title="Fixed: the import and 'all hosts unreachable' panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it." icon="bolt">
+    Fixed: the import and 'all hosts unreachable' panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it.
+  </Card>
+  <Card title="Known issue (documented, not yet changed): the Debrider preset is emitted with a type AIOStreams does not recognise" icon="shield-check">
+    `debrider` is a service id, not one of the 76 preset ids the host accepts — so the host cannot resolve it. Recorded at the emission site pending a decision on the right fix.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.92 (Aug 11 2026)
 
@@ -104,18 +120,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="New: Usenet Only service" icon="layers">
     dedicated path for pure-usenet setups (no debrid). Enables stremio_nntp + aiostreams built-in engine, bundles EasyNews++, EasyNews Search, NZBGeek, and all Newznab indexers. NZBHydra2 meta-search scraper added to optional scrapers.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.89 (Aug 4 2026)
-
-<CardGroup cols={2}>
-  <Card title="Fixed: episode-pack availability" icon="sparkles">
-    multi-episode and season-pack streams were removed too early, before cache and quality filters ran; when those filters eliminated single-episode alternatives, valid requests could return zero streams. Packs are now hidden only after three playable standalone episodes survive all filtering.
-  </Card>
-  <Card title="Fixed: Core Tools hub restored" icon="bolt">
-    the complete tools page is back after a truncated deployment removed cards and closing markup
   </Card>
 </CardGroup>
