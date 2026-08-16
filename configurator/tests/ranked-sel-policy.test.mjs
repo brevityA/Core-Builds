@@ -7,6 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rankedSelPolicy } from '../src/core/ranked-sel-policy.js';
 import { applyOutputProfile } from '../src/core/output-profile-policy.js';
+import { generateTemplate } from '../../packages/core/src/generate-template.js';
 
 const label = e => e.expression.match(/^\/\* (.*?) \*\//)?.[1];
 const labels = set => set.map(label);
@@ -63,6 +64,28 @@ test('4K is scored only when the profile actually wants 4K', () => {
   assert.ok(labels(rankedSelPolicy({ resolution: 'mixed' }, {})).includes('RSE 2160p'));
   assert.ok(!labels(rankedSelPolicy({ resolution: '1080p' }, {})).includes('RSE 2160p'),
     '1080p profiles hard-exclude 2160p, so scoring it would rank filtered streams');
+});
+
+test('no 1080p architecture lets 2160p through unscored', () => {
+  // Omitting the 2160p score on 1080p profiles is only safe because a Hard Resolution Kill ESE
+  // removes 2160p first. That fact lives in another module, so this pins the pair: if any
+  // architecture ever stops emitting the kill, 4K would survive scoring at zero and rank BELOW
+  // 1080p (+80) — an inversion, not just a missing bonus. Raised in review against apex-mixed,
+  // which does emit the kill; this makes that hold for every architecture rather than today's.
+  for (const architecture of ['standard', 'iqr', 'apex-mixed']) {
+    const { config } = generateTemplate({
+      service: 'torbox-pro', device: 'generic', resolution: '1080p',
+      architecture, outputProfile: architecture === 'standard' ? 'advanced' : 'labs',
+    });
+    const killsUhd = (config.excludedStreamExpressions || []).some(
+      e => /\/\* Hard Resolution Kill \*\/\s*resolution\(streams,'2160p'/.test(e.expression || ''),
+    );
+    const scores2160 = (config.rankedStreamExpressions || []).some(e => /RSE 2160p/.test(e.expression || ''));
+    assert.ok(
+      killsUhd || scores2160,
+      `1080p/${architecture} neither excludes 2160p nor scores it — 4K would rank below 1080p`,
+    );
+  }
 });
 
 test('composite quality out-totals any single factor', () => {

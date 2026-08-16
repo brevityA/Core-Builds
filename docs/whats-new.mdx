@@ -13,14 +13,14 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
 ## Configurator v2.95 (Aug 16 2026)
 
 <CardGroup cols={2}>
-  <Card title="Stream scoring is live on the Advanced and Labs profiles. Until now every stream carried the same score of nothing: AIOStreams only fills in a stream's score from a 'ranked expression' list, Core Builds never sent one, and so the score-based sort key and the Adaptive Score Floor were quietly dropped from every config we generated. Both were listed as features. Neither had ever run. Advanced and Labs configs now ship a set of scored rules, so the score they sort on is real." icon="sparkles">
-    Stream scoring is live on the Advanced and Labs profiles. Until now every stream carried the same score of nothing: AIOStreams only fills in a stream's score from a 'ranked expression' list, Core Builds never sent one, and so the score-based sort key and the Adaptive Score Floor were quietly dropped from every config we generated. Both were listed as features. Neither had ever run. Advanced and Labs configs now ship a set of scored rules, so the score they sort on is real.
+  <Card title="Stream scoring is live on Advanced and Labs" icon="sparkles">
+    until now every stream carried the same score of nothing. AIOStreams only fills in a stream's score from a 'ranked expression' list, Core Builds never sent one, and so the score-based sort key and the Adaptive Score Floor were quietly dropped from every config we generated. Both were listed as features. Neither had ever run. Advanced and Labs configs now ship a set of scored rules, so the score they sort on is real.
   </Card>
-  <Card title="What the scoring does: resolution, quality, HDR/Dolby Vision, audio format and release-group reputation each add points, and low-quality groups and upscales subtract them. Because the points add up, a 4K remux with Atmos from a top group now outranks a plain 4K remux without anyone having to write a rule for that exact pairing" icon="bolt">
-    which is what the old tier ladder required. Points for Dolby Vision and lossless audio are only awarded on devices that can play them.
+  <Card title="Quality now adds up instead of laddering" icon="bolt">
+    resolution, quality, HDR/Dolby Vision, audio format and release-group reputation each contribute points, while low-quality groups and upscales subtract them. Because the points combine, a 4K remux with Atmos from a top group outranks a plain 4K remux without anyone writing a rule for that exact pairing, which is what the old tier ladder required. Points for Dolby Vision and lossless audio are awarded only on devices that can play them.
   </Card>
-  <Card title="Unchanged if you use the Standard or Quick profiles: those clear the scoring layer on purpose, so their output is byte-identical apart from one reordered empty field. This lands only where you have opted into the deeper filtering." icon="shield-check">
-    Unchanged if you use the Standard or Quick profiles: those clear the scoring layer on purpose, so their output is byte-identical apart from one reordered empty field. This lands only where you have opted into the deeper filtering.
+  <Card title="Stable and Balanced are unaffected" icon="shield-check">
+    both clear the scoring layer on purpose, so their configs are unchanged in content. The only difference is one empty field that now appears earlier in the file. This lands solely where you have opted into the deeper filtering.
   </Card>
 </CardGroup>
 
