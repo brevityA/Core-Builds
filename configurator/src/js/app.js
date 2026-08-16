@@ -3549,8 +3549,14 @@ function presets() {
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      if (d.id === 'jackett') return S.creds.jackettUrl ? { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', jackettUrl:S.creds.jackettUrl, timeout:10000, ...(S.creds.jackett ? { apiKey:S.creds.jackett } : {}) }, resources:['stream'] } : null;  // v2.33: jackettUrl is REQUIRED — no URL, no preset
-      if (d.id === 'prowlarr') return S.creds.prowlarrUrl ? { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', prowlarrUrl:S.creds.prowlarrUrl, timeout:10000, ...(S.creds.prowlarr ? { apiKey:S.creds.prowlarr } : {}) }, resources:['stream'] } : null;  // v2.33: prowlarrUrl REQUIRED
+      // Per-preset option names, same contract as Debridio's `debridioApiKey`: AIOStreams
+      // declares `jackettApiKey` / `prowlarrApiKey`, NOT a bare `apiKey`. Emitting `apiKey`
+      // set an option the preset never reads, so the host saw its required key as undefined
+      // and rejected the config — for anyone who actually supplied a key. Verified against
+      // the AIOStreams preset sources; note both already used the prefixed *Url option, so
+      // only the key was wrong.
+      if (d.id === 'jackett') return S.creds.jackettUrl ? { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', jackettUrl:S.creds.jackettUrl, timeout:10000, ...(S.creds.jackett ? { jackettApiKey:S.creds.jackett } : {}) }, resources:['stream'] } : null;  // v2.33: jackettUrl is REQUIRED — no URL, no preset
+      if (d.id === 'prowlarr') return S.creds.prowlarrUrl ? { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', prowlarrUrl:S.creds.prowlarrUrl, timeout:10000, ...(S.creds.prowlarr ? { prowlarrApiKey:S.creds.prowlarr } : {}) }, resources:['stream'] } : null;  // v2.33: prowlarrUrl REQUIRED
       return null;
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {

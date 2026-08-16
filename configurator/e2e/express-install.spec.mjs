@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { validateConfigOptions } from './lib/aiostreams-contract.mjs';
 
 // These specs drive long multi-hop chains (push → full stack → stremio) behind stubbed routes;
 // on a loaded box the modal chain can lag past a single test budget. Retry locally too — a flake
@@ -32,7 +33,15 @@ async function mockBackend(page, posted) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { version: '2.32.1' } }) });
     }
     if (url.includes('/api/v1/user') && request.method() === 'POST') {
-      posted.push(JSON.parse(request.postData() || '{}'));
+      const body = JSON.parse(request.postData() || '{}');
+      posted.push(body);
+      // Enforce AIOStreams' preset option contract instead of accepting anything. Without
+      // this, the mock validated our own shape against itself: two specs here asserted the
+      // wrong Debridio option name and passed for weeks while the live path was broken.
+      const verdict = validateConfigOptions(body.config);
+      if (!verdict.ok) {
+        return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ success: false, error: verdict.error }) });
+      }
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { uuid: UUID, encryptedPassword: 'encrypted-password' } }) });
     }
     if (url.includes('core-builds-cors-proxy') && (url.includes('/api/visit') || url.includes('/api/generate') || url.includes('/api/stats'))) {
