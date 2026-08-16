@@ -40,14 +40,22 @@ export const PRESET_OPTION_IDS = {
   newznab: ['name', 'api', 'api.url', 'api.apiKey', 'proxyAuth', 'timeout', 'mediaTypes', 'services', 'searchMode', 'seasonEpisodeStrategy', 'paginate', 'useMultipleInstances', 'zyclopsHealthProxy'],
 };
 
-/** Preset types this contract knowingly does not model yet — skipped, not guessed. */
+/**
+ * Preset types this contract knowingly does not model yet — skipped, not guessed.
+ *
+ * This list is checked for completeness against the generator by
+ * `configurator/tests/preset-contract-coverage.test.mjs`, which enumerates every type app.js
+ * can emit and fails when one is in neither set. That unit test found `torrent-galaxy` and
+ * `torrents-db` missing here: the e2e fixture happens not to emit them, so the drift alarm
+ * would have stayed quiet until some other config tripped it in CI.
+ */
 export const UNMODELLED_PRESET_TYPES = new Set([
   'library', 'comet', 'meteor', 'mediafusion', 'knaben', 'eztv', 'hdhub', 'animetosho',
   'seadex', 'neko-bt', 'sootio', 'peerflix', 'easynews-search', 'easynewsPlusPlus',
   'easynewsPlus', 'easynews', 'streamnzb', 'nzbhydra', 'aiosubtitle', 'opensubtitles-v3-plus',
   'tmdb-addon', 'streaming-catalogs', 'anime-catalogs', 'rpdb-catalogs', 'torrent-catalogs',
   'stremthruTorz', 'stremthruStore', 'torrentio', 'webstreamr', 'nuvio-streams', 'flix-streams',
-  'torznab', 'zilean', 'jackettio', 'debrider',
+  'torznab', 'zilean', 'jackettio', 'debrider', 'torrent-galaxy', 'torrents-db',
 ]);
 
 /**
@@ -63,19 +71,28 @@ export function validateConfigOptions(config) {
     if (!known) continue; // unmodelled — skipped by design, see assertKnownPresetTypes
     const allowed = new Set(known);
 
-    for (const key of Object.keys(preset.options || {})) {
-      if (allowed.has(key)) continue;
-      // Nested objects: accept the parent if any `parent.child` id is modelled.
-      if (known.some(id => id.startsWith(`${key}.`))) continue;
-      return {
-        ok: false,
-        error: {
-          message:
-            `The value for option '${key}' in preset '${preset.type}' is invalid: ` +
-            `Error: Option ${key} is not defined by this preset. ` +
-            `Accepted: ${known.join(', ')}`,
-        },
-      };
+    const reject = (id) => ({
+      ok: false,
+      error: {
+        message:
+          `The value for option '${id}' in preset '${preset.type}' is invalid: ` +
+          `Error: Option ${id} is not defined by this preset. ` +
+          `Accepted: ${known.join(', ')}`,
+      },
+    });
+
+    for (const [key, value] of Object.entries(preset.options || {})) {
+      const hasNestedIds = known.some(id => id.startsWith(`${key}.`));
+      if (!allowed.has(key) && !hasNestedIds) return reject(key);
+
+      // Descend into modelled nested objects (newznab's `api: {url, apiKey}`). Accepting the
+      // parent wholesale would let `api: {url, unexpected}` through — the same "looks checked,
+      // checks nothing" gap this whole contract exists to close.
+      if (hasNestedIds && value && typeof value === 'object' && !Array.isArray(value)) {
+        for (const childKey of Object.keys(value)) {
+          if (!allowed.has(`${key}.${childKey}`)) return reject(`${key}.${childKey}`);
+        }
+      }
     }
   }
   return { ok: true };

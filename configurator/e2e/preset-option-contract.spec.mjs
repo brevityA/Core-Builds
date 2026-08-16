@@ -49,19 +49,22 @@ test('credential presets use their prefixed key, never a bare apiKey', async ({ 
   const byType = Object.fromEntries(template.config.presets.map(p => [p.type, p]));
 
   // The three that shipped broken. Each must carry its prefixed key and no bare apiKey.
+  //
+  // These are REQUIRED to exist, not skipped when absent: the fixture supplies a key (and a
+  // URL for jackett/prowlarr) for every one, so a missing preset means the generator stopped
+  // emitting it — a regression. An `if (!preset) continue` here would let that pass silently,
+  // which is precisely the vacuous-assertion pattern this suite exists to stamp out.
   for (const [type, key] of [
     ['debridio', 'debridioApiKey'],
     ['jackett', 'jackettApiKey'],
     ['prowlarr', 'prowlarrApiKey'],
+    ['subdl', 'subDlApiKey'], // already correct — anchors the convention rather than a fix
   ]) {
     const preset = byType[type];
-    if (!preset) continue; // preset legitimately omitted (e.g. no URL supplied)
+    expect(preset, `${type} preset must be emitted when its credentials are supplied`).toBeTruthy();
     expect(preset.options[key], `${type} must emit ${key}`).toBeTruthy();
     expect(preset.options.apiKey, `${type} must not emit a bare apiKey`).toBeUndefined();
   }
-
-  // SubDL was already correct — it anchors the convention rather than being a fix.
-  if (byType.subdl) expect(byType.subdl.options.subDlApiKey).toBeTruthy();
 });
 
 test('the contract table has not fallen behind the generator', async ({ page }) => {
@@ -82,9 +85,16 @@ test('the contract actually rejects a bare apiKey (negative control)', () => {
   const good = { presets: [{ type: 'debridio', options: { name: 'Debridio', debridioApiKey: 'k' } }] };
   expect(validateConfigOptions(good).ok).toBe(true);
 
-  // Nested shapes (newznab's api:{url,apiKey}) must not trip the unknown-key check.
+  // Nested shapes (newznab's api:{url,apiKey}) must not trip the unknown-key check...
   const nested = { presets: [{ type: 'newznab', options: { name: 'NZB', api: { url: 'u', apiKey: 'k' } } }] };
   expect(validateConfigOptions(nested).ok).toBe(true);
+
+  // ...but an unmodelled key INSIDE that nested object must still be caught. Accepting the
+  // parent wholesale would make the nested case look validated while checking nothing.
+  const nestedBad = { presets: [{ type: 'newznab', options: { name: 'NZB', api: { url: 'u', unexpected: 'x' } } }] };
+  const nestedVerdict = validateConfigOptions(nestedBad);
+  expect(nestedVerdict.ok).toBe(false);
+  expect(nestedVerdict.error.message).toContain('api.unexpected');
 
   // And PRESET_OPTION_IDS must not be empty — an empty table would pass everything.
   expect(Object.keys(PRESET_OPTION_IDS).length).toBeGreaterThan(0);
