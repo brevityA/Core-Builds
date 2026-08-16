@@ -41,11 +41,29 @@ test('presets() guard for jackett/prowlarr uses credKey && !apiUrl (regression: 
     'broken filter "x.credKey && x.apiUrl" found — jackett/prowlarr presets would never generate');
 });
 
-test('jackett and prowlarr presets are gated on their instance URL (v2.33 requires it)', () => {
-  assert.ok(app.includes("if (d.id === 'jackett') return S.creds.jackettUrl ? { type:'jackett', instanceId:'jackett-1'"));
-  assert.ok(app.includes("if (d.id === 'prowlarr') return S.creds.prowlarrUrl ? { type:'prowlarr', instanceId:'prowlarr-1'"));
-  assert.ok(app.includes('S.creds.jackett'));
-  assert.ok(app.includes('S.creds.prowlarr'));
-  assert.ok(app.includes('jackettUrl:S.creds.jackettUrl') && app.includes('prowlarrUrl:S.creds.prowlarrUrl'),
-    'instance URL goes out as jackettUrl/prowlarrUrl — v2.33 names these options required');
+// AIOStreams' generateManifestUrl() throws "Jackett URL and API Key are required" when either
+// half resolves empty, and that throw rejects the entire config — not just the one preset. So
+// the gate must require BOTH, not just the URL. Behavioural coverage of the emitted option
+// names lives in e2e/preset-option-contract.spec.mjs; this pins the gating condition, which the
+// e2e fixture bypasses by seeding both credentials.
+for (const [id, urlKey, keyKey] of [['jackett', 'jackettUrl', 'jackett'], ['prowlarr', 'prowlarrUrl', 'prowlarr']]) {
+  test(`${id} preset is gated on BOTH its instance URL and API key`, () => {
+    const gate = app.match(new RegExp(`if \\(d\\.id === '${id}'\\) return ([^?]+)\\?`));
+    assert.ok(gate, `could not locate the ${id} emission gate — did the generator move?`);
+    const cond = gate[1];
+    assert.match(cond, new RegExp(`S\\.creds\\.${urlKey}\\b`), `${id} gate must check ${urlKey}`);
+    assert.match(cond, new RegExp(`S\\.creds\\.${keyKey}\\b`), `${id} gate must also check the API key`);
+    assert.match(cond, /&&/, `${id} gate must require both, not either`);
+  });
+}
+
+test('jackett and prowlarr emit prefixed option names, never a bare apiKey', () => {
+  for (const [id, opts] of [['jackett', ['jackettUrl:S.creds.jackettUrl', 'jackettApiKey:S.creds.jackett']],
+                            ['prowlarr', ['prowlarrUrl:S.creds.prowlarrUrl', 'prowlarrApiKey:S.creds.prowlarr']]]) {
+    const emission = app.match(new RegExp(`if \\(d\\.id === '${id}'\\) return .*?resources:\\['stream'\\]`));
+    assert.ok(emission, `could not locate the ${id} emission`);
+    for (const opt of opts) assert.ok(emission[0].includes(opt), `${id} must emit ${opt}`);
+    assert.ok(!/[^a-zA-Z]apiKey\s*:/.test(emission[0]),
+      `${id} emits a bare apiKey — the preset declares a prefixed key and ignores this one`);
+  }
 });
