@@ -23,7 +23,11 @@ const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8')
 
 /** Every preset type app.js emits, read from the source rather than from a generated config. */
 function emittedPresetTypes() {
-  return [...new Set([...app.matchAll(/type:'([a-zA-Z0-9-]+)',\s*instanceId/g)].map(m => m[1]))].sort();
+  // The `instanceId` neighbour is load-bearing: app.js has ~200 other `type:` properties
+  // (`type:'text'`, `type:'movie'`, `type:'Login'`), and matching on `type:` alone would drag
+  // them all in as phantom preset types. Whitespace is tolerated around the colon and comma so
+  // a reformat does not silently empty the match set — the count guard below is the backstop.
+  return [...new Set([...app.matchAll(/type:\s*'([a-zA-Z0-9-]+)'\s*,\s*instanceId/g)].map(m => m[1]))].sort();
 }
 
 test('every emitted preset type is modelled or explicitly skipped', () => {

@@ -3555,8 +3555,20 @@ function presets() {
       // and rejected the config — for anyone who actually supplied a key. Verified against
       // the AIOStreams preset sources; note both already used the prefixed *Url option, so
       // only the key was wrong.
-      if (d.id === 'jackett') return S.creds.jackettUrl ? { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', jackettUrl:S.creds.jackettUrl, timeout:10000, ...(S.creds.jackett ? { jackettApiKey:S.creds.jackett } : {}) }, resources:['stream'] } : null;  // v2.33: jackettUrl is REQUIRED — no URL, no preset
-      if (d.id === 'prowlarr') return S.creds.prowlarrUrl ? { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', prowlarrUrl:S.creds.prowlarrUrl, timeout:10000, ...(S.creds.prowlarr ? { prowlarrApiKey:S.creds.prowlarr } : {}) }, resources:['stream'] } : null;  // v2.33: prowlarrUrl REQUIRED
+      //
+      // Both halves are required together. AIOStreams' generateManifestUrl() throws
+      // "Jackett URL and API Key are required" when either resolves empty, and that throw
+      // rejects the WHOLE config, not just this preset. Emitting a URL-only preset therefore
+      // trades a missing scraper for a total save failure — so omit the preset instead.
+      // (The preset options themselves are only conditionally required, on hosts with a
+      // preconfigured instance; we cannot detect that, so we take the safe branch.)
+      //
+      // NOTE: S.creds.jackettUrl / S.creds.prowlarrUrl have no writer — no UI field collects
+      // them and they are absent from the S.creds initialiser — so both branches are currently
+      // unreachable in the shipped app and these presets are never emitted. The option names
+      // below are correct for when a URL input exists; they are not a user-visible fix today.
+      if (d.id === 'jackett') return (S.creds.jackettUrl && S.creds.jackett) ? { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', jackettUrl:S.creds.jackettUrl, jackettApiKey:S.creds.jackett, timeout:10000 }, resources:['stream'] } : null;
+      if (d.id === 'prowlarr') return (S.creds.prowlarrUrl && S.creds.prowlarr) ? { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', prowlarrUrl:S.creds.prowlarrUrl, prowlarrApiKey:S.creds.prowlarr, timeout:10000 }, resources:['stream'] } : null;
       return null;
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {

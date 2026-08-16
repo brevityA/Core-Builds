@@ -26,6 +26,11 @@ async function generateWithCredentials(page) {
     creds: {
       torbox: 'test-torbox-key',
       debridio: 'test-debridio-key',
+      // jackettUrl / prowlarrUrl are seeded straight into state because NO UI FIELD COLLECTS
+      // THEM — see the known-issue note in the v2.94 changelog. Without this seeding both
+      // presets are unreachable and the option-name assertions below would silently cover
+      // nothing. Treat this fixture as a contract check on the generator, not as evidence that
+      // the feature is reachable from the app.
       jackett: 'test-jackett-key',
       jackettUrl: 'http://localhost:9117',
       prowlarr: 'test-prowlarr-key',
