@@ -8,7 +8,13 @@ This is **brevityA/Core-Builds**, the canonical repo for Core Builds by Brevity 
 
 - **Create a new PR for every task.** After committing and pushing changes, always open a pull request — even for small or experimental changes.
 - **Build and test before push.** Run `npm run build && npm test && npm run validate` in `configurator/` before pushing configurator changes.
-- **Version consistency.** When bumping `CONFIGURATOR_VERSION` in `app.js`, also update `configurator/package.json`, `versions.json`, `configurator/src/data/changelog.js`, and `configurator/scripts/validate.mjs`.
+- **Version consistency.** When bumping `CONFIGURATOR_VERSION` in `app.js`, also update `configurator/package.json`, `cli/package.json`, `packages/core/package.json`, `versions.json`, and `configurator/src/data/changelog.js`. `cli/tests/package-equivalence.test.mjs` asserts that `cli`, `packages/core` and `versions.configurator` share a `major.minor` — miss either package and 8 CLI tests fail (this list omitted both until v2.93, and CI caught it rather than the local board). `configurator/scripts/validate.mjs` needs no edit: its version check is dynamic.
+  - Then regenerate what derives from those files, or the suites fail downstream:
+    `npm run build --prefix configurator` (the version is baked into the built shell),
+    `python3 scripts/sync-docs.py --apply` (What's New + tools page come from `changelog.js`),
+    and `UPDATE_GOLDEN=1 npx playwright test e2e/golden-configs.spec.mjs` in `configurator/`
+    (all 15 goldens embed `coreBuildsVersion`; review that diff — it should be the version line and nothing else).
+  - Run `npm test` in `configurator/`, `cli/` **and** `packages/core/` before pushing. The configurator suite alone will not catch a version-coupling break.
 
 ---
 
