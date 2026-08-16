@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "2.94",
+    "coreBuildsVersion": "2.95",
     "coreBuildsAIOStreamsTarget": "2.31.1",
     "coreBuildsProfile": "balanced",
     "coreBuildsProfileVersion": "1"
@@ -1184,6 +1184,7 @@
         "expression": "/* Codec Efficiency Booster */ encode(streams,'HEVC')"
       }
     ],
+    "rankedStreamExpressions": [],
     "dynamicAddonFetching": {
       "enabled": false
     },
@@ -1224,7 +1225,6 @@
       "H-OU",
       "H-SBS"
     ],
-    "requiredStreamExpressions": [],
-    "rankedStreamExpressions": []
+    "requiredStreamExpressions": []
   }
 }

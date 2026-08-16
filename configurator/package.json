@@ -1,6 +1,6 @@
 {
   "name": "core-builds-configurator",
-  "version": "2.94.0",
+  "version": "2.95.0",
   "private": true,
   "type": "module",
   "scripts": {
