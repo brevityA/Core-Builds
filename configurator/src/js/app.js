@@ -13,6 +13,7 @@ import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../d
 import { hasTmdbCredentials, bandwidthCapMbps, templateInput } from '../core/template-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-policies.js';
 import { sortPolicy } from '../core/sort-policy.js';
+import { rankedSelPolicy } from '../core/ranked-sel-policy.js';
 import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
 import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
 import { generateTemplate } from '../core/generate-template.js';
@@ -34,7 +35,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.94';
+const CONFIGURATOR_VERSION = '2.95';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -3757,6 +3758,21 @@ function eses() {
   return out;
 }
 
+/**
+ * Ranked stream expressions — the additive score layer, and the only writer of
+ * `streamExpressionScore`. Without it AIOStreams leaves that field unset, so the score sort key,
+ * the Adaptive Score Floor and every `rseMatched()` guard are stripped by
+ * output-profile-policy.js before the config ships. The stable and balanced profiles clear this
+ * array again on purpose, which keeps scoring to the advanced and labs profiles.
+ */
+function rses() {
+  if (S.service === 'http' || S.service === 'p2p') return [];
+  return rankedSelPolicy(templateInput(S), {
+    dv: DEVICE_DV_SAFE.has(S.device),
+    limitedAudio: S.audio === 'limited' || DEVICE_FORCE_LIMITED_AUDIO.has(S.device),
+  });
+}
+
 function pses() {
   const out = [], res = S.resolution, dev = S.device, dv = DEVICE_DV_SAFE.has(dev), supportsAv1 = DEVICE_AV1_SAFE.has(dev), codecExpr = supportsAv1 ? "/* Codec Efficiency Booster */ encode(streams,'HEVC','AV1')" : "/* Codec Efficiency Booster */ encode(streams,'HEVC')";
   const pinLQ = { enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" };
@@ -3865,6 +3881,7 @@ function build() {
       }] : [])
     ],
     preferredStreamExpressions: pses(),
+    rankedStreamExpressions: rses(),
     dynamicAddonFetching: (function(){ const pool=S.streamPool||'normal', timeout=pool==='max'?10000:pool==='large'?8000:6000, isFree=S.service==='p2p'||S.service==='http', wrap=expr=>isFree?expr:`cached(${expr})`;
       if(S.resolution==='4k'){ const c4k=pool==='max'?25:pool==='large'?15:8; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'2160p')")})>=${c4k} or totalTimeTaken>${timeout}`}; }
       if(S.resolution==='ultrawide'){ return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=15 or count(${wrap("resolution(totalStreams,'2160p')")})>=5 or totalTimeTaken>${timeout}`}; }

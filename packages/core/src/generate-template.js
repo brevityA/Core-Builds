@@ -14,6 +14,7 @@ import { sortPolicy } from './sort-policy.js';
 import { sizePolicy, bitratePolicy } from './filter-policy.js';
 import { addonPolicy, assertAddonPolicy } from './addon-policy.js';
 import { getSelPolicy } from './sel-policy.js';
+import { rankedSelPolicy } from './ranked-sel-policy.js';
 import { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
 import { generateAgeRatingESE } from './agerating.js';
 import { sanitizeAioEnumArrays } from './schema.js';
@@ -714,6 +715,13 @@ export function generateTemplate(rawInput = {}, options = {}) {
       }] : [])
     ],
     preferredStreamExpressions: buildPses(input, deviceAv1Safe, deviceDvSafe, deviceForceLimitedAudio),
+    // Must stay in step with the configurator's rses(): package-equivalence.test.mjs diffs this
+    // output against the Configurator goldens, and an omission here shows up as a sort-key
+    // mismatch rather than a missing feature.
+    rankedStreamExpressions: (input.service === 'http' || input.service === 'p2p') ? [] : rankedSelPolicy(input, {
+      dv: deviceDvSafe.has(input.device),
+      limitedAudio: input.audio === 'limited' || deviceForceLimitedAudio.has(input.device),
+    }),
     dynamicAddonFetching: (function(){ const pool=input.streamPool||'normal', timeout=pool==='max'?10000:pool==='large'?8000:6000, wrap=expr=>isFree?expr:`cached(${expr})`;
       if(input.resolution==='4k'){ const c4k=pool==='max'?25:pool==='large'?15:8; return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'2160p')")})>=${c4k} or totalTimeTaken>${timeout}`}; }
       if(input.resolution==='ultrawide'){ return{enabled:true,condition:`count(${wrap("resolution(totalStreams,'1080p')")})>=15 or count(${wrap("resolution(totalStreams,'2160p')")})>=5 or totalTimeTaken>${timeout}`}; }

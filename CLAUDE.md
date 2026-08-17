@@ -585,6 +585,33 @@ Full `{name, pattern, score}` inline override entries on all active non-Anime te
 - **Why inline:** elfhosted/fortheweak whitelist specific URLs for `syncedRankedRegexUrls` — our GitHub raw URL cannot be whitelisted, so the scored file must be delivered inline
 - **History:** the override layer was silently lost during the v2.8.x slimming — between then and v3.2.0, `regexScore` in sortCriteria was a fleet-wide no-op (all 174 synced Vidhin05 entries carry score 0)
 
+### `rankedStreamExpressions` — the score source (v2.95)
+
+`rankedStreamExpressions` is the **only** writer of `stream.streamExpressionScore` in AIOStreams
+(`packages/core/src/streams/precomputer.ts` zeroes the field, then adds the score of every matching
+entry). PSEs write `streamExpressionMatched` instead, which is ordinal — a stream matches at most
+one PSE and sorts by that tier's index.
+
+**Consequence, and the reason this was added:** with no ranked set, `streamExpressionScore` is unset
+on every stream. `output-profile-policy.js#removeScoreDependentRules` correctly strips the score
+sort key and every score-reading expression in that case — so the **Adaptive Score Floor and all
+`rseMatched()` guards were being deleted from every generated config** between their introduction
+and v2.95. Same shape as the `regexScore` no-op below and the `audioChannel` upstream bug: a
+documented feature sorting on a field nobody filled in.
+
+- Generator: `configurator/src/core/ranked-sel-policy.js`, mirrored to `packages/core/src/` — keep
+  both in step or `cli/tests/package-equivalence.test.mjs` fails on a sort-key mismatch
+- Scores are **additive** across all matching entries, bounded ±1,000,000 by the schema
+- Emitted only for the **advanced** and **labs** output profiles; `stable` and `balanced` clear the
+  array themselves, which keeps their output unchanged
+- Positive factors run +50..+330; penalties reach −200 so the Adaptive Score Floor threshold
+  (`-50 + min(30, daysSinceRelease*0.1)`) has something to cut. **A purely positive score set makes
+  the floor decorative** — pinned by `configurator/tests/ranked-sel-policy.test.mjs`
+- DV and lossless-audio entries are device-gated; scoring a tag the device excludes ranks streams
+  that are filtered out downstream
+- Inline ranked expressions are **not** access-gated — `validateSyncedSelUrls` only checks
+  `synced*StreamExpressionUrls`, so these ship on elfhosted/fortheweak like our inline PSEs
+
 ### `rseMatched()` tier strategy (LABS, v3.2.0)
 Ranked regex entries double as **named matchers** via `rseMatched(streams, ...names)` — score-independent and elfhosted-safe. Used for:
 - Tier-guarded kills: `Bad 4k Bluray` only fires when no `Radarr UHD Bluray T1-T3` / `Remux T1/T2` match exists

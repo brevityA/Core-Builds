@@ -51,8 +51,21 @@ test('shared generator keeps an advanced local policy without synced expressions
   assert.equal(template.config.dynamicAddonFetching.enabled, true);
   assert.equal(template.config.presets.some(preset => preset.type === 'torbox-search'), false);
   assert.deepEqual(template.config.syncedRankedStreamExpressionUrls || [], []);
-  assert.equal((template.config.excludedStreamExpressions || []).some(entry => /streamExpressionScore\s*\(/.test(entry.expression || '')), false);
   assert.ok(template.config.syncedRankedRegexUrls.length > 0);
+
+  // This used to assert that NO expression reads streamExpressionScore, back when nothing wrote
+  // the field and output-profile-policy stripped every score-dependent rule. The advanced
+  // profile now ships a local ranked set, so the score is real and those rules must survive —
+  // the invariant flipped rather than relaxed, so both halves are pinned.
+  const readsScore = cfg => (cfg.excludedStreamExpressions || []).some(e => /streamExpressionScore\s*\(/.test(e.expression || ''));
+  assert.ok(template.config.rankedStreamExpressions.length > 0, 'advanced profile must ship a score source');
+  assert.equal(readsScore(template.config), true, 'score-dependent rules should survive alongside a ranked set');
+
+  const noScoreSource = generateTemplate({
+    service:'p2p', device:'generic', resolution:'1080p', architecture:'standard', outputProfile:'advanced',
+  });
+  assert.equal(noScoreSource.config.rankedStreamExpressions.length, 0, 'p2p ships no ranked set');
+  assert.equal(readsScore(noScoreSource.config), false, 'score-dependent rules must be stripped with no score source');
 });
 
 test('shared advanced generator records its explicit v2.32 compatibility target', () => {
