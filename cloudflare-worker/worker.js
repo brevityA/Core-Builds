@@ -79,6 +79,9 @@ const ALLOWED_HOSTS = new Set([
   'https://aiostreams-stable.forthewizards.uk',
   // WuPlay genie lane: read probes + (post-dev-blessing) profile-sync writes.
   'https://api.wuplay.app',
+  // CoreSpeed lane: the public TorBox speedtest endpoint (GET /v1/api/speedtest)
+  // that powers the tools/speedtest page. No auth, no writes — read-only.
+  'https://api.torbox.app',
 ]);
 
 const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
