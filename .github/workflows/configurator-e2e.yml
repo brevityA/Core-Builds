@@ -50,16 +50,23 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('configurator/package-lock.json') }}
           restore-keys: ${{ runner.os }}-playwright-
 
-      # On a hit the binaries are already present, so only the system libraries
-      # are needed — a much smaller apt transaction than a full --with-deps.
-      # Split rather than always running --with-deps so a cache hit skips the
-      # download entirely instead of re-verifying it.
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+      # Both steps run unconditionally, on purpose.
+      #
+      # An earlier version branched on cache-hit and installed browsers only on a
+      # miss. That trusts the cache to be complete, and a cache entry written from
+      # an interrupted run can hold a partially-downloaded browser — which would
+      # fail at launch, after the install step reported success. Review raised
+      # exactly that.
+      #
+      # `playwright install` is already the right shape for this: it verifies what
+      # is on disk and returns in seconds when the browser is intact, downloading
+      # only what is missing or corrupt. So running it every time costs almost
+      # nothing on a hit, repairs a bad cache entry, and removes any path where
+      # the job reaches the tests without a working browser.
       - name: Install Playwright system dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
 
       - run: npm run test:e2e
       - name: Upload Playwright report on failure
