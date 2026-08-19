@@ -86,6 +86,26 @@ const ALLOWED_HOSTS = new Set([
 
 const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
 
+// Per-host narrowing for the generic proxy lane.
+//
+// By default an allowlisted host is reachable with GET/POST/PATCH on any path,
+// and a caller-supplied Authorization header is forwarded verbatim — the WuPlay
+// device-token lane depends on that. api.torbox.app is a third-party API where
+// users hold their own account keys, and CoreSpeed needs exactly one public
+// read: GET /v1/api/speedtest. Without narrowing, allowlisting the host would
+// turn this worker into an authenticated relay for the whole TorBox API,
+// reachable by anyone (CORS shapes browser responses, it does not gate requests).
+//
+// A host listed here is restricted to the named methods and paths, and never
+// receives a credential.
+const HOST_SCOPES = new Map([
+  ['https://api.torbox.app', {
+    methods: new Set(['GET']),
+    paths: new Set(['/v1/api/speedtest']),
+    stripAuth: true,
+  }],
+]);
+
 const ALLOWED_ORIGINS = new Set([
   'https://brevitya.github.io',
   'http://localhost:3000',
@@ -429,6 +449,17 @@ export default {
       return respond(403, { error: 'host not allowed' });
     }
 
+    // Narrowed hosts get one door, not the whole building. See HOST_SCOPES.
+    const hostScope = HOST_SCOPES.get(host);
+    if (hostScope) {
+      if (!hostScope.methods.has(request.method)) {
+        return respond(405, { error: 'method not allowed for this host' });
+      }
+      if (!hostScope.paths.has(upstreamPath)) {
+        return respond(403, { error: 'path not allowed for this host' });
+      }
+    }
+
     // Per-IP rate limit on the proxy (open relays to allowed hosts are an amplification risk).
     const proxyIp = getClientIp(request);
     if (!(await rateAllow(env.RATELIMIT, 'proxy', proxyIp, ANALYTICS_PER_MIN * 2, 60))) {
@@ -451,7 +482,11 @@ export default {
 
     const fwdHeaders = { 'Content-Type': request.headers.get('Content-Type') || 'application/json' };
     const auth = request.headers.get('Authorization');
-    if (auth) fwdHeaders['Authorization'] = auth;   // forward-pass only when caller set it (WuPlay device tokens)
+    // Forward-pass only when the caller set it (WuPlay device tokens), and never
+    // to a narrowed host — CoreSpeed's endpoint is public, so a credential
+    // arriving for api.torbox.app is either a mistake or an attempt to use this
+    // worker as a relay. Drop it either way.
+    if (auth && !hostScope?.stripAuth) fwdHeaders['Authorization'] = auth;
     const upstreamReq = new Request(upstreamUrl, {
       method: request.method,
       headers: fwdHeaders,

@@ -286,3 +286,65 @@ test('all JSON/paste/proxy responses carry nosniff + no-referrer', async () => {
   assert.equal(read.headers.get('X-Content-Type-Options'), 'nosniff');
   assert.equal(read.headers.get('Referrer-Policy'), 'no-referrer');
 });
+
+// --- CoreSpeed lane: api.torbox.app is narrowed to one public read ---------
+//
+// Allowlisting a host normally opens GET/POST/PATCH on any path with the
+// caller's Authorization forwarded. api.torbox.app is a third-party API where
+// users hold account keys, so it is scoped to GET /v1/api/speedtest with no
+// credential. These four tests are the reason that scoping cannot quietly
+// regress: one proves the door opens, three prove it stays shut.
+
+const TORBOX = encodeURIComponent('https://api.torbox.app');
+
+test('CoreSpeed: GET /v1/api/speedtest reaches api.torbox.app', async () => {
+  let upstreamUrl;
+  global.fetch = async (input, init) => {
+    const r = input instanceof Request ? input : new Request(input, init);
+    upstreamUrl = r.url;
+    return new Response('{"data":[]}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const res = await worker.fetch(new Request(
+    `https://w.example/proxy/v1/api/speedtest?host=${TORBOX}&test_length=short`
+  ), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, {});
+  assert.equal(res.status, 200);
+  assert.match(upstreamUrl, /^https:\/\/api\.torbox\.app\/v1\/api\/speedtest/);
+});
+
+test('CoreSpeed: a non-speedtest path on api.torbox.app is refused', async () => {
+  let reached = false;
+  global.fetch = async () => { reached = true; return new Response('{}', { status: 200 }); };
+  const res = await worker.fetch(new Request(
+    `https://w.example/proxy/v1/api/torrents/mylist?host=${TORBOX}`
+  ), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, {});
+  assert.equal(res.status, 403);
+  assert.equal(reached, false, 'the request must not reach TorBox at all');
+});
+
+test('CoreSpeed: a write method on api.torbox.app is refused', async () => {
+  let reached = false;
+  global.fetch = async () => { reached = true; return new Response('{}', { status: 200 }); };
+  for (const method of ['POST', 'PATCH']) {
+    const res = await worker.fetch(new Request(
+      `https://w.example/proxy/v1/api/speedtest?host=${TORBOX}`,
+      { method, headers: { 'Content-Type': 'application/json' }, body: '{}' }
+    ), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, {});
+    assert.equal(res.status, 405, `${method} must be refused`);
+  }
+  assert.equal(reached, false, 'no write may reach TorBox');
+});
+
+test('CoreSpeed: an Authorization header is never relayed to api.torbox.app', async () => {
+  let upstreamHeaders;
+  global.fetch = async (input, init) => {
+    const r = input instanceof Request ? input : new Request(input, init);
+    upstreamHeaders = Object.fromEntries(r.headers);
+    return new Response('{"data":[]}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const res = await worker.fetch(new Request(
+    `https://w.example/proxy/v1/api/speedtest?host=${TORBOX}`,
+    { headers: { Authorization: 'Bearer user-torbox-key' } }
+  ), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, {});
+  assert.equal(res.status, 200);
+  assert.equal(upstreamHeaders.authorization, undefined, 'the key must be dropped, not relayed');
+});

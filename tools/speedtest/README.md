@@ -13,7 +13,17 @@ A client-side speed test for [TorBox](https://torbox.app)'s Hyperdrive CDN, buil
 - **Exports** — copy a Markdown report, or download CSV / JSON.
 - **Modes** — Burst (5–20 s per node), Quick (100 MB file), Full (1 GB file) · 1–8 streams per node · scope: all / closest-8 / closest-only · hard 12 GB data budget · instant Stop.
 
-No API key, no backend, no tracking — everything runs in the browser.
+No API key, and no Core Builds backend, account, or analytics — measurement runs
+entirely in your browser and results stay in `localStorage`.
+
+Two requests do leave your machine besides the CDN downloads themselves, and both
+disclose your IP address to a third party the same way any web request does:
+
+- **`ipapi.co`** — called once to place your approximate location on the map. Skip
+  it by declining, or ignore the map; CoreSpeed falls back to your closest CDN node.
+- **The Core Builds worker proxy** — used only to fetch the public CDN list, because
+  TorBox's API sends no CORS header. It forwards one `GET /v1/api/speedtest` and
+  nothing else, never receives a credential, and logs no request contents.
 
 ## How it gets the CDN list
 
