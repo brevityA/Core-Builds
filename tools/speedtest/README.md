@@ -29,17 +29,27 @@ disclose your IP address to a third party the same way any web request does:
 
 TorBox's speedtest API (`https://api.torbox.app/v1/api/speedtest`) doesn't send `Access-Control-Allow-Origin`, so browsers can't call it directly. CoreSpeed falls back in order:
 
-1. **Core Builds worker proxy** — `GET /proxy/v1/api/speedtest?host=https://api.torbox.app&test_length=short` against the suite's Cloudflare Worker (`core-builds-cors-proxy.tlorenzato26.workers.dev`). **Requires the worker redeploy below** — until then this 403s.
+1. **Core Builds worker proxy** — `GET /proxy/v1/api/speedtest?host=https://api.torbox.app&test_length=short` against the suite's Cloudflare Worker. Live since 19 Aug 2026 and verified against the deployed worker: the speedtest read returns the node list, while any other TorBox path or a write method is refused.
 2. **Direct API call** — kept for the day TorBox opens CORS; harmless when it fails.
 3. **Embedded snapshot** — the last known node list (17 nodes, date-stamped in the badge). Results still measure real files on real nodes; only the *directory* can go stale if TorBox renames nodes.
 
-## Deploying the worker change
+## The worker lane
 
-`cloudflare-worker/worker.js` gained one allowlist entry — `https://api.torbox.app` (read-only GET endpoint):
+`cloudflare-worker/worker.js` allows `https://api.torbox.app`, but narrowly. The generic
+proxy lane accepts GET/POST/PATCH on any path and forwards a caller-supplied
+`Authorization` header, which the WuPlay device-token lane needs — applied to a
+third-party API where users hold their own account keys, that would make the worker an
+authenticated relay for the whole of TorBox. So `HOST_SCOPES` restricts this host to
+`GET /v1/api/speedtest` and strips credentials; four tests in `worker.test.js` hold it shut.
+
+Deployment is automatic: `.github/workflows/deploy-worker.yml` fires on any push to `main`
+touching `cloudflare-worker/**`. Note that workflow reports success even when it *skips*
+the deploy for missing secrets, so a green tick is not on its own proof that anything
+shipped — check that the "Deploy to Cloudflare Workers" step actually ran.
 
 ```bash
 cd cloudflare-worker
-npx wrangler deploy          # or: npm run deploy, per the worker README
+npx wrangler deploy          # only needed for a manual/out-of-band deploy
 ```
 
 If you host your own worker instance instead, pass it to the page with `?worker=https://your-proxy.example`.
