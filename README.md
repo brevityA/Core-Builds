@@ -278,6 +278,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
 | [`Filtering/`](https://github.com/brevityA/Core-Builds/tree/main/Filtering) | Core Builds ESEs, PSEs, ISEs — standalone import files |
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
+| [`ticker/`](https://github.com/brevityA/Core-Builds/tree/main/ticker) | Core Line — Android / TV sports & channel RSS ticker |
 | [`Guides/`](https://github.com/brevityA/Core-Builds/tree/main/Guides) | Import guide, troubleshooting, device profiles |
 | [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) | Full version history |
 | [`STATUS.md`](https://github.com/brevityA/Core-Builds/blob/main/STATUS.md) | Live host status |

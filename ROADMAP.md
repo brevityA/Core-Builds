@@ -79,6 +79,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | Premiumize template | Under research — natively supported; European user base |
 | RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results |
 | Live Stream Preview | Under consideration — fetch real streams before deploying |
+| Core Line sports ticker | Shipped in `ticker/` — RSS + scoreboard chyron for Android / TV. Team vs team · channel bugs. Not a player. |
 
 ---
 

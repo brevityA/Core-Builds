@@ -1,0 +1,17 @@
+{
+  "name": "Core Line",
+  "short_name": "Core Line",
+  "description": "Sports and channel ticker for Android, TV, and the web. Team vs team — ESPN, TSN4, SN 3.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
+  "orientation": "any",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "icons/core-line-icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+  ],
+  "categories": ["sports", "news", "utilities"]
+}

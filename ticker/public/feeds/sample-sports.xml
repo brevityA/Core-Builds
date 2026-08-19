@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Core Line · Sample sports &amp; channels</title>
+    <link>https://github.com/brevityA/Core-Builds</link>
+    <description>Example RSS a channel-list app would emit. Paste your own feed in Settings.</description>
+    <item>
+      <title>Maple Leafs vs Canadiens — TSN4, SN 3</title>
+      <description>RDS, SN ONT</description>
+      <category>NHL</category>
+    </item>
+    <item>
+      <title>Lakers vs Celtics</title>
+      <description>ESPN, NBA TV</description>
+    </item>
+    <item>
+      <title>Team vs team epn, tsn4, sn 3</title>
+      <description></description>
+    </item>
+    <item>
+      <title>LIVE Chiefs vs Bills | CBS / NFL Network</title>
+      <description>Prime</description>
+    </item>
+    <item>
+      <title>Arsenal vs Chelsea — Peacock, NBC, DAZN</title>
+      <description>7:30 PM</description>
+    </item>
+    <item>
+      <title>Blue Jays vs Yankees - SN 1 / ESPN / TVA</title>
+      <description>MLB</description>
+    </item>
+    <item>
+      <title>Inter Miami vs LAFC</title>
+      <description>Apple TV+, TSN1</description>
+    </item>
+  </channel>
+</rss>

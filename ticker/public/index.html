@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-theme="core" data-mode="board">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07090d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Core Line">
+  <meta name="description" content="Sports and channel ticker for Android and TV. Team vs team — ESPN, TSN4, SN 3.">
+  <title>Core Line</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/core-line-icon.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-mark" src="./icon.svg" width="42" height="42" alt="">
+        <div class="brand-text">
+          <div class="brand-name"><span>CORE</span> LINE</div>
+          <div class="brand-sub" id="brandSub">Sports &amp; channel ticker</div>
+        </div>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat"><b id="statLive">0</b><span>Live</span></div>
+        <div class="stat"><b id="statUp">0</b><span>Up</span></div>
+        <div class="stat"><b id="statRss">0</b><span>RSS</span></div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn focusable" data-action="refresh" title="Refresh" aria-label="Refresh">↻</button>
+        <button class="icon-btn focusable" data-action="mode" title="Ticker only" aria-label="Ticker only">▬</button>
+        <button class="icon-btn focusable" data-action="settings" title="Settings" aria-label="Settings">⚙</button>
+      </div>
+    </header>
+
+    <nav class="leagues" id="leagues" aria-label="Leagues"></nav>
+
+    <main class="stage" id="stage">
+      <section class="bigclock" id="bigclock" hidden>
+        <div class="bigclock-kicker">CORE LINE</div>
+        <div class="bigclock-time" id="bigTime">00:00</div>
+        <div class="bigclock-date" id="bigDate"></div>
+        <div class="bigclock-next" id="bigNext"></div>
+      </section>
+      <section class="hero" id="hero" hidden></section>
+      <section class="grid" id="grid"></section>
+      <section class="empty" id="empty" hidden>
+        <div class="empty-kicker">No listings yet</div>
+        <h2>Add a sports RSS feed</h2>
+        <p>The three channel apps already publish the slate. Core Line is the reader — a crawl that says <em>Team vs Team · ESPN, TSN4, SN 3</em>.</p>
+        <button class="primary focusable" data-action="settings">Open settings</button>
+      </section>
+    </main>
+
+    <aside class="drawer" id="drawer" hidden>
+      <div class="drawer-panel">
+        <header class="drawer-head">
+          <div>
+            <div class="kicker">Setup</div>
+            <h2>Feeds &amp; ticker</h2>
+          </div>
+          <button class="icon-btn focusable" data-action="close-settings" aria-label="Close">✕</button>
+        </header>
+
+        <section class="block">
+          <h3>Your RSS feeds</h3>
+          <p class="hint">Paste any RSS, Atom, or JSON listing. Channel-list apps, sports blogs, or a homemade XML file all work. Core Line never plays video — it only reads names and channels.</p>
+          <div class="feed-add">
+            <input class="focusable" id="feedUrl" type="url" placeholder="https://example.com/sports.xml" autocomplete="off" spellcheck="false">
+            <input class="focusable" id="feedLabel" type="text" placeholder="Label" maxlength="24">
+            <button class="primary focusable" data-action="add-feed">Add</button>
+          </div>
+          <ul class="feed-list" id="feedList"></ul>
+          <label class="check">
+            <input class="focusable" type="checkbox" id="sampleFeed" checked>
+            <span>Include the bundled sample feed so the crawl is never empty</span>
+          </label>
+        </section>
+
+        <section class="block">
+          <h3>Scoreboards</h3>
+          <div class="chip-grid" id="leagueToggles"></div>
+        </section>
+
+        <section class="block split">
+          <label>Ticker speed
+            <input class="focusable" id="speed" type="range" min="20" max="120" value="52">
+          </label>
+          <label>Favorite teams
+            <input class="focusable" id="favorites" type="text" placeholder="TOR, LAL, KC, ARS">
+          </label>
+        </section>
+
+        <section class="block split">
+          <label class="check"><input class="focusable" type="checkbox" id="showFinals" checked><span>Show finals</span></label>
+          <label class="check"><input class="focusable" type="checkbox" id="wakeLock" checked><span>Keep screen awake</span></label>
+          <label>Theme
+            <select class="focusable" id="theme">
+              <option value="core">Core midnight</option>
+              <option value="broadcast">Broadcast red</option>
+              <option value="stadium">Stadium night</option>
+              <option value="mono">High contrast</option>
+            </select>
+          </label>
+          <label>Clock
+            <select class="focusable" id="clockFmt">
+              <option value="12">12-hour</option>
+              <option value="24">24-hour</option>
+            </select>
+          </label>
+        </section>
+
+        <p class="fineprint">D-pad: move · OK: select · S: settings · T: ticker only · R: refresh · F: fullscreen. This is a TV guide, not a player.</p>
+      </div>
+    </aside>
+
+    <footer class="chyron" id="chyron">
+      <div class="chyron-bug" id="chyronBug">
+        <span class="bug-live" id="bugLive">LIVE</span>
+        <span class="bug-name">LINE</span>
+      </div>
+      <div class="crawl-mask">
+        <div class="crawl" id="crawl">
+          <div class="crawl-seq" id="crawlA"></div>
+          <div class="crawl-seq" id="crawlB" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="chyron-clock" id="clock">00:00</div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
