@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="CoreSpeed — measure real latency and multi-stream throughput to every TorBox Hyperdrive CDN node, live. See which CDN streams best from where you are.">
+<meta name="description" content="CoreSpeed — measure single-connection latency and throughput to every TorBox Hyperdrive CDN node, the same way TorBox's own speedtest does. See which CDN actually streams best from where you are.">
 <title>CoreSpeed — TorBox CDN Speed Test · Core Builds</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cpath d='M22 4 39 14v16L22 40 5 30V14Z' fill='none' stroke='%2300d4ff' stroke-width='2'/%3E%3Cpath d='m22 13 9 9-9 9-9-9Z' fill='%23a78bfa'/%3E%3C/svg%3E">
 <style>
+
 :root{
   --th-bg:#0d1017;--th-card:#151923;--th-card-alt:#111720;
   --th-border:rgba(255,255,255,.06);--th-border-strong:rgba(255,255,255,.12);
@@ -245,6 +246,10 @@ tr.rank-3 .rank-num{color:#d29a6a}
 .export-row .hint{font-size:.62rem;color:var(--th-tx4)}
 .compare-select{background:var(--th-card-alt);border:1px solid var(--th-border-strong);color:var(--th-tx);border-radius:8px;padding:6px 10px;font-size:.68rem;font-weight:600;cursor:pointer}
 .stability-bar{display:inline-block;width:46px;height:5px;border-radius:99px;background:var(--th-card-alt);overflow:hidden;vertical-align:middle;margin-right:6px}
+@media (max-width:640px){
+  .export-row{width:100%}
+  .compare-select{max-width:100%;min-width:0}
+}
 .stability-bar i{display:block;height:100%;border-radius:99px;background:var(--th-green)}
 .reg-spark{display:block}
 
@@ -291,9 +296,11 @@ tr.rank-3 .rank-num{color:#d29a6a}
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 
+
 </style>
 </head>
 <body>
+<div class="wrap">
 <div class="wrap">
 <!-- HEADER BANNER -->
 <header class="hdr-banner">
@@ -324,7 +331,8 @@ tr.rank-3 .rank-num{color:#d29a6a}
     <div class="ctl">
       <label for="modeSel">Test mode</label>
       <select id="modeSel">
-        <option value="burst" selected>⚡ Burst — 10 s per CDN</option>
+        <option value="sequential" selected>🎯 Sequential — accurate (default)</option>
+        <option value="burst">⚡ Burst race — all CDNs at once</option>
         <option value="quick">🚀 Quick — 100 MB file</option>
         <option value="full">🏔 Full — 1 GB file</option>
       </select>
@@ -361,7 +369,7 @@ tr.rank-3 .rank-num{color:#d29a6a}
   </div>
   <div class="data-note">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-    <span id="dataNote">The Full test can move several GB if your line is fast — each CDN is capped, and everything aborts instantly with Stop. Ping uses tiny HEAD requests; downloads use real files served by TorBox's Hyperdrive CDN.</span>
+    <span id="dataNote">Sequential tests ONE node at a time with ONE connection — the same approach as TorBox's own speedtest and the number that matters for playback. ~2–3 min for all 17 nodes; use the scope selector to shorten it.</span>
   </div>
 </section>
 
@@ -399,7 +407,7 @@ tr.rank-3 .rank-num{color:#d29a6a}
     </svg>
     <div class="gauge-readout">
       <div class="gauge-value" id="gaugeValue">0<span class="unit">Mbps</span></div>
-      <div class="gauge-sub"><span>aggregate across all CDNs</span> · <span class="fast" id="gaugeFastest">—</span></div>
+      <div class="gauge-sub"><span id="gaugeSubLbl">aggregate across all CDNs</span> · <span class="fast" id="gaugeFastest">—</span></div>
     </div>
   </div>
   <div class="side-stats">
@@ -427,7 +435,7 @@ tr.rank-3 .rank-num{color:#d29a6a}
     <div class="card-head">
       <div>
         <div class="t">Live CDN race</div>
-        <div class="sub" id="liveSub">Every node downloading simultaneously — ranked in real time.</div>
+        <div class="sub" id="liveSub">One node at a time in Sequential mode — ranked when finished.</div>
       </div>
       <span class="spacer"></span>
       <span class="chip-mini run" id="liveBadge" hidden>● testing</span>
@@ -443,7 +451,7 @@ tr.rank-3 .rank-num{color:#d29a6a}
     <div class="card-head">
       <div>
         <div class="t">Hyperdrive map</div>
-        <div class="sub" id="mapSub">Dot size = sustained speed · colour = rank.</div>
+        <div class="sub" id="mapSub">Dot size = sustained single-connection speed · colour = rank.</div>
       </div>
       <span class="spacer"></span>
       <span class="chip-mini" id="mapYouBadge" hidden>📍 you</span>
@@ -468,6 +476,7 @@ tr.rank-3 .rank-num{color:#d29a6a}
       <button class="btn-ghost" id="copyMdBtn" type="button">⧉ Copy report</button>
       <button class="btn-ghost" id="csvBtn" type="button">↓ CSV</button>
       <button class="btn-ghost" id="jsonBtn" type="button">↓ JSON</button>
+      <button class="btn-ghost" id="diagBtn" type="button" title="Collect a diagnostic report (per-node pings, DNS records, your ISP) to share when results look wrong">⛨ Diagnostics</button>
     </div>
   </div>
   <div class="winner" id="winnerBox"></div>
@@ -512,49 +521,52 @@ tr.rank-3 .rank-num{color:#d29a6a}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 </div>
+
+</div>
 <script>
 /* CoreSpeed — TorBox CDN speed test
- * Client-side only. Endpoint list: Core-Builds worker proxy → direct API → embedded snapshot.
- * Measurements: 3× HEAD pings per node, then sustained multi-stream downloads from
- * TorBox's Hyperdrive CDN test files. History + exports live in localStorage. */
+ * Engine v2 — methodology aligned with TorBox's own speedtest:
+ *  - Default "Sequential" mode tests ONE node at a time with ONE connection (what a
+ *    streaming player actually gets), like TorBox's official test. No cross-node
+ *    contention, no multi-stream latency masking.
+ *  - Burst/Quick/Full are capacity races (all nodes at once, N streams) and are
+ *    clearly labelled as such — their numbers are not used for playback verdicts.
+ *  - Ping = 5 HEAD requests, trimmed mean (drop min & max), matching TorBox's method.
+ * Endpoint list: Core-Builds worker proxy → direct API → embedded snapshot (badged). */
 'use strict';
 
 /* ────────────────────────── Constants ────────────────────────── */
-// Override with ?worker=https://your-proxy.example for a self-hosted CORS proxy.
 const WORKER = (new URLSearchParams(location.search).get('worker') || 'https://core-builds-cors-proxy.tlorenzato26.workers.dev').replace(/\/+$/, '');
 const API_HOST = 'https://api.torbox.app';
-const GEO_API = 'https://ipapi.co/json/';
-const DATA_BUDGET_BYTES = 12 * 1024 * 1024 * 1024;   // hard stop after 12 GB total
+const GEO_API = 'https://ipwho.is/';
+const DATA_BUDGET_BYTES = 12 * 1024 * 1024 * 1024;
 const HISTORY_KEY = 'coreSpeedHistory';
 const HISTORY_MAX = 15;
-const SAMPLE_WINDOW = 240;                            // sparkline samples (~60 s at 250 ms)
+const SAMPLE_WINDOW = 240;
+const SEQ_CAP_MS = 10000;        // per-node sequential measurement cap
+const PING_ROUNDS = 5;           // 5 HEADs, trimmed mean — same as TorBox's site
 
 const REGION_META = {
-  wnam: { label: 'US West',       city: 'Los Angeles',    flag: '🇺🇸' },
-  cnam: { label: 'US Central',    city: 'Chicago',        flag: '🇺🇸' },
-  snam: { label: 'US South',      city: 'Miami',          flag: '🇺🇸' },
-  enam: { label: 'US East',       city: 'New York',       flag: '🇺🇸' },
-  seur: { label: 'South Europe',  city: 'Lisbon',         flag: '🇵🇹' },
-  latm: { label: 'Latin America', city: 'São Paulo',      flag: '🇧🇷' },
-  neur: { label: 'North Europe',  city: 'London',         flag: '🇬🇧' },
-  ceur: { label: 'Central Europe',city: 'Strasbourg',     flag: '🇫🇷' },
-  weur: { label: 'West Europe',   city: 'Amsterdam',      flag: '🇳🇱' },
-  nord: { label: 'Nordics',       city: 'Oslo',           flag: '🇳🇴' },
-  slav: { label: 'East Europe',   city: 'Kyiv',           flag: '🇺🇦' },
-  indi: { label: 'India',         city: 'Mumbai',         flag: '🇮🇳' },
-  zafr: { label: 'South Africa',  city: 'Johannesburg',   flag: '🇿🇦' },
-  apac: { label: 'Asia Pacific',  city: 'Singapore',      flag: '🇸🇬' },
-  japn: { label: 'Japan',         city: 'Tokyo',          flag: '🇯🇵' },
-  hare: { label: 'Bunny CDN',     city: 'Anycast',        flag: '🌐', anycast: true },
-  erth: { label: 'Cloudflare',    city: 'Anycast',        flag: '🌐', anycast: true },
+  wnam: { label: 'US West',       city: 'Los Angeles',    flag: '🇺🇸', net: 'Cloudflare edge' },
+  cnam: { label: 'US Central',    city: 'Chicago',        flag: '🇺🇸', net: 'direct' },
+  snam: { label: 'US South',      city: 'Miami',          flag: '🇺🇸', net: 'direct' },
+  enam: { label: 'US East',       city: 'New York',       flag: '🇺🇸', net: 'direct' },
+  seur: { label: 'South Europe',  city: 'Lisbon',         flag: '🇵🇹', net: 'direct' },
+  latm: { label: 'Latin America', city: 'São Paulo',      flag: '🇧🇷', net: 'direct' },
+  neur: { label: 'North Europe',  city: 'London',         flag: '🇬🇧', net: 'direct' },
+  ceur: { label: 'Central Europe',city: 'Strasbourg',     flag: '🇫🇷', net: 'direct' },
+  weur: { label: 'West Europe',   city: 'Amsterdam',      flag: '🇳🇱', net: 'Cloudflare edge' },
+  nord: { label: 'Nordics',       city: 'Oslo',           flag: '🇳🇴', net: 'direct' },
+  slav: { label: 'East Europe',   city: 'Kyiv',           flag: '🇺🇦', net: 'direct' },
+  indi: { label: 'India',         city: 'Mumbai',         flag: '🇮🇳', net: 'direct' },
+  zafr: { label: 'South Africa',  city: 'Johannesburg',   flag: '🇿🇦', net: 'direct' },
+  apac: { label: 'Asia Pacific',  city: 'Singapore',      flag: '🇸🇬', net: 'direct' },
+  japn: { label: 'Japan',         city: 'Tokyo',          flag: '🇯🇵', net: 'direct' },
+  hare: { label: 'Bunny CDN',     city: 'Anycast',        flag: '🌐', net: 'Bunny edge (LA)' },
+  erth: { label: 'Cloudflare',    city: 'Anycast',        flag: '🌐', net: 'Cloudflare anycast' },
 };
-const ANYCAST = ['hare', 'erth'];
-
-// Fallback snapshot — refreshed from TorBox's API on 2026-08-18. Only used when both
-// live sources fail; the page clearly badges results produced from it.
-const SNAPSHOT = { fetched: '2026-08-18', data: [{"region":"wnam","name":"nexus-125","domain":"https://nexus-125.wnam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-125.wnam.tb-cdn.io/dld/100MB.bin","url_long":"https://nexus-125.wnam.tb-cdn.io/dld/1GB.bin","closest":true,"lat":34.0522,"lng":-118.2437},{"region":"cnam","name":"nexus-090","domain":"https://nexus-090.cnam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-090.cnam.tb-cdn.io/dld/100MB.bin","url_long":"https://nexus-090.cnam.tb-cdn.io/dld/1GB.bin","closest":false,"lat":41.8781,"lng":-87.6298},{"region":"snam","name":"nexus-212","domain":"https://nexus-212.snam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-212.snam.tb-cdn.io/dld/100MB.bin","url_long":"https://nexus-212.snam.tb-cdn.io/dld/1GB.bin","closest":false,"lat":25.7617,"lng":-80.1918},{"region":"enam","name":"nexus-087","domain":"https://nexus-087.enam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-087.enam.tb-cdn.io/dld/100MB.bin","url_long":"https://nexus-087.enam.tb-cdn.io/dld/1GB.bin","closest":false,"lat":40.7128,"lng":-74.006},{"region":"seur","name":"nexus-140","domain":"https://nexus-140.seur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-140.seur.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-140.seur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":38.7167,"lng":-9.1333},{"region":"latm","name":"nexus-083","domain":"https://nexus-083.latm.tb-cdn.cx","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-083.latm.tb-cdn.cx/dld/100MB.bin","url_long":"https://nexus-083.latm.tb-cdn.cx/dld/1GB.bin","closest":false,"lat":-23.5505,"lng":-46.6333},{"region":"neur","name":"nexus-174","domain":"https://nexus-174.neur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-174.neur.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-174.neur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":51.5074,"lng":-0.1278},{"region":"ceur","name":"nexus-067","domain":"https://nexus-067.ceur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-067.ceur.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-067.ceur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":48.5833,"lng":7.75},{"region":"weur","name":"store-068","domain":"https://store-068.weur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://store-068.weur.tb-cdn.st/dld/100MB.bin","url_long":"https://store-068.weur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":52.374,"lng":4.8897},{"region":"hare","name":"bunnycdn","domain":"https://nexus.hare.tb-cdn.earth","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus.hare.tb-cdn.earth/dld/100MB.bin","url_long":"https://nexus.hare.tb-cdn.earth/dld/1GB.bin","closest":false,"lat":0,"lng":0},{"region":"erth","name":"cloudflare","domain":"https://nexus.erth.tb-cdn.earth","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus.erth.tb-cdn.earth/dld/100MB.bin","url_long":"https://nexus.erth.tb-cdn.earth/dld/1GB.bin","closest":false,"lat":0,"lng":0},{"region":"nord","name":"nexus-226","domain":"https://nexus-226.nord.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-226.nord.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-226.nord.tb-cdn.st/dld/1GB.bin","closest":false,"lat":59.9139,"lng":10.7522},{"region":"slav","name":"nexus-077","domain":"https://nexus-077.slav.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-077.slav.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-077.slav.tb-cdn.st/dld/1GB.bin","closest":false,"lat":50.4501,"lng":30.5234},{"region":"indi","name":"nexus-160","domain":"https://nexus-160.indi.tb-cdn.pw","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-160.indi.tb-cdn.pw/dld/100MB.bin","url_long":"https://nexus-160.indi.tb-cdn.pw/dld/1GB.bin","closest":false,"lat":19.076,"lng":72.8777},{"region":"zafr","name":"nexus-211","domain":"https://nexus-211.zafr.tb-cdn.to","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-211.zafr.tb-cdn.to/dld/100MB.bin","url_long":"https://nexus-211.zafr.tb-cdn.to/dld/1GB.bin","closest":false,"lat":-26.2041,"lng":28.0473},{"region":"apac","name":"nexus-118","domain":"https://nexus-118.apac.tb-cdn.pw","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-118.apac.tb-cdn.pw/dld/100MB.bin","url_long":"https://nexus-118.apac.tb-cdn.pw/dld/1GB.bin","closest":false,"lat":1.3521,"lng":103.8198},{"region":"japn","name":"nexus-115","domain":"https://nexus-115.japn.tb-cdn.pw","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-115.japn.tb-cdn.pw/dld/100MB.bin","url_long":"https://nexus-115.japn.tb-cdn.pw/dld/1GB.bin","closest":false,"lat":35.6895,"lng":139.6917}] };
-
-const WORLD_PATH = '"M-67.75 53.85L-65.05 54.70L-69.23 55.50L-72.26 54.50L-74.66 52.84L-71.11 54.07L-69.35 52.52L-67.75 53.85Z M-58.55 51.10L-57.75 51.55L-58.05 51.90L-60.70 52.30L-61.20 51.85L-58.55 51.10Z M70.28 49.71L68.75 49.77L68.94 48.62L70.53 49.06L70.28 49.71Z M145.40 40.79L148.29 40.88L147.91 43.21L146.05 43.55L144.72 41.16L145.40 40.79Z M173.02 40.92L174.25 41.35L172.71 43.37L173.08 43.85L171.45 44.24L170.62 45.91L169.33 46.64L166.68 46.22L167.05 45.11L170.52 43.03L172.10 40.96L172.80 40.49L173.02 40.92Z M174.61 36.16L176.76 37.88L178.52 37.70L177.97 39.17L177.21 39.15L175.24 41.69L174.65 41.28L175.23 40.46L174.90 39.91L173.82 39.51L174.57 38.80L174.70 37.38L172.64 34.53L174.33 35.27L174.61 36.16Z M167.12 22.16L165.47 21.68L164.03 20.11L167.12 22.16Z M178.37 17.34L178.55 18.15L177.38 18.16L178.37 17.34Z M179.36 16.80L178.60 16.64L180.00 16.07L179.36 16.80Z M-179.92 16.50L-179.79 16.02L-179.92 16.50Z M167.84 16.47L167.22 15.89L167.84 16.47Z M167.11 14.93L167.27 15.74L166.63 14.63L167.11 14.93Z M50.06 13.56L50.38 15.71L49.67 15.71L47.10 24.94L45.41 25.60L44.04 24.99L43.25 22.06L44.37 20.07L43.96 17.41L44.45 16.22L46.31 15.78L47.71 14.59L49.19 12.04L50.06 13.56Z M143.56 13.76L143.92 14.55L144.56 14.17L145.37 14.98L146.39 18.96L148.85 20.39L149.68 22.34L150.73 22.40L150.90 23.46L153.14 26.07L153.57 28.11L152.89 31.64L150.33 35.67L150.00 37.43L146.32 39.04L144.88 38.42L145.03 37.90L143.61 38.81L140.64 38.02L139.57 36.14L138.12 35.61L138.21 34.38L136.83 35.26L137.81 32.90L135.99 34.89L134.27 32.62L131.33 31.50L126.15 32.22L124.22 32.96L123.66 33.89L119.89 33.98L118.02 35.06L115.03 34.20L115.71 33.26L115.69 31.61L113.34 26.12L113.78 26.55L113.44 25.62L114.23 26.30L113.39 24.38L114.15 21.76L114.23 22.52L116.71 20.70L120.86 19.68L123.01 16.41L123.86 17.07L123.50 16.60L125.69 14.23L127.07 13.82L128.36 14.87L129.62 14.97L130.62 12.54L132.58 12.11L131.82 11.27L132.36 11.13L135.30 12.25L136.49 11.86L136.95 12.35L135.50 15.00L140.22 17.71L141.27 16.39L141.69 12.41L142.52 10.67L143.56 13.76Z M162.12 10.48L162.40 10.83L161.70 10.82L161.32 10.20L162.12 10.48Z M120.72 10.24L118.97 9.56L119.90 9.36L120.72 10.24Z M160.85 9.87L159.70 9.24L160.85 9.87Z M161.68 9.60L160.58 8.32L161.68 9.60Z M124.44 10.14L123.46 10.24L125.09 8.66L127.34 8.40L124.44 10.14Z M117.90 8.10L119.13 8.71L116.74 9.03L117.90 8.10Z M122.90 8.09L122.76 8.65L119.92 8.81L122.90 8.09Z M159.88 8.34L158.21 7.42L159.88 8.34Z M157.54 7.35L156.54 6.60L157.54 7.35Z M108.62 6.78L110.76 6.47L115.71 8.37L114.56 8.75L105.37 6.85L106.05 5.90L108.62 6.78Z M134.72 6.21L134.21 6.90L134.50 5.45L134.72 6.21Z M155.88 6.82L154.51 5.14L155.88 6.82Z M151.98 5.48L150.24 6.32L148.32 5.75L150.14 5.00L150.81 5.46L151.54 4.17L152.34 4.31L151.98 5.48Z M127.25 3.46L125.99 3.18L127.25 3.46Z M130.47 3.09L130.83 3.86L127.90 3.39L128.14 2.84L130.47 3.09Z M153.14 4.50L150.66 2.74L152.24 3.24L153.14 4.50Z M134.14 1.15L134.42 2.77L135.46 3.37L136.29 2.31L138.33 1.70L144.58 3.86L145.98 5.47L147.65 6.08L147.89 6.61L146.97 6.72L147.19 7.39L150.69 10.58L147.91 10.13L146.05 8.07L144.74 7.63L143.29 8.25L143.41 8.98L142.63 9.33L139.13 8.10L137.61 8.41L138.67 7.32L137.93 5.39L133.66 3.54L132.98 4.11L131.99 2.82L133.70 2.21L132.23 2.21L130.52 0.94L132.38 0.37L134.14 1.15Z M125.24 -1.42L123.69 -0.24L120.18 -0.24L120.04 0.52L120.94 1.41L123.34 0.62L121.51 1.90L123.16 5.34L122.24 5.28L122.72 4.46L121.49 4.57L120.97 2.63L120.31 2.93L120.43 5.53L119.37 5.38L119.50 3.49L118.77 2.80L120.04 -0.57L120.89 -1.31L122.93 -0.88L125.24 -1.42Z M128.69 -1.13L128.10 0.90L127.40 -1.01L127.93 -2.17L128.69 -1.13Z M105.82 5.85L104.71 5.87L102.58 4.22L98.60 -1.82L95.29 -5.48L97.48 -5.25L100.64 -2.10L101.66 -2.08L103.84 -0.10L103.44 0.71L106.11 3.06L105.82 5.85Z M117.88 -1.83L119.00 -0.90L117.81 -0.78L117.52 0.80L116.56 1.49L116.15 4.01L110.22 2.93L109.09 0.46L109.07 -1.34L109.66 -2.01L111.17 -1.85L111.37 -2.70L113.00 -3.10L116.73 -6.92L119.18 -5.41L117.31 -3.23L117.88 -1.83Z M126.38 -8.41L126.54 -7.19L126.20 -6.27L125.83 -7.29L125.36 -6.79L125.40 -5.58L124.22 -6.16L124.24 -7.36L123.61 -7.83L121.92 -7.19L123.49 -8.69L123.84 -8.24L125.47 -8.99L125.41 -9.76L126.38 -8.41Z M81.22 -6.20L80.35 -5.97L79.87 -6.76L80.15 -9.82L81.79 -7.52L81.22 -6.20Z M-60.94 -10.11L-61.95 -10.09L-61.10 -10.89L-60.94 -10.11Z M123.98 -10.28L123.00 -9.02L122.38 -9.71L122.95 -10.88L123.50 -10.94L123.34 -10.27L124.08 -11.23L123.98 -10.28Z M118.50 -9.32L117.17 -8.37L119.51 -11.37L119.69 -10.55L118.50 -9.32Z M121.88 -11.89L123.12 -11.58L122.00 -10.44L121.88 -11.89Z M125.50 -12.16L125.78 -11.05L125.01 -11.31L125.28 -10.36L124.80 -10.13L124.30 -11.50L124.88 -11.79L124.27 -12.56L125.50 -12.16Z M121.53 -13.07L121.26 -12.21L120.32 -13.47L121.53 -13.07Z M121.32 -18.50L122.25 -18.48L122.52 -17.09L121.66 -15.93L121.73 -14.33L123.95 -13.78L124.08 -12.54L122.93 -13.55L120.63 -13.86L120.99 -14.53L120.07 -14.97L119.88 -16.36L120.29 -16.03L120.72 -18.51L121.32 -18.50Z M-65.59 -18.23L-67.18 -17.95L-67.24 -18.37L-65.59 -18.23Z M-76.90 -17.87L-78.34 -18.23L-76.20 -17.89L-76.90 -17.87Z M-72.58 -19.87L-69.95 -19.65L-68.32 -18.61L-70.67 -18.43L-71.40 -17.60L-74.46 -18.34L-72.33 -18.67L-73.42 -19.64L-72.58 -19.87Z M110.34 -18.68L108.66 -18.51L108.63 -19.37L110.79 -20.08L110.34 -18.68Z M-155.54 -19.08L-155.86 -20.27L-154.81 -19.51L-155.54 -19.08Z M-156.08 -20.64L-156.71 -20.93L-156.08 -20.64Z M-156.76 -21.18L-157.33 -21.10L-156.76 -21.18Z M-157.65 -21.32L-158.29 -21.58L-157.65 -21.32Z M-159.35 -21.98L-159.80 -22.07L-159.35 -21.98Z M-79.68 -22.77L-74.18 -20.28L-77.76 -19.86L-77.09 -20.41L-78.72 -21.60L-82.17 -22.39L-81.80 -22.64L-84.97 -21.90L-82.27 -23.19L-79.68 -22.77Z M-77.53 -23.76L-78.41 -24.58L-78.19 -25.21L-77.53 -23.76Z M121.18 -22.79L120.75 -21.97L120.11 -23.56L121.50 -25.30L121.95 -25.00L121.18 -22.79Z M-77.82 -26.58L-78.98 -26.79L-77.82 -26.58Z M-77.00 -26.59L-77.17 -25.88L-77.79 -27.04L-77.00 -26.59Z M134.64 -34.15L134.20 -33.20L132.36 -32.99L132.92 -34.06L134.64 -34.15Z M34.58 -35.67L32.98 -34.57L32.26 -35.10L34.58 -35.67Z M23.70 -35.71L26.29 -35.30L24.72 -34.92L23.51 -35.28L23.70 -35.71Z M15.52 -38.23L15.10 -36.62L12.43 -37.61L12.57 -38.13L15.52 -38.23Z M9.21 -41.21L9.81 -40.50L9.67 -39.18L8.81 -38.91L8.16 -40.95L9.21 -41.21Z M140.98 -37.14L140.25 -35.14L137.22 -34.61L135.79 -33.46L135.08 -34.60L130.99 -33.89L132.00 -33.15L131.33 -31.45L130.20 -31.42L130.45 -32.32L129.41 -33.30L132.62 -35.43L135.68 -35.53L136.72 -37.30L137.39 -36.83L139.43 -38.22L139.88 -40.56L141.37 -41.38L141.88 -39.18L140.96 -38.17L140.98 -37.14Z M9.56 -42.15L9.23 -41.38L8.54 -42.26L9.39 -43.01L9.56 -42.15Z M143.91 -44.17L145.32 -44.38L145.54 -43.26L144.06 -42.99L143.18 -42.00L141.61 -42.68L141.07 -41.58L139.96 -41.57L139.82 -42.56L140.31 -43.33L141.38 -43.39L141.97 -45.55L143.91 -44.17Z M-63.66 -46.55L-62.01 -46.44L-62.87 -45.97L-64.39 -46.73L-63.66 -46.55Z M-61.81 -49.11L-64.52 -49.87L-61.81 -49.11Z M-123.51 -48.51L-125.66 -48.83L-128.06 -49.99L-128.36 -50.77L-125.76 -50.30L-123.51 -48.51Z M-56.13 -50.69L-56.80 -49.81L-56.14 -50.15L-55.47 -49.94L-55.82 -49.59L-53.48 -49.25L-53.79 -48.52L-53.09 -48.69L-52.65 -47.54L-53.07 -46.66L-54.18 -46.81L-54.24 -47.75L-55.40 -46.88L-56.00 -46.92L-55.29 -47.39L-56.25 -47.63L-59.27 -47.60L-58.80 -48.25L-59.23 -48.52L-57.36 -50.72L-55.41 -51.59L-56.13 -50.69Z M-132.71 -54.04L-131.75 -54.12L-132.05 -52.98L-131.18 -52.18L-133.05 -53.41L-133.18 -54.17L-132.71 -54.04Z M143.65 -50.75L144.65 -48.98L143.17 -49.31L142.56 -47.86L143.51 -46.14L142.75 -46.74L142.09 -45.97L142.18 -50.95L141.59 -51.94L141.68 -53.30L142.61 -53.76L142.21 -54.23L142.65 -54.37L143.65 -50.75Z M-6.79 -52.26L-9.98 -51.82L-9.17 -52.86L-9.69 -53.88L-6.73 -55.17L-5.66 -54.55L-6.79 -52.26Z M12.69 -55.61L12.09 -54.80L10.90 -55.78L12.37 -56.11L12.69 -55.61Z M-153.01 -57.12L-154.01 -56.73L-154.67 -57.46L-153.23 -57.97L-152.14 -57.59L-153.01 -57.12Z M-3.01 -58.63L-4.07 -57.55L-1.96 -57.68L-3.12 -55.97L-2.09 -55.91L0.47 -52.93L1.68 -52.74L1.05 -51.81L1.45 -51.29L-5.25 -49.96L-5.78 -50.16L-3.41 -51.43L-5.27 -51.99L-4.22 -52.30L-4.58 -53.50L-3.09 -53.40L-2.95 -53.98L-4.84 -54.79L-5.05 -55.78L-5.59 -55.31L-6.15 -56.79L-5.01 -58.63L-3.01 -58.63Z M-165.58 -59.91L-167.46 -60.21L-165.58 -59.91Z M-79.27 -62.16L-79.66 -61.63L-80.36 -62.02L-79.27 -62.16Z M-81.90 -62.71L-83.99 -62.45L-81.90 -62.71Z M-171.73 -63.78L-168.69 -63.30L-169.53 -62.98L-171.73 -63.78Z M-85.16 -65.66L-80.10 -63.73L-80.99 -63.41L-83.11 -64.10L-85.52 -63.05L-85.87 -63.64L-87.22 -63.54L-86.35 -64.04L-85.88 -65.74L-85.16 -65.66Z M-14.51 -66.46L-14.74 -65.81L-13.61 -65.13L-18.66 -63.50L-22.76 -63.96L-21.78 -64.40L-23.96 -64.89L-22.23 -65.38L-24.33 -65.61L-22.13 -66.41L-20.58 -65.73L-14.51 -66.46Z M-75.87 -67.15L-77.24 -67.59L-76.81 -68.15L-75.11 -68.01L-75.87 -67.15Z M-175.01 -66.58L-174.34 -66.34L-174.57 -67.06L-171.86 -66.91L-169.90 -65.98L-172.53 -65.44L-172.96 -64.25L-178.36 -65.39L-178.69 -66.11L-179.88 -65.87L-179.43 -65.40L-180.00 -64.98L-180.00 -68.96L-174.93 -67.21L-175.01 -66.58Z M-95.65 -69.11L-99.80 -69.40L-98.22 -70.14L-95.65 -69.11Z M180.00 -70.83L178.73 -71.10L180.00 -71.52L180.00 -70.83Z M-178.69 -70.89L-180.00 -70.83L-180.00 -71.52L-177.58 -71.27L-178.69 -70.89Z M-90.55 -69.50L-90.55 -68.48L-89.22 -69.26L-88.02 -68.62L-88.32 -67.87L-87.35 -67.20L-85.58 -68.78L-85.52 -69.88L-82.62 -69.66L-81.28 -69.16L-81.96 -68.13L-81.26 -67.60L-83.34 -66.41L-85.77 -66.56L-87.32 -64.78L-89.91 -64.03L-90.77 -62.96L-93.16 -62.02L-94.24 -60.90L-94.68 -58.95L-93.22 -58.78L-92.30 -57.09L-90.90 -57.28L-85.01 -55.30L-82.27 -55.15L-82.12 -53.28L-79.91 -51.21L-78.60 -52.56L-79.83 -54.67L-76.54 -56.53L-77.30 -58.05L-78.52 -58.80L-77.34 -59.85L-78.11 -62.32L-73.84 -62.44L-71.37 -61.14L-69.59 -61.06L-69.29 -58.96L-67.65 -58.21L-64.58 -60.34L-61.40 -56.97L-61.80 -56.34L-57.33 -54.63L-55.76 -53.27L-55.68 -52.15L-60.03 -50.24L-66.40 -50.23L-71.10 -46.82L-68.65 -48.30L-65.06 -49.23L-64.17 -48.74L-65.12 -48.07L-64.47 -46.24L-61.52 -45.88L-60.52 -47.01L-59.80 -45.92L-65.36 -43.55L-66.12 -43.62L-66.16 -44.47L-64.43 -45.29L-67.14 -45.14L-70.69 -43.03L-70.83 -42.34L-69.97 -41.64L-73.71 -40.93L-71.95 -40.93L-73.95 -40.75L-74.91 -38.94L-75.53 -39.50L-75.06 -38.40L-75.94 -37.22L-76.35 -39.15L-76.33 -38.08L-76.96 -38.23L-76.30 -37.92L-75.73 -35.55L-81.34 -31.44L-80.06 -26.88L-80.38 -25.21L-81.71 -25.87L-82.93 -29.10L-84.10 -30.09L-85.11 -29.64L-86.40 -30.40L-89.18 -30.32L-89.22 -29.29L-90.15 -29.12L-93.85 -29.71L-96.59 -28.31L-97.37 -27.38L-97.87 -22.44L-96.29 -19.32L-94.43 -18.14L-92.04 -18.70L-90.77 -19.28L-90.28 -21.00L-87.05 -21.54L-88.93 -15.89L-84.98 -16.00L-83.41 -15.27L-83.81 -11.10L-81.44 -8.79L-79.57 -9.61L-76.84 -8.64L-74.91 -11.08L-73.41 -11.23L-71.75 -12.44L-71.14 -12.11L-71.95 -11.42L-71.70 -9.07L-71.04 -9.86L-71.40 -10.97L-70.16 -11.38L-69.94 -12.16L-68.19 -10.55L-64.89 -10.08L-64.32 -10.64L-61.88 -10.72L-62.73 -10.42L-62.39 -9.95L-60.83 -9.38L-60.67 -8.58L-59.10 -8.00L-57.15 -5.97L-53.96 -5.76L-51.32 -4.20L-49.97 -1.74L-50.39 0.08L-48.62 0.24L-48.58 1.24L-47.82 0.58L-44.91 1.55L-44.58 2.69L-39.98 2.87L-37.22 4.82L-35.60 5.15L-34.73 7.34L-35.13 9.00L-38.67 13.06L-39.27 17.87L-40.94 21.94L-41.99 22.97L-44.65 23.35L-47.65 24.89L-48.50 25.88L-48.89 28.67L-53.81 34.40L-56.22 34.86L-58.43 33.91L-56.79 36.90L-57.75 38.18L-59.23 38.72L-62.34 38.83L-62.15 40.68L-62.75 41.03L-65.12 41.06L-64.98 42.06L-63.46 42.56L-65.18 43.50L-65.57 45.04L-67.29 45.55L-67.58 46.30L-65.64 47.24L-65.99 48.13L-69.14 50.73L-68.15 52.35L-70.85 52.90L-71.01 53.83L-74.95 52.26L-75.61 48.67L-74.13 46.94L-75.64 46.65L-74.69 45.76L-74.35 44.10L-73.24 44.45L-72.72 42.38L-73.39 42.12L-73.70 43.37L-74.33 43.22L-73.22 39.26L-73.59 37.16L-71.44 32.42L-70.16 19.76L-70.37 18.35L-71.46 17.36L-76.01 14.65L-79.76 7.19L-81.25 6.14L-81.41 4.74L-79.77 2.66L-80.97 2.25L-80.93 1.06L-80.09 -0.77L-78.86 -1.38L-77.13 -3.85L-78.18 -8.32L-79.56 -8.93L-80.48 -8.09L-80.00 -7.55L-80.89 -7.22L-81.06 -7.82L-83.51 -8.45L-84.98 -10.09L-85.11 -9.56L-85.66 -9.93L-85.71 -11.09L-87.49 -13.30L-91.23 -13.93L-94.69 -16.20L-96.56 -15.65L-103.50 -18.29L-105.49 -19.95L-105.27 -21.42L-106.03 -22.77L-112.23 -28.95L-113.15 -31.17L-114.78 -31.80L-114.67 -30.16L-109.43 -23.19L-110.03 -22.82L-112.18 -24.74L-112.30 -26.01L-115.06 -27.72L-114.16 -28.57L-115.52 -29.56L-117.30 -33.05L-120.62 -34.61L-124.40 -40.31L-123.90 -45.52L-124.69 -48.18L-123.12 -48.04L-122.59 -47.10L-122.84 -49.00L-127.44 -50.83L-127.85 -52.33L-129.13 -52.76L-134.08 -58.12L-136.63 -58.21L-139.87 -59.54L-147.11 -60.88L-148.22 -60.67L-148.02 -59.98L-151.72 -59.16L-151.41 -60.73L-150.62 -61.28L-154.02 -59.35L-153.29 -58.86L-154.23 -58.15L-158.43 -55.99L-164.79 -54.40L-157.72 -57.57L-157.04 -58.92L-161.97 -58.67L-161.87 -59.63L-163.82 -59.80L-166.12 -61.50L-164.56 -63.15L-160.77 -63.77L-161.52 -64.40L-160.78 -64.79L-164.96 -64.45L-168.11 -65.67L-164.47 -66.58L-161.68 -66.12L-166.76 -68.36L-161.91 -70.33L-156.58 -71.36L-136.50 -68.90L-129.79 -70.19L-129.11 -69.78L-128.14 -70.48L-125.76 -69.48L-124.42 -70.16L-124.29 -69.40L-121.47 -69.80L-113.90 -68.40L-115.30 -67.90L-109.95 -67.98L-108.88 -67.38L-107.79 -67.89L-108.81 -68.31L-108.17 -68.65L-106.15 -68.80L-101.45 -67.65L-98.44 -67.78L-98.56 -68.40L-97.67 -68.58L-96.12 -68.24L-96.13 -67.29L-94.68 -68.06L-94.23 -69.07L-96.47 -70.09L-96.39 -71.19L-95.21 -71.92L-92.88 -71.32L-91.52 -70.19L-92.41 -69.70L-90.55 -69.50Z M-114.17 -73.12L-114.67 -72.65L-112.44 -72.96L-111.05 -72.45L-109.92 -72.96L-108.19 -71.65L-107.69 -72.07L-108.40 -73.09L-106.52 -73.08L-105.40 -72.67L-104.46 -70.99L-100.98 -70.02L-101.09 -69.58L-102.73 -69.50L-102.09 -69.12L-102.43 -68.75L-105.96 -69.18L-113.31 -68.54L-117.34 -69.96L-112.42 -70.37L-117.90 -70.54L-118.43 -70.91L-116.11 -71.31L-119.40 -71.56L-117.87 -72.71L-114.17 -73.12Z M-104.50 -73.42L-105.38 -72.76L-106.94 -73.46L-104.50 -73.42Z M-76.34 -73.10L-79.49 -72.74L-80.88 -73.33L-78.06 -73.65L-76.34 -73.10Z M-86.56 -73.16L-85.77 -72.53L-84.85 -73.34L-82.32 -73.75L-80.60 -72.72L-80.75 -72.06L-77.82 -72.75L-74.10 -71.33L-72.24 -71.56L-68.79 -70.53L-66.97 -69.19L-68.81 -68.72L-61.85 -66.86L-63.92 -65.00L-66.72 -66.39L-68.02 -66.26L-68.14 -65.69L-65.32 -64.38L-64.67 -63.39L-65.01 -62.67L-68.78 -63.75L-66.17 -61.93L-71.02 -62.91L-74.83 -64.68L-77.71 -64.23L-78.56 -64.57L-77.90 -65.31L-73.96 -65.45L-74.29 -65.81L-72.65 -67.28L-72.93 -67.73L-78.96 -70.17L-84.94 -69.97L-88.68 -70.41L-89.51 -70.76L-88.47 -71.22L-89.89 -71.22L-90.21 -72.24L-89.44 -73.13L-85.83 -73.80L-86.56 -73.16Z M-100.36 -73.84L-97.38 -73.76L-98.05 -72.99L-96.54 -72.56L-96.72 -71.66L-99.32 -71.36L-102.50 -72.51L-100.44 -72.71L-101.54 -73.36L-100.36 -73.84Z M143.60 -73.21L139.86 -73.37L142.06 -73.86L143.60 -73.21Z M-93.20 -72.77L-95.41 -72.06L-96.02 -73.44L-94.50 -74.13L-90.51 -73.86L-93.20 -72.77Z M-120.46 -71.40L-123.09 -70.90L-125.93 -71.87L-123.94 -73.68L-124.92 -74.29L-117.56 -74.19L-115.51 -73.48L-119.22 -72.52L-120.46 -71.40Z M150.73 -75.08L146.12 -75.17L150.73 -75.08Z M-93.61 -74.98L-96.82 -74.93L-94.85 -75.65L-93.61 -74.98Z M145.09 -75.56L144.30 -74.82L138.96 -74.61L136.97 -75.26L138.83 -76.14L145.09 -75.56Z M-98.50 -76.72L-97.74 -76.26L-98.16 -75.00L-102.50 -75.56L-102.57 -76.34L-98.50 -76.72Z M-108.21 -76.20L-105.88 -75.97L-105.70 -75.48L-112.22 -74.42L-113.87 -74.72L-111.79 -75.16L-117.71 -75.22L-115.40 -76.48L-109.07 -75.47L-110.50 -76.43L-109.58 -76.79L-108.21 -76.20Z M57.54 -70.72L53.68 -70.76L51.46 -72.01L54.43 -73.63L53.51 -73.75L55.90 -74.63L55.63 -75.08L61.17 -76.25L68.16 -76.94L68.85 -76.54L58.48 -74.31L55.42 -72.37L55.62 -71.54L57.54 -70.72Z M-94.68 -77.10L-91.61 -76.78L-89.19 -75.61L-81.13 -75.71L-79.83 -74.92L-89.76 -74.52L-92.42 -74.84L-93.89 -76.32L-97.12 -76.75L-94.68 -77.10Z M-116.20 -77.65L-117.11 -76.53L-122.85 -76.12L-119.10 -77.51L-116.20 -77.65Z M106.97 -76.97L107.24 -76.48L111.08 -76.71L114.13 -75.85L109.40 -74.18L113.02 -73.98L113.53 -73.34L115.57 -73.75L123.20 -72.97L123.26 -73.74L126.98 -73.57L128.59 -73.04L129.05 -72.40L128.46 -71.98L131.29 -70.79L132.25 -71.84L139.87 -71.49L139.15 -72.42L140.47 -72.85L149.50 -72.20L152.97 -70.84L159.00 -70.87L159.83 -70.45L159.71 -69.72L160.94 -69.44L167.84 -69.58L169.58 -68.69L170.82 -69.01L170.01 -69.65L170.45 -70.10L175.72 -69.88L180.00 -68.96L180.00 -64.98L177.41 -64.61L179.37 -62.98L179.23 -62.30L177.36 -62.52L173.68 -61.65L170.33 -59.88L168.90 -60.57L166.30 -59.79L163.54 -59.87L162.02 -58.24L163.19 -57.62L163.06 -56.16L162.13 -56.12L161.70 -55.29L162.12 -54.86L160.37 -54.34L160.02 -53.20L158.53 -52.96L158.23 -51.94L156.79 -51.01L155.43 -55.38L155.91 -56.77L156.81 -57.83L158.36 -58.06L163.67 -61.14L164.47 -62.55L163.26 -62.47L160.12 -60.54L159.30 -61.77L156.72 -61.43L154.22 -59.76L155.04 -59.15L151.27 -58.78L151.34 -59.50L149.78 -59.66L142.20 -59.04L135.13 -54.73L138.16 -53.76L139.90 -54.19L141.35 -53.09L141.38 -52.24L140.06 -48.45L138.22 -46.31L134.87 -43.40L133.54 -42.81L132.28 -43.28L127.53 -39.76L129.46 -36.78L129.09 -35.08L126.49 -34.39L126.12 -36.73L126.86 -36.89L124.71 -38.11L125.32 -39.55L124.27 -39.93L121.05 -38.90L122.17 -40.42L121.64 -40.95L118.04 -39.20L117.53 -38.74L118.91 -37.45L122.36 -37.45L122.52 -36.93L121.10 -36.65L119.15 -34.91L120.23 -34.36L121.91 -31.69L121.26 -30.68L122.09 -29.83L121.68 -28.23L118.66 -24.55L115.89 -22.78L110.79 -21.40L110.44 -20.34L109.89 -20.28L109.86 -21.40L108.52 -21.72L105.88 -19.75L105.66 -19.06L108.88 -15.28L109.34 -13.43L109.20 -11.67L105.16 -8.60L105.08 -9.92L103.50 -10.63L102.59 -12.19L100.83 -12.63L100.98 -13.41L100.10 -13.41L99.22 -9.24L99.87 -9.21L100.46 -7.43L102.96 -5.52L104.23 -1.29L101.39 -2.76L100.09 -6.46L98.50 -8.38L98.34 -7.79L98.76 -11.44L97.16 -16.93L95.37 -15.71L94.19 -16.04L94.32 -18.21L91.42 -22.77L90.50 -22.81L90.27 -21.84L86.98 -21.50L86.50 -20.15L82.19 -16.56L80.32 -15.90L79.86 -10.36L77.54 -7.97L76.59 -8.90L73.53 -15.99L72.63 -21.36L70.47 -20.88L69.16 -22.09L69.35 -22.84L66.37 -25.43L61.50 -25.08L57.40 -25.74L56.49 -27.14L54.72 -26.48L51.52 -27.87L50.12 -30.15L47.97 -29.98L50.81 -24.75L51.01 -26.01L51.59 -25.80L51.79 -24.02L54.01 -24.12L56.36 -26.40L56.85 -24.24L58.73 -23.57L59.81 -22.31L57.83 -20.24L57.69 -18.94L55.27 -17.23L52.39 -16.38L52.17 -15.60L48.68 -14.00L43.48 -12.64L42.65 -16.77L39.14 -21.29L38.49 -23.69L34.63 -28.06L34.92 -29.50L33.92 -27.65L32.42 -29.85L35.69 -23.93L35.53 -23.10L36.87 -22.00L37.48 -18.61L38.41 -18.00L39.27 -15.92L43.32 -12.39L42.72 -11.74L44.61 -10.44L51.11 -12.02L51.05 -10.64L47.74 -4.22L40.26 2.57L39.20 4.68L38.80 6.48L39.44 6.84L39.19 8.49L40.48 10.77L40.78 14.69L39.45 16.72L34.79 19.78L35.61 23.71L32.57 25.73L32.20 28.75L28.22 32.77L25.78 33.94L22.57 33.86L19.62 34.82L18.38 34.14L18.22 31.66L15.21 27.09L14.26 22.11L11.79 18.07L11.78 15.79L13.69 10.73L11.92 5.04L8.80 1.11L9.80 -3.07L9.40 -3.73L8.50 -4.77L5.90 -4.26L4.33 -6.27L1.87 -6.14L-1.96 -4.71L-4.65 -5.17L-7.52 -4.34L-9.00 -4.83L-12.43 -7.26L-14.84 -10.88L-16.61 -12.17L-16.71 -13.60L-17.62 -14.73L-16.46 -16.14L-16.15 -18.11L-16.97 -21.89L-14.44 -26.25L-9.56 -29.93L-9.30 -32.56L-6.91 -34.11L-5.93 -35.76L-2.17 -35.17L1.47 -36.61L9.51 -37.35L11.10 -36.90L10.34 -33.79L15.25 -32.27L15.71 -31.38L19.09 -30.27L20.05 -30.99L20.13 -32.24L21.54 -32.84L28.91 -30.87L30.98 -31.56L33.77 -30.97L36.00 -34.64L36.16 -36.65L32.51 -36.11L31.70 -36.64L29.70 -36.14L27.64 -36.66L26.32 -38.21L26.80 -38.99L26.17 -39.46L27.28 -40.42L28.82 -40.46L29.24 -41.22L31.15 -41.09L33.51 -42.02L38.35 -40.95L40.37 -41.01L41.70 -41.96L41.45 -42.65L36.68 -45.24L38.23 -46.24L37.67 -46.64L39.12 -47.26L34.96 -46.27L35.02 -45.65L36.33 -45.11L33.88 -44.36L32.45 -45.33L33.30 -46.08L30.75 -46.58L29.63 -45.04L28.84 -44.91L27.67 -42.58L28.81 -41.05L26.36 -40.15L26.06 -40.82L24.93 -40.95L23.71 -40.69L24.41 -40.13L23.90 -39.96L22.63 -40.26L24.04 -37.66L23.12 -37.92L23.15 -36.42L22.49 -36.41L19.41 -40.25L19.54 -41.72L13.14 -45.74L12.33 -45.38L12.59 -44.09L18.48 -40.17L16.87 -40.44L16.45 -39.80L17.05 -38.90L16.10 -37.99L15.41 -40.05L12.11 -41.70L10.20 -43.92L8.89 -44.37L6.53 -43.13L3.10 -43.08L3.04 -41.89L0.81 -41.01L-0.28 -39.31L0.11 -38.74L-2.15 -36.67L-4.37 -36.68L-5.38 -35.95L-6.52 -36.94L-8.90 -36.87L-8.84 -38.27L-9.53 -38.74L-8.77 -40.76L-9.39 -43.03L-7.98 -43.75L-1.90 -43.42L-1.38 -44.02L-1.19 -46.01L-2.96 -47.57L-4.49 -47.96L-4.59 -48.68L-1.62 -48.64L-1.93 -49.78L-0.99 -49.35L1.34 -50.13L1.64 -50.95L3.83 -51.62L4.71 -53.09L8.12 -53.53L8.80 -54.02L8.12 -55.52L8.54 -57.11L10.58 -57.73L10.25 -56.89L10.91 -56.46L9.65 -55.47L10.94 -54.01L12.52 -54.47L14.12 -53.76L17.62 -54.85L19.66 -54.43L21.27 -55.19L21.58 -57.41L22.52 -57.75L24.12 -57.03L24.43 -58.38L23.34 -59.19L29.12 -60.03L28.07 -60.50L22.87 -59.85L21.32 -60.72L21.06 -62.61L21.54 -63.19L25.40 -65.11L23.90 -66.01L22.18 -65.72L21.21 -65.03L21.37 -64.41L17.85 -62.75L17.12 -61.34L18.79 -60.08L16.83 -58.72L15.88 -56.10L12.94 -55.36L10.36 -59.47L8.38 -58.31L5.67 -58.59L4.99 -61.97L10.53 -64.49L14.76 -67.81L19.18 -69.82L23.02 -70.20L24.55 -71.03L28.17 -71.19L31.29 -70.45L30.01 -70.19L31.10 -69.56L32.13 -69.91L36.51 -69.06L41.06 -67.46L41.13 -66.79L38.38 -66.00L33.18 -66.63L34.81 -65.90L34.94 -64.41L37.01 -63.85L36.52 -64.78L37.18 -65.14L39.59 -64.52L40.44 -64.76L39.76 -65.50L42.09 -66.48L43.95 -66.07L44.53 -66.76L43.45 -68.57L46.25 -68.25L46.82 -67.69L45.56 -67.57L45.56 -67.01L46.35 -66.67L53.72 -68.86L54.47 -68.81L53.49 -68.20L58.80 -68.88L59.94 -68.28L61.08 -68.94L60.03 -69.52L60.55 -69.85L68.51 -68.09L69.18 -68.62L66.93 -69.45L66.69 -71.03L69.20 -72.84L72.59 -72.78L72.80 -72.22L71.85 -71.41L72.79 -70.39L72.56 -69.02L73.67 -68.41L71.28 -66.32L72.42 -66.17L75.05 -67.76L74.47 -68.33L74.94 -68.99L73.60 -69.63L74.40 -70.63L73.10 -71.45L74.89 -72.12L74.66 -72.83L75.68 -72.30L75.29 -71.34L76.36 -71.15L75.90 -71.87L77.58 -72.27L81.50 -71.75L80.51 -73.65L86.82 -73.94L86.01 -74.46L87.17 -75.12L100.76 -76.43L104.35 -77.70L106.07 -77.37L104.71 -77.13L106.97 -76.97Z M-93.84 -77.52L-96.44 -77.83L-93.84 -77.52Z M-110.19 -77.70L-113.53 -77.73L-109.85 -78.00L-110.19 -77.70Z M24.72 -77.85L20.73 -77.68L21.42 -77.94L20.81 -78.25L22.88 -78.45L24.72 -77.85Z M-109.66 -78.60L-112.54 -78.41L-109.66 -78.60Z M-95.83 -78.06L-98.12 -78.08L-98.63 -78.87L-95.56 -78.42L-95.83 -78.06Z M-100.06 -78.32L-99.67 -77.91L-105.18 -78.38L-104.21 -78.68L-105.49 -79.30L-100.06 -78.32Z M105.08 -78.31L99.44 -77.92L102.09 -79.35L105.37 -78.71L105.08 -78.31Z M18.25 -79.70L21.54 -78.96L19.03 -78.56L17.12 -76.81L15.91 -76.77L13.76 -77.38L14.67 -77.74L10.44 -79.65L18.25 -79.70Z M25.45 -80.41L27.41 -80.06L23.02 -79.40L17.37 -80.32L25.45 -80.41Z M51.14 -80.55L47.59 -80.01L46.50 -80.25L47.07 -80.56L44.85 -80.59L51.14 -80.55Z M99.94 -78.88L94.97 -79.04L91.18 -80.34L95.94 -81.25L100.19 -79.78L99.94 -78.88Z M-87.02 -79.66L-85.81 -79.34L-90.80 -78.22L-92.88 -78.34L-93.95 -78.75L-93.15 -79.38L-96.71 -80.16L-94.30 -80.98L-94.74 -81.21L-92.41 -81.26L-87.02 -79.66Z M-68.50 -83.11L-61.85 -82.63L-67.66 -81.50L-65.48 -81.51L-71.18 -79.80L-76.91 -79.32L-75.53 -79.20L-76.22 -79.02L-75.39 -78.53L-79.76 -77.21L-77.89 -76.78L-80.56 -76.18L-89.49 -76.47L-89.62 -76.95L-87.77 -77.18L-88.26 -77.90L-84.98 -77.54L-87.96 -78.37L-85.09 -79.35L-86.93 -80.25L-81.85 -80.46L-87.60 -80.52L-91.59 -81.89L-79.31 -83.13L-68.50 -83.11Z M-27.10 -83.52L-20.85 -82.73L-31.90 -82.20L-22.07 -81.73L-23.17 -81.15L-15.77 -81.91L-12.21 -81.29L-20.05 -80.18L-17.73 -80.13L-19.70 -78.75L-19.67 -77.64L-18.47 -76.99L-21.68 -76.63L-19.83 -76.10L-19.60 -75.25L-20.67 -75.16L-19.37 -74.30L-21.59 -74.22L-20.43 -73.82L-20.76 -73.46L-23.57 -73.31L-22.30 -72.18L-24.79 -72.33L-22.13 -71.47L-21.75 -70.66L-23.54 -70.47L-25.54 -71.43L-25.20 -70.75L-26.36 -70.23L-22.35 -70.13L-27.75 -68.47L-31.78 -68.12L-34.20 -66.68L-39.81 -65.46L-41.19 -63.48L-42.82 -62.68L-42.42 -61.90L-43.38 -60.10L-48.26 -60.86L-51.63 -63.63L-53.97 -67.19L-52.98 -68.36L-51.48 -68.73L-50.87 -69.93L-53.46 -69.28L-54.68 -69.61L-54.36 -70.82L-51.39 -70.57L-55.83 -71.65L-54.72 -72.59L-58.59 -75.52L-61.27 -76.10L-68.50 -76.06L-71.40 -77.01L-66.76 -77.38L-73.30 -78.04L-65.71 -79.39L-65.32 -79.76L-68.02 -80.12L-62.23 -81.32L-62.65 -81.77L-50.39 -82.44L-44.52 -81.66L-46.90 -82.20L-46.76 -82.63L-38.62 -83.55L-27.10 -83.52Z"';
+const SNAPSHOT = { fetched: '2026-08-19', data: [{"region":"wnam","name":"store-039","domain":"https://store-039.wnam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://store-039.wnam.tb-cdn.io/dld/100MB.bin","url_long":"https://store-039.wnam.tb-cdn.io/dld/1GB.bin","closest":true,"lat":34.0522,"lng":-118.2437},{"region":"cnam","name":"nexus-090","domain":"https://nexus-090.cnam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-090.cnam.tb-cdn.io/dld/100MB.bin","url_long":"https://nexus-090.cnam.tb-cdn.io/dld/1GB.bin","closest":false,"lat":41.8781,"lng":-87.6298},{"region":"snam","name":"nexus-212","domain":"https://nexus-212.snam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-212.snam.tb-cdn.io/dld/100MB.bin","url_long":"https://nexus-212.snam.tb-cdn.io/dld/1GB.bin","closest":false,"lat":25.7617,"lng":-80.1918},{"region":"enam","name":"nexus-087","domain":"https://nexus-087.enam.tb-cdn.io","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-087.enam.tb-cdn.io/dld/100MB.bin","url_long":"https://nexus-087.enam.tb-cdn.io/dld/1GB.bin","closest":false,"lat":40.7128,"lng":-74.006},{"region":"seur","name":"nexus-140","domain":"https://nexus-140.seur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-140.seur.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-140.seur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":38.7167,"lng":-9.1333},{"region":"latm","name":"nexus-083","domain":"https://nexus-083.latm.tb-cdn.cx","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-083.latm.tb-cdn.cx/dld/100MB.bin","url_long":"https://nexus-083.latm.tb-cdn.cx/dld/1GB.bin","closest":false,"lat":-23.5505,"lng":-46.6333},{"region":"neur","name":"nexus-174","domain":"https://nexus-174.neur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-174.neur.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-174.neur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":51.5074,"lng":-0.1278},{"region":"ceur","name":"nexus-067","domain":"https://nexus-067.ceur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-067.ceur.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-067.ceur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":48.5833,"lng":7.75},{"region":"weur","name":"store-068","domain":"https://store-068.weur.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://store-068.weur.tb-cdn.st/dld/100MB.bin","url_long":"https://store-068.weur.tb-cdn.st/dld/1GB.bin","closest":false,"lat":52.374,"lng":4.8897},{"region":"hare","name":"bunnycdn","domain":"https://nexus.hare.tb-cdn.earth","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus.hare.tb-cdn.earth/dld/100MB.bin","url_long":"https://nexus.hare.tb-cdn.earth/dld/1GB.bin","closest":false,"lat":0,"lng":0},{"region":"erth","name":"cloudflare","domain":"https://nexus.erth.tb-cdn.earth","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus.erth.tb-cdn.earth/dld/100MB.bin","url_long":"https://nexus.erth.tb-cdn.earth/dld/1GB.bin","closest":false,"lat":0,"lng":0},{"region":"nord","name":"nexus-226","domain":"https://nexus-226.nord.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-226.nord.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-226.nord.tb-cdn.st/dld/1GB.bin","closest":false,"lat":59.9139,"lng":10.7522},{"region":"slav","name":"nexus-077","domain":"https://nexus-077.slav.tb-cdn.st","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-077.slav.tb-cdn.st/dld/100MB.bin","url_long":"https://nexus-077.slav.tb-cdn.st/dld/1GB.bin","closest":false,"lat":50.4501,"lng":30.5234},{"region":"indi","name":"nexus-160","domain":"https://nexus-160.indi.tb-cdn.pw","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-160.indi.tb-cdn.pw/dld/100MB.bin","url_long":"https://nexus-160.indi.tb-cdn.pw/dld/1GB.bin","closest":false,"lat":19.076,"lng":72.8777},{"region":"zafr","name":"nexus-211","domain":"https://nexus-211.zafr.tb-cdn.to","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-211.zafr.tb-cdn.to/dld/100MB.bin","url_long":"https://nexus-211.zafr.tb-cdn.to/dld/1GB.bin","closest":false,"lat":-26.2041,"lng":28.0473},{"region":"apac","name":"nexus-197","domain":"https://nexus-197.apac.tb-cdn.pw","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-197.apac.tb-cdn.pw/dld/100MB.bin","url_long":"https://nexus-197.apac.tb-cdn.pw/dld/1GB.bin","closest":false,"lat":1.3521,"lng":103.8198},{"region":"japn","name":"nexus-115","domain":"https://nexus-115.japn.tb-cdn.pw","path_short":"/dld/100MB.bin","path_long":"/dld/1GB.bin","url":"https://nexus-115.japn.tb-cdn.pw/dld/100MB.bin","url_long":"https://nexus-115.japn.tb-cdn.pw/dld/1GB.bin","closest":false,"lat":35.6895,"lng":139.6917}] };
+const WORLD_PATH = "M-67.75 53.85L-65.05 54.70L-69.23 55.50L-72.26 54.50L-74.66 52.84L-71.11 54.07L-69.35 52.52L-67.75 53.85Z M-58.55 51.10L-57.75 51.55L-58.05 51.90L-60.70 52.30L-61.20 51.85L-58.55 51.10Z M70.28 49.71L68.75 49.77L68.94 48.62L70.53 49.06L70.28 49.71Z M145.40 40.79L148.29 40.88L147.91 43.21L146.05 43.55L144.72 41.16L145.40 40.79Z M173.02 40.92L174.25 41.35L172.71 43.37L173.08 43.85L171.45 44.24L170.62 45.91L169.33 46.64L166.68 46.22L167.05 45.11L170.52 43.03L172.10 40.96L172.80 40.49L173.02 40.92Z M174.61 36.16L176.76 37.88L178.52 37.70L177.97 39.17L177.21 39.15L175.24 41.69L174.65 41.28L175.23 40.46L174.90 39.91L173.82 39.51L174.57 38.80L174.70 37.38L172.64 34.53L174.33 35.27L174.61 36.16Z M167.12 22.16L165.47 21.68L164.03 20.11L167.12 22.16Z M178.37 17.34L178.55 18.15L177.38 18.16L178.37 17.34Z M179.36 16.80L178.60 16.64L180.00 16.07L179.36 16.80Z M-179.92 16.50L-179.79 16.02L-179.92 16.50Z M167.84 16.47L167.22 15.89L167.84 16.47Z M167.11 14.93L167.27 15.74L166.63 14.63L167.11 14.93Z M50.06 13.56L50.38 15.71L49.67 15.71L47.10 24.94L45.41 25.60L44.04 24.99L43.25 22.06L44.37 20.07L43.96 17.41L44.45 16.22L46.31 15.78L47.71 14.59L49.19 12.04L50.06 13.56Z M143.56 13.76L143.92 14.55L144.56 14.17L145.37 14.98L146.39 18.96L148.85 20.39L149.68 22.34L150.73 22.40L150.90 23.46L153.14 26.07L153.57 28.11L152.89 31.64L150.33 35.67L150.00 37.43L146.32 39.04L144.88 38.42L145.03 37.90L143.61 38.81L140.64 38.02L139.57 36.14L138.12 35.61L138.21 34.38L136.83 35.26L137.81 32.90L135.99 34.89L134.27 32.62L131.33 31.50L126.15 32.22L124.22 32.96L123.66 33.89L119.89 33.98L118.02 35.06L115.03 34.20L115.71 33.26L115.69 31.61L113.34 26.12L113.78 26.55L113.44 25.62L114.23 26.30L113.39 24.38L114.15 21.76L114.23 22.52L116.71 20.70L120.86 19.68L123.01 16.41L123.86 17.07L123.50 16.60L125.69 14.23L127.07 13.82L128.36 14.87L129.62 14.97L130.62 12.54L132.58 12.11L131.82 11.27L132.36 11.13L135.30 12.25L136.49 11.86L136.95 12.35L135.50 15.00L140.22 17.71L141.27 16.39L141.69 12.41L142.52 10.67L143.56 13.76Z M162.12 10.48L162.40 10.83L161.70 10.82L161.32 10.20L162.12 10.48Z M120.72 10.24L118.97 9.56L119.90 9.36L120.72 10.24Z M160.85 9.87L159.70 9.24L160.85 9.87Z M161.68 9.60L160.58 8.32L161.68 9.60Z M124.44 10.14L123.46 10.24L125.09 8.66L127.34 8.40L124.44 10.14Z M117.90 8.10L119.13 8.71L116.74 9.03L117.90 8.10Z M122.90 8.09L122.76 8.65L119.92 8.81L122.90 8.09Z M159.88 8.34L158.21 7.42L159.88 8.34Z M157.54 7.35L156.54 6.60L157.54 7.35Z M108.62 6.78L110.76 6.47L115.71 8.37L114.56 8.75L105.37 6.85L106.05 5.90L108.62 6.78Z M134.72 6.21L134.21 6.90L134.50 5.45L134.72 6.21Z M155.88 6.82L154.51 5.14L155.88 6.82Z M151.98 5.48L150.24 6.32L148.32 5.75L150.14 5.00L150.81 5.46L151.54 4.17L152.34 4.31L151.98 5.48Z M127.25 3.46L125.99 3.18L127.25 3.46Z M130.47 3.09L130.83 3.86L127.90 3.39L128.14 2.84L130.47 3.09Z M153.14 4.50L150.66 2.74L152.24 3.24L153.14 4.50Z M134.14 1.15L134.42 2.77L135.46 3.37L136.29 2.31L138.33 1.70L144.58 3.86L145.98 5.47L147.65 6.08L147.89 6.61L146.97 6.72L147.19 7.39L150.69 10.58L147.91 10.13L146.05 8.07L144.74 7.63L143.29 8.25L143.41 8.98L142.63 9.33L139.13 8.10L137.61 8.41L138.67 7.32L137.93 5.39L133.66 3.54L132.98 4.11L131.99 2.82L133.70 2.21L132.23 2.21L130.52 0.94L132.38 0.37L134.14 1.15Z M125.24 -1.42L123.69 -0.24L120.18 -0.24L120.04 0.52L120.94 1.41L123.34 0.62L121.51 1.90L123.16 5.34L122.24 5.28L122.72 4.46L121.49 4.57L120.97 2.63L120.31 2.93L120.43 5.53L119.37 5.38L119.50 3.49L118.77 2.80L120.04 -0.57L120.89 -1.31L122.93 -0.88L125.24 -1.42Z M128.69 -1.13L128.10 0.90L127.40 -1.01L127.93 -2.17L128.69 -1.13Z M105.82 5.85L104.71 5.87L102.58 4.22L98.60 -1.82L95.29 -5.48L97.48 -5.25L100.64 -2.10L101.66 -2.08L103.84 -0.10L103.44 0.71L106.11 3.06L105.82 5.85Z M117.88 -1.83L119.00 -0.90L117.81 -0.78L117.52 0.80L116.56 1.49L116.15 4.01L110.22 2.93L109.09 0.46L109.07 -1.34L109.66 -2.01L111.17 -1.85L111.37 -2.70L113.00 -3.10L116.73 -6.92L119.18 -5.41L117.31 -3.23L117.88 -1.83Z M126.38 -8.41L126.54 -7.19L126.20 -6.27L125.83 -7.29L125.36 -6.79L125.40 -5.58L124.22 -6.16L124.24 -7.36L123.61 -7.83L121.92 -7.19L123.49 -8.69L123.84 -8.24L125.47 -8.99L125.41 -9.76L126.38 -8.41Z M81.22 -6.20L80.35 -5.97L79.87 -6.76L80.15 -9.82L81.79 -7.52L81.22 -6.20Z M-60.94 -10.11L-61.95 -10.09L-61.10 -10.89L-60.94 -10.11Z M123.98 -10.28L123.00 -9.02L122.38 -9.71L122.95 -10.88L123.50 -10.94L123.34 -10.27L124.08 -11.23L123.98 -10.28Z M118.50 -9.32L117.17 -8.37L119.51 -11.37L119.69 -10.55L118.50 -9.32Z M121.88 -11.89L123.12 -11.58L122.00 -10.44L121.88 -11.89Z M125.50 -12.16L125.78 -11.05L125.01 -11.31L125.28 -10.36L124.80 -10.13L124.30 -11.50L124.88 -11.79L124.27 -12.56L125.50 -12.16Z M121.53 -13.07L121.26 -12.21L120.32 -13.47L121.53 -13.07Z M121.32 -18.50L122.25 -18.48L122.52 -17.09L121.66 -15.93L121.73 -14.33L123.95 -13.78L124.08 -12.54L122.93 -13.55L120.63 -13.86L120.99 -14.53L120.07 -14.97L119.88 -16.36L120.29 -16.03L120.72 -18.51L121.32 -18.50Z M-65.59 -18.23L-67.18 -17.95L-67.24 -18.37L-65.59 -18.23Z M-76.90 -17.87L-78.34 -18.23L-76.20 -17.89L-76.90 -17.87Z M-72.58 -19.87L-69.95 -19.65L-68.32 -18.61L-70.67 -18.43L-71.40 -17.60L-74.46 -18.34L-72.33 -18.67L-73.42 -19.64L-72.58 -19.87Z M110.34 -18.68L108.66 -18.51L108.63 -19.37L110.79 -20.08L110.34 -18.68Z M-155.54 -19.08L-155.86 -20.27L-154.81 -19.51L-155.54 -19.08Z M-156.08 -20.64L-156.71 -20.93L-156.08 -20.64Z M-156.76 -21.18L-157.33 -21.10L-156.76 -21.18Z M-157.65 -21.32L-158.29 -21.58L-157.65 -21.32Z M-159.35 -21.98L-159.80 -22.07L-159.35 -21.98Z M-79.68 -22.77L-74.18 -20.28L-77.76 -19.86L-77.09 -20.41L-78.72 -21.60L-82.17 -22.39L-81.80 -22.64L-84.97 -21.90L-82.27 -23.19L-79.68 -22.77Z M-77.53 -23.76L-78.41 -24.58L-78.19 -25.21L-77.53 -23.76Z M121.18 -22.79L120.75 -21.97L120.11 -23.56L121.50 -25.30L121.95 -25.00L121.18 -22.79Z M-77.82 -26.58L-78.98 -26.79L-77.82 -26.58Z M-77.00 -26.59L-77.17 -25.88L-77.79 -27.04L-77.00 -26.59Z M134.64 -34.15L134.20 -33.20L132.36 -32.99L132.92 -34.06L134.64 -34.15Z M34.58 -35.67L32.98 -34.57L32.26 -35.10L34.58 -35.67Z M23.70 -35.71L26.29 -35.30L24.72 -34.92L23.51 -35.28L23.70 -35.71Z M15.52 -38.23L15.10 -36.62L12.43 -37.61L12.57 -38.13L15.52 -38.23Z M9.21 -41.21L9.81 -40.50L9.67 -39.18L8.81 -38.91L8.16 -40.95L9.21 -41.21Z M140.98 -37.14L140.25 -35.14L137.22 -34.61L135.79 -33.46L135.08 -34.60L130.99 -33.89L132.00 -33.15L131.33 -31.45L130.20 -31.42L130.45 -32.32L129.41 -33.30L132.62 -35.43L135.68 -35.53L136.72 -37.30L137.39 -36.83L139.43 -38.22L139.88 -40.56L141.37 -41.38L141.88 -39.18L140.96 -38.17L140.98 -37.14Z M9.56 -42.15L9.23 -41.38L8.54 -42.26L9.39 -43.01L9.56 -42.15Z M143.91 -44.17L145.32 -44.38L145.54 -43.26L144.06 -42.99L143.18 -42.00L141.61 -42.68L141.07 -41.58L139.96 -41.57L139.82 -42.56L140.31 -43.33L141.38 -43.39L141.97 -45.55L143.91 -44.17Z M-63.66 -46.55L-62.01 -46.44L-62.87 -45.97L-64.39 -46.73L-63.66 -46.55Z M-61.81 -49.11L-64.52 -49.87L-61.81 -49.11Z M-123.51 -48.51L-125.66 -48.83L-128.06 -49.99L-128.36 -50.77L-125.76 -50.30L-123.51 -48.51Z M-56.13 -50.69L-56.80 -49.81L-56.14 -50.15L-55.47 -49.94L-55.82 -49.59L-53.48 -49.25L-53.79 -48.52L-53.09 -48.69L-52.65 -47.54L-53.07 -46.66L-54.18 -46.81L-54.24 -47.75L-55.40 -46.88L-56.00 -46.92L-55.29 -47.39L-56.25 -47.63L-59.27 -47.60L-58.80 -48.25L-59.23 -48.52L-57.36 -50.72L-55.41 -51.59L-56.13 -50.69Z M-132.71 -54.04L-131.75 -54.12L-132.05 -52.98L-131.18 -52.18L-133.05 -53.41L-133.18 -54.17L-132.71 -54.04Z M143.65 -50.75L144.65 -48.98L143.17 -49.31L142.56 -47.86L143.51 -46.14L142.75 -46.74L142.09 -45.97L142.18 -50.95L141.59 -51.94L141.68 -53.30L142.61 -53.76L142.21 -54.23L142.65 -54.37L143.65 -50.75Z M-6.79 -52.26L-9.98 -51.82L-9.17 -52.86L-9.69 -53.88L-6.73 -55.17L-5.66 -54.55L-6.79 -52.26Z M12.69 -55.61L12.09 -54.80L10.90 -55.78L12.37 -56.11L12.69 -55.61Z M-153.01 -57.12L-154.01 -56.73L-154.67 -57.46L-153.23 -57.97L-152.14 -57.59L-153.01 -57.12Z M-3.01 -58.63L-4.07 -57.55L-1.96 -57.68L-3.12 -55.97L-2.09 -55.91L0.47 -52.93L1.68 -52.74L1.05 -51.81L1.45 -51.29L-5.25 -49.96L-5.78 -50.16L-3.41 -51.43L-5.27 -51.99L-4.22 -52.30L-4.58 -53.50L-3.09 -53.40L-2.95 -53.98L-4.84 -54.79L-5.05 -55.78L-5.59 -55.31L-6.15 -56.79L-5.01 -58.63L-3.01 -58.63Z M-165.58 -59.91L-167.46 -60.21L-165.58 -59.91Z M-79.27 -62.16L-79.66 -61.63L-80.36 -62.02L-79.27 -62.16Z M-81.90 -62.71L-83.99 -62.45L-81.90 -62.71Z M-171.73 -63.78L-168.69 -63.30L-169.53 -62.98L-171.73 -63.78Z M-85.16 -65.66L-80.10 -63.73L-80.99 -63.41L-83.11 -64.10L-85.52 -63.05L-85.87 -63.64L-87.22 -63.54L-86.35 -64.04L-85.88 -65.74L-85.16 -65.66Z M-14.51 -66.46L-14.74 -65.81L-13.61 -65.13L-18.66 -63.50L-22.76 -63.96L-21.78 -64.40L-23.96 -64.89L-22.23 -65.38L-24.33 -65.61L-22.13 -66.41L-20.58 -65.73L-14.51 -66.46Z M-75.87 -67.15L-77.24 -67.59L-76.81 -68.15L-75.11 -68.01L-75.87 -67.15Z M-175.01 -66.58L-174.34 -66.34L-174.57 -67.06L-171.86 -66.91L-169.90 -65.98L-172.53 -65.44L-172.96 -64.25L-178.36 -65.39L-178.69 -66.11L-179.88 -65.87L-179.43 -65.40L-180.00 -64.98L-180.00 -68.96L-174.93 -67.21L-175.01 -66.58Z M-95.65 -69.11L-99.80 -69.40L-98.22 -70.14L-95.65 -69.11Z M180.00 -70.83L178.73 -71.10L180.00 -71.52L180.00 -70.83Z M-178.69 -70.89L-180.00 -70.83L-180.00 -71.52L-177.58 -71.27L-178.69 -70.89Z M-90.55 -69.50L-90.55 -68.48L-89.22 -69.26L-88.02 -68.62L-88.32 -67.87L-87.35 -67.20L-85.58 -68.78L-85.52 -69.88L-82.62 -69.66L-81.28 -69.16L-81.96 -68.13L-81.26 -67.60L-83.34 -66.41L-85.77 -66.56L-87.32 -64.78L-89.91 -64.03L-90.77 -62.96L-93.16 -62.02L-94.24 -60.90L-94.68 -58.95L-93.22 -58.78L-92.30 -57.09L-90.90 -57.28L-85.01 -55.30L-82.27 -55.15L-82.12 -53.28L-79.91 -51.21L-78.60 -52.56L-79.83 -54.67L-76.54 -56.53L-77.30 -58.05L-78.52 -58.80L-77.34 -59.85L-78.11 -62.32L-73.84 -62.44L-71.37 -61.14L-69.59 -61.06L-69.29 -58.96L-67.65 -58.21L-64.58 -60.34L-61.40 -56.97L-61.80 -56.34L-57.33 -54.63L-55.76 -53.27L-55.68 -52.15L-60.03 -50.24L-66.40 -50.23L-71.10 -46.82L-68.65 -48.30L-65.06 -49.23L-64.17 -48.74L-65.12 -48.07L-64.47 -46.24L-61.52 -45.88L-60.52 -47.01L-59.80 -45.92L-65.36 -43.55L-66.12 -43.62L-66.16 -44.47L-64.43 -45.29L-67.14 -45.14L-70.69 -43.03L-70.83 -42.34L-69.97 -41.64L-73.71 -40.93L-71.95 -40.93L-73.95 -40.75L-74.91 -38.94L-75.53 -39.50L-75.06 -38.40L-75.94 -37.22L-76.35 -39.15L-76.33 -38.08L-76.96 -38.23L-76.30 -37.92L-75.73 -35.55L-81.34 -31.44L-80.06 -26.88L-80.38 -25.21L-81.71 -25.87L-82.93 -29.10L-84.10 -30.09L-85.11 -29.64L-86.40 -30.40L-89.18 -30.32L-89.22 -29.29L-90.15 -29.12L-93.85 -29.71L-96.59 -28.31L-97.37 -27.38L-97.87 -22.44L-96.29 -19.32L-94.43 -18.14L-92.04 -18.70L-90.77 -19.28L-90.28 -21.00L-87.05 -21.54L-88.93 -15.89L-84.98 -16.00L-83.41 -15.27L-83.81 -11.10L-81.44 -8.79L-79.57 -9.61L-76.84 -8.64L-74.91 -11.08L-73.41 -11.23L-71.75 -12.44L-71.14 -12.11L-71.95 -11.42L-71.70 -9.07L-71.04 -9.86L-71.40 -10.97L-70.16 -11.38L-69.94 -12.16L-68.19 -10.55L-64.89 -10.08L-64.32 -10.64L-61.88 -10.72L-62.73 -10.42L-62.39 -9.95L-60.83 -9.38L-60.67 -8.58L-59.10 -8.00L-57.15 -5.97L-53.96 -5.76L-51.32 -4.20L-49.97 -1.74L-50.39 0.08L-48.62 0.24L-48.58 1.24L-47.82 0.58L-44.91 1.55L-44.58 2.69L-39.98 2.87L-37.22 4.82L-35.60 5.15L-34.73 7.34L-35.13 9.00L-38.67 13.06L-39.27 17.87L-40.94 21.94L-41.99 22.97L-44.65 23.35L-47.65 24.89L-48.50 25.88L-48.89 28.67L-53.81 34.40L-56.22 34.86L-58.43 33.91L-56.79 36.90L-57.75 38.18L-59.23 38.72L-62.34 38.83L-62.15 40.68L-62.75 41.03L-65.12 41.06L-64.98 42.06L-63.46 42.56L-65.18 43.50L-65.57 45.04L-67.29 45.55L-67.58 46.30L-65.64 47.24L-65.99 48.13L-69.14 50.73L-68.15 52.35L-70.85 52.90L-71.01 53.83L-74.95 52.26L-75.61 48.67L-74.13 46.94L-75.64 46.65L-74.69 45.76L-74.35 44.10L-73.24 44.45L-72.72 42.38L-73.39 42.12L-73.70 43.37L-74.33 43.22L-73.22 39.26L-73.59 37.16L-71.44 32.42L-70.16 19.76L-70.37 18.35L-71.46 17.36L-76.01 14.65L-79.76 7.19L-81.25 6.14L-81.41 4.74L-79.77 2.66L-80.97 2.25L-80.93 1.06L-80.09 -0.77L-78.86 -1.38L-77.13 -3.85L-78.18 -8.32L-79.56 -8.93L-80.48 -8.09L-80.00 -7.55L-80.89 -7.22L-81.06 -7.82L-83.51 -8.45L-84.98 -10.09L-85.11 -9.56L-85.66 -9.93L-85.71 -11.09L-87.49 -13.30L-91.23 -13.93L-94.69 -16.20L-96.56 -15.65L-103.50 -18.29L-105.49 -19.95L-105.27 -21.42L-106.03 -22.77L-112.23 -28.95L-113.15 -31.17L-114.78 -31.80L-114.67 -30.16L-109.43 -23.19L-110.03 -22.82L-112.18 -24.74L-112.30 -26.01L-115.06 -27.72L-114.16 -28.57L-115.52 -29.56L-117.30 -33.05L-120.62 -34.61L-124.40 -40.31L-123.90 -45.52L-124.69 -48.18L-123.12 -48.04L-122.59 -47.10L-122.84 -49.00L-127.44 -50.83L-127.85 -52.33L-129.13 -52.76L-134.08 -58.12L-136.63 -58.21L-139.87 -59.54L-147.11 -60.88L-148.22 -60.67L-148.02 -59.98L-151.72 -59.16L-151.41 -60.73L-150.62 -61.28L-154.02 -59.35L-153.29 -58.86L-154.23 -58.15L-158.43 -55.99L-164.79 -54.40L-157.72 -57.57L-157.04 -58.92L-161.97 -58.67L-161.87 -59.63L-163.82 -59.80L-166.12 -61.50L-164.56 -63.15L-160.77 -63.77L-161.52 -64.40L-160.78 -64.79L-164.96 -64.45L-168.11 -65.67L-164.47 -66.58L-161.68 -66.12L-166.76 -68.36L-161.91 -70.33L-156.58 -71.36L-136.50 -68.90L-129.79 -70.19L-129.11 -69.78L-128.14 -70.48L-125.76 -69.48L-124.42 -70.16L-124.29 -69.40L-121.47 -69.80L-113.90 -68.40L-115.30 -67.90L-109.95 -67.98L-108.88 -67.38L-107.79 -67.89L-108.81 -68.31L-108.17 -68.65L-106.15 -68.80L-101.45 -67.65L-98.44 -67.78L-98.56 -68.40L-97.67 -68.58L-96.12 -68.24L-96.13 -67.29L-94.68 -68.06L-94.23 -69.07L-96.47 -70.09L-96.39 -71.19L-95.21 -71.92L-92.88 -71.32L-91.52 -70.19L-92.41 -69.70L-90.55 -69.50Z M-114.17 -73.12L-114.67 -72.65L-112.44 -72.96L-111.05 -72.45L-109.92 -72.96L-108.19 -71.65L-107.69 -72.07L-108.40 -73.09L-106.52 -73.08L-105.40 -72.67L-104.46 -70.99L-100.98 -70.02L-101.09 -69.58L-102.73 -69.50L-102.09 -69.12L-102.43 -68.75L-105.96 -69.18L-113.31 -68.54L-117.34 -69.96L-112.42 -70.37L-117.90 -70.54L-118.43 -70.91L-116.11 -71.31L-119.40 -71.56L-117.87 -72.71L-114.17 -73.12Z M-104.50 -73.42L-105.38 -72.76L-106.94 -73.46L-104.50 -73.42Z M-76.34 -73.10L-79.49 -72.74L-80.88 -73.33L-78.06 -73.65L-76.34 -73.10Z M-86.56 -73.16L-85.77 -72.53L-84.85 -73.34L-82.32 -73.75L-80.60 -72.72L-80.75 -72.06L-77.82 -72.75L-74.10 -71.33L-72.24 -71.56L-68.79 -70.53L-66.97 -69.19L-68.81 -68.72L-61.85 -66.86L-63.92 -65.00L-66.72 -66.39L-68.02 -66.26L-68.14 -65.69L-65.32 -64.38L-64.67 -63.39L-65.01 -62.67L-68.78 -63.75L-66.17 -61.93L-71.02 -62.91L-74.83 -64.68L-77.71 -64.23L-78.56 -64.57L-77.90 -65.31L-73.96 -65.45L-74.29 -65.81L-72.65 -67.28L-72.93 -67.73L-78.96 -70.17L-84.94 -69.97L-88.68 -70.41L-89.51 -70.76L-88.47 -71.22L-89.89 -71.22L-90.21 -72.24L-89.44 -73.13L-85.83 -73.80L-86.56 -73.16Z M-100.36 -73.84L-97.38 -73.76L-98.05 -72.99L-96.54 -72.56L-96.72 -71.66L-99.32 -71.36L-102.50 -72.51L-100.44 -72.71L-101.54 -73.36L-100.36 -73.84Z M143.60 -73.21L139.86 -73.37L142.06 -73.86L143.60 -73.21Z M-93.20 -72.77L-95.41 -72.06L-96.02 -73.44L-94.50 -74.13L-90.51 -73.86L-93.20 -72.77Z M-120.46 -71.40L-123.09 -70.90L-125.93 -71.87L-123.94 -73.68L-124.92 -74.29L-117.56 -74.19L-115.51 -73.48L-119.22 -72.52L-120.46 -71.40Z M150.73 -75.08L146.12 -75.17L150.73 -75.08Z M-93.61 -74.98L-96.82 -74.93L-94.85 -75.65L-93.61 -74.98Z M145.09 -75.56L144.30 -74.82L138.96 -74.61L136.97 -75.26L138.83 -76.14L145.09 -75.56Z M-98.50 -76.72L-97.74 -76.26L-98.16 -75.00L-102.50 -75.56L-102.57 -76.34L-98.50 -76.72Z M-108.21 -76.20L-105.88 -75.97L-105.70 -75.48L-112.22 -74.42L-113.87 -74.72L-111.79 -75.16L-117.71 -75.22L-115.40 -76.48L-109.07 -75.47L-110.50 -76.43L-109.58 -76.79L-108.21 -76.20Z M57.54 -70.72L53.68 -70.76L51.46 -72.01L54.43 -73.63L53.51 -73.75L55.90 -74.63L55.63 -75.08L61.17 -76.25L68.16 -76.94L68.85 -76.54L58.48 -74.31L55.42 -72.37L55.62 -71.54L57.54 -70.72Z M-94.68 -77.10L-91.61 -76.78L-89.19 -75.61L-81.13 -75.71L-79.83 -74.92L-89.76 -74.52L-92.42 -74.84L-93.89 -76.32L-97.12 -76.75L-94.68 -77.10Z M-116.20 -77.65L-117.11 -76.53L-122.85 -76.12L-119.10 -77.51L-116.20 -77.65Z M106.97 -76.97L107.24 -76.48L111.08 -76.71L114.13 -75.85L109.40 -74.18L113.02 -73.98L113.53 -73.34L115.57 -73.75L123.20 -72.97L123.26 -73.74L126.98 -73.57L128.59 -73.04L129.05 -72.40L128.46 -71.98L131.29 -70.79L132.25 -71.84L139.87 -71.49L139.15 -72.42L140.47 -72.85L149.50 -72.20L152.97 -70.84L159.00 -70.87L159.83 -70.45L159.71 -69.72L160.94 -69.44L167.84 -69.58L169.58 -68.69L170.82 -69.01L170.01 -69.65L170.45 -70.10L175.72 -69.88L180.00 -68.96L180.00 -64.98L177.41 -64.61L179.37 -62.98L179.23 -62.30L177.36 -62.52L173.68 -61.65L170.33 -59.88L168.90 -60.57L166.30 -59.79L163.54 -59.87L162.02 -58.24L163.19 -57.62L163.06 -56.16L162.13 -56.12L161.70 -55.29L162.12 -54.86L160.37 -54.34L160.02 -53.20L158.53 -52.96L158.23 -51.94L156.79 -51.01L155.43 -55.38L155.91 -56.77L156.81 -57.83L158.36 -58.06L163.67 -61.14L164.47 -62.55L163.26 -62.47L160.12 -60.54L159.30 -61.77L156.72 -61.43L154.22 -59.76L155.04 -59.15L151.27 -58.78L151.34 -59.50L149.78 -59.66L142.20 -59.04L135.13 -54.73L138.16 -53.76L139.90 -54.19L141.35 -53.09L141.38 -52.24L140.06 -48.45L138.22 -46.31L134.87 -43.40L133.54 -42.81L132.28 -43.28L127.53 -39.76L129.46 -36.78L129.09 -35.08L126.49 -34.39L126.12 -36.73L126.86 -36.89L124.71 -38.11L125.32 -39.55L124.27 -39.93L121.05 -38.90L122.17 -40.42L121.64 -40.95L118.04 -39.20L117.53 -38.74L118.91 -37.45L122.36 -37.45L122.52 -36.93L121.10 -36.65L119.15 -34.91L120.23 -34.36L121.91 -31.69L121.26 -30.68L122.09 -29.83L121.68 -28.23L118.66 -24.55L115.89 -22.78L110.79 -21.40L110.44 -20.34L109.89 -20.28L109.86 -21.40L108.52 -21.72L105.88 -19.75L105.66 -19.06L108.88 -15.28L109.34 -13.43L109.20 -11.67L105.16 -8.60L105.08 -9.92L103.50 -10.63L102.59 -12.19L100.83 -12.63L100.98 -13.41L100.10 -13.41L99.22 -9.24L99.87 -9.21L100.46 -7.43L102.96 -5.52L104.23 -1.29L101.39 -2.76L100.09 -6.46L98.50 -8.38L98.34 -7.79L98.76 -11.44L97.16 -16.93L95.37 -15.71L94.19 -16.04L94.32 -18.21L91.42 -22.77L90.50 -22.81L90.27 -21.84L86.98 -21.50L86.50 -20.15L82.19 -16.56L80.32 -15.90L79.86 -10.36L77.54 -7.97L76.59 -8.90L73.53 -15.99L72.63 -21.36L70.47 -20.88L69.16 -22.09L69.35 -22.84L66.37 -25.43L61.50 -25.08L57.40 -25.74L56.49 -27.14L54.72 -26.48L51.52 -27.87L50.12 -30.15L47.97 -29.98L50.81 -24.75L51.01 -26.01L51.59 -25.80L51.79 -24.02L54.01 -24.12L56.36 -26.40L56.85 -24.24L58.73 -23.57L59.81 -22.31L57.83 -20.24L57.69 -18.94L55.27 -17.23L52.39 -16.38L52.17 -15.60L48.68 -14.00L43.48 -12.64L42.65 -16.77L39.14 -21.29L38.49 -23.69L34.63 -28.06L34.92 -29.50L33.92 -27.65L32.42 -29.85L35.69 -23.93L35.53 -23.10L36.87 -22.00L37.48 -18.61L38.41 -18.00L39.27 -15.92L43.32 -12.39L42.72 -11.74L44.61 -10.44L51.11 -12.02L51.05 -10.64L47.74 -4.22L40.26 2.57L39.20 4.68L38.80 6.48L39.44 6.84L39.19 8.49L40.48 10.77L40.78 14.69L39.45 16.72L34.79 19.78L35.61 23.71L32.57 25.73L32.20 28.75L28.22 32.77L25.78 33.94L22.57 33.86L19.62 34.82L18.38 34.14L18.22 31.66L15.21 27.09L14.26 22.11L11.79 18.07L11.78 15.79L13.69 10.73L11.92 5.04L8.80 1.11L9.80 -3.07L9.40 -3.73L8.50 -4.77L5.90 -4.26L4.33 -6.27L1.87 -6.14L-1.96 -4.71L-4.65 -5.17L-7.52 -4.34L-9.00 -4.83L-12.43 -7.26L-14.84 -10.88L-16.61 -12.17L-16.71 -13.60L-17.62 -14.73L-16.46 -16.14L-16.15 -18.11L-16.97 -21.89L-14.44 -26.25L-9.56 -29.93L-9.30 -32.56L-6.91 -34.11L-5.93 -35.76L-2.17 -35.17L1.47 -36.61L9.51 -37.35L11.10 -36.90L10.34 -33.79L15.25 -32.27L15.71 -31.38L19.09 -30.27L20.05 -30.99L20.13 -32.24L21.54 -32.84L28.91 -30.87L30.98 -31.56L33.77 -30.97L36.00 -34.64L36.16 -36.65L32.51 -36.11L31.70 -36.64L29.70 -36.14L27.64 -36.66L26.32 -38.21L26.80 -38.99L26.17 -39.46L27.28 -40.42L28.82 -40.46L29.24 -41.22L31.15 -41.09L33.51 -42.02L38.35 -40.95L40.37 -41.01L41.70 -41.96L41.45 -42.65L36.68 -45.24L38.23 -46.24L37.67 -46.64L39.12 -47.26L34.96 -46.27L35.02 -45.65L36.33 -45.11L33.88 -44.36L32.45 -45.33L33.30 -46.08L30.75 -46.58L29.63 -45.04L28.84 -44.91L27.67 -42.58L28.81 -41.05L26.36 -40.15L26.06 -40.82L24.93 -40.95L23.71 -40.69L24.41 -40.13L23.90 -39.96L22.63 -40.26L24.04 -37.66L23.12 -37.92L23.15 -36.42L22.49 -36.41L19.41 -40.25L19.54 -41.72L13.14 -45.74L12.33 -45.38L12.59 -44.09L18.48 -40.17L16.87 -40.44L16.45 -39.80L17.05 -38.90L16.10 -37.99L15.41 -40.05L12.11 -41.70L10.20 -43.92L8.89 -44.37L6.53 -43.13L3.10 -43.08L3.04 -41.89L0.81 -41.01L-0.28 -39.31L0.11 -38.74L-2.15 -36.67L-4.37 -36.68L-5.38 -35.95L-6.52 -36.94L-8.90 -36.87L-8.84 -38.27L-9.53 -38.74L-8.77 -40.76L-9.39 -43.03L-7.98 -43.75L-1.90 -43.42L-1.38 -44.02L-1.19 -46.01L-2.96 -47.57L-4.49 -47.96L-4.59 -48.68L-1.62 -48.64L-1.93 -49.78L-0.99 -49.35L1.34 -50.13L1.64 -50.95L3.83 -51.62L4.71 -53.09L8.12 -53.53L8.80 -54.02L8.12 -55.52L8.54 -57.11L10.58 -57.73L10.25 -56.89L10.91 -56.46L9.65 -55.47L10.94 -54.01L12.52 -54.47L14.12 -53.76L17.62 -54.85L19.66 -54.43L21.27 -55.19L21.58 -57.41L22.52 -57.75L24.12 -57.03L24.43 -58.38L23.34 -59.19L29.12 -60.03L28.07 -60.50L22.87 -59.85L21.32 -60.72L21.06 -62.61L21.54 -63.19L25.40 -65.11L23.90 -66.01L22.18 -65.72L21.21 -65.03L21.37 -64.41L17.85 -62.75L17.12 -61.34L18.79 -60.08L16.83 -58.72L15.88 -56.10L12.94 -55.36L10.36 -59.47L8.38 -58.31L5.67 -58.59L4.99 -61.97L10.53 -64.49L14.76 -67.81L19.18 -69.82L23.02 -70.20L24.55 -71.03L28.17 -71.19L31.29 -70.45L30.01 -70.19L31.10 -69.56L32.13 -69.91L36.51 -69.06L41.06 -67.46L41.13 -66.79L38.38 -66.00L33.18 -66.63L34.81 -65.90L34.94 -64.41L37.01 -63.85L36.52 -64.78L37.18 -65.14L39.59 -64.52L40.44 -64.76L39.76 -65.50L42.09 -66.48L43.95 -66.07L44.53 -66.76L43.45 -68.57L46.25 -68.25L46.82 -67.69L45.56 -67.57L45.56 -67.01L46.35 -66.67L53.72 -68.86L54.47 -68.81L53.49 -68.20L58.80 -68.88L59.94 -68.28L61.08 -68.94L60.03 -69.52L60.55 -69.85L68.51 -68.09L69.18 -68.62L66.93 -69.45L66.69 -71.03L69.20 -72.84L72.59 -72.78L72.80 -72.22L71.85 -71.41L72.79 -70.39L72.56 -69.02L73.67 -68.41L71.28 -66.32L72.42 -66.17L75.05 -67.76L74.47 -68.33L74.94 -68.99L73.60 -69.63L74.40 -70.63L73.10 -71.45L74.89 -72.12L74.66 -72.83L75.68 -72.30L75.29 -71.34L76.36 -71.15L75.90 -71.87L77.58 -72.27L81.50 -71.75L80.51 -73.65L86.82 -73.94L86.01 -74.46L87.17 -75.12L100.76 -76.43L104.35 -77.70L106.07 -77.37L104.71 -77.13L106.97 -76.97Z M-93.84 -77.52L-96.44 -77.83L-93.84 -77.52Z M-110.19 -77.70L-113.53 -77.73L-109.85 -78.00L-110.19 -77.70Z M24.72 -77.85L20.73 -77.68L21.42 -77.94L20.81 -78.25L22.88 -78.45L24.72 -77.85Z M-109.66 -78.60L-112.54 -78.41L-109.66 -78.60Z M-95.83 -78.06L-98.12 -78.08L-98.63 -78.87L-95.56 -78.42L-95.83 -78.06Z M-100.06 -78.32L-99.67 -77.91L-105.18 -78.38L-104.21 -78.68L-105.49 -79.30L-100.06 -78.32Z M105.08 -78.31L99.44 -77.92L102.09 -79.35L105.37 -78.71L105.08 -78.31Z M18.25 -79.70L21.54 -78.96L19.03 -78.56L17.12 -76.81L15.91 -76.77L13.76 -77.38L14.67 -77.74L10.44 -79.65L18.25 -79.70Z M25.45 -80.41L27.41 -80.06L23.02 -79.40L17.37 -80.32L25.45 -80.41Z M51.14 -80.55L47.59 -80.01L46.50 -80.25L47.07 -80.56L44.85 -80.59L51.14 -80.55Z M99.94 -78.88L94.97 -79.04L91.18 -80.34L95.94 -81.25L100.19 -79.78L99.94 -78.88Z M-87.02 -79.66L-85.81 -79.34L-90.80 -78.22L-92.88 -78.34L-93.95 -78.75L-93.15 -79.38L-96.71 -80.16L-94.30 -80.98L-94.74 -81.21L-92.41 -81.26L-87.02 -79.66Z M-68.50 -83.11L-61.85 -82.63L-67.66 -81.50L-65.48 -81.51L-71.18 -79.80L-76.91 -79.32L-75.53 -79.20L-76.22 -79.02L-75.39 -78.53L-79.76 -77.21L-77.89 -76.78L-80.56 -76.18L-89.49 -76.47L-89.62 -76.95L-87.77 -77.18L-88.26 -77.90L-84.98 -77.54L-87.96 -78.37L-85.09 -79.35L-86.93 -80.25L-81.85 -80.46L-87.60 -80.52L-91.59 -81.89L-79.31 -83.13L-68.50 -83.11Z M-27.10 -83.52L-20.85 -82.73L-31.90 -82.20L-22.07 -81.73L-23.17 -81.15L-15.77 -81.91L-12.21 -81.29L-20.05 -80.18L-17.73 -80.13L-19.70 -78.75L-19.67 -77.64L-18.47 -76.99L-21.68 -76.63L-19.83 -76.10L-19.60 -75.25L-20.67 -75.16L-19.37 -74.30L-21.59 -74.22L-20.43 -73.82L-20.76 -73.46L-23.57 -73.31L-22.30 -72.18L-24.79 -72.33L-22.13 -71.47L-21.75 -70.66L-23.54 -70.47L-25.54 -71.43L-25.20 -70.75L-26.36 -70.23L-22.35 -70.13L-27.75 -68.47L-31.78 -68.12L-34.20 -66.68L-39.81 -65.46L-41.19 -63.48L-42.82 -62.68L-42.42 -61.90L-43.38 -60.10L-48.26 -60.86L-51.63 -63.63L-53.97 -67.19L-52.98 -68.36L-51.48 -68.73L-50.87 -69.93L-53.46 -69.28L-54.68 -69.61L-54.36 -70.82L-51.39 -70.57L-55.83 -71.65L-54.72 -72.59L-58.59 -75.52L-61.27 -76.10L-68.50 -76.06L-71.40 -77.01L-66.76 -77.38L-73.30 -78.04L-65.71 -79.39L-65.32 -79.76L-68.02 -80.12L-62.23 -81.32L-62.65 -81.77L-50.39 -82.44L-44.52 -81.66L-46.90 -82.20L-46.76 -82.63L-38.62 -83.55L-27.10 -83.52Z";
 
 /* ────────────────────────── Small helpers ────────────────────────── */
 const $ = id => document.getElementById(id);
@@ -564,21 +576,22 @@ function fmtMBps(v) { if (!isFinite(v)) return '—'; return (v / 8).toFixed(1) 
 function fmtMs(v) { return v == null || !isFinite(v) ? '—' : Math.round(v) + ' ms'; }
 function fmtBytes(b) { if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB'; if (b < 1024 * 1024 * 1024) return (b / (1024 * 1024)).toFixed(1) + ' MB'; return (b / (1024 * 1024 * 1024)).toFixed(2) + ' GB'; }
 function now() { return performance.now(); }
-function toast(msg, ms = 2600) {
+function mean(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : NaN; }
+function toast(msg, ms = 3200) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms);
 }
 if (!AbortSignal.timeout) { AbortSignal.timeout = ms => { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; }; }
 
 /* ────────────────────────── State ────────────────────────── */
-let servers = [];               // normalized: {region,name,urlShort,urlLong,closest,lat,lng}
-let endpointsSource = null;     // 'worker' | 'direct' | 'snapshot'
-let run = null;                 // active run state
-let results = null;             // final results for the last run
-let compareRun = null;          // history entry selected for comparison
+let servers = [];
+let endpointsSource = null;
+let run = null;
+let results = null;
+let compareRun = null;
 let history = loadHistory();
 let mapBuilt = false;
-let geo = null;                 // {lat,lng,label}
+let geo = null;
 
 /* ────────────────────────── Theme ────────────────────────── */
 function applyTheme(t) {
@@ -609,17 +622,18 @@ async function trySource(src, length) {
   return null;
 }
 
-function normalize(item, short, longPath) {
+function normalize(item, longPath) {
   if (!item || !item.url || !/^https:\/\//i.test(item.url)) return null;
   const region = /^[a-z]{2,8}$/i.test(item.region || '') ? item.region.toLowerCase() : null;
   if (!region) return null;
   const lat = item.coordinates && isFinite(item.coordinates.lat) ? Number(item.coordinates.lat) : null;
   const lng = item.coordinates && isFinite(item.coordinates.lng) ? Number(item.coordinates.lng) : null;
-  const meta = REGION_META[region] || { label: region.toUpperCase(), city: '—', flag: '🌐' };
+  const meta = REGION_META[region] || { label: region.toUpperCase(), city: '—', flag: '🌐', net: 'direct' };
+  const short = String(item.url);
   return {
     region, name: String(item.name || item.domain || '').slice(0, 40),
-    urlShort: String(item.url),
-    urlLong: longPath ? String(item.url).replace(/\/dld\/[^/]+$/i, longPath) : String(item.url).replace(/\/dld\/[^/]+$/i, '/dld/1GB.bin'),
+    urlShort: short,
+    urlLong: longPath ? short.replace(/\/dld\/[^/]+$/i, longPath) : short.replace(/\/dld\/[^/]+$/i, '/dld/1GB.bin'),
     closest: !!item.closest, lat, lng, meta,
   };
 }
@@ -627,50 +641,46 @@ function normalize(item, short, longPath) {
 async function loadEndpoints() {
   setStatus('loading', 'Loading CDN endpoints…');
   // Sequential fallback chain: worker proxy → direct API → embedded snapshot.
-  // (Sequential keeps the console clean — a parallel direct probe would log a
-  // CORS rejection even when the worker already answered.)
-  let short = null, long = null;
-  short = await trySource('worker', 'short'); long = await trySource('worker', 'long');
+  let short = await trySource('worker', 'short');
+  let long = await trySource('worker', 'long');
   if (!short || !long) {
-    const d1 = short ? short : await trySource('direct', 'short');
-    const d2 = long ? long : await trySource('direct', 'long');
+    const d1 = short || await trySource('direct', 'short');
+    const d2 = long || await trySource('direct', 'long');
     short = short || d1; long = long || d2;
   }
-  let source = null, list = null;
+  let list = null;
   if (short) {
-    source = short.id;
     const longPath = long && long.data[0] && long.data[0].path ? long.data[0].path : null;
     list = short.data.map(s => {
       const l = long ? long.data.find(x => x.region === s.region && x.name === s.name) : null;
-      const item = Object.assign({}, s, l && l.path ? { url: l.url, path: l.path } : {});
-      const n = normalize(item, true, longPath);
+      const n = normalize(s, longPath);
       if (n && l && l.url) n.urlLong = String(l.url);
       return n;
     }).filter(Boolean);
+    endpointsSource = short.id;
   }
-  if (list && list.length >= 5) {
-    servers = list;
-    endpointsSource = source;
-  } else {
-    servers = SNAPSHOT.data.map(s => normalize({
+  if (!list || list.length < 5) {
+    list = SNAPSHOT.data.map(s => normalize({
       region: s.region, name: s.name, url: s.url,
       coordinates: { lat: s.lat, lng: s.lng }, closest: !!s.closest,
-    }, true, s.path_long)).filter(Boolean);
+    }, null)).filter(Boolean);
     endpointsSource = 'snapshot';
   }
+  servers = list;
   const badge = $('endpointBadge');
+  badge.hidden = false;
   if (endpointsSource === 'snapshot') {
-    badge.hidden = false; badge.className = 'endpoint-badge snapshot';
+    badge.className = 'endpoint-badge snapshot';
     badge.textContent = `offline snapshot · ${SNAPSHOT.fetched}`;
     toast('Live endpoint list unreachable — using the embedded snapshot. Redeploy the worker proxy for live updates.');
   } else {
-    badge.hidden = false; badge.className = 'endpoint-badge live';
+    badge.className = 'endpoint-badge live';
     badge.textContent = endpointsSource === 'worker' ? 'live · via worker' : 'live · direct API';
   }
   buildAnycastLegend();
   renderLiveTable();
   $('goBtn').disabled = false;
-  setStatus('ready', `${servers.length} CDN endpoints ready — pick a mode and start.`);
+  setStatus('ready', `${servers.length} CDN endpoints ready — Sequential mode gives playback-accurate results.`);
 }
 
 /* ────────────────────────── Scope ────────────────────────── */
@@ -680,14 +690,15 @@ function selectedServers() {
   const closest = servers.find(s => s.closest) || servers[0];
   if (scope === 'closest') return closest ? [closest] : servers.slice(0, 1);
   if (scope === 'top') {
-    const geo = servers.filter(s => !ANYCAST.includes(s.region));
+    const edge = servers.filter(s => s.meta && s.meta.net !== 'direct');
+    const geo = servers.filter(s => s.meta && s.meta.net === 'direct');
     const sorted = geo.slice().sort((a, b) => haversine(closest, a) - haversine(closest, b));
-    return [...sorted.slice(0, 8), ...servers.filter(s => ANYCAST.includes(s.region))];
+    return [...sorted.slice(0, 8), ...edge];
   }
   return servers.slice();
 }
 function haversine(a, b) {
-  if (a.lat == null || b.lat == null) return Infinity;
+  if (!a || !b || a.lat == null || b.lat == null) return Infinity;
   const R = 6371, dLa = (b.lat - a.lat) * Math.PI / 180, dLo = (b.lng - a.lng) * Math.PI / 180;
   const s = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLo / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
@@ -698,14 +709,14 @@ function setStatus(kind, text) {
   const dot = $('statusDot'), bar = $('statusBar');
   dot.className = 'dot' + (kind === 'running' ? ' running' : kind === 'done' ? ' done' : kind === 'err' ? ' err' : '');
   $('statusText').textContent = text;
-  bar.classList.toggle('err', kind === 'err');
 }
 
 /* ────────────────────────── Test engine ────────────────────────── */
 const MODES = {
-  burst: { label: 'Burst', file: false },
-  quick: { label: 'Quick 100 MB', file: true, capMs: 45000 },
-  full:  { label: 'Full 1 GB', file: true, capMs: 90000 },
+  sequential: { label: 'Sequential · single connection', file: false, single: true },
+  burst:      { label: 'Burst race', file: false, single: false },
+  quick:      { label: 'Quick 100 MB', file: true, single: false },
+  full:       { label: 'Full 1 GB', file: true, single: false },
 };
 
 function buildRun() {
@@ -713,18 +724,19 @@ function buildRun() {
   const selected = selectedServers();
   run = {
     mode,
-    streams: Number($('streamsSel').value),
+    streams: mode === 'sequential' ? 1 : Number($('streamsSel').value),
     burstMs: Number($('durSel').value) * 1000,
-    capMs: MODES[mode].capMs || 0,
+    capMs: mode === 'quick' ? 45000 : mode === 'full' ? 90000 : 0,
     started: null,
+    current: null,
     regions: selected.map(s => ({
-      s, status: 'queued', pings: [], ping: null, jitter: null,
+      s, status: 'queued', pings: [], ping: null, pingMin: null, jitter: null,
       bytes: 0, lastBytes: 0, lastT: 0, ewma: 0, samples: [], instantSamples: [],
-      max: 0, startedT: 0, endT: 0, done: false, err: null, abort: null,
+      max: 0, startedT: 0, endT: 0, done: false, err: null, abort: null, seqOrder: -1,
     })),
-    aggSamples: [], totalBytes: 0, lastTotalBytes: 0, lastTick: 0,
+    aggSamples: [], totalBytes: 0, lastTick: 0,
     peak: 0, peakRegion: null, finished: false, partial: false,
-    tick: null, budgetHit: false,
+    tick: null, budgetHit: false, _done: false,
   };
   results = null;
   $('resultsCard').hidden = true;
@@ -736,16 +748,16 @@ function startTest() {
   if (!servers.length) { toast('CDN endpoints are not ready yet.'); return; }
   if (run) stopTest(true);
   buildRun();
-  const mode = MODES[run.mode].label;
-  setStatus('running', `Pinging ${run.regions.length} CDNs — then downloading with ${run.streams} stream${run.streams > 1 ? 's' : ''} per node (${mode}).`);
-  // The go button doubles as Stop during a run — it must stay enabled.
+  const m = MODES[run.mode];
+  setStatus('running', `Pinging ${run.regions.length} CDNs — then ${m.single ? 'testing each node one at a time with a single connection' : `downloading with ${run.streams} streams per node`}.`);
   $('goBtn').classList.add('stop');
   $('goBtn').querySelector('span').textContent = 'Stop Test';
   $('goBtn').querySelector('svg').outerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
   $('refreshBtn').disabled = true;
   ['modeSel', 'durSel', 'streamsSel', 'scopeSel'].forEach(id => $(id).disabled = true);
   $('liveBadge').hidden = false;
-  $('liveSub').textContent = 'Every node downloading simultaneously — ranked in real time.';
+  $('gaugeSubLbl').textContent = m.single ? 'current CDN · single connection' : 'aggregate across all CDNs';
+  $('liveSub').textContent = m.single ? "One node at a time — single connection, like TorBox's own test." : 'Every node downloading simultaneously — ranked in real time (contended).';
   $('stElapsed').textContent = '0s'; $('stData').textContent = '0 MB';
   $('stDone').textContent = `0/${run.regions.length}`; $('stPeak').textContent = '—';
   resetGauge(); resetSpark();
@@ -763,15 +775,15 @@ function stopTest(fromUI) {
   finishRunFor(rn, fromUI ? 'Stopped — partial results kept.' : null);
 }
 
+/* ── Phase 1: latency (all nodes, 5 HEADs, trimmed mean) ── */
 async function pingPhase() {
   run.started = now();
-  const rounds = 3;
   await Promise.all(run.regions.map(async r => {
     if (run.finished) return;
     r.status = 'ping';
     const url = run.mode === 'full' ? r.s.urlLong : r.s.urlShort;
     const times = [];
-    for (let i = 0; i < rounds; i++) {
+    for (let i = 0; i < PING_ROUNDS; i++) {
       if (run.finished) break;
       const t0 = now();
       try {
@@ -782,26 +794,96 @@ async function pingPhase() {
     }
     if (times.length) {
       r.pings = times;
-      r.ping = Math.min(...times);
-      const mean = times.reduce((a, b) => a + b, 0) / times.length;
-      r.jitter = times.reduce((a, b) => a + Math.abs(b - mean), 0) / times.length;
+      r.pingMin = Math.min(...times);
+      const sorted = times.slice().sort((a, b) => a - b);
+      const trimmed = sorted.length >= PING_ROUNDS ? sorted.slice(1, -1) : sorted;
+      r.ping = mean(trimmed);
+      r.jitter = times.reduce((a, b) => a + Math.abs(b - mean(times)), 0) / times.length;
     }
     r.status = run.finished ? r.status : 'dl';
     renderLiveTable();
   }));
-  if (!run.finished) { setStatus('running', `Latency done — testing ${run.regions.filter(r => r.status === 'dl').length} CDNs simultaneously.`); downloadPhase(); }
+  if (!run.finished) {
+    if (run.mode === 'sequential') sequentialPhase();
+    else downloadPhase();
+  }
 }
 
+/* ── Phase 2 (sequential): one node at a time, one connection ── */
+async function sequentialPhase() {
+  const rn = run;
+  const list = rn.regions.filter(r => r.status === 'dl');
+  let idx = 0;
+  for (const r of list) {
+    if (rn.finished) break;
+    r.seqOrder = idx++;
+    rn.current = r;
+    r.status = 'dl';
+    r.startedT = now();
+    setStatus('running', `Testing ${r.s.meta.flag} ${r.s.meta.label} — single connection (${idx}/${list.length}).`);
+    renderLiveTable(); updateMap();
+    await singleStreamTest(rn, r);
+    r.endT = now();
+    r.done = r.bytes > 0 && !r.err;
+    r.status = r.err ? 'err' : (r.bytes > 0 ? 'done' : 'err');
+    rn.current = null;
+    if (!rn.finished) {
+      const doneCount = rn.regions.filter(x => x.status === 'done' || x.status === 'err').length;
+      const avgPer = (now() - rn.started) / Math.max(1, doneCount);
+      const remaining = Math.max(0, (rn.regions.length - doneCount) * avgPer / 1000);
+      const next = list[idx];
+      setStatus('running', next
+        ? `Next: ${next.s.meta.flag} ${next.s.meta.label} — ${Math.round(remaining)}s remaining.`
+        : 'Finishing up…');
+      renderLiveTable(); updateMap();
+    }
+    await new Promise(res => setTimeout(res, 350));
+  }
+  rn.regions.forEach(r => { if (r.status === 'queued' || r.status === 'ping') { r.status = 'err'; r.err = 'skipped'; } });
+  if (!rn.finished) { rn.finished = true; finishRunFor(rn, null); }
+}
+
+async function singleStreamTest(rn, r) {
+  const url = r.s.urlShort;
+  r.abort = new AbortController();
+  const capTimer = setTimeout(() => { try { r.abort.abort(); } catch (e) {} }, SEQ_CAP_MS);
+  const sampler = setInterval(() => {
+    if (rn.finished || r.status !== 'dl') return;
+    const t = now();
+    if (r.lastT === 0) { r.lastT = t; r.lastBytes = r.bytes; return; }   // baseline: skip the buffered first interval
+    const dt = Math.max(0.05, (t - r.lastT) / 1000);
+    const inst = Math.max(0, (r.bytes - r.lastBytes) / dt * 8 / 1e6);
+    r.ewma = r.ewma ? r.ewma * 0.65 + inst * 0.35 : inst;
+    r.max = Math.max(r.max, inst);
+    r.samples.push({ t: t - r.startedT, v: r.ewma });
+    r.instantSamples.push(inst);
+    r.lastBytes = r.bytes; r.lastT = t;
+  }, 250);
+  try {
+    const res = await fetch(url, { cache: 'no-store', signal: r.abort.signal });
+    if (!res.ok || !res.body) throw new Error('http ' + (res.status || 'err'));
+    const reader = res.body.getReader();
+    while (true) {
+      if (r.abort.signal.aborted) break;
+      const { done, value } = await reader.read();
+      if (done) break;
+      r.bytes += value.byteLength;
+    }
+    r.completedFile = !r.abort.signal.aborted;
+  } catch (e) {
+    if (!rn.finished) r.err = String(e && e.name === 'AbortError' ? 'capped' : (e.message || 'failed'));
+  }
+  clearInterval(sampler); clearTimeout(capTimer);
+}
+
+/* ── Phase 2 (concurrent race): all nodes at once, N streams ── */
 function downloadPhase() {
-  const mode = MODES[run.mode];
-  const fileMode = mode.file;
-  run.regions.forEach(r => {
-    if (r.status === 'dl') startRegionDownload(r);
-  });
-  run.lastTick = now(); run.lastTotalBytes = 0;
-  run.regions.forEach(r => { r.lastT = now(); });
-  run.tick = setInterval(tick, 250);
-  const rn = run;   // capture — a stale timer must never grab a newer run
+  const rn = run;
+  const fileMode = MODES[rn.mode].file;
+  rn.regions.forEach(r => { if (r.status === 'dl') startRegionDownload(r); });
+  rn.lastTick = now();
+  rn.regions.forEach(r => { r.lastT = 0; });
+  rn.tick = setInterval(tick, 250);
   if (!fileMode) {
     setTimeout(() => { if (rn && !rn.finished) { rn.finished = true; rn.partial = false; finishRunFor(rn, null); } }, rn.burstMs);
   } else {
@@ -813,12 +895,9 @@ function downloadPhase() {
     }, rn.capMs);
   }
 }
-function finishRunFor(rn, note) {
-  const saved = run; run = rn; try { finishRun(note); } finally { run = saved; }
-}
 
 function startRegionDownload(r) {
-  const rn = run;   // capture — never touch a newer run from an old stream
+  const rn = run;
   r.startedT = now();
   r.abort = new AbortController();
   const url = rn.mode === 'full' ? r.s.urlLong : r.s.urlShort;
@@ -843,60 +922,81 @@ async function streamLoop(rn, r, url, signal) {
       const { done, value } = await reader.read();
       if (done) return;
       r.bytes += value.byteLength;
-      rn.totalBytes += value.byteLength;
-      if (rn.totalBytes > DATA_BUDGET_BYTES && !rn.budgetHit) {
-        rn.budgetHit = true; rn.partial = true; rn.finished = true;
-        clearInterval(rn.tick);
-        rn.regions.forEach(x => { if (x.abort) { try { x.abort.abort(); } catch (e) {} } });
-        finishRunFor(rn, 'Hit the 12 GB data budget — stopping early.');
-        return;
-      }
     }
   } catch (e) {
     if (!rn.finished) { r.status = 'err'; r.err = String(e && e.name === 'AbortError' ? 'aborted' : (e.message || 'failed')); }
   }
 }
 
+/* ── Live tick (UI sampling) ── */
 function tick() {
-  const t = now(), dt = Math.max(1, t - run.lastTick);
+  const rn = run;
+  const t = now(), dt = Math.max(1, t - rn.lastTick);
+  rn.lastTick = t;
+  const sum = rn.regions.reduce((a, r) => a + r.bytes, 0);
+  rn.totalBytes = sum;
+  if (rn.totalBytes > DATA_BUDGET_BYTES && !rn.budgetHit) {
+    rn.budgetHit = true; rn.partial = true; rn.finished = true;
+    clearInterval(rn.tick);
+    rn.regions.forEach(x => { if (x.abort) { try { x.abort.abort(); } catch (e) {} } });
+    finishRunFor(rn, 'Hit the 12 GB data budget — stopping early.');
+    return;
+  }
   let agg = 0, doneCount = 0;
-  run.regions.forEach(r => {
-    if (r.status === 'dl') {
-      const inst = Math.max(0, (r.bytes - r.lastBytes) / dt * 1000 * 8 / 1e6);   // Mbps
-      r.ewma = r.ewma ? r.ewma * 0.65 + inst * 0.35 : inst;
-      r.max = Math.max(r.max, inst);
-      if (t - r.lastT >= 400) {
-        r.samples.push({ t: t - run.started, v: r.ewma });
-        r.instantSamples.push(inst);
-        r.lastT = t;
+  if (rn.mode === 'sequential') {
+    const cur = rn.current;
+    if (cur && cur.status === 'dl') agg = cur.ewma;
+  } else {
+    rn.regions.forEach(r => {
+      if (r.status === 'dl') {
+        if (r.lastT === 0) { r.lastT = t; r.lastBytes = r.bytes; return; }   // baseline: skip the buffered first interval
+        const inst = Math.max(0, (r.bytes - r.lastBytes) / dt * 1000 * 8 / 1e6);
+        r.ewma = r.ewma ? r.ewma * 0.65 + inst * 0.35 : inst;
+        r.max = Math.max(r.max, inst);
+        if (t - r.lastT >= 400) {
+          r.samples.push({ t: t - rn.started, v: r.ewma });
+          r.instantSamples.push(inst);
+          r.lastT = t;
+        }
+        agg += inst;
+        r.lastBytes = r.bytes;
       }
-      agg += inst;
-      r.lastBytes = r.bytes;
-    }
-    if (r.status === 'done' || r.status === 'err') doneCount++;
-  });
-  run.lastBytesAgg = agg;
-  run.aggSamples.push({ t: t - run.started, v: agg });
-  if (run.aggSamples.length > SAMPLE_WINDOW) run.aggSamples.shift();
-  if (agg > run.peak) { run.peak = agg; run.peakRegion = topRegion(); }
-  const elapsed = ((t - run.started) / 1000);
+    });
+  }
+  rn.aggSamples.push({ t: t - rn.started, v: agg });
+  if (rn.aggSamples.length > SAMPLE_WINDOW) rn.aggSamples.shift();
+  if (agg > rn.peak) { rn.peak = agg; rn.peakRegion = topRegion(); }
+  const elapsed = (t - rn.started) / 1000;
   $('stElapsed').textContent = elapsed < 60 ? elapsed.toFixed(0) + 's' : (elapsed / 60).toFixed(1) + 'm';
-  $('stData').textContent = fmtBytes(run.totalBytes);
-  $('stDone').textContent = `${doneCount}/${run.regions.length}`;
-  $('stPeak').textContent = fmtMbps(run.peak);
-  updateGauge(agg);
-  pushSpark(agg);
-  $('sparkNow').innerHTML = fmtMbps(agg) + ' <small>Mbps</small>';
-  $('sPeak').innerHTML = fmtMbps(run.peak) + '<small> Mbps</small>';
-  const tr = topRegion();
-  if (tr) { $('gaugeFastest').textContent = `fastest now · ${tr.s.meta.flag} ${tr.s.meta.label}`; $('sBest').textContent = tr.s.meta.flag + ' ' + tr.s.meta.label; }
-  const pings = run.regions.filter(r => r.ping != null).map(r => r.ping);
+  $('stData').textContent = fmtBytes(rn.totalBytes);
+  rn.regions.forEach(r => { if (r.status === 'done' || r.status === 'err') doneCount++; });
+  $('stDone').textContent = `${doneCount}/${rn.regions.length}`;
+  if (rn.mode === 'sequential') {
+    const cur = rn.current;
+    $('stPeak').textContent = cur && cur.status === 'dl' ? fmtMbps(cur.ewma) : '—';
+    if (cur && cur.status === 'dl') {
+      updateGauge(cur.ewma);
+      pushSpark(cur.ewma);
+      $('sparkNow').innerHTML = fmtMbps(cur.ewma) + ' <small>Mbps</small>';
+      $('gaugeFastest').textContent = `now · ${cur.s.meta.flag} ${cur.s.meta.label}`;
+      $('sBest').textContent = cur.s.meta.flag + ' ' + cur.s.meta.label;
+    }
+  } else {
+    updateGauge(agg);
+    pushSpark(agg);
+    $('sparkNow').innerHTML = fmtMbps(agg) + ' <small>Mbps</small>';
+    $('sPeak').innerHTML = fmtMbps(rn.peak) + '<small> Mbps</small>';
+    const tr = topRegion();
+    if (tr) { $('gaugeFastest').textContent = `fastest now · ${tr.s.meta.flag} ${tr.s.meta.label}`; $('sBest').textContent = tr.s.meta.flag + ' ' + tr.s.meta.label; }
+  }
+  const pings = rn.regions.filter(r => r.ping != null).map(r => r.ping);
   if (pings.length) {
     $('sLatency').innerHTML = Math.min(...pings) + '<small> ms</small>';
     $('sLatencyWorst').innerHTML = Math.max(...pings) + '<small> ms</small>';
   }
   renderLiveTable();
   updateMap();
+  if (rn.mode !== 'sequential') buildAnycastLegend();
 }
 
 function topRegion() {
@@ -905,44 +1005,49 @@ function topRegion() {
   return best;
 }
 
+/* ── Finish ── */
 function finishRun(note) {
   if (run._done) return; run._done = true;
   clearInterval(run.tick);
   run.regions.forEach(r => { if (r.abort) { try { r.abort.abort(); } catch (e) {} } });
   const t = now();
   run.elapsed = (t - run.started) / 1000;
-  // sustained average per region
+  const isSingle = run.mode === 'sequential' || run.streams === 1;
   run.regions.forEach(r => {
     if (!r.endT && r.done) r.endT = t;
     const dur = Math.max(0.05, r.done && r.endT ? (r.endT - run.started) / 1000 : run.elapsed);
-    r.sustained = r.bytes * 8 / 1000 / dur / 1000;   // Mbps
-    const insts = r.instantSamples.length ? r.instantSamples : [r.sustained];
-    const mean = insts.reduce((a, b) => a + b, 0) / insts.length;
-    const sd = Math.sqrt(insts.reduce((a, b) => a + (b - mean) ** 2, 0) / insts.length);
-    r.stability = mean > 0 ? Math.max(0, Math.min(1, 1 - sd / mean)) : 0;
+    r.sustained = r.bytes * 8 / 1e6 / dur;
+    const steady = r.instantSamples.filter((_, i) => r.samples[i] && r.samples[i].t > 2000);  // post slow-start
+    const insts = steady.length >= 3 ? steady : (r.instantSamples.length ? r.instantSamples : [r.sustained]);
+    const m = mean(insts);
+    const sd = Math.sqrt(insts.reduce((a, b) => a + (b - m) ** 2, 0) / insts.length);
+    r.stability = m > 0 ? Math.max(0, Math.min(1, 1 - sd / m)) : 0;
     if (r.status === 'dl') { r.status = r.bytes > 0 ? 'done' : 'err'; r.done = r.bytes > 0; }
     if ((r.status === 'queued' || r.status === 'ping') && run.partial) { r.status = 'err'; r.err = 'skipped'; }
     if (r.bytes === 0 && !r.ping) { r.status = 'err'; r.err = r.err || 'no response'; }
+    // Playback verdicts only from single-connection data.
+    if (isSingle && r.sustained > 0) {
+      const base = r.sustained * 0.85;
+      let v = base >= 150 ? ['v4k', '4K Remux ready'] : base >= 60 ? ['v4k', '4K streaming'] :
+        base >= 25 ? ['vq', '1080p Remux / 4K'] : base >= 8 ? ['vf', '1080p'] : base >= 4 ? ['vf', '720p'] : ['vs', 'SD only'];
+      if (r.ping != null && r.ping > 400) v = ['vs', 'SD — very high latency'];
+      else if (r.ping != null && r.ping > 250) v = base >= 8 ? ['vf', '1080p max — high latency'] : ['vs', 'SD — high latency'];
+      r.verdict = v;
+      r.streamable = base;
+    } else {
+      r.verdict = null;
+      r.streamable = null;
+    }
   });
-  const pings = run.regions.filter(r => r.ping != null).map(r => r.ping);
-  if (pings.length) {
-    $('sLatency').innerHTML = Math.min(...pings) + '<small> ms</small>';
-    $('sLatencyWorst').innerHTML = Math.max(...pings) + '<small> ms</small>';
-  }
   const ranked = run.regions.filter(r => r.sustained > 0).sort((a, b) => b.sustained - a.sustained);
   ranked.forEach((r, i) => { r.rank = i + 1; });
   if (ranked.length) $('sBest').textContent = ranked[0].s.meta.flag + ' ' + ranked[0].s.meta.label;
+  run.totalBytes = run.regions.reduce((a, r) => a + r.bytes, 0);
   results = {
     id: Date.now(), ts: new Date().toISOString(), mode: run.mode, streams: run.streams,
     source: endpointsSource, dataBytes: run.totalBytes, elapsed: run.elapsed, partial: !!run.partial,
-    budgetHit: !!run.budgetHit, peak: run.peak, regions: ranked,
+    budgetHit: !!run.budgetHit, peak: run.peak, single: isSingle, regions: ranked,
   };
-  results.regions.forEach(r => {
-    const m = r.sustained * 0.85;   // 15% headroom for a smooth single stream
-    r.streamable = m;
-    r.verdict = m >= 150 ? ['v4k', '4K Remux ready'] : m >= 60 ? ['v4k', '4K streaming'] :
-      m >= 25 ? ['vq', '1080p Remux / 4K'] : m >= 8 ? ['vf', '1080p'] : m >= 4 ? ['vf', '720p'] : ['vs', 'SD only'];
-  });
   saveToHistory(results);
   renderResults();
   setStatus(results.regions.length ? 'done' : 'err', note || `Done in ${results.elapsed.toFixed(1)}s — ${results.regions.length} CDN${results.regions.length === 1 ? '' : 's'} measured, ${fmtBytes(results.dataBytes)} used.`);
@@ -951,10 +1056,15 @@ function finishRun(note) {
   $('goBtn').querySelector('svg').outerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
   $('refreshBtn').disabled = false;
   ['modeSel', 'durSel', 'streamsSel', 'scopeSel'].forEach(id => $(id).disabled = false);
+  applyModeDisabled();
   $('liveBadge').hidden = true;
-  $('liveSub').textContent = 'Every node downloading simultaneously — ranked in real time.';
+  $('liveSub').textContent = 'One node at a time in Sequential mode — ranked when finished.';
   updateMap(true);
   renderHistory();
+}
+
+function finishRunFor(rn, note) {
+  const saved = run; run = rn; try { finishRun(note); } finally { run = saved; }
 }
 
 /* ────────────────────────── Live table ────────────────────────── */
@@ -964,30 +1074,39 @@ function regionLabel(s) {
 }
 function regionCity(s) {
   const m = s.meta || {};
-  return m.city || '—';
+  const net = m.net && m.net !== 'direct' ? ' · ' + m.net : '';
+  return (m.city || '—') + net;
 }
 
 let lastTableRender = 0;
 function renderLiveTable() {
   const t = now();
   const hasRun = run && !run.finished;
-  if (hasRun && t - lastTableRender < 150) return;   // throttle during run
+  if (hasRun && t - lastTableRender < 150) return;
   lastTableRender = t;
   const body = $('liveBody');
-  const list = run ? run.regions.slice().sort((a, b) => {
-    const sa = a.status === 'dl' ? a.ewma : a.status === 'done' ? (a.sustained || 0) : -1;
-    const sb = b.status === 'dl' ? b.ewma : b.status === 'done' ? (b.sustained || 0) : -1;
-    return sb - sa;
-  }) : servers.map(s => ({ s, status: 'idle', ping: null, ewma: 0, max: 0 }));
+  let list;
+  if (run && run.mode === 'sequential') {
+    list = run.regions.slice().sort((a, b) => {
+      const order = r => r.status === 'dl' ? -2 : (r.status === 'done' || r.status === 'err') ? r.seqOrder : 1e6;
+      return order(a) - order(b);
+    });
+  } else {
+    list = run ? run.regions.slice().sort((a, b) => {
+      const sa = a.status === 'dl' ? a.ewma : a.status === 'done' ? (a.sustained || 0) : -1;
+      const sb = b.status === 'dl' ? b.ewma : b.status === 'done' ? (b.sustained || 0) : -1;
+      return sb - sa;
+    }) : servers.map(s => ({ s, status: 'idle', ping: null, ewma: 0, max: 0 }));
+  }
   const maxEwma = Math.max(1, ...list.map(r => r.ewma || 0));
-  if (hasRun) buildAnycastLegend();
+  if (hasRun && run.mode !== 'sequential') buildAnycastLegend();
   body.innerHTML = list.map((r, i) => {
     const st = r.status;
-    const chip = st === 'queued' ? '<span class="chip-mini">queued</span>'
+    const chip = st === 'queued' ? '<span class="chip-mini">waiting</span>'
       : st === 'ping' ? '<span class="chip-mini run">ping</span>'
-      : st === 'dl' ? '<span class="chip-mini run">● downloading</span>'
+      : st === 'dl' ? '<span class="chip-mini run">● testing</span>'
       : st === 'done' ? '<span class="chip-mini ok">✓ done</span>'
-      : st === 'err' ? `<span class="chip-mini bad" title="${esc(r.err || '')}">✕ failed</span>`
+      : st === 'err' ? `<span class="chip-mini bad" title="${esc(r.err || '')}">✕ ${esc((r.err || 'failed').slice(0, 12))}</span>`
       : '<span class="chip-mini">idle</span>';
     const pingTxt = r.ping != null ? fmtMs(r.ping) : st === 'ping' ? '…' : '—';
     const pct = st === 'dl' || st === 'done' ? Math.min(100, (r.ewma || r.sustained || 0) / maxEwma * 100) : 0;
@@ -996,7 +1115,7 @@ function renderLiveTable() {
     const cls = ['row', st === 'err' ? 'row-err' : '', st === 'done' ? 'row-done' : '', i === 0 && (st === 'dl' || st === 'done') ? 'rank-1' : ''].join(' ').trim();
     return `<tr class="${cls}">
       <td class="rank-num">${i + 1}</td>
-      <td><div class="reg-name"><span class="n"><span class="fl">${esc(regionLabel(r.s))}</span>${r.s.closest ? '<span class="chip-mini run">closest</span>' : ''}</span><span class="c">${esc(regionCity(r.s))}${st === 'done' && r.sustained ? '' : ''}</span></div></td>
+      <td><div class="reg-name"><span class="n"><span class="fl">${esc(regionLabel(r.s))}</span>${r.s.closest ? '<span class="chip-mini run">closest</span>' : ''}${r.s.meta && r.s.meta.net && r.s.meta.net !== 'direct' ? `<span class="chip-mini">${esc(r.s.meta.net)}</span>` : ''}</span><span class="c">${esc(regionCity(r.s))}</span></div></td>
       <td style="color:var(--th-tx2)">${pingTxt}</td>
       <td class="speed-bar-cell"><div style="display:flex;align-items:center;gap:8px"><div class="speed-bar"><i style="width:${pct}%"></i></div><span class="speed-num">${speedTxt}<small> / ${maxTxt}</small></span></div></td>
       <td>${chip}</td>
@@ -1022,8 +1141,7 @@ function tickLabel(v) { return v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) 
 function buildGauge() {
   $('zoneArc').setAttribute('d', arcPath(GAUGE.R));
   $('zoneTrack').setAttribute('d', arcPath(GAUGE.R));
-  const ticks = $('gaugeTicks');
-  ticks.innerHTML = TICK_VALUES.map(v => {
+  $('gaugeTicks').innerHTML = TICK_VALUES.map(v => {
     const p = logP(v);
     const [x0, y0] = ptOnArc(p, GAUGE.R - 8), [x1, y1] = ptOnArc(p, GAUGE.R + 1);
     const [lx, ly] = ptOnArc(p, GAUGE.R - 20);
@@ -1081,17 +1199,14 @@ function drawSpark() {
   maxV = niceMax(maxV * 1.12);
   const X = s => (s.t - t0) / Math.max(1, t1 - t0) * W;
   const Y = s => H - 4 - (s.v / maxV) * (H - 8);
-  // grid
   ctx.strokeStyle = 'rgba(128,128,128,.15)'; ctx.lineWidth = 1;
   [0.25, 0.5, 0.75].forEach(f => { ctx.beginPath(); ctx.moveTo(0, H - (H * f)); ctx.lineTo(W, H - (H * f)); ctx.stroke(); });
-  // fill
   ctx.beginPath();
   sparkSamples.forEach((s, i) => i ? ctx.lineTo(X(s), Y(s)) : ctx.moveTo(X(s), Y(s)));
   ctx.lineTo(X(sparkSamples[sparkSamples.length - 1]), H - 4); ctx.lineTo(X(sparkSamples[0]), H - 4); ctx.closePath();
   const grad = ctx.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, 'rgba(0,212,255,.28)'); grad.addColorStop(1, 'rgba(0,212,255,0)');
   ctx.fillStyle = grad; ctx.fill();
-  // line
   ctx.beginPath();
   sparkSamples.forEach((s, i) => i ? ctx.lineTo(X(s), Y(s)) : ctx.moveTo(X(s), Y(s)));
   ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.stroke();
@@ -1127,34 +1242,35 @@ function nodeColor(r) {
 function updateMap(final) {
   if (!servers.length) return;
   buildMap();
-  const g = svgQuery('#mapNodes');
+  const g = document.getElementById('mapNodes');
+  if (!g) return;
   const active = run ? run.regions : [];
   const rowFor = s => active.find(r => r.s.region === s.region && r.s.name === s.name);
   g.innerHTML = '';
   servers.forEach(s => {
-    if (s.lat == null || s.lng == null || ANYCAST.includes(s.region)) return;
+    if (s.lat == null || s.lng == null) return;
     const p = proj(s.lat, s.lng);
     const r = rowFor(s);
     const value = r ? (r.sustained || r.ewma || 0) : 0;
     const rad = value > 0 ? 5 + 8 * Math.min(1, Math.log10(1 + value) / Math.log10(1 + 1000)) : 4.5;
     const color = r ? nodeColor(r) : '#5b6b83';
-    const testing = r && r.status === 'dl' || r && r.status === 'ping';
+    const testing = r && (r.status === 'dl' || r.status === 'ping');
     const won = results && results.regions.length && results.regions[0].s.region === s.region && results.regions[0].s.name === s.name;
-    const circle = `<circle cx="${p.x}" cy="${p.y}" r="${rad.toFixed(1)}" fill="${color}" opacity="${r ? .95 : .55}" class="map-node">
+    g.insertAdjacentHTML('beforeend', `<circle cx="${p.x}" cy="${p.y}" r="${rad.toFixed(1)}" fill="${color}" opacity="${r ? .95 : .55}" class="map-node">
         ${testing ? `<circle class="pulse" cx="${p.x}" cy="${p.y}" r="${rad.toFixed(1)}" fill="none" stroke="${color}" stroke-width="1.6"/>` : ''}
         ${won ? `<circle cx="${p.x}" cy="${p.y}" r="${(rad + 5).toFixed(1)}" fill="none" stroke="#fbbf24" stroke-width="1.8" opacity=".9"/>` : ''}
       </circle>
-      <title>${esc(s.meta.label)} · ${esc(s.meta.city)}${r ? ' — ' + fmtMbps(r.sustained || r.ewma) : ''}</title>`;
-    g.insertAdjacentHTML('beforeend', circle);
+      <title>${esc(s.meta.label)} · ${esc(regionCity(s))}${r ? ' — ' + fmtMbps(r.sustained || r.ewma) : ''}</title>`);
     if (won || (results && results.regions.length > 0 && results.regions.slice(0, 3).some(x => x.s.region === s.region && x.s.name === s.name))) {
       g.insertAdjacentHTML('beforeend', `<text class="map-label" x="${p.x}" y="${p.y - rad - 8}" text-anchor="middle">${esc(s.region.toUpperCase())}</text>`);
     }
   });
-  drawYou(g);
+  drawYou();
 }
-function svgQuery(sel) { return document.querySelector(sel); }
-function drawYou(g) {
-  const you = $('mapYou'); you.innerHTML = '';
+function drawYou() {
+  const you = document.getElementById('mapYou');
+  if (!you) return;
+  you.innerHTML = '';
   const badge = $('mapYouBadge');
   if (!geo || geo.lat == null) { badge.hidden = true; return; }
   badge.hidden = false;
@@ -1179,13 +1295,11 @@ function locateYou() {
 }
 function buildAnycastLegend() {
   const el = $('anycastLegend');
-  el.innerHTML = ANYCAST.map(code => {
-    const s = servers.find(x => x.region === code);
-    if (!s) return '';
-    const r = run ? run.regions.find(x => x.s.region === code) : null;
+  el.innerHTML = servers.filter(s => s.meta && s.meta.net !== 'direct').map(s => {
+    const r = run ? run.regions.find(x => x.s.region === s.region) : null;
     const color = r ? nodeColor(r) : '#5b6b83';
     const v = r ? (r.sustained || r.ewma || 0) : null;
-    return `<span class="ax"><i style="background:${color}"></i>${esc(s.meta.label)}${v ? ' · ' + fmtMbps(v) : ''}</span>`;
+    return `<span class="ax"><i style="background:${color}"></i>${esc(s.meta.label)} · ${esc(s.meta.net)}${v ? ' · ' + fmtMbps(v) : ''}</span>`;
   }).join('');
 }
 
@@ -1194,26 +1308,38 @@ let sortKey = 'rank', sortDir = 1;
 function renderResults() {
   if (!results) return;
   $('resultsCard').hidden = false;
-  $('resultsSub').textContent = `${results.regions.length} CDNs measured · ${results.partial ? 'partial run · ' : ''}${results.streams} streams/node · ${fmtBytes(results.dataBytes)} used · ${results.elapsed.toFixed(1)}s`;
+  const modeLbl = MODES[results.mode].label;
+  $('resultsSub').textContent = `${results.regions.length} CDNs measured · ${modeLbl} · ${results.single ? 'single connection' : results.streams + ' streams/node'} · ${fmtBytes(results.dataBytes)} used · ${results.elapsed.toFixed(1)}s${results.partial ? ' · partial run' : ''}`;
   const best = results.regions[0];
   if (best) {
     const closest = results.regions.find(r => r.s.closest);
     const vs = closest && closest.region !== best.region ? ` · ${(best.sustained / Math.max(1e-9, closest.sustained)).toFixed(1)}× your closest CDN` : '';
+    const slowest = results.regions.length > 1 ? `▲ ${(best.sustained / Math.max(1e-9, results.regions[results.regions.length - 1].sustained)).toFixed(1)}× slowest` : '';
+    const pings = results.regions.map(r => r.ping).filter(p => p != null);
+    const minPing = pings.length ? Math.min(...pings) : null;
+    const anomaly = best.ping != null && minPing != null && best.ping - minPing > 80
+      ? `<div class="s" style="color:var(--th-yellow);margin-top:4px">⚠ ${Math.round(best.ping - minPing)} ms farther than your nearest node — your ISP just routes here well. Single-connection playback adds that latency; trust the ping column too.</div>` : '';
+    const isSingle = results.single;
+    const verdict = best.verdict ? `<span class="v">${esc(best.verdict[1])}</span>` : `<span class="v" style="color:var(--th-yellow)">multi-stream — no playback verdict</span>`;
+    const verdictSub = best.streamable != null
+      ? `≈ up to ${Math.round(best.streamable)} Mbps of smooth single-stream playback from this node.`
+      : 'Run Sequential mode (default) for a playback-accurate verdict — a player uses one connection.';
     $('winnerBox').innerHTML = `
       <span class="trophy" aria-hidden="true">🏆</span>
       <div>
-        <div class="w-head">Fastest route to TorBox</div>
+        <div class="w-head">${isSingle ? 'Best CDN for playback' : 'Fastest in this multi-stream race'}</div>
         <div class="w-name"><span>${esc(regionLabel(best.s))}</span><span style="font-size:.66rem;font-weight:700;color:var(--th-tx3)">${esc(regionCity(best.s))}</span></div>
         <div class="w-stats">
-          <span>Sustained <b>${fmtMbps(best.sustained)}</b> (${fmtMBps(best.sustained)})</span>
+          <span>${isSingle ? 'Single-stream' : results.streams + '-stream'} sustained <b>${fmtMbps(best.sustained)}</b> (${fmtMBps(best.sustained)})</span>
           <span>Peak <b>${fmtMbps(best.max)}</b></span>
           <span>Ping <b>${fmtMs(best.ping)}</b></span>
-          ${results.regions.length > 1 ? `<span class="pos">▲ ${(best.sustained / Math.max(1e-9, results.regions[results.regions.length - 1].sustained)).toFixed(1)}× slowest${vs}</span>` : ''}
+          ${slowest ? `<span class="pos">${slowest}${vs}</span>` : ''}
         </div>
       </div>
       <div class="w-verdict">
-        <span class="v">${esc(best.verdict[1])}</span>
-        <span class="s">≈ up to ${Math.round(best.streamable)} Mbps of smooth single-stream playback from this node.</span>
+        ${verdict}
+        <span class="s">${verdictSub}</span>
+        ${anomaly}
       </div>`;
   }
   renderResultsTable();
@@ -1235,6 +1361,7 @@ function renderResultsTable() {
       ? `<span class="${delta >= 0 ? 'delta-pos' : 'delta-neg'}">${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta).toFixed(0)}%</span>`
       : '<span style="color:var(--th-tx4)">—</span>';
     const spark = miniSpark(r.samples);
+    const verdict = r.verdict ? `<span class="verdict ${r.verdict[0]}">${esc(r.verdict[1])}</span>` : `<span class="chip-mini" title="Multi-stream numbers don't reflect what a single-connection player gets. Run Sequential mode for a verdict.">— multi-stream</span>`;
     return `<tr class="${r.rank === 1 ? 'best-row' : ''}">
       <td class="rank-num">${r.rank}</td>
       <td><div class="reg-name"><span class="n"><span class="fl">${esc(regionLabel(r.s))}</span>${r.s.closest ? '<span class="chip-mini run">closest</span>' : ''}</span><span class="c">${esc(regionCity(r.s))} · ${esc(r.s.name)}</span></div></td>
@@ -1243,7 +1370,7 @@ function renderResultsTable() {
       <td>${fmtMbps(r.max)}</td>
       <td><span class="stability-bar"><i style="width:${(r.stability * 100).toFixed(0)}%"></i></span>${(r.stability * 100).toFixed(0)}%</td>
       <td ${compareRun ? '' : 'hidden'}>${deltaHtml}</td>
-      <td><span class="verdict ${r.verdict[0]}">${esc(r.verdict[1])}</span> ${spark}</td>
+      <td>${verdict} ${spark}</td>
     </tr>`;
   }).join('');
   $('thDelta').hidden = !compareRun;
@@ -1281,15 +1408,15 @@ function loadHistory() {
 }
 function saveToHistory(res) {
   const entry = {
-    id: res.id, ts: res.ts, mode: res.mode, streams: res.streams, source: res.source,
-    dataBytes: res.dataBytes, elapsed: res.elapsed, partial: res.partial, peak: res.peak,
+    id: res.id, ts: res.ts, mode: res.mode, streams: res.streams, single: res.single,
+    source: res.source, dataBytes: res.dataBytes, elapsed: res.elapsed, partial: res.partial, peak: res.peak,
     bestLabel: res.regions.length ? regionLabel(res.regions[0].s) : '—',
     bestAvg: res.regions.length ? res.regions[0].sustained : 0,
     bestPing: res.regions.length ? res.regions[0].ping : null,
     results: res.regions.map(r => ({
       region: r.s.region, name: r.s.name, label: regionLabel(r.s), city: regionCity(r.s),
       closest: r.s.closest, ping: r.ping, jitter: r.jitter, sustained: r.sustained, max: r.max,
-      stability: r.stability, verdict: r.verdict[1], streamable: r.streamable, rank: r.rank,
+      stability: r.stability, verdict: r.verdict ? r.verdict[1] : null, streamable: r.streamable, rank: r.rank,
       samples: downSample(r.samples, 40),
     })),
   };
@@ -1311,8 +1438,8 @@ function renderHistory() {
     <div class="hist-item">
       <span class="hist-ts">${new Date(h.ts).toLocaleString()}</span>
       <span class="hist-best">
-        <span class="n">${esc(h.bestLabel)}</span>
-        <span class="s">${h.mode === 'burst' ? 'Burst' : h.mode === 'quick' ? 'Quick 100 MB' : 'Full 1 GB'} · ${h.streams} streams · ${fmtBytes(h.dataBytes)}${h.partial ? ' · partial' : ''}</span>
+        <span class="n">${esc(h.bestLabel)}${h.single ? ' <span class="chip-mini ok">single</span>' : ' <span class="chip-mini">multi-stream</span>'}</span>
+        <span class="s">${(MODES[h.mode] || {}).label || h.mode} · ${fmtBytes(h.dataBytes)}${h.partial ? ' · partial' : ''}</span>
       </span>
       <span class="hist-num">${fmtMbps(h.bestAvg)}<small>best sustained</small></span>
       <span class="hist-num">${fmtMs(h.bestPing)}<small>ping</small></span>
@@ -1332,14 +1459,14 @@ function loadFromHistory(id) {
   const h = history.find(x => String(x.id) === String(id));
   if (!h) return;
   results = {
-    id: h.id + '-view', ts: h.ts, mode: h.mode, streams: h.streams, source: h.source,
-    dataBytes: h.dataBytes, elapsed: h.elapsed, partial: h.partial, peak: h.peak,
+    id: h.id + '-view', ts: h.ts, mode: h.mode, streams: h.streams, single: !!h.single,
+    source: h.source, dataBytes: h.dataBytes, elapsed: h.elapsed, partial: h.partial, peak: h.peak,
     regions: h.results.map(r => {
-      const meta = REGION_META[r.region] || { label: r.region.toUpperCase(), city: '—', flag: '🌐' };
+      const meta = REGION_META[r.region] || { label: r.region.toUpperCase(), city: '—', flag: '🌐', net: 'direct' };
       return {
         s: { region: r.region, name: r.name, closest: r.closest, meta },
         ping: r.ping, jitter: r.jitter, sustained: r.sustained, max: r.max,
-        stability: r.stability, verdict: ['vq', r.verdict], streamable: r.streamable,
+        stability: r.stability, verdict: r.verdict ? ['vq', r.verdict] : null, streamable: r.streamable,
         rank: r.rank, samples: r.samples || [],
       };
     }).sort((a, b) => a.rank - b.rank),
@@ -1363,14 +1490,14 @@ function markdownReport() {
   if (!results) return '';
   const L = ['# CoreSpeed — TorBox CDN results', '',
     `- **Date:** ${new Date(results.ts).toLocaleString()}`,
-    `- **Mode:** ${results.mode === 'burst' ? 'Burst' : results.mode === 'quick' ? 'Quick (100 MB)' : 'Full (1 GB)'} · ${results.streams} streams/node`,
+    `- **Mode:** ${MODES[results.mode].label} · ${results.single ? 'single connection' : results.streams + ' streams/node'}`,
     `- **Data used:** ${fmtBytes(results.dataBytes)} · **Elapsed:** ${results.elapsed.toFixed(1)}s`,
     `- **Endpoints:** ${results.source === 'snapshot' ? 'offline snapshot' : 'live (' + results.source + ')'}`,
     '',
     '| # | Region | Ping | Sustained | Peak | Stability | Streaming |',
     '|---:|---|---|---:|---:|---:|---|'];
   results.regions.forEach(r => {
-    L.push(`| ${r.rank} | ${regionLabel(r.s)} (${regionCity(r.s)}) | ${fmtMs(r.ping)} | ${fmtMbps(r.sustained)} | ${fmtMbps(r.max)} | ${(r.stability * 100).toFixed(0)}% | ${r.verdict[1]} |`);
+    L.push(`| ${r.rank} | ${regionLabel(r.s)} (${regionCity(r.s)}) | ${fmtMs(r.ping)} | ${fmtMbps(r.sustained)} | ${fmtMbps(r.max)} | ${(r.stability * 100).toFixed(0)}% | ${r.verdict ? r.verdict[1] : '— (multi-stream)'} |`);
   });
   L.push('', '_Measured with CoreSpeed — brevitya.github.io/Core-Builds/tools/speedtest/_');
   return L.join('\n');
@@ -1378,7 +1505,7 @@ function markdownReport() {
 function csvReport() {
   if (!results) return '';
   const rows = [['rank', 'region', 'name', 'city', 'ping_ms', 'jitter_ms', 'sustained_mbps', 'peak_mbps', 'stability_pct', 'streams', 'verdict']];
-  results.regions.forEach(r => rows.push([r.rank, r.s.region, r.s.name, regionCity(r.s), r.ping == null ? '' : r.ping.toFixed(0), r.jitter == null ? '' : r.jitter.toFixed(0), r.sustained.toFixed(1), r.max.toFixed(1), (r.stability * 100).toFixed(0), results.streams, r.verdict[1]]));
+  results.regions.forEach(r => rows.push([r.rank, r.s.region, r.s.name, regionCity(r.s), r.ping == null ? '' : r.ping.toFixed(0), r.jitter == null ? '' : r.jitter.toFixed(0), r.sustained.toFixed(1), r.max.toFixed(1), (r.stability * 100).toFixed(0), results.streams, r.verdict ? r.verdict[1] : '']));
   return rows.map(r => r.map(c => /[",\n]/.test(String(c)) ? '"' + String(c).replace(/"/g, '""') + '"' : c).join(',')).join('\n');
 }
 function download(name, content, type) {
@@ -1396,16 +1523,74 @@ $('copyMdBtn').addEventListener('click', async () => {
 $('csvBtn').addEventListener('click', () => { if (results) download('corespeed-results.csv', csvReport(), 'text/csv'); });
 $('jsonBtn').addEventListener('click', () => { if (results) download('corespeed-results.json', JSON.stringify(results, null, 2), 'application/json'); });
 
+/* ────────────────────────── Diagnostics (for supporter reports) ────────────────────────── */
+$('diagBtn').addEventListener('click', async () => {
+  toast('Collecting diagnostics — includes DNS lookups…', 4000);
+  try {
+    const dnsCache = {};
+    const dnsOf = async host => {
+      if (dnsCache[host] !== undefined) return dnsCache[host];
+      try {
+        const r = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(host)}&type=A`, { signal: AbortSignal.timeout(3500) });
+        const j = await r.json();
+        dnsCache[host] = (j.Answer || []).filter(a => a.type === 1).map(a => a.data);
+      } catch (e) { dnsCache[host] = null; }
+      return dnsCache[host];
+    };
+    const who = await fetch(GEO_API, { signal: AbortSignal.timeout(4000) }).then(r => r.json()).catch(() => null);
+    const regionRows = run ? run.regions : results ? results.regions : null;
+    const perServer = await Promise.all(servers.map(async s => {
+      const r = regionRows ? regionRows.find(x => x.s.region === s.region && x.s.name === s.name) : null;
+      return {
+        region: s.region, name: s.name, closest: s.closest,
+        host: s.urlShort.replace(/^https:\/\//, '').split('/')[0],
+        net: s.meta.net, coords: { lat: s.lat, lng: s.lng },
+        dns: await dnsOf(s.urlShort.replace(/^https:\/\//, '').split('/')[0]),
+        pingMs: r && r.ping != null ? Math.round(r.ping) : null,
+        pingMinMs: r && r.pingMin != null ? Math.round(r.pingMin) : null,
+        jitterMs: r && r.jitter != null ? Math.round(r.jitter) : null,
+        pingsAll: r && r.pings ? r.pings.map(Math.round) : [],
+        sustainedMbps: r && r.sustained != null ? +r.sustained.toFixed(1) : null,
+        maxMbps: r && r.max != null ? +r.max.toFixed(1) : null,
+        bytes: r ? r.bytes : 0, status: r ? r.status : null, err: r ? r.err : null,
+        sampleCount: r ? r.samples.length : 0,
+      };
+    }));
+    const payload = {
+      tool: 'corespeed', v: 2, ts: new Date().toISOString(),
+      ua: navigator.userAgent, url: location.href,
+      endpointsSource, mode: run ? run.mode : results ? results.mode : null,
+      streams: run ? run.streams : results ? results.streams : null,
+      you: who ? { ip: who.ip, country: who.country, city: who.city, isp: who.connection ? who.connection.isp : null, asn: who.connection ? who.connection.asn : null } : null,
+      servers: perServer,
+    };
+    download('corespeed-diagnostics.json', JSON.stringify(payload, null, 2), 'application/json');
+    toast('Diagnostics downloaded — send the JSON file to the Core Builds crew.');
+  } catch (e) {
+    toast('Diagnostics failed: ' + (e && e.message ? e.message : 'unknown error'));
+  }
+});
+
 /* ────────────────────────── Controls wiring ────────────────────────── */
 $('goBtn').addEventListener('click', () => { if (run && !run.finished) stopTest(true); else startTest(); });
 $('refreshBtn').addEventListener('click', loadEndpoints);
+function applyModeDisabled() {
+  const mode = $('modeSel').value;
+  $('durSel').disabled = mode !== 'burst';
+  $('streamsSel').disabled = mode === 'sequential';
+  if (mode === 'sequential') $('streamsSel').value = '1';
+}
 $('modeSel').addEventListener('change', () => {
-  const burst = $('modeSel').value === 'burst';
-  $('durSel').disabled = !burst;
-  $('dataNote').textContent = $('modeSel').value === 'full'
+  applyModeDisabled();
+  const m = $('modeSel').value;
+  $('dataNote').textContent = m === 'sequential'
+    ? 'Sequential tests ONE node at a time with ONE connection — the same approach as TorBox\'s own speedtest and the number that matters for playback. ~2–3 min for all 17 nodes; use the scope selector to shorten it.'
+    : m === 'full'
     ? 'Full tests can move several GB on a fast line. Every node is capped at 1 GB (or 90 s), there is a 12 GB global budget, and Stop aborts everything instantly.'
-    : 'Downloads use real test files served by TorBox\'s Hyperdrive CDN. Everything aborts instantly with Stop, and the test respects a 12 GB global budget.';
+    : 'Multi-stream race: every node downloads at once, so numbers are contested and latency-masked. Great for fun and pipe capacity — use Sequential mode for playback-accurate ranking.';
+  if (m === 'sequential') $('streamsSel').value = '1';
 });
+applyModeDisabled();
 
 /* ────────────────────────── Init ────────────────────────── */
 buildGauge();
