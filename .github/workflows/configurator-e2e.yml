@@ -18,7 +18,12 @@ permissions:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Raised from 15. On 2026-08-19 two consecutive runs on different runners
+    # burned the entire 15-minute budget inside `playwright install` and were
+    # cancelled before a single spec executed — a slow package mirror reading as
+    # a failing build. The suite itself takes ~3 minutes; the headroom is for the
+    # install step, not the tests.
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: configurator
@@ -31,7 +36,38 @@ jobs:
           cache-dependency-path: configurator/package-lock.json
       - run: npm ci
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+
+      # Browser binaries are ~150 MB and identical for a given Playwright
+      # version, so downloading them on every run is the single largest avoidable
+      # cost here — and the step that stalled. Keyed on the lockfile so a
+      # Playwright bump invalidates the cache automatically; a stale browser
+      # against a new client is its own confusing failure.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('configurator/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      # Both steps run unconditionally, on purpose.
+      #
+      # An earlier version branched on cache-hit and installed browsers only on a
+      # miss. That trusts the cache to be complete, and a cache entry written from
+      # an interrupted run can hold a partially-downloaded browser — which would
+      # fail at launch, after the install step reported success. Review raised
+      # exactly that.
+      #
+      # `playwright install` is already the right shape for this: it verifies what
+      # is on disk and returns in seconds when the browser is intact, downloading
+      # only what is missing or corrupt. So running it every time costs almost
+      # nothing on a hit, repairs a bad cache entry, and removes any path where
+      # the job reaches the tests without a working browser.
+      - name: Install Playwright system dependencies
+        run: npx playwright install-deps chromium
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
       - run: npm run test:e2e
       - name: Upload Playwright report on failure
         if: failure()
