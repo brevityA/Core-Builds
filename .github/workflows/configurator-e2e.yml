@@ -18,7 +18,12 @@ permissions:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Raised from 15. On 2026-08-19 two consecutive runs on different runners
+    # burned the entire 15-minute budget inside `playwright install` and were
+    # cancelled before a single spec executed — a slow package mirror reading as
+    # a failing build. The suite itself takes ~3 minutes; the headroom is for the
+    # install step, not the tests.
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: configurator
@@ -31,7 +36,31 @@ jobs:
           cache-dependency-path: configurator/package-lock.json
       - run: npm ci
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+
+      # Browser binaries are ~150 MB and identical for a given Playwright
+      # version, so downloading them on every run is the single largest avoidable
+      # cost here — and the step that stalled. Keyed on the lockfile so a
+      # Playwright bump invalidates the cache automatically; a stale browser
+      # against a new client is its own confusing failure.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('configurator/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      # On a hit the binaries are already present, so only the system libraries
+      # are needed — a much smaller apt transaction than a full --with-deps.
+      # Split rather than always running --with-deps so a cache hit skips the
+      # download entirely instead of re-verifying it.
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
       - run: npm run test:e2e
       - name: Upload Playwright report on failure
         if: failure()
