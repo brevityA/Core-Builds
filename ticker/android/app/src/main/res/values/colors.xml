@@ -1,0 +1,5 @@
+<resources>
+    <color name="core_bg">#07090D</color>
+    <color name="core_line">#00D4FF</color>
+    <color name="core_live">#FF2D55</color>
+</resources>

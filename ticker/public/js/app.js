@@ -1,7 +1,12 @@
 import { toTickerText, parseFeed } from '/lib/parser.mjs';
 import { LEAGUES, compareEvents, buildDemoSlate, mergeEvents } from '/lib/scoreboard.mjs';
+import { buildClientSlate, isNativeShell } from '/lib/client-slate.mjs';
 import { loadState, saveState, cacheSlate, readCachedSlate } from './state.js';
 import { initTvNav } from './tv.js';
+
+const params = new URLSearchParams(location.search);
+if (params.get('native') === '1') globalThis.CORELINE_NATIVE = true;
+if (params.get('tv') === '1') globalThis.CORELINE_TV = true;
 
 const SAMPLE_FEED = { url: `${location.origin}/feeds/sample-sports.xml`, label: 'Sample' };
 const LEAGUE_ORDER = ['ALL', 'LIVE', 'RSS', ...Object.values(LEAGUES).map((l) => l.label)];
@@ -28,8 +33,12 @@ async function init() {
   }
   await refresh();
   setInterval(refresh, 60_000);
-  if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator && !isNativeShell()) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+  if (globalThis.CORELINE_TV && !localStorage.getItem('coreline.v1')) {
+    state.mode = 'board';
+    applyChrome();
   }
 }
 
@@ -191,13 +200,9 @@ async function refresh(manual = false) {
       ...state.feeds,
       ...(state.sampleFeed ? [SAMPLE_FEED] : []),
     ];
-    const params = new URLSearchParams({
-      leagues: state.leagues.join(','),
-      feeds: feeds.map((f) => `${encodeURIComponent(f.url)}|${encodeURIComponent(f.label)}`).join(','),
-    });
-    const res = await fetch(`/api/slate?${params}`);
-    if (!res.ok) throw new Error(`slate ${res.status}`);
-    const data = await res.json();
+    const data = isNativeShell()
+      ? await buildClientSlate({ leagues: state.leagues, feeds })
+      : await fetchSlateFromServer(state.leagues, feeds);
     events = data.events || [];
     cacheSlate(data);
     $('brandSub').textContent = data.demo
@@ -218,6 +223,25 @@ async function refresh(manual = false) {
     }
     console.warn(err);
   }
+}
+
+async function fetchSlateFromServer(leagues, feeds) {
+  const query = new URLSearchParams({
+    leagues: leagues.join(','),
+    feeds: feeds.map((f) => `${encodeURIComponent(f.url)}|${encodeURIComponent(f.label)}`).join(','),
+  });
+  const res = await fetch(`/api/slate?${query}`);
+  if (!res.ok) throw new Error(`slate ${res.status}`);
+  return res.json();
+}
+
+async function localFallback() {
+  let rss = [];
+  try {
+    const xml = await fetch('./feeds/sample-sports.xml').then((r) => r.text());
+    rss = parseFeed(xml, { source: 'rss', label: 'Sample' });
+  } catch { /* ignore */ }
+  return mergeEvents([buildDemoSlate(), rss]);
 }
 
 function visibleEvents() {

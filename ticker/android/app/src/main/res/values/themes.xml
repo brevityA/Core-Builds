@@ -1,0 +1,11 @@
+<resources>
+    <style name="Theme.CoreLine" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/core_bg</item>
+        <item name="android:statusBarColor">@color/core_bg</item>
+        <item name="android:navigationBarColor">@color/core_bg</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:colorPrimary">@color/core_line</item>
+        <item name="android:colorAccent">@color/core_line</item>
+    </style>
+</resources>

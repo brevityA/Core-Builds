@@ -1,0 +1,21 @@
+#!/bin/sh
+# Gradle start-up script (POSIX). Requires gradle/wrapper/gradle-wrapper.jar
+# Android Studio generates that jar on first sync if it is missing.
+
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+WRAPPER="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+if [ ! -f "$WRAPPER" ]; then
+  echo "gradle-wrapper.jar is missing."
+  echo "Open ticker/android in Android Studio once — it will generate the wrapper."
+  echo "Or install Gradle 8.7+ and run:  gradle wrapper --gradle-version 8.7"
+  exit 1
+fi
+
+if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+  JAVACMD="$JAVA_HOME/bin/java"
+else
+  JAVACMD="java"
+fi
+
+exec "$JAVACMD" -Xmx64m -Xms64m -classpath "$WRAPPER" org.gradle.wrapper.GradleWrapperMain "$@"

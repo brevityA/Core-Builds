@@ -26,7 +26,17 @@ A supporter put it plainly:
 
 That messy line is a first-class test. `epn` becomes ESPN. `tsn4` becomes TSN4. `sn 3` becomes SN 3.
 
-## Run it
+## Android app
+
+A native APK lives in [`android/`](android/) — phone, Shield, Google TV, Fire TV. One build, two launchers.
+
+```
+ticker/android   →  open in Android Studio  →  Build APK
+```
+
+The shell is a fullscreen WebView with a D-pad, keep-awake, and an on-device proxy so scoreboards and RSS work without a PC. Sideload `app-debug.apk`. Full steps: [`android/README.md`](android/README.md).
+
+## Run it on the web
 
 ```bash
 cd ticker
@@ -37,12 +47,11 @@ Open `http://0.0.0.0:8787` — or the phone / Shield / Fire TV on the same netwo
 
 | Surface | How |
 |---|---|
-| Phone / tablet | Chrome → Add to Home screen. Fullscreen PWA. |
-| Android TV / Google TV | Sideload a browser, open the URL, install as an app. D-pad works. |
-| Fire TV | Downloader → the URL. Ticker-only mode (`T`) is the always-on view. |
+| **Android / TV app** | Open `ticker/android` in Android Studio → Build APK → sideload |
+| Phone / tablet browser | Chrome → Add to Home screen. Fullscreen PWA. |
 | Desktop | Any modern browser. `F` fullscreen, `T` chyron-only, `S` settings. |
 
-No npm install. Node 20+. Zero dependencies.
+Web server: no npm install. Node 20+. Zero dependencies.
 
 ## Feeds
 
