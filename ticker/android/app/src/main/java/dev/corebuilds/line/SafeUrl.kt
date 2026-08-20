@@ -56,7 +56,9 @@ object SafeUrl {
             val second = m.groupValues[1].toInt()
             if (second in 16..31) return true
         }
-        if (host == "::1" || host.startsWith("fc") || host.startsWith("fd") || host.startsWith("fe80")) return true
+        if (host.contains(':')) {
+            if (host == "::1" || host.startsWith("fc") || host.startsWith("fd") || host.startsWith("fe80")) return true
+        }
         return false
     }
 }

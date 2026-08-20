@@ -15,3 +15,9 @@ test('blocks localhost and metadata', () => {
   assert.equal(isSafeFeedUrl('http://10.0.0.8/feed').ok, false);
   assert.equal(isSafeFeedUrl('file:///etc/passwd').ok, false);
 });
+
+test('does not treat public hostnames as IPv6 unique-local', () => {
+  assert.equal(isSafeFeedUrl('https://facebook.com/rss').ok, true);
+  assert.equal(isSafeFeedUrl('https://flickr.com/feed').ok, true);
+  assert.equal(isSafeFeedUrl('https://example.com/sports.xml').ok, true);
+});

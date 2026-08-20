@@ -34,7 +34,7 @@ A native APK lives in [`android/`](android/) — phone, Shield, Google TV, Fire 
 ticker/android   →  open in Android Studio  →  Build APK
 ```
 
-The shell is a fullscreen WebView with a D-pad, keep-awake, and an on-device proxy so scoreboards and RSS work without a PC. Sideload `app-debug.apk`. Full steps: [`android/README.md`](android/README.md).
+The shell is a fullscreen WebView with a D-pad, keep-awake, and an on-device proxy so scoreboards and RSS work without a PC. On a TV, **Add from phone** shows a same-Wi-Fi QR so you never type a URL with the remote. Sideload `app-debug.apk` from the Actions artifact (or Android Studio). Full steps: [`android/README.md`](android/README.md).
 
 ## Run it on the web
 

@@ -77,6 +77,16 @@
             <input class="focusable" id="feedLabel" type="text" placeholder="Label" maxlength="24">
             <button class="primary focusable" data-action="add-feed">Add</button>
           </div>
+          <div class="pair" id="pairBox">
+            <button class="ghost focusable" data-action="pair-start" id="pairStart">Add from phone (same Wi-Fi)</button>
+            <div class="pair-card" id="pairCard" hidden>
+              <p class="hint">On your phone, same Wi-Fi as this TV. Scan or open the address. Type the code. Do not type the RSS URL on the Stick.</p>
+              <img class="pair-qr" id="pairQr" alt="QR to add a feed">
+              <div class="pair-url" id="pairUrl"></div>
+              <div class="pair-code" id="pairCode"></div>
+              <button class="ghost focusable" data-action="pair-stop">Stop pairing</button>
+            </div>
+          </div>
           <ul class="feed-list" id="feedList"></ul>
           <label class="check">
             <input class="focusable" type="checkbox" id="sampleFeed" checked>

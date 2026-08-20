@@ -7,7 +7,6 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import java.io.ByteArrayInputStream
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.Locale
@@ -62,23 +61,23 @@ class LineWebClient(private val context: Context) : WebViewClient() {
             setRequestProperty("User-Agent", USER_AGENT)
             setRequestProperty("Accept", "application/json, application/rss+xml, application/xml, text/xml, */*;q=0.8")
         }
-        val code = conn.responseCode
-        if (code in 300..399) {
-            val next = conn.getHeaderField("Location") ?: return text(502, "text/plain", "redirect without location")
-            val resolved = URL(URL(url), next).toString()
-            val safety = SafeUrl.check(resolved)
-            if (!safety.ok) return text(400, "text/plain", safety.reason)
+        try {
+            val code = conn.responseCode
+            if (code in 300..399) {
+                val next = conn.getHeaderField("Location") ?: return text(502, "text/plain", "redirect without location")
+                val resolved = URL(URL(url), next).toString()
+                val safety = SafeUrl.check(resolved)
+                if (!safety.ok) return text(400, "text/plain", safety.reason)
+                return fetch(safety.url, hops + 1)
+            }
+            val raw = if (code in 200..299) conn.inputStream else (conn.errorStream ?: ByteArrayInputStream(ByteArray(0)))
+            val bytes = raw.use { it.readBytes().let { data -> if (data.size > MAX_BYTES) data.copyOf(MAX_BYTES) else data } }
+            val mime = conn.contentType?.substringBefore(';')?.trim()?.ifBlank { null } ?: "application/octet-stream"
+            val message = conn.responseMessage ?: "OK"
+            return WebResourceResponse(mime, "utf-8", code, message, CORS_HEADERS, ByteArrayInputStream(bytes))
+        } finally {
             conn.disconnect()
-            return fetch(safety.url, hops + 1)
         }
-        val stream: InputStream = if (code in 200..299) {
-            LimitedStream(conn.inputStream, MAX_BYTES)
-        } else {
-            (conn.errorStream ?: ByteArrayInputStream(ByteArray(0)))
-        }
-        val mime = conn.contentType?.substringBefore(';')?.trim()?.ifBlank { null } ?: "application/octet-stream"
-        val message = conn.responseMessage ?: "OK"
-        return WebResourceResponse(mime, "utf-8", code, message, CORS_HEADERS, stream)
     }
 
     private fun text(code: Int, mime: String, body: String): WebResourceResponse {
@@ -108,26 +107,6 @@ class LineWebClient(private val context: Context) : WebViewClient() {
             "woff2" -> "font/woff2"
             else -> "application/octet-stream"
         }
-    }
-
-    private class LimitedStream(private val inner: InputStream, private val limit: Int) : InputStream() {
-        private var seen = 0
-        override fun read(): Int {
-            if (seen >= limit) return -1
-            val value = inner.read()
-            if (value >= 0) seen += 1
-            return value
-        }
-
-        override fun read(b: ByteArray, off: Int, len: Int): Int {
-            if (seen >= limit) return -1
-            val allowed = minOf(len, limit - seen)
-            val n = inner.read(b, off, allowed)
-            if (n > 0) seen += n
-            return n
-        }
-
-        override fun close() = inner.close()
     }
 
     companion object {

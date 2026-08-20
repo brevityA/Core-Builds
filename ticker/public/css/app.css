@@ -59,7 +59,8 @@ body {
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus { outline: none; }
-.focusable:focus-visible, .focusable.is-focused {
+.focusable:focus-visible, .focusable.is-focused,
+[data-tv] .focusable:focus {
   outline: 3px solid var(--line);
   outline-offset: 3px;
 }

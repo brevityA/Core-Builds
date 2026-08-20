@@ -1,8 +1,9 @@
 export function initTvNav(root) {
   const onKey = (event) => {
+    if (isEditing(event.target)) return;
     const map = {
       ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
-      Enter: 'ok', Escape: 'back', Backspace: 'back',
+      Enter: 'ok', Escape: 'back',
     };
     const dir = map[event.key];
     if (!dir) return;
@@ -69,6 +70,18 @@ function box(el) {
 
 function visible(el) {
   if (el.disabled) return false;
+  if (el.closest('[hidden]')) return false;
   const r = el.getBoundingClientRect();
   return r.width > 0 && r.height > 0;
+}
+
+function isEditing(el) {
+  if (!el || el === document.body) return false;
+  const tag = (el.tagName || '').toLowerCase();
+  if (tag === 'textarea' || tag === 'select') return true;
+  if (tag === 'input') {
+    const type = (el.type || 'text').toLowerCase();
+    return !['button', 'submit', 'checkbox', 'radio', 'range'].includes(type);
+  }
+  return Boolean(el.isContentEditable);
 }

@@ -77,7 +77,6 @@ const ALIAS_PAIRS = [
   ['sky sports main event', 'SKY ME'],
   ['sky sports premier league', 'SKY PL'],
   ['sky sports', 'SKY'],
-  ['tnt sports', 'TNT SP'],
   ['bt sport', 'TNT SP'],
   ['now tv', 'NOW'],
   ['tsn 1', 'TSN1'],

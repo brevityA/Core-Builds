@@ -1,0 +1,52 @@
+# Copy this file to .github/workflows/core-line-apk.yml if the sandbox
+# cannot push workflow files. Then: Actions → Core Line APK → download artifact.
+name: Core Line APK
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'ticker/**'
+      - '.github/workflows/core-line-apk.yml'
+  push:
+    paths:
+      - 'ticker/**'
+      - '.github/workflows/core-line-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    name: Assemble debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform 34
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Install Gradle 8.7
+        run: |
+          curl -fsSL -o /tmp/gradle-8.7-bin.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q /tmp/gradle-8.7-bin.zip -d /opt
+          echo "/opt/gradle-8.7/bin" >> "$GITHUB_PATH"
+
+      - name: Assemble debug APK
+        working-directory: ticker/android
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Upload CoreLine.apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoreLine-debug
+          path: ticker/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

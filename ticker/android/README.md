@@ -16,6 +16,21 @@ It still does **not** play video.
 LIVE  TOR 3-2 MTL  ·  TSN4  SN 3
 ```
 
+## Get the APK
+
+**GitHub Actions:** after the workflow is on the branch, open the run → download the `CoreLine-debug` artifact → sideload `app-debug.apk`.
+
+If this repo cannot store workflow files from the agent, copy `github-workflow-core-line-apk.yml` to `.github/workflows/core-line-apk.yml` and push.
+
+## Add a feed from the phone (TV)
+
+1. On the Stick, Settings → **Add from phone (same Wi-Fi)**
+2. Scan the QR or open the address on your phone
+3. Paste the RSS URL + the 6-letter code
+4. The crawl picks it up. No D-pad typing.
+
+The pair listener only runs while that panel is open.
+
 ## Build an APK (Android Studio)
 
 1. Install [Android Studio](https://developer.android.com/studio) (Hedgehog or newer is fine).

@@ -206,7 +206,8 @@ async function serveStatic(pathname, res) {
   const root = rel.startsWith('/lib/') ? LIB_DIR : PUBLIC_DIR;
   const slice = rel.startsWith('/lib/') ? rel.slice('/lib/'.length) : rel.slice(1);
   const file = path.normalize(path.join(root, slice));
-  if (!file.startsWith(root)) {
+  const rootWithSep = root.endsWith(path.sep) ? root : root + path.sep;
+  if (file !== root && !file.startsWith(rootWithSep)) {
     send(res, 403, 'Forbidden');
     return;
   }

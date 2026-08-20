@@ -17,10 +17,13 @@ const state = loadState();
 let events = [];
 let wakeLock = null;
 let clockTimer = null;
+let refreshGen = 0;
+let pairTimer = null;
 
 init();
 
 async function init() {
+  document.documentElement.toggleAttribute('data-tv', Boolean(globalThis.CORELINE_TV));
   applyChrome();
   bind();
   initTvNav(document.getElementById('app'));
@@ -29,16 +32,14 @@ async function init() {
   const cached = readCachedSlate();
   if (cached?.events?.length) {
     events = cached.events;
-    render();
+  } else {
+    events = buildDemoSlate();
   }
+  render();
   await refresh();
   setInterval(refresh, 60_000);
   if ('serviceWorker' in navigator && !isNativeShell()) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
-  }
-  if (globalThis.CORELINE_TV && !localStorage.getItem('coreline.v1')) {
-    state.mode = 'board';
-    applyChrome();
   }
 }
 
@@ -52,6 +53,8 @@ function bind() {
     if (action === 'refresh') refresh(true);
     if (action === 'mode') toggleMode();
     if (action === 'add-feed') addFeed();
+    if (action === 'pair-start') startPair();
+    if (action === 'pair-stop') stopPair();
     if (action === 'remove-feed') {
       state.feeds = state.feeds.filter((f) => f.url !== btn.dataset.url);
       persist();
@@ -128,6 +131,7 @@ function applyChrome() {
   $('clockFmt').value = state.clockFmt;
   renderLeagueToggles();
   renderFeeds();
+  if ($('pairBox')) $('pairBox').hidden = !isNativeShell();
   syncWakeLock();
 }
 
@@ -137,7 +141,8 @@ function persist() {
 
 function openDrawer(open) {
   $('drawer').hidden = !open;
-  if (open) $('feedUrl').focus();
+  if (open && !globalThis.CORELINE_TV) $('feedUrl').focus();
+  if (!open) stopPair();
 }
 
 function toggleMode() {
@@ -146,23 +151,79 @@ function toggleMode() {
   applyChrome();
 }
 
-function addFeed() {
-  const url = $('feedUrl').value.trim();
-  const label = $('feedLabel').value.trim() || 'RSS';
+function addFeed(rawUrl, rawLabel) {
+  const url = (rawUrl ?? $('feedUrl').value).trim();
+  const label = (rawLabel ?? $('feedLabel').value).trim() || 'RSS';
   if (!url) return toast('Paste a feed URL first');
   try {
-    const parsed = new URL(url, location.href);
+    const parsed = new URL(url);
     if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('bad');
     if (state.feeds.some((f) => f.url === parsed.href)) return toast('Already added');
     state.feeds.push({ url: parsed.href, label });
-    $('feedUrl').value = '';
-    $('feedLabel').value = '';
+    if (!rawUrl) {
+      $('feedUrl').value = '';
+      $('feedLabel').value = '';
+    }
     persist();
     renderFeeds();
     refresh(true);
+    toast(`Added ${label}`);
   } catch {
-    toast('That does not look like a URL');
+    toast('Need a full http(s) URL');
   }
+}
+
+function nativeBridge() {
+  return globalThis.CoreLineNative || null;
+}
+
+function startPair() {
+  const bridge = nativeBridge();
+  if (!bridge?.startPair) {
+    toast('Pairing is in the Android app — same Wi-Fi as the TV');
+    return;
+  }
+  let info;
+  try {
+    info = JSON.parse(bridge.startPair());
+  } catch {
+    toast('Could not start pairing');
+    return;
+  }
+  if (!info.ok || !info.url) {
+    toast(info.error || 'No Wi-Fi address yet');
+    return;
+  }
+  $('pairCard').hidden = false;
+  $('pairUrl').textContent = info.url;
+  $('pairCode').textContent = info.code || '';
+  const qr = $('pairQr');
+  qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(info.url)}`;
+  qr.onerror = () => { qr.style.display = 'none'; };
+  clearInterval(pairTimer);
+  pairTimer = setInterval(pollPairInbox, 1000);
+}
+
+function stopPair() {
+  clearInterval(pairTimer);
+  pairTimer = null;
+  try { nativeBridge()?.stopPair?.(); } catch { /* ignore */ }
+  if ($('pairCard')) $('pairCard').hidden = true;
+}
+
+function pollPairInbox() {
+  const bridge = nativeBridge();
+  if (!bridge?.takeInbox) return;
+  let payload = '';
+  try { payload = bridge.takeInbox() || ''; } catch { return; }
+  if (!payload) return;
+  try {
+    const feed = JSON.parse(payload);
+    if (feed.url) {
+      addFeed(feed.url, feed.label);
+      stopPair();
+    }
+  } catch { /* ignore malformed */ }
 }
 
 function renderFeeds() {
@@ -420,6 +481,7 @@ function tickClock() {
 }
 
 async function syncWakeLock() {
+  try { nativeBridge()?.setKeepAwake?.(Boolean(state.wakeLock)); } catch { /* no native bridge */ }
   try {
     if (state.wakeLock && navigator.wakeLock) {
       wakeLock = await navigator.wakeLock.request('screen');

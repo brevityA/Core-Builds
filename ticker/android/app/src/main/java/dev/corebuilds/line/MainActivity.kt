@@ -9,14 +9,15 @@ import android.view.WindowManager
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import org.json.JSONObject
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
+    private val pairServer = PairServer()
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         hideSystemUi()
 
         webView = WebView(this).apply {
@@ -27,8 +28,10 @@ class MainActivity : Activity() {
             webChromeClient = WebChromeClient()
         }
         configure(webView.settings)
+        webView.addJavascriptInterface(LineBridge(this), "CoreLineNative")
         setContentView(webView)
         webView.requestFocus()
+        setKeepAwake(true)
 
         val tv = isTelevision()
         val query = buildString {
@@ -36,6 +39,36 @@ class MainActivity : Activity() {
             if (tv) append("&tv=1")
         }
         webView.loadUrl("https://${LineWebClient.HOST}/index.html?$query")
+    }
+
+    fun startPair(): String = synchronized(pairServer) {
+        return try {
+            pairServer.start().toString()
+        } catch (err: Exception) {
+            JSONObject()
+                .put("ok", false)
+                .put("error", err.message ?: "could not start pair server")
+                .toString()
+        }
+    }
+
+    fun stopPair() {
+        synchronized(pairServer) { pairServer.stop() }
+    }
+
+    fun takeInbox(): String {
+        val feed = synchronized(pairServer) { pairServer.takeInbox() } ?: return ""
+        return JSONObject()
+            .put("url", feed.url)
+            .put("label", feed.label)
+            .toString()
+    }
+
+    fun setKeepAwake(on: Boolean) {
+        runOnUiThread {
+            if (on) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -67,6 +100,8 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
+        stopPair()
+        webView.removeJavascriptInterface("CoreLineNative")
         webView.destroy()
         super.onDestroy()
     }

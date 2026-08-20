@@ -39,6 +39,9 @@ function isPrivateIp(host) {
   if (/^0\./.test(host)) return true;
   const m = host.match(/^172\.(\d+)\./);
   if (m && Number(m[1]) >= 16 && Number(m[1]) <= 31) return true;
-  if (host === '::1' || host.startsWith('fc') || host.startsWith('fd') || host.startsWith('fe80')) return true;
+  if (host.includes(':')) {
+    const h = host.toLowerCase();
+    if (h === '::1' || h.startsWith('fc') || h.startsWith('fd') || h.startsWith('fe80')) return true;
+  }
   return false;
 }
