@@ -257,6 +257,14 @@ input, select {
   background: transparent; border: 1px solid var(--border); color: var(--muted);
   border-radius: 8px; padding: 6px 10px;
 }
+.pair { margin: 12px 0 4px; }
+.pair-card {
+  margin-top: 12px; padding: 14px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--card); text-align: center;
+}
+.pair-qr { width: 200px; height: 200px; background: #fff; border-radius: 8px; margin: 8px auto; display: block; }
+.pair-url { font-size: .95rem; word-break: break-all; margin: 8px 0 4px; color: var(--text); }
+.pair-code { font-family: var(--font); font-size: 2.2rem; letter-spacing: .28em; color: var(--line); font-weight: 800; margin-bottom: 10px; }
 .check { display: flex; gap: 10px; align-items: flex-start; color: var(--muted); font-size: .86rem; }
 .check input { width: 18px; height: 18px; margin-top: 2px; }
 .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
