@@ -2413,9 +2413,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.innerHTML = `<span class="stat"><span class="stat-val">${fmt(d.visits)}</span> visits</span><span class="stat-dot"></span><span class="stat"><span class="stat-val">${fmt(d.generates)}</span> templates built</span>`;
       el.classList.add('loaded');
     }).catch(() => {});
-    if (navigator.sendBeacon) {
-      try { navigator.sendBeacon(COUNTER_URL + '/api/visit'); } catch(e) {}
-    }
+    beaconPost(COUNTER_URL + '/api/visit');
   }
   try { history.replaceState({ step: step }, ''); } catch(e) {}
   window.addEventListener('popstate', (e) => {
@@ -4027,11 +4025,11 @@ function generate() {
   a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 100);
   saveLastGen();
-  if (USAGE_BEACON_URL && S.telemetryOk && navigator.sendBeacon) {
-    try { navigator.sendBeacon(USAGE_BEACON_URL, JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution })); } catch(e) {}
+  if (USAGE_BEACON_URL && S.telemetryOk) {
+    beaconPost(USAGE_BEACON_URL, { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
-  if (COUNTER_URL && navigator.sendBeacon) {
-    try { navigator.sendBeacon(COUNTER_URL + '/api/generate', JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution })); } catch(e) {}
+  if (COUNTER_URL) {
+    beaconPost(COUNTER_URL + '/api/generate', { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
   const dlBtn = document.querySelector('.btn-dl');
   if (dlBtn) {
@@ -7257,6 +7255,30 @@ async function fetchWithTimeout(url, options = {}, timeout = 6000) {
   finally { clearTimeout(id); }
 }
 
+// Best-effort analytics beacon. Bare navigator.sendBeacon is silently suppressed
+// by some privacy browsers/ad-blockers and returns false on failure, and its 429s
+// are unreadable — the visit counter collapse (F10, 2026-08-21) was beacon-path
+// specific (pastes/proxy stayed healthy on the same KV namespace). This helper:
+//  1. skips when offline,
+//  2. tries sendBeacon,
+//  3. falls back to a keepalive fetch (same semantics, simple POST — no preflight),
+// and never throws or blocks the UI. Function declaration = hoisted, so the
+// page-load visit beacon (defined earlier in the file) can use it.
+function beaconPost(url, payload) {
+  if (typeof navigator === 'undefined' || navigator.onLine === false) return false;
+  const body = payload === undefined ? undefined : (typeof payload === 'string' ? payload : JSON.stringify(payload));
+  try {
+    if (navigator.sendBeacon) {
+      const ok = body === undefined ? navigator.sendBeacon(url) : navigator.sendBeacon(url, body);
+      if (ok) return true;
+    }
+  } catch (e) { /* fall through to fetch */ }
+  try {
+    fetch(url, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: body || '' }).catch(() => {});
+    return true;
+  } catch (e) { return false; }
+}
+
 // Races a direct browser fetch against the Cloudflare Worker CORS proxy for the same
 // AIOStreams host/path — most public instances don't send CORS headers, so the direct
 // attempt fails fast and the proxied one (server-to-server, no CORS) wins. Whichever
@@ -7269,11 +7291,44 @@ function raceHostFetch(host, path, options, timeout) {
 
 // Never race mutating requests: a direct POST can succeed server-side while CORS hides
 // the response, causing the proxied attempt to create a duplicate configuration.
-function writeHostFetch(host, path, options, timeout) {
-  const url = CORS_PROXY
-    ? `${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`
-    : `${host}${path}`;
-  return fetchWithTimeout(url, options, timeout);
+// The worker proxy is the primary lane; on a NETWORK-level failure (the proxy never
+// connected, so the write never left it) we fall back to direct. On timeout/abort we
+// do NOT fall back — the proxy may have already forwarded the write, and a direct
+// retry would create a duplicate config on the host. A proxy 429 is also safe to fall
+// back on: it means the worker rejected the request before forwarding it.
+async function writeHostFetch(host, path, options, timeout) {
+  if (!CORS_PROXY) return fetchWithTimeout(`${host}${path}`, options, timeout);
+  let res;
+  try {
+    res = await fetchWithTimeout(`${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`, options, timeout);
+  } catch (e) {
+    if (e && e.name === 'AbortError') throw e; // may have been processed — never duplicate
+    return fetchWithTimeout(`${host}${path}`, options, timeout);
+  }
+  if (res.status === 429) return fetchWithTimeout(`${host}${path}`, options, timeout); // not forwarded — safe
+  return res;
+}
+
+// The paste store (Cloudflare KV) is eventually consistent: a value written at the
+// user's nearest PoP can take up to ~60s to reach the PoP an AIOStreams host reads
+// from, and negative lookups are cached too. Verify the paste is actually readable
+// before promising the user an import link; retry with backoff. NOTE this verifies
+// readability at the user's own PoP (where the write just landed) — a host reading
+// from a distant colo may still briefly 404; the durable fix is a strongly
+// consistent store (D1) per the rebuild plan. On failure we fall through to the
+// public paste services (bounded ~7s worst case).
+async function verifyPasteReadable(url, attempts = 4) {
+  let delay = 250;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetchWithTimeout(url, { method: 'GET' }, 1500);
+      if (r.ok) return true;
+      // 4xx (esp. 404 "not found or expired") = not propagated yet — keep waiting.
+    } catch (e) { /* transient network blip — keep waiting */ }
+    await new Promise(res => setTimeout(res, delay));
+    delay = Math.min(delay * 1.6, 1200);
+  }
+  return false;
 }
 
 async function uploadJsonForImport(jsonStr) {
@@ -7283,6 +7338,10 @@ async function uploadJsonForImport(jsonStr) {
       const r = await fetchWithTimeout(`${CORS_PROXY}/paste`, { method:'POST', headers:{'Content-Type':'application/json'}, body:jsonStr }, 5000);
       if (r.ok) { const d = await r.json(); url = d.url || null; }
     } catch(e) { console.warn("CF paste failed", e); }
+    if (url && !(await verifyPasteReadable(url))) {
+      console.warn("CF paste not readable yet (KV propagation) — falling through");
+      url = null;
+    }
   }
   if (!url) {
     try {
