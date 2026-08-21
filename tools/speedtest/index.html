@@ -641,14 +641,19 @@ function normalize(item, longPath) {
 
 async function loadEndpoints() {
   setStatus('loading', 'Loading CDN endpoints…');
-  // Parallel discovery: worker proxy and direct API race in one shot (a dead
-  // source can no longer stall the page for 4 × timeout before the snapshot
-  // fallback kicks in). First success per length wins; snapshot if both fail.
-  const [wShort, wLong, dShort, dLong] = await Promise.all([
-    trySource('worker', 'short'), trySource('worker', 'long'),
-    trySource('direct', 'short'), trySource('direct', 'long'),
-  ]);
-  let short = wShort || dShort, long = wLong || dLong;
+  // Parallel discovery: worker proxy and direct API are both put in flight at
+  // once, so a dead source costs one timeout instead of four chained ones.
+  // The worker is preferred, but a worker success returns immediately rather
+  // than waiting on the direct probe it raced — and because the direct probe
+  // was already started, falling back to it adds no latency either.
+  // trySource never rejects (it resolves null on failure), so the unawaited
+  // probe cannot surface as an unhandled rejection.
+  const discover = async (length) => {
+    const worker = trySource('worker', length);
+    const direct = trySource('direct', length);
+    return (await worker) || (await direct);
+  };
+  const [short, long] = await Promise.all([discover('short'), discover('long')]);
   let list = null;
   if (short) {
     const longPath = long && long.data[0] && long.data[0].path ? long.data[0].path : null;
@@ -827,8 +832,11 @@ async function sequentialPhase() {
     renderLiveTable(); updateMap();
     await singleStreamTest(rn, r);
     r.endT = now();
-    r.done = r.bytes > 0;
-    r.status = r.bytes > 0 ? 'done' : 'err';
+    // Hitting the 10 s cap is a good sample and sets r.capped, not r.err — but a
+    // node that transferred some bytes and then genuinely failed is NOT done, or
+    // it would earn a playback verdict from a truncated sample.
+    r.done = r.bytes > 0 && !r.err;
+    r.status = r.done ? 'done' : 'err';
     rn.current = null;
     if (!rn.finished) {
       const doneCount = rn.regions.filter(x => x.status === 'done' || x.status === 'err').length;
