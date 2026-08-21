@@ -65,3 +65,15 @@ test('express lane shows a live host-health chip (probe on open + on change)', (
   assert.match(d[1], /catch\(/, 'UI probes never throw');
   assert.match(d[1], /'outdated'/, 'UI probes flag sub-floor versions');
 });
+
+test('writeHostFetch: proxy-only writes, direct fallback ONLY on network failure or 429 (no duplicate configs)', () => {
+  const m = app.match(/async function writeHostFetch\(host, path, options, timeout\) \{([\s\S]*?)\n\}/);
+  assert.ok(m, 'writeHostFetch exists');
+  const body = m[1];
+  assert.match(body, /CORS_PROXY}\/(proxy|path)/, 'writes go through the worker proxy first');
+  assert.match(body, /AbortError/, 'timeout/abort is rethrown — the proxy may have forwarded the write');
+  assert.match(body, /res\.status === 429/, 'proxy 429 falls back to direct (write was never forwarded)');
+  assert.match(body, /return fetchWithTimeout\(`\$\{host\}\$\{path\}`, options, timeout\);/, 'network failure falls back to direct');
+  const retries = (body.match(/return fetchWithTimeout/g) || []).length;
+  assert.ok(retries >= 2, `direct fallback present for network + 429 (got ${retries})`);
+});

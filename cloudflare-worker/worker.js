@@ -161,14 +161,24 @@ function customHostScope(host, method, upstreamPath) {
   if (u.username || u.password || u.port) return null;          // no userinfo, no explicit port
   if (u.search || u.hash) return null;
   const h = u.hostname.toLowerCase();
+  // Reject loopback and private-literal forms outright (defense in depth — the
+  // runtime already blocks private-IP subrequests, but never rely on one layer):
+  //   - 127.* , localhost, 0.0.0.0, ::1
+  //   - IPv4-mapped IPv6 (::ffff:127.0.0.1 serializes to [::ffff:7f00:1])
+  //   - any pure-IP hostname (bracketed IPv6 or dotted IPv4) — custom AIOStreams
+  //     hosts are hostnames; refusing literals removes an entire bypass class.
   if (h === 'localhost' || h === '0.0.0.0' || h === '::1' || /^127\./.test(h)) return null;
+  if (h.startsWith('[') || /^::ffff:/.test(h) || /^\d{1,3}(\.\d{1,3}){3}$/.test(h)) return null;
   const path = u.pathname; // '/' (origin) or '/stremio/<uuid>/<epwd>' (manifest-derived base)
-  if (path !== '/' && !path.startsWith('/stremio/')) return null;
-  if (path.split('/').length > 4) return null;                  // cap at /stremio/<uuid>/<epwd>
-  const okStatus  = path === '/' && method === 'GET' && upstreamPath === '/api/v1/status';
-  const okUser    = path === '/' && (method === 'POST' || method === 'PATCH') && upstreamPath === '/api/v1/user';
-  const okStream  = path !== '/' && method === 'GET' && /^\/stream\/[^/]+\/[^/]+\.json$/.test(upstreamPath);
-  return (okStatus || okUser || okStream) ? { custom: true, stripAuth: true } : null;
+  const segs = path.split('/').length;
+  if (path === '/') {
+    const okStatus = method === 'GET' && upstreamPath === '/api/v1/status';
+    const okUser   = (method === 'POST' || method === 'PATCH') && upstreamPath === '/api/v1/user';
+    return (okStatus || okUser) ? { custom: true, stripAuth: true } : null;
+  }
+  if (!path.startsWith('/stremio/') || segs !== 4) return null; // exactly /stremio/<uuid>/<epwd>
+  if (method !== 'GET' || !/^\/stream\/[^/]+\/[^/]+\.json$/.test(upstreamPath)) return null;
+  return { custom: true, stripAuth: true };
 }
 
 const ALLOWED_ORIGINS = new Set([
@@ -322,8 +332,6 @@ export default {
     const isPublicRead = request.method === 'GET' &&
       (url.pathname.startsWith('/t/') || url.pathname === '/proxy/api/v1/status');
     const publicCors = isPublicRead ? corsHeaders(request, true) : null;
-    const respondPublic = (status, payload, hdrs = {}) =>
-      json(status, payload, publicCors || cors, hdrs);
     if (request.method === 'OPTIONS') {
       // Preflight must mirror what the actual request would get.
       return new Response(null, { headers: isPublicRead ? publicCors : cors });
@@ -336,7 +344,7 @@ export default {
         return respond(429, { error: 'rate limit exceeded' });
       }
       if (!env.STATS) return respond(200, {});
-      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_errors', 'pastes_created', 'pastes_viewed'];
+      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors', 'pastes_created', 'pastes_viewed'];
       const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
       const totals = {};
       keys.forEach((k, i) => { totals[k] = parseInt(vals[i], 10) || 0; });
@@ -551,6 +559,10 @@ export default {
       if (cached) {
         const body = await cached.text().catch(() => null);
         if (body !== null) {
+          // Cache hits skip the upstream fetch AND the rate-limit bucket, so
+          // they also skip proxy_calls/proxy:host counting — count them in a
+          // dedicated bucket so /api/stats stays interpretable.
+          if (env.STATS) bgIncrement(ctx, env.STATS, 'proxy_cache_hits');
           return new Response(body, {
             status: 200,
             headers: {
@@ -576,7 +588,7 @@ export default {
     const upstreamSearch = url.searchParams.toString();
     const upstreamUrl = new URL(host + upstreamPath);
     if (upstreamSearch) {
-      const cleanedSearch = upstreamSearch.replace(/(^|&)host=[^&]*/, '').replace(/^&+|&+$/g, '');
+      const cleanedSearch = upstreamSearch.replace(/(^|&)host=[^&]*/g, '').replace(/^&+|&+$/g, '');
       if (cleanedSearch) upstreamUrl.search = cleanedSearch;
     }
 

@@ -473,14 +473,41 @@ test('status probe: cache HIT serves the cached body without touching upstream o
       put: async () => {},
     },
   };
-  const rl = { get: async () => { rlTouched = true; return null; }, put: async () => {} };
-  const env = { TEMPLATES: undefined, STATS: undefined, RATELIMIT: rl };
-  const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), env, { waitUntil: () => {} });
-  assert.equal(res.status, 200);
-  assert.equal((await res.json()).data.version, '2.33.2-cached');
-  assert.equal(upstreamCalled, 0, 'cache hit must not fetch upstream');
-  assert.equal(rlTouched, false, 'cache hit must not burn the rate-limit bucket');
-  delete globalThis.caches;
+  try {
+    const rl = { get: async () => { rlTouched = true; return null; }, put: async () => {} };
+    const env = { TEMPLATES: undefined, STATS: undefined, RATELIMIT: rl };
+    const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), env, { waitUntil: () => {} });
+    assert.equal(res.status, 200);
+    assert.equal((await res.json()).data.version, '2.33.2-cached');
+    assert.equal(upstreamCalled, 0, 'cache hit must not fetch upstream');
+    assert.equal(rlTouched, false, 'cache hit must not burn the rate-limit bucket');
+  } finally {
+    delete globalThis.caches;
+  }
+});
+
+test('status probe: cache HIT counts a proxy_cache_hits increment (stats stay interpretable)', async () => {
+  const stats = {};
+  const env = {
+    TEMPLATES: undefined,
+    STATS: { get: async (k) => stats[k] || null, put: async (k, v) => { stats[k] = v; } },
+    RATELIMIT: undefined,
+  };
+  global.fetch = async () => { throw new Error('upstream must not be reached on cache hit'); };
+  globalThis.caches = {
+    default: {
+      match: async () => new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+      put: async () => {},
+    },
+  };
+  try {
+    const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), env, { waitUntil: (p) => p && p.then ? p.then(() => {}) : p });
+    assert.equal(res.status, 200);
+    await new Promise(r => setImmediate(r));
+    assert.equal(stats.proxy_cache_hits, '1', 'cache hit must increment proxy_cache_hits');
+  } finally {
+    delete globalThis.caches;
+  }
 });
 
 test('status probe: cache MISS stores a 200 for later (put called with cacheable headers)', async () => {
@@ -492,14 +519,17 @@ test('status probe: cache MISS stores a 200 for later (put called with cacheable
       put: async (key, value) => { putArgs = { key: String(key.url), cc: value.headers.get('Cache-Control') }; },
     },
   };
-  const ctx = { waitUntil: (p) => p.then ? p.then(() => {}) : p };
-  const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, ctx);
-  assert.equal(res.status, 200);
-  await new Promise(r => setImmediate(r)); // let waitUntil settle
-  assert.ok(putArgs, '200 status probe must be stored in the Cache API');
-  assert.ok(putArgs.key.includes('/proxy/api/v1/status'));
-  assert.match(putArgs.cc, /s-maxage=30/);
-  delete globalThis.caches;
+  try {
+    const ctx = { waitUntil: (p) => p.then ? p.then(() => {}) : p };
+    const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, ctx);
+    assert.equal(res.status, 200);
+    await new Promise(r => setImmediate(r)); // let waitUntil settle
+    assert.ok(putArgs, '200 status probe must be stored in the Cache API');
+    assert.ok(putArgs.key.includes('/proxy/api/v1/status'));
+    assert.match(putArgs.cc, /s-maxage=30/);
+  } finally {
+    delete globalThis.caches;
+  }
 });
 
 test('status probe: non-status paths are never stored in the cache', async () => {
@@ -511,9 +541,38 @@ test('status probe: non-status paths are never stored in the cache', async () =>
       put: async () => { putCalled = true; },
     },
   };
-  const ctx = { waitUntil: (p) => p.then ? p.then(() => {}) : p };
-  await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, ctx);
-  await new Promise(r => setImmediate(r));
-  assert.equal(putCalled, false, 'mutating/non-status responses must not be cached');
-  delete globalThis.caches;
+  try {
+    const ctx = { waitUntil: (p) => p.then ? p.then(() => {}) : p };
+    await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, ctx);
+    await new Promise(r => setImmediate(r));
+    assert.equal(putCalled, false, 'mutating/non-status responses must not be cached');
+  } finally {
+    delete globalThis.caches;
+  }
+});
+
+test('custom lane: IP literals and IPv4-mapped loopback are refused (defense in depth)', async () => {
+  let reached = false;
+  global.fetch = async () => { reached = true; return new Response('{}', { status: 200 }); };
+  const bads = [
+    'https://[::ffff:127.0.0.1]',            // IPv4-mapped IPv6 loopback
+    'https://[::1]',                         // IPv6 loopback
+    'https://127.0.0.1',                     // IPv4 loopback literal
+    'https://192.168.1.10',                  // private IPv4 literal
+    'https://10.0.0.5',                      // private IPv4 literal
+  ];
+  for (const bad of bads) {
+    const res = await worker.fetch(new Request('https://w.example/proxy/api/v1/status?host=' + encodeURIComponent(bad)), {}, { waitUntil: () => {} });
+    assert.equal(res.status, 403, `${bad} must be refused`);
+  }
+  assert.equal(reached, false);
+});
+
+test('custom lane: 3-segment /stremio/<uuid> (missing password) is refused for stream probes', async () => {
+  let reached = false;
+  global.fetch = async () => { reached = true; return new Response('{}', { status: 200 }); };
+  const noPwd = encodeURIComponent('https://selfhost.example.com/stremio/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
+  const res = await worker.fetch(new Request(`https://w.example/proxy/stream/movie/tt1375666.json?host=${noPwd}`, { method: 'GET' }), {}, { waitUntil: () => {} });
+  assert.equal(res.status, 403);
+  assert.equal(reached, false);
 });

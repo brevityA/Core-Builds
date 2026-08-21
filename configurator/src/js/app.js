@@ -7272,23 +7272,29 @@ function raceHostFetch(host, path, options, timeout) {
 // The worker proxy is the primary lane; on a NETWORK-level failure (the proxy never
 // connected, so the write never left it) we fall back to direct. On timeout/abort we
 // do NOT fall back — the proxy may have already forwarded the write, and a direct
-// retry would create a duplicate config on the host.
+// retry would create a duplicate config on the host. A proxy 429 is also safe to fall
+// back on: it means the worker rejected the request before forwarding it.
 async function writeHostFetch(host, path, options, timeout) {
   if (!CORS_PROXY) return fetchWithTimeout(`${host}${path}`, options, timeout);
+  let res;
   try {
-    return await fetchWithTimeout(`${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`, options, timeout);
+    res = await fetchWithTimeout(`${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`, options, timeout);
   } catch (e) {
     if (e && e.name === 'AbortError') throw e; // may have been processed — never duplicate
     return fetchWithTimeout(`${host}${path}`, options, timeout);
   }
+  if (res.status === 429) return fetchWithTimeout(`${host}${path}`, options, timeout); // not forwarded — safe
+  return res;
 }
 
 // The paste store (Cloudflare KV) is eventually consistent: a value written at the
 // user's nearest PoP can take up to ~60s to reach the PoP an AIOStreams host reads
 // from, and negative lookups are cached too. Verify the paste is actually readable
-// before promising the user an import link; retry with backoff. Typical propagation
-// is <2s, so the happy path costs nothing; on failure we fall through to the public
-// paste services (bounded ~7s worst case).
+// before promising the user an import link; retry with backoff. NOTE this verifies
+// readability at the user's own PoP (where the write just landed) — a host reading
+// from a distant colo may still briefly 404; the durable fix is a strongly
+// consistent store (D1) per the rebuild plan. On failure we fall through to the
+// public paste services (bounded ~7s worst case).
 async function verifyPasteReadable(url, attempts = 4) {
   let delay = 250;
   for (let i = 0; i < attempts; i++) {
