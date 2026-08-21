@@ -7269,11 +7269,38 @@ function raceHostFetch(host, path, options, timeout) {
 
 // Never race mutating requests: a direct POST can succeed server-side while CORS hides
 // the response, causing the proxied attempt to create a duplicate configuration.
-function writeHostFetch(host, path, options, timeout) {
-  const url = CORS_PROXY
-    ? `${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`
-    : `${host}${path}`;
-  return fetchWithTimeout(url, options, timeout);
+// The worker proxy is the primary lane; on a NETWORK-level failure (the proxy never
+// connected, so the write never left it) we fall back to direct. On timeout/abort we
+// do NOT fall back — the proxy may have already forwarded the write, and a direct
+// retry would create a duplicate config on the host.
+async function writeHostFetch(host, path, options, timeout) {
+  if (!CORS_PROXY) return fetchWithTimeout(`${host}${path}`, options, timeout);
+  try {
+    return await fetchWithTimeout(`${CORS_PROXY}/proxy${path}?host=${encodeURIComponent(host)}`, options, timeout);
+  } catch (e) {
+    if (e && e.name === 'AbortError') throw e; // may have been processed — never duplicate
+    return fetchWithTimeout(`${host}${path}`, options, timeout);
+  }
+}
+
+// The paste store (Cloudflare KV) is eventually consistent: a value written at the
+// user's nearest PoP can take up to ~60s to reach the PoP an AIOStreams host reads
+// from, and negative lookups are cached too. Verify the paste is actually readable
+// before promising the user an import link; retry with backoff. Typical propagation
+// is <2s, so the happy path costs nothing; on failure we fall through to the public
+// paste services (bounded ~7s worst case).
+async function verifyPasteReadable(url, attempts = 4) {
+  let delay = 250;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetchWithTimeout(url, { method: 'GET' }, 1500);
+      if (r.ok) return true;
+      // 4xx (esp. 404 "not found or expired") = not propagated yet — keep waiting.
+    } catch (e) { /* transient network blip — keep waiting */ }
+    await new Promise(res => setTimeout(res, delay));
+    delay = Math.min(delay * 1.6, 1200);
+  }
+  return false;
 }
 
 async function uploadJsonForImport(jsonStr) {
@@ -7283,6 +7310,10 @@ async function uploadJsonForImport(jsonStr) {
       const r = await fetchWithTimeout(`${CORS_PROXY}/paste`, { method:'POST', headers:{'Content-Type':'application/json'}, body:jsonStr }, 5000);
       if (r.ok) { const d = await r.json(); url = d.url || null; }
     } catch(e) { console.warn("CF paste failed", e); }
+    if (url && !(await verifyPasteReadable(url))) {
+      console.warn("CF paste not readable yet (KV propagation) — falling through");
+      url = null;
+    }
   }
   if (!url) {
     try {
