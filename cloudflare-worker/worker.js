@@ -344,7 +344,15 @@ export default {
         return respond(429, { error: 'rate limit exceeded' });
       }
       if (!env.STATS) return respond(200, {});
-      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors', 'pastes_created', 'pastes_viewed', 'visits_rate_limited', 'visits_write_err'];
+      // Every counter the worker writes must appear here or it is write-only.
+      // The proxy_err_* class counters are incremented as `proxy_err_${cls}`
+      // (underscore) while the per-host ones are `proxy_err:${hostname}` (colon),
+      // so the listByPrefix('proxy_err:') scan below does NOT pick them up — they
+      // need naming explicitly. Adding a counter without adding it here makes it
+      // invisible to /api/stats and to smoke.mjs.
+      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors',
+        'pastes_created', 'pastes_viewed', 'visits_rate_limited', 'visits_write_err',
+        'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status'];
       const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
       const totals = {};
       keys.forEach((k, i) => { totals[k] = parseInt(vals[i], 10) || 0; });

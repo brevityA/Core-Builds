@@ -595,3 +595,29 @@ test('visit: rate-limited visits are counted in visits_rate_limited (never silen
   assert.ok(Number(stats.visits_rate_limited) > 0, 'rate-limited visits must be surfaced in stats');
   assert.ok(Number(stats.visits) <= 30, 'only non-rate-limited visits count toward visits');
 });
+
+// A counter that is written but not listed in the /api/stats `keys` array is
+// write-only: it accumulates in KV and no one can ever read it. That happened to
+// proxy_err_timeout/network/oversize/status — they are incremented as
+// `proxy_err_${cls}` (underscore) while listByPrefix scans `proxy_err:` (colon),
+// so the prefix scan never covered them and the explicit list omitted them.
+// smoke.mjs checked for them and reported a WARN blaming a stale deploy.
+test('/api/stats surfaces every counter the worker writes', async () => {
+  const written = [
+    'visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors',
+    'pastes_created', 'pastes_viewed', 'visits_rate_limited', 'visits_write_err',
+    'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
+  ];
+  const store = Object.fromEntries(written.map((k, i) => [k, String(i + 1)]));
+  const env = {
+    STATS: { get: async k => store[k] ?? null, list: async () => ({ keys: [] }) },
+  };
+  const res = await worker.fetch(new Request('https://w.example/api/stats'), env, { waitUntil() {} });
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  const missing = written.filter(k => !(k in body));
+  assert.deepEqual(missing, [], `counters written to KV but absent from /api/stats: ${missing.join(', ')}`);
+  // and the values must be the real ones, not zeros from a default
+  assert.equal(body.proxy_err_timeout, 10);
+  assert.equal(body.proxy_err_status, 13);
+});
