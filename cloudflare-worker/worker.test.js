@@ -576,3 +576,22 @@ test('custom lane: 3-segment /stremio/<uuid> (missing password) is refused for s
   assert.equal(res.status, 403);
   assert.equal(reached, false);
 });
+
+test('visit: rate-limited visits are counted in visits_rate_limited (never silent)', async () => {
+  const stats = {}; const rlStore = {};
+  const statsKv = { get: async (k) => stats[k] || null, put: async (k, v) => { stats[k] = v; } };
+  const rl = { get: async (k) => (k in rlStore ? rlStore[k] : null), put: async (k, v) => { rlStore[k] = v; } };
+  const env = { STATS: statsKv, RATELIMIT: rl };
+  const ctx = { waitUntil: (p) => p && p.then ? p.then(() => {}) : p };
+  const ip = '203.0.113.99';
+  let last = 200;
+  for (let i = 0; i < 31; i++) {
+    const res = await worker.fetch(new Request('https://w.example/api/visit', { method: 'POST', headers: { 'cf-connecting-ip': ip } }), env, ctx);
+    last = res.status;
+    if (res.status === 429) break;
+  }
+  assert.equal(last, 429, 'bucket must trip within 31 requests');
+  await new Promise(r => setImmediate(r));
+  assert.ok(Number(stats.visits_rate_limited) > 0, 'rate-limited visits must be surfaced in stats');
+  assert.ok(Number(stats.visits) <= 30, 'only non-rate-limited visits count toward visits');
+});

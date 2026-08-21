@@ -2413,9 +2413,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.innerHTML = `<span class="stat"><span class="stat-val">${fmt(d.visits)}</span> visits</span><span class="stat-dot"></span><span class="stat"><span class="stat-val">${fmt(d.generates)}</span> templates built</span>`;
       el.classList.add('loaded');
     }).catch(() => {});
-    if (navigator.sendBeacon) {
-      try { navigator.sendBeacon(COUNTER_URL + '/api/visit'); } catch(e) {}
-    }
+    beaconPost(COUNTER_URL + '/api/visit');
   }
   try { history.replaceState({ step: step }, ''); } catch(e) {}
   window.addEventListener('popstate', (e) => {
@@ -4027,11 +4025,11 @@ function generate() {
   a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 100);
   saveLastGen();
-  if (USAGE_BEACON_URL && S.telemetryOk && navigator.sendBeacon) {
-    try { navigator.sendBeacon(USAGE_BEACON_URL, JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution })); } catch(e) {}
+  if (USAGE_BEACON_URL && S.telemetryOk) {
+    beaconPost(USAGE_BEACON_URL, { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
-  if (COUNTER_URL && navigator.sendBeacon) {
-    try { navigator.sendBeacon(COUNTER_URL + '/api/generate', JSON.stringify({ v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution })); } catch(e) {}
+  if (COUNTER_URL) {
+    beaconPost(COUNTER_URL + '/api/generate', { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
   const dlBtn = document.querySelector('.btn-dl');
   if (dlBtn) {
@@ -7255,6 +7253,30 @@ async function fetchWithTimeout(url, options = {}, timeout = 6000) {
   const id = setTimeout(() => controller.abort(), timeout);
   try { return await fetch(url, { ...options, signal: controller.signal }); }
   finally { clearTimeout(id); }
+}
+
+// Best-effort analytics beacon. Bare navigator.sendBeacon is silently suppressed
+// by some privacy browsers/ad-blockers and returns false on failure, and its 429s
+// are unreadable — the visit counter collapse (F10, 2026-08-21) was beacon-path
+// specific (pastes/proxy stayed healthy on the same KV namespace). This helper:
+//  1. skips when offline,
+//  2. tries sendBeacon,
+//  3. falls back to a keepalive fetch (same semantics, simple POST — no preflight),
+// and never throws or blocks the UI. Function declaration = hoisted, so the
+// page-load visit beacon (defined earlier in the file) can use it.
+function beaconPost(url, payload) {
+  if (typeof navigator === 'undefined' || navigator.onLine === false) return false;
+  const body = payload === undefined ? undefined : (typeof payload === 'string' ? payload : JSON.stringify(payload));
+  try {
+    if (navigator.sendBeacon) {
+      const ok = body === undefined ? navigator.sendBeacon(url) : navigator.sendBeacon(url, body);
+      if (ok) return true;
+    }
+  } catch (e) { /* fall through to fetch */ }
+  try {
+    fetch(url, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: body || '' }).catch(() => {});
+    return true;
+  } catch (e) { return false; }
 }
 
 // Races a direct browser fetch against the Cloudflare Worker CORS proxy for the same

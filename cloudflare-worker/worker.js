@@ -344,7 +344,7 @@ export default {
         return respond(429, { error: 'rate limit exceeded' });
       }
       if (!env.STATS) return respond(200, {});
-      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors', 'pastes_created', 'pastes_viewed'];
+      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors', 'pastes_created', 'pastes_viewed', 'visits_rate_limited', 'visits_write_err'];
       const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
       const totals = {};
       keys.forEach((k, i) => { totals[k] = parseInt(vals[i], 10) || 0; });
@@ -365,11 +365,18 @@ export default {
     if (url.pathname === '/api/visit' && request.method === 'POST') {
       const visitIp = getClientIp(request);
       if (!(await rateAllow(env.RATELIMIT, 'visit', visitIp, ANALYTICS_PER_MIN, 60))) {
+        // sendBeacon callers cannot read the 429, so a shared-IP clamp-down is
+        // invisible — count it so /api/stats shows the clamp instead of looking
+        // like a traffic collapse (F10 in AUDIT-CONFIGURATOR-INFRA-2026-08-21).
+        if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['visits_rate_limited', `daily:visits_rl:${today()}`]);
         return respond(429, { error: 'rate limit exceeded' });
       }
       if (env.STATS) {
         const d = today();
         const v = await increment(env.STATS, 'visits');
+        // increment() returns 0 only when every KV write attempt failed — count
+        // it instead of silently reporting 0 visits.
+        if (v === 0) bgIncrement(ctx, env.STATS, 'visits_write_err');
         bgIncrement(ctx, env.STATS, `daily:visits:${d}`);
         return respond(200, { visits: v });
       }

@@ -31,6 +31,13 @@ Cross-cutting (any stage, small PRs): canonical template mirror on GitHub raw; d
 
 ## Stage 0 — Ship & observe (deploy the audit fixes)
 
+**Execution status (2026-08-21):** audit fixes + Phase-3 review fixes are code-complete on
+`arena/01a022e4-core-builds` with tests green. F10 investigation **done** (root cause
+isolated to the beacon path — evidence in `cloudflare-worker/README.md`); fix shipped
+(resilient beacon + `visits_rate_limited`/`visits_write_err` counters). Observability
+**done** (smoke script `cloudflare-worker/smoke.mjs`, metrics docs, new counters in
+`/api/stats`). Remaining: merge → Actions deploy → run the smoke script. See the open PR.
+
 **Why first:** the audit fixes (custom-host lane, paste verification, probe caching, write fallback) are already code-complete with 36 worker tests — the product is currently missing them because they're not deployed. Everything later builds on a stable, observable base.
 
 **Deliverables**
