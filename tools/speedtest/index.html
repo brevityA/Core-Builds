@@ -247,8 +247,9 @@ tr.rank-3 .rank-num{color:#d29a6a}
 .compare-select{background:var(--th-card-alt);border:1px solid var(--th-border-strong);color:var(--th-tx);border-radius:8px;padding:6px 10px;font-size:.68rem;font-weight:600;cursor:pointer}
 .stability-bar{display:inline-block;width:46px;height:5px;border-radius:99px;background:var(--th-card-alt);overflow:hidden;vertical-align:middle;margin-right:6px}
 @media (max-width:640px){
-  .export-row{width:100%}
-  .compare-select{max-width:100%;min-width:0}
+  .card-head{flex-wrap:wrap}
+  .export-row{width:100%;justify-content:flex-start}
+  .compare-select{flex:1;min-width:0;max-width:100%}
 }
 .stability-bar i{display:block;height:100%;border-radius:99px;background:var(--th-green)}
 .reg-spark{display:block}
@@ -614,7 +615,7 @@ async function trySource(src, length) {
     ? `${WORKER}/proxy/v1/api/speedtest?host=${encodeURIComponent(API_HOST)}&test_length=${length}`
     : `${API_HOST}/v1/api/speedtest?test_length=${length}`;
   try {
-    const r = await fetch(url, { signal: AbortSignal.timeout(9000), cache: 'no-store' });
+    const r = await fetch(url, { signal: AbortSignal.timeout(8000), cache: 'no-store' });
     if (!r.ok) return null;
     const j = await r.json();
     if (j && Array.isArray(j.data) && j.data.length) return { id: src, data: j.data };
@@ -640,14 +641,19 @@ function normalize(item, longPath) {
 
 async function loadEndpoints() {
   setStatus('loading', 'Loading CDN endpoints…');
-  // Sequential fallback chain: worker proxy → direct API → embedded snapshot.
-  let short = await trySource('worker', 'short');
-  let long = await trySource('worker', 'long');
-  if (!short || !long) {
-    const d1 = short || await trySource('direct', 'short');
-    const d2 = long || await trySource('direct', 'long');
-    short = short || d1; long = long || d2;
-  }
+  // Parallel discovery: worker proxy and direct API are both put in flight at
+  // once, so a dead source costs one timeout instead of four chained ones.
+  // The worker is preferred, but a worker success returns immediately rather
+  // than waiting on the direct probe it raced — and because the direct probe
+  // was already started, falling back to it adds no latency either.
+  // trySource never rejects (it resolves null on failure), so the unawaited
+  // probe cannot surface as an unhandled rejection.
+  const discover = async (length) => {
+    const worker = trySource('worker', length);
+    const direct = trySource('direct', length);
+    return (await worker) || (await direct);
+  };
+  const [short, long] = await Promise.all([discover('short'), discover('long')]);
   let list = null;
   if (short) {
     const longPath = long && long.data[0] && long.data[0].path ? long.data[0].path : null;
@@ -812,6 +818,8 @@ async function pingPhase() {
 /* ── Phase 2 (sequential): one node at a time, one connection ── */
 async function sequentialPhase() {
   const rn = run;
+  rn.lastTick = now();
+  rn.tick = setInterval(tick, 250);   // drives gauge/spark/live stats during the sequential walk
   const list = rn.regions.filter(r => r.status === 'dl');
   let idx = 0;
   for (const r of list) {
@@ -824,8 +832,11 @@ async function sequentialPhase() {
     renderLiveTable(); updateMap();
     await singleStreamTest(rn, r);
     r.endT = now();
+    // Hitting the 10 s cap is a good sample and sets r.capped, not r.err — but a
+    // node that transferred some bytes and then genuinely failed is NOT done, or
+    // it would earn a playback verdict from a truncated sample.
     r.done = r.bytes > 0 && !r.err;
-    r.status = r.err ? 'err' : (r.bytes > 0 ? 'done' : 'err');
+    r.status = r.done ? 'done' : 'err';
     rn.current = null;
     if (!rn.finished) {
       const doneCount = rn.regions.filter(x => x.status === 'done' || x.status === 'err').length;
@@ -871,7 +882,10 @@ async function singleStreamTest(rn, r) {
     }
     r.completedFile = !r.abort.signal.aborted;
   } catch (e) {
-    if (!rn.finished) r.err = String(e && e.name === 'AbortError' ? 'capped' : (e.message || 'failed'));
+    if (!rn.finished) {
+      if (e && e.name === 'AbortError') r.capped = true;   // hit the 10s cap — a successful measurement
+      else r.err = String(e.message || 'failed');
+    }
   }
   clearInterval(sampler); clearTimeout(capTimer);
 }
@@ -973,7 +987,8 @@ function tick() {
   $('stDone').textContent = `${doneCount}/${rn.regions.length}`;
   if (rn.mode === 'sequential') {
     const cur = rn.current;
-    $('stPeak').textContent = cur && cur.status === 'dl' ? fmtMbps(cur.ewma) : '—';
+    $('stPeak').textContent = fmtMbps(rn.peak);
+    $('sPeak').innerHTML = fmtMbps(rn.peak) + '<small> Mbps</small>';
     if (cur && cur.status === 'dl') {
       updateGauge(cur.ewma);
       pushSpark(cur.ewma);
@@ -1015,7 +1030,7 @@ function finishRun(note) {
   const isSingle = run.mode === 'sequential' || run.streams === 1;
   run.regions.forEach(r => {
     if (!r.endT && r.done) r.endT = t;
-    const dur = Math.max(0.05, r.done && r.endT ? (r.endT - run.started) / 1000 : run.elapsed);
+    const dur = Math.max(0.05, r.done && r.endT ? (r.endT - (r.startedT || run.started)) / 1000 : run.elapsed);
     r.sustained = r.bytes * 8 / 1e6 / dur;
     const steady = r.instantSamples.filter((_, i) => r.samples[i] && r.samples[i].t > 2000);  // post slow-start
     const insts = steady.length >= 3 ? steady : (r.instantSamples.length ? r.instantSamples : [r.sustained]);
@@ -1025,6 +1040,7 @@ function finishRun(note) {
     if (r.status === 'dl') { r.status = r.bytes > 0 ? 'done' : 'err'; r.done = r.bytes > 0; }
     if ((r.status === 'queued' || r.status === 'ping') && run.partial) { r.status = 'err'; r.err = 'skipped'; }
     if (r.bytes === 0 && !r.ping) { r.status = 'err'; r.err = r.err || 'no response'; }
+    if (run.partial && r.bytes === 0 && !r.err) { r.err = 'skipped'; }
     // Playback verdicts only from single-connection data.
     if (isSingle && r.sustained > 0) {
       const base = r.sustained * 0.85;
@@ -1059,6 +1075,7 @@ function finishRun(note) {
   applyModeDisabled();
   $('liveBadge').hidden = true;
   $('liveSub').textContent = 'One node at a time in Sequential mode — ranked when finished.';
+  renderLiveTable();   // final states (done/err/skipped) — the throttled renderer skips mid-run frames
   updateMap(true);
   renderHistory();
 }
@@ -1105,7 +1122,7 @@ function renderLiveTable() {
     const chip = st === 'queued' ? '<span class="chip-mini">waiting</span>'
       : st === 'ping' ? '<span class="chip-mini run">ping</span>'
       : st === 'dl' ? '<span class="chip-mini run">● testing</span>'
-      : st === 'done' ? '<span class="chip-mini ok">✓ done</span>'
+      : st === 'done' ? `<span class="chip-mini ok"${r.capped ? ' title="measured for 10 s, then capped — good sample"' : ''}>✓ done</span>`
       : st === 'err' ? `<span class="chip-mini bad" title="${esc(r.err || '')}">✕ ${esc((r.err || 'failed').slice(0, 12))}</span>`
       : '<span class="chip-mini">idle</span>';
     const pingTxt = r.ping != null ? fmtMs(r.ping) : st === 'ping' ? '…' : '—';
@@ -1249,6 +1266,7 @@ function updateMap(final) {
   g.innerHTML = '';
   servers.forEach(s => {
     if (s.lat == null || s.lng == null) return;
+    if (s.meta && s.meta.net && s.meta.net !== 'direct') return;   // edge/anycast live in the legend, not the map
     const p = proj(s.lat, s.lng);
     const r = rowFor(s);
     const value = r ? (r.sustained || r.ewma || 0) : 0;
@@ -1574,11 +1592,17 @@ $('diagBtn').addEventListener('click', async () => {
 /* ────────────────────────── Controls wiring ────────────────────────── */
 $('goBtn').addEventListener('click', () => { if (run && !run.finished) stopTest(true); else startTest(); });
 $('refreshBtn').addEventListener('click', loadEndpoints);
+let lastStreams = '4';
 function applyModeDisabled() {
   const mode = $('modeSel').value;
   $('durSel').disabled = mode !== 'burst';
   $('streamsSel').disabled = mode === 'sequential';
-  if (mode === 'sequential') $('streamsSel').value = '1';
+  if (mode === 'sequential') {
+    if ($('streamsSel').value !== '1') lastStreams = $('streamsSel').value;
+    $('streamsSel').value = '1';
+  } else if ($('streamsSel').value === '1' && lastStreams !== '1') {
+    $('streamsSel').value = lastStreams;
+  }
 }
 $('modeSel').addEventListener('change', () => {
   applyModeDisabled();
@@ -1588,7 +1612,6 @@ $('modeSel').addEventListener('change', () => {
     : m === 'full'
     ? 'Full tests can move several GB on a fast line. Every node is capped at 1 GB (or 90 s), there is a 12 GB global budget, and Stop aborts everything instantly.'
     : 'Multi-stream race: every node downloads at once, so numbers are contested and latency-masked. Great for fun and pipe capacity — use Sequential mode for playback-accurate ranking.';
-  if (m === 'sequential') $('streamsSel').value = '1';
 });
 applyModeDisabled();
 
