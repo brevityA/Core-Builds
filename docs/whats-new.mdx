@@ -14,12 +14,15 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
 
 <CardGroup cols={2}>
   <Card title="CoreSpeed, a TorBox CDN speed test" icon="sparkles">
-    races all 17 Hyperdrive nodes at once and tells you which one to be on. Latency first (3 pings per node), then sustained multi-stream downloads of TorBox's own test files, so the numbers come from real bytes off real nodes. Live leaderboard, world map, speedometer, and a per-region verdict on what each node can actually stream for you (4K Remux down to SD, with 15% headroom). Last 15 runs are kept locally with change-vs-previous columns; export as Markdown, CSV or JSON. Find it at tools/speedtest/ or from the Builder splash under Utilities.
+    measures all 17 Hyperdrive nodes and tells you which one to be on. It tests them the way a player actually streams: one node at a time, over a single connection, capped at 10 seconds each (~75 to 180 seconds for the full set). Ping is the trimmed mean of 5 HEAD requests. Live gauge and sparkline while it walks the list, then a ranked table, world map, and a per-region verdict on what each node can really stream for you (4K Remux down to SD, with 15% headroom) — and because latency is measured honestly, a node above 250 ms cannot earn a 4K verdict no matter how fast it downloads. Last 15 runs are kept locally with change-vs-previous columns; export as Markdown, CSV or JSON. Find it at tools/speedtest/ or from the Builder splash under Utilities.
   </Card>
-  <Card title="Pick Burst mode first" icon="bolt">
-    it ranks every node in 5 to 20 seconds each and costs a fraction of the data. Quick pulls 100 MB per node and Full pulls 1 GB, so a Full run across all nodes moves real gigabytes; there is a hard 12 GB budget and an instant Stop for exactly that reason. No account, no API key, and no Core Builds backend: the measurement runs in your browser and results stay there.
+  <Card title="Sequential is the default, and it is the mode to trust. Burst, Quick and Full run every node at once with several streams each" icon="bolt">
+    that measures how much pipe you have, not what a stream will do, because parallel connections mask latency and a fast-ramping node steals bandwidth from its neighbours during the race. Those modes are labelled capacity races and deliberately produce no playback verdicts. Quick pulls 100 MB per node and Full pulls 1 GB, so a Full run moves real gigabytes; there is a hard 12 GB budget and an instant Stop for exactly that reason. No account, no API key, and no Core Builds backend: the measurement runs in your browser and results stay there.
   </Card>
-  <Card title="The proxy lane was opened narrowly" icon="shield-check">
+  <Card title="If a run ever looks wrong" icon="shield-check">
+    a far-away node winning, or results that disagree with TorBox's own site — re-run in Sequential mode first, then use the ⛨ Diagnostics button and share the JSON it downloads. It carries per-node pings, every round, DNS records and your ISP/ASN, which is what the crew needs to tell a routing quirk from a bug.
+  </Card>
+  <Card title="The proxy lane was opened narrowly" icon="sliders">
     TorBox's API sends no CORS header, so CoreSpeed fetches the CDN list through the Core Builds worker. That worker forwards any Authorization header a caller sets, which the WuPlay lane depends on, and allowing TorBox under those rules would have turned it into an authenticated relay for a service where you hold your own account key. It is scoped instead to that single public read, with credentials stripped and every other path and method refused — verified against the deployed worker rather than assumed.
   </Card>
 </CardGroup>

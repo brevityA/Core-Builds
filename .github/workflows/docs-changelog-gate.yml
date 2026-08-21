@@ -34,7 +34,14 @@ jobs:
           CHANGED="$(git diff --name-only "origin/${BASE}...HEAD" 2>/dev/null || git diff --name-only HEAD 2>/dev/null || true)"
 
           user_facing=false
-          if echo "$CHANGED" | grep -qE '^(configurator/src/|Templates/|Formatters/|Filtering/|AIOMetadata/)'; then
+          # tools/ and account-tools/ ship user-facing pages (CoreSpeed, Inspector, Preflight,
+          # Addon Backup). They were missing here, so every CoreSpeed change set user_facing=false
+          # — which sets opt_out=true — and the gate passed green without ever being able to warn.
+          # That is how the v2 measurement rewrite shipped while the Tools page kept describing v1.
+          # tools/index.html itself is generated from changelog.js by sync-docs.py, so exclude it:
+          # it changes as a *result* of a changelog edit and would otherwise self-satisfy the gate.
+          if echo "$CHANGED" | grep -vE '^tools/index\.html$' \
+             | grep -qE '^(configurator/src/|Templates/|Formatters/|Filtering/|AIOMetadata/|tools/|account-tools/)'; then
             user_facing=true
           fi
 
