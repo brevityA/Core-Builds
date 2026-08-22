@@ -226,6 +226,18 @@ body{
         <span class="tool-link">Test →</span>
       </div>
     </a>
+    <a class="tool-card" href="./badges/">
+      <div class="tool-idx">Nuvio</div>
+      <div class="tool-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 11 23l-9-9V2h12l6.6 6.6a3.4 3.4 0 0 1 0 4.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+      </div>
+      <div class="tool-name">Core Badge Builder</div>
+      <p class="tool-desc">Choose and style Nuvio Fusion stream badges without touching regex or JSON. Includes Universal and AIO Enhanced modes, live preview, import URL, backup, and Configurator handoff.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Live</span>
+        <span class="tool-link">Build badges →</span>
+      </div>
+    </a>
   </div>
 
   <!-- Section 2: Verification & Debug -->
@@ -332,9 +344,14 @@ body{
   <!-- What's New -->
   <div class="inline-card" style="margin-top:16px">
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
-    <h3>🆕 What's New — v2.96</h3>
+    <h3>🆕 What's New — v2.97</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.97 · Aug 22 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Core Badge Builder is live under Tools — build Nuvio Fusion stream badges visually with 111 original Core badges, essential and advanced categories, Core Neon/monochrome/high-contrast themes, category colors, ordering, and a real release-title preview. The matching rules are generated and tested internally; there is no regex or JSON field in the workflow.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Two badge compatibility modes ship together: Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Badge install links are failure-safe: the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: custom formatters now survive a Configurator reload when both fields are valid and bounded. A stale custom selection without its formatter safely returns to Family v4.</span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.96 · Aug 19 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">CoreSpeed, a TorBox CDN speed test — measures all 17 Hyperdrive nodes and tells you which one to be on. It tests them the way a player actually streams: one node at a time, over a single connection, capped at 10 seconds each (~75 to 180 seconds for the full set). Ping is the trimmed mean of 5 HEAD requests. Live gauge and sparkline while it walks the list, then a ranked table, world map, and a per-region verdict on what each node can really stream for you (4K Remux down to SD, with 15% headroom) — and because latency is measured honestly, a node above 250 ms cannot earn a 4K verdict no matter how fast it downloads. Last 15 runs are kept locally with change-vs-previous columns; export as Markdown, CSV or JSON. Find it at tools/speedtest/ or from the Builder splash under Utilities.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Sequential is the default, and it is the mode to trust. Burst, Quick and Full run every node at once with several streams each — that measures how much pipe you have, not what a stream will do, because parallel connections mask latency and a fast-ramping node steals bandwidth from its neighbours during the race. Those modes are labelled capacity races and deliberately produce no playback verdicts. Quick pulls 100 MB per node and Full pulls 1 GB, so a Full run moves real gigabytes; there is a hard 12 GB budget and an instant Stop for exactly that reason. No account, no API key, and no Core Builds backend: the measurement runs in your browser and results stay there.</span></div>
@@ -348,10 +365,6 @@ body{
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed (generation): the Jackett and Prowlarr preset builders sent a bare "apiKey" — an option those presets never read — the same mistake as the Debridio fix in v2.93. Both now send the provider-specific key (jackettApiKey / prowlarrApiKey), and each preset is emitted only when its URL and key are both present, because AIOStreams rejects the entire config if either is missing. Confirmed against the AIOStreams preset definitions.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Known issue (documented, not yet changed): the Jackett and Prowlarr presets cannot currently be produced at all. Their emission is gated on an instance URL that no screen collects — there is no input for it anywhere in the app — so selecting either indexer has never added it to a config. The option-name fix above is therefore correct-but-unreachable groundwork, not a change you can observe today. Adding the URL field is a separate decision.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Test integrity: the end-to-end suite now checks generated configs against AIOStreams' actual preset option contract instead of accepting whatever we send it. That gap is why the Debridio bug shipped green and reached users — two tests were asserting the wrong option name against a mock that validated nothing. Building the new check is what surfaced the Jackett and Prowlarr bugs above, before anyone hit them.</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v2.93 · Aug 15 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: Debridio configs were rejected by AIOStreams even when you HAD entered a key ("Option debridioApiKey is required, got undefined"). Core Builds was sending a bare apiKey — an option the Debridio preset never reads — so the host saw its required option as missing. The earlier "omit the preset until a key is entered" change hid this: with no key the preset vanishes, so the rejection only ever reached people actually using Debridio. The option name is now confirmed against the AIOStreams preset source rather than inferred.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Fixed: the import and "all hosts unreachable" panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Known issue (documented, not yet changed): the Debrider preset is emitted with a type AIOStreams does not recognise — `debrider` is a service id, not one of the 76 preset ids the host accepts — so the host cannot resolve it. Recorded at the emission site pending a decision on the right fix.</span></div>
     </div>
 <!-- AUTO:TOOLS_WHATSNEW:END -->
   </div>

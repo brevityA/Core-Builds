@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Build Nuvio Fusion stream badges visually—no regex or JSON editing required.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://core-builds-cors-proxy.tlorenzato26.workers.dev https://paste.rs https://dpaste.com; base-uri 'self'; form-action 'none'; object-src 'none'">
+<title>Core Badge Builder — Nuvio stream badges without regex</title>
+<link rel="icon" type="image/svg+xml" href="./assets/core-icon.svg">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<a class="skip-link" href="#builderMain">Skip to badge builder</a>
+<button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch color theme">☀ Light</button>
+
+<header class="site-header">
+  <a class="brand" href="../../" aria-label="Core Builds Configurator">
+    <img src="./assets/core-icon.svg" width="46" height="46" alt="">
+    <span class="brand-rule" aria-hidden="true"></span>
+    <span><strong>CORE <em>BUILDS</em></strong><small>Badge Builder · by Brevity</small></span>
+  </a>
+  <nav aria-label="Related pages">
+    <a href="../">All tools</a>
+    <a href="../../">Configurator</a>
+    <a href="https://corebuilds-docs.docsalot.dev/nuvio-badges" target="_blank" rel="noopener noreferrer">Guide</a>
+  </nav>
+</header>
+
+<main id="builderMain" class="shell">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Nuvio Fusion badges · no-code builder</p>
+      <h1>Choose the badges.<br><span>We handle the matching.</span></h1>
+      <p class="lede">Build a polished Nuvio stream-badge pack without writing regex or editing JSON. Pick a compatibility mode, choose a look, and turn on only the details you want.</p>
+      <div class="trust-row"><span>✓ Runs in your browser</span><span>✓ Original Core artwork</span><span>✓ No account required</span></div>
+    </div>
+    <div class="hero-preview" aria-hidden="true">
+      <div class="mock-title">⚡ TORBOX&nbsp;&nbsp; EXAMPLE MOVIE</div>
+      <div class="mock-badges">
+        <span class="mock-chip purple">◆ 4K</span><span class="mock-chip cyan">◆ REMUX</span><span class="mock-chip amber">◆ HDR10+</span><span class="mock-chip pink">◆ ATMOS</span>
+      </div>
+      <div class="mock-meta">💾 54.2 GB · ⚡ 68 Mbps · 🌱 124</div>
+    </div>
+  </section>
+
+  <ol class="stepper" aria-label="Builder progress">
+    <li><button type="button" data-step-target="1" aria-current="step"><span>1</span>Mode &amp; style</button></li>
+    <li><button type="button" data-step-target="2"><span>2</span>Choose badges</button></li>
+    <li><button type="button" data-step-target="3"><span>3</span>Preview &amp; export</button></li>
+  </ol>
+
+  <section class="builder-step" data-step="1" aria-labelledby="step1Title">
+    <div class="section-heading">
+      <div><p class="section-index">01 · Foundation</p><h2 id="step1Title">How should your badges work?</h2></div>
+      <p>Both modes are generated from the same tested Core catalog. Nothing here changes which streams are returned.</p>
+    </div>
+
+    <div class="choice-grid two" id="modeChoices" role="radiogroup" aria-label="Compatibility mode">
+      <button class="choice-card" type="button" data-mode="enhanced" role="radio" aria-checked="true">
+        <span class="choice-kicker">Recommended · AIOStreams</span>
+        <strong>AIO Enhanced</strong>
+        <p>Pairs the badge pack with a companion formatter that emits invisible exact markers. Most accurate for Core Builds and sparse release titles.</p>
+        <span class="choice-foot">Badge JSON + formatter + Configurator handoff</span>
+      </button>
+      <button class="choice-card" type="button" data-mode="universal" role="radio" aria-checked="false">
+        <span class="choice-kicker">Any stream source</span>
+        <strong>Universal</strong>
+        <p>Reads ordinary filename and parsed stream metadata. Works without changing a formatter, with slightly less certainty on sparse addon results.</p>
+        <span class="choice-foot">Badge JSON + optional clean formatter</span>
+      </button>
+    </div>
+
+    <div class="subheading"><div><h3>Choose a visual theme</h3><p>You can still tune category colors below.</p></div></div>
+    <div class="choice-grid three" id="themeChoices" role="radiogroup" aria-label="Badge theme">
+      <button class="theme-card" type="button" data-theme-choice="neon" role="radio" aria-checked="true"><span class="theme-demo demo-neon">◆ CORE</span><strong>Core Neon</strong><small>Category colors and glass fill</small></button>
+      <button class="theme-card" type="button" data-theme-choice="mono" role="radio" aria-checked="false"><span class="theme-demo demo-mono">◆ CORE</span><strong>Monochrome</strong><small>Quiet slate treatment</small></button>
+      <button class="theme-card" type="button" data-theme-choice="contrast" role="radio" aria-checked="false"><span class="theme-demo demo-contrast">◆ CORE</span><strong>High Contrast</strong><small>Black fill and white border</small></button>
+    </div>
+
+    <div class="step-actions"><span></span><button class="primary" type="button" data-next-step="2">Choose badges →</button></div>
+  </section>
+
+  <section class="builder-step" data-step="2" aria-labelledby="step2Title" hidden>
+    <div class="section-heading">
+      <div><p class="section-index">02 · Catalog</p><h2 id="step2Title">Show what matters to you.</h2></div>
+      <p>Essentials start enabled. Advanced categories are available without exposing their detection rules.</p>
+    </div>
+    <div class="catalog-toolbar">
+      <div><strong id="selectedCount">0 badges selected</strong><small id="selectedHint">Essentials are on</small></div>
+      <div class="toolbar-actions">
+        <button type="button" class="secondary" data-catalog-action="essentials">Essentials</button>
+        <button type="button" class="secondary" data-catalog-action="all">Select all</button>
+        <button type="button" class="secondary danger-text" data-catalog-action="none">Clear</button>
+      </div>
+    </div>
+    <div id="catalog" class="catalog" aria-live="polite"></div>
+    <div class="step-actions"><button class="secondary" type="button" data-next-step="1">← Back</button><button class="primary" type="button" data-next-step="3">Preview my badges →</button></div>
+  </section>
+
+  <section class="builder-step" data-step="3" aria-labelledby="step3Title" hidden>
+    <div class="section-heading">
+      <div><p class="section-index">03 · Preview &amp; export</p><h2 id="step3Title">See the result before you install.</h2></div>
+      <p>The preview uses the same universal detection fixtures. Enhanced mode maps those detections to exact hidden markers in its companion formatter.</p>
+    </div>
+
+    <div class="preview-layout">
+      <div class="preview-controls card">
+        <label for="sampleInput">Sample release or stream text</label>
+        <textarea id="sampleInput" rows="5" maxlength="2000" spellcheck="false"></textarea>
+        <div id="samplePresets" class="sample-presets" aria-label="Sample releases"></div>
+        <div class="preview-note"><strong>Preview only:</strong> paste a real release name to check the selected catalog. Your text stays in this browser.</div>
+      </div>
+      <div class="nuvio-preview card" aria-live="polite">
+        <div class="preview-label">NUVIO STREAM CARD</div>
+        <div class="stream-name">⚡ TORBOX&nbsp;&nbsp; EXAMPLE STREAM</div>
+        <div id="badgePreview" class="badge-preview"></div>
+        <div class="stream-meta">💾 42.8 GB &nbsp;·&nbsp; ⚡ 54 Mbps &nbsp;·&nbsp; 🌱 86</div>
+        <div id="previewEmpty" class="preview-empty" hidden>No selected badges match this sample.</div>
+      </div>
+    </div>
+
+    <div id="generationStatus" class="generation-status" role="status" aria-live="polite"></div>
+    <div class="output-grid">
+      <article class="output-card">
+        <span class="output-number">01</span><h3>Nuvio badge pack</h3>
+        <p>Import this JSON URL in Nuvio → Settings → Streams → Fusion badge URLs.</p>
+        <div class="button-stack">
+          <button id="createImportUrl" class="primary" type="button">Create import URL + backup</button>
+          <button id="downloadBadges" class="secondary" type="button">Download badge JSON</button>
+        </div>
+      </article>
+      <article class="output-card">
+        <span class="output-number">02</span><h3>Companion formatter</h3>
+        <p id="formatterDescription">Carries invisible exact markers plus a clean visible AIOStreams layout.</p>
+        <div class="button-stack">
+          <button id="downloadFormatter" class="secondary" type="button">Download formatter JSON</button>
+          <button id="openConfigurator" class="primary purple-button" type="button">Open in Core Configurator →</button>
+        </div>
+      </article>
+    </div>
+
+    <div id="importResult" class="import-result" hidden>
+      <div><span class="result-kicker">NUVIO IMPORT URL</span><strong id="importProvider"></strong></div>
+      <div class="url-row"><input id="importUrl" type="text" readonly><button id="copyImportUrl" type="button" class="secondary">Copy URL</button></div>
+      <p id="importExpiry"></p>
+    </div>
+
+    <details class="diagnostics card">
+      <summary>Build details</summary>
+      <dl id="buildDetails"></dl>
+    </details>
+
+    <div class="step-actions"><button class="secondary" type="button" data-next-step="2">← Edit badges</button><button id="resetBuilder" class="text-button" type="button">Start over</button></div>
+  </section>
+</main>
+
+<footer>
+  <span>Core Badge Builder · browser-only except when you request a temporary import URL</span>
+  <span><a href="https://github.com/brevityA/Core-Builds">Source</a> · <a href="https://www.reddit.com/r/CoreBuilds/">Core Crew</a> · <a href="https://ko-fi.com/branding_brevity">Support</a></span>
+</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>

@@ -64,7 +64,23 @@ test('paste: stores and retrieves template JSON', async () => {
   assert.equal(retrieved, tmpl);
 });
 
-test('paste: rejects non-JSON body', async () => {
+test('paste: accepts and retrieves a Nuvio badge pack', async () => {
+  const env = makeEnv();
+  const pack = JSON.stringify({
+    groups: [{ id: 'resolution', name: 'Resolution' }],
+    filters: [{ id: 'res-4k', groupId: 'resolution', name: '4K', pattern: '(?i)4k', imageURL: 'https://example.com/4k.svg' }],
+  });
+  const post = new Request('https://example.com/paste', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: pack,
+  });
+  const posted = await worker.fetch(post, env);
+  assert.equal(posted.status, 200);
+  const { url } = await posted.json();
+  const fetched = await worker.fetch(new Request(url), env);
+  assert.equal(await fetched.text(), pack);
+});
+
+test('paste: rejects non-JSON and unsupported generic JSON bodies', async () => {
   const env = makeEnv();
   const req = new Request('https://example.com/paste', {
     method: 'POST',
@@ -72,6 +88,10 @@ test('paste: rejects non-JSON body', async () => {
   });
   const res = await worker.fetch(req, env);
   assert.equal(res.status, 400);
+  const generic = await worker.fetch(new Request('https://example.com/paste', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
+  }), env);
+  assert.equal(generic.status, 400);
 });
 
 test('paste: returns 404 for missing id', async () => {
@@ -156,7 +176,7 @@ test('rate limit: 31st /api/visit from one IP within a minute is rejected (429)'
 test('randomId: produces a 10-char id from the allowed alphabet', async () => {
   // exercised indirectly via /paste; assert shape of the returned id
   const env = makeFullEnv();
-  const post = new Request('https://example.com/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const post = new Request('https://example.com/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"config":{}}' });
   const { url } = await (await worker.fetch(post, env)).json();
   const id = url.split('/t/')[1];
   assert.match(id, /^[a-z0-9]{10}$/);
@@ -279,7 +299,7 @@ test('proxy OPTIONS preflight advertises Authorization in Allow-Headers', async 
 test('all JSON/paste/proxy responses carry nosniff + no-referrer', async () => {
   const pastes = {};
   const env = { TEMPLATES: { put: async (k,v)=>{pastes[k]=v;}, get: async (k)=>pastes[k]||null }, STATS: undefined, RATELIMIT: undefined };
-  const create = await worker.fetch(new Request('https://w.example/paste', { method:'POST', headers:{ 'Content-Type':'application/json', Origin:'https://brevitya.github.io' }, body:'{"a":1}' }), env, { waitUntil: ()=>{} });
+  const create = await worker.fetch(new Request('https://w.example/paste', { method:'POST', headers:{ 'Content-Type':'application/json', Origin:'https://brevitya.github.io' }, body:'{"config":{"test":true}}' }), env, { waitUntil: ()=>{} });
   assert.equal(create.headers.get('X-Content-Type-Options'), 'nosniff');
   const { url } = await create.json();
   const read = await worker.fetch(new Request(url, { method:'GET' }), env, { waitUntil: ()=>{} });

@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.6.2 (2026-08-22)
+
+### Added
+- **Core Badge Builder** (Configurator v2.97 · `tools/badges/`) — a no-code Nuvio Fusion badge configurator with 111 original Core badges, essentials-first progressive disclosure, Core Neon/monochrome/high-contrast themes, category colors, badge and group ordering, editable release preview, and selected-only JSON output. Detection rules stay internal; users never need to write regex or edit JSON.
+- **Universal + AIO Enhanced badge modes** — Universal uses portable filename/parsed-metadata rules for any Nuvio source. AIO Enhanced generates exact invisible markers plus a bounded companion formatter for more reliable matching on sparse titles. A versioned, ten-minute, consume-once browser handoff passes that formatter to the existing Configurator for full-template generation without duplicating generator logic.
+- **Badge install safety** — creating an import link downloads the JSON backup first, then uses the existing Worker → paste.rs → 365-day dpaste fallback. The result explains expiry and Nuvio's import-time local storage behaviour.
+
+### Fixed
+- **Custom formatter persistence** — valid imported/generated formatter fields now survive a Configurator reload; a saved `custom` selection without a valid bounded formatter safely falls back to Family v4.
+
 ## 3.6.1 (2026-08-13)
 
 ### Removed

@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.6.2 | 2026-08-22 | Core Badge Builder (Configurator v2.97 · tools/badges/) — a no-code Nuvio Fusion badge configurator with 111 original Co… |
 | v3.6.1 | 2026-08-13 | Live instance-status cron retired — the every-6-hours auto-check (host → STATUS.md + docs page) was retired after 25 con… |
 | v3.6.0 | 2026-08-11 | Preflight audit tool (Configurator v2.92 · Tools page) — audits any template or live config offline with rules learned f… |
 | v3.5.3 | 2026-08-04 | Episode-pack availability — multi-episode and season-pack streams were previously removed by an early exclusion filter b… |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.2.9 | 2026-07-15 | Template Migration Tool (Configurator v2.49) — "Update Existing Template" now shows a full visual diff of every change (… |
 | v3.2.8 | 2026-07-15 | REMUX ranking fix (all 44 active templates) — BluRay REMUX files were consistently ranked below WEB-DL streams because t… |
 | v3.2.7 | 2026-07-11 | LABS v0.14.0 SEL expressions (6 Labs templates) — seven new expression features across all Labs templates: |
-| v3.2.6 | 2026-07-09 | Configurator v2.30 — 3 new debrid services: EasyDebrid, PikPak, Seedr (all using StremThru Store cache layer). Generated… |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.
