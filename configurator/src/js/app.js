@@ -35,7 +35,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.96';
+const CONFIGURATOR_VERSION = '2.97';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -386,6 +386,16 @@ function saveState() {
   const badge = document.getElementById('autoSavedBadge');
   if (badge) { badge.classList.add('show'); clearTimeout(saveState._t); saveState._t = setTimeout(() => badge.classList.remove('show'), 2000); }
 }
+function sanitizeCustomFormatter(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const name = typeof value.name === 'string' ? value.name : '';
+  const description = typeof value.d === 'string' ? value.d : (typeof value.description === 'string' ? value.description : '');
+  if ((!name && !description) || name.length > 5000 || description.length > 5000) return null;
+  const label = typeof value.label === 'string'
+    ? value.label.replace(/[<>&"']/g, '').trim().slice(0, 80) || 'Custom'
+    : 'Custom';
+  return { name, d:description, label };
+}
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
 const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
@@ -556,6 +566,13 @@ function loadState() {
         if (parsed.stremioPassword) S.stremioPassword = parsed.stremioPassword;
         if (typeof parsed.cleanInstall === 'boolean') S.cleanInstall = parsed.cleanInstall;
         if (['fast','balanced','maximum'].includes(parsed.quickProfile)) S.quickProfile = parsed.quickProfile;
+        const savedCustomFormatter = sanitizeCustomFormatter(parsed.customFormatter);
+        if (savedCustomFormatter) {
+          S.customFormatter = savedCustomFormatter;
+          if (parsed.formatter === 'custom') S.formatter = 'custom';
+        } else if (S.formatter === 'custom') {
+          S.formatter = 'family-v4';
+        }
         hadSavedState = true;
         S.service = deriveService();
       } catch(e) {
@@ -1623,6 +1640,7 @@ function splashHtml() {
       <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/speedtest/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">⚡</span></div><div class="splash-door-text"><div class="splash-door-title">CoreSpeed <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Speedtest</span></div><div class="splash-door-desc">Race every TorBox CDN at once — ping, multi-stream speed, live map, and the best node for your setup.</div></div></a>
+      <a class="splash-door core-tool-door" href="../tools/badges/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🏷️</span></div><div class="splash-door-text"><div class="splash-door-title">Core Badge Builder <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">No regex</span></div><div class="splash-door-desc">Design Nuvio stream badges visually, preview them, and hand the matching formatter back here.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
     </div>
 
@@ -2381,8 +2399,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   } catch(e) { /* handoff is best-effort */ }
+
+  // Core Badge Builder hand-off: consume a formatter generated on the sibling tool page.
+  // The payload is same-origin sessionStorage, short-lived, bounded to AIOStreams' field
+  // limits, and carries no credentials. Full template generation stays in this Configurator.
+  let _badgeBuilderRoute = false;
+  try {
+    const raw = sessionStorage.getItem('cb-badge-builder-handoff-v1');
+    if (raw) {
+      sessionStorage.removeItem('cb-badge-builder-handoff-v1');
+      const handoff = JSON.parse(raw);
+      const age = Date.now() - Number(handoff?.ts || 0);
+      const formatter = handoff?.formatter;
+      const candidate = sanitizeCustomFormatter({ name:formatter?.name, description:formatter?.description, label:'Core Badge Companion' });
+      if (handoff?.v === 1 && handoff?.source === 'core-badge-builder' && age >= 0 && age < 10 * 60 * 1000 && candidate) {
+        S.customFormatter = candidate;
+        S.formatter = 'custom';
+        S.simpleMode = false;
+        S.quickStart = false;
+        S.outputProfile = 'auto';
+        saveState();
+        _badgeBuilderRoute = true;
+      }
+    }
+  } catch(e) { logError('badge-builder-handoff', e.message); }
+
   render();
-  if (!_genieRoute) {
+  if (!_genieRoute && !_badgeBuilderRoute) {
     try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
   }
   if (_genieRoute) {
@@ -2394,7 +2437,15 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch(e) { logError('genie-handoff', e.message); }
     }, 350);
   }
-  if (!hadSavedState && !_sharedImport && !_genieRoute && !localStorage.getItem('cb_tut_seen')) {
+  if (_badgeBuilderRoute) {
+    setTimeout(() => {
+      try {
+        document.querySelector('[data-action="custom-start"]')?.click();
+        showToast('Core Badge Companion applied — review your setup, then generate the full template.');
+      } catch(e) { logError('badge-builder-handoff', e.message); }
+    }, 350);
+  }
+  if (!hadSavedState && !_sharedImport && !_genieRoute && !_badgeBuilderRoute && !localStorage.getItem('cb_tut_seen')) {
     // no tutorial over a genie hand-off — the genie IS the onboarding; popping the tour
     // over the express modal we just opened was the review P1 finding.
     setTimeout(() => tutGo(0), 1000);

@@ -39,4 +39,4 @@ npm run release      # test → validate → build
 
 ## Version
 
-Current: **v2.78.0**
+Current: **v2.97.0**

@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v2.96"
+title: "What's New — Configurator v2.97"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.96 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.97 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.96**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.97**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v2.97 (Aug 22 2026)
+
+<CardGroup cols={2}>
+  <Card title="Core Badge Builder is live under Tools" icon="sparkles">
+    build Nuvio Fusion stream badges visually with 111 original Core badges, essential and advanced categories, Core Neon/monochrome/high-contrast themes, category colors, ordering, and a real release-title preview. The matching rules are generated and tested internally; there is no regex or JSON field in the workflow.
+  </Card>
+  <Card title="Two badge compatibility modes ship together: Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline." icon="bolt">
+    Two badge compatibility modes ship together: Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline.
+  </Card>
+  <Card title="Badge install links are failure-safe: the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working." icon="shield-check">
+    Badge install links are failure-safe: the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working.
+  </Card>
+  <Card title="Fixed: custom formatters now survive a Configurator reload when both fields are valid and bounded. A stale custom selection without its formatter safely returns to Family v4." icon="sliders">
+    Fixed: custom formatters now survive a Configurator reload when both fields are valid and bounded. A stale custom selection without its formatter safely returns to Family v4.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.96 (Aug 19 2026)
 
@@ -56,21 +75,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Test integrity: the end-to-end suite now checks generated configs against AIOStreams' actual preset option contract instead of accepting whatever we send it. That gap is why the Debridio bug shipped green and reached users" icon="shield-check">
     two tests were asserting the wrong option name against a mock that validated nothing. Building the new check is what surfaced the Jackett and Prowlarr bugs above, before anyone hit them.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.93 (Aug 15 2026)
-
-<CardGroup cols={2}>
-  <Card title="Fixed: Debridio configs were rejected by AIOStreams even when you HAD entered a key ('Option debridioApiKey is required, got undefined'). Core Builds was sending a bare apiKey" icon="sparkles">
-    an option the Debridio preset never reads — so the host saw its required option as missing. The earlier 'omit the preset until a key is entered' change hid this: with no key the preset vanishes, so the rejection only ever reached people actually using Debridio. The option name is now confirmed against the AIOStreams preset source rather than inferred.
-  </Card>
-  <Card title="Fixed: the import and 'all hosts unreachable' panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it." icon="bolt">
-    Fixed: the import and 'all hosts unreachable' panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it.
-  </Card>
-  <Card title="Known issue (documented, not yet changed): the Debrider preset is emitted with a type AIOStreams does not recognise" icon="shield-check">
-    `debrider` is a service id, not one of the 76 preset ids the host accepts — so the host cannot resolve it. Recorded at the emission site pending a decision on the right fix.
   </Card>
 </CardGroup>

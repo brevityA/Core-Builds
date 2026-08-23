@@ -1,6 +1,6 @@
 {
   "name": "core-builds-configurator",
-  "version": "2.96.0",
+  "version": "2.97.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -19,4 +19,3 @@
     "esbuild": "^0.28.2"
   }
 }
-

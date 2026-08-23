@@ -1,4 +1,4 @@
-# CORS proxy + template paste for the configurator
+# CORS proxy + temporary JSON imports for Core Builds
 
 The configurator's "Create & Install" flow tries to POST a config directly to
 each public AIOStreams instance's `/api/v1/user` endpoint from the browser.
@@ -16,20 +16,22 @@ seven hardcoded public AIOStreams hosts in `ALLOWED_HOSTS`.
 The configurator races a direct browser fetch against a proxied fetch via
 `raceHostFetch()` — whichever responds first wins.
 
-## 2. Template paste (`/paste`, `/t/:id`)
+## 2. Temporary JSON imports (`/paste`, `/t/:id`)
 
 When the direct API call fails (CORS, host down, rate limit), the configurator
 automatically uploads the template JSON to the Worker's KV store and gets back
 a short URL. Users then tap an instance chip to auto-import the template into
-AIOStreams via the `?template=URL` parameter.
+AIOStreams via the `?template=URL` parameter. Core Badge Builder uses the same
+bounded route for Nuvio Fusion badge packs. The endpoint accepts only these two
+validated object shapes; it is not a generic anonymous JSON store.
 
 **Fallback chain** (configurator tries each until one succeeds):
 1. Cloudflare Worker `/paste` — your infrastructure, 30-day TTL
 2. paste.rs — public paste service
 3. dpaste.com — last resort
 
-Templates are stored in Cloudflare KV with a 30-day TTL. Nothing is logged
-or inspected. Max upload size is 512 KB.
+Templates and badge packs are stored in Cloudflare KV with a 30-day TTL. Nothing is logged
+or inspected. Max upload size is 512 KB; badge packs are capped at 500 filters.
 
 ## Deploy
 
@@ -90,9 +92,9 @@ unauthenticated browser), so every abuse surface is bounded:
   so a path-traversal attempt can never reach a non-allowlisted host). Request body capped
   at 2 MB (`413` on overflow), upstream fetch has a 15 s `AbortSignal.timeout`, upstream
   response capped at 8 MB, and per-IP rate-limited. Responses carry `Cache-Control: no-store`.
-- **Paste (`/paste`, `/t/:id`)** — create is per-IP rate-limited and only accepts JSON
-  *objects* (no generic dump); retrieval is rate-limited and returns `Cache-Control: no-store`
-  because a stored paste can carry a user's config. IDs are unbiased (`crypto.getRandomValues`
+- **Paste (`/paste`, `/t/:id`)** — create is per-IP rate-limited and only accepts validated
+  AIOStreams template or Nuvio badge-pack objects (no generic dump); retrieval is rate-limited
+  and returns `Cache-Control: no-store` because a stored paste can carry a user's config. IDs are unbiased (`crypto.getRandomValues`
   with rejection sampling) and validated against `^[a-z0-9]{6,20}$`.
 - **Contact (`/contact`)** — origin allowlist (CSRF) + per-IP rate limit + field length/shape
   validation; input stripped of `<>`.

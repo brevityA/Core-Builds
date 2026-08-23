@@ -446,7 +446,7 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.6.1)
+## Active Template Inventory (as of v3.6.2)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.9.1 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached

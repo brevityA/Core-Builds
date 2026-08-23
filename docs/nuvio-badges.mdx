@@ -1,0 +1,86 @@
+---
+title: "Nuvio Stream Badges"
+description: "Build and install Nuvio Fusion stream badges visually, without writing regex or editing JSON."
+---
+
+The **Core Badge Builder** creates image-backed stream badges for Nuvio. Choose the metadata you want to see, select a theme, reorder the badge groups, preview a real release name, and export the result without touching regex or JSON.
+
+<Card title="Open Core Badge Builder" icon="tag" href="https://brevitya.github.io/Core-Builds/tools/badges/">
+  Build a Nuvio badge pack in your browser.
+</Card>
+
+## What badges do
+
+Nuvio badges are visual labels shown on stream cards. They can identify:
+
+- resolution and source quality;
+- Dolby Vision, HDR variants, IMAX, and bit depth;
+- audio formats and channel layouts;
+- video codecs;
+- cache/playback state, SeaDex, release tiers, and packs;
+- editions, streaming source, languages, and subtitles.
+
+Badges only change presentation. They do not filter, sort, add, or remove streams.
+
+## Choose a compatibility mode
+
+### AIO Enhanced
+
+Recommended for Core Builds and AIOStreams. The builder produces two matched files:
+
+1. a Nuvio badge pack; and
+2. an AIOStreams companion formatter.
+
+The formatter emits invisible, exact markers from AIOStreams' parsed stream fields. The Nuvio pack matches those markers, improving accuracy when a release filename is sparse or ambiguous.
+
+Use **Open in Core Configurator** to pass the formatter into the existing Configurator. The transfer is local to the current browser tab, expires after ten minutes, is consumed once, and contains no credentials. The Configurator then generates the full AIOStreams template using its normal schema guards.
+
+### Universal
+
+Universal mode detects ordinary release text and parsed metadata. It works with any Nuvio stream source and does not require a companion formatter. It is the simpler option when you do not use AIOStreams, but ambiguous or unusually sparse stream names can provide less information.
+
+## Build a pack
+
+1. Choose **AIO Enhanced** or **Universal**.
+2. Select Core Neon, Monochrome, or High Contrast.
+3. Keep the essential badge groups or enable optional advanced groups.
+4. Change category colors and reorder groups or individual badges.
+5. Paste a representative release name into the preview.
+6. Download the badge JSON or create an import URL.
+
+The original Core badge artwork is stored in this repository. Community artwork is not bundled or copied.
+
+## Install in Nuvio
+
+The exact menu label varies by client:
+
+- **Mobile/Desktop/Web:** Settings → Streams → Fusion badge URLs
+- **Android TV:** Settings → Layout → Streams → Fusion badge URLs
+
+Paste the URL produced by the builder and choose **Import**. Nuvio downloads and stores the rules during import, so installed badges keep working after a temporary URL expires.
+
+<Note>
+  Current Nuvio clients can remember up to three imported badge packs, but only one pack is active at a time. Selecting another imported source switches the active pack; the packs are not layered together.
+</Note>
+
+## Temporary links and backups
+
+When you choose **Create import URL + backup**, the builder downloads the JSON backup before making a network request. It then tries:
+
+1. the Core Builds Worker — 30-day expiry;
+2. `paste.rs` — provider-managed expiry;
+3. `dpaste` — up to 365 days.
+
+Keep the downloaded JSON. If you later change devices, clear Nuvio data, or want to edit the pack, reload the saved setup in the builder and create a fresh URL.
+
+## Privacy
+
+Badge selection, themes, colors, ordering, and preview text stay in local browser storage. No account or API key is required. Data leaves the browser only when you explicitly request a temporary import URL; the uploaded payload is the generated public badge JSON and contains no provider credentials.
+
+## Troubleshooting
+
+- **No badges appear:** confirm the badge image URLs are reachable and that the correct imported pack is active.
+- **Universal badges miss a sparse stream:** use AIO Enhanced with its matching companion formatter.
+- **Several similar badges appear:** disable the less-specific badge in the catalog and export again.
+- **The temporary URL expired:** Nuvio's installed copy should continue working. Use the downloaded JSON to generate a new URL when re-importing.
+- **The formatter was not applied:** open the Badge Builder result again and choose **Open in Core Configurator**, then generate/install the full template.
