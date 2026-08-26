@@ -1,0 +1,61 @@
+---
+title: "Kids Profile"
+description: "English 1080p kids overlay, WuPlay home rows, and PIN notes. Not a lock. Not Apex."
+---
+
+Kids need a **second account**. AIOStreams cannot tell which profile is asking. A template cannot set a PIN.
+
+## What this is
+
+| Piece | Job |
+| --- | --- |
+| Overlay | `applyKidsToTemplate(streamTemplate)` on **Core Nexus Stream** (1080p) |
+| WuPlay plan | [wuplay-kids.json](https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/genies/packs/wuplay-kids.json) — built-in family rows |
+| PIN | WuPlay Age Restrictions, or the Android TV user lock. Stremio has no parental PIN |
+
+The overlay adds an adult-filename kill (`XXX`, `Porn`, `NSFW`, `Hentai`, `Erotic`) and a CAM kill. It does **not** emit `certification()` — that SEL function is not in AIOStreams. Catalog ratings are a player / metadata job.
+
+## Accounts
+
+1. Adult profile — Stream / Essential / Apex as usual.
+2. Kids profile — Stream + this overlay + WuPlay Age Restrictions.
+
+Do not install the adult manifest on the kids profile.
+
+## WuPlay
+
+1. Create a kids profile. Set a PIN on that profile if WuPlay offers one.
+2. **Settings → Age Restrictions** → Movies and Shows max **Older Kids**.
+3. **Include titles without a rating: off.**
+4. Catalogs / Layout: import or recreate the rows in `wuplay-kids.json` (Continue Watching, Trending Family Movies, Popular Kids Shows, Animated Films).
+5. Add a **Kids** hub and a **Kids** screen that mirrors it.
+6. Paste the kids AIOStreams manifest under Add-ons.
+
+The JSON is a home plan, not a live apply. WuPlay catalog-row write is still configurator-side.
+
+## Stremio
+
+Stremio has no parental PIN. Use a separate Stremio account. Lock the Android TV / Google TV user. Hide the adult account from that user.
+
+## What this is not
+
+- Not Apex. Kids overlay **refuses** Apex.
+- Not forty template files. Publish from Stream if you need a paste-ready JSON:
+
+```bash
+node tools/genies/publish-kids.mjs
+```
+
+- Not the Swedish community file (`core-nexus-kids-swedish.json`). That stays community, Swedish-only.
+- Not a guarantee. Filename kills miss a lot. The PIN and the second profile are the control.
+
+## Apply
+
+```js
+import { applyKidsToTemplate, recommendKids } from './tools/genies/kids.mjs';
+
+const rec = recommendKids();
+const kids = applyKidsToTemplate(streamTemplate);
+```
+
+`recommendKids({ firstInstall: true })` points at Core Stable 1080p instead of Stream.
