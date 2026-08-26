@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v2.97"
+title: "What's New — Configurator v2.98"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.97 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.98 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.97**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.98**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v2.98 (Aug 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Three official Nuvio badge packs are published and paste-ready, so you no longer have to build one to get Core badges: core-neon-universal (55 badges, works on any Nuvio source), core-neon-enhanced (the same 55 with invisible AIO markers, paired with the companion formatter) and core-nodv-universal (54 badges, Dolby Vision removed for Samsung and TCL panels). All three carry the same six groups" icon="sparkles">
+    resolution, quality, visual, audio, channels, codec. They are generated from the Badge Builder rather than hand-written: re-running the publisher reproduces all three byte-identically, and every one of the 164 badge images resolves to the Core Builds assets path.
+  </Card>
+  <Card title="Groundwork, not yet switched on: language packs for PT-BR, ES, FR, DE, IT, NL, AR and HI; named capability profiles for Fire TV Stick HD, Fire TV Stick 4K Max, TCL Google TV and Hisense; a two-seat household picker; named AllDebrid, Premiumize and EasyDebrid store presets; and an English kids overlay with a WuPlay home plan. None of these is wired into the builder yet" icon="bolt">
+    the two new TV profiles are not selectable, the modules are imported by nothing, and no new template JSON has been generated. Nothing you can observe in the app has changed. They are listed here so the next release, which does turn them on, is not the first you hear of them.
+  </Card>
+  <Card title="The Fire TV Stick 4K Max profile is capped rather than uncapped by design" icon="shield-check">
+    it is a 4K device that stutters on REMUX-first ranking, so it gets a bitrate ceiling instead of the Apex path. TCL and Hisense join ONN and Samsung on the No-Dolby-Vision path, because neither panel family should be assumed DV-capable.
+  </Card>
+  <Card title="Real-Debrid still has no named preset. Its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat." icon="sliders">
+    Real-Debrid still has no named preset. Its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.97 (Aug 22 2026)
 
@@ -59,21 +78,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Stable and Balanced are unaffected" icon="shield-check">
     both clear the scoring layer on purpose, so their configs are unchanged in content. The only difference is one empty field that now appears earlier in the file. This lands solely where you have opted into the deeper filtering.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.94 (Aug 16 2026)
-
-<CardGroup cols={2}>
-  <Card title="Fixed (generation): the Jackett and Prowlarr preset builders sent a bare 'apiKey'" icon="sparkles">
-    an option those presets never read — the same mistake as the Debridio fix in v2.93. Both now send the provider-specific key (jackettApiKey / prowlarrApiKey), and each preset is emitted only when its URL and key are both present, because AIOStreams rejects the entire config if either is missing. Confirmed against the AIOStreams preset definitions.
-  </Card>
-  <Card title="Known issue (documented, not yet changed): the Jackett and Prowlarr presets cannot currently be produced at all. Their emission is gated on an instance URL that no screen collects" icon="bolt">
-    there is no input for it anywhere in the app — so selecting either indexer has never added it to a config. The option-name fix above is therefore correct-but-unreachable groundwork, not a change you can observe today. Adding the URL field is a separate decision.
-  </Card>
-  <Card title="Test integrity: the end-to-end suite now checks generated configs against AIOStreams' actual preset option contract instead of accepting whatever we send it. That gap is why the Debridio bug shipped green and reached users" icon="shield-check">
-    two tests were asserting the wrong option name against a mock that validated nothing. Building the new check is what surfaced the Jackett and Prowlarr bugs above, before anyone hit them.
   </Card>
 </CardGroup>
