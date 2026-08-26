@@ -13,17 +13,17 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
 ## Configurator v2.98 (Aug 26 2026)
 
 <CardGroup cols={2}>
-  <Card title="Three official Nuvio badge packs are published and paste-ready, so you no longer have to build one to get Core badges: core-neon-universal (55 badges, works on any Nuvio source), core-neon-enhanced (the same 55 with invisible AIO markers, paired with the companion formatter) and core-nodv-universal (54 badges, Dolby Vision removed for Samsung and TCL panels). All three carry the same six groups" icon="sparkles">
-    resolution, quality, visual, audio, channels, codec. They are generated from the Badge Builder rather than hand-written: re-running the publisher reproduces all three byte-identically, and every one of the 164 badge images resolves to the Core Builds assets path.
+  <Card title="Three official Nuvio badge packs, paste-ready" icon="sparkles">
+    core-neon-universal (55 badges, works on any Nuvio source), core-neon-enhanced (the same 55 with invisible AIO markers, paired with the companion formatter) and core-nodv-universal (54 badges, Dolby Vision removed for Samsung and TCL panels). All three carry the same six groups: resolution, quality, visual, audio, channels, codec. You no longer have to build a pack to get Core badges. They are generated from the Badge Builder rather than hand-written: re-running the publisher reproduces all three byte-identically, and every one of the 164 badge images resolves to the Core Builds assets path.
   </Card>
-  <Card title="Groundwork, not yet switched on: language packs for PT-BR, ES, FR, DE, IT, NL, AR and HI; named capability profiles for Fire TV Stick HD, Fire TV Stick 4K Max, TCL Google TV and Hisense; a two-seat household picker; named AllDebrid, Premiumize and EasyDebrid store presets; and an English kids overlay with a WuPlay home plan. None of these is wired into the builder yet" icon="bolt">
-    the two new TV profiles are not selectable, the modules are imported by nothing, and no new template JSON has been generated. Nothing you can observe in the app has changed. They are listed here so the next release, which does turn them on, is not the first you hear of them.
+  <Card title="Groundwork, not yet switched on" icon="bolt">
+    language packs for PT-BR, ES, FR, DE, IT, NL, AR and HI; named capability profiles for Fire TV Stick HD, Fire TV Stick 4K Max, TCL Google TV and Hisense; a two-seat household picker; named AllDebrid, Premiumize and EasyDebrid store presets; and an English kids overlay with a WuPlay home plan. None of these is wired into the builder yet: the two new TV profiles are not selectable, the modules are imported by nothing, and no new template JSON has been generated. Nothing you can observe in the app has changed. They are listed here so the next release, the one that turns them on, is not the first you hear of them.
   </Card>
-  <Card title="The Fire TV Stick 4K Max profile is capped rather than uncapped by design" icon="shield-check">
-    it is a 4K device that stutters on REMUX-first ranking, so it gets a bitrate ceiling instead of the Apex path. TCL and Hisense join ONN and Samsung on the No-Dolby-Vision path, because neither panel family should be assumed DV-capable.
+  <Card title="Fire TV Stick 4K Max is capped, not Apex" icon="shield-check">
+    it is a 4K device that stutters on REMUX-first ranking, so it gets a bitrate ceiling instead of the Apex path. TCL and Hisense join ONN and Samsung on the No-Dolby-Vision path, because neither panel family should be assumed Dolby Vision capable.
   </Card>
-  <Card title="Real-Debrid still has no named preset. Its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat." icon="sliders">
-    Real-Debrid still has no named preset. Its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat.
+  <Card title="Real-Debrid still has no named preset" icon="sliders">
+    its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat.
   </Card>
 </CardGroup>
 
@@ -35,14 +35,14 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Core Badge Builder is live under Tools" icon="sparkles">
     build Nuvio Fusion stream badges visually with 111 original Core badges, essential and advanced categories, Core Neon/monochrome/high-contrast themes, category colors, ordering, and a real release-title preview. The matching rules are generated and tested internally; there is no regex or JSON field in the workflow.
   </Card>
-  <Card title="Two badge compatibility modes ship together: Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline." icon="bolt">
-    Two badge compatibility modes ship together: Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline.
+  <Card title="Two badge compatibility modes ship together" icon="bolt">
+    Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline.
   </Card>
-  <Card title="Badge install links are failure-safe: the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working." icon="shield-check">
-    Badge install links are failure-safe: the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working.
+  <Card title="Badge install links are failure-safe" icon="shield-check">
+    the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working.
   </Card>
-  <Card title="Fixed: custom formatters now survive a Configurator reload when both fields are valid and bounded. A stale custom selection without its formatter safely returns to Family v4." icon="sliders">
-    Fixed: custom formatters now survive a Configurator reload when both fields are valid and bounded. A stale custom selection without its formatter safely returns to Family v4.
+  <Card title="Fixed: custom formatters now survive a Configurator reload" icon="sliders">
+    when both fields are valid and bounded, the formatter is restored. A stale custom selection without its formatter safely returns to Family v4.
   </Card>
 </CardGroup>
 
