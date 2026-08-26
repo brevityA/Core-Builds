@@ -21,6 +21,29 @@ test('Android mobile profile is conservative', () => {
   assert.equal(profile.audio.maxChannels, '2.0');
 });
 
+test('Fire Stick HD is 1080p SDR with no DV', () => {
+  const profile = DEVICE_PROFILES['firestick-hd'];
+  assert.equal(profile.video.maxResolution, '1080p');
+  assert.equal(profile.video.dolbyVision, false);
+  assert.equal(profile.video.hdr.includes('SDR'), true);
+  assert.equal(profile.playback.maxBitrate, 'capped');
+});
+
+test('Fire Stick 4K Max is bitrate-capped, not Apex', () => {
+  const profile = DEVICE_PROFILES['firestick-4kmax'];
+  assert.equal(profile.video.maxResolution, '2160p');
+  assert.equal(profile.playback.maxBitrate, 'capped');
+  assert.equal(profile.playback.preferSmallFiles, true);
+  assert.match(profile.warnings[0], /not Apex/);
+});
+
+test('TCL and Hisense are explicit no-DV profiles', () => {
+  for (const id of ['tcl-google-tv', 'hisense']) {
+    assert.equal(DEVICE_PROFILES[id].video.dolbyVision, false);
+    assert.equal(DEVICE_PROFILES[id].audio.lossless, false);
+  }
+});
+
 const ICON_HELPERS = [
   ['androidMobile', 'android-mobile'],
   ['androidTv', 'android-tv'],
