@@ -1,4 +1,5 @@
 import { copyFile, mkdir, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { deflateSync } from 'node:zlib';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -119,6 +120,52 @@ function makePng(label) {
   ]);
 }
 
+/* ── SVG → PNG rasteriser ───────────────────────────────────────────────────
+ * The hand-rolled 5×7 bitmap font below produced 20 px-tall PNGs that render
+ * visibly blocky wherever a client shows a badge larger than its native size
+ * (reported against AIOStreams on elfhosted). The SVG sources are real vector
+ * paths, so rasterising *those* at RASTER_SCALE gives smooth glyphs and edges.
+ *
+ * This keeps the original reason the PNGs exist at all: the font is resolved
+ * once here, at generation time, so no client ever has to resolve SVG text.
+ * Determinism caveat — glyph shapes come from the fonts available to the
+ * rendering browser, so regenerating on a differently-provisioned machine can
+ * shift antialiasing. The published pack JSON is unaffected (it references
+ * URLs, not bytes) and still reproduces byte-identically.
+ *
+ * Chromium comes from the configurator's Playwright install. When it is not
+ * available the script falls back to the bitmap font and says so, so asset
+ * generation never hard-fails.
+ */
+const RASTER_SCALE = 3;
+
+async function openRasterizer() {
+  try {
+    const require = createRequire(resolve(repoRoot, 'configurator/package.json'));
+    const { chromium } = require('playwright');
+    const browser = await chromium.launch();
+    const page = await browser.newPage({ deviceScaleFactor: RASTER_SCALE });
+    return {
+      async render(svg, width, height) {
+        await page.setViewportSize({ width: Math.ceil(width), height: Math.ceil(height) });
+        await page.setContent(
+          `<style>html,body{margin:0;padding:0;background:transparent}</style>${svg}`,
+          { waitUntil: 'load' },
+        );
+        return page.screenshot({ omitBackground: true });
+      },
+      close: () => browser.close(),
+    };
+  } catch (err) {
+    console.warn(`  ! Chromium rasterizer unavailable (${err.message.split('\n')[0]})`);
+    console.warn('  ! Falling back to the 5x7 bitmap font — badges will look blocky.');
+    console.warn('  ! Fix: npm install --prefix configurator');
+    return null;
+  }
+}
+
+const rasterizer = await openRasterizer();
+
 for (const badge of BADGES) {
   const label = badge.assetLabel;
   const width = Math.max(58, Math.min(156, 26 + [...label].length * 7.1));
@@ -129,11 +176,19 @@ for (const badge of BADGES) {
   <path d="M8 7 11 10 8 13 5 10Z" fill="#0d1117" opacity=".72" transform="translate(1 6)"/>
   <text x="21" y="16.5" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="800" letter-spacing=".35" dominant-baseline="middle">${xml(label)}</text>
 </svg>\n`;
+  const png = rasterizer
+    ? await rasterizer.render(svg, Number(width.toFixed(0)), 32)
+    : makePng(label);
   await Promise.all([
     writeFile(resolve(out, `${badge.id}.svg`), svg),
-    writeFile(resolve(out, `${badge.id}.png`), makePng(label)),
+    writeFile(resolve(out, `${badge.id}.png`), png),
   ]);
 }
 
+if (rasterizer) await rasterizer.close();
+
 await copyFile(resolve(repoRoot, 'Assets/core_icon.svg'), resolve(out, 'core-icon.svg'));
 console.log(`Generated ${BADGES.length} original Core badge assets (SVG source + PNG runtime) in ${out}`);
+console.log(rasterizer
+  ? `PNG runtime rendered from the SVG sources at ${RASTER_SCALE}x.`
+  : 'PNG runtime rendered from the bitmap font (blocky) — Chromium was unavailable.');
