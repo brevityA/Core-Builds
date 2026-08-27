@@ -7,7 +7,7 @@ import vm from 'node:vm';
 
 const target = process.argv[2] || new URL('./index.html', import.meta.url);
 const html = readFileSync(target, 'utf8');
-const m = html.match(/<script>([\s\S]*)<\/script>/);
+const m = html.match(/<script>([\s\S]*)<\/script>/i);
 if (!m) {
   console.error('FAIL: no <script> block found in', target);
   process.exit(1);
