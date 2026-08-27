@@ -116,6 +116,20 @@ function imageChip(badge) {
   return `<span class="image-chip" style="background:${visual.background};border-color:${visual.border}"><img src="./assets/${encodeURIComponent(badge.asset)}" alt="${escapeHtml(badge.name)}" loading="lazy"></span>`;
 }
 
+/* Category colour is Nuvio tag chrome, not the badge artwork.
+ * Two things confused a tester and are now said out loud in the UI:
+ *  - mono and contrast define a fixed tagColor, so the picker is disabled on
+ *    them; previously it just went grey with no reason given.
+ *  - even on Core Neon the colour sets tagColor/borderColor on the Nuvio
+ *    filter. The badge image is a pre-rendered PNG and never changes colour,
+ *    and AIOStreams renders only that image, so the colour is invisible there.
+ */
+function colorHint(theme) {
+  return theme === 'neon'
+    ? 'Tints the Nuvio tag and border. The badge image does not change colour, and AIOStreams shows only the image.'
+    : 'This theme uses a fixed palette, so per-category colour is off. Switch to Core Neon to choose your own.';
+}
+
 function renderCatalog() {
   const selected = selectedSet();
   const root = $('catalog');
@@ -137,7 +151,7 @@ function renderCatalog() {
         </div>
         <div class="group-meta">
           <span class="group-count">${enabledCount}/${orderedBadges.length} on</span>
-          <label class="color-wrap"><span>Color</span><input class="group-color" type="color" data-group-color="${group.id}" value="${escapeHtml(state.groupColors[group.id])}" aria-label="${escapeHtml(group.name)} color" ${state.theme === 'neon' ? '' : 'disabled'}></label>
+          <label class="color-wrap" title="${escapeHtml(colorHint(state.theme))}"><span>Color</span><input class="group-color" type="color" data-group-color="${group.id}" value="${escapeHtml(state.groupColors[group.id])}" aria-label="${escapeHtml(group.name)} color — ${escapeHtml(colorHint(state.theme))}" ${state.theme === 'neon' ? '' : 'disabled'}></label>
           <span class="group-chevron" aria-hidden="true">${isOpen ? '−' : '+'}</span>
         </div>
       </div>
