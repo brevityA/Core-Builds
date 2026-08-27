@@ -1,14 +1,36 @@
 ---
-title: "What's New — Configurator v2.98"
+title: "What's New — Configurator v2.99"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.98 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v2.99 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.98**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.99**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v2.99 (Aug 27 2026)
+
+<CardGroup cols={2}>
+  <Card title="CoreSpeed engine v3, and an apology for v1 and v2" icon="sparkles">
+    if the old speed test disagreed with TorBox's own site, that was our methodology, not the CDN. Three faults, all fixed. The read loop ran on the main thread while the map, table and canvas redrew every 250 ms, so on a weak device the UI starved the download and the tool reported that starvation as your speed; every byte is now counted inside a dedicated Web Worker the UI cannot touch. The 10-second cap on the 100 MB file collapsed to roughly one second of mostly TCP slow-start on a fast line, and measured a partial file on a slow one; v3 uses a 15-second window on the 1 GB file anchored at the first byte. And a single throttled sample used to define the result; each node is now measured twice and ranked by the median of steady-state, with rep-to-rep spread shown as a Consistency column.
+  </Card>
+  <Card title="Two of the CDN nodes in the old build no longer existed" icon="bolt">
+    TorBox renamed store-039 to store-011 (wnam) and nexus-083 to nexus-244 (latm), and the shipped snapshot still named the dead pair. v3 carries the current list and probes every endpoint on load rather than trusting it, flagging the badge as unverified when probes fail.
+  </Card>
+  <Card title="Three modes, and the default is the one to trust" icon="shield-check">
+    Accurate runs sequentially on one connection for playback verdicts, Express samples the closest node plus the top four by ping in about two minutes, and Capacity race opens up to eight real Range connections per node. Capacity numbers are pipe capacity and never earn a playback verdict. The 12 GB budget skips nodes rather than truncating a measurement, because a truncated sample is a wrong number while a skipped node is an honest gap.
+  </Card>
+  <Card title="CoreSpeed has tests for the first time" icon="sliders">
+    27 offline unit tests, 51 live assertions that run the shipped worker verbatim against a real CDN node rather than a mock of it, a syntax gate on the page, and a nightly CI run so an endpoint or engine break surfaces the day it happens.
+  </Card>
+  <Card title="Known gap: v3 has not been confirmed on a Fire Stick or Android TV" icon="gauge">
+    worker isolation is the entire point of the rewrite and low-power webviews are where it should matter most, but that needs real hardware and has not been run there yet. If you have one, a test result would be worth more than another round of ours.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v2.98 (Aug 26 2026)
 
@@ -62,21 +84,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="The proxy lane was opened narrowly" icon="sliders">
     TorBox's API sends no CORS header, so CoreSpeed fetches the CDN list through the Core Builds worker. That worker forwards any Authorization header a caller sets, which the WuPlay lane depends on, and allowing TorBox under those rules would have turned it into an authenticated relay for a service where you hold your own account key. It is scoped instead to that single public read, with credentials stripped and every other path and method refused — verified against the deployed worker rather than assumed.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.95 (Aug 16 2026)
-
-<CardGroup cols={2}>
-  <Card title="Stream scoring is live on Advanced and Labs" icon="sparkles">
-    until now every stream carried the same score of nothing. AIOStreams only fills in a stream's score from a 'ranked expression' list, Core Builds never sent one, and so the score-based sort key and the Adaptive Score Floor were quietly dropped from every config we generated. Both were listed as features. Neither had ever run. Advanced and Labs configs now ship a set of scored rules, so the score they sort on is real.
-  </Card>
-  <Card title="Quality now adds up instead of laddering" icon="bolt">
-    resolution, quality, HDR/Dolby Vision, audio format and release-group reputation each contribute points, while low-quality groups and upscales subtract them. Because the points combine, a 4K remux with Atmos from a top group outranks a plain 4K remux without anyone writing a rule for that exact pairing, which is what the old tier ladder required. Points for Dolby Vision and lossless audio are awarded only on devices that can play them.
-  </Card>
-  <Card title="Stable and Balanced are unaffected" icon="shield-check">
-    both clear the scoring layer on purpose, so their configs are unchanged in content. The only difference is one empty field that now appears earlier in the file. This lands solely where you have opted into the deeper filtering.
   </Card>
 </CardGroup>
