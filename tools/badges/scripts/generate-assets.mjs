@@ -166,26 +166,29 @@ async function openRasterizer() {
 
 const rasterizer = await openRasterizer();
 
-for (const badge of BADGES) {
-  const label = badge.assetLabel;
-  const width = Math.max(58, Math.min(156, 26 + [...label].length * 7.1));
-  const fontSize = [...label].length > 13 ? 9 : [...label].length > 9 ? 10 : 11;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width.toFixed(0)}" height="32" viewBox="0 0 ${width.toFixed(0)} 32" role="img" aria-label="${xml(badge.name)}">
+try {
+  for (const badge of BADGES) {
+    const label = badge.assetLabel;
+    const width = Math.max(58, Math.min(156, 26 + [...label].length * 7.1));
+    const fontSize = [...label].length > 13 ? 9 : [...label].length > 9 ? 10 : 11;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width.toFixed(0)}" height="32" viewBox="0 0 ${width.toFixed(0)} 32" role="img" aria-label="${xml(badge.name)}">
   <title>${xml(badge.name)}</title>
   <path d="M8 4 14 10 8 16 2 10Z" fill="#fff" opacity=".96" transform="translate(1 6)"/>
   <path d="M8 7 11 10 8 13 5 10Z" fill="#0d1117" opacity=".72" transform="translate(1 6)"/>
   <text x="21" y="16.5" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="800" letter-spacing=".35" dominant-baseline="middle">${xml(label)}</text>
 </svg>\n`;
-  const png = rasterizer
-    ? await rasterizer.render(svg, Number(width.toFixed(0)), 32)
-    : makePng(label);
-  await Promise.all([
-    writeFile(resolve(out, `${badge.id}.svg`), svg),
-    writeFile(resolve(out, `${badge.id}.png`), png),
-  ]);
+    const png = rasterizer
+      ? await rasterizer.render(svg, Number(width.toFixed(0)), 32)
+      : makePng(label);
+    await Promise.all([
+      writeFile(resolve(out, `${badge.id}.svg`), svg),
+      writeFile(resolve(out, `${badge.id}.png`), png),
+    ]);
+  }
+} finally {
+  // A throw mid-loop must not strand the Chromium process.
+  if (rasterizer) await rasterizer.close();
 }
-
-if (rasterizer) await rasterizer.close();
 
 await copyFile(resolve(repoRoot, 'Assets/core_icon.svg'), resolve(out, 'core-icon.svg'));
 console.log(`Generated ${BADGES.length} original Core badge assets (SVG source + PNG runtime) in ${out}`);
