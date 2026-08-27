@@ -581,6 +581,8 @@ function toARGB(hex, alpha='E6'){
 function argbToHex(argb){ if(!argb) return '#000000'; argb=argb.replace('#',''); if(argb.length===8) return '#'+argb.slice(2); return '#'+argb.slice(0,6); }
 function alphaFromArgb(argb){ if(!argb) return 'E6'; argb=argb.replace('#',''); return argb.length===8?argb.slice(0,2):'E6'; }
 function uid(str){ return (str||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'badge-'+Math.random().toString(36).slice(2,7); }
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function safeSrc(url){if(!url)return'';const s=String(url).trim();if(/^(data:|https?:\/\/)/i.test(s))return s;return'';}
 function argbToRgba(argb){
   if(!argb) return 'rgba(0,0,0,0.8)';
   argb=argb.replace('#','');
@@ -712,7 +714,7 @@ function renderGroups(){
     const count=state.filters.filter(f=>f.groupId===g.id).length;
     const el=document.createElement('div');
     el.className='group-item'+(state.selectedGroup===g.id?' active':'');
-    el.innerHTML=`<div class="group-head"><div class="group-name"><span class="group-dot" style="background:${g.color};color:${g.color}"></span>${g.name}</div><span class="group-count">${count}</span></div><div class="group-actions"><button class="btn btn-sm" data-act="edit" data-id="${g.id}">Edit</button><button class="btn btn-sm btn-ghost" data-act="del" data-id="${g.id}">Del</button></div>`;
+    el.innerHTML=`<div class="group-head"><div class="group-name"><span class="group-dot" style="background:${esc(g.color)};color:${esc(g.color)}"></span>${esc(g.name)}</div><span class="group-count">${count}</span></div><div class="group-actions"><button class="btn btn-sm" data-act="edit" data-id="${esc(g.id)}">Edit</button><button class="btn btn-sm btn-ghost" data-act="del" data-id="${esc(g.id)}">Del</button></div>`;
     el.addEventListener('click', e=>{ if(e.target.closest('button')) return; state.selectedGroup=state.selectedGroup===g.id?'all':g.id; filterSel.value=state.selectedGroup; renderGroups(); renderBadges(); });
     el.querySelectorAll('button').forEach(b=>{ b.addEventListener('click', ()=>{ const id=b.dataset.id; if(b.dataset.act==='edit') openGroupModal(id); else deleteGroup(id); }); });
     list.appendChild(el);
@@ -748,8 +750,9 @@ function renderBadges(){
     const g=state.groups.find(x=>x.id===f.groupId);
     const card=document.createElement('div');
     card.className='badge-card'+(f.isEnabled?'':' disabled');
-    const displayPattern = state.mode==='enhanced' ? (f.markerCode ? `marker:${f.markerCode} → ${f.markerField||''}` : f.pattern) : f.pattern;
-    card.innerHTML=`<div class="badge-card-head"><div class="badge-meta"><div class="badge-icon" style="border-color:${g?g.color+'40':'#333'};background:${g?g.color+'15':'#222'}">${f.imageURL?`<img src="${f.imageURL}" onerror="this.style.display='none'">`:`<span style="font-weight:700;font-size:11px">${(f.name||'').slice(0,3).toUpperCase()}</span>`}</div><div class="badge-info"><div class="badge-name">${f.name}</div><div class="badge-id">${f.id} • ${g?g.name:f.groupId}${f.markerCode?` • #${f.markerCode}`:''}</div></div></div><div class="badge-toggle ${f.isEnabled?'on':''}" data-toggle="${f.id}"></div></div><div class="badge-pattern mono" title="${(f.pattern||'').replace(/"/g,'&quot;')}">${displayPattern.slice(0,90)}</div><div class="badge-footer"><button class="btn" data-edit="${f.id}">Edit</button><button class="btn btn-ghost" data-dup="${f.id}">Dup</button><button class="btn btn-ghost" data-del="${f.id}">✕</button></div>`;
+    const displayPattern = state.mode==='enhanced' ? (f.markerCode ? `marker:${f.markerCode} → ${esc(f.markerField||'')}` : f.pattern) : f.pattern;
+    const imgSrc=safeSrc(f.imageURL);
+    card.innerHTML=`<div class="badge-card-head"><div class="badge-meta"><div class="badge-icon" style="border-color:${g?esc(g.color)+'40':'#333'};background:${g?esc(g.color)+'15':'#222'}">${imgSrc?`<img src="${esc(imgSrc)}" onerror="this.style.display='none'">`:`<span style="font-weight:700;font-size:11px">${esc((f.name||'').slice(0,3).toUpperCase())}</span>`}</div><div class="badge-info"><div class="badge-name">${esc(f.name)}</div><div class="badge-id">${esc(f.id)} • ${esc(g?g.name:f.groupId)}${f.markerCode?` • #${f.markerCode}`:''}</div></div></div><div class="badge-toggle ${f.isEnabled?'on':''}" data-toggle="${esc(f.id)}"></div></div><div class="badge-pattern mono" title="${esc(f.pattern||'')}">${esc(displayPattern.slice(0,90))}</div><div class="badge-footer"><button class="btn" data-edit="${esc(f.id)}">Edit</button><button class="btn btn-ghost" data-dup="${esc(f.id)}">Dup</button><button class="btn btn-ghost" data-del="${esc(f.id)}">✕</button></div>`;
     card.querySelector(`[data-toggle="${f.id}"]`).addEventListener('click', ()=>{ f.isEnabled=!f.isEnabled; saveLocal(); renderBadges(); renderGroups(); });
     card.querySelector(`[data-edit="${f.id}"]`).addEventListener('click', ()=>openBadgeModal(f.id));
     card.querySelector(`[data-dup="${f.id}"]`).addEventListener('click', ()=>duplicateBadge(f.id));
@@ -770,7 +773,7 @@ function renderLibrary(){
   }).forEach(item=>{
     const el=document.createElement('button');
     el.className='lib-item';
-    el.innerHTML=`<div class="lib-item-title">${item.name}</div><div class="lib-item-pattern">${item.pattern.slice(0,32)}</div><div style="margin-top:6px"><span class="badge" style="border-color:${item.color}40;color:${item.color};background:${item.color}15">${item.group}</span></div>`;
+    el.innerHTML=`<div class="lib-item-title">${esc(item.name)}</div><div class="lib-item-pattern">${esc(item.pattern.slice(0,32))}</div><div style="margin-top:6px"><span class="badge" style="border-color:${esc(item.color)}40;color:${esc(item.color)};background:${esc(item.color)}15">${esc(item.group)}</span></div>`;
     el.addEventListener('click', ()=>addFromLibrary(item));
     grid.appendChild(el);
   });
@@ -898,14 +901,14 @@ function renderPreview(){
     const matched=state.filters.filter(f=>f.isEnabled&&testPattern(f.pattern,line));
     const streamEl=document.createElement('div');
     streamEl.className='preview-stream';
-    streamEl.innerHTML=`<div class="stream-top">⚡ TORBOX • EXAMPLE STREAM ${idx+1}</div><div class="stream-badges">${matched.length?matched.map(f=>{ const g=state.groups.find(x=>x.id===f.groupId); const rgba=argbToRgba(f.tagColor); const rgbaBorder=argbToRgba(f.borderColor); const isTrans=f.tagColor.toLowerCase()==='#00000000'&&f.borderColor.toLowerCase()==='#00000000'; if(isTrans) return `<span class="stream-badge" style="background:transparent;border-color:transparent;padding:0"><img src="${f.imageURL}" style="width:72px;height:26px;object-fit:contain"></span>`; else return `<span class="stream-badge" style="background:${rgba};border-color:${rgbaBorder};color:white"><img src="${f.imageURL}" onerror="this.style.display='none'">${f.name}</span>`; }).join(''):`<span style="font-size:11px;color:var(--text3)">No match — try Universal regex or check pattern</span>`}</div><div class="stream-meta"><span>💾 42.8 GB</span><span>⚡ 54 Mbps</span><span>🌱 86</span><span class="mono" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${line.slice(0,60)}</span></div>`;
+    streamEl.innerHTML=`<div class="stream-top">⚡ TORBOX • EXAMPLE STREAM ${idx+1}</div><div class="stream-badges">${matched.length?matched.map(f=>{ const g=state.groups.find(x=>x.id===f.groupId); const rgba=argbToRgba(f.tagColor); const rgbaBorder=argbToRgba(f.borderColor); const isTrans=f.tagColor.toLowerCase()==='#00000000'&&f.borderColor.toLowerCase()==='#00000000'; const fImgSrc=safeSrc(f.imageURL); if(isTrans) return `<span class="stream-badge" style="background:transparent;border-color:transparent;padding:0">${fImgSrc?`<img src="${esc(fImgSrc)}" style="width:72px;height:26px;object-fit:contain">`:esc(f.name)}</span>`; else return `<span class="stream-badge" style="background:${esc(rgba)};border-color:${esc(rgbaBorder)};color:white">${fImgSrc?`<img src="${esc(fImgSrc)}" onerror="this.style.display='none'">`:``}${esc(f.name)}</span>`; }).join(''):`<span style="font-size:11px;color:var(--text3)">No match — try Universal regex or check pattern</span>`}</div><div class="stream-meta"><span>💾 42.8 GB</span><span>⚡ 54 Mbps</span><span>🌱 86</span><span class="mono" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(line.slice(0,60))}</span></div>`;
     previewContainer.appendChild(streamEl);
     if(idx===0){
       state.filters.forEach(f=>{
         const isMatch=testPattern(f.pattern,line);
         const row=document.createElement('div');
         row.className='match-item'+(isMatch?' matched':'');
-        row.innerHTML=`<span style="display:flex;align-items:center;gap:8px"><span class="match-dot ${isMatch?'on':''}"></span>${f.name}<span class="mono" style="font-size:10px;color:var(--text3)">${f.id}</span></span><span style="font-size:10px;color:var(--text3)">${isMatch?'MATCH':'—'}${f.markerCode?` • #${f.markerCode}`:''}</span>`;
+        row.innerHTML=`<span style="display:flex;align-items:center;gap:8px"><span class="match-dot ${isMatch?'on':''}"></span>${esc(f.name)}<span class="mono" style="font-size:10px;color:var(--text3)">${esc(f.id)}</span></span><span style="font-size:10px;color:var(--text3)">${isMatch?'MATCH':'—'}${f.markerCode?` • #${esc(String(f.markerCode))}`:''}</span>`;
         matchList.appendChild(row);
       });
     }
@@ -919,7 +922,7 @@ function openBadgeModal(id=null){
   const modal=document.getElementById('badgeModal');
   const isEdit=!!id;
   const badge=isEdit?state.filters.find(f=>f.id===id):null;
-  document.getElementById('badgeModalTitle').textContent=isEdit?`Edit Badge • ${badge.name}`:'New Custom Badge';
+  document.getElementById('badgeModalTitle').textContent=isEdit?'Edit Badge • '+badge.name:'New Custom Badge';
   document.getElementById('editId').value=badge?badge.id:'';
   document.getElementById('editName').value=badge?badge.name:'';
   document.getElementById('editGroup').value=badge?badge.groupId:(state.selectedGroup!=='all'?state.selectedGroup:state.groups[0]?.id);
@@ -1088,7 +1091,8 @@ function updateGenPreview(){
   const icon=document.getElementById('genIcon').value||'';
   const weight=document.getElementById('genWeight').value||'700';
   const dataUrl=generateBadgeImageSync(text, {bg, textColor:tc, style, icon, weight});
-  document.getElementById('genPreview').innerHTML=`<img src="${dataUrl}">`;
+  const safeDataUrl=safeSrc(dataUrl);
+  document.getElementById('genPreview').innerHTML=safeDataUrl?`<img src="${esc(safeDataUrl)}">`:'';
   document.getElementById('genPreview').dataset.url=dataUrl;
 }
 function updateStylePreview(){
@@ -1099,8 +1103,9 @@ function updateStylePreview(){
   const rgba=argbToRgba(tagColor); const rgbaBorder=argbToRgba(borderColor);
   const isTrans=tagColor.toLowerCase()==='#00000000'&&borderColor.toLowerCase()==='#00000000';
   const el=document.getElementById('stylePreview');
-  if(isTrans&&imgUrl) el.innerHTML=`<img src="${imgUrl}" style="width:120px;height:42px;object-fit:contain">`;
-  else el.innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:9px;background:${rgba};border:1px solid ${rgbaBorder};color:white;font-weight:600;font-size:12px">${imgUrl?`<img src="${imgUrl}" style="width:16px;height:16px">`:''}${name}</span>`;
+  const safeImgUrl=safeSrc(imgUrl);
+  if(isTrans&&safeImgUrl) el.innerHTML=`<img src="${esc(safeImgUrl)}" style="width:120px;height:42px;object-fit:contain">`;
+  else el.innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:9px;background:${esc(rgba)};border:1px solid ${esc(rgbaBorder)};color:white;font-weight:600;font-size:12px">${safeImgUrl?`<img src="${esc(safeImgUrl)}" style="width:16px;height:16px">`:''}${esc(name)}</span>`;
 }
 function updatePatternTest(){
   const pat=document.getElementById('editPattern').value;
@@ -1272,7 +1277,7 @@ document.getElementById('genUseBtn').addEventListener('click', ()=>{ const url=d
 document.getElementById('uploadInput').addEventListener('change', e=>{
   const file=e.target.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=()=>{ const url=reader.result; document.getElementById('uploadPreview').innerHTML=`<img src="${url}">`; document.getElementById('editImageUrl').value=url; updateStylePreview(); };
+  reader.onload=()=>{ const url=reader.result; const safeUrl=safeSrc(url); document.getElementById('uploadPreview').innerHTML=safeUrl?`<img src="${esc(safeUrl)}">`:''; document.getElementById('editImageUrl').value=url; updateStylePreview(); };
   reader.readAsDataURL(file);
 });
 document.getElementById('useCoreAssetBtn').addEventListener('click', ()=>{
