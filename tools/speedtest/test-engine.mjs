@@ -7,7 +7,9 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
-const script = html.match(/<script>([\s\S]*)<\/script>/i)[1];
+const scriptMatch = html.match(/<script\b[^>]*>([\s\S]*)<\/script>/i);
+if (!scriptMatch) { console.error('FAIL: no <script> block found in index.html'); process.exit(1); }
+const script = scriptMatch[1];
 const sectionA = script.split('/* ================= UI SECTION ================= */')[0];
 
 /* ---------- section A in a sandbox ---------- */

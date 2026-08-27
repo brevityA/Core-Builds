@@ -191,8 +191,8 @@ for (let r = 1; r <= ROUNDS; r++) {
   await runLeg('torbox', legTorbox);
   await wait(1000);
   await runLeg('curl', legCurl);
-  if (usedBytes > DATA_BUDGET * 0.85) { console.log('data budget nearly exhausted — skipping remaining rounds'); break; }
   rounds.push(round);
+  if (usedBytes > DATA_BUDGET * 0.85) { console.log('data budget nearly exhausted — skipping remaining rounds'); break; }
 }
 
 let v3full = null;
@@ -210,7 +210,7 @@ const pct = (a, b) => (a != null && b != null && b > 0) ? ((a - b) / b) * 100 : 
 const report = {
   ts: new Date().toISOString(),
   node: NODE_LABEL, url100: URL100, url1gb: LIVE_URL,
-  roundCount: ROUNDS, full: !!v3full, usedBytes,
+  roundCount: rounds.length, full: !!v3full, usedBytes,
   rounds,
   median: {
     v3_avgFbMbps: M('v3'), v3_steadyMbps: med(rd => rd.v3 && rd.v3.steadyMbps), v3_ping: med(rd => rd.v3 && rd.v3.ping), v3_ttfbMs: med(rd => rd.v3 && rd.v3.ttfbMs),

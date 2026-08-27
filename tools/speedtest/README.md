@@ -49,9 +49,9 @@ The nightly CI live test will flag engine/endpoint breakage the day it happens.
 | `node check-syntax.mjs` | Compiles the shipped page's inline script | no |
 | `node test-engine.mjs --unit` | 27 pure-logic tests (median, verdicts, units, snapshot, ranking) | no |
 | `node test-engine.mjs` | Unit + **live**: runs the shipped worker source against the real CDN (ping protocol, first-byte window, byte-exact Range slices, abort) | ~0.4 GB |
-| `node benchmark.mjs [--full] [--rounds N]` | Side-by-side vs **TorBox's actual `speedtest-worker.js`** (fetched fresh) + curl, paired per-round deltas, 2.5 GB budget guard | ~0.5–1.5 GB |
+| `node benchmark.mjs [--full] [--rounds N]` | Side-by-side vs **TorBox's actual `speedtest-worker.js`** (fetched fresh) + curl, paired per-round deltas, 2.5 GB budget guard | ~0.5–2.5 GB (`--full` and `--rounds N` both increase it) |
 
-`LIVE_URL=…` overrides the CDN target. CI (` .github/workflows/speedtest-engine.yml `) runs the offline job on every push to this folder and the live job nightly + on demand.
+`LIVE_URL=…` overrides the CDN target. CI (` .github/workflows/speedtest-engine.yml `) runs the offline job on pull requests and on pushes to `main` touching this folder, and the live job nightly + on demand.
 
 ## Architecture
 
