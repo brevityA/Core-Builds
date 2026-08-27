@@ -1,0 +1,78 @@
+# CoreSpeed Engine CI
+# ─────────────────────────────────────────────────────────────────────────────
+# Deploy to the repo as:  .github/workflows/speedtest-engine.yml
+# It expects the speedtest tool at:  tools/speedtest/
+#   index.html         (the shipped page)
+#   test-engine.mjs    (the harness)
+#   check-syntax.mjs   (inline-script syntax check)
+#
+# Two jobs:
+#   unit  — syntax + pure-logic tests, NO network. Runs on every push/PR that
+#           touches the speedtest tool. Fast (<1 min).
+#   live  — runs the real worker against the live TorBox CDN (downloads a few
+#           hundred MB). Runs nightly and on manual dispatch, so we don't burn
+#           CDN data on every commit.
+name: CoreSpeed Engine
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/speedtest/**"
+      - ".github/workflows/speedtest-engine.yml"
+  pull_request:
+    paths:
+      - "tools/speedtest/**"
+      - ".github/workflows/speedtest-engine.yml"
+  schedule:
+    # Nightly live verification — 03:17 UTC (~13:17 AEST, off-peak for the CDN)
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      run_live:
+        description: "Also run the live CDN test (downloads a few hundred MB from TorBox CDN)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: speedtest-engine-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    name: "Syntax + unit (offline)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: "Syntax-check the shipped page"
+        run: node tools/speedtest/check-syntax.mjs tools/speedtest/index.html
+      - name: "Unit tests (pure logic, no network)"
+        run: node tools/speedtest/test-engine.mjs --unit
+
+  live:
+    name: "Live CDN protocol test"
+    needs: unit
+    # Nightly schedule, or manual dispatch with run_live enabled.
+    if: >
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_live == true)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: "Live test against TorBox CDN"
+        env:
+          # Override the target node here (or via repo variable CORESPEED_LIVE_URL)
+          # if TorBox renames the closest 1 GB test file.
+          LIVE_URL: ${{ vars.CORESPEED_LIVE_URL || 'https://store-011.wnam.tb-cdn.io/dld/1GB.bin' }}
+        run: node tools/speedtest/test-engine.mjs

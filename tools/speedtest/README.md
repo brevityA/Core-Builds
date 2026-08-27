@@ -1,72 +1,60 @@
-# CoreSpeed — TorBox CDN Speed Test
+# CoreSpeed — TorBox CDN Speed Test (engine v3)
 
-A client-side speed test for [TorBox](https://torbox.app)'s Hyperdrive CDN, built into the Core Builds tool suite. Live at `brevitya.github.io/Core-Builds/tools/speedtest/` (also linked from the Builder splash → *Utilities*).
+A client-side speed test for [TorBox](https://torbox.app)'s Hyperdrive CDN, built into the Core Builds tool suite. Live at `brevitya.github.io/Core-Builds/tools/speedtest/`.
 
-## Why the methodology matters (v2)
+## What it measures, and why the methodology matters
 
-TorBox's CDN is a mix of direct per-region servers (Lisbon, Mumbai, Tokyo…) and Cloudflare-fronted edge nodes (`store-XXX`). The official TorBox speedtest answers one question: **what does a single connection from your ISP to each node actually get?** It tests nodes **sequentially** (one at a time, so nothing else eats your line), with **one connection** (what a player uses), ~30 s per node, ping = trimmed mean of 5 HEADs, all inside a Web Worker.
+v3 exists because v1/v2 numbers didn't match TorBox's own speedtest — and the audit (`docs`/community reports) showed the difference was methodology, not the CDN:
 
-CoreSpeed v1 raced all 17 nodes **concurrently with 4 streams each** — fun, but misleading: parallel streams mask latency (a player can't use them), and the concurrent start makes fast-ramping nodes steal bandwidth, so rankings became ramp noise. A supporter in southern Europe could legitimately see *India* win — their ISP routes to Akamai Mumbai well over 4 streams — while real single-connection playback there would buffer. That's exactly the "opposite to the TorBox website" report.
+- **Worker-isolated measurement.** Every byte is counted inside a dedicated Web Worker. The UI can't starve the read loop or cap measured throughput (v2 ran the read loop on the main thread while rebuilding the map/table/canvas every 250 ms).
+- **1 GB file, first-byte-anchored window.** Each node gets a 15 s window (10/20 s selectable) measured from the first byte on the 1 GB file, so TCP slow-start is <10 % of the window on any line up to ~700 Mbps. (v2's 10 s cap on the 100 MB file collapsed to ~1 s on fast lines and measured a partial file on slow ones.)
+- **Two reps, median.** Rep 2 re-samples the second half of the file via Range. Headline = median of per-rep *steady-state* (window minus the first 2 s) — one throttled rep dilutes instead of defining the result. Rep-to-rep σ is shown as a Consistency column.
+- **Honest stats, both shown.** `Steady` (playback number), `Raw avg` = bytes ÷ time-since-first-byte, plus peak, p95, TTFB and ping (5 × 1-byte Range GETs, trimmed mean of the middle 3, 4 s timeout per round — timed, unlike TorBox's own pre-test HEADs).
+- **Decimal units** (Mbps = 10⁶ bit/s; MB/s = 10⁶ B/s), with an optional correctly-labelled MiB/s toggle. (The midnight fork reports binary MiB/s labelled "MB/s" — ~4.8 % inflation.)
+- **Failed/skipped nodes are never ranked** — they get a labelled "Not ranked" section with the reason.
 
-**CoreSpeed v2 fixes this:**
+### Modes
 
-- **Sequential mode (default)** — one node at a time, **one connection**, 10 s cap or file-complete. Same approach as TorBox's own test, ~75–180 s for all 17 nodes. This is the number that matters for playback, and the only mode that produces streaming verdicts.
-- **Burst / Quick / Full** are explicitly labeled **multi-stream capacity races** — they show pipe capacity and are fun, but produce no playback verdicts.
-- **Ping = trimmed mean of 5 HEADs** (drop best & worst, mean the middle 3) — matching TorBox's site.
-- **Verdicts are ping-aware** — a node with >250 ms ping can't earn a "4K" verdict no matter how fast it downloads; >400 ms caps at SD. (Buffering on high-latency routes is real even when throughput looks fine.)
-- **Route-anomaly notices** — if a far node wins, the winner banner says so explicitly instead of just crowning it.
-- **Topology transparency** — Cloudflare-fronted / edge nodes are badged in the table and legend, because "US West" served from *your* local Cloudflare edge is a different beast from a direct server.
-- **Diagnostics export** — the ⛨ button downloads a JSON report (per-node pings, all 5 rounds, DNS A-records, your ISP/ASN, measurement metadata) so supporters can share evidence instead of screenshots.
+| Mode | What | Data (worst case) | Time (17 nodes) |
+|---|---|---|---|
+| **Accurate** (default) | Sequential, 1 connection, 2 reps × 15 s on 1 GB, median steady, playback verdicts | ≤ ~2 GB/node; 12 GB budget skips, never truncates | ~9 min slow … ~2 min on Gbps lines (budget-limited to ~6 nodes) |
+| **Express** | Closest + top-4-by-ping, 1 rep × 15 s | ≤ 5 GB — always fits | ~90–120 s |
+| **Capacity race** | All scoped nodes at once, 1–8 real Range connections each, 20 s, 250 MB–1 GB/node | ~8.5 GB @ 500 MB/node | ~20–30 s |
 
-## What it does
-
-- **Sequential accurate test (default)** — single connection per node, live gauge/sparkline for the current node, ETA, then a ranked table with stability, verdicts, and a winner banner.
-- **Capacity races** — Burst (5–20 s/node, N streams), Quick (100 MB file), Full (1 GB file), all nodes at once with live leaderboard.
-- **World map** — nodes sized/coloured by measured speed, winner crowned, your location marked (ipwho.is, falls back to your closest CDN).
-- **History + compare** — last 15 runs in `localStorage`, Δ-vs-previous columns, load any past run back.
-- **Exports** — Markdown report (copy), CSV, JSON, and the diagnostics JSON.
-- Hard 12 GB data budget, instant Stop, per-node caps (10 s sequential, 45/90 s quick/full).
-
-No API key, no backend, no tracking — everything runs in the browser.
+The capacity race is *real* parallelism (N workers, independent 1/N slices) — TorBox's own "multithreaded" mode is a single TCP connection with 1 MB buffering. Capacity numbers are pipe capacity, never a playback verdict.
 
 ## How it gets the CDN list
 
-TorBox's speedtest API (`https://api.torbox.app/v1/api/speedtest`) doesn't send `Access-Control-Allow-Origin`, so browsers can't call it directly. CoreSpeed falls back in order:
+TorBox's speedtest API (`https://api.torbox.app/v1/api/speedtest`) doesn't send `Access-Control-Allow-Origin`, so the chain is:
 
-1. **Core Builds worker proxy** — `GET /proxy/v1/api/speedtest?host=https://api.torbox.app&test_length=short` against the suite's Cloudflare Worker. **Live since 19 Aug 2026** — no allowlist edit or redeploy is needed any more, and it was verified against the running worker rather than assumed.
-2. **Direct API call** — kept for the day TorBox opens CORS; harmless when it fails.
-3. **Embedded snapshot** — the last known node list (date-stamped in the badge). Results still measure real files on real nodes; only the *directory* can go stale if TorBox renames nodes — they do rename occasionally (e.g. `store-039` replaced `nexus-125`), so refresh the snapshot when the badge date is old.
+1. **`?worker=` override** (your own proxy) — pass `?worker=https://your-proxy.example`
+2. **Core Builds worker proxy** — `GET /proxy/v1/api/speedtest?host=…&test_length=…` against `core-builds-cors-proxy.tlorenzato26.workers.dev` (restricted to that one path; see `cloudflare-worker/worker.js` `HOST_SCOPES`)
+3. **Direct API call** — kept for the day TorBox opens CORS
+4. **Embedded snapshot** — last known node list (date-stamped in the badge), **probed** on load (1-byte Range GET per host); if >20 % are unreachable it retries the live list once, else the badge says `snapshot … · unverified`
 
-If you host your own worker instance, pass it with `?worker=https://your-proxy.example`.
-
-### How narrow that lane is
-
-The generic proxy accepts GET/POST/PATCH on any path and forwards a caller-supplied
-`Authorization` header, which the WuPlay device-token lane depends on. Applied to a
-third-party API where users hold their own account keys, that would make the worker an
-authenticated relay for the whole of TorBox. `HOST_SCOPES` in `cloudflare-worker/worker.js`
-therefore restricts this host to `GET /v1/api/speedtest` and strips credentials; four tests
-in `worker.test.js` hold it shut, and the deployed worker returns
-`path not allowed for this host` / `method not allowed for this host` for anything else.
-
-Deployment is automatic — `.github/workflows/deploy-worker.yml` fires on any push to `main`
-touching `cloudflare-worker/**`. Note that workflow reports success even when it *skips* the
-deploy because secrets are unset, so a green tick alone does not prove anything shipped:
-check that the "Deploy to Cloudflare Workers" step actually ran.
-
-## Keeping the snapshot fresh
-
-The embedded snapshot lives in `tools/speedtest/index.html` (`SNAPSHOT` const). Refresh it with the output of:
+TorBox renames nodes occasionally (two in the week before v3 shipped: `store-039`→`store-011` wnam, `nexus-083`→`nexus-244` latm). Refresh the `SNAPSHOT` const with:
 
 ```bash
 curl -s "https://api.torbox.app/v1/api/speedtest?test_length=short"
 curl -s "https://api.torbox.app/v1/api/speedtest?test_length=long"
+# merge by region+name into SNAPSHOT.data (url_long from the long list)
 ```
 
-(merge by region+name; see the `SNAPSHOT.data` shape in the file).
+The nightly CI live test will flag engine/endpoint breakage the day it happens.
+
+## Tests & benchmark
+
+| Command | What | Network |
+|---|---|---|
+| `node check-syntax.mjs` | Compiles the shipped page's inline script | no |
+| `node test-engine.mjs --unit` | 27 pure-logic tests (median, verdicts, units, snapshot, ranking) | no |
+| `node test-engine.mjs` | Unit + **live**: runs the shipped worker source against the real CDN (ping protocol, first-byte window, byte-exact Range slices, abort) | ~0.4 GB |
+| `node benchmark.mjs [--full] [--rounds N]` | Side-by-side vs **TorBox's actual `speedtest-worker.js`** (fetched fresh) + curl, paired per-round deltas, 2.5 GB budget guard | ~0.5–1.5 GB |
+
+`LIVE_URL=…` overrides the CDN target. CI (` .github/workflows/speedtest-engine.yml `) runs the offline job on every push to this folder and the live job nightly + on demand.
 
 ## Architecture
 
-Single self-contained `index.html` (inline CSS + JS, ~115 KB) — matches the suite's other tool pages (genies, inspector, preflight). Zero build step; shipped by the existing `deploy-configurator.yml` Pages workflow, which copies repo-root `tools/` beside the configurator.
+Single self-contained `index.html` (inline CSS + JS, ~139 KB) — matches the suite's other tool pages. Zero build step; shipped by the existing `deploy-configurator.yml` Pages workflow, which copies repo-root `tools/` beside the configurator. The script is structured so everything above the `/* ================= UI SECTION ================= */` marker is DOM-free and unit-tested in Node; the harness extracts and runs the actual shipped `WORKER_SRC`.
 
-**Measurement engine:** ping phase (5× HEAD per node, concurrent) → sequential single-stream phase or concurrent multi-stream race. Byte counting happens in the fetch read loop (`performance.now()`-deltas, not timer-based), a 250 ms sampler drives the UI (gauge, spark, table), first-interval baselines exclude connection-setup buffering, stability = 1 − σ/μ over post-slow-start samples, sustained = bytes ÷ active time. Every async path captures its run object so a stale timer can never corrupt a newer run.
+No API key, no tracking — everything runs in the browser. Hard 12 GB data budget, instant Stop, per-node caps, background-safe measurement (window cap checked on chunk arrival, immune to tab timer throttling).
