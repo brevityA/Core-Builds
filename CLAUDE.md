@@ -1013,3 +1013,19 @@ Same structure but with `service` key after `seadex` for debrid provider priorit
 - Reddit (Core Crew): https://www.reddit.com/r/CoreBuilds/
 - AIOStreams: https://github.com/Viren070/AIOStreams
 - AIOStreams docs: https://docs.aiostreams.viren070.me
+---
+
+## Speed Test (tools/speedtest) — engine v3
+
+The speed test is a **single self-contained `tools/speedtest/index.html`** (zero build step, zero dependencies), deployed to Pages by the existing `deploy-configurator.yml`. It measures every TorBox Hyperdrive CDN node; the methodology is documented in its README.
+
+- **Engine invariants (deliberate accuracy fixes — do not regress):** all byte counting runs in a Web Worker (never the main thread); measurement windows are first-byte-anchored on the 1 GB file; nodes are measured twice and ranked by median steady-state; failed/skipped nodes are never ranked; units are decimal (MiB/s only via the labelled toggle).
+- **Test surface** (from the repo root):
+  - `node tools/speedtest/check-syntax.mjs tools/speedtest/index.html` — always
+  - `node tools/speedtest/test-engine.mjs --unit` — always before push (offline, 27 tests)
+  - `node tools/speedtest/test-engine.mjs` — before push when touching the engine (live CDN, ~0.4 GB; `LIVE_URL=…` overrides the node)
+  - `node tools/speedtest/benchmark.mjs` — manual only, downloads ~0.5–2.5 GB (`--full` and `--rounds N` both increase it; `--budget` caps it), never a gate
+- **CI:** `.github/workflows/speedtest-engine.yml` — unit job on PRs and on pushes to `main` touching the tool; live CDN job nightly + manual dispatch (override node via repo variable `CORESPEED_LIVE_URL`).
+- **Snapshot:** the `SNAPSHOT` const in `index.html` is a dated fallback endpoint list. TorBox renames nodes occasionally; if the live CI job fails or the on-page badge shows a stale/unverified snapshot, refresh the const from the two API calls in `tools/speedtest/README.md`.
+- **Do not modify `cloudflare-worker/`** for speedtest work — the v3 endpoint chain uses the existing `GET /proxy/v1/api/speedtest` lane and its `HOST_SCOPES` restrictions.
+- **Worker deploys are not proven by a green tick** (preserved from the v2 speedtest README, which v3 replaced): `deploy-worker.yml` fires on pushes to `main` touching `cloudflare-worker/**`, but it reports success even when it *skips* the deploy because the Cloudflare secrets are unset. Confirm the "Deploy to Cloudflare Workers" step actually ran before believing anything shipped.
