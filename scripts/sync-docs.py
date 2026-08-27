@@ -399,50 +399,6 @@ TOOLS_WN_END = "<!-- AUTO:TOOLS_WHATSNEW:END -->"
 USER_FACING_PATH_RE = r"^(configurator/src/|Templates/|Formatters/|Filtering/|AIOMetadata/)"
 
 
-def gen_root_roadmap_completed(entries, limit=14):
-    """Managed 'Recently Completed' table for the ROOT ROADMAP.md, from CHANGELOG.md."""
-    rows = "\n".join(
-        f"| v{e['version']} | {e['date']} | {_first_summary_line(e['body'])} |"
-        for e in entries[:limit]
-    )
-    return (
-        "Auto-generated from [`CHANGELOG.md`](" + REPO_BASE + "/blob/main/CHANGELOG.md) "
-        "by `scripts/sync-docs.py`. In Progress / Planned / Ideas below are hand-curated.\n\n"
-        "| Version | Date | Highlights |\n| --- | --- | --- |\n" + rows + "\n"
-    )
-
-
-def gen_tools_whatsnew(cfg_entries, limit=3, per_version=6):
-    """Managed 'What's New' block for tools/index.html (the standalone Core Tools page),
-    from configurator changelog.js. Includes a 'Full changelog' link so the tools page
-    always points at the configurator's changelog."""
-    blocks = []
-    for e in cfg_entries[:limit]:
-        blocks.append(
-            f'      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);'
-            f'letter-spacing:.04em;margin-top:8px">v{e["v"]} · {e["date"]}</div>'
-        )
-        for item in e["items"][:per_version]:
-            text = item.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-            blocks.append(
-                '      <div class="news-item"><span class="badge badge-green" '
-                f'style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">{text}</span></div>'
-            )
-    link = (
-        '      <div class="news-item"><span class="badge" style="flex-shrink:0;background:'
-        'rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)">'
-        '<a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);'
-        'text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; '
-        '<a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);'
-        'text-decoration:none">suite changelog →</a></span></div>'
-    )
-    return (
-        "    <h3>🆕 What's New — v" + cfg_entries[0]["v"] + "</h3>\n"
-        '    <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">\n'
-        + link + "\n" + "\n".join(blocks) + "\n    </div>"
-    )
-
-
 def user_facing_changed(changed_files):
     """True if any path in the iterable touches user-facing code/templates."""
     import re as _re

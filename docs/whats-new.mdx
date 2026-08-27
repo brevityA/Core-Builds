@@ -22,11 +22,11 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Three modes, and the default is the one to trust" icon="shield-check">
     Accurate runs sequentially on one connection for playback verdicts, Express samples the closest node plus the top four by ping in about two minutes, and Capacity race opens up to eight real Range connections per node. Capacity numbers are pipe capacity and never earn a playback verdict. The 12 GB budget skips nodes rather than truncating a measurement, because a truncated sample is a wrong number while a skipped node is an honest gap.
   </Card>
-  <Card title="CoreSpeed has tests for the first time" icon="sliders">
-    27 offline unit tests, 51 live assertions that run the shipped worker verbatim against a real CDN node rather than a mock of it, a syntax gate on the page, and a nightly CI run so an endpoint or engine break surfaces the day it happens.
-  </Card>
-  <Card title="Known gap: v3 has not been confirmed on a Fire Stick or Android TV" icon="gauge">
+  <Card title="Known gap: v3 has not been confirmed on a Fire Stick or Android TV" icon="sliders">
     worker isolation is the entire point of the rewrite and low-power webviews are where it should matter most, but that needs real hardware and has not been run there yet. If you have one, a test result would be worth more than another round of ours.
+  </Card>
+  <Card title="CoreSpeed has tests for the first time" icon="gauge">
+    27 offline unit tests, 51 live assertions that run the shipped worker verbatim against a real CDN node rather than a mock of it, a syntax gate on the page, and a nightly CI run so an endpoint or engine break surfaces the day it happens.
   </Card>
 </CardGroup>
 
