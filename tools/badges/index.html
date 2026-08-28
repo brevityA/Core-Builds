@@ -48,6 +48,17 @@ input,select,textarea{font-family:inherit}
 .pill.dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 8px var(--green)}
 .hdr-btn{padding:7px 12px;border-radius:8px;font-size:.68rem;font-weight:700;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
 .hdr-btn:hover{border-color:var(--accent-border);color:var(--accent);background:var(--accent-bg)}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+@media(max-width:640px){
+  .header{flex-wrap:wrap;overflow:visible;padding:12px 14px;margin:0 10px;gap:10px}
+  .hdr-divider{display:none}
+  .hdr-icon{width:32px;height:32px}
+  .header h1{font-size:1.05rem}
+  .header p{font-size:.6rem}
+  .hdr-actions{margin-left:0;width:100%;flex-wrap:wrap;gap:6px}
+  .hdr-btn{padding:6px 10px;font-size:.62rem}
+  .pill{padding:4px 8px;font-size:.55rem}
+}
 
 /* Stepper */
 .stepper{max-width:1440px;margin:0 auto;padding:18px 20px 0;display:flex;gap:10px;align-items:center;overflow:auto}
@@ -63,6 +74,7 @@ input,select,textarea{font-family:inherit}
 .app{max-width:1440px;margin:0 auto;padding:20px;display:grid;grid-template-columns:300px 1fr 380px;gap:20px}
 @media(max-width:1200px){.app{grid-template-columns:280px 1fr} .right{display:none}}
 @media(max-width:860px){.app{grid-template-columns:1fr;padding:12px} .left{order:2} .main{order:1} .right{display:block;order:3} .stepper{padding:12px 12px 0} .step-btn{min-width:140px}}
+@media(max-width:640px){.stepper{gap:6px;padding:10px 10px 0} .step-btn{min-width:100px;padding:10px 10px} .step-title{font-size:12px} .step-desc{font-size:10px} .step-num{font-size:.55rem} .app{padding:10px;gap:12px} .search input{width:100%} .badge-grid{grid-template-columns:1fr} .library-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))} .toolbar{flex-direction:column;align-items:stretch} .toolbar-left{flex-wrap:wrap}}
 
 /* Cards */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative}
@@ -201,7 +213,7 @@ input,select,textarea{font-family:inherit}
     <h1><span>Core </span><span class="hdr-tool">Badge Builder</span></h1>
     <p>Nuvio Fusion badges — AIO Enhanced markers or Universal regex</p>
   </div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
+  <div class="hdr-actions">
     <span class="pill dot">v3</span>
     <button class="hdr-btn" id="themeBtn">☀ Light</button>
     <a class="hdr-btn" href="../">← Tools</a>
