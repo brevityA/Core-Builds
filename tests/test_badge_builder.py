@@ -22,9 +22,9 @@ def test_badge_builder_is_no_code_in_the_user_interface():
     assert 'Regex Pattern' not in HTML
     assert 'data-mode="enhanced"' in HTML
     assert 'data-mode="universal"' in HTML
-    assert 'data-theme-choice="neon"' in HTML
-    assert 'data-theme-choice="mono"' in HTML
-    assert 'data-theme-choice="contrast"' in HTML
+    assert 'data-theme-preset="neon"' in HTML
+    assert 'data-theme-preset="mono"' in HTML
+    assert 'data-theme-preset="contrast"' in HTML
 
 
 def test_badge_builder_has_first_party_assets_and_no_third_party_catalog_urls():
@@ -45,7 +45,7 @@ def test_badge_builder_network_is_explicit_and_fallback_is_bounded():
     assert 'https://paste.rs/' in APP
     assert 'https://dpaste.com/api/v2/' in APP
     assert 'expiry_days:\'365\'' in APP
-    assert 'connect-src' in HTML
+    assert 'core-builds-cors-proxy.tlorenzato26.workers.dev' in HTML
 
 
 def test_badge_builder_handoff_contract_matches_configurator():
