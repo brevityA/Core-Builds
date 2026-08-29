@@ -73,6 +73,7 @@ async function proxyWuplay(req, res, parsed) {
   if (!isAllowedProxyRoute(req.method, upstreamPathname)) return send(res, 405, 'WuPlay route or method is not allowlisted.');
 
   const upstreamUrl = new URL(upstreamPathname, API_ORIGIN);
+  if (upstreamUrl.origin !== new URL(API_ORIGIN).origin) return send(res, 403, 'Proxy target outside allowed origin.');
   upstreamUrl.search = upstreamQuery.toString();
 
   let body;
