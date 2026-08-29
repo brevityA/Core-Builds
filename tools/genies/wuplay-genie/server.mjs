@@ -66,15 +66,14 @@ function readBody(req) {
 }
 
 async function proxyWuplay(req, res, parsed) {
-  const host = parsed.searchParams.get('host');
   const upstreamQuery = new URLSearchParams(parsed.searchParams);
   upstreamQuery.delete('host');
   const upstreamPathname = parsed.pathname.slice('/api/proxy'.length) || '/';
-  const upstreamPath = upstreamPathname + (upstreamQuery.toString() ? '?' + upstreamQuery.toString() : '');
 
-  // This bridge is intentionally allowlisted. It cannot be used as an open proxy.
-  if (host !== API_ORIGIN) return send(res, 403, 'Proxy host is not allowlisted.');
   if (!isAllowedProxyRoute(req.method, upstreamPathname)) return send(res, 405, 'WuPlay route or method is not allowlisted.');
+
+  const upstreamUrl = new URL(upstreamPathname, API_ORIGIN);
+  upstreamUrl.search = upstreamQuery.toString();
 
   let body;
   try {
@@ -91,7 +90,7 @@ async function proxyWuplay(req, res, parsed) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 20_000);
   try {
-    const upstream = await fetch(API_ORIGIN + upstreamPath, {
+    const upstream = await fetch(upstreamUrl.href, {
       method: req.method,
       headers,
       body,
