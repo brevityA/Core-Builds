@@ -1,0 +1,14 @@
+{
+  "name": "wuplay-genie",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WuPlay Genie static app with an optional same-origin API bridge",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "WuPlay Genie",
+  "short_name": "WuPlay Genie",
+  "description": "A privacy-first guided setup companion for WuPlay.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070911",
+  "theme_color": "#070911",
+  "lang": "en-AU",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
