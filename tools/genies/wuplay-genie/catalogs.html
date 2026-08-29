@@ -1088,14 +1088,25 @@
 //   PATCH /sync/{key}/screens/{id}    [source ✓ {viewType}; interceptor adds profile header]
 //   PATCH /sync/{key}/profile         [source ✓ full-object settings send + profile header]
 //   POST /sync/{key} envelope        [live ✓ accepted]
-//   Catalog routes (confirmed 2026-08-29 via sanitized devtools capture on config.wuplay.app):
+//   Configurator routes (confirmed 2026-08-29 via sanitized devtools capture on config.wuplay.app):
+//   Catalogs:
 //     POST   /configure/api/{key}/catalogs-v2                              → 201 create catalog
 //     POST   /configure/api/{key}/layouts/{layoutId}/rows                  → 201 add catalog to layout row
+//     POST   /configure/api/{key}/layouts/{layoutId}/rows/addon-bulk       → 201 bulk add rows {catalogs:[...]}
 //     PUT    /configure/api/{key}/layouts/{layoutId}/rows/reorder          → 204 full-array reorder
 //     POST   /configure/api/{key}/layouts/{layoutId}/rows/bulk-remove      → 204 remove rows
+//   Screens:
+//     POST   /configure/api/{key}/screens                                  → 201 create screen {name,icon,viewType,visible} or {name,icon,hubId,visible}; returns id+layoutId
 //     PUT    /configure/api/{key}/screens/{screenId}                       → 204 screen visibility {visible:"true"|"false"}
 //     PUT    /configure/api/{key}/screens/reorder                          → 204 screen reorder {screenIds:[...]}
+//     DELETE /configure/api/{key}/screens/{screenId}                       → 204 delete screen
 //     PUT    /configure/api/{key}/screens/catalog-defs/{catalogDefId}      → 204 rename catalog-def {name}
+//   Hubs:
+//     POST   /configure/api/{key}/hubs                                     → 201 create hub {name,detailViewType,tileShape}
+//     POST   /configure/api/{key}/hubs/{hubId}/items                       → 201 add item {name}; returns id,name,layoutId,rowCount,logoUrl,showName
+//     PUT    /configure/api/{key}/hubs/{hubId}                             → 204 update hub {items:[...],presetOrder:[...]}
+//     DELETE /configure/api/{key}/hubs/{hubId}                             → 204 delete hub
+//   Layout mapping: second observed layout is Discover (user-confirmed); discover dynamically from /screens.
 //   Host: config.wuplay.app (web configurator), not api.wuplay.app (native API).
 //   Auth: web-configurator session cookies — not device-token + profile-key headers.
 //   Bookmarklet runs on configurator origin (same-origin, has session) → full automation.
@@ -1106,13 +1117,20 @@ const WP_ROUTES = {
   catalogWrite:      'POST /configure/api/{key}/catalogs-v2 → 201 (confirmed 2026-08-29)',
   catalogCreate:     '/configure/api/{key}/catalogs-v2',
   layoutAddRow:      '/configure/api/{key}/layouts/{layoutId}/rows',
+  layoutAddonBulk:   '/configure/api/{key}/layouts/{layoutId}/rows/addon-bulk',
   layoutReorder:     '/configure/api/{key}/layouts/{layoutId}/rows/reorder',
   layoutRemove:      '/configure/api/{key}/layouts/{layoutId}/rows/bulk-remove',
   presetList:        '/configure/api/{key}/catalogs-v2/preset-variations/general/all',
   screensList:       '/configure/api/{key}/screens',
+  screenCreate:      '/configure/api/{key}/screens',
   screenVisibility:  '/configure/api/{key}/screens/{screenId}',
+  screenDelete:      '/configure/api/{key}/screens/{screenId}',
   screenReorder:     '/configure/api/{key}/screens/reorder',
-  catalogDefRename:  '/configure/api/{key}/screens/catalog-defs/{catalogDefId}'
+  catalogDefRename:  '/configure/api/{key}/screens/catalog-defs/{catalogDefId}',
+  hubCreate:         '/configure/api/{key}/hubs',
+  hubUpdate:         '/configure/api/{key}/hubs/{hubId}',
+  hubDelete:         '/configure/api/{key}/hubs/{hubId}',
+  hubAddItem:        '/configure/api/{key}/hubs/{hubId}/items'
 };
 let autoKey = null, autoToken = null, autoSnapshot = null, autoState = null, autoReceipt = [];
 
