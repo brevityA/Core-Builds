@@ -1,0 +1,79 @@
+name: Watch AIOStreams contract
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/aios-regen/**"
+      - ".github/workflows/watch-aiostreams.yml"
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Extract live source contract
+        run: node scripts/aios-regen/cli.mjs extract source
+      - name: Diff against pinned snapshot
+        id: diff
+        continue-on-error: true
+        run: node scripts/aios-regen/cli.mjs diff --fail
+      - name: Generate a sample template against ElfHosted
+        if: always()
+        run: node scripts/aios-regen/cli.mjs generate --host https://aiostreams.elfhosted.com --out /tmp/regen-core-nexus.json
+      - name: Upload regenerated template
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regen-core-nexus
+          path: /tmp/regen-core-nexus.json
+      - name: Open or update drift issue
+        if: steps.diff.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'AIOStreams contract drift detected';
+            const body = [
+              'The AIOStreams source contract no longer matches `scripts/aios-regen/snapshots/contract.source.json`.',
+              '',
+              'Re-run locally:',
+              '```',
+              'node scripts/aios-regen/cli.mjs extract source',
+              'node scripts/aios-regen/cli.mjs diff',
+              'node scripts/aios-regen/cli.mjs generate --host https://aiostreams.elfhosted.com',
+              '```',
+              '',
+              'After review, re-pin with `node scripts/aios-regen/cli.mjs pin`.',
+              '',
+              'A regenerated sample template is attached to this workflow run as an artifact.',
+            ].join('\n');
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'aios-drift',
+            });
+            if (issues.data.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues.data[0].number,
+                body: body + `\n\n_run ${context.runId}_`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['aios-drift'],
+              });
+            }

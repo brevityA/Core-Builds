@@ -1,0 +1,997 @@
+{
+  "kind": "source",
+  "extractedAt": "2026-08-29T13:32:54.382Z",
+  "fingerprint": "a9505e3ef849efca",
+  "repo": "Viren070/AIOStreams",
+  "ref": "main",
+  "commit": {
+    "sha": "2eed6d82227a3bdfd689dcc291cbcb22e5144ecc",
+    "date": "2026-08-29T12:24:55Z",
+    "message": "fix(templates): discard saved template inputs the template no longer accepts",
+    "url": "https://github.com/Viren070/AIOStreams/commit/2eed6d82227a3bdfd689dcc291cbcb22e5144ecc"
+  },
+  "counts": {
+    "presets": 79,
+    "services": 21,
+    "schemaKeys": 152,
+    "selFunctions": 62,
+    "formatterFields": 87,
+    "requiredOptions": 2
+  },
+  "presetIds": [
+    "custom",
+    "torznab",
+    "newznab",
+    "aiostreams",
+    "torrentio",
+    "comet",
+    "meteor",
+    "mediafusion",
+    "stremthruTorz",
+    "stremthruStore",
+    "sootio",
+    "zilean",
+    "knaben",
+    "library",
+    "eztv",
+    "torrent-galaxy",
+    "bitmagnet",
+    "seadex",
+    "animetosho",
+    "neko-bt",
+    "prowlarr",
+    "jackett",
+    "nzbhydra",
+    "stremio-gdrive",
+    "jackettio",
+    "peerflix",
+    "orion",
+    "torrents-db",
+    "streamfusion",
+    "baguettio",
+    "fkstream",
+    "debridio",
+    "torbox",
+    "torbox-search",
+    "easynews-search",
+    "easynews",
+    "easynewsPlus",
+    "easynewsPlusPlus",
+    "usenet-streamer",
+    "streamnzb",
+    "davex",
+    "dmm-cast",
+    "nuvio-streams",
+    "webstreamr",
+    "hdhub",
+    "flix-streams",
+    "astream",
+    "brazuca-torrents",
+    "yastream",
+    "streamasia",
+    "usa-tv",
+    "usa-tv-next",
+    "argentina-tv",
+    "debridio-tv",
+    "debridio-watchtower",
+    "tmdb-addon",
+    "debridio-tmdb",
+    "debridio-tvdb",
+    "debridio-ic4a",
+    "streaming-catalogs",
+    "anime-catalogs",
+    "torrent-catalogs",
+    "rpdb-catalogs",
+    "tmdb-collections",
+    "anime-kitsu",
+    "marvel-universe",
+    "star-wars-universe",
+    "dc-universe",
+    "doctor-who-universe",
+    "opensubtitles",
+    "opensubtitles-v3-plus",
+    "subsource",
+    "subdl",
+    "subhero",
+    "aiosubtitle",
+    "ai-companion",
+    "ai-search",
+    "more-like-this",
+    "content-deep-dive"
+  ],
+  "serviceIds": [
+    "aiostreams",
+    "alldebrid",
+    "altmount",
+    "builtin",
+    "debrider",
+    "debridlink",
+    "easydebrid",
+    "easynews",
+    "mediaflow",
+    "nzbdav",
+    "offcloud",
+    "pikpak",
+    "premiumize",
+    "putio",
+    "realdebrid",
+    "seedr",
+    "stremio_nntp",
+    "stremthru",
+    "stremthru_newz",
+    "torbox",
+    "torrin"
+  ],
+  "schemaKeys": [
+    "uuid",
+    "parentConfig",
+    "variants",
+    "activeVariants",
+    "variantSelectorLocation",
+    "encryptedPassword",
+    "trusted",
+    "showChanges",
+    "manifestNotice",
+    "linkedAccounts",
+    "accessKey",
+    "ip",
+    "addonName",
+    "addonLogo",
+    "addonBackground",
+    "addonDescription",
+    "appliedTemplates",
+    "excludedResolutions",
+    "includedResolutions",
+    "requiredResolutions",
+    "preferredResolutions",
+    "excludedQualities",
+    "includedQualities",
+    "requiredQualities",
+    "preferredQualities",
+    "excludedLanguages",
+    "includedLanguages",
+    "requiredLanguages",
+    "preferredLanguages",
+    "excludedSubtitles",
+    "includedSubtitles",
+    "requiredSubtitles",
+    "preferredSubtitles",
+    "excludedVisualTags",
+    "includedVisualTags",
+    "requiredVisualTags",
+    "preferredVisualTags",
+    "excludedAudioTags",
+    "includedAudioTags",
+    "requiredAudioTags",
+    "preferredAudioTags",
+    "excludedAudioChannels",
+    "includedAudioChannels",
+    "requiredAudioChannels",
+    "preferredAudioChannels",
+    "excludedStreamTypes",
+    "includedStreamTypes",
+    "requiredStreamTypes",
+    "preferredStreamTypes",
+    "excludedEncodes",
+    "includedEncodes",
+    "requiredEncodes",
+    "preferredEncodes",
+    "excludedRegexPatterns",
+    "includedRegexPatterns",
+    "requiredRegexPatterns",
+    "preferredRegexPatterns",
+    "syncedPreferredRegexUrls",
+    "syncedExcludedRegexUrls",
+    "syncedIncludedRegexUrls",
+    "syncedRequiredRegexUrls",
+    "syncedRankedRegexUrls",
+    "syncedPreferredStreamExpressionUrls",
+    "syncedExcludedStreamExpressionUrls",
+    "syncedIncludedStreamExpressionUrls",
+    "syncedRequiredStreamExpressionUrls",
+    "syncedRankedStreamExpressionUrls",
+    "excludedReleaseGroups",
+    "includedReleaseGroups",
+    "requiredReleaseGroups",
+    "preferredReleaseGroups",
+    "requiredKeywords",
+    "includedKeywords",
+    "excludedKeywords",
+    "preferredKeywords",
+    "excludeSeederRange",
+    "includeSeederRange",
+    "requiredSeederRange",
+    "seederRangeTypes",
+    "excludeAgeRange",
+    "includeAgeRange",
+    "requiredAgeRange",
+    "ageRangeTypes",
+    "digitalReleaseFilter",
+    "enableSeadex",
+    "excludeSeasonPacks",
+    "excludeCached",
+    "excludeCachedFromAddons",
+    "excludeCachedFromServices",
+    "excludeCachedFromStreamTypes",
+    "excludeCachedMode",
+    "excludeUncached",
+    "excludeUncachedFromAddons",
+    "excludeUncachedFromServices",
+    "excludeUncachedFromStreamTypes",
+    "excludeUncachedMode",
+    "excludedStreamExpressions",
+    "requiredStreamExpressions",
+    "preferredStreamExpressions",
+    "includedStreamExpressions",
+    "rankedStreamExpressions",
+    "rankedRegexPatterns",
+    "regexOverrides",
+    "selOverrides",
+    "dynamicAddonFetching",
+    "groups",
+    "rpdbApiKey",
+    "topPosterApiKey",
+    "aioratingsApiKey",
+    "aioratingsProfileId",
+    "openposterdbApiKey",
+    "openposterdbUrl",
+    "openposterdbParameters",
+    "posterService",
+    "usePosterRedirectApi",
+    "usePosterServiceForMeta",
+    "formatter",
+    "proxy",
+    "resultLimits",
+    "size",
+    "bitrate",
+    "hideErrors",
+    "hideErrorsForResources",
+    "statistics",
+    "tmdbAccessToken",
+    "tmdbApiKey",
+    "tvdbApiKey",
+    "yearMatching",
+    "titleMatching",
+    "seasonEpisodeMatching",
+    "episodeTitleMatching",
+    "languageInference",
+    "deduplicator",
+    "autoPlay",
+    "areYouStillThere",
+    "precacheNextEpisode",
+    "alwaysPrecache",
+    "precacheCondition",
+    "precacheSelector",
+    "precacheSingleStream",
+    "preloadStreams",
+    "services",
+    "presets",
+    "addonCategoryColors",
+    "catalogModifications",
+    "mergedCatalogs",
+    "externalDownloads",
+    "cacheAndPlay",
+    "autoRemoveDownloads",
+    "checkOwned",
+    "failover",
+    "serviceWrap"
+  ],
+  "hotspots": {
+    "deduplicator.merge": "object",
+    "groups": "object",
+    "dynamicAddonFetching": "object",
+    "sortCriteria": "object"
+  },
+  "sel": {
+    "functions": [
+      "addon",
+      "age",
+      "audioChannels",
+      "audioTag",
+      "avg",
+      "bitrate",
+      "cached",
+      "count",
+      "encode",
+      "idMatched",
+      "indexer",
+      "iqr",
+      "keyword",
+      "keywords",
+      "kurtosis",
+      "language",
+      "library",
+      "max",
+      "mean",
+      "mediaInfoQuality",
+      "median",
+      "merge",
+      "message",
+      "min",
+      "mode",
+      "multiEpisode",
+      "negate",
+      "passthrough",
+      "perGroup",
+      "percentile",
+      "pin",
+      "q1",
+      "q2",
+      "q3",
+      "quality",
+      "range",
+      "regexMatched",
+      "regexMatchedInRange",
+      "regexScore",
+      "releaseGroup",
+      "resolution",
+      "rseMatched",
+      "seMatched",
+      "seMatchedInRange",
+      "seScore",
+      "seadex",
+      "seasonPack",
+      "seeders",
+      "service",
+      "size",
+      "skewness",
+      "slice",
+      "stddev",
+      "streamExpressionScore",
+      "subtitle",
+      "subtitles",
+      "sum",
+      "type",
+      "uncached",
+      "values",
+      "variance",
+      "visualTag"
+    ],
+    "constants": [
+      "absoluteEpisode",
+      "allAddons",
+      "daysSinceFirstAired",
+      "daysSinceLastAired",
+      "daysSinceRelease",
+      "daysUntilNextEpisode",
+      "episode",
+      "genres",
+      "hasNextEpisode",
+      "hasSeaDex",
+      "isAnime",
+      "latestSeason",
+      "ongoingSeason",
+      "originalLanguage",
+      "previousGroupTimeTaken",
+      "previousStreams",
+      "queriedAddons",
+      "queryType",
+      "runtime",
+      "season",
+      "streams",
+      "title",
+      "totalStreams",
+      "totalTimeTaken",
+      "year",
+      "yearEnd"
+    ]
+  },
+  "formatterFields": [
+    "filename",
+    "folderName",
+    "size",
+    "bitrate",
+    "folderSize",
+    "library",
+    "quality",
+    "resolution",
+    "subbed",
+    "dubbed",
+    "mediaInfoQuality",
+    "languages",
+    "uLanguages",
+    "subtitles",
+    "uSubtitles",
+    "languageEmojis",
+    "uLanguageEmojis",
+    "subtitleEmojis",
+    "uSubtitleEmojis",
+    "languageCodes",
+    "uLanguageCodes",
+    "subtitleCodes",
+    "uSubtitleCodes",
+    "smallLanguageCodes",
+    "uSmallLanguageCodes",
+    "smallSubtitleCodes",
+    "uSmallSubtitleCodes",
+    "wedontknowwhatakilometeris",
+    "uWedontknowwhatakilometeris",
+    "visualTags",
+    "audioTags",
+    "releaseGroup",
+    "regexMatched",
+    "rankedRegexMatched",
+    "regexScore",
+    "nRegexScore",
+    "encode",
+    "audioChannels",
+    "edition",
+    "editions",
+    "remastered",
+    "regraded",
+    "repack",
+    "proper",
+    "uncensored",
+    "unrated",
+    "upscaled",
+    "hasChapters",
+    "network",
+    "container",
+    "extension",
+    "indexer",
+    "year",
+    "title",
+    "country",
+    "episodeTitle",
+    "date",
+    "folderSeasons",
+    "formattedFolderSeasons",
+    "seasons",
+    "season",
+    "formattedSeasons",
+    "episodes",
+    "episode",
+    "formattedEpisodes",
+    "folderEpisodes",
+    "formattedFolderEpisodes",
+    "seasonEpisode",
+    "seasonPack",
+    "seeders",
+    "private",
+    "freeleech",
+    "age",
+    "ageHours",
+    "duration",
+    "infoHash",
+    "type",
+    "message",
+    "proxied",
+    "seadex",
+    "seadexBest",
+    "seScore",
+    "nSeScore",
+    "seMatched",
+    "rseMatched",
+    "preloading",
+    "idMatched"
+  ],
+  "formatterModifiers": [
+    "base64",
+    "binary",
+    "bitrate",
+    "bytes",
+    "bytes10",
+    "bytes2",
+    "comma",
+    "exact",
+    "first",
+    "for",
+    "hex",
+    "if",
+    "join",
+    "languagecode",
+    "languageemoji",
+    "last",
+    "length",
+    "lower",
+    "lsort",
+    "octal",
+    "prefix",
+    "pstar",
+    "random",
+    "rbitrate",
+    "rbytes",
+    "rbytes10",
+    "rbytes2",
+    "replacement",
+    "return",
+    "reverse",
+    "rsort",
+    "sbitrate",
+    "sbytes",
+    "sbytes10",
+    "sbytes2",
+    "search",
+    "smallcaps",
+    "sort",
+    "star",
+    "string",
+    "subscript",
+    "superscript",
+    "time",
+    "title",
+    "upper",
+    "value",
+    "while"
+  ],
+  "formatterComparators": [
+    "and",
+    "equal",
+    "left",
+    "neq",
+    "or",
+    "right",
+    "xor"
+  ],
+  "formatters": [],
+  "sortCriteria": [
+    "quality",
+    "resolution",
+    "language",
+    "subtitle",
+    "visualTag",
+    "audioTag",
+    "audioChannel",
+    "streamType",
+    "encode",
+    "size",
+    "service",
+    "seeders",
+    "private",
+    "age",
+    "addon",
+    "regexPatterns",
+    "cached",
+    "library",
+    "keyword",
+    "streamExpressionMatched",
+    "streamExpressionScore",
+    "regexScore",
+    "seadex",
+    "bitrate",
+    "releaseGroup"
+  ],
+  "templateDirectives": [
+    "__if",
+    "{{inputs.}}",
+    "metadata.inputs"
+  ],
+  "requiredOptions": [
+    {
+      "preset": "easynewsPlusPlus",
+      "id": "strictTitleMatching",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "preset": "stremio-gdrive",
+      "id": "refreshToken",
+      "type": "oauth",
+      "default": "imdb"
+    }
+  ],
+  "presets": [
+    {
+      "id": "astream",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "ai-companion",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "ai-search",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "aiostreams",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "aiosubtitle",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "anime-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "anime-kitsu",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "animetosho",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "argentina-tv",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "baguettio",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "bitmagnet",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "brazuca-torrents",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "comet",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "content-deep-dive",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "custom",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "davex",
+      "requiredOptions": [],
+      "optionIds": [
+        "name"
+      ]
+    },
+    {
+      "id": "dc-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-ic4a",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-tmdb",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-tv",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-tvdb",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-watchtower",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "dmm-cast",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "doctor-who-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "easynews",
+      "requiredOptions": [],
+      "optionIds": [
+        "mediaTypes"
+      ]
+    },
+    {
+      "id": "easynewsPlus",
+      "requiredOptions": [],
+      "optionIds": [
+        "socials",
+        "mediaTypes"
+      ]
+    },
+    {
+      "id": "easynewsPlusPlus",
+      "requiredOptions": [
+        {
+          "id": "strictTitleMatching",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "optionIds": [
+        "mediaTypes",
+        "strictTitleMatching",
+        "socials"
+      ]
+    },
+    {
+      "id": "easynews-search",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "eztv",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "fkstream",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "flix-streams",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "stremio-gdrive",
+      "requiredOptions": [
+        {
+          "id": "refreshToken",
+          "type": "oauth",
+          "default": "imdb"
+        }
+      ],
+      "optionIds": [
+        "refreshToken"
+      ]
+    },
+    {
+      "id": "hdhub",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "jackett",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "jackettio",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "knaben",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "library",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "marvel-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "mediafusion",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "meteor",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "more-like-this",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "neko-bt",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "newznab",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "nuvio-streams",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "nzbhydra",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "opensubtitles-v3-plus",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "opensubtitles",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "orion",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "peerflix",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "prowlarr",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "rpdb-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "seadex",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "sootio",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "star-wars-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streamasia",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streamfusion",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streaming-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streamnzb",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "stremthruStore",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "stremthruTorz",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "subdl",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "subhero",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "subsource",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "tmdb-addon",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "tmdb-collections",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torbox",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torbox-search",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torrent-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torrent-galaxy",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torrentio",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torrents-db",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torznab",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "usa-tv",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "usa-tv-next",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "usenet-streamer",
+      "requiredOptions": [],
+      "optionIds": [
+        "name"
+      ]
+    },
+    {
+      "id": "webstreamr",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "yastream",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "zilean",
+      "requiredOptions": [],
+      "optionIds": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "regen-core-nexus",
+  "name": "Regen Core Nexus",
+  "version": "0.1.0",
+  "service": "torbox",
+  "resolution": "2160p",
+  "device": "generic",
+  "profile": "advanced",
+  "scrapers": [
+    "torrentio",
+    "comet",
+    "mediafusion",
+    "stremthruTorz",
+    "torbox-search",
+    "seadex",
+    "animetosho"
+  ]
+}
