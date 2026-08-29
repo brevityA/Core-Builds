@@ -1326,10 +1326,10 @@ function planToOps(){
     ops.push({ label:'Kids safety — age filter (Older Kids, unrated excluded)', sys:'kidsSettings', auto:true,
       route:'PATCH /sync/{key}/profile {settings.ageFilter} (full-object send)' });
   }
-  p.home.forEach((r,i)=>ops.push({ label:`Home row ${i+1}: “${r.name}”`, sys:'catalogRow', auto:!!WP_ROUTES.catalogWrite,
-    row:r, pos:i, home:true, route: WP_ROUTES.catalogWrite || 'row create/toggle — configurator-side route pending' }));
-  p.discover.forEach((r,i)=>ops.push({ label:`Discover row: “${r.name}”`, sys:'catalogRow', auto:!!WP_ROUTES.catalogWrite,
-    row:r, pos:i, home:false, route: WP_ROUTES.catalogWrite || 'row create/toggle — configurator-side route pending' }));
+  p.home.forEach((r,i)=>ops.push({ label:`Home row ${i+1}: “${r.name}”`, sys:'catalogRow', auto:false,
+    row:r, pos:i, home:true, route: 'bookmarklet — ' + (WP_ROUTES.catalogWrite || 'route pending') }));
+  p.discover.forEach((r,i)=>ops.push({ label:`Discover row: “${r.name}”`, sys:'catalogRow', auto:false,
+    row:r, pos:i, home:false, route: 'bookmarklet — ' + (WP_ROUTES.catalogWrite || 'route pending') }));
   if ((p.trakt||[]).length) ops.push({ label:'Trakt toggles (connect on the Trakt tab — one tap only you can do)', sys:'trakt', auto:false });
   ops.push({ label:'Verify — re-read your profile and confirm every change landed', sys:'verify', auto:true });
   return ops;
@@ -1351,7 +1351,7 @@ async function dispatchWrite(op){
     }
     case 'hubLayout':{
       const hub = (autoState.hubs||[]).find(h=> op.keys.includes(h.systemKey) || op.keys.includes(h.name));
-      if (!hub) throw { guided:true, message:'hub not on profile yet — creation is configurator-side in v0.9.0-beta' };
+      if (!hub) throw { guided:true, message:'hub not on profile yet — create it in the configurator first' };
       const prev = hub.detailViewType;
       const r = await wpAPI(`/sync/${encodeURIComponent(autoKey)}/hubs/${hub.id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ detailViewType: op.value }) });
       if (!(r.ok || r.status===204)) throw new Error('HTTP '+r.status);
