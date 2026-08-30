@@ -24,6 +24,25 @@ import { generateTemplate, healTemplate, defaultRecipe, STACKS, DEVICE_PROFILES 
 const PORT = Number(process.env.PORT || 3333);
 const HOST = '0.0.0.0';
 
+const DEFAULT_HOST_ORIGIN = assertPublicHttps(DEFAULT_HOST).origin;
+const ALLOWED_HOST_ORIGINS = new Set(
+  (process.env.AIOS_ALLOWED_HOSTS || DEFAULT_HOST_ORIGIN)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => assertPublicHttps(s).origin),
+);
+ALLOWED_HOST_ORIGINS.add(DEFAULT_HOST_ORIGIN);
+
+function normalizeAndAuthorizeHost(url) {
+  const candidate = String(url || DEFAULT_HOST_ORIGIN).trim();
+  const origin = assertPublicHttps(candidate).origin;
+  if (!ALLOWED_HOST_ORIGINS.has(origin)) {
+    throw new Error('host not allowed');
+  }
+  return origin;
+}
+
 let sourceCache = { at: 0, value: null };
 let hostCache = new Map();
 const CACHE_MS = 10 * 60 * 1000;
@@ -36,7 +55,7 @@ async function getSource({ force = false } = {}) {
 }
 
 async function getHost(url, { force = false } = {}) {
-  const key = String(url || DEFAULT_HOST).replace(/\/$/, '');
+  const key = normalizeAndAuthorizeHost(url);
   const hit = hostCache.get(key);
   if (!force && hit && Date.now() - hit.at < CACHE_MS) return hit.value;
   const value = await extractHost(key);
