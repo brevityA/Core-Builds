@@ -9,8 +9,6 @@
       "encryptedPassword",
       "trusted",
       "showChanges",
-      "manifestNotice",
-      "linkedAccounts",
       "accessKey",
       "ip",
       "addonName",
@@ -174,7 +172,6 @@
       "DTS-ES",
       "DTS",
       "TrueHD",
-      "PCM",
       "OPUS",
       "FLAC",
       "AAC",
@@ -187,7 +184,6 @@
       "VC-1",
       "XviD",
       "DivX",
-      "MPEG-4",
       "Unknown"
     ],
     "FORMATTERS": [
@@ -390,7 +386,6 @@
     "yastream",
     "streamasia",
     "usa-tv",
-    "usa-tv-next",
     "argentina-tv",
     "debridio-tv",
     "debridio-watchtower",
@@ -505,7 +500,7 @@
   },
   "upstream": {
     "repo": "Viren070/AIOStreams",
-    "sha": "d3ea9bbaa48d757b31e1277186fcfaeeff41a4cc",
+    "sha": "f36d0f93ff088280526ebca1fe3c93e2740b6987",
     "version": "2.33.2"
   }
 }

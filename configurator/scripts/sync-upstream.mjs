@@ -82,6 +82,59 @@ async function fetchOverGit(pin) {
   return sources;
 }
 
+/**
+ * Assert the pin actually names a release: `ref` must be a tag, and `sha` must be
+ * the commit that tag resolves to.
+ *
+ * Without this the pin drifts to whatever happened to be at the tip of `main` on
+ * the day someone bumped it — which is how the first pin ended up naming a
+ * docs-only commit while claiming `"version": "2.33.2"`. Every generated file
+ * carries the sha in its header, so a wrong sha misattributes the whole
+ * contract, and the drift report diffs against an arbitrary point rather than a
+ * release boundary.
+ *
+ * `git ls-remote` is used rather than the REST API: no token, no rate limit, and
+ * it is the same transport the git fallback already needs. Returns a warning
+ * string when the remote is unreachable (offline is not a verification failure);
+ * throws when the remote is reachable and disagrees with the pin.
+ */
+async function verifyPinnedTag(pin) {
+  if (!/^v?\d+\.\d+\.\d+/.test(pin.ref || '')) {
+    throw new Error(
+      `UPSTREAM.pin: "ref" must be a release tag (got ${JSON.stringify(pin.ref)}). `
+      + 'Pinning a branch makes the drift baseline meaningless.'
+    );
+  }
+  if (pin.ref.replace(/^v/, '') !== String(pin.version)) {
+    throw new Error(`UPSTREAM.pin: ref ${pin.ref} does not match version ${pin.version}`);
+  }
+
+  let stdout;
+  try {
+    stdout = await new Promise((resolve, reject) => {
+      execFile('git', ['ls-remote', '--tags', `https://github.com/${pin.repo}.git`, pin.ref, `${pin.ref}^{}`],
+        { maxBuffer: 8 * 1024 * 1024 },
+        (err, out) => (err ? reject(err) : resolve(out)));
+    });
+  } catch (error) {
+    return `could not verify ${pin.ref} against the remote (${error.message.split('\n')[0]}); pin assertions skipped`;
+  }
+
+  const lines = stdout.trim().split('\n').filter(Boolean).map(line => line.split(/\s+/));
+  if (!lines.length) throw new Error(`UPSTREAM.pin: tag ${pin.ref} does not exist in ${pin.repo}`);
+  // An annotated tag lists both the tag object and the commit it dereferences to
+  // (`^{}`); the dereferenced line is the commit we want.
+  const deref = lines.find(([, ref]) => ref.endsWith('^{}'));
+  const resolved = (deref || lines[0])[0];
+  if (resolved !== pin.sha) {
+    throw new Error(
+      `UPSTREAM.pin: ${pin.ref} resolves to ${resolved}, but the pin claims ${pin.sha}.\n`
+      + 'Set "sha" to the tag commit, or bump "ref"/"version" to match the sha.'
+    );
+  }
+  return null;
+}
+
 /** Read the pinned files out of an existing local AIOStreams checkout. */
 async function fetchFromDir(root) {
   const sources = {};
@@ -137,6 +190,14 @@ async function staleFiles(files) {
 async function main() {
   const pin = await readPin();
   const previous = await readSnapshot();
+
+  // Offline runs replay the committed snapshot and never touch the remote, so
+  // there is nothing to verify against; every networked run is checked.
+  if (!has('--offline') && !value('--from', null)) {
+    const warning = await verifyPinnedTag(pin);
+    if (warning) process.stderr.write(`${warning}\n`);
+    else process.stderr.write(`pin verified: ${pin.ref} = ${pin.sha.slice(0, 12)}\n`);
+  }
 
   const contract = has('--offline')
     ? await offlineContract()

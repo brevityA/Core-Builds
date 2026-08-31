@@ -20,7 +20,7 @@ import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
-import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals } from '../core/host-capability-policy.js';
+import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals, describeWarnings } from '../core/host-capability-policy.js';
 import { sanitizeDisplayName } from '../core/input-sanitize.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
@@ -4048,6 +4048,7 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
 // cached per host key for this page session only and never persisted.
 const _hostProbeCache = new Map();
 let _lastHostGateRemovals = [];
+let _lastHostGateWarnings = [];
 
 function activeHostKey() {
   return S.instanceHost && S.instanceHost !== 'auto' ? S.instanceHost : 'elfhosted';
@@ -4090,6 +4091,7 @@ function hostBlockReason(option) {
 }
 
 function lastHostGateRemovals() { return _lastHostGateRemovals; }
+function lastHostGateWarnings() { return _lastHostGateWarnings; }
 
 /**
  * Annotate an option group with the host gate. Returns the same object when
@@ -4117,13 +4119,19 @@ function hostGateHtml() {
   const caps = currentHostCapabilities();
   const entries = hostGateEntries();
   const removals = describeRemovals(lastHostGateRemovals());
-  if (!entries.length && !removals.length) return '';
+  const warnings = describeWarnings(lastHostGateWarnings());
+  if (!entries.length && !removals.length && !warnings.length) return '';
   const line = (text, color) => `<div class="hc-issue"><span class="hc-issue-ico" style="color:${color}">&#9679;</span><span>${escHtml(text)}</span></div>`;
   const gateLines = entries.map(entry => line(entry.reason, entry.action === 'confirm' ? '#fbbf24' : '#f87171')).join('');
+  // Kept, but not guaranteed to be accepted — distinct from a removal, and amber
+  // rather than grey so it reads as "check this" not "we handled it".
+  const warningLines = warnings.length
+    ? `<div class="hc-row"><span class="hc-name">May be rejected on save</span><span class="hc-status" style="color:#fbbf24">${warnings.length}</span></div><div class="hc-detail">${warnings.slice(0, 12).map(text => line(text, '#fbbf24')).join('')}</div>`
+    : '';
   const removalLines = removals.length
     ? `<div class="hc-row"><span class="hc-name">Removed from your export</span><span class="hc-status" style="color:#8b949e">${removals.length}</span></div><div class="hc-detail">${removals.slice(0, 12).map(text => line(text, '#8b949e')).join('')}${removals.length > 12 ? line(`+${removals.length - 12} more`, '#8b949e') : ''}</div>`
     : '';
-  return `<div class="hc-row"><span class="hc-name">${escHtml(caps.label)}</span><span class="hc-status" style="color:${caps.probed ? '#34d399' : '#fbbf24'}">${caps.probed ? `probed &middot; v${escHtml(caps.version || '?')}` : 'not probed'}</span></div>${gateLines ? `<div class="hc-detail">${gateLines}</div>` : ''}${removalLines}`;
+  return `<div class="hc-row"><span class="hc-name">${escHtml(caps.label)}</span><span class="hc-status" style="color:${caps.probed ? '#34d399' : '#fbbf24'}">${caps.probed ? `probed &middot; v${escHtml(caps.version || '?')}` : 'not probed'}</span></div>${gateLines ? `<div class="hc-detail">${gateLines}</div>` : ''}${warningLines}${removalLines}`;
 }
 
 function buildFinal() {
@@ -4141,6 +4149,7 @@ function buildFinal() {
     // directly-installed JSON are identical to what the host will store.
     const gated = gateTemplateForHost(profiled, currentHostCapabilities());
     _lastHostGateRemovals = gated.removals;
+    _lastHostGateWarnings = gated.warnings || [];
     const result = gated.template;
     _cachedBuildResult = result;
     return result;

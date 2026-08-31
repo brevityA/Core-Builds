@@ -39,6 +39,24 @@ test('UPSTREAM.pin names a full 40-char AIOStreams commit', () => {
   assert.ok(Array.isArray(PIN.sources) && PIN.sources.length >= 4);
 });
 
+// The first pin claimed "version": "2.33.2" while its sha was a docs-only commit
+// near the tip of main that day — three config keys, two enum members and a
+// preset ahead of the actual release. Every generated header carries that sha,
+// so the whole contract was misattributed. `ref` must be the release tag, and
+// scripts/sync-upstream.mjs additionally proves tag -> sha against the remote on
+// every networked run; this test is the offline half that CI always runs.
+test('UPSTREAM.pin is pinned to a release tag, not a branch', () => {
+  assert.match(PIN.ref, /^v\d+\.\d+\.\d+$/, `ref ${JSON.stringify(PIN.ref)} is not a release tag`);
+  assert.equal(PIN.ref, `v${PIN.version}`, 'ref and version disagree');
+  assert.notEqual(PIN.ref, 'main', 'a branch ref makes the drift baseline meaningless');
+});
+
+test('the snapshot records the same release the pin claims', () => {
+  assert.equal(SNAPSHOT.upstream.sha, PIN.sha);
+  assert.equal(SNAPSHOT.upstream.version, PIN.version);
+  assert.equal(SNAPSHOT.upstream.repo, PIN.repo);
+});
+
 test('every generated file carries a DO-NOT-EDIT header naming the pinned SHA', () => {
   for (const rel of GENERATED_FILES) {
     const head = readFileSync(join(ROOT, rel), 'utf8').split('\n').slice(0, 4).join('\n');

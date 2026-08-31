@@ -54,7 +54,9 @@
       "DD",
       "DTS"
     ],
-    "syncedRankedRegexUrls": [],
+    "syncedRankedRegexUrls": [
+      "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
+    ],
     "rankedRegexPatterns": [
       {
         "pattern": "/\\b(FraMeSToR)\\b/",

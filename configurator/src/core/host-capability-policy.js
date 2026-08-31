@@ -80,6 +80,11 @@ export function parseHostStatus(body) {
     baseUrl: typeof settings.baseUrl === 'string' ? settings.baseUrl : null,
     regexAccess: typeof regexAccess.level === 'string' ? regexAccess.level : null,
     allowedRegexPatterns: Array.isArray(regexAccess.patterns) ? regexAccess.patterns.filter(Boolean) : [],
+    // `level: 'none'` is NOT "no regex" — it means "only what this host has
+    // published". The host ships two independent allowlists and upstream checks
+    // them separately: patterns via isRegexAllowed(), synced URLs via
+    // validateSyncedRegexUrls() -> RegexAccess.getAllowedUrls().
+    allowedRegexUrls: Array.isArray(regexAccess.urls) ? regexAccess.urls.filter(Boolean) : [],
     disabledPresetIds,
     blockedStreamTypes,
     rateLimited: /rate limit/i.test(html) || null,
@@ -128,6 +133,16 @@ export function resolveHostCapabilities(hostKey, probe = null, options = {}) {
     blockedStreamTypes,
     regexAccess,
     allowedRegexPatterns: probed?.allowedRegexPatterns || [],
+    // Union, not "probe wins": the registry carries URLs verified by hand from
+    // the host's own status endpoint, and a browser probe is usually blocked by
+    // CORS. `urlAllowlistIsComplete` records whether we have the host's full
+    // list (only a live probe can tell us that) — the gate needs to know the
+    // difference between "not on the list" and "we have no list".
+    allowedRegexUrls: [...new Set([
+      ...(base.allowedRegexUrls || []),
+      ...(probed?.allowedRegexUrls || []),
+    ])],
+    urlAllowlistIsComplete: Boolean(probed),
     rateLimited: probed?.rateLimited ?? base.rateLimited ?? false,
     reasons: base.reasons || {},
     trustedUser: Boolean(options.trustedUser),
@@ -206,12 +221,14 @@ function patternOf(entry) {
 /**
  * Strip everything the target host would reject or silently drop.
  *
- * Returns `{ config, removals }` where each removal is
+ * Returns `{ config, removals, warnings }`. A *removal* was deleted from the
+ * config; a *warning* was kept but may still be rejected by the host. Each is
  * `{ kind, target, reason }`. The input is never mutated.
  */
 export function gateConfigForHost(rawConfig, capabilities, options = {}) {
   const config = clone(rawConfig || {});
   const removals = [];
+  const warnings = [];
   const label = capabilities?.label || 'the selected host';
 
   // 1. Keys the pinned upstream schema does not define. AIOStreams strips these
@@ -305,30 +322,61 @@ export function gateConfigForHost(rawConfig, capabilities, options = {}) {
       }
       if (kept.length !== config[field].length) config[field] = kept;
     }
-    // Synced regex URLs that are not on the host's allowed list resolve to
-    // nothing upstream; drop them so the template does not imply a live sync.
-    if (capabilities?.regexAccess === 'none') {
-      for (const field of SYNCED_REGEX_FIELDS) {
-        if (!Array.isArray(config[field]) || !config[field].length) continue;
-        removals.push({ kind: 'syncedRegex', target: field, reason: `${label} only syncs regex from its own configured URLs` });
-        config[field] = [];
+    // Synced regex URLs are a SEPARATE allowlist from inline patterns, checked
+    // by validateSyncedRegexUrls() against RegexAccess.getAllowedUrls(). A
+    // restricted host still publishes URLs it permits — ElfHosted runs
+    // `level: 'none'` and allows five, including the Vidhin05 ranked-regex feed
+    // this configurator emits. Blanket-clearing the fields deleted a feature the
+    // host explicitly supports, so filter against the allowlist instead.
+    //
+    // When we have no allowlist at all, remove nothing: absence of data is not
+    // evidence of prohibition, and upstream's failure mode here is a loud
+    // `Forbidden URL(s) in regex configuration: …` naming the offender, which is
+    // far more recoverable than silently dropping a working sync.
+    const allowedUrls = new Set(capabilities?.allowedRegexUrls || []);
+    for (const field of SYNCED_REGEX_FIELDS) {
+      if (!Array.isArray(config[field]) || !config[field].length) continue;
+      const kept = [];
+      for (const url of config[field]) {
+        if (allowedUrls.has(url)) { kept.push(url); continue; }
+        if (!capabilities?.urlAllowlistIsComplete) {
+          // Unprobed host: keep it, but say so — the export may be rejected.
+          warnings.push({
+            kind: 'syncedRegex',
+            target: `${field}: ${url}`,
+            reason: `${label} restricts synced regex URLs and could not be probed — this URL may be rejected on save`,
+          });
+          kept.push(url);
+          continue;
+        }
+        removals.push({
+          kind: 'syncedRegex',
+          target: `${field}: ${url}`,
+          reason: `${label} does not list this URL as an allowed regex source`,
+        });
       }
+      if (kept.length !== config[field].length) config[field] = kept;
     }
   }
 
-  return { config, removals };
+  return { config, removals, warnings };
 }
 
 /** Apply the gate to a whole `{ metadata, config }` template. */
 export function gateTemplateForHost(template, capabilities, options = {}) {
   if (!template || typeof template !== 'object' || !template.config) {
-    return { template, removals: [] };
+    return { template, removals: [], warnings: [] };
   }
-  const { config, removals } = gateConfigForHost(template.config, capabilities, options);
-  return { template: { ...template, config }, removals };
+  const { config, removals, warnings } = gateConfigForHost(template.config, capabilities, options);
+  return { template: { ...template, config }, removals, warnings };
 }
 
 /** One-line-per-removal summary for the UI and for the diagnostics report. */
 export function describeRemovals(removals = []) {
   return removals.map(item => `${item.kind}: ${item.target} — ${item.reason}`);
+}
+
+/** Same shape for entries that were kept but are not guaranteed to be accepted. */
+export function describeWarnings(warnings = []) {
+  return warnings.map(item => `${item.kind}: ${item.target} — ${item.reason}`);
 }

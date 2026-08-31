@@ -283,3 +283,77 @@ test('gating is idempotent — a gated config gates to itself', () => {
     assert.deepEqual(twice.removals, [], `${name} still had removals on the second pass`);
   }
 });
+
+/* ── synced regex URLs are their own allowlist ─────────────────────────────────
+ *
+ * Regression cover for a gate bug: `regexAccess: 'none'` was read as "no regex
+ * at all" and every synced-regex URL field was cleared. Upstream checks synced
+ * URLs separately (validateSyncedRegexUrls -> RegexAccess.getAllowedUrls) and a
+ * restricted host still publishes URLs it permits — ElfHosted allows the
+ * Vidhin05 feed this configurator emits. The blanket clear deleted a working,
+ * host-sanctioned feature from three golden profiles.
+ */
+
+const VIDHIN = 'https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json';
+const RANDOM_FEED = 'https://example.invalid/someone-elses-regexes.json';
+
+test('a host-allowed synced regex URL survives a regexAccess:none host', () => {
+  const caps = resolveHostCapabilities('elfhosted', null);
+  assert.equal(caps.regexAccess, 'none');
+  const { config, removals, warnings } = gateConfigForHost({ syncedRankedRegexUrls: [VIDHIN] }, caps);
+  assert.deepEqual(config.syncedRankedRegexUrls, [VIDHIN], 'ElfHosted publishes this URL as allowed');
+  assert.equal(removals.filter(r => r.kind === 'syncedRegex').length, 0);
+  assert.equal(warnings.length, 0, 'a verified-allowed URL should not warn either');
+});
+
+test('an unverifiable synced regex URL is kept with a warning, never silently dropped', () => {
+  const caps = resolveHostCapabilities('elfhosted', null);
+  assert.equal(caps.urlAllowlistIsComplete, false, 'no probe means no complete allowlist');
+  const { config, removals, warnings } = gateConfigForHost({ syncedRankedRegexUrls: [RANDOM_FEED] }, caps);
+  assert.deepEqual(config.syncedRankedRegexUrls, [RANDOM_FEED], 'absence of data is not evidence of prohibition');
+  assert.equal(removals.filter(r => r.kind === 'syncedRegex').length, 0);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0].reason, /could not be probed/);
+});
+
+test('a live probe completes the allowlist and only then removes a forbidden URL', () => {
+  const probe = parseHostStatus({
+    data: {
+      version: '2.33.2',
+      settings: { regexAccess: { level: 'none', patterns: [], urls: [VIDHIN] } },
+    },
+  });
+  assert.deepEqual(probe.allowedRegexUrls, [VIDHIN], 'the probe must read regexAccess.urls');
+
+  const caps = resolveHostCapabilities('elfhosted', probe);
+  assert.equal(caps.urlAllowlistIsComplete, true);
+  const { config, removals, warnings } = gateConfigForHost(
+    { syncedRankedRegexUrls: [VIDHIN, RANDOM_FEED] }, caps);
+  assert.deepEqual(config.syncedRankedRegexUrls, [VIDHIN]);
+  assert.equal(warnings.length, 0);
+  assert.equal(removals.filter(r => r.kind === 'syncedRegex').length, 1);
+  assert.match(removals.find(r => r.kind === 'syncedRegex').reason, /does not list this URL/);
+});
+
+test('an unrestricted host keeps every synced regex URL untouched', () => {
+  for (const key of ['fortheweak', 'viren']) {
+    const caps = resolveHostCapabilities(key, null, { trustedUser: true });
+    const { config, removals, warnings } = gateConfigForHost(
+      { syncedRankedRegexUrls: [VIDHIN, RANDOM_FEED] }, caps);
+    assert.deepEqual(config.syncedRankedRegexUrls, [VIDHIN, RANDOM_FEED], key);
+    assert.equal(removals.filter(r => r.kind === 'syncedRegex').length, 0, key);
+    assert.equal(warnings.length, 0, key);
+  }
+});
+
+test('gating stays idempotent now that synced URLs are filtered rather than cleared', () => {
+  const caps = resolveHostCapabilities('elfhosted', null);
+  const first = gateConfigForHost({ syncedRankedRegexUrls: [VIDHIN, RANDOM_FEED] }, caps);
+  const second = gateConfigForHost(first.config, caps);
+  assert.deepEqual(second.config, first.config, 'gating an already-gated config must be a no-op');
+  // The removals *log* is not idempotent by design — a second pass has nothing
+  // left to strip, so it reports nothing. What must not happen is a synced URL
+  // surviving pass one and being dropped by pass two.
+  assert.equal(second.removals.filter(r => r.kind === 'syncedRegex').length, 0);
+  assert.deepEqual(second.config.syncedRankedRegexUrls, first.config.syncedRankedRegexUrls);
+});

@@ -38,6 +38,13 @@ export const HOST_CAPABILITY_OVERRIDES = Object.freeze({
     disabledPresetIds: ['torrentio', 'anime-kitsu', 'torrent-catalogs'],
     blockedStreamTypes: ['p2p', 'http'],
     regexAccess: 'none',
+    // `regexAccess: 'none'` restricts regex to what the host publishes; it does
+    // not forbid it. These are the synced-regex sources ElfHosted allows, read
+    // from data.settings.regexAccess.urls at its own /api/v1/status. Verified
+    // subset — a live probe supersedes this list and marks it complete.
+    allowedRegexUrls: [
+      'https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json',
+    ],
     rateLimited: true,
     reasons: {
       preset: 'disabled on the ElfHosted community instance (Torrentio developer request)',
