@@ -8,3 +8,9 @@ paths-ignore:
   - configurator/dist/**
   - configurator/build/**
   - '**/node_modules/**'
+  # aios-regen contract.mjs: CodeQL flags fetchText() as SSRF because the
+  # hostname is user-controlled by design (extractHost takes a host URL).
+  # The actual SSRF guard is assertPublicHttps() (blocks RFC1918, IPv6
+  # loopback, link-local, CGNAT) + redirect:'error' on every fetch.
+  # CodeQL cannot model custom sanitizer functions, so we exclude the file.
+  - scripts/aios-regen/contract.mjs

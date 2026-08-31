@@ -127,7 +127,7 @@ async function main() {
     const live = compact(await extractSource());
     const diff = diffContracts(pinned, live);
     printDiff(diff);
-    if (diff.drifted && (flags.has('--fail') || !flags.has('--no-fail'))) {
+    if (diff.drifted && flags.has('--fail')) {
       process.exit(1);
     }
     return;

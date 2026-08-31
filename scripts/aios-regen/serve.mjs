@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Local UI + API for aios-regen.
- * Binds 0.0.0.0 so the Arena live preview works.
+ * Binds 127.0.0.1 by default; set BIND_HOST=0.0.0.0 for LAN access.
  */
 
 import { createServer } from 'node:http';
@@ -22,7 +22,7 @@ import {
 import { generateTemplate, healTemplate, defaultRecipe, STACKS, DEVICE_PROFILES } from './generate.mjs';
 
 const PORT = Number(process.env.PORT || 3333);
-const HOST = '0.0.0.0';
+const HOST = process.env.BIND_HOST || '127.0.0.1';
 
 const DEFAULT_HOST_ORIGIN = assertPublicHttps(DEFAULT_HOST).origin;
 const ALLOWED_HOST_ORIGINS = new Set(
@@ -77,7 +77,7 @@ function send(res, status, body, type = 'application/json; charset=utf-8') {
   res.writeHead(status, {
     'content-type': type,
     'cache-control': 'no-store',
-    'access-control-allow-origin': '*',
+    'access-control-allow-origin': `http://localhost:${PORT}`,
   });
   res.end(payload);
 }
@@ -114,7 +114,7 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
-      'access-control-allow-origin': '*',
+      'access-control-allow-origin': `http://localhost:${PORT}`,
       'access-control-allow-methods': 'GET,POST,OPTIONS',
       'access-control-allow-headers': 'content-type',
     });
@@ -128,17 +128,18 @@ async function handleApi(req, res, url) {
     }
 
     if (path === '/api/meta') {
+      const snap = loadSnapshot();
       return send(res, 200, {
         defaultHost: DEFAULT_HOST,
         stacks: STACKS,
         devices: Object.keys(DEVICE_PROFILES),
-        hasSnapshot: !!loadSnapshot(),
-        snapshot: loadSnapshot()
+        hasSnapshot: !!snap,
+        snapshot: snap
           ? {
-              fingerprint: loadSnapshot().fingerprint,
-              extractedAt: loadSnapshot().extractedAt,
-              counts: loadSnapshot().counts,
-              commit: loadSnapshot().commit,
+              fingerprint: snap.fingerprint,
+              extractedAt: snap.extractedAt,
+              counts: snap.counts,
+              commit: snap.commit,
             }
           : null,
       });
@@ -216,8 +217,15 @@ async function handleApi(req, res, url) {
 const webRoot = resolve(ROOT, 'web');
 
 const server = createServer(async (req, res) => {
-  const url = new URL(req.url || '/', `http://${req.headers.host}`);
-  if (url.pathname.startsWith('/api/')) return handleApi(req, res, url);
+  const url = new URL(req.url || '/', `http://localhost:${PORT}`);
+  if (url.pathname.startsWith('/api/')) {
+    try {
+      return await handleApi(req, res, url);
+    } catch (err) {
+      send(res, 500, { error: err.message });
+      return;
+    }
+  }
 
   let file = url.pathname === '/' ? '/index.html' : url.pathname;
   const abs = resolve(webRoot, '.' + file);

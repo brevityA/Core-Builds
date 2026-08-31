@@ -307,7 +307,7 @@ python3 scripts/template_builder.py --only stream  # filter by name
 | npm test | 29 tests | `node --test` in `configurator/` | Unit tests (credentials, device profiles, schema guard, UI lifecycle) |
 | Static validation | 25 checks | `npm run validate` in `configurator/` | Version consistency, host metadata, device defaults, module wiring |
 | Playwright E2E | varies | `configurator/e2e/` | Browser-based stability tests |
-| aios-regen smoke | 12 asserts | `node scripts/aios-regen/tests/smoke.mjs` | OPTIONS parser, generate, heal, diff (offline, no network) |
+| aios-regen smoke | 20 asserts | `node scripts/aios-regen/tests/smoke.mjs` | OPTIONS parser, generate, heal, diff (offline, no network) |
 
 ---
 
@@ -339,12 +339,12 @@ node scripts/aios-regen/cli.mjs heal path/to/template.json --out healed.json
 
 ### Layout
 
-```
+```text
 scripts/aios-regen/
   contract.mjs          extract source + host, fingerprint, diff, merge, snapshot
   generate.mjs          recipe + contract -> template; heal existing JSON
   cli.mjs               CLI
-  serve.mjs             local UI + API on 0.0.0.0:3333
+  serve.mjs             local UI + API on 127.0.0.1:3333
   recipes/core-nexus.json    default intent
   snapshots/contract.source.json    pinned GitHub contract (commit into git)
   tests/smoke.mjs       parser / generate / heal / diff, no network

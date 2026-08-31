@@ -227,9 +227,9 @@ export function generateTemplate(recipe, contract) {
     if (!supportsService(meta, service) && !['seadex', 'library', 'custom'].includes(type)) {
       notes.push(`Preset '${type}' does not list service '${service}' — included anyway as a scraper.`);
     }
-    const id = instanceId(type, n++);
-    if (usedIds.has(id)) {
-      /* extremely unlikely with sha1 prefix; bump */
+    let id = instanceId(type, n++);
+    while (usedIds.has(id)) {
+      id = instanceId(type, n++);
     }
     usedIds.add(id);
     const extras = {};
@@ -368,6 +368,15 @@ export function healTemplate(input, contract) {
   const config = structuredClone(wrapper.config || input);
   const byId = presetIndex(contract);
 
+  if (Array.isArray(config.groups) && (contract.hotspots || {}).groups === 'object') {
+    config.groups = {
+      enabled: true,
+      behaviour: 'sequential',
+      groupings: config.groups,
+    };
+    notes.push('Rewrote groups array → object.');
+  }
+
   if (Array.isArray(config.presets)) {
     const kept = [];
     for (const preset of config.presets) {
@@ -410,15 +419,6 @@ export function healTemplate(input, contract) {
       config.deduplicator.merge = { enabled: config.deduplicator.merge };
       notes.push('Rewrote deduplicator.merge boolean → object (AIOStreams current schema).');
     }
-  }
-
-  if (Array.isArray(config.groups) && (contract.hotspots || {}).groups === 'object') {
-    config.groups = {
-      enabled: true,
-      behaviour: 'sequential',
-      groupings: config.groups,
-    };
-    notes.push('Rewrote groups array → object.');
   }
 
   if (Array.isArray(config.services) && contract.serviceIds?.length) {

@@ -35,13 +35,14 @@ export const SOURCE_FILES = {
 
 const SKIP_OPTION_IDS = new Set(['name', 'timeout', 'socials', 'resources', 'url']);
 
-export async function fetchText(url, { timeoutMs = 20000 } = {}) {
+export async function fetchText(url, { timeoutMs = 20000, extraHeaders } = {}) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const res = await fetch(url, {
       signal: ctrl.signal,
-      headers: { 'user-agent': UA, accept: '*/*' },
+      redirect: 'error',
+      headers: { 'user-agent': UA, accept: '*/*', ...extraHeaders },
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`);
     return await res.text();
@@ -281,16 +282,15 @@ function presetIdFromMetadata(src) {
 
 async function listPresetFiles() {
   const url = `https://api.github.com/repos/${AIOS_REPO}/contents/packages/core/src/presets?ref=${AIOS_REF}`;
-  try {
-    const listing = await fetchJson(url);
-    return listing
-      .filter((f) => f.type === 'file' && f.name.endsWith('.ts') && !f.name.endsWith('.test.ts'))
-      .filter((f) => !['index.ts', 'preset.ts', 'presetManager.ts'].includes(f.name))
-      .map((f) => f.path);
-  } catch (err) {
-    console.warn(`GitHub API listing failed (${err.message}); skipping per-preset OPTIONS from source.`);
-    return [];
+  const headers = {};
+  if (process.env.GITHUB_TOKEN) {
+    headers.authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
+  const listing = await fetchJson(url, { extraHeaders: headers });
+  return listing
+    .filter((f) => f.type === 'file' && f.name.endsWith('.ts') && !f.name.endsWith('.test.ts'))
+    .filter((f) => !['index.ts', 'preset.ts', 'presetManager.ts'].includes(f.name))
+    .map((f) => f.path);
 }
 
 export async function extractSource({ includePresetOptions = true } = {}) {
@@ -426,10 +426,16 @@ export function assertPublicHttps(raw) {
     host === 'localhost' ||
     host.endsWith('.local') ||
     host === '0.0.0.0' ||
+    host === '[::1]' ||
+    host === '::1' ||
     host.startsWith('127.') ||
     host.startsWith('10.') ||
     host.startsWith('192.168.') ||
-    /^172\.(1[6-9]|2\d|3[0-1])\./.test(host)
+    host.startsWith('169.254.') ||
+    /^172\.(1[6-9]|2\d|3[0-1])\./.test(host) ||
+    /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(host) ||
+    /^\[?fe80:/i.test(host) ||
+    /^\[?::ffff:/i.test(host)
   ) {
     throw new Error('Refusing to call a private host');
   }
@@ -438,9 +444,11 @@ export function assertPublicHttps(raw) {
 
 export async function extractHost(hostUrl = DEFAULT_HOST) {
   const u = assertPublicHttps(hostUrl);
-  const origin = `${u.protocol}//${u.host}`;
-  const statusUrl = `${origin}/api/v1/status`;
-  const raw = await fetchJson(statusUrl);
+  const origin = u.origin;
+  u.pathname = '/api/v1/status';
+  u.search = '';
+  u.hash = '';
+  const raw = await fetchJson(u.href);
   const data = raw.data || raw;
   const settings = data.settings || {};
   const presets = (settings.presets || []).map(normalizeHostPreset);

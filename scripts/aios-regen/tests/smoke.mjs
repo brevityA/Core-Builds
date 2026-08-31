@@ -68,7 +68,7 @@ assert(template.config.presets.every((p) => p.instanceId && p.instanceId.length 
 assert(template.config.presets.find((p) => p.type === 'torrentio').options.useMultipleInstances === false, 'fills required option');
 assert(typeof template.config.deduplicator.merge === 'object', 'merge is object not boolean');
 assert(template.config.groups.groupings[0].addons.every((a) => a.length === 3), 'groups use instanceId');
-assert(!template.config.services[0] || template.config.services[0].id === 'torbox', 'torbox service');
+assert(template.config.services.length > 0 && template.config.services[0].id === 'torbox', 'torbox service');
 
 const stale = {
   presets: [
@@ -87,6 +87,7 @@ assert(healed.template.config.presets.find((p) => p.type === 'easynewsPlusPlus')
 assert(typeof healed.template.config.deduplicator.merge === 'object', 'healed merge shape');
 assert(!healed.template.config.services.some((s) => s.id === 'debrid0'), 'dropped unknown service');
 assert(!healed.template.config.excludedStreamExpressions.some((e) => e.name === 'old'), 'dropped unknown SEL');
+assert(healed.template.config.groups && healed.template.config.groups.groupings, 'healed groups array → object');
 
 const pinned = compact({
   ...fixture,
