@@ -233,7 +233,7 @@ upstream lexicographic comparator.
 
 ### D3 · S3 · Nothing validated emitted enum values against upstream
 **Fix (shipped):** `tests/schema-fixture-sweep.test.mjs` sweeps
-**host × device × service × resolution** (3 264 combinations) and checks every
+**host × device × service × resolution** (7 480 combinations) and checks every
 emitted resolution / quality / tag / channel / encode / stream-type value against
 the generated enums.
 

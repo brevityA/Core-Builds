@@ -5,7 +5,8 @@ Upstream pinned at `Viren070/AIOStreams@d3ea9bbaa48d757b31e1277186fcfaeeff41a4cc
 
 No new runtime dependency was added. The app is still a static ES-module site and
 the standalone single-file build still works (`configurator/index.html`,
-1 013 353 bytes after this change, was 997 605).
+1 014 356 characters after this change, was 997 605 — the figure `scripts/build.mjs`
+prints; it counts string length, so the file is 1 025 558 bytes on disk).
 
 ---
 
@@ -98,7 +99,7 @@ an inline `Unavailable — <reason>` line, `input` disabled, `aria-disabled`,
 `title` set. The currently-selected service is never disabled out from under the
 user. A `hostGateHtml()` block inside the existing collapsible *Host
 Compatibility* box lists the gate entries and everything the last build removed.
-Styles are 4 rules appended to `src/styles/06-features.css` — layer 06 lands
+Styles are 9 rules appended to `src/styles/06-features.css` — layer 06 lands
 after layer 05's `.opt` rules, so no `!important` and no cascade change.
 
 ## 3. Phase 5 — 4K-first sorting
@@ -153,13 +154,13 @@ profile or *Quality first*.
 
 ## 5. Phase 6 — tests
 
-`npm test`: **378 → 469** (`+91`), 0 failures.
+`npm test`: **378 → 470** (`+92`), 0 failures.
 
 | New file | Tests | Covers |
 | --- | --- | --- |
 | `tests/generated-upstream-contract.test.mjs` | 17 | pin shape, DO-NOT-EDIT headers, no credential values, generated dir contents, module ⇄ snapshot equality, internal consistency, `unknownConfigKeys` / `invalidSortCriteria` / `isKnownPresetId`, and that no state the sort policy can reach emits an invalid criterion |
 | `tests/sort-4k-first.test.mjs` | 18 | the tier guarantee, incl. a **95 256-comparison** 2160p × 1080p cross product over quality × HDR × audio × bitrate × size × seeders × SEL score × regex score × cached, plus tier partitioning, within-tier ordering, the 1080p profile, the `qualityFirst` opt-out, the free lanes, `libraryBoost`, and the Stable profile |
-| `tests/schema-fixture-sweep.test.mjs` | 12 | device × service × resolution × host = **3 264** gated combinations validated against the pinned enums and the 153-key schema; formatter ids, placeholder balance and credential shapes; size/bitrate range shapes |
+| `tests/schema-fixture-sweep.test.mjs` | 13 | device × service × resolution × host = **7 480** gated combinations (11 × 10 × 17 × 4) validated against the pinned enums and the 153-key schema; formatter ids, placeholder balance and credential shapes; size/bitrate range shapes |
 | `tests/host-capability-policy.test.mjs` | 44 | version compare, probe parsing, registry merge, a 13-row host × option gate matrix, one-line reasons, the export gate (unknown keys, legacy keys, presets, stream types, regex, synced URLs), idempotence, and — over the 15 real golden configs × 5 hosts — that nothing a host rejects can survive |
 | `tests/helpers/aiostreams-sorter-model.mjs` | — | port of the upstream lexicographic comparator; throws on any criterion it does not implement, so it cannot silently drift |
 | `e2e/host-capability.spec.mjs` | 7 | ElfHosted export contains no Torrentio / dead key, a permissive host keeps what ElfHosted blocks, the disabled-with-reason UI, 4K tier-first and 1080p cached-first end to end, direct-install payload shape, no credential in a generated template |
@@ -173,16 +174,16 @@ profile or *Quality first*.
 > core-builds-configurator@2.99.0 test
 > node --test tests/*.test.mjs
 
-… 469 subtests …
-1..469
-# tests 469
+… 470 subtests …
+1..470
+# tests 470
 # suites 0
-# pass 469
+# pass 470
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 5609.271825
+# duration_ms 5691.536023
 
 > core-builds-configurator@2.99.0 validate
 > node scripts/validate.mjs
@@ -225,8 +226,8 @@ PASS e2e golden generation hook
 > core-builds-configurator@2.99.0 build
 > node scripts/build.mjs
 
-Built standalone: 1013353 bytes
-Built web assets: 802642 JS bytes, 172682 CSS bytes
+Built standalone: 1014356 bytes
+Built web assets: 803285 JS bytes, 173042 CSS bytes
 ```
 Exit code **0**.
 
@@ -245,7 +246,7 @@ Generated files match the pinned contract.
 | The 1080p profile still defaults to 1080p-first | ✅ asserted |
 | An ElfHosted-community export can never contain Torrentio or a rejected key | ✅ asserted over all 15 goldens |
 | Re-running `sync-upstream.mjs` reproduces the generated files byte-for-byte and the drift report names the pinned SHA | ✅ verified in `--accept`, `--check` and `--offline` modes |
-| `npm run release` — zero failures | ✅ 469/469, 29 PASS, build OK, exit 0 |
+| `npm run release` — zero failures | ✅ 470/470, 29 PASS, build OK, exit 0 |
 | Every competitor and user claim backed by a fetched URL | ✅ see 01-research; the one unreachable tool is marked `[UNVERIFIED]` |
 | No credential logged, persisted, or written to a generated file or report | ✅ asserted by tests in three suites |
 
@@ -289,9 +290,25 @@ The 1080p profiles are correctly unchanged in sort shape: `global[0]` is still
 
 ### Full e2e result
 
-**Green on CI.** The `Configurator Playwright E2E` job on this branch runs
-142 tests across the `desktop` and `mobile` projects and reports
-**142 passed** (run `33404883715`, 5m06s). All 11 PR checks pass.
+**Green on CI, with a caveat worth reading.** The `Configurator Playwright E2E`
+job runs 142 tests across the `desktop` and `mobile` projects. Run
+`33404883715` (5m06s) reports **139 passed, 3 flaky, 0 failed** — the job is
+green and all 11 PR checks pass, but "flaky" means the spec failed its first
+attempt and passed on the single CI retry:
+
+* `[desktop] express-install.spec.mjs:100` — Express Install → Stremio push
+* `[mobile] express-install.spec.mjs:71` — Express door splash route
+* `[mobile] security-sinks.spec.mjs:44` — C3, remote error renders a reason
+  message, never markup or `[object Object]`
+
+None of these three files was modified by this branch, and the two runs before
+it reported no flakes at all on the same specs — the set varies per run, which
+points at CI timing rather than a defect. `security-sinks.spec.mjs:44` was run
+three times locally against this build and passed every time. But the `github`
+reporter that surfaces this was only added in this PR, so **there is no
+historical flake data for `main` to compare against, and I cannot prove these
+were flaky before this branch.** Treat it as an open question, not a cleared
+one. Flake rate is worth watching over the next few merges.
 
 Two things had to change to get there, both real:
 
@@ -321,8 +338,9 @@ the release gate is green as pasted above independently of this.
 
 ## 9. Remaining `[UNVERIFIED]` / out of scope
 
-* Nothing outstanding in the test suites — `npm run release` and the full
-  Playwright e2e job are both green on CI (see §8).
+* `npm run release` (470/470) and the e2e job are green on CI, but three e2e
+  specs passed only on retry in the green run and there is no pre-branch flake
+  baseline to compare against (§8).
 * Mobile rendering of the new gate note was reasoned about, not observed on a
   device (02-audit §E3).
 * TorBox-hosted AIOStreams capability details — no publicly readable status
