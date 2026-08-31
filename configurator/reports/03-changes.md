@@ -289,25 +289,40 @@ The 1080p profiles are correctly unchanged in sort shape: `global[0]` is still
 
 ### Full e2e result
 
-142 tests × 2 projects (desktop + mobile) = 147 runs: **135 passed, 6 failed,
-1 flaky.** All 6 failures are `expect(errors).toEqual([])` assertions collecting
-`net::ERR_CONNECTION_CLOSED` console errors — this sandbox has no outbound
-network, so every external asset fetch fails. They were confirmed to be
-**pre-existing and environmental**, not regressions, by checking out the base
-commit `d929aad` into a separate worktree and running the same three specs with
-the same runner: identical 3 failures on unmodified code.
+**Green on CI.** The `Configurator Playwright E2E` job on this branch runs
+142 tests across the `desktop` and `mobile` projects and reports
+**142 passed** (run `33404883715`, 5m06s). All 11 PR checks pass.
 
-* `e2e/express-install.spec.mjs:71`
-* `e2e/stability.spec.mjs:60`
-* `e2e/stability.spec.mjs:77`
+Two things had to change to get there, both real:
+
+1. `e2e/stability.spec.mjs:82` clicked the `p2p` extras card, which the new
+   host-capability gate correctly renders inert on the default ElfHosted host.
+   The spec now selects `debridio` — a source that host does serve — and
+   additionally asserts the gated cards remain present and unselectable.
+2. The gate was only wired into the `std()` option renderer. P2P and HTTP are
+   offered as `.opt-scraper-card` entries in the extras carousel, which bypassed
+   it entirely, so a user could still pick a source ElfHosted refuses and have
+   it silently stripped at export. The carousel, the additional-services
+   overlay, and the service rows now all render the gate.
+
+Locally in the authoring sandbox six of those runs fail on
+`expect(errors).toEqual([])` collecting `net::ERR_CONNECTION_CLOSED` — there is
+no outbound network there, so every external asset fetch fails. Confirmed
+environmental by running the same three specs against the unmodified base
+commit `d929aad` in a separate worktree: identical failures. CI, which has
+network, passes them.
+
+`playwright.config.mjs` now also loads the `github` reporter under CI, so a
+failing spec is annotated onto the PR diff instead of being reachable only by
+downloading the HTML report artifact.
 
 `npm run release` is `test → validate → build` and does **not** include e2e, so
 the release gate is green as pasted above independently of this.
 
 ## 9. Remaining `[UNVERIFIED]` / out of scope
 
-* The 3 specs listed in §8 cannot be verified green in this sandbox (no outbound
-  network); they fail identically on the unmodified base commit.
+* Nothing outstanding in the test suites — `npm run release` and the full
+  Playwright e2e job are both green on CI (see §8).
 * Mobile rendering of the new gate note was reasoned about, not observed on a
   device (02-audit §E3).
 * TorBox-hosted AIOStreams capability details — no publicly readable status
