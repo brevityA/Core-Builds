@@ -20,6 +20,7 @@ import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
+import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals } from '../core/host-capability-policy.js';
 import { sanitizeDisplayName } from '../core/input-sanitize.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
@@ -619,9 +620,15 @@ function label(key, val) {
 
 function renderOpts(def) {
   const key = def.key, id = def.id;
-  const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} data-action="update-radio" data-key="${key}">`;
-  const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
-  const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
+  // Host-capability gate (Phase 4): options the selected AIOStreams host cannot
+  // serve are disabled in place with a one-line reason, rather than removed —
+  // a card that silently vanishes reads as a bug, and the reason is the whole
+  // point. `blocked` is keyed by the gate's `service:<id>` option names.
+  def = gateDefForHost(def);
+  const blockedReason = (o) => (def._hostBlocked && def._hostBlocked[o.v]) || '';
+  const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} ${blockedReason(o)?'disabled':''} data-action="update-radio" data-key="${key}">`;
+  const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}${blockedReason(o)?`<br><span class="opt-host-note">Unavailable — ${escHtml(blockedReason(o))}</span>`:''}</div></div>`;
+  const std = (o, cls='') => `<div class="opt${cls}${blockedReason(o)?' opt-host-blocked':''}"${blockedReason(o)?` title="${escHtml(blockedReason(o))}" aria-disabled="true"`:''}>${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
   if (def.layout === 'device-hybrid') {
     // Responsive grid of equal-height device cards + a single contextual
@@ -1099,6 +1106,10 @@ function outputProfileContext() {
     sizeLimit: S.sizeLimit,
     bandwidthMbps: Number(S.bandwidthMbps) || 0,
     cacheMode: S.cacheMode,
+    // Needed by the Stable profile's own sort list so it can honour the same
+    // 4K-tier-first rule (and the same explicit opt-out) as sort-policy.js.
+    qualityFirst: Boolean(S.qualityFirst),
+    resolutionFirst: Boolean(S.resolutionFirst),
     aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0',
   };
 }
@@ -3307,6 +3318,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action === 'update-host') {
       S.instanceHost = e.target.value;
       saveState();
+      // Probe the newly-selected host for its real capabilities. Fire-and-forget:
+      // on success we re-render so the gate reflects the live answer, on failure
+      // the registry defaults stand and the gate asks the user to confirm.
+      probeHostCapabilities().then(hit => { if (hit) render(); });
       const val = S.instanceHost;
       const urlRow  = document.getElementById('aioUrlRow');
       const uuidRow = document.getElementById('aioUuidRow');
@@ -4022,6 +4037,90 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
   return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
 }
 
+// ── Host capability gate (Phase 4) ─────────────────────────────────────────────
+// A live /api/v1/status probe is authoritative; the hand-written registry in
+// src/data/host-capabilities.js is the offline/CORS fallback. Probe results are
+// cached per host key for this page session only and never persisted.
+const _hostProbeCache = new Map();
+let _lastHostGateRemovals = [];
+
+function activeHostKey() {
+  return S.instanceHost && S.instanceHost !== 'auto' ? S.instanceHost : 'elfhosted';
+}
+
+function currentHostCapabilities() {
+  const key = activeHostKey();
+  return resolveHostCapabilities(key, _hostProbeCache.get(key) || null, {
+    assumedVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null,
+    trustedUser: Boolean(S.hostTrustedUser),
+  });
+}
+
+// Read-only capability probe. Never throws; a failure just leaves the registry
+// defaults in place (and hostOptionGate then asks the user to confirm the host).
+async function probeHostCapabilities(timeout = 4000) {
+  const key = activeHostKey();
+  const url = key === 'custom' ? S.instanceUrl : HOST_BASE_URLS[key];
+  if (!url) return null;
+  try {
+    const res = await raceHostFetch(url, '/api/v1/status', { method: 'GET' }, timeout);
+    if (!res || !res.ok) return null;
+    const parsed = parseHostStatus(await res.clone().json());
+    if (parsed) _hostProbeCache.set(key, parsed);
+    return parsed;
+  } catch (e) { return null; }
+}
+
+function hostGateEntries() {
+  try { return hostOptionGate(currentHostCapabilities()); } catch (e) { return []; }
+}
+
+/** True when the selected host cannot accept this option (see hostGateEntries). */
+function hostBlocks(option) {
+  return hostGateEntries().some(entry => entry.option === option && entry.action !== 'confirm');
+}
+
+function hostBlockReason(option) {
+  return hostGateEntries().find(entry => entry.option === option)?.reason || '';
+}
+
+function lastHostGateRemovals() { return _lastHostGateRemovals; }
+
+/**
+ * Annotate an option group with the host gate. Returns the same object when
+ * nothing is blocked so the common path allocates nothing.
+ */
+function gateDefForHost(def) {
+  if (!def || def.key !== 'service' || !Array.isArray(def.opts)) return def;
+  const entries = hostGateEntries().filter(entry => entry.scope === 'service');
+  if (!entries.length) return def;
+  const blocked = {};
+  for (const entry of entries) {
+    const id = entry.option.slice('service:'.length);
+    // The currently-selected service is never disabled out from under the user;
+    // the compatibility panel explains it instead, and the export gate still
+    // strips whatever the host rejects.
+    if (S.service === id) continue;
+    blocked[id] = entry.reason;
+  }
+  if (!Object.keys(blocked).length) return def;
+  return { ...def, _hostBlocked: blocked };
+}
+
+/** Panel listing what the selected host blocks and what the last build removed. */
+function hostGateHtml() {
+  const caps = currentHostCapabilities();
+  const entries = hostGateEntries();
+  const removals = describeRemovals(lastHostGateRemovals());
+  if (!entries.length && !removals.length) return '';
+  const line = (text, color) => `<div class="hc-issue"><span class="hc-issue-ico" style="color:${color}">&#9679;</span><span>${escHtml(text)}</span></div>`;
+  const gateLines = entries.map(entry => line(entry.reason, entry.action === 'confirm' ? '#fbbf24' : '#f87171')).join('');
+  const removalLines = removals.length
+    ? `<div class="hc-row"><span class="hc-name">Removed from your export</span><span class="hc-status" style="color:#8b949e">${removals.length}</span></div><div class="hc-detail">${removals.slice(0, 12).map(text => line(text, '#8b949e')).join('')}${removals.length > 12 ? line(`+${removals.length - 12} more`, '#8b949e') : ''}</div>`
+    : '';
+  return `<div class="hc-row"><span class="hc-name">${escHtml(caps.label)}</span><span class="hc-status" style="color:${caps.probed ? '#34d399' : '#fbbf24'}">${caps.probed ? `probed &middot; v${escHtml(caps.version || '?')}` : 'not probed'}</span></div>${gateLines ? `<div class="hc-detail">${gateLines}</div>` : ''}${removalLines}`;
+}
+
 function buildFinal() {
   try {
     const tpl = build();
@@ -4031,7 +4130,13 @@ function buildFinal() {
       presetMatchesAddon,
       migrationKeep: S._migrationKeep,
     });
-    const result = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
+    const profiled = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
+    // Last stop before anything leaves the app: strip every key, preset and
+    // pattern the selected host would reject or silently drop, so exported and
+    // directly-installed JSON are identical to what the host will store.
+    const gated = gateTemplateForHost(profiled, currentHostCapabilities());
+    _lastHostGateRemovals = gated.removals;
+    const result = gated.template;
     _cachedBuildResult = result;
     return result;
   } catch (err) {
@@ -6046,7 +6151,7 @@ function hostCompatHtml() {
   }).join('');
   const hasNonWhitelisted = Object.values(hosts).some(h => h.issues.some(i => i.includes('not allowed on this host')));
   const stripBtn = hasNonWhitelisted ? `<button data-action="strip-regex" style="margin-top:8px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.74rem;font-weight:700;cursor:pointer">Strip host-blocked regex patterns</button>` : '';
-  return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}${stripBtn}</div></div>`;
+  return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}${hostGateHtml()}${stripBtn}</div></div>`;
 }
 
 const TROUBLESHOOT_TREE = {
@@ -7608,12 +7713,12 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
         deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
         presets: presets(),
         defaultTimeout: Number(S.addonTimeout) || 6000,
-        assemble: () => applyOutputProfile(assembleTemplate(build(), {
+        assemble: () => gateTemplateForHost(applyOutputProfile(assembleTemplate(build(), {
           metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
           disabledAddons: _disabledAddons,
           presetMatchesAddon,
           migrationKeep: S._migrationKeep,
-        }), activeOutputProfile(), outputProfileContext()),
+        }), activeOutputProfile(), outputProfileContext()), currentHostCapabilities()).template,
       });
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp

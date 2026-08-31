@@ -7,6 +7,8 @@
  * reads or returns credentials.
  */
 
+import { resolutionTierFirst } from './sort-policy.js';
+
 export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 'labs']);
 
 // The legacy TorBox Search preset ID is accepted by v2.31.1 but marked removed
@@ -192,7 +194,16 @@ function stableSortCriteria(context) {
     { key: 'encode', direction },
     { key: 'size', direction },
   ];
-  const global = context.service === 'p2p' ? p2p : core;
+  // The Stable profile replaces the generated sort list wholesale, so it has to
+  // honour the 4K-first rule itself — otherwise a Stable 4K build would fall
+  // back to cached-first and a cached 1080p would outrank an uncached 2160p.
+  const base = context.service === 'p2p' ? p2p : core;
+  const global = resolutionTierFirst(context)
+    ? [
+      ...base.filter(entry => entry.key === 'resolution' || entry.key === 'quality'),
+      ...base.filter(entry => entry.key !== 'resolution' && entry.key !== 'quality'),
+    ]
+    : base;
   return {
     global,
     movies: [], series: [], anime: [], cached: [], uncached: [],

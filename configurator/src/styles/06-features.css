@@ -88,3 +88,11 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .cs-gate.ok{color:#3fb950}
 .cs-gate.bad{color:#f87171}
 .cs-partial{font-size:.66rem;color:#6b7280;font-style:italic;padding:0 10px 8px}
+
+/* Host-capability gate (Phase 4): options the selected AIOStreams host cannot
+   serve stay visible but inert, with the reason inline. Layer 06 so it lands
+   after 05-unified-ui's .opt rules without needing !important. */
+.opt.opt-host-blocked{opacity:.42;filter:saturate(.35)}
+.opt.opt-host-blocked label{cursor:not-allowed}
+.opt.opt-host-blocked:hover{transform:none}
+.opt-host-note{display:inline-block;margin-top:3px;font-size:.66rem;font-weight:700;color:#f87171;line-height:1.35}

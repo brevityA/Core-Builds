@@ -1,0 +1,15 @@
+{
+  "repo": "Viren070/AIOStreams",
+  "ref": "main",
+  "sha": "d3ea9bbaa48d757b31e1277186fcfaeeff41a4cc",
+  "version": "2.33.2",
+  "rawBase": "https://raw.githubusercontent.com/Viren070/AIOStreams",
+  "sources": [
+    "package.json",
+    "packages/core/src/utils/constants.ts",
+    "packages/core/src/db/schemas.ts",
+    "packages/core/src/presets/presetManager.ts",
+    "packages/core/src/streams/sorter.ts"
+  ],
+  "note": "Pinned AIOStreams git ref used to regenerate src/data/generated/* and src/config/generated/*. Bump the sha, run `npm run sync:upstream`, review the drift report, then commit the regenerated files together with this pin."
+}
