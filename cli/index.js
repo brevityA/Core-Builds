@@ -10,6 +10,9 @@ import {
   SEL_ARCHITECTURES,
   assembleTemplate,
   isNuvioInstantHost,
+  gateTemplateForHost,
+  resolveHostCapabilities,
+  knownHostKeys,
 } from '@core-builds/core';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -93,6 +96,23 @@ const VALID_SORT_KEYS = [
   'language','encode','library','seeders','bitrate','size','service','addon',
   'keyword','streamType','private','age','subtitle','regexPatterns','releaseGroup',
 ];
+
+/**
+ * Pick the host to gate against: the configurator's default unless it blocks the
+ * stream type this build is built around. Mirrors the instanceHost values in
+ * configurator/e2e/golden-configs.spec.mjs, which are asserted against these
+ * exact fixtures by tests/package-equivalence.test.mjs.
+ */
+function defaultHostFor(service) {
+  const needed = service === 'p2p' ? 'p2p' : service === 'http' ? 'http' : null;
+  if (!needed) return 'elfhosted';
+  for (const key of ['elfhosted', ...knownHostKeys()]) {
+    if (key === 'custom') continue;
+    const caps = resolveHostCapabilities(key, null);
+    if (!caps.blockedStreamTypes.includes(needed) && !caps.requiresProbe && !caps.unverified) return key;
+  }
+  return 'elfhosted';
+}
 
 function die(msg) {
   process.stderr.write(`Error: ${msg}\n`);
@@ -320,7 +340,26 @@ async function cmdGenerate() {
     rankedRegexUhd: uhd,
   });
 
-  const json = JSON.stringify(template, null, 2);
+  // Match the configurator: it gates the assembled template against the target
+  // host as the last step of buildFinal(), so a template the CLI emits must go
+  // through the same filter or it will carry keys, presets and regex the host
+  // rejects — on ElfHosted an unlisted regex pattern fails the entire save.
+  //
+  // The configurator takes the host from user state; the CLI has no such state,
+  // so it defaults to the same host the wizard does (ElfHosted) and steps off it
+  // when that host cannot serve the requested source. ElfHosted disables P2P and
+  // HTTP, so gating a --service p2p build against it would strip the very addons
+  // the build is for. Resolved from the capability registry rather than
+  // hardcoded, so a registry change moves this with it.
+  // --host already names a host in the same key namespace as the capability
+  // registry, so an explicit pick governs the gate too; otherwise infer one.
+  const hostKey = knownHostKeys().includes(opts.host) ? opts.host : defaultHostFor(opts.service);
+  const gated = gateTemplateForHost(template, resolveHostCapabilities(hostKey, null));
+  for (const removal of gated.removals) {
+    process.stderr.write(`  removed for ${hostKey}: ${removal.kind}: ${removal.target}\n`);
+  }
+
+  const json = JSON.stringify(gated.template, null, 2);
 
   if (opts.output) {
     try { writeFileSync(opts.output, json); }

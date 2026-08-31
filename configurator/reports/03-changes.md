@@ -399,6 +399,46 @@ release that did not happen.
 `templateSuite` stays **3.6.2** and root `CHANGELOG.md` is unchanged — this is a
 configurator-only release.
 
+### The version bump exposed a break that had been invisible since commit 1
+
+`.github/workflows/supporting-js-ci.yml` only runs on `account-tools/**`,
+`cli/**`, `packages/core/**`, `cloudflare-worker/**` or `versions.json`. Every
+commit before this one touched **only** `configurator/**`, so that workflow had
+never fired on this branch. Bumping `versions.json` fired it, and it went red.
+
+The cause was not the version. `packages/core/` is a hand-maintained duplicate
+of the configurator's generator that the CLI consumes, and
+`cli/tests/package-equivalence.test.mjs` diffs CLI output against **these same
+15 golden fixtures**. Regenerating the goldens in commit 1 therefore broke the
+CLI contract immediately — the CLI was still emitting cached-first sorting, a
+4K list without `1440p`, the five dead keys and the ungated regex set. Merging
+would have put a red `supporting-js-ci` on `main` for the next person to touch
+`cli/`.
+
+Ported into `packages/core/`, mirroring the configurator module for module:
+
+| Change | Files |
+| --- | --- |
+| 4K tier-first sorting | `sort-policy.js` (now byte-identical to the configurator's) |
+| `1440p` in both copies of the 4K resolution list | `device-policy.js`, `output-profile-policy.js` |
+| Stable-profile tier-first | `output-profile-policy.js` |
+| Host-capability gate | new `host-capability-policy.js`, `host-capabilities.js`, `regex-whitelist.js`, `regex-allowlist.js`, `generated/{aiostreams-config-schema,aiostreams-presets}.js` |
+
+`cli/index.js` applies the gate at the same point `buildFinal()` does and reports
+each removal on stderr. The CLI has no host state, so it defaults to the host the
+wizard defaults to and steps off it when that host cannot serve the requested
+source — ElfHosted disables P2P and HTTP, so a `--service p2p` build would
+otherwise have had its own addons stripped. An explicit `--host` governs the gate.
+The choice is resolved from the capability registry, not hardcoded.
+
+Two CLI tests asserted `minSeeders`, which is not a key in the pinned
+`UserDataSchema` and never reached the instance. They now assert it is absent,
+and the P2P one additionally asserts the build still ranks on `seeders` — the
+behaviour that assertion was really protecting.
+
+Full suite after the port: pytest **290**, `packages/core` **35**, `cli` **74**,
+`account-tools` **62**, worker **42**, configurator **477**, e2e **142**.
+
 Note for whoever runs it: `npm run release` is `test → validate → build`, so on a
 version bump the version-badge test reads the *previous* build and fails. Run
 `npm run build` once first. Pre-existing ordering quirk; it only bites on a bump.
