@@ -8,10 +8,12 @@ import os
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def is_dead_seadex_ise(e):
+    """Check if expression is a disabled SeaDex ISE."""
     if not isinstance(e, dict): return False
     return not e.get("enabled", True) and "SeaDex" in e.get("expression", "")
 
 def is_sootio_ese(e):
+    """Check if expression is a Sootio ESE (always empty)."""
     if not isinstance(e, dict): return False
     return "Sootio" in e.get("expression", "")
 

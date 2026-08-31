@@ -181,9 +181,17 @@ def validate_template(fpath):
     name = path.stem
     is_deprecated = 'Deprecated' in path.parts
 
-    def err(template, msg):  errors.append(f"  ✗ [{template}] {msg}")
-    def warn(template, msg): warnings.append(f"  ⚠ [{template}] {msg}")
-    def ok(template, msg):   passes.append(f"  ✓ [{template}] {msg}")
+    def err(template, msg):
+        """Append an error message for the given template."""
+        errors.append(f"  ✗ [{template}] {msg}")
+
+    def warn(template, msg):
+        """Append a warning message for the given template."""
+        warnings.append(f"  ⚠ [{template}] {msg}")
+
+    def ok(template, msg):
+        """Append a success message for the given template."""
+        passes.append(f"  ✓ [{template}] {msg}")
 
     try:
         with open(fpath) as f:
@@ -592,6 +600,7 @@ def validate_template(fpath):
 
 
 def main():
+    """Main entry point for template validation. Parses arguments and validates templates."""
     parser = argparse.ArgumentParser(description='Validate Core Builds templates')
     parser.add_argument('--dir', action='append', default=[],
                         help='Directory to search for templates (repeatable)')

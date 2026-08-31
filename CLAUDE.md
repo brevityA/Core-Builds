@@ -307,6 +307,61 @@ python3 scripts/template_builder.py --only stream  # filter by name
 | npm test | 29 tests | `node --test` in `configurator/` | Unit tests (credentials, device profiles, schema guard, UI lifecycle) |
 | Static validation | 25 checks | `npm run validate` in `configurator/` | Version consistency, host metadata, device defaults, module wiring |
 | Playwright E2E | varies | `configurator/e2e/` | Browser-based stability tests |
+| aios-regen smoke | 20 asserts | `node scripts/aios-regen/tests/smoke.mjs` | OPTIONS parser, generate, heal, diff (offline, no network) |
+
+---
+
+## aios-regen — AIOStreams Contract Watcher
+
+`scripts/aios-regen/` watches the AIOStreams codebase for schema changes that break Core Builds templates. Sibling of `scripts/check_upstream_drift.mjs` (which watches Vidhin05 regex). This one watches **AIOStreams code**.
+
+### What it catches
+
+| Surface | Source of truth | Breakage example |
+|---|---|---|
+| Preset IDs | `presetManager.ts` + host `/api/v1/status` | `easynews-plus-plus` vs `easynewsPlusPlus` |
+| Required option fields | Each preset `METADATA.OPTIONS` | `strictTitleMatching: required: true` |
+| Services | `constants.ts` + host `settings.services` | new `torrin` / `pikpak` / `seedr` |
+| Schema hotspots | `schemas.ts` nested Zod | `deduplicator.merge` boolean to object |
+| SEL functions | `streamExpression.ts` | `perGroup()`, `rseMatched()` appearing/disappearing |
+| Formatter fields | `formatters/base.ts` | `{stream.nSeScore}` |
+
+### Commands
+
+```bash
+node scripts/aios-regen/tests/smoke.mjs                              # must stay green
+node scripts/aios-regen/cli.mjs extract source --pin                 # GitHub Viren070/AIOStreams@main
+node scripts/aios-regen/cli.mjs extract host https://aiostreams.elfhosted.com
+node scripts/aios-regen/cli.mjs diff --fail                          # exit 1 on drift
+node scripts/aios-regen/cli.mjs generate --host https://aiostreams.elfhosted.com --out regen.json
+node scripts/aios-regen/cli.mjs heal path/to/template.json --out healed.json
+```
+
+### Layout
+
+```text
+scripts/aios-regen/
+  contract.mjs          extract source + host, fingerprint, diff, merge, snapshot
+  generate.mjs          recipe + contract -> template; heal existing JSON
+  cli.mjs               CLI
+  serve.mjs             local UI + API on 127.0.0.1:3333
+  recipes/core-nexus.json    default intent
+  snapshots/contract.source.json    pinned GitHub contract (commit into git)
+  tests/smoke.mjs       parser / generate / heal / diff, no network
+```
+
+### Rules
+
+- Zero npm dependencies. Do not add any.
+- Generate is a **floor**, not Core Builds output. No IQR, no ranked regex, no formatter overrides.
+- `heal` will drop SEL that uses unknown functions. Confirm before committing a healed fleet.
+- Never embed API keys in recipes or snapshots.
+- Do not auto-commit regenerated fleet templates. Drift opens an issue; a human/agent reviews, then re-pins.
+- If you change contract shape or generate output, update the smoke test in the same commit.
+
+### Contract fingerprint
+
+16-char sha256 over: preset IDs, service IDs, schema keys, hotspots, SEL functions, formatter fields, and each preset's required option IDs. Additive changes are `severity: additive`. Removals and newly required options are `severity: breaking`.
 
 ---
 
@@ -318,6 +373,7 @@ python3 scripts/template_builder.py --only stream  # filter by name
 | `sync-docs.yml` | push to main | Auto-generates ROADMAP.md + tools page from changelogs |
 | `docs-changelog-gate.yml` | PRs | Blocks merges without changelog update |
 | `upstream-drift-watch.yml` | daily cron | Detects Vidhin05 regex/expression changes |
+| `watch-aiostreams.yml` | 6h cron + push | AIOStreams contract drift detection (aios-regen) |
 | `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` + `npm run build` |
 | `configurator-e2e.yml` | PRs | Playwright E2E tests |
 | `validate.yml` | PRs | Template JSON validation |
