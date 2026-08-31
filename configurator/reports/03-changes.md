@@ -1,11 +1,12 @@
 # 03 — Changes shipped
 
 Branch `arena/01a057d1-core-builds`, base `d929aad`.
-Upstream pinned at `Viren070/AIOStreams@d3ea9bbaa48d757b31e1277186fcfaeeff41a4cc` (v2.33.2).
+Upstream pinned at `Viren070/AIOStreams@f36d0f93ff088280526ebca1fe3c93e2740b6987`,
+which is the commit tag `v2.33.2` resolves to.
 
 No new runtime dependency was added. The app is still a static ES-module site and
 the standalone single-file build still works (`configurator/index.html`,
-1 014 356 characters after this change, was 997 605 — the figure `scripts/build.mjs`
+1 015 348 characters after this change, was 997 605 — the figure `scripts/build.mjs`
 prints; it counts string length, so the file is 1 025 558 bytes on disk).
 
 ---
@@ -28,6 +29,17 @@ says how to regenerate. **Extracted:** 153 config keys, 12 sort scopes, 25 sort
 criteria, 7 score keys, the cached-split rule, every addon preset id, and 12
 enums (resolutions, qualities, visual/audio tags, channels, encodes, stream
 types, services, formatters, proxies, resources, passthrough stages).
+
+**The pin must name a release.** `ref` has to be a tag and `sha` has to be the
+commit that tag resolves to; `sync-upstream.mjs` proves this with `git ls-remote`
+on every networked run and refuses a branch ref, and
+`tests/generated-upstream-contract.test.mjs` enforces the offline half. This is
+not hypothetical — the first version of this pin claimed `"version": "2.33.2"`
+while its sha was a docs-only commit near the tip of `main`, which is three
+config keys, two enum members and a preset *ahead* of the release
+(`manifestNotice`, `linkedAccounts`, `PCM`, `MPEG-4`, `usa-tv-next`). Since every
+generated header carries the sha, the entire contract was misattributed and the
+drift report diffed against an arbitrary point instead of a release boundary.
 
 **Flags:** `--accept`, `--check`, `--offline`, `--sha <sha>`,
 `--from <local-checkout>`. Network path is HTTPS `fetch()` with a shallow
@@ -71,6 +83,28 @@ holds `FEATURE_MIN_VERSIONS` (only entries datable from the upstream CHANGELOG:
   `disable`, `hide`, or `confirm`. Every entry carries exactly one reason line.
 * `gateConfigForHost(config, caps)` / `gateTemplateForHost(template, caps)` —
   returns `{ config, removals }`, never mutates the input, and is idempotent.
+
+**Synced regex URLs are a second, independent allowlist.** `regexAccess: 'none'`
+does not mean "no regex" — it means "only what this host publishes". Upstream
+checks the two separately: inline patterns through `isRegexAllowed()`, synced
+URLs through `validateSyncedRegexUrls()` → `RegexAccess.getAllowedUrls()`, and
+the URL path **throws** `Forbidden URL(s) in regex configuration: …` rather than
+quietly ignoring the entry. ElfHosted runs `'none'` and still allows five URLs,
+one of which is the Vidhin05 ranked-regex feed this configurator emits in three
+profiles. An earlier version of this gate cleared the synced fields wholesale on
+any `'none'` host and so deleted a feature the host sanctions.
+
+The gate now filters instead. `parseHostStatus` records
+`regexAccess.urls`; the registry carries a hand-verified fallback list, because
+ElfHosted sends no `Access-Control-Allow-Origin` and the browser probe therefore
+fails in exactly the deployment that ships to users — probe-only data would
+leave the gate at its most destructive there. When no allowlist is available at
+all the gate **removes nothing** and raises a warning instead: absence of data is
+not evidence of prohibition, and a named upstream rejection is far more
+recoverable than a silent deletion. `gateConfigForHost` returns
+`{ config, removals, warnings }`, and warnings render amber in the Host
+Compatibility panel under *May be rejected on save*, visually distinct from
+removals.
 
 **What the gate removes:** keys absent from the pinned schema (except the six
 legacy keys upstream still migrates); keys needing a newer AIOStreams than the
@@ -154,14 +188,14 @@ profile or *Quality first*.
 
 ## 5. Phase 6 — tests
 
-`npm test`: **378 → 470** (`+92`), 0 failures.
+`npm test`: **378 → 477** (`+99`), 0 failures.
 
 | New file | Tests | Covers |
 | --- | --- | --- |
-| `tests/generated-upstream-contract.test.mjs` | 17 | pin shape, DO-NOT-EDIT headers, no credential values, generated dir contents, module ⇄ snapshot equality, internal consistency, `unknownConfigKeys` / `invalidSortCriteria` / `isKnownPresetId`, and that no state the sort policy can reach emits an invalid criterion |
+| `tests/generated-upstream-contract.test.mjs` | 19 | pin shape, DO-NOT-EDIT headers, no credential values, generated dir contents, module ⇄ snapshot equality, internal consistency, `unknownConfigKeys` / `invalidSortCriteria` / `isKnownPresetId`, and that no state the sort policy can reach emits an invalid criterion |
 | `tests/sort-4k-first.test.mjs` | 18 | the tier guarantee, incl. a **95 256-comparison** 2160p × 1080p cross product over quality × HDR × audio × bitrate × size × seeders × SEL score × regex score × cached, plus tier partitioning, within-tier ordering, the 1080p profile, the `qualityFirst` opt-out, the free lanes, `libraryBoost`, and the Stable profile |
 | `tests/schema-fixture-sweep.test.mjs` | 13 | device × service × resolution × host = **7 480** gated combinations (11 × 10 × 17 × 4) validated against the pinned enums and the 153-key schema; formatter ids, placeholder balance and credential shapes; size/bitrate range shapes |
-| `tests/host-capability-policy.test.mjs` | 44 | version compare, probe parsing, registry merge, a 13-row host × option gate matrix, one-line reasons, the export gate (unknown keys, legacy keys, presets, stream types, regex, synced URLs), idempotence, and — over the 15 real golden configs × 5 hosts — that nothing a host rejects can survive |
+| `tests/host-capability-policy.test.mjs` | 49 | version compare, probe parsing, registry merge, a 13-row host × option gate matrix, one-line reasons, the export gate (unknown keys, legacy keys, presets, stream types, regex, synced URLs), idempotence, and — over the 15 real golden configs × 5 hosts — that nothing a host rejects can survive |
 | `tests/helpers/aiostreams-sorter-model.mjs` | — | port of the upstream lexicographic comparator; throws on any criterion it does not implement, so it cannot silently drift |
 | `e2e/host-capability.spec.mjs` | 7 | ElfHosted export contains no Torrentio / dead key, a permissive host keeps what ElfHosted blocks, the disabled-with-reason UI, 4K tier-first and 1080p cached-first end to end, direct-install payload shape, no credential in a generated template |
 
@@ -174,11 +208,11 @@ profile or *Quality first*.
 > core-builds-configurator@2.99.0 test
 > node --test tests/*.test.mjs
 
-… 470 subtests …
-1..470
-# tests 470
+… 477 subtests …
+1..477
+# tests 477
 # suites 0
-# pass 470
+# pass 477
 # fail 0
 # cancelled 0
 # skipped 0
@@ -226,8 +260,8 @@ PASS e2e golden generation hook
 > core-builds-configurator@2.99.0 build
 > node scripts/build.mjs
 
-Built standalone: 1014356 bytes
-Built web assets: 803285 JS bytes, 173042 CSS bytes
+Built standalone: 1015348 bytes
+Built web assets: 804277 JS bytes, 173042 CSS bytes
 ```
 Exit code **0**.
 
@@ -245,8 +279,8 @@ Generated files match the pinned contract.
 | 2160p outranks a higher-bitrate 1080p REMUX in every fixture | ✅ 95 256 comparisons, 0 inversions |
 | The 1080p profile still defaults to 1080p-first | ✅ asserted |
 | An ElfHosted-community export can never contain Torrentio or a rejected key | ✅ asserted over all 15 goldens |
-| Re-running `sync-upstream.mjs` reproduces the generated files byte-for-byte and the drift report names the pinned SHA | ✅ verified in `--accept`, `--check` and `--offline` modes |
-| `npm run release` — zero failures | ✅ 470/470, 29 PASS, build OK, exit 0 |
+| Re-running `sync-upstream.mjs` reproduces the generated files byte-for-byte and the drift report names the pinned SHA | ✅ verified in `--accept`, `--check` and `--offline` modes; the pin is additionally proven to be the `v2.33.2` tag commit |
+| `npm run release` — zero failures | ✅ 477/477, 29 PASS, build OK, exit 0 |
 | Every competitor and user claim backed by a fetched URL | ✅ see 01-research; the one unreachable tool is marked `[UNVERIFIED]` |
 | No credential logged, persisted, or written to a generated file or report | ✅ asserted by tests in three suites |
 
@@ -284,6 +318,7 @@ What changed in the goldens, and why:
 | `sortCriteria` reordered to `resolution, quality, …` | all 4K profiles | Phase 5 |
 | `preferredResolutions` gains `1440p` | all 4K profiles | audit finding §B3 |
 | `nzbFailover` **kept** | — | upstream migrates it (`utils/config.ts:719-731`), so it is legal input |
+| `syncedRankedRegexUrls` **kept** | 3 | the Vidhin05 feed is on ElfHosted's published allowlist; an earlier build wrongly cleared it |
 
 The 1080p profiles are correctly unchanged in sort shape: `global[0]` is still
 `cached` and `preferredResolutions` is still `1080p, 720p, Unknown`.
@@ -338,7 +373,7 @@ the release gate is green as pasted above independently of this.
 
 ## 9. Remaining `[UNVERIFIED]` / out of scope
 
-* `npm run release` (470/470) and the e2e job are green on CI, but three e2e
+* `npm run release` (477/477) and the e2e job are green on CI, but three e2e
   specs passed only on retry in the green run and there is no pre-branch flake
   baseline to compare against (§8).
 * Mobile rendering of the new gate note was reasoned about, not observed on a
