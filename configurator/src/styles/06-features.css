@@ -96,3 +96,8 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .opt.opt-host-blocked label{cursor:not-allowed}
 .opt.opt-host-blocked:hover{transform:none}
 .opt-host-note{display:inline-block;margin-top:3px;font-size:.66rem;font-weight:700;color:#f87171;line-height:1.35}
+.svc-list-row.opt-host-blocked{opacity:.42;filter:saturate(.35)}
+.svc-list-row.opt-host-blocked label{cursor:not-allowed}
+.fastlane-choice.opt-host-blocked{opacity:.42;filter:saturate(.35);cursor:not-allowed}
+.opt-scraper-card.opt-host-blocked{opacity:.45;filter:saturate(.3);cursor:not-allowed;pointer-events:none}
+.opt-scraper-card .opt-host-note{margin-top:4px}

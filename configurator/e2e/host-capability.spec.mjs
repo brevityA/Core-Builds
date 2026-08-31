@@ -54,23 +54,29 @@ test.describe('host capability gate', () => {
     expect(tpl.config.excludedStreamTypes || []).not.toContain('p2p');
   });
 
-  test('selecting a restricted host disables the incompatible option with a reason', async ({ page }) => {
-    await bootstrap(page);
-    await page.evaluate(() => {
-      const select = document.getElementById('aioHost');
-      if (!select) throw new Error('host select not found');
-      select.value = 'elfhosted';
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-    // The gate renders inert options with an inline explanation rather than
-    // removing them, so the user learns why the choice is unavailable.
-    const blocked = page.locator('.opt.opt-host-blocked');
-    if (await blocked.count()) {
-      const note = blocked.first().locator('.opt-host-note');
-      await expect(note).toBeVisible();
-      await expect(note).toContainText(/Unavailable —/);
-      await expect(blocked.first().locator('input')).toBeDisabled();
+  test('the default (ElfHosted) host disables the incompatible service options with a reason', async ({ page }) => {
+    // The wizard defaults to instanceHost 'elfhosted', which disables P2P and
+    // HTTP streams, so the gate must be visible where those sources are offered
+    // — without the user having to find the host picker first.
+    await page.goto('/');
+    await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+    await page.reload();
+    await page.waitForTimeout(950);
+    await page.locator('[data-action="custom-start"]').click();
+
+    for (const id of ['p2p', 'http']) {
+      const card = page.locator(`.opt-scraper-card[data-svc-id="${id}"]`);
+      await expect(card, `${id} must still be offered`).toHaveCount(1);
+      await expect(card, `${id} must be gated on ElfHosted`).toHaveClass(/opt-host-blocked/);
+      await expect(card).toHaveAttribute('aria-disabled', 'true');
+      await expect(card.locator('.opt-host-note')).toContainText(/Unavailable —/);
+      await expect(card.locator('.opt-host-note')).toContainText(/ElfHosted community instance/);
     }
+
+    // A source the host does serve stays selectable.
+    const ok = page.locator('.opt-scraper-card[data-svc-id="nzbgeek"]');
+    await expect(ok).not.toHaveClass(/opt-host-blocked/);
+    await expect(ok).toHaveAttribute('data-action', 'toggle-carousel-service');
   });
 
   test('the 4K build sorts resolution first in every scope', async ({ page }) => {

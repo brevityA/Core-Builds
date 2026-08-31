@@ -658,9 +658,9 @@ function renderOpts(def) {
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
     if (def.noHero) {
-      const rows = def.opts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}" tabindex="0">
+      const rows = def.opts.map(o => `<div class="svc-list-row opt${blockedReason(o) ? ' opt-host-blocked' : ''}"${blockedReason(o) ? ` title="${escHtml(blockedReason(o))}" aria-disabled="true"` : ''}>${inp(o)}<label for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
-        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>
+        ${body(o)}
         ${o.help ? `<button type="button" class="help-btn" data-action="toggle-device-help" data-v="${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>` : ''}
         <span class="svc-list-arr">›</span>
       </label>${o.help ? `<div class="device-help" id="help_${o.v}">${o.help}</div>` : ''}</div>`).join('');
@@ -740,7 +740,7 @@ function renderOpts(def) {
       'easynews':'usenet','nzbgeek':'usenet','streamnzb':'usenet',
       'p2p':'noaccount','http':'noaccount',
     };
-    const chk = (o) => `<input type="checkbox" id="o_${o.v}" value="${o.v}" ${S.multiServices.includes(o.v)?'checked':''} data-action="toggle-service">`;
+    const chk = (o) => `<input type="checkbox" id="o_${o.v}" value="${o.v}" ${S.multiServices.includes(o.v)?'checked':''} ${blockedReason(o) && !S.multiServices.includes(o.v) ? 'disabled' : ''} data-action="toggle-service">`;
     const ckSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
@@ -763,9 +763,10 @@ function renderOpts(def) {
       const auth = SVC_AUTH[o.v] || '';
       const cat = SVC_CAT[o.v] || 'debrid';
       const isFree = auth === 'Free';
-      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}">${chk(o)}<label for="o_${o.v}" tabindex="0">
+      const hostNote = blockedReason(o);
+      return `<div class="svc-list-row opt${hostNote ? ' opt-host-blocked' : ''}" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}"${hostNote ? ` title="${escHtml(hostNote)}" aria-disabled="true"` : ''}>${chk(o)}<label for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
-        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}${hostNote ? `<br><span class="opt-host-note">Unavailable — ${escHtml(hostNote)}</span>` : ''}</div></div>
         <span class="svc-row-auth${isFree?' free':''}">${auth}</span>
         <span class="svc-row-ck">${ckSvg}</span>
       </label></div>`;
@@ -777,10 +778,14 @@ function renderOpts(def) {
       const active = S.multiServices.includes(sv);
       const cat = SVC_CAT[sv] || 'debrid';
       const catLabel = cat === 'debrid' ? 'Debrid' : cat === 'usenet' ? 'Usenet' : cat === 'noaccount' ? 'Free' : cat;
-      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-carousel-service" data-svc-id="${sv}" role="checkbox" aria-checked="${active}" tabindex="0">
+      // Host-capability gate: a source the selected AIOStreams host refuses is
+      // shown inert with the reason, rather than silently stripped at export.
+      const why = active ? '' : (blockedReason(o) || '');
+      return `<div class="opt-scraper-card${why ? ' opt-host-blocked' : ''}" data-active="${active}" ${why ? `aria-disabled="true" title="${escHtml(why)}"` : `data-action="toggle-carousel-service" tabindex="0"`} data-svc-id="${sv}" role="checkbox" aria-checked="${active}">
         <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon opt-scraper-icon-svg">${o.icon}</div><span class="opt-scraper-name">${o.name}</span></div>
         <div class="opt-scraper-subdesc">${SVC_DESC[sv] || ''}</div>
+        ${why ? `<div class="opt-host-note">Unavailable — ${escHtml(why)}</div>` : ''}
         <span class="opt-scraper-badge opt-scraper-badge-${cat}">${catLabel}</span>
       </div>`;
     }).join('');
@@ -6430,7 +6435,10 @@ function showAdditionalServicesPicker(options={}) {
   const serviceDef=DEFS.find(d=>d.key==='service');
   const selectedServices=new Set(options.services || S.multiServices.filter(v=>CAROUSEL_SVCS.includes(v)));
   const selectedScrapers=new Set(options.scrapers || S.optionalScrapers||[]);
-  const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}" data-extra-service="${id}"><b>${o.name}</b><span>${id==='p2p'||id==='http'?'No account required':'Credentials may be required'}</span></button>`;}).join('');
+  // Host-capability gate: an extra source the selected AIOStreams host will not
+  // serve is offered disabled, with the reason in place of the usual hint.
+  const extraBlocked = (() => { const m={}; for (const e of hostGateEntries()) if (e.scope==='service') m[e.option.slice('service:'.length)] = e.reason; return m; })();
+  const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';const why=selectedServices.has(id)?'':extraBlocked[id]||'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}${why?' opt-host-blocked':''}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''} data-extra-service="${id}"><b>${o.name}</b><span${why?' class="opt-host-note"':''}>${why?`Unavailable — ${escHtml(why)}`:(id==='p2p'||id==='http'?'No account required':'Credentials may be required')}</span></button>`;}).join('');
   const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>`<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"><b>${d.label}</b><span>${d.desc}</span></button>`).join('');
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;

@@ -238,3 +238,44 @@ test('quality and visual tag vocabularies used by the sweep exist upstream', () 
   subsetOf(['BluRay REMUX', 'BluRay', 'WEB-DL', 'WEBRip', 'HDTV'], AIO_QUALITIES, 'test quality vocabulary');
   subsetOf(['HDR', 'HDR10+', 'DV'], AIO_VISUAL_TAGS, 'test visual tag vocabulary');
 });
+
+/* ── the second, later-applied copy of the resolution preference list ──────── */
+
+test('applyOutputProfile does not reintroduce an unranked resolution', async () => {
+  // output-profile-policy.js keeps its own copy of the preference list and is
+  // applied AFTER device-policies.js, so it silently wins. This caught 1440p
+  // being restored in one place and still missing in the other.
+  const { applyOutputProfile } = await import('../src/core/output-profile-policy.js');
+  const ctx = resolution => ({
+    outputProfile: 'stable', simpleMode: true, service: 'torbox-pro',
+    multiServices: ['torbox-pro'], optionalScrapers: [], resolution,
+    content: 'all', langs: ['English'], qualityFirst: false, resolutionFirst: false,
+    aiostreamsVersion: '2.32.0',
+  });
+  // Seed the config the way build() does, so the profile runs over a realistic
+  // input rather than an empty one.
+  const template = (resolution) => ({
+    metadata: {},
+    config: {
+      presets: [], services: [], sortCriteria: {}, resultLimits: {},
+      ...resolutionPolicy({ resolution, device: 'generic' }),
+    },
+  });
+
+  const fourK = applyOutputProfile(template('4k'), 'stable', ctx('4k')).config;
+  for (const value of AIO_RESOLUTIONS) {
+    const known = (fourK.preferredResolutions || []).includes(value)
+      || (fourK.excludedResolutions || []).includes(value);
+    assert.ok(known, `stable/4k: "${value}" is neither preferred nor excluded — it would sort last`);
+  }
+  assert.equal(fourK.preferredResolutions[0], '2160p');
+  assert.ok(fourK.preferredResolutions.indexOf('1440p') < fourK.preferredResolutions.indexOf('1080p'));
+
+  // and the two copies must agree for the profiles they both define
+  for (const resolution of ['1080p', '4k']) {
+    const fromDevice = resolutionPolicy({ resolution, device: 'generic' }).preferredResolutions;
+    const fromProfile = applyOutputProfile(template(resolution), 'stable', ctx(resolution)).config.preferredResolutions;
+    assert.deepEqual(fromProfile, fromDevice,
+      `device-policies and output-profile-policy disagree on preferredResolutions for "${resolution}"`);
+  }
+});

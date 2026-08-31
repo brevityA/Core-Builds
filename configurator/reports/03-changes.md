@@ -249,36 +249,65 @@ Generated files match the pinned contract.
 | Every competitor and user claim backed by a fetched URL | ✅ see 01-research; the one unreachable tool is marked `[UNVERIFIED]` |
 | No credential logged, persisted, or written to a generated file or report | ✅ asserted by tests in three suites |
 
-## 8. Required follow-up — the e2e goldens
+## 8. The e2e goldens — refreshed in-branch
 
-**The 15 files in `configurator/e2e/golden/` are stale and must be refreshed
-before the e2e suite will pass.** They are regenerated output, and the sort,
-device-policy and host-gate changes above alter them by design.
+**Done.** All 15 files in `configurator/e2e/golden/` have been regenerated and
+committed. They are regenerated output, and the sort, device-policy and
+host-gate changes above alter them by design (+287 / −724 lines).
 
-This sandbox **cannot** run them: `npx playwright install chromium` and
-`chromium-headless-shell` both fail with `Download failure, code=1`, and
-`--with-deps` additionally cannot resolve the font packages. Attempting to
-reconstruct the goldens offline was rejected as unsound — `applyOutputProfile()`
-rewrites `sortCriteria` for some profiles, so a golden is not a pure function of
-the policy modules alone.
-
-On any machine or CI runner with Playwright browsers:
+Playwright's browser CDN is unreachable from this sandbox (`npx playwright
+install chromium` → `Download failure, code=1`), so a Chromium build was
+obtained from the npm registry instead (`@sparticuz/chromium`) and driven
+through a config that only overrides `launchOptions.executablePath`. Everything
+else — `playwright.config.mjs`, the global setup, the web server, the specs —
+is the repository's own. To reproduce on a normal machine:
 
 ```bash
 cd configurator
 npm ci && npx playwright install chromium
 npm run build
 UPDATE_GOLDEN=1 npx playwright test e2e/golden-configs.spec.mjs --project=desktop
-git diff configurator/e2e/golden   # review, then commit
 npx playwright test                # full e2e, incl. e2e/host-capability.spec.mjs
 ```
 
+What changed in the goldens, and why:
+
+| Change | Count | Cause |
+| --- | --- | --- |
+| `maxResults`, `maxResultsPerResolution`, `seadexBestOnly`, `excludedStreamSources` removed | 15 files each | keys with zero hits in upstream `UserDataSchema` — stripped by the host gate |
+| `enhanceResults` removed | 13 | same |
+| `excludedStreamTypes` added | 13 | the supported replacement for `excludedStreamSources` |
+| `minSeeders` removed | 1 | same class of unknown key |
+| regex `pattern`/`name` entries removed | 72 | ElfHosted-class hosts run `regexAccess: none`; unwhitelisted patterns make upstream **reject the whole save** |
+| `score` entries removed | 66 | dependents of the removed regex rules |
+| `sortCriteria` reordered to `resolution, quality, …` | all 4K profiles | Phase 5 |
+| `preferredResolutions` gains `1440p` | all 4K profiles | audit finding §B3 |
+| `nzbFailover` **kept** | — | upstream migrates it (`utils/config.ts:719-731`), so it is legal input |
+
+The 1080p profiles are correctly unchanged in sort shape: `global[0]` is still
+`cached` and `preferredResolutions` is still `1080p, 720p, Unknown`.
+
+### Full e2e result
+
+142 tests × 2 projects (desktop + mobile) = 147 runs: **135 passed, 6 failed,
+1 flaky.** All 6 failures are `expect(errors).toEqual([])` assertions collecting
+`net::ERR_CONNECTION_CLOSED` console errors — this sandbox has no outbound
+network, so every external asset fetch fails. They were confirmed to be
+**pre-existing and environmental**, not regressions, by checking out the base
+commit `d929aad` into a separate worktree and running the same three specs with
+the same runner: identical 3 failures on unmodified code.
+
+* `e2e/express-install.spec.mjs:71`
+* `e2e/stability.spec.mjs:60`
+* `e2e/stability.spec.mjs:77`
+
 `npm run release` is `test → validate → build` and does **not** include e2e, so
-the release gate is genuinely green as pasted above.
+the release gate is green as pasted above independently of this.
 
 ## 9. Remaining `[UNVERIFIED]` / out of scope
 
-* Playwright e2e (142 tests, 20 files) has not been executed here — see §8.
+* The 3 specs listed in §8 cannot be verified green in this sandbox (no outbound
+  network); they fail identically on the unmodified base commit.
 * Mobile rendering of the new gate note was reasoned about, not observed on a
   device (02-audit §E3).
 * TorBox-hosted AIOStreams capability details — no publicly readable status

@@ -62,11 +62,18 @@
     "mergedCatalogs": [],
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "sortCriteria": {
       "global": [
+        {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
         {
           "key": "cached",
           "direction": "desc"
@@ -77,14 +84,6 @@
         },
         {
           "key": "seadex",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -138,6 +137,14 @@
       ],
       "movies": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "cached",
           "direction": "desc"
         },
@@ -151,14 +158,6 @@
         },
         {
           "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -208,6 +207,14 @@
       ],
       "series": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "cached",
           "direction": "desc"
         },
@@ -221,14 +228,6 @@
         },
         {
           "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -278,6 +277,14 @@
       ],
       "cachedMovies": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "cached",
           "direction": "desc"
         },
@@ -291,14 +298,6 @@
         },
         {
           "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -348,6 +347,14 @@
       ],
       "anime": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "cached",
           "direction": "desc"
         },
@@ -357,14 +364,6 @@
         },
         {
           "key": "streamExpressionMatched",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -414,6 +413,14 @@
       ],
       "cachedAnime": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "cached",
           "direction": "desc"
         },
@@ -427,14 +434,6 @@
         },
         {
           "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -484,6 +483,14 @@
       ],
       "uncachedAnime": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -493,14 +500,6 @@
         },
         {
           "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -550,6 +549,14 @@
       ],
       "uncachedMovies": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "streamExpressionMatched",
           "direction": "desc"
         },
@@ -559,14 +566,6 @@
         },
         {
           "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -616,6 +615,14 @@
       ],
       "uncachedSeries": [
         {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
           "key": "streamExpressionMatched",
           "direction": "desc"
         },
@@ -625,14 +632,6 @@
         },
         {
           "key": "library",
-          "direction": "desc"
-        },
-        {
-          "key": "resolution",
-          "direction": "desc"
-        },
-        {
-          "key": "quality",
           "direction": "desc"
         },
         {
@@ -1093,6 +1092,7 @@
     "requiredResolutions": [],
     "preferredResolutions": [
       "2160p",
+      "1440p",
       "1080p",
       "720p",
       "Unknown"
@@ -1134,7 +1134,6 @@
       "IMAX"
     ],
     "enableSeadex": true,
-    "seadexBestOnly": false,
     "excludeCached": false,
     "excludeCachedFromAddons": [],
     "excludeCachedFromServices": [],
@@ -1144,13 +1143,7 @@
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "preferredRegexPatterns": [],
-    "maxResults": 20,
-    "maxResultsPerResolution": 5,
     "excludedStreamExpressions": [
       {
         "enabled": true,
@@ -1250,6 +1243,10 @@
       "H-OU",
       "H-SBS"
     ],
-    "requiredStreamExpressions": []
+    "requiredStreamExpressions": [],
+    "excludedStreamTypes": [
+      "http",
+      "p2p"
+    ]
   }
 }

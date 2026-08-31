@@ -165,9 +165,13 @@ function stablePresets(config, context) {
   });
 }
 
+// NOTE: this duplicates src/core/device-policies.js#resolutionPolicy and is
+// applied AFTER it, so it wins. Keep the two in step until the duplication is
+// removed. 1440p must appear in the 4K list: a resolution that is neither
+// preferred nor excluded scores -Infinity upstream and sorts below 720p.
 function preferredResolutions(resolution) {
   if (resolution === '1080p') return ['1080p', '720p', 'Unknown'];
-  if (resolution === '4k') return ['2160p', '1080p', '720p', 'Unknown'];
+  if (resolution === '4k') return ['2160p', '1440p', '1080p', '720p', 'Unknown'];
   if (resolution === 'ultrawide') return ['2160p', '1440p', '1080p', '720p', 'Unknown'];
   if (resolution === 'mixed') return ['2160p', '1080p', '1440p', '720p', '576p', '480p', 'Unknown'];
   return [];
