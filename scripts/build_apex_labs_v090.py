@@ -31,12 +31,14 @@ apex_ise = apex_cfg["includedStreamExpressions"]
 # Helper: find an ESE entry from stable Apex by label substring
 # ---------------------------------------------------------------------------
 def apex_ese_by_label(label: str) -> dict:
+    """Find and return an ESE entry from stable Apex by label substring."""
     for e in apex_ese:
         if label in e["expression"]:
             return e
     raise KeyError(f"ESE label not found in stable Apex: {label!r}")
 
 def apex_pse_by_label(label: str) -> dict:
+    """Find and return a PSE entry from stable Apex by label substring."""
     for e in apex_pse:
         if label in e["expression"]:
             return e

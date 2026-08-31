@@ -45,7 +45,14 @@ def load_template_versions():
 # ─── 2. Generic patching helpers ─────────────────────────────────────────────
 
 class DocPatcher:
+    """Handles patching documentation files with version and changelog updates."""
+
     def __init__(self, dry_run=True):
+        """Initialize the patcher.
+
+        Args:
+            dry_run: If True, show changes without writing files.
+        """
         self.dry_run = dry_run
         self.changes = []  # [(file, old_line, new_line), ...]
 
@@ -110,6 +117,7 @@ def patch_claude_md(patcher, versions, release_version):
     lookup = build_lookup(versions)
 
     def replace_inventory_line(match):
+        """Replace template inventory line with updated version."""
         path_in_doc = match.group(1)  # e.g. "Single/core-nexus-4k-apex.json"
         old_ver = match.group(2)
         desc = match.group(3)
@@ -117,6 +125,7 @@ def patch_claude_md(patcher, versions, release_version):
         return f"- `{path_in_doc}` v{new_ver} —{desc}"
 
     def replace_heading(match):
+        """Replace Active Template Inventory heading with current release version."""
         return f"## Active Template Inventory (as of v{release_version})"
 
     patcher.patch_file("CLAUDE.md", [
@@ -144,6 +153,7 @@ def patch_readme(patcher, versions, release_version):
     }
 
     def replace_labs_row(match):
+        """Replace Labs template row in README with updated version."""
         prefix = match.group(1)
         name = match.group(2)
         mid = match.group(3)
@@ -170,6 +180,7 @@ def patch_torbox_readme(patcher, versions, release_version):
     lookup = build_lookup(versions)
 
     def replace_detail_card(match):
+        """Replace version in template detail card."""
         old_ver = match.group(1)
         # Find which template this belongs to by scanning context
         # Detail cards: | **Version** | vX.Y.Z |
@@ -227,6 +238,7 @@ def patch_mintlify_docs(patcher, versions, release_version):
 
     # template-directory.mdx: ### Template Name — vX.Y.Z
     def replace_template_heading(match):
+        """Replace template heading in directory with updated version."""
         name = match.group(1)
         old_ver = match.group(2)
         stem = heading_map.get(name.strip())
@@ -235,14 +247,17 @@ def patch_mintlify_docs(patcher, versions, release_version):
 
     # template-directory.mdx frontmatter
     def replace_frontmatter_ver(match):
+        """Replace version in frontmatter metadata."""
         return f'Current version: v{release_version}"'
 
     # introduction.mdx version badge
     def replace_intro_badge(match):
+        """Replace version badge in introduction."""
         return f'>v{release_version}<'
 
     # nightly-and-labs.mdx: ### Template (vX.Y.Z)
     def replace_labs_heading(match):
+        """Replace Labs template heading with updated version."""
         name = match.group(1)
         old_ver = match.group(2)
         stem = labs_heading_map.get(name.strip())
@@ -251,6 +266,7 @@ def patch_mintlify_docs(patcher, versions, release_version):
 
     # nightly-and-labs.mdx: vX.Y.Z — description (line after heading)
     def replace_nightly_version_line(match):
+        """Replace nightly version line following heading."""
         old_ver = match.group(1)
         desc = match.group(2)
         apple_tv_ver = lookup.get("core-nexus-apple-tv-4k", old_ver)
@@ -287,6 +303,7 @@ def patch_labs_guide(patcher, versions, release_version):
     }
 
     def replace_labs_table_row(match):
+        """Replace Labs template table row with updated version."""
         prefix = match.group(1)  # | **
         name = match.group(2)    # 4K Apex Labs
         old_ver = match.group(3) # 0.14.0
@@ -314,6 +331,7 @@ def get_release_version():
 # ─── Main ────────────────────────────────────────────────────────────────────
 
 def main():
+    """Main entry point for syncing documentation with template versions and changelogs."""
     apply = "--apply" in sys.argv
     dry_run = not apply
 

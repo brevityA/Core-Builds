@@ -30,6 +30,7 @@ WARN_FG   = colors.HexColor("#9a6700")
 base = getSampleStyleSheet()
 
 def sty(name, parent="Normal", **kw):
+    """Create a custom paragraph style inheriting from a parent style."""
     return ParagraphStyle(name, parent=base[parent], **kw)
 
 H1  = sty("H1", "Title",    fontSize=22, textColor=BRAND,    spaceAfter=6, spaceBefore=0, leading=26)
@@ -49,21 +50,49 @@ SUBTITLE = sty("SUBTITLE", fontSize=10, textColor=colors.HexColor("#555555"),
 NOTE = sty("NOTE", fontSize=8, leading=11, textColor=WARN_FG,
            backColor=WARN_BG, leftIndent=6, rightIndent=6, spaceBefore=2, spaceAfter=4)
 
-def hr(): return HRFlowable(width="100%", thickness=0.5, color=GRID_COL, spaceAfter=4, spaceBefore=2)
-def sp(h=4): return Spacer(1, h)
-def p(text, style=BODY): return Paragraph(text, style)
-def h2(text): return [sp(6), Paragraph(text, H2), hr()]
-def h3(text): return [Paragraph(text, H3)]
-def h4(text): return [Paragraph(text, H4)]
-def code(text): return Paragraph(text.replace(" ", "&nbsp;").replace("<", "&lt;").replace(">", "&gt;"), CODE)
-def note(text): return Paragraph(f"⚠ {text}", NOTE)
-def bullet(text): return Paragraph(f"• {text}", BULLET)
+def hr():
+    """Create a horizontal rule flowable."""
+    return HRFlowable(width="100%", thickness=0.5, color=GRID_COL, spaceAfter=4, spaceBefore=2)
+
+def sp(h=4):
+    """Create a vertical spacer."""
+    return Spacer(1, h)
+
+def p(text, style=BODY):
+    """Create a paragraph with the given text and style."""
+    return Paragraph(text, style)
+
+def h2(text):
+    """Create an H2 heading with spacer and horizontal rule."""
+    return [sp(6), Paragraph(text, H2), hr()]
+
+def h3(text):
+    """Create an H3 heading."""
+    return [Paragraph(text, H3)]
+
+def h4(text):
+    """Create an H4 heading."""
+    return [Paragraph(text, H4)]
+
+def code(text):
+    """Create a code block paragraph with escaped HTML."""
+    return Paragraph(text.replace(" ", "&nbsp;").replace("<", "&lt;").replace(">", "&gt;"), CODE)
+
+def note(text):
+    """Create a warning note paragraph."""
+    return Paragraph(f"⚠ {text}", NOTE)
+
+def bullet(text):
+    """Create a bulleted list item."""
+    return Paragraph(f"• {text}", BULLET)
 
 def mono(text):
+    """Format text in monospace font with HTML escaping."""
     t = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     return f'<font name="Courier">{t}</font>'
 
 def table(data, col_widths=None, header=True):
+    """Create a styled table with optional column widths and header row."""
     t = Table(data, colWidths=col_widths, repeatRows=1 if header else 0)
     style = [
         ("FONTNAME",    (0, 0), (-1, 0 if header else -1), "Helvetica-Bold"),
@@ -83,6 +112,7 @@ def table(data, col_widths=None, header=True):
     return t
 
 def mono_cell(text):
+    """Create a table cell with monospace text."""
     return Paragraph(mono(text), SMALL)
 
 # ─────────────────────────────────────────────────────────────────────────────

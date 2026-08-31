@@ -21,6 +21,7 @@ EXCLUDED_TOP = {'Legacy', 'Deprecated'}
 
 
 def collect():
+    """Collect all active (non-Legacy, non-Deprecated, non-Nightly) templates."""
     entries = []
     for f in sorted(TEMPLATES.rglob('*.json')):
         parts = f.relative_to(TEMPLATES).parts
@@ -45,10 +46,12 @@ def collect():
 
 
 def render(entries):
+    """Render template entries to compact JSON string."""
     return json.dumps(entries, separators=(',', ':'), ensure_ascii=False) + '\n'
 
 
 def main():
+    """Main entry point for syncing or checking the template collection."""
     entries = collect()
     out = render(entries)
     if '--check' in sys.argv:

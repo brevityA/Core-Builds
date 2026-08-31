@@ -18,6 +18,7 @@ NIGHTLY = {
 
 
 def check(url):
+    """Check if an AIOStreams instance URL is online and return status indicator."""
     try:
         req = urllib.request.Request(
             url, headers={"User-Agent": "CoreBuilds-StatusBot/1.0"}
@@ -31,6 +32,7 @@ def check(url):
 
 
 def build_table(instances):
+    """Build a markdown table of instance statuses by checking each URL."""
     lines = ["| Instance | Status | URL |", "|---|---|---|"]
     for name, url in instances.items():
         status = check(url)
@@ -41,6 +43,7 @@ def build_table(instances):
 
 
 def update_file(path, stable_table, nightly_table):
+    """Update a markdown/mdx file with new stable and nightly status tables."""
     with open(path, "r") as f:
         content = f.read()
 
