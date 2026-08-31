@@ -79,13 +79,19 @@ test('Advanced extras carousel is multi-select while short routes stay compact',
   await page.locator('[data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
   await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(16);
-  await page.locator('[data-svc-id="p2p"]').click();
+  // Was p2p. The wizard defaults to the ElfHosted community host, which serves
+  // neither P2P nor HTTP, so those two cards are now gated inert by the
+  // host-capability layer — see e2e/host-capability.spec.mjs. debridio is a
+  // source that host does serve, so it exercises the same multi-select path.
+  await page.locator('[data-svc-id="debridio"]').click();
   await page.locator('[data-scraper-id="nzbnoob"]').click();
   await expect(page.locator('#extrasCarouselCount')).toHaveText('2 selected');
-  await expect(page.locator('[data-svc-id="p2p"]')).toHaveAttribute('aria-checked', 'true');
-  await page.locator('[data-svc-id="p2p"]').focus();
+  await expect(page.locator('[data-svc-id="debridio"]')).toHaveAttribute('aria-checked', 'true');
+  await page.locator('[data-svc-id="debridio"]').focus();
   await page.keyboard.press('Space');
   await expect(page.locator('#extrasCarouselCount')).toHaveText('1 selected');
+  // The gated cards stay in the carousel — visible, counted, and unselectable.
+  await expect(page.locator('[data-svc-id="p2p"]')).toHaveAttribute('aria-disabled', 'true');
 
   const guided = await context.newPage();
   await fresh(guided);
