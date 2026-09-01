@@ -6,7 +6,7 @@ which is the commit tag `v2.33.2` resolves to.
 
 No new runtime dependency was added. The app is still a static ES-module site and
 the standalone single-file build still works (`configurator/index.html`,
-1 019 240 characters after this change, was 997 605 — the figure `scripts/build.mjs`
+1 020 938 characters after this change, was 997 605 — the figure `scripts/build.mjs`
 prints; it counts string length, so the file is 1 025 558 bytes on disk).
 
 ---
@@ -138,6 +138,14 @@ after layer 05's `.opt` rules, so no `!important` and no cascade change.
 
 ## 3. Phase 5 — 4K-first sorting
 
+> **Scope.** Everything in this section applies to the **4K, Mixed and Ultrawide**
+> profiles. The **1080p** profile hard-excludes `2160p` and `1440p` through
+> `applyNativeFilters()` (`output-profile-policy.js:326-333`) on the Stable and
+> Balanced output profiles, so 4K never reaches the sorter and there is nothing
+> here to reorder — a 1080p user sees no change from this work. That exclusion
+> is pre-existing (byte-identical on `d929aad`, last touched by `2467612c`),
+> intended, and left in place; §4 covers the disclosure added instead.
+
 **`src/core/sort-policy.js`** — rewritten around the existing dense generator
 rather than replacing it. New exported predicate `resolutionTierFirst(input)`:
 true when `resolution === '4k'` and the user has not opted out with
@@ -183,12 +191,25 @@ profile or *Quality first*.
 * **`src/data/formatters.js:53`** — the `tv` formatter's opening
   `{stream.resolution::exists[…]` placeholder was never closed (`]` → `]}`).
   It was the only unbalanced template of the 19.
+* **The 1080p hard lock is now disclosed** (`src/js/app.js` `resolutionLockNote()`).
+  `applyNativeFilters()` adds `2160p`/`1440p` to `excludedResolutions` for a
+  1080p build on Stable and Balanced, so 4K is discarded before sorting. That is
+  intended — the card says *"Hard lock · 2160p excluded"* and bandwidth-capped
+  users rely on it — but it was reported on 2026-08-31 as *"the show isn't giving
+  any 4k results"*, and the ranking work in this PR cannot help. An amber note on
+  the resolution step and on the review step names **Mixed · Adaptive** as the
+  route to "1080p first, 4K when it exists". Two things worth recording: the lock
+  is **profile-scoped** (Advanced and Labs keep 4K), which is why the reporter's
+  Stable→Balanced switch changed nothing; and `requiredResolutions` is **not** a
+  second exclusion path, because `applyOutputProfile` resets it to `[]` first.
+  Covered by `tests/resolution-lock-disclosure.test.mjs` (7 tests), which pins
+  both the lock and the disclosure.
 * **`e2e/golden-configs.spec.mjs`** — the `p2p-1080p` and `http-1080p` fixtures
   now target `fortheweak` instead of `elfhosted`, which disables P2P and HTTP.
 
 ## 5. Phase 6 — tests
 
-`npm test`: **378 → 477** (`+99`), 0 failures.
+`npm test`: **378 → 484** (`+106`), 0 failures.
 
 | New file | Tests | Covers |
 | --- | --- | --- |
@@ -208,11 +229,11 @@ profile or *Quality first*.
 > core-builds-configurator@2.99.0 test
 > node --test tests/*.test.mjs
 
-… 477 subtests …
-1..477
-# tests 477
+… 484 subtests …
+1..484
+# tests 484
 # suites 0
-# pass 477
+# pass 484
 # fail 0
 # cancelled 0
 # skipped 0
@@ -260,8 +281,8 @@ PASS e2e golden generation hook
 > core-builds-configurator@2.99.0 build
 > node scripts/build.mjs
 
-Built standalone: 1019240 bytes
-Built web assets: 808170 JS bytes, 173042 CSS bytes
+Built standalone: 1020938 bytes
+Built web assets: 809648 JS bytes, 173262 CSS bytes
 ```
 Exit code **0**.
 
@@ -280,7 +301,7 @@ Generated files match the pinned contract.
 | The 1080p profile still defaults to 1080p-first | ✅ asserted |
 | An ElfHosted-community export can never contain Torrentio or a rejected key | ✅ asserted over all 15 goldens |
 | Re-running `sync-upstream.mjs` reproduces the generated files byte-for-byte and the drift report names the pinned SHA | ✅ verified in `--accept`, `--check` and `--offline` modes; the pin is additionally proven to be the `v2.33.2` tag commit |
-| `npm run release` — zero failures | ✅ 477/477, 29 PASS, build OK, exit 0 |
+| `npm run release` — zero failures | ✅ 484/484, 29 PASS, build OK, exit 0 |
 | Every competitor and user claim backed by a fetched URL | ✅ see 01-research; the one unreachable tool is marked `[UNVERIFIED]` |
 | No credential logged, persisted, or written to a generated file or report | ✅ asserted by tests in three suites |
 
@@ -437,7 +458,7 @@ and the P2P one additionally asserts the build still ranks on `seeders` — the
 behaviour that assertion was really protecting.
 
 Full suite after the port: pytest **290**, `packages/core` **35**, `cli` **74**,
-`account-tools` **62**, worker **42**, configurator **477**, e2e **142**.
+`account-tools` **62**, worker **42**, configurator **484**, e2e **142**.
 
 Note for whoever runs it: `npm run release` is `test → validate → build`, so on a
 version bump the version-badge test reads the *previous* build and fails. Run
@@ -445,7 +466,7 @@ version bump the version-badge test reads the *previous* build and fails. Run
 
 ## 9. Remaining `[UNVERIFIED]` / out of scope
 
-* `npm run release` (477/477) and the e2e job are green on CI, but three e2e
+* `npm run release` (484/484) and the e2e job are green on CI, but three e2e
   specs passed only on retry in the green run and there is no pre-branch flake
   baseline to compare against (§8).
 * Mobile rendering of the new gate note was reasoned about, not observed on a
