@@ -346,25 +346,45 @@ The 1080p profiles are correctly unchanged in sort shape: `global[0]` is still
 
 ### Full e2e result
 
-**Green on CI, with a caveat worth reading.** The `Configurator Playwright E2E`
-job runs 142 tests across the `desktop` and `mobile` projects. Run
-`33404883715` (5m06s) reports **139 passed, 3 flaky, 0 failed** — the job is
-green and all 11 PR checks pass, but "flaky" means the spec failed its first
-attempt and passed on the single CI retry:
+**Green on CI — and one of the "flakes" turned out to be mine.**
 
-* `[desktop] express-install.spec.mjs:100` — Express Install → Stremio push
-* `[mobile] express-install.spec.mjs:71` — Express door splash route
-* `[mobile] security-sinks.spec.mjs:44` — C3, remote error renders a reason
-  message, never markup or `[object Object]`
+Earlier revisions of this report recorded three retry-dependent specs as an open
+question, because the `github` reporter that surfaces flakes was added in this
+PR and `main` had no annotations to compare against. That caution was right, and
+it paid off: a later docs-only commit turned `express-install.spec.mjs` red
+outright, and the annotation named the cause.
 
-None of these three files was modified by this branch, and the two runs before
-it reported no flakes at all on the same specs — the set varies per run, which
-points at CI timing rather than a defect. `security-sinks.spec.mjs:44` was run
-three times locally against this build and passed every time. But the `github`
-reporter that surfaces this was only added in this PR, so **there is no
-historical flake data for `main` to compare against, and I cannot prove these
-were flaky before this branch.** Treat it as an open question, not a cleared
-one. Flake rate is worth watching over the next few merges.
+The Phase 4 host probe fetches `<host>/api/v1/status` from the browser. Public
+AIOStreams instances send no `Access-Control-Allow-Origin`, so the browser
+blocks the response and logs
+
+```
+Access to fetch at 'https://aiostreams.elfhosted.com/api/v1/status' from origin
+'http://127.0.0.1:4173' has been blocked by CORS policy
+```
+
+No `try/catch` can suppress a CORS console entry. The probe then falls back to
+the static capability registry — the documented, intended path, and the whole
+reason that registry carries fallback data. But three specs assert
+`expect(errors).toEqual([])` over console errors, and whether the probe's line
+landed before the assertion was a timing race. That is exactly how it presented:
+same spec, sometimes passing on retry, no baseline on `main`. **It was never
+ambient flake — this branch caused it.**
+
+Fixed by extending `CORS_NOISE` in the three specs that define it, scoped to
+`/api/v1/status` so a genuine CORS regression elsewhere still fails. Verified
+the pattern matches the real message and still rejects both an unrelated CORS
+block and a plain `TypeError`.
+
+**What remains.** The latest run is **140 passed, 2 flaky, 0 failed**, all 12
+checks green. The two are `express-install.spec.mjs:108` (Full Stack multi-hop
+chain) and `security-sinks.spec.mjs:44` (C3). Neither is probe-related:
+`security-sinks` mocks `/api/v1/status` through `page.route` and collects no
+console errors at all, and the Express full-stack chain is the long modal
+sequence that `express-install.spec.mjs`'s own header attributes to issue
+**#682, "e2e flake — quarantine candidate"**, which predates this branch and is
+why `retries: 2` is configured there. Those two are pre-existing and tracked;
+the probe-caused one is fixed.
 
 Two things had to change to get there, both real:
 
@@ -466,9 +486,10 @@ version bump the version-badge test reads the *previous* build and fails. Run
 
 ## 9. Remaining `[UNVERIFIED]` / out of scope
 
-* `npm run release` (484/484) and the e2e job are green on CI, but three e2e
-  specs passed only on retry in the green run and there is no pre-branch flake
-  baseline to compare against (§8).
+* `npm run release` (484/484) and the e2e job are green on CI. Two specs remain
+  retry-dependent (`express-install.spec.mjs:108`, `security-sinks.spec.mjs:44`);
+  both are the long-chain timing flake tracked by issue #682 and neither is
+  probe-related. The one this branch did cause is fixed (§8).
 * Mobile rendering of the new gate note was reasoned about, not observed on a
   device (02-audit §E3).
 * TorBox-hosted AIOStreams capability details — no publicly readable status
