@@ -20,6 +20,7 @@ import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
+import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals, describeWarnings } from '../core/host-capability-policy.js';
 import { sanitizeDisplayName } from '../core/input-sanitize.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
@@ -35,7 +36,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '2.99';
+const CONFIGURATOR_VERSION = '3.0';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -617,11 +618,51 @@ function label(key, val) {
   return o ? o.name : val || '';
 }
 
+/**
+ * The 1080p profile is a HARD LOCK: applyNativeFilters() in
+ * output-profile-policy.js adds 2160p and 1440p to excludedResolutions, so 4K
+ * is discarded by the instance before sorting and no amount of scrolling
+ * reveals it. Intended, and the card says "Hard lock" — but easy to walk into.
+ *
+ * Two things make it worth disclosing here. The Quick Start "1080p Stream" lane
+ * sets it without ever showing that card. And the lock is profile-dependent:
+ * applyNativeFilters runs only for Stable and Balanced, so an Advanced or Labs
+ * 1080p build keeps 4K (unranked, hence last). A user who switches Stable ->
+ * Balanced to "fix" it therefore changes nothing, which is exactly what was
+ * reported on 2026-08-31: "the show isn't giving any 4k results" after
+ * re-running the wizard. Ranking work cannot help; there is nothing to rank.
+ */
+function resolutionLockNote() {
+  if (S.resolution !== '1080p') return '';
+  return '<div class="res-lock-note" role="note"><b>2160p and 1440p are excluded</b> on the Stable and Balanced profiles, so 4K will not appear at all — switching between those two changes nothing. Want 4K when it exists? Choose <b>Mixed · Adaptive</b>, which ranks 1080p first without deleting higher tiers.</div>';
+}
+
+/**
+ * The radio handler deliberately does not re-render the step (it only saves and
+ * re-evaluates Next), so the lock note has to be patched in place — same
+ * approach as the .opt-scraper-hint node. Without this the note only appears
+ * after a navigation, which is exactly when it is no longer useful.
+ */
+function refreshResolutionLockNote() {
+  const grid = document.querySelector('.svc-list');
+  const existing = document.querySelector('.res-lock-note');
+  const html = resolutionLockNote();
+  if (!html) { if (existing) existing.remove(); return; }
+  if (existing) existing.remove();
+  if (grid) grid.insertAdjacentHTML('afterend', html);
+}
+
 function renderOpts(def) {
   const key = def.key, id = def.id;
-  const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} data-action="update-radio" data-key="${key}">`;
-  const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>`;
-  const std = (o, cls='') => `<div class="opt${cls}">${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
+  // Host-capability gate (Phase 4): options the selected AIOStreams host cannot
+  // serve are disabled in place with a one-line reason, rather than removed —
+  // a card that silently vanishes reads as a bug, and the reason is the whole
+  // point. `blocked` is keyed by the gate's `service:<id>` option names.
+  def = gateDefForHost(def);
+  const blockedReason = (o) => (def._hostBlocked && def._hostBlocked[o.v]) || '';
+  const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} ${blockedReason(o)?'disabled':''} data-action="update-radio" data-key="${key}">`;
+  const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}${blockedReason(o)?`<br><span class="opt-host-note">Unavailable — ${escHtml(blockedReason(o))}</span>`:''}</div></div>`;
+  const std = (o, cls='') => `<div class="opt${cls}${blockedReason(o)?' opt-host-blocked':''}"${blockedReason(o)?` title="${escHtml(blockedReason(o))}" aria-disabled="true"`:''}>${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
   if (def.layout === 'device-hybrid') {
     // Responsive grid of equal-height device cards + a single contextual
@@ -651,14 +692,16 @@ function renderOpts(def) {
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
     if (def.noHero) {
-      const rows = def.opts.map(o => `<div class="svc-list-row opt">${inp(o)}<label for="o_${o.v}" tabindex="0">
+      const rows = def.opts.map(o => `<div class="svc-list-row opt${blockedReason(o) ? ' opt-host-blocked' : ''}"${blockedReason(o) ? ` title="${escHtml(blockedReason(o))}" aria-disabled="true"` : ''}>${inp(o)}<label for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
-        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>
+        ${body(o)}
         ${o.help ? `<button type="button" class="help-btn" data-action="toggle-device-help" data-v="${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>` : ''}
         <span class="svc-list-arr">›</span>
       </label>${o.help ? `<div class="device-help" id="help_${o.v}">${o.help}</div>` : ''}</div>`).join('');
       if (def.id === 'resolution') {
-        if (S.simpleMode) return `<div class="svc-list">${rows}</div>`;
+        // Quick Start lands here with simpleMode, having never shown the
+        // resolution card copy that states the hard lock.
+        if (S.simpleMode) return `<div class="svc-list">${rows}</div>${resolutionLockNote()}`;
         const AUDIO_OPTS = [
           { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M34 7a16 16 0 010 30" stroke="#10b981" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
           { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" fill="none"/><text x="40" y="14" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
@@ -680,7 +723,7 @@ function renderOpts(def) {
         }).join('');
         const curAudioLabel = AUDIO_OPTS.find(o => o.v === S.audio)?.name || 'Auto';
         const advOpen = !!S.audio && S.audio !== 'limited';
-        return `<div class="svc-list">${rows}</div>
+        return `<div class="svc-list">${rows}</div>${resolutionLockNote()}
         <details class="adv-audio-details"${advOpen ? ' open' : ''} style="margin-top:10px">
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);user-select:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'">
             <span style="font-size:.78rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase">Advanced options · Sound profile</span>
@@ -733,7 +776,7 @@ function renderOpts(def) {
       'easynews':'usenet','nzbgeek':'usenet','streamnzb':'usenet',
       'p2p':'noaccount','http':'noaccount',
     };
-    const chk = (o) => `<input type="checkbox" id="o_${o.v}" value="${o.v}" ${S.multiServices.includes(o.v)?'checked':''} data-action="toggle-service">`;
+    const chk = (o) => `<input type="checkbox" id="o_${o.v}" value="${o.v}" ${S.multiServices.includes(o.v)?'checked':''} ${blockedReason(o) && !S.multiServices.includes(o.v) ? 'disabled' : ''} data-action="toggle-service">`;
     const ckSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
@@ -756,9 +799,10 @@ function renderOpts(def) {
       const auth = SVC_AUTH[o.v] || '';
       const cat = SVC_CAT[o.v] || 'debrid';
       const isFree = auth === 'Free';
-      return `<div class="svc-list-row opt" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}">${chk(o)}<label for="o_${o.v}" tabindex="0">
+      const hostNote = blockedReason(o);
+      return `<div class="svc-list-row opt${hostNote ? ' opt-host-blocked' : ''}" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}"${hostNote ? ` title="${escHtml(hostNote)}" aria-disabled="true"` : ''}>${chk(o)}<label for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
-        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}</div></div>
+        <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}${hostNote ? `<br><span class="opt-host-note">Unavailable — ${escHtml(hostNote)}</span>` : ''}</div></div>
         <span class="svc-row-auth${isFree?' free':''}">${auth}</span>
         <span class="svc-row-ck">${ckSvg}</span>
       </label></div>`;
@@ -770,10 +814,14 @@ function renderOpts(def) {
       const active = S.multiServices.includes(sv);
       const cat = SVC_CAT[sv] || 'debrid';
       const catLabel = cat === 'debrid' ? 'Debrid' : cat === 'usenet' ? 'Usenet' : cat === 'noaccount' ? 'Free' : cat;
-      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-carousel-service" data-svc-id="${sv}" role="checkbox" aria-checked="${active}" tabindex="0">
+      // Host-capability gate: a source the selected AIOStreams host refuses is
+      // shown inert with the reason, rather than silently stripped at export.
+      const why = active ? '' : (blockedReason(o) || '');
+      return `<div class="opt-scraper-card${why ? ' opt-host-blocked' : ''}" data-active="${active}" ${why ? `aria-disabled="true" title="${escHtml(why)}"` : `data-action="toggle-carousel-service" tabindex="0"`} data-svc-id="${sv}" role="checkbox" aria-checked="${active}">
         <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon opt-scraper-icon-svg">${o.icon}</div><span class="opt-scraper-name">${o.name}</span></div>
         <div class="opt-scraper-subdesc">${SVC_DESC[sv] || ''}</div>
+        ${why ? `<div class="opt-host-note">Unavailable — ${escHtml(why)}</div>` : ''}
         <span class="opt-scraper-badge opt-scraper-badge-${cat}">${catLabel}</span>
       </div>`;
     }).join('');
@@ -1099,6 +1147,10 @@ function outputProfileContext() {
     sizeLimit: S.sizeLimit,
     bandwidthMbps: Number(S.bandwidthMbps) || 0,
     cacheMode: S.cacheMode,
+    // Needed by the Stable profile's own sort list so it can honour the same
+    // 4K-tier-first rule (and the same explicit opt-out) as sort-policy.js.
+    qualityFirst: Boolean(S.qualityFirst),
+    resolutionFirst: Boolean(S.resolutionFirst),
     aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0',
   };
 }
@@ -1757,6 +1809,7 @@ function render() {
         ${(() => { const h = templateHealthCheck(); return h.length ? `<div class="th-alert th-alert-red" style="margin-top:6px"><div style="font-size:.68rem;font-weight:700;color:var(--th-red);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:var(--th-tx2);line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:var(--th-red);flex-shrink:0">${ICO.warn(12,'currentColor')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div class="th-alert th-alert-green" style="margin-top:6px;font-weight:600">${ICO.check(12,'currentColor')} Template looks good</div>`; })()}
         ${healthScoreHtml()}
         ${versionBannerHtml()}
+        ${resolutionLockNote()}
         ${hostCompatHtml()}
         ${backupTimelineHtml()}
         <details class="rv-accord" style="margin-top:10px">
@@ -3254,6 +3307,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       syncNext();
+      if (k === 'resolution') refreshResolutionLockNote();
       if (S.simpleMode && (step === 2 || step === 3)) {
         setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled) b.click(); }, 350);
       }
@@ -3307,6 +3361,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action === 'update-host') {
       S.instanceHost = e.target.value;
       saveState();
+      // Probe the newly-selected host for its real capabilities. Fire-and-forget:
+      // on success we re-render so the gate reflects the live answer, on failure
+      // the registry defaults stand and the gate asks the user to confirm.
+      probeHostCapabilities().then(hit => { if (hit) render(); });
       const val = S.instanceHost;
       const urlRow  = document.getElementById('aioUrlRow');
       const uuidRow = document.getElementById('aioUuidRow');
@@ -4022,6 +4080,98 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
   return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
 }
 
+// ── Host capability gate (Phase 4) ─────────────────────────────────────────────
+// A live /api/v1/status probe is authoritative; the hand-written registry in
+// src/data/host-capabilities.js is the offline/CORS fallback. Probe results are
+// cached per host key for this page session only and never persisted.
+const _hostProbeCache = new Map();
+let _lastHostGateRemovals = [];
+let _lastHostGateWarnings = [];
+
+function activeHostKey() {
+  return S.instanceHost && S.instanceHost !== 'auto' ? S.instanceHost : 'elfhosted';
+}
+
+function currentHostCapabilities() {
+  const key = activeHostKey();
+  return resolveHostCapabilities(key, _hostProbeCache.get(key) || null, {
+    assumedVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null,
+    trustedUser: Boolean(S.hostTrustedUser),
+  });
+}
+
+// Read-only capability probe. Never throws; a failure just leaves the registry
+// defaults in place (and hostOptionGate then asks the user to confirm the host).
+async function probeHostCapabilities(timeout = 4000) {
+  const key = activeHostKey();
+  const url = key === 'custom' ? S.instanceUrl : HOST_BASE_URLS[key];
+  if (!url) return null;
+  try {
+    const res = await raceHostFetch(url, '/api/v1/status', { method: 'GET' }, timeout);
+    if (!res || !res.ok) return null;
+    const parsed = parseHostStatus(await res.clone().json());
+    if (parsed) _hostProbeCache.set(key, parsed);
+    return parsed;
+  } catch (e) { return null; }
+}
+
+function hostGateEntries() {
+  try { return hostOptionGate(currentHostCapabilities()); } catch (e) { return []; }
+}
+
+/** True when the selected host cannot accept this option (see hostGateEntries). */
+function hostBlocks(option) {
+  return hostGateEntries().some(entry => entry.option === option && entry.action !== 'confirm');
+}
+
+function hostBlockReason(option) {
+  return hostGateEntries().find(entry => entry.option === option)?.reason || '';
+}
+
+function lastHostGateRemovals() { return _lastHostGateRemovals; }
+function lastHostGateWarnings() { return _lastHostGateWarnings; }
+
+/**
+ * Annotate an option group with the host gate. Returns the same object when
+ * nothing is blocked so the common path allocates nothing.
+ */
+function gateDefForHost(def) {
+  if (!def || def.key !== 'service' || !Array.isArray(def.opts)) return def;
+  const entries = hostGateEntries().filter(entry => entry.scope === 'service');
+  if (!entries.length) return def;
+  const blocked = {};
+  for (const entry of entries) {
+    const id = entry.option.slice('service:'.length);
+    // The currently-selected service is never disabled out from under the user;
+    // the compatibility panel explains it instead, and the export gate still
+    // strips whatever the host rejects.
+    if (S.service === id) continue;
+    blocked[id] = entry.reason;
+  }
+  if (!Object.keys(blocked).length) return def;
+  return { ...def, _hostBlocked: blocked };
+}
+
+/** Panel listing what the selected host blocks and what the last build removed. */
+function hostGateHtml() {
+  const caps = currentHostCapabilities();
+  const entries = hostGateEntries();
+  const removals = describeRemovals(lastHostGateRemovals());
+  const warnings = describeWarnings(lastHostGateWarnings());
+  if (!entries.length && !removals.length && !warnings.length) return '';
+  const line = (text, color) => `<div class="hc-issue"><span class="hc-issue-ico" style="color:${color}">&#9679;</span><span>${escHtml(text)}</span></div>`;
+  const gateLines = entries.map(entry => line(entry.reason, entry.action === 'confirm' ? '#fbbf24' : '#f87171')).join('');
+  // Kept, but not guaranteed to be accepted — distinct from a removal, and amber
+  // rather than grey so it reads as "check this" not "we handled it".
+  const warningLines = warnings.length
+    ? `<div class="hc-row"><span class="hc-name">May be rejected on save</span><span class="hc-status" style="color:#fbbf24">${warnings.length}</span></div><div class="hc-detail">${warnings.slice(0, 12).map(text => line(text, '#fbbf24')).join('')}</div>`
+    : '';
+  const removalLines = removals.length
+    ? `<div class="hc-row"><span class="hc-name">Removed from your export</span><span class="hc-status" style="color:#8b949e">${removals.length}</span></div><div class="hc-detail">${removals.slice(0, 12).map(text => line(text, '#8b949e')).join('')}${removals.length > 12 ? line(`+${removals.length - 12} more`, '#8b949e') : ''}</div>`
+    : '';
+  return `<div class="hc-row"><span class="hc-name">${escHtml(caps.label)}</span><span class="hc-status" style="color:${caps.probed ? '#34d399' : '#fbbf24'}">${caps.probed ? `probed &middot; v${escHtml(caps.version || '?')}` : 'not probed'}</span></div>${gateLines ? `<div class="hc-detail">${gateLines}</div>` : ''}${warningLines}${removalLines}`;
+}
+
 function buildFinal() {
   try {
     const tpl = build();
@@ -4031,7 +4181,14 @@ function buildFinal() {
       presetMatchesAddon,
       migrationKeep: S._migrationKeep,
     });
-    const result = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
+    const profiled = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
+    // Last stop before anything leaves the app: strip every key, preset and
+    // pattern the selected host would reject or silently drop, so exported and
+    // directly-installed JSON are identical to what the host will store.
+    const gated = gateTemplateForHost(profiled, currentHostCapabilities());
+    _lastHostGateRemovals = gated.removals;
+    _lastHostGateWarnings = gated.warnings || [];
+    const result = gated.template;
     _cachedBuildResult = result;
     return result;
   } catch (err) {
@@ -6046,7 +6203,7 @@ function hostCompatHtml() {
   }).join('');
   const hasNonWhitelisted = Object.values(hosts).some(h => h.issues.some(i => i.includes('not allowed on this host')));
   const stripBtn = hasNonWhitelisted ? `<button data-action="strip-regex" style="margin-top:8px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.74rem;font-weight:700;cursor:pointer">Strip host-blocked regex patterns</button>` : '';
-  return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}${stripBtn}</div></div>`;
+  return `<div class="hc-box"><div class="hc-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">${allOk ? ICO.check(12,'#34d399') : ICO.warn(12,'#fbbf24')} Host Compatibility <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></div><div class="hc-hosts">${rows}${hostGateHtml()}${stripBtn}</div></div>`;
 }
 
 const TROUBLESHOOT_TREE = {
@@ -6325,7 +6482,10 @@ function showAdditionalServicesPicker(options={}) {
   const serviceDef=DEFS.find(d=>d.key==='service');
   const selectedServices=new Set(options.services || S.multiServices.filter(v=>CAROUSEL_SVCS.includes(v)));
   const selectedScrapers=new Set(options.scrapers || S.optionalScrapers||[]);
-  const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}" data-extra-service="${id}"><b>${o.name}</b><span>${id==='p2p'||id==='http'?'No account required':'Credentials may be required'}</span></button>`;}).join('');
+  // Host-capability gate: an extra source the selected AIOStreams host will not
+  // serve is offered disabled, with the reason in place of the usual hint.
+  const extraBlocked = (() => { const m={}; for (const e of hostGateEntries()) if (e.scope==='service') m[e.option.slice('service:'.length)] = e.reason; return m; })();
+  const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';const why=selectedServices.has(id)?'':extraBlocked[id]||'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}${why?' opt-host-blocked':''}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''} data-extra-service="${id}"><b>${o.name}</b><span${why?' class="opt-host-note"':''}>${why?`Unavailable — ${escHtml(why)}`:(id==='p2p'||id==='http'?'No account required':'Credentials may be required')}</span></button>`;}).join('');
   const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>`<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"><b>${d.label}</b><span>${d.desc}</span></button>`).join('');
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
@@ -7608,12 +7768,12 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
         deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
         presets: presets(),
         defaultTimeout: Number(S.addonTimeout) || 6000,
-        assemble: () => applyOutputProfile(assembleTemplate(build(), {
+        assemble: () => gateTemplateForHost(applyOutputProfile(assembleTemplate(build(), {
           metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
           disabledAddons: _disabledAddons,
           presetMatchesAddon,
           migrationKeep: S._migrationKeep,
-        }), activeOutputProfile(), outputProfileContext()),
+        }), activeOutputProfile(), outputProfileContext()), currentHostCapabilities()).template,
       });
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp

@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "2.99",
+    "coreBuildsVersion": "3.0",
     "coreBuildsAIOStreamsTarget": "2.31.1",
     "coreBuildsProfile": "balanced",
     "coreBuildsProfileVersion": "1"
@@ -62,7 +62,6 @@
     "mergedCatalogs": [],
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "sortCriteria": {
@@ -1112,7 +1111,6 @@
       "IMAX"
     ],
     "enableSeadex": true,
-    "seadexBestOnly": false,
     "excludeCached": false,
     "excludeCachedFromAddons": [],
     "excludeCachedFromServices": [],
@@ -1122,13 +1120,7 @@
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "preferredRegexPatterns": [],
-    "maxResults": 16,
-    "maxResultsPerResolution": 5,
     "excludedStreamExpressions": [
       {
         "enabled": true,
@@ -1224,6 +1216,10 @@
       "H-OU",
       "H-SBS"
     ],
-    "requiredStreamExpressions": []
+    "requiredStreamExpressions": [],
+    "excludedStreamTypes": [
+      "http",
+      "p2p"
+    ]
   }
 }

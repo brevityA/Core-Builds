@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "2.99",
+    "coreBuildsVersion": "3.0",
     "coreBuildsAIOStreamsTarget": "2.31.1",
     "coreBuildsProfile": "stable",
     "coreBuildsProfileVersion": "1"
@@ -475,7 +475,6 @@
       "IMAX"
     ],
     "enableSeadex": true,
-    "seadexBestOnly": false,
     "excludeCached": false,
     "excludeCachedFromAddons": [],
     "excludeCachedFromServices": [],
@@ -485,13 +484,7 @@
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "preferredRegexPatterns": [],
-    "maxResults": 10,
-    "maxResultsPerResolution": 3,
     "excludedStreamExpressions": [
       {
         "enabled": true,
@@ -551,6 +544,10 @@
         "timing"
       ],
       "showFilterStatsOnNoStreams": true
-    }
+    },
+    "excludedStreamTypes": [
+      "http",
+      "p2p"
+    ]
   }
 }

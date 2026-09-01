@@ -14,3 +14,12 @@ export { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
 export { isNuvioInstantHost, requireNuvioInstantHost } from './nuvio-hosts.js';
 export { NUVIO_ADDONS, validateNuvioHost, generateNuvioTorboxInstantPolicy } from './nuvio-torbox-instant.js';
 export { applyNuvioTorboxInstantPolicy } from './nuvio-template.js';
+// Host-capability gate. Mirrors configurator/src/core/host-capability-policy.js;
+// cli/tests/package-equivalence.test.mjs diffs CLI output against the
+// configurator goldens, which are produced with this gate applied.
+export {
+  compareVersions, isVersionAtLeast, knownHostKeys, parseHostStatus,
+  resolveHostCapabilities, hostOptionGate, gateConfigForHost, gateTemplateForHost,
+  describeRemovals, describeWarnings,
+} from './host-capability-policy.js';
+

@@ -88,3 +88,22 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .cs-gate.ok{color:#3fb950}
 .cs-gate.bad{color:#f87171}
 .cs-partial{font-size:.66rem;color:#6b7280;font-style:italic;padding:0 10px 8px}
+
+/* Host-capability gate (Phase 4): options the selected AIOStreams host cannot
+   serve stay visible but inert, with the reason inline. Layer 06 so it lands
+   after 05-unified-ui's .opt rules without needing !important. */
+.opt.opt-host-blocked{opacity:.42;filter:saturate(.35)}
+.opt.opt-host-blocked label{cursor:not-allowed}
+.opt.opt-host-blocked:hover{transform:none}
+.opt-host-note{display:inline-block;margin-top:3px;font-size:.66rem;font-weight:700;color:#f87171;line-height:1.35}
+.svc-list-row.opt-host-blocked{opacity:.42;filter:saturate(.35)}
+.svc-list-row.opt-host-blocked label{cursor:not-allowed}
+.fastlane-choice.opt-host-blocked{opacity:.42;filter:saturate(.35);cursor:not-allowed}
+.opt-scraper-card.opt-host-blocked{opacity:.45;filter:saturate(.3);cursor:not-allowed;pointer-events:none}
+.opt-scraper-card .opt-host-note{margin-top:4px}
+
+/* 1080p hard-lock disclosure — see resolutionLockNote() in app.js. Amber, the
+   same "check this" colour the host-gate warnings use, not an error red: the
+   exclusion is intended behaviour, just easy to walk into unknowingly. */
+.res-lock-note{margin-top:10px;padding:9px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.22);background:rgba(251,191,36,.06);color:#d7c69a;font-size:.72rem;line-height:1.5}
+.res-lock-note b{color:#fbbf24;font-weight:800}

@@ -1,0 +1,15 @@
+{
+  "repo": "Viren070/AIOStreams",
+  "ref": "v2.33.2",
+  "sha": "f36d0f93ff088280526ebca1fe3c93e2740b6987",
+  "version": "2.33.2",
+  "rawBase": "https://raw.githubusercontent.com/Viren070/AIOStreams",
+  "sources": [
+    "package.json",
+    "packages/core/src/utils/constants.ts",
+    "packages/core/src/db/schemas.ts",
+    "packages/core/src/presets/presetManager.ts",
+    "packages/core/src/streams/sorter.ts"
+  ],
+  "note": "Pinned AIOStreams release tag used to regenerate src/data/generated/* and src/config/generated/*. `ref` MUST be a release tag and `sha` MUST be the commit that tag resolves to \u2014 scripts/sync-upstream.mjs verifies this against the remote and refuses to run otherwise, so the drift report always diffs release-to-release. Bump ref+sha+version together, run `npm run sync:upstream`, review the drift report, then commit the regenerated files with this pin."
+}

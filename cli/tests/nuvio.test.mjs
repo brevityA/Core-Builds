@@ -43,7 +43,8 @@ test('Nuvio route generates valid template with P2P and no debrid', () => {
   assert.ok(t.config.services.every(s => s.enabled === false));
   assert.ok(t.config.services.every(s => Object.keys(s.credentials).length === 0));
   assert.ok(t.config.presets.length > 0);
-  assert.equal(t.config.minSeeders, 1);
+  // Stripped by the host gate: not an AIOStreams key (see golden-combos.test.mjs).
+  assert.equal(t.config.minSeeders, undefined);
 });
 
 test('Nuvio route contains no TorBox credentials', () => {
