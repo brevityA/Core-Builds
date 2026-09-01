@@ -101,3 +101,9 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .fastlane-choice.opt-host-blocked{opacity:.42;filter:saturate(.35);cursor:not-allowed}
 .opt-scraper-card.opt-host-blocked{opacity:.45;filter:saturate(.3);cursor:not-allowed;pointer-events:none}
 .opt-scraper-card .opt-host-note{margin-top:4px}
+
+/* 1080p hard-lock disclosure — see resolutionLockNote() in app.js. Amber, the
+   same "check this" colour the host-gate warnings use, not an error red: the
+   exclusion is intended behaviour, just easy to walk into unknowingly. */
+.res-lock-note{margin-top:10px;padding:9px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.22);background:rgba(251,191,36,.06);color:#d7c69a;font-size:.72rem;line-height:1.5}
+.res-lock-note b{color:#fbbf24;font-weight:800}

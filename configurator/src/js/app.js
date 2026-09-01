@@ -618,6 +618,40 @@ function label(key, val) {
   return o ? o.name : val || '';
 }
 
+/**
+ * The 1080p profile is a HARD LOCK: applyNativeFilters() in
+ * output-profile-policy.js adds 2160p and 1440p to excludedResolutions, so 4K
+ * is discarded by the instance before sorting and no amount of scrolling
+ * reveals it. Intended, and the card says "Hard lock" — but easy to walk into.
+ *
+ * Two things make it worth disclosing here. The Quick Start "1080p Stream" lane
+ * sets it without ever showing that card. And the lock is profile-dependent:
+ * applyNativeFilters runs only for Stable and Balanced, so an Advanced or Labs
+ * 1080p build keeps 4K (unranked, hence last). A user who switches Stable ->
+ * Balanced to "fix" it therefore changes nothing, which is exactly what was
+ * reported on 2026-08-31: "the show isn't giving any 4k results" after
+ * re-running the wizard. Ranking work cannot help; there is nothing to rank.
+ */
+function resolutionLockNote() {
+  if (S.resolution !== '1080p') return '';
+  return '<div class="res-lock-note" role="note"><b>2160p and 1440p are excluded</b> on the Stable and Balanced profiles, so 4K will not appear at all — switching between those two changes nothing. Want 4K when it exists? Choose <b>Mixed · Adaptive</b>, which ranks 1080p first without deleting higher tiers.</div>';
+}
+
+/**
+ * The radio handler deliberately does not re-render the step (it only saves and
+ * re-evaluates Next), so the lock note has to be patched in place — same
+ * approach as the .opt-scraper-hint node. Without this the note only appears
+ * after a navigation, which is exactly when it is no longer useful.
+ */
+function refreshResolutionLockNote() {
+  const grid = document.querySelector('.svc-list');
+  const existing = document.querySelector('.res-lock-note');
+  const html = resolutionLockNote();
+  if (!html) { if (existing) existing.remove(); return; }
+  if (existing) existing.remove();
+  if (grid) grid.insertAdjacentHTML('afterend', html);
+}
+
 function renderOpts(def) {
   const key = def.key, id = def.id;
   // Host-capability gate (Phase 4): options the selected AIOStreams host cannot
@@ -665,7 +699,9 @@ function renderOpts(def) {
         <span class="svc-list-arr">›</span>
       </label>${o.help ? `<div class="device-help" id="help_${o.v}">${o.help}</div>` : ''}</div>`).join('');
       if (def.id === 'resolution') {
-        if (S.simpleMode) return `<div class="svc-list">${rows}</div>`;
+        // Quick Start lands here with simpleMode, having never shown the
+        // resolution card copy that states the hard lock.
+        if (S.simpleMode) return `<div class="svc-list">${rows}</div>${resolutionLockNote()}`;
         const AUDIO_OPTS = [
           { v:'lossless', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M34 7a16 16 0 010 30" stroke="#10b981" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>', name:'Full Lossless', desc:'TrueHD · Atmos · DTS-HD MA · FLAC · eARC required' },
           { v:'standard', icon:'<svg width="28" height="28" viewBox="0 0 44 44" fill="none"><path d="M8 17v10h5l8 6V11l-8 6H8z" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M26 15a6 6 0 010 14" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30 11a11 11 0 010 22" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" fill="none"/><text x="40" y="14" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="800" font-family="system-ui,sans-serif">D+</text></svg>', name:'DD+ / Atmos', desc:'Soundbar or smart TV · Dolby Digital Plus' },
@@ -687,7 +723,7 @@ function renderOpts(def) {
         }).join('');
         const curAudioLabel = AUDIO_OPTS.find(o => o.v === S.audio)?.name || 'Auto';
         const advOpen = !!S.audio && S.audio !== 'limited';
-        return `<div class="svc-list">${rows}</div>
+        return `<div class="svc-list">${rows}</div>${resolutionLockNote()}
         <details class="adv-audio-details"${advOpen ? ' open' : ''} style="margin-top:10px">
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);user-select:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'">
             <span style="font-size:.78rem;font-weight:700;color:#4b5563;letter-spacing:.04em;text-transform:uppercase">Advanced options · Sound profile</span>
@@ -1773,6 +1809,7 @@ function render() {
         ${(() => { const h = templateHealthCheck(); return h.length ? `<div class="th-alert th-alert-red" style="margin-top:6px"><div style="font-size:.68rem;font-weight:700;color:var(--th-red);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:var(--th-tx2);line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:var(--th-red);flex-shrink:0">${ICO.warn(12,'currentColor')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div class="th-alert th-alert-green" style="margin-top:6px;font-weight:600">${ICO.check(12,'currentColor')} Template looks good</div>`; })()}
         ${healthScoreHtml()}
         ${versionBannerHtml()}
+        ${resolutionLockNote()}
         ${hostCompatHtml()}
         ${backupTimelineHtml()}
         <details class="rv-accord" style="margin-top:10px">
@@ -3270,6 +3307,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       saveState();
       syncNext();
+      if (k === 'resolution') refreshResolutionLockNote();
       if (S.simpleMode && (step === 2 || step === 3)) {
         setTimeout(() => { const b = document.getElementById('btnNext'); if (b && !b.disabled) b.click(); }, 350);
       }
