@@ -2,7 +2,15 @@ import { test, expect } from '@playwright/test';
 
 const UUID = '11111111-2222-4333-8444-555555555555';
 
-const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$/;
+// The AIOStreams host probe (Phase 4) fetches `<host>/api/v1/status` from the
+// browser to read live capabilities. Public instances send no
+// Access-Control-Allow-Origin, so the browser BLOCKS the response and logs a
+// CORS error that no try/catch can suppress — the probe then falls back to the
+// static capability registry, which is the documented and intended path. That
+// console line is expected output, not a defect, so it is filtered here like
+// the proxy noise above. Filtering is scoped to /api/v1/status specifically so
+// a genuine CORS regression elsewhere still fails.
+const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
 
 async function fresh(page) {
   const errors = [];
@@ -79,13 +87,19 @@ test('Advanced extras carousel is multi-select while short routes stay compact',
   await page.locator('[data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
   await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(16);
-  await page.locator('[data-svc-id="p2p"]').click();
+  // Was p2p. The wizard defaults to the ElfHosted community host, which serves
+  // neither P2P nor HTTP, so those two cards are now gated inert by the
+  // host-capability layer — see e2e/host-capability.spec.mjs. debridio is a
+  // source that host does serve, so it exercises the same multi-select path.
+  await page.locator('[data-svc-id="debridio"]').click();
   await page.locator('[data-scraper-id="nzbnoob"]').click();
   await expect(page.locator('#extrasCarouselCount')).toHaveText('2 selected');
-  await expect(page.locator('[data-svc-id="p2p"]')).toHaveAttribute('aria-checked', 'true');
-  await page.locator('[data-svc-id="p2p"]').focus();
+  await expect(page.locator('[data-svc-id="debridio"]')).toHaveAttribute('aria-checked', 'true');
+  await page.locator('[data-svc-id="debridio"]').focus();
   await page.keyboard.press('Space');
   await expect(page.locator('#extrasCarouselCount')).toHaveText('1 selected');
+  // The gated cards stay in the carousel — visible, counted, and unselectable.
+  await expect(page.locator('[data-svc-id="p2p"]')).toHaveAttribute('aria-disabled', 'true');
 
   const guided = await context.newPage();
   await fresh(guided);

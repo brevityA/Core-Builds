@@ -1,0 +1,62 @@
+---
+title: "Language Packs"
+description: "Overlay PT-BR, Spanish, French, German, Italian, Dutch, Arabic, or Hindi onto an existing Core Builds template without duplicating the JSON."
+---
+
+Language packs change **which audio and subtitles rank first**. They do not create forty new template files. They do not populate Stremio Discover — catalogs still come from TMDB or MediaFusion. See [Regional Content](/regional-content).
+
+## What a pack changes
+
+| Field | Effect |
+| --- | --- |
+| `requiredLanguages` / `preferredLanguages` | Household language first, English second, plus Original / Dual Audio / Multi / Dubbed / Unknown |
+| Foreign language kill | Movies and series only. Anime is exempt. Library and SeaDex always pass |
+| AIOSubtitle / OpenSubtitles / SubDL | ISO codes for the household language, then English |
+| Exclusive mode | Off by default. Turn on only when English-tagged files should drop |
+
+A pack does **not** change bitrate, device exclusions, scrapers, or debrid services.
+
+## Packs
+
+| Id | Spoken order | TMDB | Optional AIOStreams type (off by default) |
+| --- | --- | --- | --- |
+| `en` | English | `en` / `US` | — |
+| `pt-BR` | Portuguese, English | `pt` / `BR` | `brazuca-torrents` |
+| `es` | Spanish, English | `es` / `ES` | — |
+| `fr` | French, English | `fr` / `FR` | `astream` |
+| `de` | German, English | `de` / `DE` | — |
+| `it` | Italian, English | `it` / `IT` | — |
+| `nl` | Dutch, English | `nl` / `NL` | — |
+| `ar` | Arabic, English | `ar` / `SA` | — |
+| `hi` | Hindi, English | `hi` / `IN` | — |
+
+Portuguese (Brazil) uses the AIOStreams name `Portuguese`. Stream parsers do not distinguish PT-BR from PT-PT. The Brazil vs Portugal split is the TMDB region (`BR` vs `PT`).
+
+Spanish uses `ES`. Latin America: pass `{ tmdbRegion: 'MX' }` when applying the pack.
+
+## Apply
+
+The module is import-ready. It is not wired into the Configurator UI yet.
+
+```js
+import {
+  applyLanguagePackToTemplate,
+  configuratorPatch,
+} from './configurator/src/data/language-packs.js';
+
+const localized = applyLanguagePackToTemplate(template, 'pt-BR');
+const state = configuratorPatch('pt-BR');
+// state.langs → ['Portuguese', 'English']
+// state.subtitleLangs → ['pt', 'en']
+```
+
+Anime templates keep `requiredLanguages` empty and keep Japanese in preferred. A foreign-language kill is not inserted.
+
+## What this is not
+
+- Not forty copies of Core Nexus Stream.
+- Not Tugaflix, Minha TV, or other community HTTP addons. Those stay community templates.
+- Not a Swedish kids template. `core-nexus-kids-swedish.json` remains a community one-off.
+- Not Discover rows. Install TMDB (`pt` / `BR`) or MediaFusion as described in [Regional Content](/regional-content).
+
+Optional scraper types named above already exist in AIOStreams. The pack lists them. It does not enable them and does not invent a manifest URL.

@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#070911" />
+  <meta name="description" content="A privacy-first guided setup companion for WuPlay." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <title>WuPlay Genie · guided setup</title>
+  <style>
+    :root {
+      --bg: #070911;
+      --bg-raised: #0c1020;
+      --panel: rgba(17, 22, 40, 0.76);
+      --panel-solid: #111629;
+      --panel-soft: rgba(24, 30, 53, 0.58);
+      --line: rgba(167, 185, 255, 0.15);
+      --line-strong: rgba(167, 185, 255, 0.28);
+      --text: #f7f8ff;
+      --muted: #9ea7c3;
+      --muted-2: #6f7896;
+      --accent: #a99cff;
+      --accent-strong: #7b6cff;
+      --cyan: #72e2e2;
+      --green: #8ee0b6;
+      --yellow: #ffd485;
+      --red: #ff9baf;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --transition: 180ms ease;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; background: var(--bg); }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% -5%, rgba(126, 103, 255, 0.2), transparent 31rem),
+        radial-gradient(circle at 98% 12%, rgba(73, 203, 215, 0.12), transparent 28rem),
+        var(--bg);
+      font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    body::before {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      opacity: 0.34;
+      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+
+    .shell { width: min(1440px, 100%); margin: 0 auto; padding: 0 28px 36px; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 82px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand { display: flex; gap: 12px; align-items: center; min-width: 0; }
+    .brand-mark {
+      display: grid;
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      color: #0a0b16;
+      background: linear-gradient(145deg, #d5d0ff, #8c7aff 52%, #64dfe0);
+      border-radius: 14px;
+      box-shadow: 0 0 0 5px rgba(169, 156, 255, 0.08), 0 12px 28px rgba(113, 96, 255, .22);
+    }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-copy { display: grid; gap: 1px; }
+    .brand-name { font-size: 16px; font-weight: 760; letter-spacing: -0.04em; }
+    .brand-kicker { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .save-status { display: inline-flex; align-items: center; gap: 6px; color: var(--muted-2); font-size: 10px; font-weight: 750; letter-spacing: .03em; white-space: nowrap; }
+    .save-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(142,224,182,.09); }
+    .save-status.saving .save-dot { background: var(--yellow); box-shadow: 0 0 0 4px rgba(255,212,133,.09); }
+    .save-status.offline .save-dot { background: var(--muted-2); box-shadow: none; }
+    .beta-badge, .mini-badge, .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,.035);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .beta-badge { padding: 7px 10px; color: #c8c1ff; border-color: rgba(169,156,255,.3); background: rgba(169,156,255,.1); }
+    .mini-badge { padding: 4px 8px; font-size: 10px; }
+    .status-badge { padding: 5px 8px; color: var(--green); border-color: rgba(142,224,182,.24); background: rgba(142,224,182,.08); }
+    .status-badge::before { width: 5px; height: 5px; border-radius: 50%; background: currentColor; content: ""; }
+
+    .icon-button, .ghost-button, .secondary-button, .primary-button, .text-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition), color var(--transition), box-shadow var(--transition);
+    }
+    .icon-button:hover, .ghost-button:hover, .secondary-button:hover, .primary-button:hover, .text-button:hover { transform: translateY(-1px); }
+    .icon-button { width: 37px; height: 37px; padding: 0; color: var(--muted); border-color: var(--line); background: rgba(255,255,255,.035); }
+    .icon-button:hover { color: var(--text); border-color: var(--line-strong); background: rgba(255,255,255,.08); }
+    .ghost-button { padding: 10px 13px; color: var(--muted); border-color: var(--line); background: transparent; }
+    .ghost-button:hover { color: var(--text); border-color: var(--line-strong); background: rgba(255,255,255,.05); }
+    .secondary-button { padding: 11px 16px; color: var(--text); border-color: var(--line-strong); background: rgba(255,255,255,.06); }
+    .secondary-button:hover { background: rgba(255,255,255,.1); }
+    .primary-button { padding: 12px 18px; color: #0a0b16; border-color: transparent; background: linear-gradient(135deg, #d2ccff, #9e8fff 55%, #76dedf); box-shadow: 0 10px 25px rgba(126, 109, 255, .22); font-weight: 800; }
+    .primary-button:hover { box-shadow: 0 14px 32px rgba(126, 109, 255, .34); }
+    .text-button { padding: 4px 0; color: #c4bcff; background: transparent; font-weight: 700; }
+    .text-button:hover { color: #fff; }
+    .button-icon { width: 16px; height: 16px; }
+
+    .layout { display: grid; grid-template-columns: 248px minmax(0, 1fr); gap: 34px; padding-top: 30px; }
+
+    .sidebar { display: flex; min-height: calc(100vh - 140px); flex-direction: column; gap: 26px; }
+    .sidebar-heading { color: var(--muted-2); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .path-name { margin-top: 7px; font-size: 19px; font-weight: 770; letter-spacing: -0.04em; }
+    .path-detail { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .step-nav { display: grid; gap: 7px; margin-top: -4px; }
+    .step-button {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      color: var(--muted);
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: transparent;
+      text-align: left;
+      transition: var(--transition);
+    }
+    .step-button:hover { color: var(--text); background: rgba(255,255,255,.045); }
+    .step-button.active { color: var(--text); border-color: rgba(169,156,255,.25); background: linear-gradient(90deg, rgba(169,156,255,.15), rgba(169,156,255,.04)); }
+    .step-button.locked { opacity: .55; cursor: not-allowed; }
+    .step-number { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .step-button.active .step-number { color: #0a0b16; border-color: transparent; background: var(--accent); }
+    .step-button.completed .step-number { color: #0a0b16; border-color: transparent; background: var(--green); }
+    .step-title { font-size: 13px; font-weight: 720; }
+    .step-subtitle { margin-top: 1px; color: var(--muted-2); font-size: 11px; }
+    .step-arrow { color: var(--muted-2); font-size: 16px; }
+
+    .privacy-card {
+      margin-top: auto;
+      padding: 16px;
+      border: 1px solid rgba(114,226,226,.18);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(114,226,226,.1), rgba(114,226,226,.025));
+    }
+    .privacy-icon { display: grid; width: 30px; height: 30px; margin-bottom: 12px; place-items: center; color: var(--cyan); border-radius: 10px; background: rgba(114,226,226,.1); }
+    .privacy-title { font-size: 12px; font-weight: 800; }
+    .privacy-copy { margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .sidebar-links { display: flex; flex-wrap: wrap; gap: 8px 16px; padding-bottom: 2px; }
+    .sidebar-links a { color: var(--muted-2); font-size: 11px; text-decoration: none; }
+    .sidebar-links a:hover { color: var(--text); }
+
+    .main { min-width: 0; max-width: 1120px; }
+    .hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 27px; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; color: #b9b0ff; font-size: 11px; font-weight: 850; letter-spacing: .15em; text-transform: uppercase; }
+    .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 5px rgba(114,226,226,.11); content: ""; }
+    h1 { max-width: 720px; margin: 11px 0 0; font-size: clamp(30px, 4vw, 53px); line-height: .99; letter-spacing: -.065em; }
+    .hero-copy { max-width: 680px; margin: 14px 0 0; color: var(--muted); font-size: 16px; }
+    .profile-chip { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.035); }
+    .avatar { display: grid; width: 29px; height: 29px; place-items: center; color: #161227; border-radius: 10px; background: linear-gradient(135deg, #ffd98e, #f29eaa); font-size: 12px; font-weight: 900; }
+    .profile-chip-name { font-size: 12px; font-weight: 800; }
+    .profile-chip-code { margin-top: 1px; color: var(--muted-2); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    .progress-wrap { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .progress-track { height: 5px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.08); }
+    .progress-fill { width: 25%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent-strong), var(--cyan)); transition: width 300ms ease; }
+    .progress-label { color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; align-items: start; }
+    .wizard-card, .summary-card, .release-strip { border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); backdrop-filter: blur(18px); }
+    .wizard-card { min-height: 610px; overflow: hidden; border-radius: var(--radius-xl); }
+    .pane { display: none; padding: clamp(22px, 4vw, 38px); }
+    .pane.active { display: block; animation: pane-in 240ms ease both; }
+    @keyframes pane-in { from { opacity: .1; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+    .pane-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
+    .pane-kicker { margin-bottom: 8px; color: var(--muted-2); font-size: 11px; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+    h2 { margin: 0; font-size: clamp(23px, 3vw, 31px); letter-spacing: -.045em; line-height: 1.08; }
+    .pane-intro { max-width: 580px; margin: 9px 0 0; color: var(--muted); }
+    .pane-illustration { display: grid; flex: 0 0 auto; width: 64px; height: 64px; place-items: center; color: #c7c0ff; border: 1px solid rgba(169,156,255,.25); border-radius: 20px; background: linear-gradient(145deg, rgba(169,156,255,.18), rgba(114,226,226,.08)); }
+    .pane-illustration svg { width: 32px; height: 32px; }
+
+    .field-label { display: block; margin: 0 0 8px; color: #dfe2f4; font-size: 12px; font-weight: 800; }
+    .field-hint { margin: -2px 0 12px; color: var(--muted-2); font-size: 11px; }
+    .text-input, .select-input {
+      width: 100%;
+      padding: 12px 13px;
+      color: var(--text);
+      border: 1px solid var(--line-strong);
+      outline: 0;
+      border-radius: 11px;
+      background: rgba(5, 8, 17, .38);
+      transition: var(--transition);
+    }
+    .text-input::placeholder { color: #5f6885; }
+    .text-input:focus, .select-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(169,156,255,.1); }
+    .input-prefix { position: relative; }
+    .input-prefix .text-input { padding-left: 38px; }
+    .input-prefix span { position: absolute; top: 50%; left: 13px; color: var(--muted-2); transform: translateY(-50%); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .field-group + .field-group { margin-top: 22px; }
+    .form-grid { display: grid; gap: 21px; }
+
+    .choice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .choice-grid.two { grid-template-columns: repeat(2, 1fr); }
+    .choice { position: relative; }
+    .choice input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .choice label {
+      display: block;
+      height: 100%;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: rgba(255,255,255,.025);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .choice label:hover { border-color: var(--line-strong); background: rgba(255,255,255,.06); }
+    .choice input:checked + label { border-color: rgba(169,156,255,.68); background: linear-gradient(145deg, rgba(169,156,255,.16), rgba(169,156,255,.045)); box-shadow: inset 0 0 0 1px rgba(169,156,255,.18); }
+    .choice input:focus-visible + label { outline: 2px solid var(--cyan); outline-offset: 2px; }
+    .choice-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; }
+    .choice-title svg { flex: 0 0 auto; width: 17px; height: 17px; color: var(--accent); }
+    .choice-copy { margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .choice-tag { display: inline-flex; margin-top: 11px; padding: 3px 6px; color: var(--muted); border-radius: 6px; background: rgba(255,255,255,.06); font-size: 10px; font-weight: 800; }
+
+    .notice { display: flex; gap: 10px; align-items: flex-start; margin-top: 18px; padding: 12px 13px; border: 1px solid rgba(114,226,226,.17); border-radius: 12px; color: var(--muted); background: rgba(114,226,226,.055); font-size: 12px; }
+    .notice svg { flex: 0 0 auto; width: 16px; height: 16px; color: var(--cyan); }
+    .notice strong { color: var(--text); }
+    .error-text { display: none; margin-top: 7px; color: var(--red); font-size: 11px; }
+    .error-text.show { display: block; }
+    .text-input.invalid { border-color: var(--red); box-shadow: 0 0 0 4px rgba(255,155,175,.08); }
+
+    .pane-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 36px -38px -38px; padding: 18px 38px; border-top: 1px solid var(--line); background: rgba(4, 6, 14, .18); }
+    .footer-note { display: flex; align-items: center; gap: 7px; color: var(--muted-2); font-size: 11px; }
+    .footer-note svg { width: 15px; height: 15px; color: var(--green); }
+    .footer-actions { display: flex; gap: 9px; }
+
+    .summary-card { position: sticky; top: 20px; overflow: hidden; border-radius: var(--radius-lg); }
+    .summary-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 20px 19px 17px; border-bottom: 1px solid var(--line); }
+    .summary-title { font-size: 15px; font-weight: 850; letter-spacing: -.02em; }
+    .summary-subtitle { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .score-ring { position: relative; display: grid; width: 56px; height: 56px; place-items: center; border-radius: 50%; background: conic-gradient(var(--cyan) 0deg, var(--accent) var(--score, 250deg), rgba(255,255,255,.09) var(--score, 250deg)); }
+    .score-ring::before { position: absolute; inset: 5px; border-radius: 50%; background: var(--panel-solid); content: ""; }
+    .score-number { position: relative; z-index: 1; font-size: 14px; font-weight: 900; }
+    .summary-body { padding: 17px 19px; }
+    .summary-section-label { margin-bottom: 9px; color: var(--muted-2); font-size: 10px; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+    .summary-list { display: grid; gap: 10px; }
+    .summary-row { display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 8px; min-width: 0; color: var(--muted); font-size: 11px; }
+    .summary-row svg { width: 15px; height: 15px; color: var(--muted-2); }
+    .summary-row strong { min-width: 0; overflow: hidden; color: var(--text); font-size: 11px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+    .summary-value { max-width: 112px; overflow: hidden; color: #bbb5ff; text-overflow: ellipsis; white-space: nowrap; }
+    .summary-divider { height: 1px; margin: 17px 0; background: var(--line); }
+    .summary-callout { padding: 12px; border: 1px solid rgba(142,224,182,.17); border-radius: 12px; background: rgba(142,224,182,.055); }
+    .summary-callout-title { display: flex; align-items: center; gap: 7px; color: var(--green); font-size: 11px; font-weight: 850; }
+    .summary-callout-title svg { width: 14px; height: 14px; }
+    .summary-callout p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .summary-actions { display: grid; gap: 8px; padding: 0 19px 19px; }
+    .summary-actions .primary-button, .summary-actions .secondary-button { width: 100%; }
+
+    .toggle-row { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--line); }
+    .toggle-row:first-child { padding-top: 0; }
+    .toggle-row:last-child { border-bottom: 0; }
+    .toggle-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; }
+    .toggle-title svg { width: 17px; height: 17px; color: var(--accent); }
+    .toggle-copy { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.43; }
+    .toggle {
+      position: relative;
+      width: 43px;
+      height: 25px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      transition: var(--transition);
+    }
+    .toggle::after { position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: #8e96ad; content: ""; transition: var(--transition); }
+    .toggle.on { border-color: transparent; background: linear-gradient(90deg, var(--accent-strong), var(--cyan)); }
+    .toggle.on::after { left: 21px; background: #0a0b16; }
+    .community-box { display: none; margin: 14px 0 2px; padding: 15px; border: 1px solid rgba(169,156,255,.2); border-radius: 15px; background: rgba(169,156,255,.055); }
+    .community-box.show { display: block; animation: pane-in 180ms ease both; }
+    .community-box .field-group + .field-group { margin-top: 14px; }
+    .segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 11px; background: rgba(0,0,0,.15); }
+    .segment { position: relative; }
+    .segment input { position: absolute; opacity: 0; pointer-events: none; }
+    .segment label { display: block; padding: 7px 6px; border-radius: 8px; color: var(--muted); font-size: 11px; font-weight: 750; text-align: center; cursor: pointer; }
+    .segment input:checked + label { color: var(--text); background: rgba(169,156,255,.2); }
+
+    .review-hero { display: grid; grid-template-columns: 1fr 180px; gap: 17px; align-items: stretch; margin-bottom: 18px; }
+    .review-status { padding: 18px; border: 1px solid rgba(142,224,182,.19); border-radius: 17px; background: linear-gradient(145deg, rgba(142,224,182,.1), rgba(114,226,226,.04)); }
+    .review-status h3 { margin: 0; font-size: 18px; letter-spacing: -.04em; }
+    .review-status p { margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+    .review-metric { display: grid; align-content: center; padding: 18px; border: 1px solid rgba(169,156,255,.2); border-radius: 17px; background: rgba(169,156,255,.07); }
+    .metric-label { color: var(--muted-2); font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .metric-value { margin-top: 3px; color: #d9d4ff; font-size: 28px; font-weight: 900; letter-spacing: -.06em; }
+    .metric-detail { color: var(--muted); font-size: 10px; }
+    .check-list { display: grid; gap: 9px; margin-top: 16px; }
+    .check-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
+    .check-icon { display: grid; flex: 0 0 auto; width: 21px; height: 21px; place-items: center; border-radius: 7px; background: rgba(142,224,182,.13); color: var(--green); }
+    .check-icon svg { width: 13px; height: 13px; }
+    .check-row strong { display: block; font-size: 12px; }
+    .check-row span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .handoff-box { margin-top: 18px; padding: 16px; border: 1px solid var(--line-strong); border-radius: 15px; background: rgba(0,0,0,.18); }
+    .handoff-label { color: var(--muted-2); font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .handoff-url { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .handoff-url code { min-width: 0; overflow: hidden; flex: 1; padding: 10px; color: #c9c4ff; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.04); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; text-overflow: ellipsis; white-space: nowrap; }
+    .copy-button { flex: 0 0 auto; padding: 10px 11px; color: var(--text); border: 1px solid var(--line-strong); border-radius: 9px; background: rgba(255,255,255,.07); font-size: 11px; font-weight: 800; }
+    .copy-button:hover { background: rgba(255,255,255,.12); }
+
+    .release-strip { display: grid; grid-template-columns: 1fr auto; gap: 22px; align-items: center; margin-top: 18px; padding: 18px 20px; border-radius: var(--radius-lg); box-shadow: none; }
+    .release-content { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .release-icon { display: grid; flex: 0 0 auto; width: 38px; height: 38px; place-items: center; color: #0a0b16; border-radius: 12px; background: linear-gradient(145deg, #ffd78f, #ff9fac); }
+    .release-title { font-size: 12px; font-weight: 850; }
+    .release-copy { margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .release-actions { display: flex; gap: 8px; }
+
+    .toast { position: fixed; z-index: 10; right: 24px; bottom: 24px; display: flex; align-items: center; gap: 9px; max-width: min(360px, calc(100vw - 48px)); padding: 12px 14px; border: 1px solid rgba(142,224,182,.28); border-radius: 12px; color: var(--text); background: #151d2d; box-shadow: 0 16px 45px rgba(0,0,0,.42); opacity: 0; transform: translateY(10px); pointer-events: none; transition: 220ms ease; font-size: 12px; }
+    .toast.show { opacity: 1; transform: none; }
+    .toast svg { flex: 0 0 auto; width: 16px; height: 16px; color: var(--green); }
+
+    dialog { width: min(600px, calc(100vw - 28px)); padding: 0; color: var(--text); border: 1px solid var(--line-strong); border-radius: 23px; background: #111629; box-shadow: 0 30px 100px rgba(0,0,0,.62); }
+    dialog::backdrop { background: rgba(3, 4, 10, .72); backdrop-filter: blur(5px); }
+    .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; padding: 22px 23px 17px; border-bottom: 1px solid var(--line); }
+    .dialog-head h2 { font-size: 22px; }
+    .dialog-head p { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+    .dialog-body { padding: 20px 23px 23px; }
+    .release-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .release-list li { display: flex; gap: 10px; align-items: flex-start; padding: 11px 12px; border-radius: 11px; background: rgba(255,255,255,.04); color: var(--muted); font-size: 12px; }
+    .release-list li::before { flex: 0 0 auto; width: 7px; height: 7px; margin-top: 6px; border-radius: 50%; background: var(--cyan); content: ""; }
+    .dialog-foot { display: flex; justify-content: flex-end; margin-top: 20px; }
+
+    .minimal { --panel: rgba(15, 18, 30, .96); --panel-soft: rgba(24, 28, 43, .94); --shadow: 0 18px 45px rgba(0,0,0,.25); }
+    .minimal::before { opacity: .12; }
+    .minimal .wizard-card, .minimal .summary-card, .minimal .release-strip { backdrop-filter: none; }
+    .minimal .brand-mark { box-shadow: none; }
+
+    @media (max-width: 1060px) {
+      .layout { grid-template-columns: 205px minmax(0, 1fr); gap: 22px; }
+      .content-grid { grid-template-columns: minmax(0, 1fr); }
+      .summary-card { position: static; display: grid; grid-template-columns: 1fr 1fr; }
+      .summary-head { border-bottom: 0; }
+      .summary-body { padding-top: 20px; }
+      .summary-actions { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); padding-top: 14px; }
+    }
+
+    @media (max-width: 760px) {
+      .shell { padding: 0 15px 26px; }
+      .topbar { min-height: 68px; }
+      .top-actions .beta-badge { display: none; }
+      .layout { display: block; padding-top: 22px; }
+      .sidebar { min-height: 0; gap: 16px; }
+      .sidebar-heading, .path-name, .path-detail, .privacy-card, .sidebar-links { display: none; }
+      .step-nav { display: flex; gap: 6px; margin: 0 0 24px; overflow-x: auto; padding-bottom: 3px; }
+      .step-button { min-width: 128px; grid-template-columns: 27px 1fr; padding: 7px; }
+      .step-number { width: 25px; height: 25px; border-radius: 8px; font-size: 10px; }
+      .step-arrow, .step-subtitle { display: none; }
+      .step-title { font-size: 11px; }
+      .hero-row { display: block; margin-bottom: 22px; }
+      .profile-chip { width: fit-content; margin-top: 18px; }
+      .hero-copy { font-size: 14px; }
+      h1 { font-size: 37px; }
+      .wizard-card { min-height: 0; border-radius: 21px; }
+      .pane { padding: 22px 18px; }
+      .pane-top { margin-bottom: 24px; }
+      .pane-illustration { width: 50px; height: 50px; border-radius: 15px; }
+      .pane-illustration svg { width: 25px; height: 25px; }
+      .choice-grid, .choice-grid.two, .two-col { grid-template-columns: 1fr; }
+      .pane-footer { display: block; margin: 30px -18px -22px; padding: 15px 18px; }
+      .footer-note { margin-bottom: 12px; }
+      .footer-actions { justify-content: flex-end; }
+      .review-hero { grid-template-columns: 1fr; }
+      .release-strip { display: block; }
+      .release-actions { margin-top: 12px; }
+      .summary-card { display: block; }
+      .summary-actions { display: grid; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand" aria-label="WuPlay Genie">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8.3 4.5h7.4l.7 4.1a7.2 7.2 0 1 1-8.8 0l.7-4.1Z" fill="rgba(255,255,255,.34)"/>
+            <path d="M12 2.7v3.1M8.3 4.5l-.8-1.2M15.7 4.5l.8-1.2M9 12.3h.01M15 12.3h.01M10 16.2c1.2.8 2.8.8 4 0"/>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <span class="brand-name">WuPlay <span style="color:var(--accent)">Genie</span></span>
+          <span class="brand-kicker">guided setup companion</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="beta-badge">v0.9.0 beta</span>
+        <span class="save-status" id="saveStatus" title="Only non-sensitive preferences are saved in this browser"><span class="save-dot"></span>Local only</span>
+        <button class="icon-button" id="resetButton" type="button" aria-label="Start over" title="Start over">
+          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 5v5h5"/></svg>
+        </button>
+        <button class="icon-button" id="releaseButton" type="button" aria-label="Open release notes" title="Release notes">
+          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8.5"/></svg>
+        </button>
+        <button class="icon-button" id="visualToggle" type="button" aria-label="Toggle Frost preview" title="Toggle Frost preview">
+          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/><circle cx="12" cy="12" r="3.3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div>
+          <div class="sidebar-heading">Setup path</div>
+          <div class="path-name">Make it yours</div>
+          <div class="path-detail">A calmer hand-off to WuPlay</div>
+        </div>
+
+        <nav class="step-nav" id="stepNav" aria-label="Setup steps">
+          <button class="step-button active" data-step="0" type="button">
+            <span class="step-number">01</span>
+            <span><span class="step-title">Start</span><span class="step-subtitle">Profile & goal</span></span>
+            <span class="step-arrow">›</span>
+          </button>
+          <button class="step-button locked" data-step="1" type="button">
+            <span class="step-number">02</span>
+            <span><span class="step-title">Tune</span><span class="step-subtitle">Device & playback</span></span>
+            <span class="step-arrow">›</span>
+          </button>
+          <button class="step-button locked" data-step="2" type="button">
+            <span class="step-number">03</span>
+            <span><span class="step-title">Personalise</span><span class="step-subtitle">Features & sharing</span></span>
+            <span class="step-arrow">›</span>
+          </button>
+          <button class="step-button locked" data-step="3" type="button">
+            <span class="step-number">04</span>
+            <span><span class="step-title">Finish</span><span class="step-subtitle">Review & hand-off</span></span>
+            <span class="step-arrow">›</span>
+          </button>
+        </nav>
+
+        <div class="privacy-card">
+          <div class="privacy-icon" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="m8.7 12 2.2 2.2 4.5-4.7"/></svg>
+          </div>
+          <div class="privacy-title">Built for a safe hand-off</div>
+          <div class="privacy-copy">If you enter a profile key, it is used only for the hand-off and kept in memory. It is never stored or exported; credentials belong in WuPlay's official configurator.</div>
+        </div>
+        <div class="sidebar-links">
+          <a href="catalogs.html">Catalog Builder</a>
+          <a href="https://config.wuplay.app/configure/" target="_blank" rel="noreferrer">Open WuPlay</a>
+          <a href="https://github.com/wuplayapp/wuplay-releases" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://discord.gg/PvZjHVGtE9" target="_blank" rel="noreferrer">Discord</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="hero-row">
+          <div>
+            <div class="eyebrow">A better way to configure</div>
+            <h1>Make WuPlay feel<br /><span style="color:#aaa0ff">like yours.</span></h1>
+            <p class="hero-copy">Answer a few human questions. Genie turns them into a clear setup plan, then hands you back to WuPlay when it is time to save.</p>
+          </div>
+          <div class="profile-chip" aria-label="Current profile">
+            <div class="avatar">M</div>
+            <div>
+              <div class="profile-chip-name" id="profileChipName">Your profile</div>
+              <div class="profile-chip-code" id="profileChipCode">profile · not connected</div>
+            </div>
+          </div>
+        </section>
+
+        <div class="progress-wrap" aria-label="Setup progress">
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-label" id="progressLabel">Step 1 of 4</div>
+        </div>
+
+        <div class="content-grid">
+          <section class="wizard-card" aria-live="polite">
+            <!-- Step 1 -->
+            <div class="pane active" data-pane="0">
+              <div class="pane-top">
+                <div>
+                  <div class="pane-kicker">01 / Start here</div>
+                  <h2>What are we setting up?</h2>
+                  <p class="pane-intro">Genie remembers your direction, not your secrets. Pick the closest match and we will keep the rest simple.</p>
+                </div>
+                <div class="pane-illustration" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5h-5l-3.2 3v-3H6.5A2.5 2.5 0 0 1 4 13.5v-7Z"/><path d="M8 9h8M8 12h5"/></svg>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field-group">
+                  <label class="field-label">Your starting point</label>
+                  <div class="choice-grid">
+                    <div class="choice"><input id="mode-new" type="radio" name="setupMode" value="new" checked /><label for="mode-new"><span class="choice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New setup</span><span class="choice-copy">Start with a clean profile and sensible defaults.</span><span class="choice-tag">fresh</span></label></div>
+                    <div class="choice"><input id="mode-improve" type="radio" name="setupMode" value="improve" /><label for="mode-improve"><span class="choice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5V20h2.5l10.7-10.7-2.5-2.5L4 17.5Z"/><path d="m13.5 7.5 2.5 2.5M16 4.5l3.5 3.5"/></svg>Improve mine</span><span class="choice-copy">Keep your profile and make the next changes clearer.</span><span class="choice-tag">recommended</span></label></div>
+                    <div class="choice"><input id="mode-share" type="radio" name="setupMode" value="share" /><label for="mode-share"><span class="choice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.2"/><circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="19" r="2.2"/><path d="m8 11 7.8-4.7M8 13l7.8 4.7"/></svg>Share a setup</span><span class="choice-copy">Prepare a screen or hub for your community.</span><span class="choice-tag">community</span></label></div>
+                  </div>
+                </div>
+
+                <div class="two-col">
+                  <div class="field-group">
+                    <label class="field-label" for="profileName">Profile name</label>
+                    <input class="text-input" id="profileName" name="profileName" maxlength="32" value="Your profile" placeholder="e.g. Living room" autocomplete="off" />
+                    <div class="field-hint">Shown in your hand-off summary.</div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="shareCode">WuPlay profile key <span style="color:var(--muted-2);font-weight:600">optional</span></label>
+                    <div class="input-prefix"><span>key</span><input class="text-input" id="shareCode" name="shareCode" type="password" inputmode="text" maxlength="6" value="" placeholder="6 characters" autocomplete="off" spellcheck="false" /></div>
+                    <div class="field-hint">Needed only to improve an existing profile. It stays in memory and is never saved by Genie.</div>
+                    <div class="error-text" id="codeError">Enter the 6-character profile key exactly as shown in WuPlay.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7.3h.01"/></svg>
+                <div><strong>Nothing changes yet.</strong> Genie only prepares your choices. If you enter a profile key, it stays in memory for this session and is never saved or exported.</div>
+              </div>
+
+              <div class="pane-footer">
+                <div class="footer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="m8.7 12 2.2 2.2 4.5-4.7"/></svg>Private by design</div>
+                <div class="footer-actions"><button class="primary-button next-button" type="button">Continue <span>→</span></button></div>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="pane" data-pane="1">
+              <div class="pane-top">
+                <div>
+                  <div class="pane-kicker">02 / Tune the experience</div>
+                  <h2>Tell Genie how you watch.</h2>
+                  <p class="pane-intro">These choices shape your recommended layout and playback defaults. You can still fine-tune every detail in WuPlay.</p>
+                </div>
+                <div class="pane-illustration" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="12" rx="2"/><path d="M8 21h8M12 17v4M8 9h.01M11 9h5M8 12h3M13 12h3"/></svg>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field-group">
+                  <label class="field-label">Where will WuPlay live?</label>
+                  <div class="choice-grid">
+                    <div class="choice"><input id="device-tv" type="radio" name="device" value="Android TV" checked /><label for="device-tv"><span class="choice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Android TV</span><span class="choice-copy">The native WuPlay experience on a TV.</span><span class="choice-tag">primary</span></label></div>
+                    <div class="choice"><input id="device-box" type="radio" name="device" value="Android TV box" /><label for="device-box"><span class="choice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="10" rx="2"/><path d="M8 11h.01M12 11h.01M16 11h.01M8 14h8"/></svg>TV box</span><span class="choice-copy">A compact Android TV box or stick.</span><span class="choice-tag">lean-back</span></label></div>
+                    <div class="choice"><input id="device-unsure" type="radio" name="device" value="Not sure yet" /><label for="device-unsure"><span class="choice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.9 1.7c-1.2 1-1.7 1.3-1.7 2.7M12 16.8h.01"/></svg>Not sure yet</span><span class="choice-copy">Keep things flexible until you are ready.</span><span class="choice-tag">safe default</span></label></div>
+                  </div>
+                  <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M12 4a8 8 0 1 0 8 8"/><path d="M12 4c2.2 2.2 3.3 4.8 3.3 8s-1.1 5.8-3.3 8c-2.2-2.2-3.3-4.8-3.3-8S9.8 6.2 12 4Z"/></svg><div>WuPlay is built for <strong>Android TV 7+ on ARM</strong>. If your device is different, keep the flexible option and check the release page before installing.</div></div>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">Picture quality</label>
+                  <div class="choice-grid three quality-grid">
+                    <div class="choice"><input id="quality-auto" type="radio" name="quality" value="Auto" checked /><label for="quality-auto"><span class="choice-title">Auto</span><span class="choice-copy">Let your display decide.</span></label></div>
+                    <div class="choice"><input id="quality-4k" type="radio" name="quality" value="4K" /><label for="quality-4k"><span class="choice-title">4K</span><span class="choice-copy">Prioritise the sharpest streams.</span></label></div>
+                    <div class="choice"><input id="quality-1080" type="radio" name="quality" value="1080p" /><label for="quality-1080"><span class="choice-title">1080p</span><span class="choice-copy">A lighter, reliable default.</span></label></div>
+                  </div>
+                </div>
+
+                <div class="two-col">
+                  <div class="field-group">
+                    <label class="field-label" for="subtitleLanguage">Subtitle comfort</label>
+                    <select class="select-input" id="subtitleLanguage">
+                      <option value="English first">English first</option>
+                      <option value="Arabic + English">Arabic + English</option>
+                      <option value="Original language">Original language</option>
+                      <option value="Ask me each time">Ask me each time</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="screenLayout">Home screen rhythm</label>
+                    <select class="select-input" id="screenLayout">
+                      <option value="Poster rows">Poster rows</option>
+                      <option value="Sectioned grid">Sectioned grid</option>
+                      <option value="Minimal rows">Minimal rows</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pane-footer">
+                <div class="footer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="m8.7 12 2.2 2.2 4.5-4.7"/></svg>Only preferences, no installation</div>
+                <div class="footer-actions"><button class="ghost-button back-button" type="button">Back</button><button class="primary-button next-button" type="button">Continue <span>→</span></button></div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="pane" data-pane="2">
+              <div class="pane-top">
+                <div>
+                  <div class="pane-kicker">03 / Personalise</div>
+                  <h2>Choose what to turn on.</h2>
+                  <p class="pane-intro">The new release gives you more control over your screens and hubs. Start with a few switches; the rest stays reversible.</p>
+                </div>
+                <div class="pane-illustration" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="M8.5 12.3 11 14.8l4.7-5"/></svg>
+                </div>
+              </div>
+
+              <div class="toggle-list">
+                <div class="toggle-row">
+                  <div><div class="toggle-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/><circle cx="12" cy="12" r="3.3"/></svg>Frost UI</div><div class="toggle-copy">Use the new glassy interface. Turn it off if you prefer a minimal look.</div></div>
+                  <button class="toggle on" data-toggle="frost" type="button" role="switch" aria-checked="true" aria-label="Frost UI"></button>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.2"/><circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="19" r="2.2"/><path d="m8 11 7.8-4.7M8 13l7.8 4.7"/></svg>Community sharing</div><div class="toggle-copy">Prepare a shareable screen or hub without exposing your profile key.</div></div>
+                  <button class="toggle" data-toggle="community" type="button" role="switch" aria-checked="false" aria-label="Community sharing"></button>
+                </div>
+                <div class="community-box" id="communityBox">
+                  <div class="two-col">
+                    <div class="field-group"><label class="field-label">What are you sharing?</label><div class="segmented"><div class="segment"><input id="share-screen" type="radio" name="shareType" value="Screen" checked /><label for="share-screen">Screen</label></div><div class="segment"><input id="share-hub" type="radio" name="shareType" value="Hub" /><label for="share-hub">Hub</label></div><div class="segment"><input id="share-both" type="radio" name="shareType" value="Screen + hub" /><label for="share-both">Both</label></div></div></div>
+                    <div class="field-group"><label class="field-label">Visibility</label><div class="segmented"><div class="segment"><input id="visibility-private" type="radio" name="visibility" value="Private" /><label for="visibility-private">Private</label></div><div class="segment"><input id="visibility-unlisted" type="radio" name="visibility" value="Unlisted" checked /><label for="visibility-unlisted">Unlisted</label></div><div class="segment"><input id="visibility-public" type="radio" name="visibility" value="Public" /><label for="visibility-public">Public</label></div></div></div>
+                  </div>
+                  <div class="field-group"><label class="field-label" for="shareTitle">Share name</label><input class="text-input" id="shareTitle" maxlength="48" value="My WuPlay setup" placeholder="e.g. Family movie night" autocomplete="off" /><div class="field-hint">A descriptive name helps your community find the right setup.</div></div>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h16"/><path d="M8 3v4M16 10v4M10 17v4"/></svg>Content filters</div><div class="toggle-copy">Keep filters available for you to enable later. New profiles start with native search filters off.</div></div>
+                  <button class="toggle" data-toggle="filters" type="button" role="switch" aria-checked="false" aria-label="Content filters"></button>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6M7 16h.01M10 16h4"/></svg>Recovery email</div><div class="toggle-copy">Add a recovery route for a lost profile key in Web Config → Settings → Profile.</div></div>
+                  <button class="toggle" data-toggle="recovery" type="button" role="switch" aria-checked="false" aria-label="Recovery email"></button>
+                </div>
+                <div class="community-box" id="recoveryBox">
+                  <div class="field-group"><label class="field-label" for="recoveryEmail">Recovery email</label><input class="text-input" id="recoveryEmail" type="email" placeholder="you@example.com" autocomplete="email" /><div class="field-hint">Genie does not send or store this. Add it in WuPlay's official settings when you finish.</div></div>
+                </div>
+              </div>
+
+              <div class="pane-footer">
+                <div class="footer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="m8.7 12 2.2 2.2 4.5-4.7"/></svg>Every switch can be changed later</div>
+                <div class="footer-actions"><button class="ghost-button back-button" type="button">Back</button><button class="primary-button next-button" type="button">Review setup <span>→</span></button></div>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="pane" data-pane="3">
+              <div class="pane-top">
+                <div>
+                  <div class="pane-kicker">04 / Finish</div>
+                  <h2>Your hand-off is ready.</h2>
+                  <p class="pane-intro">Here is the short version of your plan. Open the official configurator to apply it, or save these notes for later.</p>
+                </div>
+                <div class="pane-illustration" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.2 4.2L19 6.5"/><path d="M4 20h16"/></svg>
+                </div>
+              </div>
+
+              <div class="review-hero">
+                <div class="review-status"><h3>All the important bits are covered.</h3><p id="reviewStatusCopy">Your choices are organised, your profile link is ready, and no credentials were collected.</p></div>
+                <div class="review-metric"><div class="metric-label">Readiness</div><div class="metric-value" id="reviewScore">92%</div><div class="metric-detail">clear next steps</div></div>
+              </div>
+
+              <div class="summary-section-label">Before you open WuPlay</div>
+              <div class="check-list" id="reviewChecklist"></div>
+
+              <div class="handoff-box">
+                <div class="handoff-label">Your official WuPlay link</div>
+                <div class="handoff-url"><code id="handoffUrl">https://config.wuplay.app/configure/</code><button class="copy-button" id="copyHandoff" type="button">Copy</button></div>
+              </div>
+
+              <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="M12 8v4M12 16h.01"/></svg><div><strong>Security note:</strong> Genie never exports or saves your profile key. WuPlay authentication and profile changes still happen in the official configurator.</div></div>
+
+              <div class="pane-footer">
+                <div class="footer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="m8.7 12 2.2 2.2 4.5-4.7"/></svg>Nothing uploaded by this page</div>
+                <div class="footer-actions"><button class="ghost-button back-button" type="button">Back</button><button class="secondary-button" id="exportNotes" type="button">Export notes</button><a class="primary-button" id="openWuplay" href="https://config.wuplay.app/configure/" target="_blank" rel="noreferrer">Open WuPlay <span>↗</span></a></div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="summary-card" aria-label="Live setup summary">
+            <div class="summary-head">
+              <div><div class="summary-title">Your build</div><div class="summary-subtitle">Updates as you answer</div></div>
+              <div class="score-ring" id="scoreRing" style="--score: 260deg"><span class="score-number" id="scoreNumber">92</span></div>
+            </div>
+            <div class="summary-body">
+              <div class="summary-section-label">At a glance</div>
+              <div class="summary-list">
+                <div class="summary-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c.8-3.2 3-5 6.5-5s5.7 1.8 6.5 5"/></svg><span>Profile</span><strong class="summary-value" id="summaryProfile">Your profile</strong></div>
+                <div class="summary-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>Device</span><strong class="summary-value" id="summaryDevice">Android TV</strong></div>
+                <div class="summary-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5V20h2.5l10.7-10.7-2.5-2.5L4 17.5Z"/><path d="m13.5 7.5 2.5 2.5M16 4.5l3.5 3.5"/></svg><span>Quality</span><strong class="summary-value" id="summaryQuality">Auto</strong></div>
+                <div class="summary-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/><circle cx="12" cy="12" r="3.3"/></svg><span>Interface</span><strong class="summary-value" id="summaryFrost">Frost on</strong></div>
+                <div class="summary-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.2"/><circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="19" r="2.2"/><path d="m8 11 7.8-4.7M8 13l7.8 4.7"/></svg><span>Share</span><strong class="summary-value" id="summaryShare">Unlisted screen</strong></div>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-callout"><div class="summary-callout-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5.4c0 4.8-3.3 8.2-8 9.6-4.7-1.4-8-4.8-8-9.6V6l8-3Z"/><path d="m8.7 12 2.2 2.2 4.5-4.7"/></svg>Safe by default</div><p>Profile keys stay in memory only. WuPlay remains the source of truth.</p></div>
+            </div>
+            <div class="summary-actions"><button class="secondary-button" id="summaryCopy" type="button">Copy hand-off link</button><button class="primary-button" id="summaryNext" type="button">Continue <span>→</span></button></div>
+          </aside>
+        </div>
+
+        <section class="release-strip">
+          <div class="release-content">
+            <div class="release-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/><circle cx="12" cy="12" r="3.3"/></svg></div>
+            <div><div class="release-title">Built around WuPlay's v0.9.0-beta changes</div><div class="release-copy">Frost UI, recovery email, custom hubs, and community sharing are all surfaced without hiding the simple path.</div></div>
+          </div>
+          <div class="release-actions"><a class="secondary-button" href="catalogs.html">Catalog Builder ↗</a><button class="ghost-button" id="releaseButtonBottom" type="button">See release notes</button><a class="secondary-button" href="https://github.com/wuplayapp/wuplay-releases" target="_blank" rel="noreferrer">View GitHub ↗</a></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.2 4.2L19 6.5"/></svg><span id="toastMessage">Copied to clipboard</span></div>
+
+  <dialog id="releaseDialog">
+    <div class="dialog-head"><div><div class="pane-kicker">What is new</div><h2>WuPlay v0.9.0-beta</h2><p>A quick, human-readable version of the release notes.</p></div><button class="icon-button" id="closeRelease" type="button" aria-label="Close release notes">×</button></div>
+    <div class="dialog-body"><ul class="release-list"><li><div><strong>Community sharing</strong><br />Screens and hubs can now be prepared for private, unlisted, or public sharing.</div></li><li><div><strong>Frost UI</strong><br />The first round of visual updates is here, with a setting to keep the interface minimal.</div></li><li><div><strong>Recovery email</strong><br />A recovery route for a lost profile key is available in Web Config → Settings → Profile.</div></li><li><div><strong>Custom hubs</strong><br />Start a custom hub from a system hub, then adjust it for your own home screen.</div></li><li><div><strong>Polish & fixes</strong><br />Better translation coverage and a fix for some Arabic subtitle rendering.</div></li></ul><div class="dialog-foot"><button class="primary-button" id="doneRelease" type="button">Back to Genie</button></div></div>
+  </dialog>
+
+  <script>
+    (() => {
+      const officialBase = 'https://config.wuplay.app/configure/';
+      const state = {
+        step: 0,
+        maxVisited: 0,
+        setupMode: 'new',
+        profileName: 'Your profile',
+        shareCode: '',
+        device: 'Android TV',
+        quality: 'Auto',
+        subtitleLanguage: 'English first',
+        screenLayout: 'Poster rows',
+        frost: true,
+        community: false,
+        shareType: 'Screen',
+        visibility: 'Unlisted',
+        shareTitle: 'My WuPlay setup',
+        filters: false,
+        recovery: false,
+        recoveryEmail: ''
+      };
+      const defaultState = { ...state };
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const panes = $$('.pane');
+      const navButtons = $$('.step-button');
+      const toast = $('#toast');
+      const STORAGE_KEY = 'wuplay-genie:setup:v1';
+      const LOCAL_FIELDS = [
+        'setupMode', 'profileName', 'device', 'quality', 'subtitleLanguage',
+        'screenLayout', 'frost', 'community', 'shareType', 'visibility', 'shareTitle', 'filters', 'recovery'
+      ];
+      let toastTimer;
+
+      function selectedValue(name, fallback) {
+        return document.querySelector(`input[name="${name}"]:checked`)?.value || fallback;
+      }
+
+      function saveLocal() {
+        const snapshot = {};
+        LOCAL_FIELDS.forEach(key => { snapshot[key] = state[key]; });
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+          const indicator = $('#saveStatus');
+          indicator.classList.remove('offline', 'saving');
+          indicator.title = 'Non-sensitive preferences are saved in this browser. Recovery email and credentials are never saved.';
+          indicator.lastChild.textContent = 'Saved locally';
+        } catch {
+          const indicator = $('#saveStatus');
+          indicator.classList.add('offline');
+          indicator.lastChild.textContent = 'Session only';
+        }
+      }
+
+      function loadLocal() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+          if (!saved || typeof saved !== 'object') return;
+          LOCAL_FIELDS.forEach(key => {
+            if (Object.prototype.hasOwnProperty.call(saved, key) && typeof saved[key] === typeof state[key]) state[key] = saved[key];
+          });
+        } catch {
+          const indicator = $('#saveStatus');
+          indicator.classList.add('offline');
+          indicator.lastChild.textContent = 'Session only';
+        }
+      }
+
+      function loadFromUrl() {
+        const query = new URLSearchParams(window.location.search);
+        const urlName = query.get('profile') || query.get('name');
+        const urlMode = query.get('mode');
+        if (urlName) state.profileName = urlName.trim().slice(0, 32);
+        if (['new', 'improve', 'share'].includes(urlMode)) state.setupMode = urlMode;
+        if (urlName || ['new', 'improve', 'share'].includes(urlMode)) {
+          const indicator = $('#saveStatus');
+          indicator.lastChild.textContent = 'Loaded from link';
+        }
+      }
+
+      function applyStateToInputs() {
+        const setChecked = (name, value) => {
+          const input = document.querySelector(`input[name="${name}"][value="${CSS.escape(String(value))}"]`);
+          if (input) input.checked = true;
+        };
+        $('#profileName').value = state.profileName === 'Unnamed profile' ? '' : state.profileName;
+        $('#shareCode').value = state.shareCode;
+        $('#subtitleLanguage').value = state.subtitleLanguage;
+        $('#screenLayout').value = state.screenLayout;
+        $('#shareTitle').value = state.shareTitle;
+        $('#recoveryEmail').value = '';
+        ['setupMode', 'device', 'quality', 'shareType', 'visibility'].forEach(name => setChecked(name, state[name]));
+      }
+
+      function syncFromInputs() {
+        state.setupMode = selectedValue('setupMode', state.setupMode);
+        state.profileName = $('#profileName').value.trim() || 'Unnamed profile';
+        state.shareCode = $('#shareCode').value.trim().toLowerCase();
+        state.device = selectedValue('device', state.device);
+        state.quality = selectedValue('quality', state.quality);
+        state.subtitleLanguage = $('#subtitleLanguage').value;
+        state.screenLayout = $('#screenLayout').value;
+        state.shareType = selectedValue('shareType', state.shareType);
+        state.visibility = selectedValue('visibility', state.visibility);
+        state.shareTitle = $('#shareTitle').value.trim() || 'Community setup';
+        state.recoveryEmail = $('#recoveryEmail').value.trim();
+      }
+
+      function officialUrl() {
+        return state.shareCode ? `${officialBase}${encodeURIComponent(state.shareCode)}#home` : 'https://config.wuplay.app/configure/';
+      }
+
+      function shareSummary() {
+        return state.community ? `${state.visibility} ${state.shareType.toLowerCase()}` : 'Not enabled';
+      }
+
+      function score() {
+        let value = 82;
+        if (state.profileName && state.profileName !== 'Unnamed profile') value += 3;
+        if (state.shareCode || state.setupMode === 'new') value += 2;
+        if (state.device !== 'Not sure yet') value += 3;
+        if (state.quality !== 'Auto') value += 1;
+        if (state.community) value += 2;
+        if (state.recovery && state.recoveryEmail.includes('@')) value += 4;
+        if (state.frost) value += 1;
+        return Math.min(99, value);
+      }
+
+      function setScore(value) {
+        const degrees = Math.round((value / 100) * 360);
+        $('#scoreNumber').textContent = value;
+        $('#scoreRing').style.setProperty('--score', `${degrees}deg`);
+        $('#reviewScore').textContent = `${value}%`;
+      }
+
+      function updateVisualMode() {
+        document.body.classList.toggle('minimal', !state.frost);
+        const topToggle = $('#visualToggle');
+        topToggle.setAttribute('aria-label', state.frost ? 'Turn Frost preview off' : 'Turn Frost preview on');
+        topToggle.title = state.frost ? 'Frost preview on' : 'Frost preview off';
+      }
+
+      function renderSummary() {
+        $('#profileChipName').textContent = state.profileName;
+        $('#profileChipCode').textContent = state.shareCode ? 'profile key · ready' : 'profile key · not connected';
+        $('#summaryProfile').textContent = state.profileName;
+        $('#summaryDevice').textContent = state.device;
+        $('#summaryQuality').textContent = state.quality;
+        $('#summaryFrost').textContent = state.frost ? 'Frost on' : 'Minimal';
+        $('#summaryShare').textContent = shareSummary();
+        const url = officialUrl();
+        $('#handoffUrl').textContent = state.shareCode ? `${officialBase}••••••#home` : url;
+        $('#handoffUrl').title = state.shareCode ? 'The profile key is hidden here. Use Copy or Open WuPlay when you are ready.' : url;
+        $('#openWuplay').href = url;
+        setScore(score());
+        updateVisualMode();
+
+        $('#communityBox').classList.toggle('show', state.community);
+        $('#recoveryBox').classList.toggle('show', state.recovery);
+
+        $$('.toggle').forEach(toggle => {
+          const key = toggle.dataset.toggle;
+          if (!key) return;
+          const isOn = Boolean(state[key]);
+          toggle.classList.toggle('on', isOn);
+          toggle.setAttribute('aria-checked', String(isOn));
+        });
+
+        const checklist = $('#reviewChecklist');
+        checklist.innerHTML = '';
+        const checks = [
+          ['Profile and hand-off', state.shareCode ? 'A personalized WuPlay hand-off is ready; the key is hidden.' : 'A new profile path is ready.'],
+          ['Playback direction', `${state.device} · ${state.quality} · ${state.subtitleLanguage}.`],
+          ['Interface preference', state.frost ? 'Frost UI is selected; it remains reversible.' : 'Minimal UI is selected; Frost stays off.'],
+          [state.community ? 'Community share draft' : 'Community sharing', state.community ? `${state.shareTitle} · ${state.visibility} ${state.shareType.toLowerCase()}.` : 'Not enabled for this hand-off.'],
+          [state.recovery ? 'Recovery route' : 'Credentials', state.recovery ? (state.recoveryEmail.includes('@') ? 'Email noted for the official settings step.' : 'Add the email in WuPlay Web Config.') : 'No API keys or credentials were collected.']
+        ];
+        checks.forEach(([title, copy]) => {
+          const row = document.createElement('div');
+          row.className = 'check-row';
+          row.innerHTML = `<div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.2 4.2L19 6.5"/></svg></div><div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(copy)}</span></div>`;
+          checklist.appendChild(row);
+        });
+
+        $('#reviewStatusCopy').textContent = state.community
+          ? 'Your choices are organised, your profile link is ready, and no credentials were collected.'
+          : 'Your choices are organised, your profile link is ready, and community sharing is left off.';
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+      }
+
+      function renderStep() {
+        panes.forEach((pane, index) => pane.classList.toggle('active', index === state.step));
+        navButtons.forEach((button, index) => {
+          button.classList.toggle('active', index === state.step);
+          button.classList.toggle('completed', index < state.step);
+          button.classList.toggle('locked', index > state.maxVisited);
+          button.setAttribute('aria-current', index === state.step ? 'step' : 'false');
+        });
+        $('#progressFill').style.width = `${((state.step + 1) / 4) * 100}%`;
+        $('#progressLabel').textContent = `Step ${state.step + 1} of 4`;
+        $('#summaryNext').textContent = state.step === 3 ? 'Open WuPlay ↗' : 'Continue →';
+      }
+
+      function render() {
+        renderStep();
+        renderSummary();
+      }
+
+      function validateCurrent() {
+        if (state.step !== 0) return true;
+        const keyInput = $('#shareCode');
+        const needsKey = state.setupMode !== 'new';
+        const valid = (!state.shareCode && !needsKey) || /^[a-z0-9]{6}$/.test(state.shareCode);
+        keyInput.classList.toggle('invalid', !valid);
+        $('#codeError').classList.toggle('show', !valid);
+        if (!valid) {
+          showToast(needsKey ? 'Add your 6-character WuPlay profile key to continue.' : 'Check the profile key before continuing.');
+          keyInput.focus();
+        }
+        return valid;
+      }
+
+      function goTo(nextStep) {
+        syncFromInputs();
+        saveLocal();
+        if (nextStep > state.step && !validateCurrent()) return;
+        if (nextStep > state.maxVisited) state.maxVisited = nextStep;
+        state.step = Math.max(0, Math.min(3, nextStep));
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function showToast(message) {
+        $('#toastMessage').textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+      }
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast('Hand-off link copied.');
+        } catch {
+          const helper = document.createElement('textarea');
+          helper.value = text;
+          helper.style.position = 'fixed';
+          helper.style.opacity = '0';
+          document.body.appendChild(helper);
+          helper.select();
+          document.execCommand('copy');
+          helper.remove();
+          showToast('Hand-off link copied.');
+        }
+      }
+
+      function exportNotes() {
+        syncFromInputs();
+        const notes = {
+          generatedBy: 'WuPlay Genie',
+          releaseContext: 'WuPlay v0.9.0-beta',
+          generatedAt: new Date().toISOString(),
+          profile: { name: state.profileName, mode: state.setupMode, hasProfileKey: Boolean(state.shareCode) },
+          playback: { device: state.device, quality: state.quality, subtitleLanguage: state.subtitleLanguage, screenLayout: state.screenLayout },
+          features: { frostUI: state.frost, communitySharing: state.community, contentFilters: state.filters, recoveryEmail: state.recovery },
+          community: state.community ? { type: state.shareType, visibility: state.visibility, name: state.shareTitle } : null,
+          officialWuPlayUrl: state.shareCode ? null : officialUrl(),
+          security: state.shareCode ? 'The profile key and key-bearing URL were intentionally omitted from this export.' : 'No API keys or profile keys are included in this export.'
+        };
+        const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'wuplay-genie-setup-notes.json';
+        link.click();
+        URL.revokeObjectURL(link.href);
+        showToast('Setup notes exported without secrets.');
+      }
+
+      $$('.next-button').forEach(button => button.addEventListener('click', () => goTo(state.step + 1)));
+      $$('.back-button').forEach(button => button.addEventListener('click', () => goTo(state.step - 1)));
+      navButtons.forEach(button => button.addEventListener('click', () => {
+        const target = Number(button.dataset.step);
+        if (target <= state.maxVisited) goTo(target);
+        else showToast('Complete the current step first.');
+      }));
+
+      $$('.toggle').forEach(button => button.addEventListener('click', () => {
+        const key = button.dataset.toggle;
+        if (!key) return;
+        state[key] = !state[key];
+        renderSummary();
+        saveLocal();
+      }));
+
+      $$('input, select').forEach(input => {
+        input.addEventListener('input', () => { syncFromInputs(); renderSummary(); saveLocal(); });
+        input.addEventListener('change', () => { syncFromInputs(); renderSummary(); saveLocal(); });
+      });
+
+      $('#copyHandoff').addEventListener('click', () => { syncFromInputs(); copyText(officialUrl()); });
+      $('#summaryCopy').addEventListener('click', () => { syncFromInputs(); copyText(officialUrl()); });
+      $('#exportNotes').addEventListener('click', exportNotes);
+      $('#summaryNext').addEventListener('click', () => {
+        if (state.step === 3) { syncFromInputs(); window.open(officialUrl(), '_blank', 'noopener,noreferrer'); return; }
+        goTo(state.step + 1);
+      });
+
+      $('#visualToggle').addEventListener('click', () => { state.frost = !state.frost; renderSummary(); saveLocal(); });
+
+      $('#resetButton').addEventListener('click', () => {
+        if (!window.confirm('Start over and clear this browser\'s saved Genie preferences?')) return;
+        Object.assign(state, { ...defaultState });
+        state.step = 0;
+        state.maxVisited = 0;
+        try { localStorage.removeItem(STORAGE_KEY); } catch {}
+        applyStateToInputs();
+        render();
+        $('#saveStatus').classList.remove('offline', 'saving');
+        $('#saveStatus').lastChild.textContent = 'Local only';
+        showToast('Genie has been reset.');
+      });
+
+      const releaseDialog = $('#releaseDialog');
+      function openRelease() { if (typeof releaseDialog.showModal === 'function') releaseDialog.showModal(); else releaseDialog.setAttribute('open', ''); }
+      function closeRelease() { if (typeof releaseDialog.close === 'function') releaseDialog.close(); else releaseDialog.removeAttribute('open'); }
+      $('#releaseButton').addEventListener('click', openRelease);
+      $('#releaseButtonBottom').addEventListener('click', openRelease);
+      $('#closeRelease').addEventListener('click', closeRelease);
+      $('#doneRelease').addEventListener('click', closeRelease);
+      releaseDialog.addEventListener('click', event => { if (event.target === releaseDialog) closeRelease(); });
+
+      // Keep the experience usable if the browser does not support smooth scrolling.
+      if (!('scrollBehavior' in document.documentElement.style)) window.scrollTo = () => {};
+      loadLocal();
+      loadFromUrl();
+      applyStateToInputs();
+      render();
+      saveLocal();
+      if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+    })();
+  </script>
+</body>
+</html>

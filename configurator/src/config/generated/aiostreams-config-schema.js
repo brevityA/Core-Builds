@@ -1,0 +1,19 @@
+// DO NOT EDIT — generated from AIOStreams f36d0f93ff088280526ebca1fe3c93e2740b6987
+// Source: https://github.com/Viren070/AIOStreams/tree/f36d0f93ff088280526ebca1fe3c93e2740b6987
+// Upstream version: 2.33.2
+// Regenerate with: npm run sync:upstream   (see configurator/README.md)
+/**
+ * Top-level keys of UserDataSchema. AIOStreams uses a plain `z.object`, so
+ * unknown keys are silently STRIPPED rather than rejected — anything not in
+ * this list is dead payload in an exported template.
+ */
+
+export const AIO_CONFIG_KEYS = Object.freeze(["uuid","parentConfig","variants","activeVariants","variantSelectorLocation","encryptedPassword","trusted","showChanges","accessKey","ip","addonName","addonLogo","addonBackground","addonDescription","appliedTemplates","excludedResolutions","includedResolutions","requiredResolutions","preferredResolutions","excludedQualities","includedQualities","requiredQualities","preferredQualities","excludedLanguages","includedLanguages","requiredLanguages","preferredLanguages","excludedSubtitles","includedSubtitles","requiredSubtitles","preferredSubtitles","excludedVisualTags","includedVisualTags","requiredVisualTags","preferredVisualTags","excludedAudioTags","includedAudioTags","requiredAudioTags","preferredAudioTags","excludedAudioChannels","includedAudioChannels","requiredAudioChannels","preferredAudioChannels","excludedStreamTypes","includedStreamTypes","requiredStreamTypes","preferredStreamTypes","excludedEncodes","includedEncodes","requiredEncodes","preferredEncodes","excludedRegexPatterns","includedRegexPatterns","requiredRegexPatterns","preferredRegexPatterns","syncedPreferredRegexUrls","syncedExcludedRegexUrls","syncedIncludedRegexUrls","syncedRequiredRegexUrls","syncedRankedRegexUrls","syncedPreferredStreamExpressionUrls","syncedExcludedStreamExpressionUrls","syncedIncludedStreamExpressionUrls","syncedRequiredStreamExpressionUrls","syncedRankedStreamExpressionUrls","excludedReleaseGroups","includedReleaseGroups","requiredReleaseGroups","preferredReleaseGroups","requiredKeywords","includedKeywords","excludedKeywords","preferredKeywords","excludeSeederRange","includeSeederRange","requiredSeederRange","seederRangeTypes","excludeAgeRange","includeAgeRange","requiredAgeRange","ageRangeTypes","digitalReleaseFilter","enableSeadex","excludeSeasonPacks","excludeCached","excludeCachedFromAddons","excludeCachedFromServices","excludeCachedFromStreamTypes","excludeCachedMode","excludeUncached","excludeUncachedFromAddons","excludeUncachedFromServices","excludeUncachedFromStreamTypes","excludeUncachedMode","excludedStreamExpressions","requiredStreamExpressions","preferredStreamExpressions","includedStreamExpressions","rankedStreamExpressions","rankedRegexPatterns","regexOverrides","selOverrides","dynamicAddonFetching","groups","sortCriteria","rpdbApiKey","topPosterApiKey","aioratingsApiKey","aioratingsProfileId","openposterdbApiKey","openposterdbUrl","openposterdbParameters","posterService","usePosterRedirectApi","usePosterServiceForMeta","formatter","proxy","resultLimits","size","bitrate","hideErrors","hideErrorsForResources","statistics","tmdbAccessToken","tmdbApiKey","tvdbApiKey","yearMatching","titleMatching","seasonEpisodeMatching","episodeTitleMatching","languageInference","deduplicator","autoPlay","areYouStillThere","precacheNextEpisode","alwaysPrecache","precacheCondition","precacheSelector","precacheSingleStream","preloadStreams","services","presets","addonCategoryColors","catalogModifications","mergedCatalogs","externalDownloads","cacheAndPlay","autoRemoveDownloads","checkOwned","failover","serviceWrap"]);
+
+
+export const AIO_CONFIG_KEY_SET = Object.freeze(new Set(AIO_CONFIG_KEYS));
+
+/** Keys present on `config` that the pinned schema does not define. */
+export function unknownConfigKeys(config = {}) {
+  return Object.keys(config).filter(key => !AIO_CONFIG_KEY_SET.has(key));
+}

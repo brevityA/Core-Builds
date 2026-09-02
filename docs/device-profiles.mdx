@@ -51,7 +51,15 @@ The Google TV Streamer supports modern 4K formats including AV1 and Dolby Vision
 
 ## Fire TV
 
-Fire TV capabilities vary substantially by generation. Fire TV Stick 4K Max models may support AV1 and Dolby Vision while older 4K and HD devices may not. Constrained profiles limit lossless audio and very large REMUX files. Confirm the exact generation before removing exclusions.
+Fire TV capabilities vary substantially by generation. Confirm the exact stick before removing exclusions.
+
+| Profile | Resolution | DV | AV1 | Start here |
+| --- | --- | --- | --- | --- |
+| Fire TV Stick HD | 1080p SDR | No | No | Stream Fire Stick |
+| Fire TV Stick 4K | 1080p first | Do not assume | No | Stream |
+| Fire TV Stick 4K Max | 1080p first, 4K capped | Conditional | Yes | Stream, then 4K Essential — **not Apex** |
+
+Constrained profiles limit lossless audio and REMUX files. The 4K Max can decode Dolby Vision and AV1; it still buffers on uncapped Apex REMUX.
 
 ## ONN devices
 

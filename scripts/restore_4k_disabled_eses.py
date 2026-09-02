@@ -23,9 +23,11 @@ DV_ONLY_KILL = {
 }
 
 def has_ese(eses, label):
+    """Check if any ESE contains the given label."""
     return any(label in e.get("expression", "") for e in eses if isinstance(e, dict))
 
 def insert_before_cam_kill(eses, *entries):
+    """Insert ESE entries before the Hard CAM Kill expression."""
     cam_idx = next(
         (i for i, e in enumerate(eses)
          if isinstance(e, dict) and "CB | Hard CAM Kill" in e.get("expression", "")),

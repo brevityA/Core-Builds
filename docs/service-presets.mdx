@@ -1,0 +1,64 @@
+---
+title: "Store Service Presets"
+description: "Named AllDebrid, Premiumize, and EasyDebrid presets. Overlay stremthruStore. No Real-Debrid template. Not Apex."
+---
+
+AllDebrid already has first-party templates. Premiumize and EasyDebrid use the same **stremthruStore** path. This module names them. It does not clone TorBox Stream JSON.
+
+TorBox stays on `stremthruTorz`. See [Debrid Comparison](/debrid-comparison) and [AllDebrid Setup](/alldebrid-setup).
+
+## What to import
+
+| Service | 1080p | 4K |
+| --- | --- | --- |
+| AllDebrid | existing `core-nexus-alldebrid.json` | existing `core-nexus-4k-alldebrid.json` |
+| Premiumize | overlay of AllDebrid 1080p | overlay of AllDebrid 4K |
+| EasyDebrid | overlay of AllDebrid 1080p | overlay of AllDebrid 4K |
+| Real-Debrid | **none** | **none** |
+
+Real-Debrid: enable it under **Services** on any template. There is no named RD family. May 2026 WEB-DL filter.
+
+## Device locks
+
+- Fire Stick HD and Fire Stick 4K Max stay on **1080p** store templates. 4K AllDebrid is uncapped — not for those sticks. Not Apex.
+- Samsung / TCL / Hisense / ONN stay on 1080p. The 4K AllDebrid stack is DV-first.
+- First install is 1080p.
+- Shield may take 4K AllDebrid / Premiumize / EasyDebrid.
+
+## Overlay
+
+```js
+import {
+  applyStoreService,
+  recommendForService,
+} from './tools/genies/service-presets.mjs';
+
+const rec = recommendForService('premiumize', { deviceId: 'firestick-4kmax' });
+const localized = applyStoreService(alldebridTemplate, 'premiumize');
+```
+
+`stremthruStore` is renamed (`StremThru Premiumize` / `StremThru EasyDebrid`). Only that service is enabled. TorBox is switched off.
+
+Publish from AllDebrid when you want paste-ready JSON:
+
+```bash
+node tools/genies/publish-service-presets.mjs
+```
+
+## Keys
+
+| Service | Dashboard |
+| --- | --- |
+| AllDebrid | [alldebrid.com/apikeys](https://alldebrid.com/apikeys) |
+| Premiumize | [premiumize.me/account](https://www.premiumize.me/account) |
+| EasyDebrid | [easydebrid.com](https://easydebrid.com/) |
+
+Paste the key in AIOStreams → Services after import. Templates do not ship keys.
+
+## What this is not
+
+- Not a hosted AIOStreams.
+- Not shared debrid keys.
+- Not a Real-Debrid template.
+- Not Apex.
+- Not forty new JSON files in git until you run publish.

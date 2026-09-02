@@ -7,6 +7,8 @@
  * reads or returns credentials.
  */
 
+import { resolutionTierFirst } from './sort-policy.js';
+
 export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 'labs']);
 
 // The legacy TorBox Search preset ID is accepted by v2.31.1 but marked removed
@@ -163,9 +165,13 @@ function stablePresets(config, context) {
   });
 }
 
+// NOTE: this duplicates src/core/device-policies.js#resolutionPolicy and is
+// applied AFTER it, so it wins. Keep the two in step until the duplication is
+// removed. 1440p must appear in the 4K list: a resolution that is neither
+// preferred nor excluded scores -Infinity upstream and sorts below 720p.
 function preferredResolutions(resolution) {
   if (resolution === '1080p') return ['1080p', '720p', 'Unknown'];
-  if (resolution === '4k') return ['2160p', '1080p', '720p', 'Unknown'];
+  if (resolution === '4k') return ['2160p', '1440p', '1080p', '720p', 'Unknown'];
   if (resolution === 'ultrawide') return ['2160p', '1440p', '1080p', '720p', 'Unknown'];
   if (resolution === 'mixed') return ['2160p', '1080p', '1440p', '720p', '576p', '480p', 'Unknown'];
   return [];
@@ -192,7 +198,16 @@ function stableSortCriteria(context) {
     { key: 'encode', direction },
     { key: 'size', direction },
   ];
-  const global = context.service === 'p2p' ? p2p : core;
+  // The Stable profile replaces the generated sort list wholesale, so it has to
+  // honour the 4K-first rule itself — otherwise a Stable 4K build would fall
+  // back to cached-first and a cached 1080p would outrank an uncached 2160p.
+  const base = context.service === 'p2p' ? p2p : core;
+  const global = resolutionTierFirst(context)
+    ? [
+      ...base.filter(entry => entry.key === 'resolution' || entry.key === 'quality'),
+      ...base.filter(entry => entry.key !== 'resolution' && entry.key !== 'quality'),
+    ]
+    : base;
   return {
     global,
     movies: [], series: [], anime: [], cached: [], uncached: [],

@@ -143,7 +143,15 @@ test('golden: EasyNews has EasyNews presets', () => {
 
 test('golden: P2P template has p2p-specific config', () => {
   const t = generate(['--service', 'p2p', '--device', 'generic', '--resolution', '1080p', '--architecture', 'standard']);
-  assert.ok(t.config.minSeeders >= 1, 'P2P should set minSeeders');
+  // minSeeders is not a key in the AIOStreams UserDataSchema at the pinned ref,
+  // so the instance discards it on import and the host gate now strips it before
+  // it can be emitted. The P2P build expresses the same intent through the
+  // seeder sort criterion instead. See configurator/reports/02-audit.md.
+  assert.equal(t.config.minSeeders, undefined, 'minSeeders is not an upstream key');
+  assert.ok(
+    Object.values(t.config.sortCriteria).some(list => list.some(c => c.key === 'seeders')),
+    'P2P should still rank on seeders',
+  );
   const presetTypes = t.config.presets.map(p => p.type);
   assert.ok(presetTypes.includes('torrentio'), 'P2P should have torrentio preset');
 });

@@ -8,6 +8,10 @@ import { fileURLToPath } from 'node:url';
 // goldens. Any logic change that alters generated templates fails CI here; if the
 // change is intentional, re-run with UPDATE_GOLDEN=1 and review the diff.
 //
+// The goldens are REGENERATED OUTPUT, not hand-written fixtures. Any change to
+// the sort policy, the device policies or the host-capability gate changes them
+// by design — refresh them in the same commit as the behaviour change.
+//
 //   UPDATE_GOLDEN=1 npx playwright test e2e/golden-configs.spec.mjs --project=desktop
 
 const GOLDEN_DIR = resolve(dirname(fileURLToPath(import.meta.url)), 'golden');
@@ -72,8 +76,11 @@ const MATRIX = [
   { name: 'torbox-4k-samsung', state: { resolution: '4k', device: 'samsung' } },
   { name: 'alldebrid-1080p', state: { service: 'alldebrid', multiServices: ['alldebrid'], resolution: '1080p' } },
   { name: 'easynews-1080p', state: { service: 'easynews', multiServices: ['easynews'], resolution: '1080p' } },
-  { name: 'p2p-1080p', state: { service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, resolution: '1080p' } },
-  { name: 'http-1080p', state: { service: 'http', multiServices: ['http'], resolution: '1080p' } },
+  // ElfHosted disables P2P and HTTP streams, so the free lanes are pinned to a
+  // host that actually serves them — otherwise the host gate (correctly) marks
+  // the very stream types these fixtures exist to cover as excluded.
+  { name: 'p2p-1080p', state: { service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, resolution: '1080p', instanceHost: 'fortheweak' } },
+  { name: 'http-1080p', state: { service: 'http', multiServices: ['http'], resolution: '1080p', instanceHost: 'fortheweak' } },
   { name: 'core-stable-torbox-1080p', profile: 'stable', state: { resolution: '1080p', simpleMode: true } },
   { name: 'core-stable-torbox-4k', profile: 'stable', state: { resolution: '4k', simpleMode: true } },
   { name: 'core-balanced-torbox-1080p', profile: 'balanced', state: { resolution: '1080p', outputProfile: 'balanced' } },

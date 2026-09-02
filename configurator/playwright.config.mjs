@@ -9,7 +9,13 @@ export default defineConfig({
   timeout: 45_000,
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [['line'], ['html', { open: 'never' }]] : 'line',
+  // The `github` reporter turns each failure into a workflow annotation, which
+  // lands inline on the PR diff and in the Checks API. Without it the only
+  // record of *which* spec failed is inside the uploaded HTML report, which
+  // costs a download and is unavailable to anything reading the API.
+  reporter: process.env.CI
+    ? [['github'], ['line'], ['html', { open: 'never' }]]
+    : 'line',
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',

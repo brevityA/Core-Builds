@@ -307,6 +307,61 @@ python3 scripts/template_builder.py --only stream  # filter by name
 | npm test | 29 tests | `node --test` in `configurator/` | Unit tests (credentials, device profiles, schema guard, UI lifecycle) |
 | Static validation | 25 checks | `npm run validate` in `configurator/` | Version consistency, host metadata, device defaults, module wiring |
 | Playwright E2E | varies | `configurator/e2e/` | Browser-based stability tests |
+| aios-regen smoke | 20 asserts | `node scripts/aios-regen/tests/smoke.mjs` | OPTIONS parser, generate, heal, diff (offline, no network) |
+
+---
+
+## aios-regen — AIOStreams Contract Watcher
+
+`scripts/aios-regen/` watches the AIOStreams codebase for schema changes that break Core Builds templates. Sibling of `scripts/check_upstream_drift.mjs` (which watches Vidhin05 regex). This one watches **AIOStreams code**.
+
+### What it catches
+
+| Surface | Source of truth | Breakage example |
+|---|---|---|
+| Preset IDs | `presetManager.ts` + host `/api/v1/status` | `easynews-plus-plus` vs `easynewsPlusPlus` |
+| Required option fields | Each preset `METADATA.OPTIONS` | `strictTitleMatching: required: true` |
+| Services | `constants.ts` + host `settings.services` | new `torrin` / `pikpak` / `seedr` |
+| Schema hotspots | `schemas.ts` nested Zod | `deduplicator.merge` boolean to object |
+| SEL functions | `streamExpression.ts` | `perGroup()`, `rseMatched()` appearing/disappearing |
+| Formatter fields | `formatters/base.ts` | `{stream.nSeScore}` |
+
+### Commands
+
+```bash
+node scripts/aios-regen/tests/smoke.mjs                              # must stay green
+node scripts/aios-regen/cli.mjs extract source --pin                 # GitHub Viren070/AIOStreams@main
+node scripts/aios-regen/cli.mjs extract host https://aiostreams.elfhosted.com
+node scripts/aios-regen/cli.mjs diff --fail                          # exit 1 on drift
+node scripts/aios-regen/cli.mjs generate --host https://aiostreams.elfhosted.com --out regen.json
+node scripts/aios-regen/cli.mjs heal path/to/template.json --out healed.json
+```
+
+### Layout
+
+```text
+scripts/aios-regen/
+  contract.mjs          extract source + host, fingerprint, diff, merge, snapshot
+  generate.mjs          recipe + contract -> template; heal existing JSON
+  cli.mjs               CLI
+  serve.mjs             local UI + API on 127.0.0.1:3333
+  recipes/core-nexus.json    default intent
+  snapshots/contract.source.json    pinned GitHub contract (commit into git)
+  tests/smoke.mjs       parser / generate / heal / diff, no network
+```
+
+### Rules
+
+- Zero npm dependencies. Do not add any.
+- Generate is a **floor**, not Core Builds output. No IQR, no ranked regex, no formatter overrides.
+- `heal` will drop SEL that uses unknown functions. Confirm before committing a healed fleet.
+- Never embed API keys in recipes or snapshots.
+- Do not auto-commit regenerated fleet templates. Drift opens an issue; a human/agent reviews, then re-pins.
+- If you change contract shape or generate output, update the smoke test in the same commit.
+
+### Contract fingerprint
+
+16-char sha256 over: preset IDs, service IDs, schema keys, hotspots, SEL functions, formatter fields, and each preset's required option IDs. Additive changes are `severity: additive`. Removals and newly required options are `severity: breaking`.
 
 ---
 
@@ -318,6 +373,7 @@ python3 scripts/template_builder.py --only stream  # filter by name
 | `sync-docs.yml` | push to main | Auto-generates ROADMAP.md + tools page from changelogs |
 | `docs-changelog-gate.yml` | PRs | Blocks merges without changelog update |
 | `upstream-drift-watch.yml` | daily cron | Detects Vidhin05 regex/expression changes |
+| `watch-aiostreams.yml` | 6h cron + push | AIOStreams contract drift detection (aios-regen) |
 | `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` + `npm run build` |
 | `configurator-e2e.yml` | PRs | Playwright E2E tests |
 | `validate.yml` | PRs | Template JSON validation |
@@ -446,7 +502,7 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.6.1)
+## Active Template Inventory (as of v3.6.2)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.9.1 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
@@ -1013,3 +1069,19 @@ Same structure but with `service` key after `seadex` for debrid provider priorit
 - Reddit (Core Crew): https://www.reddit.com/r/CoreBuilds/
 - AIOStreams: https://github.com/Viren070/AIOStreams
 - AIOStreams docs: https://docs.aiostreams.viren070.me
+---
+
+## Speed Test (tools/speedtest) — engine v3
+
+The speed test is a **single self-contained `tools/speedtest/index.html`** (zero build step, zero dependencies), deployed to Pages by the existing `deploy-configurator.yml`. It measures every TorBox Hyperdrive CDN node; the methodology is documented in its README.
+
+- **Engine invariants (deliberate accuracy fixes — do not regress):** all byte counting runs in a Web Worker (never the main thread); measurement windows are first-byte-anchored on the 1 GB file; nodes are measured twice and ranked by median steady-state; failed/skipped nodes are never ranked; units are decimal (MiB/s only via the labelled toggle).
+- **Test surface** (from the repo root):
+  - `node tools/speedtest/check-syntax.mjs tools/speedtest/index.html` — always
+  - `node tools/speedtest/test-engine.mjs --unit` — always before push (offline, 27 tests)
+  - `node tools/speedtest/test-engine.mjs` — before push when touching the engine (live CDN, ~0.4 GB; `LIVE_URL=…` overrides the node)
+  - `node tools/speedtest/benchmark.mjs` — manual only, downloads ~0.5–2.5 GB (`--full` and `--rounds N` both increase it; `--budget` caps it), never a gate
+- **CI:** `.github/workflows/speedtest-engine.yml` — unit job on PRs and on pushes to `main` touching the tool; live CDN job nightly + manual dispatch (override node via repo variable `CORESPEED_LIVE_URL`).
+- **Snapshot:** the `SNAPSHOT` const in `index.html` is a dated fallback endpoint list. TorBox renames nodes occasionally; if the live CI job fails or the on-page badge shows a stale/unverified snapshot, refresh the const from the two API calls in `tools/speedtest/README.md`.
+- **Do not modify `cloudflare-worker/`** for speedtest work — the v3 endpoint chain uses the existing `GET /proxy/v1/api/speedtest` lane and its `HOST_SCOPES` restrictions.
+- **Worker deploys are not proven by a green tick** (preserved from the v2 speedtest README, which v3 replaced): `deploy-worker.yml` fires on pushes to `main` touching `cloudflare-worker/**`, but it reports success even when it *skips* the deploy because the Cloudflare secrets are unset. Confirm the "Deploy to Cloudflare Workers" step actually ran before believing anything shipped.

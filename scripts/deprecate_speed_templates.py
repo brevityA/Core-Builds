@@ -55,6 +55,7 @@ EASYNEWS_TO_DEPRECATE = {
 }
 
 def deprecate(filename, src_dir, dest_dir, replacement_url, replacement_name):
+    """Deprecate a template by updating metadata and moving to Deprecated directory."""
     src = os.path.join(src_dir, filename)
     dest = os.path.join(dest_dir, filename)
 

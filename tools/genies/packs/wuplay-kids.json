@@ -1,0 +1,125 @@
+{
+  "format": "wuplay-home-plan",
+  "planVersion": 1,
+  "generatedBy": "Core Builds kids pack",
+  "generatedAt": "2026-08-26",
+  "style": "poster",
+  "note": "Built-in WuPlay rows only. Does not install addons. Does not set a PIN — apply Age Restrictions on the kids profile.",
+  "safety": {
+    "needsOwnAccount": true,
+    "wuplay": {
+      "path": "Settings → Age Restrictions",
+      "moviesMax": "Older Kids",
+      "showsMax": "Older Kids",
+      "includeUnrated": false
+    },
+    "stremio": {
+      "hasPin": false,
+      "note": "Stremio has no parental PIN. Use a separate account. The Android TV user lock is the PIN."
+    }
+  },
+  "plan": {
+    "catalogs": [
+      {
+        "name": "Continue Watching",
+        "source": "builtin-mystuff",
+        "sourceId": null,
+        "sourceMeta": {},
+        "mediaType": "all",
+        "sort": "default",
+        "homeOrder": 0,
+        "discoverOrder": null,
+        "showHome": true,
+        "showDiscover": false
+      },
+      {
+        "name": "Trending Family Movies",
+        "source": "preset",
+        "sourceId": null,
+        "sourceMeta": { "provider": "tmdb" },
+        "mediaType": "movie",
+        "sort": "default",
+        "homeOrder": 1,
+        "discoverOrder": null,
+        "showHome": true,
+        "showDiscover": false
+      },
+      {
+        "name": "Popular Kids Shows",
+        "source": "preset",
+        "sourceId": null,
+        "sourceMeta": { "provider": "tmdb" },
+        "mediaType": "series",
+        "sort": "default",
+        "homeOrder": 2,
+        "discoverOrder": null,
+        "showHome": true,
+        "showDiscover": false
+      },
+      {
+        "name": "Animated Films",
+        "source": "preset",
+        "sourceId": null,
+        "sourceMeta": { "provider": "tmdb" },
+        "mediaType": "movie",
+        "sort": "default",
+        "homeOrder": 3,
+        "discoverOrder": null,
+        "showHome": true,
+        "showDiscover": false
+      },
+      {
+        "name": "Popular Kids Shows",
+        "source": "preset",
+        "sourceId": null,
+        "sourceMeta": { "provider": "tmdb" },
+        "mediaType": "series",
+        "sort": "random",
+        "homeOrder": null,
+        "discoverOrder": 0,
+        "showHome": false,
+        "showDiscover": true
+      }
+    ],
+    "hubs": [
+      {
+        "name": "Kids",
+        "systemKey": null,
+        "builtin": false,
+        "position": 0,
+        "detailViewType": "poster",
+        "cards": [
+          "Trending Family Movies",
+          "Popular Kids Shows",
+          "Animated Films"
+        ]
+      }
+    ],
+    "screens": [
+      {
+        "name": "Kids",
+        "icon": "kids",
+        "viewType": "hub",
+        "hubName": "Kids",
+        "position": 0,
+        "visible": true
+      }
+    ],
+    "layout": [
+      {
+        "layoutType": "home",
+        "rowOrder": [
+          "Continue Watching",
+          "Trending Family Movies",
+          "Popular Kids Shows",
+          "Animated Films"
+        ]
+      },
+      {
+        "layoutType": "discover",
+        "rowOrder": ["Popular Kids Shows"]
+      }
+    ],
+    "trakt": { "connect": false }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "core-builds-configurator",
-  "version": "2.95.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,11 +12,12 @@
     "test:upstream-selector": "node scripts/run-upstream-selector-contract.mjs",
     "test:upstream-v232-nab": "node scripts/run-v232-nab-migration-contract.mjs",
     "validate:import-matrix": "node scripts/validate-import-matrix.mjs",
+    "sync:upstream": "node scripts/sync-upstream.mjs --accept",
+    "sync:upstream:check": "node scripts/sync-upstream.mjs --check",
     "release": "npm test && npm run validate && npm run build"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.2"
   }
 }
-

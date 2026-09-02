@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Badge Builder — Core Builds</title>
+<meta name="description" content="Build Nuvio Fusion badge packs with AIO Enhanced markers or Universal regex. Import Elite, UME, BetterFormatter, Core, Nard — or create custom badges.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cpath d='M22 4 39 14v16L22 40 5 30V14Z' fill='none' stroke='%2300d4ff' stroke-width='2'/%3E%3Cpath d='m22 13 9 9-9 9-9-9Z' fill='%23a78bfa'/%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  --bg:#0d1017; --bg2:#151923; --bg3:#111720; --bg4:#1c2230; --border:rgba(255,255,255,.06); --border2:rgba(255,255,255,.12);
+  --text:#e4e7ed; --text2:#8b949e; --text3:#6b7280; --text4:#4b5563;
+  --accent:#00d4ff; --accent2:#5ac8fa; --accent-bg:rgba(0,212,255,.08); --accent-border:rgba(0,212,255,.18);
+  --purple:#a78bfa; --purple-bg:rgba(168,85,247,.04); --purple-border:rgba(168,85,247,.18);
+  --green:#34d399; --green-bg:rgba(52,211,153,.06); --yellow:#fbbf24; --red:#f87171; --blue:#3b82f6; --cyan:#00d4ff; --pink:#ec4899; --orange:#f97316;
+  --radius:16px; --radius2:12px; --radius3:10px; --radius-sm:8px;
+  --shadow:0 10px 30px rgba(0,0,0,0.5); --shadow2:0 4px 20px rgba(0,212,255,0.12);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1017; --bg2:#151923; --bg3:#111720; --bg4:#1c2230;
+  --text:#e4e7ed; --text2:#8b949e; --text3:#6b7280;
+}}
+[data-theme="light"]{
+  --bg:#f6f8fa; --bg2:#ffffff; --bg3:#f4f4f5; --bg4:#e4e4e7; --border:rgba(0,0,0,.09); --border2:rgba(0,0,0,.18);
+  --text:#1c2128; --text2:#57606a; --text3:#6b7280; --text4:#8c959f;
+  --accent:#0969da; --accent2:#0969da; --accent-bg:rgba(9,105,218,.06); --accent-border:rgba(9,105,218,.25);
+  --purple:#7c3aed; --purple-bg:rgba(124,58,237,.04); --purple-border:rgba(124,58,237,.18);
+  --green:#059669; --green-bg:rgba(5,150,105,.06); --yellow:#a16207; --red:#dc2626;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);background-image:radial-gradient(ellipse at 15% 15%,rgba(0,212,255,.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,.05) 0%,transparent 45%);background-attachment:fixed;color:var(--text);line-height:1.5;min-height:100vh}
+.mono{font-family:'SF Mono',Monaco,Consolas,monospace}
+a{color:var(--accent);text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+
+/* Header */
+.header{position:sticky;top:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin:0 20px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;overflow:hidden;position:relative}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.35),rgba(168,85,247,.3),transparent);pointer-events:none}
+[data-theme="light"] .header{background:var(--bg2)}
+.hdr-icon{width:44px;height:44px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(0,212,255,.35))}
+.hdr-divider{width:1px;height:40px;background:linear-gradient(to bottom,transparent,rgba(0,212,255,.35),transparent);flex-shrink:0}
+.header h1{font-size:1.3rem;font-weight:900;letter-spacing:-.02em;line-height:1}
+.header h1 .hdr-tool{background:linear-gradient(90deg,var(--accent),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.header p{font-size:.7rem;color:var(--text3);letter-spacing:.04em;margin-top:2px}
+.pill{padding:5px 10px;border-radius:20px;font-size:.6rem;font-weight:700;letter-spacing:0.06em;border:1px solid var(--accent-border);background:var(--accent-bg);color:var(--accent);display:inline-flex;align-items:center;gap:6px;text-transform:uppercase}
+.pill.dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 8px var(--green)}
+.hdr-btn{padding:7px 12px;border-radius:8px;font-size:.68rem;font-weight:700;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.hdr-btn:hover{border-color:var(--accent-border);color:var(--accent);background:var(--accent-bg)}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+@media(max-width:640px){
+  .header{flex-wrap:wrap;overflow:visible;padding:12px 14px;margin:0 10px;gap:10px}
+  .hdr-divider{display:none}
+  .hdr-icon{width:32px;height:32px}
+  .header h1{font-size:1.05rem}
+  .header p{font-size:.6rem}
+  .hdr-actions{margin-left:0;width:100%;flex-wrap:wrap;gap:6px}
+  .hdr-btn{padding:6px 10px;font-size:.62rem}
+  .pill{padding:4px 8px;font-size:.55rem}
+}
+
+/* Stepper */
+.stepper{max-width:1440px;margin:0 auto;padding:18px 20px 0;display:flex;gap:10px;align-items:center;overflow:auto}
+.step-btn{flex:1;min-width:180px;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);text-align:left;transition:all .15s;position:relative}
+.step-btn[aria-current="step"]{border-color:var(--accent-border);background:var(--accent-bg);box-shadow:0 0 0 1px var(--accent-border) inset}
+.step-num{font-size:.6rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.step-num span{width:18px;height:18px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:grid;place-items:center;font-size:11px}
+.step-btn[aria-current="step"] .step-num span{background:var(--accent);color:#041018;border-color:var(--accent)}
+.step-title{font-size:13px;font-weight:700}
+.step-desc{font-size:11px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Layout */
+.app{max-width:1440px;margin:0 auto;padding:20px;display:grid;grid-template-columns:300px 1fr 380px;gap:20px}
+@media(max-width:1200px){.app{grid-template-columns:280px 1fr} .right{display:none}}
+@media(max-width:860px){.app{grid-template-columns:1fr;padding:12px} .left{order:2} .main{order:1} .right{display:block;order:3} .stepper{padding:12px 12px 0} .step-btn{min-width:140px}}
+@media(max-width:640px){.stepper{gap:6px;padding:10px 10px 0} .step-btn{min-width:100px;padding:10px 10px} .step-title{font-size:12px} .step-desc{font-size:10px} .step-num{font-size:.55rem} .app{padding:10px;gap:12px} .search input{width:100%} .badge-grid{grid-template-columns:1fr} .library-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))} .toolbar{flex-direction:column;align-items:stretch} .toolbar-left{flex-wrap:wrap}}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-header h2{font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.card-body{padding:16px}
+.card-footer{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg3);display:flex;gap:8px}
+
+/* Buttons */
+.btn{padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:7px;justify-content:center;white-space:nowrap}
+.btn:hover{background:var(--bg4);border-color:var(--border2);transform:translateY(-1px)}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:600}
+.btn-accent{background:linear-gradient(135deg,#00a9d1,#00d4ff 60%,#5aa9ff);color:#041018;border-color:transparent;font-weight:700;box-shadow:0 2px 10px rgba(0,212,255,0.2)}
+.btn-accent:hover{box-shadow:0 4px 20px rgba(0,212,255,0.3);transform:translateY(-1px)}
+.btn-sm{padding:7px 11px;font-size:12px}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-block{width:100%}
+
+/* Inputs */
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.label{font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px}
+.input,.select,.textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;outline:none;transition:all .15s}
+.input:focus,.select:focus,.textarea:focus{border-color:rgba(0,212,255,.4);box-shadow:0 0 0 3px var(--accent-bg)}
+.textarea{resize:vertical;min-height:80px;font-family:'Geist Mono',monospace;font-size:12px}
+.input-sm{padding:7px 10px;font-size:12px}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.4}
+.color-row{display:flex;align-items:center;gap:8px}
+.color-input{width:44px;height:38px;padding:2px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer}
+
+/* Mode cards */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:600px){.mode-grid{grid-template-columns:1fr}}
+.mode-card{padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;text-align:left;position:relative;overflow:hidden}
+.mode-card:hover{border-color:var(--border2);background:var(--bg4)}
+.mode-card.active{border-color:var(--accent-border);background:var(--accent-bg);box-shadow:0 0 0 1px var(--accent-border) inset}
+.mode-card.active::after{content:'✓';position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#041018;display:grid;place-items:center;font-size:12px;font-weight:700}
+.mode-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.mode-desc{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.4}
+.mode-badge{font-size:10px;padding:2px 6px;border-radius:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);margin-left:6px}
+
+/* Groups */
+.group-item{padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.group-item:hover{border-color:var(--border2);background:var(--bg4)}
+.group-item.active{border-color:var(--accent-border);background:var(--accent-bg);box-shadow:0 0 0 1px var(--accent-border) inset}
+.group-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.group-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.group-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.group-count{font-size:11px;color:var(--text3);background:var(--bg2);padding:2px 8px;border-radius:10px;border:1px solid var(--border)}
+.group-actions{display:flex;gap:4px;margin-top:8px}
+
+/* Badges */
+.toolbar{position:sticky;top:66px;z-index:10;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:16px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;backdrop-filter:blur(12px)}
+.toolbar-left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.search{position:relative}
+.search input{padding-left:32px;width:220px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.badge-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px;transition:all .15s;position:relative}
+.badge-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shadow)}
+.badge-card.disabled{opacity:0.55}
+.badge-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.badge-meta{display:flex;align-items:center;gap:10px;min-width:0}
+.badge-icon{width:42px;height:42px;border-radius:11px;background:var(--bg3);border:1px solid var(--border);display:grid;place-items:center;overflow:hidden;flex-shrink:0}
+.badge-icon img{width:100%;height:100%;object-fit:contain;padding:5px}
+.badge-info{min-width:0;flex:1}
+.badge-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge-id{font-size:10px;color:var(--text3);font-family:'Geist Mono',monospace}
+.badge-toggle{width:36px;height:22px;border-radius:20px;background:var(--bg4);border:1px solid var(--border);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0}
+.badge-toggle.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(0,212,255,.25)}
+.badge-toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:white;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.badge-toggle.on::after{transform:translateX(14px)}
+.badge-pattern{font-family:'Geist Mono',monospace;font-size:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:10px}
+.badge-footer{display:flex;gap:6px}
+.badge-footer .btn{flex:1;padding:6px 8px;font-size:11px}
+
+/* Preview */
+.preview-stream{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px;margin:12px;box-shadow:0 2px 10px rgba(0,0,0,0.2)}
+.stream-top{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:0.3px;margin-bottom:10px;color:var(--text2)}
+.stream-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:28px}
+.stream-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:9px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--bg3);max-height:26px}
+.stream-badge img{width:16px;height:16px;object-fit:contain}
+.stream-meta{display:flex;gap:12px;font-size:11px;color:var(--text2)}
+.match-list{max-height:300px;overflow:auto;border-top:1px solid var(--border)}
+.match-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.match-item.matched{background:rgba(34,197,94,0.06)}
+.match-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.match-dot.on{background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* Library */
+.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.lib-item{padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg3);cursor:pointer;transition:all .15s;text-align:left}
+.lib-item:hover{border-color:var(--accent-border);background:var(--accent-bg);transform:translateY(-1px)}
+.lib-item-title{font-size:12px;font-weight:600}
+.lib-item-pattern{font-size:10px;color:var(--text3);font-family:'Geist Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);z-index:100;display:none;place-items:center;padding:20px}
+.modal-backdrop.open{display:grid}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:100%;max-width:600px;max-height:92vh;overflow:auto;box-shadow:var(--shadow);animation:pop .2s ease}
+@keyframes pop{from{transform:scale(.96) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-body{padding:20px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:var(--bg3);position:sticky;bottom:0}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;padding:4px;background:var(--bg3);border-radius:12px;border:1px solid var(--border);width:fit-content;margin-bottom:16px}
+.tab{padding:7px 12px;border-radius:8px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap}
+.tab.active{background:var(--bg2);color:var(--text);border-color:var(--border);box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+
+/* Canvas */
+.canvas-preview{width:100%;height:120px;background:var(--bg3);border:1px dashed var(--border);border-radius:12px;display:grid;place-items:center;overflow:hidden;position:relative}
+.canvas-preview img{max-width:90%;max-height:90%;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3))}
+
+/* Utils */
+.divider{height:1px;background:var(--border);margin:14px 0}
+.badge{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent)}
+.empty{padding:40px 20px;text-align:center;color:var(--text3)}
+.kbd{font-family:'Geist Mono',monospace;font-size:11px;padding:2px 6px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);border-bottom-width:2px;color:var(--text2)}
+.builder-step[hidden]{display:none !important}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:all .25s;z-index:200}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+</style>
+</head>
+<body>
+<div style="padding:16px 20px 0">
+<div class="header">
+  <svg class="hdr-icon" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><path d="M22 4 39 14v16L22 40 5 30V14Z" fill="none" stroke="#00d4ff" stroke-width="2"/><path d="m22 13 9 9-9 9-9-9Z" fill="#a78bfa"/></svg>
+  <div class="hdr-divider"></div>
+  <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
+    <h1><span>Core </span><span class="hdr-tool">Badge Builder</span></h1>
+    <p>Nuvio Fusion badges — AIO Enhanced markers or Universal regex</p>
+  </div>
+  <div class="hdr-actions">
+    <span class="pill dot">v3</span>
+    <button class="hdr-btn" id="themeBtn">☀ Light</button>
+    <a class="hdr-btn" href="../">← Tools</a>
+    <a class="hdr-btn" href="https://github.com/brevityA/Core-Builds" target="_blank">GitHub ↗</a>
+  </div>
+</div>
+</div>
+
+<div class="stepper">
+  <button class="step-btn" data-step-target="1" aria-current="step" onclick="setStep(1)">
+    <div class="step-num"><span>1</span> Foundation</div>
+    <div class="step-title">Mode & Style</div>
+    <div class="step-desc">AIO Enhanced or Universal + theme</div>
+  </button>
+  <button class="step-btn" data-step-target="2" onclick="setStep(2)">
+    <div class="step-num"><span>2</span> Catalog</div>
+    <div class="step-title">Groups & Badges</div>
+    <div class="step-desc"><span id="step2Count">0 badges</span> • any source</div>
+  </button>
+  <button class="step-btn" data-step-target="3" onclick="setStep(3)">
+    <div class="step-num"><span>3</span> Export</div>
+    <div class="step-title">Preview & Install</div>
+    <div class="step-desc">Formatter + badge JSON + Nuvio URL</div>
+  </button>
+</div>
+
+<div class="app">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><h2 id="leftPanelTitle">Foundation</h2><span class="badge mono" id="statsBadge">0 badges</span></div>
+      <div class="card-body">
+        <!-- STEP 1 -->
+        <div class="builder-step" data-step="1">
+          <label class="label">Compatibility mode</label>
+          <div class="mode-grid">
+            <button class="mode-card active" data-mode="enhanced" id="modeEnhanced">
+              <div class="mode-title">⚡ AIO Enhanced <span class="mode-badge">Recommended</span></div>
+              <div class="mode-desc">Pairs badge pack with invisible exact markers from AIOStreams parser. Most accurate for sparse titles. Requires companion formatter.</div>
+            </button>
+            <button class="mode-card" data-mode="universal" id="modeUniversal">
+              <div class="mode-title">🌐 Universal</div>
+              <div class="mode-desc">Reads filename + parsed metadata. Works with any source, no formatter needed. Slightly less certain on sparse addons.</div>
+            </button>
+          </div>
+
+          <label class="label">Visual theme</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+            <button class="btn btn-sm" data-theme-preset="neon" style="justify-content:flex-start">◆ Core Neon</button>
+            <button class="btn btn-sm" data-theme-preset="mono" style="justify-content:flex-start">◆ Monochrome</button>
+            <button class="btn btn-sm" data-theme-preset="contrast" style="justify-content:flex-start">◆ High Contrast</button>
+            <button class="btn btn-sm" data-theme-preset="transparent" style="justify-content:flex-start">◆ Transparent (Elite)</button>
+          </div>
+
+          <div class="field">
+            <label class="label">Global tag style</label>
+            <select class="select" id="globalTagStyle"><option value="filled">Filled</option><option value="bordered">Bordered</option><option value="filled and bordered" selected>Filled + Bordered</option></select>
+          </div>
+          <div class="field">
+            <label class="label">Rendering mode</label>
+            <select class="select" id="renderMode"><option value="tag" selected>Tag + icon (Core/UME)</option><option value="image">Image badges (Elite) — transparent tag</option><option value="mixed">Mixed</option></select>
+          </div>
+
+          <div class="divider"></div>
+
+          <label class="label">Import community packs</label>
+          <div class="field">
+            <div class="row"><input class="input input-sm mono" id="importUrl" placeholder="https://raw.githubusercontent.com/.../badges.json"><button class="btn btn-sm" id="importUrlBtn">Import</button></div>
+            <div class="hint">Elite, UME, BetterFormatter, Core, Nard — any Nuvio pack</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <button class="btn btn-sm" data-quick="elite">Elite</button>
+            <button class="btn btn-sm" data-quick="ume">UME Colored</button>
+            <button class="btn btn-sm" data-quick="better">BetterFormatter</button>
+            <button class="btn btn-sm" data-quick="core">Core Neon</button>
+          </div>
+
+          <div class="field" style="margin-top:14px">
+            <label class="label">Or paste JSON</label>
+            <textarea class="textarea" id="importPaste" placeholder='{"groups":[...],"filters":[...]}' style="min-height:70px"></textarea>
+            <div class="row" style="margin-top:8px"><button class="btn btn-sm" id="importPasteBtn">Parse</button><select class="select input-sm" id="mergeMode"><option value="append" selected>Append/Merge</option><option value="replace">Replace all</option></select></div>
+          </div>
+
+          <button class="btn btn-accent btn-block" style="margin-top:16px" onclick="setStep(2)">Choose badges →</button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="builder-step" data-step="2" hidden>
+          <div class="tabs" id="sourceTabs">
+            <div class="tab active" data-tab="groups">Groups</div>
+            <div class="tab" data-tab="library">Library (80+)</div>
+          </div>
+
+          <div data-panel="groups">
+            <div style="display:flex;gap:6px;margin-bottom:10px"><button class="btn btn-sm btn-accent" id="addGroupBtn" style="flex:1">+ Group</button><button class="btn btn-sm" id="sortGroupsBtn">↕ Sort</button></div>
+            <div id="groupsList" style="max-height:360px;overflow:auto"></div>
+          </div>
+
+          <div data-panel="library" style="display:none">
+            <div class="row" style="margin-bottom:10px"><input class="input input-sm" id="libSearch" placeholder="Search 4K, Atmos..."><select class="select input-sm" id="libCategory" style="max-width:110px"><option value="all">All</option><option value="resolution">RES</option><option value="quality">SRC</option><option value="visual">VIS</option><option value="audio">AUD</option><option value="codec">CODEC</option><option value="network">NET</option><option value="language">LANG</option></select></div>
+            <div class="library-grid" id="libraryGrid"></div>
+          </div>
+
+          <button class="btn btn-accent btn-block" style="margin-top:16px" onclick="setStep(3)">Preview & export →</button>
+          <button class="btn btn-block" style="margin-top:8px" onclick="setStep(1)">← Back</button>
+        </div>
+
+        <!-- STEP 3 left -->
+        <div class="builder-step" data-step="3" hidden>
+          <div class="field"><label class="label">Pack name</label><input class="input input-sm" id="packName" value="My Universal Nuvio Pack v3"></div>
+          <div class="row"><div class="field" style="margin:0"><label class="label">Author</label><input class="input input-sm" id="packAuthor" placeholder="you"></div><div class="field" style="margin:0"><label class="label">Version</label><input class="input input-sm" id="packVersion" value="3.0.0"></div></div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px">
+            <strong style="color:var(--text)">v3 Enhanced</strong> = invisible markers + companion formatter for perfect matching.<br>
+            <strong style="color:var(--text)">Universal</strong> = regex on filename, works everywhere.
+          </div>
+          <button class="btn btn-block" style="margin-top:12px" onclick="setStep(2)">← Edit badges</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card builder-step" data-step="2">
+      <div class="card-header"><h2>Quick Stats</h2></div>
+      <div class="card-body" style="font-size:12px;color:var(--text2);line-height:1.7">
+        <div style="display:flex;justify-content:space-between"><span>Mode</span><strong id="statMode" style="color:var(--text)">AIO Enhanced</strong></div>
+        <div style="display:flex;justify-content:space-between"><span>Groups</span><strong id="statGroups" style="color:var(--text)">0</strong></div>
+        <div style="display:flex;justify-content:space-between"><span>Enabled badges</span><strong id="statEnabled" style="color:var(--text)">0</strong></div>
+        <div style="display:flex;justify-content:space-between"><span>Formatter size</span><strong id="statFormatter" style="color:var(--text)">0 / 4900</strong></div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:6px"><button class="btn btn-sm" id="enableAllBtn" style="flex:1">Enable all</button><button class="btn btn-sm" id="disableAllBtn" style="flex:1">Disable</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="builder-step" data-step="1">
+      <div class="card">
+        <div class="card-header"><h2>How v3 works</h2><span class="badge">New in v3</span></div>
+        <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <h3 style="font-size:13px;font-weight:700;margin-bottom:6px">⚡ AIO Enhanced (recommended)</h3>
+            <p style="font-size:12px;color:var(--text2);line-height:1.6">Badge JSON uses invisible markers like <span class="mono">⁠​​​​⁠</span> that are emitted by a companion AIOStreams formatter. Nuvio matches markers exactly, not filename. Most accurate for Core Builds and sparse release titles.<br><br>Exports: <span class="kbd">badge JSON</span> + <span class="kbd">formatter JSON</span> + Configurator handoff</p>
+          </div>
+          <div>
+            <h3 style="font-size:13px;font-weight:700;margin-bottom:6px">🌐 Universal</h3>
+            <p style="font-size:12px;color:var(--text2);line-height:1.6">Badge JSON uses regex like <span class="mono">(?i)\bremux\b</span> that reads ordinary filename and parsed stream metadata. Works without changing formatter, slightly less certain on sparse addons.<br><br>Exports: <span class="kbd">badge JSON</span> + optional clean formatter</p>
+          </div>
+        </div>
+        <div class="card-footer"><span style="font-size:11px;color:var(--text3)">v3 adds marker tokens for custom badges too — define field + values, we generate the formatter expression.</span></div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header"><h2>Theme preview</h2></div>
+        <div class="card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span class="stream-badge" style="background:#E68B5CF6;border-color:#FF8B5CF6;color:white">◆ 4K</span>
+            <span class="stream-badge" style="background:#E600D4FF;border-color:#FF00D4FF;color:white">◆ REMUX</span>
+            <span class="stream-badge" style="background:#E6F59E0B;border-color:#FFF59E0B;color:white">◆ HDR10+</span>
+            <span class="stream-badge" style="background:#E6EC4899;border-color:#FFEC4899;color:white">◆ ATMOS</span>
+            <span class="stream-badge" style="background:#E614B8A6;border-color:#FF14B8A6;color:white">◆ 7.1</span>
+            <span class="stream-badge" style="background:#E63B82F6;border-color:#FF3B82F6;color:white">◆ HEVC</span>
+            <span class="stream-badge" style="background:transparent;border-color:transparent;padding:0"><span style="background:#8B5CF6;color:white;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:700">4K IMAGE BADGE</span></span>
+          </div>
+          <div class="hint">Tag + icon = colored background + small icon. Image badge = transparent tag, image IS the badge.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="builder-step" data-step="2" hidden>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="input input-sm" id="badgeSearch" placeholder="Search badges, patterns..."></div>
+          <select class="select input-sm" id="filterGroup" style="width:160px"><option value="all">All groups</option></select>
+          <select class="select input-sm" id="filterEnabled" style="width:130px"><option value="all">All</option><option value="enabled">Enabled</option><option value="disabled">Disabled</option></select>
+        </div>
+        <button class="btn btn-sm btn-accent" id="addBadgeBtn">+ Custom Badge</button>
+      </div>
+      <div id="badgeGrid" class="badge-grid"></div>
+      <div id="emptyState" class="empty" style="display:none">
+        <div style="font-size:32px;margin-bottom:10px">🏷️</div>
+        <div style="font-weight:700;margin-bottom:4px">No badges yet</div>
+        <div style="font-size:12px;color:var(--text3);max-width:360px;margin:0 auto">Import a community pack or add from Library. You can build ANY Nuvio badge — not just Core — with custom regex or enhanced markers.</div>
+        <div style="margin-top:14px;display:flex;gap:8px;justify-content:center"><button class="btn btn-sm btn-accent" data-quick="elite">Load Elite starter</button><button class="btn btn-sm" onclick="document.querySelector('[data-tab=library]').click()">Open Library</button></div>
+      </div>
+    </div>
+
+    <div class="builder-step" data-step="3" hidden>
+      <div class="card">
+        <div class="card-header"><h2>Preview — same detection as export</h2><span class="badge mono" id="previewModeBadge">AIO Enhanced</span></div>
+        <div class="card-body" style="padding:0">
+          <div style="padding:14px">
+            <label class="label">Sample release or stream text (one per line)</label>
+            <textarea class="textarea" id="testInput" style="min-height:90px">Dune.Part.Two.2024.2160p.UHD.BluRay.REMUX.DV.HDR10+.Atmos.TrueHD.7.1-GROUP
+The.Bear.S03E05.1080p.WEB-DL.DDP5.1.Atmos.H.264-NTb
+Anime.Show.S01.1080p.BluRay.FLAC.JPN-ENG.MULTI-SUBS</textarea>
+            <div class="hint">Paste real release names. In Enhanced mode, preview uses Universal regex for quick check — actual Nuvio will match invisible markers.</div>
+          </div>
+          <div id="previewStreams"></div>
+          <div style="padding:14px">
+            <label class="label">Matched badges (first sample)</label>
+            <div class="match-list" id="matchList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="builder-step" data-step="1">
+      <div class="card">
+        <div class="card-header"><h2>What's new in v3</h2><span class="badge" style="background:var(--accent);color:white;border-color:var(--accent)">v3.0.0</span></div>
+        <div class="card-body" style="font-size:12px;color:var(--text2);line-height:1.7">
+          <strong style="color:var(--text)">vs v2:</strong><br>
+          • AIO Enhanced mode with invisible markers<br>
+          • Custom marker terms for any badge<br>
+          • Companion formatter builder<br>
+          • Configurator handoff<br>
+          • Temporary import URL via worker<br>
+          • Formatter size guard (4900 char limit)<br>
+          • Stepper UI like Core builder<br><br>
+          <strong style="color:var(--text)">Universal still works</strong> without Core assets — generate your own PNGs, use any image URL.
+        </div>
+      </div>
+    </div>
+
+    <div class="builder-step" data-step="2" hidden>
+      <div class="card">
+        <div class="card-header"><h2>Tip: Custom badges in Enhanced mode</h2></div>
+        <div class="card-body" style="font-size:11px;color:var(--text2);line-height:1.6">
+          When you create a custom badge in Enhanced mode, set:<br>
+          <span class="kbd">Field</span> = <span class="mono">stream.resolution</span> / <span class="mono">stream.quality</span> / <span class="mono">stream.visualTags</span> etc<br>
+          <span class="kbd">Values</span> = exact parsed values AIOStreams emits, e.g. <span class="mono">2160p, WEB-DL, DV</span><br>
+          Builder will generate <span class="mono">{field::=value [marker] }</span> formatter expression.
+        </div>
+      </div>
+    </div>
+
+    <div class="builder-step" data-step="3">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h2>Nuvio badge pack</h2><span class="badge mono" id="badgeCountBadge">0 badges</span></div>
+        <div class="card-body">
+          <div style="display:grid;gap:8px">
+            <button class="btn btn-accent btn-block" id="exportJsonBtn">⬇ Download badge JSON</button>
+            <div class="row"><button class="btn btn-sm btn-block" id="copyJsonBtn">Copy JSON</button><button class="btn btn-sm btn-block" id="downloadZipBtn">ZIP</button></div>
+            <button class="btn btn-sm btn-block" id="createImportUrlBtn">Create import URL + backup</button>
+            <div class="field"><label class="label">Nuvio import URL</label><input class="input input-sm mono" id="importUrlOutput" readonly placeholder="Will generate..."><div class="hint">Paste in Nuvio → Settings → Streams → Fusion badge URLs → Import. Up to 3 URLs.</div></div>
+            <div id="importUrlStatus" style="font-size:11px;color:var(--text3)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="formatterCard" style="margin-bottom:16px">
+        <div class="card-header"><h2>Companion formatter</h2><span class="pill">Enhanced mode</span></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Carries invisible exact markers + clean AIOStreams layout. Formatter fields limited to 4900 chars.</div>
+          <div class="field"><label class="label">Name field</label><textarea class="textarea mono" id="formatterName" readonly style="min-height:60px;font-size:10px"></textarea></div>
+          <div class="field"><label class="label">Description field</label><textarea class="textarea mono" id="formatterDesc" readonly style="min-height:80px;font-size:10px"></textarea></div>
+          <div style="display:grid;gap:6px"><button class="btn btn-sm btn-block" id="downloadFormatterBtn">Download formatter JSON</button><button class="btn btn-sm btn-block btn-accent" id="openConfiguratorBtn">Open in Core Configurator →</button></div>
+          <div class="hint" id="formatterSizeHint">0 / 4900 chars</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Build details</h2></div>
+        <div class="card-body" style="font-size:11px;color:var(--text2);line-height:1.8">
+          <div style="display:flex;justify-content:space-between"><span>Mode</span><strong id="detailMode" style="color:var(--text)">AIO Enhanced</strong></div>
+          <div style="display:flex;justify-content:space-between"><span>Theme</span><strong id="detailTheme" style="color:var(--text)">Core Neon</strong></div>
+          <div style="display:flex;justify-content:space-between"><span>Selected</span><strong id="detailSelected" style="color:var(--text)">0</strong></div>
+          <div style="display:flex;justify-content:space-between"><span>Badge JSON</span><strong id="detailSize" style="color:var(--text)">0 KB</strong></div>
+          <div style="display:flex;justify-content:space-between"><span>Builder</span><strong class="mono" style="color:var(--text)">v3.0.0</strong></div>
+        </div>
+        <div class="card-footer"><button class="btn btn-sm btn-block btn-ghost" id="saveLocalBtn">💾 Save locally</button><button class="btn btn-sm btn-block btn-ghost" id="resetBtn">Reset</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Badge Modal -->
+<div class="modal-backdrop" id="badgeModal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="badgeModalTitle">New Custom Badge</h3><button class="icon-btn" id="closeBadgeModal">✕</button></div>
+    <div class="modal-body">
+      <div class="tabs" id="badgeEditTabs">
+        <div class="tab active" data-btab="basic">Basic</div>
+        <div class="tab" data-btab="pattern">Pattern / Marker</div>
+        <div class="tab" data-btab="image">Image</div>
+        <div class="tab" data-btab="style">Style</div>
+      </div>
+
+      <div data-bpanel="basic">
+        <div class="row"><div class="field"><label class="label">ID (slug, unique)</label><input class="input mono" id="editId" placeholder="my-4k-badge"></div><div class="field"><label class="label">Group</label><select class="select" id="editGroup"></select></div></div>
+        <div class="field"><label class="label">Display Name</label><input class="input" id="editName" placeholder="4K Ultra HD"></div>
+        <div class="field"><label class="label">Description (builder only)</label><input class="input" id="editDesc" placeholder="Optional"></div>
+        <div class="field" id="markerCodeField"><label class="label">Marker code (1-255) for Enhanced mode</label><input class="input mono" id="editMarkerCode" type="number" min="1" max="255" value="1"><div class="hint">Auto-assigned. Each badge needs unique code for invisible marker token.</div></div>
+      </div>
+
+      <div data-bpanel="pattern" style="display:none">
+        <div id="universalPatternSection">
+          <div class="field"><label class="label">Regex pattern (Universal mode)</label><textarea class="textarea mono" id="editPattern" placeholder="(?i)\b(4k|2160p|uhd)\b" style="min-height:90px"></textarea><div class="hint">JS regex. Use (?i) for case-insensitive. Example: (?i)\bremux\b</div></div>
+          <div class="field"><label class="label">Pattern Helper</label><div style="display:grid;gap:8px"><div class="row"><input class="input input-sm" id="helperKeywords" placeholder="Keywords: 4k,2160p,uhd"><button class="btn btn-sm" id="helperBuildBtn">Build \b regex</button></div><div class="row"><select class="select input-sm" id="helperPreset"><option value="">Presets...</option><option value="res-4k">4K</option><option value="src-remux">REMUX</option><option value="vis-dv">DV</option><option value="aud-atmos">Atmos</option><option value="codec-hevc">HEVC</option><option value="net-netflix">Netflix</option></select><button class="btn btn-sm" id="helperPresetBtn">Apply</button></div></div></div>
+        </div>
+
+        <div id="enhancedMarkerSection" style="display:none">
+          <div class="field"><label class="label">Enhanced marker — AIOStreams field</label><select class="select" id="editMarkerField"><option value="stream.resolution">stream.resolution</option><option value="stream.quality">stream.quality</option><option value="stream.visualTags">stream.visualTags</option><option value="stream.audioTags">stream.audioTags</option><option value="stream.audioChannels">stream.audioChannels</option><option value="stream.encode">stream.encode</option><option value="stream.editions">stream.editions</option><option value="stream.language">stream.language</option><option value="stream.network">stream.network (custom)</option><option value="service.cached">service.cached (true/false)</option></select></div>
+          <div class="row"><div class="field"><label class="label">Match mode</label><select class="select" id="editMarkerMode"><option value="exact">Exact (=)</option><option value="contains" selected>Contains (~)</option><option value="true">Is true</option><option value="false">Is false</option></select></div><div class="field"><label class="label">Values (comma separated)</label><input class="input mono" id="editMarkerValues" placeholder="2160p, 4k, UHD"></div></div>
+          <div class="hint">For custom badges in Enhanced mode, define the parsed values AIOStreams emits. Example: for 4K, field=stream.resolution, mode=exact, values=2160p. Builder generates formatter expression with invisible marker.</div>
+          <div class="field" style="margin-top:10px"><label class="label">Generated formatter snippet</label><div class="textarea mono" id="markerSnippet" style="min-height:60px;background:var(--bg3);padding:10px;font-size:11px;white-space:pre-wrap;word-break:break-all"></div></div>
+        </div>
+
+        <div class="field"><label class="label">Live test (Universal regex)</label><input class="input input-sm mono" id="patternTestInput" placeholder="Type release name..."><div id="patternTestResult" style="margin-top:6px;font-size:12px;padding:8px;border-radius:8px;background:var(--bg3);border:1px solid var(--border)">No test yet</div></div>
+      </div>
+
+      <div data-bpanel="image" style="display:none">
+        <div class="tabs" id="imageSourceTabs"><div class="tab active" data-isrc="url">URL</div><div class="tab" data-isrc="generate">Generate</div><div class="tab" data-isrc="upload">Upload</div></div>
+        <div data-ispanel="url">
+          <div class="field"><label class="label">Image URL (https)</label><input class="input mono" id="editImageUrl" placeholder="https://raw.githubusercontent.com/.../4k.png"><div class="hint">Transparent PNG for image badges, small icon for tag badges. Use Core assets or any URL.</div></div>
+          <div class="field"><label class="label">Or pick Core asset (original Core artwork)</label><div class="row"><select class="select input-sm" id="coreAssetSelect"><option value="">— Select Core asset —</option><option value="res-4k.png">res-4k.png — 4K</option><option value="res-1080p.png">res-1080p.png — 1080p</option><option value="res-720p.png">res-720p.png — 720p</option><option value="src-remux.png">src-remux.png — Remux</option><option value="src-bluray.png">src-bluray.png — BluRay</option><option value="src-webdl.png">src-webdl.png — WEB-DL</option><option value="src-webrip.png">src-webrip.png — WEBRip</option><option value="vis-dv.png">vis-dv.png — Dolby Vision</option><option value="vis-hdr10plus.png">vis-hdr10plus.png — HDR10+</option><option value="vis-hdr10.png">vis-hdr10.png — HDR10</option><option value="vis-hdr.png">vis-hdr.png — HDR</option><option value="vis-imax.png">vis-imax.png — IMAX</option><option value="aud-atmos.png">aud-atmos.png — Atmos</option><option value="aud-truehd.png">aud-truehd.png — TrueHD</option><option value="aud-dtshdma.png">aud-dtshdma.png — DTS-HD MA</option><option value="aud-dts.png">aud-dts.png — DTS</option><option value="aud-aac.png">aud-aac.png — AAC</option><option value="ch-51.png">ch-51.png — 5.1</option><option value="ch-71.png">ch-71.png — 7.1</option><option value="codec-hevc.png">codec-hevc.png — HEVC</option><option value="codec-avc.png">codec-avc.png — AVC</option><option value="codec-av1.png">codec-av1.png — AV1</option></select><button class="btn btn-sm" id="useCoreAssetBtn">Use Core</button></div><div class="hint">Uses <span class="mono">https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/...</span> — your original artwork</div></div>
+        </div>
+        <div data-ispanel="generate" style="display:none">
+          <div class="row"><div class="field"><label class="label">Text</label><input class="input" id="genText" value="4K"></div><div class="field"><label class="label">Style</label><select class="select" id="genStyle"><option value="transparent" selected>Transparent Image (Elite)</option><option value="neon">Neon Glow (Core)</option><option value="solid">Solid</option><option value="outline">Outline</option><option value="gradient">Gradient</option></select></div></div>
+          <div class="row"><div class="field"><label class="label">BG</label><input type="color" class="color-input" id="genBg" value="#8b5cf6"><input class="input input-sm mono" id="genBgHex" value="#8b5cf6" style="margin-top:4px"></div><div class="field"><label class="label">Text</label><input type="color" class="color-input" id="genTextColor" value="#ffffff"><input class="input input-sm mono" id="genTextColorHex" value="#ffffff" style="margin-top:4px"></div><div class="field"><label class="label">Weight</label><select class="select" id="genWeight"><option value="700">Bold</option><option value="800">Extra Bold</option></select></div></div>
+          <div class="field"><label class="label">Icon/Emoji</label><input class="input" id="genIcon" placeholder="✦"></div>
+          <div class="canvas-preview" id="genPreview"><span style="color:var(--text3);font-size:12px">Preview</span></div>
+          <div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-sm btn-accent" id="genBtn">Generate</button><button class="btn btn-sm" id="genUseBtn">Use this image</button></div>
+        </div>
+        <div data-ispanel="upload" style="display:none"><div class="field"><label class="label">Upload</label><input type="file" id="uploadInput" accept="image/*" class="input"></div><div class="canvas-preview" id="uploadPreview"><span style="color:var(--text3);font-size:12px">No image</span></div></div>
+      </div>
+
+      <div data-bpanel="style" style="display:none">
+        <div class="row"><div class="field"><label class="label">Tag Color #AARRGGBB</label><div class="color-row"><input type="color" id="editTagColorPicker" class="color-input" value="#8b5cf6"><input class="input mono input-sm" id="editTagColor" value="#E68B5CF6"></div><div class="hint">E6=90% opaque, 00=transparent for image badges</div></div><div class="field"><label class="label">Border Color</label><div class="color-row"><input type="color" id="editBorderColorPicker" class="color-input" value="#8b5cf6"><input class="input mono input-sm" id="editBorderColor" value="#FF8B5CF6"></div></div></div>
+        <div class="row"><div class="field"><label class="label">Text Color</label><div class="color-row"><input type="color" id="editTextColorPicker" class="color-input" value="#ffffff"><input class="input mono input-sm" id="editTextColor" value="#FFFFFFFF"></div></div><div class="field"><label class="label">Tag Style</label><select class="select" id="editTagStyle"><option value="filled">Filled</option><option value="bordered">Bordered</option><option value="filled and bordered" selected>Filled and Bordered</option></select></div></div>
+        <div class="field"><label class="label">Preview</label><div class="canvas-preview" id="stylePreview"></div></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" id="cancelBadgeBtn">Cancel</button><button class="btn btn-accent" id="saveBadgeBtn">Save Badge</button></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="groupModal">
+  <div class="modal" style="max-width:420px"><div class="modal-head"><h3 id="groupModalTitle">New Group</h3><button class="icon-btn" id="closeGroupModal">✕</button></div><div class="modal-body"><div class="field"><label class="label">ID</label><input class="input mono" id="gEditId" placeholder="my-group"></div><div class="field"><label class="label">Name</label><input class="input" id="gEditName" placeholder="My Group"></div><div class="field"><label class="label">Color</label><div class="color-row"><input type="color" id="gEditColorPicker" class="color-input" value="#8b5cf6"><input class="input mono" id="gEditColor" value="#8B5CF6"></div></div><div class="field"><label class="label"><input type="checkbox" id="gEditExpanded" checked> Expanded by default</label></div></div><div class="modal-foot"><button class="btn" id="cancelGroupBtn">Cancel</button><button class="btn btn-accent" id="saveGroupBtn">Save Group</button></div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========== CONSTANTS & V3 CORE ========== */
+const BUILDER_VERSION = '3.0.0';
+const FORMATTER_FIELD_LIMIT = 4900;
+const HANDOFF_KEY = 'cb-badge-builder-handoff-v1';
+const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
+const STORAGE_KEY = 'nuvio-universal-builder-v3';
+const CORE_ASSET_BASE = 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets';
+const CORE_BASE_FORMATTER = {
+  name: '{service.cached::istrue["⚡ "||"⏳ "]}{service.shortName::exists["{service.shortName::upper}  "||""]}{stream.title::exists["{stream.title::upper}"||"STREAM"]}{stream.formattedSeasons::exists[" {stream.formattedSeasons}"||""]}{stream.formattedEpisodes::exists[" {stream.formattedEpisodes}"||""]}',
+  description: '{stream.size::exists["💾 {stream.size::sbytes}  "||""]}{stream.bitrate::exists["⚡ {stream.bitrate::sbitrate}  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.releaseGroup::exists["🏷 {stream.releaseGroup}"||""]}{tools.newLine}{addon.name::exists["{addon.name}"||"AIOStreams"]}{stream.indexer::exists[" · {stream.indexer}"||""]}'
+};
+const CORE_ASSETS = {
+  'res-4k':'res-4k.png','res-1080p':'res-1080p.png','res-720p':'res-720p.png',
+  'src-remux':'src-remux.png','src-bluray':'src-bluray.png','src-webdl':'src-webdl.png','src-webrip':'src-webrip.png','src-hdtv':'src-hdtv.png',
+  'vis-dv':'vis-dv.png','vis-hdr10plus':'vis-hdr10plus.png','vis-hdr10':'vis-hdr10.png','vis-hdr':'vis-hdr.png','vis-imax':'vis-imax.png',
+  'aud-atmos':'aud-atmos.png','aud-truehd':'aud-truehd.png','aud-dtshdma':'aud-dtshdma.png','aud-dts':'aud-dts.png','aud-aac':'aud-aac.png',
+  'ch-51':'ch-51.png','ch-71':'ch-71.png','codec-hevc':'codec-hevc.png','codec-avc':'codec-avc.png','codec-av1':'codec-av1.png'
+};
+
+function markerToken(code){
+  if(!Number.isInteger(code)||code<1||code>255) throw new RangeError('Marker code 1-255');
+  const bits=code.toString(2).padStart(8,'0');
+  return `\u2060${[...bits].map(b=>b==='1'?'\u200C':'\u200B').join('')}\u2060`;
+}
+function compilePattern(p){
+  if(!p) return null;
+  try{
+    let flags=''; let src=p;
+    if(src.startsWith('(?i)')){flags+='i'; src=src.slice(4);}
+    if(src.includes('(?i)')){flags+='i'; src=src.replace(/\(\?i\)/g,'');}
+    return new RegExp(src, flags);
+  }catch(e){return null;}
+}
+function testPattern(pattern, text){ const re=compilePattern(pattern); return re?re.test(text):false; }
+function toARGB(hex, alpha='E6'){
+  if(!hex) return '#E6000000';
+  hex=hex.replace('#','');
+  if(hex.length===8) return '#'+hex.toUpperCase();
+  if(hex.length===6) return '#'+alpha+hex.toUpperCase();
+  return '#E6'+hex.padEnd(6,'0').toUpperCase().slice(0,6);
+}
+function argbToHex(argb){ if(!argb) return '#000000'; argb=argb.replace('#',''); if(argb.length===8) return '#'+argb.slice(2); return '#'+argb.slice(0,6); }
+function alphaFromArgb(argb){ if(!argb) return 'E6'; argb=argb.replace('#',''); return argb.length===8?argb.slice(0,2):'E6'; }
+function uid(str){ return (str||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'badge-'+Math.random().toString(36).slice(2,7); }
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function safeSrc(url){if(!url)return'';const s=String(url).trim();if(/^(data:|https?:\/\/)/i.test(s))return s;return'';}
+function argbToRgba(argb){
+  if(!argb) return 'rgba(0,0,0,0.8)';
+  argb=argb.replace('#','');
+  if(argb.length===6) return '#'+argb;
+  if(argb.length===8){ const a=parseInt(argb.slice(0,2),16)/255; const r=parseInt(argb.slice(2,4),16); const g=parseInt(argb.slice(4,6),16); const b=parseInt(argb.slice(6,8),16); return `rgba(${r},${g},${b},${a})`; }
+  return argb;
+}
+
+/* ========== DEFAULTS ========== */
+const defaultGroups = [
+  {id:'resolution', name:'Resolution', color:'#8B5CF6', isExpanded:true},
+  {id:'quality', name:'Quality & Source', color:'#00D4FF', isExpanded:true},
+  {id:'visual', name:'Visual', color:'#F59E0B', isExpanded:true},
+  {id:'audio', name:'Audio', color:'#EC4899', isExpanded:true},
+  {id:'codec', name:'Video Codec', color:'#3B82F6', isExpanded:true},
+  {id:'channels', name:'Channels', color:'#14B8A6', isExpanded:true},
+  {id:'network', name:'Streaming Source', color:'#06B6D4', isExpanded:false},
+  {id:'language', name:'Audio Language', color:'#10B981', isExpanded:false},
+  {id:'custom', name:'Custom', color:'#A855F7', isExpanded:true},
+];
+
+const badgeLibrary = [
+  {group:'resolution', name:'4K', pattern:'(?i)\\b(4k|2160p|uhd)\\b', text:'4K', color:'#8B5CF6', field:'stream.resolution', mode:'exact', values:['2160p']},
+  {group:'resolution', name:'1080p', pattern:'(?i)\\b1080p\\b', text:'1080P', color:'#8B5CF6', field:'stream.resolution', mode:'exact', values:['1080p']},
+  {group:'resolution', name:'720p', pattern:'(?i)\\b720p\\b', text:'720P', color:'#8B5CF6', field:'stream.resolution', mode:'exact', values:['720p']},
+  {group:'resolution', name:'480p', pattern:'(?i)\\b480p\\b', text:'480P', color:'#6B7280', field:'stream.resolution', mode:'exact', values:['480p']},
+  {group:'quality', name:'REMUX', pattern:'(?i)\\bremux\\b', text:'REMUX', color:'#00D4FF', field:'stream.quality', mode:'exact', values:['Bluray REMUX','BluRay REMUX']},
+  {group:'quality', name:'BluRay', pattern:'(?i)\\b(blu[ ._-]?ray|bdrip)\\b', text:'BLURAY', color:'#00D4FF', field:'stream.quality', mode:'exact', values:['Bluray','BluRay']},
+  {group:'quality', name:'WEB-DL', pattern:'(?i)\\bweb[ ._-]?dl\\b', text:'WEB-DL', color:'#0EA5E9', field:'stream.quality', mode:'exact', values:['WEB-DL']},
+  {group:'quality', name:'WEBRip', pattern:'(?i)\\bweb[ ._-]?rip\\b', text:'WEBRIP', color:'#0EA5E9', field:'stream.quality', mode:'exact', values:['WEBRip']},
+  {group:'quality', name:'HDTV', pattern:'(?i)\\bhdtv\\b', text:'HDTV', color:'#64748B', field:'stream.quality', mode:'exact', values:['HDTV']},
+  {group:'quality', name:'CAM', pattern:'(?i)\\b(cam|hdcam)\\b', text:'CAM', color:'#EF4444', field:'stream.quality', mode:'exact', values:['CAM','HDCAM']},
+  {group:'visual', name:'Dolby Vision', pattern:'(?i)\\b(dolby[ ._-]?vision|dovi|\\bdv\\b)\\b', text:'DV', color:'#F59E0B', field:'stream.visualTags', mode:'contains', values:['DV','Dolby Vision']},
+  {group:'visual', name:'HDR10+', pattern:'(?i)hdr10\\+', text:'HDR10+', color:'#F59E0B', field:'stream.visualTags', mode:'contains', values:['HDR10+']},
+  {group:'visual', name:'HDR10', pattern:'(?i)\\bhdr10\\b', text:'HDR10', color:'#F59E0B', field:'stream.visualTags', mode:'contains', values:['HDR10']},
+  {group:'visual', name:'HDR', pattern:'(?i)\\bhdr\\b', text:'HDR', color:'#F59E0B', field:'stream.visualTags', mode:'contains', values:['HDR']},
+  {group:'visual', name:'IMAX', pattern:'(?i)\\bimax\\b', text:'IMAX', color:'#FBBF24', field:'stream.editions', mode:'contains', values:['IMAX']},
+  {group:'visual', name:'10-bit', pattern:'(?i)10[ ._-]?bit', text:'10-BIT', color:'#F59E0B', field:'stream.visualTags', mode:'contains', values:['10BIT']},
+  {group:'audio', name:'Dolby Atmos', pattern:'(?i)\\batmos\\b', text:'ATMOS', color:'#EC4899', field:'stream.audioTags', mode:'contains', values:['Atmos']},
+  {group:'audio', name:'TrueHD', pattern:'(?i)true[ ._-]?hd', text:'TRUEHD', color:'#EC4899', field:'stream.audioTags', mode:'contains', values:['TrueHD']},
+  {group:'audio', name:'DTS:X', pattern:'(?i)dts[ ._-]?x', text:'DTS:X', color:'#EC4899', field:'stream.audioTags', mode:'contains', values:['DTS:X']},
+  {group:'audio', name:'DTS-HD MA', pattern:'(?i)dts[ ._-]?hd[ ._-]?ma', text:'DTS-HD MA', color:'#EC4899', field:'stream.audioTags', mode:'contains', values:['DTS-HD MA']},
+  {group:'audio', name:'DTS', pattern:'(?i)\\bdts\\b', text:'DTS', color:'#EC4899', field:'stream.audioTags', mode:'contains', values:['DTS']},
+  {group:'audio', name:'FLAC', pattern:'(?i)\\bflac\\b', text:'FLAC', color:'#EC4899', field:'stream.audioTags', mode:'contains', values:['FLAC']},
+  {group:'audio', name:'DD+', pattern:'(?i)(eac3|dd\\+)', text:'DD+', color:'#EC4899', field:'stream.audioTags', mode:'contains', values:['DD+','EAC3']},
+  {group:'audio', name:'5.1', pattern:'(?i)5[ .]1', text:'5.1', color:'#14B8A6', field:'stream.audioChannels', mode:'contains', values:['5.1']},
+  {group:'audio', name:'7.1', pattern:'(?i)7[ .]1', text:'7.1', color:'#14B8A6', field:'stream.audioChannels', mode:'contains', values:['7.1']},
+  {group:'codec', name:'AV1', pattern:'(?i)\\bav1\\b', text:'AV1', color:'#3B82F6', field:'stream.encode', mode:'exact', values:['AV1']},
+  {group:'codec', name:'HEVC', pattern:'(?i)(hevc|h[ ._-]?265|x265)', text:'HEVC', color:'#3B82F6', field:'stream.encode', mode:'exact', values:['HEVC','H265','x265']},
+  {group:'codec', name:'AVC', pattern:'(?i)(avc|h[ ._-]?264|x264)', text:'AVC', color:'#3B82F6', field:'stream.encode', mode:'exact', values:['AVC','H264','x264']},
+  {group:'network', name:'Netflix', pattern:'(?i)netflix', text:'NF', color:'#E50914', field:'stream.network', mode:'contains', values:['Netflix']},
+  {group:'network', name:'Prime', pattern:'(?i)prime', text:'PRIME', color:'#00A8E1', field:'stream.network', mode:'contains', values:['Prime']},
+  {group:'network', name:'Disney+', pattern:'(?i)disney', text:'DISNEY+', color:'#113CCF', field:'stream.network', mode:'contains', values:['Disney']},
+  {group:'network', name:'Apple TV+', pattern:'(?i)apple', text:'ATV+', color:'#000000', field:'stream.network', mode:'contains', values:['Apple']},
+  {group:'language', name:'English', pattern:'(?i)english|\\beng\\b', text:'EN', color:'#10B981', field:'stream.language', mode:'contains', values:['English']},
+  {group:'language', name:'Multi', pattern:'(?i)multi', text:'MULTI', color:'#10B981', field:'stream.language', mode:'contains', values:['Multi']},
+];
+
+const QUICK_PACKS = {
+  elite: 'https://raw.githubusercontent.com/leonevz/Elite-Badges/main/badges.json',
+  ume: 'https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/refs/heads/main/Other/fusion-tags-ume-colored.json',
+  better: 'https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/presets/colored-bgb-combo-nodv.json',
+  core: 'https://raw.githubusercontent.com/brevityA/Core-Builds/main/tools/badges/published/core-neon-enhanced.json'
+};
+
+/* ========== STATE ========== */
+let state = {
+  mode: 'enhanced',
+  theme: 'neon',
+  groups: JSON.parse(JSON.stringify(defaultGroups)),
+  filters: [],
+  selectedGroup: 'all',
+  search: '',
+  enabledFilter: 'all',
+  packName: 'My Universal Nuvio Pack v3',
+  globalTagStyle: 'filled and bordered',
+  renderMode: 'tag',
+  nextMarkerCode: 1,
+};
+
+function loadLocal(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const p=JSON.parse(saved);
+      if(p.groups) state.groups=p.groups;
+      if(p.filters) state.filters=p.filters;
+      if(p.mode) state.mode=p.mode;
+      if(p.packName) state.packName=p.packName;
+      if(p.nextMarkerCode) state.nextMarkerCode=p.nextMarkerCode;
+      if(p.theme) state.theme=p.theme;
+      if(p.globalTagStyle) state.globalTagStyle=p.globalTagStyle;
+      if(p.renderMode) state.renderMode=p.renderMode;
+    }
+  }catch(e){}
+}
+function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+loadLocal();
+
+let currentStep=1;
+function setStep(n){
+  if(n===3 && state.filters.filter(f=>f.isEnabled).length===0){ toast('Select at least one badge first'); return; }
+  currentStep=n;
+  document.querySelectorAll('.builder-step').forEach(s=>{ s.hidden = Number(s.dataset.step)!==n; });
+  document.querySelectorAll('[data-step-target]').forEach(b=>{
+    if(Number(b.dataset.stepTarget)===n) b.setAttribute('aria-current','step');
+    else b.removeAttribute('aria-current');
+  });
+  if(n===2) { renderGroups(); renderBadges(); }
+  if(n===3) { buildOutputs(); renderPreview(); }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+/* ========== RENDER ========== */
+function renderGroups(){
+  const list=document.getElementById('groupsList');
+  const filterSel=document.getElementById('filterGroup');
+  const editGroupSel=document.getElementById('editGroup');
+  const curFilter=filterSel.value;
+  const curEdit=editGroupSel.value;
+  list.innerHTML=''; filterSel.innerHTML='<option value="all">All groups</option>'; editGroupSel.innerHTML='';
+  state.groups.forEach(g=>{
+    const count=state.filters.filter(f=>f.groupId===g.id).length;
+    const el=document.createElement('div');
+    el.className='group-item'+(state.selectedGroup===g.id?' active':'');
+    el.innerHTML=`<div class="group-head"><div class="group-name"><span class="group-dot" style="background:${esc(g.color)};color:${esc(g.color)}"></span>${esc(g.name)}</div><span class="group-count">${count}</span></div><div class="group-actions"><button class="btn btn-sm" data-act="edit" data-id="${esc(g.id)}">Edit</button><button class="btn btn-sm btn-ghost" data-act="del" data-id="${esc(g.id)}">Del</button></div>`;
+    el.addEventListener('click', e=>{ if(e.target.closest('button')) return; state.selectedGroup=state.selectedGroup===g.id?'all':g.id; filterSel.value=state.selectedGroup; renderGroups(); renderBadges(); });
+    el.querySelectorAll('button').forEach(b=>{ b.addEventListener('click', ()=>{ const id=b.dataset.id; if(b.dataset.act==='edit') openGroupModal(id); else deleteGroup(id); }); });
+    list.appendChild(el);
+    const opt=document.createElement('option'); opt.value=g.id; opt.textContent=`${g.name} (${count})`; filterSel.appendChild(opt);
+    const opt2=document.createElement('option'); opt2.value=g.id; opt2.textContent=g.name; editGroupSel.appendChild(opt2);
+  });
+  if(state.groups.find(g=>g.id===curFilter)) filterSel.value=curFilter; else filterSel.value=state.selectedGroup||'all';
+  if(curEdit) editGroupSel.value=curEdit;
+  document.getElementById('statsBadge').textContent=`${state.filters.length} badges`;
+  document.getElementById('step2Count').textContent=`${state.filters.filter(f=>f.isEnabled).length} badges`;
+  document.getElementById('statGroups').textContent=state.groups.length;
+  document.getElementById('statEnabled').textContent=state.filters.filter(f=>f.isEnabled).length;
+  document.getElementById('statMode').textContent=state.mode==='enhanced'?'AIO Enhanced':'Universal';
+}
+
+function renderBadges(){
+  const grid=document.getElementById('badgeGrid');
+  const empty=document.getElementById('emptyState');
+  const search=(document.getElementById('badgeSearch').value||'').toLowerCase();
+  const groupFilter=document.getElementById('filterGroup').value||'all';
+  const enabledFilter=document.getElementById('filterEnabled').value||'all';
+  let filtered=state.filters.filter(f=>{
+    if(groupFilter!=='all'&&f.groupId!==groupFilter) return false;
+    if(enabledFilter==='enabled'&&!f.isEnabled) return false;
+    if(enabledFilter==='disabled'&&f.isEnabled) return false;
+    if(search){ const hay=`${f.name} ${f.id} ${f.pattern} ${f.groupId}`.toLowerCase(); if(!hay.includes(search)) return false; }
+    return true;
+  });
+  grid.innerHTML='';
+  if(filtered.length===0){ empty.style.display='block'; grid.style.display='none'; return; }
+  empty.style.display='none'; grid.style.display='grid';
+  filtered.forEach(f=>{
+    const g=state.groups.find(x=>x.id===f.groupId);
+    const card=document.createElement('div');
+    card.className='badge-card'+(f.isEnabled?'':' disabled');
+    const displayPattern = state.mode==='enhanced' ? (f.markerCode ? `marker:${f.markerCode} → ${esc(f.markerField||'')}` : f.pattern) : f.pattern;
+    const imgSrc=safeSrc(f.imageURL);
+    card.innerHTML=`<div class="badge-card-head"><div class="badge-meta"><div class="badge-icon" style="border-color:${g?esc(g.color)+'40':'#333'};background:${g?esc(g.color)+'15':'#222'}">${imgSrc?`<img src="${esc(imgSrc)}" onerror="this.style.display='none'">`:`<span style="font-weight:700;font-size:11px">${esc((f.name||'').slice(0,3).toUpperCase())}</span>`}</div><div class="badge-info"><div class="badge-name">${esc(f.name)}</div><div class="badge-id">${esc(f.id)} • ${esc(g?g.name:f.groupId)}${f.markerCode?` • #${f.markerCode}`:''}</div></div></div><div class="badge-toggle ${f.isEnabled?'on':''}" data-toggle="${esc(f.id)}"></div></div><div class="badge-pattern mono" title="${esc(f.pattern||'')}">${esc(displayPattern.slice(0,90))}</div><div class="badge-footer"><button class="btn" data-edit="${esc(f.id)}">Edit</button><button class="btn btn-ghost" data-dup="${esc(f.id)}">Dup</button><button class="btn btn-ghost" data-del="${esc(f.id)}">✕</button></div>`;
+    card.querySelector(`[data-toggle="${f.id}"]`).addEventListener('click', ()=>{ f.isEnabled=!f.isEnabled; saveLocal(); renderBadges(); renderGroups(); });
+    card.querySelector(`[data-edit="${f.id}"]`).addEventListener('click', ()=>openBadgeModal(f.id));
+    card.querySelector(`[data-dup="${f.id}"]`).addEventListener('click', ()=>duplicateBadge(f.id));
+    card.querySelector(`[data-del="${f.id}"]`).addEventListener('click', ()=>deleteBadge(f.id));
+    grid.appendChild(card);
+  });
+}
+
+function renderLibrary(){
+  const grid=document.getElementById('libraryGrid');
+  const search=(document.getElementById('libSearch').value||'').toLowerCase();
+  const cat=document.getElementById('libCategory').value;
+  grid.innerHTML='';
+  badgeLibrary.filter(item=>{
+    if(cat!=='all'&&item.group!==cat) return false;
+    if(search&&!`${item.name} ${item.text} ${item.pattern}`.toLowerCase().includes(search)) return false;
+    return true;
+  }).forEach(item=>{
+    const el=document.createElement('button');
+    el.className='lib-item';
+    el.innerHTML=`<div class="lib-item-title">${esc(item.name)}</div><div class="lib-item-pattern">${esc(item.pattern.slice(0,32))}</div><div style="margin-top:6px"><span class="badge" style="border-color:${esc(item.color)}40;color:${esc(item.color)};background:${esc(item.color)}15">${esc(item.group)}</span></div>`;
+    el.addEventListener('click', ()=>addFromLibrary(item));
+    grid.appendChild(el);
+  });
+}
+
+function addFromLibrary(item){
+  const g=state.groups.find(x=>x.id===item.group)||state.groups[0];
+  const id=uid(item.name+'-'+Math.random().toString(36).slice(2,5));
+  const isImageMode=state.renderMode==='image';
+  const markerCode=state.nextMarkerCode++;
+  if(state.nextMarkerCode>255) state.nextMarkerCode=1;
+  const dataUrl=generateBadgeImageSync(item.text||item.name, {bg:item.color, style: state.renderMode==='image'?'transparent':'solid', textColor:'#FFFFFF'});
+  const newBadge={
+    id, groupId:g.id, name:item.name, pattern:item.pattern,
+    imageURL:dataUrl,
+    tagColor:isImageMode?'#00000000':toARGB(item.color,'E6'),
+    borderColor:isImageMode?'#00000000':toARGB(item.color,'FF'),
+    textColor:'#FFFFFFFF',
+    tagStyle:state.globalTagStyle,
+    isEnabled:true, type:'filter',
+    markerCode,
+    markerField:item.field||'stream.quality',
+    markerMode:item.mode||'contains',
+    markerValues:item.values||[item.text],
+  };
+  state.filters.push(newBadge);
+  saveLocal(); renderGroups(); renderBadges();
+}
+
+/* ========== IMAGE GEN ========== */
+function generateBadgeImageSync(text, opts={}){
+  const canvas=document.createElement('canvas');
+  const dpr=2;
+  const isFullBadge=opts.style==='transparent'||opts.style==='solid'||opts.style==='gradient';
+  const w=isFullBadge?360:120; const h=isFullBadge?96:96;
+  canvas.width=w*dpr; canvas.height=h*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,w,h);
+  const bg=opts.bg||'#8B5CF6'; const textColor=opts.textColor||'#FFFFFF'; const style=opts.style||'transparent';
+  function roundRect(x,y,w,h,r,fill,stroke){ if(typeof r==='number') r=[r,r,r,r]; ctx.beginPath(); ctx.moveTo(x+r[0],y); ctx.lineTo(x+w-r[1],y); ctx.quadraticCurveTo(x+w,y,x+w,y+r[1]); ctx.lineTo(x+w,y+h-r[2]); ctx.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h); ctx.lineTo(x+r[3],y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r[3]); ctx.lineTo(x,y+r[0]); ctx.quadraticCurveTo(x,y,x+r[0],y); ctx.closePath(); if(fill) ctx.fill(); if(stroke) ctx.stroke(); }
+  if(style==='transparent'){ const r=18; ctx.fillStyle=bg; roundRect(0,0,w,h,r,true,false); ctx.fillStyle='rgba(255,255,255,0.15)'; roundRect(0,0,w,h/2,[r,r,0,0],true,false); }
+  else if(style==='solid'){ const r=16; ctx.fillStyle=bg; roundRect(4,4,w-8,h-8,r,true,false); }
+  else if(style==='gradient'){ const grad=ctx.createLinearGradient(0,0,w,0); grad.addColorStop(0,bg); grad.addColorStop(1,bg); ctx.fillStyle=grad; roundRect(0,0,w,h,18,true,false); }
+  else if(style==='outline'){ const r=18; ctx.strokeStyle=bg; ctx.lineWidth=3; roundRect(2,2,w-4,h-4,r,false,true); ctx.fillStyle='rgba(0,0,0,0.2)'; roundRect(2,2,w-4,h-4,r,true,false); }
+  else { ctx.shadowColor=bg; ctx.shadowBlur=20; ctx.fillStyle=bg; roundRect(0,0,w,h,18,true,false); ctx.shadowBlur=0; }
+  ctx.fillStyle=textColor; ctx.font=`${opts.weight||700} ${isFullBadge?28:22}px Geist, sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+  const icon=opts.icon||''; const display=icon?`${icon} ${text}`:text;
+  let fontSize=isFullBadge?28:22; while(ctx.measureText(display).width>w-24&&fontSize>10){ fontSize--; ctx.font=`${opts.weight||700} ${fontSize}px Geist, sans-serif`; }
+  ctx.fillText(display.toUpperCase(), w/2, h/2+1);
+  return canvas.toDataURL('image/png');
+}
+
+/* ========== PREVIEW & EXPORT CORE ========== */
+function buildBadgePack(){
+  const groups=state.groups.map(g=>({id:g.id, name:g.name, color:g.color, isExpanded:g.isExpanded}));
+  const filters=state.filters.filter(f=>f.isEnabled).map(f=>{
+    let pattern;
+    if(state.mode==='enhanced'){
+      try{ pattern=markerToken(f.markerCode||1); }catch(e){ pattern=f.pattern; }
+    }else{ pattern=f.pattern; }
+    return {
+      id:f.id, groupId:f.groupId, name:f.name, pattern,
+      imageURL:f.imageURL, tagColor:f.tagColor, borderColor:f.borderColor, textColor:f.textColor, tagStyle:f.tagStyle, isEnabled:true, type:'filter'
+    };
+  });
+  return {groups, filters, _meta:{name:document.getElementById('packName').value, version:BUILDER_VERSION, mode:state.mode, builtAt:new Date().toISOString()}};
+}
+
+function buildFormatter(){
+  const BASE_NAME=CORE_BASE_FORMATTER.name;
+  const BASE_DESC=CORE_BASE_FORMATTER.description;
+  let fields={name:BASE_NAME, description:BASE_DESC};
+  if(state.mode!=='enhanced') return {_label:'Universal Companion', name:fields.name, description:fields.description, size:fields.name.length+fields.description.length};
+
+  const selected=state.filters.filter(f=>f.isEnabled).sort((a,b)=>(a.markerCode||0)-(b.markerCode||0));
+  for(const badge of selected){
+    let expr='';
+    const token=markerToken(badge.markerCode||1);
+    const field=badge.markerField||'stream.quality';
+    const mode=badge.markerMode||'contains';
+    const values=badge.markerValues||[badge.name];
+    if(mode==='true') expr=`{${field}::istrue["${token}"||""]}`;
+    else if(mode==='false') expr=`{${field}::isfalse["${token}"||""]}`;
+    else {
+      const cleanVals=values.map(v=>String(v).trim()).filter(Boolean);
+      if(cleanVals.length===0) continue;
+      const modifier=mode==='exact'?'=':'~';
+      const operands=cleanVals.map(v=>`${field}::${modifier}${v}`);
+      expr=`{${operands.join('::or::')}["${token}"||""]}`;
+    }
+    const candidates=['name','description'].sort((a,b)=>fields[a].length-fields[b].length);
+    const target=candidates.find(f=>fields[f].length+expr.length<=FORMATTER_FIELD_LIMIT);
+    if(!target) throw new Error(`Formatter too large — disable some badges (limit ${FORMATTER_FIELD_LIMIT} per field)`);
+    fields[target]+=expr;
+  }
+  return {_label:state.mode==='enhanced'?'Universal Enhanced Companion':'Universal Companion', name:fields.name, description:fields.description, size:fields.name.length+fields.description.length};
+}
+
+function buildOutputs(){
+  try{
+    const pack=buildBadgePack();
+    const formatter=buildFormatter();
+    const jsonStr=JSON.stringify(pack,null,2);
+    document.getElementById('badgeCountBadge').textContent=`${pack.filters.length} badges`;
+    document.getElementById('detailMode').textContent=state.mode==='enhanced'?'AIO Enhanced':'Universal';
+    document.getElementById('detailTheme').textContent=state.theme;
+    document.getElementById('detailSelected').textContent=pack.filters.length;
+    document.getElementById('detailSize').textContent=`${(jsonStr.length/1024).toFixed(1)} KB`;
+    document.getElementById('formatterName').value=formatter.name;
+    document.getElementById('formatterDesc').value=formatter.description;
+    document.getElementById('formatterSizeHint').textContent=`${formatter.size} / ${FORMATTER_FIELD_LIMIT*2} chars (name+desc)`;
+    document.getElementById('previewModeBadge').textContent=state.mode==='enhanced'?'AIO Enhanced — markers':'Universal — regex';
+    document.getElementById('formatterCard').style.display=state.mode==='enhanced'?'block':'none';
+    document.getElementById('statFormatter').textContent=`${formatter.size} / ${FORMATTER_FIELD_LIMIT}`;
+  }catch(e){ toast(e.message); }
+}
+
+function renderPreview(){
+  const input=document.getElementById('testInput').value;
+  const lines=input.split('\n').filter(l=>l.trim());
+  const previewContainer=document.getElementById('previewStreams');
+  const matchList=document.getElementById('matchList');
+  previewContainer.innerHTML=''; matchList.innerHTML='';
+  if(lines.length===0){ previewContainer.innerHTML='<div class="empty" style="padding:20px">Paste release name</div>'; return; }
+  lines.forEach((line,idx)=>{
+    const matched=state.filters.filter(f=>f.isEnabled&&testPattern(f.pattern,line));
+    const streamEl=document.createElement('div');
+    streamEl.className='preview-stream';
+    streamEl.innerHTML=`<div class="stream-top">⚡ TORBOX • EXAMPLE STREAM ${idx+1}</div><div class="stream-badges">${matched.length?matched.map(f=>{ const g=state.groups.find(x=>x.id===f.groupId); const rgba=argbToRgba(f.tagColor); const rgbaBorder=argbToRgba(f.borderColor); const isTrans=f.tagColor.toLowerCase()==='#00000000'&&f.borderColor.toLowerCase()==='#00000000'; const fImgSrc=safeSrc(f.imageURL); if(isTrans) return `<span class="stream-badge" style="background:transparent;border-color:transparent;padding:0">${fImgSrc?`<img src="${esc(fImgSrc)}" style="width:72px;height:26px;object-fit:contain">`:esc(f.name)}</span>`; else return `<span class="stream-badge" style="background:${esc(rgba)};border-color:${esc(rgbaBorder)};color:white">${fImgSrc?`<img src="${esc(fImgSrc)}" onerror="this.style.display='none'">`:``}${esc(f.name)}</span>`; }).join(''):`<span style="font-size:11px;color:var(--text3)">No match — try Universal regex or check pattern</span>`}</div><div class="stream-meta"><span>💾 42.8 GB</span><span>⚡ 54 Mbps</span><span>🌱 86</span><span class="mono" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(line.slice(0,60))}</span></div>`;
+    previewContainer.appendChild(streamEl);
+    if(idx===0){
+      state.filters.forEach(f=>{
+        const isMatch=testPattern(f.pattern,line);
+        const row=document.createElement('div');
+        row.className='match-item'+(isMatch?' matched':'');
+        row.innerHTML=`<span style="display:flex;align-items:center;gap:8px"><span class="match-dot ${isMatch?'on':''}"></span>${esc(f.name)}<span class="mono" style="font-size:10px;color:var(--text3)">${esc(f.id)}</span></span><span style="font-size:10px;color:var(--text3)">${isMatch?'MATCH':'—'}${f.markerCode?` • #${esc(String(f.markerCode))}`:''}</span>`;
+        matchList.appendChild(row);
+      });
+    }
+  });
+}
+
+/* ========== MODALS ========== */
+let editingBadgeId=null;
+function openBadgeModal(id=null){
+  editingBadgeId=id;
+  const modal=document.getElementById('badgeModal');
+  const isEdit=!!id;
+  const badge=isEdit?state.filters.find(f=>f.id===id):null;
+  document.getElementById('badgeModalTitle').textContent=isEdit?'Edit Badge • '+badge.name:'New Custom Badge';
+  document.getElementById('editId').value=badge?badge.id:'';
+  document.getElementById('editName').value=badge?badge.name:'';
+  document.getElementById('editGroup').value=badge?badge.groupId:(state.selectedGroup!=='all'?state.selectedGroup:state.groups[0]?.id);
+  document.getElementById('editDesc').value=badge?(badge.description||''):'';
+  document.getElementById('editPattern').value=badge?badge.pattern:'(?i)\\bremux\\b';
+  document.getElementById('editImageUrl').value=badge?badge.imageURL:'';
+  document.getElementById('editTagColor').value=badge?badge.tagColor:toARGB('#8B5CF6','E6');
+  document.getElementById('editBorderColor').value=badge?badge.borderColor:toARGB('#8B5CF6','FF');
+  document.getElementById('editTextColor').value=badge?badge.textColor:'#FFFFFFFF';
+  document.getElementById('editTagStyle').value=badge?badge.tagStyle:state.globalTagStyle;
+  document.getElementById('editTagColorPicker').value=argbToHex(badge?badge.tagColor:'#8B5CF6');
+  document.getElementById('editBorderColorPicker').value=argbToHex(badge?badge.borderColor:'#8B5CF6');
+  document.getElementById('editTextColorPicker').value=argbToHex(badge?badge.textColor:'#FFFFFF');
+  document.getElementById('editMarkerCode').value=badge?badge.markerCode:state.nextMarkerCode;
+  document.getElementById('editMarkerField').value=badge?badge.markerField:'stream.quality';
+  document.getElementById('editMarkerMode').value=badge?badge.markerMode:'contains';
+  document.getElementById('editMarkerValues').value=badge? (badge.markerValues||[]).join(', ') : '';
+  document.getElementById('genText').value=badge?badge.name.slice(0,8):'4K';
+  document.getElementById('genBg').value=argbToHex(badge?badge.tagColor:'#8B5CF6');
+  document.getElementById('genBgHex').value=argbToHex(badge?badge.tagColor:'#8B5CF6');
+  modal.classList.add('open');
+  updateModeSections();
+  updatePatternTest();
+  updateStylePreview();
+  updateGenPreview();
+  updateMarkerSnippet();
+}
+function closeBadgeModal(){ document.getElementById('badgeModal').classList.remove('open'); editingBadgeId=null; }
+let editingGroupId=null;
+function openGroupModal(id=null){
+  editingGroupId=id;
+  const modal=document.getElementById('groupModal');
+  const g=id?state.groups.find(x=>x.id===id):null;
+  document.getElementById('groupModalTitle').textContent=g?`Edit Group • ${g.name}`:'New Group';
+  document.getElementById('gEditId').value=g?g.id:'';
+  document.getElementById('gEditName').value=g?g.name:'';
+  document.getElementById('gEditColor').value=g?g.color:'#8B5CF6';
+  document.getElementById('gEditColorPicker').value=g?g.color:'#8B5CF6';
+  document.getElementById('gEditExpanded').checked=g?g.isExpanded:true;
+  modal.classList.add('open');
+}
+function closeGroupModal(){ document.getElementById('groupModal').classList.remove('open'); editingGroupId=null; }
+
+function deleteBadge(id){ if(!confirm('Delete badge '+id+'?')) return; state.filters=state.filters.filter(f=>f.id!==id); saveLocal(); renderGroups(); renderBadges(); buildOutputs(); }
+function duplicateBadge(id){ const f=state.filters.find(x=>x.id===id); if(!f) return; const copy={...f, id:uid(f.id+'-copy'), name:f.name+' Copy', markerCode:state.nextMarkerCode++}; if(state.nextMarkerCode>255) state.nextMarkerCode=1; state.filters.push(copy); saveLocal(); renderBadges(); renderGroups(); }
+function deleteGroup(id){ if(!confirm('Delete group and all its badges?')) return; state.groups=state.groups.filter(g=>g.id!==id); state.filters=state.filters.filter(f=>f.groupId!==id); saveLocal(); renderGroups(); renderBadges(); }
+
+/* ========== EXPORT ========== */
+function exportJson(){
+  const pack=buildBadgePack();
+  if(pack.filters.length===0){ toast('No enabled badges'); return; }
+  const blob=new Blob([JSON.stringify(pack,null,2)], {type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`${uid(pack._meta.name||'nuvio-badges')}.json`; a.click(); URL.revokeObjectURL(url);
+  document.getElementById('importUrlOutput').value='data:application/json,'+encodeURIComponent(JSON.stringify(pack));
+}
+function copyJson(){ const pack=buildBadgePack(); navigator.clipboard.writeText(JSON.stringify(pack,null,2)).then(()=>toast('Copied JSON')); }
+async function downloadZip(){
+  if(typeof JSZip==='undefined'){ toast('JSZip not loaded'); return; }
+  const zip=new JSZip(); const folder=zip.folder('badges');
+  for(const f of state.filters.filter(x=>x.isEnabled)){
+    if(f.imageURL.startsWith('data:image')){ const base64=f.imageURL.split(',')[1]; folder.file(`${f.id}.png`, base64, {base64:true}); }
+  }
+  const pack=buildBadgePack(); zip.file('badges.json', JSON.stringify(pack,null,2));
+  const formatter=buildFormatter(); zip.file('formatter.json', JSON.stringify({name:formatter.name, description:formatter.description},null,2));
+  zip.file('README.txt', `Nuvio Universal Pack v3\n${pack._meta.name}\nMode: ${pack._meta.mode}\n${pack.filters.length} badges\n\nUpload badges.json to GitHub → raw URL → Nuvio import.\n`);
+  const blob=await zip.generateAsync({type:'blob'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${uid(pack._meta.name)}-v3-pack.zip`; a.click(); URL.revokeObjectURL(url);
+}
+async function createImportUrl(){
+  const pack=buildBadgePack();
+  if(pack.filters.length===0){ toast('No badges'); return; }
+  const jsonStr=JSON.stringify(pack);
+  const statusEl=document.getElementById('importUrlStatus');
+  statusEl.textContent='Creating backup + import URL...';
+  // Download backup first (like Core)
+  const blob=new Blob([JSON.stringify(pack,null,2)], {type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${uid(pack._meta.name)}-backup.json`; a.click(); URL.revokeObjectURL(url);
+
+  const endpoints=[
+    {name:'Core Worker', url:'https://core-builds-cors-proxy.tlorenzato26.workers.dev/upload', type:'worker'},
+    {name:'paste.rs', url:'https://paste.rs', type:'paste'},
+    {name:'dpaste', url:'https://dpaste.com/api/v2/', type:'dpaste'}
+  ];
+
+  for(const ep of endpoints){
+    try{
+      statusEl.textContent=`Trying ${ep.name}...`;
+      let res;
+      if(ep.type==='paste'){
+        res=await fetch(ep.url, {method:'POST', body:jsonStr, headers:{'Content-Type':'application/json'}});
+        if(res.ok){ const text=(await res.text()).trim(); const finalUrl=text.startsWith('http')?text.replace('http://','https://'):text; document.getElementById('importUrlOutput').value=finalUrl; statusEl.textContent=`✅ Uploaded via ${ep.name} (may expire)`; toast(`Import URL created via ${ep.name}`); return; }
+      }else if(ep.type==='dpaste'){
+        const form=new FormData(); form.append('content', jsonStr); form.append('syntax','json'); form.append('expiry_days','30');
+        res=await fetch(ep.url, {method:'POST', body:form});
+        if(res.ok){ const loc=res.headers.get('Location')||await res.text(); document.getElementById('importUrlOutput').value=loc.trim()+'.txt'; statusEl.textContent=`✅ Uploaded via ${ep.name}`; toast('Import URL created'); return; }
+      }else{
+        // worker - try POST json
+        res=await fetch(ep.url, {method:'POST', body:jsonStr, headers:{'Content-Type':'application/json'}}).catch(()=>null);
+        if(res&&res.ok){ const data=await res.json().catch(()=>null); if(data&&data.url){ document.getElementById('importUrlOutput').value=data.url; statusEl.textContent=`✅ Uploaded via ${ep.name} (30-day)`; toast('Import URL created'); return; } }
+      }
+    }catch(e){ console.warn('Upload failed', ep.name, e); }
+  }
+  // fallback data URL
+  document.getElementById('importUrlOutput').value='data:application/json,'+encodeURIComponent(jsonStr);
+  statusEl.textContent='⚠️ All remote uploads failed — using data URL (paste may not work in Nuvio, use backup JSON + GitHub)';
+  toast('Using data URL fallback');
+}
+
+function exportFormatter(){
+  const f=buildFormatter();
+  const blob=new Blob([JSON.stringify({name:f.name, description:f.description},null,2)], {type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`formatter-${state.mode}.json`; a.click(); URL.revokeObjectURL(url);
+}
+function openConfigurator(){
+  try{
+    const formatter=buildFormatter();
+    const handoff={v:1, ts:Date.now(), source:'core-badge-builder', formatter:{name:formatter.name, description:formatter.description, label:(document.getElementById('packName').value||'Universal Companion').slice(0,80)}};
+    localStorage.setItem(HANDOFF_KEY, JSON.stringify(handoff));
+    window.open('https://brevitya.github.io/Core-Builds/configurator/', '_blank');
+    toast('Opened configurator with handoff');
+  }catch(e){ toast('Handoff failed: '+e.message); }
+}
+
+/* ========== IMPORT ========== */
+async function importFromUrl(){
+  const url=document.getElementById('importUrl').value.trim();
+  if(!url) return toast('Enter URL');
+  try{
+    const res=await fetch(url);
+    if(!res.ok) throw new Error('Fetch failed '+res.status);
+    const json=await res.json();
+    handleImportJson(json, document.getElementById('mergeMode').value);
+  }catch(e){ toast('Import failed: '+e.message); }
+}
+function importFromPaste(){
+  const txt=document.getElementById('importPaste').value.trim();
+  if(!txt) return toast('Paste JSON');
+  try{ const json=JSON.parse(txt); handleImportJson(json, document.getElementById('mergeMode').value); }catch(e){ toast('Invalid JSON'); }
+}
+function handleImportJson(json, mode){
+  let groups=json.groups||[]; let filters=json.filters||[];
+  if(!Array.isArray(filters)){ toast('Must have filters array'); return; }
+  if(mode==='replace'){ state.groups=groups.length?groups:state.groups; state.filters=filters.map(f=>({...f, isEnabled:f.isEnabled!==false, type:'filter', markerCode:f.markerCode||state.nextMarkerCode++, markerField:f.markerField||'stream.quality', markerMode:f.markerMode||'contains', markerValues:f.markerValues||[f.name]})); state.nextMarkerCode=state.filters.length+1; }
+  else{
+    const existingIds=new Set(state.groups.map(g=>g.id));
+    groups.forEach(g=>{ if(!existingIds.has(g.id)) state.groups.push(g); });
+    const existingFilterIds=new Set(state.filters.map(f=>f.id));
+    filters.forEach(f=>{ let id=f.id; if(existingFilterIds.has(id)) id=uid(id+'-imported'); state.filters.push({...f, id, isEnabled:f.isEnabled!==false, type:'filter', markerCode:f.markerCode||state.nextMarkerCode++, markerField:f.markerField||'stream.quality', markerMode:f.markerMode||'contains', markerValues:f.markerValues||[f.name]}); });
+  }
+  if(state.nextMarkerCode>255) state.nextMarkerCode=1;
+  saveLocal(); renderGroups(); renderBadges(); buildOutputs(); toast(`Imported ${filters.length} badges`);
+}
+
+/* ========== HELPERS UI ========== */
+function updateModeSections(){
+  const mode=state.mode;
+  document.getElementById('universalPatternSection').style.display=mode==='universal'?'block':'none';
+  document.getElementById('enhancedMarkerSection').style.display=mode==='enhanced'?'block':'none';
+  document.getElementById('markerCodeField').style.display=mode==='enhanced'?'block':'none';
+}
+function updateGenPreview(){
+  const text=document.getElementById('genText').value||'BADGE';
+  const style=document.getElementById('genStyle').value;
+  const bg=document.getElementById('genBgHex').value||'#8B5CF6';
+  const tc=document.getElementById('genTextColorHex').value||'#FFFFFF';
+  const icon=document.getElementById('genIcon').value||'';
+  const weight=document.getElementById('genWeight').value||'700';
+  const dataUrl=generateBadgeImageSync(text, {bg, textColor:tc, style, icon, weight});
+  const safeDataUrl=safeSrc(dataUrl);
+  document.getElementById('genPreview').innerHTML=safeDataUrl?`<img src="${esc(safeDataUrl)}">`:'';
+  document.getElementById('genPreview').dataset.url=dataUrl;
+}
+function updateStylePreview(){
+  const tagColor=document.getElementById('editTagColor').value||'#E68B5CF6';
+  const borderColor=document.getElementById('editBorderColor').value||'#FF8B5CF6';
+  const imgUrl=document.getElementById('editImageUrl').value||document.getElementById('genPreview')?.dataset?.url||'';
+  const name=document.getElementById('editName').value||'BADGE';
+  const rgba=argbToRgba(tagColor); const rgbaBorder=argbToRgba(borderColor);
+  const isTrans=tagColor.toLowerCase()==='#00000000'&&borderColor.toLowerCase()==='#00000000';
+  const el=document.getElementById('stylePreview');
+  const safeImgUrl=safeSrc(imgUrl);
+  if(isTrans&&safeImgUrl) el.innerHTML=`<img src="${esc(safeImgUrl)}" style="width:120px;height:42px;object-fit:contain">`;
+  else el.innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:9px;background:${esc(rgba)};border:1px solid ${esc(rgbaBorder)};color:white;font-weight:600;font-size:12px">${safeImgUrl?`<img src="${esc(safeImgUrl)}" style="width:16px;height:16px">`:''}${esc(name)}</span>`;
+}
+function updatePatternTest(){
+  const pat=document.getElementById('editPattern').value;
+  const test=document.getElementById('patternTestInput').value||document.getElementById('testInput').value.split('\n')[0]||'';
+  const re=compilePattern(pat);
+  const resultEl=document.getElementById('patternTestResult');
+  if(!re){ resultEl.textContent='❌ Invalid regex'; resultEl.style.background='rgba(239,68,68,0.1)'; return; }
+  const ok=re.test(test);
+  resultEl.textContent=ok?`✅ MATCHES: "${test.slice(0,80)}"`:`— No match for: "${test.slice(0,80)}"`;
+  resultEl.style.background=ok?'rgba(34,197,94,0.1)':'var(--bg3)';
+}
+function updateMarkerSnippet(){
+  const field=document.getElementById('editMarkerField').value;
+  const mode=document.getElementById('editMarkerMode').value;
+  const values=document.getElementById('editMarkerValues').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const code=parseInt(document.getElementById('editMarkerCode').value)||1;
+  let token; try{ token=markerToken(code); }catch(e){ token='[invalid code]'; }
+  let snippet='';
+  if(mode==='true') snippet=`{${field}::istrue["${token}"||""]}`;
+  else if(mode==='false') snippet=`{${field}::isfalse["${token}"||""]}`;
+  else if(values.length){ const mod=mode==='exact'?'=':'~'; const ops=values.map(v=>`${field}::${mod}${v}`); snippet=`{${ops.join('::or::')}["${token}"||""]}`; }
+  else snippet='Enter values...';
+  document.getElementById('markerSnippet').textContent=snippet;
+}
+
+/* ========== EVENTS ========== */
+document.getElementById('themeBtn').addEventListener('click', ()=>{
+  const html=document.documentElement;
+  const cur=html.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  html.setAttribute('data-theme',next);
+  document.getElementById('themeBtn').textContent=next==='light'?'☾ Dark':'☀ Light';
+});
+document.getElementById('addGroupBtn').addEventListener('click', ()=>openGroupModal());
+document.getElementById('closeGroupModal').addEventListener('click', closeGroupModal);
+document.getElementById('cancelGroupBtn').addEventListener('click', closeGroupModal);
+document.getElementById('saveGroupBtn').addEventListener('click', ()=>{
+  const id=document.getElementById('gEditId').value.trim()||uid(document.getElementById('gEditName').value);
+  const name=document.getElementById('gEditName').value.trim()||'New Group';
+  const color=document.getElementById('gEditColor').value||'#8B5CF6';
+  const expanded=document.getElementById('gEditExpanded').checked;
+  if(editingGroupId){ const g=state.groups.find(x=>x.id===editingGroupId); if(g){ g.id=id; g.name=name; g.color=color; g.isExpanded=expanded; } }
+  else{ if(state.groups.find(x=>x.id===id)) return toast('Group ID exists'); state.groups.push({id,name,color,isExpanded:expanded}); }
+  saveLocal(); renderGroups(); renderBadges(); closeGroupModal();
+});
+document.getElementById('gEditColorPicker').addEventListener('input', e=>document.getElementById('gEditColor').value=e.target.value.toUpperCase());
+document.getElementById('gEditColor').addEventListener('input', e=>{ if(/^#/.test(e.target.value)) document.getElementById('gEditColorPicker').value=e.target.value; });
+
+document.getElementById('addBadgeBtn').addEventListener('click', ()=>openBadgeModal());
+document.getElementById('closeBadgeModal').addEventListener('click', closeBadgeModal);
+document.getElementById('cancelBadgeBtn').addEventListener('click', closeBadgeModal);
+document.getElementById('saveBadgeBtn').addEventListener('click', ()=>{
+  const id=document.getElementById('editId').value.trim()||uid(document.getElementById('editName').value);
+  const name=document.getElementById('editName').value.trim()||'New Badge';
+  const groupId=document.getElementById('editGroup').value||state.groups[0].id;
+  const pattern=document.getElementById('editPattern').value.trim()||'(?i)\\b'+name.toLowerCase()+'\\b';
+  let imageURL=document.getElementById('editImageUrl').value.trim();
+  if(!imageURL&&document.getElementById('genPreview').dataset.url) imageURL=document.getElementById('genPreview').dataset.url;
+  const tagColor=document.getElementById('editTagColor').value.trim()||'#E68B5CF6';
+  const borderColor=document.getElementById('editBorderColor').value.trim()||'#FF8B5CF6';
+  const textColor=document.getElementById('editTextColor').value.trim()||'#FFFFFFFF';
+  const tagStyle=document.getElementById('editTagStyle').value;
+  const markerCode=parseInt(document.getElementById('editMarkerCode').value)||state.nextMarkerCode;
+  const markerField=document.getElementById('editMarkerField').value;
+  const markerMode=document.getElementById('editMarkerMode').value;
+  const markerValues=document.getElementById('editMarkerValues').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!compilePattern(pattern)) return toast('Invalid regex');
+  if(markerCode<1||markerCode>255) return toast('Marker code 1-255');
+  if(editingBadgeId){
+    const f=state.filters.find(x=>x.id===editingBadgeId);
+    if(f) Object.assign(f,{id,groupId,name,pattern,imageURL,tagColor,borderColor,textColor,tagStyle,markerCode,markerField,markerMode,markerValues});
+  }else{
+    if(state.filters.find(x=>x.id===id)) return toast('Badge ID exists');
+    if(state.filters.find(x=>x.markerCode===markerCode)) { if(!confirm(`Marker code ${markerCode} already used. Continue?`)) return; }
+    state.filters.push({id,groupId,name,pattern,imageURL,tagColor,borderColor,textColor,tagStyle,isEnabled:true,type:'filter',markerCode,markerField,markerMode,markerValues});
+    state.nextMarkerCode=markerCode+1; if(state.nextMarkerCode>255) state.nextMarkerCode=1;
+  }
+  saveLocal(); renderGroups(); renderBadges(); buildOutputs(); closeBadgeModal();
+});
+
+document.querySelectorAll('#badgeEditTabs .tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('#badgeEditTabs .tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const target=tab.dataset.btab;
+    document.querySelectorAll('[data-bpanel]').forEach(p=>p.style.display=p.dataset.bpanel===target?'block':'none');
+  });
+});
+document.querySelectorAll('#imageSourceTabs .tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('#imageSourceTabs .tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('[data-ispanel]').forEach(p=>p.style.display=p.dataset.ispanel===tab.dataset.isrc?'block':'none');
+  });
+});
+document.querySelectorAll('#sourceTabs .tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('#sourceTabs .tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('[data-panel]').forEach(p=>p.style.display=p.dataset.panel===tab.dataset.tab?'block':'none');
+  });
+});
+
+document.getElementById('badgeSearch').addEventListener('input', renderBadges);
+document.getElementById('filterGroup').addEventListener('change', e=>{ state.selectedGroup=e.target.value; renderBadges(); });
+document.getElementById('filterEnabled').addEventListener('change', renderBadges);
+document.getElementById('libSearch').addEventListener('input', renderLibrary);
+document.getElementById('libCategory').addEventListener('change', renderLibrary);
+document.getElementById('testInput').addEventListener('input', renderPreview);
+document.getElementById('enableAllBtn').addEventListener('click', ()=>{ state.filters.forEach(f=>f.isEnabled=true); saveLocal(); renderBadges(); renderGroups(); buildOutputs(); });
+document.getElementById('disableAllBtn').addEventListener('click', ()=>{ state.filters.forEach(f=>f.isEnabled=false); saveLocal(); renderBadges(); renderGroups(); buildOutputs(); });
+document.getElementById('sortGroupsBtn').addEventListener('click', ()=>{ state.groups.sort((a,b)=>a.name.localeCompare(b.name)); saveLocal(); renderGroups(); });
+document.getElementById('importUrlBtn').addEventListener('click', importFromUrl);
+document.getElementById('importPasteBtn').addEventListener('click', importFromPaste);
+document.querySelectorAll('[data-quick]').forEach(btn=>{ btn.addEventListener('click', async ()=>{ const key=btn.dataset.quick; const url=QUICK_PACKS[key]; document.getElementById('importUrl').value=url; importFromUrl(); }); });
+document.getElementById('exportJsonBtn').addEventListener('click', exportJson);
+document.getElementById('copyJsonBtn').addEventListener('click', copyJson);
+document.getElementById('downloadZipBtn').addEventListener('click', downloadZip);
+document.getElementById('createImportUrlBtn').addEventListener('click', createImportUrl);
+document.getElementById('downloadFormatterBtn').addEventListener('click', exportFormatter);
+document.getElementById('openConfiguratorBtn').addEventListener('click', openConfigurator);
+document.getElementById('saveLocalBtn').addEventListener('click', ()=>{ saveLocal(); toast('Saved locally'); });
+document.getElementById('resetBtn').addEventListener('click', ()=>{ if(confirm('Reset everything?')){ localStorage.removeItem(STORAGE_KEY); state.groups=JSON.parse(JSON.stringify(defaultGroups)); state.filters=[]; state.nextMarkerCode=1; saveLocal(); renderGroups(); renderBadges(); buildOutputs(); toast('Reset'); } });
+
+document.getElementById('modeEnhanced').addEventListener('click', ()=>{ state.mode='enhanced'; document.getElementById('modeEnhanced').classList.add('active'); document.getElementById('modeUniversal').classList.remove('active'); saveLocal(); buildOutputs(); renderBadges(); toast('Mode: AIO Enhanced'); });
+document.getElementById('modeUniversal').addEventListener('click', ()=>{ state.mode='universal'; document.getElementById('modeUniversal').classList.add('active'); document.getElementById('modeEnhanced').classList.remove('active'); saveLocal(); buildOutputs(); renderBadges(); toast('Mode: Universal'); });
+document.getElementById('globalTagStyle').addEventListener('change', e=>{ state.globalTagStyle=e.target.value; state.filters.forEach(f=>f.tagStyle=e.target.value); saveLocal(); renderBadges(); });
+document.getElementById('renderMode').addEventListener('change', e=>{ state.renderMode=e.target.value; saveLocal(); });
+document.querySelectorAll('[data-theme-preset]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const preset=btn.dataset.themePreset;
+    state.theme=preset;
+    const map={neon:{alpha:'C7', border:'FF', trans:false}, mono:{alpha:'E6', border:'80', trans:false}, contrast:{alpha:'FF', border:'FF', trans:false}, transparent:{alpha:'00', border:'00', trans:true}};
+    const cfg=map[preset]; if(!cfg) return;
+    state.filters.forEach(f=>{
+      const base=argbToHex(f.tagColor); const baseBorder=argbToHex(f.borderColor);
+      if(cfg.trans){ f.tagColor='#00000000'; f.borderColor='#00000000'; } else { f.tagColor='#'+cfg.alpha+base.replace('#',''); f.borderColor='#'+cfg.border+baseBorder.replace('#',''); }
+    });
+    saveLocal(); renderBadges(); buildOutputs(); toast(`Theme: ${preset}`);
+  });
+});
+
+document.getElementById('helperBuildBtn').addEventListener('click', ()=>{
+  const kw=document.getElementById('helperKeywords').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!kw.length) return;
+  const pattern=`(?i)\\b(${kw.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')})\\b`;
+  document.getElementById('editPattern').value=pattern; updatePatternTest();
+});
+document.getElementById('helperPresetBtn').addEventListener('click', ()=>{
+  const v=document.getElementById('helperPreset').value;
+  const map={'res-4k':'(?i)\\b(4k|2160p|uhd)\\b','src-remux':'(?i)\\bremux\\b','vis-dv':'(?i)\\b(dolby[ ._-]?vision|dovi|\\bdv\\b)\\b','aud-atmos':'(?i)\\batmos\\b','codec-hevc':'(?i)(hevc|h[ ._-]?265|x265)','net-netflix':'(?i)netflix'};
+  if(map[v]){ document.getElementById('editPattern').value=map[v]; updatePatternTest(); }
+});
+document.getElementById('editPattern').addEventListener('input', updatePatternTest);
+document.getElementById('patternTestInput').addEventListener('input', updatePatternTest);
+['editMarkerField','editMarkerMode','editMarkerValues','editMarkerCode'].forEach(id=>{ document.getElementById(id).addEventListener('input', updateMarkerSnippet); });
+
+['genText','genStyle','genBg','genBgHex','genTextColor','genTextColorHex','genIcon','genWeight'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    if(id==='genBg') document.getElementById('genBgHex').value=document.getElementById('genBg').value;
+    if(id==='genBgHex'&&/^#[0-9A-Fa-f]{6}$/.test(document.getElementById('genBgHex').value)) document.getElementById('genBg').value=document.getElementById('genBgHex').value;
+    if(id==='genTextColor') document.getElementById('genTextColorHex').value=document.getElementById('genTextColor').value;
+    if(id==='genTextColorHex'&&/^#[0-9A-Fa-f]{6}$/.test(document.getElementById('genTextColorHex').value)) document.getElementById('genTextColor').value=document.getElementById('genTextColorHex').value;
+    updateGenPreview(); updateStylePreview();
+  });
+});
+document.getElementById('genBtn').addEventListener('click', updateGenPreview);
+document.getElementById('genUseBtn').addEventListener('click', ()=>{ const url=document.getElementById('genPreview').dataset.url; if(url){ document.getElementById('editImageUrl').value=url; updateStylePreview(); toast('Image set'); } });
+document.getElementById('uploadInput').addEventListener('change', e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ const url=reader.result; const safeUrl=safeSrc(url); document.getElementById('uploadPreview').innerHTML=safeUrl?`<img src="${esc(safeUrl)}">`:''; document.getElementById('editImageUrl').value=url; updateStylePreview(); };
+  reader.readAsDataURL(file);
+});
+document.getElementById('useCoreAssetBtn').addEventListener('click', ()=>{
+  const sel=document.getElementById('coreAssetSelect').value;
+  if(!sel) return toast('Select a Core asset');
+  const url=`${CORE_ASSET_BASE}/${sel}`;
+  document.getElementById('editImageUrl').value=url;
+  updateStylePreview();
+  toast(`Using Core asset: ${sel}`);
+});
+document.getElementById('editTagColorPicker').addEventListener('input', e=>{ const alpha=alphaFromArgb(document.getElementById('editTagColor').value); document.getElementById('editTagColor').value='#'+alpha+e.target.value.replace('#','').toUpperCase(); updateStylePreview(); });
+document.getElementById('editBorderColorPicker').addEventListener('input', e=>{ const alpha=alphaFromArgb(document.getElementById('editBorderColor').value); document.getElementById('editBorderColor').value='#'+alpha+e.target.value.replace('#','').toUpperCase(); updateStylePreview(); });
+document.getElementById('editTextColorPicker').addEventListener('input', e=>{ const alpha=alphaFromArgb(document.getElementById('editTextColor').value); document.getElementById('editTextColor').value='#'+alpha+e.target.value.replace('#','').toUpperCase(); updateStylePreview(); });
+['editTagColor','editBorderColor','editTextColor','editName','editImageUrl'].forEach(id=>{ document.getElementById(id).addEventListener('input', updateStylePreview); });
+
+document.getElementById('packName').addEventListener('input', e=>{ state.packName=e.target.value; saveLocal(); });
+document.getElementById('badgeModal').addEventListener('click', e=>{ if(e.target.id==='badgeModal') closeBadgeModal(); });
+document.getElementById('groupModal').addEventListener('click', e=>{ if(e.target.id==='groupModal') closeGroupModal(); });
+
+/* INIT */
+if(state.mode==='enhanced'){ document.getElementById('modeEnhanced').classList.add('active'); document.getElementById('modeUniversal').classList.remove('active'); } else { document.getElementById('modeUniversal').classList.add('active'); document.getElementById('modeEnhanced').classList.remove('active'); }
+document.getElementById('packName').value=state.packName;
+document.getElementById('globalTagStyle').value=state.globalTagStyle;
+document.getElementById('renderMode').value=state.renderMode;
+renderGroups(); renderBadges(); renderLibrary(); buildOutputs(); renderPreview(); updateGenPreview();
+setStep(1);
+console.log('Nuvio Universal Builder v3 loaded');
+</script>
+</body>
+</html>

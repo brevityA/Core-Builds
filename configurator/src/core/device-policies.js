@@ -7,7 +7,10 @@ export function resolutionPolicy(input = {}) {
   const mr1k = pool === 'max' ? 75 : pool === 'large' ? 50 : 35;
   const pr4k = pool === 'max' ? 30 : pool === 'large' ? 20 : 12;
   const pr1k = pool === 'max' ? 30 : pool === 'large' ? 20 : 15;
-  if (input.resolution === '4k') return { excludedResolutions:[...ex,'480p','576p'], includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','720p','Unknown'], maxResults:mr4k, maxResultsPerResolution:pr4k };
+  // 1440p was missing from the 4K profile's preference list while NOT being
+  // excluded, so upstream scored it -Infinity and sorted every 1440p result
+  // dead last — below 720p. It belongs directly under 2160p in a 4K build.
+  if (input.resolution === '4k') return { excludedResolutions:[...ex,'480p','576p'], includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1440p','1080p','720p','Unknown'], maxResults:mr4k, maxResultsPerResolution:pr4k };
   if (input.resolution === '1080p') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:['1080p','720p'], preferredResolutions:['1080p','720p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
   if (input.resolution === 'mixed' || input.pseArch === 'apex-mixed') return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['2160p','1080p','1440p','720p','576p','480p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };
   return { excludedResolutions:ex, includedResolutions:[], requiredResolutions:[], preferredResolutions:['1080p','1440p','2160p','720p','576p','480p','Unknown'], maxResults:mr1k, maxResultsPerResolution:pr1k };

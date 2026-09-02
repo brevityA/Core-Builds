@@ -1,4 +1,4 @@
-# CORS proxy + template paste for the configurator
+# CORS proxy + temporary JSON imports for Core Builds
 
 The configurator's "Create & Install" flow tries to POST a config directly to
 each public AIOStreams instance's `/api/v1/user` endpoint from the browser.
@@ -16,20 +16,22 @@ seven hardcoded public AIOStreams hosts in `ALLOWED_HOSTS`.
 The configurator races a direct browser fetch against a proxied fetch via
 `raceHostFetch()` — whichever responds first wins.
 
-## 2. Template paste (`/paste`, `/t/:id`)
+## 2. Temporary JSON imports (`/paste`, `/t/:id`)
 
 When the direct API call fails (CORS, host down, rate limit), the configurator
 automatically uploads the template JSON to the Worker's KV store and gets back
 a short URL. Users then tap an instance chip to auto-import the template into
-AIOStreams via the `?template=URL` parameter.
+AIOStreams via the `?template=URL` parameter. Core Badge Builder uses the same
+bounded route for Nuvio Fusion badge packs. The endpoint accepts only these two
+validated object shapes; it is not a generic anonymous JSON store.
 
 **Fallback chain** (configurator tries each until one succeeds):
 1. Cloudflare Worker `/paste` — your infrastructure, 30-day TTL
 2. paste.rs — public paste service
 3. dpaste.com — last resort
 
-Templates are stored in Cloudflare KV with a 30-day TTL. Nothing is logged
-or inspected. Max upload size is 512 KB.
+Templates and badge packs are stored in Cloudflare KV with a 30-day TTL. Nothing is logged
+or inspected. Max upload size is 512 KB; badge packs are capped at 500 filters.
 
 ## Deploy
 
@@ -90,9 +92,9 @@ unauthenticated browser), so every abuse surface is bounded:
   so a path-traversal attempt can never reach a non-allowlisted host). Request body capped
   at 2 MB (`413` on overflow), upstream fetch has a 15 s `AbortSignal.timeout`, upstream
   response capped at 8 MB, and per-IP rate-limited. Responses carry `Cache-Control: no-store`.
-- **Paste (`/paste`, `/t/:id`)** — create is per-IP rate-limited and only accepts JSON
-  *objects* (no generic dump); retrieval is rate-limited and returns `Cache-Control: no-store`
-  because a stored paste can carry a user's config. IDs are unbiased (`crypto.getRandomValues`
+- **Paste (`/paste`, `/t/:id`)** — create is per-IP rate-limited and only accepts validated
+  AIOStreams template or Nuvio badge-pack objects (no generic dump); retrieval is rate-limited
+  and returns `Cache-Control: no-store` because a stored paste can carry a user's config. IDs are unbiased (`crypto.getRandomValues`
   with rejection sampling) and validated against `^[a-z0-9]{6,20}$`.
 - **Contact (`/contact`)** — origin allowlist (CSRF) + per-IP rate limit + field length/shape
   validation; input stripped of `<>`.
@@ -114,3 +116,42 @@ header for real edge traffic).
 **Deprecated.** The configurator points only at this consolidated worker, and `counter.js`
 writes a *different* KV key schema into the same `STATS` namespace (dead writes). Repoint any
 stragglers here and delete it.
+
+## Live status & metrics (2026-08-21)
+
+`GET /api/stats` on the deployed worker returns all counters (CDN-cached 60 s):
+
+| Counter | Meaning |
+|---|---|
+| `visits` / `generates` | Page-load visits, template downloads (beacon) |
+| `visits_rate_limited` | Beacons the 30/min/IP visit bucket rejected — **never silent** (see F10) |
+| `visits_write_err` | KV write failures on the visit increment (both retries failed) |
+| `proxy_calls` / `proxy:host` | Upstream fetches through `/proxy` |
+| `proxy_cache_hits` | Status probes served from the colo Cache API — skipped upstream + rate limit |
+| `proxy_errors` / `proxy_err:host` | Aggregate + per-host errors |
+| `proxy_err_timeout` / `proxy_err_network` / `proxy_err_oversize` / `proxy_err_status` | Error classes: 15 s abort, network/DNS, >8 MB response, upstream 4xx/5xx |
+| `pastes_created` / `pastes_viewed` | Paste uploads / retrievals (30-day TTL) |
+| `daily:*` | Per-day breakdowns (visits, generates, pastes, proxy, visits_rl) |
+
+### Post-deploy smoke
+
+```bash
+node cloudflare-worker/smoke.mjs            # against the production worker
+node cloudflare-worker/smoke.mjs --base=http://127.0.0.1:8787   # local wrangler dev
+```
+
+Checks: `/api/stats` + new counters, every allowlisted host's status probe (200 + 30 s
+cache header), the custom-host lane matrix (https accepted, http:// and bad paths
+refused), and a `/paste` → `/t/:id` roundtrip. Exit 0 = deploy is healthy.
+
+### F10 — the 2026-08-19 visit-counter collapse
+
+`daily:visits` fell 741 → 56 → 20 (Aug 19–21) while `pastes` (22→42→23) and
+`proxy_calls` (228→145→67) stayed healthy on the **same KV namespace**. That isolates
+the failure to the beacon path, not the traffic or the store: the visit/generate
+beacons used bare `navigator.sendBeacon` — silently suppressible by privacy
+browsers/ad-blockers, with unreadable 429s. Fixes shipped alongside:
+resilient client beacon (`sendBeacon` → keepalive-`fetch` fallback + `navigator.onLine`
+guard) and server-side visibility (`visits_rate_limited`, `visits_write_err`). Residual:
+the exact suppression vector needs production access logs to confirm; the new counters
+will make any repeat visible within a day.

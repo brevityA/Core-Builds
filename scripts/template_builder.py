@@ -144,11 +144,13 @@ SORT_ANIME = [
 
 
 def load_json(path):
+    """Load and parse a JSON file from the given path."""
     with open(path) as f:
         return json.load(f)
 
 
 def load_expressions(filename):
+    """Load expression definitions from the Filtering/expressions directory."""
     return load_json(FILTERING_DIR / "expressions" / filename)
 
 
@@ -244,6 +246,7 @@ def build_template(template_def):
 # ---------------------------------------------------------------------------
 
 def main():
+    """Main entry point for the template builder CLI."""
     dry_run = "--dry-run" in sys.argv
     show_diff = "--diff" in sys.argv
     only = None

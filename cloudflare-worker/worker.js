@@ -1,8 +1,8 @@
 // Core Builds — CORS proxy + template paste + usage analytics for the configurator.
 //
 // /proxy/*       — re-issues AIOStreams API requests server-to-server to bypass CORS.
-// /paste         — stores a template JSON in KV and returns a URL that serves it back.
-//                  Templates expire after 30 days. Nothing is logged or inspected.
+// /paste         — stores a validated template or Nuvio badge-pack JSON in KV and returns a URL.
+//                  Imports expire after 30 days. Nothing is logged or inspected.
 // /api/stats     — returns all usage counters (totals + breakdowns).
 // /api/visit     — increments configurator visit counter.
 // /api/generate  — increments template generation counter (accepts service/device/resolution).
@@ -68,6 +68,31 @@ async function readResponseCapped(response, max) {
 
 const NO_STORE = { 'Cache-Control': 'no-store' };
 
+// Public status-probe cache (see isStatusProbe in the proxy handler). Workers
+// run in front of the CDN edge cache, so this uses the Cache API (colo-local).
+// Everything else stays no-store — pastes/configs must never be cached.
+const STATUS_PROBE_CACHE_HEADER = { 'Cache-Control': 'public, max-age=30, s-maxage=30' };
+const STATUS_PROBE_CACHE_TTL = 30; // seconds
+
+async function statusProbeCacheGet(url) {
+  try {
+    const cacheKey = new Request(url.toString(), { method: 'GET' });
+    return await caches.default.match(cacheKey);
+  } catch { return null; } // no Cache API in tests/local — degrade to uncached
+}
+
+function statusProbeCachePut(ctx, url, response) {
+  const put = (async () => {
+    try {
+      const copy = response.clone();
+      copy.headers.set('Cache-Control', `public, max-age=${STATUS_PROBE_CACHE_TTL}, s-maxage=${STATUS_PROBE_CACHE_TTL}`);
+      await caches.default.put(new Request(url.toString(), { method: 'GET' }), copy);
+    } catch { /* cache write failures are never fatal */ }
+  })();
+  if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(put);
+  else put.catch(() => {}); // no ctx (unit tests) — settle best-effort
+}
+
 const ALLOWED_HOSTS = new Set([
   'https://aiostreams.elfhosted.com',
   'https://aiostreams.fortheweak.cloud',
@@ -79,9 +104,82 @@ const ALLOWED_HOSTS = new Set([
   'https://aiostreams-stable.forthewizards.uk',
   // WuPlay genie lane: read probes + (post-dev-blessing) profile-sync writes.
   'https://api.wuplay.app',
+  // CoreSpeed lane: the public TorBox speedtest endpoint (GET /v1/api/speedtest)
+  // that powers the tools/speedtest page. No auth, no writes — read-only.
+  'https://api.torbox.app',
 ]);
 
 const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
+
+// Per-host narrowing for the generic proxy lane.
+//
+// By default an allowlisted host is reachable with GET/POST/PATCH on any path,
+// and a caller-supplied Authorization header is forwarded verbatim — the WuPlay
+// device-token lane depends on that. api.torbox.app is a third-party API where
+// users hold their own account keys, and CoreSpeed needs exactly one public
+// read: GET /v1/api/speedtest. Without narrowing, allowlisting the host would
+// turn this worker into an authenticated relay for the whole TorBox API,
+// reachable by anyone (CORS shapes browser responses, it does not gate requests).
+//
+// A host listed here is restricted to the named methods and paths, and never
+// receives a credential.
+const HOST_SCOPES = new Map([
+  ['https://api.torbox.app', {
+    methods: new Set(['GET']),
+    paths: new Set(['/v1/api/speedtest']),
+    stripAuth: true,
+  }],
+]);
+
+// Custom / self-hosted lane.
+//
+// The configurator's "Custom / Self-hosted" host option lets a user point at
+// their own AIOStreams instance. The page CSP forbids direct fetches to
+// arbitrary origins, so those hosts must go through this worker — but the
+// worker must not become a general-purpose relay for arbitrary URLs. The lane
+// is therefore scoped to exactly the AIOStreams config surface:
+//
+//   host = origin only (https://self-host.example.com)
+//     GET    /api/v1/status            health/version probe
+//     POST   /api/v1/user              create config
+//     PATCH  /api/v1/user              update config
+//   host = manifest base (https://self-host.example.com/stremio/<uuid>/<epwd>)
+//     GET    /stream/<type>/<id>.json  "Test Streams" probe from the manifest modal
+//
+// https-only, no userinfo/port, bounded path depth, tighter per-IP rate limit,
+// and never receives a forwarded Authorization header. Cloudflare's runtime
+// blocks subrequests to RFC1918/loopback/link-local addresses at the network
+// layer, and self-hosted instances behind a Cloudflare Tunnel present a public
+// hostname anyway, so the residual DNS-rebinding surface is the same bounded
+// class as the existing open-relay design (which is rate-limited and path-
+// scoped).
+const CUSTOM_HOST_PER_MIN = 20;
+function customHostScope(host, method, upstreamPath) {
+  if (!host || !host.startsWith('https://')) return null;
+  let u;
+  try { u = new URL(host); } catch { return null; }
+  if (u.username || u.password || u.port) return null;          // no userinfo, no explicit port
+  if (u.search || u.hash) return null;
+  const h = u.hostname.toLowerCase();
+  // Reject loopback and private-literal forms outright (defense in depth — the
+  // runtime already blocks private-IP subrequests, but never rely on one layer):
+  //   - 127.* , localhost, 0.0.0.0, ::1
+  //   - IPv4-mapped IPv6 (::ffff:127.0.0.1 serializes to [::ffff:7f00:1])
+  //   - any pure-IP hostname (bracketed IPv6 or dotted IPv4) — custom AIOStreams
+  //     hosts are hostnames; refusing literals removes an entire bypass class.
+  if (h === 'localhost' || h === '0.0.0.0' || h === '::1' || /^127\./.test(h)) return null;
+  if (h.startsWith('[') || /^::ffff:/.test(h) || /^\d{1,3}(\.\d{1,3}){3}$/.test(h)) return null;
+  const path = u.pathname; // '/' (origin) or '/stremio/<uuid>/<epwd>' (manifest-derived base)
+  const segs = path.split('/').length;
+  if (path === '/') {
+    const okStatus = method === 'GET' && upstreamPath === '/api/v1/status';
+    const okUser   = (method === 'POST' || method === 'PATCH') && upstreamPath === '/api/v1/user';
+    return (okStatus || okUser) ? { custom: true, stripAuth: true } : null;
+  }
+  if (!path.startsWith('/stremio/') || segs !== 4) return null; // exactly /stremio/<uuid>/<epwd>
+  if (method !== 'GET' || !/^\/stream\/[^/]+\/[^/]+\.json$/.test(upstreamPath)) return null;
+  return { custom: true, stripAuth: true };
+}
 
 const ALLOWED_ORIGINS = new Set([
   'https://brevitya.github.io',
@@ -97,7 +195,7 @@ const ALLOWED_ORIGINS = new Set([
 
 function corsHeaders(request, publicRead = false) {
   const origin = request?.headers?.get('Origin') || '';
-  // Public read endpoints (paste retrieval /t/, proxy GETs) are fetched by
+  // Public read endpoints (paste retrieval /t/, status probes) are fetched by
   // OTHER origins' web apps (any public AIOStreams host importing a template).
   // Echoing only allowlisted origins breaks that (browser CORS rejects when the
   // echoed origin != the requesting origin -> "Load failed" on import). For
@@ -107,16 +205,34 @@ function corsHeaders(request, publicRead = false) {
   else allowed = ALLOWED_ORIGINS.has(origin) ? origin : 'https://brevitya.github.io';
   return {
     'Access-Control-Allow-Origin': allowed,
-    ...(publicRead ? {} : {}),
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
-    'Vary': 'Origin',
+    // Public-read responses carry ACAO:* — the value does not depend on the
+    // request Origin, so Vary: Origin would only fragment the CDN cache key.
+    // Strict-echo responses keep it so caches never serve one origin's CORS
+    // value to another.
+    ...(publicRead ? {} : { 'Vary': 'Origin' }),
   };
 }
 
 const PASTE_TTL = 30 * 24 * 60 * 60; // 30 days
 const PASTE_MAX_SIZE = 512 * 1024; // 512 KB
+const BADGE_FILTER_MAX = 500;
+
+function supportedPasteShape(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  // AIOStreams template wrapper generated by the Configurator.
+  if (value.config && typeof value.config === 'object' && !Array.isArray(value.config)) return true;
+  // Nuvio Fusion badge pack generated by Core Badge Builder. Keep the shape narrow so
+  // /paste does not become a generic anonymous JSON store.
+  if (!Array.isArray(value.groups) || !Array.isArray(value.filters)) return false;
+  if (value.filters.length < 1 || value.filters.length > BADGE_FILTER_MAX) return false;
+  return value.filters.every((filter) => filter && typeof filter === 'object' && !Array.isArray(filter)
+    && typeof filter.id === 'string' && typeof filter.groupId === 'string'
+    && typeof filter.name === 'string' && typeof filter.pattern === 'string'
+    && typeof filter.imageURL === 'string');
+}
 
 const SECURE_DOC_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
@@ -220,15 +336,17 @@ export default {
     // overwritten while an earlier async request is awaiting KV/upstream I/O.
     const cors = corsHeaders(request);
     const respond = (status, payload) => json(status, payload, cors);
-    // Public read endpoints (paste retrieval + proxy GETs) must be fetchable by
-    // ANY origin's web app (public AIOStreams hosts importing a template), so
-    // they get Access-Control-Allow-Origin: *. Computed per request.
+    // Public read endpoints (paste retrieval + status probes) must be fetchable
+    // by ANY origin's web app (public AIOStreams hosts importing a template).
+    // The set is deliberately narrow: /t/ carries pasted configs, and
+    // /proxy/api/v1/status is public health/version data. Other proxy GETs
+    // (e.g. /proxy/stremio/... stream probes whose URLs embed the config
+    // password) stay on the strict origin echo — only the configurator's own
+    // origins may read those. Computed per request.
     const url = new URL(request.url);
     const isPublicRead = request.method === 'GET' &&
-      (url.pathname.startsWith('/t/') || url.pathname.startsWith('/proxy'));
+      (url.pathname.startsWith('/t/') || url.pathname === '/proxy/api/v1/status');
     const publicCors = isPublicRead ? corsHeaders(request, true) : null;
-    const respondPublic = (status, payload, hdrs = {}) =>
-      json(status, payload, publicCors || cors, hdrs);
     if (request.method === 'OPTIONS') {
       // Preflight must mirror what the actual request would get.
       return new Response(null, { headers: isPublicRead ? publicCors : cors });
@@ -241,7 +359,15 @@ export default {
         return respond(429, { error: 'rate limit exceeded' });
       }
       if (!env.STATS) return respond(200, {});
-      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_errors', 'pastes_created', 'pastes_viewed'];
+      // Every counter the worker writes must appear here or it is write-only.
+      // The proxy_err_* class counters are incremented as `proxy_err_${cls}`
+      // (underscore) while the per-host ones are `proxy_err:${hostname}` (colon),
+      // so the listByPrefix('proxy_err:') scan below does NOT pick them up — they
+      // need naming explicitly. Adding a counter without adding it here makes it
+      // invisible to /api/stats and to smoke.mjs.
+      const keys = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors',
+        'pastes_created', 'pastes_viewed', 'visits_rate_limited', 'visits_write_err',
+        'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status'];
       const vals = await Promise.all(keys.map(k => env.STATS.get(k)));
       const totals = {};
       keys.forEach((k, i) => { totals[k] = parseInt(vals[i], 10) || 0; });
@@ -262,11 +388,18 @@ export default {
     if (url.pathname === '/api/visit' && request.method === 'POST') {
       const visitIp = getClientIp(request);
       if (!(await rateAllow(env.RATELIMIT, 'visit', visitIp, ANALYTICS_PER_MIN, 60))) {
+        // sendBeacon callers cannot read the 429, so a shared-IP clamp-down is
+        // invisible — count it so /api/stats shows the clamp instead of looking
+        // like a traffic collapse (F10 in AUDIT-CONFIGURATOR-INFRA-2026-08-21).
+        if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['visits_rate_limited', `daily:visits_rl:${today()}`]);
         return respond(429, { error: 'rate limit exceeded' });
       }
       if (env.STATS) {
         const d = today();
         const v = await increment(env.STATS, 'visits');
+        // increment() returns 0 only when every KV write attempt failed — count
+        // it instead of silently reporting 0 visits.
+        if (v === 0) bgIncrement(ctx, env.STATS, 'visits_write_err');
         bgIncrement(ctx, env.STATS, `daily:visits:${d}`);
         return respond(200, { visits: v });
       }
@@ -375,9 +508,10 @@ export default {
       }
       let parsed;
       try { parsed = JSON.parse(body); } catch { return respond(400, { error: 'invalid JSON' }); }
-      // Only accept template-shaped objects so the KV store isn't used as a generic dump.
-      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-        return respond(400, { error: 'expected a JSON object' });
+      // Accept only the two public Core Builds export shapes so this cannot become a
+      // generic anonymous JSON store: AIOStreams templates and Nuvio badge packs.
+      if (!supportedPasteShape(parsed)) {
+        return respond(400, { error: 'expected a Core Builds template or badge pack' });
       }
       const id = randomId();
       await env.TEMPLATES.put(`t:${id}`, body, { expirationTtl: PASTE_TTL });
@@ -422,20 +556,70 @@ export default {
     }
 
     const host = url.searchParams.get('host');
-    if (!host || !ALLOWED_HOSTS.has(host)) {
+    // Allowlisted hosts keep the full lane; anything else must pass the scoped
+    // custom-host gate (AIOStreams config paths only, https, origin-only).
+    const customHost = ALLOWED_HOSTS.has(host) ? null : customHostScope(host, request.method, upstreamPath);
+    if (!host || (!ALLOWED_HOSTS.has(host) && !customHost)) {
       return respond(403, { error: 'host not allowed' });
     }
 
-    // Per-IP rate limit on the proxy (open relays to allowed hosts are an amplification risk).
+    // Narrowed hosts get one door, not the whole building. See HOST_SCOPES.
+    // Custom hosts get the same treatment with an even smaller door.
+    const hostScope = customHost || HOST_SCOPES.get(host);
+    if (hostScope) {
+      if (hostScope.custom) {
+        // customHostScope already validated path+method; stripAuth is implied.
+      } else {
+        if (!hostScope.methods.has(request.method)) {
+          return respond(405, { error: 'method not allowed for this host' });
+        }
+        if (!hostScope.paths.has(upstreamPath)) {
+          return respond(403, { error: 'path not allowed for this host' });
+        }
+      }
+    }
+
+    // Status probes are public health/version data: 30s of staleness is fine for
+    // host picking. Workers sit IN FRONT of the CDN edge cache, so an s-maxage
+    // header alone never caches anything — the Cache API (colo-local) is the
+    // mechanism. Serving repeated probes from the colo cache skips the upstream
+    // fetch and the rate-limit burn on every page load.
+    const isStatusProbe = request.method === 'GET' && upstreamPath === '/api/v1/status';
+    if (isStatusProbe) {
+      const cached = await statusProbeCacheGet(url);
+      if (cached) {
+        const body = await cached.text().catch(() => null);
+        if (body !== null) {
+          // Cache hits skip the upstream fetch AND the rate-limit bucket, so
+          // they also skip proxy_calls/proxy:host counting — count them in a
+          // dedicated bucket so /api/stats stays interpretable.
+          if (env.STATS) bgIncrement(ctx, env.STATS, 'proxy_cache_hits');
+          return new Response(body, {
+            status: 200,
+            headers: {
+              ...SECURE_DOC_HEADERS,
+              'Content-Type': cached.headers.get('Content-Type') || 'application/json',
+              ...(publicCors || cors),
+              ...STATUS_PROBE_CACHE_HEADER,
+            },
+          });
+        }
+      }
+    }
+
+    // Per-IP rate limit on the proxy (open relays to allowed hosts are an
+    // amplification risk; the un-allowlisted custom lane is tighter).
     const proxyIp = getClientIp(request);
-    if (!(await rateAllow(env.RATELIMIT, 'proxy', proxyIp, ANALYTICS_PER_MIN * 2, 60))) {
+    const proxyBucket = customHost ? 'proxy_custom' : 'proxy';
+    const proxyMax = customHost ? CUSTOM_HOST_PER_MIN : ANALYTICS_PER_MIN * 2;
+    if (!(await rateAllow(env.RATELIMIT, proxyBucket, proxyIp, proxyMax, 60))) {
       return respond(429, { error: 'rate limit exceeded', headers: NO_STORE });
     }
 
     const upstreamSearch = url.searchParams.toString();
     const upstreamUrl = new URL(host + upstreamPath);
     if (upstreamSearch) {
-      const cleanedSearch = upstreamSearch.replace(/(^|&)host=[^&]*/, '').replace(/^&+|&+$/g, '');
+      const cleanedSearch = upstreamSearch.replace(/(^|&)host=[^&]*/g, '').replace(/^&+|&+$/g, '');
       if (cleanedSearch) upstreamUrl.search = cleanedSearch;
     }
 
@@ -448,7 +632,11 @@ export default {
 
     const fwdHeaders = { 'Content-Type': request.headers.get('Content-Type') || 'application/json' };
     const auth = request.headers.get('Authorization');
-    if (auth) fwdHeaders['Authorization'] = auth;   // forward-pass only when caller set it (WuPlay device tokens)
+    // Forward-pass only when the caller set it (WuPlay device tokens), and never
+    // to a narrowed host — CoreSpeed's endpoint is public, so a credential
+    // arriving for api.torbox.app is either a mistake or an attempt to use this
+    // worker as a relay. Drop it either way.
+    if (auth && !hostScope?.stripAuth) fwdHeaders['Authorization'] = auth;
     const upstreamReq = new Request(upstreamUrl, {
       method: request.method,
       headers: fwdHeaders,
@@ -462,7 +650,11 @@ export default {
     try {
       upstreamRes = await fetch(upstreamReq);
     } catch (e) {
-      if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
+      // AbortSignal.timeout rejects with TimeoutError; anything else is a
+      // network/DNS failure. Separate buckets so the operator can tell "slow
+      // host" from "dead host" without digging through upstream logs.
+      const cls = (e && e.name === 'TimeoutError') ? 'timeout' : 'network';
+      if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`, `proxy_err_${cls}`]);
       return respond(502, { error: 'upstream unreachable' });
     }
 
@@ -474,24 +666,28 @@ export default {
         `daily:proxy:${d}`,
       ]);
       if (upstreamRes.status >= 400) {
-        bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
+        bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`, 'proxy_err_status']);
       }
     }
 
     // Capped response body — protects the worker from an oversized/malicious upstream.
     const resBody = await readResponseCapped(upstreamRes, PROXY_RESP_MAX_SIZE);
     if (resBody === null) {
-      if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`]);
+      if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['proxy_errors', `proxy_err:${hostname}`, 'proxy_err_oversize']);
       return respond(502, { error: 'upstream response too large' });
     }
-    return new Response(resBody, {
+    const resp = new Response(resBody, {
       status: upstreamRes.status,
       headers: {
         ...SECURE_DOC_HEADERS,
         'Content-Type': upstreamRes.headers.get('Content-Type') || 'application/json',
         ...(publicCors || cors),
-        ...NO_STORE,
+        ...(isStatusProbe ? STATUS_PROBE_CACHE_HEADER : NO_STORE),
       },
     });
+    // Only cache successful status probes; failures keep flowing through (and
+    // are counted) so a broken host is never masked by a stale 200.
+    if (isStatusProbe && resp.status === 200) statusProbeCachePut(ctx, url, resp);
+    return resp;
   },
 };

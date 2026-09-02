@@ -10,6 +10,7 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEAD_LABELS = ["DV-Only Kill", "Unknown Resolution", "Unknown Quality"]
 
 def is_dead(ese):
+    """Check if ESE is disabled and contains a dead label."""
     if not isinstance(ese, dict):
         return False
     if ese.get("enabled", True):

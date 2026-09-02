@@ -1,91 +1,100 @@
 ---
-title: "What's New — Configurator v2.95"
+title: "What's New — Configurator v3.0"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v2.95 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.0 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v2.95**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.0**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
 
-## Configurator v2.95 (Aug 16 2026)
+## Configurator v3.0 (Sep 1 2026)
 
 <CardGroup cols={2}>
-  <Card title="Stream scoring is live on Advanced and Labs" icon="sparkles">
-    until now every stream carried the same score of nothing. AIOStreams only fills in a stream's score from a 'ranked expression' list, Core Builds never sent one, and so the score-based sort key and the Adaptive Score Floor were quietly dropped from every config we generated. Both were listed as features. Neither had ever run. Advanced and Labs configs now ship a set of scored rules, so the score they sort on is real.
+  <Card title="4K, Mixed and Ultrawide builds now sort by resolution first \u2014 and if you are on the 1080p profile, this one does not apply to you, see the next note. In those three profiles a 1080p REMUX with a high score could until now sit above a 2160p file, because AIOStreams compares sort rules in order and the first rule that differs decides the whole ranking. Cached status, expression matches and score all came before resolution, so a well-scored 1080p won before resolution was ever consulted. Every 2160p result now outranks every 1080p result regardless of bitrate, quality label or score, and the old quality ordering still applies inside each tier. This is not a UI reorder: it changes the sortCriteria your instance actually evaluates, so it takes effect on the host, not just in the list you see here." icon="sparkles">
+    4K, Mixed and Ultrawide builds now sort by resolution first \u2014 and if you are on the 1080p profile, this one does not apply to you, see the next note. In those three profiles a 1080p REMUX with a high score could until now sit above a 2160p file, because AIOStreams compares sort rules in order and the first rule that differs decides the whole ranking. Cached status, expression matches and score all came before resolution, so a well-scored 1080p won before resolution was ever consulted. Every 2160p result now outranks every 1080p result regardless of bitrate, quality label or score, and the old quality ordering still applies inside each tier. This is not a UI reorder: it changes the sortCriteria your instance actually evaluates, so it takes effect on the host, not just in the list you see here.
   </Card>
-  <Card title="Quality now adds up instead of laddering" icon="bolt">
-    resolution, quality, HDR/Dolby Vision, audio format and release-group reputation each contribute points, while low-quality groups and upscales subtract them. Because the points combine, a 4K remux with Atmos from a top group outranks a plain 4K remux without anyone writing a rule for that exact pairing, which is what the old tier ladder required. Points for Dolby Vision and lossless audio are awarded only on devices that can play them.
+  <Card title="On the 1080p profile this release will not bring your 4K back, because 4K was never being sorted away \u2014 it was being deleted. The 1080p profile hard-excludes 2160p and 1440p on the Stable and Balanced output profiles, so those streams are discarded by your instance before any sorting happens and no amount of scrolling will reveal them. That is deliberate, it is what the \'Hard lock \u00b7 2160p excluded\' wording on the card means, and bandwidth-capped users depend on it, so we have not removed it. Switching Stable to Balanced does not help either \u2014 both apply the lock. If you want 1080p most of the time and 4K when it exists, choose Mixed \u00b7 Adaptive: it ranks 1080p first without deleting the higher tiers. The wizard now says so on the resolution step instead of leaving you to find out from your results." icon="bolt">
+    On the 1080p profile this release will not bring your 4K back, because 4K was never being sorted away \u2014 it was being deleted. The 1080p profile hard-excludes 2160p and 1440p on the Stable and Balanced output profiles, so those streams are discarded by your instance before any sorting happens and no amount of scrolling will reveal them. That is deliberate, it is what the \'Hard lock \u00b7 2160p excluded\' wording on the card means, and bandwidth-capped users depend on it, so we have not removed it. Switching Stable to Balanced does not help either \u2014 both apply the lock. If you want 1080p most of the time and 4K when it exists, choose Mixed \u00b7 Adaptive: it ranks 1080p first without deleting the higher tiers. The wizard now says so on the resolution step instead of leaving you to find out from your results.
   </Card>
-  <Card title="Stable and Balanced are unaffected" icon="shield-check">
-    both clear the scoring layer on purpose, so their configs are unchanged in content. The only difference is one empty field that now appears earlier in the file. This lands solely where you have opted into the deeper filtering.
+  <Card title="The trade-off, stated plainly: an uncached 2160p now outranks a cached 1080p. Putting resolution first switches off AIOStreams' separate cached and uncached ordering, which only applies when cached is the first rule. Cached sits third, so cached still wins between two files of the same resolution" icon="shield-check">
+    but if you would rather have instant playback than the higher tier, pick the 1080p profile or turn on Quality first. Both are unchanged and still cached-first.
+  </Card>
+  <Card title="1440p was being ranked below 720p in every 4K build" icon="sliders">
+    the 4K preference list named 2160p, 1080p, 720p and Unknown but omitted 1440p, and AIOStreams scores an unlisted resolution as negative infinity. Any 1440p file therefore sorted beneath everything else instead of just under 4K. It is now listed in its proper place. If you use a 1440p display or grab 1440p releases to save bandwidth, this is the fix you noticed was missing.
+  </Card>
+  <Card title="Options your instance will not accept are now disabled before you pick them, with the reason on the option" icon="gauge">
+    on the ElfHosted community instance that means Torrentio, AnimeKitsu, Torrent Catalogs, P2P and HTTP appear greyed out and unselectable rather than being silently dropped later. Core Builds checks the host you selected, falls back to a stored capability list when the browser cannot reach it, and applies the same check to the exported JSON and the direct install, so neither can carry something the target host rejects. A Host Compatibility panel lists what was blocked, what was removed from your export, and anything kept that might still be refused.
+  </Card>
+  <Card title="Restricted hosts strip custom regex, and now you are told so" icon="wand">
+    ElfHosted runs with regex filtering limited to a published allowlist, and sending a pattern outside it makes the instance reject the entire save, not just that rule. Core Builds removes unlisted patterns before export and names each one. Synced regex sources are a separate allowlist and are treated separately: the Vidhin ranked-regex feed is on ElfHosted's allowed list, so it stays. On a host we cannot verify, nothing is removed and the panel flags what may be refused instead.
+  </Card>
+  <Card title="The generated config is now built from a specific AIOStreams release rather than a moving target" icon="layers">
+    pinned to v2.33.2 and regenerated by a script that proves the commit is the one that release tag points at. Six settings Core Builds had been emitting for a while turned out not to exist in AIOStreams at all and were being discarded on arrival: maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults and minSeeders. They are gone from the output. excludedStreamSources is replaced by excludedStreamTypes, which the instance does read.
+  </Card>
+  <Card title="Known gaps, so they are not a surprise: the per-resolution result limits that maxResults and maxResultsPerResolution were meant to provide are not reimplemented here, they were simply never reaching the instance. TorBox-hosted AIOStreams has no readable status endpoint, so its capabilities are marked unverified and you will be asked to confirm the host. And the Fine-Tune maximum NZB failover setting still does not reach the generated config." icon="bug">
+    Known gaps, so they are not a surprise: the per-resolution result limits that maxResults and maxResultsPerResolution were meant to provide are not reimplemented here, they were simply never reaching the instance. TorBox-hosted AIOStreams has no readable status endpoint, so its capabilities are marked unverified and you will be asked to confirm the host. And the Fine-Tune maximum NZB failover setting still does not reach the generated config.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v2.94 (Aug 16 2026)
+## Configurator v2.99 (Aug 27 2026)
 
 <CardGroup cols={2}>
-  <Card title="Fixed (generation): the Jackett and Prowlarr preset builders sent a bare 'apiKey'" icon="sparkles">
-    an option those presets never read — the same mistake as the Debridio fix in v2.93. Both now send the provider-specific key (jackettApiKey / prowlarrApiKey), and each preset is emitted only when its URL and key are both present, because AIOStreams rejects the entire config if either is missing. Confirmed against the AIOStreams preset definitions.
+  <Card title="CoreSpeed engine v3, and an apology for v1 and v2" icon="sparkles">
+    if the old speed test disagreed with TorBox's own site, that was our methodology, not the CDN. Three faults, all fixed. The read loop ran on the main thread while the map, table and canvas redrew every 250 ms, so on a weak device the UI starved the download and the tool reported that starvation as your speed; every byte is now counted inside a dedicated Web Worker the UI cannot touch. The 10-second cap on the 100 MB file collapsed to roughly one second of mostly TCP slow-start on a fast line, and measured a partial file on a slow one; v3 uses a 15-second window on the 1 GB file anchored at the first byte. And a single throttled sample used to define the result; each node is now measured twice and ranked by the median of steady-state, with rep-to-rep spread shown as a Consistency column.
   </Card>
-  <Card title="Known issue (documented, not yet changed): the Jackett and Prowlarr presets cannot currently be produced at all. Their emission is gated on an instance URL that no screen collects" icon="bolt">
-    there is no input for it anywhere in the app — so selecting either indexer has never added it to a config. The option-name fix above is therefore correct-but-unreachable groundwork, not a change you can observe today. Adding the URL field is a separate decision.
+  <Card title="Two of the CDN nodes in the old build no longer existed" icon="bolt">
+    TorBox renamed store-039 to store-011 (wnam) and nexus-083 to nexus-244 (latm), and the shipped snapshot still named the dead pair. v3 carries the current list and probes every endpoint on load rather than trusting it, flagging the badge as unverified when probes fail.
   </Card>
-  <Card title="Test integrity: the end-to-end suite now checks generated configs against AIOStreams' actual preset option contract instead of accepting whatever we send it. That gap is why the Debridio bug shipped green and reached users" icon="shield-check">
-    two tests were asserting the wrong option name against a mock that validated nothing. Building the new check is what surfaced the Jackett and Prowlarr bugs above, before anyone hit them.
+  <Card title="Three modes, and the default is the one to trust" icon="shield-check">
+    Accurate runs sequentially on one connection for playback verdicts, Express samples the closest node plus the top four by ping in about two minutes, and Capacity race opens up to eight real Range connections per node. Capacity numbers are pipe capacity and never earn a playback verdict. The 12 GB budget skips nodes rather than truncating a measurement, because a truncated sample is a wrong number while a skipped node is an honest gap.
+  </Card>
+  <Card title="Known gap: v3 has not been confirmed on a Fire Stick or Android TV" icon="sliders">
+    worker isolation is the entire point of the rewrite and low-power webviews are where it should matter most, but that needs real hardware and has not been run there yet. If you have one, a test result would be worth more than another round of ours.
+  </Card>
+  <Card title="CoreSpeed has tests for the first time" icon="gauge">
+    27 offline unit tests, 51 live assertions that run the shipped worker verbatim against a real CDN node rather than a mock of it, a syntax gate on the page, and a nightly CI run so an endpoint or engine break surfaces the day it happens.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v2.93 (Aug 15 2026)
+## Configurator v2.98 (Aug 26 2026)
 
 <CardGroup cols={2}>
-  <Card title="Fixed: Debridio configs were rejected by AIOStreams even when you HAD entered a key ('Option debridioApiKey is required, got undefined'). Core Builds was sending a bare apiKey" icon="sparkles">
-    an option the Debridio preset never reads — so the host saw its required option as missing. The earlier 'omit the preset until a key is entered' change hid this: with no key the preset vanishes, so the rejection only ever reached people actually using Debridio. The option name is now confirmed against the AIOStreams preset source rather than inferred.
+  <Card title="Three official Nuvio badge packs, paste-ready" icon="sparkles">
+    core-neon-universal (55 badges, works on any Nuvio source), core-neon-enhanced (the same 55 with invisible AIO markers, paired with the companion formatter) and core-nodv-universal (54 badges, Dolby Vision removed for Samsung and TCL panels). All three carry the same six groups: resolution, quality, visual, audio, channels, codec. You no longer have to build a pack to get Core badges. They are generated from the Badge Builder rather than hand-written: re-running the publisher reproduces all three byte-identically, and every one of the 164 badge images resolves to the Core Builds assets path.
   </Card>
-  <Card title="Fixed: the import and 'all hosts unreachable' panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it." icon="bolt">
-    Fixed: the import and 'all hosts unreachable' panels rendered their step numbers and mid-sentence emphasis each on its own line, shredding the instructions. A styling rule intended for the panel heading was applying to every bold fragment inside it.
+  <Card title="Groundwork, not yet switched on" icon="bolt">
+    language packs for PT-BR, ES, FR, DE, IT, NL, AR and HI; named capability profiles for Fire TV Stick HD, Fire TV Stick 4K Max, TCL Google TV and Hisense; a two-seat household picker; named AllDebrid, Premiumize and EasyDebrid store presets; and an English kids overlay with a WuPlay home plan. None of these is wired into the builder yet: the two new TV profiles are not selectable, the modules are imported by nothing, and no new template JSON has been generated. Nothing you can observe in the app has changed. They are listed here so the next release, the one that turns them on, is not the first you hear of them.
   </Card>
-  <Card title="Known issue (documented, not yet changed): the Debrider preset is emitted with a type AIOStreams does not recognise" icon="shield-check">
-    `debrider` is a service id, not one of the 76 preset ids the host accepts — so the host cannot resolve it. Recorded at the emission site pending a decision on the right fix.
+  <Card title="Fire TV Stick 4K Max is capped, not Apex" icon="shield-check">
+    it is a 4K device that stutters on REMUX-first ranking, so it gets a bitrate ceiling instead of the Apex path. TCL and Hisense join ONN and Samsung on the No-Dolby-Vision path, because neither panel family should be assumed Dolby Vision capable.
+  </Card>
+  <Card title="Real-Debrid still has no named preset" icon="sliders">
+    its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v2.92 (Aug 11 2026)
+## Configurator v2.97 (Aug 22 2026)
 
 <CardGroup cols={2}>
-  <Card title="AIOStreams v2.33.1 adopted same-day" icon="sparkles">
-    the host fleet hardened its config validation on Aug 11 (required options for torrentio/peerflix/jackett/prowlarr/newznab/nzbhydra; presets enforcing usable-service deps). Core Builds generators, templates, and CI validator updated and proven against the live hosts within hours; a nightly fleet-version watcher is the follow-up.
+  <Card title="Core Badge Builder is live under Tools" icon="sparkles">
+    build Nuvio Fusion stream badges visually with 111 original Core badges, essential and advanced categories, Core Neon/monochrome/high-contrast themes, category colors, ordering, and a real release-title preview. The matching rules are generated and tested internally; there is no regex or JSON field in the workflow.
   </Card>
-  <Card title="Express lane truth-in-advertising pass" icon="bolt">
-    a visible 'Streams shown' toggle (Mixed/⚡Cached only), an always-on install chorus (service → app · profile · resolution · cache mode · host), receipts always show the cache mode, and profile picks no longer stomp an explicit choice. Fixes the 'everything downloads to debrid' confusion class.
+  <Card title="Two badge compatibility modes ship together" icon="bolt">
+    Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline.
   </Card>
-  <Card title="Nuvio instant path honors your AIOStreams host pick on Express (a compatible pick is used; an incompatible one gets a named, actionable error instead of a silent swap). Tutorial completion and the legacy quick-install lane now land in the consolidated Express lane." icon="shield-check">
-    Nuvio instant path honors your AIOStreams host pick on Express (a compatible pick is used; an incompatible one gets a named, actionable error instead of a silent swap). Tutorial completion and the legacy quick-install lane now land in the consolidated Express lane.
+  <Card title="Badge install links are failure-safe" icon="shield-check">
+    the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working.
   </Card>
-  <Card title="Template imports get safe-credential hygiene everywhere: community templates ship presets that need your API key as disabled-with-a-note, share links never carry keys, and the update tool warns when an imported preset type can't be regenerated without re-adding its key." icon="sliders">
-    Template imports get safe-credential hygiene everywhere: community templates ship presets that need your API key as disabled-with-a-note, share links never carry keys, and the update tool warns when an imported preset type can't be regenerated without re-adding its key.
-  </Card>
-  <Card title="New tool: Preflight (tools page)" icon="gauge">
-    audit any template/config offline with rules learned from real host rejections, live dry-run the config against the actual AIOStreams host you target with a bounded auto-heal loop (until the host accepts), read-back proof of complete writes, and a manifest Doctor for existing installs. All of it browser-side through our proxy; nothing stored.
-  </Card>
-  <Card title="WuPlay Catalog Genie gains consent-gated live auto-apply" icon="wand">
-    answers → a snapshot-first, per-step verified write of hub layouts, screen layouts and age gates to your WuPlay profile, one-tap Undo, and an honest tap-guide fallback for anything the API doesn't accept yet. PIN-locked profiles degrade to guided mode explicitly. Handshake probe + diagnostics lane included.
-  </Card>
-  <Card title="Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract." icon="layers">
-    Quarantined a long-standing e2e flake properly: the Express 'Full Stack' chain now has a bounded 2-retry policy with explicit timeouts instead of wobbling the whole suite (#682). Fixed the Nuvio-import spec to express the honored-host contract.
-  </Card>
-  <Card title="Live instance-status cron retired" icon="bug">
-    the docs page is now a guidance snapshot, and live per-host checks live in Preflight (Tools page), which tests your actual host against your actual config instead of a six-hours-stale ping list.
-  </Card>
-  <Card title="Genies graduate onto the main page" icon="sparkles">
-    the Setup Genie door joins 'Choose your route' and the Nuvio Stack Genie joins the Tools row. Both pages dropped their prototype stubs: every button goes somewhere real, and finishing a genie hands your picks to the builder via a sessionStorage hand-off (Express lane opens pre-set — Nuvio/WuPlay pick the right target; a free pick preselects Free/P2P; Debrid-Link routes to Advanced). New deep-links: #express, #advanced, #update, #backup.
+  <Card title="Fixed: custom formatters now survive a Configurator reload" icon="sliders">
+    when both fields are valid and bounded, the formatter is restored. A stale custom selection without its formatter safely returns to Family v4.
   </Card>
 </CardGroup>

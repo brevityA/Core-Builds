@@ -23,9 +23,12 @@ export const CONFIGURATOR_ROOT = resolve(here, '..');
 export const STAMP_RELATIVE = 'dist/web/.cb-build-stamp.json';
 
 // Everything esbuild bundles or the shell template interpolates. package.json is included
-// because the version string is baked into the built shell.
-const SOURCE_DIRS = ['src'];
+// because the version string is baked into the built shell. The build also publishes the
+// sibling tools trees verbatim; they must be fingerprinted or Playwright can silently serve
+// a stale Badge Builder / Account Manager after a branch switch.
+const SOURCE_DIRS = ['src', '../tools', '../account-tools'];
 const SOURCE_FILES = ['package.json'];
+const IGNORED_DIRS = new Set(['.git', 'node_modules', 'dist', 'test-results', 'playwright-report']);
 
 async function walk(dir, out) {
   let entries;
@@ -35,6 +38,7 @@ async function walk(dir, out) {
     return out; // a missing optional directory is not a fingerprint input
   }
   for (const entry of entries) {
+    if (entry.isDirectory() && IGNORED_DIRS.has(entry.name)) continue;
     const full = resolve(dir, entry.name);
     if (entry.isDirectory()) await walk(full, out);
     else if (entry.isFile()) out.push(full);
