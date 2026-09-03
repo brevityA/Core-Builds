@@ -1,0 +1,7 @@
+{
+  "_comment": "Golden hashes of generateTemplate() output, captured from generation modules byte-identical to base commit 81c802b (verified with `git diff --quiet HEAD -- src/core/generate-template.js src/core/assemble-template.js src/core/sort-policy.js src/core/filter-policy.js`). Proves the pre-flight refinement did not touch generated JSON. See reports/04-refinements-research.md.",
+  "torbox-4k-shield-clean": "d7e2938bc8fc7ed7",
+  "torbox-1080p-firestick-hd-blocked-device": "ea2ddb65ecd6903b",
+  "torbox-4k-firestick-hd-conflict": "f1d6f71b3276b2ea",
+  "p2p-1080p-free": "f91821cea7f8d032"
+}

@@ -1,0 +1,44 @@
+name: Tools CI
+
+# The browser tools under `tools/` had no CI coverage at all: `tests.yml` only
+# matches `tests/**` and `validate_templates.py`, and `supporting-js-ci.yml` only
+# matches account-tools/cli/packages/cloudflare-worker. So
+# `tools/badges/tests/core.test.mjs` has never run on a pull request, and neither
+# would the Banner Studio suite. This workflow closes that gap.
+
+on:
+  pull_request:
+    paths:
+      - 'tools/**'
+      - '.github/workflows/tools-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/**'
+      - '.github/workflows/tools-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test browser tools
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Banner Studio ships as one self-contained HTML file, so its core logic is
+      # inlined into index.html rather than imported. This proves the shipped
+      # inline copy is still byte-identical to the module the tests exercise —
+      # without it, the tested code and the shipped code can silently diverge.
+      - name: Verify Banner Studio inline core is in sync
+        run: node tools/banner-studio/scripts/sync-core.mjs --check
+
+      - name: Test Banner Studio
+        run: node --test tools/banner-studio/tests/*.test.mjs
+
+      - name: Test Badge Builder
+        run: node --test tools/badges/tests/*.test.mjs
