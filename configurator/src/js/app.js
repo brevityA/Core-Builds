@@ -3,7 +3,7 @@ import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
 import { OPTIONAL_SCRAPER_DEFS } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
-import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS } from '../data/devices.js';
+import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
@@ -32,6 +32,7 @@ import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
+import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -4227,8 +4228,19 @@ function exportPartial(kind) {
   showToast(`${kind[0].toUpperCase()+kind.slice(1)} partial export downloaded`);
 }
 
-function generate() {
+/**
+ * Export the template as JSON.
+ *
+ * The export path used to validate exactly one thing (`!S.service`) while the
+ * install path ran a full pre-flight — even though both produce the same
+ * `buildFinal().config`. A template exported with no API key or an over-limit
+ * payload downloaded cleanly and only failed later, by hand, inside AIOStreams
+ * (issue #107). Both paths now share one policy. See research §CFG-P0-02.
+ */
+async function generate() {
   if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); return; }
+  const findings = collectPreflightFindings();
+  if (!await showPreflightModal(findings, { actionLabel: 'Export anyway' })) return;
   const tpl = buildFinal();
   const json = JSON.stringify(tpl, null, 2), blob = new Blob([json], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a');
   a.href = url; a.download = (S.name.trim()||defaultName()).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
@@ -5889,32 +5901,33 @@ function promptPassword() {
   });
 }
 
-function templateHealthCheck() {
-  const warns = [];
-  if (S.resolution === '1080p') {
-    const profile = activeOutputProfile();
-    if (profile === 'stable' || profile === 'balanced') {
-      const cfg = buildFinal().config;
-      const excluded = cfg.excludedResolutions || [];
-      if (!excluded.includes('2160p') || !excluded.includes('1440p')) warns.push('1080p profile is missing native 4K/1440p exclusions — higher-resolution streams may leak through');
-    } else {
-      const ec = eses();
-      const has1080pGuard = ec.some(e => e.expression && /resolution\s*\(\s*streams\s*,\s*'2160p'/.test(e.expression) && e.enabled !== false);
-      if (!has1080pGuard) warns.push('1080p template missing 2160p exclusion ESE — 4K streams may leak through');
+/**
+ * The one check the shared preflight policy cannot make on its own: it needs
+ * `eses()` and the active profile to know whether a 1080p build actually guards
+ * against higher-resolution streams. Returns a message or null.
+ */
+function resolutionLeakWarning(config) {
+  if (S.resolution !== '1080p') return null;
+  const profile = activeOutputProfile();
+  if (profile === 'stable' || profile === 'balanced') {
+    const excluded = (config || {}).excludedResolutions || [];
+    if (!excluded.includes('2160p') || !excluded.includes('1440p')) {
+      return '1080p profile is missing native 4K/1440p exclusions — higher-resolution streams may leak through';
     }
+    return null;
   }
-  if ((S.service === 'easynews' || S.multiServices.includes('easynews')) && (!S.creds.easynews || !S.creds.easynewsPass)) {
-    warns.push('EasyNews selected but username or password is missing — Usenet streams won\'t load');
-  }
-  if ((S.subtitleAddons || []).includes('subdl') && !S.creds.subdl) {
-    warns.push('SubDL subtitles enabled but API Key is missing — SubDL subtitles won\'t load');
-  }
-  if (S.audio === 'lossless' && DEVICE_FORCE_LIMITED_AUDIO.has(S.device)) warns.push('Lossless audio selected for a profile that does not reliably support passthrough');
-  if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('4K resolution on Fire Stick HD — device cannot play 2160p');
-  const credInputs = getDebridInputs();
-  const filledCreds = credInputs.filter(i => S.creds[i.id] && S.creds[i.id].trim());
-  if (credInputs.length && !filledCreds.length && !['p2p','http'].includes(S.service)) warns.push('No debrid API key — streams won\'t load');
-  return warns;
+  const has1080pGuard = eses().some(e => e.expression && /resolution\s*\(\s*streams\s*,\s*'2160p'/.test(e.expression) && e.enabled !== false);
+  return has1080pGuard ? null : '1080p template missing 2160p exclusion ESE — 4K streams may leak through';
+}
+
+/**
+ * The review-panel health strip and the pre-install/pre-export gate must never
+ * disagree: a user who sees "Template looks good" and is then stopped by a
+ * blocker has been told two different things about one config. Both now read
+ * from `collectPreflightFindings()`, so there is a single source of truth.
+ */
+function templateHealthCheck() {
+  return findingsAsMessages(collectPreflightFindings());
 }
 
 // ── Template Health Score (unique to Core Builds) ──────────────────
@@ -6427,38 +6440,166 @@ function showTroubleshooter() {
   if (firstBtn) firstBtn.focus();
 }
 
-async function preflightCheck() {
-  const warns = [];
-  const needed = getDebridInputs();
-  const hasCreds = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
-  if (needed.length && !hasCreds && !['p2p','http'].includes(S.service)) warns.push('No API key entered — streams will not load without one');
-  if (S.resolution === '4k' && S.device === 'firestick-hd') warns.push('Fire Stick HD cannot play 4K — consider 1080p resolution');
-  if (S.multiServices.includes('easynews') && !S.creds.easynews) warns.push('EasyNews selected but no username entered');
-  if (S.multiServices.includes('easynews') && !S.creds.easynewsPass) warns.push('EasyNews selected but no password entered');
-  if (S.multiServices.includes('nzbgeek') && !S.creds.nzbgeek) warns.push('NZBGeek selected but no API key entered');
-  if (S.multiServices.includes('debridio') && !S.creds.debridio) warns.push('Debridio selected but no API key entered — its preset is omitted until a key is added');
-  if (S.multiServices.includes('debrider') && !S.creds.debrider) warns.push('Debrider selected but no API key entered — its preset is omitted until a key is added');
-  if (S.multiServices.includes('streamnzb') && !S.creds.streamnzb) warns.push('StreamNZB selected but no manifest URL entered');
-  if (S.audio === 'lossless' && DEVICE_FORCE_LIMITED_AUDIO.has(S.device)) warns.push('Lossless audio selected but this device profile does not reliably support passthrough');
+/**
+ * Which resolution each device profile can actually play, as an id -> '4k'|'1080p'
+ * map for the preflight policy. Derived from DEVICE_PROFILES.video.maxResolution
+ * so a new device profile is covered automatically; `firestick-hd` is the case
+ * that has always been hard-coded and it falls out of the data correctly.
+ */
+function devicePlaybackCeilings() {
+  const out = {};
+  for (const [id, profile] of Object.entries(DEVICE_PROFILES || {})) {
+    const max = profile?.video?.maxResolution;
+    if (max) out[id] = max === '2160p' ? '4k' : max;
+  }
+  if (!out['firestick-hd']) out['firestick-hd'] = '1080p';
+  return out;
+}
+
+/**
+ * Collect the structured findings for the current state.
+ *
+ * The de-duplication that matters happens inside `preflightFindings` and is
+ * keyed on a stable id, not on the wording — see
+ * `configurator/reports/04-refinements-research.md` §CFG-P0-01 for the nine
+ * bullets / four problems repro this replaces.
+ */
+function collectPreflightFindings() {
+  const credentialsPresent = {};
+  for (const [id, value] of Object.entries(S.creds || {})) {
+    // Presence only. The policy module never receives a credential value.
+    credentialsPresent[id] = Boolean(value && String(value).trim());
+  }
+
+  const base = {
+    service: S.service,
+    multiServices: S.multiServices || [],
+    device: S.device,
+    resolution: S.resolution,
+    audio: S.audio,
+    outputProfile: activeOutputProfile(),
+    subtitleAddons: S.subtitleAddons || [],
+    credentialsPresent,
+    requiredCredentialIds: getDebridInputs().map(i => i.id),
+    devicesForcingLimitedAudio: [...DEVICE_FORCE_LIMITED_AUDIO],
+    deviceMaxResolution: devicePlaybackCeilings(),
+  };
+
+  let config = null;
+  const extraWarnings = [];
   try {
-    const cfg = buildFinal()?.config;
-    if (!cfg || !Array.isArray(cfg.presets)) warns.push('Generated template is missing its preset list');
-    const names=(cfg?.presets||[]).map(p=>p.name).filter(Boolean), duplicates=[...new Set(names.filter((n,i)=>names.indexOf(n)!==i))];
-    if (duplicates.length) warns.push('Duplicate preset names detected: '+duplicates.slice(0,3).join(', '));
-    const health=templateHealthCheck(); health.forEach(w=>{if(!warns.includes(w))warns.push(w);});
+    config = buildFinal()?.config || null;
+    const leak = resolutionLeakWarning(config);
+    if (leak) extraWarnings.push(leak);
     const profileAudit = outputProfileAudit();
     if (!profileAudit.budget.ok) {
-      warns.push(`${OUTPUT_PROFILE_INFO[profileAudit.profile].label} complexity budget exceeded — review the profile warnings before installing`);
+      extraWarnings.push(`${OUTPUT_PROFILE_INFO[profileAudit.profile].label} complexity budget exceeded — review the profile warnings before installing`);
     }
-    profileAudit.conflicts.filter(item => item.severity !== 'info').slice(0, 3).forEach(item => {
-      const message = `${item.title}: ${item.message}`;
-      if (!warns.includes(message)) warns.push(message);
+    profileAudit.conflicts.filter(item => item.severity !== 'info').slice(0, 3)
+      .forEach(item => extraWarnings.push(`${item.title}: ${item.message}`));
+    const compat = hostCompatCheck();
+    const selected = S.instanceHost && compat[S.instanceHost];
+    if (selected?.status === 'err') extraWarnings.push((selected.label || S.instanceHost) + ' host compatibility check is blocked');
+  } catch (e) {
+    // A thrown build is a blocker, not a warning the user can knowingly accept.
+    return preflightFindings({ ...base, buildError: e });
+  }
+
+  return preflightFindings({ ...base, config, extraWarnings });
+}
+
+/**
+ * Back-compatible flat string list. Existing callers and tests that expect an
+ * array of strings keep working; the structured shape is used by the modal.
+ */
+async function preflightCheck() {
+  return findingsAsMessages(collectPreflightFindings());
+}
+
+const PREFLIGHT_SEVERITY_STYLE = {
+  blocker:  { label: 'Blocks setup', color: 'var(--th-red,#f87171)',    bg: 'rgba(248,113,113,.06)', border: 'rgba(248,113,113,.22)' },
+  warning:  { label: 'Needs a look', color: 'var(--th-yellow,#fbbf24)', bg: 'rgba(245,158,11,.05)',  border: 'rgba(245,158,11,.20)' },
+  advisory: { label: 'Good to know', color: '#67e8f9',                  bg: 'rgba(0,212,255,.04)',   border: 'rgba(0,212,255,.16)' },
+};
+
+/**
+ * Show the pre-flight result and resolve to `true` when the user chooses to
+ * continue. Replaces a native `confirm()` that rendered nine unstyled bullets
+ * with no way to tell a blocker from a note (research §CFG-P0-01).
+ *
+ * Resolves `true` immediately when there is nothing to report, so callers can
+ * always `await` it.
+ */
+function showPreflightModal(findings, { actionLabel = 'Continue anyway' } = {}) {
+  if (!findings.length) return Promise.resolve(true);
+
+  const counts = summarise(findings);
+  const blocked = hasBlockers(findings);
+
+  const headline = blocked
+    ? 'This setup will not work yet.'
+    : counts.warning
+      ? 'Worth checking before you continue.'
+      : 'A couple of things to know.';
+
+  const tally = [
+    counts.blocker ? `${counts.blocker} blocking` : '',
+    counts.warning ? `${counts.warning} to check` : '',
+    counts.advisory ? `${counts.advisory} note${counts.advisory > 1 ? 's' : ''}` : '',
+  ].filter(Boolean).join(' · ');
+
+  const rows = findings.map(f => {
+    const s = PREFLIGHT_SEVERITY_STYLE[f.severity] || PREFLIGHT_SEVERITY_STYLE.advisory;
+    return `<div style="padding:11px 13px;border-radius:10px;background:${s.bg};border:1px solid ${s.border};margin-bottom:8px">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:${f.detail || f.fix ? '4px' : '0'}">
+        <span style="font-size:.56rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:${s.color};flex-shrink:0">${s.label}</span>
+        <span style="font-size:.82rem;font-weight:700;color:var(--th-tx1,#e6edf3)">${escHtml(f.title)}</span>
+      </div>
+      ${f.detail ? `<div style="font-size:.74rem;color:var(--th-tx2,#8b949e);line-height:1.55">${escHtml(f.detail)}</div>` : ''}
+      ${f.fix ? `<div style="font-size:.74rem;color:${s.color};line-height:1.55;margin-top:5px">→ ${escHtml(f.fix)}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  return new Promise(resolve => {
+    document.getElementById('preflightModal')?.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'preflightModal';
+    overlay.className = 'fastlane-overlay';
+    overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="preflightTitle" style="max-width:600px">
+      <div class="fastlane-head">
+        <div class="fastlane-head-copy">
+          <div class="fastlane-kicker">Config check</div>
+          <div class="fastlane-title" id="preflightTitle">${headline}</div>
+          <div class="fastlane-sub">${tally}</div>
+        </div>
+        <button class="fastlane-close" id="preflightClose" aria-label="Close">✕</button>
+      </div>
+      <div style="max-height:46vh;overflow-y:auto;margin-bottom:14px">${rows}</div>
+      <div class="diag-actions">
+        <button class="diag-secondary" id="preflightBack">Go back and fix</button>
+        <button class="${blocked ? 'diag-secondary' : 'diag-primary'}" id="preflightGo">${blocked ? 'Continue anyway' : escHtml(actionLabel)}</button>
+      </div>
+      ${blocked ? '<div style="font-size:.68rem;color:var(--th-red,#f87171);text-align:center;margin-top:9px">A blocking issue means this cannot produce a working setup.</div>' : ''}
+    </div>`;
+
+    let settled = false;
+    const done = (value) => {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener('keydown', onKey);
+      overlay.remove();
+      resolve(value);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') done(false); };
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay || e.target.closest('#preflightClose') || e.target.closest('#preflightBack')) done(false);
+      else if (e.target.closest('#preflightGo')) done(true);
     });
-    const compat=hostCompatCheck();
-    const selected=S.instanceHost && compat[S.instanceHost];
-    if (selected?.status==='err') warns.push((selected.label||S.instanceHost)+' host compatibility check is blocked');
-  } catch(e) { warns.push('Template preflight could not complete: '+e.message); }
-  return warns;
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(overlay);
+    overlay.querySelector('#preflightBack').focus();
+  });
 }
 
 function applyQuickProfile(profile) {
@@ -7110,12 +7251,9 @@ async function simpleInstall(target) {
   const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
   const origBtnHtml = btn ? btn.innerHTML : '';
   if (btn) { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Checking…`; }
-  const warns = await preflightCheck();
+  const findings = collectPreflightFindings();
   if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
-  if (warns.length) {
-    const proceed = confirm('⚠ Config check:\n\n• ' + warns.join('\n• ') + '\n\nContinue anyway?');
-    if (!proceed) return;
-  }
+  if (!await showPreflightModal(findings, { actionLabel: 'Install anyway' })) return;
   if (S.installMode === 'direct' && target === 'app' && !isFree) {
     if (!S.stremioEmail || !S.stremioPassword) {
       showToast('Enter your Stremio email and password above', true); return;

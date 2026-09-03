@@ -19,3 +19,13 @@ export {
   validateOutputProfileBudget,
 } from './feature-conflict-policy.js';
 export { sanitizeFeedbackText, buildFeedbackReport } from './feedback-report-policy.js';
+export {
+  PREFLIGHT_SEVERITIES,
+  PAYLOAD_LIMIT_BYTES,
+  PAYLOAD_WARN_BYTES,
+  payloadBytes,
+  preflightFindings,
+  hasBlockers,
+  summarise,
+  findingsAsMessages,
+} from './preflight-policy.js';
