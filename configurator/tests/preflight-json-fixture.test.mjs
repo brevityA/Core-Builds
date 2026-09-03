@@ -53,8 +53,53 @@ const options = {
   presets: [{ type: 'torbox', instanceId: 'torbox-1', options: {} }],
 };
 
+/**
+ * Credential-shaped fields are stripped before hashing.
+ *
+ * These fixtures never carry a real secret — every credential in the generated
+ * output is the empty string. But CodeQL's taint tracker follows the *field
+ * name* (`tmdbApiKey` -> sha256) and flags this as "password hash with
+ * insufficient computational effort", which is a fair rule: a golden-hash helper
+ * is exactly the kind of place a credential could later start flowing into a
+ * fast digest by accident.
+ *
+ * Rather than suppress the alert, the fields are removed from the hashed value
+ * outright. The hash then covers only non-credential structure, and the
+ * credential fields get their own explicit assertion below — which is a stronger
+ * check than folding them into an opaque digest, because a leaked secret would
+ * change the hash without saying why.
+ */
+const CREDENTIAL_FIELD = /^(.*(apikey|token|password|secret|passwd|credential).*)$/i;
+
+function stripCredentials(value) {
+  if (Array.isArray(value)) return value.map(stripCredentials);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([key]) => !CREDENTIAL_FIELD.test(key))
+        .map(([key, inner]) => [key, stripCredentials(inner)]),
+    );
+  }
+  return value;
+}
+
+/** Collect every credential-shaped field so they can be asserted explicitly. */
+function collectCredentialFields(value, path = '', out = {}) {
+  if (Array.isArray(value)) {
+    value.forEach((item, i) => collectCredentialFields(item, `${path}[${i}]`, out));
+  } else if (value && typeof value === 'object') {
+    for (const [key, inner] of Object.entries(value)) {
+      const next = path ? `${path}.${key}` : key;
+      if (CREDENTIAL_FIELD.test(key)) out[next] = inner;
+      else collectCredentialFields(inner, next, out);
+    }
+  }
+  return out;
+}
+
 function stableHash(value) {
-  return createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 16);
+  // Structure only — never credential material. See stripCredentials above.
+  return createHash('sha256').update(JSON.stringify(stripCredentials(value))).digest('hex').slice(0, 16);
 }
 
 test('generated template output is unchanged by the pre-flight refinement', async () => {
@@ -68,6 +113,23 @@ test('generated template output is unchanged by the pre-flight refinement', asyn
       `generated JSON changed for "${fixture.name}". The pre-flight refinement must be read-only. ` +
       `If this change is intentional, update fixtures/preflight-generation-golden.json and say why in reports/.`,
     );
+  }
+});
+
+test('no fixture emits a non-empty credential — the golden hashes cover structure only', () => {
+  // The counterpart to stripCredentials(): credential fields are excluded from
+  // the digest, so they are checked directly and by name. If generation ever
+  // starts emitting a real secret, this names the exact field rather than
+  // silently shifting an opaque hash.
+  for (const fixture of FIXTURES) {
+    const creds = collectCredentialFields(generateTemplate(fixture.input, options));
+    assert.ok(Object.keys(creds).length > 0, `${fixture.name}: expected credential fields to exist`);
+    for (const [field, value] of Object.entries(creds)) {
+      assert.equal(
+        value, '',
+        `${fixture.name}: ${field} carries a value — fixtures must never contain credential material`,
+      );
+    }
   }
 });
 
