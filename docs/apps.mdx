@@ -1,0 +1,130 @@
+---
+title: "Android Apps"
+sidebarTitle: "Android Apps"
+description: "Four Android apps from Core Builds — Icon Pack, Core Line, Core Shift, and Core Doctor."
+---
+
+Four companion apps for the living room, built to the same brand and standards as the configurator and template suite.
+
+Each app has its own Gradle root, CI workflow, and release tag — changes to one never rebuild the others. All four ship as sideloadable APKs via [Downloader](https://www.aftvnews.com/downloader/) codes or direct GitHub release links.
+
+Source: [**brevityA/CoreBuildsApps**](https://github.com/brevityA/CoreBuildsApps)
+
+---
+
+## Icon Pack
+
+<Card title="Downloader code 5270601" icon="grid-2">
+  921 transparent app icons and 70 wallpapers for Projectivy Launcher on Android TV.
+</Card>
+
+Original geometry drawn on a shared 512 grid — simple shapes, rounded ends, one accent colour per app. Backgrounds are fully transparent so the launcher's own card colour shows through.
+
+- **921 icons** across 21 categories (streaming, media centres, debrid, players, launchers, tools, stores, live TV, music, sport, gaming, VPN, browsers, files)
+- **70 curated wallpapers** with full-screen preview and bulk export
+- **16:9 monoline banners** for Projectivy's wide-card layout
+- In-app update checker via `Latestrelease/version.json`
+
+<Accordion title="Install">
+  1. Enter Downloader code **5270601**, or use the permanent APK URL:
+
+     `https://github.com/brevityA/CoreBuildsApps/releases/download/iconpack/iconpack-release.apk`
+
+  2. Sideload it (Downloader, `adb install`, or a file manager).
+  3. Open the app and press **Apply** — it detects your launcher and hands off directly.
+
+  Or apply manually: **Projectivy Launcher Settings** → **Appearance** → **Cards** → **Icon Pack** → **Core Builds Icon Pack**
+</Accordion>
+
+<Accordion title="Releases">
+  Versioned builds under [`v*`](https://github.com/brevityA/CoreBuildsApps/releases) tags. The `iconpack` release is a floating stable target.
+</Accordion>
+
+---
+
+## Core Line
+
+<Card title="Downloader code 7375676" icon="signal-stream">
+  Sports scores and channel RSS ticker (chyron) for phone, Shield, Google TV, and Fire TV.
+</Card>
+
+Not a player, not a playlist, not streams — a reader that crawls the listings other channel apps already publish as RSS.
+
+- Parses messy listing lines into clean channel tags (ESPN, TSN4, SN 3)
+- Public scoreboards (ESPN, NHL, MLB) with a labelled demo-slate fallback
+- Same-Wi-Fi QR pairing so a Fire remote never types an RSS URL
+- Zero npm dependencies; web version runs with `node server.mjs`
+
+<Accordion title="Install">
+  1. Enter Downloader code **7375676**, or grab the APK from the [stable release](https://github.com/brevityA/CoreBuildsApps/releases/tag/coreline).
+  2. Sideload it.
+  3. Open the app — it loads a demo ticker immediately. Add RSS feeds via settings or pair from a phone on the same Wi-Fi using the QR code.
+</Accordion>
+
+<Accordion title="Releases">
+  Tags starting with [`coreline-v*`](https://github.com/brevityA/CoreBuildsApps/releases) have versioned notes. The `coreline` release is a floating stable target.
+</Accordion>
+
+---
+
+## Core Shift
+
+<Card title="Downloader code 8829421" icon="film">
+  Live wallpaper browser and Projectivy plugin for Monet Launcher.
+</Card>
+
+Two delivery paths for motion wallpapers on Android TV:
+
+- **Monet Launcher** — browse live wallpapers in-app, full-screen looping preview, download MP4 loops to `Movies/CoreBuilds`. Point Monet Premium's video wallpaper picker at that folder.
+- **Projectivy Launcher** — the Core Motion plugin (`tv.corebuilds.motion`) implements Spocky's `IWallpaperProviderService` AIDL. Install [`coremotion-release.apk`](https://github.com/brevityA/CoreBuildsApps/releases/download/motion/coremotion-release.apk), then select Core Motion in Projectivy wallpaper settings.
+
+Content pipeline: 10 ffmpeg-filter MP4 loops (1080p H.264), 3 self-authored GLSL shaders, and bundled Lottie vectors.
+
+<Accordion title="Install">
+  1. Enter Downloader code **8829421**, or use the permanent APK URL:
+
+     `https://github.com/brevityA/CoreBuildsApps/releases/download/shift/coreshift-release.apk`
+
+  2. Sideload it.
+  3. Open the app — browse live wallpapers, preview full-screen, and download to `Movies/CoreBuilds` for Monet.
+</Accordion>
+
+<Accordion title="Releases">
+  Tags starting with [`shift-v*`](https://github.com/brevityA/CoreBuildsApps/releases) have versioned notes. The `shift` release is a floating stable target.
+</Accordion>
+
+---
+
+## Core Doctor
+
+<Card title="Downloader code 8664938" icon="stethoscope">
+  Streaming infrastructure diagnostics for your phone.
+</Card>
+
+Not a TV app — Core Doctor runs on your phone and checks whether your streaming setup is healthy. Six checks, gated on what credentials you provide:
+
+| Check | Gate | What it tests |
+|---|---|---|
+| DNS resolution | Always | Resolves api.real-debrid.com, api.torbox.app, v6-4.aiostreams.elfhosted.com |
+| VPN detection | Always | ConnectivityManager TRANSPORT_VPN |
+| Addon manifest | Addon URL | HTTP GET `{url}/manifest.json` — validates JSON with `id` field |
+| Stream probe | Addon URL | HTTP GET `{url}/stream/movie/tt0133093.json` — checks for results |
+| Real-Debrid | RD key | GET api.real-debrid.com/rest/1.0/user — premium status, expiry |
+| TorBox | TB key | GET api.torbox.app/v1/api/user/me — plan status, expiry |
+
+**Trust architecture:**
+- No backend, no persistence, no analytics — everything runs client-side
+- API keys are sent only to the provider they belong to (Bearer token)
+- Share reports are redacted by construction — `ReportCard.render()` emits verdicts and summaries only; keys and URLs are structurally excluded
+- `allowBackup=false`, no SharedPreferences, no Room, no files
+- Permissions: INTERNET, ACCESS_NETWORK_STATE — nothing else
+
+<Accordion title="Install">
+  1. Enter Downloader code **8664938**, or grab the APK from [Releases](https://github.com/brevityA/CoreBuildsApps/releases) under `doctor-v*` tags.
+  2. Sideload it.
+  3. Open the app — enter your addon URL and/or debrid API keys, tap Run.
+</Accordion>
+
+<Accordion title="Releases">
+  Tags starting with [`doctor-v*`](https://github.com/brevityA/CoreBuildsApps/releases) have versioned notes.
+</Accordion>
