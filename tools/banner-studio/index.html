@@ -124,6 +124,7 @@ small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
   <label>Colour</label><div class="row"><input type="color" id="bgPick" value="#1e2126" style="width:34px;height:28px;border:0;background:none"><button class="act" id="bgUse">Apply</button><button class="act" id="bgReset">Auto</button></div>
   <label>Background image (auto-dimmed for contrast)</label><input type="file" id="bgFile" accept="image/*">
   <div class="row" style="margin-top:6px"><button class="act" id="bgClear" style="flex:1">Remove image</button></div>
+  <label>Background blur <span id="bbV"></span></label><input type="range" id="bgBlur" min="0" max="20" step="0.5">
  </section>
  <section id="tagSec"><h2>Tagline &amp; badge</h2>
   <label>Kicker — small line above the logo</label><input type="text" id="kickerText" placeholder="NOW STREAMING">
@@ -132,6 +133,7 @@ small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
   <div style="flex:1"><label>Position</label><select id="pillPos" style="width:100%"><option value="tr">Top-right</option><option value="tl">Top-left</option><option value="bl">Bottom-left</option><option value="br">Bottom-right</option></select></div></div>
  </section>
  <section><h2>Cards</h2><div class="row" id="mtype" style="margin-bottom:6px"><button class="act" data-t="show" style="flex:1">Shows</button><button class="act" data-t="movie" style="flex:1">Movies</button><button class="act on" data-t="mix" style="flex:1">Mix</button></div><div class="row"><button class="act" id="fillHot">🔥 Fill trending</button><button class="act" id="fillTop">Fill popular</button></div>
+  <div class="row" style="margin-bottom:6px"><span style="color:var(--mut);font-size:11px;flex:1">Drag posters on the banner to reposition</span><button class="act" id="resetPos" style="font-size:11px">Reset positions</button></div>
   <label>Add show — live search (TVMaze)</label><div class="row"><input type="text" id="q" placeholder="e.g. The Bear"><button class="act" id="qgo">Go</button></div><div id="results"></div>
   <label>Manual poster</label><input type="file" id="posterFile" accept="image/*" multiple>
   <div id="cards"></div></section>
@@ -143,6 +145,9 @@ small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
   <label>Corner radius <span id="rdV"></span></label><input type="range" id="radius" min="0" max="0.09" step="0.002">
   <label>Brand glow <span id="gwV"></span></label><input type="range" id="glow" min="0" max="0.16" step="0.005">
   <label>Vignette <span id="vgV"></span></label><input type="range" id="vignette" min="0" max="1" step="0.02">
+  <label>Gradient type</label><select id="gradType"><option value="radial">Radial</option><option value="linear">Linear</option></select>
+  <label>Gradient angle <span id="gaV"></span></label><input type="range" id="gradAngle" min="0" max="360" step="5">
+  <label>Gradient spread <span id="gsV"></span></label><input type="range" id="gradSpread" min="0.1" max="1" step="0.02">
   <label><input type="checkbox" id="guides"> brand-guide overlay (clear-space · margins)</label>
 <label><input type="checkbox" id="snap"> magnetic snap to brand anchors</label>
  </section>
@@ -194,10 +199,11 @@ const BRANDS={
 };
 
 const DEF={cardSize:0.25,rot:14,spreadY:0.1942,driftX:0.0511,radius:0.0533,glow:0.05,vignette:0.85,
-  logoL:0.0786,logoW:0.3657,logoCY:0.5068,snap:true,maxCards:8,bgHex:'#1e2126',frame:12,kicker:'',pill:'',pillColor:null,pillPos:'tr'};
+  logoL:0.0786,logoW:0.3657,logoCY:0.5068,snap:true,maxCards:8,bgHex:'#1e2126',frame:12,kicker:'',pill:'',pillColor:null,pillPos:'tr',
+  bgBlur:0,gradType:'radial',gradAngle:0,gradSpread:0.62};
 function layout(W,H,c,n){
   const cw=c.cardSize*W,ch=cw*1.5;
-  return {cw,ch,x0:0.859*W,y0:(0.5-(n-1)*c.spreadY/2+0.1588)*H,
+  return {cw,ch,W,H,x0:0.859*W,y0:(0.5-(n-1)*c.spreadY/2+0.1588)*H,
     stepY:c.spreadY*H,stepX:-c.driftX*W,
     rot:c.rot*Math.PI/180,rad:c.radius*cw,
     logo:{L:c.logoL*W,W:c.logoW*W,cy:c.logoCY*H}};
@@ -240,8 +246,8 @@ function contrast(h1,h2){const a=relLum(h1),b=relLum(h2);return(Math.max(a,b)+.0
 function fnv(s){let x=2166136261;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)}return x>>>0}
 function clamp(v,a,b,fb){v=+v;return Number.isFinite(v)?Math.min(b,Math.max(a,v)):fb}
 function sanitize(s){const o={...DEF};if(!s||typeof s!=='object')return o;
-  for(const k of['cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards'])
-    o[k]=clamp(s[k],{rot:-24,spreadY:.1,maxCards:0}[k]??0,{cardSize:.34,rot:24,spreadY:.3,driftX:.1,radius:.09,glow:.16,vignette:1,logoL:.4,logoW:.55,logoCY:.9,maxCards:8}[k]??999,DEF[k]);
+  for(const k of['cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards','bgBlur','gradAngle','gradSpread'])
+    o[k]=clamp(s[k],{rot:-24,spreadY:.1,maxCards:0,bgBlur:0,gradAngle:0,gradSpread:.1}[k]??0,{cardSize:.34,rot:24,spreadY:.3,driftX:.1,radius:.09,glow:.16,vignette:1,logoL:.4,logoW:.55,logoCY:.9,maxCards:8,bgBlur:20,gradAngle:360,gradSpread:1}[k]??999,DEF[k]);
   o.bgHex=/^#[0-9a-fA-F]{6}$/.test(s.bgHex||'')?s.bgHex:DEF.bgHex;
   o.brand=BRANDS[s.brand]?s.brand:'netflix';o.preset=PRESETS[s.preset]?s.preset:'ref';
   o.fmt=s.fmt==='jpeg'?'jpeg':'png';o.scale=[1,2,3].includes(+s.scale)?+s.scale:1;
@@ -249,7 +255,8 @@ function sanitize(s){const o={...DEF};if(!s||typeof s!=='object')return o;
   o.guides=!!s.guides;o.snap=s.snap!==false;o.autoFill=s.autoFill!==false;
   o.accentOverride=/^#[0-9a-fA-F]{6}$/.test(s.accentOverride||'')?s.accentOverride:null;
   o.logoText=typeof s.logoText==='string'?s.logoText.slice(0,24):'';
-  o.cards=Array.isArray(s.cards)?s.cards.slice(0,o.maxCards||8).filter(c=>c&&typeof c.n==='string').map(c=>({n:c.n.slice(0,60),o:(c.o||'').startsWith('http')?c.o:'',m:(c.m||'').startsWith('http')?c.m:'',url:(c.url||'').startsWith('data:')||(c.url||'').startsWith('http')?c.url:'',type:c.type==='movie'?'movie':'show',hot:!!c.hot})):[];
+  o.gradType=['radial','linear'].includes(s.gradType)?s.gradType:'radial';
+  o.cards=Array.isArray(s.cards)?s.cards.slice(0,o.maxCards||8).filter(c=>c&&typeof c.n==='string').map(c=>({n:c.n.slice(0,60),o:(c.o||'').startsWith('http')?c.o:'',m:(c.m||'').startsWith('http')?c.m:'',url:(c.url||'').startsWith('data:')||(c.url||'').startsWith('http')?c.url:'',type:c.type==='movie'?'movie':'show',hot:!!c.hot,dx:clamp(c.dx,-.5,.5,0),dy:clamp(c.dy,-.5,.5,0)})):[];
   o.kicker=typeof s.kicker==='string'?s.kicker.slice(0,30):'';
   o.pill=typeof s.pill==='string'?s.pill.slice(0,30):'';
   o.pillColor=/^#[0-9a-fA-F]{6}$/.test(s.pillColor||'')?s.pillColor:null;
@@ -257,16 +264,16 @@ function sanitize(s){const o={...DEF};if(!s||typeof s!=='object')return o;
   return o}
 
 /* ── robustness layer v2.1 ─────────────────────────────── */
-const APP_VERSION='2.2.0';
+const APP_VERSION='2.3.0';
 const SPEC_V=1, RING_MAX=50, CAPS={specBytes:1e6, logoBytes:3e6, hashChars:60000};
 function makeSpec(st){
   const sp={v:SPEC_V};
   for(const k of['brand','preset','fmt','scale','mtype','guides','snap','autoFill','trendingFirst',
     'cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards',
-    'bgHex','logoText','kicker','pill','pillColor','pillPos'])if(st[k]!==undefined)sp[k]=st[k];
+    'bgHex','logoText','kicker','pill','pillColor','pillPos','bgBlur','gradType','gradAngle','gradSpread'])if(st[k]!==undefined)sp[k]=st[k];
   if(st.accentOverride)sp.accentOverride=st.accentOverride;
   if(st.tintOverride)sp.tintOverride=st.tintOverride;
-  sp.cards=(st.cards||[]).map(c=>({n:c.n,o:c.o||'',m:c.m||'',type:c.type||'show',hot:!!c.hot,url:(c.url&&(c.url.startsWith('http')||c.url.startsWith('data:')))?c.url:''}));
+  sp.cards=(st.cards||[]).map(c=>{const e={n:c.n,o:c.o||'',m:c.m||'',type:c.type||'show',hot:!!c.hot,url:(c.url&&(c.url.startsWith('http')||c.url.startsWith('data:')))?c.url:''};if(c.dx)e.dx=c.dx;if(c.dy)e.dy=c.dy;return e});
   if(st._logoUrl&&st._logoUrl.startsWith('data:')&&st._logoUrl.length<60000)sp.customLogo=st._logoUrl;
   if(st._bgUrl&&st._bgUrl.startsWith('data:')&&st._bgUrl.length<60000)sp.customBg=st._bgUrl;
   return sp}
@@ -323,7 +330,7 @@ let _bgImg=null;
 let svT=0;
 const save=()=>{clearTimeout(svT);svT=setTimeout(()=>{try{_save()}catch(e){}},250)};
 function _save(){try{const o={...st,
-  cards:(st.cards||[]).map(c=>({n:c.n,o:c.o||'',m:c.m||'',hot:!!c.hot,type:c.type,url:(c.url&&(c.url.startsWith('http')||c.url.startsWith('data:')))?c.url:''}))};const lg=o._logoUrl&&o._logoUrl.startsWith('data:')&&o._logoUrl.length<2e5?o._logoUrl:null;delete o._logoUrl;
+  cards:(st.cards||[]).map(c=>{const e={n:c.n,o:c.o||'',m:c.m||'',hot:!!c.hot,type:c.type,url:(c.url&&(c.url.startsWith('http')||c.url.startsWith('data:')))?c.url:''};if(c.dx)e.dx=c.dx;if(c.dy)e.dy=c.dy;return e})};const lg=o._logoUrl&&o._logoUrl.startsWith('data:')&&o._logoUrl.length<2e5?o._logoUrl:null;delete o._logoUrl;
   if(lg)o.customLogo=lg;const bg=o._bgUrl&&o._bgUrl.startsWith('data:')&&o._bgUrl.length<2e5?o._bgUrl:null;delete o._bgUrl;
   if(bg)o.customBg=bg;localStorage.setItem(LS,JSON.stringify(o))}catch(e){}}
 const setStatus=m=>{$('#stMsg').textContent=m||''};
@@ -368,7 +375,7 @@ function placeholder(name,tint){
 function drawCards(x,L){
   const rr=(a,b,w,h,r)=>{x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()};
   for(let i=0;i<st.cards.length;i++){
-    const c=st.cards[i],cx=L.x0+i*L.stepX,cy=L.y0+i*L.stepY;
+    const c=st.cards[i],cx=L.x0+i*L.stepX+(c.dx||0)*L.W,cy=L.y0+i*L.stepY+(c.dy||0)*L.H;
     x.save();x.translate(cx,cy);x.rotate(L.rot);
     x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=.06*L.cw;x.shadowOffsetY=.028*L.cw;
     rr(-L.cw/2,-L.ch/2,L.cw,L.ch,L.rad);x.fillStyle='#0e1013';x.fill();
@@ -459,20 +466,31 @@ const loadLogo=()=>{if(!st._logoUrl){loadLogo._img=null;loadLogo._crop=null;retu
 let _bgCanvas=null,_bgCtx=null,_bgKey='';
 function background(W,H){
   const tint=(st.accentOverride||BRANDS[st.brand].tint);
-  const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st._bgUrl?(_bgImg?'y':'w'):'n'].join('|');
+  const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st._bgUrl?(_bgImg?'y':'w'):'n',st.bgBlur,st.gradType,st.gradAngle,st.gradSpread].join('|');
   if(key===_bgKey&&_bgCanvas)return _bgCanvas;
   if(!_bgCanvas){_bgCanvas=document.createElement('canvas');_bgCtx=_bgCanvas.getContext('2d')}
   if(_bgCanvas.width!==W||_bgCanvas.height!==H){_bgCanvas.width=W;_bgCanvas.height=H}
   const A=_bgCanvas;const x=_bgCtx;x.clearRect(0,0,W,H);
   x.fillStyle=st.bgHex;x.fillRect(0,0,W,H);
-  if(_bgImg){const cr=fitCrop(_bgImg.naturalWidth||_bgImg.width,_bgImg.naturalHeight||_bgImg.height,W,H);
+  if(_bgImg){
+    if(st.bgBlur>0){x.save();x.filter=`blur(${st.bgBlur*(W/1800)}px)`}
+    const cr=fitCrop(_bgImg.naturalWidth||_bgImg.width,_bgImg.naturalHeight||_bgImg.height,W,H);
     x.drawImage(_bgImg,cr.sx,cr.sy,cr.sw,cr.sh,0,0,W,H);
+    if(st.bgBlur>0)x.restore();
     x.fillStyle='rgba(6,8,12,.6)';x.fillRect(0,0,W,H);
     const tg=x.createLinearGradient(0,0,W,H);
     tg.addColorStop(0,rgba(tint,.22));tg.addColorStop(1,rgba(tint,0));x.fillStyle=tg;x.fillRect(0,0,W,H)}
-  let g=x.createRadialGradient(.26*W,.5*H,0,.26*W,.5*H,.62*W);
+  const sp=st.gradSpread;
+  let g;
+  if(st.gradType==='linear'){const a=st.gradAngle*Math.PI/180,
+    cx=.26*W,cy=.5*H,r=sp*W;
+    g=x.createLinearGradient(cx-Math.cos(a)*r,cy-Math.sin(a)*r,cx+Math.cos(a)*r,cy+Math.sin(a)*r)}
+  else g=x.createRadialGradient(.26*W,.5*H,0,.26*W,.5*H,sp*W);
   g.addColorStop(0,rgba(tint,st.glow));g.addColorStop(1,rgba(tint,0));x.fillStyle=g;x.fillRect(0,0,W,H);
-  g=x.createRadialGradient(.8*W,.55*H,0,.8*W,.55*H,.5*W);
+  if(st.gradType==='linear'){const a=(st.gradAngle+90)*Math.PI/180,
+    cx=.8*W,cy=.55*H,r=sp*.8*W;
+    g=x.createLinearGradient(cx-Math.cos(a)*r,cy-Math.sin(a)*r,cx+Math.cos(a)*r,cy+Math.sin(a)*r)}
+  else g=x.createRadialGradient(.8*W,.55*H,0,.8*W,.55*H,.5*W);
   const warm=mix(BRANDS[st.brand].tint,'#ffffff',.55);
   g.addColorStop(0,rgba(warm,st.glow*.5));g.addColorStop(1,rgba(warm,0));x.fillStyle=g;x.fillRect(0,0,W,H);
   if(st.vignette>0){g=x.createRadialGradient(.5*W,.5*H,Math.min(W,H)*.3,.5*W,.5*H,Math.hypot(W,H)*.55);
@@ -544,11 +562,13 @@ function cardRow(c,i){const d=document.createElement('div');d.className='card';
   const mk=(t,f)=>{const x=document.createElement('button');x.textContent=t;x.onclick=f;b.appendChild(x)};
   mk('◀',()=>{[st.cards[i-1],st.cards[i]]=[st.cards[i],st.cards[i-1]];render();drawCardsUI()});
   mk('▶',()=>{[st.cards[i+1],st.cards[i]]=[st.cards[i],st.cards[i+1]];render();drawCardsUI()});
+  if(c.dx||c.dy)mk('⊙',()=>{c.dx=0;c.dy=0;render();drawCardsUI()});
   mk('×',()=>{st.cards.splice(i,1);render();drawCardsUI()});
   d.appendChild(b);return d}
 function drawCardsUI(){const w=$('#cards');w.innerHTML='';st.cards.forEach((c,i)=>w.appendChild(cardRow(c,i)))}
 $('#fillHot').onclick=()=>{fillSet(true);drawCardsUI()};
 $('#fillTop').onclick=()=>{fillSet(false);drawCardsUI()};
+$('#resetPos').onclick=()=>{st.cards.forEach(c=>{c.dx=0;c.dy=0});render();drawCardsUI();setStatus('Card positions reset')};
 const fileOK=(f,t)=>t.test(f.type)&&f.size<=CAPS.logoBytes;
 $('#posterFile').onchange=e=>{const fs=[...e.target.files];let bad=0;
   for(const f of fs){if(!fileOK(f,/^image\//)){bad++;diag('file',`rejected ${f.name} ${f.type||'?'} ${f.size}B`);continue}
@@ -566,7 +586,11 @@ const bind=(id,key,vid,f)=>{const el=$('#'+id);el.value=st[key];
 bind('cardSize','cardSize','csV',v=>(v*100).toFixed(1)+'%');bind('rot','rot','rotV',v=>v+'°');
 bind('spreadY','spreadY','spV',v=>(v*100).toFixed(1)+'%');bind('driftX','driftX','drV',v=>(v*100).toFixed(1)+'%');
 bind('radius','radius','rdV',v=>(v*100).toFixed(1)+'%');bind('glow','glow','gwV',v=>(v*100).toFixed(1)+'%');
-bind('vignette','vignette','vgV',v=>Math.round(v*100)+'%');bind('logoW','logoW','lwV',v=>(v*100).toFixed(1)+'%');
+bind('vignette','vignette','vgV',v=>Math.round(v*100)+'%');
+bind('bgBlur','bgBlur','bbV',v=>v>0?v.toFixed(1)+'px':'off');
+bind('gradAngle','gradAngle','gaV',v=>v+'°');bind('gradSpread','gradSpread','gsV',v=>Math.round(v*100)+'%');
+$('#gradType').value=st.gradType;$('#gradType').onchange=e=>{st.gradType=e.target.value;_bgKey='';render()};
+bind('logoW','logoW','lwV',v=>(v*100).toFixed(1)+'%');
 bind('logoL','logoL','llV',v=>(v*100).toFixed(1)+'%');bind('logoCY','logoCY','lcV',v=>(v*100).toFixed(1)+'%');
 $('#snap').checked=st.snap;$('#snap').onchange=e=>{st.snap=e.target.checked;save()};
 $('#guides').checked=st.guides;$('#guides').onchange=e=>{st.guides=e.target.checked;render()};
@@ -635,12 +659,25 @@ document.querySelector(`#mtype [data-t="${st.mtype}"]`)?.classList.add('on');
 /* logo drag with magnetic anchors */
 const SNAPX=[DEF.logoL],SNAPY=[DEF.logoCY,0.5],SNAPW=[DEF.logoW];
 let drag=null;
-cv.addEventListener('pointerdown',e=>{if(!logoBox)return;const rc=cv.getBoundingClientRect();
+function hitCard(px,py){const W=W0(),H=H0(),L=layout(W,H,st,st.cards.length||1);
+  for(let i=st.cards.length-1;i>=0;i--){
+    const c=st.cards[i],cx=L.x0+i*L.stepX+(c.dx||0)*W,cy=L.y0+i*L.stepY+(c.dy||0)*H;
+    const cos=Math.cos(-L.rot),sin=Math.sin(-L.rot),rx=(px-cx)*cos-(py-cy)*sin,ry=(px-cx)*sin+(py-cy)*cos;
+    if(Math.abs(rx)<L.cw/2&&Math.abs(ry)<L.ch/2)return i}return -1}
+cv.addEventListener('pointerdown',e=>{const rc=cv.getBoundingClientRect();
   const k=cv.width/rc.width,x=(e.clientX-rc.left)*k,y=(e.clientY-rc.top)*k;
-  if(x>logoBox.x-40&&x<logoBox.x+logoBox.w+40&&y>logoBox.y-40&&y<logoBox.y+logoBox.h+40){
-    drag={x,y,l:st.logoL*W0(),c:st.logoCY*H0()};cv.setPointerCapture(e.pointerId)}});
+  const ci=hitCard(x,y);
+  if(ci>=0){drag={kind:'card',idx:ci,x:e.clientX,y:e.clientY,dx:st.cards[ci].dx||0,dy:st.cards[ci].dy||0};
+    cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';return}
+  if(logoBox&&x>logoBox.x-40&&x<logoBox.x+logoBox.w+40&&y>logoBox.y-40&&y<logoBox.y+logoBox.h+40){
+    drag={kind:'logo',x,y,l:st.logoL*W0(),c:st.logoCY*H0()};cv.setPointerCapture(e.pointerId)}});
 const W0=()=>PRESETS[st.preset][0],H0=()=>PRESETS[st.preset][1];
-cv.addEventListener('pointermove',e=>{if(!drag)return;const rc=cv.getBoundingClientRect(),k=cv.width/rc.width;
+cv.addEventListener('pointermove',e=>{if(!drag)return;
+  if(drag.kind==='card'){const rc=cv.getBoundingClientRect(),k=cv.width/rc.width,W=W0(),H=H0();
+    const ddx=(e.clientX-drag.x)*k/W,ddy=(e.clientY-drag.y)*k/H;
+    st.cards[drag.idx].dx=clamp(drag.dx+ddx,-.5,.5,0);st.cards[drag.idx].dy=clamp(drag.dy+ddy,-.5,.5,0);
+    _bgKey='';render();return}
+  const rc=cv.getBoundingClientRect(),k=cv.width/rc.width;
   const lx=drag.l+(e.clientX-drag.x)*k, cy=drag.c+(e.clientY-drag.y)*k, W=W0(),H=H0();
   let L=lx/W,C=cy/H,flash=null;
   if(st.snap){const tx=SNAPX.map(v=>[Math.abs(L-v),v]).sort((a,b)=>a[0]-b[0])[0];
@@ -649,12 +686,14 @@ cv.addEventListener('pointermove',e=>{if(!drag)return;const rc=cv.getBoundingCli
   st.logoL=clamp(L,0,.4,DEF.logoL);st.logoCY=clamp(C,.3,.7,DEF.logoCY);
   if(flash){snapFlash=[flash];setTimeout(()=>{snapFlash=null;if(raf)paint()},450)}
   render()});
-addEventListener('pointerup',()=>drag=null);
+addEventListener('pointerup',()=>{drag=null;cv.style.cursor='default'});
 
 /* ── v2.1 robustness: state sync, sharing, import/export, diagnostics, tour ── */
 const SL=[['cardSize','csV',v=>(v*100).toFixed(1)+'%'],['rot','rotV',v=>v+'°'],['spreadY','spV',v=>(v*100).toFixed(1)+'%'],
  ['driftX','drV',v=>(v*100).toFixed(1)+'%'],['radius','rdV',v=>(v*100).toFixed(1)+'%'],['glow','gwV',v=>(v*100).toFixed(1)+'%'],
- ['vignette','vgV',v=>Math.round(v*100)+'%'],['logoW','lwV',v=>(v*100).toFixed(1)+'%'],['logoL','llV',v=>(v*100).toFixed(1)+'%'],['logoCY','lcV',v=>(v*100).toFixed(1)+'%']];
+ ['vignette','vgV',v=>Math.round(v*100)+'%'],['bgBlur','bbV',v=>v>0?v.toFixed(1)+'px':'off'],
+ ['gradAngle','gaV',v=>v+'°'],['gradSpread','gsV',v=>Math.round(v*100)+'%'],
+ ['logoW','lwV',v=>(v*100).toFixed(1)+'%'],['logoL','llV',v=>(v*100).toFixed(1)+'%'],['logoCY','lcV',v=>(v*100).toFixed(1)+'%']];
 function syncUI(){
   for(const[id,vid,f]of SL){const el=$('#'+id);if(el){el.value=st[id];const lb=$('#'+vid);if(lb)lb.textContent=f(st[id])}}
   if($('#snap'))$('#snap').checked=st.snap; if($('#guides'))$('#guides').checked=st.guides;
@@ -667,6 +706,7 @@ function syncUI(){
   if($('#pillText'))$('#pillText').value=st.pill||'';
   if($('#pillPick'))$('#pillPick').value=st.pillColor||BRANDS[st.brand].accent;
   if($('#pillPos'))$('#pillPos').value=st.pillPos||'tr';
+  if($('#gradType'))$('#gradType').value=st.gradType||'radial';
   syncChips()}
 function applySpec(sp,label){
   try{
@@ -768,6 +808,7 @@ $('#diagBtn')&&($('#diagBtn').onclick=openDiag);
 
 /* what's-new (shown once per version) + version badge */
 const CHANGELOG=`<ul class=log>
+ <li><b>2.3.0</b> — Drag posters to custom positions on the banner · background blur slider · gradient type (radial/linear), angle &amp; spread controls · per-card position reset (⊙ button)</li>
  <li><b>2.2.0</b> — 8 more streamer brands (Tubi · Crunchyroll · MGM+ · STARZ · AMC+ · BritBox · Plex · Roku Channel) · custom background colour &amp; image · kicker tagline &amp; corner pill badge · undo/redo (Ctrl+Z) · copy image to clipboard · randomise · light theme · Core Builds header, back-links &amp; footer · mobile layout</li>
  <li><b>2.1.0</b> — Diagnostics modal with environment checks & error ring buffer · share links (URL deep-link) · design import/export files · guided tour · one-click ready-made kits · uploads validated (type+size) · reduced-motion respected · export auto-caps oversized canvases</li>
  <li><b>2.0.0</b> — measured logo anchors & clear-space clamp · ink-exact text marks · sanitized persistence · taint-safe export</li>
@@ -780,7 +821,7 @@ const TOUR=[
  ['Banner Studio','Pick a streamer brand — colours, wordmark and line-up all follow. Everything renders locally; nothing is uploaded.'],
  ['One-click kits','Start from a ready-made setup (measured from real artwork) and fine-tune from there.',' #kits'],
  ['Logo precision','Width/left/Y sit at measured anchors by default. Toggle snap to magnet-drag the mark back onto brand placement; the clear-space guard auto-shrinks it before it can touch the cards.',' #logoSec'],
- ['Line-up','Fill trending-first, drag cards to reorder, or search — 153 titles are bundled and work offline; movies show real artwork too.',' #cards'],
+ ['Line-up','Fill trending-first, drag cards to reorder, or search — 153 titles are bundled and work offline. Drag any poster on the banner to reposition it freely.',' #cards'],
  ['Export & share','PNG/JPG up to 4K with auto size-capping, a shareable link that encodes your whole design, and a design file to re-import later. Diagnostics (bottom) checks your browser and keeps a local error log.','#exp']
 ];
 let tourI=-1;
