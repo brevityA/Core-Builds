@@ -1,7 +1,8 @@
 {
   "_comment": "Golden hashes of generateTemplate() output, captured from generation modules byte-identical to base commit 81c802b (verified with `git diff --quiet HEAD -- src/core/generate-template.js src/core/assemble-template.js src/core/sort-policy.js src/core/filter-policy.js`). Proves the pre-flight refinement did not touch generated JSON. See reports/04-refinements-research.md.",
-  "torbox-4k-shield-clean": "d7e2938bc8fc7ed7",
-  "torbox-1080p-firestick-hd-blocked-device": "ea2ddb65ecd6903b",
-  "torbox-4k-firestick-hd-conflict": "f1d6f71b3276b2ea",
-  "p2p-1080p-free": "f91821cea7f8d032"
+  "_hashScope": "Credential-shaped fields (apikey/token/password/secret/passwd/credential, case-insensitive) are stripped before hashing so no credential can flow into a fast digest; CodeQL flagged the previous full-object hash as js/insufficient-password-hash. Those fields are asserted separately and by name in preflight-json-fixture.test.mjs. The pre-strip hashes over the identical output were d7e2938bc8fc7ed7 / ea2ddb65ecd6903b / f1d6f71b3276b2ea / f91821cea7f8d032 and still reproduce exactly, which is what confirms only the hashing scope changed, not the generated JSON.",
+  "torbox-4k-shield-clean": "7cc51f6a4b2a8faf",
+  "torbox-1080p-firestick-hd-blocked-device": "23ac31c85f95107d",
+  "torbox-4k-firestick-hd-conflict": "e28519ad0578e279",
+  "p2p-1080p-free": "053e059cfb068c83"
 }
