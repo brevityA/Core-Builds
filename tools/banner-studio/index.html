@@ -124,7 +124,7 @@ small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
   <label>Colour</label><div class="row"><input type="color" id="bgPick" value="#1e2126" style="width:34px;height:28px;border:0;background:none"><button class="act" id="bgUse">Apply</button><button class="act" id="bgReset">Auto</button></div>
   <label>Background image (auto-dimmed for contrast)</label><input type="file" id="bgFile" accept="image/*">
   <div class="row" style="margin-top:6px"><button class="act" id="bgClear" style="flex:1">Remove image</button></div>
-  <label>Background blur <span id="bbV"></span></label><input type="range" id="bgBlur" min="0" max="20" step="0.5">
+  <label for="bgBlur">Background blur <span id="bbV"></span></label><input type="range" id="bgBlur" min="0" max="20" step="0.5">
  </section>
  <section id="tagSec"><h2>Tagline &amp; badge</h2>
   <label>Kicker — small line above the logo</label><input type="text" id="kickerText" placeholder="NOW STREAMING">
@@ -862,7 +862,7 @@ cv.tabIndex=0;cv.addEventListener('keydown',e=>{const q=e.shiftKey?0.01:0.002;
 const bsApplyTheme=t=>{const h=document.documentElement;h.setAttribute('data-theme',t);const b=$('#themeBtn');if(b)b.textContent=t==='dark'?'☀ Light':'🌙 Dark';try{localStorage.setItem('bsTheme',t)}catch(e){}};
 $('#themeBtn')&&($('#themeBtn').onclick=()=>{const h=document.documentElement;bsApplyTheme(h.getAttribute('data-theme')==='light'?'dark':'light')});
 
-function loadBg(){if(!st._bgUrl){_bgImg=null;return}const gen=++_bgGen;const url=st._bgUrl;loadImg(url).then(im=>{if(_bgGen!==gen)return;_bgImg=im;if(im)render()})}
+function loadBg(){const gen=++_bgGen;if(!st._bgUrl){_bgImg=null;return}const url=st._bgUrl;loadImg(url).then(im=>{if(_bgGen!==gen)return;_bgImg=im;if(im)render()})}
 
 $('#bgUse').onclick=()=>{st.bgHex=$('#bgPick').value;_bgKey='';render()};
 $('#bgReset').onclick=()=>{st.bgHex=DEF.bgHex;$('#bgPick').value=st.bgHex;_bgKey='';render()};
