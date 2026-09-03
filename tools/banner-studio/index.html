@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Core Banner Studio</title>
+<style>
+@font-face{font-family:BebasSrc;src:url(data:font/ttf;base64,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) format('truetype')}
+:root{--bg:#101216;--panel:#171a20;--line:#262b33;--txt:#e8eaf0;--mut:#8b93a3;--acc:#e50914}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--txt);font:13px/1.45 system-ui,'Segoe UI',Roboto,sans-serif;height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);flex:none}
+header h1{font-size:15px;font-weight:700}header .hint{color:var(--mut)}
+#wrap{flex:1;display:flex;min-height:0}
+aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px}
+main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;overflow:auto}
+#stage{max-width:100%;max-height:100%;position:relative}
+canvas{display:block;max-width:100%;max-height:78vh;border-radius:10px;box-shadow:0 10px 40px #000a;cursor:default}
+section{margin-bottom:18px}
+.skip{position:absolute;left:-999px;top:8px;background:#fff;color:#000;padding:6px 10px;border-radius:8px;z-index:99;text-decoration:none}
+.skip:focus{left:8px}
+:focus-visible{outline:2px solid #6db3ff;outline-offset:2px}
+.ver{color:var(--mut);font-size:11px}
+.dim{color:var(--mut)}
+.kits{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.kits button{display:block;text-align:left;padding:8px;border:1px solid var(--line);border-radius:8px;background:#12151a;color:var(--txt);cursor:pointer;font:inherit}
+.kits button:hover{border-color:#fff5;background:#1d222a}
+#ovl{position:fixed;inset:0;background:#000a;z-index:90;display:flex;align-items:center;justify-content:center}
+.modal{background:#171b21;border:1px solid var(--line);border-radius:12px;max-width:560px;width:92%;box-shadow:0 20px 60px #000c;max-height:82vh;display:flex;flex-direction:column}
+.mhead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.mbody{padding:12px 14px;overflow-y:auto}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--line)}
+.caps,.log{margin:6px 0;padding-left:18px}.log li{margin-bottom:4px;font-size:12px}
+#tov{position:fixed;inset:0;background:#0006;z-index:92}
+#tov .tcard{position:fixed;background:#1b2129;border:1px solid #ffffff2a;border-radius:12px;padding:14px 16px;max-width:330px;box-shadow:0 14px 50px #000d;z-index:95}
+#tov .trow{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+#tov .trow button{border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:#232a34;color:var(--txt);cursor:pointer}
+#thi{position:fixed;border:2px dashed #6db3ff;border-radius:12px;pointer-events:none;box-shadow:0 0 0 9999px #0007}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:920px){header .hint{display:none}}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin-bottom:8px}
+.brands{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.brands button{display:flex;align-items:center;gap:7px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#12151a;color:var(--txt);cursor:pointer;font:inherit;text-align:left}
+.brands button.on{border-color:#fff6;background:#1d222a}
+.dot{width:12px;height:12px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px #fff3}
+label{display:block;color:var(--mut);margin:8px 0 3px}
+input[type=range]{width:100%}
+select,input[type=text]{width:100%;background:#12151a;border:1px solid var(--line);border-radius:7px;color:var(--txt);padding:6px 8px;font:inherit}
+.row{display:flex;gap:6px;align-items:center}
+button.act{border:1px solid var(--line);background:#12151a;color:var(--txt);border-radius:7px;padding:6px 10px;cursor:pointer;font:inherit}
+button.act:hover{background:#1b2028}
+.card{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px;margin-bottom:6px;background:#12151a}
+.card img{width:30px;height:45px;object-fit:cover;border-radius:3px;background:#000}
+.card .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .btns button{border:0;background:none;color:var(--mut);cursor:pointer;padding:2px 3px;font:inherit}
+#results .card{cursor:pointer}
+#status{border-top:1px solid var(--line);padding:8px 16px;color:var(--mut);display:flex;gap:16px;flex:none;background:var(--panel)}
+#status b{color:var(--txt);font-weight:600}
+.warn{color:#ffb454}.ok{color:#7ee2a8}
+small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
+
+/* ── Core Builds site chrome (v2.2) ── */
+.sitebar{flex:none;display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.sb-brand{display:flex;align-items:center;gap:8px;color:var(--txt);text-decoration:none;font-weight:900;letter-spacing:.02em;font-size:13px}
+.sb-brand b{color:#00d4ff}
+.sb-brand svg{filter:drop-shadow(0 0 6px rgba(0,212,255,.45))}
+.sb-sep{width:1px;height:16px;background:var(--line)}
+.sb-crumb{color:var(--mut);font-size:12px;font-weight:600}
+.sb-link{color:var(--mut);text-decoration:none;font-size:12px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid transparent}
+.sb-link:hover{color:var(--txt);border-color:var(--line)}
+.sitefoot{flex:none;border-top:1px solid var(--line);padding:10px 16px;color:var(--mut);font-size:11px;text-align:center;background:var(--panel)}
+.sitefoot a{color:#4aa8c7;text-decoration:none}
+.sitefoot a:hover{text-decoration:underline}
+[data-theme=light]{--bg:#f4f6f9;--panel:#ffffff;--line:#dfe4ea;--txt:#1b222b;--mut:#5b6673;--acc:#e50914}
+[data-theme=light] .kits button,[data-theme=light] .brands button,[data-theme=light] select,[data-theme=light] input[type=text],[data-theme=light] button.act,[data-theme=light] .card{background:#fff;border-color:#d8dee6;color:var(--txt)}
+[data-theme=light] .brands button.on,[data-theme=light] button.act:hover{background:#eef2f6}
+[data-theme=light] .card{background:#f7f9fb}
+[data-theme=light] .modal,[data-theme=light] .tcard{background:#fff;color:var(--txt)}
+[data-theme=light] #status{background:#fff;border-color:#dfe4ea}
+[data-theme=light] .mhead,[data-theme=light] .mfoot{border-color:#e6ebf0}
+@media (max-width:920px){
+  header .hint{display:none}
+  #wrap{flex-direction:column}
+  aside{width:100%;border-right:0;border-bottom:1px solid var(--line);max-height:46vh}
+  main{min-height:44vh;padding:12px}
+  canvas{max-height:42vh}
+}
+</style></head><body>
+<a class="skip" href="#brandsec">Skip to controls</a>
+<div class="sitebar">
+ <a class="sb-brand" href="../../" title="Core Builds home"><svg width="20" height="20" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 4 56 18v28L32 60 8 46V18L32 4Z" stroke="url(#sbG)" stroke-width="3"/><path d="m32 20 12 12-12 12-12-12 12-12Z" fill="url(#sbG)" opacity=".9"/><defs><linearGradient id="sbG" x1="9" y1="8" x2="55" y2="57"><stop stop-color="#00e5ff"/><stop offset=".55" stop-color="#a78bfa"/><stop offset="1" stop-color="#ff7043"/></linearGradient></defs></svg> CORE <b>BUILDS</b></a>
+ <span class="sb-sep"></span><span class="sb-crumb">Tools · Banner Studio</span>
+ <span style="flex:1"></span>
+ <a class="sb-link" href="../">← All tools</a>
+ <a class="sb-link" href="../../">Configurator</a>
+ <a class="sb-link" href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a>
+ <button class="act" id="themeBtn" title="Toggle light/dark">☀ Light</button>
+</div><header><h1>🎬 Core Banner Studio</h1><span class="hint">Netflix-style brand banners for any major streamer · renders &amp; exports locally</span>
+ <span style="flex:1"></span>
+ <button class="act" id="undoBtn" title="Undo (Ctrl+Z)">↶ Undo</button>
+ <button class="act" id="redoBtn" title="Redo (Ctrl+Shift+Z)">↷ Redo</button>
+ <button class="act" id="randBtn" title="Surprise me">🎲 Random</button>
+ <button class="act" id="tourBtn" title="Guided tour (or press ?)">🧭 Guide</button>
+ <button class="act" id="diagBtn" title="Environment checks &amp; local error log">🩺 Diagnostics</button>
+ <button class="act" id="whatsBtn">What's new</button><span class="ver" id="ver"></span></header>
+<div id="wrap">
+<aside>
+ <section id="brandsec"><h2>Brand</h2><div class="brands" id="brands"></div>
+  <label>Accent override</label><div class="row"><input type="color" id="accentPick" value="#e50914" style="width:34px;height:28px;border:0;background:none"><button class="act" id="accentUse">Apply</button><button class="act" id="accentReset">Auto</button></div>
+ </section>
+ <section><h2>Ready-made setups</h2><div class="kits" id="kits"></div></section>
+ <section id="logoSec"><h2>Wordmark</h2><label>Text (empty = brand default)</label><input type="text" id="logoText" placeholder="NETFLIX">
+  <label>Custom logo file (PNG/SVG)</label><input type="file" id="logoFile" accept="image/png,image/svg+xml,image/jpeg">
+  <label>Logo width <span id="lwV"></span></label><input type="range" id="logoW" min="0.15" max="0.55" step="0.002">
+<div class="row"><div style="flex:1"><label>Left margin <span id="llV"></span></label><input type="range" id="logoL" min="0" max="0.4" step="0.002"></div>
+<div style="flex:1"><label>Center Y <span id="lcV"></span></label><input type="range" id="logoCY" min="0.3" max="0.7" step="0.002"></div></div>
+  <div class="row" style="margin-top:6px"><button class="act" id="nL">◀</button><button class="act" id="nR">▶</button><button class="act" id="nU">▲</button><button class="act" id="nD">▼</button><span class="hint" style="color:var(--mut)">…or drag the logo on the banner</span></div>
+ </section>
+  <section id="bgSec"><h2>Background</h2>
+  <label>Colour</label><div class="row"><input type="color" id="bgPick" value="#1e2126" style="width:34px;height:28px;border:0;background:none"><button class="act" id="bgUse">Apply</button><button class="act" id="bgReset">Auto</button></div>
+  <label>Background image (auto-dimmed for contrast)</label><input type="file" id="bgFile" accept="image/*">
+  <div class="row" style="margin-top:6px"><button class="act" id="bgClear" style="flex:1">Remove image</button></div>
+ </section>
+ <section id="tagSec"><h2>Tagline &amp; badge</h2>
+  <label>Kicker — small line above the logo</label><input type="text" id="kickerText" placeholder="NOW STREAMING">
+  <label>Pill badge — corner</label><input type="text" id="pillText" placeholder="NEW SEASON">
+  <div class="row" style="margin-top:6px"><div style="flex:1"><label>Badge colour</label><input type="color" id="pillPick" value="#E50914" style="width:100%;height:26px;border:0;background:none"></div>
+  <div style="flex:1"><label>Position</label><select id="pillPos" style="width:100%"><option value="tr">Top-right</option><option value="tl">Top-left</option><option value="bl">Bottom-left</option><option value="br">Bottom-right</option></select></div></div>
+ </section>
+ <section><h2>Cards</h2><div class="row" id="mtype" style="margin-bottom:6px"><button class="act" data-t="show" style="flex:1">Shows</button><button class="act" data-t="movie" style="flex:1">Movies</button><button class="act on" data-t="mix" style="flex:1">Mix</button></div><div class="row"><button class="act" id="fillHot">🔥 Fill trending</button><button class="act" id="fillTop">Fill popular</button></div>
+  <label>Add show — live search (TVMaze)</label><div class="row"><input type="text" id="q" placeholder="e.g. The Bear"><button class="act" id="qgo">Go</button></div><div id="results"></div>
+  <label>Manual poster</label><input type="file" id="posterFile" accept="image/*" multiple>
+  <div id="cards"></div></section>
+ <section><h2>Layout</h2>
+  <label>Card size <span id="csV"></span></label><input type="range" id="cardSize" min="0.16" max="0.34" step="0.005">
+  <label>Tilt <span id="rotV"></span></label><input type="range" id="rot" min="-24" max="24" step="0.5">
+  <label>Cascade spread <span id="spV"></span></label><input type="range" id="spreadY" min="0.10" max="0.30" step="0.002">
+  <label>Cascade drift <span id="drV"></span></label><input type="range" id="driftX" min="0" max="0.10" step="0.002">
+  <label>Corner radius <span id="rdV"></span></label><input type="range" id="radius" min="0" max="0.09" step="0.002">
+  <label>Brand glow <span id="gwV"></span></label><input type="range" id="glow" min="0" max="0.16" step="0.005">
+  <label>Vignette <span id="vgV"></span></label><input type="range" id="vignette" min="0" max="1" step="0.02">
+  <label><input type="checkbox" id="guides"> brand-guide overlay (clear-space · margins)</label>
+<label><input type="checkbox" id="snap"> magnetic snap to brand anchors</label>
+ </section>
+ <section id="exp"><h2>Export</h2>
+  <label>Canvas</label><select id="preset"></select>
+  <div class="row" style="margin-top:8px"><select id="fmt" style="width:90px"><option value="png">PNG</option><option value="jpeg">JPG</option></select>
+  <select id="scale" style="width:80px"><option value="1">1×</option><option value="2">2×</option><option value="3">3×</option></select>
+  <button class="act" id="dl" style="flex:1">Download</button><button class="act" id="copyImg" style="flex:1" title="Copy PNG to clipboard">📋 Copy</button></div>
+  <div class="row" style="margin-top:8px"><button class="act" id="share" style="flex:1">🔗 Copy share link</button>
+  <button class="act" id="expSpec" style="flex:1">💾 Export design file</button></div>
+  <label>Re-import a design file later</label><input type="file" id="specFile" accept=".json,application/json">
+  <button class="act" id="reset" style="width:100%;margin-top:8px">Reset all</button>
+ </section>
+ <small class="src">Posters: TVMaze API (no key, CORS-open). ◦ on a brand = approximate public color — override it above. Netflix wordmark is the official 2015 vector path. Personal/portfolio use only; logos © their owners. Your designs never leave this browser — autosave, error log and shared links stay under your control.</small>
+</aside>
+<main><div id="stage"><canvas id="cv"></canvas></div></main>
+</div>
+<div id="status" role="status" aria-live="polite"><span id="stBrand"></span><span id="stContrast"></span><span id="stMsg"></span></div>
+<footer class="sitefoot">Core Banner Studio · part of <a href="../../">Core Builds</a> by Brevity · <a href="../">All tools</a> · <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a> — logos © their owners · designs never leave your browser</footer>
+<script id="core">
+/*CORE-START*/
+/* localStorage-safe polyfill: sandboxed iframes & storage-blocked browsers throw on
+   any access; fall back to an in-memory store so the tool still boots & works. */
+let _lsMem={};try{const __p='__cb_probe';localStorage.setItem(__p,'1');localStorage.removeItem(__p)}catch(e){try{Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>Object.prototype.hasOwnProperty.call(_lsMem,k)?_lsMem[k]:null,setItem:(k,v)=>{_lsMem[k]=String(v)},removeItem:k=>{delete _lsMem[k]},clear:()=>{_lsMem={}}}})}catch(e2){}}
+
+// ── Reference measurements (source: the 700×444 Crave banner, component analysis) ──
+// crave mark bbox x55–311 y200–250 → left margin 0.0786W · width 0.3657W · optical center 0.5068H
+// Card cascade: 450×675 @1800×1200, start (0.859W, 0.1733H), step (−0.0511W, +0.1942H), tilt 14°, corner 0.0533·cardW.
+// Clear-space rule follows common brand-guide practice for all-caps logotypes: ≥ 0.5× mark height on every side.
+const PRESETS={ref:[1800,1200,'Ref 3:2 (1800×1200)'],tv:[3840,2160,'TV 4K 16:9'],web169:[1920,1080,'Web 16:9 1920×1080'],social:[1080,1350,'Social 4:5'],square:[1080,1080,'Square 1:1'],story:[1080,1920,'Story 9:16']};
+const BRANDS={
+ netflix:{label:'Netflix',accent:'#E50914',tint:'#E50914',logo:{mode:'vector',text:'NETFLIX'}},
+ max:{label:'Max',accent:'#FFFFFF',tint:'#8f6bff',logo:{mode:'text',text:'max',fam:'sys',weight:800,tracking:0.0}},
+ disney:{label:'Disney+ ◦',accent:'#113CCF',tint:'#3f77ff',logo:{mode:'text',text:'DISNEY+',fam:'script',weight:700,tracking:0.02}},
+ prime:{label:'Prime Video',accent:'#00A8E1',tint:'#00A8E1',logo:{mode:'text',text:'prime video',fam:'sys',weight:700,tracking:0.012}},
+ paramount:{label:'Paramount+',accent:'#0064FF',tint:'#0064FF',logo:{mode:'text',text:'PARAMOUNT+',fam:'sys',weight:800,tracking:0.06}},
+ hulu:{label:'hulu',accent:'#1CE783',tint:'#1CE783',logo:{mode:'text',text:'hulu',fam:'sys',weight:800,tracking:0.012}},
+ apple:{label:'Apple TV+',accent:'#FFFFFF',tint:'#aeb6c4',logo:{mode:'text',text:'Apple TV+',fam:'sys',weight:600,tracking:0.012}},
+ peacock:{label:'Peacock ◦',accent:'#FFFFFF',tint:'#7A3BFF',logo:{mode:'text',text:'PEACOCK',fam:'sys',weight:800,tracking:0.08}},
+ crave:{label:'Crave ◦',accent:'#A98ADB',tint:'#7F59BA',logo:{mode:'text',text:'crave',fam:'sys',weight:800,tracking:0.025}},
+ tubi:{label:'Tubi',accent:'#FFFFFF',tint:'#FFC832',logo:{mode:'text',text:'tubi',fam:'sys',weight:800,tracking:0.02}},
+ crunchyroll:{label:'Crunchyroll',accent:'#F47521',tint:'#F47521',logo:{mode:'text',text:'crunchyroll',fam:'sys',weight:800,tracking:0.0}},
+ mgm:{label:'MGM+',accent:'#C9A227',tint:'#C9A227',logo:{mode:'text',text:'MGM+',fam:'sys',weight:800,tracking:0.05}},
+ starz:{label:'STARZ',accent:'#F7B500',tint:'#F7B500',logo:{mode:'text',text:'STARZ',fam:'sys',weight:800,tracking:0.12}},
+ amc:{label:'AMC+',accent:'#E5271B',tint:'#E5271B',logo:{mode:'text',text:'AMC+',fam:'sys',weight:800,tracking:0.05}},
+ britbox:{label:'BritBox',accent:'#3D9BFF',tint:'#3D9BFF',logo:{mode:'text',text:'BritBox',fam:'sys',weight:800,tracking:0.02}},
+ plex:{label:'Plex',accent:'#E5A00D',tint:'#E5A00D',logo:{mode:'text',text:'Plex',fam:'sys',weight:800,tracking:0.0}},
+ roku:{label:'Roku Channel',accent:'#FFFFFF',tint:'#7C3AED',logo:{mode:'text',text:'ROKU',fam:'sys',weight:800,tracking:0.08}},
+};
+
+const DEF={cardSize:0.25,rot:14,spreadY:0.1942,driftX:0.0511,radius:0.0533,glow:0.05,vignette:0.85,
+  logoL:0.0786,logoW:0.3657,logoCY:0.5068,snap:true,maxCards:8,bgHex:'#1e2126',frame:12,kicker:'',pill:'',pillColor:null,pillPos:'tr'};
+function layout(W,H,c,n){
+  const cw=c.cardSize*W,ch=cw*1.5;
+  return {cw,ch,x0:0.859*W,y0:(0.5-(n-1)*c.spreadY/2+0.1588)*H,
+    stepY:c.spreadY*H,stepX:-c.driftX*W,
+    rot:c.rot*Math.PI/180,rad:c.radius*cw,
+    logo:{L:c.logoL*W,W:c.logoW*W,cy:c.logoCY*H}};
+}
+// collision-aware width cap using the mark's TRUE height/width ratio:
+// clearance = 0.5×mark height (brand-guide rule), solved jointly with width.
+function maxLogoWidth(W,H,c,n,r){
+  const L=layout(W,H,c,n);
+  const cos=Math.abs(Math.cos(L.rot)),sin=Math.abs(Math.sin(L.rot));
+  const ex=(L.cw/2)*cos+(L.ch/2)*sin, ey=(L.cw/2)*sin+(L.ch/2)*cos;
+  const lx=L.logo.L;
+  let w=0.55*W;
+  for(let pass=0;pass<2;pass++){
+    const clr=0.5*r*w;
+    let cap=0.55*W;
+    for(let i=0;i<n;i++){
+      const cx=L.x0+i*L.stepX, cy=L.y0+i*L.stepY;
+      if(Math.abs(cy-L.logo.cy)<ey+clr) cap=Math.min(cap,(cx-ex-clr-lx)/(1+0.5*r));
+    }
+    if(Math.abs(cap-w)<0.5){w=cap;break}
+    w=cap;
+  }
+  return Math.max(0.12*W,w);
+}
+// browser canvas limits: keep exports inside ~16.7M px & 8192 side (iOS-safe)
+function reduceScale(w,h,s){
+  for(let k=s;k>=1;k--){
+    const W=w*k,H=h*k;
+    if(W<=8192&&H<=8192&&W*H<=1.6e7) return {scale:k,reduced:k!==s};
+  }
+  return {scale:1,reduced:s>1};
+}
+function fitCrop(sw,sh,tw,th){const ar=tw/th;let w=sw,h=sw/ar;if(h>sh){h=sh;w=sh*ar}return{sx:(sw-w)/2,sy:(sh-h)/2,sw:w,sh:h}}
+function hexRgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const v=parseInt(h,16);return[(v>>16)&255,(v>>8)&255,v&255]}
+function rgba(h,a){const[r,g,b]=hexRgb(h);return`rgba(${r},${g},${b},${a})`}
+function mix(h1,h2,t){const a=hexRgb(h1),b=hexRgb(h2);const m=a.map((x,i)=>Math.round(x+(b[i]-x)*t));return'#'+m.map(x=>x.toString(16).padStart(2,'0')).join('')}
+function rgbHex(r,g,b){return'#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('')}
+function relLum(h){const c=hexRgb(h).map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function contrast(h1,h2){const a=relLum(h1),b=relLum(h2);return(Math.max(a,b)+.05)/(Math.min(a,b)+.05)}
+function fnv(s){let x=2166136261;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)}return x>>>0}
+function clamp(v,a,b,fb){v=+v;return Number.isFinite(v)?Math.min(b,Math.max(a,v)):fb}
+function sanitize(s){const o={...DEF};if(!s||typeof s!=='object')return o;
+  for(const k of['cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards'])
+    o[k]=clamp(s[k],{rot:-24,spreadY:.1,maxCards:0}[k]??0,{cardSize:.34,rot:24,spreadY:.3,driftX:.1,radius:.09,glow:.16,vignette:1,logoL:.4,logoW:.55,logoCY:.9,maxCards:8}[k]??999,DEF[k]);
+  o.bgHex=/^#[0-9a-fA-F]{6}$/.test(s.bgHex||'')?s.bgHex:DEF.bgHex;
+  o.brand=BRANDS[s.brand]?s.brand:'netflix';o.preset=PRESETS[s.preset]?s.preset:'ref';
+  o.fmt=s.fmt==='jpeg'?'jpeg':'png';o.scale=[1,2,3].includes(+s.scale)?+s.scale:1;
+  o.mtype=['show','movie','mix'].includes(s.mtype)?s.mtype:'mix';
+  o.guides=!!s.guides;o.snap=s.snap!==false;o.autoFill=s.autoFill!==false;
+  o.accentOverride=/^#[0-9a-fA-F]{6}$/.test(s.accentOverride||'')?s.accentOverride:null;
+  o.logoText=typeof s.logoText==='string'?s.logoText.slice(0,24):'';
+  o.cards=Array.isArray(s.cards)?s.cards.slice(0,o.maxCards||8).filter(c=>c&&typeof c.n==='string').map(c=>({n:c.n.slice(0,60),o:(c.o||'').startsWith('http')?c.o:'',m:(c.m||'').startsWith('http')?c.m:'',url:(c.url||'').startsWith('data:')||(c.url||'').startsWith('http')?c.url:'',type:c.type==='movie'?'movie':'show',hot:!!c.hot})):[];
+  o.kicker=typeof s.kicker==='string'?s.kicker.slice(0,30):'';
+  o.pill=typeof s.pill==='string'?s.pill.slice(0,30):'';
+  o.pillColor=/^#[0-9a-fA-F]{6}$/.test(s.pillColor||'')?s.pillColor:null;
+  o.pillPos=['tl','tr','bl','br'].includes(s.pillPos)?s.pillPos:'tr';
+  return o}
+
+/* ── robustness layer v2.1 ─────────────────────────────── */
+const APP_VERSION='2.2.0';
+const SPEC_V=1, RING_MAX=50, CAPS={specBytes:1e6, logoBytes:3e6, hashChars:60000};
+function makeSpec(st){
+  const sp={v:SPEC_V};
+  for(const k of['brand','preset','fmt','scale','mtype','guides','snap','autoFill','trendingFirst',
+    'cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards',
+    'bgHex','logoText','kicker','pill','pillColor','pillPos'])if(st[k]!==undefined)sp[k]=st[k];
+  if(st.accentOverride)sp.accentOverride=st.accentOverride;
+  if(st.tintOverride)sp.tintOverride=st.tintOverride;
+  sp.cards=(st.cards||[]).map(c=>({n:c.n,o:c.o||'',m:c.m||'',type:c.type||'show',hot:!!c.hot,url:(c.url&&(c.url.startsWith('http')||c.url.startsWith('data:')))?c.url:''}));
+  if(st._logoUrl&&st._logoUrl.startsWith('data:')&&st._logoUrl.length<60000)sp.customLogo=st._logoUrl;
+  if(st._bgUrl&&st._bgUrl.startsWith('data:')&&st._bgUrl.length<60000)sp.customBg=st._bgUrl;
+  return sp}
+function encSpec(sp){try{
+  const j=JSON.stringify(sp), b=btoa(unescape(encodeURIComponent(j)));
+  return 'b'+b.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}catch(e){return null}}
+function decSpec(s){
+  if(typeof s!=='string'||s[0]!=='b')return null;
+  const b64=s.slice(1).replace(/-/g,'+').replace(/_/g,'/');
+  if(b64.length>CAPS.hashChars)return {__tooBig:1};
+  try{const o=JSON.parse(decodeURIComponent(escape(atob(b64))));
+    if(!o||typeof o!=='object'||o.v!==SPEC_V)return null;
+    return o}catch(e){return null}}
+function ringAdd(arr,ent){const a=Array.isArray(arr)?arr.slice():[];
+  a.push({t:Date.now(),kind:String(ent&&ent.kind||'info').slice(0,20),msg:String(ent&&ent.msg||'').slice(0,300)});
+  while(a.length>RING_MAX)a.shift();return a}
+/* one-click full-start kits (validated by preset-contract tests) */
+const READY={
+  ref:{name:'Reference banner',desc:'Measured from the source artwork — exact anchors',
+       spec:{brand:'netflix',preset:'ref',trendingFirst:true,snap:true,guides:false}},
+  tv:{name:'TV wall · 4K',desc:'Max line-up sized for a living-room preview',
+      spec:{brand:'max',preset:'tv',trendingFirst:true,guides:false}},
+  social:{name:'Social 4:5 · Disney+',desc:'Movies-first set for the feed',
+      spec:{brand:'disney',preset:'social',mtype:'movie',trendingFirst:true}},
+  story:{name:'Story 9:16 · hulu',desc:'Vertical take with green-on-dark wordmark',
+      spec:{brand:'hulu',preset:'story',trendingFirst:true}}
+};
+/*CORE-END*/
+
+</script>
+<script>
+const POSTERS = {"netflix": [{"n": "Stranger Things", "o": "https://static.tvmaze.com/uploads/images/original_untouched/595/1489169.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/595/1489169.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Wednesday", "o": "https://static.tvmaze.com/uploads/images/original_untouched/586/1466410.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/586/1466410.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Squid Game", "o": "https://static.tvmaze.com/uploads/images/original_untouched/576/1440521.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/576/1440521.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Adolescence", "o": "https://static.tvmaze.com/uploads/images/original_untouched/558/1395109.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/558/1395109.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Diplomat", "o": "https://static.tvmaze.com/uploads/images/original_untouched/589/1473527.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/589/1473527.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "One Piece", "o": "https://static.tvmaze.com/uploads/images/original_untouched/617/1543011.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/617/1543011.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Black Mirror", "o": "https://static.tvmaze.com/uploads/images/original_untouched/564/1411764.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/564/1411764.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "BEEF", "o": "https://static.tvmaze.com/uploads/images/original_untouched/621/1554643.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/621/1554643.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Night Agent", "o": "https://static.tvmaze.com/uploads/images/original_untouched/614/1536331.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/614/1536331.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Nobody Wants This", "o": "https://static.tvmaze.com/uploads/images/original_untouched/594/1485603.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/594/1485603.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Avatar: The Last Airbender", "o": "https://static.tvmaze.com/uploads/images/original_untouched/633/1582667.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/633/1582667.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Queen's Gambit", "o": "https://static.tvmaze.com/uploads/images/original_untouched/510/1275203.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/510/1275203.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Money Heist: Korea - Joint Economic Area", "o": "https://static.tvmaze.com/uploads/images/original_untouched/430/1076004.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/430/1076004.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Crown", "o": "https://static.tvmaze.com/uploads/images/original_untouched/632/1580063.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/632/1580063.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "You", "o": "https://static.tvmaze.com/uploads/images/original_untouched/564/1412472.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/564/1412472.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Outer Banks", "o": "https://static.tvmaze.com/uploads/images/original_untouched/635/1589150.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/635/1589150.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Alice in Borderland", "o": "https://static.tvmaze.com/uploads/images/original_untouched/589/1473249.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/589/1473249.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Gentlemen", "o": "https://static.tvmaze.com/uploads/images/original_untouched/638/1597311.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/638/1597311.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "KPop Demon Hunters", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FzT7Lhw3BhJbMkRqm9Zlx2YGMsY0.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FzT7Lhw3BhJbMkRqm9Zlx2YGMsY0.jpg", "type": "movie", "hot": true}, {"n": "Wake Up Dead Man: A Knives Out Mystery", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FiV9LM8aUb83BjCCx2RUnKE5sSQg.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FiV9LM8aUb83BjCCx2RUnKE5sSQg.jpg", "type": "movie", "hot": true}, {"n": "The Old Guard 2", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fwqfu3bPLJaEWJVk3QOm0rKhxf1A.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fwqfu3bPLJaEWJVk3QOm0rKhxf1A.jpg", "type": "movie", "hot": false}, {"n": "Leave The World Behind", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F29rhl1xopxA7JlGVVsf1UHfYPvN.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F29rhl1xopxA7JlGVVsf1UHfYPvN.jpg", "type": "movie", "hot": false}, {"n": "Frankenstein", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fg4JtvGlQO7DByTI6frUobqvSL3R.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fg4JtvGlQO7DByTI6frUobqvSL3R.jpg", "type": "movie", "hot": true}, {"n": "The Rip", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F4wsYWH73Hb1B6noGIFaRQSAkuXj.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F4wsYWH73Hb1B6noGIFaRQSAkuXj.jpg", "type": "movie", "hot": false}], "max": [{"n": "The Last of Us", "o": "https://static.tvmaze.com/uploads/images/original_untouched/563/1409008.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/563/1409008.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "House of the Dragon", "o": "https://static.tvmaze.com/uploads/images/original_untouched/627/1568449.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/627/1568449.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Pitt", "o": "https://static.tvmaze.com/uploads/images/original_untouched/606/1516776.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/606/1516776.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The White Lotus", "o": "https://static.tvmaze.com/uploads/images/original_untouched/557/1393876.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/557/1393876.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Succession", "o": "https://static.tvmaze.com/uploads/images/original_untouched/453/1134275.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/453/1134275.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Euphoria", "o": "https://static.tvmaze.com/uploads/images/original_untouched/621/1552657.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/621/1552657.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Task", "o": "https://static.tvmaze.com/uploads/images/original_untouched/586/1466647.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/586/1466647.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Penguin", "o": "https://static.tvmaze.com/uploads/images/original_untouched/536/1340329.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/536/1340329.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Peacemaker", "o": "https://static.tvmaze.com/uploads/images/original_untouched/586/1466413.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/586/1466413.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "True Detective", "o": "https://static.tvmaze.com/uploads/images/original_untouched/490/1226764.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/490/1226764.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Industry", "o": "https://static.tvmaze.com/uploads/images/original_untouched/608/1521293.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/608/1521293.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Barry", "o": "https://static.tvmaze.com/uploads/images/original_untouched/455/1138151.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/455/1138151.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Hacks", "o": "https://static.tvmaze.com/uploads/images/original_untouched/621/1552621.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/621/1552621.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Lanterns", "o": "https://static.tvmaze.com/uploads/images/original_untouched/637/1592971.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/637/1592971.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "A Minecraft Movie", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FyFHHfHcUgGAxziP1C3lLt0q2T4s.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FyFHHfHcUgGAxziP1C3lLt0q2T4s.jpg", "type": "movie", "hot": false}, {"n": "The Conjuring Last Rites", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FbyWgphT74ClOVa8EOGzYDkl8DVL.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FbyWgphT74ClOVa8EOGzYDkl8DVL.jpg", "type": "movie", "hot": false}, {"n": "Dune Part Two", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F6izwz7rsy95ARzTR3poZ8H6c5pp.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F6izwz7rsy95ARzTR3poZ8H6c5pp.jpg", "type": "movie", "hot": false}, {"n": "Sinners", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F61DJMqFUFX6222ctnzuQEJLYdUT.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F61DJMqFUFX6222ctnzuQEJLYdUT.jpg", "type": "show", "hot": true}, {"n": "Superman", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fldyfo0BKmz5rWtJJKCvwaNS4cJT.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fldyfo0BKmz5rWtJJKCvwaNS4cJT.jpg", "type": "movie", "hot": false}, {"n": "Megalopolis", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F8Sok3HNA3r1GHnK2lCytHyBz1A.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F8Sok3HNA3r1GHnK2lCytHyBz1A.jpg", "type": "movie", "hot": false}, {"n": "Backrooms", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FrhGx6E3qRNMgj3i5su2oukNHwIQ.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FrhGx6E3qRNMgj3i5su2oukNHwIQ.jpg", "type": "movie", "hot": true}], "disney": [{"n": "Andor", "o": "https://static.tvmaze.com/uploads/images/original_untouched/564/1411766.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/564/1411766.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "X-Men '97", "o": "https://static.tvmaze.com/uploads/images/original_untouched/630/1576859.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/630/1576859.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Percy Jackson and the Olympians", "o": "https://static.tvmaze.com/uploads/images/original_untouched/633/1584337.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/633/1584337.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Mandalorian", "o": "https://static.tvmaze.com/uploads/images/original_untouched/501/1253498.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/501/1253498.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Loki", "o": "https://static.tvmaze.com/uploads/images/original_untouched/478/1195717.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/478/1195717.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Ahsoka", "o": "https://static.tvmaze.com/uploads/images/original_untouched/636/1592346.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/636/1592346.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Agatha All Along", "o": "https://static.tvmaze.com/uploads/images/original_untouched/536/1340567.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/536/1340567.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Wonder Man", "o": "https://static.tvmaze.com/uploads/images/original_untouched/613/1532943.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/613/1532943.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Moon Knight", "o": "https://static.tvmaze.com/uploads/images/original_untouched/407/1019370.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/407/1019370.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "What If...?", "o": "https://static.tvmaze.com/uploads/images/original_untouched/543/1358372.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/543/1358372.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Daredevil: Born Again", "o": "https://static.tvmaze.com/uploads/images/original_untouched/616/1540605.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/616/1540605.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Mandalorian And Grogu", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F7GV5rrUJf0BRUhoh2cyFoeNthlQ.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F7GV5rrUJf0BRUhoh2cyFoeNthlQ.jpg", "type": "movie", "hot": true}, {"n": "Zootopia 2", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FoJ7g2CifqpStmoYQyaLQgEU32qO.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FoJ7g2CifqpStmoYQyaLQgEU32qO.jpg", "type": "movie", "hot": true}, {"n": "Toy Story 5", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FsfQtVlIHljToOwYjhe21KPGzZWK.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FsfQtVlIHljToOwYjhe21KPGzZWK.jpg", "type": "movie", "hot": true}, {"n": "Avatar: Fire and Ash", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FbRBeSHfGHwkEpImlhxPmOcUsaeg.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FbRBeSHfGHwkEpImlhxPmOcUsaeg.jpg", "type": "movie", "hot": false}, {"n": "Tron Ares", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FchpWmskl3aKm1aTZqUHRCtviwPy.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FchpWmskl3aKm1aTZqUHRCtviwPy.jpg", "type": "movie", "hot": false}, {"n": "Freakier Friday", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F9wV65OmsjLAqBfDnYTkMPutXH8j.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F9wV65OmsjLAqBfDnYTkMPutXH8j.jpg", "type": "movie", "hot": false}, {"n": "Elio (2025 film)", "o": "https://upload.wikimedia.org/wikipedia/commons/5/57/MJK_70936_Elio_Germano_%28Favolacce%2C_Berlinale_2020%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=original", "m": "https://upload.wikimedia.org/wikipedia/commons/5/57/MJK_70936_Elio_Germano_%28Favolacce%2C_Berlinale_2020%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=original", "type": "movie", "hot": false, "yr": "2025"}, {"n": "Thunderbolts*", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FhqcexYHbiTBfDIdDWxrxPtVndBX.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FhqcexYHbiTBfDIdDWxrxPtVndBX.jpg", "type": "movie", "hot": false}], "prime": [{"n": "The Boys", "o": "https://static.tvmaze.com/uploads/images/original_untouched/619/1547768.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/619/1547768.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Reacher", "o": "https://static.tvmaze.com/uploads/images/original_untouched/636/1591350.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/636/1591350.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Fallout", "o": "https://static.tvmaze.com/uploads/images/original_untouched/599/1499142.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/599/1499142.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Lord of the Rings: The Rings of Power", "o": "https://static.tvmaze.com/uploads/images/original_untouched/633/1584401.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/633/1584401.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Invincible", "o": "https://static.tvmaze.com/uploads/images/original_untouched/618/1545777.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/618/1545777.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Marvelous Mrs. Maisel", "o": "https://static.tvmaze.com/uploads/images/original_untouched/456/1141825.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/456/1141825.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Tom Clancy's Jack Ryan", "o": "https://static.tvmaze.com/uploads/images/original_untouched/486/1215704.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/486/1215704.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Cross", "o": "https://static.tvmaze.com/uploads/images/original_untouched/613/1532936.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/613/1532936.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Outer Range", "o": "https://static.tvmaze.com/uploads/images/original_untouched/514/1285443.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/514/1285443.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "LOL: Last One Laughing", "o": "https://static.tvmaze.com/uploads/images/original_untouched/301/754067.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/301/754067.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Neagley", "o": "https://static.tvmaze.com/uploads/images/original_untouched/636/1591760.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/636/1591760.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Love Hypothesis", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FzUaTMxLOuW4wdaFYhRVJbO6W8Sy.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FzUaTMxLOuW4wdaFYhRVJbO6W8Sy.jpg", "type": "movie", "hot": true}, {"n": "Demon Slayer: Infinity Castle", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F8uYxx23KyDnbDkA3eQSNECVeOiS.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F8uYxx23KyDnbDkA3eQSNECVeOiS.jpg", "type": "movie", "hot": true}, {"n": "The Runner", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fode14q7WtDugFDp78fo9lCsmay9.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fode14q7WtDugFDp78fo9lCsmay9.jpg", "type": "movie", "hot": true}, {"n": "Air", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FcZ97grqenZ0oB3Da9NKkucNbSpj.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FcZ97grqenZ0oB3Da9NKkucNbSpj.jpg", "type": "show", "hot": false}], "hulu": [{"n": "The Bear", "o": "https://static.tvmaze.com/uploads/images/original_untouched/629/1574642.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/629/1574642.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Only Murders in the Building", "o": "https://static.tvmaze.com/uploads/images/original_untouched/586/1466415.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/586/1466415.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Handmaid's Tale", "o": "https://static.tvmaze.com/uploads/images/original_untouched/562/1406667.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/562/1406667.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Say Nothing", "o": "https://static.tvmaze.com/uploads/images/original_untouched/543/1358054.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/543/1358054.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Tell Me Lies", "o": "https://static.tvmaze.com/uploads/images/original_untouched/608/1520588.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/608/1520588.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Interior Chinatown", "o": "https://static.tvmaze.com/uploads/images/original_untouched/544/1360849.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/544/1360849.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Kardashians", "o": "https://static.tvmaze.com/uploads/images/original_untouched/592/1480205.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/592/1480205.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Paradise", "o": "https://static.tvmaze.com/uploads/images/original_untouched/614/1536865.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/614/1536865.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Love Story", "o": "https://static.tvmaze.com/uploads/images/original_untouched/612/1532112.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/612/1532112.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Predator Badlands", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FpHpq9yNUIo6aDoCXEBzjSolywgz.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FpHpq9yNUIo6aDoCXEBzjSolywgz.jpg", "type": "movie", "hot": true}, {"n": "The Perfect Neighbor", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F2NE7yN45zo19o4LJr6JFxDWmh2b.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F2NE7yN45zo19o4LJr6JFxDWmh2b.jpg", "type": "movie", "hot": false}, {"n": "Carry-On", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FbKa9qAg71Kkjz0tOT1gxSAX9Nfv.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FbKa9qAg71Kkjz0tOT1gxSAX9Nfv.jpg", "type": "movie", "hot": false}], "paramount": [{"n": "Yellowstone", "o": "https://static.tvmaze.com/uploads/images/original_untouched/545/1362616.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/545/1362616.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "1923", "o": "https://static.tvmaze.com/uploads/images/original_untouched/557/1392576.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/557/1392576.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Landman", "o": "https://static.tvmaze.com/uploads/images/original_untouched/598/1495770.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/598/1495770.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Tulsa King", "o": "https://static.tvmaze.com/uploads/images/original_untouched/588/1471782.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/588/1471782.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Star Trek: Strange New Worlds", "o": "https://static.tvmaze.com/uploads/images/original_untouched/635/1589217.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/635/1589217.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Lioness", "o": "https://static.tvmaze.com/uploads/images/original_untouched/635/1587727.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/635/1587727.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "FBI", "o": "https://static.tvmaze.com/uploads/images/original_untouched/591/1479841.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/591/1479841.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Dexter: Original Sin", "o": "https://static.tvmaze.com/uploads/images/original_untouched/548/1372007.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/548/1372007.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Criminal Record", "o": "https://static.tvmaze.com/uploads/images/original_untouched/622/1556570.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/622/1556570.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "1883", "o": "https://static.tvmaze.com/uploads/images/original_untouched/486/1215657.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/486/1215657.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Madison", "o": "https://static.tvmaze.com/uploads/images/original_untouched/617/1544046.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/617/1544046.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Mission Impossible The Final Reckoning", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FiKPsC9EFUafRP9SrUznI61getVP.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FiKPsC9EFUafRP9SrUznI61getVP.jpg", "type": "movie", "hot": true}, {"n": "Scream 7", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fjjyuk0edLiW8vOSnlfwWCCLpbh5.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fjjyuk0edLiW8vOSnlfwWCCLpbh5.jpg", "type": "movie", "hot": true}, {"n": "Transformers One", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FiRCgqpdVE4wyLQvGYU3ZP7pAtUc.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FiRCgqpdVE4wyLQvGYU3ZP7pAtUc.jpg", "type": "movie", "hot": false}, {"n": "The Running Man", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FdKL78O9zxczVgjtNcQ9UkbYLzqX.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FdKL78O9zxczVgjtNcQ9UkbYLzqX.jpg", "type": "movie", "hot": false}, {"n": "Regretting You", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fz4gVnxTaks3anTycwKjDmvQSuWt.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fz4gVnxTaks3anTycwKjDmvQSuWt.jpg", "type": "movie", "hot": false}], "peacock": [{"n": "The Traitors", "o": "https://static.tvmaze.com/uploads/images/original_untouched/607/1518729.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/607/1518729.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Poker Face", "o": "https://static.tvmaze.com/uploads/images/original_untouched/567/1419482.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/567/1419482.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "The Paper", "o": "https://static.tvmaze.com/uploads/images/original_untouched/636/1591367.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/636/1591367.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Day of the Jackal", "o": "https://static.tvmaze.com/uploads/images/original_untouched/541/1352923.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/541/1352923.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Bel-Air", "o": "https://static.tvmaze.com/uploads/images/original_untouched/599/1499439.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/599/1499439.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Dr. Death", "o": "https://static.tvmaze.com/uploads/images/original_untouched/490/1225885.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/490/1225885.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Five Nights at Freddy's 2", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FudAxQEORq2I5wxI97N2TEqdhzBE.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FudAxQEORq2I5wxI97N2TEqdhzBE.jpg", "type": "movie", "hot": true}, {"n": "The Wild Robot", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FwTnV3PCVW5O92JMrFvvrRcV39RU.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FwTnV3PCVW5O92JMrFvvrRcV39RU.jpg", "type": "movie", "hot": false}, {"n": "M3GAN 2.0", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FoekamLQrwlJjRNmfaBE4llIvkir.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FoekamLQrwlJjRNmfaBE4llIvkir.jpg", "type": "movie", "hot": false}, {"n": "Bring Her Back", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F1Q3GlCXGYWELifxANYZ5OVMRVZl.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F1Q3GlCXGYWELifxANYZ5OVMRVZl.jpg", "type": "movie", "hot": false}, {"n": "Nosferatu", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F5qGIxdEO841C0tdY8vOdLoRVrr0.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F5qGIxdEO841C0tdY8vOdLoRVrr0.jpg", "type": "movie", "hot": false}], "apple": [{"n": "Severance", "o": "https://static.tvmaze.com/uploads/images/original_untouched/548/1371406.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/548/1371406.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Silo", "o": "https://static.tvmaze.com/uploads/images/original_untouched/631/1577677.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/631/1577677.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Foundation", "o": "https://static.tvmaze.com/uploads/images/original_untouched/573/1433544.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/573/1433544.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Slow Horses", "o": "https://static.tvmaze.com/uploads/images/original_untouched/637/1593462.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/637/1593462.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Ted Lasso", "o": "https://static.tvmaze.com/uploads/images/original_untouched/634/1585930.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/634/1585930.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "The Morning Show", "o": "https://static.tvmaze.com/uploads/images/original_untouched/594/1485135.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/594/1485135.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Pluribus", "o": "https://static.tvmaze.com/uploads/images/original_untouched/592/1481086.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/592/1481086.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Chief of War", "o": "https://static.tvmaze.com/uploads/images/original_untouched/581/1454407.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/581/1454407.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Loot", "o": "https://static.tvmaze.com/uploads/images/original_untouched/594/1485065.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/594/1485065.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Shrinking", "o": "https://static.tvmaze.com/uploads/images/original_untouched/610/1527402.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/610/1527402.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Platonic", "o": "https://static.tvmaze.com/uploads/images/original_untouched/589/1473711.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/589/1473711.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Invasion", "o": "https://static.tvmaze.com/uploads/images/original_untouched/589/1473271.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/589/1473271.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "For All Mankind", "o": "https://static.tvmaze.com/uploads/images/original_untouched/616/1541416.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/616/1541416.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Presumed Innocent", "o": "https://static.tvmaze.com/uploads/images/original_untouched/520/1301035.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/520/1301035.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Chad Powers", "o": "https://static.tvmaze.com/uploads/images/original_untouched/636/1591779.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/636/1591779.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "F1", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F9PXZIUsSDh4alB80jheWX4fhZmy.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F9PXZIUsSDh4alB80jheWX4fhZmy.jpg", "type": "movie", "hot": true}, {"n": "Highest 2 Lowest", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FRFQtinuiHhOnbmJaCn3uzegCYF.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FRFQtinuiHhOnbmJaCn3uzegCYF.jpg", "type": "movie", "hot": false}, {"n": "Mayday", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FvsWgaABsY4QlZJHIbGOVPETTuZj.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FvsWgaABsY4QlZJHIbGOVPETTuZj.jpg", "type": "movie", "hot": true}, {"n": "Blitz", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fqjqmhhc7uLub22mhu4V6DjOBwXM.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fqjqmhhc7uLub22mhu4V6DjOBwXM.jpg", "type": "movie", "hot": false}, {"n": "Killers of the Flower Moon", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FdB6Krk806zeqd0YNp2ngQ9zXteH.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FdB6Krk806zeqd0YNp2ngQ9zXteH.jpg", "type": "movie", "hot": false}], "crave": [{"n": "Schitt's Creek", "o": "https://static.tvmaze.com/uploads/images/original_untouched/279/697623.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/279/697623.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Kim's Convenience", "o": "https://static.tvmaze.com/uploads/images/original_untouched/177/442900.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/177/442900.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Letterkenny", "o": "https://static.tvmaze.com/uploads/images/original_untouched/436/1092299.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/436/1092299.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Son of a Critch", "o": "https://static.tvmaze.com/uploads/images/original_untouched/501/1253400.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/501/1253400.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Workin' Moms", "o": "https://static.tvmaze.com/uploads/images/original_untouched/150/375471.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/150/375471.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Coroner", "o": "https://static.tvmaze.com/uploads/images/original_untouched/430/1076828.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/430/1076828.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Sort Of", "o": "https://static.tvmaze.com/uploads/images/original_untouched/321/802947.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/321/802947.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Little Bird", "o": "https://static.tvmaze.com/uploads/images/original_untouched/457/1144103.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/457/1144103.jpg", "type": "show", "hot": true, "net": "", "yr": ""}, {"n": "Bitten", "o": "https://static.tvmaze.com/uploads/images/original_untouched/0/15.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/0/15.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Between", "o": "https://static.tvmaze.com/uploads/images/original_untouched/61/153690.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/61/153690.jpg", "type": "show", "hot": false, "net": "", "yr": ""}, {"n": "Wicked (2024 film)", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fj5AVKdTm8mG7tjoxIPU5V7riaDy.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fj5AVKdTm8mG7tjoxIPU5V7riaDy.jpg", "type": "movie", "hot": true, "yr": "2024"}, {"n": "A Minecraft Movie", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FyFHHfHcUgGAxziP1C3lLt0q2T4s.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FyFHHfHcUgGAxziP1C3lLt0q2T4s.jpg", "type": "movie", "hot": false}, {"n": "Dune Part Two", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F6izwz7rsy95ARzTR3poZ8H6c5pp.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F6izwz7rsy95ARzTR3poZ8H6c5pp.jpg", "type": "movie", "hot": false}, {"n": "Sinners", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F61DJMqFUFX6222ctnzuQEJLYdUT.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F61DJMqFUFX6222ctnzuQEJLYdUT.jpg", "type": "show", "hot": true}, {"n": "Superman", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fldyfo0BKmz5rWtJJKCvwaNS4cJT.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fldyfo0BKmz5rWtJJKCvwaNS4cJT.jpg", "type": "movie", "hot": false}]};
+Object.assign(POSTERS,{"tubi": [{"n": "The Freak Brothers", "o": "https://static.tvmaze.com/uploads/images/original_untouched/630/1577066.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/630/1577066.jpg", "type": "show", "hot": true, "net": "", "yr": "2021"}, {"n": "Flatbush Misdemeanors", "o": "https://static.tvmaze.com/uploads/images/original_untouched/416/1040089.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/416/1040089.jpg", "type": "show", "hot": true, "net": "", "yr": "2021"}, {"n": "Killing It", "o": "https://static.tvmaze.com/uploads/images/original_untouched/404/1012074.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/404/1012074.jpg", "type": "show", "hot": false, "net": "", "yr": "2022"}, {"n": "The Nevers", "o": "https://static.tvmaze.com/uploads/images/original_untouched/305/764057.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/305/764057.jpg", "type": "show", "hot": false, "net": "", "yr": "2021"}, {"n": "Alert: Missing Persons Unit", "o": "https://static.tvmaze.com/uploads/images/original_untouched/558/1396027.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/558/1396027.jpg", "type": "show", "hot": false, "net": "", "yr": "2023"}, {"n": "Cocaine Bear", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video126/v4/74/97/74/749774ff-8778-c6d0-1c79-05ff758bcc71/CocaineBear_LSR_2000x3000.lsr/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video126/v4/74/97/74/749774ff-8778-c6d0-1c79-05ff758bcc71/CocaineBear_LSR_2000x3000.lsr/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2023"}, {"n": "M3GAN 2.0", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FoekamLQrwlJjRNmfaBE4llIvkir.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FoekamLQrwlJjRNmfaBE4llIvkir.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}, {"n": "The Running Man", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FdKL78O9zxczVgjtNcQ9UkbYLzqX.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FdKL78O9zxczVgjtNcQ9UkbYLzqX.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}], "crunchyroll": [{"n": "Demon Slayer", "o": "https://static.tvmaze.com/uploads/images/original_untouched/456/1140750.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/456/1140750.jpg", "type": "show", "hot": true, "net": "", "yr": "2019"}, {"n": "Attack on Titan", "o": "https://static.tvmaze.com/uploads/images/original_untouched/632/1582290.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/632/1582290.jpg", "type": "show", "hot": true, "net": "", "yr": "2013"}, {"n": "Jujutsu Kaisen", "o": "https://static.tvmaze.com/uploads/images/original_untouched/608/1521905.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/608/1521905.jpg", "type": "show", "hot": false, "net": "", "yr": "2020"}, {"n": "One Piece", "o": "https://static.tvmaze.com/uploads/images/original_untouched/617/1543011.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/617/1543011.jpg", "type": "show", "hot": false, "net": "", "yr": "2023"}, {"n": "Chainsaw Man", "o": "https://static.tvmaze.com/uploads/images/original_untouched/422/1056726.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/422/1056726.jpg", "type": "show", "hot": false, "net": "", "yr": "2022"}, {"n": "Spy×Family", "o": "https://static.tvmaze.com/uploads/images/original_untouched/590/1477119.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/590/1477119.jpg", "type": "show", "hot": false, "net": "", "yr": "2022"}, {"n": "Jujutsu Kaisen 0: The Movie", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video112/v4/0f/77/92/0f779248-9d0e-df7f-5ac1-2ce9d6370540/pr_source.jpg/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video112/v4/0f/77/92/0f779248-9d0e-df7f-5ac1-2ce9d6370540/pr_source.jpg/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2021"}, {"n": "Demon Slayer: Infinity Castle", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F8uYxx23KyDnbDkA3eQSNECVeOiS.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F8uYxx23KyDnbDkA3eQSNECVeOiS.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}], "mgm": [{"n": "FROM", "o": "https://static.tvmaze.com/uploads/images/original_untouched/621/1554646.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/621/1554646.jpg", "type": "show", "hot": true, "net": "", "yr": "2022"}, {"n": "Godfather of Harlem", "o": "https://static.tvmaze.com/uploads/images/original_untouched/559/1398402.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/559/1398402.jpg", "type": "show", "hot": true, "net": "", "yr": "2019"}, {"n": "Billy the Kid", "o": "https://static.tvmaze.com/uploads/images/original_untouched/598/1496285.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/598/1496285.jpg", "type": "show", "hot": false, "net": "", "yr": "2022"}, {"n": "Beacon 23", "o": "https://static.tvmaze.com/uploads/images/original_untouched/512/1281473.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/512/1281473.jpg", "type": "show", "hot": false, "net": "", "yr": "2023"}, {"n": "Domina", "o": "https://static.tvmaze.com/uploads/images/original_untouched/499/1248933.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/499/1248933.jpg", "type": "show", "hot": false, "net": "", "yr": "2021"}, {"n": "No Time to Die", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video116/v4/39/41/f0/3941f04b-8732-f208-1617-8f0428a3f533/pr_source.jpg/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video116/v4/39/41/f0/3941f04b-8732-f208-1617-8f0428a3f533/pr_source.jpg/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2021"}, {"n": "Creed III", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video126/v4/1b/ba/f7/1bbaf7f3-84a5-5b50-c51b-7a69f4070c4c/pr_source.lsr/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video126/v4/1b/ba/f7/1bbaf7f3-84a5-5b50-c51b-7a69f4070c4c/pr_source.lsr/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2023"}], "starz": [{"n": "Outlander", "o": "https://static.tvmaze.com/uploads/images/original_untouched/616/1541142.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/616/1541142.jpg", "type": "show", "hot": true, "net": "", "yr": "2014"}, {"n": "Power", "o": "https://static.tvmaze.com/uploads/images/original_untouched/48/122426.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/48/122426.jpg", "type": "show", "hot": true, "net": "", "yr": "2014"}, {"n": "BMF", "o": "https://static.tvmaze.com/uploads/images/original_untouched/566/1417204.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/566/1417204.jpg", "type": "show", "hot": false, "net": "", "yr": "2021"}, {"n": "Spartacus", "o": "https://static.tvmaze.com/uploads/images/original_untouched/354/886339.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/354/886339.jpg", "type": "show", "hot": false, "net": "", "yr": "2010"}, {"n": "Black Sails", "o": "https://static.tvmaze.com/uploads/images/original_untouched/501/1253514.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/501/1253514.jpg", "type": "show", "hot": false, "net": "", "yr": "2014"}, {"n": "The Blackening", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video116/v4/41/7a/2e/417a2e1b-a41c-ec1b-1010-5a2b773364d3/pr_source.lsr/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video116/v4/41/7a/2e/417a2e1b-a41c-ec1b-1010-5a2b773364d3/pr_source.lsr/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2023"}, {"n": "Nosferatu", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F5qGIxdEO841C0tdY8vOdLoRVrr0.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F5qGIxdEO841C0tdY8vOdLoRVrr0.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}, {"n": "The Wild Robot", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FwTnV3PCVW5O92JMrFvvrRcV39RU.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FwTnV3PCVW5O92JMrFvvrRcV39RU.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}], "amc": [{"n": "The Walking Dead", "o": "https://static.tvmaze.com/uploads/images/original_untouched/424/1061900.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/424/1061900.jpg", "type": "show", "hot": true, "net": "", "yr": "2010"}, {"n": "Better Call Saul", "o": "https://static.tvmaze.com/uploads/images/original_untouched/501/1253515.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/501/1253515.jpg", "type": "show", "hot": true, "net": "", "yr": "2015"}, {"n": "Anne Rice's Interview with the Vampire", "o": "https://static.tvmaze.com/uploads/images/original_untouched/469/1173859.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/469/1173859.jpg", "type": "show", "hot": false, "net": "", "yr": "2022"}, {"n": "Dark Winds", "o": "https://static.tvmaze.com/uploads/images/original_untouched/613/1534425.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/613/1534425.jpg", "type": "show", "hot": false, "net": "", "yr": "2022"}, {"n": "Gangs of London", "o": "https://static.tvmaze.com/uploads/images/original_untouched/558/1395281.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/558/1395281.jpg", "type": "show", "hot": false, "net": "", "yr": "2020"}, {"n": "Talk to Me", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video211/v4/d1/e5/57/d1e557e1-38a6-cd18-c72f-aeaca88542d0/UCMONEGMBH_SPRICHMITMIR_UDB046_en_fr-artwork_2000x3000_WW.jpg/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video211/v4/d1/e5/57/d1e557e1-38a6-cd18-c72f-aeaca88542d0/UCMONEGMBH_SPRICHMITMIR_UDB046_en_fr-artwork_2000x3000_WW.jpg/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2023"}, {"n": "Nope", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video112/v4/c3/af/21/c3af2106-443a-f2a4-03fb-73e83879096b/pr_source.lsr/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video112/v4/c3/af/21/c3af2106-443a-f2a4-03fb-73e83879096b/pr_source.lsr/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2022"}], "britbox": [{"n": "Line of Duty", "o": "https://static.tvmaze.com/uploads/images/original_untouched/199/499692.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/199/499692.jpg", "type": "show", "hot": true, "net": "", "yr": "2012"}, {"n": "Vera", "o": "https://static.tvmaze.com/uploads/images/original_untouched/550/1376455.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/550/1376455.jpg", "type": "show", "hot": true, "net": "", "yr": "2011"}, {"n": "Shetland", "o": "https://static.tvmaze.com/uploads/images/original_untouched/596/1491325.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/596/1491325.jpg", "type": "show", "hot": false, "net": "", "yr": "2013"}, {"n": "Death in Paradise", "o": "https://static.tvmaze.com/uploads/images/original_untouched/611/1528316.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/611/1528316.jpg", "type": "show", "hot": false, "net": "", "yr": "2011"}, {"n": "Father Brown", "o": "https://static.tvmaze.com/uploads/images/original_untouched/17/43213.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/17/43213.jpg", "type": "show", "hot": false, "net": "", "yr": "2013"}, {"n": "Blitz", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fqjqmhhc7uLub22mhu4V6DjOBwXM.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2Fqjqmhhc7uLub22mhu4V6DjOBwXM.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}], "plex": [{"n": "Psych", "o": "https://static.tvmaze.com/uploads/images/original_untouched/4/11255.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/4/11255.jpg", "type": "show", "hot": true, "net": "", "yr": "2006"}, {"n": "Saved by the Bell", "o": "https://static.tvmaze.com/uploads/images/original_untouched/7/17943.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/7/17943.jpg", "type": "show", "hot": true, "net": "", "yr": "1989"}, {"n": "Baywatch", "o": "https://static.tvmaze.com/uploads/images/original_untouched/206/515174.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/206/515174.jpg", "type": "show", "hot": false, "net": "", "yr": "1989"}, {"n": "The Carol Burnett Show", "o": "https://static.tvmaze.com/uploads/images/original_untouched/23/59091.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/23/59091.jpg", "type": "show", "hot": false, "net": "", "yr": "1967"}, {"n": "Degrassi", "o": "https://static.tvmaze.com/uploads/images/original_untouched/18/47039.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/18/47039.jpg", "type": "show", "hot": false, "net": "", "yr": "2001"}, {"n": "The Terminator", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video128/v4/6a/64/74/6a647480-3d2b-c40f-0901-d5b30b35ea45/pr_source.lsr/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video128/v4/6a/64/74/6a647480-3d2b-c40f-0901-d5b30b35ea45/pr_source.lsr/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "1984"}, {"n": "Ghostbusters: Frozen Empire", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video211/v4/16/61/00/1661001d-b8e8-25bd-4acd-a4200b10af0c/ed49b453-e196-48b5-9ee9-c6ba344ad67e_DP_9140848_GHOSTBUSTERSFROZENEMPIRE_2000x3000LSR_HEKeyArt.lsr/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video211/v4/16/61/00/1661001d-b8e8-25bd-4acd-a4200b10af0c/ed49b453-e196-48b5-9ee9-c6ba344ad67e_DP_9140848_GHOSTBUSTERSFROZENEMPIRE_2000x3000LSR_HEKeyArt.lsr/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2024"}, {"n": "Dune: Part Two", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F6izwz7rsy95ARzTR3poZ8H6c5pp.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F6izwz7rsy95ARzTR3poZ8H6c5pp.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}], "roku": [{"n": "Slip", "o": "https://static.tvmaze.com/uploads/images/original_untouched/458/1145741.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/458/1145741.jpg", "type": "show", "hot": true, "net": "", "yr": "2023"}, {"n": "Swimming with Sharks", "o": "https://static.tvmaze.com/uploads/images/original_untouched/399/999424.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/399/999424.jpg", "type": "show", "hot": true, "net": "", "yr": "2022"}, {"n": "Most Dangerous Game", "o": "https://static.tvmaze.com/uploads/images/original_untouched/599/1497762.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/599/1497762.jpg", "type": "show", "hot": false, "net": "", "yr": "2020"}, {"n": "The Great American Baking Show", "o": "https://static.tvmaze.com/uploads/images/original_untouched/359/898300.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/359/898300.jpg", "type": "show", "hot": false, "net": "", "yr": "2015"}, {"n": "Doomlands", "o": "https://static.tvmaze.com/uploads/images/original_untouched/393/982602.jpg", "m": "https://static.tvmaze.com/uploads/images/medium_portrait/393/982602.jpg", "type": "show", "hot": false, "net": "", "yr": "2022"}, {"n": "The Menu", "o": "https://is1-ssl.mzstatic.com/image/thumb/Video51/v4/b2/5d/f8/b25df8fa-ca68-fa7a-4319-45f7fb53ac82/the_menu_poster.jpg/600x600bb.jpg", "m": "https://is1-ssl.mzstatic.com/image/thumb/Video51/v4/b2/5d/f8/b25df8fa-ca68-fa7a-4319-45f7fb53ac82/the_menu_poster.jpg/600x600bb.jpg", "type": "movie", "hot": false, "net": "", "yr": "2016"}, {"n": "F1", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F9PXZIUsSDh4alB80jheWX4fhZmy.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F9PXZIUsSDh4alB80jheWX4fhZmy.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}, {"n": "Mayday", "o": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FvsWgaABsY4QlZJHIbGOVPETTuZj.jpg", "m": "https://images.weserv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2FvsWgaABsY4QlZJHIbGOVPETTuZj.jpg", "type": "movie", "hot": false, "net": "", "yr": ""}]});
+const NF_PATH = "M140.803 258.904c-15.404 2.705-31.079 3.516-47.294 5.676l-49.458-144.856v151.073c-15.404 1.621-29.457 3.783-44.051 5.945v-276.742h41.08l56.212 157.021v-157.021h43.511v258.904zm85.131-157.558c16.757 0 42.431-.811 57.835-.811v43.24c-19.189 0-41.619 0-57.835.811v64.322c25.405-1.621 50.809-3.785 76.482-4.596v41.617l-119.724 9.461v-255.39h119.724v43.241h-76.482v58.105zm237.284-58.104h-44.862v198.908c-14.594 0-29.188 0-43.239.539v-199.447h-44.862v-43.242h132.965l-.002 43.242zm70.266 55.132h59.187v43.24h-59.187v98.104h-42.433v-239.718h120.808v43.241h-78.375v55.133zm148.641 103.507c24.594.539 49.456 2.434 73.51 3.783v42.701c-38.646-2.434-77.293-4.863-116.75-5.676v-242.689h43.24v201.881zm109.994 49.457c13.783.812 28.377 1.623 42.43 3.242v-254.58h-42.43v251.338zm231.881-251.338l-54.863 131.615 54.863 145.127c-16.217-2.162-32.432-5.135-48.648-7.838l-31.078-79.994-31.617 73.51c-15.678-2.705-30.812-3.516-46.484-5.678l55.672-126.75-50.269-129.992h46.482l28.377 72.699 30.27-72.699h47.295z";
+const NF_AR = 3.700197;
+/* app */
+const $=s=>document.querySelector(s), cv=$('#cv'), ctx=cv.getContext('2d');
+const LS='bannerStudio.v2';
+let saved={};try{const raw=localStorage.getItem(LS);if(raw)saved=JSON.parse(raw)||{}}catch(e){saved={}}
+let st=sanitize(Object.assign({brand:'netflix',autoFill:true,guides:false,preset:'ref',fmt:'png',scale:1,accentOverride:null,logoText:'',mtype:'mix',cards:[]},saved));
+if(typeof saved.customLogo==='string'&&saved.customLogo.startsWith('data:')&&saved.customLogo.length<2e5)st._logoUrl=saved.customLogo;
+if(typeof saved.customBg==='string'&&saved.customBg.startsWith('data:')&&saved.customBg.length<2e5)st._bgUrl=saved.customBg;
+/* share deep-link (#b<enc>) beats storage; oversized links degrade gracefully */
+let fromHash=null,hashErr='';
+try{const h=(typeof location!=='undefined'&&location.hash)||'';
+  if(h.startsWith('#b')){fromHash=decSpec(h.slice(2));
+    if(fromHash&&fromHash.__tooBig){hashErr='share link too long — loading saved design instead';fromHash=null}
+    else if(fromHash){st=sanitize(Object.assign({brand:'netflix',autoFill:true,guides:false,preset:'ref',fmt:'png',scale:1,accentOverride:null,logoText:'',mtype:'mix',cards:[]},fromHash));
+      if(fromHash.customLogo&&fromHash.customLogo.startsWith('data:')&&fromHash.customLogo.length<2e5)st._logoUrl=fromHash.customLogo;if(fromHash.customBg&&fromHash.customBg.startsWith('data:')&&fromHash.customBg.length<2e5)st._bgUrl=fromHash.customBg}}}catch(e){hashErr='share link unreadable';fromHash=null}
+const VB=276.742,VW=1024;
+let imgs=new Map(),logoBox=null,lastContrast=0,clamped=false,snapFlash=null;
+let _bgImg=null;
+
+let svT=0;
+const save=()=>{clearTimeout(svT);svT=setTimeout(()=>{try{_save()}catch(e){}},250)};
+function _save(){try{const o={...st,
+  cards:(st.cards||[]).map(c=>({n:c.n,o:c.o||'',m:c.m||'',hot:!!c.hot,type:c.type,url:(c.url&&(c.url.startsWith('http')||c.url.startsWith('data:')))?c.url:''}))};const lg=o._logoUrl&&o._logoUrl.startsWith('data:')&&o._logoUrl.length<2e5?o._logoUrl:null;delete o._logoUrl;
+  if(lg)o.customLogo=lg;const bg=o._bgUrl&&o._bgUrl.startsWith('data:')&&o._bgUrl.length<2e5?o._bgUrl:null;delete o._bgUrl;
+  if(bg)o.customBg=bg;localStorage.setItem(LS,JSON.stringify(o))}catch(e){}}
+const setStatus=m=>{$('#stMsg').textContent=m||''};
+/* error ring buffer (50, localStorage) + async-safe status */
+const DIAG_LS='bannerStudio.diag';
+let diagRing=[];try{const r=JSON.parse(localStorage.getItem(DIAG_LS)||'[]');if(Array.isArray(r))diagRing=r.slice(-RING_MAX)}catch(e){}
+function diag(kind,msg){diagRing=ringAdd(diagRing,{kind,msg});try{localStorage.setItem(DIAG_LS,JSON.stringify(diagRing))}catch(e){}}
+const clip=txt=>new Promise(res=>{
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>res(true),()=>res(fallback()));return}
+  res(fallback());
+  function fallback(){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity=0;document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();return ok}});
+const RMq=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion:reduce)'):{matches:false};
+const RM=!!(RMq&&RMq.matches);
+const loadImg=url=>{if(!url)return Promise.resolve(null);
+  if(imgs.has(url))return imgs.get(url);
+  const p=new Promise(res=>{let tried=0;
+    const go=()=>{const im=new Image();im.crossOrigin='anonymous';
+      const to=setTimeout(()=>fail(),7000);
+      const ok=()=>{clearTimeout(to);res(im)};
+      const fail=()=>{clearTimeout(to);if(++tried<2)go();else res(null)};
+      im.onload=ok;im.onerror=fail;im.src=tried?url+(url.includes('?')?'&':'?')+'retry=1':url};
+    go()});
+  imgs.set(url,p);return p};
+
+function fontFor(B,px){
+  return B.logo.fam==='script'?`${B.logo.weight||700} ${px}px 'Brush Script MT','Segoe Script',cursive`
+    :`${B.logo.weight||700} ${px}px BebasSrc,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif`}
+function placeholder(name,tint){
+  const c=document.createElement('canvas');c.width=500;c.height=750;const x=c.getContext('2d');
+  const h=fnv(name)%360,g=x.createLinearGradient(0,0,0,750);
+  g.addColorStop(0,`hsl(${h},38%,22%)`);g.addColorStop(1,`hsl(${(h+40)%360},45%,8%)`);
+  x.fillStyle=g;x.fillRect(0,0,500,750);
+  x.fillStyle='rgba(255,255,255,.06)';for(let i=0;i<120;i++){const r=fnv(name+i)%40+6;x.beginPath();x.arc(fnv(name+'x'+i)%500,fnv(name+'y'+i)%750,r*.4,0,7);x.fill()}
+  x.fillStyle='#fff';x.font='900 64px BebasSrc,system-ui';x.textAlign='center';
+  const words=name.toUpperCase().split(' ');let lines=[],cur='';
+  for(const w of words){if((cur+' '+w).trim().length>13){lines.push(cur);cur=w}else cur=(cur+' '+w).trim()}
+  if(cur)lines.push(cur);lines.slice(-3).forEach((l,i)=>x.fillText(l,250,600+i*60));
+  x.fillStyle=tint;x.fillRect(196,470,12,26);x.fillStyle='#ffffffc8';x.font='700 20px BebasSrc,system-ui';
+  x.fillText('ONLY ON '+(BRANDS[st.brand]?BRANDS[st.brand].label.replace(/ ◦/,'').toUpperCase():''),250,490);
+  return c}
+
+function drawCards(x,L){
+  const rr=(a,b,w,h,r)=>{x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()};
+  for(let i=0;i<st.cards.length;i++){
+    const c=st.cards[i],cx=L.x0+i*L.stepX,cy=L.y0+i*L.stepY;
+    x.save();x.translate(cx,cy);x.rotate(L.rot);
+    x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=.06*L.cw;x.shadowOffsetY=.028*L.cw;
+    rr(-L.cw/2,-L.ch/2,L.cw,L.ch,L.rad);x.fillStyle='#0e1013';x.fill();
+    x.shadowColor='transparent';x.clip();
+    const im=c._forcePh?null:c._img;
+    if(im){{const cr=fitCrop(im.naturalWidth||im.width,im.naturalHeight||im.height,L.cw,L.ch);
+      x.drawImage(im,cr.sx,cr.sy,cr.sw,cr.sh,-L.cw/2,-L.ch/2,L.cw,L.ch)}}
+    else x.drawImage(placeholder(c.n,BRANDS[st.brand].tint),-L.cw/2,-L.ch/2,L.cw,L.ch);
+    rr(-L.cw/2,-L.ch/2,L.cw,L.ch,L.rad);x.strokeStyle='rgba(255,255,255,.18)';x.lineWidth=1.6;x.stroke();
+    x.restore()}}
+
+function drawLogo(x,W,H,L){
+  const B=BRANDS[st.brand],col=st.accentOverride||B.accent;
+  let w=L.logo.W;
+  const x0=L.logo.L,cy=L.logo.cy;
+  const im=loadLogo._img,crop=loadLogo._crop||{sx:0,sy:0,sw:im?im.width:1,sh:im?im.height:1};
+  let mode=im&&st._logoUrl?'image':(B.logo.mode==='vector'&&!st.logoText?'vector':'text');
+  // true height:width ratio per mark, then collision-aware clamp
+  let ratio;
+  if(mode==='vector')ratio=VB/VW;
+  else if(mode==='image')ratio=crop.sh/crop.sw;
+  else{
+    const fam0=fontFor(B,100);x.font=fam0;
+    const t0=(st.logoText||B.logo.text||B.label).trim();
+    const tr0=(B.logo.tracking||0)*100/2.6*0;   // tracking scales with font size; measured at base below
+    const mm=x.measureText(t0);
+    const iw=(mm.width||80)+tr0*(t0.length-1)+1e-6;
+    ratio=(x.measureText('Xg').actualBoundingBoxAscent+x.measureText('Xg').actualBoundingBoxDescent||70)/iw;
+  }
+  const maxW=maxLogoWidth(W,H,st,st.cards.length,ratio);
+  w=Math.min(w,maxW);clamped=L.logo.W-w>0.5;
+  x.fillStyle=col;
+  if(mode==='image'){
+    const h=w*crop.sh/crop.sw;
+    x.drawImage(im,crop.sx,crop.sy,crop.sw,crop.sh,x0,cy-h/2,w,h);
+    logoBox={x:x0,y:cy-h/2,w,h};return}
+  if(mode==='vector'){const h=w*VB/VW,s=h/VB;
+    x.save();x.translate(x0,cy-h/2);x.scale(s,s);x.fill(new Path2D(NF_PATH));x.restore();
+    logoBox={x:x0,y:cy-h/2,w,h};return}
+  const txt=(st.logoText||B.logo.text||B.label).trim();
+  const meas=px0=>{x.font=fontFor(B,px0);let tw=0;
+    const tr=(B.logo.tracking||0)*px0;
+    for(const ch of txt)tw+=x.measureText(ch).width+tr;
+    const m=x.measureText(txt);
+    return{tw:tw-(txt.length?0:0)-(B.logo.tracking?tr:0),tr,
+      top:m.actualBoundingBoxAscent||m.fontBoundingBoxAscent||px0*.7,
+      bot:m.actualBoundingBoxDescent||0}};
+  const base=meas(100);
+  const size=Math.max(8,Math.min(1e4,100*w/Math.max(1e-6,base.tw)));   // ink width == anchor width
+  const m2=meas(size);
+  x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle=col;
+  const h=m2.top+m2.bot,by=cy+h/2-m2.top;
+  let pxx=x0;for(const ch of txt){x.fillText(ch,pxx,by);pxx+=x.measureText(ch).width+m2.tr}
+  logoBox={x:x0,y:by-m2.top,w:m2.tw,h}}
+
+function drawTag(x,W,H){
+  const B=BRANDS[st.brand];
+  if(st.kicker&&logoBox){const t=String(st.kicker).trim().toUpperCase();if(t){
+    const fs=Math.max(9,W*0.017);
+    x.save();x.font=`800 ${fs}px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif`;
+    x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle=st.accentOverride||B.accent;
+    x.fillText(t,logoBox.x,Math.max(fs,logoBox.y-fs*1.15));x.restore()}}
+  if(st.pill){const t=String(st.pill).trim();if(t){
+    const col=st.pillColor||B.accent;
+    const fs=Math.max(10,W*0.016);x.font=`700 ${fs}px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif`;
+    const tw=x.measureText(t).width,pad=fs*.7,hgt=fs*1.7,m=W*.032,r=hgt/2;
+    let bx,by;
+    if(st.pillPos==='tl'){bx=m;by=m}
+    else if(st.pillPos==='bl'){bx=m;by=H-m-hgt}
+    else if(st.pillPos==='br'){bx=W-m-tw-pad*2;by=H-m-hgt}
+    else{bx=W-m-tw-pad*2;by=m}
+    x.save();x.beginPath();
+    x.moveTo(bx+r,by);x.arcTo(bx+tw+pad*2,by,bx+tw+pad*2,by+hgt,r);x.arcTo(bx+tw+pad*2,by+hgt,bx,by+hgt,r);x.arcTo(bx,by+hgt,bx,by,r);x.arcTo(bx,by,bx+tw+pad*2,by,r);x.closePath();
+    x.fillStyle=col;x.fill();
+    x.fillStyle=contrast(col,'#000000')>=2.6?'#0b0c0e':'#ffffff';
+    x.textAlign='left';x.textBaseline='middle';
+    x.fillText(t,bx+pad,by+hgt/2+fs*.06);x.restore()}}
+}
+const loadLogo=()=>{if(!st._logoUrl){loadLogo._img=null;loadLogo._crop=null;return}
+  loadImg(st._logoUrl).then(im=>{if(!im)return;loadLogo._img=im;
+    const s=document.createElement('canvas'),sc=512/im.width;s.width=512;s.height=Math.max(1,Math.round(im.height*sc));
+    const x=s.getContext('2d');x.drawImage(im,0,0,s.width,s.height);
+    const d=x.getImageData(0,0,s.width,s.height).data;let x0=1e9,y0=1e9,x1=-1,y1=-1;
+    for(let yy=0;yy<s.height;yy++)for(let xx=0;xx<s.width;xx++){if(d[(yy*s.width+xx)*4+3]>16){if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
+    if(x1<0){loadLogo._crop=null}else loadLogo._crop={sx:x0/sc,sy:y0/sc,sw:(x1-x0+1)/sc,sh:(y1-y0+1)/sc};
+    render()})};
+
+const bgCache=new Map();
+function background(W,H){
+  const tint=(st.accentOverride||BRANDS[st.brand].tint);
+  const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st._bgUrl?(_bgImg?'y':'w'):'n'].join('|');
+  if(bgCache.has(key))return bgCache.get(key);
+  const A=document.createElement('canvas');A.width=W;A.height=H;const x=A.getContext('2d');
+  x.fillStyle=st.bgHex;x.fillRect(0,0,W,H);
+  if(_bgImg){const cr=fitCrop(_bgImg.naturalWidth||_bgImg.width,_bgImg.naturalHeight||_bgImg.height,W,H);
+    x.drawImage(_bgImg,cr.sx,cr.sy,cr.sw,cr.sh,0,0,W,H);
+    x.fillStyle='rgba(6,8,12,.6)';x.fillRect(0,0,W,H);
+    const tg=x.createLinearGradient(0,0,W,H);
+    tg.addColorStop(0,rgba(tint,.22));tg.addColorStop(1,rgba(tint,0));x.fillStyle=tg;x.fillRect(0,0,W,H)}
+  let g=x.createRadialGradient(.26*W,.5*H,0,.26*W,.5*H,.62*W);
+  g.addColorStop(0,rgba(tint,st.glow));g.addColorStop(1,rgba(tint,0));x.fillStyle=g;x.fillRect(0,0,W,H);
+  g=x.createRadialGradient(.8*W,.55*H,0,.8*W,.55*H,.5*W);
+  const warm=mix(BRANDS[st.brand].tint,'#ffffff',.55);
+  g.addColorStop(0,rgba(warm,st.glow*.5));g.addColorStop(1,rgba(warm,0));x.fillStyle=g;x.fillRect(0,0,W,H);
+  if(st.vignette>0){g=x.createRadialGradient(.5*W,.5*H,Math.min(W,H)*.3,.5*W,.5*H,Math.hypot(W,H)*.55);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${st.vignette*.5})`);x.fillStyle=g;x.fillRect(0,0,W,H)}
+  if(bgCache.size>8)bgCache.clear();bgCache.set(key,A);return A}
+
+function renderFrame(W,H){
+  const A=background(W,H);
+  const a=A.getContext('2d');
+  const B=BRANDS[st.brand];const L=layout(W,H,st,st.cards.length||1);
+  // true contrast measurement: mean bg color under the logo zone
+  try{const zone=a.getImageData(Math.max(0,L.logo.L|0),Math.max(0,(L.logo.cy-L.logo.W/7.4)|0),Math.min(W-(L.logo.L|0),(L.logo.W|0)||10),Math.min(H,((L.logo.W/3.7)|0)||10)).data;
+    let r=0,g=0,b=0,n=zone.length/4;for(let i=0;i<zone.length;i+=4){r+=zone[i];g+=zone[i+1];b+=zone[i+2]}
+    lastContrast=contrast(st.accentOverride||B.accent,rgbHex(r/n,g/n,b/n))}catch(e){lastContrast=contrast(st.accentOverride||B.accent,st.bgHex)}
+  drawCards(a,L);drawLogo(a,W,H,L);drawTag(a,W,H);
+  if(st.guides){a.setLineDash([6,6]);a.lineWidth=Math.max(1,W/1200);
+    const cs=logoBox?logoBox.h*.5:0;a.strokeStyle='rgba(255,255,255,.3)';
+    if(logoBox)a.strokeRect(logoBox.x-cs,logoBox.y-cs,logoBox.w+2*cs,logoBox.h+2*cs);
+    if(clamped){a.strokeStyle='#ffb454';a.strokeRect(logoBox.x,logoBox.y-logoBox.h*.1,logoBox.w,logoBox.h*1.2)}
+    a.strokeStyle='rgba(255,255,255,.14)';const s=Math.min(W,H)*.045;a.strokeRect(s,s,W-2*s,H-2*s);
+    a.beginPath();a.moveTo(W/3,0);a.lineTo(W/3,H);a.moveTo(2*W/3,0);a.lineTo(2*W/3,H);a.stroke();a.setLineDash([])}
+  if(snapFlash){a.setLineDash([10,6]);a.strokeStyle='#6fd3ff';a.lineWidth=2;
+    for(const s of snapFlash){a.beginPath();a.moveTo(s.x||0,0);a.lineTo(s.x||0,H);a.moveTo(0,s.y||0);a.lineTo(W,s.y||0);a.stroke()}a.setLineDash([])}
+  const O=document.createElement('canvas');O.width=W;O.height=H;const o=O.getContext('2d');
+  o.fillStyle='#0b0c0e';o.fillRect(0,0,W,H);
+  const r=st.frame*(W/1800);
+  o.beginPath();o.moveTo(r,0);o.arcTo(W,0,W,H,r);o.arcTo(W,H,0,H,r);o.arcTo(0,H,0,0,r);o.arcTo(0,0,W,0,r);o.closePath();o.clip();
+  o.drawImage(A,0,0);return O}
+
+let raf=0;
+function render(){cancelAnimationFrame(raf);const job=()=>{
+  for(const c of st.cards)if(c._img===undefined){c._img=null;
+    loadImg(c.url||c.o||c.m).then(im=>{c._img=im;paint()})}
+  paint()};
+  if(RM){job();return}
+  raf=requestAnimationFrame(job)}
+function paint(){try{_paint()}catch(e){diag('render',(e&&e.message)||String(e));
+  setStatus('Render failed — your design is still safe · open Diagnostics for details')}}
+function _paint(){const[W,H]=PRESETS[st.preset];const O=renderFrame(W,H);
+  cv.width=W;cv.height=H;ctx.drawImage(O,0,0);
+  const B=BRANDS[st.brand];
+  $('#stBrand').innerHTML=`Brand <b>${B.label}</b> · ${st.cards.length} cards · ${W}×${H}`;
+  $('#stContrast').innerHTML=`Logo/bg contrast <b class="${lastContrast>=2.25?'ok':'warn'}">${lastContrast.toFixed(2)}:1</b>`+
+    (lastContrast<2.25?` · <b>min 2.25:1</b> — <button class="act" onclick="st.accentOverride='#FFFFFF';render()">use white mark</button>`:'')+
+    (clamped?' · <span class="warn">width clamped for clear-space</span>':'');
+  save();histTick()}
+
+/* ---- UI ---- */
+const bd=$('#brands');
+for(const k in BRANDS){const b=BRANDS[k];const el=document.createElement('button');
+  el.innerHTML=`<span class="dot" style="background:${b.accent==='#FFFFFF'?'#ffffff':b.tint}"></span>${b.label}`;
+  el.dataset.b=k;el.onclick=()=>{st.brand=k;bgCache.clear();if(st.autoFill)fillSet(false);syncChips();drawCardsUI();render()};bd.appendChild(el)}
+const syncChips=()=>[...bd.children].forEach(e=>e.classList.toggle('on',e.dataset.b===st.brand));
+function fillSet(hot){
+  let src=(POSTERS[st.brand]||[]).filter(r=>r.o||r.m).filter(r=>st.mtype==='mix'||r.type===st.mtype);
+  if(!src.length)src=(POSTERS[st.brand]||[]).filter(r=>r.o||r.m);
+  if(hot)src=[...src.filter(r=>r.hot),...src.filter(r=>!r.hot)];
+  st.cards=src.slice(0,6).map(r=>({n:r.n,o:r.o,m:r.m,hot:r.hot,type:r.type,_img:undefined}));render()}
+function addCard(e){if(st.cards.length>=st.maxCards){setStatus(`max ${st.maxCards} cards — remove one first`);return}
+  setStatus('');st.cards.push(Object.assign({type:'show',_img:undefined},e));st.autoFill=false;drawCardsUI();render()}
+function cardRow(c,i){const d=document.createElement('div');d.className='card';
+  const img=document.createElement('img');img.src=c.url||c.o||c.m;img.onerror=()=>img.style.visibility='hidden';d.appendChild(img);
+  const n=document.createElement('span');n.className='nm';n.textContent=(c.type==='movie'?'🎬 ':'')+c.n;d.appendChild(n);
+  const b=document.createElement('span');b.className='btns';
+  const mk=(t,f)=>{const x=document.createElement('button');x.textContent=t;x.onclick=f;b.appendChild(x)};
+  mk('◀',()=>{[st.cards[i-1],st.cards[i]]=[st.cards[i],st.cards[i-1]];render();drawCardsUI()});
+  mk('▶',()=>{[st.cards[i+1],st.cards[i]]=[st.cards[i],st.cards[i+1]];render();drawCardsUI()});
+  mk('×',()=>{st.cards.splice(i,1);render();drawCardsUI()});
+  d.appendChild(b);return d}
+function drawCardsUI(){const w=$('#cards');w.innerHTML='';st.cards.forEach((c,i)=>w.appendChild(cardRow(c,i)))}
+$('#fillHot').onclick=()=>{fillSet(true);drawCardsUI()};
+$('#fillTop').onclick=()=>{fillSet(false);drawCardsUI()};
+const fileOK=(f,t)=>t.test(f.type)&&f.size<=CAPS.logoBytes;
+$('#posterFile').onchange=e=>{const fs=[...e.target.files];let bad=0;
+  for(const f of fs){if(!fileOK(f,/^image\//)){bad++;diag('file',`rejected ${f.name} ${f.type||'?'} ${f.size}B`);continue}
+    const r=new FileReader();r.onerror=()=>{bad++;diag('file','read error '+f.name)};
+    r.onload=()=>addCard({n:f.name.replace(/\.[^.]+$/,''),url:r.result,type:'show'});r.readAsDataURL(f)}
+  if(bad)setStatus(`skipped ${bad} file${bad>1?'s':''} — images only, max 3 MB`);e.target.value=''};
+$('#logoFile').onchange=e=>{const f=e.target.files[0];if(!f)return;
+  if(!fileOK(f,/^image\//)){setStatus('Logo must be an image under 3 MB');diag('file','logo rejected '+(f.type||'?'));e.target.value='';return}
+  const r=new FileReader();r.onerror=()=>setStatus('Could not read logo file');
+  r.onload=()=>{st._logoUrl=r.result;loadLogo();render();save()};r.readAsDataURL(f);e.target.value=''};
+const bind=(id,key,vid,f)=>{const el=$('#'+id);el.value=st[key];
+  const upd=()=>{st[key]=+el.value;if(vid)$('#'+vid).textContent=f?f(st[key]):el.value;render()};
+  el.oninput=upd;upd()};
+bind('cardSize','cardSize','csV',v=>(v*100).toFixed(1)+'%');bind('rot','rot','rotV',v=>v+'°');
+bind('spreadY','spreadY','spV',v=>(v*100).toFixed(1)+'%');bind('driftX','driftX','drV',v=>(v*100).toFixed(1)+'%');
+bind('radius','radius','rdV',v=>(v*100).toFixed(1)+'%');bind('glow','glow','gwV',v=>(v*100).toFixed(1)+'%');
+bind('vignette','vignette','vgV',v=>Math.round(v*100)+'%');bind('logoW','logoW','lwV',v=>(v*100).toFixed(1)+'%');
+bind('logoL','logoL','llV',v=>(v*100).toFixed(1)+'%');bind('logoCY','logoCY','lcV',v=>(v*100).toFixed(1)+'%');
+$('#snap').checked=st.snap;$('#snap').onchange=e=>{st.snap=e.target.checked;save()};
+$('#guides').checked=st.guides;$('#guides').onchange=e=>{st.guides=e.target.checked;render()};
+$('#logoText').value=st.logoText||'';$('#logoText').oninput=e=>{st.logoText=e.target.value;render()};
+$('#accentUse').onclick=()=>{st.accentOverride=$('#accentPick').value;render()};
+$('#accentReset').onclick=()=>{st.accentOverride=null;render()};
+const nudge=(dx,dy)=>{st.logoL=clamp(st.logoL+dx,0,.4,DEF.logoL);st.logoCY=clamp(st.logoCY+dy,.3,.7,DEF.logoCY);render()};
+$('#nL').onclick=()=>nudge(-.005,0);$('#nR').onclick=()=>nudge(.005,0);$('#nU').onclick=()=>nudge(0,-.01);$('#nD').onclick=()=>nudge(0,.01);
+const ps=$('#preset');for(const k in PRESETS){const o=document.createElement('option');o.value=k;o.textContent=PRESETS[k][2];ps.appendChild(o)}
+ps.value=st.preset;ps.onchange=e=>{st.preset=e.target.value;render()};
+$('#fmt').value=st.fmt;$('#fmt').onchange=e=>{st.fmt=e.target.value;save()};
+$('#scale').value=st.scale;$('#scale').onchange=e=>{st.scale=+e.target.value;save()};
+$('#dl').onclick=async()=>{const[w,h]=PRESETS[st.preset];
+  const rs=reduceScale(w,h,+st.scale),s=rs.scale;
+  diag('export',`${w}x${h}@${st.scale}→${s}${rs.reduced?' (capped)':''} ${st.fmt}`);
+  setStatus(rs.reduced?`export capped to ${w*s}×${h*s} for canvas safety — render anyway at this size`:`rendering ${w*s}×${h*s}…`);await new Promise(r=>setTimeout(r,30));
+  const grab=(WW,HH)=>renderFrame(WW,HH);
+  const emit=O=>new Promise(res=>O.toBlob(b=>res(b),'image/'+st.fmt,st.fmt==='jpeg'?0.92:undefined));
+  let O=grab(w*s,h*s),b=null;
+  try{b=await emit(O)}catch(e){ // tainted by a CORS-blocked poster → re-render with placeholders
+    st.cards.forEach(c=>{if((c.url||c.o||c.m||'').startsWith('http'))c._forcePh=true});
+    O=grab(w*s,h*s);b=await emit(O);setStatus('exported ✔ (some posters blocked CORS → placeholders used)')}
+  if(b){const a=document.createElement('a');a.href=URL.createObjectURL(b);
+    a.download=`bannerstudio_${st.brand}_${PRESETS[st.preset][0]}_${s}x.${st.fmt==='png'?'png':'jpg'}`;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);if(!/exported/.test($('#stMsg').textContent))setStatus('exported ✔')}
+  render()};
+$('#reset').onclick=()=>{localStorage.removeItem(LS);location.reload()};
+
+/* search — local-first, extended online */
+$('#qgo').onclick=doSearch;$('#q').onkeydown=e=>{if(e.key==='Enter')doSearch()};
+function resultRow(entry){const d=document.createElement('div');d.className='card';
+  const img=document.createElement('img');if(entry.img){img.src=entry.img;img.onerror=()=>img.style.visibility='hidden'}else img.style.visibility='hidden';
+  d.appendChild(img);const n=document.createElement('span');n.className='nm';
+  n.textContent=`${entry.type==='movie'?'🎬':''} ${entry.name}${entry.yr?' ('+entry.yr+')':''}${entry.brand?' · '+BRANDS[entry.brand].label:''}`;d.appendChild(n);
+  const b=document.createElement('button');b.className='act';b.textContent='+ add';
+  b.onclick=()=>addCard({n:entry.name,o:entry.img,m:entry.img,type:entry.type});
+  d.appendChild(b);return d}
+async function doSearch(){const q=$('#q').value.trim().toLowerCase();if(!q)return;const r=$('#results');
+  const local=[];for(const b in POSTERS)for(const e of POSTERS[b])
+    if(e.n.toLowerCase().includes(q))local.push({name:e.n,type:e.type,img:e.o||e.m,yr:e.yr||'',brand:b});
+  r.innerHTML='';local.slice(0,6).forEach(e=>r.appendChild(resultRow(e)));
+  const online=document.createElement('div');online.style.cssText='color:var(--mut);padding:4px 2px';online.textContent='searching online…';r.appendChild(online);
+  const seen=new Set(local.map(e=>e.name.toLowerCase()));
+  const fetches=[];
+  if(st.mtype!=='movie')fetches.push(fetch('https://api.tvmaze.com/search/shows?q='+encodeURIComponent(q)).then(x=>x.json())
+    .then(res=>res.forEach(({show:s})=>{const im=(s.image||{}).original||(s.image||{}).medium;
+      if(seen.has(s.name.toLowerCase()))return;seen.add(s.name.toLowerCase());
+      r.appendChild(resultRow({name:s.name,type:'show',img:im,yr:(s.premiered||'').slice(0,4)}))}))
+    .catch(()=>{}));
+  if(st.mtype!=='show')fetches.push(itunes(q).then(res=>{(res.results||[]).forEach(m=>{
+      const nm=m.trackName||'';if(seen.has(nm.toLowerCase()))return;seen.add(nm.toLowerCase());
+      r.appendChild(resultRow({name:nm,type:'movie',img:(m.artworkUrl100||'').replace('100x100bb','600x600bb'),yr:(m.releaseDate||'').slice(0,4)}))})}).catch(()=>{}));
+  await Promise.race([Promise.all(fetches),new Promise(x=>setTimeout(x,6000))]);
+  online.remove();if(!r.children.length)r.innerHTML='<div style="color:var(--mut)">no matches (offline?)</div>'}
+function itunes(q){return new Promise((res,rej)=>{const cb='__it'+Date.now();
+  const done=f=>(...a)=>{clearTimeout(to);s.remove();delete window[cb];f(...a)};
+  const s=document.createElement('script');const to=setTimeout(()=>rej(new Error('timeout')),6000);
+  window[cb]=done(res);s.onerror=done(rej);
+  s.src=`https://itunes.apple.com/search?media=movie&limit=8&term=${encodeURIComponent(q)}&callback=${cb}`;
+  document.head.appendChild(s)})}
+/* type segmented control */
+for(const el of document.querySelectorAll('#mtype button'))el.onclick=()=>{st.mtype=el.dataset.t;
+  document.querySelectorAll('#mtype button').forEach(x=>x.classList.toggle('on',x===el));if(st.autoFill)fillSet(false);};
+document.querySelector(`#mtype [data-t="${st.mtype}"]`)?.classList.add('on');
+
+/* logo drag with magnetic anchors */
+const SNAPX=[DEF.logoL],SNAPY=[DEF.logoCY,0.5],SNAPW=[DEF.logoW];
+let drag=null;
+cv.addEventListener('pointerdown',e=>{if(!logoBox)return;const rc=cv.getBoundingClientRect();
+  const k=cv.width/rc.width,x=(e.clientX-rc.left)*k,y=(e.clientY-rc.top)*k;
+  if(x>logoBox.x-40&&x<logoBox.x+logoBox.w+40&&y>logoBox.y-40&&y<logoBox.y+logoBox.h+40){
+    drag={x,y,l:st.logoL*W0(),c:st.logoCY*H0()};cv.setPointerCapture(e.pointerId)}});
+const W0=()=>PRESETS[st.preset][0],H0=()=>PRESETS[st.preset][1];
+cv.addEventListener('pointermove',e=>{if(!drag)return;const rc=cv.getBoundingClientRect(),k=cv.width/rc.width;
+  const lx=drag.l+(e.clientX-drag.x)*k, cy=drag.c+(e.clientY-drag.y)*k, W=W0(),H=H0();
+  let L=lx/W,C=cy/H,flash=null;
+  if(st.snap){const tx=SNAPX.map(v=>[Math.abs(L-v),v]).sort((a,b)=>a[0]-b[0])[0];
+    const ty=SNAPY.map(v=>[Math.abs(C-v),v]).sort((a,b)=>a[0]-b[0])[0];
+    if(tx[0]<0.006){L=tx[1];flash={x:L*W}}if(ty[0]<0.008){C=ty[1];flash=Object.assign(flash||{},{y:C*H})}}
+  st.logoL=clamp(L,0,.4,DEF.logoL);st.logoCY=clamp(C,.3,.7,DEF.logoCY);
+  if(flash){snapFlash=[flash];setTimeout(()=>{snapFlash=null;if(raf)paint()},450)}
+  render()});
+addEventListener('pointerup',()=>drag=null);
+
+/* ── v2.1 robustness: state sync, sharing, import/export, diagnostics, tour ── */
+const SL=[['cardSize','csV',v=>(v*100).toFixed(1)+'%'],['rot','rotV',v=>v+'°'],['spreadY','spV',v=>(v*100).toFixed(1)+'%'],
+ ['driftX','drV',v=>(v*100).toFixed(1)+'%'],['radius','rdV',v=>(v*100).toFixed(1)+'%'],['glow','gwV',v=>(v*100).toFixed(1)+'%'],
+ ['vignette','vgV',v=>Math.round(v*100)+'%'],['logoW','lwV',v=>(v*100).toFixed(1)+'%'],['logoL','llV',v=>(v*100).toFixed(1)+'%'],['logoCY','lcV',v=>(v*100).toFixed(1)+'%']];
+function syncUI(){
+  for(const[id,vid,f]of SL){const el=$('#'+id);if(el){el.value=st[id];const lb=$('#'+vid);if(lb)lb.textContent=f(st[id])}}
+  if($('#snap'))$('#snap').checked=st.snap; if($('#guides'))$('#guides').checked=st.guides;
+  if($('#logoText'))$('#logoText').value=st.logoText||'';
+  if($('#preset'))$('#preset').value=st.preset;
+  if($('#fmt'))$('#fmt').value=st.fmt; if($('#scale'))$('#scale').value=st.scale;
+  if($('#accentPick'))$('#accentPick').value=st.accentOverride||BRANDS[st.brand].accent;
+  if($('#bgPick'))$('#bgPick').value=st.bgHex||DEF.bgHex;
+  if($('#kickerText'))$('#kickerText').value=st.kicker||'';
+  if($('#pillText'))$('#pillText').value=st.pill||'';
+  if($('#pillPick'))$('#pillPick').value=st.pillColor||BRANDS[st.brand].accent;
+  if($('#pillPos'))$('#pillPos').value=st.pillPos||'tr';
+  syncChips()}
+function applySpec(sp,label){
+  try{
+    st=sanitize(Object.assign({brand:'netflix',autoFill:true,guides:false,preset:'ref',fmt:'png',scale:1,accentOverride:null,logoText:'',mtype:'mix',cards:[]},sp));
+    if(typeof sp.customLogo==='string'&&sp.customLogo.startsWith('data:')&&sp.customLogo.length<2e5)st._logoUrl=sp.customLogo;
+    loadLogo._img=null;loadLogo._crop=null;loadLogo();
+    syncUI();drawCardsUI();render();save();
+    setStatus(label?`Imported — ${label}`:'Applied');diag('apply',label||'spec')}
+  catch(e){diag('apply-fail',(e&&e.message)||String(e));setStatus('Import failed — file kept? design untouched')}}
+
+/* ready-made kits (contract-validated in tests) */
+(function kits(){const w=$('#kits');if(!w)return;
+  for(const k in READY){const b=document.createElement('button');b.className='card act';
+    b.innerHTML=`<b>${READY[k].name}</b><br><span class=dim>${READY[k].desc}</span>`;
+    b.title=READY[k].desc;
+    b.onclick=()=>{const sp=Object.assign({},READY[k].spec);
+      st.trendingFirst=!!sp.trendingFirst;const tf=sp.trendingFirst;delete sp.trendingFirst;
+      applySpec(sp,'kit: '+READY[k].name);
+      fillSet(!!tf);drawCardsUI();render()};
+    w.appendChild(b)}})();
+
+/* share link (hash deep-link) + spec file export/import */
+$('#share')&&($('#share').onclick=async()=>{
+  const sp=makeSpec(st);const enc=encSpec(sp);
+  if(!enc){setStatus('Could not encode link — use “Export design” instead');return}
+  const url=location.href.split('#')[0]+'#b'+enc;
+  if(url.length>CAPS.hashChars+80){setStatus('Link too long (custom logo inlined?) — use “Export design” instead');return}
+  try{history.replaceState(null,'','#b'+enc)}catch(e){location.hash='b'+enc}
+  const ok=await clip(url);setStatus(ok?'Share link copied — opens this exact design':'Link set in address bar (clipboard blocked)')});
+$('#expSpec')&&($('#expSpec').onclick=()=>{
+  try{const j=JSON.stringify(makeSpec(st),null,1);
+    const b=new Blob([j],{type:'application/json'});const a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download=`bannerstudio_${st.brand}_design.json`;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);setStatus('Design file saved')}
+  catch(e){diag('expSpec',e.message);setStatus('Could not export design file')}});
+$('#specFile')&&($('#specFile').onchange=e=>{const f=e.target.files[0];if(!f)return;e.target.value='';
+  if(f.size>CAPS.specBytes){setStatus('Design file too large (max 1 MB)');return}
+  if(!/\.json$/i.test(f.name)&&!/^application\/json/.test(f.type)){setStatus('Pick the .json design file you exported');return}
+  const r=new FileReader();r.onerror=()=>setStatus('Could not read file');
+  r.onload=()=>{try{const o=JSON.parse(r.result);
+      if(!o||o.v!==SPEC_V){setStatus('Unknown design format (expected v'+SPEC_V+')');return}
+      applySpec(o,f.name)}catch(err){setStatus('Not a valid design file — your current design is untouched')}}});
+
+/* modal helper (esc + backdrop close, focus in) */
+let openModal=null;
+function modal(title,html,actions){
+  let ov=$('#ovl');if(ov)ov.remove();
+  ov=document.createElement('div');ov.id='ovl';
+  ov.innerHTML=`<div class=modal role=dialog aria-modal=true aria-label="${title}">
+    <div class=mhead><b>${title}</b><button class=act aria-label=close>✕</button></div>
+    <div class=mbody>${html}</div><div class=mfoot></div></div>`;
+  const ft=ov.querySelector('.mfoot');
+  for(const[a,fn,cls]of(actions||[])){const b=document.createElement('button');b.className=cls||'act';b.textContent=a;b.onclick=fn;ft.appendChild(b)}
+  const close=()=>{ov.remove();openModal=null;document.removeEventListener&&document.removeEventListener('keydown',esk)};
+  const esk=e=>{if(e.key==='Escape')close()};
+  ov.querySelector('.mhead .act').onclick=close;
+  ov.onmousedown=e=>{if(e.target===ov)close()};
+  document.addEventListener&&document.addEventListener('keydown',esk);
+  document.body.appendChild(ov);openModal={close};
+  (ov.querySelector('.mfoot button')||ov.querySelector('button')).focus();
+  return close}
+
+/* diagnostics: capabilities + error ring + bug-report generator */
+const CAP_ROWS=[
+  ['Canvas 2D',()=>{const x=document.createElement('canvas').getContext('2d');if(!x)return false;x.fillRect(0,0,1,1);return true}],
+  ['Blob export',()=>typeof document.createElement('canvas').toBlob==='function'],
+  ['Pixel readback (contrast checks)',()=>{try{return!!document.createElement('canvas').getContext('2d').getImageData(0,0,1,1)}catch(e){return false}}],
+  ['localStorage (autosave)',()=>{try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return true}catch(e){return false}}],
+  ['Fonts API (Bebas lockup)',()=>!!(document.fonts&&document.fonts.load)],
+  ['Clipboard (share link)',()=>!!(navigator.clipboard&&navigator.clipboard.writeText)],
+  ['Online (posters/search)',()=>navigator.onLine!==false],
+  ['Reduced-motion (respected)',()=>RM]
+];
+function capHtml(){return CAP_ROWS.map((r,i)=>`<li><span id=cap${i}>…</span> ${r[0]}</li>`).join('')}
+function runCaps(root){CAP_ROWS.forEach((r,i)=>{let ok=false;try{ok=r[1]()}catch(e){}
+  const el=(root||document).querySelector('#cap'+i);if(el)el.textContent=ok?'✅':'⚠️'})}
+function openDiag(){
+  const n=diagRing.length;
+  const log=diagRing.slice(-12).reverse().map(e=>`<li><span class=dim>${new Date(e.t).toLocaleTimeString()}</span> <b>${e.kind}</b> ${e.msg.replace(/[<>&]/g,'')}</li>`).join('')||'<li class=dim>No errors logged — looking good.</li>';
+  const close=modal('Diagnostics',`<ul class=caps>${capHtml()}</ul><p class=dim>Live: poster CORS probe runs on first image load; errors keep a 50-entry local ring buffer (${n} kept, never leaves this page).</p><ul class=log>${log}</ul>`,
+   [['Run checks',()=>runCaps()],
+    ['Copy bug report',async()=>{const lines=['Banner Studio v'+APP_VERSION,navigator.userAgent,new Date().toISOString(),''];
+      CAP_ROWS.forEach(r=>{let ok=true;try{r[1]()}catch(e){ok=false}lines.push((ok?'[ok] ':'[!!] ')+r[0])});
+      lines.push('',...diagRing.slice(-10).map(e=>`${new Date(e.t).toISOString()} ${e.kind}: ${e.msg}`),'',JSON.stringify(makeSpec(st)));
+      const ok=await clip(lines.join('\n'));setStatus(ok?'Bug report copied — paste it into your issue tracker':'Copy blocked — see console')
+      diag('report','bug report copied from diagnostics')}],
+    ['Clear log',()=>{diagRing=[];try{localStorage.removeItem(DIAG_LS)}catch(e){}close();openDiag()}],
+    ['Close',()=>close()]]);
+  runCaps();
+  /* async CORS probe → annotate the online row */
+  const url=(st.cards.find(c=>(c.url||c.o||c.m||'').startsWith('http'))||{});const u=url.url||url.o||url.m;
+  if(u){const im=new Image();im.crossOrigin='anonymous';
+    const to=setTimeout(()=>mark('✗'),8000);
+    im.onload=()=>{clearTimeout(to);mark('✅')};im.onerror=()=>{clearTimeout(to);mark('⚠️')}
+    im.src=u;
+    function mark(s){const el=document.getElementById('cap6');if(el)el.textContent=s}}}
+
+$('#diagBtn')&&($('#diagBtn').onclick=openDiag);
+
+/* what's-new (shown once per version) + version badge */
+const CHANGELOG=`<ul class=log>
+ <li><b>2.2.0</b> — 8 more streamer brands (Tubi · Crunchyroll · MGM+ · STARZ · AMC+ · BritBox · Plex · Roku Channel) · custom background colour &amp; image · kicker tagline &amp; corner pill badge · undo/redo (Ctrl+Z) · copy image to clipboard · randomise · light theme · Core Builds header, back-links &amp; footer · mobile layout</li>
+ <li><b>2.1.0</b> — Diagnostics modal with environment checks & error ring buffer · share links (URL deep-link) · design import/export files · guided tour · one-click ready-made kits · uploads validated (type+size) · reduced-motion respected · export auto-caps oversized canvases</li>
+ <li><b>2.0.0</b> — measured logo anchors & clear-space clamp · ink-exact text marks · sanitized persistence · taint-safe export</li>
+ <li><b>1.x</b> — 9 streamer brands, 153 real posters, responsive size set</li></ul>`;
+$('#ver')&&($('#ver').textContent='v'+APP_VERSION);
+$('#whatsBtn')&&($('#whatsBtn').onclick=()=>modal("What's new",CHANGELOG,[['Got it',c=>c()]]));
+
+/* guided tour */
+const TOUR=[
+ ['Banner Studio','Pick a streamer brand — colours, wordmark and line-up all follow. Everything renders locally; nothing is uploaded.'],
+ ['One-click kits','Start from a ready-made setup (measured from real artwork) and fine-tune from there.',' #kits'],
+ ['Logo precision','Width/left/Y sit at measured anchors by default. Toggle snap to magnet-drag the mark back onto brand placement; the clear-space guard auto-shrinks it before it can touch the cards.',' #logoSec'],
+ ['Line-up','Fill trending-first, drag cards to reorder, or search — 153 titles are bundled and work offline; movies show real artwork too.',' #cards'],
+ ['Export & share','PNG/JPG up to 4K with auto size-capping, a shareable link that encodes your whole design, and a design file to re-import later. Diagnostics (bottom) checks your browser and keeps a local error log.','#exp']
+];
+let tourI=-1;
+function openTour(){tourI=-1;tourStep()}
+function tourStep(){
+  tourI++;
+  if(tourI>=TOUR.length){close();localStorage.setItem('bannerStudio.tour','1');return}
+  const[t,b,sel]=TOUR[tourI];
+  let ov=$('#tov');if(ov){ov.remove()}
+  ov=document.createElement('div');ov.id='tov';
+  ov.innerHTML=`<div class=tcard role=dialog aria-label="tour"><b>${t}</b><p>${b}</p>
+    <div class=trow><span class=dim>${tourI+1} / ${TOUR.length}</span><span>
+    <button class=act id=tSkip>Skip</button>${tourI?'<button class=act id=tBack>Back</button>':''}
+    <button id=tNext>${tourI===TOUR.length-1?'Start creating →':'Next'}</button></span></div></div>
+    <div id=thi></div>`;
+  ov.onmousedown=e=>{if(e.target===ov)close()};
+  document.body.appendChild(ov);
+  const hi=ov.querySelector('#thi'),card=ov.querySelector('.tcard');
+  let r=null;
+  if(sel)try{r=$(sel).getBoundingClientRect()}catch(e){}
+  if(r&&r.width){hi.style.left=r.left-6+'px';hi.style.top=r.top-6+'px';hi.style.width=r.width+12+'px';hi.style.height=r.height+12+'px';hi.style.display='block';
+    card.style.left=Math.min(innerWidth-340,Math.max(12,r.left))+'px';card.style.top=Math.min(innerHeight-210,r.bottom+14)+'px'}
+  else{hi.style.display='none';card.style.left='50%';card.style.top='30%';card.style.transform='translateX(-50%)'}
+  ov.querySelector('#tNext').onclick=tourStep;
+  ov.querySelector('#tSkip')&&(ov.querySelector('#tSkip').onclick=()=>{localStorage.setItem('bannerStudio.tour','1');close()});
+  ov.querySelector('#tBack')&&(ov.querySelector('#tBack').onclick=()=>{tourI-=2;tourStep()});
+  function close(){$('#tov')&&$('#tov').remove()}}
+$('#tourBtn')&&($('#tourBtn').onclick=openTour);
+
+/* keyboard nudge */
+cv.tabIndex=0;cv.addEventListener('keydown',e=>{const q=e.shiftKey?0.01:0.002;
+  const K={ArrowLeft:[-q,0],ArrowRight:[q,0],ArrowUp:[0,-q],ArrowDown:[0,q]}[e.key];
+  if(K){e.preventDefault();nudge(K[0],K[1])}});
+
+
+/* ── v2.2 features: theme, background, tagline/pill, undo/redo, randomise, copy ── */
+const bsApplyTheme=t=>{const h=document.documentElement;h.setAttribute('data-theme',t);const b=$('#themeBtn');if(b)b.textContent=t==='dark'?'☀ Light':'🌙 Dark';try{localStorage.setItem('bsTheme',t)}catch(e){}};
+$('#themeBtn')&&($('#themeBtn').onclick=()=>{const h=document.documentElement;bsApplyTheme(h.getAttribute('data-theme')==='light'?'dark':'light')});
+
+function loadBg(){if(!st._bgUrl){_bgImg=null;return}loadImg(st._bgUrl).then(im=>{_bgImg=im;if(im)render()})}
+
+$('#bgUse').onclick=()=>{st.bgHex=$('#bgPick').value;bgCache.clear();render()};
+$('#bgReset').onclick=()=>{st.bgHex=DEF.bgHex;$('#bgPick').value=st.bgHex;bgCache.clear();render()};
+$('#bgFile').onchange=e=>{const f=e.target.files[0];if(!f)return;e.target.value='';
+  if(!/^image\//.test(f.type)||f.size>3e6){setStatus('Background must be an image under 3 MB');return}
+  const r=new FileReader();r.onerror=()=>setStatus('Could not read background image');
+  r.onload=()=>{st._bgUrl=r.result;_bgImg=null;loadBg();render();save()};r.readAsDataURL(f)};
+$('#bgClear').onclick=()=>{st._bgUrl=null;_bgImg=null;bgCache.clear();render();save()};
+
+$('#kickerText').oninput=e=>{st.kicker=e.target.value;render()};
+$('#pillText').oninput=e=>{st.pill=e.target.value;render()};
+$('#pillPick').oninput=e=>{st.pillColor=e.target.value;render()};
+$('#pillPos').onchange=e=>{st.pillPos=e.target.value;render()};
+
+/* coarse, throttled undo history */
+let undoStack=[],redoStack=[],lastSnap=null,histLast=0;
+function histTick(){const sp=makeSpec(st);const now=Date.now();
+  if(!lastSnap){lastSnap=sp;return}
+  if(JSON.stringify(sp)===JSON.stringify(lastSnap))return;
+  if(now-histLast<500)return;
+  histLast=now;undoStack.push(lastSnap);if(undoStack.length>40)undoStack.shift();redoStack=[];lastSnap=sp;updHistBtns()}
+function updHistBtns(){const u=$('#undoBtn'),r=$('#redoBtn');if(u)u.style.opacity=undoStack.length?1:.35;if(r)r.style.opacity=redoStack.length?1:.35}
+function restoreSnap(sp){st=sanitize(Object.assign({brand:'netflix',autoFill:true,guides:false,preset:'ref',fmt:'png',scale:1,accentOverride:null,logoText:'',mtype:'mix',cards:[]},sp));
+  if(sp&&typeof sp.customLogo==='string'&&sp.customLogo.startsWith('data:'))st._logoUrl=sp.customLogo;
+  if(sp&&typeof sp.customBg==='string'&&sp.customBg.startsWith('data:'))st._bgUrl=sp.customBg;
+  (st.cards||[]).forEach(c=>{c._img=undefined});
+  loadLogo._img=null;loadLogo._crop=null;loadLogo();loadBg();
+  bgCache.clear();syncUI();drawCardsUI();render()}
+$('#undoBtn').onclick=()=>{const sp=undoStack.pop();if(!sp){setStatus('Nothing to undo');return}redoStack.push(lastSnap||makeSpec(st));lastSnap=null;restoreSnap(sp);setStatus('Undid change')};
+$('#redoBtn').onclick=()=>{const sp=redoStack.pop();if(!sp){setStatus('Nothing to redo');return}undoStack.push(lastSnap||makeSpec(st));lastSnap=null;restoreSnap(sp);setStatus('Redid change')};
+
+$('#randBtn').onclick=()=>{const bs=Object.keys(BRANDS);st.brand=bs[Math.floor(Math.random()*bs.length)];
+  st.preset=['ref','tv','web169','social','square','story'][Math.floor(Math.random()*6)];
+  st.mtype=['show','movie','mix'][Math.floor(Math.random()*3)];
+  st.rot=Math.round((Math.random()*26)-8);st.cardSize=+(0.19+Math.random()*0.09).toFixed(3);
+  st.glow=+(0.03+Math.random()*0.08).toFixed(3);st.vignette=+(0.7+Math.random()*0.3).toFixed(2);
+  st.accentOverride=null;st.kicker='';st.pill='';st.autoFill=true;
+  $('#kickerText').value='';$('#pillText').value='';
+  fillSet(Math.random()>0.5);bgCache.clear();syncUI();drawCardsUI();render();setStatus('🎲 Randomised — tweak from here')};
+
+$('#copyImg').onclick=async()=>{try{const[w,h]=PRESETS[st.preset];const O=renderFrame(w,h);
+  const bl=await new Promise(r=>O.toBlob(r,'image/png'));
+  if(bl&&navigator.clipboard&&typeof ClipboardItem!=='undefined'){await navigator.clipboard.write([new ClipboardItem({'image/png':bl})]);setStatus('📋 Image copied to clipboard')}
+  else setStatus('Clipboard blocked — use Download instead')}
+  catch(e){setStatus('Copy failed — use Download instead');diag('copy',(e&&e.message)||String(e))}};
+
+addEventListener('keydown',e=>{if(e.target&&/input|select|textarea/i.test(e.target.tagName))return;
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'){e.preventDefault();$('#undoBtn').click()}
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='z'){e.preventDefault();$('#redoBtn').click()}});
+
+/* boot */
+try{if(typeof history!=='undefined')void history} catch(e){}
+addEventListener('error',e=>{const m=String(e.message||'unknown').slice(0,200);diag('error',m);
+  try{setStatus('⚠ '+m+' — your design is still safe (copy details from Diagnostics)')}catch(_){}});
+addEventListener('unhandledrejection',e=>{diag('promise',String((e&&e.reason&&e.reason.message)||e&&e.reason||'rejection').slice(0,200))});
+try{
+if(!st.cards.length)fillSet(true);else render();
+if(document.fonts&&document.fonts.load)document.fonts.load('90px BebasSrc').then(()=>render()).catch(()=>render());
+document.fonts&&document.fonts.ready.then(()=>render());
+if(hashErr)setStatus('⚠ '+hashErr);
+else if(fromHash)setStatus('Design loaded from share link');
+if(!localStorage.getItem('bannerStudio.seenVer')||localStorage.getItem('bannerStudio.seenVer')!==APP_VERSION){modal("What's new in v"+APP_VERSION,CHANGELOG,[['Got it',c=>c()]]);try{localStorage.setItem('bannerStudio.seenVer',APP_VERSION)}catch(e){}}
+if(!localStorage.getItem('bannerStudio.tour')&&!fromHash)setTimeout(openTour,900);
+addEventListener('keydown',e=>{if(e.target&&/input|select|textarea/i.test(e.target.tagName))return;
+  if(e.key==='?'&&!openModal){e.preventDefault();openTour()}
+  if(e.key.toLowerCase()==='d'&&!openModal&&e.shiftKey){e.preventDefault();openDiag()}});
+}catch(e){setStatus('boot error: '+e.message+' — Diagnostics has details');try{diag('boot',(e&&e.message)||String(e))}catch(_){}}
+syncChips();drawCardsUI();loadLogo();loadBg();histTick();updHistBtns();
+try{const t=localStorage.getItem('bsTheme');if(t==='light'||t==='dark')bsApplyTheme(t)}catch(e){}
+globalThis.__probe={get box(){return logoBox},get clamped(){return clamped},get contrast(){return lastContrast}};
+
+</script>
+</body></html>
