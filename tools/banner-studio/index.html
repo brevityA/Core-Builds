@@ -325,7 +325,7 @@ try{const h=(typeof location!=='undefined'&&location.hash)||'';
       if(fromHash.customLogo&&fromHash.customLogo.startsWith('data:')&&fromHash.customLogo.length<2e5)st._logoUrl=fromHash.customLogo;if(fromHash.customBg&&fromHash.customBg.startsWith('data:')&&fromHash.customBg.length<2e5)st._bgUrl=fromHash.customBg}}}catch(e){hashErr='share link unreadable';fromHash=null}
 const VB=276.742,VW=1024;
 let imgs=new Map(),logoBox=null,lastContrast=0,clamped=false,snapFlash=null;
-let _bgImg=null;
+let _bgImg=null,_bgGen=0;
 
 let svT=0;
 const save=()=>{clearTimeout(svT);svT=setTimeout(()=>{try{_save()}catch(e){}},250)};
@@ -695,7 +695,8 @@ const SL=[['cardSize','csV',v=>(v*100).toFixed(1)+'%'],['rot','rotV',v=>v+'°'],
  ['gradAngle','gaV',v=>v+'°'],['gradSpread','gsV',v=>Math.round(v*100)+'%'],
  ['logoW','lwV',v=>(v*100).toFixed(1)+'%'],['logoL','llV',v=>(v*100).toFixed(1)+'%'],['logoCY','lcV',v=>(v*100).toFixed(1)+'%']];
 function syncUI(){
-  for(const[id,vid,f]of SL){const el=$('#'+id);if(el){el.value=st[id];const lb=$('#'+vid);if(lb)lb.textContent=f(st[id])}}
+  for(const[id,vid,f]of SL){const el=$('#'+id);if(el){el.value=st[id];const lb=$('#'+vid);if(lb)lb.textContent=f(st[id]);
+    el.style.setProperty('--range-pct',((el.value-el.min)/(el.max-el.min)*100)+'%')}}
   if($('#snap'))$('#snap').checked=st.snap; if($('#guides'))$('#guides').checked=st.guides;
   if($('#logoText'))$('#logoText').value=st.logoText||'';
   if($('#preset'))$('#preset').value=st.preset;
@@ -861,7 +862,7 @@ cv.tabIndex=0;cv.addEventListener('keydown',e=>{const q=e.shiftKey?0.01:0.002;
 const bsApplyTheme=t=>{const h=document.documentElement;h.setAttribute('data-theme',t);const b=$('#themeBtn');if(b)b.textContent=t==='dark'?'☀ Light':'🌙 Dark';try{localStorage.setItem('bsTheme',t)}catch(e){}};
 $('#themeBtn')&&($('#themeBtn').onclick=()=>{const h=document.documentElement;bsApplyTheme(h.getAttribute('data-theme')==='light'?'dark':'light')});
 
-function loadBg(){if(!st._bgUrl){_bgImg=null;return}loadImg(st._bgUrl).then(im=>{_bgImg=im;if(im)render()})}
+function loadBg(){if(!st._bgUrl){_bgImg=null;return}const gen=++_bgGen;const url=st._bgUrl;loadImg(url).then(im=>{if(_bgGen!==gen)return;_bgImg=im;if(im)render()})}
 
 $('#bgUse').onclick=()=>{st.bgHex=$('#bgPick').value;_bgKey='';render()};
 $('#bgReset').onclick=()=>{st.bgHex=DEF.bgHex;$('#bgPick').value=st.bgHex;_bgKey='';render()};
