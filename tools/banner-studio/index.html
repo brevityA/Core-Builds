@@ -41,7 +41,13 @@ h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)
 .brands button.on{border-color:#fff6;background:#1d222a}
 .dot{width:12px;height:12px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px #fff3}
 label{display:block;color:var(--mut);margin:8px 0 3px}
-input[type=range]{width:100%}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--acc) var(--range-pct,50%),var(--line) var(--range-pct,50%));outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--txt);border:2px solid var(--acc);cursor:pointer;box-shadow:0 1px 4px #0006;transition:transform .12s ease}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-webkit-slider-thumb:active{transform:scale(1.1);background:var(--acc)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--txt);border:2px solid var(--acc);cursor:pointer;box-shadow:0 1px 4px #0006}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:var(--acc)}
 select,input[type=text]{width:100%;background:#12151a;border:1px solid var(--line);border-radius:7px;color:var(--txt);padding:6px 8px;font:inherit}
 .row{display:flex;gap:6px;align-items:center}
 button.act{border:1px solid var(--line);background:#12151a;color:var(--txt);border-radius:7px;padding:6px 10px;cursor:pointer;font:inherit}
@@ -74,6 +80,7 @@ small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
 [data-theme=light] .card{background:#f7f9fb}
 [data-theme=light] .modal,[data-theme=light] .tcard{background:#fff;color:var(--txt)}
 [data-theme=light] #status{background:#fff;border-color:#dfe4ea}
+[data-theme=light] input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 1px 4px #0003}
 [data-theme=light] .mhead,[data-theme=light] .mfoot{border-color:#e6ebf0}
 @media (max-width:920px){
   header .hint{display:none}
@@ -449,12 +456,14 @@ const loadLogo=()=>{if(!st._logoUrl){loadLogo._img=null;loadLogo._crop=null;retu
     if(x1<0){loadLogo._crop=null}else loadLogo._crop={sx:x0/sc,sy:y0/sc,sw:(x1-x0+1)/sc,sh:(y1-y0+1)/sc};
     render()})};
 
-const bgCache=new Map();
+let _bgCanvas=null,_bgCtx=null,_bgKey='';
 function background(W,H){
   const tint=(st.accentOverride||BRANDS[st.brand].tint);
   const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st._bgUrl?(_bgImg?'y':'w'):'n'].join('|');
-  if(bgCache.has(key))return bgCache.get(key);
-  const A=document.createElement('canvas');A.width=W;A.height=H;const x=A.getContext('2d');
+  if(key===_bgKey&&_bgCanvas)return _bgCanvas;
+  if(!_bgCanvas){_bgCanvas=document.createElement('canvas');_bgCtx=_bgCanvas.getContext('2d')}
+  if(_bgCanvas.width!==W||_bgCanvas.height!==H){_bgCanvas.width=W;_bgCanvas.height=H}
+  const A=_bgCanvas;const x=_bgCtx;x.clearRect(0,0,W,H);
   x.fillStyle=st.bgHex;x.fillRect(0,0,W,H);
   if(_bgImg){const cr=fitCrop(_bgImg.naturalWidth||_bgImg.width,_bgImg.naturalHeight||_bgImg.height,W,H);
     x.drawImage(_bgImg,cr.sx,cr.sy,cr.sw,cr.sh,0,0,W,H);
@@ -468,7 +477,7 @@ function background(W,H){
   g.addColorStop(0,rgba(warm,st.glow*.5));g.addColorStop(1,rgba(warm,0));x.fillStyle=g;x.fillRect(0,0,W,H);
   if(st.vignette>0){g=x.createRadialGradient(.5*W,.5*H,Math.min(W,H)*.3,.5*W,.5*H,Math.hypot(W,H)*.55);
     g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${st.vignette*.5})`);x.fillStyle=g;x.fillRect(0,0,W,H)}
-  if(bgCache.size>8)bgCache.clear();bgCache.set(key,A);return A}
+  _bgKey=key;return A}
 
 function renderFrame(W,H){
   const A=background(W,H);
@@ -487,13 +496,15 @@ function renderFrame(W,H){
     a.beginPath();a.moveTo(W/3,0);a.lineTo(W/3,H);a.moveTo(2*W/3,0);a.lineTo(2*W/3,H);a.stroke();a.setLineDash([])}
   if(snapFlash){a.setLineDash([10,6]);a.strokeStyle='#6fd3ff';a.lineWidth=2;
     for(const s of snapFlash){a.beginPath();a.moveTo(s.x||0,0);a.lineTo(s.x||0,H);a.moveTo(0,s.y||0);a.lineTo(W,s.y||0);a.stroke()}a.setLineDash([])}
-  const O=document.createElement('canvas');O.width=W;O.height=H;const o=O.getContext('2d');
+  if(!_frameCanvas){_frameCanvas=document.createElement('canvas');_frameCtx=_frameCanvas.getContext('2d')}
+  if(_frameCanvas.width!==W||_frameCanvas.height!==H){_frameCanvas.width=W;_frameCanvas.height=H}
+  const o=_frameCtx;o.save();o.clearRect(0,0,W,H);
   o.fillStyle='#0b0c0e';o.fillRect(0,0,W,H);
   const r=st.frame*(W/1800);
   o.beginPath();o.moveTo(r,0);o.arcTo(W,0,W,H,r);o.arcTo(W,H,0,H,r);o.arcTo(0,H,0,0,r);o.arcTo(0,0,W,0,r);o.closePath();o.clip();
-  o.drawImage(A,0,0);return O}
+  o.drawImage(A,0,0);o.restore();return _frameCanvas}
 
-let raf=0;
+let raf=0,_frameCanvas=null,_frameCtx=null,_lastCvW=0,_lastCvH=0;
 function render(){cancelAnimationFrame(raf);const job=()=>{
   for(const c of st.cards)if(c._img===undefined){c._img=null;
     loadImg(c.url||c.o||c.m).then(im=>{c._img=im;paint()})}
@@ -503,7 +514,9 @@ function render(){cancelAnimationFrame(raf);const job=()=>{
 function paint(){try{_paint()}catch(e){diag('render',(e&&e.message)||String(e));
   setStatus('Render failed — your design is still safe · open Diagnostics for details')}}
 function _paint(){const[W,H]=PRESETS[st.preset];const O=renderFrame(W,H);
-  cv.width=W;cv.height=H;ctx.drawImage(O,0,0);
+  if(_lastCvW!==W||_lastCvH!==H){cv.width=W;cv.height=H;_lastCvW=W;_lastCvH=H}
+  else ctx.clearRect(0,0,W,H);
+  ctx.drawImage(O,0,0);
   const B=BRANDS[st.brand];
   $('#stBrand').innerHTML=`Brand <b>${B.label}</b> · ${st.cards.length} cards · ${W}×${H}`;
   $('#stContrast').innerHTML=`Logo/bg contrast <b class="${lastContrast>=2.25?'ok':'warn'}">${lastContrast.toFixed(2)}:1</b>`+
@@ -515,7 +528,7 @@ function _paint(){const[W,H]=PRESETS[st.preset];const O=renderFrame(W,H);
 const bd=$('#brands');
 for(const k in BRANDS){const b=BRANDS[k];const el=document.createElement('button');
   el.innerHTML=`<span class="dot" style="background:${b.accent==='#FFFFFF'?'#ffffff':b.tint}"></span>${b.label}`;
-  el.dataset.b=k;el.onclick=()=>{st.brand=k;bgCache.clear();if(st.autoFill)fillSet(false);syncChips();drawCardsUI();render()};bd.appendChild(el)}
+  el.dataset.b=k;el.onclick=()=>{st.brand=k;_bgKey='';if(st.autoFill)fillSet(false);syncChips();drawCardsUI();render()};bd.appendChild(el)}
 const syncChips=()=>[...bd.children].forEach(e=>e.classList.toggle('on',e.dataset.b===st.brand));
 function fillSet(hot){
   let src=(POSTERS[st.brand]||[]).filter(r=>r.o||r.m).filter(r=>st.mtype==='mix'||r.type===st.mtype);
@@ -547,7 +560,8 @@ $('#logoFile').onchange=e=>{const f=e.target.files[0];if(!f)return;
   const r=new FileReader();r.onerror=()=>setStatus('Could not read logo file');
   r.onload=()=>{st._logoUrl=r.result;loadLogo();render();save()};r.readAsDataURL(f);e.target.value=''};
 const bind=(id,key,vid,f)=>{const el=$('#'+id);el.value=st[key];
-  const upd=()=>{st[key]=+el.value;if(vid)$('#'+vid).textContent=f?f(st[key]):el.value;render()};
+  const upd=()=>{st[key]=+el.value;if(vid)$('#'+vid).textContent=f?f(st[key]):el.value;
+    const pct=((el.value-el.min)/(el.max-el.min)*100);el.style.setProperty('--range-pct',pct+'%');render()};
   el.oninput=upd;upd()};
 bind('cardSize','cardSize','csV',v=>(v*100).toFixed(1)+'%');bind('rot','rot','rotV',v=>v+'°');
 bind('spreadY','spreadY','spV',v=>(v*100).toFixed(1)+'%');bind('driftX','driftX','drV',v=>(v*100).toFixed(1)+'%');
@@ -808,13 +822,13 @@ $('#themeBtn')&&($('#themeBtn').onclick=()=>{const h=document.documentElement;bs
 
 function loadBg(){if(!st._bgUrl){_bgImg=null;return}loadImg(st._bgUrl).then(im=>{_bgImg=im;if(im)render()})}
 
-$('#bgUse').onclick=()=>{st.bgHex=$('#bgPick').value;bgCache.clear();render()};
-$('#bgReset').onclick=()=>{st.bgHex=DEF.bgHex;$('#bgPick').value=st.bgHex;bgCache.clear();render()};
+$('#bgUse').onclick=()=>{st.bgHex=$('#bgPick').value;_bgKey='';render()};
+$('#bgReset').onclick=()=>{st.bgHex=DEF.bgHex;$('#bgPick').value=st.bgHex;_bgKey='';render()};
 $('#bgFile').onchange=e=>{const f=e.target.files[0];if(!f)return;e.target.value='';
   if(!/^image\//.test(f.type)||f.size>3e6){setStatus('Background must be an image under 3 MB');return}
   const r=new FileReader();r.onerror=()=>setStatus('Could not read background image');
   r.onload=()=>{st._bgUrl=r.result;_bgImg=null;loadBg();render();save()};r.readAsDataURL(f)};
-$('#bgClear').onclick=()=>{st._bgUrl=null;_bgImg=null;bgCache.clear();render();save()};
+$('#bgClear').onclick=()=>{st._bgUrl=null;_bgImg=null;_bgKey='';render();save()};
 
 $('#kickerText').oninput=e=>{st.kicker=e.target.value;render()};
 $('#pillText').oninput=e=>{st.pill=e.target.value;render()};
@@ -834,7 +848,7 @@ function restoreSnap(sp){st=sanitize(Object.assign({brand:'netflix',autoFill:tru
   if(sp&&typeof sp.customBg==='string'&&sp.customBg.startsWith('data:'))st._bgUrl=sp.customBg;
   (st.cards||[]).forEach(c=>{c._img=undefined});
   loadLogo._img=null;loadLogo._crop=null;loadLogo();loadBg();
-  bgCache.clear();syncUI();drawCardsUI();render()}
+  _bgKey='';syncUI();drawCardsUI();render()}
 $('#undoBtn').onclick=()=>{const sp=undoStack.pop();if(!sp){setStatus('Nothing to undo');return}redoStack.push(lastSnap||makeSpec(st));lastSnap=null;restoreSnap(sp);setStatus('Undid change')};
 $('#redoBtn').onclick=()=>{const sp=redoStack.pop();if(!sp){setStatus('Nothing to redo');return}undoStack.push(lastSnap||makeSpec(st));lastSnap=null;restoreSnap(sp);setStatus('Redid change')};
 
@@ -845,7 +859,7 @@ $('#randBtn').onclick=()=>{const bs=Object.keys(BRANDS);st.brand=bs[Math.floor(M
   st.glow=+(0.03+Math.random()*0.08).toFixed(3);st.vignette=+(0.7+Math.random()*0.3).toFixed(2);
   st.accentOverride=null;st.kicker='';st.pill='';st.autoFill=true;
   $('#kickerText').value='';$('#pillText').value='';
-  fillSet(Math.random()>0.5);bgCache.clear();syncUI();drawCardsUI();render();setStatus('🎲 Randomised — tweak from here')};
+  fillSet(Math.random()>0.5);_bgKey='';syncUI();drawCardsUI();render();setStatus('🎲 Randomised — tweak from here')};
 
 $('#copyImg').onclick=async()=>{try{const[w,h]=PRESETS[st.preset];const O=renderFrame(w,h);
   const bl=await new Promise(r=>O.toBlob(r,'image/png'));

@@ -279,8 +279,8 @@ function buildServices(input) {
     {id:'putio', enabled: false, credentials:{}},
     {id:'debrider', enabled: svc==='debrider' || (isMulti && m.includes('debrider')), credentials:cred('debrider')},
     {id:'nzbdav', enabled: false, credentials:{}}, {id:'altmount', enabled: false, credentials:{}}, {id:'stremthru_newz', enabled: false, credentials:{}},
-    
-  ];
+
+  ].filter(s => s.enabled);
 }
 
 // Pack and multi-episode results are valid fallbacks for a requested episode.

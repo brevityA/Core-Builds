@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.0"
+title: "What's New — Configurator v3.1"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.0 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.1 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.0**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.1**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.1 (Sep 3 2026)
+
+<CardGroup cols={2}>
+  <Card title="Banner Studio is live under Tools" icon="sparkles">
+    a single self-contained page for generating Netflix-style streaming banners for 17 major streamer brands (Netflix, Disney+, Hulu, Max, Prime Video, Paramount+, Apple TV+, Peacock, Crave, Tubi, Crunchyroll, MGM+, STARZ, AMC+, BritBox, Plex, Roku Channel). Custom backgrounds, taglines, corner badges, undo/redo, PNG/JPG export, share links. Everything renders locally — your designs never leave the browser.
+  </Card>
+  <Card title="Banner Studio slider controls are now smooth" icon="bolt">
+    canvas rendering reuses offscreen buffers instead of allocating new ones every frame, and the main canvas no longer resets its dimensions on each paint. Range sliders have a styled track with a filled progress indicator that follows the thumb.
+  </Card>
+  <Card title="Disabled services no longer appear in exported configs" icon="shield-check">
+    the services array was emitting all 15 entries with enabled: false on unselected ones, causing AIOStreams' import UI to auto-tick services the user never selected. Only user-selected services now appear in the generated JSON.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.0 (Sep 1 2026)
 
@@ -77,24 +93,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Real-Debrid still has no named preset" icon="sliders">
     its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.97 (Aug 22 2026)
-
-<CardGroup cols={2}>
-  <Card title="Core Badge Builder is live under Tools" icon="sparkles">
-    build Nuvio Fusion stream badges visually with 111 original Core badges, essential and advanced categories, Core Neon/monochrome/high-contrast themes, category colors, ordering, and a real release-title preview. The matching rules are generated and tested internally; there is no regex or JSON field in the workflow.
-  </Card>
-  <Card title="Two badge compatibility modes ship together" icon="bolt">
-    Universal reads ordinary filename and parsed stream metadata from any Nuvio source; AIO Enhanced pairs exact invisible markers with a generated companion formatter for reliable detection on sparse titles. The companion formatter stays below AIOStreams’ per-field limit and hands into the existing Configurator for full-template generation instead of cloning that pipeline.
-  </Card>
-  <Card title="Badge install links are failure-safe" icon="shield-check">
-    the browser downloads the JSON backup before trying the Core Worker, paste.rs, and the 365-day dpaste fallback. Nuvio stores imported rules locally, and the result explains what expires and what keeps working.
-  </Card>
-  <Card title="Fixed: custom formatters now survive a Configurator reload" icon="sliders">
-    when both fields are valid and bounded, the formatter is restored. A stale custom selection without its formatter safely returns to Family v4.
   </Card>
 </CardGroup>
