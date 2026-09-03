@@ -18,7 +18,6 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,20 +53,25 @@ const options = {
 };
 
 /**
- * Credential-shaped fields are stripped before hashing.
+ * Why this file no longer hashes anything.
  *
- * These fixtures never carry a real secret — every credential in the generated
- * output is the empty string. But CodeQL's taint tracker follows the *field
- * name* (`tmdbApiKey` -> sha256) and flags this as "password hash with
- * insufficient computational effort", which is a fair rule: a golden-hash helper
- * is exactly the kind of place a credential could later start flowing into a
- * fast digest by accident.
+ * The first version compared a sha256 of each generated template against a
+ * checked-in digest. CodeQL flagged it as `js/insufficient-password-hash`
+ * (high): `tmdbApiKey` flowed into a fast digest. Stripping the credential
+ * fields inside the hash helper did not clear it, and that is the tracker being
+ * right rather than stubborn — the tainted object still reaches the crypto sink,
+ * and a static analyser cannot know a runtime filter removed the sensitive
+ * fields.
  *
- * Rather than suppress the alert, the fields are removed from the hashed value
- * outright. The hash then covers only non-credential structure, and the
- * credential fields get their own explicit assertion below — which is a stronger
- * check than folding them into an opaque digest, because a leaked secret would
- * change the hash without saying why.
+ * The real problem was using a cryptographic hash for something that is not a
+ * security operation. This is change detection, so the honest tool is a
+ * committed snapshot of the JSON. That removes the crypto sink entirely instead
+ * of arguing with the analyser, and it is strictly better as a regression test:
+ * when output does change, the diff shows *what* changed rather than announcing
+ * that two opaque hex strings differ.
+ *
+ * Credential-shaped fields are still asserted separately and by name, so a
+ * leaked secret fails loudly with the offending field.
  */
 const CREDENTIAL_FIELD = /^(.*(apikey|token|password|secret|passwd|credential).*)$/i;
 
@@ -97,30 +101,28 @@ function collectCredentialFields(value, path = '', out = {}) {
   return out;
 }
 
-function stableHash(value) {
-  // Structure only — never credential material. See stripCredentials above.
-  return createHash('sha256').update(JSON.stringify(stripCredentials(value))).digest('hex').slice(0, 16);
+/** Canonical, diffable form of a generated template. No crypto involved. */
+function snapshot(value) {
+  return JSON.stringify(stripCredentials(value), null, 2);
 }
 
 test('generated template output is unchanged by the pre-flight refinement', async () => {
-  const golden = JSON.parse(await readFile(resolve(here, 'fixtures/preflight-generation-golden.json'), 'utf8'));
-
   for (const fixture of FIXTURES) {
-    const produced = generateTemplate(fixture.input, options);
-    const hash = stableHash(produced);
+    const expected = await readFile(resolve(here, `fixtures/${fixture.name}.json`), 'utf8');
+    const produced = snapshot(generateTemplate(fixture.input, options));
     assert.equal(
-      hash, golden[fixture.name],
+      produced.trim(), expected.trim(),
       `generated JSON changed for "${fixture.name}". The pre-flight refinement must be read-only. ` +
-      `If this change is intentional, update fixtures/preflight-generation-golden.json and say why in reports/.`,
+      `If this change is intentional, update fixtures/${fixture.name}.json and say why in reports/.`,
     );
   }
 });
 
-test('no fixture emits a non-empty credential — the golden hashes cover structure only', () => {
+test('no fixture emits a non-empty credential — snapshots cover structure only', () => {
   // The counterpart to stripCredentials(): credential fields are excluded from
-  // the digest, so they are checked directly and by name. If generation ever
-  // starts emitting a real secret, this names the exact field rather than
-  // silently shifting an opaque hash.
+  // the committed snapshots, so they are checked directly and by name. If
+  // generation ever starts emitting a real secret, this names the exact field
+  // instead of leaking it into a fixture file.
   for (const fixture of FIXTURES) {
     const creds = collectCredentialFields(generateTemplate(fixture.input, options));
     assert.ok(Object.keys(creds).length > 0, `${fixture.name}: expected credential fields to exist`);
