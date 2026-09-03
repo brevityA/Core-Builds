@@ -6,13 +6,13 @@
 :root{--bg:#101216;--panel:#171a20;--line:#262b33;--txt:#e8eaf0;--mut:#8b93a3;--acc:#e50914}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--txt);font:13px/1.45 system-ui,'Segoe UI',Roboto,sans-serif;height:100vh;display:flex;flex-direction:column}
-header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);flex:none}
+header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap;overflow-x:auto;overflow-y:hidden;max-width:100%}
 header h1{font-size:15px;font-weight:700}header .hint{color:var(--mut)}
 #wrap{flex:1;display:flex;min-height:0}
 aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px}
 main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;overflow:auto}
 #stage{max-width:100%;max-height:100%;position:relative}
-canvas{display:block;max-width:100%;max-height:78vh;border-radius:10px;box-shadow:0 10px 40px #000a;cursor:default}
+canvas{display:block;max-width:100%;max-height:78vh;border-radius:10px;box-shadow:0 10px 40px #000a;cursor:default;touch-action:none}
 section{margin-bottom:18px}
 .skip{position:absolute;left:-999px;top:8px;background:#fff;color:#000;padding:6px 10px;border-radius:8px;z-index:99;text-decoration:none}
 .skip:focus{left:8px}
@@ -35,6 +35,8 @@ section{margin-bottom:18px}
 #thi{position:fixed;border:2px dashed #6db3ff;border-radius:12px;pointer-events:none;box-shadow:0 0 0 9999px #0007}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (max-width:920px){header .hint{display:none}}
+@media (max-width:640px){.hbt{display:none}header .act{padding:6px 8px}main{padding:8px}}
+body{overflow-x:hidden}
 h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin-bottom:8px}
 .brands{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .brands button{display:flex;align-items:center;gap:7px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#12151a;color:var(--txt);cursor:pointer;font:inherit;text-align:left}
@@ -101,12 +103,12 @@ small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
  <button class="act" id="themeBtn" title="Toggle light/dark">☀ Light</button>
 </div><header><h1>🎬 Core Banner Studio</h1><span class="hint">Netflix-style brand banners for any major streamer · renders &amp; exports locally</span>
  <span style="flex:1"></span>
- <button class="act" id="undoBtn" title="Undo (Ctrl+Z)">↶ Undo</button>
- <button class="act" id="redoBtn" title="Redo (Ctrl+Shift+Z)">↷ Redo</button>
- <button class="act" id="randBtn" title="Surprise me">🎲 Random</button>
- <button class="act" id="tourBtn" title="Guided tour (or press ?)">🧭 Guide</button>
- <button class="act" id="diagBtn" title="Environment checks &amp; local error log">🩺 Diagnostics</button>
- <button class="act" id="whatsBtn">What's new</button><span class="ver" id="ver"></span></header>
+ <button class="act" id="undoBtn" title="Undo (Ctrl+Z)">↶ <span class="hbt">Undo</span></button>
+ <button class="act" id="redoBtn" title="Redo (Ctrl+Shift+Z)">↷ <span class="hbt">Redo</span></button>
+ <button class="act" id="randBtn" title="Surprise me">🎲 <span class="hbt">Random</span></button>
+ <button class="act" id="tourBtn" title="Guided tour (or press ?)">🧭 <span class="hbt">Guide</span></button>
+ <button class="act" id="diagBtn" title="Environment checks &amp; local error log">🩺 <span class="hbt">Diagnostics</span></button>
+ <button class="act" id="whatsBtn" title="What's new">✨ <span class="hbt">What's new</span></button><span class="ver" id="ver"></span></header>
 <div id="wrap">
 <aside>
  <section id="brandsec"><h2>Brand</h2><div class="brands" id="brands"></div>
@@ -177,7 +179,7 @@ let _lsMem={};try{const __p='__cb_probe';localStorage.setItem(__p,'1');localStor
 // crave mark bbox x55–311 y200–250 → left margin 0.0786W · width 0.3657W · optical center 0.5068H
 // Card cascade: 450×675 @1800×1200, start (0.859W, 0.1733H), step (−0.0511W, +0.1942H), tilt 14°, corner 0.0533·cardW.
 // Clear-space rule follows common brand-guide practice for all-caps logotypes: ≥ 0.5× mark height on every side.
-const PRESETS={ref:[1800,1200,'Ref 3:2 (1800×1200)'],tv:[3840,2160,'TV 4K 16:9'],web169:[1920,1080,'Web 16:9 1920×1080'],social:[1080,1350,'Social 4:5'],square:[1080,1080,'Square 1:1'],story:[1080,1920,'Story 9:16']};
+const PRESETS={ref:[1800,1200,'Ref 3:2 (1800×1200)'],web169:[1920,1080,'Web 16:9 1920×1080'],tv:[3840,2160,'TV 4K 16:9'],uw:[2560,1080,'Ultrawide 21:9'],xh:[1500,500,'X header 3:1'],yt:[2560,1440,'YouTube banner 16:9'],social:[1080,1350,'Social 4:5'],square:[1080,1080,'Square 1:1'],story:[1080,1920,'Story 9:16'],custom:[1920,1080,'Custom size…']};
 const BRANDS={
  netflix:{label:'Netflix',accent:'#E50914',tint:'#E50914',logo:{mode:'vector',text:'NETFLIX'}},
  max:{label:'Max',accent:'#FFFFFF',tint:'#8f6bff',logo:{mode:'text',text:'max',fam:'sys',weight:800,tracking:0.0}},
@@ -196,11 +198,13 @@ const BRANDS={
  britbox:{label:'BritBox',accent:'#3D9BFF',tint:'#3D9BFF',logo:{mode:'text',text:'BritBox',fam:'sys',weight:800,tracking:0.02}},
  plex:{label:'Plex',accent:'#E5A00D',tint:'#E5A00D',logo:{mode:'text',text:'Plex',fam:'sys',weight:800,tracking:0.0}},
  roku:{label:'Roku Channel',accent:'#FFFFFF',tint:'#7C3AED',logo:{mode:'text',text:'ROKU',fam:'sys',weight:800,tracking:0.08}},
+ custom:{label:'Custom ◦',accent:'#00d4ff',tint:'#7C3AED',logo:{mode:'text',text:'YOUR BRAND',fam:'sys',weight:800,tracking:0.05}},
 };
+const brandLabel=k=>k==='custom'?(typeof st==='object'&&st.customLabel?st.customLabel:'Custom'):BRANDS[k].label;
 
 const DEF={cardSize:0.25,rot:14,spreadY:0.1942,driftX:0.0511,radius:0.0533,glow:0.05,vignette:0.85,
   logoL:0.0786,logoW:0.3657,logoCY:0.5068,snap:true,maxCards:8,bgHex:'#1e2126',frame:12,kicker:'',pill:'',pillColor:null,pillPos:'tr',
-  bgBlur:0,gradType:'radial',gradAngle:0,gradSpread:0.62};
+  bgBlur:0,gradType:'radial',gradAngle:0,gradSpread:0.62,fillCount:6,customW:1920,customH:1080,customLabel:''};
 function layout(W,H,c,n){
   const cw=c.cardSize*W,ch=cw*1.5;
   return {cw,ch,W,H,x0:0.859*W,y0:(0.5-(n-1)*c.spreadY/2+0.1588)*H,
@@ -246,8 +250,8 @@ function contrast(h1,h2){const a=relLum(h1),b=relLum(h2);return(Math.max(a,b)+.0
 function fnv(s){let x=2166136261;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)}return x>>>0}
 function clamp(v,a,b,fb){v=+v;return Number.isFinite(v)?Math.min(b,Math.max(a,v)):fb}
 function sanitize(s){const o={...DEF};if(!s||typeof s!=='object')return o;
-  for(const k of['cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards','bgBlur','gradAngle','gradSpread'])
-    o[k]=clamp(s[k],{rot:-24,spreadY:.1,maxCards:0,bgBlur:0,gradAngle:0,gradSpread:.1}[k]??0,{cardSize:.34,rot:24,spreadY:.3,driftX:.1,radius:.09,glow:.16,vignette:1,logoL:.4,logoW:.55,logoCY:.9,maxCards:8,bgBlur:20,gradAngle:360,gradSpread:1}[k]??999,DEF[k]);
+  for(const k of['cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards','bgBlur','gradAngle','gradSpread','fillCount','customW','customH'])
+    o[k]=clamp(s[k],{rot:-24,spreadY:.1,maxCards:1,gradSpread:.1,fillCount:3,customW:320,customH:320}[k]??0,{cardSize:.34,rot:24,spreadY:.3,driftX:.1,radius:.09,glow:.16,vignette:1,logoL:.4,logoW:.55,logoCY:.9,maxCards:8,bgBlur:20,gradAngle:360,gradSpread:1,fillCount:8,customW:8192,customH:8192}[k]??999,DEF[k]);
   o.bgHex=/^#[0-9a-fA-F]{6}$/.test(s.bgHex||'')?s.bgHex:DEF.bgHex;
   o.brand=BRANDS[s.brand]?s.brand:'netflix';o.preset=PRESETS[s.preset]?s.preset:'ref';
   o.fmt=s.fmt==='jpeg'?'jpeg':'png';o.scale=[1,2,3].includes(+s.scale)?+s.scale:1;
@@ -255,6 +259,7 @@ function sanitize(s){const o={...DEF};if(!s||typeof s!=='object')return o;
   o.guides=!!s.guides;o.snap=s.snap!==false;o.autoFill=s.autoFill!==false;
   o.accentOverride=/^#[0-9a-fA-F]{6}$/.test(s.accentOverride||'')?s.accentOverride:null;
   o.logoText=typeof s.logoText==='string'?s.logoText.slice(0,24):'';
+  o.customLabel=typeof s.customLabel==='string'?s.customLabel.slice(0,24):'';
   o.gradType=['radial','linear'].includes(s.gradType)?s.gradType:'radial';
   o.cards=Array.isArray(s.cards)?s.cards.slice(0,o.maxCards||8).filter(c=>c&&typeof c.n==='string').map(c=>({n:c.n.slice(0,60),o:(c.o||'').startsWith('http')?c.o:'',m:(c.m||'').startsWith('http')?c.m:'',url:(c.url||'').startsWith('data:')||(c.url||'').startsWith('http')?c.url:'',type:c.type==='movie'?'movie':'show',hot:!!c.hot,dx:clamp(c.dx,-.5,.5,0),dy:clamp(c.dy,-.5,.5,0)})):[];
   o.kicker=typeof s.kicker==='string'?s.kicker.slice(0,30):'';
@@ -270,7 +275,8 @@ function makeSpec(st){
   const sp={v:SPEC_V};
   for(const k of['brand','preset','fmt','scale','mtype','guides','snap','autoFill','trendingFirst',
     'cardSize','rot','spreadY','driftX','radius','glow','vignette','logoL','logoW','logoCY','maxCards',
-    'bgHex','logoText','kicker','pill','pillColor','pillPos','bgBlur','gradType','gradAngle','gradSpread'])if(st[k]!==undefined)sp[k]=st[k];
+    'bgHex','logoText','kicker','pill','pillColor','pillPos','bgBlur','gradType','gradAngle','gradSpread',
+    'fillCount','customW','customH','customLabel'])if(st[k]!==undefined)sp[k]=st[k];
   if(st.accentOverride)sp.accentOverride=st.accentOverride;
   if(st.tintOverride)sp.tintOverride=st.tintOverride;
   sp.cards=(st.cards||[]).map(c=>{const e={n:c.n,o:c.o||'',m:c.m||'',type:c.type||'show',hot:!!c.hot,url:(c.url&&(c.url.startsWith('http')||c.url.startsWith('data:')))?c.url:''};if(c.dx)e.dx=c.dx;if(c.dy)e.dy=c.dy;return e});
@@ -324,6 +330,9 @@ try{const h=(typeof location!=='undefined'&&location.hash)||'';
     else if(fromHash){st=sanitize(Object.assign({brand:'netflix',autoFill:true,guides:false,preset:'ref',fmt:'png',scale:1,accentOverride:null,logoText:'',mtype:'mix',cards:[]},fromHash));
       if(fromHash.customLogo&&fromHash.customLogo.startsWith('data:')&&fromHash.customLogo.length<2e5)st._logoUrl=fromHash.customLogo;if(fromHash.customBg&&fromHash.customBg.startsWith('data:')&&fromHash.customBg.length<2e5)st._bgUrl=fromHash.customBg}}}catch(e){hashErr='share link unreadable';fromHash=null}
 const VB=276.742,VW=1024;
+function canvasSize(){
+  if(st.preset==='custom')return [Math.round(clamp(st.customW,320,8192,1920)),Math.round(clamp(st.customH,320,8192,1080))];
+  return PRESETS[st.preset]||PRESETS.ref}
 let imgs=new Map(),logoBox=null,lastContrast=0,clamped=false,snapFlash=null;
 let _bgImg=null,_bgGen=0;
 
@@ -463,39 +472,39 @@ const loadLogo=()=>{if(!st._logoUrl){loadLogo._img=null;loadLogo._crop=null;retu
     if(x1<0){loadLogo._crop=null}else loadLogo._crop={sx:x0/sc,sy:y0/sc,sw:(x1-x0+1)/sc,sh:(y1-y0+1)/sc};
     render()})};
 
-let _bgCanvas=null,_bgCtx=null,_bgKey='';
+const bgCache=new Map();
 function background(W,H){
   const tint=(st.accentOverride||BRANDS[st.brand].tint);
-  const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st._bgUrl?(_bgImg?'y':'w'):'n',st.bgBlur,st.gradType,st.gradAngle,st.gradSpread].join('|');
-  if(key===_bgKey&&_bgCanvas)return _bgCanvas;
-  if(!_bgCanvas){_bgCanvas=document.createElement('canvas');_bgCtx=_bgCanvas.getContext('2d')}
-  if(_bgCanvas.width!==W||_bgCanvas.height!==H){_bgCanvas.width=W;_bgCanvas.height=H}
-  const A=_bgCanvas;const x=_bgCtx;x.clearRect(0,0,W,H);
+  const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st.bgBlur,st.gradType,st.gradAngle,st.gradSpread,st._bgUrl?(_bgImg?'y':'w'):'n'].join('|');
+  if(bgCache.has(key))return bgCache.get(key);
+  const A=document.createElement('canvas');A.width=W;A.height=H;const x=A.getContext('2d');
   x.fillStyle=st.bgHex;x.fillRect(0,0,W,H);
-  if(_bgImg){
-    if(st.bgBlur>0){x.save();x.filter=`blur(${st.bgBlur*(W/1800)}px)`}
+  const canBlur=typeof x.filter==='string';
+  if(_bgImg){const blur=(st.bgBlur||0)*(W/1800);
     const cr=fitCrop(_bgImg.naturalWidth||_bgImg.width,_bgImg.naturalHeight||_bgImg.height,W,H);
-    x.drawImage(_bgImg,cr.sx,cr.sy,cr.sw,cr.sh,0,0,W,H);
-    if(st.bgBlur>0)x.restore();
+    if(blur>0&&canBlur){const m=blur*3;
+      x.save();x.filter=`blur(${blur}px)`;
+      const sc=Math.max((W+2*m)/W,(H+2*m)/H);
+      x.drawImage(_bgImg,cr.sx,cr.sy,cr.sw,cr.sh,-(sc*W-W)/2,-(sc*H-H)/2,sc*W,sc*H);x.restore()}
+    else x.drawImage(_bgImg,cr.sx,cr.sy,cr.sw,cr.sh,0,0,W,H);
     x.fillStyle='rgba(6,8,12,.6)';x.fillRect(0,0,W,H);
     const tg=x.createLinearGradient(0,0,W,H);
     tg.addColorStop(0,rgba(tint,.22));tg.addColorStop(1,rgba(tint,0));x.fillStyle=tg;x.fillRect(0,0,W,H)}
-  const sp=st.gradSpread;
-  let g;
-  if(st.gradType==='linear'){const a=st.gradAngle*Math.PI/180,
-    cx=.26*W,cy=.5*H,r=sp*W;
-    g=x.createLinearGradient(cx-Math.cos(a)*r,cy-Math.sin(a)*r,cx+Math.cos(a)*r,cy+Math.sin(a)*r)}
-  else g=x.createRadialGradient(.26*W,.5*H,0,.26*W,.5*H,sp*W);
-  g.addColorStop(0,rgba(tint,st.glow));g.addColorStop(1,rgba(tint,0));x.fillStyle=g;x.fillRect(0,0,W,H);
-  if(st.gradType==='linear'){const a=(st.gradAngle+90)*Math.PI/180,
-    cx=.8*W,cy=.55*H,r=sp*.8*W;
-    g=x.createLinearGradient(cx-Math.cos(a)*r,cy-Math.sin(a)*r,cx+Math.cos(a)*r,cy+Math.sin(a)*r)}
-  else g=x.createRadialGradient(.8*W,.55*H,0,.8*W,.55*H,.5*W);
-  const warm=mix(BRANDS[st.brand].tint,'#ffffff',.55);
-  g.addColorStop(0,rgba(warm,st.glow*.5));g.addColorStop(1,rgba(warm,0));x.fillStyle=g;x.fillRect(0,0,W,H);
-  if(st.vignette>0){g=x.createRadialGradient(.5*W,.5*H,Math.min(W,H)*.3,.5*W,.5*H,Math.hypot(W,H)*.55);
+  const warm=mix(BRANDS[st.brand]?BRANDS[st.brand].tint:'#7C3AED','#ffffff',.55);
+  const spread=Math.max(0.1,st.gradSpread??0.62);
+  if(st.gradType==='linear'){
+    const a=(st.gradAngle||0)*Math.PI/180,cx0=.5*W,cy0=.5*H,r=Math.max(W,H)*spread*.5;
+    const g=x.createLinearGradient(cx0-Math.cos(a)*r,cy0-Math.sin(a)*r,cx0+Math.cos(a)*r,cy0+Math.sin(a)*r);
+    g.addColorStop(0,rgba(tint,st.glow));g.addColorStop(.55,rgba(tint,st.glow*.45));g.addColorStop(1,rgba(warm,st.glow*.5));
+    x.fillStyle=g;x.fillRect(0,0,W,H)}
+  else{
+    let g=x.createRadialGradient(.26*W,.5*H,0,.26*W,.5*H,.62*W*spread/0.62);
+    g.addColorStop(0,rgba(tint,st.glow));g.addColorStop(1,rgba(tint,0));x.fillStyle=g;x.fillRect(0,0,W,H);
+    g=x.createRadialGradient(.8*W,.55*H,0,.8*W,.55*H,.5*W*spread/0.62);
+    g.addColorStop(0,rgba(warm,st.glow*.5));g.addColorStop(1,rgba(warm,0));x.fillStyle=g;x.fillRect(0,0,W,H)}
+  if(st.vignette>0){const g=x.createRadialGradient(.5*W,.5*H,Math.min(W,H)*.3,.5*W,.5*H,Math.hypot(W,H)*.55);
     g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${st.vignette*.5})`);x.fillStyle=g;x.fillRect(0,0,W,H)}
-  _bgKey=key;return A}
+  if(bgCache.size>8)bgCache.clear();bgCache.set(key,A);return A}
 
 function renderFrame(W,H){
   const A=background(W,H);
@@ -514,15 +523,18 @@ function renderFrame(W,H){
     a.beginPath();a.moveTo(W/3,0);a.lineTo(W/3,H);a.moveTo(2*W/3,0);a.lineTo(2*W/3,H);a.stroke();a.setLineDash([])}
   if(snapFlash){a.setLineDash([10,6]);a.strokeStyle='#6fd3ff';a.lineWidth=2;
     for(const s of snapFlash){a.beginPath();a.moveTo(s.x||0,0);a.lineTo(s.x||0,H);a.moveTo(0,s.y||0);a.lineTo(W,s.y||0);a.stroke()}a.setLineDash([])}
-  if(!_frameCanvas){_frameCanvas=document.createElement('canvas');_frameCtx=_frameCanvas.getContext('2d')}
-  if(_frameCanvas.width!==W||_frameCanvas.height!==H){_frameCanvas.width=W;_frameCanvas.height=H}
-  const o=_frameCtx;o.save();o.clearRect(0,0,W,H);
+  if(!renderFrame._cache)renderFrame._cache=new Map();
+  const ckey=W+'x'+H;let O=renderFrame._cache.get(ckey);
+  if(!O){O=document.createElement('canvas');O.width=W;O.height=H;
+    if(renderFrame._cache.size>3){const k0=renderFrame._cache.keys().next().value;renderFrame._cache.delete(k0)}
+    renderFrame._cache.set(ckey,O)}
+  const o=O.getContext('2d');o.save();
   o.fillStyle='#0b0c0e';o.fillRect(0,0,W,H);
   const r=st.frame*(W/1800);
   o.beginPath();o.moveTo(r,0);o.arcTo(W,0,W,H,r);o.arcTo(W,H,0,H,r);o.arcTo(0,H,0,0,r);o.arcTo(0,0,W,0,r);o.closePath();o.clip();
-  o.drawImage(A,0,0);o.restore();return _frameCanvas}
+  o.drawImage(A,0,0);o.restore();return O}
 
-let raf=0,_frameCanvas=null,_frameCtx=null,_lastCvW=0,_lastCvH=0;
+let raf=0;
 function render(){cancelAnimationFrame(raf);const job=()=>{
   for(const c of st.cards)if(c._img===undefined){c._img=null;
     loadImg(c.url||c.o||c.m).then(im=>{c._img=im;paint()})}
@@ -531,13 +543,13 @@ function render(){cancelAnimationFrame(raf);const job=()=>{
   raf=requestAnimationFrame(job)}
 function paint(){try{_paint()}catch(e){diag('render',(e&&e.message)||String(e));
   setStatus('Render failed — your design is still safe · open Diagnostics for details')}}
-function _paint(){const[W,H]=PRESETS[st.preset];const O=renderFrame(W,H);
-  if(_lastCvW!==W||_lastCvH!==H){cv.width=W;cv.height=H;_lastCvW=W;_lastCvH=H}
-  else ctx.clearRect(0,0,W,H);
-  ctx.drawImage(O,0,0);
+function _paint(){const[W,H]=canvasSize();const O=renderFrame(W,H);
+  cv.width=W;cv.height=H;ctx.drawImage(O,0,0);
   const B=BRANDS[st.brand];
-  $('#stBrand').innerHTML=`Brand <b>${B.label}</b> · ${st.cards.length} cards · ${W}×${H}`;
-  $('#stContrast').innerHTML=`Logo/bg contrast <b class="${lastContrast>=2.25?'ok':'warn'}">${lastContrast.toFixed(2)}:1</b>`+
+  $('#stBrand').innerHTML=`Brand <b>${brandLabel(st.brand)}</b> · ${st.cards.length} cards · ${W}×${H}`;
+  const tier=lastContrast>=3?'ok':(lastContrast>=2.25?'ok':'warn');
+  const tierTxt=lastContrast>=3?'pass':(lastContrast>=2.25?'ok for large marks':'fail');
+  $('#stContrast').innerHTML=`Logo/bg contrast <b class="${tier}">${lastContrast.toFixed(2)}:1</b> <span class="dim">(${tierTxt})</span>`+
     (lastContrast<2.25?` · <b>min 2.25:1</b> — <button class="act" onclick="st.accentOverride='#FFFFFF';render()">use white mark</button>`:'')+
     (clamped?' · <span class="warn">width clamped for clear-space</span>':'');
   save();histTick()}
@@ -546,13 +558,13 @@ function _paint(){const[W,H]=PRESETS[st.preset];const O=renderFrame(W,H);
 const bd=$('#brands');
 for(const k in BRANDS){const b=BRANDS[k];const el=document.createElement('button');
   el.innerHTML=`<span class="dot" style="background:${b.accent==='#FFFFFF'?'#ffffff':b.tint}"></span>${b.label}`;
-  el.dataset.b=k;el.onclick=()=>{st.brand=k;_bgKey='';if(st.autoFill)fillSet(false);syncChips();drawCardsUI();render()};bd.appendChild(el)}
+  el.dataset.b=k;el.onclick=()=>{st.brand=k;bgCache.clear();if(st.autoFill)fillSet(false);syncChips();drawCardsUI();render()};bd.appendChild(el)}
 const syncChips=()=>[...bd.children].forEach(e=>e.classList.toggle('on',e.dataset.b===st.brand));
 function fillSet(hot){
-  let src=(POSTERS[st.brand]||[]).filter(r=>r.o||r.m).filter(r=>st.mtype==='mix'||r.type===st.mtype);
-  if(!src.length)src=(POSTERS[st.brand]||[]).filter(r=>r.o||r.m);
+  let src=(POSTERS[st.brand]||POSTERS.netflix||[]).filter(r=>r.o||r.m).filter(r=>st.mtype==='mix'||r.type===st.mtype);
+  if(!src.length)src=(POSTERS[st.brand]||POSTERS.netflix||[]).filter(r=>r.o||r.m);
   if(hot)src=[...src.filter(r=>r.hot),...src.filter(r=>!r.hot)];
-  st.cards=src.slice(0,6).map(r=>({n:r.n,o:r.o,m:r.m,hot:r.hot,type:r.type,_img:undefined}));render()}
+  st.cards=src.slice(0,Math.max(1,st.fillCount||6)).map(r=>({n:r.n,o:r.o,m:r.m,hot:r.hot,type:r.type,dx:0,dy:0,_img:undefined}));render()}
 function addCard(e){if(st.cards.length>=st.maxCards){setStatus(`max ${st.maxCards} cards — remove one first`);return}
   setStatus('');st.cards.push(Object.assign({type:'show',_img:undefined},e));st.autoFill=false;drawCardsUI();render()}
 function cardRow(c,i){const d=document.createElement('div');d.className='card';
@@ -589,7 +601,7 @@ bind('radius','radius','rdV',v=>(v*100).toFixed(1)+'%');bind('glow','glow','gwV'
 bind('vignette','vignette','vgV',v=>Math.round(v*100)+'%');
 bind('bgBlur','bgBlur','bbV',v=>v>0?v.toFixed(1)+'px':'off');
 bind('gradAngle','gradAngle','gaV',v=>v+'°');bind('gradSpread','gradSpread','gsV',v=>Math.round(v*100)+'%');
-$('#gradType').value=st.gradType;$('#gradType').onchange=e=>{st.gradType=e.target.value;_bgKey='';render()};
+$('#gradType').value=st.gradType;$('#gradType').onchange=e=>{st.gradType=e.target.value;bgCache.clear();render()};
 bind('logoW','logoW','lwV',v=>(v*100).toFixed(1)+'%');
 bind('logoL','logoL','llV',v=>(v*100).toFixed(1)+'%');bind('logoCY','logoCY','lcV',v=>(v*100).toFixed(1)+'%');
 $('#snap').checked=st.snap;$('#snap').onchange=e=>{st.snap=e.target.checked;save()};
@@ -603,18 +615,18 @@ const ps=$('#preset');for(const k in PRESETS){const o=document.createElement('op
 ps.value=st.preset;ps.onchange=e=>{st.preset=e.target.value;render()};
 $('#fmt').value=st.fmt;$('#fmt').onchange=e=>{st.fmt=e.target.value;save()};
 $('#scale').value=st.scale;$('#scale').onchange=e=>{st.scale=+e.target.value;save()};
-$('#dl').onclick=async()=>{const[w,h]=PRESETS[st.preset];
+$('#dl').onclick=async()=>{const[w,h]=canvasSize();
   const rs=reduceScale(w,h,+st.scale),s=rs.scale;
   diag('export',`${w}x${h}@${st.scale}→${s}${rs.reduced?' (capped)':''} ${st.fmt}`);
   setStatus(rs.reduced?`export capped to ${w*s}×${h*s} for canvas safety — render anyway at this size`:`rendering ${w*s}×${h*s}…`);await new Promise(r=>setTimeout(r,30));
   const grab=(WW,HH)=>renderFrame(WW,HH);
   const emit=O=>new Promise(res=>O.toBlob(b=>res(b),'image/'+st.fmt,st.fmt==='jpeg'?0.92:undefined));
   let O=grab(w*s,h*s),b=null;
-  try{b=await emit(O)}catch(e){ // tainted by a CORS-blocked poster → re-render with placeholders
+  try{b=await emit(O)}catch(e){
     st.cards.forEach(c=>{if((c.url||c.o||c.m||'').startsWith('http'))c._forcePh=true});
     O=grab(w*s,h*s);b=await emit(O);setStatus('exported ✔ (some posters blocked CORS → placeholders used)')}
   if(b){const a=document.createElement('a');a.href=URL.createObjectURL(b);
-    a.download=`bannerstudio_${st.brand}_${PRESETS[st.preset][0]}_${s}x.${st.fmt==='png'?'png':'jpg'}`;a.click();
+    a.download=`bannerstudio_${st.brand}_${w}_${s}x.${st.fmt==='png'?'png':'jpg'}`;a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),4000);if(!/exported/.test($('#stMsg').textContent))setStatus('exported ✔')}
   render()};
 $('#reset').onclick=()=>{localStorage.removeItem(LS);location.reload()};
@@ -671,12 +683,12 @@ cv.addEventListener('pointerdown',e=>{const rc=cv.getBoundingClientRect();
     cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';return}
   if(logoBox&&x>logoBox.x-40&&x<logoBox.x+logoBox.w+40&&y>logoBox.y-40&&y<logoBox.y+logoBox.h+40){
     drag={kind:'logo',x,y,l:st.logoL*W0(),c:st.logoCY*H0()};cv.setPointerCapture(e.pointerId)}});
-const W0=()=>PRESETS[st.preset][0],H0=()=>PRESETS[st.preset][1];
+const W0=()=>canvasSize()[0],H0=()=>canvasSize()[1];
 cv.addEventListener('pointermove',e=>{if(!drag)return;
   if(drag.kind==='card'){const rc=cv.getBoundingClientRect(),k=cv.width/rc.width,W=W0(),H=H0();
     const ddx=(e.clientX-drag.x)*k/W,ddy=(e.clientY-drag.y)*k/H;
     st.cards[drag.idx].dx=clamp(drag.dx+ddx,-.5,.5,0);st.cards[drag.idx].dy=clamp(drag.dy+ddy,-.5,.5,0);
-    _bgKey='';render();return}
+    bgCache.clear();render();return}
   const rc=cv.getBoundingClientRect(),k=cv.width/rc.width;
   const lx=drag.l+(e.clientX-drag.x)*k, cy=drag.c+(e.clientY-drag.y)*k, W=W0(),H=H0();
   let L=lx/W,C=cy/H,flash=null;
@@ -809,7 +821,7 @@ $('#diagBtn')&&($('#diagBtn').onclick=openDiag);
 
 /* what's-new (shown once per version) + version badge */
 const CHANGELOG=`<ul class=log>
- <li><b>2.3.0</b> — Drag posters to custom positions on the banner · background blur slider · gradient type (radial/linear), angle &amp; spread controls · per-card position reset (⊙ button)</li>
+ <li><b>2.3.0</b> — Drag posters to custom positions · background blur · gradient type/angle/spread controls · per-card position reset · 4 new canvas sizes (Ultrawide, X header, YouTube, Custom) · Custom brand with editable label · fill count slider (3–8 cards) · LRU background &amp; frame cache · contrast tier display (fail/ok/pass) · improved mobile layout</li>
  <li><b>2.2.0</b> — 8 more streamer brands (Tubi · Crunchyroll · MGM+ · STARZ · AMC+ · BritBox · Plex · Roku Channel) · custom background colour &amp; image · kicker tagline &amp; corner pill badge · undo/redo (Ctrl+Z) · copy image to clipboard · randomise · light theme · Core Builds header, back-links &amp; footer · mobile layout</li>
  <li><b>2.1.0</b> — Diagnostics modal with environment checks & error ring buffer · share links (URL deep-link) · design import/export files · guided tour · one-click ready-made kits · uploads validated (type+size) · reduced-motion respected · export auto-caps oversized canvases</li>
  <li><b>2.0.0</b> — measured logo anchors & clear-space clamp · ink-exact text marks · sanitized persistence · taint-safe export</li>
@@ -864,13 +876,13 @@ $('#themeBtn')&&($('#themeBtn').onclick=()=>{const h=document.documentElement;bs
 
 function loadBg(){const gen=++_bgGen;if(!st._bgUrl){_bgImg=null;return}const url=st._bgUrl;loadImg(url).then(im=>{if(_bgGen!==gen)return;_bgImg=im;if(im)render()})}
 
-$('#bgUse').onclick=()=>{st.bgHex=$('#bgPick').value;_bgKey='';render()};
-$('#bgReset').onclick=()=>{st.bgHex=DEF.bgHex;$('#bgPick').value=st.bgHex;_bgKey='';render()};
+$('#bgUse').onclick=()=>{st.bgHex=$('#bgPick').value;bgCache.clear();render()};
+$('#bgReset').onclick=()=>{st.bgHex=DEF.bgHex;$('#bgPick').value=st.bgHex;bgCache.clear();render()};
 $('#bgFile').onchange=e=>{const f=e.target.files[0];if(!f)return;e.target.value='';
   if(!/^image\//.test(f.type)||f.size>3e6){setStatus('Background must be an image under 3 MB');return}
   const r=new FileReader();r.onerror=()=>setStatus('Could not read background image');
   r.onload=()=>{st._bgUrl=r.result;_bgImg=null;loadBg();render();save()};r.readAsDataURL(f)};
-$('#bgClear').onclick=()=>{st._bgUrl=null;_bgImg=null;_bgKey='';render();save()};
+$('#bgClear').onclick=()=>{st._bgUrl=null;_bgImg=null;bgCache.clear();render();save()};
 
 $('#kickerText').oninput=e=>{st.kicker=e.target.value;render()};
 $('#pillText').oninput=e=>{st.pill=e.target.value;render()};
@@ -890,20 +902,22 @@ function restoreSnap(sp){st=sanitize(Object.assign({brand:'netflix',autoFill:tru
   if(sp&&typeof sp.customBg==='string'&&sp.customBg.startsWith('data:'))st._bgUrl=sp.customBg;
   (st.cards||[]).forEach(c=>{c._img=undefined});
   loadLogo._img=null;loadLogo._crop=null;loadLogo();loadBg();
-  _bgKey='';syncUI();drawCardsUI();render()}
+  bgCache.clear();syncUI();drawCardsUI();render()}
 $('#undoBtn').onclick=()=>{const sp=undoStack.pop();if(!sp){setStatus('Nothing to undo');return}redoStack.push(lastSnap||makeSpec(st));lastSnap=null;restoreSnap(sp);setStatus('Undid change')};
 $('#redoBtn').onclick=()=>{const sp=redoStack.pop();if(!sp){setStatus('Nothing to redo');return}undoStack.push(lastSnap||makeSpec(st));lastSnap=null;restoreSnap(sp);setStatus('Redid change')};
 
-$('#randBtn').onclick=()=>{const bs=Object.keys(BRANDS);st.brand=bs[Math.floor(Math.random()*bs.length)];
-  st.preset=['ref','tv','web169','social','square','story'][Math.floor(Math.random()*6)];
+$('#randBtn').onclick=()=>{const bs=Object.keys(BRANDS).filter(k=>k!=='custom');st.brand=bs[Math.floor(Math.random()*bs.length)];
+  const pk=Object.keys(PRESETS).filter(k=>k!=='custom');st.preset=pk[Math.floor(Math.random()*pk.length)];
   st.mtype=['show','movie','mix'][Math.floor(Math.random()*3)];
   st.rot=Math.round((Math.random()*26)-8);st.cardSize=+(0.19+Math.random()*0.09).toFixed(3);
   st.glow=+(0.03+Math.random()*0.08).toFixed(3);st.vignette=+(0.7+Math.random()*0.3).toFixed(2);
+  st.bgBlur=+(Math.random()*10).toFixed(1);st.gradType=Math.random()>0.5?'linear':'radial';
+  st.gradAngle=Math.round(Math.random()*360);st.gradSpread=+(0.3+Math.random()*0.7).toFixed(2);
   st.accentOverride=null;st.kicker='';st.pill='';st.autoFill=true;
   $('#kickerText').value='';$('#pillText').value='';
-  fillSet(Math.random()>0.5);_bgKey='';syncUI();drawCardsUI();render();setStatus('🎲 Randomised — tweak from here')};
+  fillSet(Math.random()>0.5);bgCache.clear();syncUI();drawCardsUI();render();setStatus('🎲 Randomised — tweak from here')};
 
-$('#copyImg').onclick=async()=>{try{const[w,h]=PRESETS[st.preset];const O=renderFrame(w,h);
+$('#copyImg').onclick=async()=>{try{const[w,h]=canvasSize();const O=renderFrame(w,h);
   const bl=await new Promise(r=>O.toBlob(r,'image/png'));
   if(bl&&navigator.clipboard&&typeof ClipboardItem!=='undefined'){await navigator.clipboard.write([new ClipboardItem({'image/png':bl})]);setStatus('📋 Image copied to clipboard')}
   else setStatus('Clipboard blocked — use Download instead')}
