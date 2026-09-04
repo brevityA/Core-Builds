@@ -148,8 +148,8 @@ small.src{color:var(--mut);display:block;margin-top:10px;line-height:1.5}
   <label>Brand glow <span id="gwV"></span></label><input type="range" id="glow" min="0" max="0.16" step="0.005">
   <label>Vignette <span id="vgV"></span></label><input type="range" id="vignette" min="0" max="1" step="0.02">
   <label>Gradient type</label><select id="gradType"><option value="radial">Radial</option><option value="linear">Linear</option></select>
-  <label>Gradient angle <span id="gaV"></span></label><input type="range" id="gradAngle" min="0" max="360" step="5">
-  <label>Gradient spread <span id="gsV"></span></label><input type="range" id="gradSpread" min="0.1" max="1" step="0.02">
+  <label for="gradAngle">Gradient angle <span id="gaV"></span></label><input type="range" id="gradAngle" min="0" max="360" step="5">
+  <label for="gradSpread">Gradient spread <span id="gsV"></span></label><input type="range" id="gradSpread" min="0.1" max="1" step="0.02">
   <label><input type="checkbox" id="guides"> brand-guide overlay (clear-space · margins)</label>
 <label><input type="checkbox" id="snap"> magnetic snap to brand anchors</label>
  </section>
@@ -331,7 +331,8 @@ try{const h=(typeof location!=='undefined'&&location.hash)||'';
       if(fromHash.customLogo&&fromHash.customLogo.startsWith('data:')&&fromHash.customLogo.length<2e5)st._logoUrl=fromHash.customLogo;if(fromHash.customBg&&fromHash.customBg.startsWith('data:')&&fromHash.customBg.length<2e5)st._bgUrl=fromHash.customBg}}}catch(e){hashErr='share link unreadable';fromHash=null}
 const VB=276.742,VW=1024;
 function canvasSize(){
-  if(st.preset==='custom')return [Math.round(clamp(st.customW,320,8192,1920)),Math.round(clamp(st.customH,320,8192,1080))];
+  if(st.preset==='custom'){const w=Math.round(clamp(st.customW,320,8192,1920)),h=Math.round(clamp(st.customH,320,8192,1080));
+    return w*h>33177600?[Math.round(w*Math.sqrt(33177600/(w*h))),Math.round(h*Math.sqrt(33177600/(w*h)))]:[w,h]}
   return PRESETS[st.preset]||PRESETS.ref}
 let imgs=new Map(),logoBox=null,lastContrast=0,clamped=false,snapFlash=null;
 let _bgImg=null,_bgGen=0;
@@ -475,7 +476,7 @@ const loadLogo=()=>{if(!st._logoUrl){loadLogo._img=null;loadLogo._crop=null;retu
 const bgCache=new Map();
 function background(W,H){
   const tint=(st.accentOverride||BRANDS[st.brand].tint);
-  const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st.bgBlur,st.gradType,st.gradAngle,st.gradSpread,st._bgUrl?(_bgImg?'y':'w'):'n'].join('|');
+  const key=[W,H,st.bgHex,tint,st.glow,st.vignette,st.bgBlur,st.gradType,st.gradAngle,st.gradSpread,st._bgUrl?(_bgImg?_bgGen:'w'):'n'].join('|');
   if(bgCache.has(key))return bgCache.get(key);
   const A=document.createElement('canvas');A.width=W;A.height=H;const x=A.getContext('2d');
   x.fillStyle=st.bgHex;x.fillRect(0,0,W,H);
@@ -546,7 +547,7 @@ function paint(){try{_paint()}catch(e){diag('render',(e&&e.message)||String(e));
 function _paint(){const[W,H]=canvasSize();const O=renderFrame(W,H);
   cv.width=W;cv.height=H;ctx.drawImage(O,0,0);
   const B=BRANDS[st.brand];
-  $('#stBrand').innerHTML=`Brand <b>${brandLabel(st.brand)}</b> · ${st.cards.length} cards · ${W}×${H}`;
+  const _sb=$('#stBrand');_sb.textContent='';const _b=document.createElement('b');_b.textContent=brandLabel(st.brand);_sb.append('Brand ',_b,` · ${st.cards.length} cards · ${W}×${H}`);
   const tier=lastContrast>=3?'ok':(lastContrast>=2.25?'ok':'warn');
   const tierTxt=lastContrast>=3?'pass':(lastContrast>=2.25?'ok for large marks':'fail');
   $('#stContrast').innerHTML=`Logo/bg contrast <b class="${tier}">${lastContrast.toFixed(2)}:1</b> <span class="dim">(${tierTxt})</span>`+
@@ -688,7 +689,7 @@ cv.addEventListener('pointermove',e=>{if(!drag)return;
   if(drag.kind==='card'){const rc=cv.getBoundingClientRect(),k=cv.width/rc.width,W=W0(),H=H0();
     const ddx=(e.clientX-drag.x)*k/W,ddy=(e.clientY-drag.y)*k/H;
     st.cards[drag.idx].dx=clamp(drag.dx+ddx,-.5,.5,0);st.cards[drag.idx].dy=clamp(drag.dy+ddy,-.5,.5,0);
-    bgCache.clear();render();return}
+    render();return}
   const rc=cv.getBoundingClientRect(),k=cv.width/rc.width;
   const lx=drag.l+(e.clientX-drag.x)*k, cy=drag.c+(e.clientY-drag.y)*k, W=W0(),H=H0();
   let L=lx/W,C=cy/H,flash=null;
