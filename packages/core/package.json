@@ -1,6 +1,6 @@
 {
   "name": "@core-builds/core",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Shared template generation engine for Core Builds configurator and CLI",
   "type": "module",
   "main": "src/index.js",
