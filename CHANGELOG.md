@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.7.0 (2026-09-05)
+
+### Changed
+- **Standalone template regex sync (drift-fix release)** — every active standalone template's inline `rankedRegexPatterns`, `preferredRegexPatterns`, `excludedRegexPatterns` and `regexOverrides` copies were re-derived from the re-pinned Vidhin05 English ranked-regex snapshot (live upstream 2026-09-05, ETag `6ec5f06a`). Refreshed upstream slots: Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups. Prevents the ElfHosted "X/Y regexes are not allowed" import failure class on the 44 public-host-rejecting patterns that had gone stale between the 2026-08-29 pin and today. No filter/sort/formatter semantics changed; Legacy/ and Deprecated/ lanes untouched.
+- **New upstream release available to review**: `FAND` (tier-2 group) added to the Vidhin05 list — reviewed-list membership stays human-gated (not adopted into `Filtering/ranked-regex-patterns.json`); revisit at the next curation pass.
+- **Configurator schema data re-pinned to AIOStreams v2.34.0** (`configurator/UPSTREAM.pin` f36d0f9→e694b6a): adds `healthChecks`/`healthResults`/`autoVariants`/`manifestNotice`/`linkedAccounts` config keys, presets `the-pirate-bay`/`therarbg`/`anime-tosho-new`/`usa-tv-next`, `PCM` audio tag, `MPEG-4` encode, `DVD REMUX` quality, `DV Only`/`HDR Only`/`Upscaled` visual tags. `validate_templates.py` registry synced to the same pin (`health` SEL function included). No template adopts a new field in this release — additive sync only, so templates remain valid on v2.32.0+.
+- **`aios-regen` contract snapshot re-pinned** to AIOStreams main `e694b6a` (was 2026-08-29): additive drift reviewed (3 presets, 3 schema keys, 2 SEL functions); no removals or new required options — no shipped-preset breakage.
+
+### Fixed
+- **Allowlist regeneration path repaired** — `configurator/src/data/regex-allowlist.js` advertises `scripts/sync_template_collection.py --regex-allowlist` as its generator; the flag did not exist. It is implemented now and reproduces the committed artifact byte-for-byte from the pinned snapshot, so drift re-pins and allowlist refresh are a two-command, zero-hand-edit flow.
+- **Standalone re-sync is now a pipeline step**: `scripts/sync_ranked_regex.py` (new) regenerates the reviewed ranked list and every inline copy in active lanes from the snapshot (provenance-checked, idempotent, `--check` gate); `scripts/template_builder.py` remains scaffolding only.
+
 ## 3.6.2 (2026-08-22)
 
 ### Added

@@ -17,7 +17,7 @@
 
 All active templates for AIOStreams v2.30+. Every template requires a **TorBox subscription**. All templates ship with the **Core Syntax Formatter**, standard ESEs + Core Builds kill ESEs, Core Builds ISEs, and in-app update notifications.
 
-> **Current version: v3.6.2** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
+> **Current version: v3.7.0** · [CHANGELOG](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md)
 
 > 📖 **New here?** Start with the [Complete Setup Guide](https://github.com/brevityA/Core-Builds/wiki) — it covers picking a template, importing, API keys, device profiles, and troubleshooting.
 
@@ -656,7 +656,7 @@ Every standard template has a `-lite` variant. Lite removes 12 quality-gate ESEs
 
 ---
 
-## 🛠️ Common to All Templates (v3.6.2)
+## 🛠️ Common to All Templates (v3.7.0)
 
 | Feature | Detail |
 |---|---|

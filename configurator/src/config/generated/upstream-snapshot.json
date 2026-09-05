@@ -4,11 +4,16 @@
       "uuid",
       "parentConfig",
       "variants",
+      "healthChecks",
       "activeVariants",
+      "autoVariants",
+      "healthResults",
       "variantSelectorLocation",
       "encryptedPassword",
       "trusted",
       "showChanges",
+      "manifestNotice",
+      "linkedAccounts",
       "accessKey",
       "ip",
       "addonName",
@@ -172,6 +177,7 @@
       "DTS-ES",
       "DTS",
       "TrueHD",
+      "PCM",
       "OPUS",
       "FLAC",
       "AAC",
@@ -184,6 +190,7 @@
       "VC-1",
       "XviD",
       "DivX",
+      "MPEG-4",
       "Unknown"
     ],
     "FORMATTERS": [
@@ -350,10 +357,13 @@
     "knaben",
     "library",
     "eztv",
+    "therarbg",
+    "the-pirate-bay",
     "torrent-galaxy",
     "bitmagnet",
     "seadex",
     "animetosho",
+    "anime-tosho-new",
     "neko-bt",
     "prowlarr",
     "jackett",
@@ -386,6 +396,7 @@
     "yastream",
     "streamasia",
     "usa-tv",
+    "usa-tv-next",
     "argentina-tv",
     "debridio-tv",
     "debridio-watchtower",
@@ -500,7 +511,7 @@
   },
   "upstream": {
     "repo": "Viren070/AIOStreams",
-    "sha": "f36d0f93ff088280526ebca1fe3c93e2740b6987",
-    "version": "2.33.2"
+    "sha": "e694b6ace7309091289a8680c3f817210e261e46",
+    "version": "2.34.0"
   }
 }
