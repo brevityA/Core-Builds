@@ -16,6 +16,11 @@
 - **README now advertises the Configurator as the main product** — hero call-to-action button, a dedicated "Core Builds Configurator" section (routes, device-aware profiles, host compatibility gating, Direct Install soft-fail recovery, offline single-file use), a two-path Quick Start (Configurator recommended, pinned templates as the alternative), configurator pointer under the template decision tree, and `configurator/` + `tools/` added to the repository map.
 - **`docs/configurator.mdx` CTA unfrozen** — the hand-written "Configurator v2.97" version line went stale against shipped v3.1; it now says "latest release, deployed from this repository" so it cannot rot again.
 
+### CI
+- **Configurator e2e goldens rebaselined for the v2.34.0 schema sync** — `torbox-4k-iqr`, `torbox-4k-apex-mixed` and `torbox-mixed-apex-mixed` generated output legitimately shifted with the regenerated `src/data/generated/*`; refreshed via the spec's documented `UPDATE_GOLDEN=1` flow. Other 12 goldens byte-identical (the delta is confined to the advanced/labs tag/quality tables), confirming this was intended drift, not pipeline breakage.
+- **`configurator-e2e.yml` gained a dispatch-only golden rebaseline mode** (`updateGoldens` input): runs the golden spec with `UPDATE_GOLDEN=1` on the runner and uploads the refreshed goldens as an artifact, so contributors without browser access can rebaseline in CI; a human still reviews and commits the diff (nothing is auto-committed).
+- **Quarantined the `security-sinks` C3 flake** flagged in #682 — skipped in-suite with `test.skip` referencing the issue; timing root-cause and un-quarantine tracked in #738. C1/C2 security coverage unaffected.
+
 ## 3.6.2 (2026-08-22)
 
 ### Added

@@ -11,6 +11,11 @@ on:
       - 'configurator/**'
       - '.github/workflows/configurator-e2e.yml'
   workflow_dispatch:
+    inputs:
+      updateGoldens:
+        type: boolean
+        default: false
+        description: 'Rebaseline mode: run ONLY the golden spec with UPDATE_GOLDEN=1 (desktop project) and upload the refreshed e2e/golden/*.json as an artifact. The suite itself does not run and nothing is committed — a human reviews the artifact diff and checks the goldens in the PR that changed generation output.'
 
 permissions:
   contents: read
@@ -68,9 +73,28 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium
 
-      - run: npm run test:e2e
+      # Golden rebaseline path (dispatch-only, opt-in). e2e/golden-configs.spec.mjs
+      # documents UPDATE_GOLDEN=1 as the blessed refresh flow, but contributors whose
+      # environment cannot run a browser (restricted networks, no CDN access for
+      # `playwright install`) have no local way to do it — this runs the same documented
+      # command on the runner and hands the refreshed goldens back as an artifact.
+      - name: Refresh goldens (dispatch with updateGoldens)
+        if: github.event_name == 'workflow_dispatch' && inputs.updateGoldens
+        run: UPDATE_GOLDEN=1 npx playwright test e2e/golden-configs.spec.mjs --project=desktop
+
+      - name: Upload refreshed goldens
+        if: github.event_name == 'workflow_dispatch' && inputs.updateGoldens
+        uses: actions/upload-artifact@v5
+        with:
+          name: refreshed-goldens
+          path: configurator/e2e/golden
+          retention-days: 7
+
+      - name: Run Playwright E2E
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.updateGoldens) }}
+        run: npm run test:e2e
       - name: Upload Playwright report on failure
-        if: failure()
+        if: ${{ failure() && !(github.event_name == 'workflow_dispatch' && inputs.updateGoldens) }}
         uses: actions/upload-artifact@v5
         with:
           name: playwright-report
