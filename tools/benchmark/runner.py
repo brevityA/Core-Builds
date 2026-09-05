@@ -43,6 +43,7 @@ import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -75,20 +76,59 @@ class Sanitizer:
     GENERIC = [
         (re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"), "<REDACTED-UUID>"),
         (re.compile(r"\beyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{5,}\b"), "<REDACTED-JWT>"),
-        (re.compile(r"(?i)(api[_-]?key|token|password|apikey)=([^&\s\"']+)"), r"\1=<REDACTED>"),
+        (re.compile(r"(?i)(api[_-]?key|token|password|apikey|passkey|secret)=([^&\s\"']+)"), r"\1=<REDACTED>"),
+        # Credentials embedded in URL PATH segments, not query strings. Debrid CDN
+        # links look like https://host/dl/<32-hex-or-longer-token>/file.mkv, so a
+        # key-based redaction never fires on them. Match long opaque path segments.
+        (re.compile(r"(?i)\b(https?://[^\s\"'<>]*?/)"
+                    r"(?:(?:api|dl|d|download|token|stream|unrestrict|resolve)/)"
+                    r"([A-Za-z0-9_\-]{16,})"), r"\1<REDACTED-PATH-TOKEN>"),
+        # Any remaining long high-entropy hex/base32 run inside a URL path.
+        (re.compile(r"(?i)(https?://[^\s\"'<>]*?/)([0-9a-f]{32,})"), r"\1<REDACTED-PATH-TOKEN>"),
     ]
     SECRET_KEYS = {
         "apikey", "api_key", "token", "password", "accesskey", "access_key",
         "credentials", "encryptedpassword", "uuid", "tmdbapikey",
         "tmdbaccesstoken", "rpdbapikey", "url", "externalurl",
+        # AIOStreams instance + service credential keys. Missing these meant a
+        # real credential could reach a committed snapshot.
+        "instancepassword", "stremiopassword", "instanceurl", "stremioaddonurl",
+        "passkey", "secret", "clientsecret", "client_secret", "refreshtoken",
+        "refresh_token", "accesstoken", "access_token", "sessionid", "cookie",
+        "authorization", "auth", "privatekey", "private_key", "webhooksecret",
+        # Per-service debrid credential key names used by the services schema.
+        "debridlinkapikey", "realdebridapikey", "alldebridapikey",
+        "premiumizeapikey", "torboxapikey", "easydebridapikey", "offcloudapikey",
+        "putioclientid", "putiotoken", "pikpakusername", "pikpakpassword",
+        "seedrencodedtoken", "tvdbapikey", "mdblistapikey", "traktrefreshtoken",
     }
+    # Values shorter than this cannot be replaced by literal substring search
+    # without corrupting ordinary prose, so they are escalated to a word-boundary
+    # regex instead of being skipped entirely.
+    SHORT_SECRET_FLOOR = 6
 
     def __init__(self, secrets: list[str]):
-        self.secrets = sorted({s for s in secrets if s and len(s) >= 6}, key=len, reverse=True)
+        uniq = {s for s in secrets if s}
+        # Long secrets: plain substring replacement, longest first so that a
+        # secret which contains another is redacted before its substring.
+        self.secrets = sorted(
+            {s for s in uniq if len(s) >= self.SHORT_SECRET_FLOOR}, key=len, reverse=True
+        )
+        # Short secrets: a bare str.replace() of e.g. "abc" would mangle unrelated
+        # text, so bound them to token edges. Previously these were DROPPED, which
+        # meant a short API key was emitted verbatim.
+        self.short_patterns = [
+            re.compile(rf"(?<![A-Za-z0-9]){re.escape(s)}(?![A-Za-z0-9])")
+            for s in sorted(
+                {s for s in uniq if len(s) < self.SHORT_SECRET_FLOOR}, key=len, reverse=True
+            )
+        ]
 
     def text(self, value: str) -> str:
         for s in self.secrets:
             value = value.replace(s, "<REDACTED-SECRET>")
+        for pat in self.short_patterns:
+            value = pat.sub("<REDACTED-SECRET>", value)
         for pat, repl in self.GENERIC:
             value = pat.sub(repl, value)
         return value
@@ -97,8 +137,20 @@ class Sanitizer:
         if isinstance(node, dict):
             out = {}
             for k, v in node.items():
-                if k.lower() in self.SECRET_KEYS and isinstance(v, (str, dict)):
-                    out[k] = "<REDACTED>" if isinstance(v, str) else "<REDACTED-OBJECT>"
+                # Redact on a secret-looking KEY regardless of the value's type.
+                # The old check only covered str|dict, so a credential held in a
+                # list (e.g. {"credentials": ["<key>"]}) was written out intact.
+                if k.lower() in self.SECRET_KEYS:
+                    if isinstance(v, str):
+                        out[k] = "<REDACTED>"
+                    elif isinstance(v, dict):
+                        out[k] = "<REDACTED-OBJECT>"
+                    elif isinstance(v, list):
+                        out[k] = "<REDACTED-LIST>"
+                    elif v is None or isinstance(v, bool):
+                        out[k] = v  # carries no secret; keep for shape fidelity
+                    else:
+                        out[k] = "<REDACTED>"
                 else:
                     out[k] = self.obj(v)
             return out
@@ -232,11 +284,42 @@ def apply_lane(config: dict, lane: str, api_key: str) -> dict:
     return config
 
 
-def _resolve_pointer(obj, pointer: str):
-    node = obj
+def _resolve_pointer(obj, pointer: str, *, create: bool = False):
+    """Walk a JSON pointer to (parent_node, leaf_key).
+
+    By default every intermediate key MUST already exist. The previous
+    implementation used `setdefault(p, {})`, so a typo'd pointer in
+    contenders.json silently grew a brand-new config subtree: the mutation
+    "succeeded", the differ saw an extra field, and the variant was no longer
+    single-variable — exactly the failure the single-variable proof exists to
+    prevent.
+
+    `create=True` opts in to building missing intermediates. It is only for
+    variants that deliberately introduce a field absent from the control
+    (e.g. `/failover`, which no Core Builds template sets), and it must be
+    declared explicitly in the mutation so the intent is reviewable.
+    """
     parts = [p for p in pointer.split("/") if p]
-    for p in parts[:-1]:
-        node = node.setdefault(p, {})
+    if not parts:
+        raise ValueError(f"empty JSON pointer {pointer!r}")
+    node = obj
+    for i, p in enumerate(parts[:-1]):
+        if not isinstance(node, dict):
+            raise ValueError(
+                f"pointer {pointer!r}: segment {'/'.join(parts[:i]) or '/'} is "
+                f"{type(node).__name__}, not an object"
+            )
+        if p not in node:
+            if not create:
+                raise ValueError(
+                    f"pointer {pointer!r}: intermediate key {p!r} does not exist. "
+                    "Fix the pointer, or set \"create\": true in the mutation if the "
+                    "variant is meant to introduce it."
+                )
+            node[p] = {}
+        node = node[p]
+    if not isinstance(node, dict):
+        raise ValueError(f"pointer {pointer!r}: parent is {type(node).__name__}, not an object")
     return node, parts[-1]
 
 
@@ -244,10 +327,23 @@ def apply_mutation(config: dict, mutation: dict) -> tuple[dict, str]:
     """Apply the ONE single-variable change of an experimental variant."""
     op = mutation["op"]
     if op == "set":
-        node, leaf = _resolve_pointer(config, mutation["pointer"])
+        create = bool(mutation.get("create", False))
+        node, leaf = _resolve_pointer(config, mutation["pointer"], create=create)
+        existed = leaf in node
+        if not existed and not create:
+            raise ValueError(
+                f"set {mutation['pointer']}: key does not exist in the control config. "
+                "Set \"create\": true if this variant is meant to introduce it."
+            )
         before = node.get(leaf)
+        if before == mutation["value"]:
+            raise ValueError(
+                f"set {mutation['pointer']}: value is already {before!r} — NO-OP, "
+                "unattributable as a benchmark variable."
+            )
         node[leaf] = mutation["value"]
-        return config, f"set {mutation['pointer']}: {before!r} -> {mutation['value']!r}"
+        verb = "created" if not existed else "set"
+        return config, f"{verb} {mutation['pointer']}: {before!r} -> {mutation['value']!r}"
     if op == "remove_preset":
         presets = config.get("presets", [])
         t = mutation["preset_type"]
@@ -276,10 +372,27 @@ def apply_mutation(config: dict, mutation: dict) -> tuple[dict, str]:
         key, below = mutation["key"], mutation["below"]
         entry = next((c for c in crit if c.get("key") == key), None)
         if entry is None:
-            return config, f"NO-OP: sort key {key} not present"
+            # Was a silent NO-OP: the runner installed a config identical to the
+            # control and the comparison produced meaningless data attributed to a
+            # variable that was never changed. Every other op raises; so does this.
+            raise ValueError(
+                f"demote_sort_key: sort key {key!r} is not present in sortCriteria.global "
+                f"(has: {[c.get('key') for c in crit]}) — NO-OP, unattributable."
+            )
+        if not any(c.get("key") == below for c in crit):
+            raise ValueError(
+                f"demote_sort_key: anchor key {below!r} is not present in sortCriteria.global "
+                f"(has: {[c.get('key') for c in crit]}) — the demotion target is undefined."
+            )
+        before_order = [c.get("key") for c in crit]
         crit.remove(entry)
-        idx = next((i for i, c in enumerate(crit) if c.get("key") == below), 0)
+        idx = next(i for i, c in enumerate(crit) if c.get("key") == below)
         crit.insert(idx + 1, entry)
+        if [c.get("key") for c in crit] == before_order:
+            raise ValueError(
+                f"demote_sort_key: {key!r} is already directly below {below!r} — NO-OP, "
+                "unattributable."
+            )
         config["sortCriteria"]["global"] = crit
         return config, f"demoted sort key {key} to just below {below}"
     raise ValueError(f"unknown mutation op {op!r}")
@@ -381,8 +494,6 @@ def extract_results(payload) -> list[dict]:
 
 
 def main() -> int:
-    import urllib.parse  # noqa: PLC0415 - used by stream_url
-    globals()["urllib"].parse = urllib.parse
 
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--corpus", default=str(DEFAULT_CORPUS))
@@ -506,6 +617,11 @@ def main() -> int:
                 fname = f"r{rep}__{cid}__{entry['key']}.json"
                 # gitignored sidecar keeps the raw credentialed playback URLs so
                 # spotcheck.py can probe them; only the sanitized file is committed.
+                # Stamp the run identity so spotcheck can refuse a sidecar left
+                # behind by an earlier run into a reused directory — those URLs are
+                # expired and would be scored as dead links against this run.
+                snap["run_id"] = run_id
+                snap["captured_utc"] = datetime.now(timezone.utc).isoformat()
                 (outdir / fname.replace(".json", ".local.json")).write_text(json.dumps(snap, indent=1) + "\n")
                 (outdir / fname).write_text(json.dumps(san.obj(snap), indent=1) + "\n")
                 manifest["snapshots"].append({"contender": cid, "repeat": rep, "title_key": entry["key"],
@@ -523,5 +639,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    import urllib.parse  # noqa: F401
     sys.exit(main())

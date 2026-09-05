@@ -242,5 +242,98 @@ except RuntimeError:
     _refused = True
 check("resolve_template REFUSES a still-unresolved config", _refused)
 
+print("\n8. review hardening (PR #735)")
+from runner import Sanitizer, _resolve_pointer, apply_mutation
+
+# --- #1 sanitizer credential gaps ---
+sh = Sanitizer(["abc"])            # below the 6-char floor: previously DROPPED
+check("short secret is redacted, not emitted",
+      "abc" not in sh.text("key=abc end"))
+check("short secret does not corrupt ordinary words",
+      sh.text("abcdef fabric") == "abcdef fabric")
+s2 = Sanitizer([])
+check("credential in URL PATH segment is redacted",
+      "0123456789abcdef0123456789abcdef" not in
+      s2.text("https://cdn.example.com/dl/0123456789abcdef0123456789abcdef/f.mkv"))
+check("long hex path token is redacted",
+      "<REDACTED-PATH-TOKEN>" in s2.text("https://h.tld/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/x"))
+check("instancePassword key is redacted",
+      s2.obj({"instancePassword": "hunter2"})["instancePassword"] == "<REDACTED>")
+check("debrid service key name is redacted",
+      s2.obj({"torboxApiKey": "zzz"})["torboxApiKey"] == "<REDACTED>")
+check("credential held in a LIST is redacted",
+      s2.obj({"credentials": ["secret-value"]})["credentials"] == "<REDACTED-LIST>")
+check("non-secret keys still pass through", s2.obj({"resolution": "2160p"})["resolution"] == "2160p")
+check("query-string passkey is redacted", "p4ss" not in s2.text("http://x/y?passkey=p4ss"))
+
+# --- #2 urllib.parse available at module scope (no monkey-patch) ---
+import runner as _r
+check("runner.urllib.parse imported at module scope", hasattr(_r.urllib, "parse"))
+check("stream_url works without main() having run",
+      _r.stream_url("https://i.tld", "u", "e", {"type": "movie", "imdb": "tt1"}).endswith(".json"))
+
+# --- #3 pointer typos must not grow a subtree ---
+_cfg = {"bitrate": {"global": {"movies": [0, 1]}}}
+try:
+    _resolve_pointer(_cfg, "/bitrat/global/movies"); _raised = False
+except ValueError:
+    _raised = True
+check("typo'd pointer raises instead of creating a subtree", _raised)
+check("typo did not mutate the config", _cfg == {"bitrate": {"global": {"movies": [0, 1]}}})
+check("valid pointer still resolves",
+      _resolve_pointer(_cfg, "/bitrate/global/movies")[1] == "movies")
+try:
+    apply_mutation({"a": 1}, {"op": "set", "pointer": "/nope", "value": 2}); _raised = False
+except ValueError:
+    _raised = True
+check("set on a missing key raises without create:true", _raised)
+check("set with create:true is allowed (variants that add a field)",
+      apply_mutation({"a": 1}, {"op": "set", "pointer": "/failover", "value": {"enabled": True},
+                                "create": True})[0]["failover"] == {"enabled": True})
+try:
+    apply_mutation({"a": 1}, {"op": "set", "pointer": "/a", "value": 1}); _raised = False
+except ValueError:
+    _raised = True
+check("set to the identical value is rejected as a NO-OP", _raised)
+
+# --- #4 demote_sort_key must raise, not silently no-op ---
+def _sc(keys):
+    return {"sortCriteria": {"global": [{"key": k} for k in keys]}}
+try:
+    apply_mutation(_sc(["resolution"]), {"op": "demote_sort_key", "key": "cached",
+                                         "below": "resolution"}); _raised = False
+except ValueError:
+    _raised = True
+check("demote_sort_key raises when the key is absent", _raised)
+try:
+    apply_mutation(_sc(["cached"]), {"op": "demote_sort_key", "key": "cached",
+                                     "below": "resolution"}); _raised = False
+except ValueError:
+    _raised = True
+check("demote_sort_key raises when the anchor is absent", _raised)
+try:
+    apply_mutation(_sc(["resolution", "cached"]), {"op": "demote_sort_key", "key": "cached",
+                                                   "below": "resolution"}); _raised = False
+except ValueError:
+    _raised = True
+check("demote_sort_key raises when already directly below anchor", _raised)
+_ok, _note = apply_mutation(_sc(["cached", "seadex", "resolution"]),
+                            {"op": "demote_sort_key", "key": "cached", "below": "resolution"})
+check("demote_sort_key still performs a real demotion",
+      [c["key"] for c in _ok["sortCriteria"]["global"]] == ["seadex", "resolution", "cached"])
+
+# --- registry integrity: every declared mutation must apply cleanly ---
+_reg = json.loads((HERE / "contenders.json").read_text())
+_reg = _reg["contenders"] if isinstance(_reg, dict) else _reg
+for _c in _reg:
+    if _c.get("source") == "local" and _c.get("mutation"):
+        _base = json.loads((HERE.parents[1] / _c["path"]).read_text())["config"]
+        try:
+            apply_mutation(copy.deepcopy(_base), _c["mutation"])
+            _applied = True
+        except Exception as _e:  # noqa: BLE001
+            _applied = False
+        check(f"mutation applies: {_c['id']}", _applied)
+
 print(f"\n{'ALL PASS' if not fails else str(len(fails)) + ' FAILURES: ' + ', '.join(fails)}")
 sys.exit(1 if fails else 0)

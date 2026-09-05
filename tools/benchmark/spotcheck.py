@@ -73,11 +73,22 @@ def main() -> int:
         return 1
 
     rng = random.Random(args.seed)
+    run_id = manifest.get("run_id")
     # stratify: at most one pick per contender per bucket, then sample
     pool = []
+    stale = []
     for f in files:
         local = run / f.replace(".json", ".local.json")  # unsanitized sidecar, gitignored
-        snap = json.loads((local if local.exists() else run / f).read_text())
+        use_local = local.exists()
+        if use_local and run_id is not None:
+            # A reused output directory can leave sidecars from an EARLIER run.
+            # Their debrid CDN URLs are expired, so probing them reports dead
+            # links and silently understates this run's playability.
+            sid = json.loads(local.read_text()).get("run_id")
+            if sid is not None and sid != run_id:
+                stale.append(f)
+                use_local = False
+        snap = json.loads((local if use_local else run / f).read_text())
         rows = [r for r in snap["results"] if not r.get("is_error_row")]
         if rows:
             pool.append((f, snap, rows[0]))
@@ -91,6 +102,16 @@ def main() -> int:
         picked.append((f, snap, top))
         if len(picked) >= args.n:
             break
+
+    if stale:
+        print(
+            f"ERROR: {len(stale)} sidecar(s) in {run} belong to a different run than "
+            f"manifest run_id={run_id!r} (e.g. {stale[0]}). Their playback URLs are "
+            "expired; probing them would report dead links and understate playability. "
+            "Use a fresh output directory, or delete the stale *.local.json files.",
+            file=sys.stderr,
+        )
+        return 1
 
     san = Sanitizer([])
     results = []

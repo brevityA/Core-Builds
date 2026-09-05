@@ -22,12 +22,13 @@ repository and from live source inspection of AIOStreams.
 
 ---
 
-## 0. Provenance and knowledge cutoff
+## 0. Provenance
 
-My training data has a cutoff in early 2025. **Every claim in this document
-about AIOStreams' API, endpoint shapes, or version was verified live on
-2026-09-05**, not recalled. Claims about the Core Builds templates were read
-directly out of this checkout at commit `524458b`.
+**Every claim in this document about AIOStreams' API, endpoint shapes, or
+version was verified live against upstream on 2026-09-05** rather than assumed
+from prior knowledge. Claims about the Core Builds templates were read directly
+out of this checkout at commit `524458b`. The table below records how each fact
+was checked, so any reader can re-run the same verification.
 
 | Fact | Verified how | Date |
 |---|---|---|
@@ -265,8 +266,8 @@ Add-on research backing these variants — usage counts across all 91 templates,
 builtin-vs-external transport, liveness, and the `sootio`/`newznab` findings —
 is in [`tools/benchmark/addon-inventory.md`](../tools/benchmark/addon-inventory.md).
 
-Three variants I originally drafted were **discarded as invalid** once measured
-against the real config, and this is worth recording because it is exactly the
+Three variants drafted early on were **discarded as invalid** once measured
+against the real config. They are recorded here because this is exactly the
 "don't assume the behaviour" discipline the brief asks for:
 
 * *"drop Zilean"* — 4K Apex ships Zilean **already disabled**. Removing it is a

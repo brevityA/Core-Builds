@@ -297,7 +297,8 @@
           "maxAttempts": 5,
           "parallel": 2,
           "position": "beforeLimiting"
-        }
+        },
+        "create": true
       },
       "description": "BIGGEST competitor-only lever. Tamtaro enables failover; every Core build omits it. On a dead/unplayable pick AIOStreams retries up to 5 alternates server-side instead of handing the user a broken stream. Directly targets playability, the metric a user actually feels. Cost: added latency on the failing path only. Scored by playable_pct vs ttfl_ms."
     },
@@ -323,7 +324,8 @@
           "cmrg",
           "ettv",
           "psa"
-        ]
+        ],
+        "create": true
       },
       "description": "grabberhawk filters notorious re-encode groups by keyword. Apex leaves excludedKeywords unset and relies on 107 ranked regexes to DEMOTE them; this DROPS them. Tests whether hard exclusion beats soft ranking, and whether it over-filters obscure titles where a YTS rip is the only source."
     },
@@ -346,7 +348,8 @@
             "anime"
           ],
           "addons": []
-        }
+        },
+        "create": true
       },
       "description": "Tamtaro ships the block but leaves it disabled; Apex lacks the field entirely. Targets the classic absolute-numbering / mislabelled-episode failure on the anime and completed-series buckets. Scored by junk_pct on series rows only."
     },
@@ -364,7 +367,8 @@
         "value": [
           3,
           100000
-        ]
+        ],
+        "create": true
       },
       "description": "Tamtaro carries seeder-range plumbing; Apex has none. A 0-seeder uncached torrent can never be pulled by the debrid service, so it is a guaranteed dead result occupying a slot. Tests whether a seeder floor raises playability without hurting obscure-bucket coverage."
     }

@@ -184,3 +184,23 @@ Append to `contenders.json`:
   `single_variable` string, and exactly one `mutation`. Supported ops:
   `set` (JSON-pointer), `add_preset`, `remove_preset`, `demote_sort_key`.
   Two changes in one variant makes the win unattributable — split it.
+
+## Review hardening (PR #735)
+
+Fixes applied in response to review, each with regression coverage in
+`selftest.py` §8:
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | Sanitizer credential gaps | Secrets under 6 chars are no longer dropped — they are redacted via word-boundary regex. `SECRET_KEYS` gained AIOStreams instance keys (`instancePassword`, `stremioPassword`) and per-service debrid key names. Two new patterns catch credentials in URL **path** segments (`/dl/<token>/…`), which key-based redaction never saw. Key-based redaction now also fires on **list** values. |
+| 2 | `urllib.parse` monkey-patch | Replaced with a module-scope `import urllib.parse`. `stream_url()` no longer depends on `main()` having run. |
+| 3 | `_resolve_pointer` grew subtrees | Intermediate keys must exist; a typo raises. Variants that legitimately add an absent field (`/failover`, `/excludedKeywords`, `/episodeTitleMatching`, `/requiredSeederRange`) declare `"create": true`, so the intent is explicit and reviewable. `set` to an identical value is rejected as an unattributable no-op. |
+| 4 | `demote_sort_key` silent no-op | Raises when the key is missing, when the anchor is missing, or when the demotion would not change the order — matching every other op. |
+| 5 | Spotcheck stale sidecar | The runner stamps `run_id`/`captured_utc` into each `.local.json`; `spotcheck.py` refuses to probe sidecars whose `run_id` differs from the manifest, since expired URLs would understate playability. |
+| 6 | Report self-reference | §0 rewritten as "Provenance"; first-person training-data phrasing removed. |
+
+**Note on #3:** this one mattered most for correctness. A silently-created
+subtree makes a variant multi-variable without detection, which would invalidate
+the single-variable proof the whole comparison rests on. `selftest.py` now
+replays every registry mutation against its real base template so a bad pointer
+fails offline rather than mid-run.
