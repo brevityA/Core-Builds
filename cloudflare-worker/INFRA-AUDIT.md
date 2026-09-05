@@ -18,7 +18,12 @@ differs by plan are marked **[PLAN-DEPENDENT]**.
 
 ---
 
-## 0. Verdict in one paragraph
+## 0. Verdict in one paragraph (pre-change baseline — 2026-09-03)
+
+> **Note:** Sections 0–5 describe the state of the worker as audited on 2026-09-03
+> at commit `81c802b` (42 tests). Section 6a documents the fixes applied in this PR
+> (75 tests at commit `2ef485c`+). Read Sections 0–5 as the baseline that motivated
+> the hardening; Section 6a is the current remediation status.
 
 The worker's *design* is sound (host allowlist + path scoping as the SSRF control, size caps,
 timeouts, no-store on sensitive routes, narrowed CORS). Its *operational reality* diverges from
@@ -51,7 +56,7 @@ require a breaking change to fix.
 | `GET /t/:id` (L524) | read paste | AIOStreams hosts (server-side, `?template=URL`), `verifyPasteReadable()` `app.js:7532`, users | KV `TEMPLATES` | → stored JSON, `ACAO:*` | may contain config (never creds if produced by configurator) | no-store | 60/min → **unlimited** (65 burst all 404, verified) | 404 race after write (R1) |
 | `GET /proxy/api/v1/status?host=` (L587) | host health/version | `raceHostFetch()` ×N hosts per page load, preflight tool, smoke | allowlisted host **or any https host** (custom lane) | → upstream JSON, `ACAO:*` | none | Cache API 30 s, checked **before** rate limit (verified working on workers.dev: hits counted, ~80 ms vs 240–700 ms direct) | 60/min (custom 20/min) → **unlimited** | thundering herd on miss; **follows redirects** (S2) |
 | `POST/PATCH /proxy/api/v1/user[/:uuid]?host=` (L541–691) | direct install (create/update config) | `writeHostFetch()` `app.js:7511,7653` (proxy first, direct fallback on network error/429) | allowlisted or custom host | body `{config, password}` ≤2 MB → upstream JSON, strict-origin CORS | **config password in request body** (transits worker memory only; never logged/stored) | no-store | as above | 15 s timeout → 502; body buffered fully |
-| `GET /proxy/stremio/<uuid>/<epwd>/stream/... ` and `/manifest.json` | "Test streams" probe, preflight doctor | `app.js:5160,5513`, `tools/preflight:434,489` | allowlisted host (any path) / custom host (manifest-base form, `stream/*/*.json` only) | → upstream JSON, strict-origin CORS | **encrypted config password in the URL path** | no-store | as above | hostname (only) enters stats; full URL never logged |
+| `GET /proxy/stremio/<uuid>/<epwd>/stream/...` and `/manifest.json` | "Test streams" probe, preflight doctor | `app.js:5160,5513`, `tools/preflight:434,489` | allowlisted host (any path) / custom host (manifest-base form, `stream/*/*.json` only) | → upstream JSON, strict-origin CORS | **encrypted config password in the URL path** | no-store | as above | hostname (only) enters stats; full URL never logged |
 | `GET /proxy/v1/api/speedtest?host=https://api.torbox.app` | CoreSpeed | `tools/speedtest:925` | api.torbox.app (HOST_SCOPES: GET, one path, stripAuth) | → JSON | user's TorBox key is **dropped** if sent (tested) | no-store | as above | — |
 | `/proxy/app/version`, `/devices/register`, `/sync/**` `?host=https://api.wuplay.app` | WuPlay genie | `tools/genies/*catalogs.html` | api.wuplay.app, **Authorization forwarded** | device token in header | bearer token relayed to the intended host only… but see S3: today *every* non-scoped allowlisted host receives a caller's `Authorization` | no-store | as above | — |
 | anything else | — | — | — | 404 JSON | — | — | — | — |
@@ -65,7 +70,7 @@ falls back to direct on 429 — so **a 429 must never be emitted after the upstr
 
 ### 1.2 Trust-boundary diagram
 
-```
+```text
  ┌──────────────────────────── untrusted ────────────────────────────┐
  │ Browser @ brevitya.github.io / localhost (strict CSP)             │
  │   also: ANY web origin (routes with ACAO:*), curl, bots           │

@@ -901,7 +901,10 @@ export default {
     // mechanism. Serving repeated probes from the colo cache skips the upstream
     // fetch and the rate-limit burn on every page load.
     const isStatusProbe = request.method === 'GET' && upstreamPath === '/api/v1/status';
-    if (isStatusProbe) {
+    const auth = request.headers.get('Authorization');
+    const forwardsAuth = !!auth && !hostScope?.stripAuth && AUTH_FORWARD_HOSTS.has(host);
+    const shareable = isStatusProbe && !forwardsAuth;
+    if (shareable) {
       const cached = await statusProbeCacheGet(url);
       if (cached) {
         const body = await cached.text().catch(() => null);
@@ -961,12 +964,11 @@ export default {
     }
 
     const fwdHeaders = { 'Content-Type': request.headers.get('Content-Type') || 'application/json' };
-    const auth = request.headers.get('Authorization');
     // Forward-pass only when the caller set it AND the host is on the explicit
     // AUTH_FORWARD_HOSTS list (WuPlay device tokens). Never to a narrowed host,
     // never to the custom lane, never to an AIOStreams host (none of the
     // configurator surfaces send one there). Drop it otherwise.
-    if (auth && !hostScope?.stripAuth && AUTH_FORWARD_HOSTS.has(host)) fwdHeaders['Authorization'] = auth;
+    if (forwardsAuth) fwdHeaders['Authorization'] = auth;
 
     // Redirects are refused (INFRA-AUDIT S2). customHostScope validates the FIRST
     // hop only; following a 3xx would let any custom host (or a lapsed allowlisted
@@ -1006,7 +1008,7 @@ export default {
       return { status, ct, buf };
     };
 
-    const result = isStatusProbe ? await singleFlight(url.toString(), doFetch) : await doFetch();
+    const result = shareable ? await singleFlight(url.toString(), doFetch) : await doFetch();
 
     if (result.error) {
       const cls = result.error;
@@ -1039,12 +1041,12 @@ export default {
         ...SECURE_DOC_HEADERS,
         'Content-Type': result.ct,
         ...(publicCors || cors),
-        ...(isStatusProbe ? STATUS_PROBE_CACHE_HEADER : NO_STORE),
+        ...(shareable ? STATUS_PROBE_CACHE_HEADER : NO_STORE),
       },
     });
     // Only cache successful status probes; failures keep flowing through (and
     // are counted) so a broken host is never masked by a stale 200.
-    if (isStatusProbe && resp.status === 200) statusProbeCachePut(ctx, url, resp);
+    if (shareable && resp.status === 200) statusProbeCachePut(ctx, url, resp);
     return resp;
   },
   // Test/introspection hooks. Non-handler module exports are rejected by workerd,

@@ -1056,7 +1056,10 @@ test('O3: every counter written anywhere in worker.js is listed in /api/stats', 
   const fs = require('node:fs');
   const source = fs.readFileSync(require.resolve('./worker.js'), 'utf8');
   const written = new Set();
-  for (const m of source.matchAll(/'([a-z_]+)'/g)) written.add(m[1]);
+  for (const m of source.matchAll(/bgIncrement(?:Multi)?\([^,]+,\s*env\.STATS,\s*(?:\[([^\]]*)\]|'([a-z_]+)')/gs)) {
+    if (m[2]) { written.add(m[2]); }
+    else if (m[1]) { for (const q of m[1].matchAll(/'([a-z_]+)'/g)) written.add(q[1]); }
+  }
   const totals = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors', 'pastes_created', 'pastes_viewed',
     'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
     'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'pastes_kv_fallback_reads'];
@@ -1065,6 +1068,8 @@ test('O3: every counter written anywhere in worker.js is listed in /api/stats', 
   const body = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
   const missing = totals.filter(k => !(k in body));
   assert.deepEqual(missing, []);
+  const unpublished = [...written].filter(k => !(k in body) && !k.startsWith('daily:') && !k.startsWith('proxy:') && !k.startsWith('proxy_err:') && !k.startsWith('rl_hit:'));
+  assert.deepEqual(unpublished, [], 'every static counter written in worker.js must be published by /api/stats');
   assert.equal(body.contact_messages, 16, 'contact_messages was write-only before 2026-09-03');
   assert.ok('by_rate_limit' in body);
   assert.equal(body.version, WORKER_VERSION);
