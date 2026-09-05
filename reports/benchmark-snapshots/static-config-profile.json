@@ -74,7 +74,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "control-stream-1080p-torbox": {
       "addon_count": 11,
@@ -156,7 +167,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "control-stable-4k-torbox": {
       "addon_count": 7,
@@ -219,7 +241,18 @@
       "exclude_uncached": false,
       "title_matching": false,
       "season_episode_matching": true,
-      "year_matching": false
+      "year_matching": false,
+      "synced_regex_urls": 0,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 12,
+      "result_limit_resolution": 3
     },
     "control-stable-1080p-torbox": {
       "addon_count": 7,
@@ -282,7 +315,18 @@
       "exclude_uncached": false,
       "title_matching": false,
       "season_episode_matching": true,
-      "year_matching": false
+      "year_matching": false,
+      "synced_regex_urls": 0,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 10,
+      "result_limit_resolution": 3
     },
     "control-anime-4k-torbox": {
       "addon_count": 14,
@@ -351,7 +395,18 @@
       "exclude_uncached": null,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 0,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "control-4k-apex-alldebrid": {
       "addon_count": 11,
@@ -433,7 +488,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "challenger-community-mightyicyy": {
       "addon_count": 1,
@@ -484,7 +550,18 @@
       "exclude_uncached": true,
       "title_matching": false,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 0,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 7,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 10,
+      "result_limit_resolution": null
     },
     "challenger-community-rb3": {
       "addon_count": 0,
@@ -534,7 +611,18 @@
       "exclude_uncached": false,
       "title_matching": null,
       "season_episode_matching": null,
-      "year_matching": null
+      "year_matching": null,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": null,
+      "result_limit_resolution": null
     },
     "variant-apex-plus-torrentio": {
       "addon_count": 6,
@@ -611,7 +699,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-minus-torrentsdb": {
       "addon_count": 4,
@@ -686,7 +785,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-dedup-off": {
       "addon_count": 5,
@@ -762,7 +872,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-bitrate-cap-off": {
       "addon_count": 5,
@@ -838,7 +959,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-cached-first-off": {
       "addon_count": 5,
@@ -914,7 +1046,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-enable-zilean": {
       "addon_count": 6,
@@ -991,7 +1134,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-allow-unknown-res": {
       "addon_count": 5,
@@ -1068,7 +1222,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-plus-tpb": {
       "addon_count": 6,
@@ -1145,7 +1310,18 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     },
     "variant-apex-plus-therarbg": {
       "addon_count": 6,
@@ -1222,7 +1398,369 @@
       "exclude_uncached": false,
       "title_matching": true,
       "season_episode_matching": true,
-      "year_matching": true
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
+    },
+    "variant-apex-failover-on": {
+      "addon_count": 5,
+      "addons": [
+        "aiosubtitle",
+        "library",
+        "newznab",
+        "stremthruTorz",
+        "torrents-db"
+      ],
+      "sort_global": [
+        "cached",
+        "streamExpressionMatched",
+        "seadex",
+        "resolution",
+        "quality",
+        "regexScore",
+        "visualTag",
+        "encode",
+        "audioTag",
+        "audioChannel",
+        "language",
+        "library",
+        "seeders",
+        "bitrate",
+        "size",
+        "subtitle"
+      ],
+      "cached_first": true,
+      "resolution_rank": 3,
+      "required_resolutions": [
+        "2160p",
+        "1080p"
+      ],
+      "excluded_resolutions": [
+        "144p",
+        "240p",
+        "360p"
+      ],
+      "excluded_qualities": [],
+      "required_languages": [
+        "English",
+        "Original",
+        "Dual Audio",
+        "Multi",
+        "Dubbed",
+        "Unknown"
+      ],
+      "bitrate_global_movies": [
+        0,
+        150000000
+      ],
+      "bitrate_global_series": [
+        0,
+        150000000
+      ],
+      "bitrate_2160p_movies": null,
+      "bitrate_1080p_movies": null,
+      "dedup_enabled": true,
+      "dedup_keys": [
+        "filename",
+        "infoHash",
+        "smartDetect"
+      ],
+      "dedup_multi_group": "aggressive",
+      "excluded_regex_count": 7,
+      "ranked_regex_count": 107,
+      "excluded_sel_count": 23,
+      "ranked_sel_count": 0,
+      "synced_sel_urls": 0,
+      "max_results": 30,
+      "max_per_resolution": 12,
+      "exclude_uncached": false,
+      "title_matching": true,
+      "season_episode_matching": true,
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": true,
+      "failover_max_attempts": 5,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
+    },
+    "variant-apex-excluded-keywords": {
+      "addon_count": 5,
+      "addons": [
+        "aiosubtitle",
+        "library",
+        "newznab",
+        "stremthruTorz",
+        "torrents-db"
+      ],
+      "sort_global": [
+        "cached",
+        "streamExpressionMatched",
+        "seadex",
+        "resolution",
+        "quality",
+        "regexScore",
+        "visualTag",
+        "encode",
+        "audioTag",
+        "audioChannel",
+        "language",
+        "library",
+        "seeders",
+        "bitrate",
+        "size",
+        "subtitle"
+      ],
+      "cached_first": true,
+      "resolution_rank": 3,
+      "required_resolutions": [
+        "2160p",
+        "1080p"
+      ],
+      "excluded_resolutions": [
+        "144p",
+        "240p",
+        "360p"
+      ],
+      "excluded_qualities": [],
+      "required_languages": [
+        "English",
+        "Original",
+        "Dual Audio",
+        "Multi",
+        "Dubbed",
+        "Unknown"
+      ],
+      "bitrate_global_movies": [
+        0,
+        150000000
+      ],
+      "bitrate_global_series": [
+        0,
+        150000000
+      ],
+      "bitrate_2160p_movies": null,
+      "bitrate_1080p_movies": null,
+      "dedup_enabled": true,
+      "dedup_keys": [
+        "filename",
+        "infoHash",
+        "smartDetect"
+      ],
+      "dedup_multi_group": "aggressive",
+      "excluded_regex_count": 7,
+      "ranked_regex_count": 107,
+      "excluded_sel_count": 23,
+      "ranked_sel_count": 0,
+      "synced_sel_urls": 0,
+      "max_results": 30,
+      "max_per_resolution": 12,
+      "exclude_uncached": false,
+      "title_matching": true,
+      "season_episode_matching": true,
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 10,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
+    },
+    "variant-apex-episode-title-matching": {
+      "addon_count": 5,
+      "addons": [
+        "aiosubtitle",
+        "library",
+        "newznab",
+        "stremthruTorz",
+        "torrents-db"
+      ],
+      "sort_global": [
+        "cached",
+        "streamExpressionMatched",
+        "seadex",
+        "resolution",
+        "quality",
+        "regexScore",
+        "visualTag",
+        "encode",
+        "audioTag",
+        "audioChannel",
+        "language",
+        "library",
+        "seeders",
+        "bitrate",
+        "size",
+        "subtitle"
+      ],
+      "cached_first": true,
+      "resolution_rank": 3,
+      "required_resolutions": [
+        "2160p",
+        "1080p"
+      ],
+      "excluded_resolutions": [
+        "144p",
+        "240p",
+        "360p"
+      ],
+      "excluded_qualities": [],
+      "required_languages": [
+        "English",
+        "Original",
+        "Dual Audio",
+        "Multi",
+        "Dubbed",
+        "Unknown"
+      ],
+      "bitrate_global_movies": [
+        0,
+        150000000
+      ],
+      "bitrate_global_series": [
+        0,
+        150000000
+      ],
+      "bitrate_2160p_movies": null,
+      "bitrate_1080p_movies": null,
+      "dedup_enabled": true,
+      "dedup_keys": [
+        "filename",
+        "infoHash",
+        "smartDetect"
+      ],
+      "dedup_multi_group": "aggressive",
+      "excluded_regex_count": 7,
+      "ranked_regex_count": 107,
+      "excluded_sel_count": 23,
+      "ranked_sel_count": 0,
+      "synced_sel_urls": 0,
+      "max_results": 30,
+      "max_per_resolution": 12,
+      "exclude_uncached": false,
+      "title_matching": true,
+      "season_episode_matching": true,
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": true,
+      "language_inference": null,
+      "required_seeder_range": null,
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
+    },
+    "variant-apex-seeder-floor": {
+      "addon_count": 5,
+      "addons": [
+        "aiosubtitle",
+        "library",
+        "newznab",
+        "stremthruTorz",
+        "torrents-db"
+      ],
+      "sort_global": [
+        "cached",
+        "streamExpressionMatched",
+        "seadex",
+        "resolution",
+        "quality",
+        "regexScore",
+        "visualTag",
+        "encode",
+        "audioTag",
+        "audioChannel",
+        "language",
+        "library",
+        "seeders",
+        "bitrate",
+        "size",
+        "subtitle"
+      ],
+      "cached_first": true,
+      "resolution_rank": 3,
+      "required_resolutions": [
+        "2160p",
+        "1080p"
+      ],
+      "excluded_resolutions": [
+        "144p",
+        "240p",
+        "360p"
+      ],
+      "excluded_qualities": [],
+      "required_languages": [
+        "English",
+        "Original",
+        "Dual Audio",
+        "Multi",
+        "Dubbed",
+        "Unknown"
+      ],
+      "bitrate_global_movies": [
+        0,
+        150000000
+      ],
+      "bitrate_global_series": [
+        0,
+        150000000
+      ],
+      "bitrate_2160p_movies": null,
+      "bitrate_1080p_movies": null,
+      "dedup_enabled": true,
+      "dedup_keys": [
+        "filename",
+        "infoHash",
+        "smartDetect"
+      ],
+      "dedup_multi_group": "aggressive",
+      "excluded_regex_count": 7,
+      "ranked_regex_count": 107,
+      "excluded_sel_count": 23,
+      "ranked_sel_count": 0,
+      "synced_sel_urls": 0,
+      "max_results": 30,
+      "max_per_resolution": 12,
+      "exclude_uncached": false,
+      "title_matching": true,
+      "season_episode_matching": true,
+      "year_matching": true,
+      "synced_regex_urls": 1,
+      "failover_enabled": null,
+      "failover_max_attempts": null,
+      "excluded_keywords_count": 0,
+      "episode_title_matching": null,
+      "language_inference": null,
+      "required_seeder_range": [
+        3,
+        100000
+      ],
+      "exclude_seeder_range": null,
+      "always_precache": null,
+      "result_limit_global": 20,
+      "result_limit_resolution": 8
     }
   },
   "skipped": {

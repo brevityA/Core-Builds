@@ -81,7 +81,8 @@
       "url": "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/Tamtaro-All-Templates-for-AIOStreams.json",
       "template_select": "first",
       "description": "Tamtaro Complete SEL Setup \u2014 SEL-driven filtering/sorting template bundle.",
-      "citation": "https://github.com/Tam-Taro/SEL-Filtering-and-Sorting"
+      "citation": "https://github.com/Tam-Taro/SEL-Filtering-and-Sorting",
+      "note": "Wizard template: 549 __if/__switch/__value/{{inputs.*}} sites across 25 config fields. Resolved client-side via template_processor.py using the template's OWN declared defaults (73 inputs) -> 10 addons. Posting it raw would install literal placeholders."
     },
     {
       "id": "challenger-vidhin05-regex",
@@ -92,7 +93,9 @@
       "url": "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/all-templates.json",
       "template_select": "first",
       "description": "Vidhin's Regexes \u2014 ranked-regex / stream-expression score-based sorting template (English variant).",
-      "citation": "https://github.com/Vidhin05/Releases-Regex"
+      "citation": "https://github.com/Vidhin05/Releases-Regex",
+      "scoring": "overlay-only",
+      "note": "Resolves to ZERO addons: this template ships only ranked regexes / stream expressions plus synced-URL pointers, and declares no presets. It is a RANKING OVERLAY meant to be layered on an existing build, not a standalone config. Reported for its ranking payload; excluded from coverage/playability leaderboards, where a 0 would be a category error rather than a loss."
     },
     {
       "id": "challenger-grabberhawk",
@@ -272,6 +275,98 @@
       },
       "description": "TheRARBG builtin shipped in v2.34.0 (PR #1269), unused by every Core Builds template. In-process, credential-free, general-purpose (movies/TV/anime). Tests the catalog-older and obscure buckets where Apex is predicted to lose.",
       "citation": "https://github.com/Viren070/AIOStreams/pull/1269"
+    },
+    {
+      "id": "variant-apex-failover-on",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ENABLE server-side failover (Apex sets no `failover` block at all)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/failover",
+        "value": {
+          "enabled": true,
+          "contentTypes": [
+            "usenet",
+            "debrid"
+          ],
+          "allowCrossType": true,
+          "maxAttempts": 5,
+          "parallel": 2,
+          "position": "beforeLimiting"
+        }
+      },
+      "description": "BIGGEST competitor-only lever. Tamtaro enables failover; every Core build omits it. On a dead/unplayable pick AIOStreams retries up to 5 alternates server-side instead of handing the user a broken stream. Directly targets playability, the metric a user actually feels. Cost: added latency on the failing path only. Scored by playable_pct vs ttfl_ms."
+    },
+    {
+      "id": "variant-apex-excluded-keywords",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD grabberhawk's 10-keyword low-quality release-group blocklist",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/excludedKeywords",
+        "value": [
+          "yts",
+          "yify",
+          "galaxyrg",
+          "tgx",
+          "evo",
+          "ntb",
+          "rarbg",
+          "cmrg",
+          "ettv",
+          "psa"
+        ]
+      },
+      "description": "grabberhawk filters notorious re-encode groups by keyword. Apex leaves excludedKeywords unset and relies on 107 ranked regexes to DEMOTE them; this DROPS them. Tests whether hard exclusion beats soft ranking, and whether it over-filters obscure titles where a YTS rip is the only source."
+    },
+    {
+      "id": "variant-apex-episode-title-matching",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ENABLE episodeTitleMatching (0.85 similarity)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/episodeTitleMatching",
+        "value": {
+          "enabled": true,
+          "similarityThreshold": 0.85,
+          "requestTypes": [
+            "series",
+            "anime"
+          ],
+          "addons": []
+        }
+      },
+      "description": "Tamtaro ships the block but leaves it disabled; Apex lacks the field entirely. Targets the classic absolute-numbering / mislabelled-episode failure on the anime and completed-series buckets. Scored by junk_pct on series rows only."
+    },
+    {
+      "id": "variant-apex-seeder-floor",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "REQUIRE >=3 seeders on uncached p2p results",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/requiredSeederRange",
+        "value": [
+          3,
+          100000
+        ]
+      },
+      "description": "Tamtaro carries seeder-range plumbing; Apex has none. A 0-seeder uncached torrent can never be pulled by the debrid service, so it is a guaranteed dead result occupying a slot. Tests whether a seeder floor raises playability without hurting obscure-bucket coverage."
     }
   ]
 }

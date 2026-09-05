@@ -28,6 +28,9 @@
   max_per_resolution: 12  ->  3
   title_matching: True  ->  False
   year_matching: True  ->  False
+  synced_regex_urls: 1  ->  0
+  result_limit_global: 20  ->  12
+  result_limit_resolution: 8  ->  3
 
 ## control-stable-1080p-torbox  (vs control-4k-apex-torbox)
   addon_count: 5  ->  7
@@ -47,6 +50,9 @@
   max_per_resolution: 12  ->  3
   title_matching: True  ->  False
   year_matching: True  ->  False
+  synced_regex_urls: 1  ->  0
+  result_limit_global: 20  ->  10
+  result_limit_resolution: 8  ->  3
 
 ## control-anime-4k-torbox  (vs control-4k-apex-torbox)
   addon_count: 5  ->  14
@@ -60,6 +66,7 @@
   ranked_regex_count: 107  ->  0
   excluded_sel_count: 23  ->  21
   exclude_uncached: False  ->  None
+  synced_regex_urls: 1  ->  0
 
 ## control-4k-apex-alldebrid  (vs control-4k-apex-torbox)
   addon_count: 5  ->  11
@@ -83,6 +90,10 @@
   max_per_resolution: 12  ->  None
   exclude_uncached: False  ->  True
   title_matching: True  ->  False
+  synced_regex_urls: 1  ->  0
+  excluded_keywords_count: 0  ->  7
+  result_limit_global: 20  ->  10
+  result_limit_resolution: 8  ->  None
 
 ## challenger-community-rb3  (vs control-4k-apex-torbox)
   addon_count: 5  ->  0
@@ -106,6 +117,8 @@
   title_matching: True  ->  None
   season_episode_matching: True  ->  None
   year_matching: True  ->  None
+  result_limit_global: 20  ->  None
+  result_limit_resolution: 8  ->  None
 
 ## variant-apex-plus-torrentio  (vs control-4k-apex-torbox)
   addon_count: 5  ->  6
@@ -140,3 +153,16 @@
 ## variant-apex-plus-therarbg  (vs control-4k-apex-torbox)
   addon_count: 5  ->  6
   addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'therarbg', 'torrents-db']
+
+## variant-apex-failover-on  (vs control-4k-apex-torbox)
+  failover_enabled: None  ->  True
+  failover_max_attempts: None  ->  5
+
+## variant-apex-excluded-keywords  (vs control-4k-apex-torbox)
+  excluded_keywords_count: 0  ->  10
+
+## variant-apex-episode-title-matching  (vs control-4k-apex-torbox)
+  episode_title_matching: None  ->  True
+
+## variant-apex-seeder-floor  (vs control-4k-apex-torbox)
+  required_seeder_range: None  ->  [3, 100000]

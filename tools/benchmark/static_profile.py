@@ -24,11 +24,20 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 from runner import apply_mutation, load_local_template  # noqa: E402
+from template_processor import as_config_array  # noqa: E402
 
 
 def profile(cfg: dict) -> dict:
-    presets = cfg.get("presets") or []
-    sort_global = [c.get("key") for c in (cfg.get("sortCriteria") or {}).get("global", [])]
+    # `presets` is NOT reliably a list of dicts across real-world configs:
+    #   * absent entirely (regex/SEL-only templates, e.g. Vidhin05)
+    #   * a directive dict {"__if":..., "__value":[...]} (unresolved wizard template)
+    # as_config_array() normalises all of these; non-dict members are skipped.
+    presets = [p for p in as_config_array(cfg.get("presets")) if isinstance(p, dict)]
+    sort_criteria = cfg.get("sortCriteria")
+    sort_criteria = sort_criteria if isinstance(sort_criteria, dict) else {}
+    sort_global = [
+        c.get("key") for c in as_config_array(sort_criteria.get("global")) if isinstance(c, dict)
+    ]
     dedup = cfg.get("deduplicator") or {}
     bitrate = cfg.get("bitrate") or {}
     res2160 = ((bitrate.get("resolution") or {}).get("2160p") or {}).get("movies")
@@ -39,10 +48,10 @@ def profile(cfg: dict) -> dict:
         "sort_global": sort_global,
         "cached_first": bool(sort_global) and sort_global[0] == "cached",
         "resolution_rank": sort_global.index("resolution") if "resolution" in sort_global else None,
-        "required_resolutions": cfg.get("requiredResolutions") or [],
-        "excluded_resolutions": cfg.get("excludedResolutions") or [],
-        "excluded_qualities": cfg.get("excludedQualities") or [],
-        "required_languages": cfg.get("requiredLanguages") or [],
+        "required_resolutions": as_config_array(cfg.get("requiredResolutions")),
+        "excluded_resolutions": as_config_array(cfg.get("excludedResolutions")),
+        "excluded_qualities": as_config_array(cfg.get("excludedQualities")),
+        "required_languages": as_config_array(cfg.get("requiredLanguages")),
         "bitrate_global_movies": (bitrate.get("global") or {}).get("movies"),
         "bitrate_global_series": (bitrate.get("global") or {}).get("series"),
         "bitrate_2160p_movies": res2160,
@@ -50,17 +59,32 @@ def profile(cfg: dict) -> dict:
         "dedup_enabled": dedup.get("enabled"),
         "dedup_keys": dedup.get("keys"),
         "dedup_multi_group": dedup.get("multiGroupBehaviour"),
-        "excluded_regex_count": len(cfg.get("excludedRegexPatterns") or []),
-        "ranked_regex_count": len(cfg.get("rankedRegexPatterns") or []),
-        "excluded_sel_count": len(cfg.get("excludedStreamExpressions") or []),
-        "ranked_sel_count": len(cfg.get("rankedStreamExpressions") or []),
-        "synced_sel_urls": len(cfg.get("syncedRankedStreamExpressionUrls") or []),
+        "excluded_regex_count": len(as_config_array(cfg.get("excludedRegexPatterns"))),
+        "ranked_regex_count": len(as_config_array(cfg.get("rankedRegexPatterns"))),
+        "excluded_sel_count": len(as_config_array(cfg.get("excludedStreamExpressions"))),
+        "ranked_sel_count": len(as_config_array(cfg.get("rankedStreamExpressions"))),
+        "synced_sel_urls": len(as_config_array(cfg.get("syncedRankedStreamExpressionUrls"))),
         "max_results": cfg.get("maxResults"),
         "max_per_resolution": cfg.get("maxResultsPerResolution"),
         "exclude_uncached": cfg.get("excludeUncached"),
         "title_matching": (cfg.get("titleMatching") or {}).get("enabled"),
         "season_episode_matching": (cfg.get("seasonEpisodeMatching") or {}).get("enabled"),
         "year_matching": (cfg.get("yearMatching") or {}).get("enabled"),
+        # Fields competitors use that Core Builds does not. Profiled so the
+        # single-variable differ can actually PROVE a variant changed one thing;
+        # without these the differ reports "identical" and the variant is
+        # unattributable.
+        "synced_regex_urls": len(as_config_array(cfg.get("syncedRankedRegexUrls"))),
+        "failover_enabled": (cfg.get("failover") or {}).get("enabled"),
+        "failover_max_attempts": (cfg.get("failover") or {}).get("maxAttempts"),
+        "excluded_keywords_count": len(as_config_array(cfg.get("excludedKeywords"))),
+        "episode_title_matching": (cfg.get("episodeTitleMatching") or {}).get("enabled"),
+        "language_inference": (cfg.get("languageInference") or {}).get("enabled"),
+        "required_seeder_range": cfg.get("requiredSeederRange"),
+        "exclude_seeder_range": cfg.get("excludeSeederRange"),
+        "always_precache": cfg.get("alwaysPrecache"),
+        "result_limit_global": (cfg.get("resultLimits") or {}).get("global"),
+        "result_limit_resolution": (cfg.get("resultLimits") or {}).get("resolution"),
     }
 
 

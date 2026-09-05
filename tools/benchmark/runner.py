@@ -139,22 +139,77 @@ def http(method: str, url: str, *, body=None, headers=None, timeout=90):
 # ── config assembly ────────────────────────────────────────────────────────
 
 
+
+from template_processor import (  # noqa: E402
+    apply_template_conditionals,
+    default_inputs,
+    has_unresolved_directives,
+)
+
+def _extract_config(doc, select: str | None = None) -> dict:
+    """Normalise the four real-world template shapes into a plain config dict.
+
+    Observed in the wild (all four benchmarked challengers differ):
+      1. {"metadata":..., "config":...}          — our own + grabberhawk
+      2. [ {"metadata":..., "config":...} ]      — single-element bundle (Tamtaro, Vidhin)
+      3. {"templates":[ ... ]}                   — named bundle
+      4. a BARE config object, no wrapper        — ang3lo-azevedo
+    Shape 4 is why we must not simply assume a "config" key exists, and why the
+    bare-object fallback checks for known config keys rather than guessing.
+    """
+    if isinstance(doc, list):
+        if not doc:
+            raise RuntimeError("template bundle is empty")
+        doc = (
+            doc[0]
+            if select in (None, "first")
+            else next(d for d in doc if (d.get("metadata") or {}).get("id") == select)
+        )
+    if isinstance(doc, dict) and isinstance(doc.get("templates"), list):
+        bundle = doc["templates"]
+        doc = (
+            bundle[0]
+            if select in (None, "first")
+            else next(d for d in bundle if (d.get("metadata") or {}).get("id") == select)
+        )
+    if isinstance(doc, dict) and isinstance(doc.get("config"), dict):
+        return copy.deepcopy(doc["config"])
+    return copy.deepcopy(doc)
+
+
+def resolve_template(doc, select: str | None = None, services: list[str] | None = None) -> dict:
+    """Extract a config AND resolve any wizard directives it carries.
+
+    Wizard templates (`__if` / `__switch` / `{{inputs.*}}`) are resolved by the
+    AIOStreams FRONTEND only — `POST /api/v1/user` performs no substitution.
+    Posting one raw installs literal placeholder strings, so the benchmark would
+    score a broken config. We resolve using the template's own declared
+    defaults, i.e. the config as its author ships it.
+    """
+    cfg = _extract_config(doc, select)
+    top = doc[0] if isinstance(doc, list) and doc else doc
+    inputs = default_inputs(top if isinstance(top, dict) else {})
+    cfg = apply_template_conditionals(cfg, inputs, services or [])
+    unresolved = has_unresolved_directives(cfg)
+    if unresolved:
+        raise RuntimeError(
+            "template still has unresolved directives after processing "
+            f"({len(unresolved)}): {unresolved[:5]} — refusing to post a config "
+            "that would install literal placeholders."
+        )
+    return cfg
+
+
 def load_local_template(path: str) -> dict:
     doc = json.loads((REPO / path).read_text())
-    return copy.deepcopy(doc["config"] if "config" in doc else doc)
+    return _extract_config(doc)
 
 
-def load_remote_template(url: str, select: str | None) -> dict:
+def load_remote_template(url: str, select: str | None, services: list[str] | None = None) -> dict:
     r = http("GET", url, timeout=60)
     if not r["ok"]:
         raise RuntimeError(f"template fetch failed: {r.get('error')}")
-    doc = r["body"]
-    if isinstance(doc, list):  # multi-template bundle
-        doc = doc[0] if select in (None, "first") else next(d for d in doc if d.get("metadata", {}).get("id") == select)
-    if isinstance(doc, dict) and "templates" in doc and isinstance(doc["templates"], list):
-        bundle = doc["templates"]
-        doc = bundle[0] if select in (None, "first") else next(d for d in bundle if d.get("metadata", {}).get("id") == select)
-    return copy.deepcopy(doc.get("config", doc))
+    return resolve_template(r["body"], select, services)
 
 
 def apply_lane(config: dict, lane: str, api_key: str) -> dict:
@@ -237,7 +292,7 @@ def build_config(c: dict, lane: str, api_key: str) -> tuple[dict, list[str]]:
         config = load_local_template(c["path"])
         notes.append(f"loaded local template {c['path']}")
     elif src == "url":
-        config = load_remote_template(c["url"], c.get("template_select"))
+        config = load_remote_template(c["url"], c.get("template_select"), [lane])
         notes.append(f"loaded remote template {c['url']}")
     elif src == "default":
         config = {}  # server fills every default from the UserData schema

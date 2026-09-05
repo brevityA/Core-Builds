@@ -167,5 +167,80 @@ check("every series entry pins an episode",
       all(t.get("season") and t.get("episode") for t in corpus["titles"] if t["type"] == "series"))
 check("no duplicate keys", len({t["key"] for t in corpus["titles"]}) == len(corpus["titles"]))
 
+print("\n7. template shapes and wizard directives")
+from template_processor import (
+    apply_template_conditionals, evaluate_template_condition, as_config_array,
+    has_unresolved_directives, default_inputs,
+)
+from runner import _extract_config, resolve_template
+
+# The four real-world wrapper shapes must all yield the same bare config.
+bare = {"presets": [{"type": "comet", "enabled": True}]}
+check("shape: {metadata,config}", _extract_config({"metadata": {}, "config": bare}) == bare)
+check("shape: [ {metadata,config} ]", _extract_config([{"metadata": {}, "config": bare}]) == bare)
+check("shape: {templates:[...]}", _extract_config({"templates": [{"config": bare}]}) == bare)
+check("shape: bare config (no wrapper)", _extract_config(bare) == bare)
+
+# as_config_array tolerates absent / directive-valued list fields.
+check("as_config_array: missing key -> []", as_config_array(None) == [])
+check("as_config_array: directive dict -> inner list",
+      as_config_array({"__if": "inputs.x", "__value": [1, 2]}) == [1, 2])
+check("as_config_array: plain list passthrough", as_config_array([1]) == [1])
+
+# Condition semantics ported from conditionals.ts — including the quirks.
+ev = evaluate_template_condition
+check("cond: bare truthy", ev("inputs.a", {"a": True}, []) is True)
+check("cond: 0 is TRUTHY (upstream quirk)", ev("inputs.a", {"a": 0}, []) is True)
+check("cond: empty list is falsy", ev("inputs.a", {"a": []}, []) is False)
+check("cond: negation", ev("!inputs.a", {"a": False}, []) is True)
+check("cond: equality", ev("inputs.a == big", {"a": "big"}, []) is True)
+check("cond: numeric >=", ev("inputs.n >= 10", {"n": 10}, []) is True)
+check("cond: includes", ev("inputs.l includes en", {"l": ["en", "fr"]}, []) is True)
+check("cond: services.<id>", ev("services.torbox", {}, ["torbox"]) is True)
+check("cond: and/or precedence",
+      ev("inputs.a and inputs.b or inputs.c", {"a": False, "b": False, "c": True}, []) is True)
+check("cond: nested subsection ref", ev("inputs.p.url", {"p": {"url": "x"}}, []) is True)
+
+# Directive resolution.
+check("__switch picks case",
+      apply_template_conditionals(
+          {"__switch": "inputs.mode", "cases": {"hi": 1}, "default": 0}, {"mode": "hi"}, []) == 1)
+check("__switch falls back to default",
+      apply_template_conditionals(
+          {"__switch": "inputs.mode", "cases": {"hi": 1}, "default": 0}, {"mode": "zz"}, []) == 0)
+check("__if false drops array item",
+      apply_template_conditionals([{"__if": "inputs.a", "type": "x"}], {"a": False}, []) == [])
+check("__if true keeps array item",
+      apply_template_conditionals([{"__if": "inputs.a", "type": "x"}], {"a": True}, []) == [{"type": "x"}])
+check("__value spreads an array",
+      apply_template_conditionals([{"__value": [1, 2]}], {}, []) == [1, 2])
+check("__if+__value drops the whole key when false",
+      apply_template_conditionals({"k": {"__if": "inputs.a", "__value": 5}}, {"a": False}, []) == {})
+check("__remove drops the key",
+      apply_template_conditionals({"k": {"__remove": True}}, {}, []) == {})
+check("single-token placeholder preserves type",
+      apply_template_conditionals("{{inputs.n}}", {"n": 5000}, []) == 5000)
+check("multi-token placeholder stringifies",
+      apply_template_conditionals("a-{{inputs.n}}", {"n": 5}, []) == "a-5")
+check("credential ref is preserved verbatim",
+      apply_template_conditionals("{{services.torbox.apiKey}}", {}, ["torbox"]) == "{{services.torbox.apiKey}}")
+
+# The guardrail: a config with leftover directives must be refused, never posted.
+check("unresolved directives are detected",
+      len(has_unresolved_directives({"a": "{{inputs.x}}"})) == 1)
+check("resolved config reports clean", has_unresolved_directives({"a": "plain"}) == [])
+# NOTE: an UNDECLARED input resolves to "" (upstream substitutes unconditionally),
+# so it is not "unresolved". A foreign namespace is never substituted, and that is
+# exactly the case the guardrail exists to stop from reaching POST /api/v1/user.
+check("undeclared input resolves to empty string, not a leftover",
+      apply_template_conditionals("{{inputs.nope}}", {}, []) == "")
+_bad = {"metadata": {}, "config": {"timeout": "{{unknown.ns}}"}}
+try:
+    resolve_template(_bad, None, ["torbox"])
+    _refused = False
+except RuntimeError:
+    _refused = True
+check("resolve_template REFUSES a still-unresolved config", _refused)
+
 print(f"\n{'ALL PASS' if not fails else str(len(fails)) + ' FAILURES: ' + ', '.join(fails)}")
 sys.exit(1 if fails else 0)
