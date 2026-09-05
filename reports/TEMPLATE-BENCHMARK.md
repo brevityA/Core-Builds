@@ -38,6 +38,37 @@ directly out of this checkout at commit `524458b`.
 | Rich per-stream metadata (`streamData`) is attached only when `provideStreamData` is on, defaulting to user-agents containing `AIOStreams/` | Read `routes/stremio/stream.ts` + `packages/core/src/transformers/stremio.ts` @ `v2.34.0` | 2026-09-05 |
 | Corpus IMDb IDs resolve to the expected titles/years | Cinemeta `v3-cinemeta.strem.io/meta/...` spot-verified for 6 of 30 entries | 2026-09-05 |
 
+### 0.1 Re-verification against upstream `main` (2026-09-06)
+
+Re-checked one day later, because v2.34.0 was only two days old when the harness
+was pinned to it and a fast-moving upstream could have invalidated the
+measurement surface.
+
+| Check | Result |
+|---|---|
+| Latest stable release | **still v2.34.0** — no newer stable |
+| `main` vs `v2.34.0` | **`status: identical`, ahead_by 0** — the release commit `e694b6ac` *is* the head of `main` |
+| Nightly channel | Last nightly `2026.09.04.2319-nightly`, same timestamp as the stable cut — no post-release nightly drift |
+| `API_VERSION` | `const API_VERSION = 1` → `/api/v1` mount is correct |
+| Stremio route mounts | `app.use('/stremio', …)` and `/stremio/:uuid/:encryptedPassword${VARIANT_PATH_ROUTE}` unchanged |
+| `provideStreamData` UA sniff | Unchanged: falls back to `user-agent?.includes('AIOStreams/')` when `appConfig.api.provideStreamData` is `null` |
+| Series id shape | `IdParser` still uses named `season`/`episode` capture groups → `tt…:S:E` holds |
+
+**Conclusion: the harness needs no changes.** Every endpoint and behaviour it
+depends on is byte-identical to what was verified on 2026-09-05.
+
+#### Open upstream PRs that would affect this benchmark if merged
+
+None are merged, so none affect the pinned run — but three are worth watching,
+and the run manifest records the live instance version precisely so a mid-flight
+upstream bump is detectable rather than silent.
+
+| PR | Effect on the benchmark |
+|---|---|
+| [#1266](https://github.com/Viren070/AIOStreams/pull/1266) `feat: adaptive resolution floor` | **Directly targets the H2 mechanism.** Adds an opt-in `adaptiveResolutionFloor` flag: if *no* stream meets `requiredResolutions`, the filter is relaxed instead of returning an empty list. If this lands and is enabled, H2's "empty list" failure mode disappears and the recommended fix changes from "relax the filter" to "enable the flag". Opt-in, so a default-config run is unaffected. |
+| [#1265](https://github.com/Viren070/AIOStreams/pull/1265) `fix(parser): strip provider media-info residue` | Changes parsed filenames for HTTP streams, which is an input to the junk-rate scorer. Could shift `junk_pct` slightly for HTTP-source addons. |
+| [#1277](https://github.com/Viren070/AIOStreams/pull/1277) `fix(server): expose Content-Range/Accept-Ranges` | Affects cross-origin `fetch()` reads of proxy links. `spotcheck.py` is a server-side Python client, not a browser, so it is **not** affected. |
+
 Sources: <https://github.com/Viren070/AIOStreams> (v2.34.0),
 <https://guides.viren070.me/stremio/addons/aiostreams/documentation>.
 
@@ -155,10 +186,10 @@ is the classic wrong-episode junk generator.
 
 ---
 
-## 4. Contenders — 18 on the TorBox lane, 1 on AllDebrid
+## 4. Contenders — 19 on the TorBox lane, 1 on AllDebrid
 
 Registry: `tools/benchmark/contenders.json`. Plan verified with `--dry-run`:
-**18 contenders × 30 titles × 3 repeats = 1,620 stream requests** on the TorBox
+**19 contenders × 30 titles × 3 repeats = 1,710 stream requests** on the TorBox
 lane.
 
 ### 4.1 Control — unmodified Core Builds (6)
@@ -188,7 +219,7 @@ Tamtaro and Vidhin05 are the two most-cited community AIOStreams template
 projects and are whitelisted in several public instances' `TEMPLATE_URLS`, so
 they are the strongest available challengers rather than convenient ones.
 
-### 4.3 Experimental variants — one variable each (5)
+### 4.3 Experimental variants — one variable each (7)
 
 Each was **mechanically proved** single-variable: `static_profile.py --diff`
 shows the declared-config delta versus the control, and `selftest.py` asserts
@@ -203,6 +234,7 @@ subtree for add/remove/reorder ops).
 | `variant-apex-dedup-off` | `deduplicator.multiGroupBehaviour: aggressive → conservative` | exactly that field | does aggressive smart-dedup discard genuinely distinct releases? |
 | `variant-apex-bitrate-cap-off` | `bitrate.global.movies: [0, 150 Mbps] → [0, ∞)` | exactly that field | what does the strict cap cost in coverage, and what junk does it prevent? |
 | `variant-apex-cached-first-off` | demote sort key `cached` below `resolution` | `cached_first True → False`, `resolution_rank 3 → 2` | how much of Core Builds' quality comes from cached-first? |
+| `variant-apex-allow-unknown-res` | `requiredResolutions: [2160p,1080p] → [2160p,1080p,Unknown]` | exactly that field | **tests H2 directly**: what does dropping every undeclared-resolution stream cost, and what junk returns if we stop? |
 
 Two variants I originally drafted were **discarded as invalid** once measured
 against the real config, and this is worth recording because it is exactly the
@@ -337,6 +369,21 @@ whatever the data shows. Pre-registration means a miss is reported as a miss:
 * **H2** — Apex's `requiredResolutions: [2160p, 1080p]` produces total coverage
   failures (empty lists) on ≥2 catalog-older/obscure titles that Stable 4K
   serves. *Falsified if* Apex returns ≥1 result for every such title.
+  **Mechanism confirmed in source** (`packages/core/src/streams/filterer.ts` @
+  `main`, read 2026-09-06): the filter coerces a missing resolution to the
+  literal string `'Unknown'` and drops the stream unless `'Unknown'` is itself
+  in the allowlist. Apex's allowlist is `['2160p','1080p']`, so **every stream
+  whose resolution the parser cannot determine is discarded**, not merely
+  low-resolution ones. This widens H2: the loss should show up not only on
+  catalog/obscure titles but on any source that publishes undeclared
+  resolutions. Note the same templates' **`requiredLanguages` allowlists do
+  include `Unknown`** (verified in `core-nexus-4k-apex-torbox`,
+  `core-nexus-stream`, `core-nexus-4k-alldebrid`) — the identical defensive
+  guard, applied to the language filter but *not* to the resolution filter.
+  That asymmetry looks like an oversight rather than a decision.
+  The cheap candidate fix (pending measurement) is adding `'Unknown'` to
+  `requiredResolutions`; upstream PR #1266 is solving the same problem with an
+  opt-in relaxation flag.
 * **H3** — `cached-first` sorting is worth ≥15 points of `rank_cache_ok_pct`
   versus `variant-apex-cached-first-off`, confirming it as a genuine Core Builds
   strength rather than a stylistic choice. *Falsified if* the gap is <5 points.

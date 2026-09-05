@@ -223,6 +223,25 @@
         "preset_type": "zilean"
       },
       "description": "4K Apex ships Zilean declared-but-disabled. Turning it on is the cheapest possible coverage lever \u2014 does it pay for its latency?"
+    },
+    {
+      "id": "variant-apex-allow-unknown-res",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD 'Unknown' to requiredResolutions ['2160p','1080p'] -> ['2160p','1080p','Unknown']",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/requiredResolutions",
+        "value": [
+          "2160p",
+          "1080p",
+          "Unknown"
+        ]
+      },
+      "description": "Tests H2 directly. filterer.ts coerces a missing resolution to the literal 'Unknown' and drops the stream unless 'Unknown' is allowlisted, so Apex currently discards every stream whose resolution the parser cannot determine. The same templates already allowlist 'Unknown' in requiredLanguages. Measures what that asymmetry costs in coverage, and what junk it lets back in."
     }
   ]
 }

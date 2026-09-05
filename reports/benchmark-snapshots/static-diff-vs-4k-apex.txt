@@ -129,3 +129,6 @@
 ## variant-apex-enable-zilean  (vs control-4k-apex-torbox)
   addon_count: 5  ->  6
   addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db', 'zilean']
+
+## variant-apex-allow-unknown-res  (vs control-4k-apex-torbox)
+  required_resolutions: ['2160p', '1080p']  ->  ['2160p', '1080p', 'Unknown']
