@@ -5,10 +5,12 @@ on:
     paths:
       - 'validate_templates.py'
       - 'tests/**'
+      - 'tools/benchmark/**'
   pull_request:
     paths:
       - 'validate_templates.py'
       - 'tests/**'
+      - 'tools/benchmark/**'
       - 'Templates/**/*.json'
       - 'Formatters/**/*.json'
       - '**/*.md'
