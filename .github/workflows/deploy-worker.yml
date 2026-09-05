@@ -1,18 +1,53 @@
 name: Deploy CORS Proxy Worker
 
+# Deploy pipeline (INFRA-AUDIT 2026-09-03, plan item 12):
+#   test  → unit tests + wrangler dry-run bundle (catches config/binding errors
+#           before anything touches Cloudflare)
+#   deploy → wrangler deploy (production) or --env staging (manual dispatch)
+#   smoke  → smoke.mjs --strict against the freshly deployed URL; a failure fails
+#           the run and prints the rollback command. Rollback itself is a human
+#           decision (see cloudflare-worker/README.md → Runbook → Rollback).
+
 on:
   push:
     branches: [main]
     paths:
       - 'cloudflare-worker/**'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target (production = top-level wrangler env, staging = [env.staging])'
+        type: choice
+        options: [staging, production]
+        default: staging
 
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-worker-${{ github.event.inputs.environment || 'production' }}
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Worker unit tests
+        run: node --test cloudflare-worker/worker.test.js
+      - name: Wrangler dry-run (bundle + config validation, no upload)
+        working-directory: cloudflare-worker
+        run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/wr-out ${{ github.event.inputs.environment == 'staging' && '--env staging' || '' }}
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    outputs:
+      base_url: ${{ steps.url.outputs.base_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -37,3 +72,48 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: cloudflare-worker
+          # Tag the version with the commit so `wrangler versions list` / rollback
+          # can be matched to git history.
+          command: deploy --message "${{ github.sha }}" ${{ github.event.inputs.environment == 'staging' && '--env staging' || '' }}
+
+      - name: Resolve deployed URL
+        id: url
+        if: steps.cloudflare-secrets.outputs.cloudflare_ready == 'true'
+        env:
+          WORKER_BASE_URL: ${{ vars.WORKER_BASE_URL }}
+          WORKER_STAGING_BASE_URL: ${{ vars.WORKER_STAGING_BASE_URL }}
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
+            echo "base_url=${WORKER_STAGING_BASE_URL:-https://core-builds-cors-proxy-staging.tlorenzato26.workers.dev}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base_url=${WORKER_BASE_URL:-https://core-builds-cors-proxy.tlorenzato26.workers.dev}" >> "$GITHUB_OUTPUT"
+          fi
+
+  smoke:
+    needs: deploy
+    if: needs.deploy.outputs.base_url != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Wait for the new version to be live (healthz reports the version tag)
+        run: |
+          for i in $(seq 1 12); do
+            v=$(curl -sf "${{ needs.deploy.outputs.base_url }}/healthz" | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).version' 2>/dev/null || true)
+            echo "attempt $i: version=$v"
+            [ "$v" = "2026-09-03" ] && exit 0
+            sleep 5
+          done
+          echo "::warning::healthz never reported the expected version — smoke will run in strict mode and fail if the deploy is stale"
+      - name: Post-deploy smoke (strict)
+        id: smoke
+        run: node cloudflare-worker/smoke.mjs --base="${{ needs.deploy.outputs.base_url }}" --strict
+      - name: Rollback guidance
+        if: failure()
+        run: |
+          echo "::error::Smoke failed against ${{ needs.deploy.outputs.base_url }}."
+          echo "Roll back with:  cd cloudflare-worker && npx wrangler rollback --message 'smoke failed ${{ github.sha }}'"
+          echo "(or Cloudflare dashboard → Workers → core-builds-cors-proxy → Deployments → Rollback)"
+          echo "See cloudflare-worker/README.md → Runbook → Rollback for the binding caveats."
