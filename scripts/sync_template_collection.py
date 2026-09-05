@@ -23,7 +23,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATES = ROOT / 'Templates'
 OUT = ROOT / 'core-builds-template-collection.json'
 SNAPSHOT = ROOT / 'Filtering' / 'upstream' / 'vidhin05-regexes.snapshot.json'
-ALLOWLIST_OUT = ROOT / 'configurator' / 'src' / 'data' / 'regex-allowlist.js'
+ALLOWLIST_OUTS = [ROOT / 'configurator' / 'src' / 'data' / 'regex-allowlist.js',
+                  ROOT / 'packages' / 'core' / 'src' / 'regex-allowlist.js']
 
 _ALLOWLIST_HEADER = (
     '// Auto-generated from Filtering/upstream/vidhin05-regexes.snapshot.json\n'
@@ -86,17 +87,22 @@ def main():
     """Main entry point for syncing or checking the template collection."""
     if '--regex-allowlist' in sys.argv:
         want = render_allowlist()
+        n = want.count('\n  "')
         if '--check' in sys.argv:
-            current = ALLOWLIST_OUT.read_text(encoding='utf-8') if ALLOWLIST_OUT.exists() else ''
-            if current != want:
-                print('❌ configurator/src/data/regex-allowlist.js is STALE vs the pinned snapshot. '
+            stale = []
+            for out_path in ALLOWLIST_OUTS:
+                current = out_path.read_text(encoding='utf-8') if out_path.exists() else ''
+                if current != want:
+                    stale.append(str(out_path.relative_to(ROOT)))
+            if stale:
+                print(f'❌ regex allowlist mirror(s) STALE vs the pinned snapshot: {", ".join(stale)}. '
                       'Run: python3 scripts/sync_template_collection.py --regex-allowlist')
                 sys.exit(1)
-            print('✅ regex allowlist in sync with the pinned snapshot')
+            print('✅ regex allowlist in sync with the pinned snapshot (configurator + packages/core mirrors)')
             return
-        ALLOWLIST_OUT.write_text(want, encoding='utf-8')
-        n = want.count('\n  "')
-        print(f'✅ regenerated configurator/src/data/regex-allowlist.js ({n} patterns)')
+        for out_path in ALLOWLIST_OUTS:
+            out_path.write_text(want, encoding='utf-8')
+            print(f'✅ regenerated {out_path.relative_to(ROOT)} ({n} patterns)')
         return
     entries = collect()
     out = render(entries)

@@ -8,6 +8,12 @@ Pipeline position (see CLAUDE.md "Template Builder" / drift-watch sections):
            └─ THIS SCRIPT (regenerates every derived copy from the snapshot)
                 ├─ Filtering/ranked-regex-patterns.json    (reviewed subset, patterns refreshed)
                 ├─ Templates/** active lanes               (inline copies refreshed + version/changelog)
+                ├─ configurator/src/js/app.js              (embedded regex consts refreshed —
+                │    the host-capability gate strips any embedded copy whose text has left the
+                │    pinned snapshot, so these consts are derived data, not hand-maintained)
+                ├─ cli/data/ranked-regex.json              (CLI mirror of the Common+UHD lists —
+                │    must stay text-identical to the configurator copies or CLI/golden
+                │    equivalence drifts the moment the allowlist moves)
                 └─ exit codes / --check mode for CI
 
 Why this exists: standalone templates embed an inline copy of Vidhin05's ranked
@@ -47,6 +53,10 @@ ROOT = Path(__file__).resolve().parent.parent
 SNAPSHOT = ROOT / 'Filtering' / 'upstream' / 'vidhin05-regexes.snapshot.json'
 RANKED = ROOT / 'Filtering' / 'ranked-regex-patterns.json'
 TEMPLATES = ROOT / 'Templates'
+APP_JS = ROOT / 'configurator' / 'src' / 'js' / 'app.js'
+CLI_RANKED = ROOT / 'cli' / 'data' / 'ranked-regex.json'
+APP_CONST_NAMES = ('EXCLUDED_REGEX', 'PREFERRED_REGEX_4K', 'RANKED_REGEX_COMMON', 'RANKED_REGEX_UHD')
+APP_CONST_RE = re.compile(r'^const (' + '|'.join(APP_CONST_NAMES) + r') = (\[.*\]);$', re.M)
 
 REGEX_FIELDS = ('rankedRegexPatterns', 'preferredRegexPatterns',
                 'excludedRegexPatterns', 'regexOverrides')
@@ -166,6 +176,104 @@ def load(path):
         return json.load(f)
 
 
+def _embed_lists():
+    """Yield (label, items) for every derived embedded copy of the regex lists."""
+    if APP_JS.exists():
+        text = APP_JS.read_text(encoding='utf-8')
+        for m in APP_CONST_RE.finditer(text):
+            try:
+                items = json.loads(m.group(2))
+            except json.JSONDecodeError:
+                print(f'note: app.js const {m.group(1)} is not JSON — left alone')
+                continue
+            if isinstance(items, list) and items:
+                yield f'app.js:{m.group(1)}', items
+    if CLI_RANKED.exists():
+        obj = json.loads(CLI_RANKED.read_text(encoding='utf-8'))
+        for key in ('common', 'uhd'):
+            if isinstance(obj.get(key), list) and obj[key]:
+                yield f'cli/data/ranked-regex.json:{key}', obj[key]
+
+
+def check_embeds(new_norm_all):
+    """Offenders for embedded copies — same rule as the template scan: any embedded
+    pattern neither in the pinned snapshot nor a known custom is stale (the host gate
+    strips it from generated output; CLI/golden equivalence silently diverges)."""
+    offenders = []
+    for label, items in _embed_lists():
+        for item in items:
+            p = item.get('pattern') if isinstance(item, dict) else item
+            if isinstance(p, str) and p.strip():
+                n = norm(p)
+                if n not in new_norm_all and not is_known_custom(n):
+                    offenders.append(f'{label}:{p[:48]}')
+    return offenders
+
+
+def sync_embeds(old_map, new_lookup, new_norm_set, new_entries, changes, apply):
+    """Refresh the configurator/CLI embedded copies from the snapshot using the exact
+    derivation rules already applied to templates (provenance-checked text refresh;
+    membership/order never touched). Minimal diff: only the replaced string literals
+    are rewritten, so const lines keep their original byte formatting."""
+    n_files = 0
+    if APP_JS.exists():
+        text = APP_JS.read_text(encoding='utf-8')
+        out, at, file_changed = [], 0, False
+        for m in APP_CONST_RE.finditer(text):
+            name, body = m.group(1), m.group(2)
+            out.append(text[at:m.start(2)])
+            try:
+                before = json.loads(body)
+            except json.JSONDecodeError:
+                out.append(body); at = m.end(2); continue
+            probe = json.loads(body)
+            ch = set()
+            if sync_list(probe, old_map, new_lookup, new_norm_set, new_entries, ch):
+                for o, u in zip(before, probe):
+                    os_ = o.get('pattern') if isinstance(o, dict) else o
+                    us_ = u.get('pattern') if isinstance(u, dict) else u
+                    if os_ != us_:
+                        body = body.replace(json.dumps(os_, ensure_ascii=False),
+                                            json.dumps(us_, ensure_ascii=False), 1)
+                changes |= ch
+                file_changed = True
+                print(f'  ~ configurator/src/js/app.js:{name} ← {", ".join(sorted(ch))}')
+            out.append(body)
+            at = m.end(2)
+        out.append(text[at:])
+        if file_changed:
+            n_files += 1
+            if apply:
+                APP_JS.write_text(''.join(out), encoding='utf-8')
+    if CLI_RANKED.exists():
+        raw = CLI_RANKED.read_text(encoding='utf-8')
+        obj = json.loads(raw)
+        file_changed = False
+        for key in ('common', 'uhd'):
+            items = obj.get(key)
+            if not isinstance(items, list) or not items:
+                continue
+            before = [dict(x) if isinstance(x, dict) else x for x in items]
+            ch = set()
+            if sync_list(items, old_map, new_lookup, new_norm_set, new_entries, ch):
+                for o, u in zip(before, items):
+                    os_ = o.get('pattern') if isinstance(o, dict) else o
+                    us_ = u.get('pattern') if isinstance(u, dict) else u
+                    if os_ != us_:
+                        raw = raw.replace(json.dumps(os_, ensure_ascii=False),
+                                          json.dumps(us_, ensure_ascii=False), 1)
+                changes |= ch
+                file_changed = True
+                print(f'  ~ cli/data/ranked-regex.json:{key} ← {", ".join(sorted(ch))}')
+        if file_changed:
+            n_files += 1
+            if apply:
+                # reparse the patched raw text so the file stays valid JSON, canonicalized
+                json.loads(raw)
+                CLI_RANKED.write_text(raw, encoding='utf-8')
+    return n_files
+
+
 def target_files(include_deprecated=False, include_personal=False):
     files = []
     for f in sorted(TEMPLATES.rglob('*.json')):
@@ -228,12 +336,14 @@ def main():
                         n = norm(p)
                         if n not in new_norm_all and not is_known_custom(n):
                             offenders.append(f'{f.relative_to(ROOT)}:{fld}:{p[:40]}')
+        offenders += check_embeds(new_norm_all)
         if offenders:
             print(f'❌ {len(offenders)} inline pattern(s) not synced to the pinned snapshot:')
             for o in offenders:
                 print('   ', o)
             sys.exit(1)
-        print(f'✅ every inline regex copy is synced to the pinned snapshot '
+        print(f'✅ every inline regex copy (templates, configurator consts, CLI data) '
+              f'is synced to the pinned snapshot '
               f'({len(new_entries)} upstream patterns, '
               f'{len(scan_files)} files scanned; '
               f'custom patterns exempt: {len(CUSTOM_OK)})')
@@ -283,8 +393,14 @@ def main():
             file_changes[fpath] = sorted(ch)
         changes |= ch
 
+    # 3. configurator/CLI embedded copies (app.js regex consts + cli/data mirror)
+    embed_changes = set()
+    n_embed = sync_embeds(old_map, new_lookup, new_norm_set, new_entries, embed_changes, args.apply)
+    changes |= embed_changes
+
     print(f'\n{"APPLIED" if args.apply else "DRY RUN"}: {len(updated_files)} template file(s) '
-          f'changed; upstream names refreshed: {len(changes or rchanges)}')
+          f'changed; {n_embed} embedded copy(ies) refreshed; '
+          f'upstream names refreshed: {len(changes or rchanges)}')
     for f in updated_files:
         print(f'   ~ {f}  ← {", ".join(file_changes[f])}')
     if stale_now:
