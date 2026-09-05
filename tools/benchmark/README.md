@@ -19,7 +19,7 @@ The output is `reports/TEMPLATE-BENCHMARK.md` plus sanitized raw snapshots under
 | File | What it is |
 |---|---|
 | `corpus/corpus-v1.json` | The fixed 30-title corpus (versioned data). |
-| `corpus/corpus-v1.verified.json` | Generated: each ID verified live against Cinemeta. |
+| `corpus/corpus-v1.verified.json` | Generated locally by `verify_corpus.py`, gitignored — each ID verified live against Cinemeta. Not committed, so a stale or failed verification can never be mistaken for evidence. |
 | `verify_corpus.py` | Verifies every corpus ID/title/year resolves. No credentials needed. |
 | `contenders.json` | Control templates, community challengers (with citations), and single-variable variants. |
 | `runner.py` | Installs each contender, queries every corpus title, snapshots the full raw result list. |

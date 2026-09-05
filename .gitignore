@@ -61,3 +61,4 @@ docsalot-corebuilds/
 tools/benchmark/.env
 tools/benchmark/*.local
 reports/benchmark-snapshots/**/*.local.json
+tools/benchmark/corpus/*.verified.json
