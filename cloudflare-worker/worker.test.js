@@ -641,3 +641,472 @@ test('/api/stats surfaces every counter the worker writes', async () => {
   assert.equal(body.proxy_err_timeout, 10);
   assert.equal(body.proxy_err_status, 13);
 });
+
+// ── 2026-09-03 INFRA-AUDIT regression tests ──────────────────────────────
+// Each security test below FAILS against the pre-audit worker (verified by
+// running it against /tmp/worker.orig.js during the audit). See INFRA-AUDIT.md
+// for the finding ids (S*, R*, O*) referenced in test names.
+
+// Guarded so this file can be pointed at a pre-audit worker.js to demonstrate
+// which tests fail without the fixes (the legacy tests keep running).
+const _resetBreakers = worker._resetBreakers || (() => {});
+const PasteStore = workerModule.PasteStore || class { constructor() { throw new Error('PasteStore not exported by this worker build'); } };
+const WORKER_VERSION = worker.WORKER_VERSION || 'legacy';
+const ctxSync = { waitUntil: (p) => p && p.then ? p.then(() => {}) : p };
+const settle = () => new Promise(r => setImmediate(r));
+
+// A fake Durable Object namespace that runs the real PasteStore class over an
+// in-memory SQLite-shaped shim (exec/toArray), so the read-after-write path is
+// exercised end to end without workerd.
+function fakeSql() {
+  const rows = new Map();
+  return {
+    exec(q, ...args) {
+      if (/CREATE (TABLE|INDEX)/.test(q)) return { toArray: () => [] };
+      if (q.startsWith('INSERT')) { rows.set(args[0], { body: args[1], expires_at: args[2] }); return { toArray: () => [] }; }
+      if (q.startsWith('SELECT')) { const r = rows.get(args[0]); return { toArray: () => (r ? [r] : []) }; }
+      if (q.startsWith('DELETE')) { for (const [k, v] of rows) if (v.expires_at <= args[0]) rows.delete(k); return { toArray: () => [] }; }
+      throw new Error('unexpected sql: ' + q);
+    },
+    _rows: rows,
+  };
+}
+function fakeDoNamespace({ failWrites = false, failAll = false } = {}) {
+  let instance;
+  const state = {
+    storage: { sql: fakeSql(), getAlarm: async () => null, setAlarm: async () => {} },
+    blockConcurrencyWhile: async (fn) => { await fn(); },
+  };
+  return {
+    idFromName: (n) => `id:${n}`,
+    get: () => ({
+      fetch: async (url, init) => {
+        if (failAll) throw new Error('DO unavailable');
+        if (failWrites && init && init.method === 'PUT') return new Response('boom', { status: 500 });
+        instance = instance || new PasteStore(state);
+        return instance.fetch(new Request(url, init));
+      },
+    }),
+    _state: state,
+  };
+}
+const TEMPLATE_BODY = JSON.stringify({ metadata: { id: 'x', name: 'x', version: '0.0.1' }, config: { addonName: 'x' } });
+
+test.beforeEach(() => _resetBreakers());
+
+// ── S2: redirects ──────────────────────────────────────────────────────────
+test('S2: an upstream 3xx is refused (502), the redirect target is never fetched', async () => {
+  const fetched = [];
+  global.fetch = async (input) => {
+    const r = input instanceof Request ? input : new Request(input);
+    fetched.push(r.url);
+    assert.equal(r.redirect, 'manual', 'upstream request must not auto-follow');
+    return new Response(null, { status: 302, headers: { Location: 'https://attacker.example/steal' } });
+  };
+  const stats = {};
+  const env = { STATS: { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; } } };
+  const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${CUSTOM}`), env, ctxSync);
+  assert.equal(res.status, 502);
+  assert.deepEqual(await res.json(), { error: 'upstream redirect refused' });
+  assert.deepEqual(fetched, ['https://selfhost.example.com/api/v1/status']);
+  await settle();
+  assert.equal(stats.proxy_err_redirect, '1');
+  assert.equal(res.headers.get('Location'), null);
+});
+
+test('S2: redirect refusal also applies to allowlisted hosts and to POST writes (body never replayed elsewhere)', async () => {
+  let calls = 0;
+  global.fetch = async () => { calls++; return new Response('', { status: 307, headers: { Location: 'https://aiostreams.elfhosted.com/api/v1/user' } }); };
+  const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"config":{},"password":"pw"}' }), {}, ctxSync);
+  assert.equal(res.status, 502);
+  assert.equal(calls, 1);
+});
+
+// ── S3: Authorization forwarding allowlist ────────────────────────────────
+test('S3: Authorization is dropped for AIOStreams hosts and kept only for api.wuplay.app', async () => {
+  const seen = {};
+  global.fetch = async (input) => {
+    const r = input instanceof Request ? input : new Request(input);
+    seen[new URL(r.url).hostname] = r.headers.get('authorization');
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const h = { Authorization: 'Bearer token' };
+  await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`, { headers: h }), {}, ctxSync);
+  await worker.fetch(new Request(`https://w.example/proxy/app/version?host=${encodeURIComponent('https://api.wuplay.app')}`, { headers: h }), {}, ctxSync);
+  assert.equal(seen['aiostreams.elfhosted.com'], null, 'AIOStreams host must not receive the caller credential');
+  assert.equal(seen['api.wuplay.app'], 'Bearer token', 'WuPlay lane still gets its device token');
+});
+
+// ── S4: rate limiting must hold with no KV binding and across isolates ────
+test('S4: rate limit holds with NO RATELIMIT KV bound (in-isolate floor)', async () => {
+  global.fetch = async () => new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  let last = 200;
+  for (let i = 0; i < 25; i++) {
+    const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${CUSTOM}`, { headers: { 'cf-connecting-ip': '198.51.100.9' } }), {}, ctxSync);
+    last = res.status; if (last === 429) break;
+  }
+  assert.equal(last, 429, 'custom lane (20/min) must trip without any KV binding');
+});
+
+test('S4: Rate Limiting binding deny is honoured (cross-isolate counter), and is keyed by scope+ip', async () => {
+  const keys = [];
+  const env = { RL_PASTE_READ: { limit: async ({ key }) => { keys.push(key); return { success: false }; } }, TEMPLATES: { get: async () => TEMPLATE_BODY, put: async () => {} } };
+  const res = await worker.fetch(new Request('https://w.example/t/abcdef1234', { headers: { 'cf-connecting-ip': '198.51.100.10' } }), env, ctxSync);
+  assert.equal(res.status, 429);
+  assert.deepEqual(keys, ['paste_read:198.51.100.10']);
+});
+
+test('S4: KV same-key write-cap failure inside the window counts against the caller (no fail-open burst)', async () => {
+  // Simulate KV: reads return the current count, but puts throw once the count
+  // approaches the limit (the 1 write/s/key behaviour under burst).
+  const store = {};
+  const rl = {
+    get: async (k) => (k in store ? store[k] : null),
+    put: async (k, v) => { if (parseInt(v, 10) >= 10) throw new Error('KV PUT failed: 429 too many writes'); store[k] = v; },
+  };
+  const env = { RATELIMIT: rl, TEMPLATES: { get: async () => null, put: async () => {} } };
+  let statuses = [];
+  for (let i = 0; i < 12; i++) {
+    const res = await worker.fetch(new Request('https://w.example/paste', { method: 'POST', headers: { 'cf-connecting-ip': '198.51.100.11', 'Content-Type': 'application/json' }, body: TEMPLATE_BODY }), env, ctxSync);
+    statuses.push(res.status);
+  }
+  assert.ok(statuses.includes(429), `burst must be stopped even when KV puts fail: ${statuses.join(',')}`);
+  assert.ok(statuses.filter(s => s === 200).length <= 10, 'never more than the configured 10/min pass');
+});
+
+test('S4: X-Forwarded-For cannot be used to escape the bucket (only cf-connecting-ip is keyed)', async () => {
+  global.fetch = async () => new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  let last = 200;
+  for (let i = 0; i < 25; i++) {
+    const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${CUSTOM}`, { headers: { 'cf-connecting-ip': '198.51.100.12', 'X-Forwarded-For': `10.0.${i}.1` } }), {}, ctxSync);
+    last = res.status; if (last === 429) break;
+  }
+  assert.equal(last, 429);
+});
+
+test('S4: rate-limit rejections are counted (rate_limited + rl_hit:<scope>) and listed by /api/stats', async () => {
+  const stats = {}; const statsKv = { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; }, list: async ({ prefix }) => ({ keys: Object.keys(stats).filter(k => k.startsWith(prefix)).map(name => ({ name })), list_complete: true }) };
+  const env = { STATS: statsKv, RL_ANALYTICS: { limit: async () => ({ success: false }) } };
+  const res = await worker.fetch(new Request('https://w.example/api/generate', { method: 'POST', headers: { 'cf-connecting-ip': '198.51.100.13' } }), env, ctxSync);
+  assert.equal(res.status, 429);
+  await settle();
+  const s = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
+  assert.equal(s.rate_limited, 1);
+  assert.deepEqual(s.by_rate_limit, { generate: 1 });
+});
+
+// ── S5: reserved / dotless hostnames ──────────────────────────────────────
+test('S5: custom lane refuses dotless and reserved-suffix hostnames, keeps public FQDNs', async () => {
+  let reached = 0;
+  global.fetch = async () => { reached++; return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  for (const bad of ['https://intranet', 'https://router.local', 'https://vault.internal', 'https://box.lan', 'https://svc.corp', 'https://h.onion', 'https://1.0.0.10.in-addr.arpa', 'https://localhost.localdomain'.replace('localdomain', 'local')]) {
+    const res = await worker.fetch(new Request('https://w.example/proxy/api/v1/status?host=' + encodeURIComponent(bad)), {}, ctxSync);
+    assert.equal(res.status, 403, `${bad} must be refused`);
+  }
+  assert.equal(reached, 0);
+  const ok = await worker.fetch(new Request('https://w.example/proxy/api/v1/status?host=' + encodeURIComponent('https://aio.my-home-server.example.com')), {}, ctxSync);
+  assert.equal(ok.status, 200);
+  const canary = await worker.fetch(new Request('https://w.example/proxy/api/v1/status?host=' + encodeURIComponent('https://example.com')), {}, ctxSync);
+  assert.equal(canary.status, 200, 'smoke canary example.com stays allowed');
+});
+
+test('SSRF matrix: decimal / hex / octal / short IPv4 encodings and IPv6 literals are all refused', async () => {
+  let reached = 0;
+  global.fetch = async () => { reached++; return new Response('{}', { status: 200 }); };
+  const bads = ['https://2130706433', 'https://0x7f000001', 'https://0177.0.0.1', 'https://127.1', 'https://0x7f.1', 'https://[::ffff:7f00:1]', 'https://[fe80::1]', 'https://169.254.169.254', 'https://0.0.0.0', 'https://user@selfhost.example.com', 'https://selfhost.example.com:8443', 'https://selfhost.example.com/?x=1', 'https://selfhost.example.com/#f'];
+  for (const bad of bads) {
+    const res = await worker.fetch(new Request('https://w.example/proxy/api/v1/status?host=' + encodeURIComponent(bad)), {}, ctxSync);
+    assert.equal(res.status, 403, `${bad} must be refused`);
+  }
+  assert.equal(reached, 0);
+});
+
+// ── S6/S7: input validation ────────────────────────────────────────────────
+test('S6: /api/generate only accepts bounded lowercase dimension values as KV keys', async () => {
+  const stats = {}; const statsKv = { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; } };
+  const env = { STATS: statsKv };
+  await worker.fetch(new Request('https://w.example/api/generate', { method: 'POST', body: JSON.stringify({ service: 'torbox-pro', device: '<img src=x onerror=alert(1)>', resolution: 'x'.repeat(600) }) }), env, ctxSync);
+  await settle();
+  assert.equal(stats['gen:service:torbox-pro'], '1');
+  assert.equal(Object.keys(stats).filter(k => k.startsWith('gen:device:')).length, 0);
+  assert.equal(Object.keys(stats).filter(k => k.startsWith('gen:res:')).length, 0);
+});
+
+test('S7: /contact refuses oversized payloads (413) before parsing', async () => {
+  const env = { DISCORD_WEBHOOK_URL: 'https://discord.example/hook' };
+  global.fetch = async () => { throw new Error('webhook must not be called'); };
+  const res = await worker.fetch(new Request('https://w.example/contact', { method: 'POST', headers: { Origin: 'https://brevitya.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'a', message: 'x'.repeat(20000) }) }), env, ctxSync);
+  assert.equal(res.status, 413);
+});
+
+// ── S8/O6: no credentials, paths or custom hostnames in stats/logs ─────────
+test('S8: custom-lane hostnames are not published in /api/stats (label = custom)', async () => {
+  global.fetch = async () => new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  const stats = {}; const statsKv = { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; } };
+  await worker.fetch(new Request('https://w.example/proxy/api/v1/status?host=' + encodeURIComponent('https://my-private-box.example.net')), { STATS: statsKv }, ctxSync);
+  await settle();
+  assert.equal(stats['proxy:custom'], '1');
+  assert.ok(!Object.keys(stats).some(k => k.includes('my-private-box')), 'private hostname must not become a KV key');
+});
+
+test('O6: log lines never contain the request URL, path, body, password or IP', async () => {
+  const lines = [];
+  const origLog = console.log; console.log = (l) => lines.push(String(l));
+  try {
+    global.fetch = async () => { throw new TypeError('fetch failed'); };
+    const url = `https://w.example/proxy/stremio/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/SUPERSECRETPW/stream/movie/tt1.json?host=${ELFH}`;
+    for (let i = 0; i < 6; i++) await worker.fetch(new Request(url, { headers: { 'cf-connecting-ip': '198.51.100.44' } }), {}, ctxSync);
+  } finally { console.log = origLog; }
+  assert.ok(lines.length > 0, 'transport failures are logged');
+  for (const l of lines) {
+    assert.ok(!/SUPERSECRETPW|stremio|198\.51\.100\.44|w\.example\/proxy/.test(l), `log leaked request data: ${l}`);
+    const parsed = JSON.parse(l);
+    assert.equal(parsed.event, 'proxy_upstream_error');
+    assert.equal(parsed.host, 'aiostreams.elfhosted.com');
+  }
+});
+
+// ── S9: security headers on every worker response ──────────────────────────
+test('S9: JSON, paste and proxy responses carry frame/CSP/HSTS headers', async () => {
+  global.fetch = async () => new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  const env = { TEMPLATES: { get: async () => TEMPLATE_BODY, put: async () => {} } };
+  for (const req of [new Request('https://w.example/nope'), new Request('https://w.example/t/abcdef1234'), new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), new Request('https://w.example/healthz')]) {
+    const res = await worker.fetch(req, env, ctxSync);
+    assert.equal(res.headers.get('X-Frame-Options'), 'DENY', req.url);
+    assert.match(res.headers.get('Content-Security-Policy'), /frame-ancestors 'none'/);
+    assert.match(res.headers.get('Strict-Transport-Security'), /max-age=/);
+  }
+});
+
+// ── CORS on the credential-bearing route stays strict after all changes ────
+test('CORS: /proxy/stremio/<uuid>/<epwd>/... never gets ACAO * even from an allowlisted host origin, and preflight matches', async () => {
+  global.fetch = async () => new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  const url = `https://w.example/proxy/stremio/u/epwd/stream/movie/tt1.json?host=${ELFH}`;
+  const actual = await worker.fetch(new Request(url, { headers: { Origin: 'https://evil.example' } }), {}, ctxSync);
+  assert.equal(actual.headers.get('Access-Control-Allow-Origin'), 'https://brevitya.github.io');
+  const pre = await worker.fetch(new Request(url, { method: 'OPTIONS', headers: { Origin: 'https://evil.example' } }), {}, ctxSync);
+  assert.equal(pre.headers.get('Access-Control-Allow-Origin'), 'https://brevitya.github.io');
+  assert.equal(pre.headers.get('Vary'), 'Origin');
+});
+
+// ── R1: paste read-after-write via the Durable Object store ───────────────
+test('R1: paste written to the DO store is readable immediately even when KV would still 404', async () => {
+  const PASTES = fakeDoNamespace();
+  // KV that NEVER returns what was just written (models a distant colo's cached negative lookup)
+  const staleKv = { put: async () => {}, get: async () => null };
+  const env = { PASTES, TEMPLATES: staleKv };
+  const post = await worker.fetch(new Request('https://w.example/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: TEMPLATE_BODY }), env, ctxSync);
+  assert.equal(post.status, 200);
+  const { url } = await post.json();
+  const read = await worker.fetch(new Request(url), env, ctxSync);
+  assert.equal(read.status, 200, 'no 404 race');
+  assert.equal(await read.text(), TEMPLATE_BODY);
+  assert.equal(read.headers.get('Cache-Control'), 'no-store');
+  assert.equal(read.headers.get('Access-Control-Allow-Origin'), '*');
+});
+
+test('R1: legacy ids written to KV before the DO store are still served (fallback read, counted)', async () => {
+  const PASTES = fakeDoNamespace();
+  const kv = { 't:legacy0001': TEMPLATE_BODY };
+  const stats = {};
+  const env = { PASTES, TEMPLATES: { get: async k => kv[k] || null, put: async () => {} }, STATS: { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; } } };
+  const read = await worker.fetch(new Request('https://w.example/t/legacy0001'), env, ctxSync);
+  assert.equal(read.status, 200);
+  await settle();
+  assert.equal(stats.pastes_kv_fallback_reads, '1');
+});
+
+test('R1: DO write failure degrades to KV (route stays alive), DO outage degrades to KV reads', async () => {
+  const kv = {};
+  const kvBinding = { get: async k => kv[k] || null, put: async (k, v) => { kv[k] = v; } };
+  const env = { PASTES: fakeDoNamespace({ failWrites: true }), TEMPLATES: kvBinding };
+  const post = await worker.fetch(new Request('https://w.example/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: TEMPLATE_BODY }), env, ctxSync);
+  assert.equal(post.status, 200);
+  assert.equal(Object.keys(kv).length, 1, 'fell back to KV');
+  const id = (await post.json()).url.split('/t/')[1];
+  const read = await worker.fetch(new Request(`https://w.example/t/${id}`), { PASTES: fakeDoNamespace({ failAll: true }), TEMPLATES: kvBinding }, ctxSync);
+  assert.equal(read.status, 200);
+});
+
+test('R1: shape and size validation are unchanged in front of the DO store', async () => {
+  const env = { PASTES: fakeDoNamespace() };
+  const generic = await worker.fetch(new Request('https://w.example/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"hello":"world"}' }), env, ctxSync);
+  assert.equal(generic.status, 400);
+  const big = await worker.fetch(new Request('https://w.example/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config: { pad: 'x'.repeat(600 * 1024) } }) }), env, ctxSync);
+  assert.equal(big.status, 400);
+  assert.equal((await big.json()).error, 'too large');
+});
+
+test('R1: PasteStore expires rows via alarm and refuses non-conforming ids', async () => {
+  const ns = fakeDoNamespace();
+  const env = { PASTES: ns };
+  const post = await worker.fetch(new Request('https://w.example/paste', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: TEMPLATE_BODY }), env, ctxSync);
+  const id = (await post.json()).url.split('/t/')[1];
+  const row = ns._state.storage.sql._rows.get(id);
+  row.expires_at = Date.now() - 1;
+  const stub = ns.get();
+  assert.equal((await stub.fetch(`https://paste-store/${id}`, { method: 'GET' })).status, 404, 'expired rows are not served');
+  assert.equal((await stub.fetch('https://paste-store/../etc', { method: 'GET' })).status, 400);
+});
+
+// ── R2: single-flight on status-probe cache miss ──────────────────────────
+test('R2: concurrent cache misses for one status probe share a single upstream fetch', async () => {
+  let upstream = 0; let release;
+  const gate = new Promise(r => { release = r; });
+  global.fetch = async () => { upstream++; await gate; return new Response(JSON.stringify({ data: { version: '2.33.2' } }), { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  globalThis.caches = { default: { match: async () => undefined, put: async () => {} } };
+  try {
+    const reqs = Array.from({ length: 8 }, () => worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), {}, ctxSync));
+    await settle(); release();
+    const results = await Promise.all(reqs);
+    assert.equal(upstream, 1, 'exactly one upstream fetch for 8 concurrent misses');
+    for (const r of results) { assert.equal(r.status, 200); assert.equal((await r.json()).data.version, '2.33.2'); }
+  } finally { delete globalThis.caches; }
+});
+
+test('R2: single-flight is per URL — different hosts do not share a fetch', async () => {
+  let upstream = 0;
+  global.fetch = async () => { upstream++; return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  await Promise.all([
+    worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), {}, ctxSync),
+    worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${encodeURIComponent('https://aiostreams.viren070.me')}`), {}, ctxSync),
+  ]);
+  assert.equal(upstream, 2);
+});
+
+// ── R3: upstream timeout / 429 / 5xx / CF egress errors / circuit breaker ──
+test('R3: upstream timeout → 502 + proxy_err_timeout; upstream 429/5xx are mirrored (not converted to a worker 429)', async () => {
+  const stats = {}; const statsKv = { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; } };
+  global.fetch = async () => { const e = new Error('t'); e.name = 'TimeoutError'; throw e; };
+  const t = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'POST', body: '{}' }), { STATS: statsKv }, ctxSync);
+  assert.equal(t.status, 502);
+  await settle(); assert.equal(stats.proxy_err_timeout, '1');
+  global.fetch = async () => new Response('{"error":"slow down"}', { status: 429, headers: { 'Content-Type': 'application/json' } });
+  const r = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'POST', body: '{}' }), {}, ctxSync);
+  assert.equal(r.status, 429, 'an UPSTREAM 429 is passed through unchanged (contract: writeHostFetch may then retry direct)');
+  global.fetch = async () => new Response('{"error":"boom"}', { status: 503, headers: { 'Content-Type': 'application/json' } });
+  const f = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'POST', body: '{}' }), { STATS: statsKv }, ctxSync);
+  assert.equal(f.status, 503);
+  await settle(); assert.equal(stats.proxy_err_status, '1');
+});
+
+test('R3/O2: Cloudflare egress error pages (530 "error code: 1016") are classified as network, returned as JSON 502', async () => {
+  const stats = {}; const statsKv = { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; } };
+  global.fetch = async () => new Response('error code: 1016', { status: 530, headers: { 'Content-Type': 'text/plain; charset=UTF-8' } });
+  const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${CUSTOM}`), { STATS: statsKv }, ctxSync);
+  assert.equal(res.status, 502);
+  assert.equal(res.headers.get('Content-Type'), 'application/json');
+  assert.deepEqual(await res.json(), { error: 'upstream unreachable' });
+  await settle();
+  assert.equal(stats.proxy_err_network, '1');
+  assert.equal(stats.proxy_err_status, undefined);
+});
+
+test('R3: circuit breaker opens after 5 transport failures (fast 503 + Retry-After, no upstream call), recovers on success', async () => {
+  let upstream = 0; let mode = 'fail';
+  global.fetch = async () => { upstream++; if (mode === 'fail') throw new TypeError('fetch failed'); return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  const stats = {}; const statsKv = { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; } };
+  const env = { STATS: statsKv };
+  const url = `https://w.example/proxy/api/v1/user?host=${encodeURIComponent('https://aiostreams.stremio.ru')}`;
+  for (let i = 0; i < 5; i++) assert.equal((await worker.fetch(new Request(url, { method: 'POST', body: '{}' }), env, ctxSync)).status, 502);
+  assert.equal(upstream, 5);
+  const open = await worker.fetch(new Request(url, { method: 'POST', body: '{}' }), env, ctxSync);
+  assert.equal(open.status, 503);
+  assert.equal(open.headers.get('Retry-After'), '30');
+  assert.equal(upstream, 5, 'open breaker must not touch upstream');
+  await settle(); assert.equal(stats.proxy_err_breaker, '1');
+  // other hosts are unaffected (blast radius = one host)
+  mode = 'ok';
+  assert.equal((await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), env, ctxSync)).status, 200);
+  // half-open after the window: reset and verify recovery path
+  _resetBreakers();
+  assert.equal((await worker.fetch(new Request(url, { method: 'POST', body: '{}' }), env, ctxSync)).status, 200);
+});
+
+test('R3: upstream 4xx/5xx do NOT trip the breaker (the host is answering)', async () => {
+  global.fetch = async () => new Response('{}', { status: 500, headers: { 'Content-Type': 'application/json' } });
+  const url = `https://w.example/proxy/api/v1/status?host=${ELFH}`;
+  for (let i = 0; i < 8; i++) assert.equal((await worker.fetch(new Request(url), {}, ctxSync)).status, 500);
+});
+
+// ── R4: binary-safe passthrough ────────────────────────────────────────────
+test('R4: upstream bytes are passed through unmodified (no UTF-8 round-trip)', async () => {
+  const bytes = new Uint8Array([0xff, 0xfe, 0x00, 0x80, 0x7b, 0x7d]);
+  global.fetch = async () => new Response(bytes, { status: 200, headers: { 'Content-Type': 'application/octet-stream' } });
+  const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`), {}, ctxSync);
+  assert.deepEqual(new Uint8Array(await res.arrayBuffer()), bytes);
+});
+
+// ── R6/O1: counter retries are spaced and failures are visible ────────────
+test('O1: exhausted counter writes increment counter_write_err and it is surfaced by /api/stats', async () => {
+  const stats = {};
+  const flaky = { get: async k => stats[k] || null, put: async (k, v) => { if (k === 'visits') throw new Error('KV PUT failed: 429'); stats[k] = v; }, list: async () => ({ keys: [], list_complete: true }) };
+  const env = { STATS: flaky };
+  const res = await worker.fetch(new Request('https://w.example/api/visit', { method: 'POST' }), env, ctxSync);
+  assert.deepEqual(await res.json(), { visits: 0 });
+  await settle();
+  assert.equal(stats.counter_write_err, '1');
+  assert.equal(stats.visits_write_err, '1');
+  const s = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
+  assert.equal(s.counter_write_err, 1);
+});
+
+// ── O3: /api/stats completeness (extends the existing write-only guard) ────
+test('O3: every counter written anywhere in worker.js is listed in /api/stats', async () => {
+  const fs = require('node:fs');
+  const source = fs.readFileSync(require.resolve('./worker.js'), 'utf8');
+  const written = new Set();
+  for (const m of source.matchAll(/'([a-z_]+)'/g)) written.add(m[1]);
+  const totals = ['visits', 'generates', 'proxy_calls', 'proxy_cache_hits', 'proxy_errors', 'pastes_created', 'pastes_viewed',
+    'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
+    'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'pastes_kv_fallback_reads'];
+  const store = Object.fromEntries(totals.map((k, i) => [k, String(i + 1)]));
+  const env = { STATS: { get: async k => store[k] ?? null, list: async () => ({ keys: [], list_complete: true }) } };
+  const body = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
+  const missing = totals.filter(k => !(k in body));
+  assert.deepEqual(missing, []);
+  assert.equal(body.contact_messages, 16, 'contact_messages was write-only before 2026-09-03');
+  assert.ok('by_rate_limit' in body);
+  assert.equal(body.version, WORKER_VERSION);
+});
+
+test('O5: /healthz reports version + bindings without touching KV, 503 when no paste store is bound', async () => {
+  const touched = { kv: 0 };
+  const env = { STATS: { get: async () => { touched.kv++; return null; } }, TEMPLATES: { get: async () => { touched.kv++; return null; } } };
+  const ok = await worker.fetch(new Request('https://w.example/healthz'), env, ctxSync);
+  assert.equal(ok.status, 200);
+  const body = await ok.json();
+  assert.equal(body.version, WORKER_VERSION);
+  assert.equal(body.bindings.TEMPLATES, true);
+  assert.equal(touched.kv, 0);
+  const notReady = await worker.fetch(new Request('https://w.example/healthz'), {}, ctxSync);
+  assert.equal(notReady.status, 503);
+});
+
+test('R5: /api/stats is served from the Cache API keyed on the path only (query busting cannot force a rebuild)', async () => {
+  let kvLists = 0; let putKey = null;
+  const env = { STATS: { get: async () => '1', list: async () => { kvLists++; return { keys: [], list_complete: true }; } } };
+  let stored = null;
+  globalThis.caches = { default: { match: async (req) => (stored && req.url === putKey ? stored.clone() : undefined), put: async (req, res) => { putKey = req.url; stored = res; } } };
+  try {
+    await worker.fetch(new Request('https://w.example/api/stats?bust=1'), env, ctxSync);
+    await settle();
+    assert.equal(putKey, 'https://w.example/api/stats');
+    await worker.fetch(new Request('https://w.example/api/stats?bust=2'), env, ctxSync);
+    assert.equal(kvLists, 7, 'second request must be a cache hit (no new KV list calls)');
+  } finally { delete globalThis.caches; }
+});
+
+test('contract: 429 is only ever emitted before the upstream call (writeHostFetch relies on it)', async () => {
+  // Drive the proxy bucket to exhaustion, then confirm upstream is never reached for the 429s.
+  let upstream = 0;
+  global.fetch = async () => { upstream++; return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  const ip = { 'cf-connecting-ip': '198.51.100.77' };
+  let limited = 0;
+  for (let i = 0; i < 70; i++) {
+    const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'POST', headers: ip, body: '{}' }), {}, ctxSync);
+    if (res.status === 429) limited++;
+  }
+  assert.ok(limited >= 10);
+  assert.equal(upstream, 70 - limited);
+});
