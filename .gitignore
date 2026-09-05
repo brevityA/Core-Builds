@@ -56,3 +56,9 @@ configurator/playwright-report/
 # Docsalot local working copies
 docsalot-docs/
 docsalot-corebuilds/
+
+# Benchmark harness (tools/benchmark) — credentials + unsanitized evidence
+tools/benchmark/.env
+tools/benchmark/*.local
+reports/benchmark-snapshots/**/*.local.json
+tools/benchmark/corpus/*.verified.json

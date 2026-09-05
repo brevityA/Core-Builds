@@ -1,0 +1,376 @@
+{
+  "registry_version": "1.0.0",
+  "created": "2026-09-05",
+  "notes": [
+    "Each contender is one config the runner will install on the SAME AIOStreams instance with the SAME debrid credentials.",
+    "'source: local' = a JSON template in this repo. 'source: url' = a published community template fetched at run time.",
+    "'lane' selects which debrid service block the runner enables + injects the key into (from the gitignored env file).",
+    "'variant_of' + 'single_variable' mark Phase-1(c) experimental variants: exactly ONE attributable change vs the named control.",
+    "Do NOT add a contender without a citation (for challengers) or a repo path (for control/variants)."
+  ],
+  "contenders": [
+    {
+      "id": "control-4k-apex-torbox",
+      "role": "control",
+      "lane": "torbox",
+      "profile": "4K Apex",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "description": "Current Core Builds 4K Apex, TorBox lane. UNMODIFIED control."
+    },
+    {
+      "id": "control-stream-1080p-torbox",
+      "role": "control",
+      "lane": "torbox",
+      "profile": "1080p Stream",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-stream.json",
+      "description": "Current Core Builds 1080p Stream, TorBox lane. UNMODIFIED control."
+    },
+    {
+      "id": "control-stable-4k-torbox",
+      "role": "control",
+      "lane": "torbox",
+      "profile": "Stable 4K",
+      "source": "local",
+      "path": "Templates/Stable/core-stable-torbox-4k.json",
+      "description": "Core Stable 4K baseline (native filtering, no remote SEL). UNMODIFIED control."
+    },
+    {
+      "id": "control-stable-1080p-torbox",
+      "role": "control",
+      "lane": "torbox",
+      "profile": "Stable 1080p",
+      "source": "local",
+      "path": "Templates/Stable/core-stable-torbox-1080p.json",
+      "description": "Core Stable 1080p baseline. UNMODIFIED control."
+    },
+    {
+      "id": "control-anime-4k-torbox",
+      "role": "control",
+      "lane": "torbox",
+      "profile": "Anime 4K",
+      "source": "local",
+      "path": "Templates/Torbox/Anime/core-nexus-anime-4k.json",
+      "description": "Core Nexus Anime 4K. UNMODIFIED control (scored on the anime bucket)."
+    },
+    {
+      "id": "control-4k-apex-alldebrid",
+      "role": "control",
+      "lane": "alldebrid",
+      "profile": "4K Apex",
+      "source": "local",
+      "path": "Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json",
+      "description": "Core Nexus 4K, AllDebrid lane. UNMODIFIED control. Secondary lane."
+    },
+    {
+      "id": "challenger-aiostreams-default",
+      "role": "challenger",
+      "subtype": "no-template",
+      "lane": "torbox",
+      "source": "default",
+      "description": "AIOStreams defaults: fresh config, debrid key set, addons left at instance default, NO template applied. Phase-1(b) baseline.",
+      "citation": "https://github.com/Viren070/AIOStreams (v2.34.0 default UserData schema)"
+    },
+    {
+      "id": "challenger-tamtaro-sel",
+      "role": "challenger",
+      "subtype": "community",
+      "lane": "torbox",
+      "source": "url",
+      "url": "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/Tamtaro-All-Templates-for-AIOStreams.json",
+      "template_select": "first",
+      "description": "Tamtaro Complete SEL Setup \u2014 SEL-driven filtering/sorting template bundle.",
+      "citation": "https://github.com/Tam-Taro/SEL-Filtering-and-Sorting",
+      "note": "Wizard template: 549 __if/__switch/__value/{{inputs.*}} sites across 25 config fields. Resolved client-side via template_processor.py using the template's OWN declared defaults (73 inputs) -> 10 addons. Posting it raw would install literal placeholders."
+    },
+    {
+      "id": "challenger-vidhin05-regex",
+      "role": "challenger",
+      "subtype": "community",
+      "lane": "torbox",
+      "source": "url",
+      "url": "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/all-templates.json",
+      "template_select": "first",
+      "description": "Vidhin's Regexes \u2014 ranked-regex / stream-expression score-based sorting template (English variant).",
+      "citation": "https://github.com/Vidhin05/Releases-Regex",
+      "scoring": "overlay-only",
+      "note": "Resolves to ZERO addons: this template ships only ranked regexes / stream expressions plus synced-URL pointers, and declares no presets. It is a RANKING OVERLAY meant to be layered on an existing build, not a standalone config. Reported for its ranking payload; excluded from coverage/playability leaderboards, where a 0 would be a category error rather than a loss."
+    },
+    {
+      "id": "challenger-grabberhawk",
+      "role": "challenger",
+      "subtype": "community",
+      "lane": "torbox",
+      "source": "url",
+      "url": "https://raw.githubusercontent.com/grabberhawk/stremio-aiostreams-config/main/aiostreams_config.json",
+      "description": "grabberhawk optimized config \u2014 1080p-first prioritisation, REMUX detection, anime filler skipping.",
+      "citation": "https://github.com/grabberhawk/stremio-aiostreams-config"
+    },
+    {
+      "id": "challenger-ang3lo-azevedo",
+      "role": "challenger",
+      "subtype": "community",
+      "lane": "torbox",
+      "source": "url",
+      "url": "https://raw.githubusercontent.com/ang3lo-azevedo/AIOStreams-config/main/aiostreams-config-english-only.json",
+      "description": "ang3lo-azevedo AIOStreams-config, English-only variant \u2014 quality-focused multi-addon config.",
+      "citation": "https://github.com/ang3lo-azevedo/AIOStreams-config"
+    },
+    {
+      "id": "challenger-community-mightyicyy",
+      "role": "challenger",
+      "subtype": "community",
+      "lane": "torbox",
+      "source": "local",
+      "path": "Community-Templates/Templates/MightyIcyy/prism-torbox-essential-1080p.json",
+      "description": "Prism \u2014 TorBox Essential 1080p (in-repo community build, not a Core Nexus control).",
+      "citation": "Community-Templates/Templates/MightyIcyy/README.md"
+    },
+    {
+      "id": "challenger-community-rb3",
+      "role": "challenger",
+      "subtype": "community",
+      "lane": "torbox",
+      "source": "local",
+      "path": "Community-Templates/Templates/RB3/auburn-tiger-rb3.json",
+      "description": "RB3 Auburn Tiger Edition (in-repo community build).",
+      "citation": "Community-Templates/Templates/RB3/README.md"
+    },
+    {
+      "id": "variant-apex-plus-torrentio",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD one addon preset: torrentio",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "add_preset",
+        "preset_type": "torrentio"
+      },
+      "description": "Does an extra scraper raise cached coverage on obscure/regional buckets?"
+    },
+    {
+      "id": "variant-apex-minus-torrentsdb",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "DROP one enabled addon preset: torrents-db",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "remove_preset",
+        "preset_type": "torrents-db"
+      },
+      "description": "torrents-db is one of only four enabled scrapers in 4K Apex. Does removing it cost coverage, or only add duplicate/junk rows?"
+    },
+    {
+      "id": "variant-apex-dedup-off",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "REPLACE deduplicator.multiGroupBehaviour aggressive -> conservative",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/deduplicator/multiGroupBehaviour",
+        "value": "conservative"
+      },
+      "description": "Does aggressive smart-dedup discard genuinely distinct releases (coverage loss) or only true duplicates?"
+    },
+    {
+      "id": "variant-apex-bitrate-cap-off",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "REPLACE bitrate.global upper cap 150 Mbps -> unbounded (4K Apex caps globally, not per-resolution)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/bitrate/global/movies",
+        "value": [
+          0,
+          null
+        ]
+      },
+      "description": "Isolates the strict bitrate cap: what coverage/rank does it cost, what junk does it prevent?"
+    },
+    {
+      "id": "variant-apex-cached-first-off",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "REPLACE sortCriteria.global head key 'cached' -> demoted below 'resolution'",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "demote_sort_key",
+        "key": "cached",
+        "below": "resolution"
+      },
+      "description": "Quantifies the value of cached-first ordering vs resolution-first for rank correctness and TTFR."
+    },
+    {
+      "id": "variant-apex-enable-zilean",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ENABLE one already-declared but disabled preset: zilean",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "add_preset",
+        "preset_type": "zilean"
+      },
+      "description": "4K Apex ships Zilean declared-but-disabled. Turning it on is the cheapest possible coverage lever \u2014 does it pay for its latency?"
+    },
+    {
+      "id": "variant-apex-allow-unknown-res",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD 'Unknown' to requiredResolutions ['2160p','1080p'] -> ['2160p','1080p','Unknown']",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/requiredResolutions",
+        "value": [
+          "2160p",
+          "1080p",
+          "Unknown"
+        ]
+      },
+      "description": "Tests H2 directly. filterer.ts coerces a missing resolution to the literal 'Unknown' and drops the stream unless 'Unknown' is allowlisted, so Apex currently discards every stream whose resolution the parser cannot determine. The same templates already allowlist 'Unknown' in requiredLanguages. Measures what that asymmetry costs in coverage, and what junk it lets back in."
+    },
+    {
+      "id": "variant-apex-plus-tpb",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD one addon preset: the-pirate-bay (new in v2.34.0)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "add_preset",
+        "preset_type": "the-pirate-bay"
+      },
+      "description": "TPB builtin shipped in v2.34.0 (PR #1273) and no Core Builds template uses it. It is an in-process TorznabPreset needing NO credentials, searching by title and IMDB ID via apibay.org. Cheapest untested coverage lever for the 4-scraper Apex profile.",
+      "citation": "https://github.com/Viren070/AIOStreams/pull/1273"
+    },
+    {
+      "id": "variant-apex-plus-therarbg",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD one addon preset: therarbg (new in v2.34.0)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "add_preset",
+        "preset_type": "therarbg"
+      },
+      "description": "TheRARBG builtin shipped in v2.34.0 (PR #1269), unused by every Core Builds template. In-process, credential-free, general-purpose (movies/TV/anime). Tests the catalog-older and obscure buckets where Apex is predicted to lose.",
+      "citation": "https://github.com/Viren070/AIOStreams/pull/1269"
+    },
+    {
+      "id": "variant-apex-failover-on",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ENABLE server-side failover (Apex sets no `failover` block at all)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/failover",
+        "value": {
+          "enabled": true,
+          "contentTypes": [
+            "usenet",
+            "debrid"
+          ],
+          "allowCrossType": true,
+          "maxAttempts": 5,
+          "parallel": 2,
+          "position": "beforeLimiting"
+        },
+        "create": true
+      },
+      "description": "BIGGEST competitor-only lever. Tamtaro enables failover; every Core build omits it. On a dead/unplayable pick AIOStreams retries up to 5 alternates server-side instead of handing the user a broken stream. Directly targets playability, the metric a user actually feels. Cost: added latency on the failing path only. Scored by playable_pct vs ttfl_ms."
+    },
+    {
+      "id": "variant-apex-excluded-keywords",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD grabberhawk's 10-keyword low-quality release-group blocklist",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/excludedKeywords",
+        "value": [
+          "yts",
+          "yify",
+          "galaxyrg",
+          "tgx",
+          "evo",
+          "ntb",
+          "rarbg",
+          "cmrg",
+          "ettv",
+          "psa"
+        ],
+        "create": true
+      },
+      "description": "grabberhawk filters notorious re-encode groups by keyword. Apex leaves excludedKeywords unset and relies on 107 ranked regexes to DEMOTE them; this DROPS them. Tests whether hard exclusion beats soft ranking, and whether it over-filters obscure titles where a YTS rip is the only source."
+    },
+    {
+      "id": "variant-apex-episode-title-matching",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ENABLE episodeTitleMatching (0.85 similarity)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/episodeTitleMatching",
+        "value": {
+          "enabled": true,
+          "similarityThreshold": 0.85,
+          "requestTypes": [
+            "series",
+            "anime"
+          ],
+          "addons": []
+        },
+        "create": true
+      },
+      "description": "Tamtaro ships the block but leaves it disabled; Apex lacks the field entirely. Targets the classic absolute-numbering / mislabelled-episode failure on the anime and completed-series buckets. Scored by junk_pct on series rows only."
+    },
+    {
+      "id": "variant-apex-seeder-floor",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "REQUIRE >=3 seeders on uncached p2p results",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/requiredSeederRange",
+        "value": [
+          3,
+          100000
+        ],
+        "create": true
+      },
+      "description": "Tamtaro carries seeder-range plumbing; Apex has none. A 0-seeder uncached torrent can never be pulled by the debrid service, so it is a guaranteed dead result occupying a slot. Tests whether a seeder floor raises playability without hurting obscure-bucket coverage."
+    }
+  ]
+}
