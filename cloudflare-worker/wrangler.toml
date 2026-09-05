@@ -2,21 +2,126 @@ name = "core-builds-cors-proxy"
 main = "worker.js"
 compatibility_date = "2024-09-25"
 
+# Workers Logs (structured, secret-free events from logEvent()). Free plan includes
+# Workers Logs with sampling; keep head_sampling_rate at 1 while volume is < 100k/day.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [[kv_namespaces]]
 binding = "STATS"
 id = "e21df08fe77846ee8246bda94288c111"
 
-# Required for POST /paste and GET /t/:id.
+# Legacy paste store + read fallback for ids created before the Durable Object
+# store shipped (2026-09-03). Safe to unbind 30 days after that deploy.
 [[kv_namespaces]]
 binding = "TEMPLATES"
 id = "100cc344297b41c785f8c07dba85982c"
 
-# Optional but recommended: edge-wide rate limiting. If unbound, rate limits degrade to
-# "allow" (the worker never 503s on a missing namespace). Create a KV namespace and bind
-# it as RATELIMIT to enable per-IP limits on /proxy, /paste, /contact and /api/*.
+# Optional third rate-limit layer (cross-colo). If unbound, the Rate Limiting
+# bindings below + the in-isolate floor still enforce limits.
 # [[kv_namespaces]]
 # binding = "RATELIMIT"
 # id = "<your-ratelimit-kv-namespace-id>"
 
+# Strongly consistent paste store (INFRA-AUDIT R1). SQLite-backed = works on the
+# Workers Free plan. One object ("pastes-v1") holds all pastes; hourly alarm expiry.
+[[durable_objects.bindings]]
+name = "PASTES"
+class_name = "PasteStore"
+
+[[migrations]]
+tag = "v1-paste-store"
+new_sqlite_classes = ["PasteStore"]
+
+# Workers Rate Limiting bindings (INFRA-AUDIT S4). Per-colo, shared across isolates,
+# no extra cost. period must be 10 or 60. namespace_id is any account-unique integer.
+# The contact limit is 5/hour in the design; the binding can only express 60 s
+# windows, so it enforces a 5/min ceiling here and the KV layer (if bound) enforces
+# the hourly budget.
+[[ratelimits]]
+name = "RL_PROXY"
+namespace_id = "3001"
+simple = { limit = 60, period = 60 }
+
+[[ratelimits]]
+name = "RL_PROXY_CUSTOM"
+namespace_id = "3002"
+simple = { limit = 20, period = 60 }
+
+[[ratelimits]]
+name = "RL_PASTE"
+namespace_id = "3003"
+simple = { limit = 10, period = 60 }
+
+[[ratelimits]]
+name = "RL_PASTE_READ"
+namespace_id = "3004"
+simple = { limit = 60, period = 60 }
+
+[[ratelimits]]
+name = "RL_ANALYTICS"
+namespace_id = "3005"
+simple = { limit = 30, period = 60 }
+
+[[ratelimits]]
+name = "RL_STATS"
+namespace_id = "3006"
+simple = { limit = 20, period = 60 }
+
+[[ratelimits]]
+name = "RL_CONTACT"
+namespace_id = "3007"
+simple = { limit = 5, period = 60 }
+
 [vars]
 ALLOWED_ORIGIN = "*"
+
+# ── Staging ──────────────────────────────────────────────────────────────────
+# `npx wrangler deploy --env staging` → core-builds-cors-proxy-staging.<sub>.workers.dev
+# Bindings are NOT inherited by environments: create separate KV namespaces
+# (`wrangler kv namespace create STATS --env staging`, same for TEMPLATES) and put
+# their ids below. The DO class and ratelimits are declared again explicitly.
+[env.staging]
+name = "core-builds-cors-proxy-staging"
+[env.staging.observability]
+enabled = true
+[env.staging.vars]
+ALLOWED_ORIGIN = "*"
+# [[env.staging.kv_namespaces]]
+# binding = "STATS"
+# id = "<staging-stats-kv-id>"
+# [[env.staging.kv_namespaces]]
+# binding = "TEMPLATES"
+# id = "<staging-templates-kv-id>"
+[[env.staging.durable_objects.bindings]]
+name = "PASTES"
+class_name = "PasteStore"
+[[env.staging.ratelimits]]
+name = "RL_PROXY"
+namespace_id = "3101"
+simple = { limit = 60, period = 60 }
+[[env.staging.ratelimits]]
+name = "RL_PROXY_CUSTOM"
+namespace_id = "3102"
+simple = { limit = 20, period = 60 }
+[[env.staging.ratelimits]]
+name = "RL_PASTE"
+namespace_id = "3103"
+simple = { limit = 10, period = 60 }
+[[env.staging.ratelimits]]
+name = "RL_PASTE_READ"
+namespace_id = "3104"
+simple = { limit = 60, period = 60 }
+[[env.staging.ratelimits]]
+name = "RL_ANALYTICS"
+namespace_id = "3105"
+simple = { limit = 30, period = 60 }
+[[env.staging.ratelimits]]
+name = "RL_STATS"
+namespace_id = "3106"
+simple = { limit = 20, period = 60 }
+[[env.staging.ratelimits]]
+name = "RL_CONTACT"
+namespace_id = "3107"
+simple = { limit = 5, period = 60 }

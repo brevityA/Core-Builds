@@ -1,0 +1,213 @@
+name: Version Sync & Release
+
+# Detects when CONFIGURATOR_VERSION changes on main, propagates the version
+# to all package.json files and versions.json, regenerates docs, rebuilds
+# the configurator bundle, creates a GitHub release + tag, and opens a PR
+# for review.
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: version-sync
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'configurator/src/js/app.js'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run even if versions already match'
+        type: boolean
+        default: false
+
+jobs:
+  sync:
+    name: Sync versions, docs & release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Extract CONFIGURATOR_VERSION
+        id: ver
+        run: |
+          RAW=$(grep -oP "CONFIGURATOR_VERSION\s*=\s*'\K[^']+" configurator/src/js/app.js)
+          if [ -z "$RAW" ]; then
+            echo "::error::Could not find CONFIGURATOR_VERSION in app.js"
+            exit 1
+          fi
+          # RAW is e.g. '3.1', semver is '3.1.0'
+          SEMVER="${RAW}.0"
+          echo "raw=$RAW" >> "$GITHUB_OUTPUT"
+          echo "semver=$SEMVER" >> "$GITHUB_OUTPUT"
+          echo "tag=v$SEMVER" >> "$GITHUB_OUTPUT"
+          echo "Detected version: $RAW → $SEMVER"
+
+      - name: Check if sync needed
+        id: check
+        run: |
+          SEMVER="${{ steps.ver.outputs.semver }}"
+          FORCE="${{ inputs.force || 'false' }}"
+          CURRENT=$(jq -r .configurator versions.json)
+          if [ "$CURRENT" = "$SEMVER" ] && [ "$FORCE" = "false" ]; then
+            # Also verify package.jsons match
+            CLI_V=$(jq -r .version cli/package.json)
+            CORE_V=$(jq -r .version packages/core/package.json)
+            CFG_V=$(jq -r .version configurator/package.json)
+            if [ "$CLI_V" = "$SEMVER" ] && [ "$CORE_V" = "$SEMVER" ] && [ "$CFG_V" = "$SEMVER" ]; then
+              echo "All versions already at $SEMVER — nothing to do."
+              echo "needed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          echo "needed=true" >> "$GITHUB_OUTPUT"
+          echo "Sync needed: versions.json=$CURRENT → $SEMVER"
+
+      - name: Setup Node
+        if: steps.check.outputs.needed == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Update versions.json
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          SEMVER="${{ steps.ver.outputs.semver }}"
+          jq --arg v "$SEMVER" '.configurator = $v' versions.json > versions.tmp && mv versions.tmp versions.json
+
+      - name: Update package.json files
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          SEMVER="${{ steps.ver.outputs.semver }}"
+          for PKG in configurator/package.json cli/package.json packages/core/package.json; do
+            jq --arg v "$SEMVER" '.version = $v' "$PKG" > "$PKG.tmp" && mv "$PKG.tmp" "$PKG"
+            echo "Updated $PKG → $SEMVER"
+          done
+
+      - name: Sync docs (CLAUDE.md, README, tools page, roadmap, etc.)
+        if: steps.check.outputs.needed == 'true'
+        run: python3 scripts/sync-docs.py --apply
+
+      - name: Rebuild configurator bundle
+        if: steps.check.outputs.needed == 'true'
+        run: cd configurator && npm ci --no-audit --no-fund && npm run build
+
+      - name: Check for changes
+        if: steps.check.outputs.needed == 'true'
+        id: diff
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No file changes after sync."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create sync PR
+        if: steps.check.outputs.needed == 'true' && steps.diff.outputs.changed == 'true'
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SEMVER="${{ steps.ver.outputs.semver }}"
+          RAW="${{ steps.ver.outputs.raw }}"
+          TAG="${{ steps.ver.outputs.tag }}"
+          BRANCH="chore/version-sync-${SEMVER}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "chore: sync all versions to $SEMVER and regenerate docs"
+
+          git push -u origin "$BRANCH" --force-with-lease
+
+          # Build PR body
+          BODY=$(cat <<'PREOF'
+          ## Version Sync
+
+          Automatically propagated `CONFIGURATOR_VERSION` **RAW_PLACEHOLDER** across:
+
+          - `versions.json` → `SEMVER_PLACEHOLDER`
+          - `configurator/package.json` → `SEMVER_PLACEHOLDER`
+          - `cli/package.json` → `SEMVER_PLACEHOLDER`
+          - `packages/core/package.json` → `SEMVER_PLACEHOLDER`
+          - Docs regenerated via `sync-docs.py`
+          - Configurator bundle rebuilt
+
+          ### After merge
+
+          A GitHub release **TAG_PLACEHOLDER** will be created automatically by the release tagging step.
+
+          ---
+          *Opened automatically by the version-sync workflow.*
+          PREOF
+          )
+          BODY="${BODY//RAW_PLACEHOLDER/$RAW}"
+          BODY="${BODY//SEMVER_PLACEHOLDER/$SEMVER}"
+          BODY="${BODY//TAG_PLACEHOLDER/$TAG}"
+
+          gh pr create \
+            --title "chore: sync versions to $SEMVER + regenerate docs" \
+            --body "$BODY" \
+            --base main \
+            --head "$BRANCH" \
+            --label "chore"
+
+      - name: Create tag and release
+        if: steps.check.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.ver.outputs.tag }}"
+          SEMVER="${{ steps.ver.outputs.semver }}"
+          RAW="${{ steps.ver.outputs.raw }}"
+
+          # Check if tag already exists
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists — skipping release."
+            exit 0
+          fi
+
+          # Check if release already exists
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists — skipping."
+            exit 0
+          fi
+
+          # Tag current main HEAD (the commit that triggered this workflow)
+          git tag "$TAG" "${{ github.sha }}"
+          git push origin "$TAG"
+
+          # Build release notes from changelog.js
+          # Extract the items array for this version
+          NOTES=$(python3 -c "
+          import re, sys
+          with open('configurator/src/data/changelog.js') as f:
+              content = f.read()
+          # Find the entry for this version
+          pattern = r\"v:'${RAW}'.*?items:\[(.*?)\]\"
+          m = re.search(pattern, content, re.DOTALL)
+          if not m:
+              print('Configurator v${SEMVER}')
+              sys.exit(0)
+          raw = m.group(1)
+          items = re.findall(r\"'((?:[^'\\\\]|\\\\.)*?)'\", raw)
+          for item in items:
+              clean = item.replace(\"\\\\\\\\\", \"\\\\\").replace(\"\\\\'\", \"'\")
+              print(f'- {clean}')
+          " 2>/dev/null || echo "Configurator v${SEMVER}")
+
+          gh release create "$TAG" \
+            --title "Configurator v${SEMVER}" \
+            --notes "$NOTES" \
+            --latest
