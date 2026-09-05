@@ -242,6 +242,36 @@
         ]
       },
       "description": "Tests H2 directly. filterer.ts coerces a missing resolution to the literal 'Unknown' and drops the stream unless 'Unknown' is allowlisted, so Apex currently discards every stream whose resolution the parser cannot determine. The same templates already allowlist 'Unknown' in requiredLanguages. Measures what that asymmetry costs in coverage, and what junk it lets back in."
+    },
+    {
+      "id": "variant-apex-plus-tpb",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD one addon preset: the-pirate-bay (new in v2.34.0)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "add_preset",
+        "preset_type": "the-pirate-bay"
+      },
+      "description": "TPB builtin shipped in v2.34.0 (PR #1273) and no Core Builds template uses it. It is an in-process TorznabPreset needing NO credentials, searching by title and IMDB ID via apibay.org. Cheapest untested coverage lever for the 4-scraper Apex profile.",
+      "citation": "https://github.com/Viren070/AIOStreams/pull/1273"
+    },
+    {
+      "id": "variant-apex-plus-therarbg",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ADD one addon preset: therarbg (new in v2.34.0)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "add_preset",
+        "preset_type": "therarbg"
+      },
+      "description": "TheRARBG builtin shipped in v2.34.0 (PR #1269), unused by every Core Builds template. In-process, credential-free, general-purpose (movies/TV/anime). Tests the catalog-older and obscure buckets where Apex is predicted to lose.",
+      "citation": "https://github.com/Viren070/AIOStreams/pull/1269"
     }
   ]
 }

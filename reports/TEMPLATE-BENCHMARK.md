@@ -186,10 +186,10 @@ is the classic wrong-episode junk generator.
 
 ---
 
-## 4. Contenders — 19 on the TorBox lane, 1 on AllDebrid
+## 4. Contenders — 21 on the TorBox lane, 1 on AllDebrid
 
 Registry: `tools/benchmark/contenders.json`. Plan verified with `--dry-run`:
-**19 contenders × 30 titles × 3 repeats = 1,710 stream requests** on the TorBox
+**21 contenders × 30 titles × 3 repeats = 1,890 stream requests** on the TorBox
 lane.
 
 ### 4.1 Control — unmodified Core Builds (6)
@@ -219,7 +219,7 @@ Tamtaro and Vidhin05 are the two most-cited community AIOStreams template
 projects and are whitelisted in several public instances' `TEMPLATE_URLS`, so
 they are the strongest available challengers rather than convenient ones.
 
-### 4.3 Experimental variants — one variable each (7)
+### 4.3 Experimental variants — one variable each (9)
 
 Each was **mechanically proved** single-variable: `static_profile.py --diff`
 shows the declared-config delta versus the control, and `selftest.py` asserts
@@ -234,9 +234,15 @@ subtree for add/remove/reorder ops).
 | `variant-apex-dedup-off` | `deduplicator.multiGroupBehaviour: aggressive → conservative` | exactly that field | does aggressive smart-dedup discard genuinely distinct releases? |
 | `variant-apex-bitrate-cap-off` | `bitrate.global.movies: [0, 150 Mbps] → [0, ∞)` | exactly that field | what does the strict cap cost in coverage, and what junk does it prevent? |
 | `variant-apex-cached-first-off` | demote sort key `cached` below `resolution` | `cached_first True → False`, `resolution_rank 3 → 2` | how much of Core Builds' quality comes from cached-first? |
+| `variant-apex-plus-tpb` | add addon `the-pirate-bay` (new in v2.34.0) | `addon_count 5 → 6` | credential-free in-process indexer; **no Core Builds template uses it** |
+| `variant-apex-plus-therarbg` | add addon `therarbg` (new in v2.34.0) | `addon_count 5 → 6` | same, different index — targets the buckets H1/H2 predict Apex loses |
 | `variant-apex-allow-unknown-res` | `requiredResolutions: [2160p,1080p] → [2160p,1080p,Unknown]` | exactly that field | **tests H2 directly**: what does dropping every undeclared-resolution stream cost, and what junk returns if we stop? |
 
-Two variants I originally drafted were **discarded as invalid** once measured
+Add-on research backing these variants — usage counts across all 91 templates,
+builtin-vs-external transport, liveness, and the `sootio`/`newznab` findings —
+is in [`tools/benchmark/addon-inventory.md`](../tools/benchmark/addon-inventory.md).
+
+Three variants I originally drafted were **discarded as invalid** once measured
 against the real config, and this is worth recording because it is exactly the
 "don't assume the behaviour" discipline the brief asks for:
 
@@ -244,6 +250,9 @@ against the real config, and this is worth recording because it is exactly the
   no-op and any score difference would have been noise misread as a finding.
   The runner now raises on removing an already-disabled preset. Inverted into
   `variant-apex-enable-zilean`.
+* *"drop sootio"* — `sootio` is declared in **59 templates and enabled in zero**.
+  The same guardrail rejected it. A no-op yields no attributable score, so it is
+  recorded as a **housekeeping cleanup recommendation, not a benchmark result**.
 * *"lift the 2160p bitrate cap"* — 4K Apex has **no per-resolution bitrate
   band**; the JSON pointer would have silently created one, making the variant
   two changes (add a band *and* set it). Retargeted to the real

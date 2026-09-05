@@ -1069,6 +1069,160 @@
       "title_matching": true,
       "season_episode_matching": true,
       "year_matching": true
+    },
+    "variant-apex-plus-tpb": {
+      "addon_count": 6,
+      "addons": [
+        "aiosubtitle",
+        "library",
+        "newznab",
+        "stremthruTorz",
+        "the-pirate-bay",
+        "torrents-db"
+      ],
+      "sort_global": [
+        "cached",
+        "streamExpressionMatched",
+        "seadex",
+        "resolution",
+        "quality",
+        "regexScore",
+        "visualTag",
+        "encode",
+        "audioTag",
+        "audioChannel",
+        "language",
+        "library",
+        "seeders",
+        "bitrate",
+        "size",
+        "subtitle"
+      ],
+      "cached_first": true,
+      "resolution_rank": 3,
+      "required_resolutions": [
+        "2160p",
+        "1080p"
+      ],
+      "excluded_resolutions": [
+        "144p",
+        "240p",
+        "360p"
+      ],
+      "excluded_qualities": [],
+      "required_languages": [
+        "English",
+        "Original",
+        "Dual Audio",
+        "Multi",
+        "Dubbed",
+        "Unknown"
+      ],
+      "bitrate_global_movies": [
+        0,
+        150000000
+      ],
+      "bitrate_global_series": [
+        0,
+        150000000
+      ],
+      "bitrate_2160p_movies": null,
+      "bitrate_1080p_movies": null,
+      "dedup_enabled": true,
+      "dedup_keys": [
+        "filename",
+        "infoHash",
+        "smartDetect"
+      ],
+      "dedup_multi_group": "aggressive",
+      "excluded_regex_count": 7,
+      "ranked_regex_count": 107,
+      "excluded_sel_count": 23,
+      "ranked_sel_count": 0,
+      "synced_sel_urls": 0,
+      "max_results": 30,
+      "max_per_resolution": 12,
+      "exclude_uncached": false,
+      "title_matching": true,
+      "season_episode_matching": true,
+      "year_matching": true
+    },
+    "variant-apex-plus-therarbg": {
+      "addon_count": 6,
+      "addons": [
+        "aiosubtitle",
+        "library",
+        "newznab",
+        "stremthruTorz",
+        "therarbg",
+        "torrents-db"
+      ],
+      "sort_global": [
+        "cached",
+        "streamExpressionMatched",
+        "seadex",
+        "resolution",
+        "quality",
+        "regexScore",
+        "visualTag",
+        "encode",
+        "audioTag",
+        "audioChannel",
+        "language",
+        "library",
+        "seeders",
+        "bitrate",
+        "size",
+        "subtitle"
+      ],
+      "cached_first": true,
+      "resolution_rank": 3,
+      "required_resolutions": [
+        "2160p",
+        "1080p"
+      ],
+      "excluded_resolutions": [
+        "144p",
+        "240p",
+        "360p"
+      ],
+      "excluded_qualities": [],
+      "required_languages": [
+        "English",
+        "Original",
+        "Dual Audio",
+        "Multi",
+        "Dubbed",
+        "Unknown"
+      ],
+      "bitrate_global_movies": [
+        0,
+        150000000
+      ],
+      "bitrate_global_series": [
+        0,
+        150000000
+      ],
+      "bitrate_2160p_movies": null,
+      "bitrate_1080p_movies": null,
+      "dedup_enabled": true,
+      "dedup_keys": [
+        "filename",
+        "infoHash",
+        "smartDetect"
+      ],
+      "dedup_multi_group": "aggressive",
+      "excluded_regex_count": 7,
+      "ranked_regex_count": 107,
+      "excluded_sel_count": 23,
+      "ranked_sel_count": 0,
+      "synced_sel_urls": 0,
+      "max_results": 30,
+      "max_per_resolution": 12,
+      "exclude_uncached": false,
+      "title_matching": true,
+      "season_episode_matching": true,
+      "year_matching": true
     }
   },
   "skipped": {
