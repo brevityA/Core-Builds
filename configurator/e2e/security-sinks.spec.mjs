@@ -83,20 +83,22 @@ test.describe('security sinks', () => {
     await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
     await page.locator('#stremioEmailInline').fill('test@stremio.com');
     await page.locator('#stremioPasswordInline').fill('test-password');
-    await page.locator('#expressGo').click();
-    // #pwdPrompt appears only after the app's async validation round-trip — gate on it.
-    // Conditional on purpose: when this origin already holds a stored token (an
-    // earlier spec in this file clicked .pwd-go), the app legitimately skips the
-    // prompt and proceeds — accepting that path keeps the check deterministic;
-    // a regression that produces NEITHER prompt nor progress still times out red.
-    await expect.poll(async () => {
-      const prompt = page.locator('#pwdPrompt');
-      if (await prompt.isVisible().catch(() => false)) {
-        await prompt.locator('.pwd-go').click();
-        return true;
-      }
-      return userPosts > 0;
-    }, { timeout: 60000, intervals: [500] }).toBe(true);
+    // The expressGo click can be swallowed the same way on mobile (the modal re-renders
+    // around the inline credential fields). Retry the whole "click → observable progress"
+    // block: progress means EITHER the password prompt rendered (drive it) OR the app
+    // proceeded straight to posting (origin already holds a token / inline creds were
+    // accepted). A flow that produces neither is retried, and stays red if it never moves.
+    await expect(async () => {
+      await page.locator('#expressGo').click();
+      await expect.poll(async () => {
+        const prompt = page.locator('#pwdPrompt');
+        if (await prompt.isVisible().catch(() => false)) {
+          await prompt.locator('.pwd-go').click();
+          return true;
+        }
+        return userPosts > 0;
+      }, { timeout: 20000, intervals: [250] }).toBe(true);
+    }).toPass({ timeout: 90000 });
     await expect.poll(() => userPosts, { timeout: 45000 }).toBeGreaterThan(0);
 
     // The sink was actually reached — now it must be inert and legible.
