@@ -42,7 +42,7 @@ test.describe('security sinks', () => {
   });
 
   test('C3: a remote error object renders a reason message, never markup or [object Object]', async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(240_000); // worst-case chain of the explicit gates below (~160s); spent only on failure
     // Flake fix (#738, quarantine #682): the old body raced hydration in three places — a fixed
     // 900 ms sleep after reload, a dialog handler attached after navigation, and a fixed 600 ms
     // sleep for the error render. All replaced by explicit gates below. The security assertions
@@ -85,8 +85,18 @@ test.describe('security sinks', () => {
     await page.locator('#stremioPasswordInline').fill('test-password');
     await page.locator('#expressGo').click();
     // #pwdPrompt appears only after the app's async validation round-trip — gate on it.
-    await expect(page.locator('#pwdPrompt')).toBeVisible({ timeout: 20000 });
-    await page.locator('#pwdPrompt .pwd-go').click();
+    // Conditional on purpose: when this origin already holds a stored token (an
+    // earlier spec in this file clicked .pwd-go), the app legitimately skips the
+    // prompt and proceeds — accepting that path keeps the check deterministic;
+    // a regression that produces NEITHER prompt nor progress still times out red.
+    await expect.poll(async () => {
+      const prompt = page.locator('#pwdPrompt');
+      if (await prompt.isVisible().catch(() => false)) {
+        await prompt.locator('.pwd-go').click();
+        return true;
+      }
+      return userPosts > 0;
+    }, { timeout: 60000, intervals: [500] }).toBe(true);
     await expect.poll(() => userPosts, { timeout: 45000 }).toBeGreaterThan(0);
 
     // The sink was actually reached — now it must be inert and legible.
