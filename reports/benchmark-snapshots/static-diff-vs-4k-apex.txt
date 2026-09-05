@@ -1,0 +1,168 @@
+
+## control-stream-1080p-torbox  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  11
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'comet', 'eztv', 'knaben', 'library', 'mediafusion', 'meteor', 'stremthruTorz', 'torrent-galaxy', 'torrents-db', 'zilean']
+  required_resolutions: ['2160p', '1080p']  ->  ['1080p', '720p']
+  bitrate_global_movies: [0, 150000000]  ->  [0, 60000000]
+  bitrate_global_series: [0, 150000000]  ->  [0, 60000000]
+  ranked_regex_count: 107  ->  103
+  excluded_sel_count: 23  ->  24
+  max_results: 30  ->  35
+  max_per_resolution: 12  ->  15
+
+## control-stable-4k-torbox  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  7
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'comet', 'library', 'meteor', 'seadex', 'stremthruTorz', 'tmdb-addon']
+  sort_global: ['cached', 'streamExpressionMatched', 'seadex', 'resolution', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']  ->  ['cached', 'resolution', 'quality', 'visualTag', 'audioTag', 'audioChannel', 'language', 'encode', 'size']
+  resolution_rank: 3  ->  1
+  required_resolutions: ['2160p', '1080p']  ->  []
+  excluded_resolutions: ['144p', '240p', '360p']  ->  ['144p', '240p', '360p', '480p', '576p']
+  excluded_qualities: []  ->  ['CAM', 'SCR', 'TS', 'TC', 'HC HD-Rip']
+  required_languages: ['English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown']  ->  []
+  bitrate_global_movies: [0, 150000000]  ->  None
+  bitrate_global_series: [0, 150000000]  ->  None
+  excluded_regex_count: 7  ->  0
+  ranked_regex_count: 107  ->  0
+  excluded_sel_count: 23  ->  1
+  max_results: 30  ->  12
+  max_per_resolution: 12  ->  3
+  title_matching: True  ->  False
+  year_matching: True  ->  False
+  synced_regex_urls: 1  ->  0
+  result_limit_global: 20  ->  12
+  result_limit_resolution: 8  ->  3
+
+## control-stable-1080p-torbox  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  7
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'comet', 'library', 'meteor', 'seadex', 'stremthruTorz', 'tmdb-addon']
+  sort_global: ['cached', 'streamExpressionMatched', 'seadex', 'resolution', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']  ->  ['cached', 'resolution', 'quality', 'visualTag', 'audioTag', 'audioChannel', 'language', 'encode', 'size']
+  resolution_rank: 3  ->  1
+  required_resolutions: ['2160p', '1080p']  ->  []
+  excluded_resolutions: ['144p', '240p', '360p']  ->  ['144p', '240p', '360p', '2160p', '1440p']
+  excluded_qualities: []  ->  ['CAM', 'SCR', 'TS', 'TC', 'HC HD-Rip']
+  required_languages: ['English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown']  ->  []
+  bitrate_global_movies: [0, 150000000]  ->  None
+  bitrate_global_series: [0, 150000000]  ->  None
+  excluded_regex_count: 7  ->  0
+  ranked_regex_count: 107  ->  0
+  excluded_sel_count: 23  ->  1
+  max_results: 30  ->  10
+  max_per_resolution: 12  ->  3
+  title_matching: True  ->  False
+  year_matching: True  ->  False
+  synced_regex_urls: 1  ->  0
+  result_limit_global: 20  ->  10
+  result_limit_resolution: 8  ->  3
+
+## control-anime-4k-torbox  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  14
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'animetosho', 'comet', 'hdhub', 'knaben', 'library', 'mediafusion', 'meteor', 'neko-bt', 'seadex', 'stremthruTorz', 'torrent-galaxy', 'torrents-db', 'zilean']
+  sort_global: ['cached', 'streamExpressionMatched', 'seadex', 'resolution', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']  ->  ['cached', 'seadex', 'streamExpressionMatched', 'resolution', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']
+  required_resolutions: ['2160p', '1080p']  ->  []
+  required_languages: ['English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown']  ->  []
+  bitrate_global_movies: [0, 150000000]  ->  None
+  bitrate_global_series: [0, 150000000]  ->  None
+  excluded_regex_count: 7  ->  0
+  ranked_regex_count: 107  ->  0
+  excluded_sel_count: 23  ->  21
+  exclude_uncached: False  ->  None
+  synced_regex_urls: 1  ->  0
+
+## control-4k-apex-alldebrid  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  11
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'comet', 'eztv', 'knaben', 'library', 'mediafusion', 'meteor', 'stremthruStore', 'torrent-galaxy', 'torrents-db', 'zilean']
+
+## challenger-community-mightyicyy  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  1
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['torrentio']
+  sort_global: ['cached', 'streamExpressionMatched', 'seadex', 'resolution', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']  ->  ['cached', 'library', 'resolution', 'quality', 'streamExpressionScore', 'regexScore', 'type', 'visualTag', 'audioTag', 'audioChannel', 'encode', 'language', 'subtitle', 'size']
+  resolution_rank: 3  ->  2
+  required_resolutions: ['2160p', '1080p']  ->  ['1080p']
+  excluded_resolutions: ['144p', '240p', '360p']  ->  []
+  required_languages: ['English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown']  ->  []
+  bitrate_global_movies: [0, 150000000]  ->  None
+  bitrate_global_series: [0, 150000000]  ->  None
+  dedup_keys: ['filename', 'infoHash', 'smartDetect']  ->  ['filename', 'infoHash']
+  excluded_regex_count: 7  ->  0
+  ranked_regex_count: 107  ->  0
+  excluded_sel_count: 23  ->  2
+  max_results: 30  ->  None
+  max_per_resolution: 12  ->  None
+  exclude_uncached: False  ->  True
+  title_matching: True  ->  False
+  synced_regex_urls: 1  ->  0
+  excluded_keywords_count: 0  ->  7
+  result_limit_global: 20  ->  10
+  result_limit_resolution: 8  ->  None
+
+## challenger-community-rb3  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  0
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  []
+  sort_global: ['cached', 'streamExpressionMatched', 'seadex', 'resolution', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']  ->  ['streamExpressionMatched', 'library', 'resolution', 'quality', 'streamExpressionScore', 'language', 'visualTag', 'audioTag', 'encode', 'age', 'bitrate', 'seeders', 'subtitle']
+  cached_first: True  ->  False
+  resolution_rank: 3  ->  2
+  required_resolutions: ['2160p', '1080p']  ->  []
+  excluded_resolutions: ['144p', '240p', '360p']  ->  []
+  bitrate_global_movies: [0, 150000000]  ->  None
+  bitrate_global_series: [0, 150000000]  ->  None
+  dedup_enabled: True  ->  None
+  dedup_keys: ['filename', 'infoHash', 'smartDetect']  ->  None
+  dedup_multi_group: 'aggressive'  ->  None
+  excluded_regex_count: 7  ->  0
+  ranked_regex_count: 107  ->  0
+  excluded_sel_count: 23  ->  0
+  synced_sel_urls: 0  ->  1
+  max_results: 30  ->  None
+  max_per_resolution: 12  ->  None
+  title_matching: True  ->  None
+  season_episode_matching: True  ->  None
+  year_matching: True  ->  None
+  result_limit_global: 20  ->  None
+  result_limit_resolution: 8  ->  None
+
+## variant-apex-plus-torrentio  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  6
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrentio', 'torrents-db']
+
+## variant-apex-minus-torrentsdb  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  4
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'library', 'newznab', 'stremthruTorz']
+
+## variant-apex-dedup-off  (vs control-4k-apex-torbox)
+  dedup_multi_group: 'aggressive'  ->  'conservative'
+
+## variant-apex-bitrate-cap-off  (vs control-4k-apex-torbox)
+  bitrate_global_movies: [0, 150000000]  ->  [0, None]
+
+## variant-apex-cached-first-off  (vs control-4k-apex-torbox)
+  sort_global: ['cached', 'streamExpressionMatched', 'seadex', 'resolution', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']  ->  ['streamExpressionMatched', 'seadex', 'resolution', 'cached', 'quality', 'regexScore', 'visualTag', 'encode', 'audioTag', 'audioChannel', 'language', 'library', 'seeders', 'bitrate', 'size', 'subtitle']
+  cached_first: True  ->  False
+  resolution_rank: 3  ->  2
+
+## variant-apex-enable-zilean  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  6
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db', 'zilean']
+
+## variant-apex-allow-unknown-res  (vs control-4k-apex-torbox)
+  required_resolutions: ['2160p', '1080p']  ->  ['2160p', '1080p', 'Unknown']
+
+## variant-apex-plus-tpb  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  6
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'the-pirate-bay', 'torrents-db']
+
+## variant-apex-plus-therarbg  (vs control-4k-apex-torbox)
+  addon_count: 5  ->  6
+  addons: ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'torrents-db']  ->  ['aiosubtitle', 'library', 'newznab', 'stremthruTorz', 'therarbg', 'torrents-db']
+
+## variant-apex-failover-on  (vs control-4k-apex-torbox)
+  failover_enabled: None  ->  True
+  failover_max_attempts: None  ->  5
+
+## variant-apex-excluded-keywords  (vs control-4k-apex-torbox)
+  excluded_keywords_count: 0  ->  10
+
+## variant-apex-episode-title-matching  (vs control-4k-apex-torbox)
+  episode_title_matching: None  ->  True
+
+## variant-apex-seeder-floor  (vs control-4k-apex-torbox)
+  required_seeder_range: None  ->  [3, 100000]

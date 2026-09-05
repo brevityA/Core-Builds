@@ -174,6 +174,21 @@ def validate_list(values, valid_set):
     return [v for v in (values or []) if v not in valid_set]
 
 
+def _obj(container, key, name, warn):
+    """Read `key` from `container`, tolerating a non-object value.
+
+    Several config fields are objects in every real template but appear as bare
+    lists in non-template JSON that a bare `validate_templates.py` invocation
+    sweeps up (it defaults to `--dir .`). Returning {} and warning keeps the
+    validator reporting instead of dying with AttributeError mid-run.
+    """
+    val = container.get(key, {})
+    if not isinstance(val, dict):
+        warn(name, f"{key} is {type(val).__name__}, expected an object — skipped")
+        return {}
+    return val
+
+
 def validate_template(fpath):
     """Validate a single template file. Returns (errors, warnings, passes)."""
     errors, warnings, passes = [], [], []
@@ -384,7 +399,18 @@ def validate_template(fpath):
         _validate_sel_functions(all_expression_lists, name, err, warn)
 
     # ── Sort criteria ─────────────────────────────────────────
-    for scope, sort_list in c.get('sortCriteria', {}).items():
+    # `sortCriteria` is normally a mapping of scope -> [criteria]. Some non-template
+    # JSON in the repo (e.g. scripts/aios-regen snapshots) uses a bare list, which
+    # crashed the validator with AttributeError whenever it was run without --dir
+    # scoping. Report the shape instead of dying on it.
+    _sort_criteria = c.get('sortCriteria', {})
+    if not isinstance(_sort_criteria, dict):
+        warn(name, f"sortCriteria is {type(_sort_criteria).__name__}, expected an object of scopes — skipped")
+        _sort_criteria = {}
+    for scope, sort_list in _sort_criteria.items():
+        if not isinstance(sort_list, list):
+            warn(name, f"sortCriteria.{scope} is {type(sort_list).__name__}, expected a list — skipped")
+            continue
         bad_keys = [s['key'] for s in sort_list if s.get('key') not in VALID['sort_keys']]
         if bad_keys:
             err(name, f"sortCriteria.{scope}: invalid keys {bad_keys}")
@@ -478,8 +504,8 @@ def validate_template(fpath):
              f"{sum(1 for p in c.get('presets', []) if p.get('enabled'))} enabled")
 
     # ── Groups ────────────────────────────────────────────────
-    groups = c.get('groups', {})
-    dynamic_fetching = c.get('dynamicAddonFetching', {})
+    groups = _obj(c, 'groups', name, warn)
+    dynamic_fetching = _obj(c, 'dynamicAddonFetching', name, warn)
     if (is_core_builds_template and groups.get('enabled')
             and dynamic_fetching.get('enabled')):
         err(name, "Groups and Dynamic fetching cannot both be enabled in a Core Builds template")
@@ -503,21 +529,21 @@ def validate_template(fpath):
         ok(name, f"groups: {len(groups.get('groups', []))} groups configured")
 
     # ── Deduplicator ─────────────────────────────────────────
-    dedup = c.get('deduplicator', {})
+    dedup = _obj(c, 'deduplicator', name, warn)
     for key in ('cached', 'uncached', 'p2p'):
         val = dedup.get(key)
         if val and val not in VALID['dedup_modes']:
             err(name, f"deduplicator.{key}: invalid value '{val}'")
 
     # ── Playback enum contracts ───────────────────────────────
-    autoplay = c.get('autoPlay', {})
+    autoplay = _obj(c, 'autoPlay', name, warn)
     bad_autoplay = validate_list(autoplay.get('attributes', []), VALID['autoplay_attributes'])
     if bad_autoplay:
         err(name, f"autoPlay.attributes: invalid values {bad_autoplay}")
     elif autoplay.get('attributes'):
         ok(name, f"autoPlay.attributes: {len(autoplay['attributes'])} values valid")
 
-    cache_and_play = c.get('cacheAndPlay', {})
+    cache_and_play = _obj(c, 'cacheAndPlay', name, warn)
     bad_cache_types = validate_list(cache_and_play.get('streamTypes', []), VALID['cache_and_play_types'])
     if bad_cache_types:
         err(name, f"cacheAndPlay.streamTypes: invalid values {bad_cache_types}")
@@ -525,17 +551,17 @@ def validate_template(fpath):
         ok(name, f"cacheAndPlay.streamTypes: {len(cache_and_play['streamTypes'])} values valid")
 
     # ── Matching ──────────────────────────────────────────────
-    tm = c.get('titleMatching', {})
+    tm = _obj(c, 'titleMatching', name, warn)
     if tm.get('mode') == 'exact':
         warn(name, "titleMatching.mode is 'exact' — causes zero results on title variations")
     if tm.get('similarityThreshold', 0) > 0.85:
         warn(name, f"titleMatching.similarityThreshold {tm['similarityThreshold']} — very strict")
 
-    ym = c.get('yearMatching', {})
+    ym = _obj(c, 'yearMatching', name, warn)
     if ym.get('strict'):
         warn(name, "yearMatching.strict=True — blocks valid releases with TMDB date discrepancies")
 
-    sem = c.get('seasonEpisodeMatching', {})
+    sem = _obj(c, 'seasonEpisodeMatching', name, warn)
     if sem.get('strict'):
         warn(name, "seasonEpisodeMatching.strict=True — drops BluRay/REMUX without S/E metadata")
 
@@ -549,7 +575,7 @@ def validate_template(fpath):
     # (size.global and size.resolution are both valid AIOStreams schema keys)
 
     # ── Formatter ─────────────────────────────────────────────
-    fmt = c.get('formatter', {})
+    fmt = _obj(c, 'formatter', name, warn)
     if fmt.get('id') == 'tamtaro':
         override = fmt.get('definitions', {}).get('overrides', {})
         if 'tamtaro' not in override:
