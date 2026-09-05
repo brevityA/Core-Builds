@@ -51,11 +51,45 @@
   <a href="https://corebuilds-docs.docsalot.dev/templates/directory"><b>corebuilds-docs.docsalot.dev</b></a>
 </p>
 
+<p align="center">
+  <a href="https://brevitya.github.io/Core-Builds/">
+    <img src="https://img.shields.io/badge/OPEN_CONFIGURATOR-Build_your_template_in_30_seconds-00d4ff?style=for-the-badge&logo=react&logoColor=white&labelColor=1a1f27" alt="Open the Core Builds Configurator"/>
+  </a>
+</p>
+
 > 🚀 **These templates are built for [TorBox](https://torbox.app/subscription?referral=d1ccddb0-f094-45ca-b52b-942a2635855e).** Use the referral link above and get **up to 84 extra days free** depending on the plan — and support this project.
 
 ---
 
+## 🎛️ Core Builds Configurator — the main product
+
+The [**Configurator**](https://brevitya.github.io/Core-Builds/) turns your service, device, and preferences into a polished, tuned AIOStreams template — **"Build streams with intent"**, no JSON editing required. It shares its policies, formatters and filter stack with the pinned template suite below, so a generated setup and a shipped template speak the same language.
+
+| Route | For |
+|---|---|
+| ⚡ **Express Install** | One click — pick debrid · profile · device, install in ~30s (Stremio, WuPlay, Nuvio, or manifest) |
+| 🛠️ **Advanced Builder** | Full control: filters, sort rules, SEL expressions, 19 formatters, subtitles, catalogs, proxy, bandwidth cap |
+| 🔄 **Update Existing Setup** | Import your live config or template → rebuild with current logic, diffed, with cherry-pick |
+| 🧞 **Setup Genie** | Chat-style guided walkthrough for first-timers |
+
+**What it does that a pinned template can't:**
+- **Device-aware profiles** — Fire Stick, Apple TV, Samsung, Android TV, Windows, ultrawide… each sets the right codec limits, HDR handling and resolution caps.
+- **Host Compatibility gate** — options your chosen AIOStreams host (ElfHosted, Yeb's, self-hosted…) would reject are greyed out and stripped *before* you save — no more "X/Y regexes are not allowed" surprises.
+- **Direct Install with soft-fail recovery** — deploys to your host; if an add-on fetch fails, it offers to disable and retry with an auto-backup.
+- **Free and paid alike** — TorBox, Real-Debrid, AllDebrid, EasyNews, plus free P2P/HTTP lanes with no account or server-side credentials.
+- **Runs locally, works offline** — export stays in your browser; the whole app is a [single-file build](https://github.com/brevityA/Core-Builds/blob/main/configurator/index.html) you can download and open anywhere.
+
+> 📖 Configurator guide: [core-builds.mintlify.app/configurator](https://core-builds.mintlify.app/configurator)
+
+---
+
 ## 🚀 Quick Start
+
+### ⭐ Recommended: let the Configurator build it
+
+Open the [**Configurator**](https://brevitya.github.io/Core-Builds/) and pick a route — **⚡ Express Install** is one click from debrid + device to deployed config. It generates the template, **Direct Installs** it to your chosen AIOStreams host, and opens Stremio / WuPlay / Nuvio. Prefer to stay manual? Export the JSON and import it in the next section.
+
+### Or: import a pinned template
 
 **Three steps to get running:**
 
@@ -99,6 +133,8 @@ Watching anime?
 
 Getting too few results / low-overhead host? → use the Lite variant of any template above
 ```
+
+> 🎛️ Prefer a setup tuned to *your* device and host instead of a pinned template? **[Generate one in the Configurator →](https://brevitya.github.io/Core-Builds/)** — it covers every lane above, plus free P2P/HTTP builds.
 
 ---
 
@@ -273,6 +309,8 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 
 | Folder | Contents |
 |---|---|
+| [`configurator/`](https://github.com/brevityA/Core-Builds/tree/main/configurator) | **Core Builds Configurator** — the web app that generates tuned AIOStreams templates; ships as a single-file build live at [brevitya.github.io/Core-Builds](https://brevitya.github.io/Core-Builds/) |
+| [`tools/`](https://github.com/brevityA/Core-Builds/tree/main/tools) | Companion utilities — Preflight audit, Template Inspector, Badge Builder, Banner Studio, CoreSpeed |
 | [`Templates/Stable/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Stable) | Core Stable baseline templates — minimal local filtering and predictable fetch behaviour |
 | [`Templates/Torbox/`](https://github.com/brevityA/Core-Builds/tree/main/Templates/Torbox) | Curated TorBox, device, Lite, Nightly, and Labs templates |
 | [`Community-Templates/`](https://github.com/brevityA/Core-Builds/tree/main/Community-Templates) | Community-submitted templates |
@@ -290,6 +328,7 @@ Full docs at **[corebuilds-docs.docsalot.dev](https://corebuilds-docs.docsalot.d
 
 | Guide | Link |
 |---|---|
+| Configurator | [Docs → Template Configurator](https://core-builds.mintlify.app/configurator) |
 | Quick Start | [Docs → Quick Start](https://corebuilds-docs.docsalot.dev/getting-started/quick-start) |
 | Import a template | [Docs → Importing a Template](https://corebuilds-docs.docsalot.dev/guides/importing-templates) |
 | Which template? | [Docs → Which Template?](https://corebuilds-docs.docsalot.dev/guides/choosing-a-template) |

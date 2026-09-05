@@ -12,6 +12,10 @@
 - **Allowlist regeneration path repaired** — `configurator/src/data/regex-allowlist.js` advertises `scripts/sync_template_collection.py --regex-allowlist` as its generator; the flag did not exist. It is implemented now and reproduces the committed artifact byte-for-byte from the pinned snapshot, so drift re-pins and allowlist refresh are a two-command, zero-hand-edit flow.
 - **Standalone re-sync is now a pipeline step**: `scripts/sync_ranked_regex.py` (new) regenerates the reviewed ranked list and every inline copy in active lanes from the snapshot (provenance-checked, idempotent, `--check` gate); `scripts/template_builder.py` remains scaffolding only.
 
+### Docs
+- **README now advertises the Configurator as the main product** — hero call-to-action button, a dedicated "Core Builds Configurator" section (routes, device-aware profiles, host compatibility gating, Direct Install soft-fail recovery, offline single-file use), a two-path Quick Start (Configurator recommended, pinned templates as the alternative), configurator pointer under the template decision tree, and `configurator/` + `tools/` added to the repository map.
+- **`docs/configurator.mdx` CTA unfrozen** — the hand-written "Configurator v2.97" version line went stale against shipped v3.1; it now says "latest release, deployed from this repository" so it cannot rot again.
+
 ## 3.6.2 (2026-08-22)
 
 ### Added
