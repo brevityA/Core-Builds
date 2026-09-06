@@ -20,6 +20,7 @@ import {
   KNOWN_DEAD_CONFIG_KEYS,
   LEGACY_MIGRATED_CONFIG_KEYS,
 } from '../data/host-capabilities.js';
+import { HOST_META } from '../data/hosts.js';
 import { AIO_CONFIG_KEY_SET } from '../config/generated/aiostreams-config-schema.js';
 import { AIO_PRESET_ID_SET } from '../data/generated/aiostreams-presets.js';
 import { isAllowed, hasLookbehind, REGEX_FIELDS } from './regex-whitelist.js';
@@ -121,7 +122,14 @@ export function resolveHostCapabilities(hostKey, probe = null, options = {}) {
     key,
     label: base.label || key,
     kind: base.kind || 'unknown',
-    version: probed?.version || options.assumedVersion || null,
+    // Precedence: live probe > HOST_META registry snapshot (read from each
+    // host's own /api/v1/status at the last audit) > the caller's assumed
+    // target. The registry entry exists for the offline / CORS-blocked path,
+    // where the assumed target was previously the only guess available.
+    version: probed?.version
+      || HOST_META[key]?.aiostreamsVersion
+      || options.assumedVersion
+      || null,
     channel: probed?.channel || (base.kind === 'nightly' ? 'nightly' : null),
     probed: Boolean(probed),
     // An unprobed host that the registry flags as owner-configured cannot be
@@ -146,6 +154,8 @@ export function resolveHostCapabilities(hostKey, probe = null, options = {}) {
     rateLimited: probed?.rateLimited ?? base.rateLimited ?? false,
     reasons: base.reasons || {},
     trustedUser: Boolean(options.trustedUser),
+    // Surfaced from HOST_META so routing checks work off one record.
+    blocksFree: Boolean(HOST_META[key]?.blocksFree),
   };
 }
 

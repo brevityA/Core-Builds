@@ -29,14 +29,20 @@ import { iqrExpression } from '../core/iqr-expression.js';
 import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from '../core/update-check.js';
-import { AIOSTREAMS_COMPATIBILITY_TARGETS, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
+import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
+import { hasLibraryCapableService, missingDirectInstallCredentials } from '../core/install-policy.js';
+import { hostRoutingDecision, autoRoutableHostKeys, hostPickerLabel } from '../core/host-routing.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '3.1';
+// Single source of truth for the app version. Per repo convention (version-sync
+// workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
+// the release tag; the built badge drops the trailing .0. At the 2026-09-06
+// audit the release tag was v3.7.0 while this said 3.1 — they must move together.
+const CONFIGURATOR_VERSION = '3.7';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -167,6 +173,9 @@ function stremioErrText(raw, fallback) {
 }
 
 let _expressProbeSeq = 0;
+// The Express lane keeps its service pick in a closure-local `state`; the host
+// chip's capability verdict needs it, so mirror it here while the lane is open.
+let _expressLaneService = null;
 async function probeExpressHost() {
   const chip = document.getElementById('expressHostChip');
   const sel = document.getElementById('expressHost');
@@ -179,10 +188,16 @@ async function probeExpressHost() {
   chip.style.color=''; chip.style.borderColor='';
   const d = await probeHostDetail(url, 4000);
   if (seq !== _expressProbeSeq) return;
-  if (d.ok && !d.degraded)      { chip.textContent = `● healthy${d.version?' v'+d.version:''} · ${d.ms}ms`; chip.style.color='#34d399'; chip.style.borderColor='rgba(52,211,153,.35)'; }
-  else if (d.ok)                { chip.textContent = `● slow · ${d.ms}ms`; chip.style.color='#fbbf24'; chip.style.borderColor='rgba(251,191,36,.35)'; }
+  // Capability-matrix verdict for the CURRENT pick (audit defect 4), shown on
+  // the chip BEFORE Deploy: a pick the matrix blocks turns the chip red with
+  // the reason; a host merely behind the selected target says so in amber.
+  const routing = (() => { try { return hostRoutingDecision({ service: _expressLaneService || S.service, config: {} }, currentHostCapabilities(), { targetVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null }); } catch(e) { return { status:'ok', reasons:[] }; } })();
+  if (routing.status === 'blocked') { chip.textContent = '✕ ' + routing.reasons[0].split(' — ')[0]; chip.title = routing.reasons.join(' '); chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; return; }
+  chip.title = routing.status === 'warn' ? routing.reasons.join(' ') : '';
+  if (d.ok && !d.degraded)      { chip.textContent = `● healthy${d.version?' v'+d.version:''} · ${d.ms}ms${routing.status==='warn'?' · behind target':''}`; chip.style.color = routing.status==='warn' ? '#fbbf24' : '#34d399'; chip.style.borderColor = routing.status==='warn' ? 'rgba(251,191,36,.35)' : 'rgba(52,211,153,.35)'; }
+  else if (d.ok)                { chip.textContent = `● slow · ${d.ms}ms${routing.status==='warn'?' · behind target':''}`; chip.style.color='#fbbf24'; chip.style.borderColor='rgba(251,191,36,.35)'; }
   else if (d.reason==='outdated'){ chip.textContent = `● outdated ${d.version?'v'+d.version:''}`; chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; }
-  else { chip.textContent = '● down'; chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; }
+  else { chip.textContent = `● down${routing.status==='warn'?' · behind target':''}`; chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; }
 }
 
 function hostErrorHtml(raw) {
@@ -202,9 +217,26 @@ function hostErrorHtml(raw) {
   return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`;
 }
 
+// Inline notice for the Direct Install key gate — names the exact missing key(s).
+function missingCredHtml(missing) {
+  const rows = missing.map(m => `<li style="margin:2px 0"><b style="color:#fbbf24">${escHtml(m.label)}</b></li>`).join('');
+  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Direct Install needs a key</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px;line-height:1.5">The AIOStreams host rejects a config whose service has no credential ("Option apiKey is required"). Enter:<ul style="margin:4px 0 6px;padding-left:18px">${rows}</ul>then install again — or use <b>Export JSON</b>, which stays keyless.</div></div>`;
+}
+
+// Inline notice for the host-routing gate (capability matrix, audit defect 4).
+function hostRoutingNoticeHtml(decision) {
+  const warn = decision.status === 'warn';
+  return `<div class="import-success${warn ? ' import-info' : ' import-error'}" style="margin-top:12px"><strong style="color:${warn ? '#fbbf24' : '#f87171'}">${warn ? 'Heads-up before deploying' : 'This host can\'t take this config'}</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${decision.reasons.map(r => escHtml(r)).join('<br>')}</div></div>`;
+}
+
 async function selectHealthyHost(timeout=4000) {
   const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
-  const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree));
+  // Hosts the routing matrix would block for the CURRENT config (feature keys
+  // newer than the host's registry version) are not candidates — 'auto' must
+  // never park a 2.34-only config on a 2.33.2 host.
+  let _routable = null;
+  try { _routable = new Set(autoRoutableHostKeys({ service: S?.service, config: buildFinal().config })); } catch(e) { _routable = null; }
+  const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree)).filter(([,host])=>!_routable || _routable.has(hostKeyFromUrl(host)));
   let preferred='';
   try { preferred=localStorage.getItem('coreBuildLastGoodHost')||''; } catch(e) {}
   const probe = async host => {
@@ -229,7 +261,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:'2.32.0', installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 const SENSITIVE_TOP_LEVEL_KEYS = new Set(['instancePassword', 'basePassword', 'stremioPassword']);
 const SENSITIVE_KEY_TOKENS = ['password', 'apikey', 'api_key', 'token', 'secret', 'credential', 'auth'];
 
@@ -374,7 +406,7 @@ function migrateState(input) {
     if(!['auto', ...OUTPUT_PROFILES].includes(d.outputProfile)) d.outputProfile='auto';
   }
   if(schema<4){
-    if(!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(d.aiostreamsVersion)) d.aiostreamsVersion='2.32.0';
+    if(!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(d.aiostreamsVersion)) d.aiostreamsVersion=DEFAULT_AIOSTREAMS_VERSION;
   }
   d._schema=STATE_SCHEMA; return d;
 }
@@ -1151,7 +1183,7 @@ function outputProfileContext() {
     // 4K-tier-first rule (and the same explicit opt-out) as sort-policy.js.
     qualityFirst: Boolean(S.qualityFirst),
     resolutionFirst: Boolean(S.resolutionFirst),
-    aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0',
+    aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : DEFAULT_AIOSTREAMS_VERSION,
   };
 }
 
@@ -1178,13 +1210,17 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     </button>`;
   }).join('');
   const flowDefault = S.simpleMode || S.quickStart ? 'Core Stable' : (S.pseArch === 'apex-mixed' ? 'Labs' : S.pseArch === 'iqr' ? 'Advanced' : 'Balanced');
-  const target = AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0';
-  const targetNote = target === '2.31.1'
-    ? 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.'
-    : target === '2.32.0'
-      ? 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.'
-      : 'Unknown target: old TorBox Search is removed rather than assumed portable.';
-  const targetControl = `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)"><label style="display:block;font-size:.64rem;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">AIOStreams compatibility target</label><select data-action="set-aiostreams-target" style="width:100%;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 8px;font-size:.72rem"><option value="2.31.1" ${target === '2.31.1' ? 'selected' : ''}>2.31.1 — legacy TorBox Search compatibility lane</option><option value="2.32.0" ${target === '2.32.0' ? 'selected' : ''}>2.32.0 — remove legacy preset; Newznab migration review</option><option value="unknown" ${target === 'unknown' ? 'selected' : ''}>Unknown / older — do not assume legacy preset support</option></select><div style="font-size:.62rem;line-height:1.4;color:#6b7280;margin-top:5px">${targetNote}</div></div>`;
+  const target = AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : DEFAULT_AIOSTREAMS_VERSION;
+  // Descriptions live with the options so the picker cannot say less than the target list knows.
+  const TARGET_NOTES = {
+    '2.31.1': 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.',
+    '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
+    '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. Matches the Midnight / Omni / Wizaardd hosts.',
+    '2.34.0': 'v2.34.0 lane: the release this configurator is pinned against (schema pin e694b6a). Default — matches most live hosts.',
+    'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
+  };
+  const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
+  const targetControl = `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)"><label style="display:block;font-size:.64rem;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">AIOStreams compatibility target</label><select data-action="set-aiostreams-target" style="width:100%;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 8px;font-size:.72rem">${AIOSTREAMS_COMPATIBILITY_TARGETS.map(v => `<option value="${v}" ${target === v ? 'selected' : ''}>${v === 'unknown' ? 'Unknown / older — do not assume legacy preset support' : v + (v === '2.31.1' ? ' — legacy TorBox Search lane' : v === '2.32.0' ? ' — remove legacy preset' : v === DEFAULT_AIOSTREAMS_VERSION ? ' — pinned release (default)' : ' — variants supported')}</option>`).join('')}</select><div style="font-size:.62rem;line-height:1.4;color:#6b7280;margin-top:5px">${targetNote}</div></div>`;
   const reset = S.outputProfile && S.outputProfile !== 'auto'
     ? `<button type="button" data-action="set-output-profile" data-val="auto" style="margin-top:7px;padding:0;border:0;background:none;color:#6b7280;font-size:.66rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px">Use this flow’s default (${flowDefault})</button>`
     : `<span style="display:block;margin-top:7px;color:#4b5563;font-size:.66rem">This flow defaults to ${flowDefault}.</span>`;
@@ -1676,12 +1712,19 @@ function splashHtml() {
     </div>
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
-    <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Express install</h2><p>The whole job is five steps: service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
-      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, profile, and device — install in about 30 seconds.</div></div></div>
-      <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
-      <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
-      <a class="splash-door core-tool-door" href="../tools/genies/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Setup Genie <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Newcomer-friendly</span></div><div class="splash-door-desc">The chat-style guided walkthrough, on its own focused page — nothing else on screen.</div></div></a>
+      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy — working streams in about 30 seconds.</div></div></div>
+    </div>
+    <!-- Express-first IA (2026-09-06 audit): the other routes stay one click away
+         as secondary text links — same data-actions, so #advanced / #update
+         deep links, the tour and every spec that clicks them still work. The
+         Setup Genie card is gone from the landing; the route itself is
+         unchanged and still linked here and from All Core Tools. -->
+    <div class="splash-tertiary splash-anim splash-anim-d4" id="splashAltRoutes" style="margin-top:10px">
+      <button data-action="custom-start" class="splash-tertiary-btn">Advanced Builder</button>
+      <button data-action="update-template" class="splash-tertiary-btn">Update Existing Setup</button>
+      <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
     </div>
 
     <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
@@ -1893,14 +1936,7 @@ function render() {
                 <label>AIOStreams Host</label>
                 <select class="name-input" id="aioHost" data-action="update-host" style="cursor:pointer;color-scheme:dark">
                   <option value="auto"       ${S.instanceHost==='auto'?'selected':''}>Auto (tries all public hosts)</option>
-                  <option value="elfhosted"  ${S.instanceHost==='elfhosted'||S.instanceHost===''?'selected':''}>ElfHosted — aiostreams.elfhosted.com</option>
-                  <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthWeak — aiostreams.fortheweak.cloud</option>
-                  <option value="midnight"   ${S.instanceHost==='midnight'?'selected':''}>Midnight's — midnightignite.me</option>
-                  <option value="viren"      ${S.instanceHost==='viren'?'selected':''}>Viren's — aiostreams.viren070.me</option>
-                  <option value="kuu"        ${S.instanceHost==='kuu'?'selected':''}>Kuu's — aiostreams.stremio.ru</option>
-                  <option value="atbp"       ${S.instanceHost==='atbp'?'selected':''}>ATBP — aio.atbphosting.com</option>
-                  <option value="omni"       ${S.instanceHost==='omni'?'selected':''}>Omni's — aiostreams.12312023.xyz</option>
-                  <option value="wizaardd"   ${S.instanceHost==='wizaardd'?'selected':''}>Wizaardd — forthewizards.uk</option>
+                  ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${k}" ${S.instanceHost===k||(k==='elfhosted'&&S.instanceHost==='')?'selected':''}>${escHtml(hostPickerLabel(k))}</option>`).join('')}
                   <option value="custom"     ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted</option>
                 </select>
               </div>
@@ -3574,6 +3610,13 @@ function defaultName() {
 function presets() {
   const svc = S.service;
   const isMulti = svc === 'multi', isP2P = svc === 'p2p', isEasynews = svc === 'easynews', isHttp = svc === 'http', isDebridio = svc === 'debridio', isUsenet = svc === 'usenet';
+  // Library root-cause fix (2026-09-06 audit): AIOStreams generates the Library
+  // addon from the *services* array and rejects the whole config when no
+  // enabled service can back it ("Library requires at least one usable
+  // service"). EasyNews — and every other non-debrid route — cannot, so the
+  // library preset is emitted only when services() carries a capable service.
+  // Applied here (every route reads this list), not in one lane.
+  const libCapable = hasLibraryCapableService(services());
   const hasDebridio = isDebridio || (isMulti && S.multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
@@ -3582,7 +3625,10 @@ function presets() {
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
   if (isUsenet) {
     const usenetList = [
-      { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+      // The usenet route enables the `aiostreams` service (see services()), which
+      // IS library-capable upstream — kept. Any future usenet route without it
+      // loses the library preset automatically via `libCapable`.
+      ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
       ...(S.creds.nzbgeek ? [{ type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } }] : []),
@@ -3620,7 +3666,9 @@ function presets() {
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
-    { type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+    // See the libCapable note above: no capable service → no library preset,
+    // or the host rejects the save outright (EasyNews-only 400, audit defect 2).
+    ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
@@ -4462,7 +4510,7 @@ function parseTemplateToState(tpl) {
     name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
     exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
-    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false, outputProfile: 'auto', aiostreamsVersion: '2.32.0'
+    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false, outputProfile: 'auto', aiostreamsVersion: DEFAULT_AIOSTREAMS_VERSION
   };
   if (OUTPUT_PROFILES.includes(tpl?.metadata?.coreBuildsProfile)) st.outputProfile = tpl.metadata.coreBuildsProfile;
   if (AIOSTREAMS_COMPATIBILITY_TARGETS.includes(tpl?.metadata?.coreBuildsAIOStreamsTarget)) st.aiostreamsVersion = tpl.metadata.coreBuildsAIOStreamsTarget;
@@ -6563,7 +6611,7 @@ function showExpressLane() {
   };
   const overlay = document.createElement('div');
   const prevFocus = document.activeElement;
-  const closeLane = () => { overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
+  const closeLane = () => { _expressLaneService = null; overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
   const expressLaneEscKey = (e) => { if (e.key === 'Escape') closeLane(); };
   document.addEventListener('keydown', expressLaneEscKey);
   overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.closest('#expressClose')) closeLane(); }, { once:false });
@@ -6580,7 +6628,7 @@ function showExpressLane() {
         <span id="expressHostChip" style="flex-shrink:0;font-size:.58rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.12);color:#6b7280;white-space:nowrap">…</span>
         <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
           <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
-          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(HOST_LABEL_MAP[k]||k)}${HOST_META[k]&&HOST_META[k].channel==='nightly'?' (nightly)':''}</option>`).join('')}
+          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(hostPickerLabel(k))}</option>`).join('')}
           <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
         </select>
       </div>
@@ -6623,6 +6671,7 @@ function showExpressLane() {
   </div>`;
   document.body.appendChild(overlay);
   document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); refreshExpressSummary(); });
+  _expressLaneService = state.service;
   probeExpressHost();
   // Truthful-at-a-glance chorus above the Install button — every pick lands in it.
   const refreshExpressSummary = () => {
@@ -6643,6 +6692,8 @@ function showExpressLane() {
     const svcBtn = e.target.closest('[data-express-service]');
     if (svcBtn) {
       state.service = svcBtn.dataset.expressService;
+      _expressLaneService = state.service;
+      probeExpressHost();
       overlay.querySelectorAll('[data-express-service]').forEach(b => b.classList.toggle('active', b.dataset.expressService === state.service));
       state.extras = state.extras.filter(v => v !== state.service);
       renderCredsInto();
@@ -6735,7 +6786,6 @@ function showExpressLane() {
 
 async function runExpressInstall(p) {
   const isFree = p.service === 'p2p';
-  if (!isFree && !Object.values(p.creds).some(v => v)) { showToast('Enter your API key first', true); return; }
   if (p.target === 'app' && !isFree) {
     if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
     S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
@@ -6811,6 +6861,18 @@ async function runExpressInstall(p) {
       result.replaceChildren(errDiv);
     }
     return;
+  }
+  // Key gate (audit defect 3), express side: name the exact missing key before
+  // anything is posted. Applies to every install target that POSTs a config
+  // (Stremio / manifest / WuPlay); the Nuvio paste route returned above.
+  if (!isFree) {
+    const missingCreds = missingDirectInstallCredentials(services(), S.creds);
+    if (missingCreds.length) {
+      const result = document.getElementById('aioResult');
+      if (result) result.innerHTML = missingCredHtml(missingCreds);
+      showToast('Enter your ' + missingCreds[0].label + ' first', true);
+      return;
+    }
   }
   S.installMode = p.target === 'app' ? 'direct' : 'manifest';
   saveState();
@@ -7121,6 +7183,18 @@ async function simpleInstall(target) {
       showToast('Enter your Stremio email and password above', true); return;
     }
   }
+  // Key gate (audit defect 3): every enabled service that needs a credential
+  // must have one before anything is POSTed — the host refuses the save with
+  // "Option apiKey is required" otherwise. Export JSON deliberately stays
+  // keyless; this gate only guards the install path.
+  if (!isFree) {
+    const missingCreds = missingDirectInstallCredentials(services(), S.creds);
+    if (missingCreds.length) {
+      if (result) result.innerHTML = missingCredHtml(missingCreds);
+      showToast('Enter your ' + missingCreds[0].label + ' first', true);
+      return;
+    }
+  }
   const origHtml = btn.innerHTML;
   if (isFree) {
     btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
@@ -7144,6 +7218,15 @@ async function simpleInstall(target) {
   const cfg = buildFinal().config;
   const sz = payloadSizeGuard(cfg);
   if (sz.over) { btn.disabled = false; btn.innerHTML = 'Install'; result.innerHTML = payloadTooLargeHtml(sz); return; }
+  // Host routing gate (audit defect 4): never POST to a host the capability
+  // matrix says will refuse this config (P2P on ElfHosted; feature keys newer
+  // than the host). A host that merely lags the selected target warns instead.
+  const routing = hostRoutingDecision({ service: S.service, config: cfg }, currentHostCapabilities(), { targetVersion: outputProfileContext().aiostreamsVersion });
+  if (routing.status === 'blocked') {
+    btn.disabled = false; btn.innerHTML = 'Install';
+    result.innerHTML = hostRoutingNoticeHtml(routing);
+    return;
+  }
   const _allHosts = orderedHostEntries();
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });

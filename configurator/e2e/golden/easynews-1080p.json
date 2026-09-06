@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.1",
+    "coreBuildsVersion": "3.7",
     "coreBuildsAIOStreamsTarget": "2.31.1",
     "coreBuildsProfile": "balanced",
     "coreBuildsProfileVersion": "1"
@@ -853,27 +853,6 @@
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "presets": [
-      {
-        "type": "library",
-        "instanceId": "lib-1",
-        "enabled": true,
-        "options": {
-          "name": "Library",
-          "timeout": 6000,
-          "resources": [
-            "stream",
-            "catalog",
-            "meta"
-          ],
-          "mediaTypes": [],
-          "showRefreshActions": [
-            "catalog"
-          ],
-          "skipProcessing": false,
-          "hideStreams": false,
-          "useMultipleInstances": false
-        }
-      },
       {
         "type": "seadex",
         "instanceId": "tam-seadex",
