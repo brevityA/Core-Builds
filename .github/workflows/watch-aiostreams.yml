@@ -43,7 +43,7 @@ jobs:
           path: /tmp/regen-core-nexus.json
       - name: Open or update drift issue
         if: steps.diff.outcome == 'failure'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const title = 'AIOStreams contract drift detected';
