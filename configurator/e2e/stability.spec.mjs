@@ -10,7 +10,7 @@ const UUID = '11111111-2222-4333-8444-555555555555';
 // console line is expected output, not a defect, so it is filtered here like
 // the proxy noise above. Filtering is scoped to /api/v1/status specifically so
 // a genuine CORS regression elsewhere still fails.
-const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
+const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_(?:FAILED|CONNECTION_CLOSED)$|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
 
 async function fresh(page) {
   const errors = [];

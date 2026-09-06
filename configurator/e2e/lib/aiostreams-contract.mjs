@@ -59,10 +59,50 @@ export const UNMODELLED_PRESET_TYPES = new Set([
 ]);
 
 /**
+ * Services AIOStreams' built-in Library preset can track — mirrored from
+ * `LibraryPreset.supportedServices` (packages/core/src/presets/library.ts
+ * @ v2.34.0): every StremThru service plus the usenet engines (nzbdav /
+ * altmount / stremthru_newz / aiostreams). EasyNews is NOT listed, so an
+ * EasyNews-only config that still enables Library is rejected with
+ * "The library requires at least one usable service to be configured".
+ */
+export const HOST_LIBRARY_CAPABLE_SERVICES = new Set([
+  'alldebrid', 'debrider', 'debridlink', 'easydebrid', 'offcloud', 'premiumize',
+  'pikpak', 'realdebrid', 'torbox', 'torrin', 'nzbdav', 'altmount',
+  'stremthru_newz', 'aiostreams',
+]);
+
+/**
+ * The save-time host rule the mocked backend should enforce exactly: an
+ * enabled Library preset with no usable (debrid/usenet-engine) service is a
+ * hard 400, not a soft drop. Independent re-statement of the host rule —
+ * deliberately not imported from the app, so the assertion stays honest.
+ */
+export function validateLibraryUsableService(config) {
+  const presets = config?.presets;
+  if (!Array.isArray(presets)) return { ok: true };
+  const library = presets.find(p => p?.type === 'library' && p?.enabled !== false);
+  if (!library) return { ok: true };
+  const enabledServices = (config.services || []).filter(s => s?.enabled).map(s => s.id);
+  if (enabledServices.some(id => HOST_LIBRARY_CAPABLE_SERVICES.has(id))) return { ok: true };
+  return {
+    ok: false,
+    error: {
+      message: 'The library requires at least one usable service to be configured',
+    },
+  };
+}
+
+/**
  * Validate a generated config against the modelled option contract.
  * @returns {{ok: true} | {ok: false, error: {message: string}}} AIOStreams' rejection shape.
  */
 export function validateConfigOptions(config) {
+  // The unconditional save rule first — mirrors the host regardless of preset
+  // table coverage.
+  const libraryVerdict = validateLibraryUsableService(config);
+  if (!libraryVerdict.ok) return libraryVerdict;
+
   const presets = config?.presets;
   if (!Array.isArray(presets)) return { ok: true };
 

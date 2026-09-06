@@ -9,9 +9,10 @@ import {
   resolveHostCapabilities, hostOptionGate, gateConfigForHost, gateTemplateForHost,
   describeRemovals,
 } from '../src/core/host-capability-policy.js';
-import { KNOWN_DEAD_CONFIG_KEYS, LEGACY_MIGRATED_CONFIG_KEYS } from '../src/data/host-capabilities.js';
+import { KNOWN_DEAD_CONFIG_KEYS, LEGACY_MIGRATED_CONFIG_KEYS, PRESET_MIN_VERSIONS } from '../src/data/host-capabilities.js';
 import { AIO_CONFIG_KEY_SET } from '../src/config/generated/aiostreams-config-schema.js';
 import { AIO_PRESET_ID_SET } from '../src/data/generated/aiostreams-presets.js';
+import { HOST_BASE_URLS, HOST_META } from '../src/data/hosts.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const GOLDEN_DIR = join(HERE, '..', 'e2e', 'golden');
@@ -356,4 +357,67 @@ test('gating stays idempotent now that synced URLs are filtered rather than clea
   // surviving pass one and being dropped by pass two.
   assert.equal(second.removals.filter(r => r.kind === 'syncedRegex').length, 0);
   assert.deepEqual(second.config.syncedRankedRegexUrls, first.config.syncedRankedRegexUrls);
+});
+
+/* ── v2.34 schema sync: registry versions + version-gated config keys/presets ── */
+
+test('a probe wins over the registry version, the registry wins over the assumed one', () => {
+  const registry = resolveHostCapabilities('elfhosted', null);
+  assert.equal(registry.version, HOST_META.elfhosted.aiostreamsVersion);
+  assert.equal(registry.versionSource, 'registry');
+  const probed = resolveHostCapabilities('elfhosted', parseHostStatus(ELF_STATUS));
+  assert.equal(probed.version, ELF_STATUS.data.version);
+  assert.equal(probed.versionSource, 'probe');
+  const customBox = resolveHostCapabilities('custom', null, { assumedVersion: '2.33.2' });
+  assert.equal(customBox.version, '2.33.2', 'no registry entry for custom — assumed stands');
+  assert.equal(customBox.versionSource, 'assumed');
+});
+
+test('the registry versions are real semver slots the picker offers', () => {
+  for (const key of Object.keys(HOST_BASE_URLS)) {
+    assert.match(HOST_META[key].aiostreamsVersion, /^\d+\.\d+\.\d+$/, key);
+  }
+});
+
+test('2.34.0-only config keys stay on a 2.34.0 host and leave a 2.33.2 host', () => {
+  const payload = { healthChecks: [{ enabled: true }], autoVariants: [{ enabled: true }], manifestNotice: { enabled: false }, linkedAccounts: [{ id: 'x' }] };
+  const current = gateConfigForHost(payload, resolveHostCapabilities('fortheweak'));
+  assert.deepEqual(current.config, payload, 'a 2.34.0 host keeps the v2.34 keys');
+  const behind = gateConfigForHost(payload, resolveHostCapabilities('midnight'));
+  assert.equal(behind.config.healthChecks, undefined);
+  assert.equal(behind.config.autoVariants, undefined);
+  assert.equal(behind.config.manifestNotice, undefined);
+  assert.equal(behind.config.linkedAccounts, undefined);
+  assert.ok(behind.removals.some(r => r.kind === 'feature' && r.target === 'healthChecks' && /2\.34\.0/.test(r.reason)));
+});
+
+test('version-gated presets are removed on hosts that predate the v2.34 built-ins', () => {
+  const presets = { presets: [{ type: 'therarbg', instanceId: 'r1' }, { type: 'usa-tv-next', instanceId: 'u1' }, { type: 'comet', instanceId: 'c1' }] };
+  const behind = gateConfigForHost(presets, resolveHostCapabilities('midnight'));
+  assert.deepEqual(behind.config.presets.map(p => p.type), ['comet']);
+  assert.ok(behind.removals.filter(r => r.kind === 'preset').length === 2);
+  const current = gateConfigForHost(presets, resolveHostCapabilities('fortheweak'));
+  assert.deepEqual(current.config.presets.map(p => p.type), ['therarbg', 'usa-tv-next', 'comet']);
+});
+
+test('every PRESET_MIN_VERSIONS id really exists upstream at the pinned version', () => {
+  for (const id of Object.keys(PRESET_MIN_VERSIONS)) {
+    assert.ok(AIO_PRESET_ID_SET.has(id), `${id} is version-gated but not a known preset id at the pin`);
+  }
+});
+
+test('the UI gate hides v2.34 built-in presets for 2.33.2 hosts with a named reason', () => {
+  const gate = hostOptionGate(resolveHostCapabilities('midnight'));
+  const hit = gate.find(entry => entry.option === 'preset:therarbg');
+  assert.ok(hit, 'a 2.33.2 host must hide the therarbg preset');
+  assert.match(hit.reason, /2\.34\.0/);
+  const gate2 = hostOptionGate(resolveHostCapabilities('kuu'));
+  assert.ok(!gate2.some(entry => entry.option === 'preset:therarbg'), 'a 2.34.0 host must not hide it');
+});
+
+test('the pinned config schema actually defines the v2.34 feature keys being gated', () => {
+  for (const key of ['healthChecks', 'autoVariants', 'healthResults', 'manifestNotice', 'linkedAccounts']) {
+    assert.ok(AIO_CONFIG_KEY_SET.has(key), `${key} is gated as v2.34-only but missing from the pinned schema`);
+  }
+  assert.ok(!AIO_CONFIG_KEY_SET.has('mediaInfoQuality'), 'mediaInfoQuality is stream-level metadata, not a config key');
 });

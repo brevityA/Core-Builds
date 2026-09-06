@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 
 const app = readFileSync(new URL('../src/js/app.js', import.meta.url), 'utf8');
 const start = app.indexOf('function parseAddonFetchError');
-const end = app.indexOf('function buildFinal()');
+const end = app.search(/^function buildFinal\(/m);
 assert.ok(start > 0 && end > start, 'soft-fail helpers missing from app.js');
 const shim = 'const ICO={warn:()=>""};let _cachedBuildResult=null,_lastAddonKey="",_lastInstall={target:"app",pwd:""},_disabledAddons=new Set();';
 eval(shim + app.slice(start, end) + ';globalThis.__p=parseAddonFetchError;globalThis.__n=normAddonName;globalThis.__m=presetMatchesAddon;');

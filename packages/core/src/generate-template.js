@@ -12,7 +12,7 @@ import { templateInput, hasTmdbCredentials } from './input.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from './device-policy.js';
 import { sortPolicy } from './sort-policy.js';
 import { sizePolicy, bitratePolicy } from './filter-policy.js';
-import { addonPolicy, assertAddonPolicy } from './addon-policy.js';
+import { addonPolicy, assertAddonPolicy, hasLibraryCapableService } from './addon-policy.js';
 import { getSelPolicy } from './sel-policy.js';
 import { rankedSelPolicy } from './ranked-sel-policy.js';
 import { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
@@ -150,6 +150,13 @@ function buildPresets(input) {
   const isNzbgeek = isMulti && multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && multiServices.includes('streamnzb');
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  // AIOStreams refuses to save a config whose Library preset has no usable
+  // service ("The library requires at least one usable service to be
+  // configured" — LibraryPreset.supportedServices @ v2.34.0). EasyNews is NOT
+  // on that list, so the old static `enabled` flags made every EasyNews-only
+  // install fail on save. Emit the preset only when an enabled service can
+  // actually back it; `enabled:false` is dropped by addonPolicy below.
+  const libraryUsable = hasLibraryCapableService(buildServices(input).map(s => s.id));
 
   if (isHttp) return [
     // v2.33+: Sootio validates as debrid/usenet-only — pure-HTTP/p2p routes can't satisfy it
@@ -165,7 +172,7 @@ function buildPresets(input) {
 
   if (isUsenet) {
     const usenetList = [
-      { type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+      { type:'library', instanceId:'lib-1', enabled:libraryUsable, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
       { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
       ...(creds.nzbgeek ? [{ type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } }] : []),
@@ -194,7 +201,7 @@ function buildPresets(input) {
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
-    { type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+    { type:'library', instanceId:'lib-1', enabled:libraryUsable, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 hard-rejects "SeaDex requires at least one usable service",

@@ -20,6 +20,12 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    // Optional escape hatch for sandboxes whose Chromium binary predates the
+    // pinned one and rejects flags Playwright adds itself (e.g. Chrome 149
+    // rejecting --disable-headless-shell). No-op when unset.
+    launchOptions: process.env.PW_IGNORE_DEFAULT_ARGS
+      ? { ignoreDefaultArgs: process.env.PW_IGNORE_DEFAULT_ARGS.split(',') }
+      : undefined,
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } } },

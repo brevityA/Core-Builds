@@ -15,7 +15,10 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // upstream in v2.32. This is deliberately a target choice, not a silent
 // migration to Newznab: the two presets do not have equivalent options or
 // credential handling.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', 'unknown']);
+// 2.33.2 / 2.34.0 are the releases the audited public hosts actually run
+// (registry in src/data/hosts.js); keep the older entries as explicit legacy
+// lanes for self-hosters.
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', 'unknown']);
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({

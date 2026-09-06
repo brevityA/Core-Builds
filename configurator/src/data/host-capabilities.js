@@ -129,11 +129,44 @@ export const HOST_CAPABILITY_OVERRIDES = Object.freeze({
  *   - variants / activeVariants: "add configuration variants with CEL" -> 2.33.0
  *   - variantSelectorLocation:   "variants: support path param based selector
  *                                 and make default"                   -> 2.33.2
+ *
+ * v2.34.0 additions were established by diffing UserDataSchema between the
+ * v2.33.2 and v2.34.0 upstream tags — only TOP-LEVEL config keys count
+ * (mediaInfoQuality landed in the same release but is a parsed-stream property,
+ * not a user config key, so it is absent here):
+ *   - healthChecks / healthResults: "Add health checks" (Check result helpers)
+ *   - autoVariants:                 the conditional `when` engine for variants
+ *                                   ("variants: `when` field") serialised with
+ *                                   the config
+ *   - manifestNotice:               Preferences flag for manifest-change
+ *                                   notifications
+ *   - linkedAccounts:               linked debrid/nusenet accounts
  */
 export const FEATURE_MIN_VERSIONS = Object.freeze({
   variants: '2.33.0',
   activeVariants: '2.33.0',
   variantSelectorLocation: '2.33.2',
+  healthChecks: '2.34.0',
+  autoVariants: '2.34.0',
+  healthResults: '2.34.0',
+  manifestNotice: '2.34.0',
+  linkedAccounts: '2.34.0',
+});
+
+/**
+ * Built-in preset ids that only exist from a given AIOStreams version onwards,
+ * established by diffing `packages/core/src/presets` (PresetManager.fromId)
+ * between the v2.33.2 and v2.34.0 upstream tags:
+ *   "Anime Tosho (New)", "The Pirate Bay", "TheRARBG", "USA TV Next".
+ * A host on an older build throws on save ("Could not build preset <id>"),
+ * so the gate removes them before import/install just like host-disabled
+ * presets.
+ */
+export const PRESET_MIN_VERSIONS = Object.freeze({
+  'anime-tosho-new': '2.34.0',
+  'the-pirate-bay': '2.34.0',
+  'therarbg': '2.34.0',
+  'usa-tv-next': '2.34.0',
 });
 
 /**
