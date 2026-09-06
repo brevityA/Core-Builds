@@ -119,6 +119,41 @@ actions; Genie card gone but linked; genie page exists; tour target still resolv
 - [ ] Stremio one-click open after Full-Stack install
 - [ ] WuPlay / Nuvio one-click opens from the Deploy row
 
+## 7. Regex-allowlist preflight (post-audit addendum — the "3 / 180 regexes" bounce)
+
+A user's Direct Install of **Advanced › Apex (IQR) › 1080p** was rejected by a host with
+*"…you have 3 / 180 regexes that are not allowed"* (2026-09-05 22:53). Reproduced exactly:
+the then-live (pre-`b07efba`) generator shipped **3 stale inline regex constants**
+(`\b(CtrlHD|W4NK3R|DON)\b` + two BluRay-group lookaheads) no longer present in the
+community list, on top of the 177-entry synced set → union **180**, rejected **3** — on
+every allowlist vintage (they are old pattern versions the list has since replaced).
+`b07efba`'s standalone-template regex re-sync (merged ~16h later) aligned the constants;
+current builds are union 177 / 0 rejected everywhere. Two structural hazards remain,
+both covered by this gate: (a) the synced URL pins Vidhin05's Releases-Regex **`main`** —
+a moving target the host resolves live at save but validates against its **cached**
+allowlist, so an upstream merge plus a lagging host refresh bounces fresh patterns
+(verified: two patterns changed upstream 2026-09-05 05:58 UTC; hosts caught up only
+hours later); (b) any future stale-constant regression. The user-facing failure in both
+is the same cryptic host 400, after the POST.
+
+- `src/core/regex-access-policy.js` (new) — `collectRegexPatternSet()` + `regexAccessDecision()`,
+  mirroring upstream `validateRegexes()` at the pin: five top-level `*RegexPatterns` arrays,
+  exact-string dedupe; `skip` on every unknown (unrestricted host, allowlist not exposed,
+  list unfetchable) — the gate explains a predictable 400, it never creates one.
+- `app.js` — `regexGateForHost()` rides `raceHostFetch` (the same direct+CORS-proxy lane the
+  host chip uses) for status and fetches the synced list client-side
+  (`raw.githubusercontent.com` sends `Access-Control-Allow-Origin: *`); blocked verdicts stop
+  the install POST with a plain-language inline notice ("N / M regex patterns are not allowed
+  on this host — its pattern allowlist lags the synced list"); the Express chip shows the same
+  verdict advisory. Goldens and generated configs unchanged — no regex semantics touched.
+
+**Tests:** `tests/regex-access-policy.test.mjs` (golden carries the synced URL + 83 inline
+patterns; skip matrix; the recorded race reproduced with the two real changed strings;
+app.js gate ordering between host resolve and POST); `e2e/direct-install-gate.spec.mjs`
+"regex allowlist preflight" ×3 (stale allowlist → blocked inline notice + zero POSTs;
+allowlist caught up → installs; `level: all` → gate never trips) driven through the real
+`simple-install` delegate with a standalone 4K apex-mixed state.
+
 ## Explicitly NOT done here (per instructions)
 
 - Cross-repo follow-up: the same version-stamp honesty bug in the CoreBuildsApps icon pack — to be filed separately.

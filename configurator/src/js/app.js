@@ -32,6 +32,7 @@ import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
 import { hasLibraryCapableService, missingDirectInstallCredentials } from '../core/install-policy.js';
 import { hostRoutingDecision, autoRoutableHostKeys, hostPickerLabel } from '../core/host-routing.js';
+import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-access-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 
@@ -193,6 +194,15 @@ async function probeExpressHost() {
   // the reason; a host merely behind the selected target says so in amber.
   const routing = (() => { try { return hostRoutingDecision({ service: _expressLaneService || S.service, config: {} }, currentHostCapabilities(), { targetVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null }); } catch(e) { return { status:'ok', reasons:[] }; } })();
   if (routing.status === 'blocked') { chip.textContent = '✕ ' + routing.reasons[0].split(' — ')[0]; chip.title = routing.reasons.join(' '); chip.style.color='#f87171'; chip.style.borderColor='rgba(248,113,113,.35)'; return; }
+  // Regex-allowlist verdict for the current build on this host (2026-09-06
+  // race diagnosis). Advisory: the authoritative gate runs at POST time with
+  // the final config — the chip reads the global build state, which the
+  // Express lane may not have written yet, in which case this skips quietly.
+  if (routing.status !== 'blocked') {
+    let rgx = { status: 'skip' };
+    try { rgx = await regexGateForHost(url, buildFinal().config); } catch (e) { /* nothing selected yet */ }
+    if (rgx.status === 'blocked') { chip.textContent = '✕ ' + rgx.reason.split(' — ')[0]; chip.title = rgx.reason; chip.style.color = '#f87171'; chip.style.borderColor = 'rgba(248,113,113,.35)'; return; }
+  }
   chip.title = routing.status === 'warn' ? routing.reasons.join(' ') : '';
   if (d.ok && !d.degraded)      { chip.textContent = `● healthy${d.version?' v'+d.version:''} · ${d.ms}ms${routing.status==='warn'?' · behind target':''}`; chip.style.color = routing.status==='warn' ? '#fbbf24' : '#34d399'; chip.style.borderColor = routing.status==='warn' ? 'rgba(251,191,36,.35)' : 'rgba(52,211,153,.35)'; }
   else if (d.ok)                { chip.textContent = `● slow · ${d.ms}ms${routing.status==='warn'?' · behind target':''}`; chip.style.color='#fbbf24'; chip.style.borderColor='rgba(251,191,36,.35)'; }
@@ -4141,6 +4151,71 @@ function activeHostKey() {
   return S.instanceHost && S.instanceHost !== 'auto' ? S.instanceHost : 'elfhosted';
 }
 
+// ── Regex-allowlist preflight (2026-09-06 race diagnosis) ──────────────────
+// Hosts running regexAccess 'trusted'/'none' validate the deduped union of
+// the config's synced regex URLs (resolved LIVE at save time) and inline
+// patterns against the host's cached allowlist. Our synced URL pins a moving
+// branch head, so an upstream list change plus a lagging host refresh turns
+// every regex-scoring Direct Install into a host 400 ("N / M regexes that
+// are not allowed"). Resolve the same union client-side (raw.githubusercontent
+// sends Access-Control-Allow-Origin: *) and check it before the POST. Every
+// unknown (status unfetchable, allowlist not exposed, list unfetchable)
+// skips the check — this explains a predictable 400, it never adds one.
+const _regexStatusCache = new Map();   // base URL -> {level, patterns?} | null
+const _syncedRegexCache = new Map();   // list URL -> [patterns] | null (null = unfetchable)
+
+async function fetchHostRegexAccess(base) {
+  const key = String(base || '').replace(/\/$/, '');
+  if (!key) return null;
+  if (_regexStatusCache.has(key)) return _regexStatusCache.get(key);
+  let out = null;
+  try {
+    // raceHostFetch races a direct request against the CORS proxy — the same
+    // path probeHostDetail uses, so the gate works wherever the chip does.
+    const res = await raceHostFetch(key, '/api/v1/status', { method:'GET' }, 4000);
+    if (res && res.ok) {
+      const j = await res.json();
+      const ra = j && j.data && j.data.settings && j.data.settings.regexAccess;
+      if (ra && typeof ra.level === 'string') out = { level: ra.level, patterns: Array.isArray(ra.patterns) ? ra.patterns : undefined };
+    }
+  } catch (e) { /* offline / CORS-blocked / slow: skip the check */ }
+  _regexStatusCache.set(key, out);
+  return out;
+}
+
+async function fetchSyncedRegexPatterns(urls) {
+  const lists = await Promise.all(urls.map(async u => {
+    if (_syncedRegexCache.has(u)) return _syncedRegexCache.get(u);
+    let out = null;
+    try {
+      const res = await fetch(u, { signal: AbortSignal.timeout(4000) });
+      const j = await res.json();
+      const arr = Array.isArray(j) ? j : (j && Array.isArray(j.patterns) ? j.patterns : null);
+      if (arr) out = arr.map(e => (typeof e === 'string' ? e : e && e.pattern)).filter(p => typeof p === 'string' && p);
+    } catch (e) { /* unfetchable: skip the check rather than block */ }
+    _syncedRegexCache.set(u, out);
+    return out;
+  }));
+  if (lists.some(l => l === null)) return null;   // any list unknown → cannot validate
+  return new Set(lists.flat());
+}
+
+// Pre-POST check against the host the install will actually hit. Returns
+// {status:'skip'} on any unknown — never blocks on missing data.
+async function regexGateForHost(base, config) {
+  try {
+    const set = collectRegexPatternSet(config);
+    if (!set.syncedUrls.length && !set.inline.size) return { status: 'skip' };
+    const access = await fetchHostRegexAccess(base);
+    if (!access || access.level === 'all' || !Array.isArray(access.patterns)) return { status: 'skip' };
+    const resolved = set.syncedUrls.length ? await fetchSyncedRegexPatterns(set.syncedUrls) : undefined;
+    if (resolved === null) return { status: 'skip' };
+    return regexAccessDecision(access, { inline: set.inline, resolved });
+  } catch (e) {
+    return { status: 'skip' };
+  }
+}
+
 function currentHostCapabilities() {
   const key = activeHostKey();
   return resolveHostCapabilities(key, _hostProbeCache.get(key) || null, {
@@ -7233,6 +7308,17 @@ async function simpleInstall(target) {
 
   try {
     const fastest = await resolveInstallHost(4000);
+    // Regex-allowlist preflight (2026-09-06 race diagnosis): the same union
+    // the host validates (synced URLs resolved live + inline patterns),
+    // checked against the host's own allowlist before the POST that would
+    // 400. Skips on any unknown — the gate explains a predictable failure,
+    // it must never create one.
+    const rgx = await regexGateForHost(fastest, cfg);
+    if (rgx.status === 'blocked') {
+      btn.disabled = false; btn.innerHTML = 'Install';
+      result.innerHTML = hostRoutingNoticeHtml({ status: 'blocked', reasons: [rgx.reason] });
+      return;
+    }
     const res = await writeHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {

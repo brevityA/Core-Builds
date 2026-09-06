@@ -142,3 +142,120 @@ test.describe('truthful host picker', () => {
     expect(errors).toEqual([]);
   });
 });
+
+test.describe('regex allowlist preflight (synced-URL race, 2026-09-06 diagnosis)', () => {
+  // Recorded shape of the observed failure: the config's synced ranked-regex
+  // URL resolves LIVE at save time while the host validates against its own
+  // cached allowlist. When the upstream list merges changes faster than the
+  // host refreshes, the install POST 400s with "N / M regexes that are not
+  // allowed". The gate in app.js resolves the same union client-side and
+  // blocks the POST with a plain-language reason instead.
+  //
+  // Driven through the app's own cb-e2e hook + the real global
+  // data-action="simple-install" delegate, so the genuine simpleInstall path
+  // runs: real fetches (status + synced list), real config, real POST spy.
+  // A standalone 4K apex-mixed build carries the synced URL (the Express
+  // lane builds from a base config and is not affected).
+  const STUB_LIST = [
+    { name: 'Allowed One', pattern: '/^allowed-one$/i' },
+    { name: 'Freshly Changed', pattern: '/^freshly-changed$/i' },
+  ];
+
+  async function mockRegexBackend(page, posted, regexAccess) {
+    await page.route('**/*', async route => {
+      const request = route.request();
+      const url = request.url();
+      if (url.includes('/api/v1/status')) {
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { version: '2.34.0', settings: { regexAccess } } }) });
+      }
+      if (url.includes('raw.githubusercontent.com/Vidhin05/Releases-Regex')) {
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(STUB_LIST) });
+      }
+      if (url.includes('/api/v1/user') && request.method() === 'POST') {
+        posted.push(JSON.parse(request.postData() || '{}'));
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { uuid: UUID, encryptedPassword: 'encrypted-password' } }) });
+      }
+      if (url.includes('core-builds-cors-proxy') && (url.includes('/api/visit') || url.includes('/api/generate') || url.includes('/api/stats'))) {
+        return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+      }
+      return route.continue();
+    });
+  }
+
+  // Standalone regex-scoring build (4K apex-mixed) + a real install button.
+  async function armInstall(page) {
+    await page.evaluate(() => {
+      window.__coreBuilds.setState({
+        service: 'torbox-pro', multiServices: ['torbox-pro'], device: 'generic',
+        resolution: '4k', pseArch: 'apex-mixed', content: 'all', instanceHost: 'elfhosted',
+        creds: { torbox: 'test-torbox-key' },
+      });
+      if (!document.getElementById('aioResult')) {
+        const out = document.createElement('div'); out.id = 'aioResult'; document.body.appendChild(out);
+      }
+      const btn = document.createElement('button');
+      // id matters: simpleInstall reads btnAio || btnAutoCreate for its button state
+      btn.id = 'btnAutoCreate'; btn.dataset.action = 'simple-install'; btn.dataset.target = 'manifest';
+      btn.textContent = 'Install'; document.body.appendChild(btn);
+    });
+  }
+
+  async function goldenInlinePatterns() {
+    // The 4K build's inline pattern arrays are resolution-driven (not service-
+    // driven), so this standalone build carries exactly these alongside the
+    // synced URL.
+    const { readFile } = await import('node:fs/promises');
+    const golden = JSON.parse(await readFile(new URL('./golden/torbox-4k-apex-mixed.json', import.meta.url), 'utf8'));
+    const c = golden.config;
+    return [
+      ...(c.excludedRegexPatterns || []), ...(c.includedRegexPatterns || []), ...(c.requiredRegexPatterns || []),
+      ...(c.preferredRegexPatterns || []).map(e => e.pattern), ...(c.rankedRegexPatterns || []).map(e => e.pattern),
+    ];
+  }
+
+  test('a stale host allowlist blocks the POST with the pattern counts — nothing is posted', async ({ page }) => {
+    const posted = [];
+    // Host allowlist still holds every inline pattern but has NOT picked up
+    // the freshly-changed synced entry — the recorded 2026-09-05 race shape.
+    const allowlist = [...await goldenInlinePatterns(), '/^allowed-one$/i'];
+    await mockRegexBackend(page, posted, { level: 'none', patterns: allowlist });
+    await page.goto('/?cb-e2e=1');
+    await page.waitForFunction(() => !!window.__coreBuilds, null, { timeout: 15000 });
+    await armInstall(page);
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('#btnAutoCreate').click();
+    await page.locator('#pwdPrompt .pwd-go').click();
+    await expect(page.locator('#aioResult')).toContainText('regex patterns are not allowed on this host', { timeout: 20000 });
+    await expect(page.locator('#aioResult')).toContainText('lags the synced list');
+    await page.waitForTimeout(800);
+    expect(posted, 'a config the host would 400 must never be POSTed').toEqual([]);
+  });
+
+  test('the same build installs cleanly once the allowlist catches up', async ({ page }) => {
+    const posted = [];
+    const allowlist = [...await goldenInlinePatterns(), ...STUB_LIST.map(e => e.pattern)];
+    await mockRegexBackend(page, posted, { level: 'none', patterns: allowlist });
+    await page.goto('/?cb-e2e=1');
+    await page.waitForFunction(() => !!window.__coreBuilds, null, { timeout: 15000 });
+    await armInstall(page);
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('#btnAutoCreate').click();
+    await page.locator('#pwdPrompt .pwd-go').click();
+    await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+    expect(posted).toHaveLength(1);
+    expect(posted[0].config.syncedRankedRegexUrls || []).toContain('https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json');
+  });
+
+  test('an unrestricted host (level: all) never trips the gate', async ({ page }) => {
+    const posted = [];
+    await mockRegexBackend(page, posted, { level: 'all', patterns: [] });
+    await page.goto('/?cb-e2e=1');
+    await page.waitForFunction(() => !!window.__coreBuilds, null, { timeout: 15000 });
+    await armInstall(page);
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('#btnAutoCreate').click();
+    await page.locator('#pwdPrompt .pwd-go').click();
+    await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+    expect(posted).toHaveLength(1);
+  });
+});
