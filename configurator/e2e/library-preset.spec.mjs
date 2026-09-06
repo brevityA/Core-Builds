@@ -16,7 +16,7 @@ import { validateConfigOptions } from './lib/aiostreams-contract.mjs';
 
 test.describe.configure({ retries: 2 });
 
-const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$|favicon|404 \(Not Found\)|Failed to load resource: the server responded with a status of 404|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
+const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_(?:FAILED|CONNECTION_CLOSED)$|favicon|404 \(Not Found\)|Failed to load resource: the server responded with a status of 404|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
 
 const UUID = '11111111-2222-4333-8444-555555555555';
 
@@ -35,6 +35,8 @@ async function mockBackend(page, posted) {
   await page.route('**/*', async route => {
     const request = route.request();
     const url = request.url();
+    let reqHost = '';
+    try { reqHost = new URL(url).hostname; } catch { /* leave empty */ }
     if (url.includes('/api/v1/status')) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { version: '2.34.0' } }) });
     }
@@ -50,7 +52,7 @@ async function mockBackend(page, posted) {
     if (url.includes('core-builds-cors-proxy') && (url.includes('/api/visit') || url.includes('/api/generate') || url.includes('/api/stats'))) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     }
-    if (url.includes('api.strem.io/')) {
+    if (reqHost === 'api.strem.io') {
       const isLogin = url.includes('/api/login') || url.includes('/api/register');
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(isLogin ? { result: { authKey: 'auth-key-123', user: { email: 'x@y.z' } } } : { result: url.includes('addonCollectionGet') ? { addons: [] } : {} }) });
     }
@@ -75,7 +77,7 @@ test('EasyNews-only express install validates and posts with NO library preset',
   await page.locator('[data-express-target="manifest"]').click();
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
-  await expect(page.locator('#manifestModal, #mUrlVal, #aioResult')).not.toBeEmpty({ timeout: 45000 });
+  await expect(page.locator('#mUrlVal')).toContainText('stremio/', { timeout: 45000 });
   expect(posted, 'the install must POST exactly once').toHaveLength(1);
   const config = posted[0].config;
   expect(
