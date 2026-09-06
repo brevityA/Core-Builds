@@ -15,19 +15,25 @@ VALID = {
     },
     'qualities': {
         'BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HC HD-Rip',
-        'DVDRip','HDTV','CAM','TS','TC','SCR','Unknown'
-    },
+        'DVDRip','HDTV','CAM','TS','TC','SCR','Unknown',
+        'DVD REMUX',
+},
     'encodes': {
-        'AV1','HEVC','AVC','VP9','VC-1','XviD','DivX','Unknown'
-    },
+        'AV1','HEVC','AVC','VP9','VC-1','XviD','DivX','Unknown',
+        'MPEG-4',
+},
     'visual_tags': {
         'HDR+DV','DV','HDR10+','HDR10','HDR','HLG','10bit','SDR','IMAX','AI','3D',
-        'H-OU','H-SBS','Unknown'
-    },
+        'H-OU','H-SBS','Unknown',
+        'DV Only',
+        'HDR Only',
+        'Upscaled',
+},
     'audio_tags': {
         'Atmos','DD+','DD','DTS:X','DTS-HD MA','DTS-HD','DTS-ES','DTS',
-        'TrueHD','OPUS','FLAC','AAC','AC-4','Unknown'
-    },
+        'TrueHD','OPUS','FLAC','AAC','AC-4','Unknown',
+        'PCM',
+},
     'audio_channels': {
         '7.1','6.1','5.1','2.0','Unknown'
     },
@@ -49,6 +55,8 @@ VALID = {
         'mediafusion','knaben','torrent-galaxy','eztv','animeTosho','nekobt',
         'library','opensubtitles-v3-plus','aiosubtitle','newznab','torbox-search',
         'debridio','jackett','prowlarr','torrentio','torznab','custom',
+        # Full upstream preset registry from AIOStreams v2.34.0 (pin-synced 2026-09-05)
+        'aiostreams','therarbg','the-pirate-bay','bitmagnet','anime-tosho-new','stremio-gdrive','jackettio','orion','streamfusion','baguettio','fkstream','torbox','easynewsPlus','nuvio-streams','webstreamr','flix-streams','astream','brazuca-torrents','yastream','streamasia','usa-tv','usa-tv-next','argentina-tv','debridio-tv','debridio-watchtower','debridio-tmdb','debridio-tvdb','debridio-ic4a','streaming-catalogs','anime-catalogs','torrent-catalogs','rpdb-catalogs','tmdb-collections','anime-kitsu','marvel-universe','star-wars-universe','dc-universe','doctor-who-universe','opensubtitles','subsource','subhero','ai-companion','ai-search','more-like-this','content-deep-dive',
         # Current AIOStreams/community preset identifiers used by the template suite.
         'hdhub','torrents-db','sootio','peerflix','subdl','neko-bt','animetosho','dmm-cast',
         'easynews','easynewsPlusPlus','easynews-search','davex','nzbhydra','usenet-streamer','streamnzb','tmdb-addon'
@@ -87,6 +95,8 @@ SEL_FUNCTIONS = {
     'seMatchedInRange','seScore','seadex','seasonPack','seeders','service',
     'size','skewness','slice','stddev','streamExpressionScore','subtitle',
     'subtitles','sum','type','uncached','values','variance','visualTag',
+    # added by AIOStreams v2.34.0 (health lane; folderSize landed with it and was already listed)
+    'health',
     # expr-eval math allowlist (true entries in the parser's math config)
     'sqrt','ceil','floor','round','trunc','random','in',
 }
@@ -220,6 +230,14 @@ def validate_template(fpath):
         for i, entry in enumerate(t):
             if isinstance(entry, dict) and 'expression' not in entry:
                 warn(name, f"entry [{i}] missing 'expression' key")
+        return errors, warnings, passes
+
+    # Known pitfall (CLAUDE.md): repo-root scans also walk non-template JSON.
+    # A bare AIOStreams config is accepted (validated as config), but objects with
+    # no template or config markers at all (badge packs, generated artifacts)
+    # are skipped rather than half-validated.
+    if 'metadata' not in t and 'config' not in t and not any(
+            k in t for k in ('presets', 'services', 'sortCriteria', 'resultLimits')):
         return errors, warnings, passes
 
     c = t.get('config', t)
@@ -629,14 +647,14 @@ def main():
     """Main entry point for template validation. Parses arguments and validates templates."""
     parser = argparse.ArgumentParser(description='Validate Core Builds templates')
     parser.add_argument('--dir', action='append', default=[],
-                        help='Directory to search for templates (repeatable)')
+                        help='Directory to search for templates (repeatable; default: Templates + Community-Templates, matching the CI scope)')
     parser.add_argument('--file', help='Validate a single file')
     args = parser.parse_args()
 
     if args.file:
         files = [args.file]
     else:
-        dirs = args.dir if args.dir else ['.']
+        dirs = args.dir if args.dir else ['Templates', 'Community-Templates']
         files = []
         for d in dirs:
             p = Path(d)

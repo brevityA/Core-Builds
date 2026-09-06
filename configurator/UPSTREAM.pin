@@ -1,8 +1,8 @@
 {
   "repo": "Viren070/AIOStreams",
-  "ref": "v2.33.2",
-  "sha": "f36d0f93ff088280526ebca1fe3c93e2740b6987",
-  "version": "2.33.2",
+  "ref": "v2.34.0",
+  "sha": "e694b6ace7309091289a8680c3f817210e261e46",
+  "version": "2.34.0",
   "rawBase": "https://raw.githubusercontent.com/Viren070/AIOStreams",
   "sources": [
     "package.json",

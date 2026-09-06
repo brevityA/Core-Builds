@@ -42,11 +42,11 @@ test.describe('security sinks', () => {
   });
 
   test('C3: a remote error object renders a reason message, never markup or [object Object]', async ({ page }) => {
-    test.setTimeout(90_000);
-    // The earlier version of this test navigated to /#express and asserted on the DOM without
-    // ever submitting an install — the intercepted route was never requested (verified: 0 hits),
-    // so it passed no matter how unsafe the sink was. Drive the real flow and prove the route
-    // was exercised before asserting anything.
+    test.setTimeout(240_000); // worst-case chain of the explicit gates below (~160s); spent only on failure
+    // Flake fix (#738, quarantine #682): the old body raced hydration in three places — a fixed
+    // 900 ms sleep after reload, a dialog handler attached after navigation, and a fixed 600 ms
+    // sleep for the error render. All replaced by explicit gates below. The security assertions
+    // and the userPosts proof-of-route are unchanged — do not loosen them.
     let userPosts = 0;
     await page.route('**/*', async route => {
       const url = route.request().url();
@@ -69,18 +69,37 @@ test.describe('security sinks', () => {
 
     await page.goto('/');
     await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+    page.on('dialog', dialog => dialog.accept()); // attached before reload: an early native confirm
+    // must be answered by the handler, never silently auto-dismissed by the browser default.
     await page.reload();
-    await page.waitForTimeout(900);
 
-    page.on('dialog', dialog => dialog.accept());
-    await page.locator('[data-action="open-express-lane"]').click();
+    // A painted-but-not-yet-hydrated button accepts clicks into the void; gate the open on the
+    // lane modal actually rendering (same container C1 uses), retrying until the binding is live.
+    await expect(page.locator('[data-action="open-express-lane"]')).toBeVisible({ timeout: 15000 });
+    await expect(async () => {
+      await page.locator('[data-action="open-express-lane"]').click();
+      await expect(page.locator('#expressLaneModal')).toBeVisible({ timeout: 2500 });
+    }).toPass({ timeout: 20000 });
     await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
     await page.locator('#stremioEmailInline').fill('test@stremio.com');
     await page.locator('#stremioPasswordInline').fill('test-password');
-    await page.locator('#expressGo').click();
-    await page.locator('#pwdPrompt .pwd-go').click();
+    // The expressGo click can be swallowed the same way on mobile (the modal re-renders
+    // around the inline credential fields). Retry the whole "click → observable progress"
+    // block: progress means EITHER the password prompt rendered (drive it) OR the app
+    // proceeded straight to posting (origin already holds a token / inline creds were
+    // accepted). A flow that produces neither is retried, and stays red if it never moves.
+    await expect(async () => {
+      await page.locator('#expressGo').click();
+      await expect.poll(async () => {
+        const prompt = page.locator('#pwdPrompt');
+        if (await prompt.isVisible().catch(() => false)) {
+          await prompt.locator('.pwd-go').click();
+          return true;
+        }
+        return userPosts > 0;
+      }, { timeout: 20000, intervals: [250] }).toBe(true);
+    }).toPass({ timeout: 90000 });
     await expect.poll(() => userPosts, { timeout: 45000 }).toBeGreaterThan(0);
-    await page.waitForTimeout(600);
 
     // The sink was actually reached — now it must be inert and legible.
     //
@@ -92,7 +111,11 @@ test.describe('security sinks', () => {
 
     // Inertness alone is not enough: assertions that only say "nothing executed" would also
     // pass if the UI swallowed the remote reason and showed a bare fallback. Require the
-    // reason to survive as TEXT, so safety and legibility are pinned together.
+    // reason to survive as TEXT — poll until it renders (replaces the fixed 600 ms sleep),
+    // so safety and legibility are pinned together.
+    await expect
+      .poll(async () => page.evaluate(() => document.body.innerText), { timeout: 20000 })
+      .toContain('nope');
     const text = await page.evaluate(() => document.body.innerText);
     expect(text).not.toContain('[object Object]');
     expect(text).toContain('nope');

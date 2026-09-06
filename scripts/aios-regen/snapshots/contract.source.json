@@ -1,20 +1,20 @@
 {
   "kind": "source",
-  "extractedAt": "2026-08-29T13:32:54.382Z",
-  "fingerprint": "a9505e3ef849efca",
+  "extractedAt": "2026-09-05T16:05:23.934Z",
+  "fingerprint": "55ad4579a0ffa919",
   "repo": "Viren070/AIOStreams",
   "ref": "main",
   "commit": {
-    "sha": "2eed6d82227a3bdfd689dcc291cbcb22e5144ecc",
-    "date": "2026-08-29T12:24:55Z",
-    "message": "fix(templates): discard saved template inputs the template no longer accepts",
-    "url": "https://github.com/Viren070/AIOStreams/commit/2eed6d82227a3bdfd689dcc291cbcb22e5144ecc"
+    "sha": "e694b6ace7309091289a8680c3f817210e261e46",
+    "date": "2026-09-04T23:19:08Z",
+    "message": "chore: release 2.34.0 (#1189)",
+    "url": "https://github.com/Viren070/AIOStreams/commit/e694b6ace7309091289a8680c3f817210e261e46"
   },
   "counts": {
-    "presets": 79,
+    "presets": 82,
     "services": 21,
-    "schemaKeys": 152,
-    "selFunctions": 62,
+    "schemaKeys": 155,
+    "selFunctions": 64,
     "formatterFields": 87,
     "requiredOptions": 2
   },
@@ -34,10 +34,13 @@
     "knaben",
     "library",
     "eztv",
+    "therarbg",
+    "the-pirate-bay",
     "torrent-galaxy",
     "bitmagnet",
     "seadex",
     "animetosho",
+    "anime-tosho-new",
     "neko-bt",
     "prowlarr",
     "jackett",
@@ -126,7 +129,10 @@
     "uuid",
     "parentConfig",
     "variants",
+    "healthChecks",
     "activeVariants",
+    "autoVariants",
+    "healthResults",
     "variantSelectorLocation",
     "encryptedPassword",
     "trusted",
@@ -293,6 +299,8 @@
       "cached",
       "count",
       "encode",
+      "folderSize",
+      "health",
       "idMatched",
       "indexer",
       "iqr",
@@ -607,6 +615,11 @@
       "optionIds": []
     },
     {
+      "id": "anime-tosho-new",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
       "id": "animetosho",
       "requiredOptions": [],
       "optionIds": []
@@ -913,6 +926,16 @@
     },
     {
       "id": "subsource",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "the-pirate-bay",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "therarbg",
       "requiredOptions": [],
       "optionIds": []
     },
