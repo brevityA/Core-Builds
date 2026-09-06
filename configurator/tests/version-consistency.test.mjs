@@ -29,6 +29,19 @@ test('versions.json agrees with package.json', () => {
   assert.equal(repoVersions.configurator, pkg.version);
 });
 
+test('the CLI and shared core packages run the same template-suite stamp', async () => {
+  // cli/tests/package-equivalence.test.mjs enforces this again downstream with
+  // a full template-replay comparison; catching it here keeps the failure
+  // one hop away from the stamp edit itself.
+  const cliPkg = JSON.parse(await readFile(new URL('../../cli/package.json', import.meta.url), 'utf8'));
+  const corePkg = JSON.parse(await readFile(new URL('../../packages/core/package.json', import.meta.url), 'utf8'));
+  const majorMinor = v => v.split('.').slice(0, 2).join('.');
+  assert.equal(cliPkg.version, pkg.version, `cli/package.json says ${cliPkg.version}, configurator says ${pkg.version}`);
+  assert.equal(corePkg.version, pkg.version, `packages/core/package.json says ${corePkg.version}, configurator says ${pkg.version}`);
+  assert.equal(majorMinor(repoVersions.templateSuite), majorMinor(pkg.version),
+    `versions.json templateSuite ${repoVersions.templateSuite} vs ${pkg.version}`);
+});
+
 test('the in-app changelog opens with the shipped version', () => {
   assert.equal(CHANGELOG[0].v, configuratorVersion,
     `CHANGELOG top entry is v${CHANGELOG[0].v} but the app ships ${configuratorVersion}`);
