@@ -76,6 +76,10 @@ const MATRIX = [
   { name: 'torbox-4k-samsung', state: { resolution: '4k', device: 'samsung' } },
   { name: 'alldebrid-1080p', state: { service: 'alldebrid', multiServices: ['alldebrid'], resolution: '1080p' } },
   { name: 'easynews-1080p', state: { service: 'easynews', multiServices: ['easynews'], resolution: '1080p' } },
+  // Regression pin for the library contract: EasyNews alone CANNOT back the
+  // AIOStreams Library preset (LibraryPreset.supportedServices @ v2.34.0),
+  // but adding a debrid service makes it legal again.
+  { name: 'easynews-torbox-multi-1080p', state: { service: 'multi', multiServices: ['easynews', 'torbox-pro'], resolution: '1080p' } },
   // ElfHosted disables P2P and HTTP streams, so the free lanes are pinned to a
   // host that actually serves them — otherwise the host gate (correctly) marks
   // the very stream types these fixtures exist to cover as excluded.
@@ -108,6 +112,22 @@ for (const combo of MATRIX) {
 
     if (state.aiostreamsVersion !== '2.31.1') {
       expect(tpl.config.presets.some(preset => preset.type === 'torbox-search'), `${combo.name} must not emit legacy TorBox Search outside the v2.31.1 lane`).toBe(false);
+    }
+
+    // Host-side contract (LibraryPreset.supportedServices @ v2.34.0, mirrored
+    // independently in e2e/lib/aiostreams-contract.mjs): an enabled Library
+    // preset with no usable service is a hard "400 on save" failure upstream.
+    // Keep the two in lockstep on every fixture — easynews-only must omit the
+    // preset; easynews+debrid must keep it.
+    {
+      const libPreset = tpl.config.presets.find(p => p.type === 'library');
+      const enabledSvcIds = (tpl.config.services || []).filter(s => s.enabled).map(s => s.id);
+      const LIBRARY_CAPABLE = ['alldebrid','debrider','debridlink','easydebrid','offcloud','premiumize','pikpak','realdebrid','torbox','torrin','nzbdav','altmount','stremthru_newz','aiostreams'];
+      if (enabledSvcIds.some(id => LIBRARY_CAPABLE.includes(id))) {
+        expect(Boolean(libPreset), `${combo.name}: an enabled debrid/engine service must keep the Library preset`).toBe(true);
+      } else {
+        expect(libPreset, `${combo.name}: no library-capable service — the preset must be omitted or the host rejects the save`).toBeUndefined();
+      }
     }
 
     if (expectedProfile === 'stable') {

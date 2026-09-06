@@ -15,7 +15,9 @@ import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-poli
 import { sortPolicy } from '../core/sort-policy.js';
 import { rankedSelPolicy } from '../core/ranked-sel-policy.js';
 import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
-import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
+import { addonPolicy, assertAddonPolicy, hasLibraryCapableService } from '../core/addon-policy.js';
+import { missingServiceCredentials } from '../core/install-readiness.js';
+import { hostCapabilitySummary } from '../data/hosts.js';
 import { generateTemplate } from '../core/generate-template.js';
 import { assembleTemplate } from '../core/assemble-template.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
@@ -36,7 +38,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
 const STEPS = 6;
-const CONFIGURATOR_VERSION = '3.1';
+const CONFIGURATOR_VERSION = '3.7';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -115,6 +117,13 @@ async function checkHostVersion(baseUrl, timeout, hostKeyOrLabel) {
   const version = payload?.data?.version || payload?.version || '';
   if (version && !versionAtLeast(version, MIN_AIOSTREAMS_VERSION)) {
     throw new Error(`HOST_OUTDATED:${label}:${version}`);
+  }
+  // Best-effort: this status body is exactly what a capability probe would
+  // return — keep it so POSTED configs gate for the live host, not the
+  // registry. Only public-host keys are cached (labels/custom hosts skipped).
+  if (HOST_BASE_URLS[hostKeyOrLabel]) {
+    const parsed = parseHostStatus(payload);
+    if (parsed) _hostProbeCache.set(hostKeyOrLabel, parsed);
   }
   return baseUrl;
 }
@@ -213,6 +222,9 @@ async function selectHealthyHost(timeout=4000) {
     const payload=await res.clone().json().catch(()=>null);
     const version=payload?.data?.version || payload?.version || '';
     if(version && !versionAtLeast(version,MIN_AIOSTREAMS_VERSION)) throw new Error(`host outdated (${version})`);
+    // Cache the poll so install-time gating uses the live host's capabilities.
+    const key=hostKeyFromUrl(host);
+    if(key){ const parsed=parseHostStatus(payload); if(parsed) _hostProbeCache.set(key,parsed); }
     return host;
   };
   if (preferred && entries.some(([,host])=>host===preferred)) {
@@ -229,7 +241,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:'2.32.0', installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:'2.34.0', installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 const SENSITIVE_TOP_LEVEL_KEYS = new Set(['instancePassword', 'basePassword', 'stremioPassword']);
 const SENSITIVE_KEY_TOKENS = ['password', 'apikey', 'api_key', 'token', 'secret', 'credential', 'auth'];
 
@@ -374,7 +386,7 @@ function migrateState(input) {
     if(!['auto', ...OUTPUT_PROFILES].includes(d.outputProfile)) d.outputProfile='auto';
   }
   if(schema<4){
-    if(!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(d.aiostreamsVersion)) d.aiostreamsVersion='2.32.0';
+    if(!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(d.aiostreamsVersion)) d.aiostreamsVersion='2.34.0';
   }
   d._schema=STATE_SCHEMA; return d;
 }
@@ -1151,7 +1163,7 @@ function outputProfileContext() {
     // 4K-tier-first rule (and the same explicit opt-out) as sort-policy.js.
     qualityFirst: Boolean(S.qualityFirst),
     resolutionFirst: Boolean(S.resolutionFirst),
-    aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0',
+    aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.34.0',
   };
 }
 
@@ -1178,13 +1190,17 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     </button>`;
   }).join('');
   const flowDefault = S.simpleMode || S.quickStart ? 'Core Stable' : (S.pseArch === 'apex-mixed' ? 'Labs' : S.pseArch === 'iqr' ? 'Advanced' : 'Balanced');
-  const target = AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.32.0';
+  const target = AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : '2.34.0';
   const targetNote = target === '2.31.1'
     ? 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.'
     : target === '2.32.0'
       ? 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.'
-      : 'Unknown target: old TorBox Search is removed rather than assumed portable.';
-  const targetControl = `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)"><label style="display:block;font-size:.64rem;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">AIOStreams compatibility target</label><select data-action="set-aiostreams-target" style="width:100%;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 8px;font-size:.72rem"><option value="2.31.1" ${target === '2.31.1' ? 'selected' : ''}>2.31.1 — legacy TorBox Search compatibility lane</option><option value="2.32.0" ${target === '2.32.0' ? 'selected' : ''}>2.32.0 — remove legacy preset; Newznab migration review</option><option value="unknown" ${target === 'unknown' ? 'selected' : ''}>Unknown / older — do not assume legacy preset support</option></select><div style="font-size:.62rem;line-height:1.4;color:#6b7280;margin-top:5px">${targetNote}</div></div>`;
+      : target === '2.33.2'
+        ? 'v2.33.2 lane: matches hosts that have not moved to the v2.34 release yet (Midnight, Omni legacy, Wizaardd at last check).'
+        : target === '2.34.0'
+          ? 'v2.34.0 lane: the release the audited public hosts run (default).'
+          : 'Unknown target: old TorBox Search is removed rather than assumed portable.';
+  const targetControl = `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)"><label style="display:block;font-size:.64rem;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">AIOStreams compatibility target</label><select data-action="set-aiostreams-target" style="width:100%;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 8px;font-size:.72rem"><option value="2.34.0" ${target === '2.34.0' ? 'selected' : ''}>2.34.0 — current public-host release (default)</option><option value="2.33.2" ${target === '2.33.2' ? 'selected' : ''}>2.33.2 — previous release still on some hosts</option><option value="2.31.1" ${target === '2.31.1' ? 'selected' : ''}>2.31.1 — legacy TorBox Search compatibility lane</option><option value="2.32.0" ${target === '2.32.0' ? 'selected' : ''}>2.32.0 — remove legacy preset; Newznab migration review</option><option value="unknown" ${target === 'unknown' ? 'selected' : ''}>Unknown / older — do not assume legacy preset support</option></select><div style="font-size:.62rem;line-height:1.4;color:#6b7280;margin-top:5px">${targetNote}</div></div>`;
   const reset = S.outputProfile && S.outputProfile !== 'auto'
     ? `<button type="button" data-action="set-output-profile" data-val="auto" style="margin-top:7px;padding:0;border:0;background:none;color:#6b7280;font-size:.66rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px">Use this flow’s default (${flowDefault})</button>`
     : `<span style="display:block;margin-top:7px;color:#4b5563;font-size:.66rem">This flow defaults to ${flowDefault}.</span>`;
@@ -1676,12 +1692,13 @@ function splashHtml() {
     </div>
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
-    <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Start simple or take full control.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Choose your route</h2><p>Express first — it is the path that actually gets you streaming.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
-      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Pick your debrid, profile, and device — install in about 30 seconds.</div></div></div>
-      <div class="splash-door" data-action="custom-start" tabindex="0" role="button"><div class="splash-door-icon">${ICO.gear(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">Advanced Builder <span class="splash-door-tag splash-tag-advanced">Advanced</span></div><div class="splash-door-desc">Fine control over every filter, sort rule, and formatter.</div></div></div>
-      <div class="splash-door" data-action="update-template" tabindex="0" role="button"><div class="splash-door-icon">${ICO.refresh(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Update Existing Setup <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Updater</span></div><div class="splash-door-desc">Import an existing template and rebuild it with current logic.</div></div></div>
-      <a class="splash-door core-tool-door" href="../tools/genies/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Setup Genie <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Newcomer-friendly</span></div><div class="splash-door-desc">The chat-style guided walkthrough, on its own focused page — nothing else on screen.</div></div></a>
+      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">The five-step flow: pick your debrid, paste the key, choose a host, pick where it installs, tap go. Done in about 30 seconds.</div></div></div>
+      <div class="splash-tertiary splash-anim splash-anim-d4" style="margin-top:2px">
+        <button data-action="custom-start" class="splash-tertiary-btn">Advanced Builder — full control</button>
+        <button data-action="update-template" class="splash-tertiary-btn">Update Existing Setup</button>
+      </div>
     </div>
 
     <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
@@ -1757,6 +1774,15 @@ function render() {
     if (!S.name) { S.name = defaultName(); saveState(); }
     const auto = S.name;
     const hasApis = S.tmdbToken || S.tmdbApiKey || Object.values(S.creds).some(v=>v);
+    // Direct Install readiness (render-time half of the "no keyless host POST"
+    // contract; the runtime backstop lives in simpleInstall/openInAIOStreams).
+    // Primary controls render disabled with a precise inline message — never
+    // hidden, and the p2p/http free lanes are exempt (they need no key).
+    const _reviewInstallBlocked = installCredentialGate();
+    const _reviewIsFree = S.service === 'p2p' || S.service === 'http';
+    const _installBlocked = !_reviewIsFree && _reviewInstallBlocked.length > 0;
+    const _installBlockedNotice = _installBlocked ? installCredentialGateHtml(_reviewInstallBlocked) : '';
+    const _installBlockedAttr = _installBlocked ? 'disabled aria-disabled="true" data-install-blocked="1" ' : '';
     main.innerHTML = `
       <div class="card">
         <div class="receipt-card">
@@ -1868,14 +1894,16 @@ function render() {
                 <a href="https://www.stremio.com/register" target="_blank" rel="noopener noreferrer" style="font-size:.72rem;color:var(--th-tx3);text-decoration:none;transition:color .15s">Sign up at stremio.com</a>
               </div>
             </div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
+            ${_installBlockedNotice}
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" ${_installBlockedAttr}style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
             <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:2px;margin-bottom:8px;font-size:.68rem;color:#059669;font-weight:600">
               <span>🔐</span> <span>Safe Auth — Credentials are used locally to authenticate with Stremio API. Never stored or shared.</span>
             </div>
             <div id="aioResult"></div>
             ` : `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
+            ${_installBlockedNotice}
+            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" ${_installBlockedAttr}style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
             <div style="display:flex;gap:8px">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
               <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
@@ -1892,17 +1920,11 @@ function render() {
               <div class="name-row" style="margin-bottom:0">
                 <label>AIOStreams Host</label>
                 <select class="name-input" id="aioHost" data-action="update-host" style="cursor:pointer;color-scheme:dark">
-                  <option value="auto"       ${S.instanceHost==='auto'?'selected':''}>Auto (tries all public hosts)</option>
-                  <option value="elfhosted"  ${S.instanceHost==='elfhosted'||S.instanceHost===''?'selected':''}>ElfHosted — aiostreams.elfhosted.com</option>
-                  <option value="fortheweak" ${S.instanceHost==='fortheweak'?'selected':''}>ForthWeak — aiostreams.fortheweak.cloud</option>
-                  <option value="midnight"   ${S.instanceHost==='midnight'?'selected':''}>Midnight's — midnightignite.me</option>
-                  <option value="viren"      ${S.instanceHost==='viren'?'selected':''}>Viren's — aiostreams.viren070.me</option>
-                  <option value="kuu"        ${S.instanceHost==='kuu'?'selected':''}>Kuu's — aiostreams.stremio.ru</option>
-                  <option value="atbp"       ${S.instanceHost==='atbp'?'selected':''}>ATBP — aio.atbphosting.com</option>
-                  <option value="omni"       ${S.instanceHost==='omni'?'selected':''}>Omni's — aiostreams.12312023.xyz</option>
-                  <option value="wizaardd"   ${S.instanceHost==='wizaardd'?'selected':''}>Wizaardd — forthewizards.uk</option>
-                  <option value="custom"     ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted</option>
+                  <option value="auto"       ${S.instanceHost==='auto'?'selected':''}>Auto — fastest healthy host (config gated for the winner)</option>
+                  ${Object.keys(HOST_BASE_URLS).map(k => `<option value="${k}" ${(S.instanceHost===k||(!S.instanceHost&&k==='elfhosted'))?'selected':''}>${hostOptionLabel(k)}</option>`).join('')}
+                  <option value="custom"     ${S.instanceHost==='custom'?'selected':''}>Custom / Self-hosted — probe before trusting</option>
                 </select>
+                <div id="hostFactsLine" style="font-size:.66rem;line-height:1.5;color:#6b7280;margin-top:5px">${escHtml(hostFactsLine())}</div>
               </div>
               <div id="aioUrlRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='custom'?'':'display:none'}">
                 <label>Instance URL</label>
@@ -1967,7 +1989,8 @@ function render() {
                 ${S.baseUuid ? `<div style="font-size:.7rem;color:#a855f7;margin-top:8px;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generated template will use parentConfig — formatter, sort, presets inherited from base.</div>` : ''}
               </div>
             </details>
-            <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
+            ${_installBlockedNotice}
+            <button class="btn-manifest" id="btnAio" data-action="install-stremio" ${_installBlockedAttr}style="margin-top:14px">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Get Install Link
             </button>
@@ -3362,9 +3385,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action === 'update-host') {
       S.instanceHost = e.target.value;
       saveState();
-      // Probe the newly-selected host for its real capabilities. Fire-and-forget:
+      // Refresh the per-host facts line immediately (registry), then probe the
+      // newly-selected host for its real capabilities. Fire-and-forget:
       // on success we re-render so the gate reflects the live answer, on failure
       // the registry defaults stand and the gate asks the user to confirm.
+      const factsRow = document.getElementById('hostFactsLine');
+      if (factsRow) factsRow.textContent = hostFactsLine(e.target.value);
       probeHostCapabilities().then(hit => { if (hit) render(); });
       const val = S.instanceHost;
       const urlRow  = document.getElementById('aioUrlRow');
@@ -3388,6 +3414,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (a === 'update-name') S.name = sanitizeDisplayName(e.target.value);
     else if (a === 'update-cred') {
       S.creds[e.target.dataset.service] = e.target.value;
+      refreshInstallGateState();
     }
     else if (a === 'update-tmdb') {
       S.tmdbToken = e.target.value;
@@ -3620,7 +3647,14 @@ function presets() {
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
-    { type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
+    // AIOStreams refuses to save a config whose Library preset has no usable
+    // service ("The library requires at least one usable service to be
+    // configured" — LibraryPreset.supportedServices, packages/core/src/presets/
+    // library.ts @ v2.34.0). EasyNews is NOT on that list, so the old
+    // `enabled:!isP2P` made every EasyNews-only install fail on save. Emit the
+    // preset only when an enabled service can actually back it; `enabled:false`
+    // drops it out of the template via addonPolicy.
+    { type:'library', instanceId:'lib-1', enabled:hasLibraryCapableService(services().map(service => service.id)), options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } },
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
@@ -4093,8 +4127,73 @@ function activeHostKey() {
   return S.instanceHost && S.instanceHost !== 'auto' ? S.instanceHost : 'elfhosted';
 }
 
-function currentHostCapabilities() {
-  const key = activeHostKey();
+/**
+ * Host key for a concrete base URL (what Auto resolved, or the explicit pick),
+ * used to gate the POSTed config for its real destination. Returns null for
+ * unrecognised URLs so callers fall back to the selected host key.
+ */
+function installHostKeyFor(baseUrl) {
+  const key = hostKeyFromUrl(baseUrl);
+  if (key) return key;
+  if (baseUrl && baseUrl === S.instanceUrl && S.instanceHost === 'custom') return 'custom';
+  return null;
+}
+
+/** Credentials Direct Install must have before it POSTs anything to a host. */
+function installCredentialGate() {
+  return missingServiceCredentials(services().map(service => service.id), S.creds);
+}
+
+/** Precise inline block message naming each missing key. */
+function installCredentialGateHtml(missing) {
+  if (!missing.length) return '';
+  const esc = escHtml;
+  const names = missing.map(item => `<li><strong style="color:#fbbf24">${esc(item.label)}</strong></li>`).join('');
+  return `<div class="install-cred-gate" style="margin-top:10px;padding:11px 14px;border-radius:10px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.06);text-align:left">
+    <div style="font-size:.78rem;font-weight:800;color:#fbbf24;margin-bottom:4px">${ICO.warn(13,'#fbbf24')} Direct Install can&#8217;t create this manifest yet</div>
+    <div style="font-size:.72rem;color:#c9d1d9;line-height:1.55">The config enables a debrid service without its credential, and the host rejects the save with &#8220;Option apiKey is required&#8221;. Add ${missing.length > 1 ? 'these' : 'it'} and install again:<ul style="margin:4px 0 0;padding-left:18px">${names}</ul></div>
+    <div style="font-size:.68rem;color:#8b949e;margin-top:6px;line-height:1.5">No key handy? <strong>Export JSON</strong> installs the same template without credentials and AIOStreams&#8217; own import UI asks for the key there.</div>
+  </div>`;
+}
+
+/**
+ * Live update of the render-time Direct Install gates after key edits. The
+ * page does NOT re-render on credential input (typing would lose focus), so
+ * blocked controls would otherwise stay disabled with the key filled. Once
+ * the gate passes, un-disable them and drop the notice. If a key is cleared
+ * again the runtime backstop in simpleInstall catches the POST.
+ */
+function refreshInstallGateState() {
+  const blocked = document.querySelectorAll('[data-install-blocked]');
+  if (!blocked.length) return;
+  if (installCredentialGate().length) return;
+  blocked.forEach(btn => {
+    btn.disabled = false;
+    btn.removeAttribute('aria-disabled');
+    btn.removeAttribute('data-install-blocked');
+  });
+  document.querySelectorAll('.install-cred-gate').forEach(el => el.remove());
+}
+
+/** One-line per-host facts for the install pickers (capability + version). */
+function hostFactsLine(key = activeHostKey()) {
+  const caps = currentHostCapabilities(key);
+  const summary = hostCapabilitySummary(key);
+  const ver = caps.version ? `AIOStreams v${caps.version}${caps.versionSource === 'registry' ? ' (last checked)' : caps.versionSource === 'probe' ? ' (probed)' : ''}` : 'AIOStreams version unverified';
+  return [summary, ver].filter(Boolean).join(' · ');
+}
+
+/** Host select option label, e.g. "ElfHosted — Debrid only — no P2P/HTTP · v2.34.0". */
+function hostOptionLabel(key) {
+  const label = HOST_LABEL_MAP[key] || key;
+  const summary = hostCapabilitySummary(key);
+  const ver = HOST_META[key]?.aiostreamsVersion;
+  const nightly = HOST_META[key]?.channel === 'nightly' ? ' (nightly)' : '';
+  return `${label}${nightly} — ${[summary, ver ? `v${ver}` : ''].filter(Boolean).join(' · ')}`;
+}
+
+function currentHostCapabilities(hostKey) {
+  const key = hostKey || activeHostKey();
   return resolveHostCapabilities(key, _hostProbeCache.get(key) || null, {
     assumedVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null,
     trustedUser: Boolean(S.hostTrustedUser),
@@ -4173,7 +4272,7 @@ function hostGateHtml() {
   return `<div class="hc-row"><span class="hc-name">${escHtml(caps.label)}</span><span class="hc-status" style="color:${caps.probed ? '#34d399' : '#fbbf24'}">${caps.probed ? `probed &middot; v${escHtml(caps.version || '?')}` : 'not probed'}</span></div>${gateLines ? `<div class="hc-detail">${gateLines}</div>` : ''}${warningLines}${removalLines}`;
 }
 
-function buildFinal() {
+function buildFinal(hostKey) {
   try {
     const tpl = build();
     const assembled = assembleTemplate(tpl, {
@@ -4186,7 +4285,10 @@ function buildFinal() {
     // Last stop before anything leaves the app: strip every key, preset and
     // pattern the selected host would reject or silently drop, so exported and
     // directly-installed JSON are identical to what the host will store.
-    const gated = gateTemplateForHost(profiled, currentHostCapabilities());
+    // Install callers pass the key of the host they actually resolved (Auto's
+    // winner, not the fallback), so the posted config is gated for its real
+    // destination.
+    const gated = gateTemplateForHost(profiled, currentHostCapabilities(hostKey));
     _lastHostGateRemovals = gated.removals;
     _lastHostGateWarnings = gated.warnings || [];
     const result = gated.template;
@@ -4462,7 +4564,7 @@ function parseTemplateToState(tpl) {
     name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
     exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
-    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false, outputProfile: 'auto', aiostreamsVersion: '2.32.0'
+    cacheMode: 'mixed', streamPool: 'normal', simpleMode: false, outputProfile: 'auto', aiostreamsVersion: '2.34.0'
   };
   if (OUTPUT_PROFILES.includes(tpl?.metadata?.coreBuildsProfile)) st.outputProfile = tpl.metadata.coreBuildsProfile;
   if (AIOSTREAMS_COMPATIBILITY_TARGETS.includes(tpl?.metadata?.coreBuildsAIOStreamsTarget)) st.aiostreamsVersion = tpl.metadata.coreBuildsAIOStreamsTarget;
@@ -5655,6 +5757,12 @@ function simpleFinishHtml() {
   const isFree = S.service === 'p2p' || S.service === 'http';
   const needed = getDebridInputs();
   const anyFilled = needed.some(i => S.creds[i.id] && S.creds[i.id].trim());
+  // Render-time half of the "no keyless host POST" contract: keep Deploy
+  // primary controls disabled with the precise inline key message (the
+  // runtime backstop still lives in simpleInstall).
+  const _simpleInstBlocked = installCredentialGate();
+  const _simpleInstBlockedHtml = !isFree && _simpleInstBlocked.length ? installCredentialGateHtml(_simpleInstBlocked) : '';
+  const _simpleInstBlockedAttr = _simpleInstBlockedHtml ? 'disabled aria-disabled="true" data-install-blocked="1" ' : '';
   const bits = [[ICO.plug(13,'#8b949e'), label('service', S.service)], [ICO.tv(13,'#8b949e'), label('device', S.device)], [ICO.monitor(13,'#8b949e'), label('resolution', S.resolution)], [ICO.speaker(13,'#8b949e'), label('audio', S.audio)]].filter(b => b[1]);
   return `
     <div class="card">
@@ -5827,9 +5935,11 @@ function simpleFinishHtml() {
         </div>
         <button type="button" data-action="create-stremio-account" style="align-self:flex-start;font-size:.7rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:600;opacity:.8">Create random account →</button>
       </div>
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
+      ${_simpleInstBlockedHtml}
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" ${_simpleInstBlockedAttr}style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
       ` : `
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
+      ${_simpleInstBlockedHtml}
+      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" ${_simpleInstBlockedAttr}style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
       <div style="display:flex;gap:8px">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
         <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
@@ -6579,9 +6689,9 @@ function showExpressLane() {
         <label for="expressHost" style="font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#566372;white-space:nowrap">AIOStreams host</label>
         <span id="expressHostChip" style="flex-shrink:0;font-size:.58rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.12);color:#6b7280;white-space:nowrap">…</span>
         <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
-          <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
-          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(HOST_LABEL_MAP[k]||k)}${HOST_META[k]&&HOST_META[k].channel==='nightly'?' (nightly)':''}</option>`).join('')}
-          <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
+          <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy) — config gated for the winner</option>
+          ${Object.keys(HOST_BASE_URLS).map(k=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(hostOptionLabel(k))}</option>`).join('')}
+          <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced — probe before trusting)</option>
         </select>
       </div>
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
@@ -6634,7 +6744,9 @@ function showExpressLane() {
     const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
-    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span style="color:#a78bfa">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
+    const isConcreteHost = S.instanceHost && S.instanceHost !== 'auto' && S.instanceHost !== 'custom';
+    const hostFacts = isConcreteHost ? `${HOST_LABEL_MAP[S.instanceHost]} · ${hostFactsLine(S.instanceHost)}` : (HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto');
+    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(hostFacts)}${fsOn ? ' · <span style="color:#a78bfa">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
   };
   refreshExpressSummary();
   document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
@@ -7116,6 +7228,18 @@ async function simpleInstall(target) {
     const proceed = confirm('⚠ Config check:\n\n• ' + warns.join('\n• ') + '\n\nContinue anyway?');
     if (!proceed) return;
   }
+  // Backstop: never POST a config that enables a debrid service without its
+  // key — the host answers "Option apiKey is required" and the install dies.
+  // Render-time, the Deploy controls are already disabled (see review markup);
+  // this guards every other path that reaches simpleInstall (Express lane,
+  // hidden proxy buttons, stale renders).
+  if (!isFree) {
+    const missingKeys = installCredentialGate();
+    if (missingKeys.length) {
+      result.innerHTML = installCredentialGateHtml(missingKeys);
+      return;
+    }
+  }
   if (S.installMode === 'direct' && target === 'app' && !isFree) {
     if (!S.stremioEmail || !S.stremioPassword) {
       showToast('Enter your Stremio email and password above', true); return;
@@ -7141,15 +7265,17 @@ async function simpleInstall(target) {
   _lastInstall = { target, pwd };
   btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating config…`;
   result.innerHTML = '';
-  const cfg = buildFinal().config;
-  const sz = payloadSizeGuard(cfg);
-  if (sz.over) { btn.disabled = false; btn.innerHTML = 'Install'; result.innerHTML = payloadTooLargeHtml(sz); return; }
   const _allHosts = orderedHostEntries();
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
   try {
     const fastest = await resolveInstallHost(4000);
+    // Gate the posted config against the host that ACTUALLY resolved (Auto's
+    // winner), not the selected/fallback host — they can differ.
+    const cfg = buildFinal(installHostKeyFor(fastest) || undefined).config;
+    const sz = payloadSizeGuard(cfg);
+    if (sz.over) { btn.disabled = false; btn.innerHTML = 'Install'; result.innerHTML = payloadTooLargeHtml(sz); return; }
     const res = await writeHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {
@@ -7634,9 +7760,14 @@ async function openInAIOStreams() {
   if (isAuto && pwd) {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
-    const cfg = buildFinal().config;
-    const sz = payloadSizeGuard(cfg);
-    if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
+    // Backstop: no host POST while a required key is empty — the host rejects
+    // the save with "Option apiKey is required" (precise inline message first).
+    const missingKeysAuto = installCredentialGate();
+    if (missingKeysAuto.length) {
+      resetBtn(origHtml);
+      result.innerHTML = installCredentialGateHtml(missingKeysAuto);
+      return;
+    }
     const existingUuid = validateUuid(uuid) ? uuid : null;
     const hostPick = await resolveInstallHost(4000).then(h=>({host:h,err:null})).catch(e=>({host:null,err:e}));
     const fastest = hostPick.host;
@@ -7648,6 +7779,10 @@ async function openInAIOStreams() {
       return;
     }
     rememberGoodHost(fastest);
+    // Gate the posted config for the host that actually won the race.
+    const cfg = buildFinal(installHostKeyFor(fastest) || undefined).config;
+    const sz = payloadSizeGuard(cfg);
+    if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
     const attempt = async (id) => {
       const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
       const res = await writeHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
@@ -7720,9 +7855,15 @@ async function openInAIOStreams() {
   if (pwd) {
     const origHtml = btn.innerHTML;
     setBtnLoading(); result.innerHTML = '';
+    const missingKeysPwd = installCredentialGate();
+    if (missingKeysPwd.length) {
+      resetBtn(origHtml);
+      result.innerHTML = installCredentialGateHtml(missingKeysPwd);
+      return;
+    }
     try {
       const resolvedBase = await resolveInstallHost(4000);
-      const cfg = buildFinal().config;
+      const cfg = buildFinal(installHostKeyFor(resolvedBase) || undefined).config;
       const sz = payloadSizeGuard(cfg);
       if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
       const res = await writeHostFetch(resolvedBase, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);

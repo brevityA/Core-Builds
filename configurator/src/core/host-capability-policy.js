@@ -17,9 +17,11 @@
 import {
   HOST_CAPABILITY_OVERRIDES,
   FEATURE_MIN_VERSIONS,
+  PRESET_MIN_VERSIONS,
   KNOWN_DEAD_CONFIG_KEYS,
   LEGACY_MIGRATED_CONFIG_KEYS,
 } from '../data/host-capabilities.js';
+import { HOST_META } from '../data/hosts.js';
 import { AIO_CONFIG_KEY_SET } from '../config/generated/aiostreams-config-schema.js';
 import { AIO_PRESET_ID_SET } from '../data/generated/aiostreams-presets.js';
 import { isAllowed, hasLookbehind, REGEX_FIELDS } from './regex-whitelist.js';
@@ -117,11 +119,18 @@ export function resolveHostCapabilities(hostKey, probe = null, options = {}) {
   const levels = [base.regexAccess || 'trusted', probed?.regexAccess].filter(level => level in rank);
   const regexAccess = levels.sort((a, b) => rank[a] - rank[b])[0] || 'trusted';
 
+  // Version precedence: a live probe always wins; otherwise the registry's
+  // last-verified version for that public host (data/hosts.js) so the gate
+  // stays honest when a browser probe is CORS-blocked; otherwise the caller's
+  // assumption.
+  const registryVersion = HOST_META[key]?.aiostreamsVersion || null;
+
   return {
     key,
     label: base.label || key,
     kind: base.kind || 'unknown',
-    version: probed?.version || options.assumedVersion || null,
+    version: probed?.version || registryVersion || options.assumedVersion || null,
+    versionSource: probed?.version ? 'probe' : (registryVersion ? 'registry' : (options.assumedVersion ? 'assumed' : null)),
     channel: probed?.channel || (base.kind === 'nightly' ? 'nightly' : null),
     probed: Boolean(probed),
     // An unprobed host that the registry flags as owner-configured cannot be
@@ -199,6 +208,14 @@ export function hostOptionGate(capabilities) {
         });
       }
     }
+    for (const [presetId, minimum] of Object.entries(PRESET_MIN_VERSIONS)) {
+      if (!isVersionAtLeast(capabilities.version, minimum)) {
+        gate.push({
+          option: `preset:${presetId}`, scope: 'addon', action: 'hide',
+          reason: `${presetId} was added in AIOStreams ${minimum}; ${label} runs ${capabilities.version}`,
+        });
+      }
+    }
   }
   if (!capabilities.confirmed) {
     gate.push({
@@ -258,8 +275,9 @@ export function gateConfigForHost(rawConfig, capabilities, options = {}) {
     }
   }
 
-  // 3. Presets the host refuses to resolve, plus preset types the pinned
-  //    upstream does not know at all (PresetManager.fromId would throw).
+  // 3. Presets the host refuses to resolve, preset types the pinned upstream
+  //    does not know at all (PresetManager.fromId would throw), and built-ins
+  //    that post-date the host's version (same throw, one release later).
   if (Array.isArray(config.presets)) {
     const disabled = new Set(capabilities?.disabledPresetIds || []);
     config.presets = config.presets.filter((preset) => {
@@ -270,6 +288,11 @@ export function gateConfigForHost(rawConfig, capabilities, options = {}) {
       }
       if (type && !AIO_PRESET_ID_SET.has(type)) {
         removals.push({ kind: 'preset', target: type, reason: 'not a preset id AIOStreams can resolve at the pinned version' });
+        return false;
+      }
+      const presetMinimum = PRESET_MIN_VERSIONS[type];
+      if (presetMinimum && capabilities?.version && !isVersionAtLeast(capabilities.version, presetMinimum)) {
+        removals.push({ kind: 'preset', target: type, reason: `${type} was added in AIOStreams ${presetMinimum}; ${label} runs ${capabilities.version}` });
         return false;
       }
       return true;
