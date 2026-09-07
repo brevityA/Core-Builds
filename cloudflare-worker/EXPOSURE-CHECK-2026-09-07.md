@@ -1,8 +1,44 @@
-# Exposure check — Cloudflare Workers (2026-09-07)
+# Exposure check — Cloudflare Workers (2026-09-07, hardening 2026-09-08)
 
 Scope: the deployed `core-builds-cors-proxy` worker (and any sibling workers on the
 same `tlorenzato26` account subdomain), plus every worker reference in this repo
 (`configurator/`, `tools/badges/`, `.github/workflows/deploy-worker.yml`).
+
+## 2026-09-08 hardening pass (repo, committed; deploy + two secrets required)
+
+Follow-up to the owner directive *"harden the worker — never expose anything"`.
+All changes are in `worker.js` / `worker.test.js` / `smoke.mjs` / the deploy
+workflow (81/81 unit tests pass; version tag stays `2026-09-08`):
+
+1. **`/api/stats` public payload = exactly `{visits, generates}`** (the two
+   counters the configurator splash renders — verified `app.js:2508/2518`).
+   No totals beyond those, no `by_*` breakdowns, no error counters, no `daily`
+   series, no `version`. Still rate-limited 20/min and cached 60 s per colo.
+2. **Full stats moved behind an operator gate**: `Authorization: Bearer
+   ADMIN_TOKEN` (env secret, constant-time compare, ≥16 chars or disabled,
+   never in repo) returns the full counters + breakdowns (with the 09-07
+   `by_host`/`by_host_errors` allowlist filter), always `no-store` and never
+   written to the shared public cache.
+3. **`/healthz` public payload = `{ok, version}`** (200/503 readiness
+   semantics unchanged). Binding presence (incl. `DISCORD_WEBHOOK_URL`),
+   `ready` and `breakers_open` are operator-token-only.
+4. **Allowlisted hosts are lane-scoped — no more any-path relay**: AIOStreams
+   hosts → `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]`, `GET
+   /stremio/<uuid>/<pwd>/{manifest.json,stream/*/*.json}` (origin form) or
+   `GET /stream/*/*.json` (manifest-base form); `api.wuplay.app` → `GET
+   /app/version`, `POST /devices/register`, `GET/POST/PATCH /sync/**` (the
+   only Authorization-forwarding host); `api.torbox.app` unchanged (`GET
+   /v1/api/speedtest`). A listed host matching no scope is refused, and an
+   allowlisted host can no longer fall into the custom lane.
+5. **`configurator/worker/` deleted** (stale `core-builds-counter` sources
+   sharing the prod STATS KV — plan item 5 of the 08-21 audit). The live
+   dashboard worker still needs deleting (owner).
+
+Deploy steps for the owner: `wrangler deploy` + `wrangler secret put
+ADMIN_TOKEN` (≥16 chars, e.g. `openssl rand -hex 24`) in each environment, and
+optionally mirror it as the GitHub secret `STATS_ADMIN_TOKEN` so the CI smoke
+gate re-verifies the operator view. Until `ADMIN_TOKEN` exists, the operator
+views are simply unavailable (public payloads unchanged, no fail-open).
 
 Method: line-by-line review of `cloudflare-worker/worker.js` @ `50a2f88` (this
 snapshot) and live probing of the deployed workers on 2026-09-07. The sandbox's
@@ -64,9 +100,13 @@ deploy). `/api/stats` now filters `by_host`/`by_host_errors` through
 `ALLOWED_HOSTS`) plus the `custom`/`unknown` buckets are published; legacy
 custom-lane hostnames and canary keys are dropped at read time while their KV
 counters are kept (operator dashboards reading KV directly are unaffected).
-Regression test `S8b` added; 76/76 unit tests pass. The legacy keys can still be
-purged from KV once (owner action) so every `/api/stats` rebuild stops paying the
-read cost for dead keys — cleanup script available on request.
+Regression test `S8b` added; 76/76 unit tests pass. **Superseded on the same
+date by the hardening pass**: the public `/api/stats` payload is now exactly
+`{visits, generates}` and host data of any kind (allowlisted or not) is
+operator-token-only, so this whole finding class is closed on the public
+surface. The legacy keys can still be purged from KV once (owner action) so
+every operator stats rebuild stops paying the read cost for dead keys —
+cleanup script available on request.
 
 ### 2. [High — stale surface] Orphaned second deployment `core-builds-counter` is live and unmanaged
 
@@ -110,11 +150,12 @@ unauthenticated `DELETE`**. Do this if you have not already: Discord → Server
 Settings → Integrations → Webhooks → delete + recreate, then
 `wrangler secret put DISCORD_WEBHOOK_URL`.
 
-### 4. [Low] `/healthz` is public, unauthenticated, and un-rate-limited
+### 4. [Fixed 2026-09-08] `/healthz` disclosed bindings + breaker state publicly
 
-By design (it is the CI/smoke liveness probe, no I/O). It discloses the version
-tag and which bindings exist, including that a Discord webhook secret is
-configured (boolean only — never the URL). Acceptable; noted for completeness.
+It previously disclosed the version tag and which bindings exist, including
+that a Discord webhook secret is configured (boolean only — never the URL).
+The public payload is now `{ok, version}` (readiness semantics unchanged);
+bindings, `ready`, `breakers_open` require `Authorization: Bearer ADMIN_TOKEN`.
 
 ### 5. [Low] Dead `/upload` route still wired in the badge builder
 
@@ -124,7 +165,16 @@ existed on the consolidated worker (404 → the client falls back to `paste.rs`)
 This is INFRA-AUDIT finding R7 / plan item 13, still open. Fix: point it at
 `/paste` (the worker's real, shape-checked paste endpoint) — one line.
 
-### 6. [Low] Residual, documented exposures (unchanged, re-confirmed)
+### 6. [Fixed 2026-09-08] Allowlisted hosts relayed any path (GET/POST/PATCH)
+
+Before the hardening pass, a host in `ALLOWED_HOSTS` was reachable on *any*
+path with GET/POST/PATCH (auth-bearing on the wuplay lane). Every allowlisted
+host is now lane-scoped (AIOStreams config/manifest surface, WuPlay genie
+endpoints, TorBox speedtest) and a listed host matching no scope is refused —
+see the hardening header above. Regression tests cover the AIO + wuplay
+matrices and the "no unscoped host" invariant.
+
+### 7. [Low] Residual, documented exposures (unchanged, re-confirmed)
 
 - `/t/<id>` is public-read with `ACAO: *` by design (AIOStreams hosts import
   templates) — bodies are only safe if writers use the configurator's
@@ -142,13 +192,13 @@ This is INFRA-AUDIT finding R7 / plan item 13, still open. Fix: point it at
 
 | # | Action | Owner | Effort |
 |---|---|---|---|
-| 1 | Whitelist `by_host`/`by_host_errors` in `/api/stats` (drop non-allowlisted, non-`custom` keys at publication) | repo | S — ✅ done (2026-09-08, version tag `2026-09-08`; **deploy to take effect**) |
-| 2 | Delete the live `core-builds-counter` worker in the dashboard | owner | S |
-| 3 | Rotate `DISCORD_WEBHOOK_URL` if not done since 2026-09-03 | owner | S |
-| 4 | Purge legacy `proxy:*` / `proxy_err:*` KV keys for non-allowlisted hosts + canary junk | owner (script provided on request) | S |
-| 5 | Delete `configurator/worker/` (stale counter worker sources) | repo | S |
-| 6 | Point badge builder at `/paste` instead of `/upload` (`tools/badges/index.html:1029`) | repo | S |
-| 7 | Tighten `smoke.mjs` line 86 WARN into a post-deploy gate once #1 ships | repo | S — obsolete once #1 deploys (WARN can never fire again); kept as a tripwire for future regressions |
+| 1 | Minimal-disclosure hardening (public stats/healthz, ADMIN_TOKEN operator gate, allowlisted-host lane scopes) | repo | ✅ done (2026-09-08; **deploy + `wrangler secret put ADMIN_TOKEN` to take effect**) |
+| 2 | Delete the live `core-builds-counter` worker in the dashboard | owner | S — still pending |
+| 3 | Rotate `DISCORD_WEBHOOK_URL` if not done since 2026-09-03 | owner | S — still pending |
+| 4 | Set `ADMIN_TOKEN` secret (≥16 chars) per environment; mirror as GitHub secret `STATS_ADMIN_TOKEN` for the smoke gate | owner | S — required for the operator view |
+| 5 | Purge legacy `proxy:*` / `proxy_err:*` KV keys for non-allowlisted hosts + canary junk | owner (script provided on request) | S — optional now (public JSON is filtered regardless) |
+| 6 | Delete `configurator/worker/` (stale counter worker sources) | repo | ✅ done 2026-09-08 |
+| 7 | Point badge builder at `/paste` instead of `/upload` (`tools/badges/index.html:1029`) | repo | S — still open |
 
 Verified non-issues (no action): rate limits enforced (bindings live), upstream
 redirects refused, `Authorization` forwarded only to `api.wuplay.app`, CORS

@@ -4,10 +4,12 @@
 // /paste         — stores a validated template or Nuvio badge-pack JSON and returns a URL.
 //                  Imports expire after 30 days. Nothing is logged or inspected.
 // /t/:id         — returns a stored paste (Durable Object first, legacy KV fallback).
-// /api/stats     — returns all usage counters (totals + breakdowns).
+// /api/stats     — public: {visits, generates} only (the configurator splash's two
+//                  counters). With `Authorization: Bearer ADMIN_TOKEN`: all counters
+//                  + breakdowns, never cached. See isAdminRequest.
 // /api/visit     — increments configurator visit counter.
 // /api/generate  — increments template generation counter (accepts service/device/resolution).
-// /healthz       — liveness/readiness: bindings present + version tag. No I/O.
+// /healthz       — public: {ok, version}. With the token: bindings + breakers. No I/O.
 //
 // Proxy calls, paste creates, and paste views are counted automatically.
 // Per-host proxy counts, per-service generates, and daily counters are tracked.
@@ -218,6 +220,57 @@ const HOST_SCOPES = new Map([
   }],
 ]);
 
+// ── Allowlisted-host lane scopes (2026-09-08 hardening) ────────────────────
+// Before this pass, listing a host in ALLOWED_HOSTS granted GET/POST/PATCH on
+// ANY path (auth-bearing for hosts that forward Authorization). Now every
+// allowlisted host must match one explicit lane scope — exact HOST_SCOPES
+// (above), the AIOStreams config/manifest surface, or the WuPlay genie
+// surface — and a listed host with no matching scope is refused. Adding an
+// allowlisted host therefore means deliberately scoping it; allowlisting alone
+// never grants an any-path relay again.
+const LANE_EXACT_HOSTS = new Set(['https://api.wuplay.app', 'https://api.torbox.app']);
+const AIO_LANE_HOSTS = new Set([...ALLOWED_HOSTS].filter((h) => !LANE_EXACT_HOSTS.has(h)));
+
+const AIO_USER_PATH_RE = /^\/api\/v1\/user(\/[A-Za-z0-9_-]{1,128})?$/;
+const AIO_STREMIO_PATH_RE = /^\/stremio\/[^/]+\/[^/]+\/(manifest\.json|stream\/[^/]+\/[^/]+\.json)$/;
+const AIO_MANIFEST_BASE_RE = /^\/stremio\/[^/]+\/[^/]+$/;
+const AIO_MANIFEST_STREAM_RE = /^\/stream\/[^/]+\/[^/]+\.json$/;
+
+// AIOStreams instance lane — the direct-install surface the configurator uses:
+//   origin form  (host = https://instance):              GET /api/v1/status;
+//                                                        POST|PATCH /api/v1/user[/<id>];
+//                                                        GET /stremio/<uuid>/<epwd>/{manifest.json, stream/…}
+//   manifest form (host = https://instance/stremio/<uuid>/<epwd>): GET /stream/<type>/<id>.json
+// The manifest-base door is exactly the custom lane's ("Test Streams" probe);
+// manifest reads go origin-form. Never forwards caller credentials.
+function aioLaneScope(host, method, upstreamPath) {
+  let u;
+  try { u = new URL(host); } catch { return null; }
+  const base = u.pathname;
+  if (base === '/') {
+    if (method === 'GET' && upstreamPath === '/api/v1/status') return { lane: 'aio', stripAuth: true };
+    if ((method === 'POST' || method === 'PATCH') && AIO_USER_PATH_RE.test(upstreamPath)) return { lane: 'aio', stripAuth: true };
+    if (method === 'GET' && AIO_STREMIO_PATH_RE.test(upstreamPath)) return { lane: 'aio', stripAuth: true };
+    return null;
+  }
+  if (method === 'GET' && AIO_MANIFEST_BASE_RE.test(base) && AIO_MANIFEST_STREAM_RE.test(upstreamPath)) return { lane: 'aio', stripAuth: true };
+  return null;
+}
+
+const WUPLAY_SYNC_RE = /^\/sync\/[^/]+(\/.*)?$/;
+
+// WuPlay genie lane — the ONLY allowlisted lane that may carry a caller-supplied
+// Authorization header (device tokens; see AUTH_FORWARD_HOSTS). Scoped to the
+// genie's documented endpoints so a WuPlay token can never be replayed against
+// an unrelated api.wuplay.app path through this worker.
+function wuplayLaneScope(host, method, upstreamPath) {
+  if (host !== 'https://api.wuplay.app') return null;
+  if (method === 'GET' && upstreamPath === '/app/version') return { lane: 'wuplay' };
+  if (method === 'POST' && upstreamPath === '/devices/register') return { lane: 'wuplay' };
+  if ((method === 'GET' || method === 'POST' || method === 'PATCH') && WUPLAY_SYNC_RE.test(upstreamPath)) return { lane: 'wuplay' };
+  return null;
+}
+
 // Custom / self-hosted lane.
 //
 // The configurator's "Custom / Self-hosted" host option lets a user point at
@@ -306,6 +359,23 @@ function corsHeaders(request, publicRead = false) {
     // value to another.
     ...(publicRead ? {} : { 'Vary': 'Origin' }),
   };
+}
+
+// ── Operator gate (2026-09-08 hardening) ────────────────────────────────────
+// /api/stats and /healthz answer with a minimal public payload and a full
+// operator payload for requests carrying `Authorization: Bearer $ADMIN_TOKEN`
+// (wrangler secret — never in repo/config). No ADMIN_TOKEN (or a token shorter
+// than 16 chars) means the full view does not exist at all, public or not.
+// Comparison is constant-time; the token is never logged or echoed.
+function isAdminRequest(request, env) {
+  const token = env && env.ADMIN_TOKEN;
+  if (!token || typeof token !== 'string' || token.length < 16) return false;
+  const header = request.headers.get('Authorization') || '';
+  const prefix = 'Bearer ';
+  if (header.length !== prefix.length + token.length) return false;
+  let diff = 0;
+  for (let i = 0; i < token.length; i++) diff |= header.charCodeAt(prefix.length + i) ^ token.charCodeAt(i);
+  return diff === 0;
 }
 
 const PASTE_TTL = 30 * 24 * 60 * 60; // 30 days
@@ -626,39 +696,61 @@ export default {
     // --- Health: liveness/readiness (no I/O, never rate limited) ---
     if (url.pathname === '/healthz' && request.method === 'GET') {
       const has = (b) => !!(env && env[b]);
+      const ready = (has('PASTES') || has('TEMPLATES'));
+      const admin = isAdminRequest(request, env);
       const body = {
-        ok: true,
+        ok: ready,
         version: WORKER_VERSION,
-        bindings: {
+      };
+      if (admin) {
+        // Operator view: which bindings exist (incl. the Discord webhook
+        // secret's presence) and breaker state. Never on the public surface —
+        // it advertises deployment internals to anyone probing /healthz.
+        body.bindings = {
           STATS: has('STATS'), TEMPLATES: has('TEMPLATES'), PASTES: has('PASTES'),
           RATELIMIT: has('RATELIMIT'), RL_PROXY: has('RL_PROXY'), DISCORD_WEBHOOK_URL: has('DISCORD_WEBHOOK_URL'),
-        },
-        // readiness = the two stores the configurator's flows depend on
-        ready: (has('PASTES') || has('TEMPLATES')),
-        breakers_open: [...breakers.entries()].filter(([, b]) => b.openedAt && Date.now() - b.openedAt < BREAKER_OPEN_MS).length,
-      };
-      return respond(body.ready ? 200 : 503, { ...body, headers: NO_STORE });
+          ADMIN_TOKEN: has('ADMIN_TOKEN'),
+        };
+        body.ready = ready;
+        body.breakers_open = [...breakers.entries()].filter(([, b]) => b.openedAt && Date.now() - b.openedAt < BREAKER_OPEN_MS).length;
+      }
+      return respond(ready ? 200 : 503, { ...body, headers: NO_STORE });
     }
 
-    // --- Counter: return all stats ---
+    // --- Counter: usage stats (2026-09-08: public = 2 splash counters only) ---
     if (url.pathname === '/api/stats' && request.method === 'GET') {
       const statsIp = getClientIp(request);
       if (!(await rateAllow(env, 'stats', statsIp, STATS_PER_MIN, 60))) {
         if (env.STATS) bgIncrementMulti(ctx, env.STATS, ['rate_limited', 'rl_hit:stats']);
         return respond(429, { error: 'rate limit exceeded' });
       }
-      if (!env.STATS) return respond(200, {});
-      // ~200 KV ops per build. Workers run BEFORE the CDN cache, so the max-age
-      // header alone never cached this; serve from the colo Cache API for 60 s,
-      // keyed on the path only so ?cache-busting cannot force a rebuild (R5/O7).
-      const statsKey = new URL('/api/stats', url.origin);
-      const cached = await statusProbeCacheGet(statsKey);
-      if (cached) {
-        const body = await cached.text().catch(() => null);
-        if (body !== null) {
-          return new Response(body, { status: 200, headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, 'Cache-Control': `public, max-age=${STATS_CACHE_TTL}` } });
+      const admin = isAdminRequest(request, env);
+      if (!admin) {
+        // The public surface is exactly what the configurator splash renders:
+        // { visits, generates }. No totals beyond those, no breakdowns, no
+        // per-host data, no daily series, no error counters — operator data
+        // lives behind ADMIN_TOKEN only. Served from the colo Cache API (60 s,
+        // keyed on the path only so ?cache-busting cannot force a rebuild).
+        if (!env.STATS) return respond(200, { visits: 0, generates: 0 });
+        const statsKey = new URL('/api/stats', url.origin);
+        const cached = await statusProbeCacheGet(statsKey);
+        if (cached) {
+          const body = await cached.text().catch(() => null);
+          if (body !== null) {
+            return new Response(body, { status: 200, headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, 'Cache-Control': `public, max-age=${STATS_CACHE_TTL}` } });
+          }
         }
+        const [v, g] = await Promise.all([env.STATS.get('visits'), env.STATS.get('generates')]);
+        const payload = { visits: parseInt(v, 10) || 0, generates: parseInt(g, 10) || 0 };
+        const resp = new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, 'Cache-Control': `public, max-age=${STATS_CACHE_TTL}` } });
+        statusProbeCachePut(ctx, statsKey, resp, STATS_CACHE_TTL);
+        return resp;
       }
+      // Operator view (Authorization: Bearer ADMIN_TOKEN). Full counters and
+      // breakdowns. NEVER cached (no-store, no Cache API) — the public cache
+      // key is the path, and a cached full dump must never leak to a plain
+      // public request.
+      if (!env.STATS) return respond(200, {});
       // Every counter the worker writes must appear here or it is write-only.
       // The proxy_err_* class counters are incremented as `proxy_err_${cls}`
       // (underscore) while the per-host ones are `proxy_err:${hostname}` (colon),
@@ -696,9 +788,7 @@ export default {
       // the 2026-09-03 collapse (S8) plus attacker canary keys; never publish
       // those — allowlisted hostnames and the custom/unknown buckets only.
       const payload = { ...totals, by_host: publishableHostBuckets(byHost), by_host_errors: publishableHostBuckets(byHostErrors), by_service: byService, by_device: byDevice, by_resolution: byResolution, by_rate_limit: byRateLimit, daily, version: WORKER_VERSION };
-      const resp = new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, 'Cache-Control': `public, max-age=${STATS_CACHE_TTL}` } });
-      statusProbeCachePut(ctx, statsKey, resp, STATS_CACHE_TTL);
-      return resp;
+      return new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, ...NO_STORE } });
     }
 
     // --- Counter: increment visit ---
@@ -894,27 +984,36 @@ export default {
     }
 
     const host = url.searchParams.get('host');
-    // Allowlisted hosts keep the full lane; anything else must pass the scoped
-    // custom-host gate (AIOStreams config paths only, https, origin-only).
-    const customHost = ALLOWED_HOSTS.has(host) ? null : customHostScope(host, request.method, upstreamPath);
-    if (!host || (!ALLOWED_HOSTS.has(host) && !customHost)) {
+    if (!host) {
       return respond(403, { error: 'host not allowed' });
     }
-
-    // Narrowed hosts get one door, not the whole building. See HOST_SCOPES.
-    // Custom hosts get the same treatment with an even smaller door.
-    const hostScope = customHost || HOST_SCOPES.get(host);
-    if (hostScope) {
-      if (hostScope.custom) {
-        // customHostScope already validated path+method; stripAuth is implied.
-      } else {
-        if (!hostScope.methods.has(request.method)) {
+    // Three doors into the proxy: the custom/self-hosted lane gate (validates
+    // https-origin/manifest-base shapes + AIOStreams config paths), or — for
+    // ALLOWED_HOSTS — one of the explicit lane scopes (HOST_SCOPES exact,
+    // aioLaneScope, wuplayLaneScope). Allowlisting alone never grants an
+    // any-path relay: a listed host that matches no scope is refused. An
+    // allowlisted host never falls back into the custom lane (stats labels and
+    // rate-limit buckets must stay on the allowlisted lane).
+    const customHost = ALLOWED_HOSTS.has(host) ? null : customHostScope(host, request.method, upstreamPath);
+    let hostScope = customHost;
+    if (ALLOWED_HOSTS.has(host)) {
+      const exact = HOST_SCOPES.get(host);
+      if (exact) {
+        if (!exact.methods.has(request.method)) {
           return respond(405, { error: 'method not allowed for this host' });
         }
-        if (!hostScope.paths.has(upstreamPath)) {
+        if (!exact.paths.has(upstreamPath)) {
           return respond(403, { error: 'path not allowed for this host' });
         }
+        hostScope = { stripAuth: true };
+      } else if (AIO_LANE_HOSTS.has(host)) {
+        hostScope = aioLaneScope(host, request.method, upstreamPath);
+      } else {
+        hostScope = wuplayLaneScope(host, request.method, upstreamPath);
       }
+    }
+    if (!hostScope) {
+      return respond(403, { error: 'host not allowed' });
     }
 
     const hostname = hostLabel(host, !!customHost);

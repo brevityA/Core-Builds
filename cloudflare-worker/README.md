@@ -51,21 +51,30 @@ cd cloudflare-worker
 # [[migrations]] block creates the DO class on first deploy).
 npx wrangler login
 npx wrangler secret put DISCORD_WEBHOOK_URL   # contact form; never commit it
+npx wrangler secret put ADMIN_TOKEN           # operator view: >=16 chars, random; never commit it
 npx wrangler deploy --dry-run --outdir /tmp/wr  # validates config + bundle, uploads nothing
 npx wrangler deploy
-node smoke.mjs --strict                         # post-deploy gate
-```
+STATS_ADMIN_TOKEN=<same ADMIN_TOKEN> node smoke.mjs --strict   # post-deploy gate (full checks)
 
 The deploy output prints your Worker's URL:
 `https://core-builds-cors-proxy.<your-subdomain>.workers.dev`
 
-After deployment, `/healthz` confirms the version and which bindings are present
-(200 = ready; 503 = no paste store bound):
+After deployment, `/healthz` confirms the version (200 = ready; 503 = no paste
+store bound). Since 2026-09-08 the public payload is minimal — deployment
+internals (which bindings exist, breaker state) are operator data:
 
 ```bash
 curl -s https://<worker>.workers.dev/healthz
-# {"ok":true,"version":"2026-09-03","bindings":{"STATS":true,"TEMPLATES":true,"PASTES":true,"RATELIMIT":false,"RL_PROXY":true,"DISCORD_WEBHOOK_URL":true},"breakers_open":0}
+# {"ok":true,"version":"2026-09-08"}
+
+curl -s https://<worker>.workers.dev/healthz -H "Authorization: Bearer $ADMIN_TOKEN"
+# {"ok":true,"version":"2026-09-08","bindings":{"STATS":true,"TEMPLATES":true,
+#  "PASTES":true,"RATELIMIT":false,"RL_PROXY":true,"DISCORD_WEBHOOK_URL":true,
+#  "ADMIN_TOKEN":true},"ready":true,"breakers_open":0}
 ```
+
+The same `Authorization: Bearer $ADMIN_TOKEN` header unlocks the full
+`/api/stats` payload (see Routes below).
 
 ## Wire it into the configurator
 
@@ -88,18 +97,20 @@ Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 - `CLOUDFLARE_API_TOKEN` — a token with Workers Scripts:Edit permission
 - `CLOUDFLARE_ACCOUNT_ID` — found on the Cloudflare dashboard's right sidebar
 
-## Routes & limits (2026-09-03)
+## Routes & limits (2026-09-08)
 
 | Route | Method | Purpose | Limit / IP | Notes |
 |---|---|---|---|---|
-| `/healthz` | GET | liveness + readiness + version + bindings, no I/O | none | 200 = a paste store is bound; 503 otherwise |
-| `/api/stats` | GET | all counters | 20/min | served from the colo Cache API for 60 s; `daily` windowed to 120 days |
+| `/healthz` | GET | public liveness + readiness + version, no I/O, no token | none | 200 = a paste store is bound; 503 otherwise. Payload is `{ok, version}` only |
+| `/healthz` | GET | operator view (bindings incl. `DISCORD_WEBHOOK_URL` presence, `breakers_open`) | none | requires `Authorization: Bearer ADMIN_TOKEN`; 503 when not ready |
+| `/api/stats` | GET | public: **`{visits, generates}` only** (the configurator splash's two counters) | 20/min | served from the colo Cache API for 60 s |
+| `/api/stats` | GET | operator: all counters + breakdowns (`by_host` allowlist-filtered, `by_service/device/resolution`, `by_rate_limit`, `daily` windowed to 120 days) | 20/min | requires `Authorization: Bearer ADMIN_TOKEN`; always `no-store`, never cached |
 | `/api/visit` | POST | visit beacon | 30/min | |
 | `/api/generate` | POST | generate beacon `{service,device,resolution}` | 30/min | dimension values must match `^[a-z0-9][a-z0-9_-]{0,31}$` or are dropped |
 | `/contact` | POST | Discord webhook relay | 5/min (binding) + 5/h (KV, if bound) | Origin allowlist, 16 KB body cap |
 | `/paste` | POST | store template / badge pack | 10/min | ≤512 KB, two shapes only, 30-day TTL |
 | `/t/:id` | GET | read paste | 60/min | `ACAO: *`, `no-store` |
-| `/proxy<path>?host=` | GET/POST/PATCH | allowlisted lane | 60/min | any path on `ALLOWED_HOSTS`; `Authorization` forwarded **only** to `api.wuplay.app`; TorBox scoped to `GET /v1/api/speedtest` |
+| `/proxy<path>?host=` | GET/POST/PATCH | allowlisted lane | 60/min | every allowlisted host is scoped to its own surface — AIOStreams hosts: `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]`, `GET /stremio/<uuid>/<pwd>/{manifest.json,stream/*/*.json}` (origin form) or `GET /stream/*/*.json` (manifest-base form); `api.wuplay.app`: `GET /app/version`, `POST /devices/register`, `GET/POST/PATCH /sync/**` and is the **only** host that receives `Authorization`; `api.torbox.app`: `GET /v1/api/speedtest`. An allowlisted host matching no scope is refused |
 | `/proxy<path>?host=` | GET/POST/PATCH | custom lane | 20/min | `https://` origin → `GET /api/v1/status`, `POST/PATCH /api/v1/user`; manifest base → `GET /stream/*/*.json`; no IP literals, no userinfo/port/query, no dotless or reserved names (`.local .internal .lan .corp .home .test .example .invalid .onion .arpa`) |
 
 Caps everywhere: 2 MB proxy request body (413), 8 MB proxy response (502
@@ -166,20 +177,21 @@ under **Workers & Pages → core-builds-cors-proxy → Observability**.
 
 ## Alerting & runbook
 
-Read `/api/stats` twice, 10 minutes apart, and alert on the deltas (a tiny
-scheduled script or an uptime monitor that evaluates JSON is enough; Cloudflare
-Notifications can additionally alert on Worker error rate and CPU limits).
+Read the **operator** `/api/stats` (send `Authorization: Bearer $ADMIN_TOKEN`)
+twice, 10 minutes apart, and alert on the deltas (a tiny scheduled script or an
+uptime monitor that evaluates JSON is enough; Cloudflare Notifications can
+additionally alert on Worker error rate and CPU limits).
 
 | Alert | Threshold | Likely cause | Runbook |
 |---|---|---|---|
-| **Worker down** | `/healthz` non-200 for 2 checks | bad deploy, missing paste-store binding | `wrangler rollback`; check `bindings` in the healthz body |
+| **Worker down** | `/healthz` non-200 for 2 checks | bad deploy, missing paste-store binding | `wrangler rollback`; check operator healthz `bindings` (`curl -H "Authorization: Bearer $ADMIN_TOKEN"`) |
 | **Version mismatch** | `/healthz.version` ≠ `git HEAD` `WORKER_VERSION` >10 min after a deploy | deploy failed silently | re-run the workflow; check Actions log |
-| **Upstream error ratio** | Δ`proxy_errors` / Δ`proxy_calls` > 30% over 10 min | a public host is down/slow | look at Δ`by_host_errors`; if one host ≫ others, it's the host — nothing to do in the worker (breaker limits blast radius). If `proxy_err_timeout` dominates across all hosts, suspect Cloudflare egress → status.cloudflare.com |
-| **Breaker open** | `/healthz.breakers_open` > 0 for >5 min, or Δ`proxy_err_breaker` > 50/10 min | one host hard-down | confirm host directly (`curl https://<host>/api/v1/status`); ask the host operator; consider removing from `ALLOWED_HOSTS` + the configurator host list if >24 h |
+| **Upstream error ratio** | Δ`proxy_errors` / Δ`proxy_calls` > 30% over 10 min | a public host is down/slow | look at Δ`by_host_errors` (operator `/api/stats`); if one host ≫ others, it's the host — nothing to do in the worker (breaker limits blast radius). If `proxy_err_timeout` dominates across all hosts, suspect Cloudflare egress → status.cloudflare.com |
+| **Breaker open** | operator `/healthz.breakers_open` > 0 for >5 min, or Δ`proxy_err_breaker` > 50/10 min | one host hard-down | confirm host directly (`curl https://<host>/api/v1/status`); ask the host operator; consider removing from `ALLOWED_HOSTS` + the configurator host list if >24 h |
 | **Redirect refusals** | Δ`proxy_err_redirect` > 5/10 min from a *non-custom* host | an allowlisted host changed domains, or is compromised | verify with `curl -I`; update `ALLOWED_HOSTS`; never re-enable redirect following |
 | **Rate-limit storm** | Δ`rate_limited` > 500/10 min | abuse or a client bug retry-looping | check `by_rate_limit` scope; if `paste` — anonymous storage abuse: temporarily lower `PASTE_CREATE_PER_MIN`; if `proxy` — check the configurator for a probe loop (`raceHostFetch`) |
 | **Counter loss** | Δ`counter_write_err` > 20/10 min | KV write pressure (same-key 1/s) or KV incident | analytics only — no user impact; if persistent, move counters to Analytics Engine (plan item 14) |
-| **Paste failures** | `/paste` 5xx in smoke, or Δ`pastes_created` = 0 while Δ`visits` > 100 | DO storage full / DO outage | `/healthz.bindings.PASTES`; `wrangler tail` for `paste_do_write_failed`; writes degrade to KV meanwhile |
+| **Paste failures** | `/paste` 5xx in smoke, or Δ`pastes_created` = 0 while Δ`visits` > 100 | DO storage full / DO outage | operator healthz `bindings.PASTES`; `wrangler tail` for `paste_do_write_failed`; writes degrade to KV meanwhile |
 | **KV fallback reads** | `pastes_kv_fallback_reads` still increasing >30 days after 2026-09-03 | something still writes to KV (DO write failures) | check `paste_do_write_failed` log volume before unbinding `TEMPLATES` |
 | **Contact failures** | log event `contact_upstream_error` >3/h | Discord webhook rotated/deleted | `wrangler secret put DISCORD_WEBHOOK_URL` |
 | **Free-plan quota** [PLAN-DEPENDENT] | Cloudflare notification for 100k req/day or KV 100k reads/day | traffic growth or `/api/stats` scraping | `/api/stats` is cached 60 s per colo; if scraped, tighten `STATS_PER_MIN`; upgrade plan |
@@ -199,10 +211,14 @@ reports from scripts are usually this, not the worker.
   namespaces. Create staging KV namespaces once and fill the ids in
   `[env.staging]` (bindings are not inherited between environments). Point a
   local configurator at it with `CORS_PROXY`/`COUNTER_URL`.
-- **Secrets**: only `DISCORD_WEBHOOK_URL`, via `wrangler secret put` (per
-  environment). The webhook that was committed in the deleted
-  `worker-contact-endpoint.js` must be **rotated in Discord** — it is still in
-  git history.
+- **Secrets**: `DISCORD_WEBHOOK_URL` (contact form) and `ADMIN_TOKEN` (operator
+  view of `/api/stats` + `/healthz`; generate with e.g.
+  `openssl rand -hex 24` — must be ≥16 chars or the operator view is disabled),
+  via `wrangler secret put` per environment. The webhook that was committed in
+  the deleted `worker-contact-endpoint.js` must be **rotated in Discord** — it
+  is still in git history. For the CI smoke gate to verify the operator view,
+  mirror `ADMIN_TOKEN` as the GitHub secret `STATS_ADMIN_TOKEN` (optional: the
+  smoke skips operator checks with a warning when it is unset).
 - **Rollback**: `npx wrangler rollback --message "<why>"` reverts to the last
   stable version (last 100 versions are eligible). Caveat from Cloudflare's docs:
   rollback is refused if a Durable Object class migration or a deleted KV binding
@@ -221,12 +237,14 @@ node cloudflare-worker/smoke.mjs --strict        # production
 node cloudflare-worker/smoke.mjs --base=http://127.0.0.1:8787   # local: npx wrangler dev --local
 ```
 
-Checks `/healthz` (version, bindings, breakers), `/api/stats` counter
-completeness, every allowlisted host's status probe (200 + 30 s cache header),
-the custom-lane matrix (https accepted; http://, bad paths, reserved names
-refused), redirect refusal, security headers, and an immediate `/paste` →
-`/t/:id` round-trip. Exit 0 = deploy is healthy. Without `--strict`, an older
-deployed worker produces warnings instead of failures.
+Checks public `/healthz` (minimal payload + version) and public `/api/stats`
+(exactly `{visits, generates}`), then — when `STATS_ADMIN_TOKEN` is set — the
+operator view (counter completeness, bindings, breakers), every allowlisted
+host's status probe (200 + 30 s cache header), the custom-lane matrix (https
+accepted; http://, bad paths, reserved names refused), redirect refusal,
+security headers, and an immediate `/paste` → `/t/:id` round-trip. Exit 0 =
+deploy is healthy. Without `--strict`, an older deployed worker produces
+warnings instead of failures.
 
 ### F10 — the 2026-08-19 visit-counter collapse
 
