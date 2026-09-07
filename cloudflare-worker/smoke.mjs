@@ -41,10 +41,10 @@ async function get(url) {
 
 const enc = (s) => encodeURIComponent(s);
 
-// --strict: fail (not warn) when the deployed worker predates 2026-09-03
+// --strict: fail (not warn) when the deployed worker predates 2026-09-08
 // (used by the deploy workflow's post-deploy gate).
 const STRICT = args.includes('--strict');
-const EXPECTED_VERSION = '2026-09-03';
+const EXPECTED_VERSION = '2026-09-08';
 
 async function main() {
   console.log(`Core Builds worker smoke — ${BASE}\n`);

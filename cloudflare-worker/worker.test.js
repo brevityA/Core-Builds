@@ -849,6 +849,39 @@ test('S8: custom-lane hostnames are not published in /api/stats (label = custom)
   assert.ok(!Object.keys(stats).some(k => k.includes('my-private-box')), 'private hostname must not become a KV key');
 });
 
+// Keys written before the 2026-09-03 custom-lane collapse (S8) still live in the
+// STATS namespace as proxy:<hostname> / proxy_err:<hostname> — real users'
+// private instances and SSRF canary keys (169.254.169.254.nip.io, router.local,
+// …). /api/stats must not publish them; only allowlisted hostnames and the
+// custom/unknown buckets may appear in the public JSON.
+test('S8b: /api/stats filters legacy custom-lane and attacker-supplied host labels from by_host/by_host_errors', async () => {
+  const store = {
+    'visits': '1',
+    'proxy:aiostreams.elfhosted.com': '10',             // allowlisted host → published
+    'proxy:api.wuplay.app': '2',                        // allowlisted host → published
+    'proxy:custom': '3',                                // collapse bucket → published
+    'proxy:user-private-box.example.net': '4',          // legacy custom hostname → dropped
+    'proxy_err:user-private-box.example.net': '1',      // legacy custom hostname → dropped
+    'proxy:169.254.169.254.nip.io': '1',                // SSRF canary → dropped
+    'proxy_err:router.local': '4',                      // SSRF canary → dropped
+  };
+  const names = Object.keys(store);
+  const env = {
+    STATS: {
+      get: async (k) => store[k] ?? null,
+      list: async ({ prefix }) => ({ keys: names.filter(n => n.startsWith(prefix)).map(name => ({ name })), list_complete: true }),
+    },
+  };
+  const res = await worker.fetch(new Request('https://w.example/api/stats'), env, { waitUntil() {} });
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.deepEqual(body.by_host, { 'aiostreams.elfhosted.com': 10, 'api.wuplay.app': 2, 'custom': 3 });
+  assert.deepEqual(body.by_host_errors, {});
+  assert.ok(!('user-private-box.example.net' in body.by_host), 'legacy custom hostname leaked in by_host');
+  assert.ok(!('user-private-box.example.net' in body.by_host_errors), 'legacy custom hostname leaked in by_host_errors');
+  assert.ok(!Object.keys(body.by_host).some(h => h.includes('nip.io') || h.includes('router')), 'canary host labels leaked');
+});
+
 test('O6: log lines never contain the request URL, path, body, password or IP', async () => {
   const lines = [];
   const origLog = console.log; console.log = (l) => lines.push(String(l));

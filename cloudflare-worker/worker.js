@@ -16,7 +16,7 @@
 // lane, probe cache, CORS narrowing), 2026-09-03 (INFRA-AUDIT.md: redirect refusal,
 // layered rate limiting, DO paste store, circuit breaker, observability fixes).
 
-const WORKER_VERSION = '2026-09-03';
+const WORKER_VERSION = '2026-09-08';
 
 // ── Hardening constants ─────────────────────────────────────────────────────
 const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
@@ -380,6 +380,28 @@ function hostLabel(hostUrl, isCustom = false) {
   try { return new URL(hostUrl).hostname; } catch { return 'unknown'; }
 }
 
+// Hostname labels that /api/stats may publish under by_host / by_host_errors.
+// Allowlisted hosts are public and named; everything else in the published view
+// collapses to 'custom' (or 'unknown'). Keys written BEFORE the 2026-09-03
+// collapse still sit in the STATS namespace as proxy:<hostname> /
+// proxy_err:<hostname> — real users' private self-hosted instances and SSRF
+// canary keys (e.g. *.nip.io probes) — so they are filtered at read time,
+// never published. The KV counters themselves are kept (history for the
+// operator's own dashboards); only the public JSON is narrowed. See
+// EXPOSURE-CHECK-2026-09-07.md finding 1.
+const PUBLISHABLE_HOST_LABELS = new Set(
+  [...ALLOWED_HOSTS]
+    .map((h) => { try { return new URL(h).hostname; } catch { return null; } })
+    .filter(Boolean),
+);
+function publishableHostBuckets(raw) {
+  const out = {};
+  for (const [label, count] of Object.entries(raw || {})) {
+    if (label === 'custom' || label === 'unknown' || PUBLISHABLE_HOST_LABELS.has(label)) out[label] = count;
+  }
+  return out;
+}
+
 // Telemetry dimension values become KV keys and are published by /api/stats:
 // accept a small, lowercase, bounded alphabet only (INFRA-AUDIT S6).
 const DIMENSION_RE = /^[a-z0-9][a-z0-9_-]{0,31}$/;
@@ -670,7 +692,10 @@ export default {
         if (day >= cutoff) daily[k] = v;
       }
 
-      const payload = { ...totals, by_host: byHost, by_host_errors: byHostErrors, by_service: byService, by_device: byDevice, by_resolution: byResolution, by_rate_limit: byRateLimit, daily, version: WORKER_VERSION };
+      // by_host / by_host_errors carry legacy custom-lane hostnames written before
+      // the 2026-09-03 collapse (S8) plus attacker canary keys; never publish
+      // those — allowlisted hostnames and the custom/unknown buckets only.
+      const payload = { ...totals, by_host: publishableHostBuckets(byHost), by_host_errors: publishableHostBuckets(byHostErrors), by_service: byService, by_device: byDevice, by_resolution: byResolution, by_rate_limit: byRateLimit, daily, version: WORKER_VERSION };
       const resp = new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, 'Cache-Control': `public, max-age=${STATS_CACHE_TTL}` } });
       statusProbeCachePut(ctx, statsKey, resp, STATS_CACHE_TTL);
       return resp;
