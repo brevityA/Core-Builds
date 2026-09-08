@@ -19,6 +19,10 @@ on:
   schedule:
     - cron: '36 1 * * 0'
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})

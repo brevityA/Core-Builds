@@ -5,6 +5,10 @@ on:
     - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
   workflow_dispatch:
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   sync-upstream:
     runs-on: ubuntu-latest
