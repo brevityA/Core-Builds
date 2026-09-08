@@ -4941,12 +4941,12 @@ function upgradeToTemplate(tpl, opts = {}) {
 function remoteUpdateBannerHtml() {
   if (!_pendingUpdate) return '';
   const p = _pendingUpdate;
-  const ch = p.changelog && p.changelog.length ? `<ul style="margin:6px 0 0;padding-left:16px">${p.changelog.map(e=>`<li style="font-size:.7rem;color:#8b949e;margin:2px 0"><b style="color:#00d4ff">v${e.version}</b>${e.body.length?` — ${e.body.slice(0,3).join(' · ')}`:''}</li>`).join('')}</ul>` : '';
+  const ch = p.changelog && p.changelog.length ? `<ul style="margin:6px 0 0;padding-left:16px">${p.changelog.map(e=>`<li style="font-size:.7rem;color:#8b949e;margin:2px 0"><b style="color:#00d4ff">v${escH(e.version)}</b>${e.body.length?` — ${escH(e.body.slice(0,3).join(' · '))}`:''}</li>`).join('')}</ul>` : '';
   return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:1.1rem">🔄</span>
       <div style="flex:1">
-        <div style="font-size:.78rem;font-weight:700;color:#00d4ff">Update available: v${p.from} → v${p.to}</div>
+        <div style="font-size:.78rem;font-weight:700;color:#00d4ff">Update available: v${escH(p.from)} → v${escH(p.to)}</div>
         <div style="font-size:.7rem;color:#8b949e">${p.name ? escH(p.name) + ' ' : ''}has a newer version${ch ? '' : ' — update or rebuild to get it.'}</div>
         ${ch}
       </div>
