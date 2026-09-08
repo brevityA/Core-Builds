@@ -36,3 +36,16 @@ The generated badge image URLs intentionally point to the `main` branch so publi
 ## Upstream contract check
 
 On 2026-08-22, the complete 111-badge Enhanced formatter was parsed and rendered against the current `Viren070/AIOStreams` formatter engine. Both fields produced zero parser diagnostics, all representative structured fields emitted their expected markers, and the generated fields remained below the 4,900-character safety budget.
+
+## Vendored code
+
+- `jszip-3.10.1.min.js` — [JSZip](https://stuartk.com/jszip) v3.10.1,
+  dual-licensed `MIT OR GPL-3.0-or-later` (copyright header retained in-file),
+  used for ZIP export of badge packs. Copied verbatim from the official npm
+  tarball (`jszip-3.10.1.tgz`, file `package/dist/jszip.min.js`) on 2026-09-08
+  so this page has no CDN dependency and no third-party network load.
+
+  - sha384: `+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG`
+  - To upgrade: replace the file from the matching npm release, then update
+    this hash and the version in the filename. `index.html` references it via
+    `<script src="./jszip-3.10.1.min.js">`.

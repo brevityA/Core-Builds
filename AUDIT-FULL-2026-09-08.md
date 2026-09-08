@@ -125,18 +125,58 @@ Sampled all 18 HTML pages: **most have no CSP meta and no referrer policy**
 (badges, speedtest, preflight, genies, banner-studio, inspector …). They are
 static single-file apps on GitHub Pages holding no credentials (keys stay in
 the user's session/memory or go straight to the worker proxy), so exposure is
-low — but they have no clickjacking/XSS-blast-radius defense and `tools/
-badges/index.html` loads JSZip from cdnjs **without SRI**.
+low — but they had no clickjacking/XSS-blast-radius defense and `tools/
+badges/index.html` loaded JSZip from cdnjs **without SRI**.
 
-⚠️ Owner recommendations (not auto-applied — each page's CSP needs its real
-fetch list, and an SRI hash must match cdnjs exactly):
-1. Add per-page CSP metas (`frame-ancestors 'none'`, `object-src 'none'` at
-   minimum) + `no-referrer` — start with pages that navigate to manifest URLs
-   (genies, preflight) or post data (badges).
-2. Add `integrity="sha384-…"` + `crossorigin="anonymous"` to the cdnjs JSZip
-   include in `tools/badges/index.html` (compute against the exact 3.10.1
-   artifact). Sandbox egress to cdnjs was blocked, so the hash was not
-   fabricated here.
+### Follow-up hardening (executed same day, see commit log)
+
+1. **CSP + `no-referrer` added to all 13 content-bearing standalone pages**
+   (all of `tools/*` and both `Assets/*` HTML files; root `index.html` is a
+   bare meta-refresh stub with zero content and was left as-is). Common policy:
+   `default-src 'self'`; `script-src 'self' 'unsafe-inline'`; `style-src 'self'
+   'unsafe-inline'`; `img-src 'self' data: https:`; `base-uri 'self'`;
+   `form-action 'self'`; `frame-src 'none'`; `object-src 'none'`. Per-page
+   deltas derived from each page's actual code:
+   - `connect-src https://api.tvmaze.com` — banner-studio (only real fetch).
+   - `connect-src https:` — pages that by design fetch user-supplied or
+     user-editable URLs (badges import-URL / custom image URLs, inspector
+     URL input, preflight + wuplay-catalogs/catalogs editable CORS-worker
+     field, nuvio-stacks live manifest verification of add-on hosts,
+     speedtest dynamic `*.tb-cdn.*` endpoint list). Still blocks `http://`,
+     `ws://`, and every non-https exfil channel.
+   - `connect-src 'self'` — pure hub pages (tools, genies, wuplay-genie).
+   - `worker-src 'self' blob:` — speedtest (its measurement engine is a
+     Blob worker); `worker-src 'self'` — wuplay-genie (`./sw.js` service
+     worker); `'none'` everywhere else.
+   - `font-src 'self' data:` — banner-studio copies (embedded data: TTF);
+     `media-src 'self' data:` — `Assets/Audio/core-wallpaper.html` (embedded
+     data: audio). No page uses eval/new Function, iframes, or plugins, so
+     those are all locked down.
+2. **cdnjs dependency removed instead of SRI'd**: sandbox egress to cdnjs
+   stayed blocked, so an SRI hash could not be computed against the CDN copy
+   without fabricating one. Instead JSZip 3.10.1 was pulled from the official
+   npm tarball (registry reachable) and vendored at
+   `tools/badges/jszip-3.10.1.min.js` (license header retained; sha384 recorded
+   in `tools/badges/README.md`). The page now makes **zero third-party
+   network loads**, which is strictly stronger than CDN + SRI.
+3. Verified: 296/296 repo tests, 15/15 badge core tests, all pages serve 200
+   with exactly one CSP + one `no-referrer` meta, secret-scan patterns clean.
+
+### Residual notes (not fixable via `<meta>` on GitHub Pages)
+
+- `frame-ancestors` and `sandbox` are ignored in `<meta>`-delivered CSP, and
+  GitHub Pages cannot set `X-Frame-Options`/CSP headers — pages remain
+  embeddable in third-party frames (UI-redress only; no credentials or
+  persistent secrets on any page). A reverse proxy in front of Pages could add
+  real headers if clickjack protection is ever required.
+- `script-src` keeps `'unsafe-inline'` (all apps are single-file inline), so a
+  future content-injection XSS could still run inline code; the meta CSP
+  mainly blocks remote-script injection, plugin/frame/worker injection, base
+  hijacking, and non-https exfil. Converting to hashes would require a build
+  step per page.
+- `Assets/banner-studio (3).html` is an unlinked, near-duplicate of
+  `tools/banner-studio/index.html` (hardened in place for defense); owner may
+  want to delete it from the published site.
 
 ## 8. Dependencies — ✅ clean
 
@@ -167,8 +207,12 @@ fetch list, and an SRI hash must match cdnjs exactly):
    dashboard (older build sharing the production STATS KV).
 4. **Enable GitHub push protection** for secret scanning; consider the
    gitleaks action and SHA-pinning of actions (section 5).
-5. **Tool pages**: add CSP + `no-referrer` per page and SRI to the cdnjs
-   include (section 7).
-6. Optional: purge legacy `proxy:*`/`proxy_err:*` KV canary keys (script on
-   request); badge-builder `/upload` → `/paste` one-liner
+5. ~~Tool pages CSP/referrer + cdnjs SRI~~ → **done in the follow-up pass**
+   (section 7): per-page CSP + `no-referrer` on all 13 pages; the cdnjs JSZip
+   include was *removed* (vendored, `tools/badges/jszip-3.10.1.min.js`) rather
+   than SRI'd, since the CDN copy was unreachable for hashing. No owner action
+   needed unless you prefer CDN+SRI over vendoring.
+6. Optional: delete the unlinked duplicate `Assets/banner-studio (3).html`
+   from the published site; purge legacy `proxy:*`/`proxy_err:*` KV canary
+   keys (script on request); badge-builder `/upload` → `/paste` one-liner
    (`tools/badges/index.html:1029`).
