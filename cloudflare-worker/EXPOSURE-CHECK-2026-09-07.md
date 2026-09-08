@@ -199,6 +199,7 @@ matrices and the "no unscoped host" invariant.
 | 5 | Purge legacy `proxy:*` / `proxy_err:*` KV keys for non-allowlisted hosts + canary junk | owner (script provided on request) | S — optional now (public JSON is filtered regardless) |
 | 6 | Delete `configurator/worker/` (stale counter worker sources) | repo | ✅ done 2026-09-08 |
 | 7 | Point badge builder at `/paste` instead of `/upload` (`tools/badges/index.html:1029`) | repo | S — still open |
+| 8 | Repo tripwire: `.github/workflows/secret-scan.yml` blocks any committed Discord webhook in plaintext **or** base64/base64url; `.gitignore` guards `.dev.vars`/`.env*` | repo | ✅ done 2026-09-08 |
 
 Verified non-issues (no action): rate limits enforced (bindings live), upstream
 redirects refused, `Authorization` forwarded only to `api.wuplay.app`, CORS
