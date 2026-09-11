@@ -1,0 +1,76 @@
+name: Sync Worker ADMIN_TOKEN
+
+# Pushes GitHub secret STATS_ADMIN_TOKEN onto the Worker as ADMIN_TOKEN.
+# The token is never logged. Does not deploy worker code.
+#
+# Owner setup (once): repo Settings → Secrets → Actions → STATS_ADMIN_TOKEN
+#   openssl rand -hex 24
+# Then run this workflow (or wait for the next Deploy CORS Proxy Worker).
+#
+# See cloudflare-worker/OPERATOR.md
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target wrangler env (production = top-level, staging = [env.staging])'
+        type: choice
+        options: [production, staging]
+        default: production
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-admin-token-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Check secrets
+        id: check
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
+        run: |
+          missing=
+          [ -n "$CLOUDFLARE_API_TOKEN" ] || missing="${missing} CLOUDFLARE_API_TOKEN"
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || missing="${missing} CLOUDFLARE_ACCOUNT_ID"
+          [ -n "$STATS_ADMIN_TOKEN" ] || missing="${missing} STATS_ADMIN_TOKEN"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing GitHub Action secrets:$missing"
+            echo "Create STATS_ADMIN_TOKEN with: openssl rand -hex 24"
+            echo "Repo → Settings → Secrets and variables → Actions"
+            echo "See cloudflare-worker/OPERATOR.md"
+            exit 1
+          fi
+          if [ "${#STATS_ADMIN_TOKEN}" -lt 16 ]; then
+            echo "::error::STATS_ADMIN_TOKEN is shorter than 16 characters. The Worker disables the operator view for short tokens."
+            exit 1
+          fi
+
+      - name: wrangler secret put ADMIN_TOKEN
+        working-directory: cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
+        run: |
+          ENV_FLAG=""
+          if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
+            ENV_FLAG="--env staging"
+          fi
+          printf '%s' "$STATS_ADMIN_TOKEN" | npx --yes wrangler@4 secret put ADMIN_TOKEN $ENV_FLAG
+          echo "ADMIN_TOKEN updated on the Worker. It is not printed here."
+          echo "Verify: STATS_ADMIN_TOKEN=*** node cloudflare-worker/smoke.mjs --strict"
+          echo "or ./cloudflare-worker/operator-stats.sh"
