@@ -39,6 +39,20 @@ returns) with a 30-day TTL, with the legacy KV namespace as a read fallback for
 ids created before 2026-09-03. Nothing is logged or inspected. Max upload size is
 512 KB; badge packs are capped at 500 filters.
 
+## Operator API (stats admin token)
+
+Full `/api/stats` and `/healthz` internals are **not** a Cloudflare API. They
+are routes on this Worker gated by the `ADMIN_TOKEN` wrangler secret.
+
+See **[OPERATOR.md](./OPERATOR.md)** for:
+- generating the token (`openssl rand -hex 24`)
+- storing it as GitHub secret `STATS_ADMIN_TOKEN` and Worker secret `ADMIN_TOKEN`
+- `curl` / `./operator-stats.sh` against `/healthz` and `/api/stats`
+
+CI copies `STATS_ADMIN_TOKEN` onto the Worker on every deploy (and via the
+**Sync Worker ADMIN_TOKEN** workflow). `CLOUDFLARE_API_TOKEN` cannot unlock
+those routes.
+
 ## Deploy
 
 Requires a free Cloudflare account and [wrangler](https://developers.cloudflare.com/workers/wrangler/):
@@ -96,6 +110,9 @@ Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 
 - `CLOUDFLARE_API_TOKEN` — a token with Workers Scripts:Edit permission
 - `CLOUDFLARE_ACCOUNT_ID` — found on the Cloudflare dashboard's right sidebar
+- `STATS_ADMIN_TOKEN` — same value as Worker `ADMIN_TOKEN` (≥16 chars). Optional
+  for deploy; required for operator smoke checks and for CI to `wrangler secret put`
+  it. See [OPERATOR.md](./OPERATOR.md).
 
 ## Routes & limits (2026-09-08)
 
@@ -183,7 +200,7 @@ uptime monitor that evaluates JSON is enough; Cloudflare Notifications can
 additionally alert on Worker error rate and CPU limits).
 
 | Alert | Threshold | Likely cause | Runbook |
-|---|---|---|---|
+|---|---|---|
 | **Worker down** | `/healthz` non-200 for 2 checks | bad deploy, missing paste-store binding | `wrangler rollback`; check operator healthz `bindings` (`curl -H "Authorization: Bearer $ADMIN_TOKEN"`) |
 | **Version mismatch** | `/healthz.version` ≠ `git HEAD` `WORKER_VERSION` >10 min after a deploy | deploy failed silently | re-run the workflow; check Actions log |
 | **Upstream error ratio** | Δ`proxy_errors` / Δ`proxy_calls` > 30% over 10 min | a public host is down/slow | look at Δ`by_host_errors` (operator `/api/stats`); if one host ≫ others, it's the host — nothing to do in the worker (breaker limits blast radius). If `proxy_err_timeout` dominates across all hosts, suspect Cloudflare egress → status.cloudflare.com |
