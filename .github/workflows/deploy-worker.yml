@@ -4,6 +4,7 @@ name: Deploy CORS Proxy Worker
 #   test  → unit tests + wrangler dry-run bundle (catches config/binding errors
 #           before anything touches Cloudflare)
 #   deploy → wrangler deploy (production) or --env staging (manual dispatch)
+#           + sync GitHub STATS_ADMIN_TOKEN → Worker ADMIN_TOKEN when set
 #   smoke  → smoke.mjs --strict against the freshly deployed URL; a failure fails
 #           the run and prints the rollback command. Rollback itself is a human
 #           decision (see cloudflare-worker/README.md → Runbook → Rollback).
@@ -13,6 +14,8 @@ on:
     branches: [main]
     paths:
       - 'cloudflare-worker/**'
+      - '.github/workflows/deploy-worker.yml'
+      - '.github/workflows/sync-admin-token.yml'
   workflow_dispatch:
     inputs:
       environment:
@@ -57,12 +60,23 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "cloudflare_ready=false" >> "$GITHUB_OUTPUT"
             echo "::warning::Cloudflare deployment skipped because CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not configured."
           else
             echo "cloudflare_ready=true" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -z "$STATS_ADMIN_TOKEN" ]; then
+            echo "admin_token_ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::STATS_ADMIN_TOKEN is not set. Operator /healthz and /api/stats stay public-only. Create the secret (openssl rand -hex 24) then run workflow Sync Worker ADMIN_TOKEN. See cloudflare-worker/OPERATOR.md"
+          elif [ "${#STATS_ADMIN_TOKEN}" -lt 16 ]; then
+            echo "admin_token_ready=false" >> "$GITHUB_OUTPUT"
+            echo "::error::STATS_ADMIN_TOKEN is shorter than 16 characters. The Worker disables the operator view for short tokens."
+            exit 1
+          else
+            echo "admin_token_ready=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Deploy to Cloudflare Workers
@@ -75,6 +89,21 @@ jobs:
           # Tag the version with the commit so `wrangler versions list` / rollback
           # can be matched to git history.
           command: deploy --message "${{ github.sha }}" ${{ github.event.inputs.environment == 'staging' && '--env staging' || '' }}
+
+      - name: Sync ADMIN_TOKEN from GitHub secret
+        if: steps.cloudflare-secrets.outputs.cloudflare_ready == 'true' && steps.cloudflare-secrets.outputs.admin_token_ready == 'true'
+        working-directory: cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
+        run: |
+          ENV_FLAG=""
+          if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
+            ENV_FLAG="--env staging"
+          fi
+          printf '%s' "$STATS_ADMIN_TOKEN" | npx --yes wrangler@4 secret put ADMIN_TOKEN $ENV_FLAG
+          echo "Worker ADMIN_TOKEN synced from STATS_ADMIN_TOKEN (value not logged)."
 
       - name: Resolve deployed URL
         id: url
@@ -110,9 +139,10 @@ jobs:
       - name: Post-deploy smoke (strict)
         id: smoke
         env:
-          # Optional: the worker's ADMIN_TOKEN secret. When set, smoke also
+          # Same value as the Worker's ADMIN_TOKEN secret. When set, smoke also
           # verifies the operator view (full counters, bindings, breakers);
           # when unset those checks are skipped with a warning.
+          # See cloudflare-worker/OPERATOR.md
           STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
         run: node cloudflare-worker/smoke.mjs --base="${{ needs.deploy.outputs.base_url }}" --strict
       - name: Rollback guidance
