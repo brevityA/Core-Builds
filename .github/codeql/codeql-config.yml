@@ -14,3 +14,8 @@ paths-ignore:
   # loopback, link-local, CGNAT) + redirect:'error' on every fetch.
   # CodeQL cannot model custom sanitizer functions, so we exclude the file.
   - scripts/aios-regen/contract.mjs
+  # Vendored third-party minified library (JSZip 3.10.1). CodeQL flags a ReDoS
+  # in its zip-parsing path, but the badges tool uses JSZip write-only
+  # (zip.file() + generateAsync(); never loadAsync()), so that path is
+  # unreachable. Bundled minified vendor code is not ours to patch.
+  - tools/badges/jszip-*.min.js
