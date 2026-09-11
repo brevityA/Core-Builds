@@ -18,7 +18,7 @@
 // lane, probe cache, CORS narrowing), 2026-09-03 (INFRA-AUDIT.md: redirect refusal,
 // layered rate limiting, DO paste store, circuit breaker, observability fixes).
 
-const WORKER_VERSION = '2026-09-08';
+const WORKER_VERSION = '2026-09-11';
 
 // ── Hardening constants ─────────────────────────────────────────────────────
 const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
@@ -482,6 +482,26 @@ function cleanDimension(v) {
 const STATS_DAILY_WINDOW_DAYS = 120;
 const STATS_CACHE_TTL = 60;
 
+// Public /api/stats Cache API key. Incoming `?bust=` is ignored (the key is
+// constructed, not taken from the request URL) so clients cannot force a
+// rebuild. The version query is INTERNAL to the cache key — it is never on
+// the public URL. Deploy #46 failed 23/24 because the 2026-09-08 hardening
+// still read caches.default at `/api/stats`, which held the pre-hardening
+// 27-key dump for the remaining 60 s TTL. Versioning the key makes a payload
+// shape change a cache miss instead of a leak.
+function publicStatsCacheKey(origin) {
+  return new URL(`/api/stats?v=${WORKER_VERSION}`, origin);
+}
+
+function isPublicStatsBody(text) {
+  try {
+    const d = JSON.parse(text);
+    const keys = Object.keys(d);
+    return keys.length === 2 && 'visits' in d && 'generates' in d
+      && Number.isFinite(Number(d.visits)) && Number.isFinite(Number(d.generates));
+  } catch { return false; }
+}
+
 // ── Structured, secret-free logging (INFRA-AUDIT O6) ────────────────────────
 // The ONLY console sink in this worker. Fields are a fixed, reviewed set: event
 // name, error class, hostname label, HTTP status. Never a URL, path, body, IP,
@@ -729,14 +749,15 @@ export default {
         // The public surface is exactly what the configurator splash renders:
         // { visits, generates }. No totals beyond those, no breakdowns, no
         // per-host data, no daily series, no error counters — operator data
-        // lives behind ADMIN_TOKEN only. Served from the colo Cache API (60 s,
-        // keyed on the path only so ?cache-busting cannot force a rebuild).
+        // lives behind ADMIN_TOKEN only. Served from the colo Cache API (60 s).
+        // Cache key is versioned (see publicStatsCacheKey); a hit whose body
+        // is not the public shape is treated as a miss and rebuilt.
         if (!env.STATS) return respond(200, { visits: 0, generates: 0 });
-        const statsKey = new URL('/api/stats', url.origin);
+        const statsKey = publicStatsCacheKey(url.origin);
         const cached = await statusProbeCacheGet(statsKey);
         if (cached) {
           const body = await cached.text().catch(() => null);
-          if (body !== null) {
+          if (body !== null && isPublicStatsBody(body)) {
             return new Response(body, { status: 200, headers: { 'Content-Type': 'application/json', ...SECURE_DOC_HEADERS, ...cors, 'Cache-Control': `public, max-age=${STATS_CACHE_TTL}` } });
           }
         }
@@ -748,7 +769,7 @@ export default {
       }
       // Operator view (Authorization: Bearer ADMIN_TOKEN). Full counters and
       // breakdowns. NEVER cached (no-store, no Cache API) — the public cache
-      // key is the path, and a cached full dump must never leak to a plain
+      // key is versioned, and a cached full dump must never leak to a plain
       // public request.
       if (!env.STATS) return respond(200, {});
       // Every counter the worker writes must appear here or it is write-only.

@@ -41,10 +41,10 @@ async function get(url) {
 
 const enc = (s) => encodeURIComponent(s);
 
-// --strict: fail (not warn) when the deployed worker predates 2026-09-08
+// --strict: fail (not warn) when the deployed worker predates 2026-09-11
 // (used by the deploy workflow's post-deploy gate).
 const STRICT = args.includes('--strict');
-const EXPECTED_VERSION = '2026-09-08';
+const EXPECTED_VERSION = '2026-09-11';
 
 async function main() {
   console.log(`Core Builds worker smoke — ${BASE}\n`);
@@ -76,7 +76,18 @@ async function main() {
     if (r.status === 200) {
       let d;
       try { d = JSON.parse(r.text); } catch { d = null; }
-      const pubKeys = d ? Object.keys(d).sort().join(',') : '';
+      let pubKeys = d ? Object.keys(d).sort().join(',') : '';
+      // Deploy #46 failed here: colo Cache API still held the pre-hardening
+      // 27-key dump for up to 60s. The worker now versions that cache key;
+      // retry briefly so a leftover edge entry cannot fail --strict.
+      if (STRICT && pubKeys && pubKeys !== 'generates,visits') {
+        for (let i = 0; i < 6 && pubKeys !== 'generates,visits'; i++) {
+          await new Promise((ok) => setTimeout(ok, 2000));
+          const retry = await get(`${BASE}/api/stats`);
+          try { d = JSON.parse(retry.text); } catch { d = null; }
+          pubKeys = d ? Object.keys(d).sort().join(',') : '';
+        }
+      }
       check('public stats exposes only visits + generates', !STRICT || (d && pubKeys === 'generates,visits'), `keys=${pubKeys || '(no STATS binding?)'}`);
       check('visits counter is numeric', !!d && Number.isFinite(Number(d.visits)), `visits=${d?.visits}`);
     }

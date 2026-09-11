@@ -1139,7 +1139,7 @@ test('O5: /healthz public shows only ok+version; operator view shows bindings; n
   assert.ok(!('bindings' in notReadyBody), '503 body stays minimal on the public surface');
 });
 
-test('R5: public /api/stats is cached on the path key; the operator view is never cached', async () => {
+test('R5: public /api/stats is cached on a versioned path key; the operator view is never cached', async () => {
   let kvLists = 0; let kvGets = 0; let putKey = null;
   const env = withAdmin({ STATS: { get: async () => { kvGets++; return '1'; }, list: async () => { kvLists++; return { keys: [], list_complete: true }; } } });
   let stored = null;
@@ -1147,7 +1147,7 @@ test('R5: public /api/stats is cached on the path key; the operator view is neve
   try {
     await worker.fetch(new Request('https://w.example/api/stats?bust=1'), env, ctxSync);
     await settle();
-    assert.equal(putKey, 'https://w.example/api/stats', 'public stats cached on the path key only');
+    assert.equal(putKey, `https://w.example/api/stats?v=${WORKER_VERSION}`, 'public stats cached on a versioned path key; query busting is ignored');
     assert.equal(kvLists, 0, 'the public build never enumerates KV prefixes');
     kvGets = 0;
     await worker.fetch(new Request('https://w.example/api/stats?bust=2'), env, ctxSync);
@@ -1159,6 +1159,52 @@ test('R5: public /api/stats is cached on the path key; the operator view is neve
     assert.equal(adminRes.headers.get('cache-control'), 'no-store');
     assert.equal(putKey, null, 'operator stats must never be written to the shared public cache');
     assert.equal(kvLists, 7, 'operator build enumerates all seven breakdown prefixes');
+  } finally { delete globalThis.caches; }
+});
+
+test('R5b: a stale unversioned /api/stats cache hit (pre-hardening dump) is ignored', async () => {
+  // Deploy #46: caches.default still held the 27-key public dump at /api/stats
+  // after the 2026-09-08 hardening shipped. Serving it leaked by_host and
+  // failed smoke --strict. The versioned key must miss, and the unversioned
+  // entry must not be returned.
+  const store = { visits: '7', generates: '3', proxy_calls: '9000' };
+  const env = { STATS: { get: async (k) => store[k] ?? null, list: async () => ({ keys: [], list_complete: true }) } };
+  const stale = new Response(JSON.stringify({
+    visits: 1, generates: 2, by_host: { 'aio.deuspi.xyz': 9 }, version: '2026-09-03',
+  }), { headers: { 'Content-Type': 'application/json' } });
+  let putKey = null;
+  globalThis.caches = {
+    default: {
+      match: async (req) => {
+        const u = new URL(req.url);
+        if (u.pathname === '/api/stats' && u.search === '') return stale.clone();
+        return undefined;
+      },
+      put: async (req) => { putKey = req.url; },
+    },
+  };
+  try {
+    const res = await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync);
+    assert.deepEqual(await res.json(), { visits: 7, generates: 3 }, 'stale full dump must not be served');
+    assert.equal(putKey, `https://w.example/api/stats?v=${WORKER_VERSION}`);
+  } finally { delete globalThis.caches; }
+});
+
+test('R5c: a wrong-shape body at the versioned stats cache key is rebuilt', async () => {
+  const store = { visits: '7', generates: '3' };
+  const env = { STATS: { get: async (k) => store[k] ?? null, list: async () => ({ keys: [], list_complete: true }) } };
+  const poisoned = new Response(JSON.stringify({ visits: 1, generates: 2, by_host: { custom: 1 } }), { headers: { 'Content-Type': 'application/json' } });
+  let rebuilt = false;
+  globalThis.caches = {
+    default: {
+      match: async (req) => (req.url.includes(`v=${WORKER_VERSION}`) ? poisoned.clone() : undefined),
+      put: async () => { rebuilt = true; },
+    },
+  };
+  try {
+    const res = await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync);
+    assert.deepEqual(await res.json(), { visits: 7, generates: 3 }, 'poisoned cache entry must not leak extra keys');
+    assert.equal(rebuilt, true, 'wrong-shape hit is treated as a miss and rewritten');
   } finally { delete globalThis.caches; }
 });
 
