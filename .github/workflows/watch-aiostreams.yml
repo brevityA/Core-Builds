@@ -37,7 +37,7 @@ jobs:
         run: node scripts/aios-regen/cli.mjs generate --host https://aiostreams.elfhosted.com --out /tmp/regen-core-nexus.json
       - name: Upload regenerated template
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: regen-core-nexus
           path: /tmp/regen-core-nexus.json
