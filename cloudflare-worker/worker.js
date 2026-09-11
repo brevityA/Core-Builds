@@ -16,9 +16,11 @@
 //
 // Hardening history: 2026-07-27 (caps/timeouts/KV rate limit), 2026-08-21 (custom
 // lane, probe cache, CORS narrowing), 2026-09-03 (INFRA-AUDIT.md: redirect refusal,
-// layered rate limiting, DO paste store, circuit breaker, observability fixes).
+// layered rate limiting, DO paste store, circuit breaker, observability fixes),
+// 2026-09-08 (minimal public disclosure, ADMIN_TOKEN operator gate, lane-scoped
+// allowlist), 2026-09-11 (version-scoped public stats cache key).
 
-const WORKER_VERSION = '2026-09-08';
+const WORKER_VERSION = '2026-09-11';
 
 // ── Hardening constants ─────────────────────────────────────────────────────
 const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
@@ -729,10 +731,15 @@ export default {
         // The public surface is exactly what the configurator splash renders:
         // { visits, generates }. No totals beyond those, no breakdowns, no
         // per-host data, no daily series, no error counters — operator data
-        // lives behind ADMIN_TOKEN only. Served from the colo Cache API (60 s,
-        // keyed on the path only so ?cache-busting cannot force a rebuild).
+        // lives behind ADMIN_TOKEN only. Served from the colo Cache API (60 s).
+        // The key is built here, never from the request, so a client cannot
+        // ?cache-bust its way to a rebuild. It carries WORKER_VERSION because
+        // the payload SHAPE is version-specific: without it, a deploy that
+        // narrows the public surface keeps serving the previous version's
+        // cached body for up to STATS_CACHE_TTL, which is a disclosure window
+        // (and fails the post-deploy smoke gate). A new version = a new key.
         if (!env.STATS) return respond(200, { visits: 0, generates: 0 });
-        const statsKey = new URL('/api/stats', url.origin);
+        const statsKey = new URL(`/api/stats?v=${WORKER_VERSION}`, url.origin);
         const cached = await statusProbeCacheGet(statsKey);
         if (cached) {
           const body = await cached.text().catch(() => null);

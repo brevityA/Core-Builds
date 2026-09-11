@@ -1139,7 +1139,7 @@ test('O5: /healthz public shows only ok+version; operator view shows bindings; n
   assert.ok(!('bindings' in notReadyBody), '503 body stays minimal on the public surface');
 });
 
-test('R5: public /api/stats is cached on the path key; the operator view is never cached', async () => {
+test('R5: public /api/stats is cached on a version-scoped key; the operator view is never cached', async () => {
   let kvLists = 0; let kvGets = 0; let putKey = null;
   const env = withAdmin({ STATS: { get: async () => { kvGets++; return '1'; }, list: async () => { kvLists++; return { keys: [], list_complete: true }; } } });
   let stored = null;
@@ -1147,7 +1147,12 @@ test('R5: public /api/stats is cached on the path key; the operator view is neve
   try {
     await worker.fetch(new Request('https://w.example/api/stats?bust=1'), env, ctxSync);
     await settle();
-    assert.equal(putKey, 'https://w.example/api/stats', 'public stats cached on the path key only');
+    // The key is built by the worker, never from the request: the caller's
+    // ?bust=1 is absent, so cache-busting cannot force a rebuild. It carries
+    // WORKER_VERSION so a deploy that changes the public payload shape cannot
+    // keep serving the previous version's cached body (disclosure window).
+    assert.equal(putKey, `https://w.example/api/stats?v=${worker.WORKER_VERSION}`, 'public stats cached on a worker-built, version-scoped key');
+    assert.ok(!putKey.includes('bust'), 'client query string never reaches the cache key');
     assert.equal(kvLists, 0, 'the public build never enumerates KV prefixes');
     kvGets = 0;
     await worker.fetch(new Request('https://w.example/api/stats?bust=2'), env, ctxSync);
@@ -1159,6 +1164,28 @@ test('R5: public /api/stats is cached on the path key; the operator view is neve
     assert.equal(adminRes.headers.get('cache-control'), 'no-store');
     assert.equal(putKey, null, 'operator stats must never be written to the shared public cache');
     assert.equal(kvLists, 7, 'operator build enumerates all seven breakdown prefixes');
+  } finally { delete globalThis.caches; }
+});
+
+test('2026-09-11: a public stats entry cached under a previous WORKER_VERSION is never served', async () => {
+  // Regression. The key used to be path-only, so after a deploy that narrowed the
+  // public surface the PREVIOUS version's cached body kept being served for up to
+  // STATS_CACHE_TTL — a disclosure window (by_host carried private self-hosted
+  // hostnames) and the cause of a false post-deploy smoke failure.
+  const stale = JSON.stringify({ visits: 1, generates: 1, by_host: { 'private.example': 9 }, version: '2026-09-08' });
+  const cache = new Map([['https://w.example/api/stats?v=2026-09-08', stale]]);
+  let kvGets = 0;
+  const env = withAdmin({ STATS: { get: async () => { kvGets++; return '5'; }, list: async () => ({ keys: [], list_complete: true }) } });
+  globalThis.caches = { default: {
+    match: async (req) => (cache.has(req.url) ? new Response(cache.get(req.url)) : undefined),
+    put: async (req, res) => { cache.set(req.url, await res.clone().text()); },
+  } };
+  try {
+    const res = await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync);
+    const body = await res.json();
+    assert.deepEqual(Object.keys(body).sort(), ['generates', 'visits'], 'serves the current minimal shape, not the stale payload');
+    assert.ok(!('by_host' in body), 'a previous version’s by_host is never surfaced publicly');
+    assert.ok(kvGets > 0, 'a version miss rebuilds from KV instead of serving the old entry');
   } finally { delete globalThis.caches; }
 });
 
