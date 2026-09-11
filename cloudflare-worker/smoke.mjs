@@ -75,10 +75,12 @@ async function main() {
       try { d = JSON.parse(r.text); } catch { d = null; }
       const hasCounters = !!d && Object.keys(d).length > 2;
       check('stats has visits counter', !hasCounters || Number.isFinite(Number(d.visits)), hasCounters ? `visits=${d?.visits}` : 'no STATS binding (staging?)');
-      const required = ['proxy_cache_hits', 'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
-        'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'by_rate_limit'];
-      const missing = d ? required.filter((k) => !(k in d)) : required;
-      check('stats exposes every counter class', missing.length === 0 || !STRICT, missing.length ? `missing: ${missing.join(', ')} (deployed worker older than 2026-09-03?)` : 'all present');
+      if (hasCounters) {
+        const required = ['proxy_cache_hits', 'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
+          'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'by_rate_limit'];
+        const missing = d ? required.filter((k) => !(k in d)) : required;
+        check('stats exposes every counter class', missing.length === 0 || !STRICT, missing.length ? `missing: ${missing.join(', ')} (deployed worker older than 2026-09-03?)` : 'all present');
+      }
       if (d && Number(d.proxy_calls) > 100) {
         const ratio = Number(d.proxy_errors) / Number(d.proxy_calls);
         check('lifetime proxy error ratio < 35%', ratio < 0.35, `${(ratio * 100).toFixed(1)}%`);
