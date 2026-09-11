@@ -29,6 +29,20 @@ test('the configure-page link stays hidden for custom, which has no known public
   assert.match(source, /cfgLinkRow\.style\.display = showCfgLink \? '' : 'none'/);
 });
 
+test('the manual panel pushes to an entered UUID instead of only rebuilding the link', () => {
+  // Regression: `if (uuid && !isAuto)` returned early for ANY uuid on a concrete
+  // host, so a self-hosted user could enter their UUID, click Get Install Link,
+  // and receive a manifest URL for the config they already had — the template
+  // they had just built was never sent. Showing the UUID field without this is
+  // worse than hiding it: it looks like it worked. A uuid with no password still
+  // short-circuits, because there is nothing to push.
+  assert.match(source, /if \(uuid && !isAuto && !pwd\) \{/, 'the link-only short-circuit requires the absence of a password');
+  const manual = source.match(/const userPath = uuid \?[\s\S]{0,900}/)?.[0] || '';
+  assert.ok(manual, 'the manual install path selects its route from the uuid');
+  assert.match(manual, /method: uuid \? 'PATCH' : 'POST'/, 'a uuid updates in place; no uuid creates');
+  assert.match(manual, /\|\| uuid;/, 'a PATCH response need not echo the uuid, so it falls back to the one sent');
+});
+
 test('an entered UUID drives an update-in-place regardless of which host is selected', () => {
   // validateUuid is format-only, and the install path picks PATCH /api/v1/user/<id>
   // from the UUID alone — nothing there branches on the host being a public one.

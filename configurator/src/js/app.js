@@ -7935,8 +7935,12 @@ async function openInAIOStreams() {
     return;
   }
 
-  /* Known host + UUID — show manifest URL directly, no API call */
-  if (uuid && !isAuto) {
+  /* Known host + UUID, no password — nothing to send, so just rebuild the link.
+     With a password the config below is pushed to that UUID instead: before this,
+     ANY uuid on a non-auto host returned here, so a self-hosted user could enter
+     their UUID and get a manifest URL for the config they already had while the
+     template they just built was never sent. Auto mode has always updated. */
+  if (uuid && !isAuto && !pwd) {
     const manifestUrl = pwd ? `${base}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json` : `${base}/stremio/${uuid}/manifest.json`;
     showManifestModal(manifestUrl, pwd || null, hostLabel);
     return;
@@ -7957,10 +7961,15 @@ async function openInAIOStreams() {
       const cfg = buildFinal().config;
       const sz = payloadSizeGuard(cfg);
       if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
-      const res = await writeHostFetch(resolvedBase, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
+      // With a UUID this updates that config in place; without one it creates a
+      // new config. Same shape auto mode uses, and the proxy's custom lane
+      // accepts the /<id> form, so self-hosted hosts take this path too.
+      const userPath = uuid ? `/api/v1/user/${uuid}` : '/api/v1/user';
+      const res = await writeHostFetch(resolvedBase, userPath, { method: uuid ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
-        const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
+        // A PATCH answers without echoing the uuid, so fall back to the one we sent.
+        const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id || uuid;
         const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         resetBtn(origHtml);

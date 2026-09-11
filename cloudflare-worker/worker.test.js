@@ -426,12 +426,13 @@ test('custom lane: PATCH /api/v1/user/<id> updates an existing self-hosted confi
   // Without this the lane allowed only the exact /api/v1/user, so a self-hoster
   // could never update: every install POSTed a new config and orphaned the old
   // one. The allowlisted AIOStreams lane has always permitted the /<id> form.
-  let reached = false, seenUrl = null;
-  global.fetch = async (req) => { reached = true; seenUrl = req.url; return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  let reached = false, seenUrl = null, seenMethod = null;
+  global.fetch = async (req) => { reached = true; seenUrl = req.url; seenMethod = req.method; return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }); };
   const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user/abc-123_XYZ?host=${CUSTOM}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: '{"config":{}}' }), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, { waitUntil: () => {} });
   assert.equal(res.status, 200);
   assert.equal(reached, true);
   assert.match(seenUrl, /\/api\/v1\/user\/abc-123_XYZ$/, 'the id is forwarded verbatim');
+  assert.equal(seenMethod, 'PATCH', 'the caller method reaches upstream — an update, not a create');
 });
 
 test('custom lane: the /<id> form stays bounded (extra segment and bad charset refused)', async () => {
