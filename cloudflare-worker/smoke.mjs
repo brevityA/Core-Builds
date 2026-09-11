@@ -44,7 +44,7 @@ const enc = (s) => encodeURIComponent(s);
 // --strict: fail (not warn) when the deployed worker predates 2026-09-11
 // (used by the deploy workflow's post-deploy gate).
 const STRICT = args.includes('--strict');
-const EXPECTED_VERSION = '2026-09-11';
+const EXPECTED_VERSION = '2026-09-11b';
 
 async function main() {
   console.log(`Core Builds worker smoke — ${BASE}\n`);

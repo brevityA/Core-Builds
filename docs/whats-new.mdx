@@ -1,14 +1,36 @@
 ---
-title: "What's New — Configurator v3.7"
+title: "What's New — Configurator v3.8"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.7 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.8 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.7**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.8**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.8 (Sep 11 2026)
+
+<CardGroup cols={2}>
+  <Card title="Self-hosted instances can be updated in place instead of accumulating configs. The UUID field was hidden whenever the host was set to Custom / Self-hosted, so every Get Install Link posted a new configuration and orphaned the previous one" icon="sparkles">
+    the public hosts have always offered that field. It is now shown for any single host, self-hosted included, and the CORS proxy's custom lane accepts PATCH /api/v1/user/<id> using the same bounded id shape the allowlisted lane already used. Leave it blank to create a new config exactly as before. Known gap: an instance running with AIOSTREAMS_AUTH_REQUIRED still has nowhere to enter its access key, so those saves are refused by the host regardless of this change.
+  </Card>
+  <Card title="The exported JSON contains your API keys in plain text, and now says so at the moment you download it. Export has never stripped credentials" icon="bolt">
+    the sanitiser that clears them runs on share links and imports only — so the downloaded file carries whatever you entered, and these files get posted publicly when people ask for help. The notice names which fields are embedded, never their values, and points at Copy a safe feedback report instead; it stays silent when nothing is set. A test asserting that 'exports never carry credentials' was passing only because that case entered none, and now pins both directions.
+  </Card>
+  <Card title="A hand-typed manifest password is checked before it is sent. Anything shorter than 8 characters was accepted, posted, and bounced by the host as 'Invalid addon password', a message that never says what is wrong; the reason is now shown inline while it can still be fixed. This is a Core Builds floor rather than a value read from AIOStreams" icon="shield-check">
+    the pinned schema carries no password rule, so the host's own requirement is still unknown. Auto-generate is unaffected and continues to produce 12 characters or more.
+  </Card>
+  <Card title="The CORS proxy stopped serving the previous build's statistics payload after a deploy. The public /api/stats response was cached under a path-only key, so a deploy that narrowed the payload kept answering from the old build's cached body for up to 60 seconds" icon="sliders">
+    the same window that failed the post-deploy smoke gate. The cache key now carries the worker version, so a new build is always a new key.
+  </Card>
+  <Card title="Operator tooling for the proxy: the full statistics view and detailed health sit behind an ADMIN_TOKEN, with a token-sync workflow, an OPERATOR.md runbook and an operator-stats.sh helper, and wrangler secret put is pinned to --env on production so a secret cannot land on the wrong environment." icon="gauge">
+    Operator tooling for the proxy: the full statistics view and detailed health sit behind an ADMIN_TOKEN, with a token-sync workflow, an OPERATOR.md runbook and an operator-stats.sh helper, and wrangler secret put is pinned to --env on production so a secret cannot land on the wrong environment.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.7 (Sep 6 2026)
 
@@ -74,27 +96,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Known gaps, so they are not a surprise: the per-resolution result limits that maxResults and maxResultsPerResolution were meant to provide are not reimplemented here, they were simply never reaching the instance. TorBox-hosted AIOStreams has no readable status endpoint, so its capabilities are marked unverified and you will be asked to confirm the host. And the Fine-Tune maximum NZB failover setting still does not reach the generated config." icon="bug">
     Known gaps, so they are not a surprise: the per-resolution result limits that maxResults and maxResultsPerResolution were meant to provide are not reimplemented here, they were simply never reaching the instance. TorBox-hosted AIOStreams has no readable status endpoint, so its capabilities are marked unverified and you will be asked to confirm the host. And the Fine-Tune maximum NZB failover setting still does not reach the generated config.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.99 (Aug 27 2026)
-
-<CardGroup cols={2}>
-  <Card title="CoreSpeed engine v3, and an apology for v1 and v2" icon="sparkles">
-    if the old speed test disagreed with TorBox's own site, that was our methodology, not the CDN. Three faults, all fixed. The read loop ran on the main thread while the map, table and canvas redrew every 250 ms, so on a weak device the UI starved the download and the tool reported that starvation as your speed; every byte is now counted inside a dedicated Web Worker the UI cannot touch. The 10-second cap on the 100 MB file collapsed to roughly one second of mostly TCP slow-start on a fast line, and measured a partial file on a slow one; v3 uses a 15-second window on the 1 GB file anchored at the first byte. And a single throttled sample used to define the result; each node is now measured twice and ranked by the median of steady-state, with rep-to-rep spread shown as a Consistency column.
-  </Card>
-  <Card title="Two of the CDN nodes in the old build no longer existed" icon="bolt">
-    TorBox renamed store-039 to store-011 (wnam) and nexus-083 to nexus-244 (latm), and the shipped snapshot still named the dead pair. v3 carries the current list and probes every endpoint on load rather than trusting it, flagging the badge as unverified when probes fail.
-  </Card>
-  <Card title="Three modes, and the default is the one to trust" icon="shield-check">
-    Accurate runs sequentially on one connection for playback verdicts, Express samples the closest node plus the top four by ping in about two minutes, and Capacity race opens up to eight real Range connections per node. Capacity numbers are pipe capacity and never earn a playback verdict. The 12 GB budget skips nodes rather than truncating a measurement, because a truncated sample is a wrong number while a skipped node is an honest gap.
-  </Card>
-  <Card title="Known gap: v3 has not been confirmed on a Fire Stick or Android TV" icon="sliders">
-    worker isolation is the entire point of the rewrite and low-power webviews are where it should matter most, but that needs real hardware and has not been run there yet. If you have one, a test result would be worth more than another round of ours.
-  </Card>
-  <Card title="CoreSpeed has tests for the first time" icon="gauge">
-    27 offline unit tests, 51 live assertions that run the shipped worker verbatim against a real CDN node rather than a mock of it, a syntax gate on the page, and a nightly CI run so an endpoint or engine break surfaces the day it happens.
   </Card>
 </CardGroup>
