@@ -66,11 +66,14 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
         run: |
-          ENV_FLAG=""
+          # wrangler.toml has [env.staging]; omitting --env warns and can miss the target.
+          # --env= is the documented way to address the top-level (production) worker.
           if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
-            ENV_FLAG="--env staging"
+            ENV_FLAG=(--env staging)
+          else
+            ENV_FLAG=(--env=)
           fi
-          printf '%s' "$STATS_ADMIN_TOKEN" | npx --yes wrangler@4 secret put ADMIN_TOKEN $ENV_FLAG
+          printf '%s' "$STATS_ADMIN_TOKEN" | npx --yes wrangler@4 secret put ADMIN_TOKEN "${ENV_FLAG[@]}"
           echo "ADMIN_TOKEN updated on the Worker. It is not printed here."
           echo "Verify: STATS_ADMIN_TOKEN=*** node cloudflare-worker/smoke.mjs --strict"
           echo "or ./cloudflare-worker/operator-stats.sh"
