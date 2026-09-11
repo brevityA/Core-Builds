@@ -18,7 +18,11 @@
 // lane, probe cache, CORS narrowing), 2026-09-03 (INFRA-AUDIT.md: redirect refusal,
 // layered rate limiting, DO paste store, circuit breaker, observability fixes).
 
-const WORKER_VERSION = '2026-09-11';
+// Build tag, compared by exact string in smoke.mjs and the deploy workflow's
+// wait-loop. A second deploy on the same date takes a letter suffix (…-11 →
+// …-11b): reusing a live tag makes that wait-loop pass instantly and lets smoke
+// run before the new build has propagated. Never parsed as a date.
+const WORKER_VERSION = '2026-09-11b';
 
 // ── Hardening constants ─────────────────────────────────────────────────────
 const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
@@ -282,7 +286,12 @@ function wuplayLaneScope(host, method, upstreamPath) {
 //   host = origin only (https://self-host.example.com)
 //     GET    /api/v1/status            health/version probe
 //     POST   /api/v1/user              create config
-//     PATCH  /api/v1/user              update config
+//     PATCH  /api/v1/user[/<id>]       update config (by id = update in place)
+//
+// The /<id> form matches the AIOStreams lane (same AIO_USER_PATH_RE, so the
+// same bounded id charset). Without it a self-hoster could only ever POST, so
+// every install minted a NEW config and orphaned the previous one — the public
+// hosts have always allowed the update-in-place form.
 //   host = manifest base (https://self-host.example.com/stremio/<uuid>/<epwd>)
 //     GET    /stream/<type>/<id>.json  "Test Streams" probe from the manifest modal
 //
@@ -318,7 +327,7 @@ function customHostScope(host, method, upstreamPath) {
   const segs = path.split('/').length;
   if (path === '/') {
     const okStatus = method === 'GET' && upstreamPath === '/api/v1/status';
-    const okUser   = (method === 'POST' || method === 'PATCH') && upstreamPath === '/api/v1/user';
+    const okUser   = (method === 'POST' || method === 'PATCH') && AIO_USER_PATH_RE.test(upstreamPath);
     return (okStatus || okUser) ? { custom: true, stripAuth: true } : null;
   }
   if (!path.startsWith('/stremio/') || segs !== 4) return null; // exactly /stremio/<uuid>/<epwd>
