@@ -65,10 +65,10 @@ internals (which bindings exist, breaker state) are operator data:
 
 ```bash
 curl -s https://<worker>.workers.dev/healthz
-# {"ok":true,"version":"2026-09-08"}
+# {"ok":true,"version":"2026-09-11"}
 
 curl -s https://<worker>.workers.dev/healthz -H "Authorization: Bearer $ADMIN_TOKEN"
-# {"ok":true,"version":"2026-09-08","bindings":{"STATS":true,"TEMPLATES":true,
+# {"ok":true,"version":"2026-09-11","bindings":{"STATS":true,"TEMPLATES":true,
 #  "PASTES":true,"RATELIMIT":false,"RL_PROXY":true,"DISCORD_WEBHOOK_URL":true,
 #  "ADMIN_TOKEN":true},"ready":true,"breakers_open":0}
 ```
