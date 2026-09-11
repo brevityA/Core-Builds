@@ -7,6 +7,10 @@ on:
       - '.github/labels.yml'
   workflow_dispatch:
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   sync:
     name: Sync labels to repository

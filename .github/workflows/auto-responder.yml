@@ -4,6 +4,10 @@ on:
   issues:
     types: [opened]
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   auto-reply:
     runs-on: ubuntu-latest

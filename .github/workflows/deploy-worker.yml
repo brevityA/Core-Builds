@@ -103,12 +103,17 @@ jobs:
           for i in $(seq 1 12); do
             v=$(curl -sf "${{ needs.deploy.outputs.base_url }}/healthz" | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).version' 2>/dev/null || true)
             echo "attempt $i: version=$v"
-            [ "$v" = "2026-09-03" ] && exit 0
+            [ "$v" = "2026-09-08" ] && exit 0
             sleep 5
           done
           echo "::warning::healthz never reported the expected version — smoke will run in strict mode and fail if the deploy is stale"
       - name: Post-deploy smoke (strict)
         id: smoke
+        env:
+          # Optional: the worker's ADMIN_TOKEN secret. When set, smoke also
+          # verifies the operator view (full counters, bindings, breakers);
+          # when unset those checks are skipped with a warning.
+          STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
         run: node cloudflare-worker/smoke.mjs --base="${{ needs.deploy.outputs.base_url }}" --strict
       - name: Rollback guidance
         if: failure()

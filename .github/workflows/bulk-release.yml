@@ -17,6 +17,10 @@ on:
         required: false
         default: false
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   bulk-release:
     name: Bulk create releases

@@ -4,6 +4,10 @@ on:
   release:
     types: [created]   # fires on draft creation — before publish, while still mutable
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   package-and-upload:
     name: package-and-upload

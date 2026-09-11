@@ -385,7 +385,9 @@ test('status probe: GET /proxy/api/v1/status is CDN-cacheable (max-age + s-maxag
 
 test('proxy: non-status proxy GET stays no-store', async () => {
   global.fetch = async () => new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
-  const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${ELFH}`, { method: 'GET' }), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, { waitUntil: () => {} });
+  // A manifest read is a valid allowlisted-lane GET that is not a status probe.
+  const res = await worker.fetch(new Request(`https://w.example/proxy/stremio/uuid/pw/manifest.json?host=${ELFH}`, { method: 'GET' }), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, { waitUntil: () => {} });
+  assert.equal(res.status, 200);
   assert.equal(res.headers.get('cache-control'), 'no-store');
 });
 
@@ -629,10 +631,10 @@ test('/api/stats surfaces every counter the worker writes', async () => {
     'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
   ];
   const store = Object.fromEntries(written.map((k, i) => [k, String(i + 1)]));
-  const env = {
+  const env = withAdmin({
     STATS: { get: async k => store[k] ?? null, list: async () => ({ keys: [] }) },
-  };
-  const res = await worker.fetch(new Request('https://w.example/api/stats'), env, { waitUntil() {} });
+  });
+  const res = await worker.fetch(adminStatsReq(), env, { waitUntil() {} });
   assert.equal(res.status, 200);
   const body = await res.json();
   const missing = written.filter(k => !(k in body));
@@ -654,6 +656,14 @@ const PasteStore = workerModule.PasteStore || class { constructor() { throw new 
 const WORKER_VERSION = worker.WORKER_VERSION || 'legacy';
 const ctxSync = { waitUntil: (p) => p && p.then ? p.then(() => {}) : p };
 const settle = () => new Promise(r => setImmediate(r));
+
+// 2026-09-08 hardening: /api/stats and /healthz answer with a minimal public
+// payload; the full operator payload requires `Authorization: Bearer
+// ADMIN_TOKEN` where ADMIN_TOKEN is a >=16-char env secret (wrangler secret).
+const ADMIN_TOKEN = 'unit-test-admin-token-0123456789';
+const adminHeaders = (extra = {}) => ({ Authorization: `Bearer ${ADMIN_TOKEN}`, ...extra });
+const withAdmin = (env) => ({ ...env, ADMIN_TOKEN });
+const adminStatsReq = (base = 'https://w.example') => new Request(`${base}/api/stats`, { headers: adminHeaders() });
 
 // A fake Durable Object namespace that runs the real PasteStore class over an
 // in-memory SQLite-shaped shim (exec/toArray), so the read-after-write path is
@@ -786,11 +796,11 @@ test('S4: X-Forwarded-For cannot be used to escape the bucket (only cf-connectin
 
 test('S4: rate-limit rejections are counted (rate_limited + rl_hit:<scope>) and listed by /api/stats', async () => {
   const stats = {}; const statsKv = { get: async k => stats[k] || null, put: async (k, v) => { stats[k] = v; }, list: async ({ prefix }) => ({ keys: Object.keys(stats).filter(k => k.startsWith(prefix)).map(name => ({ name })), list_complete: true }) };
-  const env = { STATS: statsKv, RL_ANALYTICS: { limit: async () => ({ success: false }) } };
+  const env = withAdmin({ STATS: statsKv, RL_ANALYTICS: { limit: async () => ({ success: false }) } });
   const res = await worker.fetch(new Request('https://w.example/api/generate', { method: 'POST', headers: { 'cf-connecting-ip': '198.51.100.13' } }), env, ctxSync);
   assert.equal(res.status, 429);
   await settle();
-  const s = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
+  const s = await (await worker.fetch(adminStatsReq(), env, ctxSync)).json();
   assert.equal(s.rate_limited, 1);
   assert.deepEqual(s.by_rate_limit, { generate: 1 });
 });
@@ -847,6 +857,39 @@ test('S8: custom-lane hostnames are not published in /api/stats (label = custom)
   await settle();
   assert.equal(stats['proxy:custom'], '1');
   assert.ok(!Object.keys(stats).some(k => k.includes('my-private-box')), 'private hostname must not become a KV key');
+});
+
+// Keys written before the 2026-09-03 custom-lane collapse (S8) still live in the
+// STATS namespace as proxy:<hostname> / proxy_err:<hostname> — real users'
+// private instances and SSRF canary keys (169.254.169.254.nip.io, router.local,
+// …). /api/stats must not publish them; only allowlisted hostnames and the
+// custom/unknown buckets may appear in the public JSON.
+test('S8b: /api/stats filters legacy custom-lane and attacker-supplied host labels from by_host/by_host_errors', async () => {
+  const store = {
+    'visits': '1',
+    'proxy:aiostreams.elfhosted.com': '10',             // allowlisted host → published
+    'proxy:api.wuplay.app': '2',                        // allowlisted host → published
+    'proxy:custom': '3',                                // collapse bucket → published
+    'proxy:user-private-box.example.net': '4',          // legacy custom hostname → dropped
+    'proxy_err:user-private-box.example.net': '1',      // legacy custom hostname → dropped
+    'proxy:169.254.169.254.nip.io': '1',                // SSRF canary → dropped
+    'proxy_err:router.local': '4',                      // SSRF canary → dropped
+  };
+  const names = Object.keys(store);
+  const env = withAdmin({
+    STATS: {
+      get: async (k) => store[k] ?? null,
+      list: async ({ prefix }) => ({ keys: names.filter(n => n.startsWith(prefix)).map(name => ({ name })), list_complete: true }),
+    },
+  });
+  const res = await worker.fetch(adminStatsReq(), env, { waitUntil() {} });
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.deepEqual(body.by_host, { 'aiostreams.elfhosted.com': 10, 'api.wuplay.app': 2, 'custom': 3 });
+  assert.deepEqual(body.by_host_errors, {});
+  assert.ok(!('user-private-box.example.net' in body.by_host), 'legacy custom hostname leaked in by_host');
+  assert.ok(!('user-private-box.example.net' in body.by_host_errors), 'legacy custom hostname leaked in by_host_errors');
+  assert.ok(!Object.keys(body.by_host).some(h => h.includes('nip.io') || h.includes('router')), 'canary host labels leaked');
 });
 
 test('O6: log lines never contain the request URL, path, body, password or IP', async () => {
@@ -1041,13 +1084,13 @@ test('R4: upstream bytes are passed through unmodified (no UTF-8 round-trip)', a
 test('O1: exhausted counter writes increment counter_write_err and it is surfaced by /api/stats', async () => {
   const stats = {};
   const flaky = { get: async k => stats[k] || null, put: async (k, v) => { if (k === 'visits') throw new Error('KV PUT failed: 429'); stats[k] = v; }, list: async () => ({ keys: [], list_complete: true }) };
-  const env = { STATS: flaky };
+  const env = withAdmin({ STATS: flaky });
   const res = await worker.fetch(new Request('https://w.example/api/visit', { method: 'POST' }), env, ctxSync);
   assert.deepEqual(await res.json(), { visits: 0 });
   await settle();
   assert.equal(stats.counter_write_err, '1');
   assert.equal(stats.visits_write_err, '1');
-  const s = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
+  const s = await (await worker.fetch(adminStatsReq(), env, ctxSync)).json();
   assert.equal(s.counter_write_err, 1);
 });
 
@@ -1064,8 +1107,8 @@ test('O3: every counter written anywhere in worker.js is listed in /api/stats', 
     'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
     'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'pastes_kv_fallback_reads'];
   const store = Object.fromEntries(totals.map((k, i) => [k, String(i + 1)]));
-  const env = { STATS: { get: async k => store[k] ?? null, list: async () => ({ keys: [], list_complete: true }) } };
-  const body = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
+  const env = withAdmin({ STATS: { get: async k => store[k] ?? null, list: async () => ({ keys: [], list_complete: true }) } });
+  const body = await (await worker.fetch(adminStatsReq(), env, ctxSync)).json();
   const missing = totals.filter(k => !(k in body));
   assert.deepEqual(missing, []);
   const unpublished = [...written].filter(k => !(k in body) && !k.startsWith('daily:') && !k.startsWith('proxy:') && !k.startsWith('proxy_err:') && !k.startsWith('rl_hit:'));
@@ -1075,30 +1118,47 @@ test('O3: every counter written anywhere in worker.js is listed in /api/stats', 
   assert.equal(body.version, WORKER_VERSION);
 });
 
-test('O5: /healthz reports version + bindings without touching KV, 503 when no paste store is bound', async () => {
+test('O5: /healthz public shows only ok+version; operator view shows bindings; no KV; 503 when not ready', async () => {
   const touched = { kv: 0 };
-  const env = { STATS: { get: async () => { touched.kv++; return null; } }, TEMPLATES: { get: async () => { touched.kv++; return null; } } };
-  const ok = await worker.fetch(new Request('https://w.example/healthz'), env, ctxSync);
-  assert.equal(ok.status, 200);
-  const body = await ok.json();
-  assert.equal(body.version, WORKER_VERSION);
-  assert.equal(body.bindings.TEMPLATES, true);
+  const env = withAdmin({ STATS: { get: async () => { touched.kv++; return null; } }, TEMPLATES: { get: async () => { touched.kv++; return null; } } });
+  const pub = await worker.fetch(new Request('https://w.example/healthz'), env, ctxSync);
+  assert.equal(pub.status, 200);
+  const pubBody = await pub.json();
+  assert.deepEqual(Object.keys(pubBody).sort(), ['ok', 'version'], 'public healthz must not leak bindings/breakers/ready');
+  assert.equal(pubBody.version, WORKER_VERSION);
+  const full = await worker.fetch(new Request('https://w.example/healthz', { headers: adminHeaders() }), env, ctxSync);
+  assert.equal(full.status, 200);
+  const fullBody = await full.json();
+  assert.equal(fullBody.bindings.TEMPLATES, true);
+  assert.equal(fullBody.bindings.ADMIN_TOKEN, true);
+  assert.ok('breakers_open' in fullBody);
   assert.equal(touched.kv, 0);
   const notReady = await worker.fetch(new Request('https://w.example/healthz'), {}, ctxSync);
   assert.equal(notReady.status, 503);
+  const notReadyBody = await notReady.json();
+  assert.ok(!('bindings' in notReadyBody), '503 body stays minimal on the public surface');
 });
 
-test('R5: /api/stats is served from the Cache API keyed on the path only (query busting cannot force a rebuild)', async () => {
-  let kvLists = 0; let putKey = null;
-  const env = { STATS: { get: async () => '1', list: async () => { kvLists++; return { keys: [], list_complete: true }; } } };
+test('R5: public /api/stats is cached on the path key; the operator view is never cached', async () => {
+  let kvLists = 0; let kvGets = 0; let putKey = null;
+  const env = withAdmin({ STATS: { get: async () => { kvGets++; return '1'; }, list: async () => { kvLists++; return { keys: [], list_complete: true }; } } });
   let stored = null;
   globalThis.caches = { default: { match: async (req) => (stored && req.url === putKey ? stored.clone() : undefined), put: async (req, res) => { putKey = req.url; stored = res; } } };
   try {
     await worker.fetch(new Request('https://w.example/api/stats?bust=1'), env, ctxSync);
     await settle();
-    assert.equal(putKey, 'https://w.example/api/stats');
+    assert.equal(putKey, 'https://w.example/api/stats', 'public stats cached on the path key only');
+    assert.equal(kvLists, 0, 'the public build never enumerates KV prefixes');
+    kvGets = 0;
     await worker.fetch(new Request('https://w.example/api/stats?bust=2'), env, ctxSync);
-    assert.equal(kvLists, 7, 'second request must be a cache hit (no new KV list calls)');
+    assert.equal(kvGets, 0, 'second public request is a cache hit (no KV reads at all)');
+    // Operator view: no-store, no Cache API writes, and still a full rebuild —
+    // a cached full dump must never be reachable through the shared path key.
+    putKey = null; kvLists = 0;
+    const adminRes = await worker.fetch(adminStatsReq(), env, ctxSync);
+    assert.equal(adminRes.headers.get('cache-control'), 'no-store');
+    assert.equal(putKey, null, 'operator stats must never be written to the shared public cache');
+    assert.equal(kvLists, 7, 'operator build enumerates all seven breakdown prefixes');
   } finally { delete globalThis.caches; }
 });
 
@@ -1114,4 +1174,101 @@ test('contract: 429 is only ever emitted before the upstream call (writeHostFetc
   }
   assert.ok(limited >= 10);
   assert.equal(upstream, 70 - limited);
+});
+
+// ── 2026-09-08 minimal-disclosure hardening ─────────────────────────────────
+test('hardening: public /api/stats exposes exactly { visits, generates }', async () => {
+  const store = {
+    'visits': '7', 'generates': '3', 'proxy_calls': '9000', 'contact_messages': '9',
+    'proxy:aiostreams.elfhosted.com': '42', 'daily:visits:2026-09-01': '1',
+  };
+  const names = Object.keys(store);
+  const env = {
+    STATS: {
+      get: async (k) => store[k] ?? null,
+      list: async ({ prefix }) => ({ keys: names.filter(n => n.startsWith(prefix)).map(n => ({ name: n })), list_complete: true }),
+    },
+  };
+  const res = await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { visits: 7, generates: 3 }, 'breakdowns/counters must not be public');
+});
+
+test('hardening: full stats require a >=16-char ADMIN_TOKEN binding AND a matching Bearer header', async () => {
+  const store = { 'visits': '5', 'generates': '1', 'proxy:custom': '9' };
+  const names = Object.keys(store);
+  const kv = {
+    get: async (k) => store[k] ?? null,
+    list: async ({ prefix }) => ({ keys: names.filter(n => n.startsWith(prefix)).map(n => ({ name: n })), list_complete: true }),
+  };
+  // (a) no ADMIN_TOKEN at all → even a correct-looking Bearer gets the public view
+  const noToken = await (await worker.fetch(adminStatsReq(), { STATS: kv }, ctxSync)).json();
+  assert.deepEqual(noToken, { visits: 5, generates: 1 });
+  // (b) token shorter than 16 chars → operator view disabled
+  const short = await (await worker.fetch(adminStatsReq(), { STATS: kv, ADMIN_TOKEN: 'short' }, ctxSync)).json();
+  assert.deepEqual(short, { visits: 5, generates: 1 });
+  // (c) valid token configured but missing/wrong header → public view
+  const env = withAdmin({ STATS: kv });
+  const noHeader = await (await worker.fetch(new Request('https://w.example/api/stats'), env, ctxSync)).json();
+  assert.deepEqual(noHeader, { visits: 5, generates: 1 });
+  const wrongHeader = await (await worker.fetch(new Request('https://w.example/api/stats', { headers: { Authorization: 'Bearer not-the-token' } }), env, ctxSync)).json();
+  assert.deepEqual(wrongHeader, { visits: 5, generates: 1 });
+  // (d) valid token + matching Bearer → operator view
+  const full = await (await worker.fetch(adminStatsReq(), env, ctxSync)).json();
+  assert.equal(full.visits, 5);
+  assert.deepEqual(full.by_host, { custom: 9 });
+  assert.equal(full.version, WORKER_VERSION);
+});
+
+test('hardening: allowlisted AIOStreams hosts are scoped to the config/manifest surface', async () => {
+  let upstream = 0;
+  global.fetch = async () => { upstream++; return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  const elfh = (path, method = 'GET', host = 'https://aiostreams.elfhosted.com') =>
+    worker.fetch(new Request(`https://w.example/proxy${path}?host=${encodeURIComponent(host)}`, { method, body: method === 'GET' ? undefined : '{}' }), {}, ctxSync);
+  // allowed surface
+  assert.equal((await elfh('/api/v1/status')).status, 200);
+  assert.equal((await elfh('/api/v1/user', 'POST')).status, 200);
+  assert.equal((await elfh('/api/v1/user/abc-123', 'PATCH')).status, 200);
+  assert.equal((await elfh('/stremio/uuid/pw/manifest.json')).status, 200);
+  assert.equal((await elfh('/stremio/uuid/pw/stream/movie/tt123.json')).status, 200);
+  // manifest-base form mirrors the custom lane: /stream/<type>/<id>.json only
+  assert.equal((await elfh('/stream/movie/tt999.json', 'GET', 'https://aiostreams.elfhosted.com/stremio/uuid/pw')).status, 200);
+  assert.equal((await elfh('/manifest.json', 'GET', 'https://aiostreams.elfhosted.com/stremio/uuid/pw')).status, 403, 'manifest reads go origin-form');
+  // refused: wrong method, wrong path, off-surface path, relay-ish path
+  assert.equal((await elfh('/api/v1/user')).status, 403, 'GET /api/v1/user is not part of the AIO lane');
+  assert.equal((await elfh('/api/v1/status', 'POST')).status, 403, 'status is GET-only');
+  assert.equal((await elfh('/admin/delete-all')).status, 403);
+  assert.equal((await elfh('/api/v1/user', 'POST', 'https://aiostreams.elfhosted.com/stremio/uuid/pw')).status, 403, 'config writes must target the origin form');
+  assert.equal((await elfh('/stremio/uuid/pw/someother.json')).status, 403, 'only manifest.json / stream/<type>/<id>.json under stremio');
+  assert.equal((await elfh('/stremio/uuid/pw')).status, 403, 'directory listing is not a file');
+  // upstream must only have seen the allowed requests
+  assert.equal(upstream, 6);
+});
+
+test('hardening: api.wuplay.app is scoped to the genie endpoints', async () => {
+  let upstream = 0;
+  global.fetch = async () => { upstream++; return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  const wp = (path, method = 'GET', host = 'https://api.wuplay.app') =>
+    worker.fetch(new Request(`https://w.example/proxy${path}?host=${encodeURIComponent(host)}`, { method, body: method === 'GET' ? undefined : '{}' }), {}, ctxSync);
+  assert.equal((await wp('/app/version')).status, 200);
+  assert.equal((await wp('/devices/register', 'POST')).status, 200);
+  assert.equal((await wp('/sync/abc123')).status, 200);
+  assert.equal((await wp('/sync/abc123/hubs/h1', 'PATCH')).status, 200);
+  assert.equal((await wp('/sync/abc123/profile', 'PATCH')).status, 200);
+  assert.equal((await wp('/sync/abc123', 'POST')).status, 200);
+  // refused: off-surface paths and the AIO surface on the wuplay host
+  assert.equal((await wp('/admin')).status, 403);
+  assert.equal((await wp('/app/version2')).status, 403);
+  assert.equal((await wp('/devices/register')).status, 403, 'register is POST-only');
+  assert.equal((await wp('/api/v1/status')).status, 403);
+  assert.equal(upstream, 6);
+});
+
+test('hardening: allowlisted lane scopes apply to the whole ALLOWED_HOSTS set (no unscoped host)', async () => {
+  let upstream = 0;
+  global.fetch = async () => { upstream++; return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+  // viren070.me is an AIO host: the wuplay-only /app/version surface must be refused there
+  const res = await worker.fetch(new Request(`https://w.example/proxy/app/version?host=${encodeURIComponent('https://aiostreams.viren070.me')}`), {}, ctxSync);
+  assert.equal(res.status, 403);
+  assert.equal(upstream, 0);
 });

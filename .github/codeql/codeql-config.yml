@@ -14,3 +14,14 @@ paths-ignore:
   # loopback, link-local, CGNAT) + redirect:'error' on every fetch.
   # CodeQL cannot model custom sanitizer functions, so we exclude the file.
   - scripts/aios-regen/contract.mjs
+  # Vendored third-party minified library (JSZip 3.10.1). CodeQL flags a ReDoS
+  # in its zip-parsing path, but the badges tool uses JSZip write-only
+  # (zip.file() + generateAsync(); never loadAsync()), so that path is
+  # unreachable. Bundled minified vendor code is not ours to patch.
+  - tools/badges/jszip-*.min.js
+  # Post-deploy smoke script: CodeQL flags fetch(`${BASE}${path}`) as SSRF
+  # because BASE comes from a --base=<url> command-line arg. This is an
+  # operator-run test tool that probes an endpoint the operator names on the
+  # command line; there is no attacker-controlled input and nothing is shipped.
+  # CodeQL cannot model that the URL is operator-supplied test config.
+  - cloudflare-worker/smoke.mjs

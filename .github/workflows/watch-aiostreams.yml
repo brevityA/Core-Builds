@@ -13,6 +13,10 @@ concurrency:
   group: watch-aiostreams
   cancel-in-progress: true
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   drift:
     runs-on: ubuntu-latest

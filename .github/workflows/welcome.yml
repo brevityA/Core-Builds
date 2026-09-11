@@ -6,6 +6,10 @@ on:
   issues:
     types: [opened]
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   welcome:
     runs-on: ubuntu-latest

@@ -62,3 +62,8 @@ tools/benchmark/.env
 tools/benchmark/*.local
 reports/benchmark-snapshots/**/*.local.json
 tools/benchmark/corpus/*.verified.json
+
+# Local dev secrets — never commit (wrangler dev / environment overrides)
+.dev.vars
+.env
+.env.local

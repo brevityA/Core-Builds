@@ -41,46 +41,62 @@ async function get(url) {
 
 const enc = (s) => encodeURIComponent(s);
 
-// --strict: fail (not warn) when the deployed worker predates 2026-09-03
+// --strict: fail (not warn) when the deployed worker predates 2026-09-08
 // (used by the deploy workflow's post-deploy gate).
 const STRICT = args.includes('--strict');
-const EXPECTED_VERSION = '2026-09-03';
+const EXPECTED_VERSION = '2026-09-08';
 
 async function main() {
   console.log(`Core Builds worker smoke — ${BASE}\n`);
 
-  // 0. health: cheapest possible liveness + version + bindings (no KV)
+  // 0. health: public liveness + version only (no KV, no token).
+  //    Since 2026-09-08 the public payload is {ok, version}; bindings/breaker
+  //    state moved behind `Authorization: Bearer ADMIN_TOKEN` (checked below).
   try {
     const r = await get(`${BASE}/healthz`);
     let h = null; try { h = JSON.parse(r.text); } catch {}
-    check('GET /healthz → 200', r.status === 200 || !STRICT, `http ${r.status} version=${h?.version}${r.status === 404 ? ' (pre-2026-09-03 worker)' : ''}`);
+    check('GET /healthz → 200', r.status === 200 || !STRICT, `http ${r.status} version=${h?.version}${r.status === 404 ? ' (pre-2026-09-08 worker)' : ''}`);
     if (h && r.status === 200) {
       const isNew = h.version === EXPECTED_VERSION;
       check('healthz reports expected worker version', isNew || !STRICT, `got ${h.version}, expected ${EXPECTED_VERSION}${isNew ? '' : ' (stale deploy?)'}`);
-      check('healthz: a paste store is bound (PASTES DO or TEMPLATES KV)', !!(h.bindings?.PASTES || h.bindings?.TEMPLATES), JSON.stringify(h.bindings));
-      if (!h.bindings?.PASTES) console.log('WARN  PASTES Durable Object not bound — paste read-after-write relies on KV (eventual consistency)');
-      if (!h.bindings?.RL_PROXY) console.log('WARN  Rate Limiting bindings not present — only the in-isolate floor + KV (if bound) enforce limits');
-      check('healthz: no circuit breakers open', (h.breakers_open || 0) === 0, `breakers_open=${h.breakers_open}`);
+      const publicKeys = Object.keys(h).sort().join(',');
+      check('public healthz is minimal (ok + version only)', !STRICT || publicKeys === 'ok,version', `keys=${publicKeys}`);
     }
   } catch (e) {
     check('GET /healthz → 200', false, String(e.message || e));
   }
 
-  // 1. stats endpoint + observability counters
+  // 1. stats endpoint: the public surface is exactly {visits, generates}.
+  //    Full counters, bindings and breaker state are operator data: they are
+  //    only verifiable with STATS_ADMIN_TOKEN (GitHub secret STATS_ADMIN_TOKEN
+  //    = the worker's ADMIN_TOKEN secret). Skipped with a warning when unset.
   try {
     const r = await get(`${BASE}/api/stats`);
     check('GET /api/stats → 200', r.status === 200, `http ${r.status}`);
     if (r.status === 200) {
       let d;
       try { d = JSON.parse(r.text); } catch { d = null; }
-      const hasCounters = !!d && Object.keys(d).length > 2;
-      check('stats has visits counter', !hasCounters || Number.isFinite(Number(d.visits)), hasCounters ? `visits=${d?.visits}` : 'no STATS binding (staging?)');
-      if (hasCounters) {
-        const required = ['proxy_cache_hits', 'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
-          'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'by_rate_limit'];
-        const missing = d ? required.filter((k) => !(k in d)) : required;
-        check('stats exposes every counter class', missing.length === 0 || !STRICT, missing.length ? `missing: ${missing.join(', ')} (deployed worker older than 2026-09-03?)` : 'all present');
-      }
+      const pubKeys = d ? Object.keys(d).sort().join(',') : '';
+      check('public stats exposes only visits + generates', !STRICT || (d && pubKeys === 'generates,visits'), `keys=${pubKeys || '(no STATS binding?)'}`);
+      check('visits counter is numeric', !!d && Number.isFinite(Number(d.visits)), `visits=${d?.visits}`);
+    }
+    const token = process.env.STATS_ADMIN_TOKEN;
+    if (token) {
+      const auth = { headers: { Authorization: `Bearer ${token}` } };
+      const hr = await fetch(`${BASE}/healthz`, { ...auth, signal: AbortSignal.timeout(TIMEOUT_MS) });
+      const h = await hr.json().catch(() => null);
+      check('operator healthz → 200', hr.status === 200, `http ${hr.status}`);
+      check('operator healthz: a paste store is bound (PASTES DO or TEMPLATES KV)', !!(h?.bindings?.PASTES || h?.bindings?.TEMPLATES), JSON.stringify(h?.bindings));
+      if (h?.bindings && !h.bindings.PASTES) console.log('WARN  PASTES Durable Object not bound — paste read-after-write relies on KV (eventual consistency)');
+      if (h?.bindings && !h.bindings.RL_PROXY) console.log('WARN  Rate Limiting bindings not present — only the in-isolate floor + KV (if bound) enforce limits');
+      check('operator healthz: no circuit breakers open', (h?.breakers_open || 0) === 0, `breakers_open=${h?.breakers_open}`);
+      const sr = await fetch(`${BASE}/api/stats`, { ...auth, signal: AbortSignal.timeout(TIMEOUT_MS) });
+      const d = await sr.json().catch(() => null);
+      check('operator stats → 200', sr.status === 200, `http ${sr.status}`);
+      const required = ['proxy_cache_hits', 'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
+        'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'by_rate_limit'];
+      const missing = d ? required.filter((k) => !(k in d)) : required;
+      check('operator stats exposes every counter class', missing.length === 0, missing.length ? `missing: ${missing.join(', ')}` : 'all present');
       if (d && Number(d.proxy_calls) > 100) {
         const ratio = Number(d.proxy_errors) / Number(d.proxy_calls);
         check('lifetime proxy error ratio < 35%', ratio < 0.35, `${(ratio * 100).toFixed(1)}%`);
@@ -88,6 +104,8 @@ async function main() {
       if (d && Object.keys(d.by_host || {}).some((h) => !AIO_HOSTS.some((a) => a.endsWith(h)) && !['api.wuplay.app', 'api.torbox.app', 'custom', 'unknown'].includes(h))) {
         console.log('WARN  by_host still lists pre-2026-09-03 custom hostnames (historical keys; new traffic is labelled "custom")');
       }
+    } else {
+      console.log('WARN  STATS_ADMIN_TOKEN not set — operator checks (full counters, bindings, breakers) skipped. Set the GitHub secret STATS_ADMIN_TOKEN to the worker\'s ADMIN_TOKEN secret.');
     }
   } catch (e) {
     check('GET /api/stats → 200', false, String(e.message || e));

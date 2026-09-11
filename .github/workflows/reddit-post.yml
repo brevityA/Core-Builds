@@ -5,6 +5,10 @@ on:
     - cron: '0 18 * * *'   # 18:00 UTC daily
   workflow_dispatch:         # manual trigger for testing
 
+
+permissions:
+  contents: read  # least-privilege default; jobs needing more declare it
+
 jobs:
   post:
     runs-on: ubuntu-latest
