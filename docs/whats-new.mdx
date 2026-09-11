@@ -1,14 +1,36 @@
 ---
-title: "What's New — Configurator v3.1"
+title: "What's New — Configurator v3.7"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.1 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.7 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.1**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.7**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.7 (Sep 6 2026)
+
+<CardGroup cols={2}>
+  <Card title="Version honesty: the badge, package.json and the template stamp now all report this release (they disagreed" icon="sparkles">
+    badge v3.1, package 3.1.0, tag v3.7.0) and a test fails if they ever drift apart again. The default AIOStreams compatibility target moves from the stale 2.32.0 to the pinned 2.34.0, with 2.33.2 and 2.34.0 added to the target list so it covers every version the live fleet actually runs.
+  </Card>
+  <Card title="Fixed: EasyNews-only Direct Install no longer fails with 'Library requires at least one usable service'. AIOStreams builds the Library addon from your services, and EasyNews cannot back it" icon="bolt">
+    the library preset is now omitted whenever no library-capable (debrid) service is enabled, on every route, and EasyNews configs install clean. EasyNews plus any debrid keeps the library.
+  </Card>
+  <Card title="Direct Install now refuses to post without the keys the host demands, naming exactly what is missing ('Option apiKey is required' was the previous failure, delivered by the host after the fact). Export JSON remains keyless by design." icon="shield-check">
+    Direct Install now refuses to post without the keys the host demands, naming exactly what is missing ('Option apiKey is required' was the previous failure, delivered by the host after the fact). Export JSON remains keyless by design.
+  </Card>
+  <Card title="The host picker now states each host's capabilities and its AIOStreams version before you deploy" icon="sliders">
+    ElfHosted says 'Debrid only — no P2P/HTTP', and the three hosts still on 2.33.2 say so. A config using features newer than a host is not routed there, and a P2P config can no longer be sent to ElfHosted.
+  </Card>
+  <Card title="The landing is Express-first: one primary card for the five-step install (service → device → resolution → key → Deploy), with Advanced Builder, Update Existing and the Setup Genie demoted to plain links. The Genie page itself is unchanged." icon="gauge">
+    The landing is Express-first: one primary card for the five-step install (service → device → resolution → key → Deploy), with Advanced Builder, Update Existing and the Setup Genie demoted to plain links. The Genie page itself is unchanged.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.1 (Sep 3 2026)
 
@@ -74,24 +96,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="CoreSpeed has tests for the first time" icon="gauge">
     27 offline unit tests, 51 live assertions that run the shipped worker verbatim against a real CDN node rather than a mock of it, a syntax gate on the page, and a nightly CI run so an endpoint or engine break surfaces the day it happens.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v2.98 (Aug 26 2026)
-
-<CardGroup cols={2}>
-  <Card title="Three official Nuvio badge packs, paste-ready" icon="sparkles">
-    core-neon-universal (55 badges, works on any Nuvio source), core-neon-enhanced (the same 55 with invisible AIO markers, paired with the companion formatter) and core-nodv-universal (54 badges, Dolby Vision removed for Samsung and TCL panels). All three carry the same six groups: resolution, quality, visual, audio, channels, codec. You no longer have to build a pack to get Core badges. They are generated from the Badge Builder rather than hand-written: re-running the publisher reproduces all three byte-identically, and every one of the 164 badge images resolves to the Core Builds assets path.
-  </Card>
-  <Card title="Groundwork, not yet switched on" icon="bolt">
-    language packs for PT-BR, ES, FR, DE, IT, NL, AR and HI; named capability profiles for Fire TV Stick HD, Fire TV Stick 4K Max, TCL Google TV and Hisense; a two-seat household picker; named AllDebrid, Premiumize and EasyDebrid store presets; and an English kids overlay with a WuPlay home plan. None of these is wired into the builder yet: the two new TV profiles are not selectable, the modules are imported by nothing, and no new template JSON has been generated. Nothing you can observe in the app has changed. They are listed here so the next release, the one that turns them on, is not the first you hear of them.
-  </Card>
-  <Card title="Fire TV Stick 4K Max is capped, not Apex" icon="shield-check">
-    it is a 4K device that stutters on REMUX-first ranking, so it gets a bitrate ceiling instead of the Apex path. TCL and Hisense join ONN and Samsung on the No-Dolby-Vision path, because neither panel family should be assumed Dolby Vision capable.
-  </Card>
-  <Card title="Real-Debrid still has no named preset" icon="sliders">
-    its May 2026 WEB-DL filter means a named RD template would misrepresent what the service actually returns, so the preset is refused rather than shipped with a caveat.
   </Card>
 </CardGroup>

@@ -699,3 +699,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+# CI-nudge: comment touched to satisfy the required "Validate Templates" status check (#739).
