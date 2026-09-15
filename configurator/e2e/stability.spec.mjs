@@ -86,7 +86,7 @@ test('Advanced extras carousel is multi-select while short routes stay compact',
   const errors = await fresh(page);
   await page.locator('[data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
-  await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(16);
+  await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(20);
   // Was p2p. The wizard defaults to the ElfHosted community host, which serves
   // neither P2P nor HTTP, so those two cards are now gated inert by the
   // host-capability layer — see e2e/host-capability.spec.mjs. debridio is a
