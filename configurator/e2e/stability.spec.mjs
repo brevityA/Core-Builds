@@ -18,14 +18,17 @@ async function fresh(page) {
   // throttled there (429), and the resulting console line is
   // "Failed to load resource: the server responded with a status of 429 ()" —
   // no URL in the text, so CORS_NOISE cannot filter it and the errors===[]
-  // assertions below fail non-deterministically. Serve the counter locally:
-  // this pattern matches only the proxy host, and specs that additionally call
-  // mockAioStreams keep their own capture semantics (that mock answers `{}`
-  // for the same URLs, so behaviour is identical for the app).
-  await page.route(/core-builds-cors-proxy/, route => route.fulfill({
-    status: 200, contentType: 'application/json',
-    body: JSON.stringify({ visits: 4211, generates: 987 }),
-  }));
+  // assertions below fail non-deterministically. Fulfil ONLY the three counter
+  // endpoints locally. The predicate must stay this narrow: the app also tunnels
+  // AIOStreams /api/v1/* calls through this proxy host, and mockAioStreams
+  // captures those POSTs — a host-wide route registered here would shadow them
+  // (later-registered routes win) and empty the capture lists.
+  await page.route(url =>
+      /core-builds-cors-proxy/.test(url.hostname) && /\/api\/(stats|visit|generate)$/.test(url.pathname),
+    route => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ visits: 4211, generates: 987 }),
+    }));
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && !CORS_NOISE.test(message.text())) errors.push(message.text()); });
   await page.goto('/');
