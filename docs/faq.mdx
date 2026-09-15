@@ -82,7 +82,11 @@ description: "Quick answers to the most common Core Builds questions."
   </Accordion>
 
   <Accordion title="Stream plays for a few seconds then stutters or stops">
-    You are playing an uncached stream. Look for a `[cached]` badge in the stream card — only cached streams play reliably without buffering. Uncached content downloads in real time and depends on seeder count. REMUX files (50–80 GB) also require a fast connection to the debrid server; try a HEVC or WEB-DL stream instead if REMUX stutters.
+    You are playing an uncached stream. Look for a `[cached]` badge in the stream card — only cached streams play reliably without buffering. Uncached content downloads in real time and depends on seeder count. REMUX files (50–80 GB) also require a fast connection to the debrid server; try a HEVC or WEB-DL stream instead if REMUX stutters. One exception: since May 2026 Real-Debrid refuses `WEB-DL`/`WEBRip`-tagged filenames outright, so on RD the lower-tier fallback may not be usable — see "One title buffers forever" in [Troubleshooting](/troubleshooting).
+  </Accordion>
+
+  <Accordion title="One title buffers forever and nothing else does">
+    That's a source-side problem, not a template problem. The usual causes are a debrid service refusing the filenames that title's pool is made of (Real-Debrid's keyword filter, live since about 2026-05-10, hangs the player instead of erroring), a cache state that was over-reported (TorBox), or a freshly released title whose pool has no 1080p tier to fall back to yet. [Troubleshooting → One title buffers forever](/troubleshooting) has the two-minute confirmation and the workarounds.
   </Accordion>
 </AccordionGroup>
 

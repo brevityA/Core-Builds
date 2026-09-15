@@ -113,6 +113,25 @@ Before troubleshooting, confirm what you're running.
     - **Codec not supported on your device** — check the stream's codec in the formatter display. If it's AV1 on a device without hardware AV1 decode (Fire Stick 4K, older Samsung Tizen), the stream will buffer or fail. Switch to a device-specific template (Samsung TV, Fire Stick) which hard-exclude unsupported codecs.
     - **DV-only stream on a non-DV device** — the Samsung templates have a DV-Only Kill ESE enabled by default. If you're on a generic template, enable the DV-Only Kill ESE manually in AIOStreams.
     - **Bitrate too high** — very high-bitrate REMUX streams can stall on slower connections or budget hardware. Try the B-tier or lower result in the list.
+    - **Every candidate file is a name your service refuses** — only on Real-Debrid since May 2026. See "One title buffers forever — every other title plays fine" below.
+  </Accordion>
+
+  <Accordion title="One title buffers forever — every other title plays fine">
+    When a single title stalls on every device (TV, phone, PC) and the rest of your library is fine, the cause is almost always the files that exist for *that* title, not your template or your device. Work through these in order.
+
+    **1. Streams are listed, but none of them start — Real-Debrid.** Around 2026-05-10 Real-Debrid started refusing cached torrents based on **filename keywords**: `WEB-DL`, `WEBRip`, `AMZN`, `NF`, `CR`, `YTS`, `RARBG` and similar release-tag conventions. RD's API reports these as `infringing_file` (error 35, surfaced as "File was removed from debrid service due to copyright infringement"); it is a heuristic filter, not a takedown against your account. Hosts that patched for it (ElfHosted and the addons it runs) drop those streams before Stremio sees them. On self-hosted and unpatched hosts the stream is still offered — the refusal only happens *after* Stremio has a playback link, so the player buffers forever instead of erroring. Titles whose entire 4K pool is WEB-DL-tagged HEVC + Dolby Vision (i.e. nearly every title that went digital recently) are hit hardest.
+
+    - **Confirm in about two minutes:** in the Real-Debrid web panel use *Add torrent* with the infohash of a stream that hangs, then with the infohash of a clean-named stream from the same list. "Not allowed" / stuck in queue on the first and an instant accept on the second is the keyword filter — not a config fault, and nothing in your template can fix it.
+    - **Tonight's workaround:** pick the file with `REMUX` or a plain `BluRay`/`BDRip` name — those are not on the keyword list. Expect 50–70 GB and ~80 Mbps for a 4K REMUX, so use Ethernet or 5 GHz.
+    - **Durable fix:** add a second service that isn't keyword-filtered (TorBox, Premiumize, AllDebrid) and keep Real-Debrid for everything else. In the configurator that means a multi-service setup, not a different template.
+
+    **2. Streams are listed, but none of them start — TorBox.** TorBox's cache lookups can over-report "cached" for hot recent releases; the file then sits in the queue at 0% and the player waits on it. Same symptom, different cause: re-add the torrent from the web panel to refresh cache state, and skip "4K HDR/DV" files under roughly 12 GB — those are downscaled fakes, and they never play from any service.
+
+    **3. The title is freshly released and has no fallback tier.** For the first 4–10 weeks after a disc date, the pool is often 4K WEB-DL/DV plus foreign re-encodes, with no 1080p x264 releases yet. Quality gates and the 1080p/720p fallback ladders can't rescue you when there is nothing to degrade *to*, which is exactly why every older title works and this one doesn't. Re-check after the disc-era encodes land.
+
+    **4. Everything looks right and only this title's *audio* is off.** Early rips of a new digital release are frequently desynced. That's the release, not your config — wait for the disc-era re-rip rather than trying to filter it out.
+
+    If you can't tell which case you're in, compare the per-stream errors from your host or debrid panel against the causes above: a *blocked file* (case 1), a *queued/uncached file* (case 2), or *no candidate at all* (case 3).
   </Accordion>
 </AccordionGroup>
 
