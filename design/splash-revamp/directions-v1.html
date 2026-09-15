@@ -195,55 +195,18 @@ footer .sup:hover{color:var(--ember);border-color:rgba(255,75,43,.35)}
     <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a>
     <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener">Core Crew</a>
     <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener">Discord</a>
-    <span class="ver">v3.7 · AIOStreams 2.32+</span>
+    <span class="ver">v3.7 · AIOStreams 2.34.0</span>
   </nav>
 </header>
-<section id="hero" style="max-width:1060px;margin:0 auto;padding:8px 22px 4px">
-  <p class="eyebrow">AIOStreams configurator · works entirely in your browser</p>
-  <h1>Your whole Stremio setup, <em>written to your account</em> — once.</h1>
-  <p class="lede" style="max-width:70ch">Log in, and Core Builds deploys <b>AIOStreams</b> (every option name checked against the pinned upstream source first),
-    <b>AIOMetadata</b> for catalogs and posters, a <b>Cinemeta patch</b> so they actually take over, and <b>subtitles</b>.
-    One install, the same setup on every device. Manifest URL or raw JSON if you'd rather not hand over a login — and old installs are replaced only when you tick it.</p>
 
-  <div class="grp" style="margin-top:18px" role="group" aria-label="Preset">
-    <h3>Start from a preset <span style="color:var(--dim);text-transform:none;letter-spacing:0">· the wizard defaults follow; everything stays editable later</span></h3>
-    <div class="chips">
-      <button class="chip" data-toast="Lean: Torrentio + Comet capped at 2 results per resolution, subtitles only — the field&rsquo;s answer to &ldquo;too many scrapers = slow lists&rdquo;. Ships today as quickProfile <em>fast</em>; this tile just names it.">Lean<small>3 addons · instant lists</small></button>
-      <button class="chip pop" aria-pressed="true" data-toast="Standard: lane-tuned scraper set (debrid or P2P), 4K-first sorting, per-device codec gates, RD keyword-refusal handling — what 74 community setups converged on. quickProfile <em>balanced</em>.">Standard<small>recommended · 8–10 scrapers</small></button>
-      <button class="chip" data-toast="Maximum: redundancy across debrid and usenet lanes, all 14 optional extras available. For the &ldquo;what if a service dies&rdquo; crowd. quickProfile <em>maximum</em>.">Maximum<small>full redundancy</small></button>
-      <button class="chip" data-toast="Prototype endpoint. The product maps this to the existing cleanInstall path (&ldquo;Previous install replaced!&rdquo;) plus a one-click export of the current config as the undo. Named safety valves are how the account tools earn trust: tick, don&rsquo;t hope.">Backup + reset<small>undo, not luck</small></button>
-    </div>
-  </div>
-
-  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:22px">
-    <button class="btn" style="padding:13px 22px;font-size:.95rem" data-toast="Prototype endpoint. The real door is open-express-lane: email + password (or paste an AuthKey), manifest check, then pushToStremio. If the login step fails you still get the working manifest URL — never a dead end.">Set up my account</button>
-    <button class="btn" id="tuneOpen" style="padding:13px 18px;background:transparent;border:1px solid rgba(0,212,255,.35);color:#00d4ff">Tune it first — see every cut ↓</button>
-    <span class="path" data-path="json" style="font-size:.8rem">🧾 Download JSON</span>
-  </div>
-
-  <div class="trust" style="margin-top:18px"><span>82 preset ids verified vs AIOStreams <code>e694b6a</code></span><span>keys go to your chosen host only</span><span>open source · MIT</span><span>update in place</span></div>
-</section>
-
-<section class="fold" aria-label="What lands in your account" style="max-width:1060px">
-  <div class="fold-head">
-    <div><p class="eyebrow">02 / the payload</p><h2>What lands in your account</h2></div>
-    <span class="idx">every count true in-repo today</span>
-  </div>
-  <div class="payload">
-    <div class="pcard"><b>⚙️ AIOStreams config</b><p>74 named community setups to start from. A setting the host would reject fails visibly at build time — it is never silently dropped from your export.</p><span>82 preset ids · 0 guessed</span></div>
-    <div class="pcard"><b>🗂 AIOMetadata catalogs</b><p>Two curated exports — <b>full</b> (74 of 91 catalogs on) and <b>movies-tv</b> (60 of 71) — v2.7.1, with the Cinemeta patch so posters and ratings actually switch over.</p><span>what everyone else installs by hand</span></div>
-    <div class="pcard"><b>💬 Subtitles</b><p>AIOSubtitle on by default; OpenSubtitles v3+ and SubDL are one checkbox each, with household languages set once and shipped to every device.</p><span>in the plan, not an afterthought</span></div>
-    <div class="pcard"><b>🔌 Your services</b><p>Real-Debrid, TorBox, Premiumize, AllDebrid, DebridLink, Easynews, OffCloud — plus 14 optional extras (Sootio, Knaben, NekoBT, WebStreamr, yastream…), each gated to lanes where the host accepts it.</p><span>inert on a lane = not emitted</span></div>
-    <div class="pcard"><b>🖥 Host, your call</b><p>The ElfHosted community instance or your own URL — capabilities checked against 8 audited public hosts before anything is emitted for the wrong AIOStreams version.</p><span>min 2.32.0 · contract pinned at 2.34.0</span></div>
-    <div class="pcard"><b>🛟 Undo first</b><p>One-click export of your current config, clean-install replaces the old manifest on request, and a failed account push still hands you the working manifest URL. There is always a way back.</p><span>&ldquo;wipe&rdquo; is a ticked choice</span></div>
-  </div>
-</section>
-
-<details class="tune" id="tune" open="false">
-  <summary>Tune it first — watch the policy cut a real stream list <small>Mortal Kombat II · 2026 · tt17490712 — the same probe behind the troubleshooting docs</small></summary>
-<div class="hero-grid" style="padding:18px 4px 6px">
+<!-- ═══════════ HERO: the engine, live ═══════════ -->
+<section id="hero" class="hero-grid">
   <div>
-    <p class="lede" style="margin-bottom:4px">Same policy the export runs — <b>pick chips, watch the list react.</b> On the real page this drawer is where <i>Advanced</i> starts; nothing above it depends on it.</p>
+    <p class="eyebrow">AIOStreams configurator · no JSON · no account</p>
+    <h1>Your streams,<br>cut by <em>rules you can see.</em></h1>
+    <p class="lede">Pick a device, a resolution and a service. The list reacts with the same policy your export
+      runs — 4K-first sorting, codec gates per panel, and streams your debrid would only ever hang on, removed
+      at build time instead of left in the list.</p>
 
     <div class="grp" style="margin-top:20px" role="group" aria-label="Device">
       <h3>Device <span style="color:var(--dim);text-transform:none;letter-spacing:0">· from devices.js profiles</span></h3>
@@ -287,7 +250,7 @@ footer .sup:hover{color:var(--ember);border-color:rgba(255,75,43,.35)}
 
     <div class="receipt" style="margin-top:12px">
       <span class="lbl">What you'd get</span>
-      <h2 id="tplName">Core Builds · 4K · Shield TV — TorBox</h2>
+      <h2 id="tplName">Core Nexus · 4K · Shield TV — TorBox</h2>
       <div class="sub" id="tplSub">device audio: lossless ✓ · AV1: not assumed · DV: safe</div>
       <div class="paths">
         <span class="path" data-path="app">⤓ Install to app</span>
@@ -300,43 +263,95 @@ footer .sup:hover{color:var(--ember);border-color:rgba(255,75,43,.35)}
     </div>
     <div class="trust"><span>Runs locally</span><span>Keys never uploaded</span><span>Open source · MIT</span><span>Update in place</span></div>
   </div>
+</section>
+
+<!-- ═══════════ BENTO OF TRUTH ═══════════ -->
+<section class="fold" aria-label="What this tool verifies">
+  <div class="fold-head">
+    <div><p class="eyebrow">02 / receipts, not adjectives</p><h2>What runs before you can click save</h2></div>
+    <span class="idx">bento · live where a source exists</span>
+  </div>
+  <div class="bento">
+    <div class="cell c4">
+      <span class="live off" id="counterLive">not live</span>
+      <h3>Adoption, measured — not estimated</h3>
+      <div class="big" id="counterRow"><i>—</i> visits · <i>—</i> templates built</div>
+      <p>Pulled from the same counter worker the real configurator pings on load. If it can't be reached,
+        the cell says so — the design rule for this page is <em>no “live” badge without a fetch behind it</em>.</p>
+    </div>
+    <div class="cell c2">
+      <h3>Upstream, pinned</h3>
+      <div class="big">e694b6a</div>
+      <p>Option names snapshot-generated from AIOStreams v2.34.0 in CI. Never hand-written, so “Option X is
+        required, got undefined” rejections are a class we can't ship.</p>
+    </div>
+    <div class="cell c2">
+      <h3>Host truth</h3>
+      <p style="margin-bottom:2px"><b style="color:var(--txt)">8 public hosts</b>, probed, never guessed. Sources a host can't serve show inert with the reason.</p>
+      <div class="hosts">
+        <span>ElfHosted <i>2.34.0</i> <b>✓</b></span><span>Kuu <i>2.34.0</i> <b>✓</b></span>
+        <span>ATBP <i>2.34.0</i> <b>✓</b></span><span>Viren <i>nightly</i> <b>✓</b></span>
+        <span>Midnight <i>2.33.2</i> <b>✓</b></span><span>Wizaardd <i>2.33.2</i> <b>✓</b></span>
+      </div>
+      <p style="font-size:10.5px;color:var(--dim);margin-top:7px">audit 2026-09-06 snapshot — in the product this cell is a live probe</p>
+    </div>
+    <div class="cell c2">
+      <h3>Known failure classes → tests</h3>
+      <ul class="testify">
+        <li>1080p outranks 4K <code>sort-4k-first</code> <em>pinned</em></li>
+        <li>key with trailing space <code>import-sanitizer</code> <em>pinned</em></li>
+        <li>host regex reject <code>regex-allowlist</code> <em>preflight</em></li>
+        <li>required-option reject <code>schema-sweep</code> <em>pinned</em></li>
+        <li>unknown preset type <code>contract-coverage</code> <em>pinned</em></li>
+      </ul>
+    </div>
+    <div class="cell c3">
+      <h3>The uncomfortable cell</h3>
+      <p>Real-Debrid has refused <b style="color:var(--txt)">WEB-DL / WEBRip / AMZN / NF / RARBG</b> filename classes
+        since ~2026-05-10 (API 35, <span style="font-family:var(--mono);font-size:11px">infringing_file</span>).
+        Configs on RD have that class removed at build time — so you get a shorter, working list instead of a
+        spinner that never resolves. <a href="#" data-toast="Ships as docs/troubleshooting.mdx — 'One title buffers forever — every other title plays fine', already written on this branch." id="rdLink">Why, in the docs →</a></p>
+    </div>
+    <div class="cell c3">
+      <h3>Everything else you can do here</h3>
+      <p><b style="color:var(--txt)">74</b> ready-made setups (Stable · TorBox · Usenet · Personal) ·
+        <b style="color:var(--txt)">14</b> keyless extras, gated to lanes that can run them ·
+        <b style="color:var(--txt)">26</b> device audio profiles ·
+        per-device codec, DV and bitrate policy — no hand-edits after a host bump.</p>
+    </div>
   </div>
 
-</details>
-
-<footer class="slim">
-  <div class="fcol">
-    <span class="live off" id="counterLive">not live</span>
-    <div class="big" id="counterRow" style="font-size:.9rem"><i>—</i> visits · <i>—</i> templates built</div>
-    <p style="margin:0;font-size:.7rem;color:var(--dim)">Same counter worker the real configurator pings on load; it says “offline here” instead of faking.</p>
+  <div class="fold-head" style="margin-top:30px">
+    <div><p class="eyebrow">03 / the field</p><h2>Why the splash leads with a demo, not a pitch</h2></div>
+    <span class="idx">what their users report</span>
   </div>
-  <div class="fcol right">
-    <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">Docs &amp; GitHub</a>
-    <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener">Reddit</a>
-    <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener">Discord</a>
-    <span class="sup" id="supBtn">♥ Support</span>
+  <div class="strip">
+    <div class="cell"><b>“Sorting seems random — HD before 4K”</b><p>a builder's own release thread, v3</p></div>
+    <div class="cell"><b>“Missing config field” on import</b><p>formatter builder, share-URL and JSON both rejected</p></div>
+    <div class="cell"><b>“Installer rejected my key — it added a space”</b><p>the whole product, one character</p></div>
+    <div class="cell"><b>“Configured from a shared link, next day nothing loaded”</b><p>no host/version awareness upstream</p></div>
+    <div class="cell"><b>“Same stream repeats 8–10 times”</b><p>dedup is policy, not luck</p></div>
+  </div>
+</section>
+
+<footer>
+  <div>Core Builds by Brevity · template suite 3.7.0 · minimum AIOStreams 2.32.0 · MIT</div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <span class="sup" id="supBtn">♥ Support Core Builds</span>
+    <a href="#" data-toast="Prototype only — the real page keeps its tour and deep links (#advanced, #update).">Tour</a>
   </div>
 </footer>
+<p style="font-size:10.5px;color:var(--dim);padding-bottom:18px">
+  Prototype data: device ceilings/audio/AV1/DV sets from configurator/src/data/devices.js · preset ids from the
+  generated upstream contract (AIOStreams e694b6a) · counts from Templates/ and data/scrapers.js · stream pool from
+  the live 2026-09-14 probe of the public Torrentio endpoint for tt17490712. Demo policy is a simplified mirror of
+  the shipped ESE stack; the product's truth is src/core/. Shipping note: landing-ia.test.mjs pins the current
+  Express-first layout and must move with this page in the same commit.
+</p>
+</div>
+
 <div id="toast" role="status" aria-live="polite"></div>
 
-<style>
-.payload{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px}
-.pcard{border:1px solid var(--line,rgba(255,255,255,.09));background:rgba(13,21,31,.7);border-radius:14px;padding:16px 17px;display:grid;gap:8px;align-content:start}
-.pcard b{font-size:.92rem}
-.pcard p{margin:0;font-size:.8rem;line-height:1.55;color:var(--mut,#8b949e)}
-.pcard span{font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:rgba(94,234,212,.66)}
-details.tune{max-width:1060px;margin:26px auto 0;border:1px solid var(--line,rgba(255,255,255,.09));border-radius:16px;background:rgba(13,21,31,.5)}
-details.tune>summary{cursor:pointer;list-style:none;padding:15px 20px;font-weight:800;font-size:.92rem;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-details.tune>summary::-webkit-details-marker{display:none}
-details.tune>summary small{font-weight:600;color:var(--dim,#637185)}
-details.tune>summary::before{content:"▸";color:#00d4ff}
-details.tune[open]>summary::before{content:"▾"}
-footer.slim{max-width:1060px;margin:34px auto 0;padding:18px 22px 30px;border-top:1px solid var(--line,rgba(255,255,255,.09));display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;align-items:flex-start}
-footer.slim .right{display:flex;gap:16px;align-items:center;font-size:.8rem}
-footer.slim a{color:var(--mut,#8b949e);text-decoration:none}
-footer.slim .sup{color:#f87171;cursor:pointer;font-weight:700}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-</style>
 <script>
 'use strict';
 /* Device metadata is read verbatim from configurator/src/data/devices.js:
@@ -418,7 +433,7 @@ function render(){
     : 'option names verified against AIOStreams e694b6a · 82 preset ids, 0 guessed';
   document.getElementById('ringArc').setAttribute('stroke-dasharray', (rd?94:97)+' 100');
   document.getElementById('tplName').textContent =
-    `Core Builds · ${state.res==='4k'?'4K':'1080p'} · ${d.label} — ${state.svc==='rd'?'Real-Debrid':'TorBox'}`;
+    `Core Nexus · ${state.res==='4k'?'4K':'1080p'} · ${d.label} — ${state.svc==='rd'?'Real-Debrid':'TorBox'}`;
   document.getElementById('tplSub').textContent =
     `device audio: ${d.audio} · AV1: ${d.av1?'safe':'not assumed'} · DV: ${d.dv?'safe':'excluded when DV-only'} · ceiling ${d.cap}p`;
   const done = [!!state.svc, !!state.dev, !!state.res, false, false];
@@ -442,16 +457,15 @@ document.addEventListener('click', e=>{
     return;
   }
   const t = e.target.closest('[data-toast]') || (e.target.id==='deployBtn' ? {dataset:{toast:
-    'Prototype endpoint. In the product this is the Express Install hand-off: the five steps, four already done by the chips above — key and Deploy remain.'}} : null);
+    'Prototype endpoint. In the product this button keeps its real <em>data-action="open-express-lane"</em> and the five-step flow takes it from here — your chips above are already the first three steps.'}} : null);
   if (t) toast(t.dataset.toast);
 });
-document.querySelectorAll('[data-toast]').forEach(()=>{}); /* hero CTAs handled by delegated listener */
 document.querySelectorAll('.path').forEach(p=>p.onclick=()=>toast(
-  p.dataset.path==='app' ? 'Set up my account — pushToStremio: manifest check, then AIOStreams + AIOMetadata + Cinemeta patch written into your Stremio account. Same setup on every device where you log in.'
+  p.dataset.path==='app' ? 'Direct install — the real page does the manifest check, then hands off. If an addon 500s, you get “save without it”, not a dead end.'
   : p.dataset.path==='url' ? 'Copy manifest URL — same config, paste it anywhere Stremio-compatible (Nuvio, WuPlay…).'
   : 'Download JSON — full config file, keys redacted in the export warning since 30980fc.'));
 document.getElementById('supBtn').onclick = ()=>toast(
-  'Moved on purpose: support lives in the footer and the changelog dialog. The hero shows what lands in your account, not the machinery.');
+  'Moved on purpose: support lives in the footer and the changelog dialog. The hero’s centre of gravity is the engine, not the tip jar.');
 
 let tt;
 function toast(html){ const el=document.getElementById('toast'); el.innerHTML=html; el.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('show'),5200); }
@@ -470,12 +484,5 @@ function toast(html){ const el=document.getElementById('toast'); el.innerHTML=ht
 
 render();
 </script>
-<script>
-document.getElementById('tuneOpen').onclick = () => {
-  const t = document.getElementById('tune'); t.open = true;
-  t.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
-};
-</script>
-</div>
 </body>
 </html>

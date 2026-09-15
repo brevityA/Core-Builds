@@ -5,10 +5,15 @@ lived in the 2026-09-15 session (`/home/user/research/splash-revamp-competitive-
 which a sandbox reset deleted — the load-bearing findings are restated here so they can't be lost
 again, which is also why this folder is in the repo instead of a scratch dir.
 
-**Prototype:** `index.html` in this folder is a static, self-contained mock of the recommended
-composite (directions A + C + D). Open it directly in a browser; no build, no deps. It reads
-nothing from the network except the counter worker (`/api/stats`) and degrades to a dash with an
-honest `offline here` badge when unreachable.
+**Prototype:** `index.html` in this folder is a static, self-contained mock — **v2 (2026-09-15, simplified per
+the "it complicates the page" note + the add-on-stack research in `why-theyre-popular-2026-09-15.md`)**: hero =
+named presets (Lean/Standard/Maximum/Backup) over one CTA "Set up my account", a "what lands in your account"
+payload grid (AIOStreams · AIOMetadata 74/91 catalogs · Cinemeta patch · subtitles · services · undo), two trust
+lines, and the whole policy-demo engine demoted into a collapsed "Tune it first" drawer. `directions-v1.html`
+keeps the previous composite (live-policy hero + bento of truth) for comparison. Open either directly in a
+browser; no build, no deps. They read nothing from the network except the counter worker (`/api/stats`) and
+degrade to a dash with an honest `offline here` badge when unreachable.
+
 
 ## The recommendation, one paragraph
 
