@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Core Builds — UI Lab · uniformity & preview prototypes</title>
+<style>
+:root{--bg:#070b12;--panel:#0d151f;--ink:#e6edf3;--mut:#8b949e;--dim:#637185;--line:rgba(255,255,255,.09);--cyan:#00d4ff;--emerald:#34d399;--rose:#f87171;--amber:#fbbf24}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% -6%,rgba(0,212,255,.08),transparent 32%),var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:26px 16px 60px}
+.wrap{max-width:1140px;margin:0 auto}
+.eyebrow{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);font-weight:800;margin:0}
+h1{font-size:1.5rem;margin:6px 0 4px}h2{font-size:1.05rem;margin:0}.lede{color:var(--mut);font-size:.82rem;max-width:74ch;margin:6px 0 0}
+.metrics{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.metric{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 14px;font-size:.7rem;color:var(--mut)}
+.metric b{display:block;font-size:1.05rem;color:var(--ink)}.metric em{font-style:normal;color:var(--emerald);font-weight:800}
+.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#0b1220,#080d15);margin-top:26px;padding:18px 20px}
+.ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.dev{border:1px solid var(--line);background:transparent;color:var(--mut);border-radius:99px;padding:7px 14px;font-weight:800;font-size:.74rem;cursor:pointer}
+.dev.on{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.08)}
+label.tg{display:flex;gap:7px;align-items:center;font-size:.74rem;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:6px 12px;cursor:pointer}
+label.tg input{accent-color:var(--cyan)}
+label.tg b{color:var(--emerald);font-weight:800}
+input[type=range]{width:240px;accent-color:var(--cyan)}
+.wlbl{font-size:.72rem;color:var(--dim);font-variant-numeric:tabular-nums;min-width:74px}
+.stage{margin-top:14px;border:1px dashed rgba(255,255,255,.12);border-radius:14px;padding:14px;display:flex;justify-content:center;background:repeating-linear-gradient(135deg,transparent 0 12px,rgba(255,255,255,.012) 12px 24px)}
+.frame{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:width .12s ease;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.fbody{padding:12px;position:relative;overflow-y:auto;max-height:560px;background:radial-gradient(circle at 20% 0%,rgba(0,212,255,.05),transparent 40%)}
+.mtop{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;gap:8px}
+.mbrand{font-size:.6rem;font-weight:900;letter-spacing:.14em}.mbrand b{color:var(--cyan)}
+.mlinks{display:flex;gap:9px;font-size:.56rem;color:var(--mut);white-space:nowrap}
+.mlinks.hide a{display:none}
+.mlinks.scroll{overflow-x:auto;scroll-snap-type:x proximity;max-width:58%}
+.mlinks.scroll a{scroll-snap-align:start;border:1px solid var(--line);border-radius:99px;padding:3px 9px}
+.mh1{font-family:Georgia,serif;font-weight:800;line-height:.96;letter-spacing:-.05em;margin:12px 0 6px}
+.mlede{color:var(--mut);margin:0 0 8px}
+.mchips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.mchip{border:1px solid var(--line);border-radius:8px;color:#c9d5df;font-weight:700;white-space:nowrap}
+.mchip.on{border-color:rgba(0,212,255,.5);background:rgba(0,212,255,.07);color:#67e8f9}
+.mdoors{display:grid;gap:6px;margin-top:10px}.mdoor{border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-weight:800;font-size:inherit;color:#c9d5df}
+.mdoor.pri{border-color:rgba(0,212,255,.45);background:linear-gradient(145deg,rgba(0,212,255,.08),transparent)}
+.mstage{display:grid;place-items:center;border:1px dashed rgba(255,255,255,.1);border-radius:10px;padding:14px;color:var(--dim);font-size:.62rem;text-align:center;min-height:64px}
+.mreceipt{border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.04);border-radius:10px;padding:9px 11px;font-size:.62rem;color:var(--mut);text-align:left}
+.mreceipt b{color:var(--ink)}.mreceipt li{margin:3px 0}
+.msticky{position:sticky;bottom:4px;display:block;width:fit-content;margin:8px auto 0;background:var(--cyan);color:#04121b;font-weight:900;border-radius:99px;padding:7px 16px;font-size:.62rem;box-shadow:0 8px 22px rgba(0,212,255,.35)}
+.ruler{position:relative;height:26px;margin-top:10px;border-top:1px solid var(--line)}
+.ruler i{position:absolute;top:2px;width:2px;height:14px;background:var(--rose);opacity:.85}
+.ruler u{position:absolute;top:2px;width:3px;height:20px;background:var(--emerald);border-radius:2px;text-decoration:none}
+.ruler small{position:absolute;top:16px;font-size:.52rem;color:var(--dim);transform:translateX(-50%);white-space:nowrap}
+.rlbl{font-size:.62rem;color:var(--dim);margin-top:2px}
+.grid19{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:14px}
+.ft{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column}
+.ft img{width:100%;display:block;background:#0a0f16;border-bottom:1px solid var(--line)}
+.ft .noimg{height:74px;display:grid;place-items:center;font-size:.62rem;color:var(--amber);border-bottom:1px dashed rgba(251,191,36,.35);background:rgba(251,191,36,.03)}
+.ft .fbb{padding:9px 11px;display:grid;gap:4px}
+.ft .fbb b{font-size:.78rem}.ft .fbb span{font-size:.62rem;color:var(--dim);line-height:1.45}
+.badge{font-size:.54rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 6px;vertical-align:2px}
+.place{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.pmock{border:1px dashed rgba(255,255,255,.14);border-radius:12px;padding:12px;background:rgba(13,21,31,.5)}
+.pmock h4{margin:0 0 8px;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+.pchip{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:6px 9px;margin-top:6px;font-size:.66rem;color:#c9d5df;font-weight:700}
+.pchip img{height:26px;border-radius:5px;background:#0a0f16}.pchip.sel{border-color:rgba(0,212,255,.5);background:rgba(0,212,255,.06)}
+.note{font-size:.7rem;color:var(--dim);margin-top:10px;line-height:1.6}
+.note code{color:#67e8f9}
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#111b27;border:1px solid rgba(0,212,255,.3);color:var(--ink);padding:10px 16px;border-radius:10px;font-size:.76rem;max-width:min(560px,90vw);transition:.18s;z-index:99}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.foot{max-width:1140px;margin:26px auto 0;font-size:.68rem;color:var(--dim);display:flex;gap:16px;flex-wrap:wrap}
+.foot a{color:var(--mut)}
+@media (prefers-reduced-motion:reduce){.frame{transition:none}}
+</style></head><body><div class="wrap">
+<p class="eyebrow">Core Builds · UI Lab · companion to ui-uniformity-2026-09-15.md</p>
+<h1>Every recommendation from the research, in one interactive page</h1>
+<p class="lede">Panel A makes the <em>breakpoint patchwork</em> visible — drag the width and watch components reflow at thirteen different pixels, or flip to the two-step system and watch them snap together. The fix toggles apply exactly the proposed CSS to the mock. Panel B is the “screenshots, not icons” move using <b>your repo's own preview SVGs</b> — including the gap: the default and flagship formatters have no preview asset at all.</p>
+
+<div class="metrics">
+  <div class="metric"><b>143 → <em>0</em></b>!important outside the mobile layer (proposal)</div>
+  <div class="metric"><b>13 → <em>2</em></b>breakpoints: 600 + 1000 (+1500 cap)</div>
+  <div class="metric"><b>29px → <em>44px</em></b>splash chip tap height, via pointer:coarse too</div>
+  <div class="metric"><b>456 inline</b>font sizes in app.js · 116 under .7rem · root-lift +10%</div>
+  <div class="metric"><b>0 → <em>6</em></b>inputmode/enterkeyhint added to credential fields</div>
+  <div class="metric"><b>17 of 19</b>formatters have previews · <b style="color:var(--amber)">family-v4 + ultra don't</b></div>
+</div>
+
+<section class="panel">
+  <h2>A · Responsive workbench <span style="font-weight:400;color:var(--dim);font-size:.74rem">— real metrics from 01-core.css / 04-landing.css, scaled 1:1</span></h2>
+  <div class="ctl">
+    <button class="dev" data-w="390">390 · phone</button><button class="dev" data-w="768">768 · tablet</button><button class="dev on" data-w="1280">1280 · laptop</button>
+    <input type="range" id="wRange" min="320" max="1280" step="2" value="1280"><span class="wlbl" id="wLbl">1280 px</span>
+    <button class="dev" id="modeBtn" style="border-color:rgba(52,211,153,.5);color:var(--emerald)">mode: CURRENT (13 breakpoints)</button>
+  </div>
+  <div class="ctl">
+    <label class="tg"><input type="checkbox" id="fxChips"><b>fix</b> 44px chips + touch-action</label>
+    <label class="tg"><input type="checkbox" id="fxNav"><b>fix</b> snap-scroll topbar links</label>
+    <label class="tg"><input type="checkbox" id="fxType"><b>fix</b> root type lift (17px &lt;600)</label>
+    <label class="tg"><input type="checkbox" id="fxCta"><b>fix</b> sticky mini-CTA</label>
+    <label class="tg"><input type="checkbox" id="fxPayload" checked><b>fix</b> payload receipt &gt; donation glow</label>
+  </div>
+  <div class="stage"><div class="frame" id="frame" style="width:1280px"><div class="fbody" id="fb"></div></div></div>
+  <div class="ruler" id="ruler"></div>
+  <div class="rlbl">red = a component's own breakpoint firing (current layer files) · green = unified system · <span id="ruleCap"></span></div>
+</section>
+
+<section class="panel">
+  <h2>B · The preview wall <span style="font-weight:400;color:var(--dim);font-size:.74rem">— real <code>Assets/Formatters/*.svg</code> from the repo, loaded live; click a tile to open full size</span></h2>
+  <div class="grid19" id="fwall"></div>
+  <div class="place">
+    <div class="pmock"><h4>…on the landing (bento rule: product, not icons)</h4>
+      <div class="pchip"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg">Family v3 · Legacy</div>
+      <div class="pchip sel"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg">Sigma · Popular</div>
+      <div class="pchip"><span class="noimg" style="height:26px;width:44px;border-radius:5px;display:inline-grid"></span>Ultra — <i>needs preview PNG</i></div>
+      <p class="note">One row of these replaces the whole “what is a formatter” paragraph. QuackStart does this with PNGs; yours are repo-owned SVGs at 1:1.</p></div>
+    <div class="pmock"><h4>…in the wizard's formatter step</h4>
+      <div class="pchip sel"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg">Apex v2 — selected</div>
+      <div class="pchip"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg">TV minimal</div>
+      <p class="note">Current step shows label + desc text only. Thumbnails here come from the same <code>img:</code> field <code>formatters.js</code> already ships — zero new assets needed except the two missing ones.</p></div>
+  </div>
+  <p class="note"><b>Action for the repo if approved:</b> author preview SVGs for <code>family-v4</code> (the default!) and <code>ultra</code> (flagship) in <code>Assets/Formatters/</code>, matching the existing 17. Then <code>formatters.js</code> has 19/19 and both the landing strip and the wizard step can render the wall unmodified.</p>
+</section>
+
+<footer class="foot"><span>Prototype — nothing here is in the configurator yet.</span><a href="index.html">v3 splash · proposed vs current</a><a href="ui-uniformity-2026-09-15.md">the research note</a><span>previews load from raw.githubusercontent.com; offline = dark tiles, by design no fake art.</span></footer>
+</div>
+<div id="toast" role="status"></div>
+<script>
+const FMTS = [{"id":"family-v3","label":"Family v3","badge":"Legacy","bc":"#6b7280","desc":"Human-readable \u00b7 \u2705 Plays Fast \u00b7 network source \u00b7 edition badges \u00b7 by RB3","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg"},{"id":"apex-v2","label":"Apex v2","badge":"Rich","bc":"#7c3aed","desc":"4-line \u00b7 colored resolution \u00b7 emoji HDR tags \u00b7 elite badges \u00b7 bitrate","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg"},{"id":"sigma","label":"Sigma","badge":"Elegant","bc":"#0891b2","desc":"4-line \u00b7 \u300c \u300d brackets \u00b7 \u300e \u300f elite marks \u00b7 smallcaps audio","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg"},{"id":"minimal","label":"Minimal","badge":"Clean","bc":"#059669","desc":"3-line \u00b7 audio tag in title \u00b7 quality \u00b7 bitrate \u00b7 size below","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg"},{"id":"prime","label":"Prime","badge":"Classic","bc":"#d97706","desc":"4-line \u00b7 \ud83d\udda5\ufe0f resolution \u00b7 plain text audio labels \u00b7 full metadata","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/nexus-prime-preview.svg"},{"id":"tv","label":"TV","badge":"Compact","bc":"#dc2626","desc":"3-line \u00b7 uppercase \u00b7 quality+visual+size on one line \u00b7 TV-friendly","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg"},{"id":"apex","label":"Apex","badge":"Classic","bc":"#7c3aed","desc":"4-line \u00b7 audio codec in name \u00b7 two-tier score badge \u00b7 PREMIER","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-preview.svg"},{"id":"elite","label":"Elite","badge":"Dense","bc":"#2563eb","desc":"4-line \u00b7 emoji resolution circles \u00b7 INSTANT/UNCACHED \u00b7 PREMIER badges","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/elite-preview.svg"},{"id":"uniform","label":"Uniform","badge":"Legacy","bc":"#6b7280","desc":"4-line \u00b7 \ud83d\udda5\ufe0f resolution \u00b7 plain text \u00b7 replaced by Elite","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/uniform-preview.svg"},{"id":"syntax","label":"Core Syntax","badge":"Original","bc":"#8b5cf6","desc":"\u300c \u300d brackets \u00b7 \u2726/\u2727 cache \u00b7 \u25c8 ELITE badge \u00b7 original formatter","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-preview.svg"},{"id":"syntax-v3","label":"Core Syntax V3","badge":"Updated","bc":"#a855f7","desc":"\u300c \u300d brackets \u00b7 JBL Spatial \u00b7 \u2605 Premium badge \u00b7 IMAX/edition flags","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg"},{"id":"omni-diamond","label":"Omni Diamond","badge":"Dense","bc":"#0ea5e9","desc":"Two-line name \u00b7 maximum metadata density \u00b7 \ud83d\udd39 diamond dots","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/omni-diamond-preview.svg"},{"id":"zenith-diamond","label":"Zenith Diamond","badge":"Polished","bc":"#06b6d4","desc":"\ud83d\udd39/\ud83d\udd38 dots \u00b7 encode + audio + PREMIER in name line","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/zenith-diamond-preview.svg"},{"id":"auburn-tiger","label":"Auburn Tiger","badge":"Warm","bc":"#ea580c","desc":"\ud83d\udd38 orange/navy \u00b7 \ud83d\udc05 release prefix \u00b7 warm editorial feel","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/auburn-tiger-preview.svg"},{"id":"midnight-slate","label":"Midnight Slate","badge":"No Emoji","bc":"#475569","desc":"ASCII symbols only \u00b7 no emoji \u00b7 for clients with poor emoji rendering","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/midnight-slate-preview.svg"},{"id":"rb3-clean","label":"RB3 Clean v4","badge":"Community","bc":"#f59e0b","desc":"Bold unicode \u00b7 three-line name \u00b7 italic quality source","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-clean-v4-preview.svg"},{"id":"rb3","label":"RB3","badge":"Community","bc":"#f97316","desc":"\ud83d\udd38/\ud83d\udd39 smallcaps \u00b7 Auburn Tiger paired \u00b7 JBL Spatial \u00b7 PREMIER","img":"https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg"}];
+const state = { w: 1280, unified: false, chips: false, nav: false, type: false, cta: false, payload: true };
+const CUR_BP = [360,380,400,420,480,520,580,599,640,720,820,1000,1600];
+const NEW_BP = [600,1000];
+function bpset(){ return state.unified ? NEW_BP : CUR_BP; }
+function stacks(){ return state.unified ? 600 : 820; }           // hero columns stack
+function doorsSingle(){ return state.unified ? 600 : 520; }      // doors grid 2→1
+function navHide(){ return state.unified ? false : 520; }       // topbar links vanish
+function chipScale(){ return state.unified ? 600 : 480; }       // chips shrink
+function typeLift(){ return (state.type && state.w < 600) ? 17 : 16; }
+function s(){ return state.w / 1280 > .55 ? 1 : state.w/880; } // keep mock legible, real px for phone
+function px(v){ return Math.max(9, +(v*s()).toFixed(2)) + 'px'; }
+
+function draw(){
+  const f = document.getElementById('frame'); f.style.width = Math.min(state.w, document.querySelector('.stage').clientWidth-2)+'px';
+  document.getElementById('wLbl').textContent = state.w+' px';
+  document.querySelectorAll('.dev[data-w]').forEach(b=>b.classList.toggle('on', +b.dataset.w===state.w));
+  const root = typeLift(), u = x=>px(x*root/16);
+  const chipCss = state.chips
+    ? 'min-height:44px;padding:11px 16px;display:flex;align-items:center;gap:6px;touch-action:manipulation'
+    : 'padding:'+ (state.w<=chipScale()? '5px 9px':'7px 11px');
+  const linksCls = state.nav ? 'scroll' : (navHide() && state.w<=navHide() ? 'hide' : '');
+  const stacked = state.w <= stacks();
+  document.getElementById('fb').innerHTML = `
+    <div class="mtop"><span class="mbrand" style="font-size:${u(.85)}">CORE <b>BUILDS</b></span>
+      <span class="mlinks ${linksCls}"><a>Templates</a><a>GitHub</a><a>Reddit</a><a>Discord</a><span style="border:1px solid var(--line);border-radius:5px;padding:1px 6px">v3.7</span></span></div>
+    <div style="display:grid;grid-template-columns:${stacked?'1fr':'1.25fr .9fr'};gap:${u(12)}">
+      <div>
+        <p class="eyebrow" style="font-size:${u(.66)}">AIOStreams configurator</p>
+        <div class="mh1" style="font-size:${u(state.w<=520&&!state.unified ? 2.7 : Math.min(4.4, Math.max(2.65, state.w*0.0042)))}">Build streams with intent.</div>
+        <p class="mlede" style="font-size:${u(.82)};max-width:${stacked?'100%':'52ch'}">Service, device, preferences → a checked AIOStreams template. Account push available.</p>
+        <div class="mchips">${['TorBox','AllDebrid','Real-Debrid','EasyNews','Free'].map((c,i)=>`<span class="mchip ${i==0?'on':''}" style="${chipCss};font-size:${u(.65)}">${c}</span>`).join('')}</div>
+        <div class="mdoors" style="grid-template-columns:${(state.w<=doorsSingle())?'1fr':'1fr 1fr'}">
+          <div class="mdoor pri" style="font-size:${u(.72)}">⚡ Set up my account · <b style="color:#67e8f9">full stack</b></div>
+          <div class="mdoor" style="font-size:${u(.66)}">Formatter: Family v4 · preview renders right here in the proposed build</div>
+        </div>
+      </div>
+      <div class="mstage">${state.payload
+        ? `<div class="mreceipt"><b>Your account gets</b><ul style="margin:5px 0 0;padding-left:16px"><li>AIOStreams · 82 ids host-checked</li><li>AIOMetadata · 74/91 catalogs</li><li>Cinemeta patch · subtitles on</li></ul></div>`
+        : 'tap the core to support ♥<br>(current hero right slot — 245px of glow)'}</div>
+    </div>
+    ${state.cta && state.w<=600 ? '<span class="msticky">Set up my account</span>' : ''}`;
+  const r = document.getElementById('ruler'); const max=1280;
+  r.innerHTML = bpset().map(b=> b===NEW_BP[0]||b===NEW_BP[1]
+      ? `<u style="left:${(Math.min(b,max)/max*100)}%"></u><small style="left:${(Math.min(b,max)/max*100)}%">${b}${state.unified?' ← only':''}</small>`
+      : `<i style="left:${(b/max*100)}%"></i><small style="left:${(b/max*100)}%">${b}</small>`).join('')
+    + `<small style="left:${(state.w/max*100)}%;color:var(--cyan);top:0;font-weight:900">▲</small>`;
+  document.getElementById('ruleCap').innerHTML = state.unified
+    ? '<span style="color:var(--emerald)">everything snaps together — one reflow to reason about, one to test</span>'
+    : '<span style="color:var(--rose)">13 thresholds from 7 files · drag slowly: pieces jump one by one</span>';
+}
+document.getElementById('wRange').addEventListener('input',e=>{state.w=+e.target.value;draw();});
+document.querySelectorAll('.dev[data-w]').forEach(b=>b.onclick=()=>{state.w=+b.dataset.w;document.getElementById('wRange').value=state.w;draw();});
+document.getElementById('modeBtn').onclick=e=>{state.unified=!state.unified;e.target.textContent = state.unified?'mode: UNIFIED (600 · 1000)':'mode: CURRENT (13 breakpoints)';draw();};
+['Chips','Nav','Type','Cta','Payload'].forEach(k=>document.getElementById('fx'+k).addEventListener('change',e=>{state[k.toLowerCase()]=e.target.checked;draw();}));
+
+function toast(m){const t=document.getElementById('toast');t.innerHTML=m;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),5200);}
+document.getElementById('fwall').innerHTML = FMTS.map(f=>`
+  <div class="ft"><a href="${f.img}" target="_blank" rel="noopener"><img loading="lazy" src="${f.img}" alt="${f.label} preview" onerror="this.outerHTML='<div class=&quot;noimg&quot;>preview asset unreachable offline</div>'"></a>
+  <div class="fbb"><b>${f.label}${f.badge?` <span class="badge" style="background:${f.bc}22;color:${f.bc};border:1px solid ${f.bc}55">${f.badge}</span>`:''}</b><span>${f.desc}</span></div></div>`).join('')
+ + `<div class="ft" style="border-color:rgba(251,191,36,.4)"><div class="noimg" style="height:74px">⚠ no preview asset</div><div class="fbb"><b>Family v4 <span class="badge" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Default</span></b><span>The formatter everyone sees first — and the only one of 19 without a preview. Author one and this whole wall renders the product instead of adjectives.</span></div></div>
+   <div class="ft" style="border-color:rgba(251,191,36,.4)"><div class="noimg" style="height:74px">⚠ no preview asset</div><div class="fbb"><b>Ultra <span class="badge" style="background:#e11d4822;color:#e11d48;border:1px solid #e11d4855">Flagship</span></b><span>Second gap. Same fix.</span></div></div>`;
+window.addEventListener('resize',draw);
+draw();
+</script></body></html>
