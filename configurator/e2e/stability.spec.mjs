@@ -14,6 +14,18 @@ const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Or
 
 async function fresh(page) {
   const errors = [];
+  // Splash fetches the visit counter from the live worker. CI intermittently gets
+  // throttled there (429), and the resulting console line is
+  // "Failed to load resource: the server responded with a status of 429 ()" —
+  // no URL in the text, so CORS_NOISE cannot filter it and the errors===[]
+  // assertions below fail non-deterministically. Serve the counter locally:
+  // this pattern matches only the proxy host, and specs that additionally call
+  // mockAioStreams keep their own capture semantics (that mock answers `{}`
+  // for the same URLs, so behaviour is identical for the app).
+  await page.route(/core-builds-cors-proxy/, route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ visits: 4211, generates: 987 }),
+  }));
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && !CORS_NOISE.test(message.text())) errors.push(message.text()); });
   await page.goto('/');
