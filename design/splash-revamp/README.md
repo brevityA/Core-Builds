@@ -71,3 +71,50 @@ job is to answer 1–3 in five seconds, because our engineering already does.
 
 Anti-goals: don't race on "free one-click" (gated P2P/HTTP lanes are deliberate), template count,
 or claim bigness. No fake-live cells, no 3D/blob hero (TV browsers; LCP is conversion here).
+
+## Leverage audit — what we already have, and what to do with it (2026-09-15)
+
+Verified against `app.js`/`packages/core` at this branch. Four buckets; the recommendation is
+ordered by them.
+
+**A. Done, real, and unsold (copy-only fixes — highest ROI):**
+- *Account push / full stack*: `pushToStremio` writes AIOStreams + AIOMetadata + Cinemeta patch
+  (Cinebye) + addon ordering; `cleanInstall` = "Previous install replaced!"; failed login falls
+  back to the working manifest URL. The current splash says **"No account required"** — it is
+  actively advertising against our own killer feature. Replace that chip with the dual path:
+  "Build without a login — or push it all in one click."
+- *Preload & autoplay policy & timeouts*: `preloadEnabled:true`, `autoPlayMethod`, `addonTimeout:6000`
+  flow through `addon-policy.js` into the export. This is literally QuackStart's "preload first
+  stream" selling point, shipped by us, unmentioned. One payload-card line.
+- *Curated catalogs*: AIOM exports 74-of-91 / 60-of-71 (their "lean" number is 67–80 of 150 — we
+  are already at their tuned answer, not their raw dump). Keep the number, don't chase the count.
+
+**B. Wired but half-named (small UI change, zero policy risk):**
+- `applyQuickProfile(fast|balanced|maximum)` genuinely retunes dials (res, audio, cache, pool,
+  size cap, sort bias) — it does **not** touch the scraper set. Name the three tiles Lean /
+  Standard / Maximum and let them call the existing function; do not promise "3 addons" in copy
+  (the v2 chip toasts previously did — corrected in this commit). If presets should pick scrapers
+  per lane too, that is a *small* extension of the same function, reviewed as such.
+- JSON export exists; label it "Backup" beside the replace-install tick and the safety-valve
+  story (Backup → change → Reset) is complete without new code.
+
+**C. One hop away (small engineering, verify first):**
+- "Open in host UI" deeplinks: instance selection + capability probe + `instanceUrl` exist; the
+  host's load-template URL shape must be verified at the pinned ref before emitting any link
+  (this repo's own rule: never an unverified option/URL).
+- Host audit table cells could link the troubleshooting docs (already shipped in this PR) —
+  proof beats adjectives.
+
+**D. What we deliberately should NOT have (from their tricks list):**
+- Pooled/shared API keys ("risk of ban") — refuse permanently.
+- Random-account generation for Stremio — privacy posture differs on purpose.
+- Tam-Taro's TorBox-Search auto-add — our code already documents that preset as legacy/removed
+  at v2.32 (app.js:3785); copying the trick verbatim would emit a rejected id.
+- Catalog-count racing / SideKick descriptor hacks — their 150-catalog dump is the thing they
+  need a workaround for; don't import the problem.
+- Health checks are the exception to D: the one thing they shipped (2026-09-05) that we lack —
+  it is a real feature, not copy, and belongs in the engine backlog, not the splash.
+
+**Recommended order:** (1) splash copy corrections from A + B naming [this folder → `splashHtml()` +
+`04-landing.css` + landing-ia updates in one commit], (2) Backup labelling, (3) host deeplink after
+URL-shape verification, (4) Health auto-drop as the next functional PR.
