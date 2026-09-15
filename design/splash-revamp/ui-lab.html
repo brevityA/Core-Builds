@@ -76,7 +76,7 @@ input[type=range]{width:240px;accent-color:var(--cyan)}
   <div class="metric"><b>29px → <em>44px</em></b>splash chip tap height, via pointer:coarse too</div>
   <div class="metric"><b>456 inline</b>font sizes in app.js · 116 under .7rem · root-lift +10%</div>
   <div class="metric"><b>0 → <em>6</em></b>inputmode/enterkeyhint added to credential fields</div>
-  <div class="metric"><b>17 of 19</b>formatters have previews · <b style="color:var(--amber)">family-v4 + ultra don't</b></div>
+  <div class="metric"><b>17 of 19</b>formatters have previews · <b style="color:var(--amber)">+2 drafts below</b></div>
 </div>
 
 <section class="panel">
@@ -105,14 +105,14 @@ input[type=range]{width:240px;accent-color:var(--cyan)}
     <div class="pmock"><h4>…on the landing (bento rule: product, not icons)</h4>
       <div class="pchip"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/rb3-formatter-preview.svg">Family v3 · Legacy</div>
       <div class="pchip sel"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/sigma-preview.svg">Sigma · Popular</div>
-      <div class="pchip"><span class="noimg" style="height:26px;width:44px;border-radius:5px;display:inline-grid"></span>Ultra — <i>needs preview PNG</i></div>
+      <div class="pchip"><img alt="" src="previews/ultra-preview.svg">Ultra — proposed draft</div>
       <p class="note">One row of these replaces the whole “what is a formatter” paragraph. QuackStart does this with PNGs; yours are repo-owned SVGs at 1:1.</p></div>
     <div class="pmock"><h4>…in the wizard's formatter step</h4>
       <div class="pchip sel"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg">Apex v2 — selected</div>
       <div class="pchip"><img alt="" src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg">TV minimal</div>
       <p class="note">Current step shows label + desc text only. Thumbnails here come from the same <code>img:</code> field <code>formatters.js</code> already ships — zero new assets needed except the two missing ones.</p></div>
   </div>
-  <p class="note"><b>Action for the repo if approved:</b> author preview SVGs for <code>family-v4</code> (the default!) and <code>ultra</code> (flagship) in <code>Assets/Formatters/</code>, matching the existing 17. Then <code>formatters.js</code> has 19/19 and both the landing strip and the wizard step can render the wall unmodified.</p>
+  <p class="note"><b>Action for the repo if approved:</b> the two drafts in this folder (<code>previews/</code>) get copied to <code>Assets/Formatters/</code> and the <code>img:</code> fields added to <code>formatters.js</code> — then it is 19/19 and both the landing strip and the wizard step render the wall unmodified. Drafts are marked as such on the tiles; nothing lands in Assets/ without your nod.</p>
 </section>
 
 <footer class="foot"><span>Prototype — nothing here is in the configurator yet.</span><a href="index.html">v3 splash · proposed vs current</a><a href="ui-uniformity-2026-09-15.md">the research note</a><span>previews load from raw.githubusercontent.com; offline = dark tiles, by design no fake art.</span></footer>
@@ -179,8 +179,10 @@ function toast(m){const t=document.getElementById('toast');t.innerHTML=m;t.class
 document.getElementById('fwall').innerHTML = FMTS.map(f=>`
   <div class="ft"><a href="${f.img}" target="_blank" rel="noopener"><img loading="lazy" src="${f.img}" alt="${f.label} preview" onerror="this.outerHTML='<div class=&quot;noimg&quot;>preview asset unreachable offline</div>'"></a>
   <div class="fbb"><b>${f.label}${f.badge?` <span class="badge" style="background:${f.bc}22;color:${f.bc};border:1px solid ${f.bc}55">${f.badge}</span>`:''}</b><span>${f.desc}</span></div></div>`).join('')
- + `<div class="ft" style="border-color:rgba(251,191,36,.4)"><div class="noimg" style="height:74px">⚠ no preview asset</div><div class="fbb"><b>Family v4 <span class="badge" style="background:#10b98122;color:#10b981;border:1px solid #10b98155">Default</span></b><span>The formatter everyone sees first — and the only one of 19 without a preview. Author one and this whole wall renders the product instead of adjectives.</span></div></div>
-   <div class="ft" style="border-color:rgba(251,191,36,.4)"><div class="noimg" style="height:74px">⚠ no preview asset</div><div class="fbb"><b>Ultra <span class="badge" style="background:#e11d4822;color:#e11d48;border:1px solid #e11d4855">Flagship</span></b><span>Second gap. Same fix.</span></div></div>`;
+ + ['family-v4|Family v4|Default|#10b981|10b98155|10b98122','ultra|Ultra|Flagship|#e11d48|e11d4855|e11d4822'].map(t=>{const [id,label,badge,bc,b1,b2]=t.split('|');return `
+   <div class="ft" style="border-color:${bc}88;position:relative"><span class="badge" style="position:absolute;top:6px;right:6px;background:rgba(251,191,36,.14);color:var(--amber);border:1px solid rgba(251,191,36,.4)">DRAFT · not in Assets yet</span>
+   <img loading="lazy" src="previews/${id}-preview.svg" alt="${label} proposed preview">
+   <div class="fbb"><b>${label} <span class="badge" style="background:${b2};color:${bc};border:1px solid ${b1}">${badge}</span></b><span>No preview shipped — proposed draft drafted from the live template (truncate(36), DD+ mapping, smallcaps age). Approve → copy to Assets/Formatters/ + add img: line.</span></div></div>`}).join('');
 window.addEventListener('resize',draw);
 draw();
 </script></body></html>

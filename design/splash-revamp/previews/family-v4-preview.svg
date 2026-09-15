@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" width="800" height="334">
+  <defs>
+    <style>
+      .bg   { fill: #0d1117; }
+      .card { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .lbl  { font-family: 'Segoe UI', sans-serif; font-size: 11px; font-weight: 600; fill: #58a6ff; letter-spacing: 0.08em; text-transform: uppercase; }
+      .name { font-family: 'Segoe UI', sans-serif; font-size: 13.5px; font-weight: 700; fill: #e6edf3; }
+      .d1   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #c9d1d9; }
+      .d2   { font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: 400; fill: #8b949e; }
+    </style>
+  </defs>
+  <rect class="bg" width="800" height="334"/>
+  <text x="20" y="20" class="lbl">Core Nexus Family v4 — Stream Preview</text>
+
+  <rect class="card" x="16" y="30" width="768" height="150" rx="6"/>
+  <text x="32" y="54" class="name">4K ⚡ Mortal Kombat II (2026) 2160p UHD B  Core 87</text>
+  <text x="32" y="75" class="d1">✅ Plays Fast 🥇 Good Stream ⭐ Best 🏷 BTM</text>
+  <text x="32" y="96" class="d2">🎥 BluRay REMUX • H265 • DV, HDR10+</text>
+  <text x="32" y="117" class="d2">🔊 7.1, Atmos • ⚡ 82 Mb/s</text>
+  <text x="32" y="138" class="d2">💾 68.4 GB • 📁 68.9 GB • 🌱 412 • ⏱ 2ʏ 🏞 torbox</text>
+  <text x="32" y="163" class="d2" font-size="10.5px">drafted from the live family-v4 template · truncate(36) · sbytes · smallcaps age — verify against a real run</text>
+
+  <rect class="card" x="16" y="192" width="768" height="120" rx="6"/>
+  <text x="32" y="216" class="name">1080p ⚡ The Office (US) S02 • E01  Core 91</text>
+  <text x="32" y="237" class="d1">✅ Plays Fast 🥇 Good Stream 🏷 NTb</text>
+  <text x="32" y="258" class="d2">📺 From Apple TV</text>
+  <text x="32" y="279" class="d2">🎥 WEB-DL • H264 • HDR10  🔊 5.1, EAC3 • ⚡ 14 Mb/s</text>
+  <text x="32" y="300" class="d2">💾 2.4 GB • 🌱 1204 • ⏱ 6ᴍ 🏞 torbox • 🔍 ᴛᴏʀʀᴇɴᴛɪᴏ 🗣 en</text>
+
+  <text x="400" y="326" class="lbl" text-anchor="middle" fill="#484f58">Core Builds by Brevity · github.com/brevityA/Core-Builds</text>
+</svg>
