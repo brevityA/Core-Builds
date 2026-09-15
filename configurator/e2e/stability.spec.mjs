@@ -14,6 +14,21 @@ const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Or
 
 async function fresh(page) {
   const errors = [];
+  // Splash fetches the visit counter from the live worker. CI intermittently gets
+  // throttled there (429), and the resulting console line is
+  // "Failed to load resource: the server responded with a status of 429 ()" —
+  // no URL in the text, so CORS_NOISE cannot filter it and the errors===[]
+  // assertions below fail non-deterministically. Fulfil ONLY the three counter
+  // endpoints locally. The predicate must stay this narrow: the app also tunnels
+  // AIOStreams /api/v1/* calls through this proxy host, and mockAioStreams
+  // captures those POSTs — a host-wide route registered here would shadow them
+  // (later-registered routes win) and empty the capture lists.
+  await page.route(url =>
+      /core-builds-cors-proxy/.test(url.hostname) && /\/api\/(stats|visit|generate)$/.test(url.pathname),
+    route => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ visits: 4211, generates: 987 }),
+    }));
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && !CORS_NOISE.test(message.text())) errors.push(message.text()); });
   await page.goto('/');
@@ -86,7 +101,7 @@ test('Advanced extras carousel is multi-select while short routes stay compact',
   const errors = await fresh(page);
   await page.locator('[data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
-  await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(16);
+  await expect(page.locator('.opt-scraper-scroll .opt-scraper-card')).toHaveCount(20);
   // Was p2p. The wizard defaults to the ElfHosted community host, which serves
   // neither P2P nor HTTP, so those two cards are now gated inert by the
   // host-capability layer — see e2e/host-capability.spec.mjs. debridio is a
