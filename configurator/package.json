@@ -17,7 +17,7 @@
     "release": "npm test && npm run validate && npm run build"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.63.0",
     "esbuild": "^0.28.2"
   }
 }
