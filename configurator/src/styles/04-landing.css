@@ -96,3 +96,10 @@
    ~6:1 mut tier; sub-11px footnotes likewise. Decorative arrows keep dim. */
 .hybrid-services-label{color:#8b949e}
 .hybrid-splash .splash-tertiary-btn{color:#8b949e}
+
+/* splash copy rev (2026-09-16): subnote under stats + preset row shares the
+   service-chip rhythm but one step quieter; both ride the same 44px coarse rule. */
+.hybrid-subnote{font-size:.62rem;color:#8b949e;margin-top:8px;letter-spacing:.02em}
+.hybrid-presets{padding:9px 0}
+.hybrid-presets .splash-chip{border-style:dashed}
+.hybrid-presets .splash-chip.active{border-style:solid}

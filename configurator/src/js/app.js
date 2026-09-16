@@ -1679,9 +1679,10 @@ function splashHtml() {
       <div class="splash-anim splash-anim-d2">
         <div class="hybrid-eyebrow">AIOStreams template configurator</div>
         <h1>Build streams<br>with intent.</h1>
-        <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a polished <strong>AIOStreams template</strong> — without touching JSON.</div>
-        <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source</span><span><i></i> No account required</span></div>
+        <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a checked <strong>AIOStreams template</strong> — and can write the whole stack (AIOStreams + AIOMetadata + a Cinemeta patch + subtitles) <strong>straight into your Stremio account</strong>. No JSON editing either way.</div>
+        <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
         <div class="splash-stats" id="splashStats"></div>
+        <div class="hybrid-subnote">First stream preloads by default · 6s addon timeout · keys go only to the host you choose</div>
       </div>
       <div class="hybrid-core-stage splash-anim splash-anim-d2">
         <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
@@ -1698,7 +1699,7 @@ function splashHtml() {
             <circle class="core-click-ring" cx="256" cy="256" r="86"/>
           </svg>
         </button>
-        <div class="hybrid-core-caption">Tap the core to support</div>
+        <div class="hybrid-core-caption">One install writes: AIOStreams · AIOMetadata 74-of-91 catalogs · Cinemeta patch · subtitles<br><span style="opacity:.6">tap the core to support the project</span></div>
       </div>
     </div>
 
@@ -1720,11 +1721,16 @@ function splashHtml() {
         <span class="splash-chip${_splashSvc==='free'?' active':''}" data-svc="free" role="radio" aria-checked="${_splashSvc==='free'}" tabindex="0"><span class="splash-chip-icon">${ICO.free(14,'#34d399')}</span> Free</span>
       </div>
     </div>
+    ${hadSavedState ? '' : `<div class="hybrid-services hybrid-presets"><div class="hybrid-services-label">Preset</div><div class="splash-chips" role="radiogroup" aria-label="Quick profile — tunes the dials, never trims your services">
+        <span class="splash-chip${S.quickProfile==='fast'?' active':''}" data-qp="fast" role="radio" aria-checked="${S.quickProfile==='fast'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#67e8f9')}</span> Lean · 1080p cached-first</span>
+        <span class="splash-chip${S.quickProfile==='balanced'?' active':''}" data-qp="balanced" role="radio" aria-checked="${S.quickProfile==='balanced'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#10b981')}</span> Standard · recommended</span>
+        <span class="splash-chip${S.quickProfile==='maximum'?' active':''}" data-qp="maximum" role="radio" aria-checked="${S.quickProfile==='maximum'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#fbbf24')}</span> Maximum · 4K quality-first</span>
+      </div></div>`}
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Express install</h2><p>The whole job is five steps: service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
-      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy — working streams in about 30 seconds.</div></div></div>
+      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click · full-stack</span></div><div class="splash-door-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy — working streams in about 30 seconds. The account push writes every addon on every device; a failed login still hands you the manifest URL, and old installs are replaced only when you tick it.</div></div></div>
     </div>
     <!-- Express-first IA (2026-09-06 audit): the other routes stay one click away
          as secondary text links — same data-actions, so #advanced / #update
@@ -2712,6 +2718,14 @@ document.addEventListener('DOMContentLoaded', () => {
       svcChip.setAttribute('aria-checked','true');
       const pp = document.getElementById('splashPresets');
       if (pp) pp.innerHTML = splashPresetsHtml(svcChip.dataset.svc);
+      return;
+    }
+    const qpChip = e.target.closest('.splash-chip[data-qp]');
+    if (qpChip) {
+      document.querySelectorAll('.splash-chip[data-qp]').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-checked','false'); });
+      qpChip.classList.add('active'); qpChip.setAttribute('aria-checked','true');
+      // named entry to the existing applyQuickProfile — dials only, scraper sets stay your call
+      applyQuickProfile(qpChip.dataset.qp);
       return;
     }
     const ftInfo = e.target.closest('.ft-info[data-fttip]');
