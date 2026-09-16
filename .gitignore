@@ -67,3 +67,10 @@ tools/benchmark/corpus/*.verified.json
 .dev.vars
 .env
 .env.local
+
+# Design research & prototypes — deploy-configurator.yml uploads the repo root
+# (`path: '.'`), so anything tracked here is served from the public Pages site.
+# The splash prototypes and their competitor/self-audit notes are internal working
+# material; keep them local. Recover the originals from the branch history if needed:
+#   git log --diff-filter=D --  design/splash-revamp
+design/
