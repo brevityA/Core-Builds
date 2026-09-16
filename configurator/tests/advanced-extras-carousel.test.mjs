@@ -19,7 +19,15 @@ test('Quick and guided routes retain the compact optional-services picker', () =
 });
 
 test('carousel cards expose selection state to keyboard and assistive technology', () => {
-  assert.ok(app.includes('role="checkbox" aria-checked="${active}" tabindex="0"'));
+  // Both carousels now gate cards the selected route cannot satisfy, so the interactive
+  // attributes live in one arm of a conditional and a gated card is deliberately not
+  // focusable. Assert those properties rather than one byte sequence — the old literal
+  // `role=… aria-checked=… tabindex=0` run only ever matched whichever card had not been
+  // gated yet, which made it fail the moment the second one was.
+  assert.ok(app.includes('role="checkbox" aria-checked="${active}"'), 'cards announce selection state');
+  assert.match(app, /data-action="toggle-optional-scraper" tabindex="0"/, 'a reachable scraper card is focusable');
+  assert.match(app, /data-action="toggle-carousel-service" tabindex="0"/, 'a reachable service card is focusable');
+  assert.match(app, /aria-disabled="true" title="\$\{escHtml\(why\)\}"/, 'a gated card is announced as disabled, with the reason');
   assert.ok(app.includes("extrasCard && (e.key === 'Enter' || e.key === ' ')"));
   assert.ok(app.includes("card.setAttribute('aria-checked', String(selected))"));
   assert.match(css, /\.opt-scraper-card:focus-visible/);

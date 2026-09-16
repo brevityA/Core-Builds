@@ -870,10 +870,16 @@ function renderOpts(def) {
     const scraperCards = OPTIONAL_SCRAPER_DEFS.map(d => {
       const active = S.optionalScrapers.includes(d.id);
       const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat;
-      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-optional-scraper" data-scraper-id="${d.id}" role="checkbox" aria-checked="${active}" tabindex="0">
+      // Same gate the service cards above use, for the same reason: presets() emits
+      // nothing for some of these on some routes, so an ungated card lets you tick it,
+      // keeps it ticked, and exports a config without it. The reasons mirror the
+      // emission matrix in presets() exactly — change one and change the other.
+      const why = active ? '' : optionalScraperLaneBlock(d.id);
+      return `<div class="opt-scraper-card${why ? ' opt-host-blocked' : ''}" data-active="${active}" ${why ? `aria-disabled="true" title="${escHtml(why)}"` : `data-action="toggle-optional-scraper" tabindex="0"`} data-scraper-id="${d.id}" role="checkbox" aria-checked="${active}">
         <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
         <div class="opt-scraper-subdesc">${d.desc}</div>
+        ${why ? `<div class="opt-host-note">Unavailable — ${escHtml(why)}</div>` : ''}
         <span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span>
       </div>`;
     }).join('');
@@ -1277,6 +1283,27 @@ function outputProfileAuditHtml() {
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px">${counts.map(count => `<span style="font-size:.62rem;color:#9ca3af;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:2px 5px">${count}</span>`).join('')}</div>
     ${issueHtml}
   </div>`;
+}
+
+// Why a given optional scraper cannot be emitted on the currently selected route,
+// or '' when it can. This is the read-side mirror of the emission matrix in
+// presets(): the Usenet branch returns its own list before the keyless block runs,
+// and Sootio is refused on routes with no service to back it. Without this the
+// carousel happily accepts a toggle that the export then drops in silence — the
+// same class of bug as an extra being filtered back out by the output profile.
+// Keep in step with presets() and with configurator/tests/optional-extras-toggles.mjs.
+function optionalScraperLaneBlock(id) {
+  const svc = S.service;
+  if (svc === 'usenet' && ['neko-bt', 'sootio', 'webstreamr', 'yastream'].includes(id)) {
+    return 'the Usenet route builds its own addon list — only Newznab indexers and NZBHydra2 apply here';
+  }
+  if (id === 'sootio' && (svc === 'p2p' || svc === 'http')) {
+    return 'AIOStreams v2.33+ accepts Sootio only with a debrid or usenet service behind it';
+  }
+  if (id === 'neko-bt' && svc === 'http') {
+    return 'the HTTP route carries no torrent scrapers';
+  }
+  return '';
 }
 
 function renderAdvancedPanel() {
@@ -3801,7 +3828,11 @@ function presets() {
       { type:'animetosho', instanceId:'nx-at-01', enabled:S.content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
-    { type:'sootio', instanceId:'sootio-core-builds', enabled:extrasOn('sootio') && !isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },  // p2p-only: v2.33 rejects Sootio without a usable service/HTTP provider,
+    // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
+    // cannot reach it there. Neither can the HTTP branch (hardcoded false above) nor the
+    // Usenet branch (returns before the keyless block). Debrid and multi are the only routes
+    // where this toggle does anything — optionalScraperLaneBlock() greys the card elsewhere.
+    { type:'sootio', instanceId:'sootio-core-builds', enabled:extrasOn('sootio') && !isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
     ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...subtitlePresets(),
     ...catalogPresets()

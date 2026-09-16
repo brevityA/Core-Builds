@@ -272,7 +272,11 @@ function buildPresets(input) {
       { type:'animetosho', instanceId:'nx-at-01', enabled:content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
-    { type:'sootio', instanceId:'sootio-core-builds', enabled:extrasOn('sootio') && !isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },  // p2p-only: v2.33 rejects Sootio (no usable service/HTTP provider); the HTTP/Usenet branches enable their own,
+    // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
+    // cannot reach it there. Neither can the HTTP branch (hardcoded false above) nor the
+    // Usenet branch (returns before the keyless block). Debrid and multi are the only routes
+    // where this toggle does anything — optionalScraperLaneBlock() greys the card elsewhere.
+    { type:'sootio', instanceId:'sootio-core-builds', enabled:extrasOn('sootio') && !isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
     ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...buildSubtitlePresets(input),
     ...buildCatalogPresets(input)

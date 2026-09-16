@@ -115,6 +115,30 @@ test('each toggle produces exactly one enabled instance on the lanes that suppor
   }
 });
 
+// The carousel card is the other half of the contract. EXPECT above says which lane/extra pairs
+// emit nothing; on exactly those pairs the card has to say so. An ungated card on an inert lane
+// takes the click, stays ticked, survives into the share link, and exports a config without the
+// preset — indistinguishable from success. Derived from EXPECT rather than a second hand-written
+// list, so widening the generator's lane support can never leave a card greyed out for a route
+// that now works (or vice versa).
+test('the carousel blocks exactly the lane/extra pairs the generator cannot emit', () => {
+  const fnSrc = appSrc.match(/function optionalScraperLaneBlock\(id\) \{[\s\S]*?\n\}/)?.[0];
+  assert.ok(fnSrc, 'optionalScraperLaneBlock() not found in app.js — the carousel gate is gone');
+  const laneBlockFor = new Function('S', `${fnSrc}\nreturn optionalScraperLaneBlock;`);
+
+  for (const [lane, expectation] of Object.entries(EXPECT)) {
+    const blocked = laneBlockFor({ service: LANES[lane].service });
+    for (const [id, want] of Object.entries(expectation)) {
+      const why = blocked(id);
+      if (want === 0) {
+        assert.ok(why, `${lane}: ${id} emits nothing here, so the card must give a reason`);
+      } else {
+        assert.equal(why, '', `${lane}: ${id} does emit here — greying the card hides a working option`);
+      }
+    }
+  }
+});
+
 test('enabling every extra at once still yields one instance per preset', () => {
   // The duplicate-advert trap: 3 of these 4 are emitted disabled elsewhere, so a naive second
   // emission shows up as two presets with the same type (or, worse, the same instanceId).
