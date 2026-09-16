@@ -35,7 +35,7 @@
   <a href="https://corebuilds-docs.docsalot.dev">
     <img src="https://img.shields.io/badge/DOCS-corebuilds-docs.docsalot.dev-00d4ff?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=1a1f27" alt="Documentation"/>
   </a>
-  <a href="https://discord.gg/ZvjnKbrq">
+  <a href="https://discord.gg/AwJ49yzbqT">
     <img src="https://img.shields.io/badge/DISCORD-Join_Us-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1a1f27" alt="Discord"/>
   </a>
 </p>
