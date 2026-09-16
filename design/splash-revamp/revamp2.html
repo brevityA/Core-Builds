@@ -398,15 +398,15 @@ function render(){
   const list = document.getElementById('streamList');
   list.innerHTML = kept.length ? kept.map((r,i)=>`
     <li${i===0?' class="best"':''}>
-      <span class="res ${r.s.res==='2160p'?'four':'two'}">${r.s.res==='2160p'?'4K':'1080p'}</span>
-      <span class="fname"><span class="n">Mortal.Kombat.II.2026.${r.s.name}</span>
-        <span class="meta">${r.s.size} GB${r.s.web?' · WEB class':''}${r.s.remux?' · REMUX':''}${r.s.dv?' · DV':''}</span></span>
+      <span class="res ${esc(r.s.res==='2160p'?'four':'two')}">${esc(r.s.res==='2160p'?'4K':'1080p')}</span>
+      <span class="fname"><span class="n">Mortal.Kombat.II.2026.${esc(r.s.name)}</span>
+        <span class="meta">${esc(r.s.size)} GB${esc(r.s.web?' · WEB class':'')}${esc(r.s.remux?' · REMUX':'')}${esc(r.s.dv?' · DV':'')}</span></span>
       <span class="acts">
-        <span class="badge ${r.s.cached==='cached'?'ok':'warn'}">${r.s.cached}</span>
+        <span class="badge ${esc(r.s.cached==='cached'?'ok':'warn')}">${esc(r.s.cached)}</span>
         ${i===0?'<span class="badge qc">your pick</span>':''}
-        ${r.reasons.length?`<span class="badge warn">${r.reasons.length}</span>`:''}
+        ${r.reasons.length?`<span class="badge warn">${esc(r.reasons.length)}</span>`:''}
       </span>
-      ${r.reasons.length?`<span class="reasons"><b>why:</b> ${r.reasons.join(' · ')}</span>`:''}
+      ${r.reasons.length?`<span class="reasons"><b>why:</b> ${esc(r.reasons.join(' · '))}</span>`:''}
     </li>`).join('')
     : `<li class="empty" style="display:block">Nothing survives both cuts here — on the real page this is where the “no playable result” guidance and the P2P fallback suggestion appear, not an empty spinner.</li>`;
   const d = DEVICES[state.dev];
@@ -428,8 +428,8 @@ function render(){
 /* device chips, built from the same table the demo evaluates */
 const dc = document.getElementById('devChips');
 dc.innerHTML = Object.entries(DEVICES).map(([id,d])=>`
-  <button class="chip${POPULAR.has(id)?' pop':''}" data-g="dev" data-v="${id}" aria-pressed="${state.dev===id}">
-    ${d.label}<small>${d.cap===1080?'1080p max':(d.audio==='lossless'?'lossless':'limited audio')}</small>
+  <button class="chip${esc(POPULAR.has(id)?' pop':'')}" data-g="dev" data-v="${id}" aria-pressed="${esc(state.dev===id)}">
+    ${esc(d.label)}<small>${esc(d.cap===1080?'1080p max':(d.audio==='lossless'?'lossless':'limited audio'))}</small>
   </button>`).join('');
 
 document.addEventListener('click', e=>{
@@ -454,7 +454,8 @@ document.getElementById('supBtn').onclick = ()=>toast(
   'Moved on purpose: support lives in the footer and the changelog dialog. The hero shows what lands in your account, not the machinery.');
 
 let tt;
-function toast(html){ const el=document.getElementById('toast'); el.innerHTML=html; el.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('show'),5200); }
+const esc = v => String(v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(txt){ const el=document.getElementById('toast'); el.textContent=txt; el.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('show'),5200); }
 
 /* adoption counter: same endpoint as the real splash (app.js splashStats), honest dash on failure */
 (function(){
@@ -463,7 +464,7 @@ function toast(html){ const el=document.getElementById('toast'); el.innerHTML=ht
   const fail = ()=>{ document.getElementById('counterLive').textContent='offline here'; };
   fetch(url,{signal:AbortSignal.timeout(4000)}).then(r=>r.ok?r.json():Promise.reject())
     .then(d=>{ const v=fmt(d.visits), g=fmt(d.generates); if(!v&&!g){fail();return;}
-      document.getElementById('counterRow').innerHTML = `<i>${v??'—'}</i> visits · <i>${g??'—'}</i> templates built`;
+      document.getElementById('counterRow').innerHTML = `<i>${esc(v??'—')}</i> visits · <i>${esc(g??'—')}</i> templates built`;
       const L=document.getElementById('counterLive'); L.textContent='live'; L.classList.remove('off');
     }).catch(fail);
 })();

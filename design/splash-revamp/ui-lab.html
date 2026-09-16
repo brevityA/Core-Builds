@@ -145,13 +145,13 @@ function draw(){
   document.getElementById('fb').innerHTML = `
     <div class="mtop"><span class="mbrand" style="font-size:${u(.85)}">CORE <b>BUILDS</b></span>
       <span class="mlinks ${linksCls}"><a>Templates</a><a>GitHub</a><a>Reddit</a><a>Discord</a><span style="border:1px solid var(--line);border-radius:5px;padding:1px 6px">v3.7</span></span></div>
-    <div style="display:grid;grid-template-columns:${stacked?'1fr':'1.25fr .9fr'};gap:${u(12)}">
+    <div style="display:grid;grid-template-columns:${esc(stacked?'1fr':'1.25fr .9fr')};gap:${u(12)}">
       <div>
         <p class="eyebrow" style="font-size:${u(.66)}">AIOStreams configurator</p>
         <div class="mh1" style="font-size:${u(state.w<=520&&!state.unified ? 2.7 : Math.min(4.4, Math.max(2.65, state.w*0.0042)))}">Build streams with intent.</div>
         <p class="mlede" style="font-size:${u(.82)};max-width:${stacked?'100%':'52ch'}">Service, device, preferences → a checked AIOStreams template. Account push available.</p>
         <div class="mchips">${['TorBox','AllDebrid','Real-Debrid','EasyNews','Free'].map((c,i)=>`<span class="mchip ${i==0?'on':''}" style="${chipCss};font-size:${u(.65)}">${c}</span>`).join('')}</div>
-        <div class="mdoors" style="grid-template-columns:${(state.w<=doorsSingle())?'1fr':'1fr 1fr'}">
+        <div class="mdoors" style="grid-template-columns:${esc((state.w<=doorsSingle())?'1fr':'1fr 1fr')}">
           <div class="mdoor pri" style="font-size:${u(.72)}">⚡ Set up my account · <b style="color:#67e8f9">full stack</b></div>
           <div class="mdoor" style="font-size:${u(.66)}">Formatter: Family v4 · preview renders right here in the proposed build</div>
         </div>
@@ -175,10 +175,11 @@ document.querySelectorAll('.dev[data-w]').forEach(b=>b.onclick=()=>{state.w=+b.d
 document.getElementById('modeBtn').onclick=e=>{state.unified=!state.unified;e.target.textContent = state.unified?'mode: UNIFIED (600 · 1000)':'mode: CURRENT (13 breakpoints)';draw();};
 ['Chips','Nav','Type','Cta','Payload'].forEach(k=>document.getElementById('fx'+k).addEventListener('change',e=>{state[k.toLowerCase()]=e.target.checked;draw();}));
 
+const esc = v => String(v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(m){const t=document.getElementById('toast');t.innerHTML=m;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),5200);}
 document.getElementById('fwall').innerHTML = FMTS.map(f=>`
-  <div class="ft"><a href="${f.img}" target="_blank" rel="noopener"><img loading="lazy" src="${f.img}" alt="${f.label} preview" onerror="this.outerHTML='<div class=&quot;noimg&quot;>preview asset unreachable offline</div>'"></a>
-  <div class="fbb"><b>${f.label}${f.badge?` <span class="badge" style="background:${f.bc}22;color:${f.bc};border:1px solid ${f.bc}55">${f.badge}</span>`:''}</b><span>${f.desc}</span></div></div>`).join('')
+  <div class="ft"><a href="${esc(f.img)}" target="_blank" rel="noopener"><img loading="lazy" src="${esc(f.img)}" alt="${esc(f.label)} preview" onerror="this.outerHTML='<div class=&quot;noimg&quot;>preview asset unreachable offline</div>'"></a>
+  <div class="fbb"><b>${esc(f.label)}${f.badge?` <span class="badge" style="background:${esc(f.bc)}22;color:${esc(f.bc)};border:1px solid ${esc(f.bc)}55">${esc(f.badge)}</span>`:''}</b><span>${esc(f.desc)}</span></div></div>`).join('')
  + ['family-v4|Family v4|Default|#10b981|10b98155|10b98122','ultra|Ultra|Flagship|#e11d48|e11d4855|e11d4822'].map(t=>{const [id,label,badge,bc,b1,b2]=t.split('|');return `
    <div class="ft" style="border-color:${bc}88;position:relative"><span class="badge" style="position:absolute;top:6px;right:6px;background:rgba(251,191,36,.14);color:var(--amber);border:1px solid rgba(251,191,36,.4)">DRAFT · not in Assets yet</span>
    <img loading="lazy" src="previews/${id}-preview.svg" alt="${label} proposed preview">
