@@ -96,7 +96,7 @@ test.describe('Direct Install key gate', () => {
     expect(posted).toEqual([]);
   });
 
-  test('Export JSON stays keyless and working (the gate is install-only)', async ({ page }) => {
+  test('Export JSON works without keys, and embeds them when they are entered (the gate is install-only)', async ({ page }) => {
     await page.goto('/?cb-e2e=1');
     await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
     await page.reload();
@@ -107,10 +107,19 @@ test.describe('Direct Install key gate', () => {
     }));
     expect(tpl.config, 'keyless export must still build').toBeTruthy();
     expect(tpl.config.presets.some(p => p.type === 'library'), 'debrid-backed export keeps the Library addon').toBe(true);
-    expect(
-      (tpl.config.services || []).flatMap(svc => Object.values(svc.credentials || {})).filter(Boolean),
-      'exports never carry credentials',
-    ).toEqual([]);
+    const credsOf = t => (t.config.services || []).flatMap(svc => Object.values(svc.credentials || {})).filter(Boolean);
+    expect(credsOf(tpl), 'an export built with NO credentials entered is keyless').toEqual([]);
+
+    // The export is buildFinal() verbatim — it does NOT strip credentials. The old
+    // assertion here read "exports never carry credentials", which only held because
+    // this case enters none; it asserted a security property the code does not have.
+    // Pin the real behaviour, since the export warning in generate() depends on it.
+    const withKey = await page.evaluate(() => window.__coreBuilds.generate({
+      service: 'torbox-pro', multiServices: ['torbox-pro'], device: 'generic',
+      resolution: '1080p', content: 'all', instanceHost: 'elfhosted',
+      creds: { torbox: 'demo4u-placeholder-key' },
+    }));
+    expect(credsOf(withKey), 'an entered credential IS embedded in the exported file').toContain('demo4u-placeholder-key');
   });
 });
 

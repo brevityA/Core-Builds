@@ -1881,6 +1881,7 @@ function render() {
         </div>
         ${sizeLimitHtml()}
         <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
+        <div id="exportCredNotice"></div>
         <button data-action="open-feedback-report" style="width:100%;margin-top:8px;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer">🧾 Need help? Copy a safe feedback report</button>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button data-action="share-config" style="flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
@@ -4350,6 +4351,30 @@ function exportPartial(kind) {
   showToast(`${kind[0].toUpperCase()+kind.slice(1)} partial export downloaded`);
 }
 
+// The exported JSON is buildFinal() verbatim: credentials are NOT stripped
+// (sanitizeSharedConfig guards share links and imports only, never the download).
+// Users do post these files when asking for help, so name what the file actually
+// carries at the moment it lands. Scans the built output rather than a hardcoded
+// provider list, so a new credential-bearing preset is covered automatically.
+const EXPORT_SECRET_KEY_RE = /(key|token|password|secret|username)/i;
+function exportedSecretSources(tpl) {
+  const cfg = (tpl && tpl.config) || {};
+  const filled = o => o && typeof o === 'object'
+    && Object.entries(o).some(([k, v]) => EXPORT_SECRET_KEY_RE.test(k) && typeof v === 'string' && v.trim());
+  const found = new Set();
+  for (const s of cfg.services || []) {
+    const c = s && s.credentials;
+    if (c && typeof c === 'object' && Object.values(c).some(v => typeof v === 'string' && v.trim())) found.add(s.id);
+  }
+  for (const p of cfg.presets || []) if (filled(p && p.options)) found.add((p.options && p.options.name) || p.type);
+  // Top-level keys (rpdbApiKey, tmdbApiKey, tmdbAccessToken, …) are easy to
+  // forget when hand-stripping a file — name the field, never the value.
+  for (const [k, v] of Object.entries(cfg)) {
+    if (EXPORT_SECRET_KEY_RE.test(k) && typeof v === 'string' && v.trim()) found.add(k);
+  }
+  return [...found].filter(Boolean);
+}
+
 function generate() {
   if (!S.service) { showToast('No service selected — go back and pick your debrid service first', true); return; }
   const tpl = buildFinal();
@@ -4369,6 +4394,20 @@ function generate() {
     dlBtn.innerHTML = ICO.check(14,'currentColor') + ' Downloaded!';
     dlBtn.style.background = 'linear-gradient(135deg,#065f46,#059669)';
     setTimeout(() => { dlBtn.innerHTML = orig; dlBtn.style.background = ''; }, 2200);
+  }
+  const noticeEl = document.getElementById('exportCredNotice');
+  if (noticeEl) {
+    const secrets = exportedSecretSources(tpl);
+    noticeEl.innerHTML = secrets.length
+      ? `<div style="margin-top:8px;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.28)">
+           <div style="font-size:.78rem;font-weight:700;color:#f59e0b;display:flex;align-items:center;gap:6px">${ICO.warn(13,'#f59e0b')} This file contains your credentials</div>
+           <div style="font-size:.72rem;color:#8b949e;line-height:1.5;margin-top:4px">
+             Keys for <b style="color:#e6edf3">${escHtml(secrets.join(', '))}</b> are saved in the downloaded JSON in plain text.
+             It is safe to import into AIOStreams, but do not post it in Discord, Reddit or a GitHub issue.
+             For help, use <b>Copy a safe feedback report</b> below instead.
+           </div>
+         </div>`
+      : '';
   }
 }
 
@@ -5768,8 +5807,14 @@ function togglePwd() {
   if (eye) eye.style.color = show ? '#00d4ff' : '#4b5563';
 }
 
+// Floor for a hand-typed manifest password. This is our own guard, not a value
+// read from the AIOStreams schema (the pinned contract carries no password rule):
+// the host validates server-side and answers only "Invalid addon password", so a
+// short one is caught here instead. makePwd() produces 12+ chars, well clear of it.
+const MIN_MANUAL_PWD_LEN = 8;
+
 function makePwd() {
-  const PWD_WORDS = ['Blue','Red','Dark','Bright','Swift','Deep','High','Storm','Wild','Sharp','Iron','Gold','Stone','Silver','Flash','Frost','Fire','Wind','Thunder','Star','River','Forest','Ocean','Mountain','Canyon','Desert','Arctic','Ember','Shadow','Crystal','Falcon','Tiger','Wolf','Eagle','Phoenix','Dragon','Hawk','Raven','Cobra','Viper'];
+  const PWD_WORDS =['Blue','Red','Dark','Bright','Swift','Deep','High','Storm','Wild','Sharp','Iron','Gold','Stone','Silver','Flash','Frost','Fire','Wind','Thunder','Star','River','Forest','Ocean','Mountain','Canyon','Desert','Arctic','Ember','Shadow','Crystal','Falcon','Tiger','Wolf','Eagle','Phoenix','Dragon','Hawk','Raven','Cobra','Viper'];
   const arr = new Uint8Array(4); crypto.getRandomValues(arr);
   return `${PWD_WORDS[arr[0] % PWD_WORDS.length]}${PWD_WORDS[arr[1] % PWD_WORDS.length]}${PWD_WORDS[arr[2] % PWD_WORDS.length]}${String(100 + (arr[3] % 900))}`;
 }
@@ -5981,8 +6026,9 @@ function promptPassword() {
       </div>
       <div class="pwd-option" data-mode="manual">
         <div class="pwd-option-label">Enter my own</div>
-        <div class="pwd-option-hint">Use a password you'll remember</div>
+        <div class="pwd-option-hint">Use a password you'll remember — at least ${MIN_MANUAL_PWD_LEN} characters</div>
         <input class="pwd-manual-input" type="text" placeholder="Type your password…" autocomplete="off" spellcheck="false" style="display:none">
+        <div class="pwd-manual-warn" style="display:none;font-size:.72rem;color:#f59e0b;margin-top:6px"></div>
       </div>
       <button class="pwd-go">Continue →</button>
       <button class="pwd-cancel">Cancel</button>
@@ -5997,12 +6043,24 @@ function promptPassword() {
         mode = opt.dataset.mode;
         opts.forEach(o => o.classList.toggle('active', o === opt));
         manualInput.style.display = mode === 'manual' ? '' : 'none';
-        if (mode === 'manual') { manualInput.focus(); goBtn.disabled = !manualInput.value.trim(); }
-        else goBtn.disabled = false;
+        if (mode === 'manual') { manualInput.focus(); syncManual(); }
+        else { goBtn.disabled = false; warnEl.textContent = ''; warnEl.style.display = 'none'; }
       });
     });
-    manualInput.addEventListener('input', () => { goBtn.disabled = !manualInput.value.trim(); });
-    manualInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && manualInput.value.trim()) done(); });
+    // A too-short manual password is rejected by the host AFTER the config has
+    // been posted, and the host's message ("Invalid addon password") does not say
+    // why — so gate it here and say what is wrong while it can still be fixed.
+    const warnEl = overlay.querySelector('.pwd-manual-warn');
+    const manualPwdOk = () => manualInput.value.trim().length >= MIN_MANUAL_PWD_LEN;
+    const syncManual = () => {
+      const v = manualInput.value.trim();
+      const short = v.length > 0 && v.length < MIN_MANUAL_PWD_LEN;
+      warnEl.textContent = short ? `Too short — use at least ${MIN_MANUAL_PWD_LEN} characters.` : '';
+      warnEl.style.display = short ? '' : 'none';
+      goBtn.disabled = !manualPwdOk();
+    };
+    manualInput.addEventListener('input', syncManual);
+    manualInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && manualPwdOk()) done(); });
     const done = () => { overlay.remove(); resolve(mode === 'auto' ? autoPwd : manualInput.value.trim()); };
     const cancel = () => { overlay.remove(); resolve(null); };
     goBtn.addEventListener('click', done);
