@@ -34,3 +34,9 @@ button,a,label,input,select,textarea,summary,[role='button']{-webkit-tap-highlig
 @media(max-height:520px) and (orientation:landscape){.modal-overlay,.sup-overlay,.qs-overlay,#apiReminder,#pwdPrompt{align-items:flex-start;overflow-y:auto}.modal-box,.sup-panel,.qs-panel,#apiReminderCard,#pwdPromptCard{max-height:none;margin-block:8px}.card:not(.splash){padding-block:18px}.nav{position:static}}
 /* PWA / standalone safe-area behavior */
 @media(display-mode:standalone){body{padding-top:max(14px,env(safe-area-inset-top));padding-bottom:max(14px,env(safe-area-inset-bottom))}.nav{bottom:max(10px,env(safe-area-inset-bottom))}}
+
+/* Coarse-pointer parity (2026-09-16): the ≤599px mobile layer's two most
+   load-bearing rules — 16px inputs (iOS auto-zoom) and 48px nav buttons —
+   were width-keyed, so a 10" tablet with a finger got neither. Same fixes,
+   pointer-keyed, for the width gap the media block can't reach. */
+@media(pointer:coarse) and (min-width:600px){.name-input,.th-input,.fmt-select,.svc-search input,select,textarea{font-size:16px!important}.btn-next,.btn-back{min-height:48px}.splash-chip{min-height:44px}}

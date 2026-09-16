@@ -1423,7 +1423,7 @@ function renderAdvancedPanel() {
               <a href="https://subdl.com/panel/api" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#06b6d4;text-decoration:none;font-weight:700;opacity:.7">Get key &rarr;</a>
             </div>
             <div style="position:relative;display:flex;align-items:center">
-              <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" placeholder="Your SubDL API key"
+              <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Your SubDL API key"
                 value="${escH(S.creds.subdl || '')}" maxlength="120" style="padding-right:38px;font-size:.78rem">
               <button type="button" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -1905,11 +1905,11 @@ function render() {
             ${S.installMode === 'direct' ? `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Enter your Stremio credentials to install the addon directly to your library.</div>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-              <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
+              <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next" data-action="update-stremio-email"
                 value="${escH(S.stremioEmail||'')}"
                 class="th-input">
               <div style="position:relative">
-                <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
+                <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" data-action="update-stremio-password"
                   value="${escH(S.stremioPassword||'')}"
                   class="th-input" style="padding-right:40px">
                 <button type="button" data-action="toggle-stremio-pwd" aria-label="Show or hide password"
@@ -1962,7 +1962,7 @@ function render() {
                   <button type="button" data-action="gen-pwd" style="font-size:.82rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
                 </div>
                 <div style="position:relative">
-                  <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
+                  <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest" autocapitalize="none" enterkeyhint="done"
                     value="${escH(S.instancePassword||'')}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
                     style="padding-right:40px">
                   <button type="button" id="pwdEye" data-action="toggle-pwd"
@@ -2006,7 +2006,7 @@ function render() {
                 </div>
                 <div class="name-row" style="margin-bottom:0">
                   <label style="color:var(--th-purple)">Base Password</label>
-                  <input class="name-input" id="basePwdInput" type="password"
+                  <input class="name-input" id="basePwdInput" type="password" autocapitalize="none" enterkeyhint="done"
                     placeholder="leave blank if none"
                     value="${escH(S.basePassword||'')}" data-action="update-base-pwd" maxlength="200"
                     autocomplete="new-password">
@@ -2183,7 +2183,7 @@ function render() {
             ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
           <div style="position:relative;display:flex;align-items:center">
-            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
+            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
               value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -2211,7 +2211,7 @@ function render() {
                 <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div style="position:relative;display:flex;align-items:center">
-                <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+                <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
                   value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -2228,7 +2228,7 @@ function render() {
                 <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div style="position:relative;display:flex;align-items:center">
-                <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+                <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
                   value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -5528,8 +5528,8 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <span>${ICO.rocket(13,'#8b949e')} Push to Stremio Library</span><span style="font-size:.7rem">›</span>
         </summary>
         <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-          <input id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
-          <input id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <input id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <input id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
           <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s">${ICO.download(14,'#00d4ff')} Log in &amp; Install</button>
           <div id="stremioInstallResult" style="font-size:.75rem"></div>
         </div>
@@ -5858,7 +5858,7 @@ function simpleFinishHtml() {
             ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
           <div style="position:relative;display:flex;align-items:center">
-            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
+            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
               value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
@@ -5897,7 +5897,7 @@ function simpleFinishHtml() {
               <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
             <div style="position:relative;display:flex;align-items:center">
-              <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+              <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
                 value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
@@ -5914,7 +5914,7 @@ function simpleFinishHtml() {
               <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
             <div style="position:relative;display:flex;align-items:center">
-              <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+              <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
                 value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
@@ -5995,11 +5995,11 @@ function simpleFinishHtml() {
       </div>
       ${S.installMode === 'direct' ? `
       <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
-        <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
+        <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next" data-action="update-stremio-email"
           value="${escH(S.stremioEmail||'')}"
           style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:.8rem;outline:none">
         <div style="position:relative">
-          <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
+          <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" data-action="update-stremio-password"
             value="${escH(S.stremioPassword||'')}"
             style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;padding-right:38px;color:var(--tx);font-size:.8rem;outline:none">
           <button type="button" data-action="toggle-stremio-pwd" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
@@ -6729,7 +6729,7 @@ function showExpressLane() {
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
-    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"></div>`;
+    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" enterkeyhint="done" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"></div>`;
   };
   const credArea = (service) => {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
