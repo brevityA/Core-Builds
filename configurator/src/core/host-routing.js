@@ -4,9 +4,11 @@
  *
  * The 2026-09-06 host audit found the picker presented every host as
  * interchangeable when it is not: ElfHosted refuses P2P/HTTP ("Addon Torrentio
- * p2p is disabled: Private instances only"), and three hosts (Midnight, Omni,
- * Wizaardd) still run AIOStreams 2.33.2 while 2.34-only options can be
- * defaulted towards them. Two surfaces fix that:
+ * p2p is disabled: Private instances only"), and some hosts still run
+ * AIOStreams 2.33.2 while 2.34-only options can be defaulted towards them.
+ * (Re-audited 2026-09-17: Midnight's moved to 2.34.0; Omni and Wizaardd are
+ * the registry's remaining 2.33.2 entries. Versions come from hosts.js, not
+ * from this comment — check /api/v1/status before trusting either.) Two surfaces fix that:
  *
  *   - `hostPickerLabel()` puts capability + live-known version on the picker
  *     itself, before anything is deployed.
