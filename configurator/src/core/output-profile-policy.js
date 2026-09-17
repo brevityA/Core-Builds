@@ -75,6 +75,11 @@ const EXPLICIT_STREAM_TYPES = new Set([
   'debridio', 'debrider', 'jackett', 'prowlarr',
 ]);
 
+// Preset types whose emission is driven by an optional-extras toggle. knaben was the only one
+// until these were added; its id and its preset type are the same string, which is what makes
+// the `optional.has(type)` check below work at all.
+const OPTIONAL_EXTRAS_STREAM_TYPES = new Set(['knaben', 'neko-bt', 'sootio', 'webstreamr', 'yastream']);
+
 const STABLE_STREAM_TYPES = new Set([
   // Account/library and service bridges.
   'library', 'stremthrutorz', 'stremthrustore', 'easynewsplusplus', 'easynews-search',
@@ -157,7 +162,12 @@ function isExplicitPreset(preset, context) {
   if (type === 'debridio') return services.has('debridio');
   if (type === 'debrider') return services.has('debrider');
   const optional = new Set(values(context.optionalScrapers));
-  if (type === 'knaben') return optional.has('knaben');
+  // Optional-extras toggles are explicit by definition. Without this the four extras that are
+  // advertised *disabled* on most lanes (neko-bt/sootio/webstreamr/yastream) get filtered back
+  // out of Stable/Balanced the moment a user switches them on — the toggle would silently do
+  // nothing. Scoped to a set rather than "any id in optionalScrapers" so `nzbhydra`/`newznab`
+  // keep their deliberate Stable exclusion below.
+  if (OPTIONAL_EXTRAS_STREAM_TYPES.has(type)) return optional.has(type);
   // AIOStreams v2.32 replaced the legacy Newznab URL/apiPath fields with an
   // options.api object. Keep Newznab out of Stable/Balanced until the explicit
   // v2.32 capability/import lane is proven rather than generating a shape that

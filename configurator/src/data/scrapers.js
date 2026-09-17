@@ -9,4 +9,8 @@ export const OPTIONAL_SCRAPER_DEFS = [
   { id:'drunkenslug', label:'DrunkenSlug', desc:'Popular Newznab indexer', presetType:'newznab', cat:'usenet', color:'#f97316', credKey:'drunkenslug', apiUrl:'https://drunkenslug.com/api' },
   { id:'nzbfinder', label:'NZBFinder', desc:'Newznab indexer · generous free tier', presetType:'newznab', cat:'usenet', color:'#06b6d4', credKey:'nzbfinder', apiUrl:'https://nzbfinder.ws/api' },
   { id:'nzbhydra', label:'NZBHydra2', desc:'Usenet meta-search — aggregates all your indexers', presetType:'nzbhydra', cat:'usenet', color:'#10b981', credKey:'nzbhydra' },
+  { id:'neko-bt', label:'NekoBT', desc:'nekoBT anime torrents · debrid-cached search', presetType:'neko-bt', cat:'debrid', color:'#f472b6' },
+  { id:'sootio', label:'Sootio', desc:'Multi-indexer debrid scraper · 10 HTTP providers', presetType:'sootio', cat:'debrid', color:'#22d3ee' },
+  { id:'webstreamr', label:'WebStreamr', desc:'HTTP streaming-site scraper · no debrid needed', presetType:'webstreamr', cat:'debrid', color:'#84cc16' },
+  { id:'yastream', label:'YaStream', desc:'Asian catalogs + streams (kisskh, OneTouchTV, iDrama)', presetType:'yastream', cat:'debrid', color:'#eab308' },
 ];

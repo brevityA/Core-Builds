@@ -151,12 +151,21 @@ function buildPresets(input) {
   const isNzbgeek = isMulti && multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && multiServices.includes('streamnzb');
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  // Optional-extras toggles: exactly one emission site per preset. All four are *also*
+  // advertised disabled on lanes that cannot satisfy them, so a toggle flips that advert's
+  // `enabled` instead of emitting a second instanceId, and the keyless branch below emits only
+  // where no advert exists. Sootio stays disabled on p2p/http — v2.33+ validates it as
+  // debrid/usenet-only, and a preset the lane cannot back rejects the WHOLE config, so an
+  // enabled-but-unsatisfiable Sootio is a save failure rather than a missing scraper.
+  const extrasOn = sid => optionalScrapers.includes(sid);
+  const animeContent = content === 'anime' || content === 'all' || content === 'mixed';
 
   if (isHttp) return [
     // v2.33+: Sootio validates as debrid/usenet-only — pure-HTTP/p2p routes can't satisfy it
     { type:'sootio', instanceId:'sootio-core-builds', enabled:false, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
     { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] },
-    { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
+    { type:'webstreamr', instanceId:'wsr-1', enabled:extrasOn('webstreamr'), options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
+    { type:'yastream', instanceId:'yas-1', enabled:extrasOn('yastream'), options:{ name:'YaStream', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     { type:'hdhub', instanceId:'hdhub-1', enabled:true, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
@@ -224,8 +233,13 @@ function buildPresets(input) {
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(creds.debrider ? { apiKey:creds.debrider } : {}) }, resources:['stream'] },
     ] : []),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
-      if (sid === 'knaben') return null;
-      if (sid === 'zilean') return null;
+      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      if (d.id === 'knaben') return null;  // emitted unconditionally below
+      if (d.id === 'zilean') return null;
+      if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
+      if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
+      if (d.id === 'webstreamr') return (hasExtraHttp || isHttp) ? null : { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] };
+      if (d.id === 'sootio') return null;  // the debrid/multi lanes advertise it at the tail — that advert carries the toggle
       return null;
     }).filter(Boolean),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
@@ -242,7 +256,7 @@ function buildPresets(input) {
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
-      { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
+      { type:'webstreamr', instanceId:'wsr-1', enabled:extrasOn('webstreamr'), options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
       { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
       { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     ] : []),
@@ -254,11 +268,15 @@ function buildPresets(input) {
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
-    ...(content === 'anime' || content === 'all' || content === 'mixed' ? [
+    ...(animeContent ? [
       { type:'animetosho', instanceId:'nx-at-01', enabled:content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
-      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:false, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
-    { type:'sootio', instanceId:'sootio-core-builds', enabled:false, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },  // p2p-only: v2.33 rejects Sootio (no usable service/HTTP provider); the HTTP/Usenet branches enable their own,
+    // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
+    // cannot reach it there. Neither can the HTTP branch (hardcoded false above) nor the
+    // Usenet branch (returns before the keyless block). Debrid and multi are the only routes
+    // where this toggle does anything — optionalScraperLaneBlock() greys the card elsewhere.
+    { type:'sootio', instanceId:'sootio-core-builds', enabled:extrasOn('sootio') && !isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
     ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...buildSubtitlePresets(input),
     ...buildCatalogPresets(input)

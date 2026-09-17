@@ -870,10 +870,16 @@ function renderOpts(def) {
     const scraperCards = OPTIONAL_SCRAPER_DEFS.map(d => {
       const active = S.optionalScrapers.includes(d.id);
       const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat;
-      return `<div class="opt-scraper-card" data-active="${active}" data-action="toggle-optional-scraper" data-scraper-id="${d.id}" role="checkbox" aria-checked="${active}" tabindex="0">
+      // Same gate the service cards above use, for the same reason: presets() emits
+      // nothing for some of these on some routes, so an ungated card lets you tick it,
+      // keeps it ticked, and exports a config without it. The reasons mirror the
+      // emission matrix in presets() exactly — change one and change the other.
+      const why = active ? '' : optionalScraperLaneBlock(d.id);
+      return `<div class="opt-scraper-card${why ? ' opt-host-blocked' : ''}" data-active="${active}" ${why ? `aria-disabled="true" title="${escHtml(why)}"` : `data-action="toggle-optional-scraper" tabindex="0"`} data-scraper-id="${d.id}" role="checkbox" aria-checked="${active}">
         <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
         <div class="opt-scraper-subdesc">${d.desc}</div>
+        ${why ? `<div class="opt-host-note">Unavailable — ${escHtml(why)}</div>` : ''}
         <span class="opt-scraper-badge opt-scraper-badge-${d.cat}">${catLabel}</span>
       </div>`;
     }).join('');
@@ -1279,6 +1285,27 @@ function outputProfileAuditHtml() {
   </div>`;
 }
 
+// Why a given optional scraper cannot be emitted on the currently selected route,
+// or '' when it can. This is the read-side mirror of the emission matrix in
+// presets(): the Usenet branch returns its own list before the keyless block runs,
+// and Sootio is refused on routes with no service to back it. Without this the
+// carousel happily accepts a toggle that the export then drops in silence — the
+// same class of bug as an extra being filtered back out by the output profile.
+// Keep in step with presets() and with configurator/tests/optional-extras-toggles.mjs.
+function optionalScraperLaneBlock(id) {
+  const svc = S.service;
+  if (svc === 'usenet' && ['neko-bt', 'sootio', 'webstreamr', 'yastream'].includes(id)) {
+    return 'the Usenet route builds its own addon list — only Newznab indexers and NZBHydra2 apply here';
+  }
+  if (id === 'sootio' && (svc === 'p2p' || svc === 'http')) {
+    return 'AIOStreams v2.33+ accepts Sootio only with a debrid or usenet service behind it';
+  }
+  if (id === 'neko-bt' && svc === 'http') {
+    return 'the HTTP route carries no torrent scrapers';
+  }
+  return '';
+}
+
 function renderAdvancedPanel() {
   const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   const reachedReview = (localStorage.getItem('coreBuildStep') && parseInt(localStorage.getItem('coreBuildStep'), 10) === STEPS);
@@ -1423,7 +1450,7 @@ function renderAdvancedPanel() {
               <a href="https://subdl.com/panel/api" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#06b6d4;text-decoration:none;font-weight:700;opacity:.7">Get key &rarr;</a>
             </div>
             <div style="position:relative;display:flex;align-items:center">
-              <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" placeholder="Your SubDL API key"
+              <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Your SubDL API key"
                 value="${escH(S.creds.subdl || '')}" maxlength="120" style="padding-right:38px;font-size:.78rem">
               <button type="button" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -1679,9 +1706,10 @@ function splashHtml() {
       <div class="splash-anim splash-anim-d2">
         <div class="hybrid-eyebrow">AIOStreams template configurator</div>
         <h1>Build streams<br>with intent.</h1>
-        <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a polished <strong>AIOStreams template</strong> — without touching JSON.</div>
-        <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source</span><span><i></i> No account required</span></div>
+        <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a checked <strong>AIOStreams template</strong> — and can write the whole stack (AIOStreams + AIOMetadata + a Cinemeta patch + subtitles) <strong>straight into your Stremio account</strong>. No JSON editing either way.</div>
+        <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
         <div class="splash-stats" id="splashStats"></div>
+        <div class="hybrid-subnote">First stream preloads by default · 6s addon timeout · keys go only to the host you choose</div>
       </div>
       <div class="hybrid-core-stage splash-anim splash-anim-d2">
         <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
@@ -1698,7 +1726,7 @@ function splashHtml() {
             <circle class="core-click-ring" cx="256" cy="256" r="86"/>
           </svg>
         </button>
-        <div class="hybrid-core-caption">Tap the core to support</div>
+        <div class="hybrid-core-caption">One install writes: AIOStreams · AIOMetadata 74-of-91 catalogs · Cinemeta patch · subtitles<br><span style="opacity:.6">tap the core to support the project</span></div>
       </div>
     </div>
 
@@ -1720,11 +1748,16 @@ function splashHtml() {
         <span class="splash-chip${_splashSvc==='free'?' active':''}" data-svc="free" role="radio" aria-checked="${_splashSvc==='free'}" tabindex="0"><span class="splash-chip-icon">${ICO.free(14,'#34d399')}</span> Free</span>
       </div>
     </div>
+    ${hadSavedState ? '' : `<div class="hybrid-services hybrid-presets"><div class="hybrid-services-label">Preset</div><div class="splash-chips" role="radiogroup" aria-label="Quick profile — tunes the dials, never trims your services">
+        <span class="splash-chip${S.quickProfile==='fast'?' active':''}" data-qp="fast" role="radio" aria-checked="${S.quickProfile==='fast'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#67e8f9')}</span> Lean · 1080p cached-first</span>
+        <span class="splash-chip${S.quickProfile==='balanced'?' active':''}" data-qp="balanced" role="radio" aria-checked="${S.quickProfile==='balanced'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#10b981')}</span> Standard · recommended</span>
+        <span class="splash-chip${S.quickProfile==='maximum'?' active':''}" data-qp="maximum" role="radio" aria-checked="${S.quickProfile==='maximum'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#fbbf24')}</span> Maximum · 4K quality-first</span>
+      </div></div>`}
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
     <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Express install</h2><p>The whole job is five steps: service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
     <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
-      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click</span></div><div class="splash-door-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy — working streams in about 30 seconds.</div></div></div>
+      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click · full-stack</span></div><div class="splash-door-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy — working streams in about 30 seconds. The account push writes every addon on every device; a failed login still hands you the manifest URL, and old installs are replaced only when you tick it.</div></div></div>
     </div>
     <!-- Express-first IA (2026-09-06 audit): the other routes stay one click away
          as secondary text links — same data-actions, so #advanced / #update
@@ -1740,7 +1773,17 @@ function splashHtml() {
     <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
     <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>What the streams will look like</h2><p>Not adjectives — these are the real cards AIOStreams draws with each formatter, generated from the same templates this configurator writes.</p></div><p class="hybrid-section-index">03 / Preview</p></div>
+    <div class="hybrid-wall splash-anim splash-anim-d6" aria-label="Formatter previews">
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/ultra-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Ultra — flagship 3-line"><figcaption><b>Ultra</b><span>flagship 3-line</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Minimal — title only"><figcaption><b>Minimal</b><span>title only</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — TV — episode-first"><figcaption><b>TV</b><span>episode-first</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
+    </div>
+
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">04 / Tools</p></div>
     <div class="splash-doors splash-anim splash-anim-d6">
       <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
@@ -1905,11 +1948,11 @@ function render() {
             ${S.installMode === 'direct' ? `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Enter your Stremio credentials to install the addon directly to your library.</div>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-              <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
+              <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next" data-action="update-stremio-email"
                 value="${escH(S.stremioEmail||'')}"
                 class="th-input">
               <div style="position:relative">
-                <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
+                <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" data-action="update-stremio-password"
                   value="${escH(S.stremioPassword||'')}"
                   class="th-input" style="padding-right:40px">
                 <button type="button" data-action="toggle-stremio-pwd" aria-label="Show or hide password"
@@ -1962,7 +2005,7 @@ function render() {
                   <button type="button" data-action="gen-pwd" style="font-size:.82rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
                 </div>
                 <div style="position:relative">
-                  <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest"
+                  <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest" autocapitalize="none" enterkeyhint="done"
                     value="${escH(S.instancePassword||'')}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
                     style="padding-right:40px">
                   <button type="button" id="pwdEye" data-action="toggle-pwd"
@@ -2006,7 +2049,7 @@ function render() {
                 </div>
                 <div class="name-row" style="margin-bottom:0">
                   <label style="color:var(--th-purple)">Base Password</label>
-                  <input class="name-input" id="basePwdInput" type="password"
+                  <input class="name-input" id="basePwdInput" type="password" autocapitalize="none" enterkeyhint="done"
                     placeholder="leave blank if none"
                     value="${escH(S.basePassword||'')}" data-action="update-base-pwd" maxlength="200"
                     autocomplete="new-password">
@@ -2183,7 +2226,7 @@ function render() {
             ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
           <div style="position:relative;display:flex;align-items:center">
-            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
+            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
               value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -2211,7 +2254,7 @@ function render() {
                 <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div style="position:relative;display:flex;align-items:center">
-                <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+                <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
                   value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -2228,7 +2271,7 @@ function render() {
                 <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div style="position:relative;display:flex;align-items:center">
-                <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+                <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
                   value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
@@ -2712,6 +2755,14 @@ document.addEventListener('DOMContentLoaded', () => {
       svcChip.setAttribute('aria-checked','true');
       const pp = document.getElementById('splashPresets');
       if (pp) pp.innerHTML = splashPresetsHtml(svcChip.dataset.svc);
+      return;
+    }
+    const qpChip = e.target.closest('.splash-chip[data-qp]');
+    if (qpChip) {
+      document.querySelectorAll('.splash-chip[data-qp]').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-checked','false'); });
+      qpChip.classList.add('active'); qpChip.setAttribute('aria-checked','true');
+      // named entry to the existing applyQuickProfile — dials only, scraper sets stay your call
+      applyQuickProfile(qpChip.dataset.qp);
       return;
     }
     const ftInfo = e.target.closest('.ft-info[data-fttip]');
@@ -3639,6 +3690,14 @@ function presets() {
   const isNzbgeek = isMulti && S.multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && S.multiServices.includes('streamnzb');
   const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  // Optional-extras toggles: exactly one emission site per preset. All four are *also*
+  // advertised disabled on lanes that cannot satisfy them, so a toggle flips that advert's
+  // `enabled` instead of emitting a second instanceId, and the keyless branch below emits only
+  // where no advert exists. Sootio stays disabled on p2p/http — v2.33+ validates it as
+  // debrid/usenet-only, and a preset the lane cannot back rejects the WHOLE config, so an
+  // enabled-but-unsatisfiable Sootio is a save failure rather than a missing scraper.
+  const extrasOn = sid => S.optionalScrapers.includes(sid);
+  const animeContent = S.content === 'anime' || S.content === 'all' || S.content === 'mixed';
   if (isUsenet) {
     const usenetList = [
       // The usenet route enables the `aiostreams` service (see services()), which
@@ -3664,7 +3723,8 @@ function presets() {
     // v2.33+: Sootio validates as debrid/usenet-only — pure-HTTP/p2p routes can't satisfy it
     { type:'sootio', instanceId:'sootio-core-builds', enabled:false, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
     { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] },
-    { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
+    { type:'webstreamr', instanceId:'wsr-1', enabled:extrasOn('webstreamr'), options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
+    { type:'yastream', instanceId:'yas-1', enabled:extrasOn('yastream'), options:{ name:'YaStream', timeout:7000 }, resources:['stream'] },
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     { type:'hdhub', instanceId:'hdhub-1', enabled:true, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
@@ -3719,6 +3779,10 @@ function presets() {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       if (d.id === 'knaben') return { type:'knaben', instanceId:'knaben-1', enabled:true, options:{ name:'Knaben', timeout:7000 }, resources:['stream'] };
       if (d.id === 'zilean') return null;
+      if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
+      if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
+      if (d.id === 'webstreamr') return (hasExtraHttp || isHttp) ? null : { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] };
+      if (d.id === 'sootio') return null;  // the debrid/multi lanes advertise it at the tail — that advert carries the toggle
       return null;
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
@@ -3753,7 +3817,7 @@ function presets() {
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
     ...(hasExtraHttp ? [
-      { type:'webstreamr', instanceId:'wsr-1', enabled:false, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
+      { type:'webstreamr', instanceId:'wsr-1', enabled:extrasOn('webstreamr'), options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
       { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
       { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     ] : []),
@@ -3765,11 +3829,15 @@ function presets() {
     { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
     { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
-    ...(S.content === 'anime' || S.content === 'all' || S.content === 'mixed' ? [
+    ...(animeContent ? [
       { type:'animetosho', instanceId:'nx-at-01', enabled:S.content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
-      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:false, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
-    { type:'sootio', instanceId:'sootio-core-builds', enabled:false, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },  // p2p-only: v2.33 rejects Sootio without a usable service/HTTP provider,
+    // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
+    // cannot reach it there. Neither can the HTTP branch (hardcoded false above) nor the
+    // Usenet branch (returns before the keyless block). Debrid and multi are the only routes
+    // where this toggle does anything — optionalScraperLaneBlock() greys the card elsewhere.
+    { type:'sootio', instanceId:'sootio-core-builds', enabled:extrasOn('sootio') && !isP2P, options:{ name:'Sootio', timeout:5000 }, resources:['stream'] },
     ...(isP2P ? [{ type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] }] : []),
     ...subtitlePresets(),
     ...catalogPresets()
@@ -5520,8 +5588,8 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <span>${ICO.rocket(13,'#8b949e')} Push to Stremio Library</span><span style="font-size:.7rem">›</span>
         </summary>
         <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-          <input id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
-          <input id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <input id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <input id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
           <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s">${ICO.download(14,'#00d4ff')} Log in &amp; Install</button>
           <div id="stremioInstallResult" style="font-size:.75rem"></div>
         </div>
@@ -5850,7 +5918,7 @@ function simpleFinishHtml() {
             ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
           <div style="position:relative;display:flex;align-items:center">
-            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" placeholder="${inp.placeholder}"
+            <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
               value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
@@ -5889,7 +5957,7 @@ function simpleFinishHtml() {
               <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
             <div style="position:relative;display:flex;align-items:center">
-              <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" placeholder="eyJhbGciOiJSUzI1NiJ9…"
+              <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
                 value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
@@ -5906,7 +5974,7 @@ function simpleFinishHtml() {
               <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
             <div style="position:relative;display:flex;align-items:center">
-              <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" placeholder="abc123def456…"
+              <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
                 value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
@@ -5987,11 +6055,11 @@ function simpleFinishHtml() {
       </div>
       ${S.installMode === 'direct' ? `
       <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
-        <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" data-action="update-stremio-email"
+        <input id="stremioEmailInline" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next" data-action="update-stremio-email"
           value="${escH(S.stremioEmail||'')}"
           style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:.8rem;outline:none">
         <div style="position:relative">
-          <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" data-action="update-stremio-password"
+          <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" data-action="update-stremio-password"
             value="${escH(S.stremioPassword||'')}"
             style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;padding-right:38px;color:var(--tx);font-size:.8rem;outline:none">
           <button type="button" data-action="toggle-stremio-pwd" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
@@ -6721,7 +6789,7 @@ function showExpressLane() {
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
-    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"></div>`;
+    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" enterkeyhint="done" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"></div>`;
   };
   const credArea = (service) => {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
