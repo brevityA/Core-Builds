@@ -1028,7 +1028,7 @@ async function createImportUrl(){
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${uid(pack._meta.name)}-backup.json`; a.click(); URL.revokeObjectURL(url);
 
   const endpoints=[
-    {name:'Core Worker', url:'https://core-builds-cors-proxy.tlorenzato26.workers.dev/upload', type:'worker'},
+    {name:'Core Worker', url:'https://core-builds-cors-proxy.tlorenzato26.workers.dev/paste', type:'worker'},
     {name:'paste.rs', url:'https://paste.rs', type:'paste'},
     {name:'dpaste', url:'https://dpaste.com/api/v2/', type:'dpaste'}
   ];

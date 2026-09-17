@@ -191,6 +191,16 @@ test('Express without a Debridio key omits the preset (no config reject)', async
   await page.locator('#stremioEmailInline').fill('test@stremio.com');
   await page.locator('#stremioPasswordInline').fill('test-password');
   await page.locator('#expressGo').click();
+
+  // Adding Debridio without a key means its preset is dropped from the config.
+  // That used to happen silently; the preflight gate now says so before install
+  // (CFG-P0-02). Assert the warning is actually surfaced, then continue.
+  const preflight = page.locator('#preflightModal');
+  await expect(preflight).toBeVisible({ timeout: 15000 });
+  await expect(preflight).toContainText(/debridio/i);
+  await preflight.locator('#preflightGo').click();
+  await expect(preflight).toBeHidden();
+
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#aioResult')).toContainText('Full Stack Installed!', { timeout: 45000 });
   const config = posted[0].config;

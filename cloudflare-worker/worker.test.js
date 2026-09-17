@@ -1341,3 +1341,33 @@ test('hardening: allowlisted lane scopes apply to the whole ALLOWED_HOSTS set (n
   assert.equal(res.status, 403);
   assert.equal(upstream, 0);
 });
+
+// Badge Builder posted its pack to `/upload` for as long as that file has existed.
+// The worker has never had that route — the upload silently 404'd and fell through
+// to paste.rs, so the feature "worked" while never touching our own worker. Nothing
+// caught it because no test tied the callers to the router.
+//
+// This walks the repo for worker URLs and asserts each path is one the router
+// actually handles, so a caller pointed at a route that does not exist fails here
+// rather than degrading quietly in production.
+test('every worker URL referenced in the repo names a route the worker serves', () => {
+  const { execFileSync } = require('node:child_process');
+  const repo = require('node:path').resolve(__dirname, '..');
+  const out = execFileSync('grep', [
+    '-rhoE', 'workers\\.dev/[a-zA-Z0-9/_-]+',
+    '--include=*.html', '--include=*.js', '--include=*.mjs', '--include=*.md', repo,
+  ], { encoding: 'utf-8' });
+
+  // Routes the worker answers. Exact paths, plus the two prefix families.
+  const EXACT = new Set(['/api/generate', '/api/stats', '/api/visit', '/app/version',
+    '/contact', '/devices/register', '/healthz', '/paste']);
+  const PREFIX = ['/proxy', '/stremio/', '/t/'];
+  const served = (path) => EXACT.has(path) || PREFIX.some((pre) => path.startsWith(pre));
+
+  const referenced = [...new Set(out.split('\n').filter(Boolean)
+    .map((hit) => hit.slice(hit.indexOf('workers.dev') + 'workers.dev'.length)))];
+  assert.ok(referenced.length > 0, 'found no worker URLs to check — the grep stopped working');
+
+  const dangling = referenced.filter((path) => !served(path));
+  assert.deepEqual(dangling, [], `worker URL(s) point at routes the worker does not serve: ${dangling.join(', ')}`);
+});
