@@ -44,8 +44,8 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Fixed: EasyNews-only Direct Install no longer fails with 'Library requires at least one usable service'. AIOStreams builds the Library addon from your services, and EasyNews cannot back it" icon="bolt">
     the library preset is now omitted whenever no library-capable (debrid) service is enabled, on every route, and EasyNews configs install clean. EasyNews plus any debrid keeps the library.
   </Card>
-  <Card title="Direct Install now refuses to post without the keys the host demands, naming exactly what is missing ('Option apiKey is required' was the previous failure, delivered by the host after the fact). Export JSON remains keyless by design." icon="shield-check">
-    Direct Install now refuses to post without the keys the host demands, naming exactly what is missing ('Option apiKey is required' was the previous failure, delivered by the host after the fact). Export JSON remains keyless by design.
+  <Card title="Direct Install now refuses to post without the keys the host demands, naming exactly what is missing ('Option apiKey is required' was the previous failure, delivered by the host after the fact). Correction (v3.8): this entry originally ended 'Export JSON remains keyless by design', which was never true" icon="shield-check">
+    export has always embedded whatever credentials you entered, and the sanitiser that strips them runs on share links and imports only. Treat an exported file as secret; see the v3.8 note above.
   </Card>
   <Card title="The host picker now states each host's capabilities and its AIOStreams version before you deploy" icon="sliders">
     ElfHosted says 'Debrid only — no P2P/HTTP', and the three hosts still on 2.33.2 say so. A config using features newer than a host is not routed there, and a P2P config can no longer be sent to ElfHosted.
