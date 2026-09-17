@@ -133,9 +133,14 @@ test.describe('truthful host picker', () => {
     expect(await elf.textContent()).toContain('v2.34.0');
     const midnight = page.locator('#expressHost option[value="midnight"]');
     expect(await midnight.textContent()).toContain('Debrid + P2P + HTTP');
-    expect(await midnight.textContent()).toContain('v2.33.2');
+    expect(await midnight.textContent()).toContain('v2.34.0');
     const ftw = page.locator('#expressHost option[value="fortheweak"]');
     expect(await ftw.textContent()).toContain('v2.34.0');
+    // Keep a host that is genuinely still on 2.33.2 in this row. Without one,
+    // every asserted option reads v2.34.0 and the test stops proving the label
+    // renders the registry's version rather than a constant.
+    const wiz = page.locator('#expressHost option[value="wizaardd"]');
+    expect(await wiz.textContent()).toContain('v2.33.2');
   });
 
   test('the chip flags a pick the capability matrix blocks (P2P on ElfHosted)', async ({ page }) => {
