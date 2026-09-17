@@ -22,7 +22,7 @@
 // wait-loop. A second deploy on the same date takes a letter suffix (…-11 →
 // …-11b): reusing a live tag makes that wait-loop pass instantly and lets smoke
 // run before the new build has propagated. Never parsed as a date.
-const WORKER_VERSION = '2026-09-11b';
+const WORKER_VERSION = '2026-09-17';
 
 // ── Hardening constants ─────────────────────────────────────────────────────
 const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
