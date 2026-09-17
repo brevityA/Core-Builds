@@ -332,3 +332,16 @@ test('version: generated template includes coreBuildsVersion', () => {
   assert.ok(t.metadata.coreBuildsVersion, 'metadata.coreBuildsVersion should be set');
   assert.match(t.metadata.coreBuildsVersion, /^\d+\.\d+$/, 'coreBuildsVersion should be MAJOR.MINOR');
 });
+
+// cli/package-lock.json sat at 3.0.0 while package.json said 3.8.0 — eight minor
+// versions of drift, because the version-lockstep ritual lists package.json and
+// versions.json but never the lockfile. `npm ci` rewrites the installed tree from
+// the lockfile, so a stale one is what a fresh clone and CI actually get.
+test('cli package-lock version matches package.json', () => {
+  const pkg = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf-8'));
+  const lock = JSON.parse(readFileSync(resolve(__dirname, '..', 'package-lock.json'), 'utf-8'));
+  assert.equal(lock.version, pkg.version,
+    `package-lock.json version ${lock.version} != package.json ${pkg.version} — bump the lockfile in the same commit`);
+  assert.equal(lock.packages?.['']?.version, pkg.version,
+    `package-lock packages[""].version ${lock.packages?.['']?.version} != package.json ${pkg.version}`);
+});
