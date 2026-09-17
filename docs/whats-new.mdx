@@ -13,20 +13,20 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
 ## Configurator v3.9 (Sep 17 2026)
 
 <CardGroup cols={2}>
-  <Card title="Four more scrapers can be switched on from Advanced extras" icon="sparkles">
-    NekoBT, Sootio, WebStreamr and YaStream — and the cards now say when a route cannot use them. Three of the four are already advertised disabled on some routes, so the toggle flips that existing entry rather than emitting a second one with a duplicate instanceId. The routes differ and the UI no longer hides that: Usenet builds its own addon list and takes none of the four, HTTP takes two, and AIOStreams refuses Sootio on any route with no service behind it. A card the current route cannot satisfy is greyed out with the reason instead of accepting the click, staying ticked, and exporting a config without the preset — which is indistinguishable from it having worked. With every toggle off, the generated template is byte-identical to before.
+  <Card title="Optional scrapers in Advanced extras" icon="sparkles">
+    four more can be switched on: NekoBT, Sootio, WebStreamr and YaStream — and the cards now say when a route cannot use them. Three of the four are already advertised disabled on some routes, so the toggle flips that existing entry rather than emitting a second one with a duplicate instanceId. The routes differ and the UI no longer hides that: Usenet builds its own addon list and takes none of the four, HTTP takes two, and AIOStreams refuses Sootio on any route with no service behind it. A card the current route cannot satisfy is greyed out with the reason instead of accepting the click, staying ticked, and exporting a config without the preset — which is indistinguishable from it having worked. With every toggle off, the generated template is byte-identical to before.
   </Card>
-  <Card title="The landing page is rebuilt: a Lean / Standard / Maximum preset row on a first visit, a wall showing the real stream cards each formatter draws rather than describing them, and copy that says the install can write the whole stack into your Stremio account. Spacing, colour and type now come from one token set across all seven stylesheets, and the layout collapses to two bands on a phone. A test pins the small-text count so microcopy cannot keep shrinking" icon="bolt">
-    the 17px phone root scales it.
+  <Card title="Landing page rebuilt" icon="bolt">
+    a Lean / Standard / Maximum preset row on a first visit, a wall showing the real stream cards each formatter draws rather than describing them, and copy that says the install can write the whole stack into your Stremio account. Spacing, colour and type now come from one token set across all seven stylesheets, and the layout collapses to two bands on a phone. A test pins the small-text count so microcopy cannot keep shrinking — the 17px phone root scales it.
   </Card>
-  <Card title="Export now runs the same pre-flight as install. It used to check exactly one thing" icon="shield-check">
-    that a service was picked — while install ran the full check, even though both produce the same config. A template with no API key, or one over the payload limit, downloaded cleanly and only failed later inside AIOStreams. Both paths now share one policy and show the same findings, with export naming any credential fields the downloaded file carries.
+  <Card title="Shared export pre-flight" icon="shield-check">
+    export now runs the same check as install. It used to check exactly one thing — that a service was picked — while install ran the full check, even though both produce the same config. A template with no API key, or one over the payload limit, downloaded cleanly and only failed later inside AIOStreams. Both paths now share one policy and show the same findings, with export naming any credential fields the downloaded file carries.
   </Card>
-  <Card title="Fixed: Midnight's was recorded as running AIOStreams 2.33.2 when it had moved to 2.34.0. The host registry decides what each instance may receive, so configs using 2.34 features were being routed away from it and the picker advertised the wrong version. Re-checked every host against its own status endpoint." icon="sliders">
-    Fixed: Midnight's was recorded as running AIOStreams 2.33.2 when it had moved to 2.34.0. The host registry decides what each instance may receive, so configs using 2.34 features were being routed away from it and the picker advertised the wrong version. Re-checked every host against its own status endpoint.
+  <Card title="Midnight's host version corrected" icon="sliders">
+    it was recorded as running AIOStreams 2.33.2 when it had moved to 2.34.0. The host registry decides what each instance may receive, so configs using 2.34 features were being routed away from it and the picker advertised the wrong version. Re-checked every host against its own status endpoint.
   </Card>
-  <Card title="Troubleshooting has a decision tree for the case where one title buffers forever and everything else plays. That shape is not a config fault: Real-Debrid removes files by filename keyword, so every candidate for that one title returns 404 for Real-Debrid users while other services play it normally." icon="gauge">
-    Troubleshooting has a decision tree for the case where one title buffers forever and everything else plays. That shape is not a config fault: Real-Debrid removes files by filename keyword, so every candidate for that one title returns 404 for Real-Debrid users while other services play it normally.
+  <Card title="Single-title buffering guide" icon="gauge">
+    troubleshooting has a decision tree for the case where one title buffers forever and everything else plays. That shape is not a config fault: Real-Debrid removes files by filename keyword, so every candidate for that one title returns 404 for Real-Debrid users while other services play it normally.
   </Card>
 </CardGroup>
 
