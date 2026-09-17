@@ -13,7 +13,8 @@ const required = [
   'src/index.html', 'src/styles/01-core.css', 'src/styles/02-brand-theme.css', 'src/styles/03-enhancements.css', 'src/styles/04-landing.css', 'src/styles/05-unified-ui.css', 'src/styles/06-features.css', 'src/styles/07-menu-parity.css', 'src/js/app.js',
   'src/data/devices.js', 'src/data/hosts.js', 'src/data/services.js',
   'src/data/scrapers.js', 'src/data/formatters.js', 'src/data/icons.js',
-  'src/data/changelog.js', 'src/data/credentials.js', 'src/config/schema-guard.js', 'src/core/import-template.js'
+  'src/data/changelog.js', 'src/data/credentials.js', 'src/config/schema-guard.js', 'src/core/import-template.js',
+  'src/core/preflight-policy.js'
 ];
 await Promise.all(required.map(file => access(resolve(root, file))));
 
