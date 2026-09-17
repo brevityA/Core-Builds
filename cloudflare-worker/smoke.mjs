@@ -41,10 +41,11 @@ async function get(url) {
 
 const enc = (s) => encodeURIComponent(s);
 
-// --strict: fail (not warn) when the deployed worker predates 2026-09-11
-// (used by the deploy workflow's post-deploy gate).
+// --strict: fail (not warn) when the deployed worker does not report
+// EXPECTED_VERSION below (used by the deploy workflow's post-deploy gate).
+// Named rather than dated, so the two cannot drift apart on the next bump.
 const STRICT = args.includes('--strict');
-const EXPECTED_VERSION = '2026-09-11';
+const EXPECTED_VERSION = '2026-09-17';
 
 async function main() {
   console.log(`Core Builds worker smoke — ${BASE}\n`);
@@ -104,10 +105,17 @@ async function main() {
       const sr = await fetch(`${BASE}/api/stats`, { ...auth, signal: AbortSignal.timeout(TIMEOUT_MS) });
       const d = await sr.json().catch(() => null);
       check('operator stats → 200', sr.status === 200, `http ${sr.status}`);
+      // Staging (and any env without STATS KV) cannot invent counter classes.
+      // Deploy #49 failed 28/29 here after a staging dispatch. Same skip as #741.
+      const hasStatsKv = !!h?.bindings?.STATS;
       const required = ['proxy_cache_hits', 'visits_rate_limited', 'visits_write_err', 'proxy_err_timeout', 'proxy_err_network', 'proxy_err_oversize', 'proxy_err_status',
         'proxy_err_redirect', 'proxy_err_breaker', 'contact_messages', 'counter_write_err', 'rate_limited', 'by_rate_limit'];
-      const missing = d ? required.filter((k) => !(k in d)) : required;
-      check('operator stats exposes every counter class', missing.length === 0, missing.length ? `missing: ${missing.join(', ')}` : 'all present');
+      if (!hasStatsKv) {
+        check('operator stats exposes every counter class', true, 'skipped: STATS KV not bound');
+      } else {
+        const missing = d ? required.filter((k) => !(k in d)) : required;
+        check('operator stats exposes every counter class', missing.length === 0, missing.length ? `missing: ${missing.join(', ')}` : 'all present');
+      }
       if (d && Number(d.proxy_calls) > 100) {
         const ratio = Number(d.proxy_errors) / Number(d.proxy_calls);
         check('lifetime proxy error ratio < 35%', ratio < 0.35, `${(ratio * 100).toFixed(1)}%`);

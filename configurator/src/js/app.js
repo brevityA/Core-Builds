@@ -43,7 +43,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.7';
+const CONFIGURATOR_VERSION = '3.8';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1697,7 +1697,7 @@ function splashHtml() {
         <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer">Templates</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a>
-        <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer">Discord</a>
+        <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer">Discord</a>
         <button data-action="show-changelog" class="hybrid-version">v${CONFIGURATOR_VERSION}</button>
       </div>
     </div>
@@ -1799,7 +1799,7 @@ function splashHtml() {
       <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
       <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">GitHub</a>
       <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Core Crew</a>
-      <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Discord</a>
+      <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Discord</a>
       <button data-action="show-changelog" class="splash-tertiary-btn">What's new · v${CONFIGURATOR_VERSION}</button>
       <button data-action="open-diagnostics" class="splash-tertiary-btn">Report Issue</button>
     </div>
@@ -2021,7 +2021,7 @@ function render() {
                   Open configure page
                 </a>
               </div>
-              <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+              <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'?'display:none':''}">
                 <label>UUID</label>
                 <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
                   value="${S.instanceUuid}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
@@ -2125,7 +2125,7 @@ function render() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
               Core Crew
             </a>
-            <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="community-link">
+            <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
               Discord
             </a>
@@ -3469,10 +3469,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const uuidRow = document.getElementById('aioUuidRow');
       const cfgLinkRow = document.getElementById('hostConfigLinkRow');
       const cfgLink = document.getElementById('hostConfigLink');
-      const showUuid = (val !== 'custom' && val !== 'auto');
+      // A UUID names an existing config to update in place, which applies to any
+      // single concrete host — self-hosted included. Only 'auto' has no single
+      // target to update. The configure-page link is a separate condition: it
+      // needs a known public base URL, which 'custom' by definition has not.
+      const showUuid = val !== 'auto';
+      const showCfgLink = (val !== 'custom' && val !== 'auto');
       if (urlRow)  urlRow.style.display  = (val === 'custom') ? '' : 'none';
       if (uuidRow) uuidRow.style.display = showUuid ? '' : 'none';
-      if (cfgLinkRow) cfgLinkRow.style.display = showUuid ? '' : 'none';
+      if (cfgLinkRow) cfgLinkRow.style.display = showCfgLink ? '' : 'none';
       if (cfgLink && HOST_BASE_URLS[val]) cfgLink.href = HOST_BASE_URLS[val] + '/configure';
       if (val === 'custom') { const u = document.getElementById('aioUrl'); if (u) u.value = S.instanceUrl || ''; }
       const _ar = document.getElementById('manualAioResult') || document.getElementById('aioResult');
@@ -5593,7 +5598,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="community-link">Core Crew</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="community-link">GitHub</a>
-        <a href="https://discord.gg/ZvjnKbrq" target="_blank" rel="noopener noreferrer" class="community-link">Discord</a>
+        <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer" class="community-link">Discord</a>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -7998,8 +8003,12 @@ async function openInAIOStreams() {
     return;
   }
 
-  /* Known host + UUID — show manifest URL directly, no API call */
-  if (uuid && !isAuto) {
+  /* Known host + UUID, no password — nothing to send, so just rebuild the link.
+     With a password the config below is pushed to that UUID instead: before this,
+     ANY uuid on a non-auto host returned here, so a self-hosted user could enter
+     their UUID and get a manifest URL for the config they already had while the
+     template they just built was never sent. Auto mode has always updated. */
+  if (uuid && !isAuto && !pwd) {
     const manifestUrl = pwd ? `${base}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json` : `${base}/stremio/${uuid}/manifest.json`;
     showManifestModal(manifestUrl, pwd || null, hostLabel);
     return;
@@ -8020,10 +8029,15 @@ async function openInAIOStreams() {
       const cfg = buildFinal().config;
       const sz = payloadSizeGuard(cfg);
       if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
-      const res = await writeHostFetch(resolvedBase, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
+      // With a UUID this updates that config in place; without one it creates a
+      // new config. Same shape auto mode uses, and the proxy's custom lane
+      // accepts the /<id> form, so self-hosted hosts take this path too.
+      const userPath = uuid ? `/api/v1/user/${uuid}` : '/api/v1/user';
+      const res = await writeHostFetch(resolvedBase, userPath, { method: uuid ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
-        const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
+        // A PATCH answers without echoing the uuid, so fall back to the one we sent.
+        const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id || uuid;
         const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         resetBtn(origHtml);
