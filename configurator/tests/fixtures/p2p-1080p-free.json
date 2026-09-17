@@ -1,0 +1,200 @@
+{
+  "input": {
+    "service": "p2p",
+    "device": "generic",
+    "resolution": "1080p",
+    "architecture": "standard",
+    "pseArch": "standard",
+    "bandwidthMbps": 0,
+    "sizeLimit": "unlimited"
+  },
+  "hasTmdb": false,
+  "device": {
+    "resolution": {
+      "excludedResolutions": [
+        "144p",
+        "240p",
+        "360p"
+      ],
+      "includedResolutions": [],
+      "requiredResolutions": [
+        "1080p",
+        "720p"
+      ],
+      "preferredResolutions": [
+        "1080p",
+        "720p",
+        "Unknown"
+      ],
+      "maxResults": 35,
+      "maxResultsPerResolution": 15
+    },
+    "encode": {
+      "excludedEncodes": [
+        "AV1",
+        "VC-1"
+      ],
+      "preferredEncodes": [
+        "HEVC",
+        "AVC",
+        "Unknown"
+      ]
+    },
+    "audio": {
+      "excludedAudioTags": [],
+      "preferredAudioTags": [
+        "TrueHD",
+        "Atmos",
+        "DTS-HD MA",
+        "DTS:X",
+        "FLAC",
+        "DTS-HD",
+        "DD+",
+        "AAC",
+        "DTS",
+        "DD"
+      ],
+      "preferredAudioChannels": [
+        "5.1",
+        "2.0"
+      ]
+    }
+  },
+  "filters": {
+    "size": {
+      "global": {
+        "movies": [
+          1610612736,
+          80000000000
+        ],
+        "series": [
+          209715200,
+          40000000000
+        ]
+      },
+      "resolution": {
+        "1080p": {
+          "movies": [
+            524288000,
+            30000000000
+          ],
+          "series": [
+            104857600,
+            20000000000
+          ]
+        },
+        "720p": {
+          "movies": [
+            209715200,
+            12000000000
+          ],
+          "series": [
+            52428800,
+            8000000000
+          ]
+        }
+      }
+    },
+    "bitrate": {
+      "useMetadataRuntime": false,
+      "global": {
+        "movies": [
+          1000000,
+          150000000
+        ],
+        "series": [
+          1000000,
+          150000000
+        ]
+      },
+      "resolution": {
+        "1080p": {
+          "movies": [
+            2000000,
+            150000000
+          ],
+          "series": [
+            2000000,
+            150000000
+          ]
+        },
+        "720p": {
+          "movies": [
+            1000000,
+            150000000
+          ],
+          "series": [
+            1000000,
+            150000000
+          ]
+        }
+      }
+    }
+  },
+  "sort": {
+    "global": [
+      {
+        "key": "streamExpressionMatched",
+        "direction": "desc"
+      },
+      {
+        "key": "streamExpressionScore",
+        "direction": "desc"
+      },
+      {
+        "key": "seadex",
+        "direction": "desc"
+      },
+      {
+        "key": "resolution",
+        "direction": "desc"
+      },
+      {
+        "key": "quality",
+        "direction": "desc"
+      },
+      {
+        "key": "seeders",
+        "direction": "desc"
+      },
+      {
+        "key": "encode",
+        "direction": "desc"
+      },
+      {
+        "key": "language",
+        "direction": "desc"
+      },
+      {
+        "key": "size",
+        "direction": "desc"
+      }
+    ]
+  },
+  "addons": {
+    "presets": [
+      {
+        "type": "torbox",
+        "instanceId": "torbox-1",
+        "options": {
+          "timeout": 6000
+        },
+        "enabled": true
+      }
+    ],
+    "groups": {
+      "default": [
+        {
+          "type": "torbox",
+          "instanceId": "torbox-1",
+          "options": {
+            "timeout": 6000
+          },
+          "enabled": true
+        }
+      ]
+    },
+    "disabled": [],
+    "warnings": []
+  }
+}
