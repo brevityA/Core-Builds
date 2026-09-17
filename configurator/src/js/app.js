@@ -43,7 +43,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.7';
+const CONFIGURATOR_VERSION = '3.8';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1978,7 +1978,7 @@ function render() {
                   Open configure page
                 </a>
               </div>
-              <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'||S.instanceHost==='custom'?'display:none':''}">
+              <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'?'display:none':''}">
                 <label>UUID</label>
                 <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
                   value="${S.instanceUuid}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
@@ -3418,10 +3418,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const uuidRow = document.getElementById('aioUuidRow');
       const cfgLinkRow = document.getElementById('hostConfigLinkRow');
       const cfgLink = document.getElementById('hostConfigLink');
-      const showUuid = (val !== 'custom' && val !== 'auto');
+      // A UUID names an existing config to update in place, which applies to any
+      // single concrete host — self-hosted included. Only 'auto' has no single
+      // target to update. The configure-page link is a separate condition: it
+      // needs a known public base URL, which 'custom' by definition has not.
+      const showUuid = val !== 'auto';
+      const showCfgLink = (val !== 'custom' && val !== 'auto');
       if (urlRow)  urlRow.style.display  = (val === 'custom') ? '' : 'none';
       if (uuidRow) uuidRow.style.display = showUuid ? '' : 'none';
-      if (cfgLinkRow) cfgLinkRow.style.display = showUuid ? '' : 'none';
+      if (cfgLinkRow) cfgLinkRow.style.display = showCfgLink ? '' : 'none';
       if (cfgLink && HOST_BASE_URLS[val]) cfgLink.href = HOST_BASE_URLS[val] + '/configure';
       if (val === 'custom') { const u = document.getElementById('aioUrl'); if (u) u.value = S.instanceUrl || ''; }
       const _ar = document.getElementById('manualAioResult') || document.getElementById('aioResult');
@@ -7930,8 +7935,12 @@ async function openInAIOStreams() {
     return;
   }
 
-  /* Known host + UUID — show manifest URL directly, no API call */
-  if (uuid && !isAuto) {
+  /* Known host + UUID, no password — nothing to send, so just rebuild the link.
+     With a password the config below is pushed to that UUID instead: before this,
+     ANY uuid on a non-auto host returned here, so a self-hosted user could enter
+     their UUID and get a manifest URL for the config they already had while the
+     template they just built was never sent. Auto mode has always updated. */
+  if (uuid && !isAuto && !pwd) {
     const manifestUrl = pwd ? `${base}/stremio/${uuid}/${encodeURIComponent(pwd)}/manifest.json` : `${base}/stremio/${uuid}/manifest.json`;
     showManifestModal(manifestUrl, pwd || null, hostLabel);
     return;
@@ -7952,10 +7961,15 @@ async function openInAIOStreams() {
       const cfg = buildFinal().config;
       const sz = payloadSizeGuard(cfg);
       if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
-      const res = await writeHostFetch(resolvedBase, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
+      // With a UUID this updates that config in place; without one it creates a
+      // new config. Same shape auto mode uses, and the proxy's custom lane
+      // accepts the /<id> form, so self-hosted hosts take this path too.
+      const userPath = uuid ? `/api/v1/user/${uuid}` : '/api/v1/user';
+      const res = await writeHostFetch(resolvedBase, userPath, { method: uuid ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
-        const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
+        // A PATCH answers without echoing the uuid, so fall back to the one we sent.
+        const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id || uuid;
         const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         resetBtn(origHtml);
