@@ -224,7 +224,11 @@ export function preflightFindings(input = {}) {
         'Copy a Safe Feedback Report from Tools and open an issue.',
       ));
     } else {
-      const names = config.presets.map((p) => p && p.name).filter(Boolean);
+      // Generated presets carry their display name under options.name; nothing sets a
+      // top-level p.name. Reading p.name left `names` permanently empty, so the
+      // duplicate-name check below could never fire. Fall back to p.name for any
+      // hand-written config that does use it.
+      const names = config.presets.map((p) => p?.options?.name || p?.name).filter(Boolean);
       const duplicates = [...new Set(names.filter((n, i) => names.indexOf(n) !== i))];
       if (duplicates.length) {
         add(finding(

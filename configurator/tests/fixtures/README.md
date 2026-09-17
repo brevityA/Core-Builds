@@ -10,7 +10,9 @@ Captured from generation modules verified byte-identical to base commit
 `81c802b`:
 
 ```
-git diff --quiet 81c802b -- \
+# Paths below are relative to configurator/, so run it from there: from the repo
+# root git matches nothing and --quiet exits 0, falsely reporting "unchanged".
+cd configurator && git diff --quiet 81c802b -- \
   src/core/generate-template.js src/core/assemble-template.js \
   src/core/sort-policy.js src/core/filter-policy.js
 ```

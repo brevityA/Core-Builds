@@ -135,6 +135,24 @@ test('no fixture emits a non-empty credential — snapshots cover structure only
   }
 });
 
+/**
+ * The policy's `config` contract is `buildFinal().config` — presets live at
+ * `config.presets` (app.js: `presets: activePresets, services: services()`).
+ * This module's generateTemplate() returns the derived pieces instead
+ * (`{input, hasTmdb, device, filters, sort, addons}`), so passing its output
+ * straight in gave the policy an object with no `.presets` and tripped the
+ * `missing-presets` blocker on every fixture. The mutation test still passed —
+ * it only compares before/after — so the policy was never actually exercised
+ * against a realistic config here.
+ *
+ * Map the pieces onto the contract rather than teaching the policy a second
+ * shape: `config.addons.presets` is this generator's layout, not the app's, and
+ * making the policy read it would break the real export and install paths.
+ */
+function policyConfig(produced) {
+  return { ...produced, presets: produced?.addons?.presets ?? [] };
+}
+
 test('running the pre-flight policy does not mutate the config it inspects', () => {
   for (const fixture of FIXTURES) {
     const produced = generateTemplate(fixture.input, options);
@@ -153,11 +171,20 @@ test('running the pre-flight policy does not mutate the config it inspects', () 
       requiredCredentialIds: ['torbox'],
       devicesForcingLimitedAudio: ['firestick-hd'],
       deviceMaxResolution: { 'firestick-hd': '1080p' },
-      config: produced,
+      config: policyConfig(produced),
       extraWarnings: ['something external'],
     });
 
     assert.equal(JSON.stringify(produced), before, `${fixture.name}: config was mutated by the policy`);
+
+    // A valid generated config must never trip the structural blocker. This is what
+    // caught the shape mismatch above: it fired on all four fixtures before the fix.
+    const structural = preflightFindings({
+      service: fixture.input.service, device: fixture.input.device,
+      resolution: fixture.input.resolution, credentialsPresent: {}, requiredCredentialIds: [],
+      config: policyConfig(produced),
+    }).filter((f) => f.id === 'missing-presets');
+    assert.deepEqual(structural, [], `${fixture.name}: a valid config raised missing-presets`);
     assert.equal(payloadBytes(produced), beforeBytes, `${fixture.name}: byte length changed`);
   }
 });
