@@ -222,6 +222,21 @@ test.describe('regex allowlist preflight (synced-URL race, 2026-09-06 diagnosis)
     ];
   }
 
+  // The shared pre-flight gate (CFG-P0-02) now runs on the install path as well as
+  // export, and it fires BEFORE the password prompt. The 4K apex-mixed build these
+  // cases arm legitimately raises two advisory findings — overlapping result-limit
+  // layers and overlapping hard language filters — so the modal is expected here.
+  // Neither is a blocker and neither is what this block tests: the gate under test
+  // is the regex allowlist one below. Assert the gate is the advisory kind (a
+  // blocker would mean the build itself regressed), then continue through it.
+  async function passPreflight(page) {
+    const modal = page.locator('#preflightModal');
+    await expect(modal).toBeVisible({ timeout: 15000 });
+    await expect(modal).toContainText('Worth checking before you continue.');
+    await modal.locator('#preflightGo').click();
+    await expect(modal).toBeHidden();
+  }
+
   test('a stale host allowlist blocks the POST with the pattern counts — nothing is posted', async ({ page }) => {
     const posted = [];
     // Host allowlist still holds every inline pattern but has NOT picked up
@@ -233,6 +248,7 @@ test.describe('regex allowlist preflight (synced-URL race, 2026-09-06 diagnosis)
     await armInstall(page);
     page.on('dialog', dialog => dialog.accept());
     await page.locator('#btnAutoCreate').click();
+    await passPreflight(page);
     await page.locator('#pwdPrompt .pwd-go').click();
     await expect(page.locator('#aioResult')).toContainText('regex patterns are not allowed on this host', { timeout: 20000 });
     await expect(page.locator('#aioResult')).toContainText('lags the synced list');
@@ -249,6 +265,7 @@ test.describe('regex allowlist preflight (synced-URL race, 2026-09-06 diagnosis)
     await armInstall(page);
     page.on('dialog', dialog => dialog.accept());
     await page.locator('#btnAutoCreate').click();
+    await passPreflight(page);
     await page.locator('#pwdPrompt .pwd-go').click();
     await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
     expect(posted).toHaveLength(1);
@@ -263,6 +280,7 @@ test.describe('regex allowlist preflight (synced-URL race, 2026-09-06 diagnosis)
     await armInstall(page);
     page.on('dialog', dialog => dialog.accept());
     await page.locator('#btnAutoCreate').click();
+    await passPreflight(page);
     await page.locator('#pwdPrompt .pwd-go').click();
     await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
     expect(posted).toHaveLength(1);
