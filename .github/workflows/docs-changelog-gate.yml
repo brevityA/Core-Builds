@@ -97,3 +97,38 @@ jobs:
           else
             echo "OK — changelog coverage present or PR is internal/docs-only."
           fi
+
+  # BLOCKING, unlike the advisory job above, and deliberately a separate job so
+  # that contract stays intact. This one checks the *shape* of the newest
+  # changelog entry, not whether one exists: docs/whats-new.mdx splits each item
+  # on its first " — " to build a card title, so an item written as one long
+  # sentence ships a card with a 300-character title, or with its body printed
+  # twice. v3.9 shipped two of each. The failure is mechanical, the fix is one
+  # edit, and after merge it is a published page — so it blocks.
+  changelog-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Did this PR touch the configurator changelog?
+        id: touched
+        run: |
+          BASE="${{ github.base_ref }}"
+          CHANGED="$(git diff --name-only "origin/${BASE}...HEAD" 2>/dev/null || true)"
+          if echo "$CHANGED" | grep -q 'configurator/src/data/changelog\.js'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "changelog.js untouched — nothing to check."
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.touched.outputs.run == 'true'
+        with:
+          python-version: '3.x'
+
+      - name: Check card titles in the newest entry
+        if: steps.touched.outputs.run == 'true'
+        run: python3 scripts/sync-docs.py --check-changelog

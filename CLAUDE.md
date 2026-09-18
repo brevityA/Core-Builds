@@ -8,13 +8,15 @@ This is **brevityA/Core-Builds**, the canonical repo for Core Builds by Brevity 
 
 - **Create a new PR for every task.** After committing and pushing changes, always open a pull request — even for small or experimental changes.
 - **Build and test before push.** Run `npm run build && npm test && npm run validate` in `configurator/` before pushing configurator changes.
-- **Version consistency.** When bumping `CONFIGURATOR_VERSION` in `app.js`, also update `configurator/package.json`, `cli/package.json`, `packages/core/package.json`, `versions.json`, and `configurator/src/data/changelog.js`. `cli/tests/package-equivalence.test.mjs` asserts that `cli`, `packages/core` and `versions.configurator` share a `major.minor` — miss either package and 8 CLI tests fail (this list omitted both until v2.93, and CI caught it rather than the local board). `configurator/scripts/validate.mjs` needs no edit: its version check is dynamic.
-  - Then regenerate what derives from those files, or the suites fail downstream:
-    `npm run build --prefix configurator` (the version is baked into the built shell),
+- **Version consistency.** When bumping `CONFIGURATOR_VERSION` in `app.js`, also update `configurator/package.json`, `cli/package.json`, **`cli/package-lock.json`** (both `version` and `packages[""].version`), `packages/core/package.json`, `versions.json`, and `configurator/src/data/changelog.js`. `cli/tests/package-equivalence.test.mjs` asserts that `cli`, `packages/core` and `versions.configurator` share a `major.minor` — miss either package and 8 CLI tests fail (this list omitted both until v2.93, and CI caught it rather than the local board). The lockfile was missing from this list until v3.9 and had drifted to **3.0.0 against a 3.8.0 package.json**; `npm ci` rebuilds the installed tree *from the lockfile*, so a stale one is what a fresh clone and CI actually get. A guard in the same suite now asserts the two match. `configurator/scripts/validate.mjs` needs no edit: its version check is dynamic.
+  - Then regenerate what derives from those files, or the suites fail downstream, **in this order**:
     `python3 scripts/sync-docs.py --apply` (What's New + tools page come from `changelog.js`),
-    and `UPDATE_GOLDEN=1 npx playwright test e2e/golden-configs.spec.mjs` in `configurator/`
-    (all 15 goldens embed `coreBuildsVersion`; review that diff — it should be the version line and nothing else).
+    `UPDATE_GOLDEN=1 npx playwright test e2e/golden-configs.spec.mjs` in `configurator/`
+    (all 15 goldens embed `coreBuildsVersion`; review that diff — it should be the version line and nothing else),
+    and **`npm run build --prefix configurator` LAST**. The build must come after every content edit: the e2e `global-setup.mjs` refuses to run when `dist/` predates the working tree (`stamp <a> != source <b>`), which is exactly what happens if you build before `sync-docs` touches a file.
   - Run `npm test` in `configurator/`, `cli/` **and** `packages/core/` before pushing. The configurator suite alone will not catch a version-coupling break.
+- **Changelog items are `Short title — body`.** `docs/whats-new.mdx` builds each Mintlify `<Card>` by splitting an item on its **first** `" — "`: the part before it becomes the card title. An item that leads straight into prose ships a card with a 300-character title, or — with no separator at all — one whose title and body are the same paragraph printed twice. `python3 scripts/sync-docs.py --check-changelog` lints the newest entry and blocks the PR; the renderer derives a short title for older entries so they degrade rather than break.
+- **Touching `configurator/src/data/hosts.js` means running e2e, not just `npm test`.** Host metadata is asserted in browser specs (`direct-install-gate.spec.mjs` pins each host's advertised version), so the unit suite goes green on a change that fails CI. #755 did exactly this.
 
 ---
 
