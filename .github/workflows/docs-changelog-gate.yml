@@ -109,26 +109,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Did this PR touch the configurator changelog?
-        id: touched
-        run: |
-          BASE="${{ github.base_ref }}"
-          CHANGED="$(git diff --name-only "origin/${BASE}...HEAD" 2>/dev/null || true)"
-          if echo "$CHANGED" | grep -q 'configurator/src/data/changelog\.js'; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "changelog.js untouched — nothing to check."
-          fi
 
       - uses: actions/setup-python@v5
-        if: steps.touched.outputs.run == 'true'
         with:
           python-version: '3.x'
 
-      - name: Check card titles in the newest entry
-        if: steps.touched.outputs.run == 'true'
+      # Runs on EVERY PR, not only ones touching changelog.js. A conditional
+      # here would mean the checking path never executes until a release PR
+      # opens — a check whose first real run is someone else's release is not
+      # a check anyone has verified. This repo has shipped that twice already
+      # (status-check.yml gated nothing for months; the worker deploy reported
+      # success while skipping). The lint is read-only, sub-second, and judges
+      # only the newest entry, so on a clean main it is a no-op that proves
+      # itself on every PR.
+      - name: Check card titles in the newest changelog entry
         run: python3 scripts/sync-docs.py --check-changelog
