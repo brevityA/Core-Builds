@@ -72,7 +72,11 @@ test('every inline script block in the page parses', () => {
 });
 
 test('the page stays classic — a module tag would break file:// and the inline onclick', () => {
-  assert.equal(/<script[^>]*type=["']module["']/.test(html), false);
+  // Strip block comments first: the fence now inlines core.mjs's own header,
+  // which *describes* the `<script type="module">` we deliberately do not use.
+  // Matching prose instead of markup would fail on the documentation alone.
+  const markup = html.replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.equal(/<script[^>]*type=["']module["']/.test(markup), false);
 });
 
 test('all 22 core symbols resolve from the following classic script block', () => {

@@ -8,7 +8,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  BANNER_STUDIO_VERSION, BRANDS, DEF, PRESETS, EXPORT_SETS, READY,
+  APP_VERSION, BRANDS, DEF, PRESETS, EXPORT_SETS, READY,
   CONTRAST_MIN, CLAMP_REPORT_EPSILON, ASSET_PERSIST_LIMIT, ASSET_SHARE_LIMIT, SPEC_V,
   contrast, contrastVerdict, relLum, hexRgb, rgbHex, mix, clamp, fnv, fitCrop,
   layout, maxLogoWidth, clampIsReportable, reduceScale,
@@ -218,8 +218,12 @@ test('BS-P1-04 · a size set plans every preset in the set, once each', () => {
   assert.equal(new Set(plan.map(p => p.filename)).size, plan.length, 'filenames must not collide');
 });
 
-test('BS-P1-04 · the "all" set covers every declared preset', () => {
-  assert.deepEqual([...EXPORT_SETS.all.presets].sort(), Object.keys(PRESETS).sort());
+test('BS-P1-04 · the "all" set covers every fixed-size preset', () => {
+  // `custom` takes its dimensions from the user, so it is a canvas size rather
+  // than an export target and is deliberately not in any set.
+  const fixed = Object.keys(PRESETS).filter(k => k !== 'custom');
+  assert.deepEqual([...EXPORT_SETS.all.presets].sort(), fixed.sort());
+  assert.ok(!EXPORT_SETS.all.presets.includes('custom'));
 });
 
 test('every export set references only real presets', () => {
@@ -370,8 +374,12 @@ test('sanitize only accepts well-formed hex overrides', () => {
   assert.equal(sanitize({ accentOverride: '#00d4ff' }).accentOverride, '#00d4ff');
 });
 
-test('sanitize accepts svg as an export format now that it is supported', () => {
-  assert.equal(sanitize({ fmt: 'svg' }).fmt, 'svg');
+test('sanitize rejects svg until the UI can actually produce it', () => {
+  // svgAvailability() and planExport()'s svg branch are tested logic that is
+  // not yet wired into the page. Accepting fmt:'svg' here would let a shared
+  // link ask for SVG and get a PNG named .svg — a worse failure than refusing
+  // it. Flip this to expect 'svg' in the same commit that wires the export.
+  assert.equal(sanitize({ fmt: 'svg' }).fmt, 'png');
   assert.equal(sanitize({ fmt: 'jpeg' }).fmt, 'jpeg');
   assert.equal(sanitize({ fmt: 'bmp' }).fmt, 'png', 'unknown formats fall back to png');
 });
@@ -478,5 +486,5 @@ test('every kit produces a design that passes the contrast floor', () => {
 });
 
 test('the version is a semver string', () => {
-  assert.match(BANNER_STUDIO_VERSION, /^\d+\.\d+\.\d+$/);
+  assert.match(APP_VERSION, /^\d+\.\d+\.\d+$/);
 });
