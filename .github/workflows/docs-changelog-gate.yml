@@ -109,6 +109,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # This job reads the tree and runs a script — it performs no git
+          # operation that needs auth. A same-repo PR can carry a writable
+          # token, and a persisted one is readable from .git/config by anything
+          # the job runs (zizmor: artipacked).
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:

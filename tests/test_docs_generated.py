@@ -177,7 +177,21 @@ def test_no_generated_card_title_is_absurdly_long():
 def test_check_changelog_items_flags_a_missing_separator():
     bad = [{"v": "9.9", "date": "x", "items": ["One long sentence with no lead title at all."]}]
     problems = sync.check_changelog_items(bad)
-    assert len(problems) == 1 and "no \" — \" separator" in problems[0]
+    assert len(problems) == 1 and "Short title — body" in problems[0]
+
+
+def test_an_item_that_opens_with_the_separator_is_rejected_and_still_renders():
+    # " — body" reaches the validator with a present separator and a non-empty
+    # body, so only an explicit empty-lead check catches it. The renderer must
+    # also not fall back to a title that is the body minus its dash, which is
+    # the same duplication this whole guard exists to stop.
+    item = " — body text that carries the whole item"
+    problems = sync.check_changelog_items([{"v": "9.9", "date": "x", "items": [item]}])
+    assert len(problems) == 1, "an empty lead title must be rejected"
+
+    title, body = sync.card_title_body(item, 0)
+    assert not title.startswith("—")
+    assert title.strip() != body.strip()
 
 
 def test_check_changelog_items_flags_an_overlong_lead():

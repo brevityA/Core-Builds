@@ -556,7 +556,11 @@ def derive_card_title(item):
     # Split on a sentence end or a dash clause, but NOT on a colon: many items
     # open with "Fixed:" or "Security:", and cutting there yields a one-word
     # title that names the category instead of the change.
-    lead = re.split(r"(?<=[.;])\s|\s[—–-]\s", item.strip(), maxsplit=1)[0]
+    # Strip a leading separator first: an item written as " — body" strips to
+    # "— body", which the clause split below cannot break, so the derived title
+    # came back as the body minus a space — the exact duplication this guards.
+    text = re.sub(r"^[\s—–-]+", "", item.strip())
+    lead = re.split(r"(?<=[.;])\s|\s[—–-]\s", text, maxsplit=1)[0]
     words = lead.split()
     out = ""
     for w in words:
@@ -588,10 +592,11 @@ def check_changelog_items(cfg_entries):
     problems = []
     for i, item in enumerate(entry["items"], start=1):
         title, sep, rest = item.partition(" — ")
-        if not sep or not rest.strip():
+        if not sep or not rest.strip() or not title.strip():
             problems.append(
-                f'v{entry["v"]} item {i}: no " — " separator, so the whole item '
-                f"becomes both the card title and its body.\n      {item[:90]}…"
+                f'v{entry["v"]} item {i}: needs \'Short title — body\'; the lead '
+                f"title or the body is missing, so the card cannot be built from "
+                f"it.\n      {item[:90]}…"
             )
         elif len(title.strip()) > CARD_TITLE_MAX:
             problems.append(
