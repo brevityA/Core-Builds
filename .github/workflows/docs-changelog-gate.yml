@@ -97,3 +97,36 @@ jobs:
           else
             echo "OK — changelog coverage present or PR is internal/docs-only."
           fi
+
+  # BLOCKING, unlike the advisory job above, and deliberately a separate job so
+  # that contract stays intact. This one checks the *shape* of the newest
+  # changelog entry, not whether one exists: docs/whats-new.mdx splits each item
+  # on its first " — " to build a card title, so an item written as one long
+  # sentence ships a card with a 300-character title, or with its body printed
+  # twice. v3.9 shipped two of each. The failure is mechanical, the fix is one
+  # edit, and after merge it is a published page — so it blocks.
+  changelog-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # This job reads the tree and runs a script — it performs no git
+          # operation that needs auth. A same-repo PR can carry a writable
+          # token, and a persisted one is readable from .git/config by anything
+          # the job runs (zizmor: artipacked).
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Runs on EVERY PR, not only ones touching changelog.js. A conditional
+      # here would mean the checking path never executes until a release PR
+      # opens — a check whose first real run is someone else's release is not
+      # a check anyone has verified. This repo has shipped that twice already
+      # (status-check.yml gated nothing for months; the worker deploy reported
+      # success while skipping). The lint is read-only, sub-second, and judges
+      # only the newest entry, so on a clean main it is a no-op that proves
+      # itself on every PR.
+      - name: Check card titles in the newest changelog entry
+        run: python3 scripts/sync-docs.py --check-changelog

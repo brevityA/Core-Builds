@@ -335,6 +335,24 @@ def main():
     apply = "--apply" in sys.argv
     dry_run = not apply
 
+    # Read-only lint for the release being cut. Writes nothing, so it is safe to
+    # run on a PR — which is the only point where the author can still fix it.
+    if "--check-changelog" in sys.argv:
+        problems = check_changelog_items(parse_config_changelog())
+        if not problems:
+            print("changelog card titles OK")
+            return 0
+        print("Malformed changelog items in the newest entry:\n")
+        for p in problems:
+            print(f"  - {p}")
+        print(
+            "\nEach item must read 'Short title — body'. The part before the first"
+            "\n' — ' becomes the card title on docs/whats-new.mdx; without one the"
+            f"\nwhole item is used, which is why titles ran past {CARD_TITLE_MAX} characters"
+            "\nor appeared twice on the same card."
+        )
+        return 1
+
     print("=" * 60)
     print(f"  sync-docs.py {'(DRY RUN)' if dry_run else '(APPLYING)'}")
     print("=" * 60)
@@ -517,6 +535,77 @@ def gen_roadmap_shipped_md(entries, limit=12):
     return preamble + rows + "\n"
 
 
+# A What's New card is built by splitting an item on its first " — ": the part
+# before it becomes the <Card title>, the rest the body. An item that leads
+# straight into prose therefore produced a title hundreds of characters long, or
+# — with no separator at all — a card whose title and body were the same
+# paragraph twice. v3.9 shipped two of each before this was caught; 83 of the
+# 364 items in the fleet's history have the same shape.
+#
+# card_title_body() is the floor: it keeps any well-formed lead title and
+# derives a short one otherwise, so a malformed item degrades to a readable
+# card instead of a broken one. check_changelog_items() is the ceiling: it
+# fails the PR gate when the release being cut introduces a new one, because
+# a derived title is a fallback, not as good as a written one.
+CARD_TITLE_MAX = 80
+CARD_TITLE_DERIVED_MAX = 48
+
+
+def derive_card_title(item):
+    """Short title for an item with no usable lead, never equal to the body."""
+    # Split on a sentence end or a dash clause, but NOT on a colon: many items
+    # open with "Fixed:" or "Security:", and cutting there yields a one-word
+    # title that names the category instead of the change.
+    # Strip a leading separator first: an item written as " — body" strips to
+    # "— body", which the clause split below cannot break, so the derived title
+    # came back as the body minus a space — the exact duplication this guards.
+    text = re.sub(r"^[\s—–-]+", "", item.strip())
+    lead = re.split(r"(?<=[.;])\s|\s[—–-]\s", text, maxsplit=1)[0]
+    words = lead.split()
+    out = ""
+    for w in words:
+        if out and len(out) + 1 + len(w) > CARD_TITLE_DERIVED_MAX:
+            return out.rstrip(",;:") + "…"
+        out = f"{out} {w}".strip()
+    return (out or item[:CARD_TITLE_DERIVED_MAX]).rstrip(".,;:")
+
+
+def card_title_body(item, index):
+    """Split a changelog item into (title, body) for a Mintlify <Card>."""
+    title, sep, rest = item.partition(" — ")
+    title, rest = title.strip(), rest.strip()
+    if sep and rest and 0 < len(title) <= CARD_TITLE_MAX:
+        return title, rest
+    return (derive_card_title(item) or f"Update {index + 1}"), item
+
+
+def check_changelog_items(cfg_entries):
+    """Problems in the newest entry's items, as human-readable strings.
+
+    Scoped to the newest entry on purpose: it is the one being written, so its
+    author can still fix it. Older entries keep whatever shape they shipped
+    with and rely on card_title_body() to render sanely.
+    """
+    if not cfg_entries:
+        return []
+    entry = cfg_entries[0]
+    problems = []
+    for i, item in enumerate(entry["items"], start=1):
+        title, sep, rest = item.partition(" — ")
+        if not sep or not rest.strip() or not title.strip():
+            problems.append(
+                f'v{entry["v"]} item {i}: needs \'Short title — body\'; the lead '
+                f"title or the body is missing, so the card cannot be built from "
+                f"it.\n      {item[:90]}…"
+            )
+        elif len(title.strip()) > CARD_TITLE_MAX:
+            problems.append(
+                f'v{entry["v"]} item {i}: lead title is {len(title.strip())} characters '
+                f"(max {CARD_TITLE_MAX}).\n      {title.strip()[:90]}…"
+            )
+    return problems
+
+
 def gen_whats_new_page(cfg_entries, limit=4):
     """Fully regenerate docs/whats-new.mdx from configurator changelog.js."""
     if not cfg_entries:
@@ -527,9 +616,7 @@ def gen_whats_new_page(cfg_entries, limit=4):
     for e in cfg_entries[:limit]:
         cards = []
         for i, item in enumerate(e["items"]):
-            title, _, rest = item.partition(" — ")
-            title = title.strip() or f"Update {i + 1}"
-            body = rest.strip() or item
+            title, body = card_title_body(item, i)
             icon = icon_cycle[i % len(icon_cycle)]
             safe_title = title.replace('"', "'")
             safe_body = body.replace('"', "'")
@@ -677,4 +764,4 @@ def sync_generated_pages(patcher):
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main() or 0)
