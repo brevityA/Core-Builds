@@ -3943,9 +3943,10 @@ function eses() {
     if (['generic','samsung','firestick-hd','roku','projector','onn'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
     if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-    if (S.sizeLimit !== 'unlimited') {
-      out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'1B','${S.sizeLimit}GB')` });
-    }
+      // Size cap is owned by the native size policy (sizePolicy() reads the same
+      // S.sizeLimit and applies it on every route). Emitting a Size Limit SEL too
+      // capped twice with different pack/folder semantics — reported as "size
+      // filtering is applied twice" (C07_DUPLICATE_SIZE_CAP).
     { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     out.push(...lateEpisodePackFallbackEses());
     return out;
@@ -3986,14 +3987,21 @@ function eses() {
   out.push({ enabled:true, expression:"/* Indexer Diversity */ count(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))))>20 ? negate(perGroup(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'indexer',2),negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http')))) : []" });
   if (S.cacheMode !== 'uncached') out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" });
   if (S.cacheMode !== 'cached') out.push({ enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
-  if (S.cacheMode === 'cached')   out.push({ enabled:true, expression:"/* Cached Only — hard kill uncached */ uncached(streams)" });
-  if (S.cacheMode === 'uncached') out.push({ enabled:true, expression:"/* Uncached Only — hard kill cached */ cached(streams)" });
+  // The native excludeUncached/excludeCached flags already do this, but they are
+  // gated on the route (`S.service!=='p2p' && S.service!=='http'`) while these
+  // expressions were not — so on every debrid route both fired, which is the
+  // "cached only is applied twice" report (C05/C06). Keep the SEL only for the
+  // routes where the native flag is forced off and it is the single mechanism.
+  const nativeCacheFilter = S.service !== 'p2p' && S.service !== 'http';
+  if (S.cacheMode === 'cached'   && !nativeCacheFilter) out.push({ enabled:true, expression:"/* Cached Only — hard kill uncached */ uncached(streams)" });
+  if (S.cacheMode === 'uncached' && !nativeCacheFilter) out.push({ enabled:true, expression:"/* Uncached Only — hard kill cached */ cached(streams)" });
   if (!S.p2pEnabled && !S.multiServices.includes('p2p')) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
   if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
   if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-  if (S.sizeLimit !== 'unlimited') {
-    out.push({ enabled:true, expression:`/* Size Limit — max ${S.sizeLimit}GB */ size(streams,'1B','${S.sizeLimit}GB')` });
-  }
+    // Size cap is owned by the native size policy (sizePolicy() reads the same
+    // S.sizeLimit and applies it on every route). Emitting a Size Limit SEL too
+    // capped twice with different pack/folder semantics — reported as "size
+    // filtering is applied twice" (C07_DUPLICATE_SIZE_CAP).
   const ageEse = generateAgeRatingESE(S.ageLimit);
   if (ageEse) out.push(ageEse);
   out.push(...lateEpisodePackFallbackEses());

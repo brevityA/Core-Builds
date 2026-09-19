@@ -84,6 +84,20 @@ const MATRIX = [
   { name: 'core-stable-torbox-1080p', profile: 'stable', state: { resolution: '1080p', simpleMode: true } },
   { name: 'core-stable-torbox-4k', profile: 'stable', state: { resolution: '4k', simpleMode: true } },
   { name: 'core-balanced-torbox-1080p', profile: 'balanced', state: { resolution: '1080p', outputProfile: 'balanced' } },
+  // Cached-only + a size cap. BASE pins cacheMode 'mixed' and sizeLimit
+  // 'unlimited', so before this fixture NO golden exercised either route —
+  // which is how the duplicated cached-only and size rules reached users
+  // unnoticed (they are what the feature-conflict checker reports as
+  // "applied twice").
+  { name: 'torbox-4k-cached-size-capped', state: { resolution: '4k', cacheMode: 'cached', sizeLimit: 20 } },
+  // Same two routes on the labs profile, which keeps its expression stack
+  // instead of collapsing it — this is the shape a user on Apex Mixed runs.
+  { name: 'torbox-4k-apex-mixed-cached-size', state: { resolution: '4k', pseArch: 'apex-mixed', cacheMode: 'cached', sizeLimit: 20 } },
+  // p2p forces the native excludeUncached/excludeCached flags off, so here the
+  // Cached Only expression is the ONLY thing filtering uncached streams and
+  // must survive. This fixture is what stops the C05 fix from silently
+  // dropping cache filtering on the free routes.
+  { name: 'p2p-1080p-cached-only', state: { service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, resolution: '1080p', instanceHost: 'fortheweak', cacheMode: 'cached' } },
 ];
 
 for (const combo of MATRIX) {
