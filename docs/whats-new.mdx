@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.9"
+title: "What's New — Configurator v3.10"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.9 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.10 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.9**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.10**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.10 (Sep 19 2026)
+
+<CardGroup cols={2}>
+  <Card title="Stream statistics off by default" icon="sparkles">
+    the Removal Reasons, Included Reasons and Pipeline Timing cards no longer appear among your streams. They are AIOStreams statistics output and Core Builds was asking for them: the Stable profile set statistics.enabled with addon, filter and timing stats. It was the only profile doing so, and 66 of the 69 checked-in templates already shipped them off, so the two Core Stable templates were the outliers. On Android TV the cards render above the streams, which made diagnostics the first thing on screen. hideErrors stays off, which is what actually keeps real failures visible. The Stable templates go to 1.0.1 so the update banner offers the change to anyone already running them.
+  </Card>
+  <Card title="Banner Studio contrast and clamp fixes" icon="bolt">
+    every brand now carries its own background, and an unset background picks it up rather than falling back to one shared colour. All 18 brands clear the 2.25:1 contrast floor on their own default; Disney+ was 1.98:1 and could not be fixed from the UI at all, and is now 5.83:1. The clear-space clamp reports proportionally, so the roughly 1px trim at the shipped default stops warning while a genuine 72px clamp still does, and a failing contrast check now offers a one-tap remedy instead of a bare button. The tool also gained its first tests — 69 of them, plus 15 for the Badge Builder that had never run on a pull request.
+  </Card>
+  <Card title="What's New card titles" icon="shield-check">
+    the docs site builds each release card by splitting a changelog item on its first em dash, so items written as one long sentence shipped cards with 300-character titles, or with the same paragraph printed as both title and body. Two of each went out with v3.9. The renderer now derives a short title when an item lacks one, and a blocking check refuses a malformed item in the release being cut.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.9 (Sep 17 2026)
 
@@ -74,21 +90,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="The landing is Express-first: one primary card…" icon="gauge">
     The landing is Express-first: one primary card for the five-step install (service → device → resolution → key → Deploy), with Advanced Builder, Update Existing and the Setup Genie demoted to plain links. The Genie page itself is unchanged.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.1 (Sep 3 2026)
-
-<CardGroup cols={2}>
-  <Card title="Banner Studio is live under Tools" icon="sparkles">
-    a single self-contained page for generating Netflix-style streaming banners for 17 major streamer brands (Netflix, Disney+, Hulu, Max, Prime Video, Paramount+, Apple TV+, Peacock, Crave, Tubi, Crunchyroll, MGM+, STARZ, AMC+, BritBox, Plex, Roku Channel). Custom backgrounds, taglines, corner badges, undo/redo, PNG/JPG export, share links. Everything renders locally — your designs never leave the browser.
-  </Card>
-  <Card title="Banner Studio slider controls are now smooth" icon="bolt">
-    canvas rendering reuses offscreen buffers instead of allocating new ones every frame, and the main canvas no longer resets its dimensions on each paint. Range sliders have a styled track with a filled progress indicator that follows the thumb.
-  </Card>
-  <Card title="Disabled services no longer appear in exported configs" icon="shield-check">
-    the services array was emitting all 15 entries with enabled: false on unselected ones, causing AIOStreams' import UI to auto-tick services the user never selected. Only user-selected services now appear in the generated JSON.
   </Card>
 </CardGroup>
