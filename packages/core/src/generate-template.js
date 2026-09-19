@@ -353,9 +353,8 @@ function buildEses(input) {
     if (DV_ONLY_KILL_DEVICES.has(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
     if (input.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (input.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-    if (input.sizeLimit && input.sizeLimit !== 'unlimited') {
-      out.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
-    }
+    // Size cap is owned by the native size policy on this route too — see the
+    // note on the debrid path below (C07_DUPLICATE_SIZE_CAP).
     { const ae = generateAgeRatingESE(input.ageLimit); if (ae) out.push(ae); }
     out.push(...lateEpisodePackFallbackEses());
     return out;
@@ -397,14 +396,18 @@ function buildEses(input) {
   const cacheMode = input.cacheMode || 'mixed';
   if (cacheMode !== 'uncached') out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" });
   if (cacheMode !== 'cached') out.push({ enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
-  if (cacheMode === 'cached')   out.push({ enabled:true, expression:"/* Cached Only — hard kill uncached */ uncached(streams)" });
-  if (cacheMode === 'uncached') out.push({ enabled:true, expression:"/* Uncached Only — hard kill cached */ cached(streams)" });
+  // Cache filtering is owned by the native excludeUncached/excludeCached flags
+  // set below. Emitting the SEL as well made every debrid route filter twice —
+  // the "cached only is applied twice" report (C05/C06). The free routes return
+  // before this point and have no debrid cache state at all, so there is no
+  // exception to carry for them either.
   if (!input.p2pEnabled && !multiServices.includes('p2p')) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
   if (input.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
   if (input.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-  if (input.sizeLimit && input.sizeLimit !== 'unlimited') {
-    out.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
-  }
+  // Size cap is owned by the native size policy (sizePolicy() reads the same
+  // sizeLimit and applies it on every route). Emitting a Size Limit SEL too
+  // capped twice with different pack/folder semantics — reported as "size
+  // filtering is applied twice" (C07_DUPLICATE_SIZE_CAP).
   const ageEse = generateAgeRatingESE(input.ageLimit);
   if (ageEse) out.push(ageEse);
   out.push(...lateEpisodePackFallbackEses());
