@@ -6202,7 +6202,11 @@ function calculateHealthScore(prebuilt) {
     check('Conflict checks', 25, conflicts.length ? 0 : 25, conflicts.length ? `${conflicts.length} conflict check(s) need review` : 'No redundant or contradictory rule stack');
     check('Device-safe native filters', 15, (cfg.excludedQualities?.length && cfg.preferredResolutions?.length) ? 15 : 6, 'Native quality and resolution policy');
     check('Predictable sort', 10, sortKeys.includes('resolution') && sortKeys.includes('quality') ? 10 : 4, 'Resolution and quality are explicit');
-    check('Observable errors', 10, cfg.hideErrors === false && cfg.statistics?.enabled ? 10 : 3, 'Errors and timings stay visible');
+    // Scored on hideErrors alone. It used to also require statistics.enabled,
+    // which would now cost every Stable build 7 points for a setting we turn
+    // off deliberately — the stats cards render in the stream list, not in a
+    // diagnostics pane. Visible failures are what this check is actually about.
+    check('Observable errors', 10, cfg.hideErrors === false ? 10 : 3, 'Errors stay visible');
     check('Distinct baseline coverage', 5, complexity.runtime.enabledPresets >= 3 ? 5 : 2, `${complexity.runtime.enabledPresets} enabled preset(s)`);
     const finalScore = Math.min(score, 100);
     return {

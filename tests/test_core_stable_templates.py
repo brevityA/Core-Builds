@@ -24,7 +24,7 @@ def test_core_stable_templates_stay_within_the_stable_contract(filename, expecte
     assert metadata["coreBuildsProfile"] == "stable"
     assert metadata["coreBuildsVersion"] == "2.89"
     assert metadata["author"] == "Branding-Brevity"
-    assert metadata["version"] == "1.0.0"
+    assert metadata["version"] == "1.0.1"
     assert config["groups"]["enabled"] is False
     assert config["dynamicAddonFetching"]["enabled"] is False
     assert config["syncedRankedRegexUrls"] == []
@@ -38,7 +38,10 @@ def test_core_stable_templates_stay_within_the_stable_contract(filename, expecte
     assert config["resultLimits"]["global"] == expected_limit
     assert config["resultLimits"]["mode"] == "independent"
     assert config["hideErrors"] is False
-    assert config["statistics"]["enabled"] is True
+    # Off deliberately: the stats cards render inside the stream list (above the
+    # streams on Android TV), so they are not a diagnostics pane. hideErrors
+    # stays False, which is what keeps real failures visible.
+    assert config["statistics"]["enabled"] is False
     assert config["posterService"] == "none"
     assert expected_resolution in config["preferredResolutions"]
 

@@ -5,7 +5,7 @@
     "description": "Minimal, predictable 1080p TorBox baseline. Uses local/native filtering, no remote SEL or regex sync, no fetch groups, and no dynamic early exit.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -542,7 +542,7 @@
     "requiredStreamExpressions": [],
     "rankedStreamExpressions": [],
     "statistics": {
-      "enabled": true,
+      "enabled": false,
       "position": "bottom",
       "statsToShow": [
         "addon",
