@@ -1161,6 +1161,12 @@ function renderMatchMode() {
 }
 
 function renderCacheMode() {
+  // Cache state only exists on a debrid route. On p2p and http the native
+  // excludeCached/excludeUncached flags are forced off, the deduplicator
+  // disables its cached/uncached passes and the `cached` sort key is dropped —
+  // so every one of these pills would be a no-op. Hide it rather than offer a
+  // control the generated config cannot honour.
+  if (S.service === 'p2p' || S.service === 'http') return '';
   const modes = [
     { v:'mixed',   icon:'<svg width="16" height="16" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="6" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><circle cx="16" cy="18" r="3.5" fill="#22c55e" fill-opacity=".8"/><circle cx="28" cy="18" r="3.5" stroke="#f59e0b" stroke-width="1.2" fill="none"/><path d="M16 27h12" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/></svg>', label:'Mixed',       desc:'Cached + uncached, cached first' },
     { v:'cached',  icon:'<svg width="16" height="16" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="6" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".08"/><path d="M15 22l4 4 10-10" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>', label:'Cached Only', desc:'Instant play — cached debrid only' },
@@ -3987,14 +3993,18 @@ function eses() {
   out.push({ enabled:true, expression:"/* Indexer Diversity */ count(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))))>20 ? negate(perGroup(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'indexer',2),negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http')))) : []" });
   if (S.cacheMode !== 'uncached') out.push({ enabled:true, expression: "/* Extra Cached HQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'BluRay REMUX','BluRay','WEB-DL','WEBRip')))" }, { enabled:true, expression: "/* Extra Cached LQ */ negate(perGroup(negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')),'resolution',5),negate(merge(library(streams),uncached(streams)),quality(streams,'HDTV','HDRip','DVDRip','HC HD-Rip','TC','SCR','CAM','TS','Unknown')))" });
   if (S.cacheMode !== 'cached') out.push({ enabled:true, expression: "/* Extra Uncached */ negate(perGroup(uncached(streams),'resolution',3),uncached(streams))" });
-  // The native excludeUncached/excludeCached flags already do this, but they are
-  // gated on the route (`S.service!=='p2p' && S.service!=='http'`) while these
-  // expressions were not — so on every debrid route both fired, which is the
-  // "cached only is applied twice" report (C05/C06). Keep the SEL only for the
-  // routes where the native flag is forced off and it is the single mechanism.
-  const nativeCacheFilter = S.service !== 'p2p' && S.service !== 'http';
-  if (S.cacheMode === 'cached'   && !nativeCacheFilter) out.push({ enabled:true, expression:"/* Cached Only — hard kill uncached */ uncached(streams)" });
-  if (S.cacheMode === 'uncached' && !nativeCacheFilter) out.push({ enabled:true, expression:"/* Uncached Only — hard kill cached */ cached(streams)" });
+  // Cache filtering is owned by the native excludeUncached/excludeCached flags.
+  // Emitting the SEL as well made every debrid route filter twice — the "cached
+  // only is applied twice" report (C05/C06).
+  //
+  // There is no free-route exception to carry here. The p2p and http branches
+  // above return before this point, and cache is deliberately not a concept on
+  // those routes: the native flags are off, the deduplicator sets
+  // cached/uncached to 'disabled', and sort-policy.js drops the `cached` sort
+  // key entirely. Re-adding the SEL for them would not restore filtering, it
+  // would apply a debrid predicate to streams that have no debrid cache state.
+  // Cache Mode is hidden from the wizard on those routes instead, so the
+  // setting is never shown as doing something it cannot do.
   if (!S.p2pEnabled && !S.multiServices.includes('p2p')) out.push({ enabled:true, expression:"/* P2P Kill */ type(streams,'p2p')" });
   if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
   if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
