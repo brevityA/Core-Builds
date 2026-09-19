@@ -426,8 +426,14 @@ function applyStableProfile(template, context) {
   clearUnselectedCaps(config, context);
   disableEarlyExitAndBackgroundFetch(config, { disableAutoPlay: true });
   config.hideErrors = false;
+  // Off by default. These render as "Removal Reasons" / "Pipeline Timing" cards
+  // in the stream list itself — on Android TV they sit ABOVE the streams, so the
+  // first thing a user sees is diagnostics rather than something to play. Stable
+  // was the only profile enabling them; the other 66 templates already ship
+  // `enabled: false`, so this makes the fleet consistent. `hideErrors` stays
+  // false, which is what actually keeps failures visible.
   config.statistics = {
-    enabled: true,
+    enabled: false,
     position: 'bottom',
     statsToShow: ['addon', 'filter', 'timing'],
     showFilterStatsOnNoStreams: true,

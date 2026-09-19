@@ -456,7 +456,7 @@
     ],
     "requiredStreamExpressions": [],
     "statistics": {
-      "enabled": true,
+      "enabled": false,
       "position": "bottom",
       "statsToShow": [
         "addon",
