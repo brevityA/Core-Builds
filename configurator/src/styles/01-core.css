@@ -269,6 +269,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-hero-badge{font-size:.58rem;font-weight:800;letter-spacing:.1em;color:var(--th-accent);background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.22);border-radius:20px;padding:1px 8px;margin-left:7px;vertical-align:middle;white-space:nowrap}
 .svc-hero-tags{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
 .svc-hero-tag{font-size:.6rem;font-weight:600;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;color:#9ca3af}
+.svc-list-row{content-visibility:auto;contain-intrinsic-size:0 56px;contain:layout paint style}
 .svc-list-row label{flex-direction:row!important;align-items:center!important;gap:12px!important;padding:11px 14px!important;border-radius:11px!important;border-color:rgba(255,255,255,.06)!important}
 .svc-list-row label:focus-visible,.svc-list-hero label:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
 .svc-list-row .opt-icon{margin-bottom:0!important;flex-shrink:0}
@@ -307,7 +308,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt-scraper-scroll::-webkit-scrollbar{height:4px}
 .opt-scraper-scroll::-webkit-scrollbar-track{background:transparent}
 .opt-scraper-scroll::-webkit-scrollbar-thumb{background:rgba(232,163,58,.25);border-radius:4px}
-.opt-scraper-card{scroll-snap-align:start;flex:0 0 200px;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(8,12,18,.9);cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative}
+.opt-scraper-card{scroll-snap-align:start;flex:0 0 200px;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(8,12,18,.9);cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative;content-visibility:auto;contain-intrinsic-size:200px 140px;contain:layout paint style}
 .opt-scraper-card:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.03)}
 .opt-scraper-card[data-active="true"]{border-color:rgba(232,163,58,.6);background:rgba(232,163,58,.06);box-shadow:0 0 12px rgba(232,163,58,.1)}
 .opt-scraper-card-head{display:flex;align-items:center;gap:8px}

@@ -143,3 +143,31 @@ Export failure root cause was twofold: missing required options (e.g. `catalogs`
 - Upstream sync git fallback for reliable CI.
 
 Web research confirms best stack is Comet + MediaFusion + Torz + Zilean + Knaben + DMM + EasyNews++ for Usenet, with HTTP as supplement. Self-hosted improvements (PostgreSQL, CometNet, groups, SEL) are next frontier beyond configurator scope.
+
+## 6. Implementation 2026-09-21 — XS/S WebTools Improvements (this patch)
+
+All XS/S items from the matrix have been implemented and verified (595 tests pass, build 865KB JS).
+
+### DONE
+
+- **Debounce svc-filter 200ms + requestIdleCallback** — `debounce` + `idleDebounce` utils, `debouncedFilterSvcRows = idleDebounce(filterSvcRows,200)` used in input handler (line ~3640). Prevents layout thrash on 82 presets.
+- **Host status 5-min localStorage cache + background refresh** — `HOST_STATUS_CACHE_KEY='cbHostStatusCacheV1'`, `loadHostStatusCache`/`saveHostStatusCache`, `getCachedHostStatus` returns `{fresh, age}`, `setCachedHostStatus` merges prev. `probeHostCapabilities` returns fresh cache instantly, refreshes in background if >2min; stale returns immediately + background refresh. `probeHostDetail` also cached with `detail` field. `currentHostCapabilities` falls back to localStorage cache if in-mem miss. TTL 5min, keeps 2x TTL entries.
+- **Live byte counter in Review** — `livePayloadHtml()` uses `payloadSizeGuard(buildFinal().config)` with bar, color (green/yellow/red), KB/100KB + %. Rendered after `sizeLimitHtml()` in review step, `refreshLivePayloadCounter()` called on size-limit change and can be called on other toggles. Prevents late 100KB wall.
+- **content-visibility:auto virtual scroll** — `.svc-list-row{content-visibility:auto;contain-intrinsic-size:0 56px;contain:layout paint style}` and `.opt-scraper-card{...content-visibility:auto;contain-intrinsic-size:200px 140px;contain:layout paint style}` in `01-core.css`. Reduces layout cost for 31-card carousel + service list.
+- **Import unknown keys warning** — imports `unknownConfigKeys` from generated schema, in `parseAndApply` checks `cfg = tpl.config||tpl`, shows dead payload warning with first 8 keys in `infoEl`. Tells user if paste contains stripped payload.
+- **Feature flags cb-flags** — `parseCbFlags()` parses `localStorage.getItem('cb-flags')` comma list `k=v` or bare flag, `CB_FLAGS` global, `flagEnabled(name,def)`. Supports `pwa=0`, `webVitals=1`, `sentryDsn=https://...`, `hostCache=0`. Documented in Ctrl+/ help.
+- **PWA manifest.json + SW** — `src/manifest.json` (name, short_name, start_url ./, display standalone, theme_color #00d4ff, icon ./icon.svg), `src/icon.svg`, `src/sw.js` (cache-first same-origin, never cache /api/, strem.io, paste.rs, elfhosted etc). `src/index.html` adds `<link rel="manifest">`, `<meta theme-color>`, CSP `worker-src 'self'` (was 'none'), `script-src` allows sentry CDN, `connect-src` allows *.ingest.sentry.io, inline SW registration respects `pwa=0` flag. `build.mjs` copies manifest/icon/sw to dist/web and dist.
+- **Web Vitals beacon** — `initWebVitals()` via PerformanceObserver LCP/CLS/FID, only if `USAGE_BEACON_URL` set or `webVitals=1` flag, uses `beaconPost` (routes through central beacon, no bare sendBeacon). Sends to `USAGE_BEACON_URL||COUNTER_URL` with t:'web-vital'.
+- **Sentry optional** — `initSentry()` checks `CB_FLAGS.sentryDsn` https://, injects `https://browser.sentry-cdn.com/8.30.0/bundle.tracing.min.js`, init with release `core-builds@VERSION`, tags cb-flags. CSP updated for script-src and connect-src.
+- **Ctrl+/ shortcut** — keydown listener at top checks `(ctrlKey||metaKey) && (key==='/'||'?'||code==='Slash')`, shows `showShortcutsModal()` with list of shortcuts and flags. Also added `showRecommendedStackModal()` surfaced in Review → Tools → Recommended Stack, documents best add-ons per research.
+- **Lighthouse CI** — `configurator/lighthouserc.json` (collect http://localhost:8080, 2 runs, desktop, asserts perf 0.85, a11y 0.9, FCP 2s, LCP 2.5s, CLS 0.1, byte-weight 600KB), `.github/workflows/lighthouse.yml` (install, build, lhci autorun, bundle size budget JS 600KB CSS 150KB).
+- **Recommended Stack docs** — `configurator/docs/best-addons.md` with forks decision (skip picker, pick host), debrid picks, 17 safe scrapers, HTTP reliability note, self-hosted PG tuning, CometNet, DMM, FlareSolverr, groups sequential, Vidhin+Tamtaro, configurator webtools matrix, credential handling. Surfaced in UI via modal and link to full docs.
+
+### Remaining M (optional future)
+- QR code already done at ~5560 `qrcode(0,'M')` — verified DONE.
+- Payload guard already at 4 sites — DONE.
+- Host routing race vs write separation — DONE.
+
+All changes keep 595 tests green, validate pass, build 865KB JS 176KB CSS, standalone 1.08MB.
+
+

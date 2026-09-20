@@ -1,0 +1,17 @@
+{
+  "name": "Core Builds — Template Configurator",
+  "short_name": "Core Builds",
+  "description": "Generate optimized AIOStreams templates for Stremio — debrid, device, resolution, audio, content, formatter, scrapers, sorting, regex.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#00d4ff",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

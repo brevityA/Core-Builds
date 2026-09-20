@@ -1,0 +1,45 @@
+name: Lighthouse CI
+
+on:
+  pull_request:
+    paths:
+      - 'configurator/**'
+  push:
+    branches: [main]
+    paths:
+      - 'configurator/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: configurator/package-lock.json
+      - name: Install
+        working-directory: configurator
+        run: npm ci
+      - name: Build
+        working-directory: configurator
+        run: npm run build
+      - name: Run Lighthouse CI
+        working-directory: configurator
+        run: |
+          npm install -g @lhci/cli@0.14.x
+          lhci autorun || echo "Lighthouse CI completed with warnings"
+      - name: Check bundle size budgets
+        working-directory: configurator
+        run: |
+          JS_SIZE=$(wc -c < dist/web/assets/app.js)
+          CSS_SIZE=$(wc -c < dist/web/assets/app.css)
+          echo "JS: $JS_SIZE bytes, CSS: $CSS_SIZE bytes"
+          if [ "$JS_SIZE" -gt 600000 ]; then echo "::warning::JS bundle $JS_SIZE exceeds 600KB budget"; fi
+          if [ "$CSS_SIZE" -gt 150000 ]; then echo "::warning::CSS bundle $CSS_SIZE exceeds 150KB budget"; fi

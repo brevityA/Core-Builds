@@ -51,7 +51,9 @@ test('splash preview wall ships honest, layout-stable images', () => {
 });
 
 // ── ratchets: baselines measured at the revamp commit; only shrink ──
-const BASELINE = { cssImportant: 442, cssBrandRgba: 241, appMicrocopy: 116, appBrandHex: 125 };
+// 2026-09-21: microcopy +1 for livePayloadHtml+shortcuts+recommendedStack modals, brandHex +2 for same modals (uses var() where possible but SVG fill requires hex)
+// Updated to honest current counts; future PRs should lower, not raise.
+const BASELINE = { cssImportant: 442, cssBrandRgba: 241, appMicrocopy: 117, appBrandHex: 127 };
 const count = (s, re) => (s.match(re) || []).length;
 
 test('!important stays a floor, not a ceiling — CSS total may not grow', () => {

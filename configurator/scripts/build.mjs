@@ -56,6 +56,11 @@ if (!webHtml.includes(`app.js?v=${assetVersions.js}`) || !webHtml.includes(`app.
   throw new Error('Web build is missing content-versioned asset URLs');
 }
 await writeFile(resolve(web, 'index.html'), webHtml);
+// PWA assets
+try { await copyFile(resolve(src, 'manifest.json'), resolve(web, 'manifest.json')); } catch(e) {}
+try { await copyFile(resolve(src, 'icon.svg'), resolve(web, 'icon.svg')); } catch(e) {}
+try { await copyFile(resolve(src, 'sw.js'), resolve(web, 'sw.js')); } catch(e) {}
+
 
 // Publish the independent static utilities beside the Configurator.
 const skipBuild = (src) => { const s = src.replace(/\\/g, '/'); return s.includes('/node_modules/') || s.includes('/.git/'); };
@@ -73,6 +78,11 @@ if (standalone.includes('<script type="module" src="./js/app.js"></script>')) th
 if (standalone.includes("import { ICO }")) throw new Error('Standalone build contains unresolved module imports');
 await writeFile(resolve(dist, 'index.html'), standalone);
 await writeFile(resolve(root, 'index.html'), standalone);
+// Also publish PWA assets to dist root for standalone preview
+try { await copyFile(resolve(src, 'manifest.json'), resolve(dist, 'manifest.json')); } catch(e) {}
+try { await copyFile(resolve(src, 'icon.svg'), resolve(dist, 'icon.svg')); } catch(e) {}
+try { await copyFile(resolve(src, 'sw.js'), resolve(dist, 'sw.js')); } catch(e) {}
+
 
 // Stamp the source fingerprint into dist/ so the e2e global setup can prove the served
 // bundle matches the working tree. dist/ is gitignored and therefore survives a branch
