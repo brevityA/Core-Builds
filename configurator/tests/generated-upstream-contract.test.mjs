@@ -17,6 +17,7 @@ import { dirname, join } from 'node:path';
 import { AIO_CONFIG_KEYS, AIO_CONFIG_KEY_SET, unknownConfigKeys } from '../src/config/generated/aiostreams-config-schema.js';
 import { AIO_SORT_SCOPES, AIO_SORT_CRITERIA, AIO_SORT_SCORE_KEYS, AIO_SORT_DEFAULT_DIRECTIONS, AIO_CACHED_SPLIT_REQUIRES_CACHED_FIRST, invalidSortCriteria } from '../src/config/generated/aiostreams-sort-schema.js';
 import { AIO_PRESET_IDS, AIO_PRESET_ID_SET, isKnownPresetId } from '../src/data/generated/aiostreams-presets.js';
+import { AIO_PRESET_REQUIRED_OPTIONS, isSimpleTogglePreset } from '../src/data/generated/aiostreams-preset-options.js';
 import * as ENUMS from '../src/data/generated/aiostreams-enums.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -28,6 +29,7 @@ const GENERATED_FILES = [
   'src/config/generated/aiostreams-sort-schema.js',
   'src/data/generated/aiostreams-enums.js',
   'src/data/generated/aiostreams-presets.js',
+  'src/data/generated/aiostreams-preset-options.js',
 ];
 
 /* ── the pin ───────────────────────────────────────────────────────────────── */
@@ -85,7 +87,7 @@ test('generated files embed no credential VALUES', () => {
 });
 
 test('the generated directories contain nothing but the expected modules', () => {
-  assert.deepEqual(readdirSync(join(ROOT, 'src/data/generated')).sort(), ['aiostreams-enums.js', 'aiostreams-presets.js']);
+  assert.deepEqual(readdirSync(join(ROOT, 'src/data/generated')).sort(), ['aiostreams-enums.js', 'aiostreams-preset-options.js', 'aiostreams-presets.js']);
   assert.deepEqual(readdirSync(join(ROOT, 'src/config/generated')).sort(), ['aiostreams-config-schema.js', 'aiostreams-sort-schema.js', 'upstream-snapshot.json']);
 });
 
@@ -166,6 +168,21 @@ test('invalidSortCriteria rejects bad scopes, keys and directions', () => {
 test('isKnownPresetId agrees with the emitted set', () => {
   assert.ok(isKnownPresetId(AIO_PRESET_IDS[0]));
   assert.ok(!isKnownPresetId('definitely-not-a-preset'));
+});
+
+test('emitted preset required-options match the snapshot exactly', () => {
+  assert.deepEqual(AIO_PRESET_REQUIRED_OPTIONS, SNAPSHOT.presetRequiredOptions);
+  assert.ok(Object.keys(AIO_PRESET_REQUIRED_OPTIONS).length >= 20, `only ${Object.keys(AIO_PRESET_REQUIRED_OPTIONS).length} presets with extra required options extracted`);
+});
+
+test('simple-toggle presets are those with no extra required options', () => {
+  for (const id of AIO_PRESET_IDS) {
+    const extra = AIO_PRESET_REQUIRED_OPTIONS[id] || [];
+    assert.equal(isSimpleTogglePreset(id), extra.length === 0, `${id} simple-toggle mismatch`);
+  }
+  // Critical regression: streaming-catalogs and rpdb-catalogs must require catalogs
+  assert.deepEqual(AIO_PRESET_REQUIRED_OPTIONS['streaming-catalogs'], ['catalogs']);
+  assert.deepEqual(AIO_PRESET_REQUIRED_OPTIONS['rpdb-catalogs'], ['catalogs']);
 });
 
 /* ── the configurator must not contradict the contract ─────────────────────── */

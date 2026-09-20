@@ -78,6 +78,16 @@ async function fetchOverGit(pin) {
   await run(['fetch', '--quiet', '--depth', '1', 'origin', pin.sha]);
   const sources = {};
   for (const path of REQUIRED_SOURCES) sources[path] = await run(['show', `FETCH_HEAD:${path}`]);
+  // Also fetch preset sources via git so presetRequiredOptions survives offline checks.
+  try {
+    const listing = await run(['ls-tree', '--name-only', 'FETCH_HEAD:packages/core/src/presets']);
+    const files = listing.split('\n').filter(n => n.endsWith('.ts'));
+    for (const name of files) {
+      const rel = `packages/core/src/presets/${name}`;
+      sources[rel] = await run(['show', `FETCH_HEAD:${rel}`]);
+    }
+    if (files.length) process.stderr.write(`fetched ${files.length} preset sources via git\n`);
+  } catch {}
   await rm(dir, { recursive: true, force: true });
   return sources;
 }
@@ -139,7 +149,67 @@ async function verifyPinnedTag(pin) {
 async function fetchFromDir(root) {
   const sources = {};
   for (const path of REQUIRED_SOURCES) sources[path] = await readFile(join(root, path), 'utf8');
+  // Also read preset files for required-options extraction when available.
+  try {
+    const { readdir } = await import('node:fs/promises');
+    const presetDir = join(root, 'packages/core/src/presets');
+    const files = await readdir(presetDir);
+    for (const file of files) {
+      if (!file.endsWith('.ts')) continue;
+      const full = join(presetDir, file);
+      const rel = `packages/core/src/presets/${file}`;
+      sources[rel] = await readFile(full, 'utf8');
+    }
+  } catch {}
   return sources;
+}
+
+async function fetchPresetSourcesOverHttp(pin) {
+  const presetSources = {};
+  // Try GitHub contents API to list preset files — avoids guessing file names.
+  try {
+    const apiUrl = `https://api.github.com/repos/${pin.repo}/contents/packages/core/src/presets?ref=${pin.sha}`;
+    const res = await fetch(apiUrl, { headers: { 'user-agent': 'Core-Builds-sync-upstream', accept: 'application/vnd.github.v3+json' } });
+    if (res.ok) {
+      const listing = await res.json();
+      const files = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'file' && e.name.endsWith('.ts')).map(e => e.name);
+      for (const name of files) {
+        const url = `${pin.rawBase}/${pin.sha}/packages/core/src/presets/${name}`;
+        const r = await fetch(url, { headers: { 'user-agent': 'Core-Builds-sync-upstream' } });
+        if (r.ok) presetSources[`packages/core/src/presets/${name}`] = await r.text();
+      }
+      return presetSources;
+    }
+  } catch {}
+  return presetSources;
+}
+
+async function fetchPresetSourcesOverGit(pin) {
+  const dir = await mkdtemp(join(tmpdir(), 'aios-pin-'));
+  const run = (args) => new Promise((resolve, reject) => {
+    execFile('git', args, { cwd: dir, maxBuffer: 64 * 1024 * 1024 }, (err, stdout) => {
+      if (err) reject(new Error(`git ${args.join(' ')}: ${err.message}`));
+      else resolve(stdout);
+    });
+  });
+  try {
+    await run(['init', '--quiet']);
+    await run(['remote', 'add', 'origin', `https://github.com/${pin.repo}.git`]);
+    await run(['fetch', '--quiet', '--depth', '1', 'origin', pin.sha]);
+    const listing = await run(['ls-tree', '--name-only', 'FETCH_HEAD:packages/core/src/presets']);
+    const files = listing.split('\n').filter(n => n.endsWith('.ts'));
+    const sources = {};
+    for (const name of files) {
+      const rel = `packages/core/src/presets/${name}`;
+      sources[rel] = await run(['show', `FETCH_HEAD:${rel}`]);
+    }
+    if (files.length) process.stderr.write(`fetched ${files.length} preset sources via git\n`);
+    await rm(dir, { recursive: true, force: true });
+    return sources;
+  } catch (e) {
+    await rm(dir, { recursive: true, force: true });
+    return {};
+  }
 }
 
 async function fetchSources(pin) {
@@ -149,12 +219,31 @@ async function fetchSources(pin) {
     return fetchFromDir(local);
   }
   process.stderr.write(`fetching ${REQUIRED_SOURCES.length} sources at ${pin.sha.slice(0, 12)}\n`);
+  let sources;
   try {
-    return await fetchOverHttp(pin);
+    sources = await fetchOverHttp(pin);
   } catch (error) {
     process.stderr.write(`raw HTTP fetch unavailable (${error.message}); falling back to git\n`);
-    return fetchOverGit(pin);
+    sources = await fetchOverGit(pin);
   }
+  // Best-effort preset sources for required-options; HTTP first, then git fallback.
+  // Failure is non-fatal because the snapshot already contains the last known map and offline replays it.
+  let presetCount = 0;
+  try {
+    const presets = await fetchPresetSourcesOverHttp(pin);
+    Object.assign(sources, presets);
+    presetCount = Object.keys(presets).length;
+    if (presetCount) process.stderr.write(`fetched ${presetCount} preset sources\n`);
+  } catch {}
+  const hasPresetKeys = Object.keys(sources).some(k => k.startsWith('packages/core/src/presets/'));
+  if (presetCount === 0 && !hasPresetKeys) {
+    // If HTTP preset fetch failed (common in sandboxed CI), try git so --check stays green.
+    try {
+      const gitPresets = await fetchPresetSourcesOverGit(pin);
+      Object.assign(sources, gitPresets);
+    } catch {}
+  }
+  return sources;
 }
 
 /** Rebuild the exact source-free contract stored in the committed snapshot. */

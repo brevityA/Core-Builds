@@ -77,8 +77,18 @@ const EXPLICIT_STREAM_TYPES = new Set([
 
 // Preset types whose emission is driven by an optional-extras toggle. knaben was the only one
 // until these were added; its id and its preset type are the same string, which is what makes
-// the `optional.has(type)` check below work at all.
-const OPTIONAL_EXTRAS_STREAM_TYPES = new Set(['knaben', 'neko-bt', 'sootio', 'webstreamr', 'yastream']);
+// the `optional.has(type)` check below work at all. The 18 safe add-ons audited against
+// v2.34.0 (all simple toggles) are included so Stable/Balanced do not filter them back out
+// the moment a user switches them on.
+const OPTIONAL_EXTRAS_STREAM_TYPES = new Set([
+  'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream',
+  // 17 safe add-ons (v2.34.0 audit — all isSimpleTogglePreset, lowercased, torbox-search removed in v2.32)
+  'anime-kitsu', 'argentina-tv', 'bitmagnet', 'brazuca-torrents',
+  'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb', 'debridio-watchtower',
+  'doctor-who-universe', 'easynews', 'easynewsplus', 'jackettio',
+  'opensubtitles', 'tmdb-collections', 'torbox',
+  'usa-tv', 'usa-tv-next',
+]);
 
 const STABLE_STREAM_TYPES = new Set([
   // Account/library and service bridges.
@@ -161,12 +171,12 @@ function isExplicitPreset(preset, context) {
   const services = new Set([context.service, ...values(context.multiServices)]);
   if (type === 'debridio') return services.has('debridio');
   if (type === 'debrider') return services.has('debrider');
-  const optional = new Set(values(context.optionalScrapers));
+  const optional = new Set(values(context.optionalScrapers).map(v => String(v).toLowerCase()));
   // Optional-extras toggles are explicit by definition. Without this the four extras that are
   // advertised *disabled* on most lanes (neko-bt/sootio/webstreamr/yastream) get filtered back
   // out of Stable/Balanced the moment a user switches them on — the toggle would silently do
   // nothing. Scoped to a set rather than "any id in optionalScrapers" so `nzbhydra`/`newznab`
-  // keep their deliberate Stable exclusion below.
+  // keep their deliberate Stable exclusion below. Lowercased for case-insensitive match (easynewsPlus).
   if (OPTIONAL_EXTRAS_STREAM_TYPES.has(type)) return optional.has(type);
   // AIOStreams v2.32 replaced the legacy Newznab URL/apiPath fields with an
   // options.api object. Keep Newznab out of Stable/Balanced until the explicit

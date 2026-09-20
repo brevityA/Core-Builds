@@ -143,6 +143,84 @@ export function readStringArray(source, name, scalars = scalarConstants(source),
   return out;
 }
 
+/* ------------------------------------------------------------------ *
+ * Preset required-options extraction
+ * ------------------------------------------------------------------ */
+
+function extractPresetId(source) {
+  const match = /ID\s*:\s*['\"]([^'\"]+)['\"]/.exec(source);
+  return match ? match[1] : null;
+}
+
+function extractOptionsArrayFromStripped(stripped) {
+  const constIdx = stripped.indexOf('const options');
+  if (constIdx !== -1) {
+    const eqIdx = stripped.indexOf('=', constIdx);
+    if (eqIdx !== -1) {
+      let searchPos = eqIdx;
+      while (true) {
+        const open = stripped.indexOf('[', searchPos);
+        if (open === -1) break;
+        const bal = balanced(stripped, open, '[', ']');
+        if (bal) return bal.body;
+        searchPos = open + 1;
+      }
+    }
+  }
+  const optIdx = stripped.indexOf('OPTIONS:');
+  if (optIdx !== -1) {
+    let searchPos = optIdx;
+    while (true) {
+      const open = stripped.indexOf('[', searchPos);
+      if (open === -1) break;
+      const bal = balanced(stripped, open, '[', ']');
+      if (bal) return bal.body;
+      searchPos = open + 1;
+    }
+  }
+  return null;
+}
+
+function parsePresetOptionBlocks(arrayBody) {
+  if (!arrayBody) return [];
+  const blocks = splitTopLevel(arrayBody);
+  const out = [];
+  for (const block of blocks) {
+    const trimmed = block.trim();
+    if (!trimmed.startsWith('{')) continue;
+    const idMatch = /id\s*:\s*['\"]([^'\"]+)['\"]/.exec(trimmed);
+    if (!idMatch) continue;
+    const requiredMatch = /required\s*:\s*(true|false)/.exec(trimmed);
+    const required = requiredMatch ? requiredMatch[1] === 'true' : false;
+    out.push({ id: idMatch[1], required });
+  }
+  return out;
+}
+
+function extractRequiredIdsFromSource(source) {
+  const stripped = stripComments(source);
+  const arrayBody = extractOptionsArrayFromStripped(stripped);
+  if (!arrayBody) return [];
+  const opts = parsePresetOptionBlocks(arrayBody);
+  return opts.filter(o => o.required).map(o => o.id);
+}
+
+export function extractPresetRequiredOptions(presetSources) {
+  const base = new Set(['name', 'timeout', 'resources', 'url']);
+  const out = {};
+  for (const [filePath, content] of Object.entries(presetSources || {})) {
+    if (!/extends\s+\w*Preset/.test(content)) continue;
+    const presetId = extractPresetId(content);
+    if (!presetId) continue;
+    const requiredIds = extractRequiredIdsFromSource(content);
+    const beyond = requiredIds.filter(id => !base.has(id)).sort();
+    if (beyond.length) out[presetId] = beyond;
+  }
+  const sorted = {};
+  for (const key of Object.keys(out).sort()) sorted[key] = out[key];
+  return sorted;
+}
+
 /** Top-level property names of the object literal that follows `header`. */
 export function readObjectKeys(source, header) {
   const index = source.indexOf(header);
@@ -194,7 +272,9 @@ const ENUM_ARRAYS = Object.freeze([
 
 /**
  * Build the canonical, order-stable contract object from raw upstream sources.
- * `sources` maps the repo-relative path to its text.
+ * `sources` maps the repo-relative path to its text. Any additional keys
+ * starting with `packages/core/src/presets/` are treated as preset sources
+ * for required-options extraction.
  */
 export function extractContract(sources, pin) {
   for (const path of REQUIRED_SOURCES) {
@@ -235,6 +315,16 @@ export function extractContract(sources, pin) {
   const scoreKeys = ['streamExpressionScore', 'regexScore', 'bitrate', 'size', 'seeders', 'age', 'seadex']
     .filter(key => enums.SORT_CRITERIA.includes(key));
 
+  const presetSources = {};
+  for (const [path, content] of Object.entries(sources)) {
+    if (path.startsWith('packages/core/src/presets/') && path.endsWith('.ts')) {
+      presetSources[path] = content;
+    }
+  }
+  const presetRequiredOptions = Object.keys(presetSources).length
+    ? extractPresetRequiredOptions(presetSources)
+    : undefined;
+
   return {
     upstream: {
       repo: pin.repo,
@@ -243,6 +333,7 @@ export function extractContract(sources, pin) {
     },
     enums,
     presetIds,
+    presetRequiredOptions,
     config: { keys: configKeys },
     sort: {
       scopes: sortScopes,
@@ -399,6 +490,25 @@ export function emitFiles(contract) {
   ].join('\n');
 
   files['src/config/generated/upstream-snapshot.json'] = stableJson(contract);
+
+  if (contract.presetRequiredOptions) {
+    const presetOptionsContent = head + [
+      '/** Required options beyond name,timeout,resources,url for each preset at the pinned ref. */',
+      '',
+      'export const AIO_PRESET_REQUIRED_OPTIONS = Object.freeze(' + JSON.stringify(sortedKeys(contract.presetRequiredOptions), null, 2) + ');',
+      '',
+      'export function requiredOptionsForPreset(id) {',
+      '  return AIO_PRESET_REQUIRED_OPTIONS[String(id||"")] || [];',
+      '}',
+      '',
+      'export function isSimpleTogglePreset(id) {',
+      '  return requiredOptionsForPreset(id).length === 0;',
+      '}',
+      '',
+    ].join('\n');
+    files['src/data/generated/aiostreams-preset-options.js'] = presetOptionsContent;
+    files['../../packages/core/src/generated/aiostreams-preset-options.js'] = presetOptionsContent;
+  }
 
   return files;
 }
