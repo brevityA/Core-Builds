@@ -209,11 +209,15 @@
 // PWA SW registration — respects cb-flags pwa=0 to disable
 try {
   const flags = (localStorage.getItem("cb-flags")||"").split(",").map(s=>s.trim());
-  const disabled = flags.includes("pwa=0") || flags.includes("pwa=false");
+  const params = new URLSearchParams(location.search);
+  const disabled = flags.includes("pwa=0") || flags.includes("pwa=false") || params.get('cb-e2e')==='1' || params.get('e2e')==='1';
   if (!disabled && "serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(()=>{});
     });
+  } else if ("serviceWorker" in navigator) {
+    // In e2e, ensure no stale SW interferes
+    navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
   }
 } catch(e) {}
 </script>

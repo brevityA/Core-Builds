@@ -168,6 +168,8 @@ function saveHostStatusCache(cache) {
 }
 let _hostStatusCache = loadHostStatusCache();
 function getCachedHostStatus(baseUrl) {
+  try { if (new URLSearchParams(location.search).get('cb-e2e')==='1') return null; } catch(e){}
+  if (CB_FLAGS.hostCache===false || CB_FLAGS.hostCache==='0' || CB_FLAGS.hostCache===0) return null;
   const c = _hostStatusCache[baseUrl];
   if (!c) return null;
   const age = Date.now() - c.ts;
@@ -3693,12 +3695,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     else if (a === 'svc-filter') {
       const q = e.target.value.toLowerCase().trim();
+      const isE2E = (() => { try { return new URLSearchParams(location.search).get('cb-e2e')==='1'; } catch(e){ return false; } })();
       if (q) {
         document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === 'all'));
-        debouncedFilterSvcRows('all', q);
+        if (isE2E) filterSvcRows('all', q); else debouncedFilterSvcRows('all', q);
       } else {
         const activeCat = document.querySelector('.svc-seg-b.act');
-        debouncedFilterSvcRows(activeCat ? activeCat.dataset.cat : 'all', '');
+        const cat = activeCat ? activeCat.dataset.cat : 'all';
+        if (isE2E) filterSvcRows(cat, ''); else debouncedFilterSvcRows(cat, '');
       }
     }
     else if (a === 'update-url') {
