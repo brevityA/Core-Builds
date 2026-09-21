@@ -28,7 +28,15 @@ self.addEventListener('fetch', (e) => {
   // E2E bypass — never intercept when cb-e2e=1 or e2e=1 in URL (Playwright)
   if (url.searchParams.get('cb-e2e') === '1' || url.searchParams.get('e2e') === '1') return;
   // Never cache AIOStreams host probes or Stremio API or paste services
-  if (url.pathname.startsWith('/api/') || url.hostname.includes('strem.io') || url.hostname.includes('paste.rs') || url.hostname.includes('elfhosted.com') || url.hostname.includes('viren070.me') || url.hostname.includes('fortheweak.cloud') || url.hostname.includes('midnightignite.me')) {
+  // Use endsWith check to avoid incomplete substring sanitization (CodeQL)
+  const host = url.hostname;
+  const isBlockedHost = host === 'strem.io' || host.endsWith('.strem.io')
+    || host === 'paste.rs' || host.endsWith('.paste.rs')
+    || host === 'elfhosted.com' || host.endsWith('.elfhosted.com')
+    || host === 'viren070.me' || host.endsWith('.viren070.me')
+    || host === 'fortheweak.cloud' || host.endsWith('.fortheweak.cloud')
+    || host === 'midnightignite.me' || host.endsWith('.midnightignite.me');
+  if (url.pathname.startsWith('/api/') || isBlockedHost) {
     return;
   }
   // Never cache the SW itself or any URL with query (e2e uses ?cb-e2e=1)
