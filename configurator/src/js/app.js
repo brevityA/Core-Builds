@@ -263,6 +263,15 @@ function initSentry() {
   } catch(e) {}
 }
 setTimeout(initSentry, 1500);
+// E2E: disable content-visibility:auto which hides off-screen cards from Playwright visibility checks
+try {
+  if (new URLSearchParams(location.search).get('cb-e2e')==='1') {
+    const st = document.createElement('style');
+    st.textContent = '.svc-list-row{content-visibility:visible !important} .opt-scraper-card{content-visibility:visible !important}';
+    document.head.appendChild(st);
+  }
+} catch(e) {}
+
 
 // ── Host selection honoring (Patch 14 rebuild, 2026-08-09) ─────────────────────
 // checkHostVersion: probe ONE host — reachable + version floor. Throws named

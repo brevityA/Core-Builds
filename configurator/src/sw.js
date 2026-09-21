@@ -1,5 +1,6 @@
 // Core Builds — minimal offline SW (cache-first for same-origin assets, network-first for APIs)
-const CACHE = 'cb-v3_10-1';
+// v3_10-2 bumps cache to invalidate old SW that cached index.html without e2e bypass
+const CACHE = 'cb-v3_10-2';
 const ASSETS = [
   './',
   './index.html',
@@ -24,10 +25,14 @@ self.addEventListener('activate', (e) => {
 });
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+  // E2E bypass — never intercept when cb-e2e=1 or e2e=1 in URL (Playwright)
+  if (url.searchParams.get('cb-e2e') === '1' || url.searchParams.get('e2e') === '1') return;
   // Never cache AIOStreams host probes or Stremio API or paste services
-  if (url.pathname.startsWith('/api/') || url.hostname.includes('strem.io') || url.hostname.includes('paste.rs') || url.hostname.includes('elfhosted.com') || url.hostname.includes('viren070.me')) {
+  if (url.pathname.startsWith('/api/') || url.hostname.includes('strem.io') || url.hostname.includes('paste.rs') || url.hostname.includes('elfhosted.com') || url.hostname.includes('viren070.me') || url.hostname.includes('fortheweak.cloud') || url.hostname.includes('midnightignite.me')) {
     return;
   }
+  // Never cache the SW itself or any URL with query (e2e uses ?cb-e2e=1)
+  if (url.pathname.endsWith('sw.js') || url.search) return;
   // Same-origin: cache-first
   if (url.origin === self.location.origin) {
     e.respondWith(
