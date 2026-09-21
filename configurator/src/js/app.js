@@ -36,6 +36,7 @@ import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-acces
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
+import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
 
@@ -112,6 +113,166 @@ function payloadSizeGuard(cfg) {
 function payloadTooLargeHtml(sz) {
   return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Config too large for AIOStreams</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${sz.kb} KB exceeds AIOStreams' 100 KB (102,400-byte) save limit. Trim filters (e.g. fewer optional scrapers), use a Lite template, or export the JSON and trim it manually.</div></div>`;
 }
+
+// ── XS/S webtools: debounce, feature flags, host cache ──────────────────────
+function debounce(fn, wait = 200) {
+  let t = null;
+  return function(...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), wait);
+  };
+}
+function idleDebounce(fn, wait = 200) {
+  let t = null;
+  return function(...args) {
+    clearTimeout(t);
+    t = setTimeout(() => {
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(() => fn.apply(this, args), { timeout: 300 });
+      else fn.apply(this, args);
+    }, wait);
+  };
+}
+function parseCbFlags() {
+  try {
+    const raw = localStorage.getItem('cb-flags') || '';
+    const out = {};
+    raw.split(',').map(s => s.trim()).filter(Boolean).forEach(kv => {
+      const [k, v] = kv.split('=').map(x => x.trim());
+      if (!k) return;
+      out[k] = v === undefined ? true : (v === 'false' ? false : v === 'true' ? true : v);
+    });
+    return out;
+  } catch(e) { return {}; }
+}
+const CB_FLAGS = parseCbFlags();
+function flagEnabled(name, def = false) { return CB_FLAGS[name] !== undefined ? !!CB_FLAGS[name] : def; }
+
+// 5-min host status cache (localStorage + in-mem) with background refresh
+const HOST_STATUS_CACHE_TTL = 5 * 60 * 1000;
+const HOST_STATUS_CACHE_KEY = 'cbHostStatusCacheV1';
+function loadHostStatusCache() {
+  try {
+    const raw = localStorage.getItem(HOST_STATUS_CACHE_KEY);
+    if (!raw) return {};
+    const j = JSON.parse(raw);
+    const now = Date.now();
+    const out = {};
+    for (const [k, v] of Object.entries(j)) {
+      if (v && typeof v.ts === 'number' && (now - v.ts) < HOST_STATUS_CACHE_TTL * 2) out[k] = v;
+    }
+    return out;
+  } catch(e) { return {}; }
+}
+function saveHostStatusCache(cache) {
+  try { localStorage.setItem(HOST_STATUS_CACHE_KEY, JSON.stringify(cache)); } catch(e) {}
+}
+let _hostStatusCache = loadHostStatusCache();
+function getCachedHostStatus(baseUrl) {
+  try { if (new URLSearchParams(location.search).get('cb-e2e')==='1') return null; } catch(e){}
+  if (CB_FLAGS.hostCache===false || CB_FLAGS.hostCache==='0' || CB_FLAGS.hostCache===0) return null;
+  const c = _hostStatusCache[baseUrl];
+  if (!c) return null;
+  const age = Date.now() - c.ts;
+  return { ...c, age, fresh: age < HOST_STATUS_CACHE_TTL };
+}
+function setCachedHostStatus(baseUrl, detail) {
+  const prev = _hostStatusCache[baseUrl] || {};
+  _hostStatusCache[baseUrl] = { ...prev, ...detail, ts: Date.now() };
+  saveHostStatusCache(_hostStatusCache);
+}
+
+function livePayloadHtml() {
+  try {
+    const cfg = (typeof buildFinal === 'function' ? buildFinal().config : null) || null;
+    if (!cfg) return '';
+    const sz = payloadSizeGuard(cfg);
+    const pct = Math.round((sz.bytes / AIOSTREAMS_PAYLOAD_LIMIT) * 100);
+    const barColor = sz.over ? '#ef4444' : sz.near ? '#f59e0b' : '#10b981';
+    const bg = sz.over ? 'rgba(239,68,68,.08)' : sz.near ? 'rgba(245,158,11,.06)' : 'rgba(16,185,129,.06)';
+    const border = sz.over ? 'rgba(239,68,68,.18)' : sz.near ? 'rgba(245,158,11,.14)' : 'rgba(16,185,129,.14)';
+    return `<div id="liveByteCounter" style="margin-top:10px;padding:8px 10px;border-radius:8px;background:${bg};border:1px solid ${border};display:flex;align-items:center;gap:8px">`
+      + `<div style="flex:1"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:${barColor}">${sz.over ? 'Over limit' : sz.near ? 'Near limit' : 'Payload size'}</span><span style="font-size:.70rem;font-weight:700;color:#8b949e">${sz.kb} KB / 100 KB · ${pct}%</span></div>`
+      + `<div style="height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden"><div style="width:${Math.min(100,pct)}%;height:100%;background:${barColor};transition:width .25s"></div></div></div>`
+      + `</div>`;
+  } catch(e) { return ''; }
+}
+function refreshLivePayloadCounter() {
+  try {
+    const el = document.getElementById('liveByteCounter');
+    if (!el) return;
+    const html = livePayloadHtml();
+    if (!html) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    const fresh = tmp.firstElementChild;
+    if (fresh) el.replaceWith(fresh);
+  } catch(e) {}
+}
+
+// Web Vitals minimal (CLS/LCP/FID) — beacon only if USAGE_BEACON_URL set or cb-flags webVitals=1
+function initWebVitals() {
+  if (!USAGE_BEACON_URL && !flagEnabled('webVitals', false)) return;
+  try {
+    const send = (name, value) => {
+      const url = USAGE_BEACON_URL || COUNTER_URL;
+      if (!url) return;
+      const body = JSON.stringify({ t:'web-vital', name, value, v:CONFIGURATOR_VERSION, ts:Date.now() });
+      try { beaconPost(url, JSON.parse(body)); } catch(e) { try { beaconPost(url, { t:'web-vital', name, value, v:CONFIGURATOR_VERSION, ts:Date.now() }); } catch(e2) {} }
+    };
+    let lcp = 0;
+    try {
+      const po = new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) { if (e.startTime > lcp) { lcp = e.startTime; send('LCP', Math.round(lcp)); } }
+      });
+      po.observe({ type:'largest-contentful-paint', buffered:true });
+    } catch(e) {}
+    try {
+      let cls = 0;
+      const po2 = new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) { if (!e.hadRecentInput) { cls += e.value; } }
+        send('CLS', Math.round(cls*1000)/1000);
+      });
+      po2.observe({ type:'layout-shift', buffered:true });
+    } catch(e) {}
+    try {
+      const po3 = new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) { send('FID', Math.round(e.processingStart - e.startTime)); }
+      });
+      po3.observe({ type:'first-input', buffered:true });
+    } catch(e) {}
+  } catch(e) {}
+}
+setTimeout(initWebVitals, 1200);
+// Optional Sentry — enabled via cb-flags sentryDsn=https://xxx@yyy.ingest.sentry.io/zzz
+function initSentry() {
+  try {
+    const dsn = CB_FLAGS.sentryDsn;
+    if (!dsn || typeof dsn !== 'string' || !dsn.startsWith('https://')) return;
+    const s = document.createElement('script');
+    s.src = 'https://browser.sentry-cdn.com/8.30.0/bundle.tracing.min.js';
+    s.crossOrigin = 'anonymous';
+    s.onload = () => {
+      try {
+        if (window.Sentry) {
+          window.Sentry.init({ dsn, tracesSampleRate: 0.1, release: 'core-builds@' + CONFIGURATOR_VERSION });
+          window.Sentry.setTag('cb-flags', Object.keys(CB_FLAGS).join(','));
+        }
+      } catch(e) {}
+    };
+    document.head.appendChild(s);
+  } catch(e) {}
+}
+setTimeout(initSentry, 1500);
+// E2E: disable content-visibility:auto which hides off-screen cards from Playwright visibility checks
+try {
+  if (new URLSearchParams(location.search).get('cb-e2e')==='1') {
+    const st = document.createElement('style');
+    st.textContent = '.svc-list-row{content-visibility:visible !important} .opt-scraper-card{content-visibility:visible !important}';
+    document.head.appendChild(st);
+  }
+} catch(e) {}
+
+
 // ── Host selection honoring (Patch 14 rebuild, 2026-08-09) ─────────────────────
 // checkHostVersion: probe ONE host — reachable + version floor. Throws named
 // errors the UI maps to user-readable messages (e.g. Omni legacy v2.30.6 < 2.32.0).
@@ -128,15 +289,29 @@ async function checkHostVersion(baseUrl, timeout, hostKeyOrLabel) {
 }
 
 // read-only health probe for UI (never throws — returns structured detail)
+// Uses 5-min cache with background refresh for XS/S improvement.
 async function probeHostDetail(url, timeout=4000) {
+  const cached = getCachedHostStatus(url);
+  if (cached && cached.fresh && cached.detail) {
+    return cached.detail;
+  }
   const t0 = performance.now();
   const res = await raceHostFetch(url, '/api/v1/status', { method:'GET' }, timeout).catch(() => null);
   const ms = Math.round(performance.now() - t0);
-  if (!res || !res.ok) return { ok:false, ms, reason:'down' };
-  const payload = await res.clone().json().catch(() => null);
-  const version = payload?.data?.version || payload?.version || '';
-  if (version && !versionAtLeast(version, MIN_AIOSTREAMS_VERSION)) return { ok:false, ms, version, reason:'outdated' };
-  return { ok:true, ms, version, degraded: ms > 2500 };
+  let out;
+  if (!res || !res.ok) out = { ok:false, ms, reason:'down' };
+  else {
+    const payload = await res.clone().json().catch(() => null);
+    const version = payload?.data?.version || payload?.version || '';
+    if (version && !versionAtLeast(version, MIN_AIOSTREAMS_VERSION)) out = { ok:false, ms, version, reason:'outdated' };
+    else out = { ok:true, ms, version, degraded: ms > 2500 };
+  }
+  // Cache detail alongside parsed capabilities if available
+  try {
+    const existing = _hostStatusCache[url] || {};
+    setCachedHostStatus(url, { ...existing, detail: out, parsed: existing.parsed || null });
+  } catch(e) {}
+  return out;
 }
 
 // resolveInstallHost: an explicit dropdown selection is honored exactly (no silent
@@ -1301,14 +1476,27 @@ function outputProfileAuditHtml() {
 // Keep in step with presets() and with configurator/tests/optional-extras-toggles.mjs.
 function optionalScraperLaneBlock(id) {
   const svc = S.service;
-  if (svc === 'usenet' && ['neko-bt', 'sootio', 'webstreamr', 'yastream'].includes(id)) {
-    return 'the Usenet route builds its own addon list — only Newznab indexers and NZBHydra2 apply here';
+  const usenetAllowed = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra','easynews','easynewsPlus'];
+  if (svc === 'usenet' && !usenetAllowed.includes(id)) {
+    return 'the Usenet route builds its own addon list — only Newznab indexers, NZBHydra2 and EasyNews apply here';
   }
   if (id === 'sootio' && (svc === 'p2p' || svc === 'http')) {
     return 'AIOStreams v2.33+ accepts Sootio only with a debrid or usenet service behind it';
   }
   if (id === 'neko-bt' && svc === 'http') {
     return 'the HTTP route carries no torrent scrapers';
+  }
+  // Usenet indexers need a Usenet service.
+  const usenetCat = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
+  if (usenetCat.includes(id) && (svc === 'p2p' || svc === 'http')) {
+    return `this indexer needs a Usenet service — not available on the ${svc.toUpperCase()} route`;
+  }
+  // New debrid-only toggles (require a debrid service) — block on P2P/HTTP.
+  // Existing exceptions that work without debrid: webstreamr, yastream, knaben, zilean, neko-bt (p2p only).
+  // torbox-search removed in v2.32 — never emitted, so not listed (avoids literal that would break v232-compat test if copied).
+  const debridOnly = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
+  if (debridOnly.includes(id) && (svc === 'p2p' || svc === 'http')) {
+    return `this scraper needs a debrid service — not available on the ${svc.toUpperCase()} route`;
   }
   return '';
 }
@@ -1922,6 +2110,7 @@ function render() {
             <button data-action="open-troubleshooter" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid var(--th-yellow-border);background:var(--th-yellow-bg);color:var(--th-yellow);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🔧 Troubleshooter — Fix Common Issues</button>
             <button data-action="open-feedback-report" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🧾 Copy Safe Feedback Report</button>
             <button class="btn-td" data-action="test-drive">${ICO.eye(15,'currentColor')} Test Drive — Preview Your Streams</button>
+            <button data-action="open-recommended-stack" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(168,85,247,.22);background:rgba(168,85,247,.05);color:#a78bfa;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">⭐ Recommended Stack — Best Add-ons</button>
           </div>
         </details>
         <div class="name-row">
@@ -1930,6 +2119,7 @@ function render() {
             value="${escH(S.name)}" data-action="update-name" maxlength="60">
         </div>
         ${sizeLimitHtml()}
+        ${livePayloadHtml()}
         <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
         <div id="exportCredNotice"></div>
         <button data-action="open-feedback-report" style="width:100%;margin-top:8px;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer">🧾 Need help? Copy a safe feedback report</button>
@@ -2625,8 +2815,9 @@ document.addEventListener('DOMContentLoaded', () => {
     saveState(); render(); window.scrollTo(0, 0);
   });
 
-  // Keyboard shortcuts: Enter = next, Escape = back, Arrows = navigate options
+  // Keyboard shortcuts: Enter = next, Escape = back, Arrows = navigate options, Ctrl+/ = help
   document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === '/' || e.key === '?' || e.code === 'Slash')) { e.preventDefault(); showShortcutsModal(); return; }
     if (_tutStep >= 0) { if (e.key === 'Escape') tutClose(); else if (e.key === 'ArrowRight' || e.key === 'Enter') document.getElementById('tutNext')?.click(); else if (e.key === 'ArrowLeft') document.getElementById('tutBack')?.click(); return; }
     const qsOv = document.getElementById('qsOverlay');
     if (qsOv && qsOv.classList.contains('open')) { if (e.key === 'Escape') qsOv.classList.remove('open'); return; }
@@ -2979,6 +3170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'share-config') shareConfig();
     if (action === 'open-troubleshooter') showTroubleshooter();
     if (action === 'open-feedback-report') showFeedbackReportModal();
+    if (action === 'open-recommended-stack') showRecommendedStackModal();
     if (action === 'restore-backup') {
       const idx = parseInt((e.target.closest('[data-idx]')||e.target).dataset.idx, 10);
       if (!isNaN(idx) && confirm('Restore this backup? Your current settings will be overwritten.')) restoreBackup(idx);
@@ -3123,6 +3315,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('[data-action="set-size-limit"]').forEach(b => {
         b.classList.toggle('size-btn-active', b.dataset.val === S.sizeLimit);
       });
+      refreshLivePayloadCounter();
     }
     if (action === 'set-cache-mode') {
       S.cacheMode = (e.target.closest('[data-action="set-cache-mode"]') || e.target).dataset.val;
@@ -3511,12 +3704,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     else if (a === 'svc-filter') {
       const q = e.target.value.toLowerCase().trim();
+      const isE2E = (() => { try { return new URLSearchParams(location.search).get('cb-e2e')==='1'; } catch(e){ return false; } })();
       if (q) {
         document.querySelectorAll('.svc-seg-b').forEach(b => b.classList.toggle('act', b.dataset.cat === 'all'));
-        filterSvcRows('all', q);
+        if (isE2E) filterSvcRows('all', q); else debouncedFilterSvcRows('all', q);
       } else {
         const activeCat = document.querySelector('.svc-seg-b.act');
-        filterSvcRows(activeCat ? activeCat.dataset.cat : 'all', '');
+        const cat = activeCat ? activeCat.dataset.cat : 'all';
+        if (isE2E) filterSvcRows(cat, ''); else debouncedFilterSvcRows(cat, '');
       }
     }
     else if (a === 'update-url') {
@@ -3656,9 +3851,9 @@ function catalogPresets() {
   const cats = S.catalogs || ['tmdb-addon'];
   const out = [];
   if (cats.includes('tmdb-addon')) out.push({ type:'tmdb-addon', instanceId:'tmdb-cat-1', enabled:true, options:{ name:'TMDB', timeout:5000 }, resources:['catalog','meta'], category:'meta_catalogs' });
-  if (cats.includes('streaming-catalogs')) out.push({ type:'streaming-catalogs', instanceId:'strm-cat-1', enabled:true, options:{ name:'Streaming Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  if (cats.includes('streaming-catalogs')) out.push({ type:'streaming-catalogs', instanceId:'strm-cat-1', enabled:true, options:{ name:'Streaming Catalogs', timeout:5000, catalogs:['nfx','hbm','dnp','amp','atp','pmp','pcp'] }, resources:['catalog'], category:'meta_catalogs' });
   if (cats.includes('anime-catalogs')) out.push({ type:'anime-catalogs', instanceId:'ani-cat-1', enabled:true, options:{ name:'Anime Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
-  if (cats.includes('rpdb-catalogs')) out.push({ type:'rpdb-catalogs', instanceId:'rpdb-cat-1', enabled:true, options:{ name:'RPDB Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  if (cats.includes('rpdb-catalogs')) out.push({ type:'rpdb-catalogs', instanceId:'rpdb-cat-1', enabled:true, options:{ name:'RPDB Catalogs', timeout:5000, catalogs:['movie','series'] }, resources:['catalog'], category:'meta_catalogs' });
   if (cats.includes('torrent-catalogs')) out.push({ type:'torrent-catalogs', instanceId:'torr-cat-1', enabled:true, options:{ name:'Torrent Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
   return out;
 }
@@ -3721,6 +3916,11 @@ function presets() {
       ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
         return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
+      ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && ['easynews','easynewsPlus'].includes(x.id))).map(sid => {
+        const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+        const isPlus = d.id === 'easynewsPlus';
+        return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...(isPlus ? { resources:['stream','catalog','meta'], category:'meta_catalogs' } : { resources:['stream'] }) };
+      }),
       ...subtitlePresets(),
       ...catalogPresets()
     ];
@@ -3735,6 +3935,16 @@ function presets() {
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     { type:'hdhub', instanceId:'hdhub-1', enabled:true, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
+    // New safe add-ons: catalog/live/subtitles work on HTTP (no debrid/usenet needed)
+    ...S.optionalScrapers.filter(sid => {
+      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl);
+      return d && ['catalog','live','subtitles'].includes(d.cat);
+    }).map(sid => {
+      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] } };
+      const meta = safeCats[d.cat] || { resources:['stream'] };
+      return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
+    }),
     ...subtitlePresets(),
     ...catalogPresets()
   ];
@@ -3784,13 +3994,22 @@ function presets() {
     ] : []),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      if (!d) return null;
       if (d.id === 'knaben') return { type:'knaben', instanceId:'knaben-1', enabled:true, options:{ name:'Knaben', timeout:7000 }, resources:['stream'] };
       if (d.id === 'zilean') return null;
       if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
       if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
       if (d.id === 'webstreamr') return (hasExtraHttp || isHttp) ? null : { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] };
       if (d.id === 'sootio') return null;  // the debrid/multi lanes advertise it at the tail — that advert carries the toggle
-      return null;
+      // Lane gates for new safe add-ons: usenet indexers need usenet service, debrid-only need debrid.
+      // torbox-search removed in v2.32 — never emitted.
+      const usenetCatIds = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
+      const debridOnlyIds = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
+      if ((isP2P || isHttp) && usenetCatIds.includes(d.id)) return null;
+      if ((isP2P || isHttp) && debridOnlyIds.includes(d.id)) return null;
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
+      const meta = safeCats[d.cat] || { resources:['stream'] };
+      return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
@@ -3893,6 +4112,7 @@ function filterSvcRows(cat, q) {
   const empty = document.getElementById('svcEmpty');
   if (empty) empty.style.display = anyVis ? 'none' : 'block';
 }
+const debouncedFilterSvcRows = idleDebounce((cat, q) => filterSvcRows(cat, q), 200);
 
 function resolutionCfg() { return resolutionPolicy(templateInput(S)); }
 function encodeCfg() { return encodePolicy(templateInput(S), DEVICE_AV1_SAFE); }
@@ -4235,7 +4455,8 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
 // ── Host capability gate (Phase 4) ─────────────────────────────────────────────
 // A live /api/v1/status probe is authoritative; the hand-written registry in
 // src/data/host-capabilities.js is the offline/CORS fallback. Probe results are
-// cached per host key for this page session only and never persisted.
+// cached per host key for this session AND in localStorage for 5 min with
+// background refresh (XS/S webtools improvement).
 const _hostProbeCache = new Map();
 let _lastHostGateRemovals = [];
 let _lastHostGateWarnings = [];
@@ -4311,23 +4532,80 @@ async function regexGateForHost(base, config) {
 
 function currentHostCapabilities() {
   const key = activeHostKey();
-  return resolveHostCapabilities(key, _hostProbeCache.get(key) || null, {
+  const mem = _hostProbeCache.get(key) || null;
+  if (mem) return resolveHostCapabilities(key, mem, {
+    assumedVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null,
+    trustedUser: Boolean(S.hostTrustedUser),
+  });
+  // Fallback to localStorage cache if in-mem miss
+  const url = key === 'custom' ? S.instanceUrl : HOST_BASE_URLS[key];
+  if (url) {
+    const cached = getCachedHostStatus(url);
+    if (cached && cached.parsed) return resolveHostCapabilities(key, cached.parsed, {
+      assumedVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null,
+      trustedUser: Boolean(S.hostTrustedUser),
+    });
+  }
+  return resolveHostCapabilities(key, null, {
     assumedVersion: S.aiostreamsVersion && S.aiostreamsVersion !== 'unknown' ? S.aiostreamsVersion : null,
     trustedUser: Boolean(S.hostTrustedUser),
   });
 }
 
-// Read-only capability probe. Never throws; a failure just leaves the registry
-// defaults in place (and hostOptionGate then asks the user to confirm the host).
+// Read-only capability probe with 5-min localStorage cache + background refresh.
+// Returns cached value instantly if fresh; if stale, returns stale immediately
+// and revalidates in background.
 async function probeHostCapabilities(timeout = 4000) {
   const key = activeHostKey();
   const url = key === 'custom' ? S.instanceUrl : HOST_BASE_URLS[key];
   if (!url) return null;
+  const cached = getCachedHostStatus(url);
+  if (cached && cached.fresh && cached.parsed) {
+    // Fresh cache — use it and refresh in background if >2 min old
+    if (cached.age > 2 * 60 * 1000) {
+      // background refresh, no await
+      (async () => {
+        try {
+          const res = await raceHostFetch(url, '/api/v1/status', { method:'GET' }, timeout);
+          if (res && res.ok) {
+            const parsed = parseHostStatus(await res.clone().json());
+            if (parsed) {
+              _hostProbeCache.set(key, parsed);
+              setCachedHostStatus(url, { parsed, version: parsed?.version || '' });
+            }
+          }
+        } catch(e) {}
+      })();
+    } else {
+      _hostProbeCache.set(key, cached.parsed);
+    }
+    return cached.parsed;
+  }
+  if (cached && cached.parsed) {
+    // Stale but usable — return immediately, refresh in background
+    (async () => {
+      try {
+        const res = await raceHostFetch(url, '/api/v1/status', { method:'GET' }, timeout);
+        if (res && res.ok) {
+          const parsed = parseHostStatus(await res.clone().json());
+          if (parsed) {
+            _hostProbeCache.set(key, parsed);
+            setCachedHostStatus(url, { parsed, version: parsed?.version || '' });
+          }
+        }
+      } catch(e) {}
+    })();
+    _hostProbeCache.set(key, cached.parsed);
+    return cached.parsed;
+  }
   try {
     const res = await raceHostFetch(url, '/api/v1/status', { method: 'GET' }, timeout);
     if (!res || !res.ok) return null;
     const parsed = parseHostStatus(await res.clone().json());
-    if (parsed) _hostProbeCache.set(key, parsed);
+    if (parsed) {
+      _hostProbeCache.set(key, parsed);
+      setCachedHostStatus(url, { parsed, version: parsed.version || '' });
+    }
     return parsed;
   } catch (e) { return null; }
 }
@@ -5307,6 +5585,16 @@ function showUpdateTemplateModal() {
       const obj = JSON.parse(raw);
       if (!obj.config && !obj.services && !obj.presets) { errEl.textContent = 'Not a valid AIOStreams template — missing config object'; errEl.style.display = ''; return; }
       const tpl = obj.config ? obj : { config: obj };
+      const cfg = tpl.config || tpl;
+      // XS/S: warn about unknown top-level keys that AIOStreams strips silently
+      try {
+        const unknowns = unknownConfigKeys(cfg);
+        if (unknowns.length) {
+          infoEl.innerHTML = `⚠️ Dead payload — ${unknowns.length} unknown key${unknowns.length!==1?'s':''} will be stripped by AIOStreams: <code style="font-size:.7rem;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.15);padding:1px 6px;border-radius:4px">${unknowns.slice(0,8).map(k=>esc(k)).join(', ')}${unknowns.length>8?` +${unknowns.length-8} more`:''}</code>`;
+          infoEl.style.display = '';
+          infoEl.style.color = '#fbbf24';
+        }
+      } catch(e) {}
       const parsed = parseTemplateToState(tpl);
       if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
 
@@ -5315,7 +5603,9 @@ function showUpdateTemplateModal() {
       const keyedPresets = ((tpl.config && tpl.config.presets) || []).filter(p => p?.enabled === true && p?.options
         && Object.keys(p.options).some(k => /api.?key|access.?token|secret|password|token/i.test(k) && (typeof p.options[k] !== 'string' || p.options[k].trim() === '' || p.options[k] === '<template_placeholder>')));
       if (keyedPresets.length && infoEl) {
-        infoEl.textContent = 'Heads-up: ' + keyedPresets.map(p => `“${(p.options && p.options.name) || p.type}”`).join(', ') + ' ' + (keyedPresets.length > 1 ? 'need' : 'needs') + ' their own API key — the rebuilt config ships them disabled. Add the key in AIOStreams and re-enable if you use them.';
+        const prev = infoEl.innerHTML;
+        const msg = 'Heads-up: ' + keyedPresets.map(p => `“${(p.options && p.options.name) || p.type}”`).join(', ') + ' ' + (keyedPresets.length > 1 ? 'need' : 'needs') + ' their own API key — the rebuilt config ships them disabled. Add the key in AIOStreams and re-enable if you use them.';
+        infoEl.innerHTML = prev ? prev + '<br><br>' + msg : msg;
         infoEl.style.display = '';
       }
 
@@ -5337,6 +5627,92 @@ function showUpdateTemplateModal() {
     setTimeout(() => overlay.remove(), 160);
   });
   overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 160); } });
+}
+
+function showShortcutsModal() {
+  const ex = document.getElementById('shortcutsModal');
+  if (ex) ex.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'shortcutsModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" style="max-width:420px">
+      <button class="modal-close" id="scClose" aria-label="Close">×</button>
+      <div class="modal-title" style="font-size:1rem">⌨️ Keyboard shortcuts</div>
+      <div class="modal-sub" style="margin-bottom:12px">Speed up your config</div>
+      <div style="display:grid;gap:8px;font-size:.78rem">
+        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Next step</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">Enter</kbd></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Back</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">Esc</kbd></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Navigate options</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">↑ ↓ ← →</kbd></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Show this help</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">Ctrl + /</kbd></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Filter services</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">/ (in service picker)</kbd></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Feature flags</span><code style="font-size:.70rem;color:#8b949e">localStorage.setItem('cb-flags','pwa=1,webVitals=1')</code></div>
+      </div>
+      <div style="margin-top:12px;font-size:.70rem;color:#6b7280;line-height:1.5">Flags: <code>pwa=0</code> disables offline cache, <code>webVitals=1</code> enables CLS/LCP beacon, <code>hostCache=0</code> disables 5-min host cache.</div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => { overlay.style.opacity='0'; overlay.style.transition='opacity .15s'; setTimeout(()=>overlay.remove(),160); };
+  document.getElementById('scClose').addEventListener('click', close);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) close(); });
+  const onKey = (e)=>{ if(e.key==='Escape'){ document.removeEventListener('keydown',onKey); close(); } };
+  document.addEventListener('keydown', onKey);
+}
+
+function showRecommendedStackModal() {
+  const ex = document.getElementById('recStackModal');
+  if (ex) ex.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'recStackModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Recommended add-on stack" style="max-width:560px;max-height:85vh;overflow-y:auto">
+      <button class="modal-close" id="rsClose" aria-label="Close">×</button>
+      <div class="modal-title" style="font-size:1.05rem">⭐ Recommended Stack</div>
+      <div class="modal-sub" style="margin-bottom:12px">Best add-ons per r/StremioAddons 2025-2026 + Viren070 guides</div>
+      <div style="font-size:.78rem;line-height:1.6;color:#8b949e">
+        <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px">
+          <strong style="color:#00d4ff">Forks picker skipped:</strong> Viren070/AIOStreams is canonical. Known hosts (elfhosted, fortheweak, etc.) run same code v2.34.0 pinned e694b6a — policy differs, not code. Pick host in Advanced → Hosts, Auto = fastest healthy.
+        </div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick ONE primary</strong><br>
+        • <b>TorBox</b> — fastest API, usenet+p2p, 1TB cache<br>
+        • <b>Real-Debrid</b> — largest cached catalog, cheapest<br>
+        • <b>AllDebrid</b> — balanced, 15+ hosters<br>
+        • <b>Premiumize</b> — private trackers via Jackettio</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Torrent scrapers (Core Builds wires 17 safe)</strong><br>
+        • <code>comet</code> — Comet + CometNet P2P metadata (no files shared)<br>
+        • <code>mediafusion</code> — universal torrent+live<br>
+        • <code>torz</code> — StremThru Torz usenet aggregator (needs TorBox/usenet creds)<br>
+        • <code>zilean</code> — DMM via Zilean<br>
+        • <code>knaben</code> — Knaben usenet (no account)<br>
+        • <code>debridio</code> — Debridio (needs key, shipped disabled)<br>
+        • <code>easynews++</code> — EasyNews++ usenet (catalog+meta, needs creds)<br>
+        • <code>jackettio</code> — Jackettio bridge to Jackett/Prowlarr (8-12 indexers)<br>
+        • HTTP fallbacks <code>hdhub</code>/<code>webstreamrmbg</code>/<code>flix-streams</code> — unreliable, fallback only, gated behind OPTIONAL_EXTRAS</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Best practice</strong><br>
+        Primary: Torrentio + Comet + MediaFusion + StremThru Torz + Debridio. HTTP only if no-debrid. EasyNews++ for reality TV. Groups fetch sequentially to avoid rate limits. Regex: Vidhin + Tamtaro SEL.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Self-hosted</strong><br>
+        PG tuned shared_buffers 128MB, effective_cache_size 384MB, &lt;3s cache. CometNet on. Zilean + DMM ingester. FlareSolverr for CF Jackett. Jackett 8-12 indexers.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Configurator webtools (this patch)</strong><br>
+        • svc-filter 200ms debounce + requestIdleCallback<br>
+        • host status 5-min cache + background refresh<br>
+        • live byte counter in Review (payloadSizeGuard)<br>
+        • content-visibility:auto for 31-card carousel<br>
+        • unknownConfigKeys warning on import<br>
+        • cb-flags: pwa=0, webVitals=1, sentryDsn=https://..., hostCache=0<br>
+        • PWA manifest+SW, Web Vitals beacon, Sentry optional, Ctrl+/ help, Lighthouse CI</div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <a href="https://github.com/brevityA/Core-Builds/blob/main/configurator/docs/best-addons.md" target="_blank" rel="noopener noreferrer" style="flex:1;padding:9px;border-radius:8px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;text-align:center;font-size:.78rem;font-weight:700;text-decoration:none">Full docs</a>
+        <button id="rsOk" style="flex:1;padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#8b949e;font-size:.78rem;font-weight:700;cursor:pointer">Got it</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => { overlay.style.opacity='0'; overlay.style.transition='opacity .15s'; setTimeout(()=>overlay.remove(),160); };
+  document.getElementById('rsClose').addEventListener('click', close);
+  document.getElementById('rsOk').addEventListener('click', close);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) close(); });
+  const onKey = (e)=>{ if(e.key==='Escape'){ document.removeEventListener('keydown',onKey); close(); } };
+  document.addEventListener('keydown', onKey);
 }
 
 function showTestDriveModal() {

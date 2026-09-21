@@ -15,7 +15,17 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // upstream in v2.32. This is deliberately a target choice, not a silent
 // migration to Newznab: the two presets do not have equivalent options or
 // credential handling.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', 'unknown']);
+//
+// 2.33.2 and 2.34.0 were added after the 2026-09-06 host audit: the live fleet
+// runs exactly those two versions (ElfHosted/ForTheWeak/Viren/Kuu/ATBP at
+// 2.34.0; Midnight/Omni/Wizaardd at 2.33.2). Older entries stay so existing
+// saved sessions and shared links keep resolving.
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', 'unknown']);
+
+// The target a fresh session gets: the AIOStreams release this configurator is
+// pinned against (see UPSTREAM.pin). Single source of truth — app.js imports it
+// for the state default and every fallback that used to hard-code '2.32.0'.
+export const DEFAULT_AIOSTREAMS_VERSION = '2.34.0';
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({
@@ -67,8 +77,18 @@ const EXPLICIT_STREAM_TYPES = new Set([
 
 // Preset types whose emission is driven by an optional-extras toggle. knaben was the only one
 // until these were added; its id and its preset type are the same string, which is what makes
-// the `optional.has(type)` check below work at all.
-const OPTIONAL_EXTRAS_STREAM_TYPES = new Set(['knaben', 'neko-bt', 'sootio', 'webstreamr', 'yastream']);
+// the `optional.has(type)` check below work at all. The 18 safe add-ons audited against
+// v2.34.0 (all simple toggles) are included so Stable/Balanced do not filter them back out
+// the moment a user switches them on.
+const OPTIONAL_EXTRAS_STREAM_TYPES = new Set([
+  'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream',
+  // 17 safe add-ons (v2.34.0 audit — all isSimpleTogglePreset, lowercased, torbox-search removed in v2.32)
+  'anime-kitsu', 'argentina-tv', 'bitmagnet', 'brazuca-torrents',
+  'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb', 'debridio-watchtower',
+  'doctor-who-universe', 'easynews', 'easynewsplus', 'jackettio',
+  'opensubtitles', 'tmdb-collections', 'torbox',
+  'usa-tv', 'usa-tv-next',
+]);
 
 const STABLE_STREAM_TYPES = new Set([
   // Account/library and service bridges.
@@ -151,12 +171,12 @@ function isExplicitPreset(preset, context) {
   const services = new Set([context.service, ...values(context.multiServices)]);
   if (type === 'debridio') return services.has('debridio');
   if (type === 'debrider') return services.has('debrider');
-  const optional = new Set(values(context.optionalScrapers));
+  const optional = new Set(values(context.optionalScrapers).map(v => String(v).toLowerCase()));
   // Optional-extras toggles are explicit by definition. Without this the four extras that are
   // advertised *disabled* on most lanes (neko-bt/sootio/webstreamr/yastream) get filtered back
   // out of Stable/Balanced the moment a user switches them on — the toggle would silently do
   // nothing. Scoped to a set rather than "any id in optionalScrapers" so `nzbhydra`/`newznab`
-  // keep their deliberate Stable exclusion below.
+  // keep their deliberate Stable exclusion below. Lowercased for case-insensitive match (easynewsPlus).
   if (OPTIONAL_EXTRAS_STREAM_TYPES.has(type)) return optional.has(type);
   // AIOStreams v2.32 replaced the legacy Newznab URL/apiPath fields with an
   // options.api object. Keep Newznab out of Stable/Balanced until the explicit
@@ -175,11 +195,12 @@ function stablePresets(config, context) {
   });
 }
 
+// NOTE: this duplicates src/core/device-policies.js#resolutionPolicy and is
+// applied AFTER it, so it wins. Keep the two in step until the duplication is
+// removed. 1440p must appear in the 4K list: a resolution that is neither
+// preferred nor excluded scores -Infinity upstream and sorts below 720p.
 function preferredResolutions(resolution) {
   if (resolution === '1080p') return ['1080p', '720p', 'Unknown'];
-  // NOTE: this duplicates device-policy.js#resolutionPolicy and is applied AFTER
-  // it, so it wins. Both lists must stay in step — 1440p was missing here, which
-  // scored every 1440p stream at -Infinity and sorted it below 720p.
   if (resolution === '4k') return ['2160p', '1440p', '1080p', '720p', 'Unknown'];
   if (resolution === 'ultrawide') return ['2160p', '1440p', '1080p', '720p', 'Unknown'];
   if (resolution === 'mixed') return ['2160p', '1080p', '1440p', '720p', '576p', '480p', 'Unknown'];

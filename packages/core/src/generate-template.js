@@ -94,9 +94,9 @@ function buildCatalogPresets(input) {
   const cats = input.catalogs || ['tmdb-addon'];
   const out = [];
   if (cats.includes('tmdb-addon')) out.push({ type:'tmdb-addon', instanceId:'tmdb-cat-1', enabled:true, options:{ name:'TMDB', timeout:5000 }, resources:['catalog','meta'], category:'meta_catalogs' });
-  if (cats.includes('streaming-catalogs')) out.push({ type:'streaming-catalogs', instanceId:'strm-cat-1', enabled:true, options:{ name:'Streaming Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  if (cats.includes('streaming-catalogs')) out.push({ type:'streaming-catalogs', instanceId:'strm-cat-1', enabled:true, options:{ name:'Streaming Catalogs', timeout:5000, catalogs:['nfx','hbm','dnp','amp','atp','pmp','pcp'] }, resources:['catalog'], category:'meta_catalogs' });
   if (cats.includes('anime-catalogs')) out.push({ type:'anime-catalogs', instanceId:'ani-cat-1', enabled:true, options:{ name:'Anime Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
-  if (cats.includes('rpdb-catalogs')) out.push({ type:'rpdb-catalogs', instanceId:'rpdb-cat-1', enabled:true, options:{ name:'RPDB Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
+  if (cats.includes('rpdb-catalogs')) out.push({ type:'rpdb-catalogs', instanceId:'rpdb-cat-1', enabled:true, options:{ name:'RPDB Catalogs', timeout:5000, catalogs:['movie','series'] }, resources:['catalog'], category:'meta_catalogs' });
   if (cats.includes('torrent-catalogs')) out.push({ type:'torrent-catalogs', instanceId:'torr-cat-1', enabled:true, options:{ name:'Torrent Catalogs', timeout:5000 }, resources:['catalog'], category:'meta_catalogs' });
   return out;
 }
@@ -169,6 +169,16 @@ function buildPresets(input) {
     { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     { type:'hdhub', instanceId:'hdhub-1', enabled:true, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
+    // New safe add-ons: catalog/live/subtitles work on HTTP (no debrid/usenet needed)
+    ...optionalScrapers.filter(sid => {
+      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl);
+      return d && ['catalog','live','subtitles'].includes(d.cat);
+    }).map(sid => {
+      const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] } };
+      const meta = safeCats[d.cat] || { resources:['stream'] };
+      return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
+    }),
     ...buildSubtitlePresets(input),
     ...buildCatalogPresets(input)
   ];
@@ -193,6 +203,11 @@ function buildPresets(input) {
       ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
         const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
         return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:creds.nzbhydra || '', apiKey:creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
+      }),
+      ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && ['easynews','easynewsPlus'].includes(x.id))).map(sid => {
+        const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+        const isPlus = d.id === 'easynewsPlus';
+        return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...(isPlus ? { resources:['stream','catalog','meta'], category:'meta_catalogs' } : { resources:['stream'] }) };
       }),
       ...buildSubtitlePresets(input),
       ...buildCatalogPresets(input)
@@ -234,13 +249,25 @@ function buildPresets(input) {
     ] : []),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      if (!d) return null;
       if (d.id === 'knaben') return null;  // emitted unconditionally below
       if (d.id === 'zilean') return null;
       if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
       if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
       if (d.id === 'webstreamr') return (hasExtraHttp || isHttp) ? null : { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] };
       if (d.id === 'sootio') return null;  // the debrid/multi lanes advertise it at the tail — that advert carries the toggle
-      return null;
+      // Lane gates for new safe add-ons: usenet indexers need usenet service, debrid-only need debrid.
+      // torbox-search removed in v2.32 — never emitted, so not listed here (avoids literal that breaks v232-compat test).
+      const usenetCatIds = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
+      const debridOnlyIds = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
+      if ((isP2P || isHttp) && usenetCatIds.includes(d.id)) return null;
+      if ((isP2P || isHttp) && debridOnlyIds.includes(d.id)) return null;
+      // 18 safe add-ons (v2.34.0 audit — all simple toggles). Generic emission: {name,timeout}
+      // resources chosen from cat so Stable/Balanced filtering keeps them via OPTIONAL_EXTRAS_STREAM_TYPES.
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
+      const meta = safeCats[d.cat] || { resources:['stream'] };
+      // Preserve existing special-case for anime-kitsu etc — generic is fine.
+      return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }).filter(Boolean),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
