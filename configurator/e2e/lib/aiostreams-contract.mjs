@@ -58,7 +58,7 @@ export const UNMODELLED_PRESET_TYPES = new Set([
   'torznab', 'zilean', 'jackettio', 'debrider', 'torrent-galaxy', 'torrents-db',
   // yastream is a basic HTTP preset (baseOptions only) added as an optional-extras toggle;
   // its catalog/stream sub-options are deliberately not modelled here — the generator emits
-  // just {name,timeout}, which is the entire required set at AIOStreams e694b6a.
+  // just {name,timeout}, which is the entire required set at AIOStreams c1d044c.
   'yastream',
 ]);
 

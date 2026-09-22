@@ -1,5 +1,5 @@
 {
-  "templateSuite": "3.7.0",
-  "configurator": "3.10.0",
+  "templateSuite": "3.8.0",
+  "configurator": "3.11.0",
   "minimumAIOStreams": "2.32.0"
 }

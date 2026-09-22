@@ -359,7 +359,7 @@ def validate_template(fpath):
         elif isinstance(o.get('url'), str):
             api_url = o.get('url')
         if 'torbox.app' in api_url and 'newznab' in api_url:
-            warn(name, f"preset '{p.get('type')}' points at the shut-down TorBox Search API ({api_url}) — no availability claim until an authorised endpoint/import test")
+            warn(name, f"preset '{p.get('type')}' points at the host-allowlisted TorBox Search API ({api_url}) — resolves only on approved hosts, silently times out elsewhere (see troubleshooting: TorBox Search host allowlist)")
 
     # ── Size budget (AIOStreams hardcoded 102,400-byte save limit) ──
     # The limit applies to the compact serialized config POSTed to

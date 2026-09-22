@@ -40,6 +40,11 @@ def profile(cfg: dict) -> dict:
     ]
     dedup = cfg.get("deduplicator") or {}
     bitrate = cfg.get("bitrate") or {}
+    result_limits = cfg.get("resultLimits") or {}
+    # `maxResults` / `maxResultsPerResolution` are NOT upstream keys (stripped
+    # server-side since before v2.31.1); resultLimits is the live spelling.
+    # The legacy keys survive here as a fallback for stale third-party
+    # templates that predate the rename.
     res2160 = ((bitrate.get("resolution") or {}).get("2160p") or {}).get("movies")
     res1080 = ((bitrate.get("resolution") or {}).get("1080p") or {}).get("movies")
     return {
@@ -64,8 +69,8 @@ def profile(cfg: dict) -> dict:
         "excluded_sel_count": len(as_config_array(cfg.get("excludedStreamExpressions"))),
         "ranked_sel_count": len(as_config_array(cfg.get("rankedStreamExpressions"))),
         "synced_sel_urls": len(as_config_array(cfg.get("syncedRankedStreamExpressionUrls"))),
-        "max_results": cfg.get("maxResults"),
-        "max_per_resolution": cfg.get("maxResultsPerResolution"),
+        "max_results": result_limits.get("global", cfg.get("maxResults")),
+        "max_per_resolution": result_limits.get("resolution", cfg.get("maxResultsPerResolution")),
         "exclude_uncached": cfg.get("excludeUncached"),
         "title_matching": (cfg.get("titleMatching") or {}).get("enabled"),
         "season_episode_matching": (cfg.get("seasonEpisodeMatching") or {}).get("enabled"),

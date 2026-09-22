@@ -414,7 +414,7 @@ AIOStreams v2.28+ supports a parent/child config system. A "parent" config lives
 | **Proxy** | MediaFlow proxy config |
 | **Regex URLs** | Vidhin05 synced regex files |
 | **Category colours** | Addon category colour map (Mix/Debrid/Usenet/HTTP/P2P/Subs) |
-| **Misc** | RPDB poster service, TMDB integration defaults, autoPlay, enhanceResults |
+| **Misc** | RPDB poster service, TMDB integration defaults, autoPlay |
 
 Your generated child template keeps only what's unique to it: resolution settings, stream expressions (ESEs/ISEs/PSEs), encode preferences, visual tags, and branding.
 
@@ -738,7 +738,7 @@ When Stremio's native catalog (Cinemeta) finds no streams for a title, it someti
 
 **AIOStreams mitigation (v2.4.6+):**
 - `Hard YouTube Kill` ESE blocks `type(streams, 'youtube')`, `type(streams, 'external')`, and keyword matches
-- `excludedStreamSources` blocks YouTube source variants
+- `excludedStreamTypes: ["youtube"]` blocks YouTube-type streams natively (the old `excludedStreamSources` spelling was never an AIOStreams schema key and is ignored by hosts)
 - `hideErrors: true` suppresses AIOStreams' own error cards
 
 WuPlay does not inject these Cinemeta trailer entries alongside addon results, so the problem simply does not occur. If you encounter YouTube links in WuPlay, the ESE fix will still catch them.
@@ -1308,7 +1308,7 @@ Fixed in **v2.4.6**. The `Hard YouTube Kill` ESE now also blocks `type(streams, 
 
 #### YouTube trailers are appearing in my stream list
 
-Fixed in **v2.4.6**. Three layers now block YouTube content: the ESE catches type, external, source, and quality field variants; `excludedStreamSources` covers all case variants; `excludedStreamTypes` includes youtube. Re-import the latest template.
+Fixed in **v2.4.6**, corrected in **v3.8**. The ESE catches type, external, source, and quality field variants, and `excludedStreamTypes` includes youtube — those two layers were always the ones doing the work. (The v2.4.6 notes also credited `excludedStreamSources`, but that key was never part of the AIOStreams schema, so hosts strip it.) Re-import the latest template.
 
 #### Wrong episode is playing
 

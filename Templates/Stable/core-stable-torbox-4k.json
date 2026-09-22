@@ -476,7 +476,6 @@
       "IMAX"
     ],
     "enableSeadex": true,
-    "seadexBestOnly": false,
     "excludeCached": false,
     "excludeCachedFromAddons": [],
     "excludeCachedFromServices": [],
@@ -486,13 +485,11 @@
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
+    "excludedStreamTypes": [
+      "youtube",
+      "external"
     ],
     "preferredRegexPatterns": [],
-    "maxResults": 12,
-    "maxResultsPerResolution": 3,
     "excludedStreamExpressions": [
       {
         "enabled": true,

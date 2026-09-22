@@ -2245,15 +2245,9 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 50,
-    "maxResultsPerResolution": 20,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -2263,10 +2257,8 @@
       "Subs": "purple"
     },
     "mergedCatalogs": [],
-    "seadexBestOnly": false,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,

@@ -62,7 +62,7 @@ test('the two generator data files stay byte-identical', () => {
 });
 
 test('every new toggle is a preset id the pinned AIOStreams ref can actually resolve', () => {
-  // Generated from AIOStreams e694b6a (v2.34.0) — see src/data/generated/aiostreams-presets.js.
+  // Generated from AIOStreams c1d044c (v2.34.1) — see src/data/generated/aiostreams-presets.js.
   // This is the repo's own record of PresetManager.fromId(); guessing an id here is how PR #557
   // shipped a `debrider` preset no host could load.
   for (const id of TOGGLES) {

@@ -1471,13 +1471,10 @@
       "catalog",
       "subtitles"
     ],
-    "maxResults": 25,
-    "maxResultsPerResolution": 10,
     "precacheNextEpisode": true,
     "precacheSingleStream": true,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "tmdbAccessToken": "<template_placeholder>",

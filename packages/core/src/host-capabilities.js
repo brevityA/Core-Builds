@@ -11,8 +11,12 @@
  *    data.settings.regexAccess.level / data.settings.customHtml
  *  - the AIOStreams README / Docker Hub description for the community instance
  *
- * Checked 2026-08-31 against the live status endpoints; a probe always wins
+ * Checked 2026-09-22 against the live status endpoints; a probe always wins
  * over these defaults, which exist for the offline / CORS-blocked path.
+ * ATBP and Wizaardd both report regexAccess `all` (every other host reports
+ * `trusted`, ElfHosted `none`), so their defaults record `all` — the merge
+ * still takes the stricter of registry vs probe, so a re-restriction is
+ * picked up live and can never be over-permitted by a stale default.
  */
 
 /** Access levels AIOStreams exposes for user-supplied regex (utils/regex-access.ts). */
@@ -81,8 +85,8 @@ export const HOST_CAPABILITY_OVERRIDES = Object.freeze({
     rateLimited: true,
   },
   kuu: { label: "Kuu's", kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'trusted', rateLimited: true },
-  atbp: { label: 'ATBP', kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'trusted', rateLimited: true },
-  wizaardd: { label: 'Wizaardd', kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'trusted', rateLimited: true },
+  atbp: { label: 'ATBP', kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'all', rateLimited: true },
+  wizaardd: { label: 'Wizaardd', kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'all', rateLimited: true },
   viren: {
     label: "Viren's Nightly",
     kind: 'nightly',

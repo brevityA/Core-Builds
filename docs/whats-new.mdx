@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.10"
+title: "What's New — Configurator v3.11"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.10 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.11 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.10**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.11**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.11 (Sep 22 2026)
+
+<CardGroup cols={2}>
+  <Card title="Fleet re-audit" icon="sparkles">
+    every public host re-checked against its own status endpoint. Seven of the eight run AIOStreams 2.34.1 (six on the stable build, Viren's on its nightly); Omni's is the only 2.33.2 holdout, over six weeks behind. The schema pin, the default compatibility target and the host registry all move to 2.34.1 together, and the 2.34.1 contract was verified byte-identical to 2.34.0 in every generated file, so nothing you generate changes shape. Two corrections fell out of the audit: ATBP and Wizaardd both report regexAccess `all`, not `trusted`, so their offline defaults now say so — the live probe still wins whenever it can reach the host.
+  </Card>
+  <Card title="Dead settings stop being emitted, not just stripped" icon="bolt">
+    v3.0 found six settings Core Builds emitted that AIOStreams never defined (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, minSeeders) and began removing them at the export gate. The generators kept writing them anyway, relying on the gate to clean up. They no longer write them at all, and the native-filters policy that wrote the dead `excludedStreamSources` now writes the live `excludedStreamTypes` instead — Stable and Balanced output newly, actually excludes YouTube-type streams rather than carrying a key the host ignored. The 55 checked-in templates that carried the dead keys are cleaned (about 8 KB of payload that was stripped on every save), and the guides that described the dead keys as working now describe what the host really reads.
+  </Card>
+  <Card title="TorBox Search preset is allowlisted, not dead" icon="shield-check">
+    the Apex, Hybrid and several Personal and Device templates ship an enabled preset pointed at TorBox's Search API, and the validator called that endpoint shut down. It is not down; TorBox restricts it to allowlisted caller hosts, so it resolves on approved managed hosts and silently times out everywhere else, which reads as slow or missing Usenet results with no error. The warning now says that and points at two new troubleshooting entries: the allowlist (with the remedy — move hosts, or swap in a personal indexer) and the separate TorBox CDN routing advisory, where some hosts need the CDN set manually for AIOStreams-installed addons.
+  </Card>
+  <Card title="Import-link URLs are HTML-escaped" icon="sliders">
+    six result panels rendered the paste-service URL into the page unescaped. A hostile paste response could have injected markup; every one now goes through the same escaper the rest of the app uses. No known exploit, found and fixed in a hardening pass that also confirmed share links still carry settings only, stored snapshots still scrub credentials, and display names are still sanitised at every write path.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.10 (Sep 19 2026)
 
@@ -68,27 +87,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Operator tooling for the proxy: the full…" icon="wand">
     Operator tooling for the proxy: the full statistics view and detailed health sit behind an ADMIN_TOKEN, with a token-sync workflow, an OPERATOR.md runbook and an operator-stats.sh helper, and wrangler secret put is pinned to --env on production so a secret cannot land on the wrong environment.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.7 (Sep 6 2026)
-
-<CardGroup cols={2}>
-  <Card title="Version honesty: the badge, package.json and the…" icon="sparkles">
-    Version honesty: the badge, package.json and the template stamp now all report this release (they disagreed — badge v3.1, package 3.1.0, tag v3.7.0) and a test fails if they ever drift apart again. The default AIOStreams compatibility target moves from the stale 2.32.0 to the pinned 2.34.0, with 2.33.2 and 2.34.0 added to the target list so it covers every version the live fleet actually runs.
-  </Card>
-  <Card title="Fixed: EasyNews-only Direct Install no longer…" icon="bolt">
-    Fixed: EasyNews-only Direct Install no longer fails with 'Library requires at least one usable service'. AIOStreams builds the Library addon from your services, and EasyNews cannot back it — the library preset is now omitted whenever no library-capable (debrid) service is enabled, on every route, and EasyNews configs install clean. EasyNews plus any debrid keeps the library.
-  </Card>
-  <Card title="Direct Install now refuses to post without the…" icon="shield-check">
-    Direct Install now refuses to post without the keys the host demands, naming exactly what is missing ('Option apiKey is required' was the previous failure, delivered by the host after the fact). Correction (v3.8): this entry originally ended 'Export JSON remains keyless by design', which was never true — export has always embedded whatever credentials you entered, and the sanitiser that strips them runs on share links and imports only. Treat an exported file as secret; see the v3.8 note above.
-  </Card>
-  <Card title="The host picker now states each host's…" icon="sliders">
-    The host picker now states each host's capabilities and its AIOStreams version before you deploy — ElfHosted says 'Debrid only — no P2P/HTTP', and the three hosts still on 2.33.2 say so. A config using features newer than a host is not routed there, and a P2P config can no longer be sent to ElfHosted.
-  </Card>
-  <Card title="The landing is Express-first: one primary card…" icon="gauge">
-    The landing is Express-first: one primary card for the five-step install (service → device → resolution → key → Deploy), with Advanced Builder, Update Existing and the Setup Genie demoted to plain links. The Genie page itself is unchanged.
   </Card>
 </CardGroup>

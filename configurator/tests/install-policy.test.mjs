@@ -23,7 +23,7 @@ const svc = (id, enabled = true) => ({ id, enabled, credentials: {} });
 /* ── the library-capable service set ───────────────────────────────────────── */
 
 test('the library-capable set is exactly the upstream Library supported services at the pin', () => {
-  // Read from AIOStreams v2.34.0 @ e694b6a: LibraryPreset.supportedServices =
+  // Read from AIOStreams v2.34.1 @ c1d044c (re-verified at the pin bump; identical to v2.34.0): LibraryPreset.supportedServices =
   // StremThruPreset list (alldebrid, debrider, debridlink, easydebrid,
   // offcloud, premiumize, pikpak, realdebrid, torbox, torrin) + nzbdav +
   // altmount + stremthru_newz + aiostreams. EasyNews is NOT among them.

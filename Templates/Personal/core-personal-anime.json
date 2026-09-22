@@ -990,11 +990,6 @@
         "torbox"
       ],
       "reconfigureService": false
-    },
-    "enhanceResults": true,
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ]
+    }
   }
 }

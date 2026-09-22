@@ -21,7 +21,6 @@
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
     "tmdbApiKey": "<template_placeholder>",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "services": [
@@ -439,10 +438,6 @@
     ],
     "includedLanguages": [],
     "excludedLanguages": [],
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "excludedStreamExpressions": [
       {
         "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))",
@@ -1396,8 +1391,6 @@
     ],
     "excludedRegexPatterns": [],
     "showChanges": true,
-    "rankedRegexPatterns": [],
-    "maxResults": 30,
-    "maxResultsPerResolution": 12
+    "rankedRegexPatterns": []
   }
 }

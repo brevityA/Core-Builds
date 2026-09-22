@@ -1403,10 +1403,6 @@
     "checkOwned": false,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -1418,7 +1414,6 @@
     "mergedCatalogs": [],
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,
@@ -1782,8 +1777,6 @@
       "min": 0,
       "max": 150
     },
-    "maxResults": 20,
-    "maxResultsPerResolution": 8,
     "dynamicAddonFetching": {
       "enabled": false,
       "condition": ""

@@ -2378,8 +2378,6 @@
     "syncedRankedRegexUrls": [
       "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
     ],
-    "syncedRankedStreamExpressionUrls": [],
-    "maxResults": 30,
-    "maxResultsPerResolution": 12
+    "syncedRankedStreamExpressionUrls": []
   }
 }
