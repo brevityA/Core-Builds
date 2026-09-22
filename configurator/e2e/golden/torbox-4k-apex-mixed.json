@@ -1334,7 +1334,7 @@
         "torrent"
       ]
     },
-    "nzbFailover": {
+    "failover": {
       "enabled": false
     },
     "areYouStillThere": {

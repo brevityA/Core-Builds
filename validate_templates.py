@@ -246,10 +246,12 @@ def validate_template(fpath):
 
     # ── Removed preset gate (AIOStreams v2.32) ────────────────
     # The legacy built-in torbox-search preset was removed in AIOStreams v2.32
-    # (TorBox Search API shut down); saving a config that still includes it
+    # (endpoint host-allowlisted; preset type removed from the schema); saving a config that still includes it
     # fails. Only the explicit Templates/Legacy/v2.31.1 lane may keep it.
     is_core = 'Templates' in path.parts
     is_legacy = 'Legacy' in path.parts
+    is_deprecated = 'Deprecated' in path.parts
+    is_community = 'Community-Templates' in path.parts
     presets_list = c.get('presets', []) if isinstance(c, dict) else []
     has_torbox = any(
         isinstance(p, dict) and p.get('type') == 'torbox-search'
@@ -360,6 +362,30 @@ def validate_template(fpath):
             api_url = o.get('url')
         if 'torbox.app' in api_url and 'newznab' in api_url:
             warn(name, f"preset '{p.get('type')}' points at the host-allowlisted TorBox Search API ({api_url}) — resolves only on approved hosts, silently times out elsewhere (see troubleshooting: TorBox Search host allowlist)")
+
+    # ── Failover block (upstream renamed nzbFailover -> failover) ──
+    # Upstream migrates nzbFailover BEFORE schema validation and passes
+    # `position` through blindly, so a legacy position that is not in the new
+    # enum ('beforeSEL' / 'beforeLimiting' / 'last') rejects the whole save —
+    # this check exists because Base-Config carried position 'after' and the
+    # builder emitted 'first' for before-torrents, both 400s at v2.34.1.
+    if isinstance(c, dict):
+        if 'nzbFailover' in c and is_core and not is_legacy and not is_deprecated and not is_community:
+            warn(name, "legacy 'nzbFailover' key — upstream renamed it to 'failover'; migrate (enabled/count/position map across, 'first' has no equivalent: use 'beforeLimiting')")
+        fo = c.get('failover')
+        if isinstance(fo, dict):
+            pos = fo.get('position')
+            if pos is not None and pos not in ('beforeSEL', 'beforeLimiting', 'last'):
+                err(name, f"failover.position '{pos}' is not in the upstream enum (beforeSEL/beforeLimiting/last) — the host rejects the save")
+            ma = fo.get('maxAttempts', fo.get('count'))
+            if ma is not None and (not isinstance(ma, int) or isinstance(ma, bool) or ma < 1):
+                err(name, f"failover.maxAttempts must be an integer >= 1, got {ma!r}")
+            ct = fo.get('contentTypes')
+            if ct is not None and (not isinstance(ct, list) or any(t not in ('usenet', 'debrid') for t in ct)):
+                err(name, f"failover.contentTypes must be a list of usenet/debrid, got {ct!r}")
+            par = fo.get('parallel')
+            if par is not None and (not isinstance(par, int) or isinstance(par, bool) or par < 1):
+                err(name, f"failover.parallel must be an integer >= 1, got {par!r}")
 
     # ── Size budget (AIOStreams hardcoded 102,400-byte save limit) ──
     # The limit applies to the compact serialized config POSTed to

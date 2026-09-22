@@ -863,7 +863,7 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
+    "failover": {
       "enabled": false
     },
     "areYouStillThere": {

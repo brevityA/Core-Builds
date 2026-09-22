@@ -140,3 +140,23 @@ test('published output profile budgets are immutable and include the planned pro
   assert.equal(OUTPUT_PROFILE_BUDGETS.stable.dynamicFetching, false);
   assert.throws(() => { OUTPUT_PROFILE_BUDGETS.stable.syncedSelUrls = 1; }, TypeError);
 });
+
+test('C12 fires on the live failover key and names it in fields', () => {
+  const found = findFeatureConflicts({ config: { excludeUncached: true, failover: { enabled: true } } });
+  const c12 = found.find(item => item.id === 'C12_CACHED_ONLY_WITH_UNCACHED_BACKGROUND_ACTION');
+  assert.ok(c12, 'expected C12 for cached-only + enabled failover');
+  assert.ok(c12.fields.includes('failover'));
+  assert.ok(!c12.fields.includes('nzbFailover'));
+});
+
+test('C12 still fires on stale imports carrying legacy nzbFailover', () => {
+  const found = findFeatureConflicts({ config: { excludeUncached: true, nzbFailover: { enabled: true } } });
+  const c12 = found.find(item => item.id === 'C12_CACHED_ONLY_WITH_UNCACHED_BACKGROUND_ACTION');
+  assert.ok(c12, 'expected C12 for cached-only + legacy nzbFailover');
+  assert.ok(c12.fields.includes('nzbFailover'));
+});
+
+test('C12 stays silent when failover is absent or disabled', () => {
+  assert.ok(!ids({ excludeUncached: true }).includes('C12_CACHED_ONLY_WITH_UNCACHED_BACKGROUND_ACTION'));
+  assert.ok(!ids({ excludeUncached: true, failover: { enabled: false } }).includes('C12_CACHED_ONLY_WITH_UNCACHED_BACKGROUND_ACTION'));
+});

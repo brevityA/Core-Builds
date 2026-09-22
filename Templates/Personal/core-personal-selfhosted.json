@@ -1362,9 +1362,12 @@
     },
     "autoRemoveDownloads": false,
     "checkOwned": true,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,

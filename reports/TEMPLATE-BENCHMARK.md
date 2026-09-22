@@ -252,13 +252,18 @@ subtree for add/remove/reorder ops).
 | `variant-apex-plus-tpb` | add addon `the-pirate-bay` (new in v2.34.0) | `addon_count 5 → 6` | credential-free in-process indexer; **no Core Builds template uses it** |
 | `variant-apex-plus-therarbg` | add addon `therarbg` (new in v2.34.0) | `addon_count 5 → 6` | same, different index — targets the buckets H1/H2 predict Apex loses |
 | `variant-apex-allow-unknown-res` | `requiredResolutions: [2160p,1080p] → [2160p,1080p,Unknown]` | exactly that field | **tests H2 directly**: what does dropping every undeclared-resolution stream cost, and what junk returns if we stop? |
-| `variant-apex-failover-on` | set `/failover` (enabled, 5 attempts, parallel 2) | `failover_enabled None → True`, `failover_max_attempts None → 5` | **largest competitor-only lever**: retry a dead pick server-side instead of serving a broken stream |
+| `variant-apex-failover-on` | `failover.maxAttempts: unset (=3) → 5` | `failover_max_attempts None → 5` | adopted 2026-09-22: Apex now ships conservative failover, so the variant escalates the attempt budget instead of enabling the feature |
+| `variant-apex-failover-parallel` | `failover.parallel: unset (=1) → 2` | exactly that field | sister variant: 2-in-flight vs sequential on the failing path |
+| `variant-apex-failover-crosstype` | `failover.allowCrossType: unset (=false) → true` | exactly that field | sister variant: dead debrid picks may fail over into Usenet and vice versa |
+| `variant-apex-failover-early` | `failover.position: unset (=last) → beforeLimiting` | exactly that field | sister variant: targets drawn from the pre-limit pool vs final list only |
 | `variant-apex-excluded-keywords` | `excludedKeywords` ← grabberhawk's 10 bad-group list | `excluded_keywords_count 0 → 10` | does hard exclusion beat Apex's soft regex demotion — or over-filter obscure titles? |
 | `variant-apex-episode-title-matching` | enable `episodeTitleMatching` @ 0.85 | `episode_title_matching None → True` | cuts mislabelled/absolute-numbered episodes on anime + series |
 | `variant-apex-seeder-floor` | `requiredSeederRange` ← `[3, 100000]` | `required_seeder_range None → [3,100000]` | a 0-seeder uncached torrent is a guaranteed dead slot |
 
 The last four come from the competitor teardown: each uses a capability that
-**no Core Builds template sets** but that exists in upstream's v2.34.0 schema.
+existed in upstream's v2.34.0 schema but that **no Core Builds template set**.
+(Apex adopted conservative `failover` on 2026-09-22, so the failover row and its
+three sisters now escalate from that baseline instead.)
 `static_profile.py` had to be taught these ten fields first — it reported all
 four as *identical* until then, and an unattributable variant is not a result.
 

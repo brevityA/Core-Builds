@@ -622,9 +622,8 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
-      "enabled": false,
-      "position": "last"
+    "failover": {
+      "enabled": false
     },
     "proxy": {
       "id": "mediaflow",

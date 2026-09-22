@@ -2192,9 +2192,8 @@
       "streamTypes": []
     },
     "checkOwned": false,
-    "nzbFailover": {
-      "enabled": false,
-      "position": "last"
+    "failover": {
+      "enabled": false
     },
     "serviceWrap": {
       "enabled": false,

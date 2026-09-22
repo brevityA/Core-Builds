@@ -1628,9 +1628,8 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
-      "enabled": false,
-      "position": "after"
+    "failover": {
+      "enabled": false
     },
     "checkOwned": false,
     "autoPlay": {

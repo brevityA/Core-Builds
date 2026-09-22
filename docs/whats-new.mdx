@@ -22,7 +22,10 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="TorBox Search preset is allowlisted, not dead" icon="shield-check">
     the Apex, Hybrid and several Personal and Device templates ship an enabled preset pointed at TorBox's Search API, and the validator called that endpoint shut down. It is not down; TorBox restricts it to allowlisted caller hosts, so it resolves on approved managed hosts and silently times out everywhere else, which reads as slow or missing Usenet results with no error. The warning now says that and points at two new troubleshooting entries: the allowlist (with the remedy — move hosts, or swap in a personal indexer) and the separate TorBox CDN routing advisory, where some hosts need the CDN set manually for AIOStreams-installed addons.
   </Card>
-  <Card title="Import-link URLs are HTML-escaped" icon="sliders">
+  <Card title="Failover replaces NZB Failover, and two save rejections go with it" icon="sliders">
+    AIOStreams renamed nzbFailover to the generic failover (Usenet plus debrid) and migrates the old spelling before validating, passing position through blindly. Core Builds emitted two positions outside the new enum: the before-torrents option wrote `first`, and the base config carried `after` — both rejected the whole save at the host. The builder, all 60 active templates and the conflict checker now use the live spelling, with before-torrents mapped to the widest candidate pool. The Fine-Tune attempt count finally lands in maxAttempts instead of a key upstream never read, which closes the v3.0 known gap, and the template validator now rejects out-of-enum failover positions so this class cannot return.
+  </Card>
+  <Card title="Import-link URLs are HTML-escaped" icon="gauge">
     six result panels rendered the paste-service URL into the page unescaped. A hostile paste response could have injected markup; every one now goes through the same escaper the rest of the app uses. No known exploit, found and fixed in a hardening pass that also confirmed share links still carry settings only, stored snapshots still scrub credentials, and display names are still sanitised at every write path.
   </Card>
 </CardGroup>
