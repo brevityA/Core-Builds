@@ -1,0 +1,190 @@
+name: Deploy icon-request broker (CoreBuildsApps)
+
+# Deploys the icon pack's anonymous icon-request worker from
+# brevityA/CoreBuildsApps (tools/icon_request_broker/) using THIS repo's
+# Cloudflare credentials. GitHub secrets cannot be read across repositories
+# and brevityA is a user account (no organisation secrets), so the deploy
+# runs where the credentials already are: the same CLOUDFLARE_API_TOKEN /
+# CLOUDFLARE_ACCOUNT_ID, under the same environments, that deploy-worker.yml
+# uses for core-builds-cors-proxy. CoreBuildsApps is public, so the checkout
+# needs no token.
+#
+# Manual only. The broker's code, tests and its parity test against the issue
+# form live in CoreBuildsApps; a push there must not deploy from here.
+#
+# What it does:
+#   test    - the broker's own `node --test` suite at the chosen ref
+#   guard   - fails if the broker's rate-limit namespace_ids collide with the
+#             cors-proxy's (they share this Cloudflare account, and
+#             namespace_id is account-wide)
+#   kv      - finds the environment's RATE_KV namespace by title, creating it
+#             on first run, unless vars.WRK_ICONREQ_KV_ID_{STAGING,PRODUCTION}
+#             pins an id
+#   deploy  - wrangler deploy [--env staging]
+#   smoke   - the broker's smoke.mjs --strict, which never files a request
+#
+# Not done here, by design: the worker's own secrets (the GitHub App trio or
+# ICON_REQUEST_DISCORD_WEBHOOK_URL). CI deploys code only; set those once with
+# `wrangler secret put`, see tools/icon_request_broker/README.md in
+# CoreBuildsApps. Without them the worker deploys and passes smoke but cannot
+# file a request.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target (staging = corebuilds-icon-request-staging)'
+        type: choice
+        options: [staging, production]
+        default: staging
+      ref:
+        description: 'CoreBuildsApps branch, tag or SHA to deploy'
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-icon-request-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Same environments as deploy-worker.yml, so environment-scoped
+    # Cloudflare secrets resolve exactly as they do for the cors-proxy.
+    environment: ${{ github.event.inputs.environment }}
+    env:
+      ENV_NAME: ${{ github.event.inputs.environment }}
+      BROKER: apps/tools/icon_request_broker
+    steps:
+      - name: Checkout Core-Builds (for the cors-proxy config)
+        uses: actions/checkout@v7
+
+      - name: Checkout CoreBuildsApps @ ${{ github.event.inputs.ref }}
+        uses: actions/checkout@v7
+        with:
+          repository: brevityA/CoreBuildsApps
+          ref: ${{ github.event.inputs.ref }}
+          path: apps
+          sparse-checkout: tools/icon_request_broker
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Broker unit tests
+        working-directory: ${{ env.BROKER }}
+        run: node --test
+
+      - name: Check Cloudflare deployment secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # Fail, not skip: a skipped deploy that reports green is the trap
+          # deploy-worker.yml documents. This workflow is manual, so a missing
+          # secret is always a mistake worth a red run.
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not set for environment '$ENV_NAME'."
+            exit 1
+          fi
+
+      - name: Guard - rate-limit namespace ids must not collide with the cors-proxy
+        run: |
+          ids() { grep -E '^\s*namespace_id\s*=' "$1" | sed -E 's/.*"([0-9]+)".*/\1/' | sort; }
+          clash=$(comm -12 <(ids cloudflare-worker/wrangler.toml) <(ids "$BROKER/wrangler.toml.example"))
+          if [ -n "$clash" ]; then
+            echo "::error::Broker rate-limit namespace_id(s) $(echo $clash) are already used by core-builds-cors-proxy on this account. Change them in CoreBuildsApps tools/icon_request_broker/wrangler.toml.example."
+            exit 1
+          fi
+          echo "No namespace_id overlap with the cors-proxy."
+
+      - name: Resolve the RATE_KV namespace (find or create)
+        id: kv
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PINNED: ${{ github.event.inputs.environment == 'staging' && vars.WRK_ICONREQ_KV_ID_STAGING || vars.WRK_ICONREQ_KV_ID_PRODUCTION }}
+        run: |
+          if [ -n "$PINNED" ]; then
+            echo "id=$PINNED" >> "$GITHUB_OUTPUT"
+            echo "Using pinned KV namespace id from repo variables."
+            exit 0
+          fi
+          if [ "$ENV_NAME" = "staging" ]; then
+            TITLE=corebuilds-icon-request-staging-RATE_KV
+          else
+            TITLE=corebuilds-icon-request-RATE_KV
+          fi
+          # Run outside any wrangler config, so the title is exactly TITLE and
+          # not prefixed with some other worker's name.
+          cd "$RUNNER_TEMP"
+          find_id() {
+            npx --yes wrangler@4 kv namespace list 2>/dev/null \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const m=s.search(/\[\s*(\{|\])/);if(m<0)return;const j=JSON.parse(s.slice(m));const n=j.find(x=>x.title===process.argv[1]);if(n)console.log(n.id)})' "$TITLE"
+          }
+          ID=$(find_id)
+          if [ -z "$ID" ]; then
+            echo "Creating KV namespace $TITLE"
+            npx --yes wrangler@4 kv namespace create "$TITLE"
+            ID=$(find_id)
+          fi
+          if [ -z "$ID" ]; then
+            echo "::error::Could not find or create KV namespace $TITLE. The API token may lack 'Workers KV Storage: Edit'; either add it, or create the namespace once and set vars.WRK_ICONREQ_KV_ID_$(echo "$ENV_NAME" | tr a-z A-Z)."
+            exit 1
+          fi
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+          echo "KV namespace $TITLE = $ID"
+
+      - name: Build wrangler.toml from the example
+        working-directory: ${{ env.BROKER }}
+        env:
+          KV_ID: ${{ steps.kv.outputs.id }}
+        run: |
+          cp wrangler.toml.example wrangler.toml
+          if [ "$ENV_NAME" = "staging" ]; then
+            sed -i "s/REPLACE_WITH_STAGING_NAMESPACE_ID/$KV_ID/" wrangler.toml
+            # The unused production binding still has to parse.
+            sed -i "s/REPLACE_WITH_NAMESPACE_ID/$KV_ID/" wrangler.toml
+          else
+            sed -i "s/REPLACE_WITH_NAMESPACE_ID/$KV_ID/" wrangler.toml
+            sed -i "s/REPLACE_WITH_STAGING_NAMESPACE_ID/$KV_ID/" wrangler.toml
+          fi
+          if grep -q REPLACE_WITH wrangler.toml; then
+            echo "::error::wrangler.toml still has a placeholder"; exit 1
+          fi
+
+      - name: Deploy (${{ github.event.inputs.environment }})
+        working-directory: ${{ env.BROKER }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          SHA=$(git -C "$GITHUB_WORKSPACE/apps" rev-parse --short HEAD)
+          if [ "$ENV_NAME" = "staging" ]; then
+            npx --yes wrangler@4 deploy --env staging --message "CoreBuildsApps@$SHA"
+          else
+            npx --yes wrangler@4 deploy --message "CoreBuildsApps@$SHA"
+          fi
+
+      - name: Smoke (strict; never files a request)
+        working-directory: ${{ env.BROKER }}
+        env:
+          SUBDOMAIN: ${{ vars.WORKERS_DEV_SUBDOMAIN || 'tlorenzato26' }}
+        run: |
+          if [ "$ENV_NAME" = "staging" ]; then
+            URL="https://corebuilds-icon-request-staging.${SUBDOMAIN}.workers.dev"
+          else
+            URL="https://corebuilds-icon-request.${SUBDOMAIN}.workers.dev"
+          fi
+          # A fresh deploy can take a few seconds to serve everywhere; strict
+          # smoke compares /healthz's version to this checkout, so retry it.
+          for i in 1 2 3 4 5 6; do
+            node smoke.mjs --strict "$URL" && exit 0
+            echo "attempt $i failed; retrying in 5s"
+            sleep 5
+          done
+          echo "::error::Smoke failed against $URL. Roll back with: npx wrangler rollback$( [ "$ENV_NAME" = staging ] && echo ' --env staging')"
+          exit 1
