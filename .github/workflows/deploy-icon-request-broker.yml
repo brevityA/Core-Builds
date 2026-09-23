@@ -77,6 +77,10 @@ jobs:
 
       - name: Refuse a ref that is not on CoreBuildsApps main
         working-directory: apps
+        env:
+          # Caller-typed text: read through the environment, never pasted
+          # into the script with ${{ }}, which would execute it as shell.
+          REF_INPUT: ${{ github.event.inputs.ref }}
         run: |
           # The chosen ref's code runs next to the Cloudflare token (npx
           # wrangler resolves package.json/.npmrc from that directory), so
@@ -84,7 +88,7 @@ jobs:
           # main is fine; a branch, PR ref or stray SHA is not.
           git fetch --no-tags origin main
           if ! git merge-base --is-ancestor HEAD FETCH_HEAD; then
-            echo "::error::CoreBuildsApps ref '${{ github.event.inputs.ref }}' ($(git rev-parse --short HEAD)) is not on main. Merge it first."
+            echo "::error::CoreBuildsApps ref '$REF_INPUT' ($(git rev-parse --short HEAD)) is not on main. Merge it first."
             exit 1
           fi
 
