@@ -68,7 +68,25 @@ jobs:
           repository: brevityA/CoreBuildsApps
           ref: ${{ github.event.inputs.ref }}
           path: apps
-          sparse-checkout: tools/icon_request_broker
+          # The broker's tests read the issue form they must stay in step
+          # with (worker.test.mjs -> .github/ISSUE_TEMPLATE/).
+          sparse-checkout: |
+            tools/icon_request_broker
+            .github/ISSUE_TEMPLATE
+          fetch-depth: 0
+
+      - name: Refuse a ref that is not on CoreBuildsApps main
+        working-directory: apps
+        run: |
+          # The chosen ref's code runs next to the Cloudflare token (npx
+          # wrangler resolves package.json/.npmrc from that directory), so
+          # only reviewed history may be deployed. Any commit reachable from
+          # main is fine; a branch, PR ref or stray SHA is not.
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor HEAD FETCH_HEAD; then
+            echo "::error::CoreBuildsApps ref '${{ github.event.inputs.ref }}' ($(git rev-parse --short HEAD)) is not on main. Merge it first."
+            exit 1
+          fi
 
       - uses: actions/setup-node@v7
         with:
@@ -106,8 +124,17 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          PINNED: ${{ github.event.inputs.environment == 'staging' && vars.WRK_ICONREQ_KV_ID_STAGING || vars.WRK_ICONREQ_KV_ID_PRODUCTION }}
+          STAGING_PINNED: ${{ vars.WRK_ICONREQ_KV_ID_STAGING }}
+          PRODUCTION_PINNED: ${{ vars.WRK_ICONREQ_KV_ID_PRODUCTION }}
         run: |
+          # Each environment reads only its own pin. An `a && b || c`
+          # expression would hand staging the production id whenever the
+          # staging variable is unset.
+          if [ "$ENV_NAME" = "staging" ]; then
+            PINNED=$STAGING_PINNED
+          else
+            PINNED=$PRODUCTION_PINNED
+          fi
           if [ -n "$PINNED" ]; then
             echo "id=$PINNED" >> "$GITHUB_OUTPUT"
             echo "Using pinned KV namespace id from repo variables."
