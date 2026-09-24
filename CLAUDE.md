@@ -373,7 +373,7 @@ scripts/aios-regen/
 |---|---|---|
 | `deploy-configurator.yml` | push to main | Deploys entire repo root to GitHub Pages |
 | `sync-docs.yml` | push to main | Auto-generates ROADMAP.md + tools page from changelogs |
-| `deploy-icon-request-broker.yml` | manual | Deploys CoreBuildsApps' icon-request worker (`tools/icon_request_broker/`) with this repo's Cloudflare secrets; guards rate-limit `namespace_id` overlap with the cors-proxy (same account) and finds/creates its KV namespace |
+| `deploy-icon-request-broker.yml` | manual | Deploys CoreBuildsApps' icon-request worker (`tools/icon_request_broker/`) with this repo's Cloudflare secrets; guards rate-limit `namespace_id` overlap with the cors-proxy (same account), finds/creates its KV namespace, and pushes the worker's filing secrets from `ICONREQ_*` Actions secrets (`ICONREQ_GITHUB_TOKEN` = the owner's fine-grained token) |
 | `docs-changelog-gate.yml` | PRs | Blocks merges without changelog update |
 | `upstream-drift-watch.yml` | daily cron | Detects Vidhin05 regex/expression changes |
 | `watch-aiostreams.yml` | 6h cron + push | AIOStreams contract drift detection (aios-regen) |
