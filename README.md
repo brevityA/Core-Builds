@@ -234,11 +234,11 @@ SeaDex best-release enforcement · AnimeTosho · FLAC/AAC audio priority · Japa
 
 | Template | Version | Res | Import URL |
 |---|---|---|---|
-| **Core Nexus 4K Apex Labs** 🧪 | v0.15.2 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
-| **Core Nexus Stream Labs** 🧪 | v0.10.2 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
-| **Core Nexus All-Rounder Labs** 🧪 | v0.4.2 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
-| **Core Nexus 4K Essential Labs** 🧪 | v0.6.2 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
-| **Core Nexus Essential Labs** 🧪 | v0.4.2 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
+| **Core Nexus 4K Apex Labs** 🧪 | v0.15.3 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json` |
+| **Core Nexus Stream Labs** 🧪 | v0.10.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json` |
+| **Core Nexus All-Rounder Labs** 🧪 | v0.4.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json` |
+| **Core Nexus 4K Essential Labs** 🧪 | v0.6.3 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json` |
+| **Core Nexus Essential Labs** 🧪 | v0.4.3 | 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json` |
 | **Core Nexus Anime 4K Labs** 🧪 | v0.3.1 | 4K + 1080p | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json` |
 
 > [**Full Labs changelog & testing guide →**](https://github.com/brevityA/Core-Builds/blob/main/Guides/LABS.md)

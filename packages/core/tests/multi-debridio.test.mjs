@@ -24,7 +24,10 @@ test('multi-service generation keeps Debridio and an optional Usenet Crawler pre
   const crawler = template.config.presets.find(preset => preset.instanceId === 'usenetcrawler-1');
 
   assert.ok(debridio, 'Debridio must be emitted when it is selected as a multi-service extra');
-  assert.equal(debridio.options.apiKey, 'test-debridio-key');
+  // `debridioApiKey`, not `apiKey`: that is the option AIOStreams declares and requires.
+  // This assertion pinned the bare name, so it passed while the emitted config was
+  // missing a required option and the host rejected it outright.
+  assert.equal(debridio.options.debridioApiKey, 'test-debridio-key');
 
   assert.ok(crawler, 'Usenet Crawler must be emitted from optionalScrapers');
   assert.equal(crawler.type, 'newznab');
@@ -61,7 +64,10 @@ test('Debridio IS emitted enabled+keyed when its API key is present', () => {
   const debridio = template.config.presets.find(p => p.type === 'debridio');
   assert.ok(debridio, 'Debridio preset must be present when key is entered');
   assert.equal(debridio.enabled, true);
-  assert.equal(debridio.options.apiKey, 'test-debridio-key');
+  // `debridioApiKey`, not `apiKey`: that is the option AIOStreams declares and requires.
+  // This assertion pinned the bare name, so it passed while the emitted config was
+  // missing a required option and the host rejected it outright.
+  assert.equal(debridio.options.debridioApiKey, 'test-debridio-key');
 });
 
 test('Usenet Only service enables stremio_nntp + aiostreams and includes EasyNews presets', () => {

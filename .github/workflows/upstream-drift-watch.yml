@@ -34,8 +34,15 @@ jobs:
         run: |
           set +e
           node scripts/check_upstream_drift.mjs 2>&1 | tee /tmp/drift_report.txt
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          # $? after a pipeline is `tee`'s status, which is always 0 — so this
+          # step reported exit_code=0 through real drift. That did not merely
+          # skip the issue: it ran the "back in sync" branch below, which closes
+          # an open drift issue. The HHWEB removal in Radarr/Sonarr Web T3 went
+          # unreported for days behind a green tick. Read the script's own
+          # status out of PIPESTATUS instead.
+          code=${PIPESTATUS[0]}
           set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
 
       - name: Open or refresh drift issue
         if: steps.drift.outputs.exit_code == '1'
@@ -74,6 +81,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Exit 0 covers two different outcomes: genuinely in sync, and
+          # "upstream unreachable — soft pass" (deliberate, so network blips do
+          # not spam issues). Only the first one justifies closing a drift
+          # issue; treating an outage as proof of sync would retract a real
+          # report because GitHub raw had a bad minute.
+          if grep -q "upstream unreachable" /tmp/drift_report.txt; then
+            echo "Upstream was unreachable this run — no sync conclusion, leaving any open issue alone."
+            exit 0
+          fi
           EXISTING=$(gh issue list --label "upstream-drift" --state open --json number --jq '.[0].number')
           if [ -n "$EXISTING" ]; then
             gh issue close "$EXISTING" --comment "Upstream is back in sync with the pinned snapshots (verified $(date -u +%Y-%m-%dT%H:%M:%SZ))."
