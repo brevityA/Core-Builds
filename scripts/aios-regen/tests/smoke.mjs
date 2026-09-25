@@ -1,4 +1,4 @@
-import { extractPresetOptions, diffContracts, compact } from '../contract.mjs';
+import { extractPresetOptions, extractModifiers, diffContracts, compact } from '../contract.mjs';
 import { generateTemplate, healTemplate, defaultRecipe } from '../generate.mjs';
 
 function assert(cond, msg) {
@@ -29,6 +29,41 @@ export class EasynewsPlusPlusPreset {
 const opts = extractPresetOptions(easynews);
 assert(opts.some((o) => o.id === 'strictTitleMatching' && o.required === true), 'parses required strictTitleMatching');
 assert(opts.find((o) => o.id === 'strictTitleMatching').default === false, 'default false');
+
+const modifierSource = `
+const stringModifiers = {
+  upper: (value) => value.toUpperCase(),
+};
+function replaceAll(value, search, replacement) {
+  while (value.includes(search)) value = value.replace(search, replacement);
+  return value;
+}
+const arrayModifiers = {
+  unique: (value) => {
+    const seen = new Set();
+    return value.filter((item) => {
+      if (seen.has(item)) return false;
+      seen.add(item);
+      return true;
+    });
+  },
+};
+const numberModifiers = {
+  comma: (value) => value.toLocaleString(),
+};
+const booleanModifiers = {
+  string: (value) => String(value),
+};
+function helper(literals, references, ctx) {
+  return { literals, references, ctx };
+}
+`;
+const modifierNames = extractModifiers(modifierSource);
+assert(
+  JSON.stringify(modifierNames) === JSON.stringify(['comma', 'string', 'unique', 'upper']),
+  `formatter modifiers stay scoped to their tables: ${modifierNames.join(', ')}`,
+);
+assert(!modifierNames.includes('search') && !modifierNames.includes('ctx'), 'ignores function parameters');
 
 const fixture = {
   kind: 'merged',

@@ -30,6 +30,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "20"
+      - name: Test contract tooling
+        run: node scripts/aios-regen/tests/smoke.mjs
       - name: Extract live source contract
         run: node scripts/aios-regen/cli.mjs extract source
       - name: Diff against pinned snapshot

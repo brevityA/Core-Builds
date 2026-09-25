@@ -177,14 +177,19 @@ function extractFormatterFields(src) {
   return unique(fields);
 }
 
-function extractModifiers(src) {
+export function extractModifiers(src) {
   const tables = ['stringModifiers', 'numberModifiers', 'arrayModifiers', 'booleanModifiers'];
   const names = [];
   for (const table of tables) {
-    const idx = src.indexOf(`const ${table}`);
+    const idx = src.search(new RegExp(`const\\s+${table}\\s*=`));
     if (idx < 0) continue;
-    const slice = src.slice(idx, idx + 4000);
-    for (const m of slice.matchAll(/^\s{2}([a-z][a-z0-9]*)\s*[:(]/gm)) names.push(m[1]);
+
+    // Keep the scan inside this table's object literal. The old fixed 4,000-
+    // character window leaked into later functions and treated parameters and
+    // control-flow keywords (for example `search`, `value`, and `while`) as
+    // public formatter modifiers.
+    const body = sliceBalancedObject(src, idx);
+    for (const m of body.matchAll(/^\s{2}([a-z][a-z0-9]*)\s*[:(]/gm)) names.push(m[1]);
   }
   return unique(names).sort();
 }
@@ -242,14 +247,14 @@ function parseOptionArray(body) {
   return options;
 }
 
-function sliceBalancedArray(src, from) {
-  let i = src.indexOf('[', from);
-  if (i < 0) return '';
+function sliceBalanced(src, from, open, close) {
+  const start = src.indexOf(open, from);
+  if (start < 0) return '';
   let depth = 0;
-  let end = i;
+  let end = start;
   for (; end < src.length; end++) {
-    if (src[end] === '[') depth++;
-    else if (src[end] === ']') {
+    if (src[end] === open) depth++;
+    else if (src[end] === close) {
       depth--;
       if (depth === 0) {
         end++;
@@ -257,7 +262,15 @@ function sliceBalancedArray(src, from) {
       }
     }
   }
-  return src.slice(i, end);
+  return src.slice(start, end);
+}
+
+function sliceBalancedArray(src, from) {
+  return sliceBalanced(src, from, '[', ']');
+}
+
+function sliceBalancedObject(src, from) {
+  return sliceBalanced(src, from, '{', '}');
 }
 
 export function extractPresetOptions(src) {
