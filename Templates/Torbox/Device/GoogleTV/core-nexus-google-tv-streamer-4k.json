@@ -5,7 +5,7 @@
     "description": "4K template tuned for the Google TV Streamer (2024). DV, HDR10+, HDR10, HLG all supported. AV1 hardware decode enabled. Lossless audio excluded (TrueHD, DTS-HD MA, DTS:X, FLAC) — DD+ Atmos is the audio ceiling. Audio channels capped at 5.1. Based on Core Nexus 4K Apex with full IQR Tukey fence PSE stack, Score IQR Guard, elite group pins, and perGroup() Extra Cached.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.6",
+    "version": "0.1.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -18,9 +18,14 @@
     },
     "changelog": [
       {
+        "date": "2026-09-25",
+        "version": "0.1.5",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B], Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
+      },
+      {
         "date": "2026-09-05",
-        "version": "0.1.6",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B]). No filter/sort/formatter changes."
+        "version": "0.1.4",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },

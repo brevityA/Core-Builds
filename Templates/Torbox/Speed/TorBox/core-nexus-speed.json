@@ -5,7 +5,7 @@
     "description": "Speed-optimised 1080p build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean for fast cached results. Exits as soon as 3 cached 1080p streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.11",
+    "version": "2.10.10",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -13,9 +13,14 @@
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
       {
+        "date": "2026-09-25",
+        "version": "2.10.10",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B], Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
+      },
+      {
         "date": "2026-09-05",
-        "version": "2.10.11",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B]). No filter/sort/formatter changes."
+        "version": "2.10.9",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },

@@ -20,7 +20,7 @@
       {
         "date": "2026-09-25",
         "version": "0.2.10",
-        "content": "Inline regex sync: Vidhin05 removed the HHWEB release group from Radarr Web T3 and Sonarr Web T3. Both inline patterns re-derived to match upstream verbatim — without this the host allowlist (exact string equality) rejected the config on import. No filter/sort/formatter changes."
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
       },
       {
         "date": "2026-09-05",

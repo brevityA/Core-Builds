@@ -242,7 +242,11 @@ function buildPresets(input) {
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(creds.streamnzb ? { url:creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
     ...(hasDebridio && creds.debridio ? [
-      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(creds.debridio ? { apiKey:creds.debridio } : {}) }, resources:['stream'] },
+      // `debridioApiKey`, not a bare `apiKey`: that is the option AIOStreams declares and
+      // requires, so a bare apiKey left the required option undefined and the host rejected
+      // the whole config. app.js already emitted the prefixed name — this mirror did not, so
+      // the CLI shipped a broken config on the debridio route while the web app did not.
+      { type:'debridio', instanceId:'dbio-1', enabled:true, options:{ name:'Debridio', timeout:7000, ...(creds.debridio ? { debridioApiKey:creds.debridio } : {}) }, resources:['stream'] },
     ] : []),
     ...(multiServices.includes('debrider') && creds.debrider ? [
       { type:'debrider', instanceId:'dbr-1', enabled:true, options:{ name:'Debrider', timeout:7000, ...(creds.debrider ? { apiKey:creds.debrider } : {}) }, resources:['stream'] },

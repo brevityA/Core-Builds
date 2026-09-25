@@ -5,7 +5,7 @@
     "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p · TorBox Essential · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.12",
+    "version": "0.3.11",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -18,9 +18,14 @@
     },
     "changelog": [
       {
+        "date": "2026-09-25",
+        "version": "0.3.11",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B], Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
+      },
+      {
         "date": "2026-09-05",
-        "version": "0.3.12",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B]). No filter/sort/formatter changes."
+        "version": "0.3.10",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },

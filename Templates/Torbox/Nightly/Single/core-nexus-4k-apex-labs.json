@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.15.4",
+    "version": "0.15.3",
     "description": "Nightly Labs v0.15.0 — runtime-aware bitrate floors, anime language passthrough, latestSeason pack logic, age sort key, subtitle preference PSE, cachedAnime/uncachedAnime sorts, private tracker kill, totalCachedStreams DAF, catalog-aware Unknown kills, strict year+title matching, SeaDex Best PSE, Score IQR Guard, perGroup() ESEs, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "source": "external",
@@ -18,9 +18,14 @@
     },
     "changelog": [
       {
+        "date": "2026-09-25",
+        "version": "0.15.3",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B], Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
+      },
+      {
         "date": "2026-09-05",
-        "version": "0.15.4",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B]). No filter/sort/formatter changes."
+        "version": "0.15.2",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },

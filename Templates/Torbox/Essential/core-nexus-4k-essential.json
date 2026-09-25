@@ -5,7 +5,7 @@
     "description": "A full-featured 4K build for TorBox Essential users. No Usenet access required -- runs entirely on TorBox's torrent cache.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.12.12",
+    "version": "2.12.11",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -18,9 +18,14 @@
     },
     "changelog": [
       {
+        "date": "2026-09-25",
+        "version": "2.12.11",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B], Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
+      },
+      {
         "date": "2026-09-05",
-        "version": "2.12.12",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B]). No filter/sort/formatter changes."
+        "version": "2.12.10",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },
