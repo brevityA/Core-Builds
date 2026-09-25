@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.10"
+title: "What's New — Configurator v3.11"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.10 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.11 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.10**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.11**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.11 (Sep 25 2026)
+
+<CardGroup cols={2}>
+  <Card title="Configs rejected on import" icon="sparkles">
+    fixed. Vidhin05 removed the HHWEB release group from two ranked patterns, Radarr Web T3 and Sonarr Web T3, and every Core Builds surface still carried the old string. Hosts check regex by exact string equality against their allowlist, so two of the 91 patterns in a generated config no longer matched and the whole config was refused — which looks like the addons simply not being configured. Nothing shipped on our side to cause it and nothing had to: the allowlist moved underneath us. Both patterns are re-derived verbatim from upstream across the configurator, the CLI, the shared filter files and 43 templates, each of which bumps so the update banner offers the corrected version. Audited the whole fleet against the live allowlist rather than only the reported case: these two were the only mismatches.
+  </Card>
+  <Card title="The drift watcher that should have caught this" icon="bolt">
+    it ran every night and reported success while the snapshot sat stale. It piped the check into tee and then read $?, which is tee's status and always zero, so the step that opens a drift issue never ran. Worse, the 'back in sync' branch is the one that did run, and it closes an open drift issue — so a real report would have been retracted automatically. It now reads the checker's own status, and it no longer treats an unreachable upstream as proof of sync.
+  </Card>
+  <Card title="Debridio add-ons no longer export an invalid config" icon="shield-check">
+    Debridio TMDB, TVDB and Watchtower were offered as simple on/off toggles, but each requires an API key that has no default, so switching one on produced a config the host refused. They were classified as safe by a generated options map that is missing 11 required options across 8 presets, and the test guarding that classification read the same map, so it agreed. The three now carry their key, and the check reads the live host contract instead of the map it is meant to be checking.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.10 (Sep 19 2026)
 
@@ -68,27 +84,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Operator tooling for the proxy: the full…" icon="wand">
     Operator tooling for the proxy: the full statistics view and detailed health sit behind an ADMIN_TOKEN, with a token-sync workflow, an OPERATOR.md runbook and an operator-stats.sh helper, and wrangler secret put is pinned to --env on production so a secret cannot land on the wrong environment.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.7 (Sep 6 2026)
-
-<CardGroup cols={2}>
-  <Card title="Version honesty: the badge, package.json and the…" icon="sparkles">
-    Version honesty: the badge, package.json and the template stamp now all report this release (they disagreed — badge v3.1, package 3.1.0, tag v3.7.0) and a test fails if they ever drift apart again. The default AIOStreams compatibility target moves from the stale 2.32.0 to the pinned 2.34.0, with 2.33.2 and 2.34.0 added to the target list so it covers every version the live fleet actually runs.
-  </Card>
-  <Card title="Fixed: EasyNews-only Direct Install no longer…" icon="bolt">
-    Fixed: EasyNews-only Direct Install no longer fails with 'Library requires at least one usable service'. AIOStreams builds the Library addon from your services, and EasyNews cannot back it — the library preset is now omitted whenever no library-capable (debrid) service is enabled, on every route, and EasyNews configs install clean. EasyNews plus any debrid keeps the library.
-  </Card>
-  <Card title="Direct Install now refuses to post without the…" icon="shield-check">
-    Direct Install now refuses to post without the keys the host demands, naming exactly what is missing ('Option apiKey is required' was the previous failure, delivered by the host after the fact). Correction (v3.8): this entry originally ended 'Export JSON remains keyless by design', which was never true — export has always embedded whatever credentials you entered, and the sanitiser that strips them runs on share links and imports only. Treat an exported file as secret; see the v3.8 note above.
-  </Card>
-  <Card title="The host picker now states each host's…" icon="sliders">
-    The host picker now states each host's capabilities and its AIOStreams version before you deploy — ElfHosted says 'Debrid only — no P2P/HTTP', and the three hosts still on 2.33.2 say so. A config using features newer than a host is not routed there, and a P2P config can no longer be sent to ElfHosted.
-  </Card>
-  <Card title="The landing is Express-first: one primary card…" icon="gauge">
-    The landing is Express-first: one primary card for the five-step install (service → device → resolution → key → Deploy), with Advanced Builder, Update Existing and the Setup Genie demoted to plain links. The Genie page itself is unchanged.
   </Card>
 </CardGroup>
