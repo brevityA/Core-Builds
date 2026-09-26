@@ -5,7 +5,7 @@
     "description": "Self-hosted variant of Core Personal. Synced regex scoring via Core Builds URL (requires self-hosted AIOStreams with TEMPLATE_URLS whitelist). Split cached/uncached sort criteria. SDR override neutralizes -25 penalty. TorBox Pro · WEB-DL · DD+/AAC · SDR · HEVC/AV1/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

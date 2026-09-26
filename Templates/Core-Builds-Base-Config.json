@@ -2,12 +2,22 @@
   "metadata": {
     "id": "core-builds-base",
     "name": "Core Builds Base Config",
-    "version": "1.4.2",
+    "version": "1.4.4",
     "description": "Shared scraper + expression layer for all Core Builds templates. USAGE: (1) Import this file into AIOStreams to create the parent config and get its UUID. (2) In each child template, add: \"parentConfig\": {\"uuid\": \"PASTE_UUID_HERE\", \"password\": \"PASTE_PASSWORD_HERE\", \"mergeStrategies\": {\"presets\": \"extend\", \"services\": \"extend\", \"filters\": \"override\", \"sorting\": \"inherit\", \"formatter\": \"inherit\", \"branding\": \"override\", \"misc\": \"inherit\"}}. (3) Child template only needs: its service preset (stremthruTorz / stremthruStore), its PSEs, and its template-specific ESEs (Hard Resolution Kill, Score IQR Guard, DV-Only Kill, etc.). Scrapers, sort criteria, formatter, and universal ESEs all inherit from this parent. One update here propagates to all child templates instantly.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Core-Builds-Base-Config.json",
     "author": "Branding-Brevity",
     "category": "Base",
     "changelog": [
+      {
+        "date": "2026-09-26",
+        "version": "1.4.4",
+        "content": "Upstream schema alignment for AIOStreams 2.34.1: nzbFailover migrated to the generic failover key (Usenet plus debrid) — the old spelling passed a position value outside the new enum and the host rejected the save — and six settings AIOStreams no longer defines (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, sourceUrl) are no longer emitted. No filter/sort/formatter changes."
+      },
+      {
+        "date": "2026-09-25",
+        "version": "1.4.3",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-05",
         "version": "1.4.2",
@@ -1080,12 +1090,12 @@
       },
       {
         "name": "Radarr Web T3",
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|GNOMiSSiON|HHWEB|NINJACENTRAL|NPMS|ROCCaT|SiGMA|SLiGNOME|SwAgLaNdEr)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|GNOMiSSiON|NINJACENTRAL|NPMS|ROCCaT|SiGMA|SLiGNOME|SwAgLaNdEr)\\b).*/i",
         "score": 40
       },
       {
         "name": "Sonarr Web T3",
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|HHWEB|NINJACENTRAL|SLiGNOME|SwAgLaNdEr|T4H)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|NINJACENTRAL|SLiGNOME|SwAgLaNdEr|T4H)\\b).*/i",
         "score": 40
       },
       {

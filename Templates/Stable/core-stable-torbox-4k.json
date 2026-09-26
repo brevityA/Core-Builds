@@ -5,7 +5,7 @@
     "description": "Minimal, predictable 4K TorBox baseline. Uses local/native filtering, no remote SEL or regex sync, no fetch groups, and no dynamic early exit.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

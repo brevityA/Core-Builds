@@ -1,16 +1,16 @@
 ---
-title: "What's New — Configurator v3.11"
+title: "What's New — Configurator v3.12"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.11 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.12 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.11**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.12**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
 
-## Configurator v3.11 (Sep 22 2026)
+## Configurator v3.12 (Sep 26 2026)
 
 <CardGroup cols={2}>
   <Card title="Fleet re-audit" icon="sparkles">
@@ -27,6 +27,22 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Import-link URLs are HTML-escaped" icon="gauge">
     six result panels rendered the paste-service URL into the page unescaped. A hostile paste response could have injected markup; every one now goes through the same escaper the rest of the app uses. No known exploit, found and fixed in a hardening pass that also confirmed share links still carry settings only, stored snapshots still scrub credentials, and display names are still sanitised at every write path.
+  </Card>
+</CardGroup>
+
+---
+
+## Configurator v3.11 (Sep 25 2026)
+
+<CardGroup cols={2}>
+  <Card title="Configs rejected on import" icon="sparkles">
+    fixed. Vidhin05 removed the HHWEB release group from two ranked patterns, Radarr Web T3 and Sonarr Web T3, and every Core Builds surface still carried the old string. Hosts check regex by exact string equality against their allowlist, so two of the 91 patterns in a generated config no longer matched and the whole config was refused — which looks like the addons simply not being configured. Nothing shipped on our side to cause it and nothing had to: the allowlist moved underneath us. Both patterns are re-derived verbatim from upstream across the configurator, the CLI, the shared filter files and 43 templates, each of which bumps so the update banner offers the corrected version. Audited the whole fleet against the live allowlist rather than only the reported case: these two were the only mismatches.
+  </Card>
+  <Card title="The drift watcher that should have caught this" icon="bolt">
+    it ran every night and reported success while the snapshot sat stale. It piped the check into tee and then read $?, which is tee's status and always zero, so the step that opens a drift issue never ran. Worse, the 'back in sync' branch is the one that did run, and it closes an open drift issue — so a real report would have been retracted automatically. It now reads the checker's own status, and it no longer treats an unreachable upstream as proof of sync.
+  </Card>
+  <Card title="Debridio add-ons no longer export an invalid config" icon="shield-check">
+    Debridio TMDB, TVDB and Watchtower were offered as simple on/off toggles, but each requires an API key that has no default, so switching one on produced a config the host refused. They were classified as safe by a generated options map that is missing 11 required options across 8 presets, and the test guarding that classification read the same map, so it agreed. The three now carry their key, and the check reads the live host contract instead of the map it is meant to be checking.
   </Card>
 </CardGroup>
 
@@ -65,30 +81,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Single-title buffering guide" icon="gauge">
     troubleshooting has a decision tree for the case where one title buffers forever and everything else plays. That shape is not a config fault: Real-Debrid removes files by filename keyword, so every candidate for that one title returns 404 for Real-Debrid users while other services play it normally.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.8 (Sep 17 2026)
-
-<CardGroup cols={2}>
-  <Card title="Self-hosted instances can be updated in place…" icon="sparkles">
-    Self-hosted instances can be updated in place instead of accumulating configs. The UUID field was hidden whenever the host was set to Custom / Self-hosted, so every Get Install Link posted a new configuration and orphaned the previous one — the public hosts have always offered that field. It is now shown for any single host, self-hosted included, and the CORS proxy's custom lane accepts PATCH /api/v1/user/<id> using the same bounded id shape the allowlisted lane already used. Leave it blank to create a new config exactly as before. Known gap: an instance running with AIOSTREAMS_AUTH_REQUIRED still has nowhere to enter its access key, so those saves are refused by the host regardless of this change.
-  </Card>
-  <Card title="This also changes what a UUID does on the public…" icon="bolt">
-    This also changes what a UUID does on the public hosts, and not only on self-hosted ones. Entering a UUID together with a password used to return a link to the configuration you already had, silently discarding the template you had just built; that combination now updates that configuration in place, which is what the Auto host has always done. A UUID with no password still only rebuilds the link, and a blank UUID still creates a new configuration — so the way to keep a second config is to leave the field empty.
-  </Card>
-  <Card title="The exported JSON contains your API keys in…" icon="shield-check">
-    The exported JSON contains your API keys in plain text, and now says so at the moment you download it. Export has never stripped credentials — the sanitiser that clears them runs on share links and imports only — so the downloaded file carries whatever you entered, and these files get posted publicly when people ask for help. The notice names which fields are embedded, never their values, and points at Copy a safe feedback report instead; it stays silent when nothing is set. A test asserting that 'exports never carry credentials' was passing only because that case entered none, and now pins both directions.
-  </Card>
-  <Card title="A hand-typed manifest password is checked before…" icon="sliders">
-    A hand-typed manifest password is checked before it is sent. Anything shorter than 8 characters was accepted, posted, and bounced by the host as 'Invalid addon password', a message that never says what is wrong; the reason is now shown inline while it can still be fixed. This is a Core Builds floor rather than a value read from AIOStreams — the pinned schema carries no password rule, so the host's own requirement is still unknown. Auto-generate is unaffected and continues to produce 12 characters or more.
-  </Card>
-  <Card title="The CORS proxy stopped serving the previous…" icon="gauge">
-    The CORS proxy stopped serving the previous build's statistics payload after a deploy. The public /api/stats response was cached under a path-only key, so a deploy that narrowed the payload kept answering from the old build's cached body for up to 60 seconds — the same window that failed the post-deploy smoke gate. The cache key now carries the worker version, so a new build is always a new key.
-  </Card>
-  <Card title="Operator tooling for the proxy: the full…" icon="wand">
-    Operator tooling for the proxy: the full statistics view and detailed health sit behind an ADMIN_TOKEN, with a token-sync workflow, an OPERATOR.md runbook and an operator-stats.sh helper, and wrangler secret put is pinned to --env on production so a secret cannot land on the wrong environment.
   </Card>
 </CardGroup>

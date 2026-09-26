@@ -5,7 +5,7 @@
     "description": "Instant cached-only play for Hotack L007CM. TorBox Pro + TorBox Pro. Zero uncached results. Stops fetching at 3 cached streams. Pre-resolves top stream for single-click play. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

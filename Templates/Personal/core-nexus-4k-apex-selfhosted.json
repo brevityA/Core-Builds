@@ -5,7 +5,7 @@
     "description": "Self-hosted variant of the 4K Apex flagship. Identical ESE/PSE/ISE stack. Uses synced ranked regex URL instead of inline patterns — auto-updates, 27 KB lighter. Requires Core Builds regex URL whitelisted on instance.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,

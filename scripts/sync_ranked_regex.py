@@ -43,6 +43,7 @@ Usage:
                                                         # copy is stale vs snapshot
 """
 import argparse
+import datetime as _dt
 import json
 import re
 import subprocess
@@ -304,9 +305,14 @@ def main():
     ap.add_argument('--include-deprecated', action='store_true')
     ap.add_argument('--include-personal', action='store_true',
                     help='also re-derive shared copies inside Templates/Personal (user lane)')
+    ap.add_argument('--date', default=None,
+                    help="date to stamp on the changelog entry (YYYY-MM-DD); defaults to today. "
+                         "The date used to be hardcoded to 2026-09-05, so every sync after that "
+                         "one back-dated its own entry to it.")
     args = ap.parse_args()
     if not (args.apply or args.check):
         ap.error('pick --apply or --check')
+    stamp_date = args.date or _dt.date.today().isoformat()
 
     new_entries = load(SNAPSHOT)
     if args.old_snapshot:
@@ -379,13 +385,18 @@ def main():
             bits[-1] = str(int(bits[-1]) + 1)
             newv = '.'.join(bits)
             meta['version'] = newv
-            meta['changelog'] = [{
-                'date': '2026-09-05',
+            # Prepend, never replace. This assigned a single-element list, so each sync
+            # discarded every earlier entry for the template — the changelog could only
+            # ever describe the most recent sync, and a template's history was one run deep.
+            entry = {
+                'date': stamp_date,
                 'version': newv,
                 'content': ('Inline regex sync: patterns re-derived from the current '
                            'Vidhin05 English ranked list (' + ', '.join(sorted(ch)) +
                            '). No filter/sort/formatter changes.'),
-            }]
+            }
+            prior = meta.get('changelog')
+            meta['changelog'] = [entry] + (prior if isinstance(prior, list) else [])
             fpath = str(f.relative_to(ROOT))
             if args.apply:
                 f.write_text(dump(d), encoding='utf-8')

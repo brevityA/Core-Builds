@@ -24,7 +24,12 @@ def test_core_stable_templates_stay_within_the_stable_contract(filename, expecte
     assert metadata["coreBuildsProfile"] == "stable"
     assert metadata["coreBuildsVersion"] == "2.89"
     assert metadata["author"] == "Branding-Brevity"
-    assert metadata["version"] == "1.0.1"
+    # 1.0.2: the 2.34.1 schema alignment. Five settings AIOStreams no longer
+    # defines were dropped (maxResults, maxResultsPerResolution, seadexBestOnly,
+    # excludedStreamSources, nzbFailover) and failover + excludedStreamTypes took
+    # their place, so the templates genuinely changed and had to bump — without it
+    # the update banner never offers the corrected copy.
+    assert metadata["version"] == "1.0.2"
     assert config["groups"]["enabled"] is False
     assert config["dynamicAddonFetching"]["enabled"] is False
     assert config["syncedRankedRegexUrls"] == []
