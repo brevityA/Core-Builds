@@ -36,6 +36,7 @@ import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-acces
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
+import { adviseBuild } from '../core/build-advisor-policy.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
@@ -1960,8 +1961,10 @@ function splashHtml() {
          Setup Genie card is gone from the landing; the route itself is
          unchanged and still linked here and from All Core Tools. -->
     <div class="splash-tertiary splash-anim splash-anim-d4" id="splashAltRoutes" style="margin-top:10px">
+      <button data-action="open-build-advisor" class="splash-tertiary-btn">Help Me Choose</button>
       <button data-action="custom-start" class="splash-tertiary-btn">Advanced Builder</button>
       <button data-action="update-template" class="splash-tertiary-btn">Update Existing Setup</button>
+      <a href="../tools/inspector/" class="splash-tertiary-btn">Diagnose a Setup</a>
       <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
     </div>
 
@@ -2001,6 +2004,66 @@ function splashHtml() {
     <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
   </div>`;
 }
+
+function showBuildAdvisor() {
+  document.getElementById('buildAdvisorModal')?.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'buildAdvisorModal';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="advisorTitle" style="max-width:680px">
+    <button class="modal-close" data-advisor-close aria-label="Close">✕</button>
+    <div class="modal-title" id="advisorTitle" style="font-size:1.1rem">${ICO.bolt(19,'var(--accent)')} Build Advisor</div>
+    <p style="font-size:.78rem;color:#8b949e;line-height:1.55;margin:6px 0 16px">Tell us the outcome you want. The advisor applies only playback preferences — it never chooses a paid service, host, or credentials.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">
+      <label class="advisor-field">Primary goal<select id="advisorGoal"><option value="balanced">Balanced</option><option value="speed">Fastest first result</option><option value="quality">Best available quality</option><option value="coverage">Hard-to-find title coverage</option></select></label>
+      <label class="advisor-field">Content<select id="advisorContent"><option value="all">A bit of everything</option><option value="movies">Mostly movies</option><option value="series">Mostly series</option><option value="anime">Anime</option><option value="niche">Older, foreign, or niche</option></select></label>
+      <label class="advisor-field">Network<select id="advisorNetwork"><option value="unknown">Not sure</option><option value="slow">Under 25 Mbps</option><option value="medium">25–75 Mbps</option><option value="fast">Over 75 Mbps</option></select></label>
+      <label class="advisor-field">Result preference<select id="advisorReliability"><option value="cached-first">Cached first + fallback</option><option value="cached-only">Instant-play only</option><option value="broad">Broadest coverage</option></select></label>
+    </div>
+    <div id="advisorResult" style="margin-top:14px"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button class="diag-secondary" data-advisor-close>Cancel</button><button class="diag-primary" id="advisorApply">Apply recommendation</button></div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  const maxResolution = DEVICE_PROFILES[S.device]?.video?.maxResolution === '1080p' ? '1080p' : '4k';
+  let current;
+  const update = () => {
+    current = adviseBuild({
+      goal: overlay.querySelector('#advisorGoal').value,
+      content: overlay.querySelector('#advisorContent').value,
+      network: overlay.querySelector('#advisorNetwork').value,
+      reliability: overlay.querySelector('#advisorReliability').value,
+      device: S.device || 'generic',
+      deviceMaxResolution: maxResolution,
+    });
+    const p = current.patch;
+    overlay.querySelector('#advisorResult').innerHTML = `<div style="padding:12px;border-radius:10px;background:color-mix(in srgb,var(--accent) 5%,transparent);border:1px solid color-mix(in srgb,var(--accent) 18%,transparent)">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px"><strong style="font-size:.82rem;color:#e6edf3">Recommended build</strong><span style="font-size:.7rem;font-weight:800;text-transform:uppercase;color:${current.confidence==='high'?'#34d399':'#fbbf24'}">${current.confidence} confidence</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px">${[
+        p.resolution==='4k'?'4K':p.resolution==='mixed'?'Mixed resolution':'1080p',
+        p.cacheMode==='cached'?'Cached only':'Cached first',
+        p.streamPool==='wide'?'Wide pool':p.streamPool==='small'?'Small pool':'Normal pool',
+        `${Math.round(p.addonTimeout/1000)}s timeout`, p.pseArch==='standard'?'Standard ranking':p.pseArch==='iqr'?'Apex IQR':'Apex Mixed',
+      ].map(x=>`<span style="font-size:.7rem;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.05);color:#cbd5e1;border:1px solid rgba(255,255,255,.08)">${escHtml(x)}</span>`).join('')}</div>
+      ${current.reasons.map(r=>`<div style="font-size:.73rem;color:#8b949e;line-height:1.45;margin-top:6px"><strong style="color:#dbeafe">${escHtml(r.title)}</strong> — ${escHtml(r.detail)}<div style="font-size:.7rem;color:#4b5563">Evidence: ${escHtml(r.evidence)}</div></div>`).join('')}
+      ${current.assumptions.map(a=>`<div style="font-size:.7rem;color:#fbbf24;margin-top:8px">Assumption: ${escHtml(a)}</div>`).join('')}
+    </div>`;
+  };
+  overlay.querySelectorAll('select').forEach(select => select.addEventListener('change', update));
+  overlay.addEventListener('click', e => { if (e.target === overlay || e.target.closest('[data-advisor-close]')) overlay.remove(); });
+  overlay.querySelector('#advisorApply').addEventListener('click', () => {
+    if (!current) update();
+    Object.assign(S, current.patch, { simpleMode:true, quickStart:false });
+    saveState();
+    overlay.remove();
+    step = S.service ? 2 : 1;
+    pushStep(); render(); window.scrollTo(0,0);
+    showToast('Advisor recommendation applied — every choice stays editable');
+  });
+  update();
+  overlay.querySelector('#advisorGoal').focus();
+}
+
 function initScrollFades() {
   document.querySelectorAll('.scroll-fade-wrap').forEach(wrap => {
     const inner = wrap.firstElementChild;
@@ -3082,6 +3145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showExpressLane();   // legacy Quick-Install action → consolidated Express lane (Patch 32)
     if (action === 'open-express-lane') showExpressLane();
+    if (action === 'open-build-advisor') showBuildAdvisor();
     if (action === 'update-now') applyRemoteUpdate();
     if (action === 'revert-update') revertToPrevious();
     if (action === 'strip-regex') stripNonWhitelistedRegex();
