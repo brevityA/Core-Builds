@@ -3,7 +3,7 @@
 This document is surfaced inside the configurator (Review → Tools → Recommended Stack) and as a standalone reference.
 
 ## Decision: Forks picker skipped
-Viren070/AIOStreams is the canonical repo. Known forks (elfhosted, fortheweak, etc.) run the **same** upstream code (pinned e694b6a v2.34.0) with different host policy (free/P2P allowed, rate limits, regex allowlist level). A forks picker would be misleading — pick the **host**, not the fork. Host selection lives in Advanced → Hosts (Auto = fastest healthy).
+Viren070/AIOStreams is the canonical repo. Public instances deploy that upstream project on independent schedules and apply different host policy (free/P2P access, rate limits, and regex allowlists). A forks picker would be misleading — pick the **host**, not a supposed fork. Host selection lives in Advanced → Hosts; live status wins over the offline registry.
 
 ## Recommended Stack (r/StremioAddons 2025-2026 consensus)
 
@@ -67,7 +67,7 @@ Core Builds wires **17 safe** optional scrapers by default:
 - StreamNZB URL blanked on export (can embed credential)
 
 ### References
-- Upstream pin e694b6a v2.34.0 Viren070/AIOStreams
+- Upstream pin c1d044c v2.34.1 Viren070/AIOStreams
 - r/StremioAddons 2025-2026 threads: best setup Torrentio+Comet+MediaFusion+StremThru Torz+Debridio
 - g0ldyy/comet: CometNet
 - ImJustDoingMyPart/stremio-stack: PG tuning, Jackett, FlareSolverr

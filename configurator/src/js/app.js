@@ -1415,7 +1415,8 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     '2.31.1': 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.',
     '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
     '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. Matches the Midnight / Omni / Wizaardd hosts.',
-    '2.34.0': 'v2.34.0 lane: the release this configurator is pinned against (schema pin e694b6a). Default — matches most live hosts.',
+    '2.34.0': 'v2.34.0 lane: retained for hosts that have not moved to the latest stable release.',
+    '2.34.1': 'v2.34.1 lane: the release this configurator is pinned against (schema pin c1d044c). Default — matches the current stable contract.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
@@ -5746,7 +5747,7 @@ function showRecommendedStackModal() {
       <div class="modal-sub" style="margin-bottom:12px">Best add-ons per r/StremioAddons 2025-2026 + Viren070 guides</div>
       <div style="font-size:.78rem;line-height:1.6;color:#8b949e">
         <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px">
-          <strong style="color:#00d4ff">Forks picker skipped:</strong> Viren070/AIOStreams is canonical. Known hosts (elfhosted, fortheweak, etc.) run same code v2.34.0 pinned e694b6a — policy differs, not code. Pick host in Advanced → Hosts, Auto = fastest healthy.
+          <strong style="color:#00d4ff">Forks picker skipped:</strong> Viren070/AIOStreams is canonical. Public hosts run the same upstream code on independently updated versions — host policy differs, not the source project. Pick a host in Advanced → Hosts; Auto selects a compatible healthy target.
         </div>
         <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick ONE primary</strong><br>
         • <b>TorBox</b> — fastest API, usenet+p2p, 1TB cache<br>

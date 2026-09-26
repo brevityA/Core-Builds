@@ -86,6 +86,17 @@ test('generated files embed no credential VALUES', () => {
   }
 });
 
+test('shared core guards are byte-identical to the configurator contract', () => {
+  const pairs = [
+    ['src/data/generated/aiostreams-presets.js', '../packages/core/src/generated/aiostreams-presets.js'],
+    ['src/config/generated/aiostreams-config-schema.js', '../packages/core/src/generated/aiostreams-config-schema.js'],
+    ['src/data/generated/aiostreams-preset-options.js', '../packages/core/src/generated/aiostreams-preset-options.js'],
+  ];
+  for (const [configuratorFile, coreFile] of pairs) {
+    assert.equal(readFileSync(join(ROOT, configuratorFile), 'utf8'), readFileSync(join(ROOT, coreFile), 'utf8'), `${coreFile} drifted from ${configuratorFile}`);
+  }
+});
+
 test('the generated directories contain nothing but the expected modules', () => {
   assert.deepEqual(readdirSync(join(ROOT, 'src/data/generated')).sort(), ['aiostreams-enums.js', 'aiostreams-preset-options.js', 'aiostreams-presets.js']);
   assert.deepEqual(readdirSync(join(ROOT, 'src/config/generated')).sort(), ['aiostreams-config-schema.js', 'aiostreams-sort-schema.js', 'upstream-snapshot.json']);

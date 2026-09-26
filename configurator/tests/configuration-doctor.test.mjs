@@ -1,6 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { diagnoseTemplate, applyRepairs } from '../../tools/inspector/doctor.mjs';
+import {
+  diagnoseTemplate, applyRepairs, DOCTOR_SORT_CRITERIA, DOCTOR_RESOLUTIONS,
+  DOCTOR_QUALITIES, DOCTOR_VISUAL_TAGS, DOCTOR_AUDIO_TAGS, DOCTOR_AUDIO_CHANNELS,
+} from '../../tools/inspector/doctor.mjs';
+import { AIO_SORT_CRITERIA } from '../src/config/generated/aiostreams-sort-schema.js';
+import {
+  AIO_RESOLUTIONS, AIO_QUALITIES, AIO_VISUAL_TAGS, AIO_AUDIO_TAGS, AIO_AUDIO_CHANNELS,
+} from '../src/data/generated/aiostreams-enums.js';
+
+test('standalone Doctor contract stays equal to the pinned AIOStreams schema', () => {
+  assert.deepEqual(DOCTOR_SORT_CRITERIA, AIO_SORT_CRITERIA);
+  assert.deepEqual(DOCTOR_RESOLUTIONS, AIO_RESOLUTIONS);
+  assert.deepEqual(DOCTOR_QUALITIES, AIO_QUALITIES);
+  assert.deepEqual(DOCTOR_VISUAL_TAGS, AIO_VISUAL_TAGS);
+  assert.deepEqual(DOCTOR_AUDIO_TAGS, AIO_AUDIO_TAGS);
+  assert.deepEqual(DOCTOR_AUDIO_CHANNELS, AIO_AUDIO_CHANNELS);
+});
 
 const broken = () => ({
   metadata: { name:'Imported' },

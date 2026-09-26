@@ -1,3 +1,13 @@
+// Mirrored from the pinned AIOStreams contract. configuration-doctor.test.mjs
+// compares these exports with generated upstream data so a release bump cannot
+// silently leave this standalone tool behind.
+export const DOCTOR_SORT_CRITERIA = Object.freeze(["quality","resolution","language","subtitle","visualTag","audioTag","audioChannel","streamType","encode","size","service","seeders","private","age","addon","regexPatterns","cached","library","keyword","streamExpressionMatched","streamExpressionScore","regexScore","seadex","bitrate","releaseGroup"]);
+export const DOCTOR_RESOLUTIONS = Object.freeze(["2160p","1440p","1080p","720p","576p","480p","360p","240p","144p","Unknown"]);
+export const DOCTOR_QUALITIES = Object.freeze(["BluRay REMUX","BluRay","WEB-DL","WEBRip","HDRip","HC HD-Rip","DVD REMUX","DVDRip","HDTV","CAM","TS","TC","SCR","Unknown"]);
+export const DOCTOR_VISUAL_TAGS = Object.freeze(["HDR+DV","DV Only","HDR Only","HDR10+","HDR10","DV","HDR","HLG","10bit","3D","IMAX","AI","Upscaled","SDR","H-OU","H-SBS","Unknown"]);
+export const DOCTOR_AUDIO_TAGS = Object.freeze(["Atmos","DD+","DD","DTS:X","DTS-HD MA","DTS-HD","DTS-ES","DTS","TrueHD","PCM","OPUS","FLAC","AAC","Unknown"]);
+export const DOCTOR_AUDIO_CHANNELS = Object.freeze(["2.0","5.1","6.1","7.1","Unknown"]);
+
 const SENSITIVE_KEY = /(?:api.?key|access.?token|authorization|auth.?key|password|secret|token)/i;
 const SECRET_URL_PARAM = /(?:api_?key|token|auth|password|secret|key)=([^&#]+)/i;
 const REMOVED_PRESETS = new Set(['torbox-search']);

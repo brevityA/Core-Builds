@@ -16,16 +16,14 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // migration to Newznab: the two presets do not have equivalent options or
 // credential handling.
 //
-// 2.33.2 and 2.34.0 were added after the 2026-09-06 host audit: the live fleet
-// runs exactly those two versions (ElfHosted/ForTheWeak/Viren/Kuu/ATBP at
-// 2.34.0; Midnight/Omni/Wizaardd at 2.33.2). Older entries stay so existing
-// saved sessions and shared links keep resolving.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', 'unknown']);
+// Keep historical fleet versions selectable so saved sessions and shared links
+// continue to resolve, while fresh sessions follow the release in UPSTREAM.pin.
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
 // pinned against (see UPSTREAM.pin). Single source of truth — app.js imports it
 // for the state default and every fallback that used to hard-code '2.32.0'.
-export const DEFAULT_AIOSTREAMS_VERSION = '2.34.0';
+export const DEFAULT_AIOSTREAMS_VERSION = '2.34.1';
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({

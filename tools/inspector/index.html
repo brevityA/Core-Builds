@@ -76,30 +76,19 @@
 </div>
 
 <script type="module">
-import { diagnoseTemplate, applyRepairs } from './doctor.mjs';
+import {
+  diagnoseTemplate, applyRepairs, DOCTOR_SORT_CRITERIA, DOCTOR_RESOLUTIONS,
+  DOCTOR_QUALITIES, DOCTOR_VISUAL_TAGS, DOCTOR_AUDIO_TAGS, DOCTOR_AUDIO_CHANNELS,
+} from './doctor.mjs';
 
 // ── Validation engine (ported from validate_templates.py) ──────────
 
-const VALID_SORT_KEYS = new Set([
-  'resolution','quality','cached','size','seeders','bitrate','encode',
-  'audioChannels','audioTags','visualTags','releaseGroup','age',
-  'regexScore','seScore','language','subtitle','title','year',
-  'service','type','filename','indexer'
-]);
-
-const VALID_EXCLUDED_RESOLUTIONS = ['240p','360p','480p','576p','720p','1080p','1440p','2160p'];
-const VALID_EXCLUDED_QUALITIES = ['HDRip','Cam','TeleSync','Telecine','Scr','Unknown'];
-const VALID_EXCLUDED_VISUAL_TAGS = ['DV','HDR10','HDR10+','HDR','HLG','SDR','10bit'];
-const VALID_EXCLUDED_AUDIO_TAGS = ['Atmos','TrueHD','DTS-HD MA','DTS','EAC3','DD+','AAC','FLAC','AC3','OPUS'];
-const VALID_EXCLUDED_AUDIO_CHANNELS = ['2.0','5.1','7.1'];
-
-const KNOWN_PRESET_TYPES = [
-  'torrentio','comet','mediafusion','torbox-search','torbox-usenet',
-  'jackettio','debridio','peerflix','sootio','neko-bt','animetosho',
-  'dmm-cast','hdhub','torrents-db','easynews','davex','stremthruStore',
-  'aiosubtitle','opensubtitles-v3-plus','subdl','tmdb-addon','streamingCatalogs',
-  'animeCatalogs','rpdb','torrentCatalogs','baguettio','flixStreams'
-];
+const VALID_SORT_KEYS = new Set(DOCTOR_SORT_CRITERIA);
+const VALID_EXCLUDED_RESOLUTIONS = DOCTOR_RESOLUTIONS;
+const VALID_EXCLUDED_QUALITIES = DOCTOR_QUALITIES;
+const VALID_EXCLUDED_VISUAL_TAGS = DOCTOR_VISUAL_TAGS;
+const VALID_EXCLUDED_AUDIO_TAGS = DOCTOR_AUDIO_TAGS;
+const VALID_EXCLUDED_AUDIO_CHANNELS = DOCTOR_AUDIO_CHANNELS;
 
 const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
 
@@ -160,12 +149,11 @@ function validateTemplate(config) {
   const enabledPresets = presets.filter(p => p.enabled !== false);
   passes.push(`presets: ${presets.length} total, ${enabledPresets.length} enabled`);
 
-  const presetTypes = presets.map(p => p.type).filter(Boolean);
   const missingIids = presets.filter(p => p.enabled !== false && !p.instanceId);
   if (missingIids.length) warnings.push(`${missingIids.length} enabled preset(s) missing instanceId`);
-
-  const unknownTypes = presetTypes.filter(t => !KNOWN_PRESET_TYPES.includes(t));
-  if (unknownTypes.length) warnings.push(`unknown preset type(s): ${[...new Set(unknownTypes)].join(', ')}`);
+  // Do not keep a hand-written preset allowlist here. AIOStreams' marketplace
+  // changes frequently, and custom presets are valid by design. The previous
+  // 29-item list mislabeled most current v2.34 presets as unknown.
 
   // Formatter
   const fmt = cfg.formatter || {};
@@ -214,9 +202,10 @@ function validateTemplate(config) {
 
   // Deduplicator
   const dedup = cfg.deduplicator || {};
-  const validDedup = ['per_addon','per_service','per_quality_resolution','global'];
-  if (dedup.cached && !validDedup.includes(dedup.cached)) errors.push(`deduplicator.cached: invalid mode '${dedup.cached}'`);
-  if (dedup.uncached && dedup.uncached === 'all') errors.push("deduplicator.uncached: 'all' is not a valid mode");
+  const validDedup = ['single_result','per_service','per_addon','disabled'];
+  for (const lane of ['cached','uncached','p2p','http','live','youtube','external']) {
+    if (dedup[lane] && !validDedup.includes(dedup[lane])) errors.push(`deduplicator.${lane}: invalid mode '${dedup[lane]}'`);
+  }
 
   return { errors, warnings, passes };
 }

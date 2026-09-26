@@ -1,9 +1,9 @@
-// DO NOT EDIT — generated from AIOStreams e694b6ace7309091289a8680c3f817210e261e46
-// Source: https://github.com/Viren070/AIOStreams/tree/e694b6ace7309091289a8680c3f817210e261e46
-// Upstream version: 2.34.0
+// DO NOT EDIT — generated from AIOStreams c1d044c23b48acff9e5f0ce672c786797177e767
+// Source: https://github.com/Viren070/AIOStreams/tree/c1d044c23b48acff9e5f0ce672c786797177e767
+// Upstream version: 2.34.1
 // Regenerate with: npm run sync:upstream   (see configurator/README.md)
-
 /** Required options beyond name,timeout,resources,url for each preset at the pinned ref. */
+
 export const AIO_PRESET_REQUIRED_OPTIONS = Object.freeze({
   "ai-companion": [
     "maxResults",
@@ -109,7 +109,7 @@ export const AIO_PRESET_REQUIRED_OPTIONS = Object.freeze({
 });
 
 export function requiredOptionsForPreset(id) {
-  return AIO_PRESET_REQUIRED_OPTIONS[String(id||'')] || [];
+  return AIO_PRESET_REQUIRED_OPTIONS[String(id||"")] || [];
 }
 
 export function isSimpleTogglePreset(id) {
