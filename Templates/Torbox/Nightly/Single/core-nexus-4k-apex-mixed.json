@@ -5,7 +5,7 @@
     "description": "Nightly — 4K Apex v0.9.0 IQR stack with the Mixed adaptive resolution policy. The requiredResolutions cap is lifted, which activates Apex’s dormant 480p/240p fallback tiers and adds a 576p niche tier — classic and rare content that capped templates never surface. Sort uses the cached × quality blend (quality ranks before resolution) so an elite 1080p encode can beat a mediocre 4K stream, while the full IQR Tukey-fence bitrate logic, ESE stack, slice limits, IMAX pin, and audio priority are preserved verbatim. Blended 4K/1080p dynamic-fetch exit. For niche-heavy libraries that want flagship ranking without a resolution floor.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-09-26",
+        "version": "0.2.4",
+        "content": "Upstream schema alignment for AIOStreams 2.34.1: nzbFailover migrated to the generic failover key (Usenet plus debrid) — the old spelling passed a position value outside the new enum and the host rejected the save — and six settings AIOStreams no longer defines (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, sourceUrl) are no longer emitted. No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-25",
         "version": "0.2.3",
@@ -1982,9 +1987,12 @@
       ]
     },
     "checkOwned": false,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,
@@ -1993,15 +2001,9 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 20,
-    "maxResultsPerResolution": 8,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -2011,10 +2013,8 @@
       "Subs": "purple"
     },
     "mergedCatalogs": [],
-    "seadexBestOnly": false,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,

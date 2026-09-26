@@ -104,6 +104,14 @@ Before troubleshooting, confirm what you're running.
 
   <Accordion title="Usenet results slow or not appearing">
     Fixed in v2.7.5. The newznab timeout was 3000ms — too short for TorBox Usenet. Updated to 10,000ms. Additionally `searchMode: auto` and `checkOwned: true` are now set. Re-import your template.
+
+    If Usenet results are still empty after re-importing, check the next entry — the TorBox Search preset only resolves on allowlisted hosts.
+  </Accordion>
+
+  <Accordion title="TorBox Search preset returns nothing (host allowlist)">
+    The Apex, Hybrid, and several Personal/Device templates ship an enabled `newznab` preset pointed at TorBox's Search API (`search-api.torbox.app/newznab/api`). That endpoint is **restricted to allowlisted caller hosts** — TorBox approves managed hosts individually, and most self-hosted installs are blocked. On a non-allowlisted host the preset silently times out, so Usenet results are slow or missing with no error shown.
+
+    **Remedy:** import the template on an allowlisted host (ElfHosted's managed instances are approved; self-hosted installs generally are not — when in doubt, test the same template on a second host and compare). If your host is blocked, disable the TorBox Search preset in AIOStreams and add a personal Newznab indexer instead; everything else in the template is unaffected.
   </Accordion>
 
   <Accordion title="Results appear but nothing plays">
@@ -132,6 +140,12 @@ Before troubleshooting, confirm what you're running.
     **4. Everything looks right and only this title's *audio* is off.** Early rips of a new digital release are frequently desynced. That's the release, not your config — wait for the disc-era re-rip rather than trying to filter it out.
 
     If you can't tell which case you're in, compare the per-stream errors from your host or debrid panel against the causes above: a *blocked file* (case 1), a *queued/uncached file* (case 2), or *no candidate at all* (case 3).
+  </Accordion>
+
+  <Accordion title="Streams stall or fail only on one host (TorBox CDN routing)">
+    Some hosts cannot auto-route TorBox CDN traffic for addons installed through AIOStreams. Kuu's host, for example, advises setting the TorBox CDN **manually** in your TorBox settings when your addon was installed via their AIOStreams instance — automatic CDN selection silently fails and TorBox is investigating.
+
+    **Symptom pattern that points here:** the same template plays fine on a different host (or the same file plays from the TorBox web panel), but stalls on one specific host. Fix it in the TorBox dashboard, not in the template: pick an explicit CDN region instead of Automatic.
   </Accordion>
 </AccordionGroup>
 
@@ -210,7 +224,7 @@ Before troubleshooting, confirm what you're running.
   </Accordion>
 
   <Accordion title="What is seadexBestOnly?">
-    SeaDex is an anime release quality database. When `seadexBestOnly: true`, only streams flagged as SeaDex best releases are shown for anime queries. This was incorrectly enabled on several non-Anime templates and fixed in v2.8.3.
+    SeaDex is an anime release quality database. `seadexBestOnly` was a Core Builds template key that was *intended* to restrict results to SeaDex best releases — but it was never part of the AIOStreams schema, so hosts always stripped it and it never had any effect. It was removed from all templates in v3.8; SeaDex filtering on Anime templates is controlled by `enableSeadex`.
   </Accordion>
 
   <Accordion title="Why does the expression layer page say not to grow the Final Limit ESE?">

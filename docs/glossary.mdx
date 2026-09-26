@@ -146,7 +146,7 @@ description: "Key terms used across Core Builds and AIOStreams."
     An AIOStreams addon that searches for streams — Comet, MediaFusion, TorBox Search, Knaben, Meteor, etc. Each scraper queries different sources (torrent indexes, debrid caches, Usenet). Core Builds templates configure which scrapers are enabled and their timeouts.
   </Accordion>
   <Accordion title="SeaDex">
-    An anime-only best-release database. Tracks which fansub/encode group produced the definitive release for each anime title. Used in Anime templates — `seadexBestOnly` restricts results to SeaDex-approved releases when data exists.
+    An anime-only best-release database. Tracks which fansub/encode group produced the definitive release for each anime title. Used in Anime templates via `enableSeadex`. (The old `seadexBestOnly` key was never part of the AIOStreams schema — hosts strip it — so it never restricted anything; retired from all templates in v3.8.)
   </Accordion>
   <Accordion title="SEL (Stream Expression Language)">
     The expression language built into AIOStreams for writing PSEs, ESEs, and ISEs. Supports statistical functions (`iqr`, `q1`, `q3`, `percentile`), stream filters (`bitrate`, `resolution`, `quality`, `cached`), math (`pow`, `sqrt`), and array operations (`merge`, `count`, `slice`, `pin`).

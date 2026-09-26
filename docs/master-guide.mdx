@@ -41,7 +41,7 @@ When Stremio's native catalog (Cinemeta) finds no streams for a title, it someti
 
 **AIOStreams mitigation (v2.4.6+):**
 - The `Hard YouTube Kill` ESE blocks `type(streams, 'youtube')`, `type(streams, 'external')`, and keyword matches
-- `excludedStreamSources` blocks YouTube source variants
+- `excludedStreamTypes: ["youtube"]` blocks YouTube-type streams natively (the old `excludedStreamSources` spelling was never an AIOStreams schema key and is ignored by hosts)
 - `hideErrors: true` suppresses AIOStreams' own error cards
 
 WuPlay does not inject these Cinemeta trailer entries alongside addon results, so the problem simply does not occur. If you encounter YouTube links in WuPlay, the ESE fix will still catch them.

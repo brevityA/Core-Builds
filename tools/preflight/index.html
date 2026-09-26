@@ -89,7 +89,7 @@
   <div class="card" id="fleetCard">
     <div class="kicker">live · host fleet</div>
     <h2>The fleet, right now.</h2>
-    <p class="lede">Every public AIOStreams host we support, probed through the proxy: version, channel, policy flags. When the fleet moves (v2.33.1 landed 2026-08-11 with stricter validation), this is where drift surfaces first.</p>
+    <p class="lede">Every public AIOStreams host we support, probed through the proxy: version, channel, policy flags. When the fleet moves (v2.34.1 reached 7 of 8 hosts by 2026-09-22), this is where drift surfaces first.</p>
     <div class="btnrow"><button class="btn primary" id="btnFleet">Re-probe</button><span class="chip" id="fleetVerdict" style="display:none"></span></div>
     <div class="hostgrid" id="hostGrid"></div>
     <div class="fine">All calls route through your Core Builds CORS worker: <input id="workerUrl" type="text" style="font-family:inherit;font-size:.62rem;display:inline-block;width:min(340px,72%)" value="https://core-builds-cors-proxy.tlorenzato26.workers.dev" spellcheck="false" aria-label="Proxy worker URL"> <span style="font-family:ui-monospace,monospace">/proxy/&lt;path&gt;?host=…</span></div>
@@ -133,7 +133,7 @@
     <div id="doctorOut"></div>
   </div>
 
-  <div class="foot">Core Builds Preflight · built 2026-08-11 · rules floor v2.33.1 · every rule cites a real host rejection (audit: work-p34 evidence)</div>
+  <div class="foot">Core Builds Preflight · host table re-verified 2026-09-22 · rules floor v2.33.1 · every rule cites a real host rejection (audit: work-p34 evidence)</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -144,7 +144,7 @@ const $ = s => document.querySelector(s);
 const toast = m => { const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const HOSTS = {                                                                                          // mirror of the repo's data/hosts.js (2026-08-11)
+const HOSTS = {                                                                                          // mirror of the repo's data/hosts.js (re-verified 2026-09-22: same 8 hosts, same flags)
   elfhosted:  { label:'ElfHosted',          url:'https://aiostreams.elfhosted.com',                      channel:'stable',  blocksFree:true,  p2p:false, http:false, nuvio:false },
   fortheweak: { label:"Yeb's / ForTheWeak", url:'https://aiostreams.fortheweak.cloud',                   channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },
   midnight:   { label:"Midnight's",         url:'https://aiostreamsfortheweebsstable.midnightignite.me', channel:'stable',  blocksFree:false, p2p:true,  http:true,  nuvio:true  },

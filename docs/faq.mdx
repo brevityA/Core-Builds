@@ -74,7 +74,7 @@ description: "Quick answers to the most common Core Builds questions."
   </Accordion>
 
   <Accordion title="YouTube trailers are appearing in my stream list">
-    Fixed in v2.4.6. Three layers now block YouTube content: the Hard YouTube Kill ESE catches type, external, source, and quality field variants; `excludedStreamSources` covers all case variants; `excludedStreamTypes` includes youtube. **Re-import** the latest template to get these fixes.
+    Fixed in v2.4.6 and corrected in v3.8: the Hard YouTube Kill ESE catches type, external, source, and quality field variants, and `excludedStreamTypes` includes youtube. (The v2.4.6 notes also credited `excludedStreamSources`, but that key was never part of the AIOStreams schema — hosts strip it — so the ESE and the stream-type exclusion were always the two layers doing the work.) **Re-import** the latest template to get these fixes.
   </Accordion>
 
   <Accordion title="The wrong episode is playing">

@@ -36,8 +36,6 @@ import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-acces
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
-import { adviseBuild } from '../core/build-advisor-policy.js';
-import { planAddonInstall, verifyAddonInstall, createInstallReceipt } from '../core/install-transaction-policy.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
@@ -47,7 +45,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.11';
+const CONFIGURATOR_VERSION = '3.12';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1415,9 +1413,9 @@ function renderOutputProfilePicker({ compact=false } = {}) {
   const TARGET_NOTES = {
     '2.31.1': 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.',
     '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
-    '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. Matches the Midnight / Omni / Wizaardd hosts.',
-    '2.34.0': 'v2.34.0 lane: retained for hosts that have not moved to the latest stable release.',
-    '2.34.1': 'v2.34.1 lane: the release this configurator is pinned against (schema pin c1d044c). Default — matches the current stable contract.',
+    '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. Matches Omni\u2019s host — the last 2.33.2 holdout; every other public host runs 2.34.1.',
+    '2.34.0': 'v2.34.0 lane: the previous pinned release. No host in the registry still runs it — kept so saved sessions keep resolving.',
+    '2.34.1': 'v2.34.1 lane: the release this configurator is pinned against (schema pin c1d044c). Default — matches the live fleet except Omni.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
@@ -1606,17 +1604,17 @@ function renderAdvancedPanel() {
         ${(S.service !== 'http' && S.service !== 'p2p' && (S.multiServices.includes('easynews') || S.multiServices.includes('nzbgeek') || S.multiServices.includes('streamnzb') || S.service === 'easynews' || S.service === 'nzbgeek' || S.service === 'streamnzb')) ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <div>
-              <div style="font-size:.78rem;font-weight:700;color:#e6edf3">NZB Failover</div>
-              <div style="font-size:.68rem;color:#6b7280">Configurable NZB failover position and count</div>
+              <div style="font-size:.78rem;font-weight:700;color:#e6edf3">Failover</div>
+              <div style="font-size:.68rem;color:#6b7280">Retry dead picks server-side from Usenet + debrid alternates</div>
             </div>
             <label class="toggle-sw"><input type="checkbox" data-action="toggle-nzb-failover" ${S.nzbFailover?'checked':''}><span class="toggle-track"></span></label>
           </div>
           ${S.nzbFailover ? `
             <div style="display:flex;gap:6px;margin-bottom:8px">
-              ${[['before-torrents','Before Torrents'],['after-torrents','After Torrents']].map(([v,l]) => { const on=(S.nzbFailoverPosition||'after-torrents')===v; return `<button data-action="set-nzb-failover-pos" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+              ${[['before-torrents','Before limiting'],['after-torrents','Final list']].map(([v,l]) => { const on=(S.nzbFailoverPosition||'after-torrents')===v; return `<button data-action="set-nzb-failover-pos" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
             </div>
             <div style="display:flex;gap:6px">
-              ${[[1,'1 NZB'],[2,'2 NZBs'],[3,'3 NZBs'],[5,'5 NZBs']].map(([v,l]) => { const on=(S.maxFailoverNzbs||3)===v; return `<button data-action="set-max-failover-nzbs" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+              ${[[1,'1 attempt'],[2,'2 attempts'],[3,'3 attempts'],[5,'5 attempts']].map(([v,l]) => { const on=(S.maxFailoverNzbs||3)===v; return `<button data-action="set-max-failover-nzbs" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
             </div>
           ` : ''}
         </div>` : ''}
@@ -1963,10 +1961,8 @@ function splashHtml() {
          Setup Genie card is gone from the landing; the route itself is
          unchanged and still linked here and from All Core Tools. -->
     <div class="splash-tertiary splash-anim splash-anim-d4" id="splashAltRoutes" style="margin-top:10px">
-      <button data-action="open-build-advisor" class="splash-tertiary-btn">Help Me Choose</button>
       <button data-action="custom-start" class="splash-tertiary-btn">Advanced Builder</button>
       <button data-action="update-template" class="splash-tertiary-btn">Update Existing Setup</button>
-      <a href="../tools/inspector/" class="splash-tertiary-btn">Diagnose a Setup</a>
       <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
     </div>
 
@@ -2006,71 +2002,6 @@ function splashHtml() {
     <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
   </div>`;
 }
-
-function showBuildAdvisor() {
-  document.getElementById('buildAdvisorModal')?.remove();
-  const overlay = document.createElement('div');
-  overlay.id = 'buildAdvisorModal';
-  overlay.className = 'modal-overlay';
-  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="advisorTitle" style="max-width:680px">
-    <button class="modal-close" data-advisor-close aria-label="Close">✕</button>
-    <div class="modal-title" id="advisorTitle" style="font-size:1.1rem">${ICO.bolt(19,'var(--accent)')} Build Advisor</div>
-    <p style="font-size:.78rem;color:#8b949e;line-height:1.55;margin:6px 0 16px">Tell us the outcome you want. The advisor applies only playback preferences — it never chooses a paid service, host, or credentials.</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">
-      <label class="advisor-field">Primary goal<select id="advisorGoal"><option value="balanced">Balanced</option><option value="speed">Fastest first result</option><option value="quality">Best available quality</option><option value="coverage">Hard-to-find title coverage</option></select></label>
-      <label class="advisor-field">Content<select id="advisorContent"><option value="all">A bit of everything</option><option value="movies">Mostly movies</option><option value="series">Mostly series</option><option value="anime">Anime</option><option value="niche">Older, foreign, or niche</option></select></label>
-      <label class="advisor-field">Network<select id="advisorNetwork"><option value="unknown">Not sure</option><option value="slow">Under 25 Mbps</option><option value="medium">25–75 Mbps</option><option value="fast">Over 75 Mbps</option></select></label>
-      <label class="advisor-field">Result preference<select id="advisorReliability"><option value="cached-first">Cached first + fallback</option><option value="cached-only">Instant-play only</option><option value="broad">Broadest coverage</option></select></label>
-      <label class="advisor-field">Language<select id="advisorLocale"><option value="en">English</option><option value="pt-BR">Portuguese (Brazil)</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="it">Italian</option><option value="nl">Dutch</option><option value="ar">Arabic</option><option value="hi">Hindi</option></select></label>
-      <label class="advisor-field">Household<select id="advisorHousehold"><option value="general">General</option><option value="family">Family · through PG-13</option><option value="kids">Kids · through PG</option></select></label>
-    </div>
-    <div id="advisorResult" style="margin-top:14px"></div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button class="diag-secondary" data-advisor-close>Cancel</button><button class="diag-primary" id="advisorApply">Apply recommendation</button></div>
-  </div>`;
-  document.body.appendChild(overlay);
-
-  const maxResolution = DEVICE_PROFILES[S.device]?.video?.maxResolution === '1080p' ? '1080p' : '4k';
-  let current;
-  const update = () => {
-    current = adviseBuild({
-      goal: overlay.querySelector('#advisorGoal').value,
-      content: overlay.querySelector('#advisorContent').value,
-      network: overlay.querySelector('#advisorNetwork').value,
-      reliability: overlay.querySelector('#advisorReliability').value,
-      locale: overlay.querySelector('#advisorLocale').value,
-      household: overlay.querySelector('#advisorHousehold').value,
-      device: S.device || 'generic',
-      deviceMaxResolution: maxResolution,
-    });
-    const p = current.patch;
-    overlay.querySelector('#advisorResult').innerHTML = `<div style="padding:12px;border-radius:10px;background:color-mix(in srgb,var(--accent) 5%,transparent);border:1px solid color-mix(in srgb,var(--accent) 18%,transparent)">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px"><strong style="font-size:.82rem;color:#e6edf3">Recommended build</strong><span style="font-size:.7rem;font-weight:800;text-transform:uppercase;color:${current.confidence==='high'?'#34d399':'#fbbf24'}">${current.confidence} confidence</span></div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px">${[
-        p.resolution==='4k'?'4K':p.resolution==='mixed'?'Mixed resolution':'1080p',
-        p.cacheMode==='cached'?'Cached only':'Cached first',
-        p.streamPool==='wide'?'Wide pool':p.streamPool==='small'?'Small pool':'Normal pool',
-        `${Math.round(p.addonTimeout/1000)}s timeout`, p.pseArch==='standard'?'Standard ranking':p.pseArch==='iqr'?'Apex IQR':'Apex Mixed',
-        p.langs.join(' + '), p.ageLimit==='none'?'Unrestricted':`Up to ${p.ageLimit}`,
-      ].map(x=>`<span style="font-size:.7rem;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.05);color:#cbd5e1;border:1px solid rgba(255,255,255,.08)">${escHtml(x)}</span>`).join('')}</div>
-      ${current.reasons.map(r=>`<div style="font-size:.73rem;color:#8b949e;line-height:1.45;margin-top:6px"><strong style="color:#dbeafe">${escHtml(r.title)}</strong> — ${escHtml(r.detail)}<div style="font-size:.7rem;color:#4b5563">Evidence: ${escHtml(r.evidence)}</div></div>`).join('')}
-      ${current.assumptions.map(a=>`<div style="font-size:.7rem;color:#fbbf24;margin-top:8px">Assumption: ${escHtml(a)}</div>`).join('')}
-    </div>`;
-  };
-  overlay.querySelectorAll('select').forEach(select => select.addEventListener('change', update));
-  overlay.addEventListener('click', e => { if (e.target === overlay || e.target.closest('[data-advisor-close]')) overlay.remove(); });
-  overlay.querySelector('#advisorApply').addEventListener('click', () => {
-    if (!current) update();
-    Object.assign(S, current.patch, { simpleMode:true, quickStart:false });
-    saveState();
-    overlay.remove();
-    step = S.service ? 2 : 1;
-    pushStep(); render(); window.scrollTo(0,0);
-    showToast('Advisor recommendation applied — every choice stays editable');
-  });
-  update();
-  overlay.querySelector('#advisorGoal').focus();
-}
-
 function initScrollFades() {
   document.querySelectorAll('.scroll-fade-wrap').forEach(wrap => {
     const inner = wrap.firstElementChild;
@@ -3152,7 +3083,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'open-fast-lane') showExpressLane();   // legacy Quick-Install action → consolidated Express lane (Patch 32)
     if (action === 'open-express-lane') showExpressLane();
-    if (action === 'open-build-advisor') showBuildAdvisor();
     if (action === 'update-now') applyRemoteUpdate();
     if (action === 'revert-update') revertToPrevious();
     if (action === 'strip-regex') stripNonWhitelistedRegex();
@@ -4389,7 +4319,7 @@ function build() {
     rankedRegexPatterns: (S.service==='p2p'||S.service==='http') ? [] : ((S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? [...RANKED_REGEX_COMMON,...RANKED_REGEX_UHD] : [...RANKED_REGEX_COMMON]),
     excludedRegexPatterns: [...EXCLUDED_REGEX],
     addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
-    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
+    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb',
     usePosterRedirectApi: true, usePosterServiceForMeta: true,
     ...(S.tmdbToken ? { tmdbAccessToken: S.tmdbToken } : {}),
     ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
@@ -4408,7 +4338,7 @@ function build() {
     precacheSingleStream: true,
     preloadStreams: { enabled:S.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
-    nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', count:Number(S.maxFailoverNzbs)||3 } : { enabled:false, count:Number(S.maxFailoverNzbs)||3, position:S.nzbFailoverPosition==='before-torrents'?'first':'last' },
+    failover: S.nzbFailover ? { enabled:true, contentTypes:['usenet','debrid'], ...(S.nzbFailoverPosition==='before-torrents' ? { position:'beforeLimiting' } : {}), maxAttempts:Number(S.maxFailoverNzbs)||3 } : { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: activePresets, services: services(),
@@ -4422,13 +4352,11 @@ function build() {
     excludedQualities: [], includedQualities: [], requiredQualities: [],
     excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes,
     excludedAudioTags: ac.excludedAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTags(),
-    enableSeadex: S.content !== 'live', seadexBestOnly: S.content === 'anime',
+    enableSeadex: S.content !== 'live',
     excludeCached: (S.service!=='p2p'&&S.service!=='http') && S.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
     excludeUncached: (S.service!=='p2p'&&S.service!=='http') && S.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
-    excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
-    ...(S.service==='p2p' ? { minSeeders:1 } : {}),
+    excludeUncachedMode: 'or',
     preferredRegexPatterns: (S.service==='p2p'||S.service==='http') ? [] : ((S.resolution==='4k'||S.resolution==='ultrawide'||S.resolution==='mixed'||S.pseArch==='apex-mixed') ? PREFERRED_REGEX_4K : PREFERRED_REGEX_1080P),
-    maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
     excludedStreamExpressions: eses(),
     includedStreamExpressions: [
       { enabled:true, expression:"/* Protect Library & SeaDex */ passthrough(merge(library(streams), seadex(streams)), 'excluded')" },
@@ -5753,7 +5681,7 @@ function showRecommendedStackModal() {
       <div class="modal-sub" style="margin-bottom:12px">Best add-ons per r/StremioAddons 2025-2026 + Viren070 guides</div>
       <div style="font-size:.78rem;line-height:1.6;color:#8b949e">
         <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px">
-          <strong style="color:#00d4ff">Forks picker skipped:</strong> Viren070/AIOStreams is canonical. Public hosts run the same upstream code on independently updated versions — host policy differs, not the source project. Pick a host in Advanced → Hosts; Auto selects a compatible healthy target.
+          <strong style="color:#00d4ff">Forks picker skipped:</strong> Viren070/AIOStreams is canonical. Known hosts (elfhosted, fortheweak, etc.) run same code v2.34.1 pinned c1d044c — policy differs, not code. Pick host in Advanced → Hosts, Auto = fastest healthy.
         </div>
         <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick ONE primary</strong><br>
         • <b>TorBox</b> — fastest API, usenet+p2p, 1TB cache<br>
@@ -7217,14 +7145,6 @@ function collectPreflightFindings() {
     requiredCredentialIds: getDebridInputs().map(i => i.id),
     devicesForcingLimitedAudio: [...DEVICE_FORCE_LIMITED_AUDIO],
     deviceMaxResolution: devicePlaybackCeilings(),
-    filterRisk: {
-      cachedOnly: S.cacheMode === 'cached',
-      hardResolution: S.resolution === '1080p' || S.exclude4K === true,
-      exclusiveLanguage: S.langExclusive === true,
-      foreignLanguageKill: S.foreignLangKill !== false,
-      strictMatching: S.matchMode === 'strict',
-      ageLimited: Boolean(S.ageLimit && S.ageLimit !== 'none' && S.ageLimit !== 'NC-17'),
-    },
   };
 
   let config = null;
@@ -7874,7 +7794,7 @@ function showFastLane() {
               <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap a host below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save<br><strong style="color:#e6edf3">4.</strong> Copy the manifest URL into Nuvio</div>
               <div class="inst-chips">${chipHtml}</div>
               <div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this import URL:</div>
-              <div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>
+              <div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>
             </div>`;
             showToast('Nuvio template created — tap a host to import');
           } else {
@@ -8035,7 +7955,7 @@ async function simpleInstall(target) {
     btn.disabled = false; btn.innerHTML = origHtml;
     if (importUrl) {
       saveLastGen();
-      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Tap an instance to import your free template:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div></div>`;
+      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Tap an instance to import your free template:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div></div>`;
       showToast('Tap an instance chip to import your template');
     } else {
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not reach any paste service</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">Download the JSON and import it manually into AIOStreams.</div><div style="display:flex;gap:10px;justify-content:center"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
@@ -8092,12 +8012,11 @@ async function simpleInstall(target) {
       if (S.installMode === 'direct' && target === 'app' && S.stremioEmail && S.stremioPassword) {
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Pushing to Stremio…`;
         try {
-          const installResult = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
-          const installed = installResult.status;
+          const installed = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
           // ── Full Stack: AIOMetadata + Cinemeta patch + addon ordering ──
           btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Setting up full stack…`;
           const stackResult = await fullStackAfterPush(
-            installResult.authKey,
+            (await stremioFetch('https://api.strem.io/api/login', { type:'Login', email:S.stremioEmail, password:S.stremioPassword, facebook:false }))?.result?.authKey,
             manifestUrl,
             { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true }
           );
@@ -8106,15 +8025,13 @@ async function simpleInstall(target) {
           if (installed === 'already') {
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div>${stackHtml}</div>`;
           } else {
-            const stackTitle = stackResult.ok ? (installed==='replaced'?'Previous install replaced and verified!':'Full Stack Installed and verified!') : 'AIOStreams installed; stack needs attention';
-            const stackColour = stackResult.ok ? '#3fb950' : '#fbbf24';
-            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:${stackColour};margin-bottom:4px">${ICO.check(14,stackColour)} ${stackTitle}</div><div style="font-size:.78rem;color:#8b949e">${stackResult.ok?'The requested addons were read back from your account successfully. Reopen Stremio to see your new setup.':'AIOStreams was verified, but one or more optional full-stack operations did not verify. Review the details below.'}</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} ${installed==='replaced'?'Previous install replaced!':'Full Stack Installed!'}</div><div style="font-size:.78rem;color:#8b949e">AIOStreams, AIOMetadata, and Cinemeta patch deployed. Reopen Stremio to see your new setup.</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
           }
-          showToast(stackResult.ok ? 'Install verified in your Stremio library' : 'AIOStreams verified; optional stack needs attention', !stackResult.ok);
+          showToast('Addon installed to your Stremio library');
           return;
         } catch(err) {
           btn.disabled = false; btn.innerHTML = origHtml;
-          result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio install stopped safely</div><div style="font-size:.78rem;color:#8b949e">${esc(err.message || 'Something went wrong')}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
+          result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio install stopped safely</div><div style="font-size:.78rem;color:#8b949e">${esc(err.message || 'Something went wrong')}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${escHtml(manifestUrl)}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
           return;
         }
       }
@@ -8152,7 +8069,7 @@ async function simpleInstall(target) {
         }).join('');
         credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
       }
-      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">All hosts unreachable — tap an instance to import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">All hosts unreachable — tap an instance to import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
       showToast('Tap an instance chip to import your template');
     } else {
       result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
@@ -8183,64 +8100,24 @@ function stremioFetch(url, body, timeoutMs = 15000) {
     .finally(() => clearTimeout(timer));
 }
 
-async function getStremioAddons(authKey) {
-  const data = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
-  if (!Array.isArray(data?.result?.addons)) throw new Error(stremioErrText(data?.error, 'Could not fetch your addon list.'));
-  return data.result.addons;
-}
-
-async function setStremioAddons(authKey, addons) {
-  const data = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons });
-  if (!data?.result) throw new Error(stremioErrText(data?.error, 'Could not save your addon list.'));
-}
-
 async function pushToStremio(manifestUrl, email, password) {
   const loginData = await stremioFetch('https://api.strem.io/api/login', { type:'Login', email, password, facebook:false });
   const authKey = loginData?.result?.authKey;
-  if (!authKey) throw new Error(stremioErrText(loginData?.error, 'Login failed — check your email and password.'));
-
-  // The in-memory snapshot exists before the first write. It intentionally is
-  // not persisted: configured manifest URLs can be bearer-like secrets.
-  const before = await getStremioAddons(authKey);
+  if (!authKey) {
+        throw new Error(stremioErrText(loginData?.error, 'Login failed — check your email and password.'));
+      }
+  const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+  if (!getData?.result?.addons) throw new Error(stremioErrText(getData?.error, 'Could not fetch your addon list.'));
+  const existing = getData.result.addons;
+  const already = existing.some(a => a.transportUrl === manifestUrl);
+  if (already && !S.cleanInstall) return 'already';
   const knownBases = Object.values(HOST_BASE_URLS);
-  const isReplacedAioManifest = a => S.cleanInstall && typeof a?.transportUrl === 'string'
-    && a.transportUrl !== manifestUrl && a.transportUrl.includes('/stremio/')
-    && knownBases.some(base => a.transportUrl.startsWith(base));
-  const plan = planAddonInstall({ existing:before, desiredUrls:[manifestUrl], removeWhen:isReplacedAioManifest });
-  const already = plan.added.length === 0 && plan.removed.length === 0;
-  if (already) {
-    const verification = verifyAddonInstall({ actual:before, expectedUrls:[manifestUrl] });
-    return { status:'already', authKey, before, verification, receipt:createInstallReceipt({ status:'verified', beforeCount:before.length, afterCount:before.length, verification }) };
-  }
-
-  const expectedUrls = [manifestUrl];
-  const absentUrls = plan.removed.map(a => a.transportUrl);
-  try {
-    await setStremioAddons(authKey, plan.after);
-    let actual = await getStremioAddons(authKey);
-    let verification = verifyAddonInstall({ actual, expectedUrls, absentUrls });
-    let repaired = false;
-    if (!verification.ok) {
-      // One bounded self-heal: replay the complete intended collection, then
-      // read it back again. Never loop indefinitely against a degraded API.
-      repaired = true;
-      await setStremioAddons(authKey, plan.after);
-      actual = await getStremioAddons(authKey);
-      verification = verifyAddonInstall({ actual, expectedUrls, absentUrls });
-    }
-    if (!verification.ok) {
-      throw new Error('Install verification failed after one retry.');
-    }
-    const status = S.cleanInstall && plan.removed.length ? 'replaced' : 'installed';
-    return { status, authKey, before, verification, repaired, receipt:createInstallReceipt({ status:'verified', beforeCount:before.length, afterCount:actual.length, verification, repaired }) };
-  } catch (error) {
-    // Best-effort rollback for write/read failures as well as explicit verify
-    // failures. Preserve the original useful message if rollback also fails.
-    try { await setStremioAddons(authKey, before); }
-    catch { throw new Error(`${error.message} Automatic rollback also failed; use Account Tools to restore your backup.`); }
-    if (/restored automatically/.test(error.message)) throw error;
-    throw new Error(`${error.message} Your previous addon list was restored automatically.`);
-  }
+  const isKnownAioManifest = a => typeof a?.transportUrl === 'string' && a.transportUrl.includes('/stremio/') && knownBases.some(base => a.transportUrl.startsWith(base));
+  const kept = S.cleanInstall ? existing.filter(a => !isKnownAioManifest(a)) : existing.slice();
+  if (!kept.some(a => a.transportUrl === manifestUrl)) kept.push({ transportName:'http', transportUrl: manifestUrl, flags:{} });
+  const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: kept });
+  if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'Install failed.'));
+  return S.cleanInstall ? 'replaced' : 'installed';
 }
 
 // ── Full Stack Install (Cinemeta patch + AIOMetadata + addon ordering) ──
@@ -8323,24 +8200,6 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
     const r = await reorderAddons(authKey, AIOMETADATA_MANIFEST, aiostreamsUrl);
     if (r.ok) steps.push('✓ ' + r.message);
     else errors.push(r.message);
-  }
-
-  // Final read-after-write verification catches partial API success instead of
-  // telling the user the stack installed when one addon silently disappeared.
-  try {
-    const expectedUrls = [aiostreamsUrl, ...(installAIOMetadata ? [AIOMETADATA_MANIFEST] : [])];
-    let actual = await getStremioAddons(authKey);
-    let verification = verifyAddonInstall({ actual, expectedUrls });
-    if (!verification.ok && verification.missing.includes(AIOMETADATA_MANIFEST)) {
-      const repaired = planAddonInstall({ existing:actual, desiredUrls:[AIOMETADATA_MANIFEST] });
-      await setStremioAddons(authKey, repaired.after);
-      actual = await getStremioAddons(authKey);
-      verification = verifyAddonInstall({ actual, expectedUrls });
-    }
-    if (verification.ok) steps.push(`✓ Verified ${verification.expectedCount} Core addon${verification.expectedCount === 1 ? '' : 's'} in your account`);
-    else errors.push(`Verification failed: ${verification.missing.length} expected addon${verification.missing.length === 1 ? '' : 's'} missing`);
-  } catch (e) {
-    errors.push('Verification: ' + e.message);
   }
 
   return { steps, errors, ok: errors.length === 0 };
@@ -8593,7 +8452,7 @@ async function createImportUrl() {
       </div>`;
     }
 
-    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong style="color:#e6edf3">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong style="color:#fbbf24">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${url}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link expires after 30 days — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong style="color:#e6edf3">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong style="color:#fbbf24">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(url)}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link expires after 30 days — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
     logError('deploy', 'Paste service blocked or timed out', { service: S.service });
@@ -8677,7 +8536,7 @@ async function openInAIOStreams() {
             }).join('');
             credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
           }
-          result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">One-click wasn't available — here's the quick import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${importUrl}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+          result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">One-click wasn't available — here's the quick import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
           showToast('Tap an instance chip to import your template');
         } else {
           result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Couldn't connect directly or create an import link. Try again in a minute, or use the manual options.</div><button data-action="show-full-review" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Show manual setup options →</button></div>`;

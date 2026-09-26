@@ -5,7 +5,7 @@
     "description": "Self-hosted variant of the 4K Apex flagship. Identical ESE/PSE/ISE stack. Uses synced ranked regex URL instead of inline patterns — auto-updates, 27 KB lighter. Requires Core Builds regex URL whitelisted on instance.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1632,9 +1632,12 @@
       ]
     },
     "checkOwned": false,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,
@@ -1643,15 +1646,9 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 20,
-    "maxResultsPerResolution": 8,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -1661,10 +1658,8 @@
       "Subs": "purple"
     },
     "mergedCatalogs": [],
-    "seadexBestOnly": false,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,

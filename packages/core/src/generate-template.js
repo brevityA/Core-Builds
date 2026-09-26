@@ -22,7 +22,7 @@ import { sanitizeAioEnumArrays } from './schema.js';
 import { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
 import { requireNuvioInstantHost } from './nuvio-hosts.js';
 import { NUVIO_ADDONS } from './nuvio-torbox-instant.js';
-import { applyOutputProfile, resolveOutputProfile, DEFAULT_AIOSTREAMS_VERSION } from './output-profile-policy.js';
+import { applyOutputProfile, resolveOutputProfile } from './output-profile-policy.js';
 
 const EXCLUDED_REGEX = ["/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i","/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"];
 
@@ -266,7 +266,7 @@ function buildPresets(input) {
       const debridOnlyIds = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
       if ((isP2P || isHttp) && usenetCatIds.includes(d.id)) return null;
       if ((isP2P || isHttp) && debridOnlyIds.includes(d.id)) return null;
-      // 18 safe add-ons (v2.34.0 audit — all simple toggles). Generic emission: {name,timeout}
+      // 18 safe add-ons (v2.34.1 audit — all simple toggles). Generic emission: {name,timeout}
       // resources chosen from cat so Stable/Balanced filtering keeps them via OPTIONAL_EXTRAS_STREAM_TYPES.
       const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
       const meta = safeCats[d.cat] || { resources:['stream'] };
@@ -570,7 +570,7 @@ function generateNuvioTemplate(input, options = {}) {
     rankedRegexPatterns: [],
     excludedRegexPatterns: [...EXCLUDED_REGEX],
     addonCategoryColors: {Mix:'indigo',P2P:'orange',Subs:'purple'},
-    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
+    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb',
     usePosterRedirectApi: true, usePosterServiceForMeta: true,
     ...(input.tmdbToken ? { tmdbAccessToken: input.tmdbToken } : {}),
     ...(input.tmdbApiKey ? { tmdbApiKey: input.tmdbApiKey } : {}),
@@ -587,7 +587,7 @@ function generateNuvioTemplate(input, options = {}) {
     precacheNextEpisode: false,
     preloadStreams: { enabled:false },
     cacheAndPlay: { enabled:false },
-    nzbFailover: { enabled:false },
+    failover: { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: activePresets,
@@ -597,13 +597,11 @@ function generateNuvioTemplate(input, options = {}) {
     excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes,
     excludedAudioTags: ac.excludedAudioTags, preferredAudioChannels: ac.preferredAudioChannels,
     preferredVisualTags: visualTagsFor(input.device, input.resolution, input.architecture),
-    enableSeadex: true, seadexBestOnly: false,
+    enableSeadex: true,
     excludeCached: false, excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
     excludeUncached: false, excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
-    excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
-    minSeeders: 1,
+    excludeUncachedMode: 'or',
     preferredRegexPatterns: [],
-    maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
     excludedStreamExpressions: eses,
     includedStreamExpressions: [
       { enabled:true, expression:"/* Protect Library & SeaDex */ passthrough(merge(library(streams), seadex(streams)), 'excluded')" },
@@ -685,7 +683,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     optionalScrapers: rawInput.optionalScrapers || [],
     formatter: rawInput.formatter || 'family-v4',
     outputProfile: String(rawInput.outputProfile || 'auto'),
-    aiostreamsVersion: String(rawInput.aiostreamsVersion || DEFAULT_AIOSTREAMS_VERSION),
+    aiostreamsVersion: String(rawInput.aiostreamsVersion || '2.31.1'),
     simpleMode: Boolean(rawInput.simpleMode),
     quickStart: Boolean(rawInput.quickStart),
   };
@@ -731,7 +729,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     rankedRegexPatterns: isFree ? [] : (isHighRes ? [...rankedRegexCommon,...rankedRegexUhd] : [...rankedRegexCommon]).map(r => ({...r})),
     excludedRegexPatterns: [...EXCLUDED_REGEX],
     addonCategoryColors: {Mix:'indigo',Debrid:'emerald',Usenet:'lime',HTTP:'cyan',P2P:'orange',Subs:'purple'},
-    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb', enhanceResults: true,
+    mergedCatalogs: [], rpdbApiKey: 't0-free-rpdb', posterService: 'rpdb',
     usePosterRedirectApi: true, usePosterServiceForMeta: true,
     ...(input.tmdbToken ? { tmdbAccessToken: input.tmdbToken } : {}),
     ...(input.tmdbApiKey ? { tmdbApiKey: input.tmdbApiKey } : {}),
@@ -750,7 +748,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     precacheSingleStream: true,
     preloadStreams: { enabled:input.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
-    nzbFailover: input.nzbFailover ? { enabled:true, position:input.nzbFailoverPosition==='before-torrents'?'first':'last', count:Number(input.maxFailoverNzbs)||3 } : { enabled:false, count:Number(input.maxFailoverNzbs)||3, position:input.nzbFailoverPosition==='before-torrents'?'first':'last' },
+    failover: input.nzbFailover ? { enabled:true, contentTypes:['usenet','debrid'], ...(input.nzbFailoverPosition==='before-torrents' ? { position:'beforeLimiting' } : {}), maxAttempts:Number(input.maxFailoverNzbs)||3 } : { enabled:false },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: activePresets, services: buildServices(input),
@@ -764,13 +762,11 @@ export function generateTemplate(rawInput = {}, options = {}) {
     excludedQualities: [], includedQualities: [], requiredQualities: [],
     excludedEncodes: ec.excludedEncodes, preferredEncodes: ec.preferredEncodes,
     excludedAudioTags: ac.excludedAudioTags, preferredAudioChannels: ac.preferredAudioChannels, preferredVisualTags: visualTagsFor(input.device, input.resolution, input.architecture),
-    enableSeadex: input.content !== 'live', seadexBestOnly: input.content === 'anime',
+    enableSeadex: input.content !== 'live',
     excludeCached: !isFree && input.cacheMode === 'uncached', excludeCachedFromAddons: [], excludeCachedFromServices: [], excludeCachedFromStreamTypes: [],
     excludeUncached: !isFree && input.cacheMode === 'cached', excludeUncachedFromAddons: [], excludeUncachedFromServices: [], excludeUncachedFromStreamTypes: [],
-    excludeUncachedMode: 'or', excludedStreamSources: ['YouTube','AI Enhanced'],
-    ...(input.service==='p2p' ? { minSeeders:1 } : {}),
+    excludeUncachedMode: 'or',
     preferredRegexPatterns: isFree ? [] : (isHighRes ? PREFERRED_REGEX_4K : PREFERRED_REGEX_1080P),
-    maxResults: rc.maxResults, maxResultsPerResolution: rc.maxResultsPerResolution,
     excludedStreamExpressions: buildEses(input),
     includedStreamExpressions: [
       { enabled:true, expression:"/* Protect Library & SeaDex */ passthrough(merge(library(streams), seadex(streams)), 'excluded')" },

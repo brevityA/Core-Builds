@@ -195,7 +195,7 @@ test('modern lanes emit canonical failover and preserve the configured attempt c
   const current = applyOutputProfile(template, 'advanced', { service:'torbox-pro', aiostreamsVersion:'2.34.1' });
   assert.equal(Object.hasOwn(current.config, 'nzbFailover'), false);
   assert.deepEqual(current.config.failover, {
-    enabled:true, maxAttempts:5, position:'first', contentTypes:['usenet'], allowCrossType:false, parallel:false,
+    enabled:true, contentTypes:['usenet', 'debrid'], position:'beforeLimiting', maxAttempts:5,
   });
 
   const legacy = applyOutputProfile(template, 'advanced', { service:'torbox-pro', aiostreamsVersion:'2.31.1' });

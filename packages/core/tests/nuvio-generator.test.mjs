@@ -16,7 +16,7 @@ describe('generateTemplate — nuvio-torbox-instant route', () => {
     assert.ok(result.config.presets.length > 0);
     assert.ok(result.config.services.every(s => s.enabled === false));
     assert.ok(result.config.services.every(s => Object.keys(s.credentials).length === 0));
-    assert.equal(result.config.minSeeders, 1);
+    assert.equal(result.config.minSeeders, undefined, 'minSeeders is not an upstream key — the generator must not emit it');
     assert.ok(result.metadata.description.includes('Nuvio'));
     assert.equal(result.metadata.category, 'P2P');
   });

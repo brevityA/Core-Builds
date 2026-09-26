@@ -2,12 +2,17 @@
   "metadata": {
     "id": "core-builds-base",
     "name": "Core Builds Base Config",
-    "version": "1.4.3",
+    "version": "1.4.4",
     "description": "Shared scraper + expression layer for all Core Builds templates. USAGE: (1) Import this file into AIOStreams to create the parent config and get its UUID. (2) In each child template, add: \"parentConfig\": {\"uuid\": \"PASTE_UUID_HERE\", \"password\": \"PASTE_PASSWORD_HERE\", \"mergeStrategies\": {\"presets\": \"extend\", \"services\": \"extend\", \"filters\": \"override\", \"sorting\": \"inherit\", \"formatter\": \"inherit\", \"branding\": \"override\", \"misc\": \"inherit\"}}. (3) Child template only needs: its service preset (stremthruTorz / stremthruStore), its PSEs, and its template-specific ESEs (Hard Resolution Kill, Score IQR Guard, DV-Only Kill, etc.). Scrapers, sort criteria, formatter, and universal ESEs all inherit from this parent. One update here propagates to all child templates instantly.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Core-Builds-Base-Config.json",
     "author": "Branding-Brevity",
     "category": "Base",
     "changelog": [
+      {
+        "date": "2026-09-26",
+        "version": "1.4.4",
+        "content": "Upstream schema alignment for AIOStreams 2.34.1: nzbFailover migrated to the generic failover key (Usenet plus debrid) — the old spelling passed a position value outside the new enum and the host rejected the save — and six settings AIOStreams no longer defines (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, sourceUrl) are no longer emitted. No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-25",
         "version": "1.4.3",
@@ -1476,13 +1481,10 @@
       "catalog",
       "subtitles"
     ],
-    "maxResults": 25,
-    "maxResultsPerResolution": 10,
     "precacheNextEpisode": true,
     "precacheSingleStream": true,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "tmdbAccessToken": "<template_placeholder>",
@@ -1636,9 +1638,8 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
-      "enabled": false,
-      "position": "after"
+    "failover": {
+      "enabled": false
     },
     "checkOwned": false,
     "autoPlay": {

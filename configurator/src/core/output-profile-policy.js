@@ -16,8 +16,10 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // migration to Newznab: the two presets do not have equivalent options or
 // credential handling.
 //
-// Keep historical fleet versions selectable so saved sessions and shared links
-// continue to resolve, while fresh sessions follow the release in UPSTREAM.pin.
+// 2.34.1 joined after the 2026-09-22 host audit: seven of the eight public
+// hosts run it (six on stable build c1d044c2, Viren's on its nightly), with
+// Omni's the only 2.33.2 holdout. Older entries stay so existing saved
+// sessions and shared links keep resolving.
 export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
@@ -76,11 +78,12 @@ const EXPLICIT_STREAM_TYPES = new Set([
 // Preset types whose emission is driven by an optional-extras toggle. knaben was the only one
 // until these were added; its id and its preset type are the same string, which is what makes
 // the `optional.has(type)` check below work at all. The 18 safe add-ons audited against
-// v2.34.0 (all simple toggles) are included so Stable/Balanced do not filter them back out
+// v2.34.1 (all simple toggles; contract re-verified byte-identical at the pin bump) are
+// included so Stable/Balanced do not filter them back out
 // the moment a user switches them on.
 const OPTIONAL_EXTRAS_STREAM_TYPES = new Set([
   'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream',
-  // 17 safe add-ons (v2.34.0 audit — all isSimpleTogglePreset, lowercased, torbox-search removed in v2.32)
+  // 17 safe add-ons (v2.34.1 audit — all isSimpleTogglePreset, lowercased, torbox-search removed in v2.32)
   'anime-kitsu', 'argentina-tv', 'bitmagnet', 'brazuca-torrents',
   'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb', 'debridio-watchtower',
   'doctor-who-universe', 'easynews', 'easynewsplus', 'jackettio',
@@ -304,7 +307,7 @@ function preventStackedFetchExits(config) {
 }
 
 function compatibilityTarget(context = {}) {
-  const requested = String(context.aiostreamsVersion || DEFAULT_AIOSTREAMS_VERSION);
+  const requested = String(context.aiostreamsVersion || '2.31.1');
   return AIOSTREAMS_COMPATIBILITY_TARGETS.includes(requested) ? requested : 'unknown';
 }
 
@@ -323,20 +326,16 @@ function applyAIOStreamsCompatibility(template, context) {
       preset => String(preset?.type || '').toLowerCase() !== 'torbox-search'
     );
 
-    // v2.34 accepts the old nzbFailover key only through its migration layer.
-    // Emit the canonical shape on modern lanes so the user's attempt count is
-    // preserved and generated output is directly schema-valid. The mapping
-    // mirrors upstream applyMigrations(): legacy failover was Usenet-only and
-    // sequential, with no cross-type fallback.
+
+    // Modern targets receive the canonical v2.34 failover shape. Preserve the
+    // explicit v2.31.1 lane unchanged for hosts that still require nzbFailover.
     if (config.failover === undefined && config.nzbFailover !== undefined) {
       const legacy = config.nzbFailover || {};
       config.failover = {
         enabled: Boolean(legacy.enabled),
+        contentTypes: ['usenet', 'debrid'],
+        ...(legacy.position === 'first' ? { position: 'beforeLimiting' } : {}),
         maxAttempts: Number(legacy.count ?? legacy.maxFailoverNzbs) || 3,
-        position: legacy.position === 'first' ? 'first' : 'last',
-        contentTypes: ['usenet'],
-        allowCrossType: false,
-        parallel: false,
       };
     }
     delete config.nzbFailover;
@@ -362,9 +361,12 @@ function applyNativeFilters(config, context) {
     ...values(config.excludedVisualTags),
     '3D', 'H-OU', 'H-SBS',
   ]);
-  config.excludedStreamSources = unique([
-    ...values(config.excludedStreamSources),
-    'YouTube', 'AI Enhanced',
+  // `excludedStreamSources` is not an upstream key (see KNOWN_DEAD_CONFIG_KEYS)
+  // — the live equivalent is the stream *type*. 'AI Enhanced' has no type
+  // spelling; external-URL killing stays with the Stable profile's ESE.
+  config.excludedStreamTypes = unique([
+    ...values(config.excludedStreamTypes),
+    'youtube',
   ]);
 
   const resolution = context.resolution;
@@ -418,9 +420,9 @@ function setResultLimits(config, context, profile) {
   const high = ['4k', 'ultrawide', 'mixed'].includes(context.resolution);
   const global = profile === 'stable' ? (high ? 12 : 10) : (high ? 20 : 16);
   const resolution = profile === 'stable' ? 3 : 5;
+  // `maxResults` / `maxResultsPerResolution` are not upstream keys (see
+  // KNOWN_DEAD_CONFIG_KEYS) — resultLimits is the live spelling.
   config.resultLimits = { global, resolution, mode: 'independent' };
-  config.maxResults = global;
-  config.maxResultsPerResolution = resolution;
 }
 
 function clearUnselectedCaps(config, context) {

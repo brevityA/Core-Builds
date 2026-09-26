@@ -5,7 +5,7 @@
     "description": "Nightly Labs build of Anime 4K. Tests SeaDex-aware conditional PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins, private tracker kill, and totalCachedStreams DAF. Not a daily driver — report regressions before these features graduate to stable.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
@@ -21,7 +21,6 @@
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
     "tmdbApiKey": "<template_placeholder>",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "services": [
@@ -439,10 +438,6 @@
     ],
     "includedLanguages": [],
     "excludedLanguages": [],
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "excludedStreamExpressions": [
       {
         "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))",
@@ -627,9 +622,8 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
-      "enabled": false,
-      "position": "last"
+    "failover": {
+      "enabled": false
     },
     "proxy": {
       "id": "mediaflow",

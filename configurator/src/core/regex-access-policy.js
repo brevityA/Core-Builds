@@ -14,7 +14,7 @@
  * only later).
  *
  * This module mirrors `validateRegexes()` in AIOStreams
- * packages/core/src/utils/config.ts at the pinned ref (v2.34.0 @ e694b6a):
+ * packages/core/src/utils/config.ts at the pinned ref (v2.34.1 @ c1d044c, re-verified identical):
  * only the five top-level `*RegexPatterns` arrays are part of this gate
  * (stream expressions are NOT validated against the allowlist upstream) and
  * matching is exact-string on the deduped union. The DOM half lives in app.js

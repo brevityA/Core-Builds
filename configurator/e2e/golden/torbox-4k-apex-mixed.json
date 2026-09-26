@@ -11,8 +11,8 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.11",
-    "coreBuildsAIOStreamsTarget": "2.34.1",
+    "coreBuildsVersion": "3.12",
+    "coreBuildsAIOStreamsTarget": "2.31.1",
     "coreBuildsProfile": "labs",
     "coreBuildsProfileVersion": "1"
   },
@@ -1334,6 +1334,9 @@
         "torrent"
       ]
     },
+    "failover": {
+      "enabled": false
+    },
     "areYouStillThere": {
       "enabled": false
     },
@@ -2005,16 +2008,6 @@
     "syncedIncludedStreamExpressionUrls": [],
     "syncedPreferredStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [],
-    "failover": {
-      "enabled": false,
-      "maxAttempts": 3,
-      "position": "last",
-      "contentTypes": [
-        "usenet"
-      ],
-      "allowCrossType": false,
-      "parallel": false
-    },
     "excludedStreamTypes": [
       "http",
       "p2p"

@@ -1,14 +1,36 @@
 ---
-title: "What's New — Configurator v3.11"
+title: "What's New — Configurator v3.12"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.11 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.12 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.11**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.12**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.12 (Sep 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Fleet re-audit" icon="sparkles">
+    every public host re-checked against its own status endpoint. Seven of the eight run AIOStreams 2.34.1 (six on the stable build, Viren's on its nightly); Omni's is the only 2.33.2 holdout, over six weeks behind. The schema pin, the default compatibility target and the host registry all move to 2.34.1 together, and the 2.34.1 contract was verified byte-identical to 2.34.0 in every generated file, so nothing you generate changes shape. Two corrections fell out of the audit: ATBP and Wizaardd both report regexAccess `all`, not `trusted`, so their offline defaults now say so — the live probe still wins whenever it can reach the host.
+  </Card>
+  <Card title="Dead settings stop being emitted, not just stripped" icon="bolt">
+    v3.0 found six settings Core Builds emitted that AIOStreams never defined (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, minSeeders) and began removing them at the export gate. The generators kept writing them anyway, relying on the gate to clean up. They no longer write them at all, and the native-filters policy that wrote the dead `excludedStreamSources` now writes the live `excludedStreamTypes` instead — Stable and Balanced output newly, actually excludes YouTube-type streams rather than carrying a key the host ignored. The 55 checked-in templates that carried the dead keys are cleaned (about 8 KB of payload that was stripped on every save), and the guides that described the dead keys as working now describe what the host really reads.
+  </Card>
+  <Card title="TorBox Search preset is allowlisted, not dead" icon="shield-check">
+    the Apex, Hybrid and several Personal and Device templates ship an enabled preset pointed at TorBox's Search API, and the validator called that endpoint shut down. It is not down; TorBox restricts it to allowlisted caller hosts, so it resolves on approved managed hosts and silently times out everywhere else, which reads as slow or missing Usenet results with no error. The warning now says that and points at two new troubleshooting entries: the allowlist (with the remedy — move hosts, or swap in a personal indexer) and the separate TorBox CDN routing advisory, where some hosts need the CDN set manually for AIOStreams-installed addons.
+  </Card>
+  <Card title="Failover replaces NZB Failover, and two save rejections go with it" icon="sliders">
+    AIOStreams renamed nzbFailover to the generic failover (Usenet plus debrid) and migrates the old spelling before validating, passing position through blindly. Core Builds emitted two positions outside the new enum: the before-torrents option wrote `first`, and the base config carried `after` — both rejected the whole save at the host. The builder, all 60 active templates and the conflict checker now use the live spelling, with before-torrents mapped to the widest candidate pool. The Fine-Tune attempt count finally lands in maxAttempts instead of a key upstream never read, which closes the v3.0 known gap, and the template validator now rejects out-of-enum failover positions so this class cannot return.
+  </Card>
+  <Card title="Import-link URLs are HTML-escaped" icon="gauge">
+    six result panels rendered the paste-service URL into the page unescaped. A hostile paste response could have injected markup; every one now goes through the same escaper the rest of the app uses. No known exploit, found and fixed in a hardening pass that also confirmed share links still carry settings only, stored snapshots still scrub credentials, and display names are still sanitised at every write path.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.11 (Sep 25 2026)
 
@@ -59,30 +81,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Single-title buffering guide" icon="gauge">
     troubleshooting has a decision tree for the case where one title buffers forever and everything else plays. That shape is not a config fault: Real-Debrid removes files by filename keyword, so every candidate for that one title returns 404 for Real-Debrid users while other services play it normally.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.8 (Sep 17 2026)
-
-<CardGroup cols={2}>
-  <Card title="Self-hosted instances can be updated in place…" icon="sparkles">
-    Self-hosted instances can be updated in place instead of accumulating configs. The UUID field was hidden whenever the host was set to Custom / Self-hosted, so every Get Install Link posted a new configuration and orphaned the previous one — the public hosts have always offered that field. It is now shown for any single host, self-hosted included, and the CORS proxy's custom lane accepts PATCH /api/v1/user/<id> using the same bounded id shape the allowlisted lane already used. Leave it blank to create a new config exactly as before. Known gap: an instance running with AIOSTREAMS_AUTH_REQUIRED still has nowhere to enter its access key, so those saves are refused by the host regardless of this change.
-  </Card>
-  <Card title="This also changes what a UUID does on the public…" icon="bolt">
-    This also changes what a UUID does on the public hosts, and not only on self-hosted ones. Entering a UUID together with a password used to return a link to the configuration you already had, silently discarding the template you had just built; that combination now updates that configuration in place, which is what the Auto host has always done. A UUID with no password still only rebuilds the link, and a blank UUID still creates a new configuration — so the way to keep a second config is to leave the field empty.
-  </Card>
-  <Card title="The exported JSON contains your API keys in…" icon="shield-check">
-    The exported JSON contains your API keys in plain text, and now says so at the moment you download it. Export has never stripped credentials — the sanitiser that clears them runs on share links and imports only — so the downloaded file carries whatever you entered, and these files get posted publicly when people ask for help. The notice names which fields are embedded, never their values, and points at Copy a safe feedback report instead; it stays silent when nothing is set. A test asserting that 'exports never carry credentials' was passing only because that case entered none, and now pins both directions.
-  </Card>
-  <Card title="A hand-typed manifest password is checked before…" icon="sliders">
-    A hand-typed manifest password is checked before it is sent. Anything shorter than 8 characters was accepted, posted, and bounced by the host as 'Invalid addon password', a message that never says what is wrong; the reason is now shown inline while it can still be fixed. This is a Core Builds floor rather than a value read from AIOStreams — the pinned schema carries no password rule, so the host's own requirement is still unknown. Auto-generate is unaffected and continues to produce 12 characters or more.
-  </Card>
-  <Card title="The CORS proxy stopped serving the previous…" icon="gauge">
-    The CORS proxy stopped serving the previous build's statistics payload after a deploy. The public /api/stats response was cached under a path-only key, so a deploy that narrowed the payload kept answering from the old build's cached body for up to 60 seconds — the same window that failed the post-deploy smoke gate. The cache key now carries the worker version, so a new build is always a new key.
-  </Card>
-  <Card title="Operator tooling for the proxy: the full…" icon="wand">
-    Operator tooling for the proxy: the full statistics view and detailed health sit behind an ADMIN_TOKEN, with a token-sync workflow, an OPERATOR.md runbook and an operator-stats.sh helper, and wrangler secret put is pinned to --env on production so a secret cannot land on the wrong environment.
   </Card>
 </CardGroup>

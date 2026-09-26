@@ -5,7 +5,7 @@
     "description": "4K template tuned for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 is natively supported — DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. AV1 hard-excluded (no hardware decoder on the A15 chip — severe performance hit). DD+ Atmos is the native top audio format. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.10",
+    "version": "0.2.11",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-09-26",
+        "version": "0.2.11",
+        "content": "Upstream schema alignment for AIOStreams 2.34.1: nzbFailover migrated to the generic failover key (Usenet plus debrid) — the old spelling passed a position value outside the new enum and the host rejected the save — and six settings AIOStreams no longer defines (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, sourceUrl) are no longer emitted. No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-25",
         "version": "0.2.10",
@@ -2262,9 +2267,12 @@
       ]
     },
     "checkOwned": false,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,
@@ -2273,15 +2281,9 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 25,
-    "maxResultsPerResolution": 10,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -2293,7 +2295,6 @@
     "mergedCatalogs": [],
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,

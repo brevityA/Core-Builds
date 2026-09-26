@@ -2,7 +2,7 @@
  * Host routing + host-picker truthfulness (2026-09-06 audit, defect 4).
  *
  * The picker treated every host as interchangeable. These tests pin:
- *   - the registry's per-host AIOStreams versions (2.34.0 fleet, 2.33.2 laggards)
+ *   - the registry's per-host AIOStreams versions (2.34.1 fleet, Omni's the 2.33.2 holdout)
  *   - the capability + version label each picker shows before Deploy
  *   - the routing matrix: P2P can never target ElfHosted; a config needing a
  *     newer AIOStreams than a host runs is not routed there
@@ -32,16 +32,13 @@ test('every public host carries a known AIOStreams version', () => {
   }
 });
 
-test('registry versions match the 2026-09-17 audit of the live fleet', () => {
-  // Re-audited 2026-09-17 against each host's own /api/v1/status. Midnight's
-  // had upgraded 2.33.2 -> 2.34.0 and the registry had not followed, so the
-  // picker advertised a stale version and capability routing treated a 2.34
-  // host as a 2.33.2 one.
-  const at2341 = ['elfhosted', 'fortheweak', 'viren', 'kuu', 'atbp'];
-  const at234 = ['midnight', 'wizaardd'];
+test('registry versions match the 2026-09-22 audit of the live fleet', () => {
+  // Re-audited 2026-09-22 against each host's own /api/v1/status. Seven of
+  // the eight public hosts run 2.34.1 (six stable on build c1d044c2, Viren's
+  // on its nightly); Omni's is the only 2.33.2 holdout (build 2026-08-11).
+  const at2341 = ['elfhosted', 'fortheweak', 'viren', 'kuu', 'atbp', 'midnight', 'wizaardd'];
   const at2332 = ['omni'];
   for (const key of at2341) assert.equal(HOST_META[key].aiostreamsVersion, '2.34.1', key);
-  for (const key of at234) assert.equal(HOST_META[key].aiostreamsVersion, '2.34.0', key);
   for (const key of at2332) assert.equal(HOST_META[key].aiostreamsVersion, '2.33.2', key);
 });
 
@@ -63,7 +60,7 @@ test('the default target is the pinned release and is itself a target', async ()
 
 test('resolveHostCapabilities falls back to the registry version when the probe is blocked', () => {
   assert.equal(resolveHostCapabilities('elfhosted', null).version, '2.34.1');
-  assert.equal(resolveHostCapabilities('midnight', null).version, '2.34.0');
+  assert.equal(resolveHostCapabilities('midnight', null).version, '2.34.1');
   // keep a genuinely-2.33.2 host here, or this stops proving the fallback
   // reads the registry rather than a constant
   assert.equal(resolveHostCapabilities('omni', null).version, '2.33.2');
@@ -89,8 +86,9 @@ test('full-service hosts state Debrid + P2P + HTTP', () => {
 test('every picker label carries the host\'s AIOStreams version', () => {
   assert.match(hostPickerLabel('elfhosted'), /ElfHosted .*Debrid only — no P2P\/HTTP.*v2\.34\.1/);
   assert.match(hostPickerLabel('fortheweak'), /v2\.34\.1/);
-  assert.match(hostPickerLabel('midnight'), /v2\.34\.0/);
-  assert.match(hostPickerLabel('wizaardd'), /v2\.34\.0/);
+  assert.match(hostPickerLabel('midnight'), /v2\.34\.1/);
+  assert.match(hostPickerLabel('wizaardd'), /v2\.34\.1/);
+  assert.match(hostPickerLabel('omni'), /v2\.33\.2/);
   assert.match(hostPickerLabel('viren'), /nightly/);
 });
 
@@ -138,10 +136,10 @@ test('an HTTP config is blocked on ElfHosted too', () => {
 test('a config needing 2.33.2+ is blocked on an older host', () => {
   const config = { variantSelectorLocation: 'path' };
   assert.equal(hostRoutingDecision({ service: 'torbox-pro', config }, capsFor('custom', '2.33.0')).status, 'blocked');
-  assert.equal(hostRoutingDecision({ service: 'torbox-pro', config }, capsFor('wizaardd')).status, 'ok', '2.33.2 host satisfies the 2.33.2 floor');
+  assert.equal(hostRoutingDecision({ service: 'torbox-pro', config }, capsFor('omni')).status, 'ok', '2.33.2 host satisfies the 2.33.2 floor');
 });
 
-test('a 2.34-only config is blocked on the 2.33.2 host and routes to the 2.34+ fleet', () => {
+test('a 2.34-only config is blocked on the 2.33.2 host and routes to the 2.34.1 fleet', () => {
   // No real config key is 2.34-only yet (FEATURE_MIN_VERSIONS tops out at
   // 2.33.2), so this row injects a hypothetical floor through the documented
   // test hook and runs the REAL decision path over the REAL registry hosts.
@@ -157,7 +155,7 @@ test('a 2.34-only config is blocked on the 2.33.2 host and routes to the 2.34+ f
   }
 });
 
-test('a host behind the selected target warns instead of silently receiving newer defaults', () => {
+test('a host behind the selected target warns instead of silently receiving 2.34-defaults', () => {
   const decision = hostRoutingDecision({ service: 'torbox-pro', config: {} }, capsFor('omni'), { targetVersion: '2.34.1' });
   assert.equal(decision.status, 'warn');
   assert.match(decision.reasons[0], /2\.33\.2/);

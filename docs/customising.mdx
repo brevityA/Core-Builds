@@ -101,12 +101,13 @@ To keep AV1 allowed but prefer HEVC over it, add it to the end of `preferredEnco
 
 ### Change Result Limit
 
-Default is 25 total results, 10 per resolution. Increase for a wider list or decrease for a tighter one:
+Result caps live in `resultLimits` — `global` caps the whole list, `resolution` caps each resolution bucket, and `mode` decides how the two combine. Increase for a wider list or decrease for a tighter one:
 
 ```json
-"maxResults": 40,
-"maxResultsPerResolution": 15
+"resultLimits": { "global": 40, "resolution": 15, "mode": "conjunctive" }
 ```
+
+Do not use the old `maxResults` / `maxResultsPerResolution` spellings: they were never AIOStreams schema keys, so hosts silently strip them and they have no effect.
 
 ---
 

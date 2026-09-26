@@ -5,7 +5,7 @@
     "description": "4K template tuned for the Google TV Streamer (2024). DV, HDR10+, HDR10, HLG all supported. AV1 hardware decode enabled. Lossless audio excluded (TrueHD, DTS-HD MA, DTS:X, FLAC) — DD+ Atmos is the audio ceiling. Audio channels capped at 5.1. Based on Core Nexus 4K Apex with full IQR Tukey fence PSE stack, Score IQR Guard, elite group pins, and perGroup() Extra Cached.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-09-26",
+        "version": "0.1.6",
+        "content": "Upstream schema alignment for AIOStreams 2.34.1: nzbFailover migrated to the generic failover key (Usenet plus debrid) — the old spelling passed a position value outside the new enum and the host rejected the save — and six settings AIOStreams no longer defines (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, sourceUrl) are no longer emitted. No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-25",
         "version": "0.1.5",
@@ -2340,9 +2345,12 @@
       ]
     },
     "checkOwned": false,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,
@@ -2351,15 +2359,9 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 30,
-    "maxResultsPerResolution": 12,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -2369,10 +2371,8 @@
       "Subs": "purple"
     },
     "mergedCatalogs": [],
-    "seadexBestOnly": false,
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,

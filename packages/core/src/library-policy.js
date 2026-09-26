@@ -9,7 +9,7 @@
  * AIOStreams generates the Library addon from the enabled services and rejects
  * the whole save when none can back it ("Library requires at least one usable
  * service"). These are the service ids upstream's LibraryPreset can use at the
- * pinned ref (v2.34.0 / e694b6a): the StremThru services plus nzbdav,
+ * pinned ref (v2.34.1 / c1d044c, re-verified identical): the StremThru services plus nzbdav,
  * altmount, stremthru_newz and aiostreams. EasyNews, Seedr, Debridio, putio
  * and stremio_nntp are NOT library-capable.
  */

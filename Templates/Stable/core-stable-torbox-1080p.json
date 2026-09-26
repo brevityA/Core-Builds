@@ -5,7 +5,7 @@
     "description": "Minimal, predictable 1080p TorBox baseline. Uses local/native filtering, no remote SEL or regex sync, no fetch groups, and no dynamic early exit.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -205,7 +205,7 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
+    "failover": {
       "enabled": false
     },
     "areYouStillThere": {
@@ -475,7 +475,6 @@
       "IMAX"
     ],
     "enableSeadex": true,
-    "seadexBestOnly": false,
     "excludeCached": false,
     "excludeCachedFromAddons": [],
     "excludeCachedFromServices": [],
@@ -485,13 +484,11 @@
     "excludeUncachedFromServices": [],
     "excludeUncachedFromStreamTypes": [],
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
+    "excludedStreamTypes": [
+      "youtube",
+      "external"
     ],
     "preferredRegexPatterns": [],
-    "maxResults": 10,
-    "maxResultsPerResolution": 3,
     "excludedStreamExpressions": [
       {
         "enabled": true,

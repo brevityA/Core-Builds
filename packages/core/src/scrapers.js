@@ -13,7 +13,7 @@ export const OPTIONAL_SCRAPER_DEFS = [
   { id:'sootio', label:'Sootio', desc:'Multi-indexer debrid scraper · 10 HTTP providers', presetType:'sootio', cat:'debrid', color:'#22d3ee' },
   { id:'webstreamr', label:'WebStreamr', desc:'HTTP streaming-site scraper · no debrid needed', presetType:'webstreamr', cat:'debrid', color:'#84cc16' },
   { id:'yastream', label:'YaStream', desc:'Asian catalogs + streams (kisskh, OneTouchTV, iDrama)', presetType:'yastream', cat:'debrid', color:'#eab308' },
-  // ── 17 safe add-ons audited against v2.34.0 required-options (all simple toggles, torbox-search removed in v2.32) ──
+  // ── 17 safe add-ons audited against v2.34.1 required-options (all simple toggles, torbox-search removed in v2.32) ──
   { id:'anime-kitsu', label:'Anime Kitsu', desc:'Anime catalog using Kitsu · meta catalogs', presetType:'anime-kitsu', cat:'catalog', color:'#f43f5e' },
   { id:'argentina-tv', label:'Argentina TV', desc:'Live Argentine channels · live streams', presetType:'argentina-tv', cat:'live', color:'#38bdf8' },
   { id:'bitmagnet', label:'Bitmagnet', desc:'Self-hosted BitTorrent indexer & DHT crawler · debrid', presetType:'bitmagnet', cat:'debrid', color:'#a3e635' },

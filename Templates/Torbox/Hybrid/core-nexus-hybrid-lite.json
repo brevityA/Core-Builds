@@ -5,13 +5,18 @@
     "description": "A 1080p SDR hybrid build for TorBox users who also run a Usenet indexer. Combines TorBox's Usenet and torrent cache with NZBGeek for maximum source diversity. Unlike other builds, shows both cached and uncached streams — uncached streams are downloaded by TorBox before playback begins. Targets 1080p and 720p only — 4K and HDR are excluded. Blocks BluRay and Remux for low-end hardware compatibility. File range 1 GB–60 GB, 1080p capped at 25 GB. NZBGeek API key required — enter your key in the NZBGeek preset before saving. Core Builds SEL stack with live-synced ESEs, PSEs, and regex. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.12",
+    "version": "2.10.13",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-09-26",
+        "version": "2.10.13",
+        "content": "Upstream schema alignment for AIOStreams 2.34.1: nzbFailover migrated to the generic failover key (Usenet plus debrid) — the old spelling passed a position value outside the new enum and the host rejected the save — and six settings AIOStreams no longer defines (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, sourceUrl) are no longer emitted. No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-25",
         "version": "2.10.12",
@@ -2366,9 +2371,12 @@
       ]
     },
     "checkOwned": false,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,
@@ -2377,15 +2385,9 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 50,
-    "maxResultsPerResolution": 20,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -2397,7 +2399,6 @@
     "mergedCatalogs": [],
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,

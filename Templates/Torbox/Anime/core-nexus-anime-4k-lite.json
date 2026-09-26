@@ -5,7 +5,7 @@
     "description": "Dedicated 4K anime template. SeaDex best releases · DV/HDR10+ priority · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential. Relaxed filtering — quality gates removed, more results shown.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.16",
+    "version": "2.8.17",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
@@ -21,7 +21,6 @@
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
     "tmdbApiKey": "<template_placeholder>",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "services": [
@@ -408,10 +407,6 @@
     ],
     "includedLanguages": [],
     "excludedLanguages": [],
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "excludedStreamExpressions": [
       {
         "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3))",
@@ -527,9 +522,8 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
-      "enabled": false,
-      "position": "last"
+    "failover": {
+      "enabled": false
     },
     "proxy": {
       "id": "mediaflow",
@@ -1316,8 +1310,6 @@
     ],
     "excludedRegexPatterns": [],
     "showChanges": true,
-    "rankedRegexPatterns": [],
-    "maxResults": 30,
-    "maxResultsPerResolution": 12
+    "rankedRegexPatterns": []
   }
 }
