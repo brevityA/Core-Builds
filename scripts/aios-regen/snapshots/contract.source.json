@@ -1,21 +1,23 @@
 {
   "kind": "source",
-  "extractedAt": "2026-09-05T16:05:23.934Z",
-  "fingerprint": "55ad4579a0ffa919",
+  "extractedAt": "2026-09-26T00:36:25.655Z",
+  "fingerprint": "63f529cd121034f7",
   "repo": "Viren070/AIOStreams",
   "ref": "main",
   "commit": {
-    "sha": "e694b6ace7309091289a8680c3f817210e261e46",
-    "date": "2026-09-04T23:19:08Z",
-    "message": "chore: release 2.34.0 (#1189)",
-    "url": "https://github.com/Viren070/AIOStreams/commit/e694b6ace7309091289a8680c3f817210e261e46"
+    "sha": "00fb93a4a19804600f5053d4a409d8d42f1fa6e7",
+    "date": "2026-09-26T00:06:53Z",
+    "message": "chore(desktop): update the web app (#1362)",
+    "url": "https://github.com/Viren070/AIOStreams/commit/00fb93a4a19804600f5053d4a409d8d42f1fa6e7"
   },
   "counts": {
-    "presets": 82,
+    "presets": 83,
     "services": 21,
-    "schemaKeys": 155,
-    "selFunctions": 64,
-    "formatterFields": 87,
+    "schemaKeys": 158,
+    "selFunctions": 70,
+    "formatterFields": 90,
+    "formatters": 8,
+    "autoPlayMethods": 3,
     "requiredOptions": 2
   },
   "presetIds": [
@@ -64,6 +66,7 @@
     "streamnzb",
     "davex",
     "dmm-cast",
+    "penguplay",
     "nuvio-streams",
     "webstreamr",
     "hdhub",
@@ -256,6 +259,7 @@
     "tmdbAccessToken",
     "tmdbApiKey",
     "tvdbApiKey",
+    "pmdbApiKey",
     "yearMatching",
     "titleMatching",
     "seasonEpisodeMatching",
@@ -280,13 +284,20 @@
     "autoRemoveDownloads",
     "checkOwned",
     "failover",
-    "serviceWrap"
+    "serviceWrap",
+    "jellyfin",
+    "remuxDb"
   ],
   "hotspots": {
     "deduplicator.merge": "object",
     "groups": "object",
     "dynamicAddonFetching": "object",
-    "sortCriteria": "object"
+    "sortCriteria": "object",
+    "titleMatching": "object",
+    "yearMatching": "object",
+    "seasonEpisodeMatching": "object",
+    "autoPlay": "object",
+    "preloadStreams": "object"
   },
   "sel": {
     "functions": [
@@ -294,11 +305,15 @@
       "age",
       "audioChannels",
       "audioTag",
+      "audioTrack",
       "avg",
       "bitrate",
       "cached",
+      "container",
       "count",
+      "editions",
       "encode",
+      "extension",
       "folderSize",
       "health",
       "idMatched",
@@ -319,6 +334,7 @@
       "mode",
       "multiEpisode",
       "negate",
+      "network",
       "passthrough",
       "perGroup",
       "percentile",
@@ -347,6 +363,7 @@
       "stddev",
       "streamExpressionScore",
       "subtitle",
+      "subtitleTrack",
       "subtitles",
       "sum",
       "type",
@@ -416,6 +433,8 @@
     "uWedontknowwhatakilometeris",
     "visualTags",
     "audioTags",
+    "audioTracks",
+    "subtitleTracks",
     "releaseGroup",
     "regexMatched",
     "rankedRegexMatched",
@@ -434,6 +453,7 @@
     "upscaled",
     "hasChapters",
     "network",
+    "site",
     "container",
     "extension",
     "indexer",
@@ -481,11 +501,8 @@
     "bytes10",
     "bytes2",
     "comma",
-    "exact",
     "first",
-    "for",
     "hex",
-    "if",
     "join",
     "languagecode",
     "languageemoji",
@@ -494,22 +511,18 @@
     "lower",
     "lsort",
     "octal",
-    "prefix",
     "pstar",
     "random",
     "rbitrate",
     "rbytes",
     "rbytes10",
     "rbytes2",
-    "replacement",
-    "return",
     "reverse",
     "rsort",
     "sbitrate",
     "sbytes",
     "sbytes10",
     "sbytes2",
-    "search",
     "smallcaps",
     "sort",
     "star",
@@ -518,9 +531,9 @@
     "superscript",
     "time",
     "title",
-    "upper",
-    "value",
-    "while"
+    "trim",
+    "unique",
+    "upper"
   ],
   "formatterComparators": [
     "and",
@@ -531,7 +544,16 @@
     "right",
     "xor"
   ],
-  "formatters": [],
+  "formatters": [
+    "gdrive",
+    "prism",
+    "tamtaro",
+    "lightgdrive",
+    "minimalisticgdrive",
+    "torrentio",
+    "torbox",
+    "custom"
+  ],
   "sortCriteria": [
     "quality",
     "resolution",
@@ -558,6 +580,27 @@
     "seadex",
     "bitrate",
     "releaseGroup"
+  ],
+  "autoPlayMethods": [
+    "matchingFile",
+    "matchingIndex",
+    "firstFile"
+  ],
+  "autoPlayAttributes": [
+    "service",
+    "cached",
+    "addon",
+    "proxied",
+    "resolution",
+    "quality",
+    "encode",
+    "audioTags",
+    "visualTags",
+    "languages",
+    "releaseGroup",
+    "type",
+    "infoHash",
+    "size"
   ],
   "templateDirectives": [
     "__if",
@@ -858,6 +901,13 @@
       "id": "peerflix",
       "requiredOptions": [],
       "optionIds": []
+    },
+    {
+      "id": "penguplay",
+      "requiredOptions": [],
+      "optionIds": [
+        "name"
+      ]
     },
     {
       "id": "prowlarr",

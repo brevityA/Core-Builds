@@ -91,6 +91,11 @@ function selOrNull(contract, expr) {
   return expr;
 }
 
+function commentedExpression(name, expression) {
+  const safeName = String(name).replaceAll('*/', '* /');
+  return `/* ${safeName} */ ${expression}`;
+}
+
 function buildExpressions(contract, { resolution, device }) {
   const excluded = [];
   const preferred = [];
@@ -98,7 +103,7 @@ function buildExpressions(contract, { resolution, device }) {
   const ranked = [];
   const push = (arr, name, expr) => {
     const ok = selOrNull(contract, expr);
-    if (ok) arr.push({ name, expression: ok, enabled: true });
+    if (ok) arr.push({ expression: commentedExpression(name, ok), enabled: true });
   };
 
   if (resolution === '1080p') {
@@ -113,11 +118,20 @@ function buildExpressions(contract, { resolution, device }) {
     push(preferred, 'Cached', `cached(streams)`);
   }
 
-  if (hasFn(contract, 'perGroup') && resolution === '2160p') {
+  if (hasFn(contract, 'perGroup') && hasFn(contract, 'negate') && resolution === '2160p') {
     const n = device === 'firestick' ? 3 : 4;
-    push(excluded, 'QR balance', `perGroup(resolution(streams), ${n})`);
-  } else if (hasFn(contract, 'slice')) {
-    push(excluded, 'Per-resolution cap', `slice(resolution(streams, '${resolution === '1080p' ? '1080p' : '2160p'}'), 8)`);
+    push(excluded, 'Per-resolution cap', `negate(streams, perGroup(streams, 'resolution', ${n}))`);
+  } else if (hasFn(contract, 'slice') && hasFn(contract, 'negate')) {
+    push(excluded, 'Global cap', 'negate(streams, slice(streams, 0, 24))');
+  }
+
+  if (
+    hasFn(contract, 'cached') &&
+    hasFn(contract, 'uncached') &&
+    hasFn(contract, 'count') &&
+    hasFn(contract, 'slice')
+  ) {
+    push(included, '0Cached final fallback', 'count(cached(streams)) == 0 ? slice(uncached(streams), 0, 1) : []');
   }
 
   if (hasFn(contract, 'seScore') && hasFn(contract, 'negate') === false) {
@@ -126,15 +140,15 @@ function buildExpressions(contract, { resolution, device }) {
 
   if (hasFn(contract, 'quality')) {
     ranked.push(
-      { name: 'REMUX', expression: `quality(streams, 'BluRay REMUX')`, score: 120, enabled: true },
-      { name: 'BluRay', expression: `quality(streams, 'BluRay')`, score: 80, enabled: true },
-      { name: 'WEB', expression: `quality(streams, 'WEB-DL', 'WEBRip')`, score: 50, enabled: true },
+      { expression: commentedExpression('REMUX', `quality(streams, 'BluRay REMUX')`), score: 120, enabled: true },
+      { expression: commentedExpression('BluRay', `quality(streams, 'BluRay')`), score: 80, enabled: true },
+      { expression: commentedExpression('WEB', `quality(streams, 'WEB-DL', 'WEBRip')`), score: 50, enabled: true },
     );
   }
   if (hasFn(contract, 'resolution')) {
     ranked.push(
-      { name: '4K', expression: `resolution(streams, '2160p')`, score: 80, enabled: resolution !== '1080p' },
-      { name: '1080p', expression: `resolution(streams, '1080p')`, score: 40, enabled: true },
+      { expression: commentedExpression('4K', `resolution(streams, '2160p')`), score: 80, enabled: resolution !== '1080p' },
+      { expression: commentedExpression('1080p', `resolution(streams, '1080p')`), score: 40, enabled: true },
     );
   }
 
@@ -158,19 +172,67 @@ function sortCriteria(contract) {
   return picked.length ? picked : [{ key: 'cached', direction: 'desc' }, { key: 'resolution', direction: 'desc' }];
 }
 
-function deduplicator(contract) {
-  const mergeKind = contract.hotspots?.['deduplicator.merge'] || 'object';
-  const merge = mergeKind === 'boolean' ? false : { enabled: false };
+function deduplicator() {
   return {
     enabled: true,
+    excludeAddons: [],
+    multiGroupBehaviour: 'aggressive',
     keys: ['filename', 'infoHash', 'smartDetect'],
     cached: 'single_result',
-    uncached: 'single_result',
-    p2p: 'single_result',
-    http: 'single_result',
+    uncached: 'per_service',
+    p2p: 'per_addon',
+    smartDetectAttributes: [
+      'size',
+      'resolution',
+      'quality',
+      'visualTags',
+      'audioTags',
+      'audioChannels',
+      'languages',
+      'encode',
+      'edition',
+      'network',
+      'remastered',
+      'bitrate',
+      'releaseGroup',
+    ],
+    smartDetectRounding: 10,
     libraryBehaviour: 'prefer',
-    merge,
+    tiebreakers: [
+      { type: 'torrent_seeders', position: 'before_addon' },
+      { type: 'usenet_age', position: 'before_addon' },
+    ],
   };
+}
+
+function autoPlay(contract) {
+  const allowedMethods = contract.autoPlayMethods || [];
+  const method = allowedMethods.includes('matchingFile')
+    ? 'matchingFile'
+    : allowedMethods[0] || 'matchingFile';
+  const wantedAttributes = ['resolution', 'quality', 'audioTags'];
+  const allowedAttributes = new Set(contract.autoPlayAttributes || []);
+  const attributes = allowedAttributes.size
+    ? wantedAttributes.filter((attribute) => allowedAttributes.has(attribute))
+    : wantedAttributes;
+  return { enabled: true, method, attributes };
+}
+
+function precacheSelector(contract) {
+  return selOrNull(
+    contract,
+    "count(cached(streams)) == 0 ? slice(uncached(type(streams, 'debrid', 'usenet')), 0, 1) : []",
+  );
+}
+
+function preloadStreams(contract) {
+  const selector = selOrNull(
+    contract,
+    "queryType == 'movie' ? slice(perGroup(cached(streams), 'quality', 2), 0, 4) : slice(perGroup(cached(streams), 'resolution', 2), 0, 4)",
+  );
+  return selector
+    ? { enabled: true, selector, singleStream: true }
+    : { enabled: false };
 }
 
 function groups(contract, presets) {
@@ -182,17 +244,19 @@ function groups(contract, presets) {
     }));
   }
   const addons = presets.filter((p) => p.enabled).map((p) => p.instanceId).filter(Boolean);
-  if (addons.length < 2) return undefined;
+  if (addons.length < 2) return { enabled: false, groupings: [] };
+  const midpoint = Math.ceil(addons.length / 2);
   return {
     enabled: true,
     behaviour: 'sequential',
     onConditionFailure: 'includeFinished',
     groupings: [
+      { addons: addons.slice(0, midpoint), condition: 'true' },
       {
-        addons,
+        addons: addons.slice(midpoint),
         condition: hasFn(contract, 'cached')
-          ? `count(cached(streams)) >= 4`
-          : `count(streams) >= 6`,
+          ? 'count(cached(previousStreams)) < 4'
+          : 'count(previousStreams) < 6',
       },
     ],
   };
@@ -275,13 +339,17 @@ export function generateTemplate(recipe, contract) {
     warnings.push(`Service '${service}' is not in the current contract service list.`);
   }
 
-  const formatterId = (contract.formatters || []).includes('tamtaro')
-    ? 'tamtaro'
+  // Tamtaro is only valid with a matching definitions.overrides.tamtaro block.
+  // Recipes without a custom definition use the current built-in GDrive format.
+  const formatterId = (contract.formatters || []).includes('gdrive')
+    ? 'gdrive'
     : (contract.formatters || [])[0] || 'gdrive';
 
   const addonName = recipe.name || `Regen ${service} ${resolution} ${device}`;
+  const precache = precacheSelector(contract);
 
   const config = {
+    trusted: false,
     addonName,
     addonDescription: `Self-regenerated against AIOStreams ${contract.version || contract.ref || 'source'} (${new Date().toISOString().slice(0, 10)}).`,
     services,
@@ -298,23 +366,43 @@ export function generateTemplate(recipe, contract) {
     sortCriteria: {
       global: sortCriteria(contract),
     },
-    deduplicator: deduplicator(contract),
+    deduplicator: deduplicator(),
     groups: profile === 'stable' ? undefined : groups(contract, presets),
     dynamicAddonFetching:
       profile === 'labs' || profile === 'advanced'
         ? {
             enabled: true,
             condition: hasFn(contract, 'cached')
-              ? `count(cached(streams)) >= ${resolution === '1080p' ? 6 : 8}`
-              : `count(streams) >= 10`,
+              ? `count(cached(totalStreams)) >= ${resolution === '1080p' ? 6 : 8}`
+              : 'count(totalStreams) >= 10',
           }
         : undefined,
-    titleMatching: { enabled: true, method: 'contains', similarity: 0.75 },
-    yearMatching: { enabled: true, tolerance: 1 },
-    seasonEpisodeMatching: { enabled: true, requestTypes: ['series'] },
-    autoPlay: { enabled: true, method: 'default' },
+    titleMatching: {
+      enabled: true,
+      mode: 'contains',
+      similarityThreshold: 0.75,
+      requestTypes: [],
+      addons: [],
+    },
+    yearMatching: {
+      enabled: true,
+      tolerance: 2,
+      strict: false,
+      useInitialAirDate: true,
+      requestTypes: [],
+      addons: [],
+    },
+    seasonEpisodeMatching: {
+      enabled: true,
+      strict: false,
+      requestTypes: [],
+      addons: [],
+    },
+    autoPlay: autoPlay(contract),
     precacheNextEpisode: true,
-    preloadStreams: true,
+    precacheSelector: precache || undefined,
+    precacheSingleStream: precache ? true : undefined,
+    preloadStreams: preloadStreams(contract),
     checkOwned: true,
     showChanges: true,
   };
@@ -336,26 +424,28 @@ export function generateTemplate(recipe, contract) {
       description: config.addonDescription,
       author: 'aios-regen',
       version: recipe.version || '0.1.0',
-      source: 'aios-regen',
+      source: 'external',
       category: 'community',
+      tags: ['core-builds', 'generated'],
+      serviceRequired: false,
+      setToSaveInstallMenu: true,
     },
     config,
-    _regen: {
-      service,
-      resolution,
-      device,
-      profile,
-      contractKind: contract.kind,
-      contractVersion: contract.version || null,
-      contractHost: contract.hostUrl || contract.host || null,
-      fingerprint: contract.source?.fingerprint || contract.fingerprint || null,
-      generatedAt: new Date().toISOString(),
-      warnings,
-      notes,
-    },
   };
 
-  return { template, warnings, notes, config };
+  const provenance = {
+    service,
+    resolution,
+    device,
+    profile,
+    contractKind: contract.kind,
+    contractVersion: contract.version || null,
+    contractHost: contract.hostUrl || contract.host || null,
+    fingerprint: contract.source?.fingerprint || contract.fingerprint || null,
+    generatedAt: new Date().toISOString(),
+  };
+
+  return { template, warnings, notes, config, provenance };
 }
 
 /**
@@ -365,8 +455,14 @@ export function healTemplate(input, contract) {
   const warnings = [];
   const notes = [];
   const wrapper = input.config ? input : { metadata: input.metadata, config: input };
+  const metadata = wrapper.metadata ? structuredClone(wrapper.metadata) : null;
   const config = structuredClone(wrapper.config || input);
   const byId = presetIndex(contract);
+
+  if (metadata?.source === 'aios-regen') {
+    metadata.source = 'external';
+    notes.push("Rewrote metadata.source 'aios-regen' → 'external'.");
+  }
 
   if (Array.isArray(config.groups) && (contract.hotspots || {}).groups === 'object') {
     config.groups = {
@@ -375,6 +471,36 @@ export function healTemplate(input, contract) {
       groupings: config.groups,
     };
     notes.push('Rewrote groups array → object.');
+  }
+
+  if (typeof config.preloadStreams === 'boolean') {
+    config.preloadStreams = { enabled: config.preloadStreams };
+    notes.push('Rewrote preloadStreams boolean → object.');
+  }
+
+  if (config.titleMatching && typeof config.titleMatching === 'object') {
+    if (config.titleMatching.mode === undefined && config.titleMatching.method !== undefined) {
+      config.titleMatching.mode = config.titleMatching.method;
+    }
+    if (
+      config.titleMatching.similarityThreshold === undefined &&
+      config.titleMatching.similarity !== undefined
+    ) {
+      config.titleMatching.similarityThreshold = config.titleMatching.similarity;
+    }
+    if ('method' in config.titleMatching || 'similarity' in config.titleMatching) {
+      delete config.titleMatching.method;
+      delete config.titleMatching.similarity;
+      notes.push('Rewrote legacy titleMatching keys to mode/similarityThreshold.');
+    }
+  }
+
+  if (config.autoPlay?.method === 'default') {
+    config.autoPlay.method = (contract.autoPlayMethods || []).includes('matchingFile')
+      ? 'matchingFile'
+      : (contract.autoPlayMethods || [])[0] || 'matchingFile';
+    config.autoPlay.attributes ??= ['resolution', 'quality', 'audioTags'];
+    notes.push("Rewrote autoPlay method 'default' to the current matching-file shape.");
   }
 
   if (Array.isArray(config.presets)) {
@@ -440,22 +566,39 @@ export function healTemplate(input, contract) {
       'rankedStreamExpressions',
     ]) {
       if (!Array.isArray(config[key])) continue;
-      config[key] = config[key].filter((row) => {
-        const expr = typeof row === 'string' ? row : row.expression;
-        if (!expr) return true;
-        const used = [...expr.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\(/g)].map((m) => m[1]);
-        const unknown = used.filter((fn) => !selFns.has(fn) && !['min', 'max', 'sqrt', 'ceil', 'floor', 'round', 'trunc', 'random'].includes(fn));
-        if (unknown.length) {
-          warnings.push(`Dropped SEL '${row.name || expr.slice(0, 40)}' — unknown function(s): ${unknown.join(', ')}`);
-          return false;
-        }
-        return true;
-      });
+      let reshaped = false;
+      config[key] = config[key]
+        .map((row) => {
+          if (typeof row === 'string') {
+            reshaped = true;
+            return { expression: row, enabled: true };
+          }
+          if (!row || typeof row !== 'object' || !row.name) return row;
+          const next = { ...row };
+          if (next.expression && !next.expression.trimStart().startsWith('/*')) {
+            next.expression = commentedExpression(next.name, next.expression);
+          }
+          delete next.name;
+          reshaped = true;
+          return next;
+        })
+        .filter((row) => {
+          const expr = row?.expression;
+          if (!expr) return true;
+          const used = [...expr.matchAll(/\b([A-Za-z_][A-Za-z0-9_]*)\s*\(/g)].map((m) => m[1]);
+          const unknown = used.filter((fn) => !selFns.has(fn) && !['min', 'max', 'sqrt', 'ceil', 'floor', 'round', 'trunc', 'random'].includes(fn));
+          if (unknown.length) {
+            warnings.push(`Dropped SEL '${expr.slice(0, 40)}' — unknown function(s): ${unknown.join(', ')}`);
+            return false;
+          }
+          return true;
+        });
+      if (reshaped) notes.push(`Rewrote ${key} entries to the current expression-row shape.`);
     }
   }
 
   return {
-    template: { ...(wrapper.metadata ? { metadata: wrapper.metadata } : {}), config },
+    template: { ...(metadata ? { metadata } : {}), config },
     warnings,
     notes,
   };
