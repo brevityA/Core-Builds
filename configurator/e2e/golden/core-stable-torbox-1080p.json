@@ -34,6 +34,7 @@
     "includedLanguages": [],
     "requiredLanguages": [],
     "preferredLanguages": [
+      "English",
       "Original",
       "Dual Audio",
       "Multi",
@@ -461,10 +462,6 @@
       ],
       "showFilterStatsOnNoStreams": true
     },
-    "excludedStreamTypes": [
-      "http",
-      "p2p"
-    ],
     "failover": {
       "enabled": false,
       "maxAttempts": 3,
@@ -474,6 +471,10 @@
       ],
       "allowCrossType": false,
       "parallel": false
-    }
+    },
+    "excludedStreamTypes": [
+      "http",
+      "p2p"
+    ]
   }
 }

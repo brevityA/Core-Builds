@@ -2005,10 +2005,6 @@
     "syncedIncludedStreamExpressionUrls": [],
     "syncedPreferredStreamExpressionUrls": [],
     "syncedRankedStreamExpressionUrls": [],
-    "excludedStreamTypes": [
-      "http",
-      "p2p"
-    ],
     "failover": {
       "enabled": false,
       "maxAttempts": 3,
@@ -2018,6 +2014,10 @@
       ],
       "allowCrossType": false,
       "parallel": false
-    }
+    },
+    "excludedStreamTypes": [
+      "http",
+      "p2p"
+    ]
   }
 }

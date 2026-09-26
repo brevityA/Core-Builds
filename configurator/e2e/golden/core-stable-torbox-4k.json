@@ -34,6 +34,7 @@
     "includedLanguages": [],
     "requiredLanguages": [],
     "preferredLanguages": [
+      "English",
       "Original",
       "Dual Audio",
       "Multi",
@@ -63,15 +64,15 @@
     "sortCriteria": {
       "global": [
         {
-          "key": "cached",
-          "direction": "desc"
-        },
-        {
           "key": "resolution",
           "direction": "desc"
         },
         {
           "key": "quality",
+          "direction": "desc"
+        },
+        {
+          "key": "cached",
           "direction": "desc"
         },
         {
@@ -168,7 +169,7 @@
       "proxiedServices": []
     },
     "resultLimits": {
-      "global": 10,
+      "global": 12,
       "resolution": 3,
       "mode": "independent"
     },
@@ -463,10 +464,6 @@
       ],
       "showFilterStatsOnNoStreams": true
     },
-    "excludedStreamTypes": [
-      "http",
-      "p2p"
-    ],
     "failover": {
       "enabled": false,
       "maxAttempts": 3,
@@ -476,6 +473,10 @@
       ],
       "allowCrossType": false,
       "parallel": false
-    }
+    },
+    "excludedStreamTypes": [
+      "http",
+      "p2p"
+    ]
   }
 }

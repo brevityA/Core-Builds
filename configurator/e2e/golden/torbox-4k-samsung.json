@@ -34,6 +34,7 @@
     "includedLanguages": [],
     "requiredLanguages": [],
     "preferredLanguages": [
+      "English",
       "Original",
       "Dual Audio",
       "Multi",
@@ -736,7 +737,7 @@
       "proxiedServices": []
     },
     "resultLimits": {
-      "global": 16,
+      "global": 20,
       "resolution": 5,
       "mode": "independent"
     },
@@ -1161,10 +1162,6 @@
       "H-SBS"
     ],
     "requiredStreamExpressions": [],
-    "excludedStreamTypes": [
-      "http",
-      "p2p"
-    ],
     "failover": {
       "enabled": false,
       "maxAttempts": 3,
@@ -1174,6 +1171,10 @@
       ],
       "allowCrossType": false,
       "parallel": false
-    }
+    },
+    "excludedStreamTypes": [
+      "http",
+      "p2p"
+    ]
   }
 }

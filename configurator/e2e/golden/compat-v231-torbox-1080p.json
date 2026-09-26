@@ -34,6 +34,7 @@
     "includedLanguages": [],
     "requiredLanguages": [],
     "preferredLanguages": [
+      "English",
       "Original",
       "Dual Audio",
       "Multi",
@@ -1140,8 +1141,6 @@
     "excludedStreamTypes": [
       "http",
       "p2p"
-    ],
-    "maxResults": 16,
-    "maxResultsPerResolution": 5
+    ]
   }
 }
