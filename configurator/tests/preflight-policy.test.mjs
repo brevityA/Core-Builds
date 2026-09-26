@@ -266,6 +266,30 @@ test('the policy never receives or echoes a credential value', () => {
   assert.equal(blob.includes('sk-super-secret-value'), false);
 });
 
+test('filter simulator warns when independent hard constraints intersect', () => {
+  const findings = preflightFindings({
+    service: 'p2p',
+    filterRisk: { cachedOnly:true, hardResolution:true, exclusiveLanguage:true, strictMatching:true },
+  });
+  const risk = findings.find(f => f.id === 'filter-starvation-high');
+  assert.equal(risk?.severity, 'warning');
+  assert.match(risk.detail, /4 hard constraints/);
+  assert.match(risk.fix, /Prefer ranking over removal/);
+});
+
+test('filter simulator gives a targeted advisory for a narrow language path', () => {
+  const findings = preflightFindings({
+    service: 'p2p',
+    filterRisk: { hardResolution:true, exclusiveLanguage:true },
+  });
+  assert.equal(findings.find(f => f.id === 'filter-starvation-moderate')?.severity, 'advisory');
+});
+
+test('filter simulator stays silent for preference-first setups', () => {
+  const findings = preflightFindings({ service:'p2p', filterRisk:{ cachedOnly:false, hardResolution:false, exclusiveLanguage:false } });
+  assert.equal(findings.some(f => f.id.startsWith('filter-starvation-')), false);
+});
+
 test('no findings means the caller can skip the modal entirely', () => {
   assert.deepEqual(preflightFindings({}), [
     Object.freeze({

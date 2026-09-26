@@ -2020,6 +2020,8 @@ function showBuildAdvisor() {
       <label class="advisor-field">Content<select id="advisorContent"><option value="all">A bit of everything</option><option value="movies">Mostly movies</option><option value="series">Mostly series</option><option value="anime">Anime</option><option value="niche">Older, foreign, or niche</option></select></label>
       <label class="advisor-field">Network<select id="advisorNetwork"><option value="unknown">Not sure</option><option value="slow">Under 25 Mbps</option><option value="medium">25–75 Mbps</option><option value="fast">Over 75 Mbps</option></select></label>
       <label class="advisor-field">Result preference<select id="advisorReliability"><option value="cached-first">Cached first + fallback</option><option value="cached-only">Instant-play only</option><option value="broad">Broadest coverage</option></select></label>
+      <label class="advisor-field">Language<select id="advisorLocale"><option value="en">English</option><option value="pt-BR">Portuguese (Brazil)</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="it">Italian</option><option value="nl">Dutch</option><option value="ar">Arabic</option><option value="hi">Hindi</option></select></label>
+      <label class="advisor-field">Household<select id="advisorHousehold"><option value="general">General</option><option value="family">Family · through PG-13</option><option value="kids">Kids · through PG</option></select></label>
     </div>
     <div id="advisorResult" style="margin-top:14px"></div>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button class="diag-secondary" data-advisor-close>Cancel</button><button class="diag-primary" id="advisorApply">Apply recommendation</button></div>
@@ -2034,6 +2036,8 @@ function showBuildAdvisor() {
       content: overlay.querySelector('#advisorContent').value,
       network: overlay.querySelector('#advisorNetwork').value,
       reliability: overlay.querySelector('#advisorReliability').value,
+      locale: overlay.querySelector('#advisorLocale').value,
+      household: overlay.querySelector('#advisorHousehold').value,
       device: S.device || 'generic',
       deviceMaxResolution: maxResolution,
     });
@@ -2045,6 +2049,7 @@ function showBuildAdvisor() {
         p.cacheMode==='cached'?'Cached only':'Cached first',
         p.streamPool==='wide'?'Wide pool':p.streamPool==='small'?'Small pool':'Normal pool',
         `${Math.round(p.addonTimeout/1000)}s timeout`, p.pseArch==='standard'?'Standard ranking':p.pseArch==='iqr'?'Apex IQR':'Apex Mixed',
+        p.langs.join(' + '), p.ageLimit==='none'?'Unrestricted':`Up to ${p.ageLimit}`,
       ].map(x=>`<span style="font-size:.7rem;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.05);color:#cbd5e1;border:1px solid rgba(255,255,255,.08)">${escHtml(x)}</span>`).join('')}</div>
       ${current.reasons.map(r=>`<div style="font-size:.73rem;color:#8b949e;line-height:1.45;margin-top:6px"><strong style="color:#dbeafe">${escHtml(r.title)}</strong> — ${escHtml(r.detail)}<div style="font-size:.7rem;color:#4b5563">Evidence: ${escHtml(r.evidence)}</div></div>`).join('')}
       ${current.assumptions.map(a=>`<div style="font-size:.7rem;color:#fbbf24;margin-top:8px">Assumption: ${escHtml(a)}</div>`).join('')}
@@ -7211,6 +7216,14 @@ function collectPreflightFindings() {
     requiredCredentialIds: getDebridInputs().map(i => i.id),
     devicesForcingLimitedAudio: [...DEVICE_FORCE_LIMITED_AUDIO],
     deviceMaxResolution: devicePlaybackCeilings(),
+    filterRisk: {
+      cachedOnly: S.cacheMode === 'cached',
+      hardResolution: S.resolution === '1080p' || S.exclude4K === true,
+      exclusiveLanguage: S.langExclusive === true,
+      foreignLanguageKill: S.foreignLangKill !== false,
+      strictMatching: S.matchMode === 'strict',
+      ageLimited: Boolean(S.ageLimit && S.ageLimit !== 'none' && S.ageLimit !== 'NC-17'),
+    },
   };
 
   let config = null;

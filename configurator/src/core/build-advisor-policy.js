@@ -9,6 +9,18 @@ const GOALS = new Set(['balanced', 'speed', 'quality', 'coverage']);
 const CONTENT = new Set(['all', 'movies', 'series', 'anime', 'niche']);
 const RELIABILITY = new Set(['cached-only', 'cached-first', 'broad']);
 const NETWORK = new Set(['unknown', 'slow', 'medium', 'fast']);
+const HOUSEHOLDS = new Set(['general', 'family', 'kids']);
+const LOCALES = Object.freeze({
+  en: { langs:['English'], subtitles:['en'], label:'English' },
+  'pt-BR': { langs:['Portuguese','English'], subtitles:['pt','en'], label:'Portuguese (Brazil)' },
+  es: { langs:['Spanish','English'], subtitles:['es','en'], label:'Spanish' },
+  fr: { langs:['French','English'], subtitles:['fr','en'], label:'French' },
+  de: { langs:['German','English'], subtitles:['de','en'], label:'German' },
+  it: { langs:['Italian','English'], subtitles:['it','en'], label:'Italian' },
+  nl: { langs:['Dutch','English'], subtitles:['nl','en'], label:'Dutch' },
+  ar: { langs:['Arabic','English'], subtitles:['ar','en'], label:'Arabic' },
+  hi: { langs:['Hindi','English'], subtitles:['hi','en'], label:'Hindi' },
+});
 
 function allowed(value, values, fallback) {
   return values.has(value) ? value : fallback;
@@ -30,6 +42,8 @@ function candidate(id, label, patch, tradeoff) {
  * @param {'unknown'|'slow'|'medium'|'fast'} rawIntent.network
  * @param {string} [rawIntent.device]
  * @param {'4k'|'1080p'} [rawIntent.deviceMaxResolution]
+ * @param {'en'|'pt-BR'|'es'|'fr'|'de'|'it'|'nl'|'ar'|'hi'} [rawIntent.locale]
+ * @param {'general'|'family'|'kids'} [rawIntent.household]
  */
 export function adviseBuild(rawIntent = {}) {
   const intent = Object.freeze({
@@ -39,13 +53,18 @@ export function adviseBuild(rawIntent = {}) {
     network: allowed(rawIntent.network, NETWORK, 'unknown'),
     device: String(rawIntent.device || 'generic'),
     deviceMaxResolution: rawIntent.deviceMaxResolution === '1080p' ? '1080p' : '4k',
+    locale: Object.hasOwn(LOCALES, rawIntent.locale) ? rawIntent.locale : 'en',
+    household: allowed(rawIntent.household, HOUSEHOLDS, 'general'),
   });
+  const locale = LOCALES[intent.locale];
 
   const patch = {
     resolution: '1080p', cacheMode: 'mixed', qualityFirst: false,
     resolutionFirst: true, streamPool: 'normal', matchMode: 'balanced',
     content: intent.content === 'niche' ? 'all' : intent.content,
     outputProfile: 'balanced', addonTimeout: 6000, pseArch: 'standard',
+    langs: [...locale.langs], subtitleLangs: [...locale.subtitles],
+    langExclusive: false, foreignLangKill: false, ageLimit: 'none',
   };
   const reasons = [];
   const assumptions = [];
@@ -93,6 +112,18 @@ export function adviseBuild(rawIntent = {}) {
     reasons.push(reason('device-cap', 'Capped to the device', `${intent.device} is represented by a 1080p device profile, so higher tiers are removed.`, 'Device capability policy'));
   }
 
+  if (intent.locale !== 'en') {
+    reasons.push(reason('locale-pack', `${locale.label} preference pack`, `${locale.label} streams and subtitles rank first, with English retained as a fallback. Unknown language tags are not hard-filtered.`, 'Your language answer'));
+  }
+
+  if (intent.household === 'kids') {
+    patch.ageLimit = 'PG';
+    reasons.push(reason('kids-profile', 'Kids content ceiling', 'The generated stream policy allows G and PG certifications. TMDB credentials are needed for certification data.', 'Your household answer'));
+  } else if (intent.household === 'family') {
+    patch.ageLimit = 'PG-13';
+    reasons.push(reason('family-profile', 'Family content ceiling', 'The generated stream policy allows content through PG-13. TMDB credentials are needed for certification data.', 'Your household answer'));
+  }
+
   if (intent.content === 'anime') {
     patch.content = 'anime';
     if (patch.matchMode === 'balanced') patch.matchMode = 'lenient';
@@ -111,7 +142,7 @@ export function adviseBuild(rawIntent = {}) {
   ];
 
   return Object.freeze({
-    policyVersion: 1,
+    policyVersion: 2,
     intent,
     patch: Object.freeze(patch),
     reasons: Object.freeze(reasons),

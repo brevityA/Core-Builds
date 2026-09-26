@@ -41,6 +41,26 @@ test('coverage and niche intent reduce starvation risk', () => {
   assert.ok(result.reasons.some(r => r.id === 'niche-matching'));
 });
 
+test('locale and household intents compose safe language and family policies', () => {
+  const result = adviseBuild({ goal:'balanced', content:'anime', reliability:'cached-first', network:'fast', locale:'pt-BR', household:'kids' });
+  assert.equal(result.policyVersion, 2);
+  assert.deepEqual(result.patch.langs, ['Portuguese', 'English']);
+  assert.deepEqual(result.patch.subtitleLangs, ['pt', 'en']);
+  assert.equal(result.patch.langExclusive, false);
+  assert.equal(result.patch.foreignLangKill, false);
+  assert.equal(result.patch.ageLimit, 'PG');
+  assert.ok(result.reasons.some(r => r.id === 'locale-pack'));
+  assert.ok(result.reasons.some(r => r.id === 'kids-profile'));
+});
+
+test('unknown locale and household values use non-restrictive defaults', () => {
+  const result = adviseBuild({ locale:'invented', household:'locked-down', network:'fast' });
+  assert.equal(result.intent.locale, 'en');
+  assert.equal(result.intent.household, 'general');
+  assert.deepEqual(result.patch.langs, ['English']);
+  assert.equal(result.patch.ageLimit, 'none');
+});
+
 test('unknown input is normalized and lowers confidence only when evidence is missing', () => {
   const unknown = adviseBuild({ goal:'made-up', content:'bad', reliability:'nope', network:'unknown' });
   assert.equal(unknown.intent.goal, 'balanced');
