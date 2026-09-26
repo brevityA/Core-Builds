@@ -1,14 +1,14 @@
 {
   "kind": "source",
-  "extractedAt": "2026-09-25T23:02:23.139Z",
-  "fingerprint": "0a6befd0751ff5dd",
+  "extractedAt": "2026-09-26T00:36:25.655Z",
+  "fingerprint": "63f529cd121034f7",
   "repo": "Viren070/AIOStreams",
   "ref": "main",
   "commit": {
-    "sha": "19d7c1294fc2fec70755a4e5864485eb67793ab5",
-    "date": "2026-09-25T14:26:48Z",
-    "message": "fix(core): make trailer source and type optional",
-    "url": "https://github.com/Viren070/AIOStreams/commit/19d7c1294fc2fec70755a4e5864485eb67793ab5"
+    "sha": "00fb93a4a19804600f5053d4a409d8d42f1fa6e7",
+    "date": "2026-09-26T00:06:53Z",
+    "message": "chore(desktop): update the web app (#1362)",
+    "url": "https://github.com/Viren070/AIOStreams/commit/00fb93a4a19804600f5053d4a409d8d42f1fa6e7"
   },
   "counts": {
     "presets": 83,
@@ -16,6 +16,8 @@
     "schemaKeys": 158,
     "selFunctions": 70,
     "formatterFields": 90,
+    "formatters": 8,
+    "autoPlayMethods": 3,
     "requiredOptions": 2
   },
   "presetIds": [
@@ -290,7 +292,12 @@
     "deduplicator.merge": "object",
     "groups": "object",
     "dynamicAddonFetching": "object",
-    "sortCriteria": "object"
+    "sortCriteria": "object",
+    "titleMatching": "object",
+    "yearMatching": "object",
+    "seasonEpisodeMatching": "object",
+    "autoPlay": "object",
+    "preloadStreams": "object"
   },
   "sel": {
     "functions": [
@@ -537,7 +544,16 @@
     "right",
     "xor"
   ],
-  "formatters": [],
+  "formatters": [
+    "gdrive",
+    "prism",
+    "tamtaro",
+    "lightgdrive",
+    "minimalisticgdrive",
+    "torrentio",
+    "torbox",
+    "custom"
+  ],
   "sortCriteria": [
     "quality",
     "resolution",
@@ -564,6 +580,27 @@
     "seadex",
     "bitrate",
     "releaseGroup"
+  ],
+  "autoPlayMethods": [
+    "matchingFile",
+    "matchingIndex",
+    "firstFile"
+  ],
+  "autoPlayAttributes": [
+    "service",
+    "cached",
+    "addon",
+    "proxied",
+    "resolution",
+    "quality",
+    "encode",
+    "audioTags",
+    "visualTags",
+    "languages",
+    "releaseGroup",
+    "type",
+    "infoHash",
+    "size"
   ],
   "templateDirectives": [
     "__if",

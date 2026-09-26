@@ -95,6 +95,22 @@ function constStringMap(src, suffix = '_SERVICE') {
   return map;
 }
 
+/** Resolve a string array that may reference named string constants. */
+export function resolvedStringArrayDecl(src, name, constants = {}) {
+  const re = new RegExp(
+    `(?:export\\s+)?(?:let|const)\\s+${name}\\s*(?::[^=]+)?=\\s*\\[([\\s\\S]*?)\\]`,
+  );
+  const match = src.match(re);
+  if (!match) return [];
+
+  const values = [];
+  for (const token of match[1].matchAll(/'([^']*)'|"([^"]*)"|\b([A-Z][A-Z0-9_]*)\b/g)) {
+    const value = token[1] ?? token[2] ?? constants[token[3]];
+    if (value) values.push(value);
+  }
+  return unique(values);
+}
+
 function objectKeysFromZod(src, declName) {
   const idx = src.search(new RegExp(`export const ${declName}\\s*=\\s*z\\.object\\(`));
   if (idx < 0) return [];
@@ -153,6 +169,11 @@ function extractHotspots(schemas) {
     groups: lastZodKind(schemas, 'groups'),
     dynamicAddonFetching: lastZodKind(schemas, 'dynamicAddonFetching'),
     sortCriteria: lastZodKind(schemas, 'sortCriteria'),
+    titleMatching: lastZodKind(schemas, 'titleMatching'),
+    yearMatching: lastZodKind(schemas, 'yearMatching'),
+    seasonEpisodeMatching: lastZodKind(schemas, 'seasonEpisodeMatching'),
+    autoPlay: lastZodKind(schemas, 'autoPlay'),
+    preloadStreams: lastZodKind(schemas, 'preloadStreams'),
   };
 }
 
@@ -331,13 +352,11 @@ export async function extractSource({ includePresetOptions = true } = {}) {
   const modifiers = extractModifiers(files.modifiers);
   const comparators = extractComparators(files.comparators);
 
-  const formatters = unique([
-    ...quotedStrings(files.constants, /FORMATTERS\s*=\s*\[([\s\S]*?)\]/),
-  ]);
-
-  const sortCriteria = unique([
-    ...quotedStrings(files.constants, /SORT_CRITERIA\s*=\s*\[([\s\S]*?)\]/),
-  ]);
+  const formatterConsts = constStringMap(files.constants, '_FORMATTER');
+  const formatters = resolvedStringArrayDecl(files.constants, 'FORMATTERS', formatterConsts);
+  const sortCriteria = stringArrayDecl(files.constants, 'SORT_CRITERIA');
+  const autoPlayMethods = stringArrayDecl(files.constants, 'AUTO_PLAY_METHODS');
+  const autoPlayAttributes = stringArrayDecl(files.constants, 'AUTO_PLAY_ATTRIBUTES');
 
   const presets = [];
   if (includePresetOptions) {
@@ -391,6 +410,8 @@ export async function extractSource({ includePresetOptions = true } = {}) {
     formatterComparators: comparators,
     formatters,
     sortCriteria,
+    autoPlayMethods,
+    autoPlayAttributes,
     templateDirectives: ['__if', '{{inputs.}}', 'metadata.inputs'],
   };
   contract.fingerprint = fingerprint(contract);
@@ -512,6 +533,11 @@ export function fingerprint(contract) {
     selFunctions: contract.sel?.functions || [],
     formatterFields: contract.formatterFields || [],
     formatterModifiers: contract.formatterModifiers || [],
+    formatterComparators: contract.formatterComparators || [],
+    formatters: contract.formatters || [],
+    sortCriteria: contract.sortCriteria || [],
+    autoPlayMethods: contract.autoPlayMethods || [],
+    autoPlayAttributes: contract.autoPlayAttributes || [],
     required: (contract.presets || []).map((p) => ({
       id: p.id,
       req: (p.requiredOptions || []).map((o) => o.id).sort(),
@@ -538,6 +564,8 @@ export function compact(contract) {
       schemaKeys: (contract.schemaKeys || []).length,
       selFunctions: (contract.sel?.functions || []).length,
       formatterFields: (contract.formatterFields || []).length,
+      formatters: (contract.formatters || []).length,
+      autoPlayMethods: (contract.autoPlayMethods || []).length,
       requiredOptions: (contract.presets || []).reduce(
         (n, p) => n + (p.requiredOptions || []).length,
         0,
@@ -553,6 +581,8 @@ export function compact(contract) {
     formatterComparators: contract.formatterComparators,
     formatters: contract.formatters,
     sortCriteria: contract.sortCriteria,
+    autoPlayMethods: contract.autoPlayMethods,
+    autoPlayAttributes: contract.autoPlayAttributes,
     templateDirectives: contract.templateDirectives,
     requiredOptions: (contract.presets || []).flatMap((p) =>
       (p.requiredOptions || []).map((o) => ({ preset: p.id, ...o })),
@@ -617,6 +647,26 @@ export function diffContracts(pinned, live) {
   const fm = arrDiff(pinned.formatterModifiers, live.formatterModifiers);
   push('formatter.modifiers', 'added', fm.added);
   push('formatter.modifiers', 'removed', fm.removed);
+
+  const fc = arrDiff(pinned.formatterComparators, live.formatterComparators);
+  push('formatter.comparators', 'added', fc.added);
+  push('formatter.comparators', 'removed', fc.removed);
+
+  const formatters = arrDiff(pinned.formatters, live.formatters);
+  push('formatters', 'added', formatters.added);
+  push('formatters', 'removed', formatters.removed);
+
+  const sorts = arrDiff(pinned.sortCriteria, live.sortCriteria);
+  push('sortCriteria', 'added', sorts.added);
+  push('sortCriteria', 'removed', sorts.removed);
+
+  const autoPlayMethods = arrDiff(pinned.autoPlayMethods, live.autoPlayMethods);
+  push('autoPlay.methods', 'added', autoPlayMethods.added);
+  push('autoPlay.methods', 'removed', autoPlayMethods.removed);
+
+  const autoPlayAttributes = arrDiff(pinned.autoPlayAttributes, live.autoPlayAttributes);
+  push('autoPlay.attributes', 'added', autoPlayAttributes.added);
+  push('autoPlay.attributes', 'removed', autoPlayAttributes.removed);
 
   if (pinned.hotspots && live.hotspots) {
     for (const key of unique([...Object.keys(pinned.hotspots), ...Object.keys(live.hotspots)])) {
@@ -701,6 +751,8 @@ export function mergeContracts(source, host) {
     formatterComparators: source?.formatterComparators || [],
     formatters: source?.formatters || [],
     sortCriteria: source?.sortCriteria || [],
+    autoPlayMethods: source?.autoPlayMethods || [],
+    autoPlayAttributes: source?.autoPlayAttributes || [],
     templateDirectives: source?.templateDirectives || [],
     limits: host?.limits || null,
     version: host?.version || null,
