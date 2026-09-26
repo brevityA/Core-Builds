@@ -189,6 +189,20 @@ test('legacy TorBox Search is retained only by the explicit v2.31 advanced compa
   assert.equal(stable.config.presets.some(preset => preset.type === 'torbox-search'), false);
 });
 
+test('modern lanes emit canonical failover and preserve the configured attempt count', () => {
+  const template = richTemplate();
+  template.config.nzbFailover = { enabled:true, count:5, position:'first' };
+  const current = applyOutputProfile(template, 'advanced', { service:'torbox-pro', aiostreamsVersion:'2.34.1' });
+  assert.equal(Object.hasOwn(current.config, 'nzbFailover'), false);
+  assert.deepEqual(current.config.failover, {
+    enabled:true, maxAttempts:5, position:'first', contentTypes:['usenet'], allowCrossType:false, parallel:false,
+  });
+
+  const legacy = applyOutputProfile(template, 'advanced', { service:'torbox-pro', aiostreamsVersion:'2.31.1' });
+  assert.deepEqual(legacy.config.nzbFailover, { enabled:true, count:5, position:'first' });
+  assert.equal(Object.hasOwn(legacy.config, 'failover'), false);
+});
+
 test('every profile strips synced expression URLs and unusable remote-score rules', () => {
   for (const profile of ['stable', 'balanced', 'advanced', 'labs']) {
     const output = applyOutputProfile(richTemplate(), profile, { service:'torbox-pro', resolution:'1080p' });

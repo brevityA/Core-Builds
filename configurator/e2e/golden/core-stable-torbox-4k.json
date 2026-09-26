@@ -12,7 +12,7 @@
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "coreBuildsVersion": "3.11",
-    "coreBuildsAIOStreamsTarget": "2.31.1",
+    "coreBuildsAIOStreamsTarget": "2.34.1",
     "coreBuildsProfile": "stable",
     "coreBuildsProfileVersion": "1"
   },
@@ -34,7 +34,6 @@
     "includedLanguages": [],
     "requiredLanguages": [],
     "preferredLanguages": [
-      "English",
       "Original",
       "Dual Audio",
       "Multi",
@@ -64,15 +63,15 @@
     "sortCriteria": {
       "global": [
         {
+          "key": "cached",
+          "direction": "desc"
+        },
+        {
           "key": "resolution",
           "direction": "desc"
         },
         {
           "key": "quality",
-          "direction": "desc"
-        },
-        {
-          "key": "cached",
           "direction": "desc"
         },
         {
@@ -169,7 +168,7 @@
       "proxiedServices": []
     },
     "resultLimits": {
-      "global": 12,
+      "global": 10,
       "resolution": 3,
       "mode": "independent"
     },
@@ -205,9 +204,6 @@
     "cacheAndPlay": {
       "enabled": false,
       "streamTypes": []
-    },
-    "nzbFailover": {
-      "enabled": false
     },
     "areYouStillThere": {
       "enabled": false
@@ -470,6 +466,16 @@
     "excludedStreamTypes": [
       "http",
       "p2p"
-    ]
+    ],
+    "failover": {
+      "enabled": false,
+      "maxAttempts": 3,
+      "position": "last",
+      "contentTypes": [
+        "usenet"
+      ],
+      "allowCrossType": false,
+      "parallel": false
+    }
   }
 }

@@ -322,6 +322,22 @@ function applyAIOStreamsCompatibility(template, context) {
     config.presets = values(config.presets).filter(
       preset => String(preset?.type || '').toLowerCase() !== 'torbox-search'
     );
+
+    // Modern AIOStreams lanes use the canonical generic failover schema. Keep
+    // v2.31.1 on the legacy input shape, but avoid relying on runtime migration
+    // elsewhere and preserve the configured attempt count.
+    if (config.failover === undefined && config.nzbFailover !== undefined) {
+      const legacy = config.nzbFailover || {};
+      config.failover = {
+        enabled: Boolean(legacy.enabled),
+        maxAttempts: Number(legacy.count ?? legacy.maxFailoverNzbs) || 3,
+        position: legacy.position === 'first' ? 'first' : 'last',
+        contentTypes: ['usenet'],
+        allowCrossType: false,
+        parallel: false,
+      };
+    }
+    delete config.nzbFailover;
   }
 
   template.metadata = {

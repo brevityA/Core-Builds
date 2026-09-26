@@ -12,7 +12,7 @@
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "coreBuildsVersion": "3.11",
-    "coreBuildsAIOStreamsTarget": "2.31.1",
+    "coreBuildsAIOStreamsTarget": "2.34.1",
     "coreBuildsProfile": "labs",
     "coreBuildsProfileVersion": "1"
   },
@@ -1334,9 +1334,6 @@
         "torrent"
       ]
     },
-    "nzbFailover": {
-      "enabled": false
-    },
     "areYouStillThere": {
       "enabled": false
     },
@@ -2011,6 +2008,16 @@
     "excludedStreamTypes": [
       "http",
       "p2p"
-    ]
+    ],
+    "failover": {
+      "enabled": false,
+      "maxAttempts": 3,
+      "position": "last",
+      "contentTypes": [
+        "usenet"
+      ],
+      "allowCrossType": false,
+      "parallel": false
+    }
   }
 }

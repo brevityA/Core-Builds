@@ -750,7 +750,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     precacheSingleStream: true,
     preloadStreams: { enabled:input.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
-    nzbFailover: input.nzbFailover ? { enabled:true, position:input.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(input.maxFailoverNzbs)||3 } : { enabled:false },
+    nzbFailover: input.nzbFailover ? { enabled:true, position:input.nzbFailoverPosition==='before-torrents'?'first':'last', count:Number(input.maxFailoverNzbs)||3 } : { enabled:false, count:Number(input.maxFailoverNzbs)||3, position:input.nzbFailoverPosition==='before-torrents'?'first':'last' },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: activePresets, services: buildServices(input),

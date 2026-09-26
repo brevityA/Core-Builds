@@ -4408,7 +4408,7 @@ function build() {
     precacheSingleStream: true,
     preloadStreams: { enabled:S.preloadEnabled!==false, selector:"slice(perGroup(cached(streams), 'resolution', 2), 0, 4)", singleStream:true },
     cacheAndPlay: { enabled:true, streamTypes:['usenet','torrent'] },
-    nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', maxFailoverNzbs:Number(S.maxFailoverNzbs)||3 } : { enabled:false },
+    nzbFailover: S.nzbFailover ? { enabled:true, position:S.nzbFailoverPosition==='before-torrents'?'first':'last', count:Number(S.maxFailoverNzbs)||3 } : { enabled:false, count:Number(S.maxFailoverNzbs)||3, position:S.nzbFailoverPosition==='before-torrents'?'first':'last' },
     areYouStillThere: { enabled:false },
     checkOwned: false, externalDownloads: false, autoRemoveDownloads: false,
     presets: activePresets, services: services(),

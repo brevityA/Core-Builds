@@ -322,6 +322,24 @@ function applyAIOStreamsCompatibility(template, context) {
     config.presets = values(config.presets).filter(
       preset => String(preset?.type || '').toLowerCase() !== 'torbox-search'
     );
+
+    // v2.34 accepts the old nzbFailover key only through its migration layer.
+    // Emit the canonical shape on modern lanes so the user's attempt count is
+    // preserved and generated output is directly schema-valid. The mapping
+    // mirrors upstream applyMigrations(): legacy failover was Usenet-only and
+    // sequential, with no cross-type fallback.
+    if (config.failover === undefined && config.nzbFailover !== undefined) {
+      const legacy = config.nzbFailover || {};
+      config.failover = {
+        enabled: Boolean(legacy.enabled),
+        maxAttempts: Number(legacy.count ?? legacy.maxFailoverNzbs) || 3,
+        position: legacy.position === 'first' ? 'first' : 'last',
+        contentTypes: ['usenet'],
+        allowCrossType: false,
+        parallel: false,
+      };
+    }
+    delete config.nzbFailover;
   }
 
   template.metadata = {
