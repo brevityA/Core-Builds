@@ -37,6 +37,7 @@ import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileB
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
 import { adviseBuild } from '../core/build-advisor-policy.js';
+import { planAddonInstall, verifyAddonInstall, createInstallReceipt } from '../core/install-transaction-policy.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
@@ -8091,11 +8092,12 @@ async function simpleInstall(target) {
       if (S.installMode === 'direct' && target === 'app' && S.stremioEmail && S.stremioPassword) {
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Pushing to Stremio…`;
         try {
-          const installed = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
+          const installResult = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
+          const installed = installResult.status;
           // ── Full Stack: AIOMetadata + Cinemeta patch + addon ordering ──
           btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Setting up full stack…`;
           const stackResult = await fullStackAfterPush(
-            (await stremioFetch('https://api.strem.io/api/login', { type:'Login', email:S.stremioEmail, password:S.stremioPassword, facebook:false }))?.result?.authKey,
+            installResult.authKey,
             manifestUrl,
             { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true }
           );
@@ -8104,13 +8106,15 @@ async function simpleInstall(target) {
           if (installed === 'already') {
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div>${stackHtml}</div>`;
           } else {
-            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} ${installed==='replaced'?'Previous install replaced!':'Full Stack Installed!'}</div><div style="font-size:.78rem;color:#8b949e">AIOStreams, AIOMetadata, and Cinemeta patch deployed. Reopen Stremio to see your new setup.</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
+            const stackTitle = stackResult.ok ? (installed==='replaced'?'Previous install replaced and verified!':'Full Stack Installed and verified!') : 'AIOStreams installed; stack needs attention';
+            const stackColour = stackResult.ok ? '#3fb950' : '#fbbf24';
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:${stackColour};margin-bottom:4px">${ICO.check(14,stackColour)} ${stackTitle}</div><div style="font-size:.78rem;color:#8b949e">${stackResult.ok?'The requested addons were read back from your account successfully. Reopen Stremio to see your new setup.':'AIOStreams was verified, but one or more optional full-stack operations did not verify. Review the details below.'}</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
           }
-          showToast('Addon installed to your Stremio library');
+          showToast(stackResult.ok ? 'Install verified in your Stremio library' : 'AIOStreams verified; optional stack needs attention', !stackResult.ok);
           return;
         } catch(err) {
           btn.disabled = false; btn.innerHTML = origHtml;
-          result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio login failed</div><div style="font-size:.78rem;color:#8b949e">${esc(err.message || 'Something went wrong')}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
+          result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio install stopped safely</div><div style="font-size:.78rem;color:#8b949e">${esc(err.message || 'Something went wrong')}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${manifestUrl}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
           return;
         }
       }
@@ -8179,24 +8183,64 @@ function stremioFetch(url, body, timeoutMs = 15000) {
     .finally(() => clearTimeout(timer));
 }
 
+async function getStremioAddons(authKey) {
+  const data = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+  if (!Array.isArray(data?.result?.addons)) throw new Error(stremioErrText(data?.error, 'Could not fetch your addon list.'));
+  return data.result.addons;
+}
+
+async function setStremioAddons(authKey, addons) {
+  const data = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons });
+  if (!data?.result) throw new Error(stremioErrText(data?.error, 'Could not save your addon list.'));
+}
+
 async function pushToStremio(manifestUrl, email, password) {
   const loginData = await stremioFetch('https://api.strem.io/api/login', { type:'Login', email, password, facebook:false });
   const authKey = loginData?.result?.authKey;
-  if (!authKey) {
-        throw new Error(stremioErrText(loginData?.error, 'Login failed — check your email and password.'));
-      }
-  const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
-  if (!getData?.result?.addons) throw new Error(stremioErrText(getData?.error, 'Could not fetch your addon list.'));
-  const existing = getData.result.addons;
-  const already = existing.some(a => a.transportUrl === manifestUrl);
-  if (already && !S.cleanInstall) return 'already';
+  if (!authKey) throw new Error(stremioErrText(loginData?.error, 'Login failed — check your email and password.'));
+
+  // The in-memory snapshot exists before the first write. It intentionally is
+  // not persisted: configured manifest URLs can be bearer-like secrets.
+  const before = await getStremioAddons(authKey);
   const knownBases = Object.values(HOST_BASE_URLS);
-  const isKnownAioManifest = a => typeof a?.transportUrl === 'string' && a.transportUrl.includes('/stremio/') && knownBases.some(base => a.transportUrl.startsWith(base));
-  const kept = S.cleanInstall ? existing.filter(a => !isKnownAioManifest(a)) : existing.slice();
-  if (!kept.some(a => a.transportUrl === manifestUrl)) kept.push({ transportName:'http', transportUrl: manifestUrl, flags:{} });
-  const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: kept });
-  if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'Install failed.'));
-  return S.cleanInstall ? 'replaced' : 'installed';
+  const isReplacedAioManifest = a => S.cleanInstall && typeof a?.transportUrl === 'string'
+    && a.transportUrl !== manifestUrl && a.transportUrl.includes('/stremio/')
+    && knownBases.some(base => a.transportUrl.startsWith(base));
+  const plan = planAddonInstall({ existing:before, desiredUrls:[manifestUrl], removeWhen:isReplacedAioManifest });
+  const already = plan.added.length === 0 && plan.removed.length === 0;
+  if (already) {
+    const verification = verifyAddonInstall({ actual:before, expectedUrls:[manifestUrl] });
+    return { status:'already', authKey, before, verification, receipt:createInstallReceipt({ status:'verified', beforeCount:before.length, afterCount:before.length, verification }) };
+  }
+
+  const expectedUrls = [manifestUrl];
+  const absentUrls = plan.removed.map(a => a.transportUrl);
+  try {
+    await setStremioAddons(authKey, plan.after);
+    let actual = await getStremioAddons(authKey);
+    let verification = verifyAddonInstall({ actual, expectedUrls, absentUrls });
+    let repaired = false;
+    if (!verification.ok) {
+      // One bounded self-heal: replay the complete intended collection, then
+      // read it back again. Never loop indefinitely against a degraded API.
+      repaired = true;
+      await setStremioAddons(authKey, plan.after);
+      actual = await getStremioAddons(authKey);
+      verification = verifyAddonInstall({ actual, expectedUrls, absentUrls });
+    }
+    if (!verification.ok) {
+      throw new Error('Install verification failed after one retry.');
+    }
+    const status = S.cleanInstall && plan.removed.length ? 'replaced' : 'installed';
+    return { status, authKey, before, verification, repaired, receipt:createInstallReceipt({ status:'verified', beforeCount:before.length, afterCount:actual.length, verification, repaired }) };
+  } catch (error) {
+    // Best-effort rollback for write/read failures as well as explicit verify
+    // failures. Preserve the original useful message if rollback also fails.
+    try { await setStremioAddons(authKey, before); }
+    catch { throw new Error(`${error.message} Automatic rollback also failed; use Account Tools to restore your backup.`); }
+    if (/restored automatically/.test(error.message)) throw error;
+    throw new Error(`${error.message} Your previous addon list was restored automatically.`);
+  }
 }
 
 // ── Full Stack Install (Cinemeta patch + AIOMetadata + addon ordering) ──
@@ -8279,6 +8323,24 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
     const r = await reorderAddons(authKey, AIOMETADATA_MANIFEST, aiostreamsUrl);
     if (r.ok) steps.push('✓ ' + r.message);
     else errors.push(r.message);
+  }
+
+  // Final read-after-write verification catches partial API success instead of
+  // telling the user the stack installed when one addon silently disappeared.
+  try {
+    const expectedUrls = [aiostreamsUrl, ...(installAIOMetadata ? [AIOMETADATA_MANIFEST] : [])];
+    let actual = await getStremioAddons(authKey);
+    let verification = verifyAddonInstall({ actual, expectedUrls });
+    if (!verification.ok && verification.missing.includes(AIOMETADATA_MANIFEST)) {
+      const repaired = planAddonInstall({ existing:actual, desiredUrls:[AIOMETADATA_MANIFEST] });
+      await setStremioAddons(authKey, repaired.after);
+      actual = await getStremioAddons(authKey);
+      verification = verifyAddonInstall({ actual, expectedUrls });
+    }
+    if (verification.ok) steps.push(`✓ Verified ${verification.expectedCount} Core addon${verification.expectedCount === 1 ? '' : 's'} in your account`);
+    else errors.push(`Verification failed: ${verification.missing.length} expected addon${verification.missing.length === 1 ? '' : 's'} missing`);
+  } catch (e) {
+    errors.push('Verification: ' + e.message);
   }
 
   return { steps, errors, ok: errors.length === 0 };
