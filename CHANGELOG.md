@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.8.0 (2026-09-22)
+
+### Changed
+- **Dead-key purge across all 55 active templates** — `maxResults`, `maxResultsPerResolution`, `seadexBestOnly`, `excludedStreamSources`, `enhanceResults` and `minSeeders` were proven absent from the AIOStreams schema at every tag from v2.31.1 to v2.34.1 (hosts strip them on save), so they are removed from every active lane (Stable, Torbox, Personal, Usenet, Base). ~8 KB of payload that never survived a save. The three files that carried `excludedStreamSources` without its live counterpart (both Stable templates, Usenet 4K) gain `excludedStreamTypes: ["youtube", "external"]` in its place. Legacy/Deprecated lanes untouched.
+- **Schema pin v2.34.1** (`configurator/UPSTREAM.pin` e694b6a→c1d044c2): all seven generated files re-derived with header-only diffs (sha/version stamps, zero contract drift). The only upstream change inside the pinned sources besides the version bump is a pure refactor (`MEDIA_INFO_QUALITY_TIERS` const extraction in `ParsedFileSchema`, not the user config). Default compatibility target moves 2.34.0→2.34.1; the 2.34.0 lane stays for saved sessions.
+- **Fleet re-audit 2026-09-22** — seven of eight public hosts run 2.34.1 (six stable on c1d044c2, Viren's on its nightly); Omni's is the only 2.33.2 holdout. Registry, picker labels, routing tests and target notes updated together. ATBP and Wizaardd corrected to `regexAccess: all` (observed live; the merge still takes the stricter of registry vs probe).
+
+### Fixed
+- **Generators no longer emit the dead keys at all** — v3.7.0 stopped them at the export gate (`KNOWN_DEAD_CONFIG_KEYS`), but the Configurator builder, both `packages/core` builders and the output-profile policy kept writing them. Source emissions removed in all three; the gate stays as import hygiene. Behaviour change, intended: the native-filters policy wrote the dead `excludedStreamSources` and now writes the live `excludedStreamTypes: ["youtube"]`, so Stable/Balanced output newly excludes YouTube-type streams instead of carrying an ignored key.
+- **TorBox Search validator warning corrected** — the endpoint was never shut down; TorBox restricts it to allowlisted caller hosts. The 13 active templates carrying the enabled preset keep it; the warning now states the allowlist reality and points at troubleshooting.
+- **Import-link panels escape paste-service URLs** — six result panels rendered the returned URL unescaped into `innerHTML` (`escHtml` hardening; no known exploit). Share links (settings-only allowlist), stored-snapshot credential scrubbing and display-name sanitization re-verified in the same pass.
+- **Lockfiles re-synced** — `configurator/package-lock.json` root was stale at 3.7.0, `cli/package-lock.json` pinned `@core-builds/core` at 3.0.0; both refreshed to 3.11.0 via `--package-lock-only`.
+- **`nzbFailover` migrated to upstream's `failover` rename** — AIOStreams migrates the legacy spelling before validation with a blind position pass-through, and Core Builds emitted two positions outside the new enum (`first` from the before-torrents option, `after` in Base-Config): both rejected the whole save at the host (verified against the `validateConfig` → `applyMigrations` order at v2.34.1). Builders, all 60 active templates and the C12 conflict check now emit/read `failover` (`contentTypes: [usenet, debrid]` when enabled; before-torrents → `beforeLimiting`; `after`/omitted → default `last`). The Fine-Tune attempt count now lands in `maxAttempts` (previously emitted as `maxFailoverNzbs`, which upstream never read — closing the v3.0 known gap). `validate_templates.py` gains a legacy-key warning plus `failover` shape errors (position enum, `maxAttempts`/`parallel` ≥ 1, `contentTypes` subset).
+
+### Docs
+- **Dead-key claims corrected everywhere user-facing** — the customising result-limit example now shows `resultLimits`, the YouTube guides credit the two layers that actually work (ESE + `excludedStreamTypes`), and the glossary/troubleshooting `seadexBestOnly` entries note the key never existed upstream. New troubleshooting entries: TorBox Search host allowlist (symptom → remedy) and the TorBox CDN manual-selection advisory. Preflight probe prose refreshed to the 2026-09-22 audit (its host table re-verified identical).
+
+### CI
+- **Goldens re-derived for the `excludedStreamTypes` change** — 14 Stable/Balanced fixtures gain `youtube` (prepended; the policy runs before the host gate appends), 4 Advanced/Labs byte-identical. No browsers in this environment, so regeneration ran through a headless jsdom run of the built bundle (one fresh app instance per combo, per the 3.7.0 procedure): 18/18 reproduce byte-identically, proving the harness CI-equivalent with zero hand-editing. CLI equivalence suite back to 75/0 against the same fixtures.
+
 ## 3.7.0 (2026-09-05)
 
 ### Changed

@@ -22,8 +22,8 @@ import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 /**
  * Service ids AIOStreams' Library addon can be generated from, read from the
  * pinned upstream source (LibraryPreset.supportedServices = StremThruPreset's
- * list + nzbdav + altmount + stremthru_newz + aiostreams) at v2.34.0 /
- * e694b6a. EasyNews, Seedr, Debridio, putio and stremio_nntp are NOT in that
+ * list + nzbdav + altmount + stremthru_newz + aiostreams) at v2.34.1 /
+ * c1d044c (re-verified identical at the pin bump). EasyNews, Seedr, Debridio, putio and stremio_nntp are NOT in that
  * list — a Library preset with only those enabled is rejected on save.
  */
 export const LIBRARY_CAPABLE_SERVICE_IDS = Object.freeze([

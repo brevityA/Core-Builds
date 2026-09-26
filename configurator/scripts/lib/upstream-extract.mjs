@@ -445,6 +445,11 @@ export function emitFiles(contract) {
     '',
   ].join('\n');
 
+  // The shared generator package consumes the same upstream guards. Keep these
+  // byte-identical from the one emitter instead of relying on manual copies.
+  files['../packages/core/src/generated/aiostreams-presets.js'] = files['src/data/generated/aiostreams-presets.js'];
+  files['../packages/core/src/generated/aiostreams-config-schema.js'] = files['src/config/generated/aiostreams-config-schema.js'];
+
   files['src/config/generated/aiostreams-sort-schema.js'] = head + [
     '/** Sort-criteria contract: valid scopes, keys, directions and semantics. */',
     '',
@@ -507,7 +512,10 @@ export function emitFiles(contract) {
       '',
     ].join('\n');
     files['src/data/generated/aiostreams-preset-options.js'] = presetOptionsContent;
-    files['../../packages/core/src/generated/aiostreams-preset-options.js'] = presetOptionsContent;
+    // ROOT is configurator/, so the shared core package is one level up. The old
+    // ../../ path escaped the repository into /home/user/packages and made every
+    // sync:upstream:check report a permanently stale generated file.
+    files['../packages/core/src/generated/aiostreams-preset-options.js'] = presetOptionsContent;
   }
 
   return files;

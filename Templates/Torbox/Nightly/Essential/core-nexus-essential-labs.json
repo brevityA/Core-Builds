@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache only. 1080p build. Template directives: exit thresholds configurable at import. v0.4.0: Private Tracker Kill, DAF fix, catalog-guarded Unknown Resolution/Quality Kills.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -32,6 +32,11 @@
     ],
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-09-26",
+        "version": "0.4.4",
+        "content": "Upstream schema alignment for AIOStreams 2.34.1: nzbFailover migrated to the generic failover key (Usenet plus debrid) — the old spelling passed a position value outside the new enum and the host rejected the save — and six settings AIOStreams no longer defines (maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSources, enhanceResults, sourceUrl) are no longer emitted. No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-25",
         "version": "0.4.3",
@@ -2128,9 +2133,8 @@
       "streamTypes": []
     },
     "checkOwned": false,
-    "nzbFailover": {
-      "enabled": false,
-      "position": "last"
+    "failover": {
+      "enabled": false
     },
     "serviceWrap": {
       "enabled": false,
@@ -2139,15 +2143,9 @@
       ],
       "reconfigureService": false
     },
-    "maxResults": 25,
-    "maxResultsPerResolution": 10,
     "externalDownloads": false,
     "autoRemoveDownloads": false,
     "excludeUncachedMode": "or",
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -2159,7 +2157,6 @@
     "mergedCatalogs": [],
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
-    "enhanceResults": true,
     "tmdbAccessToken": "<template_placeholder>",
     "tmdbApiKey": "<template_placeholder>",
     "usePosterRedirectApi": true,

@@ -4,7 +4,7 @@
  * `Option <id> is required` — default does NOT rescue, only forced does.
  * That path surfaces as USER_INVALID_CONFIG from the host.
  *
- * This test uses the generated AIO_PRESET_REQUIRED_OPTIONS map (pinned v2.34.0)
+ * This test uses the generated AIO_PRESET_REQUIRED_OPTIONS map (pinned v2.34.1)
  * to prove every OPTIONAL_SCRAPER_DEFS entry is safe to emit as a simple toggle,
  * or has explicit credential handling that supplies the required option.
  */

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { unknownConfigKeys } from '../src/config/generated/aiostreams-config-schema.js';
 
 // Golden config snapshots — the whole generation pipeline (S → build() → buildFinal())
 // exercised through the real app via the ?cb-e2e=1 hook, diffed against checked-in
@@ -60,7 +61,7 @@ const BASE = {
   quickStart: false,
   simpleMode: false,
   outputProfile: 'auto',
-  aiostreamsVersion: '2.31.1',
+  aiostreamsVersion: '2.34.1',
   tmdbToken: '',
   tmdbApiKey: '',
 };
@@ -98,6 +99,11 @@ const MATRIX = [
   // must survive. This fixture is what stops the C05 fix from silently
   // dropping cache filtering on the free routes.
   { name: 'p2p-1080p-cached-only', state: { service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, resolution: '1080p', instanceHost: 'fortheweak', cacheMode: 'cached' } },
+  // Explicit compatibility sentinels. The primary matrix above always follows
+  // the release pinned in UPSTREAM.pin; these prevent current work from
+  // accidentally deleting the older host lanes still used by saved sessions.
+  { name: 'compat-v232-torbox-1080p', state: { resolution:'1080p', aiostreamsVersion:'2.32.0' } },
+  { name: 'compat-v231-torbox-1080p', state: { resolution:'1080p', aiostreamsVersion:'2.31.1' } },
 ];
 
 for (const combo of MATRIX) {
@@ -111,6 +117,7 @@ for (const combo of MATRIX) {
     expect(tpl.metadata?.generatedAt, 'generatedAt must be stripped for golden stability').toBeUndefined();
     const expectedProfile = combo.profile || (state.pseArch === 'apex-mixed' ? 'labs' : state.pseArch === 'iqr' ? 'advanced' : 'balanced');
     expect(tpl.metadata?.coreBuildsProfile, 'generated output must identify its output profile').toBe(expectedProfile);
+    expect(tpl.metadata?.coreBuildsAIOStreamsTarget, 'generated output must identify the requested AIOStreams lane').toBe(state.aiostreamsVersion);
     for (const key of [
       'syncedExcludedStreamExpressionUrls',
       'syncedIncludedStreamExpressionUrls',
@@ -122,6 +129,9 @@ for (const combo of MATRIX) {
 
     if (state.aiostreamsVersion !== '2.31.1') {
       expect(tpl.config.presets.some(preset => preset.type === 'torbox-search'), `${combo.name} must not emit legacy TorBox Search outside the v2.31.1 lane`).toBe(false);
+      expect(unknownConfigKeys(tpl.config), `${combo.name} current output must be directly schema-valid without runtime migration`).toEqual([]);
+      expect(Object.hasOwn(tpl.config, 'nzbFailover'), `${combo.name} must use canonical failover on modern lanes`).toBe(false);
+      expect(tpl.config.failover, `${combo.name} must emit canonical failover`).toBeTruthy();
     }
 
     if (expectedProfile === 'stable') {

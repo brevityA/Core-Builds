@@ -5,7 +5,7 @@
     "description": "Anime-optimised build for Hotack L007CM. TorBox Pro · SeaDex · NZBGeek · EZTV · Meteor. Non-Anime Query Guard. SeaDex best releases · Dual audio · Sub + Dub aware. SDR · 1080p · DD+/AAC/FLAC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "category": "Anime",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -980,9 +980,12 @@
     },
     "autoRemoveDownloads": false,
     "checkOwned": true,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,
@@ -990,11 +993,6 @@
         "torbox"
       ],
       "reconfigureService": false
-    },
-    "enhanceResults": true,
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ]
+    }
   }
 }

@@ -332,14 +332,14 @@ export function findFeatureConflicts(templateOrConfig) {
   }
 
   const uncachedPrecache = typeof config.precacheSelector === 'string' && /\buncached\s*\(/i.test(config.precacheSelector);
-  const uncachedFailover = Boolean(config.nzbFailover?.enabled);
+  const uncachedFailover = Boolean(config.failover?.enabled ?? config.nzbFailover?.enabled);
   if (config.excludeUncached === true && (uncachedPrecache || uncachedFailover)) {
     issues.push(issue(
       'C12_CACHED_ONLY_WITH_UNCACHED_BACKGROUND_ACTION',
       'info',
       'Cached-only display is combined with an uncached background action',
       'This can be intentional, but it is difficult to explain during support. Make the background behaviour visible in the Review screen.',
-      ['excludeUncached', 'precacheSelector', 'nzbFailover']
+      ['excludeUncached', 'precacheSelector', ...(config.failover ? ['failover'] : config.nzbFailover ? ['nzbFailover'] : [])]
     ));
   }
 

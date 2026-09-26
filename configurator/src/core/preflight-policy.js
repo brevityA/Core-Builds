@@ -99,6 +99,7 @@ export function preflightFindings(input = {}) {
     buildError = null,
     devicesForcingLimitedAudio = [],
     deviceMaxResolution = {},
+    filterRisk = {},
   } = input;
 
   const found = new Map();
@@ -211,6 +212,33 @@ export function preflightFindings(input = {}) {
       '4K will not appear at all',
       'On the Stable and Balanced profiles, 1080p excludes 2160p and 1440p outright rather than ranking them lower — higher-resolution releases are removed before you see them.',
       'Want 4K when it exists? Choose Mixed · Adaptive, which ranks 1080p first without deleting higher tiers.',
+    ));
+  }
+
+  // ── Filter-intersection simulator. Multiple individually reasonable hard
+  // constraints can leave no result. This is deliberately conservative: it
+  // reports structural risk, never pretends to predict a live title's count.
+  const hardConstraints = [
+    filterRisk.cachedOnly && 'instant-play only',
+    filterRisk.hardResolution && 'hard resolution cap',
+    filterRisk.exclusiveLanguage && 'exclusive language',
+    filterRisk.foreignLanguageKill && 'foreign-language removal',
+    filterRisk.strictMatching && 'strict title/episode matching',
+    filterRisk.ageLimited && 'age certification',
+  ].filter(Boolean);
+  if (hardConstraints.length >= 3) {
+    add(finding(
+      'filter-starvation-high', 'warning',
+      'Filters may leave no streams',
+      `${hardConstraints.length} hard constraints intersect: ${hardConstraints.join(', ')}. A release must pass all of them, and missing metadata can count as a failure.`,
+      'Prefer ranking over removal: keep cached-first, non-exclusive languages, Balanced matching, or Mixed resolution.',
+    ));
+  } else if (hardConstraints.length === 2 && (filterRisk.exclusiveLanguage || filterRisk.strictMatching)) {
+    add(finding(
+      'filter-starvation-moderate', 'advisory',
+      'This setup has a narrow fallback path',
+      `These constraints must both match: ${hardConstraints.join(' and ')}. Rare, anime, and international titles are most likely to be affected.`,
+      'If a title has no results, relax language or matching before adding more providers.',
     ));
   }
 

@@ -75,29 +75,20 @@
   <div id="results" class="results hidden"></div>
 </div>
 
-<script>
+<script type="module">
+import {
+  diagnoseTemplate, applyRepairs, DOCTOR_SORT_CRITERIA, DOCTOR_RESOLUTIONS,
+  DOCTOR_QUALITIES, DOCTOR_VISUAL_TAGS, DOCTOR_AUDIO_TAGS, DOCTOR_AUDIO_CHANNELS,
+} from './doctor.mjs';
+
 // ── Validation engine (ported from validate_templates.py) ──────────
 
-const VALID_SORT_KEYS = new Set([
-  'resolution','quality','cached','size','seeders','bitrate','encode',
-  'audioChannels','audioTags','visualTags','releaseGroup','age',
-  'regexScore','seScore','language','subtitle','title','year',
-  'service','type','filename','indexer'
-]);
-
-const VALID_EXCLUDED_RESOLUTIONS = ['240p','360p','480p','576p','720p','1080p','1440p','2160p'];
-const VALID_EXCLUDED_QUALITIES = ['HDRip','Cam','TeleSync','Telecine','Scr','Unknown'];
-const VALID_EXCLUDED_VISUAL_TAGS = ['DV','HDR10','HDR10+','HDR','HLG','SDR','10bit'];
-const VALID_EXCLUDED_AUDIO_TAGS = ['Atmos','TrueHD','DTS-HD MA','DTS','EAC3','DD+','AAC','FLAC','AC3','OPUS'];
-const VALID_EXCLUDED_AUDIO_CHANNELS = ['2.0','5.1','7.1'];
-
-const KNOWN_PRESET_TYPES = [
-  'torrentio','comet','mediafusion','torbox-search','torbox-usenet',
-  'jackettio','debridio','peerflix','sootio','neko-bt','animetosho',
-  'dmm-cast','hdhub','torrents-db','easynews','davex','stremthruStore',
-  'aiosubtitle','opensubtitles-v3-plus','subdl','tmdb-addon','streamingCatalogs',
-  'animeCatalogs','rpdb','torrentCatalogs','baguettio','flixStreams'
-];
+const VALID_SORT_KEYS = new Set(DOCTOR_SORT_CRITERIA);
+const VALID_EXCLUDED_RESOLUTIONS = DOCTOR_RESOLUTIONS;
+const VALID_EXCLUDED_QUALITIES = DOCTOR_QUALITIES;
+const VALID_EXCLUDED_VISUAL_TAGS = DOCTOR_VISUAL_TAGS;
+const VALID_EXCLUDED_AUDIO_TAGS = DOCTOR_AUDIO_TAGS;
+const VALID_EXCLUDED_AUDIO_CHANNELS = DOCTOR_AUDIO_CHANNELS;
 
 const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
 
@@ -158,12 +149,11 @@ function validateTemplate(config) {
   const enabledPresets = presets.filter(p => p.enabled !== false);
   passes.push(`presets: ${presets.length} total, ${enabledPresets.length} enabled`);
 
-  const presetTypes = presets.map(p => p.type).filter(Boolean);
   const missingIids = presets.filter(p => p.enabled !== false && !p.instanceId);
   if (missingIids.length) warnings.push(`${missingIids.length} enabled preset(s) missing instanceId`);
-
-  const unknownTypes = presetTypes.filter(t => !KNOWN_PRESET_TYPES.includes(t));
-  if (unknownTypes.length) warnings.push(`unknown preset type(s): ${[...new Set(unknownTypes)].join(', ')}`);
+  // Do not keep a hand-written preset allowlist here. AIOStreams' marketplace
+  // changes frequently, and custom presets are valid by design. The previous
+  // 29-item list mislabeled most current v2.34 presets as unknown.
 
   // Formatter
   const fmt = cfg.formatter || {};
@@ -212,9 +202,10 @@ function validateTemplate(config) {
 
   // Deduplicator
   const dedup = cfg.deduplicator || {};
-  const validDedup = ['per_addon','per_service','per_quality_resolution','global'];
-  if (dedup.cached && !validDedup.includes(dedup.cached)) errors.push(`deduplicator.cached: invalid mode '${dedup.cached}'`);
-  if (dedup.uncached && dedup.uncached === 'all') errors.push("deduplicator.uncached: 'all' is not a valid mode");
+  const validDedup = ['single_result','per_service','per_addon','disabled'];
+  for (const lane of ['cached','uncached','p2p','http','live','youtube','external']) {
+    if (dedup[lane] && !validDedup.includes(dedup[lane])) errors.push(`deduplicator.${lane}: invalid mode '${dedup[lane]}'`);
+  }
 
   return { errors, warnings, passes };
 }
@@ -290,28 +281,45 @@ async function inspect() {
 
   const unwrapped = unwrap(json);
   const result = validateTemplate(unwrapped);
+  const doctor = diagnoseTemplate(json);
   const hosts = checkHostCompat(unwrapped);
-  renderResults(result, hosts);
+  window._inspectedTemplate = json;
+  renderResults(result, hosts, doctor);
 
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('results').classList.remove('hidden');
 }
 
-function renderResults(result, hosts) {
+function renderResults(result, hosts, doctor) {
   const { errors, warnings, passes } = result;
+  const blockers = doctor.findings.filter(f => f.severity === 'blocker');
+  const doctorWarnings = doctor.findings.filter(f => f.severity === 'warning');
+  const advisories = doctor.findings.filter(f => f.severity === 'advisory');
+  const repairable = doctor.findings.filter(f => f.repair && f.repair.type !== 'none');
   const el = document.getElementById('results');
 
-  const statusColor = errors.length ? 'err' : warnings.length ? 'warn' : 'ok';
-  const statusText = errors.length ? 'Issues Found' : warnings.length ? 'Warnings' : 'All Clear';
-  const statusEmoji = errors.length ? '✕' : warnings.length ? '⚠' : '✓';
+  const errorCount = errors.length + blockers.length;
+  const warningCount = warnings.length + doctorWarnings.length;
+  const statusColor = errorCount ? 'err' : warningCount ? 'warn' : 'ok';
+  const statusText = errorCount ? 'Issues Found' : warningCount ? 'Warnings' : 'All Clear';
 
   let html = `
     <div class="summary-bar">
-      <div class="summary-stat"><div class="summary-num" style="color:var(--err)">${errors.length}</div><div class="summary-lbl">Errors</div></div>
-      <div class="summary-stat"><div class="summary-num" style="color:var(--warn)">${warnings.length}</div><div class="summary-lbl">Warnings</div></div>
+      <div class="summary-stat"><div class="summary-num" style="color:var(--err)">${errorCount}</div><div class="summary-lbl">Blockers</div></div>
+      <div class="summary-stat"><div class="summary-num" style="color:var(--warn)">${warningCount}</div><div class="summary-lbl">Warnings</div></div>
       <div class="summary-stat"><div class="summary-num" style="color:var(--ok)">${passes.length}</div><div class="summary-lbl">Passed</div></div>
       <div class="summary-stat"><div class="summary-num"><span class="dot dot-${statusColor}"></span></div><div class="summary-lbl">${statusText}</div></div>
     </div>`;
+
+  if (doctor.findings.length) {
+    html += `<div class="section"><div class="section-title"><span class="badge ${blockers.length?'badge-err':doctorWarnings.length?'badge-warn':'badge-pass'}">${doctor.findings.length}</span> Configuration Doctor</div>`;
+    html += doctor.findings.map(f => `<div class="item ${f.severity==='blocker'?'item-err':f.severity==='warning'?'item-warn':'item-pass'}">
+      ${f.repair && f.repair.type !== 'none' ? `<input type="checkbox" class="doctor-repair" value="${esc(f.id)}" checked aria-label="Select repair for ${esc(f.title)}" style="margin-top:4px;accent-color:var(--accent)">` : `<span class="item-icon">${f.severity==='blocker'?'✕':f.severity==='warning'?'⚠':'ℹ'}</span>`}
+      <span class="item-text"><strong style="color:var(--tx)">${esc(f.title)}</strong><br>${esc(f.detail)}${f.path?`<br><code style="font-size:.68rem;color:var(--tx3)">${esc(f.path)}</code>`:''}${f.repair&&f.repair.type!=='none'?'<br><span style="color:var(--accent);font-size:.7rem;font-weight:700">Safe repair available</span>':''}</span>
+    </div>`).join('');
+    if (repairable.length) html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button onclick="previewRepairs()">Preview selected repairs</button><button class="btn-secondary" onclick="downloadRepaired()">Download repaired copy</button></div><div id="repairPreview" class="hidden" style="margin-top:10px"></div>`;
+    html += '</div>';
+  }
 
   if (errors.length) {
     html += `<div class="section"><div class="section-title"><span class="badge badge-err">${errors.length}</span> Errors</div>`;
@@ -346,7 +354,36 @@ function renderResults(result, hosts) {
   el.innerHTML = html;
 
   // Store for export
-  window._lastReport = { errors, warnings, passes, hosts, inspectedAt: new Date().toISOString() };
+  window._lastReport = { doctor, legacyChecks:{ errors, warnings, passes }, hosts, inspectedAt: new Date().toISOString() };
+}
+
+function selectedRepairIds() {
+  return [...document.querySelectorAll('.doctor-repair:checked')].map(input => input.value);
+}
+
+function previewRepairs() {
+  if (!window._inspectedTemplate) return;
+  const ids = selectedRepairIds();
+  const repaired = applyRepairs(window._inspectedTemplate, ids);
+  const after = diagnoseTemplate(repaired);
+  const before = window._lastReport?.doctor?.summary || { blocker:0, warning:0, total:0 };
+  const el = document.getElementById('repairPreview');
+  if (!el) return;
+  el.classList.remove('hidden');
+  el.innerHTML = `<div style="padding:12px;border-radius:8px;background:var(--card);border:1px solid var(--border);font-size:.76rem;color:var(--tx2);line-height:1.6"><strong style="color:var(--tx)">Repair preview</strong><br>${ids.length} selected change${ids.length===1?'':'s'} · blockers ${before.blocker} → ${after.summary.blocker} · warnings ${before.warning} → ${after.summary.warning}<br><span style="color:var(--ok)">Your original remains unchanged. Download creates a separate JSON file.</span></div>`;
+}
+
+function downloadRepaired() {
+  if (!window._inspectedTemplate) return;
+  const ids = selectedRepairIds();
+  if (!ids.length) { alert('Select at least one safe repair first.'); return; }
+  const repaired = applyRepairs(window._inspectedTemplate, ids);
+  const blob = new Blob([JSON.stringify(repaired, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'core-builds-repaired.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
 function clearAll() {
@@ -411,6 +448,9 @@ function loadFile(input) {
   const onLeave = e => { if (dz) { dz.style.borderColor = 'var(--border)'; dz.style.background = 'transparent'; } };
   [dz, ta].forEach(el => { if (!el) return; el.addEventListener('drop', onDrop); el.addEventListener('dragover', onOver); el.addEventListener('dragleave', onLeave); });
 })();
+
+// Inline button attributes are retained for this standalone, dependency-free tool.
+Object.assign(window, { inspect, clearAll, loadExample, exportReport, loadFile, previewRepairs, downloadRepaired });
 </script>
 </body>
 </html>

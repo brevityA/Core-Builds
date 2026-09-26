@@ -504,70 +504,70 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.7.0)
+## Active Template Inventory (as of v3.8.0)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.9.3 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Single/core-nexus-4k-apex-torbox.json` v2.12.12 — TorBox-cached-only Apex variant, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Single/core-nexus-stream.json` v2.10.11 — 1080p streaming quality, 720p fallback
-- `Single/core-nexus-stream-lite.json` v2.10.11 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.10.11 — Fire Stick optimised
+- `Single/core-nexus-4k-apex.json` v0.9.4 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `Single/core-nexus-4k-apex-torbox.json` v2.12.13 — TorBox-cached-only Apex variant, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `Single/core-nexus-stream.json` v2.10.12 — 1080p streaming quality, 720p fallback
+- `Single/core-nexus-stream-lite.json` v2.10.12 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.10.12 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.10.5
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.12.11 — 4K with IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Essential/core-nexus-4k-essential-lite.json` v2.10.11 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.10.11 — 1080p
+- `Essential/core-nexus-4k-essential.json` v2.12.12 — 4K with IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `Essential/core-nexus-4k-essential-lite.json` v2.10.12 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.10.12 — 1080p
 - `Essential/core-nexus-essential-lite.json` v2.10.5
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.10.10 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.10.10 — cached-only 1080p instant play
+- `Flash/core-nexus-flash-4k.json` v2.10.11 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.10.11 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.10.10 — fast cached 4K
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.10.11 — fast cached 4K
 - `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.10.5
-- `Speed/TorBox/core-nexus-speed.json` v2.10.10 — fast cached 1080p
+- `Speed/TorBox/core-nexus-speed.json` v2.10.11 — fast cached 1080p
 - `Speed/TorBox/core-nexus-speed-lite.json` v2.10.5
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.12 — EasyNews 4K, davex preset (disabled by default)
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.12 — EasyNews 1080p, davex preset (disabled by default)
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.13 — EasyNews 4K, davex preset (disabled by default)
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.13 — EasyNews 1080p, davex preset (disabled by default)
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.12 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.2.12 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.2.12 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.12 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.13 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.2.13 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.2.13 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.13 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.12.12 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid.json` v2.10.12 — 1080p hybrid, TorBox-priority twins (IQR), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid-lite.json` v2.10.12 — TorBox-priority twins (CB-style), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-4k-hybrid.json` v2.12.13 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid.json` v2.10.13 — 1080p hybrid, TorBox-priority twins (IQR), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid-lite.json` v2.10.13 — TorBox-priority twins (CB-style), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.3.11 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.3.11 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
-- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.3.11 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
-- `Device/Xiaomi/core-nexus-xiaomi-4k.json` v0.1.4 — Xiaomi Mi Box S 4K, DV Profile 5 + HDR10+ native, AV1/VC-1 excluded, lossless audio excluded (DD+ Atmos ceiling), handles REMUX
-- `Device/Windows/core-nexus-ultrawide.json` v0.2.11 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.3.12 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.3.12 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
+- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.3.12 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
+- `Device/Xiaomi/core-nexus-xiaomi-4k.json` v0.1.5 — Xiaomi Mi Box S 4K, DV Profile 5 + HDR10+ native, AV1/VC-1 excluded, lossless audio excluded (DD+ Atmos ceiling), handles REMUX
+- `Device/Windows/core-nexus-ultrawide.json` v0.2.12 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
 
 ### Anime
-- `Anime/core-nexus-anime-4k.json` v2.8.18 — 4K anime, SeaDex + AnimeTosho, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-4k-lite.json` v2.8.16 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime.json` v2.8.18 — 1080p anime, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-lite.json` v2.8.16 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub.json` v2.8.18 — dubbed variant, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub-lite.json` v2.8.16 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k.json` v2.8.19 — 4K anime, SeaDex + AnimeTosho, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime.json` v2.8.19 — 1080p anime, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub.json` v2.8.19 — dubbed variant, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.10 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.6.3 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.4.3 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.15.3 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-stream-labs.json` v0.10.3 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.3 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
-- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.1 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.11 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.6.4 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.4.4 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.15.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-stream-labs.json` v0.10.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
+- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.2 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
 
 ---
 
@@ -1086,4 +1086,4 @@ The speed test is a **single self-contained `tools/speedtest/index.html`** (zero
 - **CI:** `.github/workflows/speedtest-engine.yml` — unit job on PRs and on pushes to `main` touching the tool; live CDN job nightly + manual dispatch (override node via repo variable `CORESPEED_LIVE_URL`).
 - **Snapshot:** the `SNAPSHOT` const in `index.html` is a dated fallback endpoint list. TorBox renames nodes occasionally; if the live CI job fails or the on-page badge shows a stale/unverified snapshot, refresh the const from the two API calls in `tools/speedtest/README.md`.
 - **Do not modify `cloudflare-worker/`** for speedtest work — the v3 endpoint chain uses the existing `GET /proxy/v1/api/speedtest` lane and its `HOST_SCOPES` restrictions.
-- **Worker deploys are not proven by a green tick** (preserved from the v2 speedtest README, which v3 replaced): `deploy-worker.yml` fires on pushes to `main` touching `cloudflare-worker/**`, but it reports success even when it *skips* the deploy because the Cloudflare secrets are unset. Confirm the "Deploy to Cloudflare Workers" step actually ran before believing anything shipped.
+- **Worker deploys are now proven by a green tick** — but the history is worth keeping. `deploy-worker.yml` fires on pushes to `main` touching `cloudflare-worker/**`. It used to report success even when it *skipped* the deploy because the Cloudflare secrets were unset: the missing-secret branch emitted a `::warning::` and set `cloudflare_ready=false`, which skipped the deploy, the ADMIN_TOKEN sync and the URL resolution — and with no `base_url` the smoke job's own `if:` skipped the verification too. Skip the work, skip the proof, report green. It now `exit 1`s on missing credentials (the workflow has no `pull_request` trigger, so there is no fork context where their absence is legitimate), and the dead `cloudflare_ready` guards are gone. A green run means the deploy ran.

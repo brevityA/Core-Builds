@@ -62,11 +62,22 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           STATS_ADMIN_TOKEN: ${{ secrets.STATS_ADMIN_TOKEN }}
         run: |
+          # Missing credentials fail the run; they used to emit a ::warning:: and
+          # set cloudflare_ready=false, which skipped the deploy, the ADMIN_TOKEN
+          # sync and the URL resolution. With no base_url the smoke job's own
+          # `if:` then skipped it too — so an unconfigured runner skipped the
+          # deploy, skipped the proof that it had deployed, and reported the whole
+          # workflow green. cloudflare-worker/README.md had to carry a standing
+          # warning that a green tick here does not mean anything shipped.
+          #
+          # Nothing is protected by being lenient: this workflow runs only on
+          # push-to-main and workflow_dispatch, never on pull_request, so there is
+          # no fork context where the secrets are legitimately absent. If they are
+          # missing, the deploy genuinely cannot happen and the run should say so —
+          # the same stance the STATS_ADMIN_TOKEN length check below already takes.
           if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "cloudflare_ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Cloudflare deployment skipped because CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not configured."
-          else
-            echo "cloudflare_ready=true" >> "$GITHUB_OUTPUT"
+            echo "::error::CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not configured — cannot deploy. Set both under the '${{ github.event.inputs.environment || 'production' }}' environment. See cloudflare-worker/OPERATOR.md"
+            exit 1
           fi
           if [ -z "$STATS_ADMIN_TOKEN" ]; then
             echo "admin_token_ready=false" >> "$GITHUB_OUTPUT"
@@ -80,7 +91,6 @@ jobs:
           fi
 
       - name: Deploy to Cloudflare Workers
-        if: steps.cloudflare-secrets.outputs.cloudflare_ready == 'true'
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -91,7 +101,7 @@ jobs:
           command: deploy --message "${{ github.sha }}" ${{ github.event.inputs.environment == 'staging' && '--env staging' || '' }}
 
       - name: Sync ADMIN_TOKEN from GitHub secret
-        if: steps.cloudflare-secrets.outputs.cloudflare_ready == 'true' && steps.cloudflare-secrets.outputs.admin_token_ready == 'true'
+        if: steps.cloudflare-secrets.outputs.admin_token_ready == 'true'
         working-directory: cloudflare-worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -108,7 +118,6 @@ jobs:
 
       - name: Resolve deployed URL
         id: url
-        if: steps.cloudflare-secrets.outputs.cloudflare_ready == 'true'
         env:
           WORKER_BASE_URL: ${{ vars.WORKER_BASE_URL }}
           WORKER_STAGING_BASE_URL: ${{ vars.WORKER_STAGING_BASE_URL }}

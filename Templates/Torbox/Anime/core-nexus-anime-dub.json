@@ -5,7 +5,7 @@
     "description": "Dubbed-first anime build. Prioritises English dubs and Dual Audio over raw Japanese sub tracks. SeaDex best releases · Nyaa-sourced · FLAC/AAC · TorBox Essential. Ideal for users who prefer English voice acting or mixed households.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.18",
+    "version": "2.8.19",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
@@ -21,7 +21,6 @@
     "rpdbApiKey": "t0-free-rpdb",
     "posterService": "rpdb",
     "tmdbApiKey": "<template_placeholder>",
-    "enhanceResults": true,
     "usePosterRedirectApi": true,
     "usePosterServiceForMeta": true,
     "services": [
@@ -440,10 +439,6 @@
     ],
     "includedLanguages": [],
     "excludedLanguages": [],
-    "excludedStreamSources": [
-      "YouTube",
-      "AI Enhanced"
-    ],
     "excludedStreamExpressions": [
       {
         "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))",
@@ -608,9 +603,8 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
-      "enabled": false,
-      "position": "last"
+    "failover": {
+      "enabled": false
     },
     "proxy": {
       "id": "mediaflow",
@@ -1387,8 +1381,6 @@
     ],
     "excludedRegexPatterns": [],
     "showChanges": true,
-    "rankedRegexPatterns": [],
-    "maxResults": 35,
-    "maxResultsPerResolution": 15
+    "rankedRegexPatterns": []
   }
 }

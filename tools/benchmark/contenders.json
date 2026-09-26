@@ -281,26 +281,64 @@
       "role": "variant",
       "lane": "torbox",
       "variant_of": "control-4k-apex-torbox",
-      "single_variable": "ENABLE server-side failover (Apex sets no `failover` block at all)",
+      "single_variable": "ESCALATE failover attempts 3 -> 5 (Apex now ships conservative failover; 3 is the upstream default)",
       "source": "local",
       "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
       "mutation": {
         "op": "set",
-        "pointer": "/failover",
-        "value": {
-          "enabled": true,
-          "contentTypes": [
-            "usenet",
-            "debrid"
-          ],
-          "allowCrossType": true,
-          "maxAttempts": 5,
-          "parallel": 2,
-          "position": "beforeLimiting"
-        },
+        "pointer": "/failover/maxAttempts",
+        "value": 5,
         "create": true
       },
-      "description": "BIGGEST competitor-only lever. Tamtaro enables failover; every Core build omits it. On a dead/unplayable pick AIOStreams retries up to 5 alternates server-side instead of handing the user a broken stream. Directly targets playability, the metric a user actually feels. Cost: added latency on the failing path only. Scored by playable_pct vs ttfl_ms."
+      "description": "Apex adopted conservative failover on 2026-09-22 (enabled, usenet+debrid, upstream defaults). This variant escalates the attempt budget to 5 (the default host ceiling) to test whether more retries raise playability. Scored by playable_pct vs ttfl_ms. Sibling variants cover parallel, cross-type and early-chain escalation separately."
+    },
+    {
+      "id": "variant-apex-failover-parallel",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ESCALATE failover to 2 parallel attempts (upstream default is sequential)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/failover/parallel",
+        "value": 2,
+        "create": true
+      },
+      "description": "Sister variant to variant-apex-failover-on. Tests whether 2-in-flight failover attempts (the default host ceiling) cut time-to-first-playable on the failing path vs sequential."
+    },
+    {
+      "id": "variant-apex-failover-crosstype",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "ALLOW failover to cross usenet/debrid type boundaries (upstream default same-type only)",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/failover/allowCrossType",
+        "value": true,
+        "create": true
+      },
+      "description": "Sister variant to variant-apex-failover-on. Tests whether letting a dead debrid pick fail over into Usenet results (and vice versa) raises playability."
+    },
+    {
+      "id": "variant-apex-failover-early",
+      "role": "variant",
+      "lane": "torbox",
+      "variant_of": "control-4k-apex-torbox",
+      "single_variable": "BUILD the failover chain before result-limiting (upstream/Apex default 'last')",
+      "source": "local",
+      "path": "Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
+      "mutation": {
+        "op": "set",
+        "pointer": "/failover/position",
+        "value": "beforeLimiting",
+        "create": true
+      },
+      "description": "Sister variant to variant-apex-failover-on. Tests whether drawing failover targets from the pre-limit pool (streams that would otherwise be cut) beats the final-list-only default."
     },
     {
       "id": "variant-apex-excluded-keywords",

@@ -614,7 +614,7 @@
   },
   "upstream": {
     "repo": "Viren070/AIOStreams",
-    "sha": "e694b6ace7309091289a8680c3f817210e261e46",
-    "version": "2.34.0"
+    "sha": "c1d044c23b48acff9e5f0ce672c786797177e767",
+    "version": "2.34.1"
   }
 }

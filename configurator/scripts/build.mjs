@@ -31,7 +31,7 @@ await build({
   charset: 'utf8',
 });
 
-const cssFiles = ['01-core.css','02-brand-theme.css','03-enhancements.css','04-landing.css','05-unified-ui.css','06-features.css','07-menu-parity.css'];
+const cssFiles = ['01-core.css','02-brand-theme.css','03-enhancements.css','04-landing.css','05-unified-ui.css','06-features.css','07-menu-parity.css','08-advisor.css'];
 const rawCss = (await Promise.all(cssFiles.map(file => readFile(resolve(src, 'styles', file), 'utf8')))).join('\n');
 const { code: css } = await transform(rawCss, { loader: 'css', minify: true, target: 'es2020' });
 await writeFile(resolve(assets, 'app.css'), css);

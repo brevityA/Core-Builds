@@ -11,8 +11,8 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.11",
-    "coreBuildsAIOStreamsTarget": "2.31.1",
+    "coreBuildsVersion": "3.12",
+    "coreBuildsAIOStreamsTarget": "2.34.1",
     "coreBuildsProfile": "balanced",
     "coreBuildsProfileVersion": "1"
   },
@@ -868,7 +868,7 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
+    "failover": {
       "enabled": false
     },
     "areYouStillThere": {
@@ -1163,10 +1163,11 @@
       "H-OU",
       "H-SBS"
     ],
-    "requiredStreamExpressions": [],
     "excludedStreamTypes": [
+      "youtube",
       "http",
       "p2p"
-    ]
+    ],
+    "requiredStreamExpressions": []
   }
 }

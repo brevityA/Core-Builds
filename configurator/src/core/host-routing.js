@@ -37,7 +37,7 @@ export function hostCapabilityLabel(meta) {
 
 /**
  * Full host-picker option label: name — capability · AIOStreams version
- * (channel), e.g. "ElfHosted — Debrid only — no P2P/HTTP · v2.34.0".
+ * (channel), e.g. "ElfHosted — Debrid only — no P2P/HTTP · v2.34.1".
  * The version is the registry snapshot from HOST_META; a live probe supersedes
  * it in the health chip, not in this static label.
  */

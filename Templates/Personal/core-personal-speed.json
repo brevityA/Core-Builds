@@ -5,7 +5,7 @@
     "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -776,9 +776,12 @@
     },
     "autoRemoveDownloads": false,
     "checkOwned": true,
-    "nzbFailover": {
+    "failover": {
       "enabled": true,
-      "position": "last"
+      "contentTypes": [
+        "usenet",
+        "debrid"
+      ]
     },
     "serviceWrap": {
       "enabled": false,
