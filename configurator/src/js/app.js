@@ -8012,11 +8012,12 @@ async function simpleInstall(target) {
       if (S.installMode === 'direct' && target === 'app' && S.stremioEmail && S.stremioPassword) {
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Pushing to Stremio…`;
         try {
-          const installed = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
+          const installResult = await pushToStremio(manifestUrl, S.stremioEmail, S.stremioPassword);
+          const installed = installResult.status;
           // ── Full Stack: AIOMetadata + Cinemeta patch + addon ordering ──
           btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Setting up full stack…`;
           const stackResult = await fullStackAfterPush(
-            (await stremioFetch('https://api.strem.io/api/login', { type:'Login', email:S.stremioEmail, password:S.stremioPassword, facebook:false }))?.result?.authKey,
+            installResult.authKey,
             manifestUrl,
             { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true }
           );
@@ -8025,9 +8026,11 @@ async function simpleInstall(target) {
           if (installed === 'already') {
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div>${stackHtml}</div>`;
           } else {
-            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:#3fb950;margin-bottom:4px">${ICO.check(14,'#3fb950')} ${installed==='replaced'?'Previous install replaced!':'Full Stack Installed!'}</div><div style="font-size:.78rem;color:#8b949e">AIOStreams, AIOMetadata, and Cinemeta patch deployed. Reopen Stremio to see your new setup.</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
+            const stackTitle = stackResult.ok ? (installed==='replaced'?'Previous install replaced and verified!':'Full Stack Installed and verified!') : 'AIOStreams installed; stack needs attention';
+            const stackColour = stackResult.ok ? '#3fb950' : '#fbbf24';
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:${stackColour};margin-bottom:4px">${ICO.check(14,stackColour)} ${stackTitle}</div><div style="font-size:.78rem;color:#8b949e">${stackResult.ok?'The requested addons were read back from your account successfully. Reopen Stremio to see your new setup.':'AIOStreams was verified, but one or more optional full-stack operations did not verify. Review the details below.'}</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
           }
-          showToast('Addon installed to your Stremio library');
+          showToast(stackResult.ok ? 'Install verified in your Stremio library' : 'AIOStreams verified; optional stack needs attention', !stackResult.ok);
           return;
         } catch(err) {
           btn.disabled = false; btn.innerHTML = origHtml;

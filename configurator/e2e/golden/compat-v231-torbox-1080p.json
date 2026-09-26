@@ -843,11 +843,6 @@
       "enabled": false,
       "streamTypes": []
     },
-    "nzbFailover": {
-      "enabled": false,
-      "count": 3,
-      "position": "last"
-    },
     "areYouStillThere": {
       "enabled": false
     },
@@ -1139,10 +1134,16 @@
       "H-OU",
       "H-SBS"
     ],
-    "requiredStreamExpressions": [],
     "excludedStreamTypes": [
+      "youtube",
       "http",
       "p2p"
-    ]
+    ],
+    "requiredStreamExpressions": [],
+    "nzbFailover": {
+      "enabled": false,
+      "count": 3,
+      "position": "last"
+    }
   }
 }

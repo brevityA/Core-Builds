@@ -843,6 +843,9 @@
       "enabled": false,
       "streamTypes": []
     },
+    "failover": {
+      "enabled": false
+    },
     "areYouStillThere": {
       "enabled": false
     },
@@ -1134,20 +1137,11 @@
       "H-OU",
       "H-SBS"
     ],
-    "requiredStreamExpressions": [],
-    "failover": {
-      "enabled": false,
-      "maxAttempts": 3,
-      "position": "last",
-      "contentTypes": [
-        "usenet"
-      ],
-      "allowCrossType": false,
-      "parallel": false
-    },
     "excludedStreamTypes": [
+      "youtube",
       "http",
       "p2p"
-    ]
+    ],
+    "requiredStreamExpressions": []
   }
 }

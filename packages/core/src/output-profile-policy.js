@@ -321,6 +321,16 @@ function applyAIOStreamsCompatibility(template, context) {
   // Only the explicitly selected v2.31.1 lane retains the legacy built-in
   // preset. v2.32 and unknown targets fail safe by removing it; a future
   // Newznab replacement must be an explicit, credential-aware migration.
+  if (target === '2.31.1' && config.nzbFailover === undefined && config.failover !== undefined) {
+    const canonical = config.failover || {};
+    config.nzbFailover = {
+      enabled: Boolean(canonical.enabled),
+      count: Number(canonical.maxAttempts) || 3,
+      position: canonical.position === 'beforeLimiting' ? 'first' : 'last',
+    };
+    delete config.failover;
+  }
+
   if (target !== '2.31.1') {
     config.presets = values(config.presets).filter(
       preset => String(preset?.type || '').toLowerCase() !== 'torbox-search'
