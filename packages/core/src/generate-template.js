@@ -22,7 +22,7 @@ import { sanitizeAioEnumArrays } from './schema.js';
 import { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
 import { requireNuvioInstantHost } from './nuvio-hosts.js';
 import { NUVIO_ADDONS } from './nuvio-torbox-instant.js';
-import { applyOutputProfile, resolveOutputProfile } from './output-profile-policy.js';
+import { applyOutputProfile, resolveOutputProfile, DEFAULT_AIOSTREAMS_VERSION } from './output-profile-policy.js';
 
 const EXCLUDED_REGEX = ["/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i","/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"];
 
@@ -685,7 +685,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     optionalScrapers: rawInput.optionalScrapers || [],
     formatter: rawInput.formatter || 'family-v4',
     outputProfile: String(rawInput.outputProfile || 'auto'),
-    aiostreamsVersion: String(rawInput.aiostreamsVersion || '2.31.1'),
+    aiostreamsVersion: String(rawInput.aiostreamsVersion || DEFAULT_AIOSTREAMS_VERSION),
     simpleMode: Boolean(rawInput.simpleMode),
     quickStart: Boolean(rawInput.quickStart),
   };

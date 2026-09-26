@@ -304,7 +304,7 @@ function preventStackedFetchExits(config) {
 }
 
 function compatibilityTarget(context = {}) {
-  const requested = String(context.aiostreamsVersion || '2.31.1');
+  const requested = String(context.aiostreamsVersion || DEFAULT_AIOSTREAMS_VERSION);
   return AIOSTREAMS_COMPATIBILITY_TARGETS.includes(requested) ? requested : 'unknown';
 }
 
