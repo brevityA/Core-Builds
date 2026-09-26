@@ -1,0 +1,206 @@
+---
+title: "Core Line"
+sidebarTitle: "Core Line"
+description: "What would make the Core Line ticker the best in its category, and how stadium sync plugs into it."
+---
+
+Core Line is not a sports app in the ESPN sense. It is a 10-foot chyron: team, score, channel, then the next game. The source lives in [brevityA/CoreBuildsApps](https://github.com/brevityA/CoreBuildsApps) at `ticker/` (v1.3.0, Downloader **7375676**). This page is the market read, the gap list, and the stadium bridge that now sits beside it.
+
+## The category it actually competes in
+
+Phone score apps are a different product. ESPN is a browse-and-watch session. theScore is a notification machine with a betting skin. SofaScore and Flashscore win on league depth. Apple Sports, as [Slate put it during the 2026 World Cup](https://slate.com/technology/2026/06/fifa-world-cup-apple-app-sports.html), wins by doing almost nothing: teams, records, a clock, no headlines, and an ads toggle that stays off. None of those are built for a television across the room.
+
+The television category is thin, which is why Core Line exists:
+
+| Product | What it is good at | What it will not do |
+|---|---|---|
+| [Sports Scores TV](https://www.amazon.com/Sports-Scores-TV-Live/dp/B0HJMVK1D4) | Dark 10-foot dashboard, 14 leagues, a bottom crawl, a screensaver, no ads, one-time purchase | Channels are plain text. No RSS. No venue clock. No overlay on another app. |
+| [StatCave](https://www.amazon.com/StatCave-Live-Sports-Score-ticker/dp/B0HCMTW3RB) | A TV ticker with box scores and a custom text line | Leads with betting odds. That is the opposite of the Apple Sports bar. |
+| Kodi's old RSS crawl | Proved the demand | Not a product anyone still installs for this. |
+| [Sportzcast / ScoreLink](https://geniussportscast.com/) and [ScoreBird](https://www.scorebird.com/api-documentation) | Ground-truth data off the controller, for trucks and school sites | A raw feed. You still have to draw the graphic. Pricing is a sales call. |
+| Daktronics SportApps | Broadcast bugs driven by OES, Whiteway, Fair-Play, or OCR of the board | A truck tool, not a living-room app. |
+
+Core Line already owns the part none of them shipped together: a reader. Public scoreboards plus whatever RSS the household already has, channel aliases (`epn` → ESPN, `sn 3` → SN 3), a labeled demo slate so the first three seconds are never blank, same-Wi-Fi pairing, and an overlay crawl. v1.3.0 also has favorites, a watch handoff, and a 15-second refresh floor. That is a real product. It is not yet the one a gym or a sports bar would leave on all night.
+
+## What "best" means here
+
+Do not try to out-Flashscore Flashscore, and do not add a bet slip. The bar is:
+
+1. **Glanceable at 10 feet.** One live game readable from the couch, plus a crawl for everything else. Apple Sports' restraint, Sports Scores TV's type size.
+2. **Honest about time.** A league API is 10–30 seconds behind the building. The controller in the building is not. The ticker that can show both, and say which is which, is the one a venue will trust.
+3. **Channels stay first-class.** "Leafs on TSN4 / SN 3" is the original request. Sports Scores TV never did this. Do not bury it under stats.
+4. **No betting, no streams, no bundled playlists.** theScore and StatCave already occupy the odds corner. Core Line's locked decision — a guide, not a player — is a feature. The playlist matcher in v1.3.0 should stay a matcher. The moment it ships sources, it is a different app, and a worse one.
+5. **It has to work on a Fire remote.** Pairing exists so nobody types a URL with a D-pad. Every new source has to clear that bar.
+
+## What to do better, in order
+
+### 1. Let a paired stadium host through the SSRF guard
+
+This is the bug that makes stadium sync impossible on the shipping APK.
+
+`SafeUrl.kt` and `ticker/lib/ssrf.mjs` reject `10.x`, `192.168.x`, `172.16–31`, `.local`, and `.internal`. That is the right rule for an arbitrary RSS URL — it stops the on-device proxy from being aimed at cloud metadata. It is the wrong rule for the scoreboard on the same Wi-Fi as the Stick. The pair server on port 8791 uses the same check, so a phone cannot hand the TV `http://192.168.1.20:8792/coreline.json` either.
+
+The fix is an allowlist, not a hole. `packages/stadium-sync/lib/lan.mjs` is the rule: public feeds stay public-only, a host is allowed only after it was paired, and `169.254.169.254` stays blocked even if someone adds it. Until that lands in CoreBuildsApps, two paths work tonight:
+
+- Open the bridge's `/display` in the gym TV's own browser. It never touches Core Line's proxy.
+- Pair a hostname, not a raw private IP. The shipping check looks at the host string. A split-horizon name such as `scoreboard.riverside.edu` resolves on the gym LAN and is accepted. `192.168.1.20` is not.
+
+### 2. A clock that does not jump every 15 seconds
+
+`REFRESH_CHOICES` bottoms out at 15 seconds. That is fine for ESPN. It is wrong for a shot clock. The bridge projects a running clock when Core Line polls, and it stamps `HELD` after 20 seconds of silence so a dead serial cable does not keep counting. The in-venue `/display` polls every second. Core Line itself should grow a stadium lane that refreshes a paired host at 1 second and leaves league APIs on the slow timer.
+
+`parseJsonFeed` also drops `detail`, `venue`, and `source`. A clock only survives today because the bridge hides an `H:MM` token in `description`, where the listing parser's time regex can see it. The quarter does not survive. Four lines in `ticker/lib/parser.mjs` would:
+
+```js
+if (row.detail) event.detail = String(row.detail).slice(0, 80);
+if (row.venue) event.venue = String(row.venue).slice(0, 80);
+if (row.source === 'stadium') event.source = 'stadium';
+```
+
+That is the difference between a badge that says `3:12` and one that says `Q2 3:12 · 2nd & 7`.
+
+### 3. One featured game, not only a ribbon
+
+Sports Scores TV's dashboard and Apple Sports' lock-screen both answer "what's the score of the game I care about?" Core Line's crawl answers "what's on." A sports bar needs both. v1.3.0 has a grid and a game sheet; the sheet is a channel picker, not a score bug. The bridge display is the bug: two scores, a clock, a period, readable from the doorway. Bring that layout into Core Line as a mode (`T` is ticker-only today; it should have a sibling for "this game, huge"), driven by the favorite star that already exists.
+
+### 4. Be the screensaver, not another app to launch
+
+Sports Scores TV's Channel Mode registers as the television's screensaver. Core Line's overlay is more useful while someone is watching something else, and worse when the TV is idle — Fire TV blocks the overlay entirely, which the app already admits in settings. A daydream / screensaver on Google TV and Shield, showing favorites then the stadium board, is the always-on product. The overlay stays the hero on devices that allow it.
+
+### 5. Cover the games the national apps skip, without becoming a news app
+
+WNBA is in the built-in league list. NCAAW, NWSL, PWHL, and the CFL are not. theScore's own reviews still complain about women's coverage. Adding those ESPN scoreboard paths is a small, legal, on-mission change. Going to 6,000 competitions is not. Families who follow a county league, a youth bracket, or a league ESPN does not publish should paste RSS or point at the stadium bridge. That is the extension model. Do not scrape league sites, and do not take a betting API to fill the holes.
+
+### 6. Favorites that survive a reinstall, still with no account
+
+Favorites in v1.3.0 are a local string. That is the right privacy posture and a weak household posture: the Stick and the phone disagree. The pair server already moves feed URLs across the couch. The same envelope can move a favorite list. No login, no cloud, same Wi-Fi. Apple Sports' "my teams" feeling, without an Apple ID.
+
+### 7. Say where the number came from
+
+A crawl that mixes an ESPN delay, a user RSS line, and a controller clock will look wrong if it looks identical. Stamp stadium events (`GYM`, `HELD`, `NO SIGNAL`) and keep the demo slate labeled, which the app already does. Trust is the feature Sportzcast sells to trucks. Core Line can give the same honesty to a living room.
+
+## Layout v2
+
+The five screens are a mock, not an APK change: `packages/stadium-sync/public/mocks.html`, served at `/mocks`. Tonight, the overlay crawl, a multi-court stadium bug, the idle screen, and settings.
+
+The home is three lanes. One bug for the favorite that is live, else the next favorite, else the biggest live game. A rail of four for the rest of what is on. A crawl for everything else, channels included. The league-chip row and the dense card grid spend the 10-foot glance on navigation.
+
+Tricks that are not already in the list above:
+
+- **Overscan is 5%, and only once.** Current Leanback guidance is about 48dp on the sides and 27dp top and bottom. Do not add that margin again inside a Leanback row. Older style docs still say 10% and a 12sp floor. Use the 10-foot size. A lower third sits above the bottom 8–12%, where captions and player chrome land.
+- **Red is a plate, not a word.** 4:2:0 fringes saturated red type, and a moving red word fringes first. Live is white on `#FF2D55`. The crawl stays white. Initials, not logos.
+- **The crawl is already a transform.** `ticker.js` moves one track at a fixed px/s with `translate3d`, wraps on the copy width, and a watchdog restarts a stalled loop. Do not replace that with a CSS keyframe. The holes are in the next section.
+- **Two timers.** League polls stay near 15 seconds. A paired stadium host is 1 second, and the clock interpolates locally until the console is held. Size type off the screen (`cqw` / sp), not the window.
+- **Fire TV cannot cover other apps.** `SYSTEM_ALERT_WINDOW` is unsupported there. Overlay is a Shield and Google TV path. Fire gets the full-screen idle screen. A third-party app cannot start `DreamService`; the OS does.
+
+The gym TV at `/display` now does the cheap part for real. A poll patches score and clock in place. It does not rebuild the tree. The crawl carries score, period, and the one extra line — not a ticking clock — so the animation width stays put. A packet within two seconds of the local clock does not twitch the second. Farther than that, it snaps. The clock is not eased.
+
+Still not in the APK:
+
+- **Speed is a fraction of the screen, not 80 pixels.** A 720p Stick and a 4K panel do not share a pixel. About 7.5% of the width per second reads as the same crawl.
+- **Do not restart the crawl** when the string is unchanged, and do not put the game clock in it. A clock in the crawl changes the width every second and makes the speed lie.
+- **One extra line, and only if the feed has it.** Basketball shot clock. Football down and distance. If the packet does not contain it, do not invent a power play or a box score.
+- **The DOM rebuild is the stampede, not the parse.** Leagues already fetch in isolation. `render()` then rebuilds the hero, the grid, and the filter row together. Restore focus by event id, not by row index. A 304 should not reach that function.
+- **The overlay WebView is the height of the bar**, not a transparent full-screen page. A full-screen WebView is the memory cost, even if most of it is clear.
+- **First paint is a labeled demo**, never a black glass. Last-good is a different chip from demo, and both are different from HELD. A failed refresh keeps the last slate. It does not swap in the sample.
+- **The phone sends the host.** A pair code on the TV. The Fire remote never types a URL.
+
+## What the shipping ticker already got right
+
+Read from `ticker/` in CoreBuildsApps, v1.3.0. These are not ideas. They are in the tree.
+
+- The ribbon is not a CSS keyframe. `public/js/ticker.js` writes `translate3d` from `requestAnimationFrame` at `state.speed` (default 52, range 20–120). Replacing content remeasures and does not reset the offset, so a poll does not teleport the line.
+- A watchdog samples that offset every 5 seconds and restarts the loop if it has not moved. Wake and `pageshow` kick it too. That is the right response to a WebView that pauses after sleep.
+- Refresh is single-flight. A dead league does not block the others. Last-good stays, and the demo slate appears only when there is nothing at all. Failures back off.
+- The overlay window is already the height of the bar, not a full-screen transparent page. Fire TV is refused in `MainActivity` before the service starts. The web app can pin the crawl top or bottom. Default is bottom.
+- Logos are on the competitor object and are not drawn. Initials are already the mark.
+
+## What that code still gets wrong
+
+Key 7 on the layout mock is this list, drawn.
+
+- **The TV overlay throws away the 10-foot type.** `OverlayService` pins the window to `Gravity.TOP` at 80dp and never reads `state.position`, so the bottom setting does nothing once the ticker is floating. The page is loaded with `tv=1`, and `[data-tv] .tick` is 2rem. `[data-overlay] .tick` is 1.02rem and comes later, so it wins. The moving `LIVE` word is `color: var(--live)` at 0.8rem. That is red type, in motion, at phone size, on the glass the crawl is for.
+- **The watchdog cannot see a ribbon that has flown off.** If `seqWidth` is 0, `_tick` still adds to the offset and never wraps. The offset is changing, so the stall check is happy. Snap the transform to a whole pixel, and do not advance when the copy has not been measured.
+- **Reduced motion does not stop the loop.** It sets the speed to 12px/s and leaves `requestAnimationFrame` running. A static line that pages is the accessible version, and it lets the Stick sleep the compositor.
+- **The game clock does not tick.** `tickClock` writes the wall clock. The period and clock live in `detail`, which is `status.type.shortDetail` from ESPN or a string from the NHL clock, copied at the last poll. Nothing projects it. That is the 15-second jump.
+- **Baseball is a default league, and the situation is thrown away.** The MLB fallback requests `hydrate=team,linescore,broadcasts(all)`. `eventsFromMlb` keeps `detailedState`, which is often “In Progress,” and never reads the linescore. `eventsFromEspn` never reads `situation`, so down-and-distance and the count are not in the slate either. A clock in the middle of a baseball bug is the wrong graphic. The middle is inning, outs, count, and who is on, as text. This is the public schedule payload. It is not a Daktronics offset.
+- **The remote pays a tax on every card.** The article, the star, and Watch are each `.focusable`. Right from the card hits the star. `captureFocus` stores a container id and an index of those controls. `restoreFocus` puts the ring back on that index after `render()` rebuilds the hero, the grid, and the filter row with `innerHTML`. A game inserted above the focused row moves the ring. One stop per game. Star and Watch belong on the sheet. Restore by event id.
+- **A favorite is a substring.** `isFav` uses `b.includes(f)` on the abbreviation and the name. `CHI` matches CHIEFS. `NY` matches NYY. The field is free text, so a one-letter token sorts the whole slate first. Match the abbreviation exactly, or a word in the name.
+- **The gym and the league feed do not meet.** `matchupKey` is `league::away::home`. A controller game and the ESPN row for the same clubs are two crawl items. `preferEvent` then keeps the row with more channel names, then whichever arrived first. It does not know that a stadium source should win the score and the clock while the league row keeps the channels. League color is also painted onto every card as `--acc`. That is someone else’s brand, and at 10 feet it is a rainbow.
+- **The overlay still runs the whole app.** CSS hides the grid. `render()` still builds it, and a second WebView polls the same leagues if the full activity is also open. Skip the grid when `overlay=1`. Do not start a second refresh loop.
+
+## Over other apps
+
+There is no API that puts a third-party ticker on top of every app, on every stick. The shipping service is the right kind of window where the OS allows it, and a dead end where it does not. Do not invent a second mechanism to force the dead end.
+
+### Where it can work
+
+Google TV, Shield, and other Android TV devices that still expose `SYSTEM_ALERT_WINDOW`. Core Line already declares that permission, starts a foreground service of type `specialUse`, and adds a `TYPE_APPLICATION_OVERLAY` window. That window type, since Android 8, draws above ordinary activities and below the status bar, the keyboard, and other system windows. It does not cover the system UI, and it should not try.
+
+The user has to grant it. There is no in-app Allow dialog. `startOverlay()` sends them to `Settings.ACTION_MANAGE_OVERLAY_PERMISSION` and checks `Settings.canDrawOverlays()`. On a television that screen is often missing or not reachable with a remote. Stock Android TV and several vendor ROMs have never shipped a D-pad UI for this toggle. If the intent fails, or the switch is not there, say so and offer the full-screen ticker. Do not make the customer run ADB.
+
+On Android 12 and later, a window that is `FLAG_NOT_TOUCHABLE` and not translucent enough blocks touches to the app underneath, in the rectangle it occupies. The remote is key input, and `FLAG_NOT_FOCUSABLE` is what keeps those keys with Netflix. Keep the window the height of the bar, not the screen, so a touch television only loses that strip. Do not turn off the platform’s untrusted-touch block.
+
+On Android 12 and later, any app can call `setHideOverlayWindows(true)` and the system removes non-system overlays from that window. A streaming app that does this will hide the ticker on its own screen. There is no legitimate way through that. Leave it hidden.
+
+### Where it cannot work
+
+Fire TV. Amazon’s developer answer is that `SYSTEM_ALERT_WINDOW` is not supported, so an app will not draw over other apps. There is no settings switch. `isFireTv()` already refuses to start the service, which is the correct product behavior. Newer sticks are leaving Android entirely. A grant forced from a computer is not a feature, and it will not survive that split.
+
+Picture-in-picture is not a substitute. Android’s PiP mode is for video, calls, and navigation. On TV it is Android 14 or newer, on qualified devices, placed by the system, and the other app can push it off important content. A line of type is not a video. Do not wrap the crawl in a player surface to sneak it into that window.
+
+A screensaver is the idle screen, not a layer over a playing app. The system starts it. Fire OS 8’s Ambient Experience also gets in front of a third-party dream. A replacement launcher only owns the home screen.
+
+An accessibility service can draw a window the overlay permission cannot, and it can read the screen. That is the wrong privilege for a score bug. Do not use it.
+
+### What to change in the window that already exists
+
+The service is the right object. The page inside it is not.
+
+- Honor `state.position`. The web app defaults to the bottom. `OverlayService` hardcodes `Gravity.TOP`, so the setting does nothing once the ticker is floating. Bottom should sit above the caption band. Top should sit under the system UI, not in it.
+- The window is 80dp, then the overlay stylesheet overrides the 10-foot type back to phone size. Make the window tall enough for the TV crawl, or stop loading the full page.
+- Load a strip, not `index.html`. One poller, in the service. If the activity is open, it should read that slate, not start a second fetch loop.
+- Pass the special-use type into `startForeground` on API 34. The manifest already declares it. The property text still says the overlay is for a phone. Say television as well, or Play review will read it as a phone widget.
+- When the permission cannot be granted, the full-screen activity is the product. On Fire TV that is the only product. Do not show a toggle the operating system will refuse.
+
+## What not to build
+
+- Odds, props, or a sportsbook deep link. StatCave already did this. It makes the ticker louder and the brand worse.
+- Highlights, news, and chat. Those are the 10–20 minute ESPN session. Core Line's session is three seconds, many times a night.
+- A bundled IPTV source. The playlist import is a matcher for a URL the household pasted. Leave it that way.
+- An official Daktronics or Genius partnership as a launch dependency. Read the documented feeds. Calibrate. Do not block the youth-gym pad on a vendor agreement.
+- Play Store as the definition of done. Sideload is the decision, and it is why a gym can install this on a Stick without a review cycle.
+
+## Stadium sync
+
+The bridge is `packages/stadium-sync`. Node 20, no dependencies.
+
+```bash
+cd packages/stadium-sync
+node server.mjs
+```
+
+| Who | Where |
+|---|---|
+| Volunteer keeping score on a tablet | `/` |
+| Gym TV, full-screen bug | `/display` |
+| Core Line feed | `/coreline.json` |
+
+One process can hold several boards — court 1, court 2, the football field — which is the concourse case Sports Scores TV cannot see, because it has no idea the building exists.
+
+Controllers, in the order a school actually has them:
+
+- **No controller.** The manual pad posts the same JSON the consoles do.
+- **Daktronics All Sport 5000.** RTD at 19200 8N1. Frames are `0x16` … `0x17`. The packet prefix `004210` and the checksum match the public decoder in [daktronics-allsport-5000-rs](https://github.com/zabackary/daktronics-allsport-5000-rs). The shared prefix (clock, names, scores, period at the documented one-based offsets) was checked against that project's basketball, football, hockey/lacrosse, volleyball, and soccer maps. Football also reads down-and-distance. This is a reader. It never transmits to a board.
+- **Sportzcast ScoreLink / ScoreConnect.** JSON from the [shared sport contract](https://docs.sportzcast.net/public/data-integration/mqtt-json-contracts/base-contract-reference/): `HomeTeamName`, `GuestScore`, `Clock`, `ClockStatus`, `EventId`. Local TCP uses the [legacy port 1402 `JB` command](https://docs.sportzcast.net/public/data-integration/tcp-sockets-legacy/). New Sportzcast work prefers MQTT; the bridge consumes the JSON rather than embedding a broker client. Cloud `GT` / `FB` runs only if the operator supplies credentials, and a failed bot lookup waits at least 10 seconds.
+- **Fair-Play, OES, Nevco, a custom app.** POST the small venue document. ScoreBird's partner API is real and not published as a stable public schema — poll whatever URL the school was given; do not invent one.
+
+Ingest is LAN-only unless `STADIUM_TOKEN` is set. A gym score is public. The ability to change it is not.
+
+The first night on a real All Sport should be treated as calibration. Daktronics does not publish a blessed third-party SDK for this port, and the offset maps say so themselves.
+
+## The position to hold
+
+Sports Scores TV is the clean TV scoreboard. StatCave is the ticker with a bookmaker attached. Sportzcast is the cable coming out of the controller. Apple Sports is the taste bar, and it is not on a Fire TV.
+
+Core Line is the reader that was missing: channels, a crawl, an overlay, and — once the allowlist lands — the clock on the wall of the building you are standing in. That last part is the one nobody in the living-room category has. The bridge is the start of it. The APK change is the rest.

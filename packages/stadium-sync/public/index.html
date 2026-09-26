@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stadium sync — operator</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="operator">
+    <header class="head">
+      <div class="head-copy">
+        <span class="kicker">Stadium</span>
+        <h1>The clock in the building</h1>
+        <hr class="rule">
+        <p class="lede">Same night canvas as the rest of the suite. The console, or this pad, is the score. Core Line crawls the feed. The gym TV opens the bug.</p>
+      </div>
+      <a class="ghost" href="/display">Open display</a>
+    </header>
+
+    <div class="urls">
+      <span class="url" id="feedUrl">/coreline.json</span>
+    </div>
+
+    <h2 class="section">Manual pad</h2>
+    <section class="card">
+      <div class="pad-grid">
+        <div>
+          <input id="guest" value="Riverside" maxlength="24" aria-label="Guest team">
+          <div class="big" id="guestScore">0</div>
+          <div class="steppers">
+            <button type="button" class="ghost" id="guestMinus">−</button>
+            <button type="button" class="cta" id="guestPlus">+</button>
+          </div>
+        </div>
+        <div>
+          <div class="period">Clock</div>
+          <div class="big" id="clock">8:00</div>
+        </div>
+        <div class="home">
+          <input id="home" value="Oak Hill" maxlength="24" aria-label="Home team">
+          <div class="big" id="homeScore">0</div>
+          <div class="steppers">
+            <button type="button" class="ghost" id="homeMinus">−</button>
+            <button type="button" class="cta" id="homePlus">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="fields">
+        <label class="field">Sport
+          <select id="sport">
+            <option>basketball</option>
+            <option>football</option>
+            <option>hockey</option>
+            <option>soccer</option>
+            <option>volleyball</option>
+            <option>lacrosse</option>
+          </select>
+        </label>
+        <label class="field">Period <input id="period" value="Q1" maxlength="8"></label>
+        <label class="field">Clock <input id="clockInput" value="8:00" maxlength="8"></label>
+        <label class="field">Channels <input id="channels" value="GYM" maxlength="32"></label>
+      </div>
+      <div class="actions">
+        <button type="button" class="cta" id="toggle">Start clock</button>
+        <button type="button" class="ghost" id="finalBtn">Mark final</button>
+        <button type="button" class="ghost" id="push">Push score</button>
+      </div>
+      <p id="padStatus" class="hint"></p>
+    </section>
+
+    <h2 class="section">Send to Core Line</h2>
+    <form class="card" id="pair">
+      <div class="fields">
+        <label class="field">TV address <input id="tvHost" placeholder="192.168.1.40" required></label>
+        <label class="field">Code on the TV <input id="tvCode" maxlength="6" placeholder="ABC123" required></label>
+        <label class="field">Feed URL <input id="pairUrl" required></label>
+      </div>
+      <div class="actions"><button class="cta" type="submit">Send feed</button></div>
+      <p id="pairStatus" class="hint"></p>
+    </form>
+    <p class="note">Core Line 1.3.0 rejects a raw 192.168 or 10.x URL. Put the gym TV on the display tonight. Pair a hostname, not a private IP literal, until the allowlist lands.</p>
+
+    <h2 class="section">Wire a console</h2>
+    <div class="row-card"><strong>Daktronics All Sport 5000</strong><span>19200 8N1 RTD, frames 0x16 to 0x17. UDP the bytes to the port in the config, or POST the raw frame to /api/ingest/main/rtd.</span></div>
+    <div class="row-card"><strong>Sportzcast / ScoreLink</strong><span>POST the JSON contract to /api/ingest/main?format=sportzcast. A local ScoreConnect on port 1402 can be set as sportzcast.host.</span></div>
+    <div class="row-card"><strong>Anything else</strong><span>POST guest, home, guestScore, homeScore, clock, period, running. Fair-Play, OES, Nevco, or a school app.</span></div>
+
+    <p class="foot">Score pushes stay on the LAN unless STADIUM_TOKEN is set. A gym score is not a secret. Changing it is. Nothing on this page is reported anywhere.</p>
+  </main>
+  <script>
+    const state = { guestScore: 0, homeScore: 0, running: false, status: 'live', timer: null };
+    const $ = (id) => document.getElementById(id);
+    const origin = location.origin;
+    $('feedUrl').textContent = origin + '/coreline.json';
+    $('pairUrl').value = origin + '/coreline.json';
+
+    function showScores() {
+      $('guestScore').textContent = state.guestScore;
+      $('homeScore').textContent = state.homeScore;
+    }
+    function bump(side, delta) {
+      state[side] = Math.max(0, state[side] + delta);
+      state.status = 'live';
+      showScores();
+      push();
+    }
+    $('guestPlus').onclick = () => bump('guestScore', 1);
+    $('guestMinus').onclick = () => bump('guestScore', -1);
+    $('homePlus').onclick = () => bump('homeScore', 1);
+    $('homeMinus').onclick = () => bump('homeScore', -1);
+    $('finalBtn').onclick = () => { state.status = 'final'; state.running = false; push(); };
+
+    function parseClock(text) {
+      const m = String(text || '').trim().match(/^(\d+):([0-5]\d)$/);
+      if (!m) return null;
+      return Number(m[1]) * 60 + Number(m[2]);
+    }
+    function formatClock(total) {
+      const s = Math.max(0, total);
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    }
+    $('toggle').onclick = () => {
+      state.running = !state.running;
+      $('toggle').textContent = state.running ? 'Stop clock' : 'Start clock';
+      clearInterval(state.timer);
+      if (!state.running) { push(); return; }
+      state.timer = setInterval(() => {
+        const up = $('sport').value === 'soccer';
+        const now = parseClock($('clockInput').value);
+        if (now == null) return;
+        const next = up ? now + 1 : now - 1;
+        $('clockInput').value = formatClock(next);
+        $('clock').textContent = $('clockInput').value;
+        if (!up && next <= 0) {
+          state.running = false;
+          $('toggle').textContent = 'Start clock';
+          clearInterval(state.timer);
+        }
+        push();
+      }, 1000);
+    };
+    $('clockInput').oninput = () => { $('clock').textContent = $('clockInput').value || '—'; };
+    $('push').onclick = () => push();
+
+    async function push() {
+      $('clock').textContent = $('clockInput').value || '—';
+      const payload = {
+        sport: $('sport').value,
+        guest: $('guest').value,
+        home: $('home').value,
+        guestScore: state.guestScore,
+        homeScore: state.homeScore,
+        clock: $('clockInput').value,
+        period: $('period').value,
+        running: state.running,
+        status: state.status,
+        channels: $('channels').value.split(',').map((s) => s.trim()).filter(Boolean),
+      };
+      try {
+        const res = await fetch('/api/ingest/main', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        $('padStatus').textContent = data.ok ? 'On the crawl.' : (data.reason || data.error || 'Not accepted');
+        $('padStatus').className = data.ok ? 'ok' : 'warn';
+      } catch (err) {
+        $('padStatus').textContent = err.message || 'Bridge unreachable';
+        $('padStatus').className = 'warn';
+      }
+    }
+
+    $('pair').onsubmit = async (event) => {
+      event.preventDefault();
+      const res = await fetch('/api/pair', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          host: $('tvHost').value.trim(),
+          code: $('tvCode').value.trim(),
+          url: $('pairUrl').value.trim(),
+          label: 'Stadium',
+        }),
+      });
+      const data = await res.json();
+      $('pairStatus').textContent = data.ok ? 'Sent. Look at the TV.' : (data.reason || 'Not sent');
+      $('pairStatus').className = data.ok ? 'ok' : 'warn';
+    };
+  </script>
+</body>
+</html>

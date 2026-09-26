@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Core Line — layout mocks</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { margin: 0; background: var(--void); }
+    .studio { max-width: 1280px; margin: 0 auto; padding: 22px 18px 48px; }
+    .studio-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-end; margin-bottom: 14px; }
+    .studio h1 { font-size: clamp(26px, 3vw, 36px); letter-spacing: -.03em; }
+    .studio .lede { margin: 6px 0 0; max-width: 62ch; }
+    .modes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .modes button {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid rgba(0, 212, 255, .35);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .modes button[aria-pressed="true"] {
+      background: linear-gradient(315deg, var(--cta-start), var(--cyan));
+      color: var(--cta-ink);
+      border-color: transparent;
+    }
+    .bezel {
+      background: #000;
+      border-radius: 18px;
+      padding: 10px;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, .5);
+    }
+    .screen {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: var(--night);
+      border-radius: 8px;
+      overflow: hidden;
+      container-type: inline-size;
+    }
+    .v-safe {
+      position: absolute;
+      inset: 3.2% 4.8%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 0;
+    }
+    .v-top, .v-meta, .v-chs { display: flex; align-items: center; gap: 8px; }
+    .v-top { justify-content: space-between; }
+    .v-brand { display: flex; align-items: baseline; gap: 8px; font-family: var(--font); letter-spacing: .06em; font-size: clamp(18px, 2.2cqw, 26px); }
+    .v-brand b { font-weight: 800; }
+    .v-brand span { font-weight: 500; color: var(--muted); }
+    .v-health {
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.1cqw, 12px);
+      letter-spacing: .14em;
+      color: var(--muted);
+    }
+    .v-health i {
+      display: inline-block;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--live);
+      margin-right: 6px;
+      vertical-align: 1px;
+    }
+    .v-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1px solid var(--hairline);
+      background: var(--surface);
+      color: var(--ink);
+      display: grid; place-items: center;
+    }
+    .v-lanes {
+      display: grid;
+      grid-template-columns: 1.55fr .85fr;
+      gap: 14px;
+      min-height: 0;
+      padding: 12px 0 10px;
+    }
+    .v-bug {
+      position: relative;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 18px 14px 22px;
+      border-radius: 16px;
+      border: 1px solid var(--hairline);
+      background:
+        linear-gradient(135deg, rgba(0, 212, 255, .08), transparent 46%),
+        #10151c;
+      contain: layout paint;
+    }
+    .v-bug::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 16px; bottom: 16px; width: 4px;
+      border-radius: 2px;
+      background: var(--live);
+    }
+    .v-bug.held::before { background: var(--held); }
+    .v-meta {
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.05cqw, 12px);
+      letter-spacing: .14em;
+      color: var(--muted);
+    }
+    .v-live, .v-src, .v-ch {
+      font-family: var(--font);
+      font-weight: 800;
+      letter-spacing: .08em;
+      line-height: 1.2;
+    }
+    .v-live {
+      background: var(--live);
+      color: #fff;
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: clamp(12px, 1.3cqw, 15px);
+    }
+    .v-src, .v-ch {
+      color: var(--cyan);
+      background: rgba(0, 212, 255, .12);
+      border: 1px solid rgba(0, 212, 255, .28);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: clamp(13px, 1.5cqw, 17px);
+    }
+    .v-src.held { color: var(--held); border-color: rgba(251, 191, 36, .45); background: rgba(251, 191, 36, .08); }
+    .v-match {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+    .v-side h2 {
+      margin: 0;
+      font-family: var(--font);
+      font-weight: 800;
+      font-size: clamp(28px, 4.4cqw, 56px);
+      letter-spacing: .02em;
+      line-height: .85;
+    }
+    .v-side p { margin: 4px 0 0; color: var(--muted); font-size: clamp(12px, 1.35cqw, 16px); }
+    .v-side.home { text-align: right; }
+    .v-num {
+      margin-top: 6px;
+      font-family: var(--font);
+      font-weight: 800;
+      font-size: clamp(52px, 8.2cqw, 104px);
+      line-height: .8;
+      font-variant-numeric: tabular-nums;
+    }
+    .v-mid { text-align: center; padding-bottom: 4px; }
+    .v-per {
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.1cqw, 12px);
+      font-weight: 700;
+      letter-spacing: .16em;
+    }
+    .v-clk {
+      font-family: var(--font);
+      font-weight: 800;
+      font-size: clamp(32px, 4.4cqw, 56px);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.03em;
+      line-height: .9;
+    }
+    .v-rail { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    .v-rail h3 {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .16em;
+      color: var(--cyan);
+    }
+    .v-row {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      padding: 8px 12px;
+      contain: layout paint;
+    }
+    .v-row b {
+      display: block;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: clamp(16px, 2cqw, 24px);
+      letter-spacing: .03em;
+    }
+    .v-row em { font-style: normal; color: var(--muted); font-size: clamp(11px, 1.15cqw, 13px); }
+    .v-when {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .v-on {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 6px rgba(0, 212, 255, .22);
+    }
+    .v-crawl {
+      height: clamp(40px, 5.2cqw, 52px);
+      overflow: hidden;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    }
+    .v-track {
+      display: flex;
+      width: max-content;
+      will-change: transform;
+      animation: v-crawl linear infinite;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: clamp(18px, 2.3cqw, 28px);
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .v-track span { padding-right: 2.5rem; }
+    .v-track s { text-decoration: none; color: var(--muted); padding: 0 .35em; }
+    @keyframes v-crawl { to { transform: translateX(-50%); } }
+    .v-program { position: absolute; inset: 0; background: #071018; }
+    .v-program .ice {
+      position: absolute;
+      left: 16%; right: 16%; top: 10%; bottom: 26%;
+      border: 1px solid rgba(230, 237, 243, .1);
+      border-radius: 40% / 8%;
+      background:
+        radial-gradient(circle at 50% 50%, transparent 18%, rgba(230, 237, 243, .05) 19%, transparent 20%),
+        linear-gradient(180deg, rgba(0, 212, 255, .05), transparent 40%);
+    }
+    .v-program .tag {
+      position: absolute;
+      left: 8%; top: 14%;
+      font-family: var(--mono);
+      letter-spacing: .18em;
+      color: rgba(230, 237, 243, .28);
+      font-size: 12px;
+    }
+    .v-bar {
+      position: absolute;
+      left: 4.8%; right: 4.8%;
+      bottom: 10%;
+      height: clamp(48px, 6cqw, 64px);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      background: rgba(4, 7, 15, .92);
+      border: 1px solid var(--hairline);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .v-courts {
+      display: grid;
+      grid-template-columns: 1.45fr .7fr;
+      gap: 12px;
+      min-height: 0;
+      padding-top: 12px;
+    }
+    .v-sideboard { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    .v-mini {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .v-mini b { font-family: var(--font); font-size: clamp(16px, 2cqw, 24px); letter-spacing: .03em; }
+    .v-mini .v-clk { font-size: clamp(22px, 2.6cqw, 32px); }
+    .v-idle { display: grid; place-items: center; height: 100%; text-align: center; }
+    .v-idle .v-match { min-width: min(78cqw, 760px); }
+    .v-idle .note { margin: 14px 0 0; color: var(--muted); }
+    .v-set {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 16px;
+      min-height: 0;
+      padding-top: 14px;
+    }
+    .v-nav button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      padding: 10px 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .14em;
+    }
+    .v-nav button[aria-pressed="true"] { color: var(--cyan); }
+    .v-card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .v-card strong { display: block; font-size: 16px; }
+    .v-card span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .v-title { margin: 6px 0 0; font-size: clamp(22px, 2.8cqw, 32px); letter-spacing: -.03em; }
+    .v-extra {
+      min-height: 1.1em;
+      margin-top: 2px;
+      font-family: var(--font);
+      font-weight: 700;
+      letter-spacing: .08em;
+      font-size: clamp(14px, 1.6cqw, 20px);
+    }
+    .v-extra:empty { display: none; }
+    .v-bug.v-on { outline: 3px solid var(--cyan); outline-offset: 4px; box-shadow: 0 0 0 6px rgba(0, 212, 255, .22); }
+    .v-sheet {
+      position: absolute;
+      inset: 0 0 54px 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--hairline);
+      background: rgba(4, 7, 15, .94);
+    }
+    .v-sheet[hidden] { display: none; }
+    .v-sheet .v-num { font-size: clamp(40px, 6cqw, 76px); }
+    .v-sheet p { margin: 8px 0 0; color: var(--muted); max-width: 62ch; }
+    .v-meter {
+      margin: 10px 2px 0;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .04em;
+      color: var(--muted);
+    }
+    .v-holes .holes {
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 16px;
+      min-height: 0;
+      padding-top: 12px;
+    }
+    .v-holes p { margin: 8px 0 0; color: var(--muted); font-size: clamp(12px, 1.25cqw, 14px); line-height: 1.4; }
+    .v-holes .v-num { font-size: clamp(36px, 4.6cqw, 58px); }
+    .v-holes .v-side h2 { font-size: clamp(22px, 2.6cqw, 34px); }
+    .v-holes .v-clk { font-size: clamp(22px, 2.4cqw, 32px); }
+    .ship-bar {
+      margin-top: 8px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: rgba(5, 7, 10, .92);
+      font-family: var(--font);
+      font-size: 16px;
+      letter-spacing: .04em;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .ship-live { color: #ff2d55; font-weight: 800; letter-spacing: .12em; }
+    .stops { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .stop {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--hairline);
+      color: var(--muted);
+    }
+    .stop.on {
+      color: var(--ink);
+      outline: 3px solid var(--cyan);
+      outline-offset: 2px;
+    }
+    .spec { display: grid; grid-template-columns: 1.25fr .75fr; gap: 22px; margin-top: 16px; }
+    .spec h2 {
+      margin: 0 0 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+    .spec li, .spec p { color: #c5d0dc; font-size: 14px; line-height: 1.45; }
+    .spec li { margin: 7px 0; }
+    .spec p { margin: 0; color: var(--muted); }
+    @media (max-width: 860px) {
+      .studio-head, .spec, .v-lanes, .v-courts, .v-set { display: block; }
+      .modes { justify-content: flex-start; margin-top: 12px; }
+      .screen { aspect-ratio: auto; min-height: 720px; }
+      .v-lanes, .v-courts, .v-set { display: grid; grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .v-track { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="studio">
+    <div class="studio-head">
+      <div>
+        <div class="kicker">Core Line · layout v2 · mock</div>
+        <h1>One bug. A short rail. A crawl.</h1>
+        <p class="lede">Not the shipping ticker. Keys 1–7. On Tonight, up and down move focus, Enter opens the guide, Back closes it, left and right change the featured game. Key 7 is what the shipping code actually does.</p>
+      </div>
+      <div class="modes" id="modes" role="tablist" aria-label="Screens"></div>
+    </div>
+    <div class="bezel">
+      <div class="screen" id="screen"></div>
+    </div>
+    <p class="v-meter" id="meter"></p>
+    <div class="spec">
+      <div>
+        <h2 id="specTitle">Why this screen</h2>
+        <ul id="specList"></ul>
+      </div>
+      <div>
+        <h2>What this beats</h2>
+        <p id="specBeat"></p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const crawl = 'LIVE  RIV 18–21 OAK · Q2 3:12 · TSN4 · SN 3 <s>◆</s> NEXT  LAL vs BOS · 7:00 PM · ESPN <s>◆</s> FINAL  NY 88–81 LV · ESPN <s>◆</s> LIVE  ARS 1–1 CHE · 71\' · PEACOCK <s>◆</s> ';
+    const screens = {
+      tonight: {
+        title: 'Tonight — the default',
+        beat: 'Sports Scores TV is a dashboard of every league. Apple Sports is a phone list. This is the three-second read from the couch: the game that matters, the channels it is on, and nothing else competing for the glance.',
+        points: [
+          'The league-chip row is gone. Filters belong in settings. Left and right change the featured game without rebuilding the rail.',
+          'One extra line, and only if the feed has it. Basketball shows the shot clock. Football shows down and distance. Hockey does not grow a power-play graphic we do not have.',
+          'The clock is local. A packet within two seconds does not twitch the digit. Farther than that, it snaps. It is not eased.',
+          'A poll patches the score with textContent. Focus is an id, not a row index, so the ring stays. The crawl does not carry the ticking clock, so its width stays put.',
+          'Enter opens a guide: channels, source age, the one extra line. Back returns to the same row. Nothing on that sheet starts a stream.'
+        ],
+        html: `
+          <div class="v-safe">
+            <header class="v-top">
+              <div class="v-brand"><b>CORE</b><span>LINE</span></div>
+              <div class="v-health"><i></i>3 LIVE · 1 HELD</div>
+              <div class="v-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.4v1.8M8 12.8v1.8M1.4 8h1.8M12.8 8h1.8M3.2 3.2l1.3 1.3M11.5 11.5l1.3 1.3M12.8 3.2l-1.3 1.3M4.5 11.5l-1.3 1.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+            </header>
+            <div class="v-lanes">
+              <article class="v-bug" id="bug">
+                <div class="v-meta"><span class="v-live" id="bug-badge">LIVE</span><span class="v-src" id="bug-src">GYM</span><span id="bug-sport">BASKETBALL</span><span id="bug-age">0.4s</span></div>
+                <div class="v-match">
+                  <div class="v-side"><h2 id="bug-away-abbr">RIV</h2><p id="bug-away-name">Riverside</p><div class="v-num" id="bug-away-score">18</div></div>
+                  <div class="v-mid"><div class="v-per" id="bug-period">Q2</div><div class="v-clk" id="bug-clock">3:12</div><div class="v-extra" id="bug-extra">SHOT 14</div></div>
+                  <div class="v-side home"><h2 id="bug-home-abbr">OAK</h2><p id="bug-home-name">Oak Hill</p><div class="v-num" id="bug-home-score">21</div></div>
+                </div>
+                <div class="v-chs" id="bug-chs"><span class="v-ch">TSN4</span><span class="v-ch">SN 3</span></div>
+              </article>
+              <aside class="v-rail" id="rail">
+                <h3>ALSO ON</h3>
+                <div class="v-row v-on" data-id="ars"><div><b>ARS 1–1 CHE</b><em>Peacock · NBC</em></div><span class="v-when">71'</span></div>
+                <div class="v-row" data-id="ny"><div><b>NY 88–81 LV</b><em>ESPN</em></div><span class="v-when">FINAL</span></div>
+                <div class="v-row" data-id="lal"><div><b>LAL vs BOS</b><em>ESPN</em></div><span class="v-when">7:00</span></div>
+                <div class="v-row" data-id="edm"><div><b>EDM vs VAN</b><em>SN 3</em></div><span class="v-when">9:00</span></div>
+              </aside>
+            </div>
+            <div class="v-sheet" id="sheet" hidden>
+              <div>
+                <div class="kicker">Guide · not a player</div>
+                <div class="v-meta" style="margin-top:10px"><span class="v-live" id="sheet-badge">LIVE</span><span class="v-src" id="sheet-src">GYM</span><span id="sheet-age"></span></div>
+                <div class="v-match" style="margin-top:12px">
+                  <div class="v-side"><h2 id="sheet-away-abbr"></h2><p id="sheet-away-name"></p><div class="v-num" id="sheet-away-score"></div></div>
+                  <div class="v-mid"><div class="v-per" id="sheet-period"></div><div class="v-clk" id="sheet-clock"></div><div class="v-extra" id="sheet-extra"></div></div>
+                  <div class="v-side home"><h2 id="sheet-home-abbr"></h2><p id="sheet-home-name"></p><div class="v-num" id="sheet-home-score"></div></div>
+                </div>
+              </div>
+              <div>
+                <div class="v-chs" id="sheet-chs"></div>
+                <p id="sheet-note"></p>
+              </div>
+            </div>
+            <div class="v-crawl"><div class="v-track" id="tonight-crawl"></div></div>
+          </div>`
+      },
+      crawl: {
+        title: 'Overlay — the crawl only',
+        beat: 'This bar is a real window only on Google TV and Shield, and only after the television grants Display over other apps. Fire TV will not draw it. Picture-in-picture is a video window, not a ticker.',
+        points: [
+          'No app chrome. The overlay surface is this plate and nothing else — no grid, no second font decode, no backdrop-filter. A blur is the effect people reach for, and the one that janks a Stick.',
+          'The bar sits 10% off the glass. The WebView should be the height of that bar, not a transparent full-screen page. The memory cost is the WebView, even when most of it is clear.',
+          'Motion is transform only, about 80 pixels a second, on a duplicated track. will-change stays on that track. Never on the parent, and never all.',
+          'Patch a score with textContent. Do not rebuild the focused tree with innerHTML on each poll — that drops the D-pad highlight.',
+          'prefers-reduced-motion stops the crawl. The line stays readable. It just sits still.'
+        ],
+        html: `
+          <div class="v-program" aria-hidden="true"><div class="ice"></div><div class="tag">PROGRAM</div></div>
+          <div class="v-bar"><div class="v-track">${crawl}</div></div>`
+      },
+      stadium: {
+        title: 'Stadium — the building’s clock',
+        beat: 'No national app has the controller in the gym. This is the concourse screen, and the feed the living-room bug should trust ahead of ESPN when both exist for the same game.',
+        points: [
+          'Court 1 is the bug. Court 2 and the field are a strip. A doorway gets one score.',
+          'Between packets the clock is local, once a second. After 20 seconds of silence it stamps HELD. A dead cable must not keep counting.',
+          'League polls stay near 15 seconds. A paired stadium host is the fast lane. One timer for both is how a shot clock lies.',
+          'If GYM and ESPN describe the same matchup, the controller wins the bug and the league feed keeps the channel pills.',
+          'Score correction is one tap on the operator pad. The television does not edit the number.'
+        ],
+        html: `
+          <div class="v-safe">
+            <header class="v-top">
+              <div class="v-brand"><b>RIVERSIDE</b><span>GYM</span></div>
+              <div class="v-health"><i></i>COURT 1 LIVE · FIELD HELD</div>
+              <span class="kicker">Stadium</span>
+            </header>
+            <div class="v-courts">
+              <article class="v-bug">
+                <div class="v-meta"><span class="v-live">LIVE</span><span class="v-src">COURT 1</span><span>SYNCED 0.4s</span></div>
+                <div class="v-match">
+                  <div class="v-side"><h2>RIV</h2><p>Riverside</p><div class="v-num">18</div></div>
+                  <div class="v-mid"><div class="v-per">Q2</div><div class="v-clk">3:12</div><div class="v-extra">SHOT 14</div></div>
+                  <div class="v-side home"><h2>OAK</h2><p>Oak Hill</p><div class="v-num">21</div></div>
+                </div>
+                <div class="v-chs"><span class="v-ch">GYM</span></div>
+              </article>
+              <div class="v-sideboard">
+                <div class="v-mini"><div class="v-meta"><span class="v-src">COURT 2</span></div><b>LIN 12–9 CED</b><div class="v-clk">Q1 6:40</div></div>
+                <div class="v-mini"><div class="v-meta"><span class="v-src held">FIELD · HELD</span></div><b>RIV 14–7 LIN</b><div class="v-clk">Q3 8:04</div></div>
+              </div>
+            </div>
+            <div class="v-crawl"><div class="v-track">COURT 1  RIV 18–21 OAK · Q2 3:12 <s>◆</s> COURT 2  LIN 12–9 CED · Q1 6:40 <s>◆</s> FIELD  RIV 14–7 LIN · HELD <s>◆</s> </div></div>
+          </div>`
+      },
+      idle: {
+        title: 'Idle — the Fire TV answer',
+        beat: 'Sports Scores TV’s screensaver is the always-on trick. Fire TV blocks the overlay, so the idle screen has to be good enough that the Stick does not fall back to Amazon’s photos.',
+        points: [
+          'A DreamService is only started by the OS, and Fire OS has no third-party dream intent. Ship a full-screen activity a button mapper can launch. Do not plan on SYSTEM_ALERT_WINDOW.',
+          'Favorites only, one game, no buttons. The set is idle. Do not ask it to browse.',
+          'No pulse. A throbbing idle screen looks like an ad and burns the panel. Opacity on a live pill is enough, and even that can sit still.',
+          'Paint from the last-good slate. A screensaver that waits on ESPN is a blank television.',
+          'Leave the edges empty. Overscan plus a photo-frame bezel will crop a crawl parked on the glass.'
+        ],
+        html: `
+          <div class="v-safe">
+            <div class="v-idle">
+              <div>
+                <div class="kicker">Screensaver · favorites</div>
+                <div class="v-meta" style="justify-content:center;margin:12px 0"><span class="v-live">LIVE</span><span class="v-src">ESPN</span></div>
+                <div class="v-match">
+                  <div class="v-side"><h2>TOR</h2><div class="v-num">3</div></div>
+                  <div class="v-mid"><div class="v-per">P2</div><div class="v-clk">12:04</div></div>
+                  <div class="v-side home"><h2>MTL</h2><div class="v-num">2</div></div>
+                </div>
+                <p class="note">TSN4 · SN 3 · RDS</p>
+              </div>
+            </div>
+          </div>`
+      },
+      settings: {
+        title: 'Settings — the Icon Pack pattern',
+        beat: 'Core Doctor looks like a different company. Settings should look like Icon Pack: a kicker, a sentence, a row with one job, and a cyan ring that is not the only cue.',
+        points: [
+          'Pair a stadium host here. That allowlist is the only private address the proxy may fetch. Metadata addresses stay blocked even if someone types them.',
+          'Two clocks, said out loud. This host at 1 second. ESPN, NHL, and MLB at 15. The row is the explanation, not a slider buried in engineering.',
+          'Copy detail, venue, and source through the JSON parser. Today a quarter dies unless an H:MM token happens to sit in the description.',
+          'Favorites move over the pair server that already exists. No account. The Stick and the phone should agree.',
+          'Focus order is one column. Hidden rows are not focusable. The ring is cyan, and the label is cyan too, so color is not the only signal.'
+        ],
+        html: `
+          <div class="v-safe">
+            <header class="v-top">
+              <div>
+                <div class="kicker">Settings</div>
+                <div class="v-title">Worth storing, worth knowing</div>
+              </div>
+            </header>
+            <div class="v-set">
+              <nav class="v-nav">
+                <button type="button">FEEDS</button>
+                <button type="button" aria-pressed="true">STADIUM</button>
+                <button type="button">DISPLAY</button>
+                <button type="button">FAVORITES</button>
+              </nav>
+              <div>
+                <div class="v-card v-on"><strong>Riverside Gym</strong><span>Paired host. Allowlisted. A raw 192.168 address stays blocked until it is paired.</span></div>
+                <div class="v-card"><strong>Clock lane</strong><span>This host refreshes every 1s. League feeds stay on 15s. A quiet console shows HELD, not a fake clock.</span></div>
+                <div class="v-card"><strong>Overlay</strong><span>On Google TV and Shield, the crawl draws over other apps. Fire TV blocks that. Use the screensaver there.</span></div>
+                <div class="v-card"><strong>Pair code</strong><span>The phone sends the host. The Fire remote never types a URL. A raw private address stays blocked until this row exists.</span></div>
+              </div>
+            </div>
+          </div>`
+      },
+      cold: {
+        title: 'First paint — never a black glass',
+        beat: 'A ticker that waits on ESPN for the first frame is a black television. Sports Scores TV and Core Line both learned this. The demo slate has to say it is a demo, or the household trusts a fake score.',
+        points: [
+          'DEMO is a source chip, not a live pill. Last-good is a different chip. HELD is a third. Three quiet states, three words.',
+          'The sample game is real type at the real size, so the first three seconds still prove the product.',
+          'Pair is the one action. The phone sends the host. The remote does not type a URL, and a raw 192.168 address is still blocked until that pair exists.',
+          'A failed refresh keeps the last slate and stamps STALE. It does not swap in the demo, and it does not blank the glass.',
+          'Eight league polls must not land in the same frame. Stagger them. One request in flight per feed. A 304 does not touch the DOM.'
+        ],
+        html: `
+          <div class="v-safe">
+            <header class="v-top">
+              <div class="v-brand"><b>CORE</b><span>LINE</span></div>
+              <div class="v-health">NOT A LIVE SCORE</div>
+              <span class="kicker">Demo slate</span>
+            </header>
+            <div class="v-lanes">
+              <article class="v-bug">
+                <div class="v-meta"><span class="v-src">DEMO</span><span>SAMPLE</span></div>
+                <div class="v-match">
+                  <div class="v-side"><h2>TOR</h2><p>Toronto</p><div class="v-num">3</div></div>
+                  <div class="v-mid"><div class="v-per">P2</div><div class="v-clk">12:04</div></div>
+                  <div class="v-side home"><h2>MTL</h2><p>Montreal</p><div class="v-num">2</div></div>
+                </div>
+                <div class="v-chs"><span class="v-ch">TSN4</span><span class="v-ch">SN 3</span></div>
+              </article>
+              <aside class="v-rail">
+                <h3>START HERE</h3>
+                <div class="v-card v-on"><strong>Pair a gym</strong><span>The phone sends the host. The remote never types it.</span></div>
+                <div class="v-card"><strong>Or paste a public feed</strong><span>RSS the household already has. Not a private address. Not a stream.</span></div>
+              </aside>
+            </div>
+            <div class="v-crawl"><div class="v-track">DEMO  TOR 3–2 MTL · SAMPLE · NOT A LIVE SCORE <s>◆</s> PAIR A GYM OR PASTE A PUBLIC FEED <s>◆</s> </div></div>
+          </div>`
+      },
+      holes: {
+        title: 'What the shipping code actually does',
+        beat: 'The constant-speed crawl is already shipped. ticker.js moves one track with translate3d and a watchdog. Replacing that with a CSS keyframe would be a step backward. The losses are around it.',
+        points: [
+          'The overlay window is Gravity.TOP and 80dp, and it ignores the bottom setting. The TV stylesheet sets the crawl to 2rem. The overlay stylesheet comes later and sets it back to 1.02rem, and the LIVE word to 0.8rem. That word is color #ff2d55, and it is inside the moving track.',
+          'Each game card is three focus stops: the card, the star, and Watch. Right from the card hits the star, not the next game. Focus is saved as a container plus an index, so a poll can put the ring on a different control.',
+          'tickClock updates the wall clock only. The game clock is a string from the last poll, so it jumps. MLB already requests linescore and then keeps detailedState, which is often just In Progress. ESPN situation is never read.',
+          'A favorite is a substring. CHI matches CHIEFS. NY matches NYY. The box is free text, so a short token paints the whole slate as favorite and sorts it first.',
+          'Two games merge only when league, away, and home all match. A gym clock and an ESPN row for the same clubs stay two items. If they ever share a key, the row with more channel names wins, so the controller can lose. If the ribbon width measures as 0, the offset still runs and the watchdog thinks that is healthy.'
+        ],
+        html: `
+          <div class="v-safe v-holes">
+            <header class="v-top">
+              <div class="v-brand"><b>CORE</b><span>LINE</span></div>
+              <div class="v-health">SHIPPING · NOT THE MOCK</div>
+            </header>
+            <div class="holes">
+              <section>
+                <div class="kicker">Overlay window</div>
+                <div class="ship-bar"><span class="ship-live">LIVE</span><span>RIV 18–21 OAK · Q2 · TSN4</span></div>
+                <p>Drawn at the top, 80dp tall. The 10-foot type is then overridden. Red type, moving.</p>
+                <div class="stops" aria-hidden="true">
+                  <span class="stop on">CARD</span>
+                  <span class="stop on">★</span>
+                  <span class="stop on">▶</span>
+                  <span class="stop">NEXT GAME</span>
+                </div>
+                <p>Right lands on the star. A refresh restores focus by index, not by game id.</p>
+              </section>
+              <section>
+                <div class="kicker">Dropped on the way in</div>
+                <article class="v-bug">
+                  <div class="v-meta"><span class="v-live">LIVE</span><span class="v-src">MLB</span><span>LINESCORE</span></div>
+                  <div class="v-match">
+                    <div class="v-side"><h2>TOR</h2><p>Toronto</p><div class="v-num">4</div></div>
+                    <div class="v-mid"><div class="v-per">TOP 7</div><div class="v-clk">1 OUT</div><div class="v-extra">2-1 · 1B 3B</div></div>
+                    <div class="v-side home"><h2>NYY</h2><p>Yankees</p><div class="v-num">3</div></div>
+                  </div>
+                  <div class="v-chs"><span class="v-ch">ESPN</span><span class="v-ch">SN 1</span></div>
+                </article>
+                <p>The fallback already hydrates linescore. The mapper never reads it. A clock in the middle of this bug would be a lie.</p>
+              </section>
+            </div>
+          </div>`
+      }
+    };
+
+    const order = ['tonight', 'crawl', 'stadium', 'idle', 'settings', 'cold', 'holes'];
+    const labels = { tonight: '1 Tonight', crawl: '2 Overlay', stadium: '3 Stadium', idle: '4 Idle', settings: '5 Settings', cold: '6 First paint', holes: '7 Holes' };
+    const modes = document.getElementById('modes');
+    const screen = document.getElementById('screen');
+
+    const featured = [
+      { id: 'riv', sport: 'BASKETBALL', source: 'GYM', age: '0.4s', awayAbbr: 'RIV', awayName: 'Riverside', awayScore: 18, homeAbbr: 'OAK', homeName: 'Oak Hill', homeScore: 21, period: 'Q2', clock: 192, running: true, channels: ['TSN4', 'SN 3'], extra: 'SHOT 14', note: 'Controller clock. Shot clock is the one extra line. A league feed is not the source of this number.' },
+      { id: 'kc', sport: 'FOOTBALL', source: 'ESPN', age: '12s', awayAbbr: 'KC', awayName: 'Kansas City', awayScore: 14, homeAbbr: 'BUF', homeName: 'Buffalo', homeScore: 10, period: 'Q3', clock: 484, running: true, channels: ['CBS', 'NFLN'], extra: '2ND & 7', note: 'ESPN is 12 seconds behind the building. Down and distance is the one extra line. No box score.' },
+      { id: 'tor', sport: 'HOCKEY', source: 'ESPN', age: '9s', awayAbbr: 'TOR', awayName: 'Toronto', awayScore: 3, homeAbbr: 'MTL', homeName: 'Montreal', homeScore: 2, period: 'P2', clock: 724, running: true, channels: ['TSN4', 'SN 3', 'RDS'], extra: '', note: 'No power-play graphic. The feed does not have one, so the bug does not invent one.' },
+    ];
+    const railIds = ['ars', 'ny', 'lal', 'edm'];
+    const railGuides = {
+      ars: { badge: 'LIVE', source: 'ESPN', age: '8s', awayAbbr: 'ARS', awayName: 'Arsenal', awayScore: 1, homeAbbr: 'CHE', homeName: 'Chelsea', homeScore: 1, period: "71'", clock: "71'", extra: '', channels: ['Peacock', 'NBC'], note: 'Channels are the action. This sheet does not start a stream.' },
+      ny: { badge: 'FINAL', source: 'ESPN', age: '', awayAbbr: 'NY', awayName: 'New York', awayScore: 88, homeAbbr: 'LV', homeName: 'Las Vegas', homeScore: 81, period: 'FINAL', clock: '', extra: '', channels: ['ESPN'], note: 'Final is a state, not a recap. No highlights.' },
+      lal: { badge: 'NEXT', source: 'ESPN', age: '', awayAbbr: 'LAL', awayName: 'Lakers', awayScore: '–', homeAbbr: 'BOS', homeName: 'Boston', homeScore: '–', period: '7:00', clock: 'PM', extra: '', channels: ['ESPN'], note: 'The channel is the reason this row exists. Still not a player.' },
+      edm: { badge: 'NEXT', source: 'NHL', age: '', awayAbbr: 'EDM', awayName: 'Edmonton', awayScore: '–', homeAbbr: 'VAN', homeName: 'Vancouver', homeScore: '–', period: '9:00', clock: 'PM', extra: '', channels: ['SN 3'], note: 'Same guide for a game that has not started.' },
+    };
+    let current = 'tonight';
+    let featuredIndex = 0;
+    let focusId = 'ars';
+    let sheetOpen = false;
+    let clockTimer = 0;
+    let steps = 0;
+    let patched = false;
+
+    function meter(text) {
+      const el = document.getElementById('meter');
+      if (el) el.textContent = text;
+    }
+    function crawlSpeed() {
+      return Math.max(70, (screen.clientWidth || 1280) * 0.075);
+    }
+    function formatClock(total) {
+      const seconds = Math.max(0, total | 0);
+      return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    }
+    function setNode(id, value) {
+      const el = document.getElementById(id);
+      const next = value == null ? '' : String(value);
+      if (el && el.textContent !== next) el.textContent = next;
+    }
+    function setChannels(id, channels) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const key = channels.join('|');
+      if (el.dataset.key === key) return;
+      el.dataset.key = key;
+      el.replaceChildren(...channels.map((channel) => {
+        const pill = document.createElement('span');
+        pill.className = 'v-ch';
+        pill.textContent = channel;
+        return pill;
+      }));
+    }
+    function armCrawl(root) {
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      for (const track of root.querySelectorAll('.v-track')) {
+        if (track.dataset.armed !== '1') {
+          const text = track.innerHTML;
+          const a = document.createElement('span');
+          a.innerHTML = text;
+          const b = a.cloneNode(true);
+          b.setAttribute('aria-hidden', 'true');
+          track.replaceChildren(a, b);
+          track.dataset.armed = '1';
+        }
+        if (reduce) continue;
+        const px = track.firstElementChild.getBoundingClientRect().width || 1200;
+        track.style.animationDuration = `${Math.max(12, px / crawlSpeed())}s`;
+      }
+    }
+    function setTonightCrawl() {
+      const game = featured[featuredIndex];
+      const line = `LIVE  ${game.awayAbbr} ${game.awayScore}–${game.homeScore} ${game.homeAbbr} · ${game.period}${game.extra ? ` · ${game.extra}` : ''} · ${game.channels.join(' · ')}   ◆   NEXT  LAL vs BOS · 7:00 PM · ESPN   ◆   FINAL  NY 88–81 LV   ◆   `;
+      const track = document.getElementById('tonight-crawl');
+      if (!track) return;
+      if (track.dataset.line === line && track.dataset.armed === '1') return;
+      track.dataset.line = line;
+      if (track.dataset.armed === '1') {
+        track.firstElementChild.textContent = line;
+        track.lastElementChild.textContent = line;
+        const px = track.firstElementChild.getBoundingClientRect().width || 1200;
+        track.style.animationDuration = `${Math.max(12, px / crawlSpeed())}s`;
+        return;
+      }
+      track.textContent = line;
+      armCrawl(screen);
+    }
+    function paintFeatured() {
+      const game = featured[featuredIndex];
+      setNode('bug-sport', game.sport);
+      setNode('bug-src', game.source);
+      setNode('bug-age', game.age);
+      setNode('bug-away-abbr', game.awayAbbr);
+      setNode('bug-away-name', game.awayName);
+      setNode('bug-away-score', game.awayScore);
+      setNode('bug-home-abbr', game.homeAbbr);
+      setNode('bug-home-name', game.homeName);
+      setNode('bug-home-score', game.homeScore);
+      setNode('bug-period', game.period);
+      setNode('bug-clock', formatClock(game.clock));
+      setNode('bug-extra', game.extra);
+      setChannels('bug-chs', game.channels);
+      setTonightCrawl();
+    }
+    function applyFocus() {
+      for (const el of screen.querySelectorAll('.v-on')) el.classList.remove('v-on');
+      if (sheetOpen) return;
+      if (focusId === 'bug') document.getElementById('bug')?.classList.add('v-on');
+      else screen.querySelector(`[data-id="${focusId}"]`)?.classList.add('v-on');
+    }
+    function openSheet() {
+      const game = focusId === 'bug' ? featured[featuredIndex] : railGuides[focusId];
+      if (!game) return;
+      sheetOpen = true;
+      document.getElementById('sheet').hidden = false;
+      const badge = document.getElementById('sheet-badge');
+      badge.textContent = game.badge || 'LIVE';
+      badge.className = badge.textContent === 'LIVE' ? 'v-live' : 'v-src';
+      setNode('sheet-src', game.source);
+      setNode('sheet-age', game.age || '');
+      setNode('sheet-away-abbr', game.awayAbbr);
+      setNode('sheet-away-name', game.awayName);
+      setNode('sheet-away-score', game.awayScore);
+      setNode('sheet-home-abbr', game.homeAbbr);
+      setNode('sheet-home-name', game.homeName);
+      setNode('sheet-home-score', game.homeScore);
+      setNode('sheet-period', game.period);
+      setNode('sheet-clock', typeof game.clock === 'number' ? formatClock(game.clock) : game.clock);
+      setNode('sheet-extra', game.extra);
+      setChannels('sheet-chs', game.channels);
+      setNode('sheet-note', game.note);
+      meter(`Guide open. Back returns focus to ${focusId}. Nothing here starts a stream.`);
+    }
+    function closeSheet() {
+      sheetOpen = false;
+      const sheet = document.getElementById('sheet');
+      if (sheet) sheet.hidden = true;
+      applyFocus();
+      meter(`Focus restored to ${focusId}. The bug was not rebuilt.`);
+    }
+    function stopLive() {
+      clearInterval(clockTimer);
+      clockTimer = 0;
+    }
+    function startTonight() {
+      featuredIndex = 0;
+      focusId = 'ars';
+      sheetOpen = false;
+      steps = 0;
+      patched = false;
+      paintFeatured();
+      applyFocus();
+      meter('Clock is local. The crawl has no ticking clock, so the track is not restarted each second.');
+      clockTimer = setInterval(() => {
+        if (current !== 'tonight') return;
+        for (const game of featured) {
+          if (game.running) game.clock = Math.max(0, game.clock - 1);
+        }
+        const shown = formatClock(featured[featuredIndex].clock);
+        setNode('bug-clock', shown);
+        if (sheetOpen && focusId === 'bug') setNode('sheet-clock', shown);
+        steps += 1;
+        if (steps === 4) meter('Packet arrived 1s off. Kept the local second. No twitch.');
+        if (steps === 8 && !patched) {
+          patched = true;
+          game.awayScore += 1;
+          setNode('bug-away-score', game.awayScore);
+          if (sheetOpen && focusId === 'bug') setNode('sheet-away-score', game.awayScore);
+          setTonightCrawl();
+          meter(`Patched 1 score node. Focus still on ${focusId}. Crawl text changed. Animation did not restart.`);
+        }
+      }, 1000);
+    }
+    function show(id) {
+      stopLive();
+      current = id;
+      const spec = screens[id];
+      screen.innerHTML = spec.html;
+      document.getElementById('specTitle').textContent = spec.title;
+      document.getElementById('specList').innerHTML = spec.points.map((point) => `<li>${point}</li>`).join('');
+      document.getElementById('specBeat').textContent = spec.beat;
+      for (const btn of modes.querySelectorAll('button')) {
+        btn.setAttribute('aria-pressed', btn.dataset.id === id ? 'true' : 'false');
+      }
+      armCrawl(screen);
+      if (id === 'tonight') startTonight();
+      else meter('');
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => { if (current === id) armCrawl(screen); });
+      }
+    }
+    function move(delta) {
+      if (focusId === 'bug') {
+        if (delta > 0) focusId = railIds[0];
+      } else {
+        const index = railIds.indexOf(focusId);
+        if (index === 0 && delta < 0) focusId = 'bug';
+        else if (index + delta >= 0 && index + delta < railIds.length) focusId = railIds[index + delta];
+      }
+      applyFocus();
+      meter(`Focus id ${focusId}. A later poll will not move this ring.`);
+    }
+
+    for (const id of order) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.dataset.id = id;
+      btn.textContent = labels[id];
+      btn.setAttribute('aria-pressed', 'false');
+      btn.onclick = () => show(id);
+      modes.appendChild(btn);
+    }
+    document.addEventListener('keydown', (event) => {
+      const n = Number(event.key);
+      if (n >= 1 && n <= 7) { show(order[n - 1]); return; }
+      if (current !== 'tonight') return;
+      const onTab = event.target && event.target.closest && event.target.closest('.modes');
+      if (onTab && (event.key === 'Enter' || event.key === ' ')) return;
+      if (event.key === 'ArrowDown') { if (!sheetOpen) move(1); event.preventDefault(); }
+      else if (event.key === 'ArrowUp') { if (!sheetOpen) move(-1); event.preventDefault(); }
+      else if (event.key === 'ArrowRight' && !sheetOpen) { featuredIndex = (featuredIndex + 1) % featured.length; paintFeatured(); meter(`${featured[featuredIndex].sport}. Extra line: ${featured[featuredIndex].extra || 'none'}. Rail was not rebuilt.`); event.preventDefault(); }
+      else if (event.key === 'ArrowLeft' && !sheetOpen) { featuredIndex = (featuredIndex + featured.length - 1) % featured.length; paintFeatured(); meter(`${featured[featuredIndex].sport}. Extra line: ${featured[featuredIndex].extra || 'none'}. Rail was not rebuilt.`); event.preventDefault(); }
+      else if (event.key === 'Enter') { if (!sheetOpen) openSheet(); event.preventDefault(); }
+      else if ((event.key === 'Escape' || event.key === 'Backspace') && sheetOpen) { closeSheet(); event.preventDefault(); }
+    });
+    show('tonight');
+  </script>
+</body>
+</html>

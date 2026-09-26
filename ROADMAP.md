@@ -78,6 +78,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | Debrid-Link template | Under research — supported in AIOStreams; smaller user base |
 | Premiumize template | Under research — natively supported; European user base |
 | RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results |
+| Core Line stadium sync | Bridge in `packages/stadium-sync` (Daktronics RTD, Sportzcast JSON, manual pad). Shipping APK still blocks raw LAN feed URLs — see `docs/core-line.mdx` |
 | Live Stream Preview | Under consideration — fetch real streams before deploying |
 
 ---

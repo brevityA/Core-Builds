@@ -1,0 +1,14 @@
+{
+  "name": "core-line-stadium-sync",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Venue scoreboard bridge for Core Line — Daktronics RTD, Sportzcast JSON, and a manual pad, served as a ticker feed.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stadium sync</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="display">
+  <header>
+    <div class="who">
+      <span class="kicker">Stadium</span>
+      <h1 id="venue">Stadium</h1>
+    </div>
+    <div class="clock-of-day" id="when"></div>
+  </header>
+  <main class="stage solo" id="stage">
+    <section class="hero" id="hero" hidden>
+      <div class="hero-meta">
+        <span class="badge" id="badge">LIVE</span>
+        <span id="league"></span>
+        <span id="age"></span>
+      </div>
+      <div class="d-match">
+        <div class="d-team">
+          <div class="abbr" id="away-abbr"></div>
+          <div class="team-name" id="away-name"></div>
+          <div class="score" id="away-score" aria-live="polite"></div>
+        </div>
+        <div class="d-mid">
+          <div class="period" id="period"></div>
+          <div class="game-clock" id="clock" aria-live="off">—</div>
+          <div class="d-extra" id="extra"></div>
+        </div>
+        <div class="d-team home">
+          <div class="abbr" id="home-abbr"></div>
+          <div class="team-name" id="home-name"></div>
+          <div class="score" id="home-score" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="pills" id="pills"></div>
+    </section>
+    <aside class="d-rail" id="rail" hidden></aside>
+    <div class="empty" id="empty">
+      <div class="kicker">No console</div>
+      <h1>Waiting for the scoreboard</h1>
+      <p>Start a game on the operator pad, or point a controller at this bridge.</p>
+    </div>
+  </main>
+  <footer>
+    <div class="crawl-wrap"><div class="track" id="crawl"></div></div>
+    <a class="ghost" href="/">Operator</a>
+  </footer>
+  <script>
+    const stage = document.getElementById('stage');
+    const hero = document.getElementById('hero');
+    const rail = document.getElementById('rail');
+    const empty = document.getElementById('empty');
+    const crawl = document.getElementById('crawl');
+    const local = { base: '', at: 0, running: false, dir: 'down' };
+    const shots = new Map();
+    let crawlKey = '';
+    let lastEvents = [];
+    let lastFeatured = null;
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      const next = value == null ? '' : String(value);
+      if (el && el.textContent !== next) el.textContent = next;
+    }
+
+    function parseClock(text) {
+      const match = /^(\d+):([0-5]\d)$/.exec(text || '');
+      return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+    }
+
+    function formatClock(total) {
+      const seconds = Math.max(0, total | 0);
+      return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    }
+
+    function projected(now = Date.now()) {
+      const base = parseClock(local.base);
+      if (base == null) return local.base || '—';
+      if (!local.running) return local.base;
+      const delta = Math.floor((now - local.at) / 1000);
+      return formatClock(local.dir === 'up' ? base + delta : base - delta);
+    }
+
+    function acceptClock(clock, running, dir) {
+      const server = parseClock(clock);
+      const shown = parseClock(projected());
+      if (!local.base || server == null || shown == null || Math.abs(server - shown) > 2) {
+        local.base = clock || '—';
+        local.at = Date.now();
+      }
+      local.running = Boolean(running) && server != null;
+      local.dir = dir === 'up' ? 'up' : 'down';
+      setText('clock', projected());
+    }
+
+    function parseShot(detail) {
+      const raw = String(detail || '').replace(/^(NO SIGNAL · |HELD )/, '');
+      const match = raw.match(/\bshot\s+(\d{1,2})\b/i);
+      if (!match) return null;
+      const n = Number(match[1]);
+      return n >= 0 && n <= 35 ? n : null;
+    }
+
+    function projectStored(entry, now = Date.now()) {
+      if (!entry || entry.base == null) return null;
+      if (!entry.running) return entry.base;
+      const delta = Math.floor((now - entry.at) / 1000);
+      return Math.max(0, entry.base - delta);
+    }
+
+    function acceptShot(event) {
+      const server = parseShot(event.detail);
+      if (server == null) {
+        shots.delete(event.id);
+        return;
+      }
+      const quiet = event.signal === 'held' || event.signal === 'lost' || !event.running;
+      const prev = shots.get(event.id);
+      const shown = projectStored(prev);
+      const snap = !prev || shown == null || event.receivedAt !== prev.receivedAt || Math.abs(server - shown) > 2;
+      if (quiet || snap) {
+        shots.set(event.id, {
+          base: server,
+          at: Date.now(),
+          running: !quiet,
+          receivedAt: event.receivedAt,
+        });
+      } else {
+        prev.running = true;
+      }
+    }
+
+    function projectedShot(id, now = Date.now()) {
+      return projectStored(shots.get(id), now);
+    }
+
+    function extraLine(event) {
+      const detail = typeof event === 'string' ? event : event?.detail;
+      const id = event && typeof event === 'object' ? event.id : '';
+      const raw = String(detail || '').replace(/^(NO SIGNAL · |HELD )/, '');
+      const live = id ? projectedShot(id) : null;
+      if (live != null && /\bshot\s+\d{1,2}\b/i.test(raw)) return `SHOT ${live}`;
+      const shot = raw.match(/\bshot\s+(\d{1,2})\b/i);
+      if (shot) return `SHOT ${shot[1]}`;
+      const down = raw.match(/\b(\d(?:st|nd|rd|th)?\s*&\s*\d+)\b/i);
+      return down ? down[1].toUpperCase() : '';
+    }
+
+    function periodOf(event) {
+      const raw = String(event.detail || '').replace(/^(NO SIGNAL · |HELD )/, '');
+      const skip = new Set(['shot', 'held', 'no', 'signal', '&']);
+      for (const token of raw.split(/\s+/)) {
+        if (!token || skip.has(token.toLowerCase())) continue;
+        if (/^\d{1,3}:[0-5]\d$/.test(token) || /^\d+$/.test(token)) continue;
+        if (/^\d(?:st|nd|rd|th)?$/i.test(token)) continue;
+        return token;
+      }
+      return event.status === 'final' ? 'FINAL' : '';
+    }
+
+    function ageLabel(event) {
+      if (event.signal === 'lost') return 'NO SIGNAL';
+      if (event.signal === 'held') return 'HELD';
+      const seconds = Math.floor((event.ageMs || 0) / 1000);
+      return seconds < 1 ? 'SYNCED' : `${seconds}s`;
+    }
+
+    function setPills(channels) {
+      const el = document.getElementById('pills');
+      const key = (channels || []).join('|');
+      if (el.dataset.key === key) return;
+      el.dataset.key = key;
+      el.replaceChildren(...(channels || []).map((channel) => {
+        const pill = document.createElement('span');
+        pill.className = 'pill';
+        pill.textContent = channel;
+        return pill;
+      }));
+    }
+
+    function setBadge(event) {
+      const badge = document.getElementById('badge');
+      const quiet = event.signal === 'held' || event.signal === 'lost';
+      const final = event.status === 'final';
+      const text = event.signal === 'lost' ? 'NO SIGNAL' : quiet ? 'HELD' : final ? 'FINAL' : 'LIVE';
+      if (badge.textContent !== text) badge.textContent = text;
+      badge.className = `badge${quiet ? ' held' : final ? ' final' : ''}`;
+      hero.classList.toggle('held', quiet);
+      const clock = document.getElementById('clock');
+      clock.classList.toggle('held', quiet);
+      document.getElementById('extra').classList.toggle('held', quiet);
+    }
+
+    function crawlLine(events) {
+      return events.map((event) => {
+        const away = event.away?.abbr || 'AWAY';
+        const home = event.home?.abbr || 'HOME';
+        const score = event.away?.score != null ? `${event.away.score}–${event.home.score}` : 'vs';
+        const state = event.signal === 'lost' ? 'NO SIGNAL' : event.signal === 'held' ? 'HELD' : event.status === 'final' ? 'FINAL' : event.status === 'live' ? 'LIVE' : '';
+        return [state, away, score, home, periodOf(event), extraLine(event), (event.channels || [])[0]].filter(Boolean).join('  ');
+      }).join('     ◆     ');
+    }
+
+    function setCrawl(line) {
+      if (!line || line === crawlKey) return;
+      const shotOnly = crawlKey
+        && line.replace(/\bSHOT\s+\d+\b/g, 'SHOT') === crawlKey.replace(/\bSHOT\s+\d+\b/g, 'SHOT');
+      crawlKey = line;
+      if (shotOnly) {
+        for (const span of crawl.querySelectorAll(':scope > span')) {
+          if (span.textContent !== line) span.textContent = line;
+        }
+        return;
+      }
+      let first = crawl.querySelector('span');
+      if (!first) {
+        first = document.createElement('span');
+        const second = document.createElement('span');
+        second.setAttribute('aria-hidden', 'true');
+        crawl.replaceChildren(first, second);
+      }
+      const second = crawl.querySelector('[aria-hidden]');
+      if (first.textContent !== line) first.textContent = line;
+      if (second && second.textContent !== line) second.textContent = line;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+      const speed = Math.max(70, (document.documentElement.clientWidth || 1280) * 0.075);
+      const width = first.getBoundingClientRect().width || 1200;
+      crawl.style.animationDuration = `${Math.max(12, width / speed)}s`;
+    }
+
+    function syncRail(others) {
+      const key = others.map((event) => event.id).join(',');
+      if (rail.dataset.key !== key) {
+        rail.dataset.key = key;
+        rail.replaceChildren(...others.map((event) => {
+          const row = document.createElement('div');
+          row.className = 'd-mini';
+          row.dataset.id = event.id;
+          const title = document.createElement('b');
+          const meta = document.createElement('span');
+          row.append(title, meta);
+          return row;
+        }));
+      }
+      const show = others.length > 0;
+      rail.hidden = !show;
+      stage.classList.toggle('solo', !show);
+      for (const event of others) {
+        const row = rail.querySelector(`[data-id="${CSS.escape(event.id)}"]`);
+        if (!row) continue;
+        const away = event.away?.abbr || 'AWAY';
+        const home = event.home?.abbr || 'HOME';
+        const score = event.away?.score != null ? `${event.away.score}–${event.home.score}` : 'vs';
+        const title = `${event.feed || ''}  ${away} ${score} ${home}`.trim();
+        const quiet = event.signal === 'held' || event.signal === 'lost';
+        const meta = [quiet ? 'HELD' : periodOf(event), quiet ? '' : event.clock, extraLine(event)].filter(Boolean).join('  ');
+        const titleEl = row.querySelector('b');
+        const metaEl = row.querySelector('span');
+        if (titleEl.textContent !== title) titleEl.textContent = title;
+        if (metaEl.textContent !== meta) metaEl.textContent = meta;
+      }
+    }
+
+    function render(data) {
+      setText('venue', data.venue || 'Stadium');
+      const when = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      setText('when', when);
+      const events = (data.boards || []).flatMap((board) => board.events || []);
+      if (!events.length) {
+        hero.hidden = true;
+        rail.hidden = true;
+        empty.hidden = false;
+        stage.classList.add('solo');
+        local.running = false;
+        shots.clear();
+        lastEvents = [];
+        lastFeatured = null;
+        setCrawl('Waiting for a console');
+        return;
+      }
+      empty.hidden = true;
+      hero.hidden = false;
+      const featured = events.find((event) => event.signal === 'ok' && event.status === 'live') || events[0];
+      setBadge(featured);
+      setText('league', featured.league || featured.feed || '');
+      setText('age', ageLabel(featured));
+      setText('away-abbr', featured.away?.abbr || '');
+      setText('away-name', featured.away?.name || '');
+      setText('home-abbr', featured.home?.abbr || '');
+      setText('home-name', featured.home?.name || '');
+      const awayScore = document.getElementById('away-score');
+      const homeScore = document.getElementById('home-score');
+      const awayText = featured.away?.score == null ? '–' : String(featured.away.score);
+      const homeText = featured.home?.score == null ? '–' : String(featured.home.score);
+      if (awayScore.textContent !== awayText) awayScore.textContent = awayText;
+      if (homeScore.textContent !== homeText) homeScore.textContent = homeText;
+      awayScore.classList.toggle('win', Boolean(featured.away?.winner));
+      homeScore.classList.toggle('win', Boolean(featured.home?.winner));
+      setText('period', periodOf(featured));
+      for (const event of events) acceptShot(event);
+      lastEvents = events;
+      lastFeatured = featured;
+      setText('extra', extraLine(featured));
+      const quiet = featured.signal === 'held' || featured.signal === 'lost';
+      acceptClock(featured.clock, featured.running && !quiet, featured.direction);
+      setPills(featured.channels);
+      syncRail(events.filter((event) => event.id !== featured.id));
+      setCrawl(crawlLine(events));
+    }
+
+    async function poll() {
+      try {
+        const res = await fetch('/api/boards', { cache: 'no-store' });
+        render(await res.json());
+      } catch {
+        setCrawl('Bridge unreachable');
+      }
+    }
+
+    poll();
+    setInterval(poll, 1000);
+    function paintLiveShots() {
+      if (![...shots.values()].some((entry) => entry.running)) return;
+      if (lastFeatured) setText('extra', extraLine(lastFeatured));
+      for (const event of lastEvents) {
+        const row = rail.querySelector(`[data-id="${CSS.escape(event.id)}"] span`);
+        if (!row) continue;
+        const quiet = event.signal === 'held' || event.signal === 'lost';
+        const meta = [quiet ? 'HELD' : periodOf(event), quiet ? '' : event.clock, extraLine(event)].filter(Boolean).join('  ');
+        if (row.textContent !== meta) row.textContent = meta;
+      }
+      if (lastEvents.length) setCrawl(crawlLine(lastEvents));
+    }
+
+    setInterval(() => {
+      if (local.running && !hero.hidden) setText('clock', projected());
+      paintLiveShots();
+    }, 250);
+  </script>
+</body>
+</html>

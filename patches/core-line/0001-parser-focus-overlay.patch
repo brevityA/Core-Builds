@@ -1,0 +1,724 @@
+--- a/ticker/android/app/src/main/java/dev/corebuilds/line/LineBridge.kt
++++ b/ticker/android/app/src/main/java/dev/corebuilds/line/LineBridge.kt
+@@ -71,6 +71,12 @@
+     @JavascriptInterface
+     fun startOverlay(): Boolean = activity.startOverlay()
+ 
++    /** Move a running overlay. The strip also calls this after reading localStorage. */
++    @JavascriptInterface
++    fun setOverlayEdge(edge: String) {
++        activity.setOverlayEdge(edge)
++    }
++
+     /** Stop the floating ticker. */
+     @JavascriptInterface
+     fun stopOverlay(): Boolean = activity.stopOverlay()
+--- a/ticker/android/app/src/main/java/dev/corebuilds/line/MainActivity.kt
++++ b/ticker/android/app/src/main/java/dev/corebuilds/line/MainActivity.kt
+@@ -215,9 +215,9 @@
+ 
+     /**
+      * Start the floating ticker. Works on phone, tablet, and Android TV
+-     * (some devices require the overlay permission to be granted first via
+-     * Settings or ADB). Returns false on Fire TV, which blocks
+-     * SYSTEM_ALERT_WINDOW at the OS level.
++     * where Display over other apps can be granted. Returns false on Fire TV,
++     * which does not support overlay windows. Position comes from the
++     * saved ticker setting, default bottom.
+      */
+     fun startOverlay(): Boolean {
+         if (isFireTv()) return false
+@@ -231,10 +231,19 @@
+         ) {
+             requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 7)
+         }
+-        OverlayService.start(this)
++        webView.evaluateJavascript(
++            "(function(){try{var s=JSON.parse(localStorage.getItem('coreline.v1')||'{}');return s.position==='top'?'top':'bottom';}catch(e){return 'bottom';}})()",
++        ) { raw ->
++            val edge = raw?.trim()?.trim('"')
++            OverlayService.start(this, if (edge == "top") "top" else "bottom")
++        }
+         return true
+     }
+ 
++    fun setOverlayEdge(edge: String) {
++        OverlayService.setEdge(edge)
++    }
++
+     /** Stop the floating ticker. */
+     fun stopOverlay(): Boolean {
+         OverlayService.stop(this)
+--- a/ticker/android/app/src/main/java/dev/corebuilds/line/OverlayService.kt
++++ b/ticker/android/app/src/main/java/dev/corebuilds/line/OverlayService.kt
+@@ -10,8 +10,11 @@
+ import android.graphics.Color
+ import android.graphics.PixelFormat
+ import android.os.Build
++import android.os.Handler
+ import android.os.IBinder
++import android.os.Looper
+ import android.view.Gravity
++import android.webkit.JavascriptInterface
+ import android.view.View
+ import android.view.WindowManager
+ import android.webkit.WebChromeClient
+@@ -22,11 +25,9 @@
+  * Floating ticker — the chyron drawn as a translucent, non-focusable,
+  * touch-through overlay window above every other app.
+  *
+- * It reuses the SAME Core Line web app as the full screen (loaded from
+- * https://coreline.local with ?native=1&overlay=1), so it shares the parser,
+- * the /api/proxy data path, and — because both WebViews are on the same origin
+- * — the same localStorage settings as the main app. The overlay page strips
+- * everything but the chyron via the [data-overlay] CSS.
++ * It loads overlay.html, a crawl strip, not the full board. The strip is on
++ * the same origin, so it can read the main app's localStorage (position,
++ * feeds, cached slate) without building the grid. Default edge is the bottom.
+  *
+  * Supported on phone, tablet, and Android TV (Google TV, NVIDIA Shield, etc.)
+  * where SYSTEM_ALERT_WINDOW is granted. Fire TV blocks overlay windows at the
+@@ -35,6 +36,7 @@
+ class OverlayService : Service() {
+     private var windowManager: WindowManager? = null
+     private var webView: WebView? = null
++    private var edge: String = "bottom"
+ 
+     override fun onBind(intent: Intent?): IBinder? = null
+ 
+@@ -48,6 +50,8 @@
+             stopSelf()
+             return START_NOT_STICKY
+         }
++        val requested = intent?.getStringExtra(EXTRA_POSITION)
++        if (requested == "top" || requested == "bottom") edge = requested
+         showOverlay()
+         return START_STICKY
+     }
+@@ -82,7 +86,10 @@
+     }
+ 
+     private fun showOverlay() {
+-        if (windowManager != null && webView != null) return // already up
++        if (windowManager != null && webView != null) {
++            applyEdge(edge)
++            return
++        }
+ 
+         val wm = getSystemService(WINDOW_SERVICE) as WindowManager
+         val overlayType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+@@ -91,10 +98,11 @@
+             @Suppress("DEPRECATION")
+             WindowManager.LayoutParams.TYPE_PHONE
+         }
+-        // TV gets a taller bar (80dp) for 10-foot readability; phone/tablet stays at 56dp.
++        // Tall enough for the 2rem crawl used at 10-foot. The window is only
++        // the bar — not a clear WebView over the rest of the screen.
+         val isTv = packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LEANBACK)
+             || packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_TELEVISION)
+-        val baseDp = if (isTv) 80 else 56
++        val baseDp = if (isTv) 112 else 64
+         val height = (baseDp * resources.displayMetrics.density).toInt().coerceAtLeast(96)
+         val params = WindowManager.LayoutParams(
+             WindowManager.LayoutParams.MATCH_PARENT,
+@@ -106,7 +114,7 @@
+                 or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+             PixelFormat.TRANSLUCENT,
+         ).apply {
+-            gravity = Gravity.TOP or Gravity.FILL_HORIZONTAL
++            gravity = gravityFor(edge)
+             x = 0
+             y = 0
+         }
+@@ -120,11 +128,11 @@
+             isHorizontalScrollBarEnabled = false
+             webViewClient = LineWebClient(this@OverlayService)
+             webChromeClient = WebChromeClient()
++            addJavascriptInterface(OverlayEdgeBridge(this@OverlayService), "CoreLineNative")
+         }
+         configure(wv.settings)
+-        // Pass tv=1 so the web app applies the 10-foot CSS scale ladder.
+         val tvParam = if (isTv) "&tv=1" else ""
+-        wv.loadUrl("https://${LineWebClient.HOST}/index.html?native=1&overlay=1$tvParam")
++        wv.loadUrl("https://${LineWebClient.HOST}/overlay.html?native=1$tvParam")
+ 
+         try {
+             wm.addView(wv, params)
+@@ -136,10 +144,37 @@
+         webView = wv
+         windowManager = wm
+         running = true
++        instance = this
++    }
++
++    fun applyEdge(next: String) {
++        val edgeName = if (next == "top") "top" else "bottom"
++        val run = Runnable {
++            edge = edgeName
++            val view = webView ?: return@Runnable
++            val wm = windowManager ?: return@Runnable
++            val params = view.layoutParams as? WindowManager.LayoutParams ?: return@Runnable
++            val gravity = gravityFor(edgeName)
++            if (params.gravity == gravity) return@Runnable
++            params.gravity = gravity
++            params.y = 0
++            try {
++                wm.updateViewLayout(view, params)
++            } catch (_: Exception) {
++                /* window already gone */
++            }
++        }
++        if (Looper.myLooper() == Looper.getMainLooper()) run.run() else Handler(Looper.getMainLooper()).post(run)
++    }
++
++    private fun gravityFor(edgeName: String): Int {
++        val vertical = if (edgeName == "top") Gravity.TOP else Gravity.BOTTOM
++        return vertical or Gravity.FILL_HORIZONTAL
+     }
+ 
+     override fun onDestroy() {
+         running = false
++        if (instance === this) instance = null
+         try {
+             webView?.let { windowManager?.removeView(it) }
+         } catch (_: Exception) {
+@@ -166,14 +201,21 @@
+ 
+     companion object {
+         const val ACTION_STOP = "dev.corebuilds.line.OVERLAY_STOP"
++        const val EXTRA_POSITION = "dev.corebuilds.line.OVERLAY_POSITION"
+         const val OVERLAY_NOTIFICATION_ID = 42
+ 
+         @Volatile
+         var running = false
+             private set
+ 
+-        fun start(context: Context) {
++        @Volatile
++        private var instance: OverlayService? = null
++
++        fun start(context: Context, position: String? = null) {
+             val intent = Intent(context, OverlayService::class.java)
++            if (position == "top" || position == "bottom") {
++                intent.putExtra(EXTRA_POSITION, position)
++            }
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                 context.startForegroundService(intent)
+             } else {
+@@ -181,8 +223,20 @@
+             }
+         }
+ 
++        fun setEdge(edge: String) {
++            instance?.applyEdge(edge)
++        }
++
+         fun stop(context: Context) {
+             context.stopService(Intent(context, OverlayService::class.java))
+         }
+     }
+ }
++
++/** Overlay WebView bridge. Reads nothing itself — the strip passes the saved edge. */
++class OverlayEdgeBridge(private val service: OverlayService) {
++    @JavascriptInterface
++    fun setOverlayEdge(edge: String) {
++        service.applyEdge(edge)
++    }
++}
+--- /dev/null
++++ b/ticker/lib/favorites.mjs
+@@ -0,0 +1,20 @@
++/**
++ * Favorite match is an exact abbreviation, or a whole word in the team name.
++ * CHI must not match CHIEFS. NY must not match NYY.
++ */
++export function matchesFavorite(event, favs) {
++  const needles = (Array.isArray(favs) ? favs : String(favs || '').split(/[,\s]+/))
++    .map((s) => String(s).trim().toUpperCase())
++    .filter(Boolean);
++  if (!needles.length || !event) return false;
++  const abbrs = [event.home?.abbr, event.away?.abbr]
++    .filter(Boolean)
++    .map((s) => String(s).toUpperCase());
++  const names = [event.home?.name, event.away?.name]
++    .filter(Boolean)
++    .map((s) => String(s).toUpperCase());
++  return needles.some((fav) => {
++    if (abbrs.includes(fav)) return true;
++    return names.some((name) => name.split(/[^A-Z0-9]+/).includes(fav));
++  });
++}
+--- a/ticker/lib/parser.mjs
++++ b/ticker/lib/parser.mjs
+@@ -166,12 +166,17 @@
+     : data.items || data.events || data.games || data.entries || data.results || [];
+   if (!Array.isArray(rows)) return [];
+   const limited = rows.slice(0, MAX_ITEMS_PER_FEED);
++  const bodySource = !Array.isArray(data) && data && data.source != null && String(data.source).trim()
++    ? String(data.source).trim()
++    : '';
++  const bodyVenue = !Array.isArray(data) && data && data.venue ? String(data.venue) : '';
+ 
+   return limited.map((row, index) => {
+     if (row == null) return null; // skip null rows instead of crashing (AUDIT B-group)
+     if (typeof row === 'string') {
+       const event = parseListing(row);
+-      event.source = meta.source || 'rss';
++      event.source = bodySource || meta.source || 'rss';
++      if (bodyVenue) event.venue = bodyVenue;
+       event.feed = meta.label || 'RSS';
+       event.id = event.id || `json-${index}`;
+       return event;
+@@ -204,7 +209,13 @@
+       const ms = Date.parse(row.start || row.date || row.time || row.date_published || row.published);
+       if (!Number.isNaN(ms)) event.start = new Date(ms).toISOString();
+     }
+-    event.source = meta.source || 'rss';
++    if (row.detail) event.detail = String(row.detail);
++    if (row.venue) event.venue = String(row.venue);
++    else if (bodyVenue) event.venue = bodyVenue;
++    // A body source of "stadium" has to win over the caller's default
++    // (client-slate always passes source: 'rss'), including when meta.source
++    // was never set.
++    event.source = row.source ? String(row.source) : (bodySource || meta.source || 'rss');
+     event.feed = meta.label || row.feed || 'RSS';
+     event.id = row.id || event.id || `json-${index}`;
+     return event;
+--- a/ticker/public/js/app.js
++++ b/ticker/public/js/app.js
+@@ -1,4 +1,5 @@
+ import { toTickerText, parseFeed } from '/lib/parser.mjs';
++import { matchesFavorite } from '/lib/favorites.mjs';
+ import { LEAGUES, LEAGUE_LABELS, SPORT_GROUPS, compareEvents, buildDemoSlate, mergeEvents } from '/lib/scoreboard.mjs';
+ import { WATCH_WEB, sortAppsForPicker, espnWebUrl, watchChoiceFor } from '/lib/watch.mjs';
+ import { matchChannels } from '/lib/playlist.mjs';
+@@ -210,6 +211,7 @@
+     state.position = $('position').value;
+     persist();
+     document.documentElement.dataset.position = state.position;
++    try { nativeBridge()?.setOverlayEdge?.(state.position); } catch { /* overlay not up */ }
+   });
+ 
+   $('overlayEnabled')?.addEventListener('change', () => {
+@@ -336,7 +338,8 @@
+   renderFeeds();
+   if ($('pairBox')) $('pairBox').hidden = !isNativeShell();
+   if ($('overlayBlock')) {
+-    $('overlayBlock').hidden = !isNativeShell();
++    const platform = isNativeShell() ? nativeBridge()?.overlayPlatform?.() : '';
++    $('overlayBlock').hidden = !isNativeShell() || platform === 'unsupported';
+   }
+   if ($('overlayEnabled')) {
+     $('overlayEnabled').checked = Boolean(nativeBridge()?.overlayActive?.());
+@@ -349,7 +352,7 @@
+       overlayHint.textContent = 'Floating ticker is not available on Fire TV. The operating system blocks overlay windows on all Fire TV devices.';
+       if ($('overlayEnabled')) $('overlayEnabled').disabled = true;
+     } else if (globalThis.CORELINE_TV) {
+-      overlayHint.textContent = 'Draws the crawl on top of every app. If the toggle does not work, grant the permission via Settings → Apps → Special app access → Display over other apps, or run: adb shell appops set dev.corebuilds.line SYSTEM_ALERT_WINDOW allow';
++      overlayHint.textContent = 'Draws the crawl on top of every app. On Google TV or Shield, grant Display over other apps if the toggle asks. Stock Android TV often has no screen for that permission.';
+     } else {
+       overlayHint.textContent = 'Draws the crawl on top of every app, edge to edge. Stop it from the notification or untick this box.';
+     }
+@@ -958,9 +961,7 @@
+ }
+ 
+ function isFav(ev, favs) {
+-  if (!favs.length) return false;
+-  const bag = [ev.home?.abbr, ev.away?.abbr, ev.home?.name, ev.away?.name].filter(Boolean).map((s) => String(s).toUpperCase());
+-  return favs.some((f) => bag.some((b) => b.includes(f)));
++  return matchesFavorite(ev, favs);
+ }
+ 
+ function favSet() {
+@@ -1087,6 +1088,10 @@
+ }
+ 
+ function render() {
++  if (globalThis.CORELINE_OVERLAY) {
++    renderCrawl(visibleEvents());
++    return;
++  }
+   const focusSnap = captureFocus();
+   const list = visibleEvents();
+   const live = events.filter((e) => e.status === 'live').length;
+@@ -1112,22 +1117,37 @@
+   renderTeamPicker();
+ }
+ 
++function cssEscape(value) {
++  if (typeof CSS !== 'undefined' && CSS.escape) return CSS.escape(value);
++  return String(value).replace(/["\\]/g, '\\$&');
++}
++
+ function captureFocus() {
+   const el = document.activeElement;
+   if (!el || !el.classList || !el.classList.contains('focusable')) return null;
+-  const container = el.closest('#leagues, #grid, #hero');
+-  if (!container) return null;
+-  const nodes = [...container.querySelectorAll('.focusable')];
+-  return { id: container.id, idx: nodes.indexOf(el) };
++  const card = el.closest('[data-id]');
++  if (card?.dataset?.id) {
++    const container = el.closest('#hero, #grid');
++    return { eventId: card.dataset.id, container: container?.id || '' };
++  }
++  if (el.dataset?.action === 'filter' && el.dataset.league) return { filter: el.dataset.league };
++  return null;
+ }
+ 
+ function restoreFocus(snap) {
+-  if (!snap || snap.idx < 0) return;
+-  const container = document.getElementById(snap.id);
+-  if (!container) return;
+-  const nodes = [...container.querySelectorAll('.focusable')];
+-  const target = nodes[Math.min(snap.idx, nodes.length - 1)];
+-  if (target) target.focus();
++  if (!snap) return;
++  if (snap.eventId) {
++    const root = snap.container ? document.getElementById(snap.container) : document;
++    const target = root?.querySelector(`.focusable[data-id="${cssEscape(snap.eventId)}"]`);
++    if (target) {
++      target.focus();
++      return;
++    }
++  }
++  if (snap.filter) {
++    const chip = document.querySelector(`[data-action="filter"][data-league="${cssEscape(snap.filter)}"]`);
++    if (chip) chip.focus();
++  }
+ }
+ 
+ function renderFilters() {
+@@ -1187,7 +1207,7 @@
+       </div>
+       <div class="hero-side">
+         <div class="pills">${(featured.channels || []).map((c) => `<span class="pill">${esc(c)}</span>`).join('')}</div>
+-        <button class="watch-btn focusable" data-action="watch" data-id="${esc(featured.id)}">▶ Watch</button>
++        <button class="watch-btn" data-action="watch" data-id="${esc(featured.id)}">▶ Watch</button>
+         <div class="when">${esc(featured.venue || featured.feed || '')}</div>
+       </div>
+     </article>
+@@ -1226,8 +1246,8 @@
+         <span class="league-tag">${esc(ev.league || ev.feed || 'RSS')}</span>
+         <div class="game-top-right">
+           <span class="badge ${badge}">${esc(label)}</span>
+-          <button class="fav-star focusable ${favOn ? 'on' : ''}" data-action="toggle-card-fav" data-id="${esc(ev.id)}" aria-label="${favOn ? 'Unfavorite' : 'Favorite'} these teams" aria-pressed="${favOn}">★</button>
+-          <button class="watch-mini focusable" data-action="watch" data-id="${esc(ev.id)}" aria-label="Watch in app" title="Watch in app">▶</button>
++          <button class="fav-star ${favOn ? 'on' : ''}" data-action="toggle-card-fav" data-id="${esc(ev.id)}" aria-label="${favOn ? 'Unfavorite' : 'Favorite'} these teams" aria-pressed="${favOn}">★</button>
++          <button class="watch-mini" data-action="watch" data-id="${esc(ev.id)}" aria-label="Watch in app" title="Watch in app">▶</button>
+         </div>
+       </div>
+       <div class="game-teams">
+@@ -1263,7 +1283,8 @@
+       const body = ev.away && ev.home
+         ? `${esc(ev.away.abbr)}${ev.status !== 'upcoming' && ev.away.score != null ? ` ${esc(ev.away.score)}-${esc(ev.home.score)} ` : ' vs '}${esc(ev.home.abbr)}`
+         : esc(ev.headline || ev.rawTitle || toTickerText(ev));
+-      return `<span class="tick"><span class="${klass}">${kind}</span> ${body}${channels ? ` <span class="chs">${esc(channels)}</span>` : ''}</span>`;
++      const detail = ev.detail ? ` ${esc(ev.detail)}` : '';
++      return `<span class="tick"><span class="${klass}">${kind}</span> ${body}${detail}${channels ? ` <span class="chs">${esc(channels)}</span>` : ''}</span>`;
+     })
+     .join('');
+   ticker.setItems(html);
+--- /dev/null
++++ b/ticker/public/js/overlay.js
+@@ -0,0 +1,173 @@
++import { loadState, readCachedSlate } from './state.js';
++import { buildClientSlate, hydrateClientSlateRegistry, isNativeShell } from '/lib/client-slate.mjs';
++import { compareEvents, buildDemoSlate, mergeEvents } from '/lib/scoreboard.mjs';
++import { parseFeed } from '/lib/parser.mjs';
++import { matchesFavorite } from '/lib/favorites.mjs';
++import { Ticker } from './ticker.js';
++import { startWatchdog } from './watchdog.js';
++
++const params = new URLSearchParams(location.search);
++if (params.get('native') === '1') globalThis.CORELINE_NATIVE = true;
++if (params.get('tv') === '1') document.documentElement.setAttribute('data-tv', '');
++
++const SAMPLE = { url: `${location.origin}/feeds/sample-sports.xml`, label: 'Sample' };
++const $ = (id) => document.getElementById(id);
++
++let state = loadState();
++let events = [];
++let refreshing = false;
++let ticker = null;
++
++hydrateClientSlateRegistry();
++reportEdge();
++window.addEventListener('storage', (event) => {
++  if (event.key === 'coreline.v1') {
++    state = loadState();
++    reportEdge();
++  }
++});
++setInterval(() => {
++  state = loadState();
++  reportEdge();
++}, 2000);
++
++ticker = new Ticker({
++  track: $('crawl'),
++  seqA: $('crawlA'),
++  seqB: $('crawlB'),
++  mask: $('crawl-mask'),
++  speed: state.speed,
++});
++if (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches) {
++  ticker.setSpeed(Math.min(state.speed, 12));
++}
++startWatchdog({
++  getProgress: () => ticker.progress(),
++  isRunning: () => ticker.running,
++  onStall: () => ticker.restart(),
++  onWake: () => {
++    ticker.restart();
++    refresh();
++  },
++});
++
++const cached = readCachedSlate();
++events = cached?.events?.length ? cached.events : buildDemoSlate();
++paint();
++ticker.start();
++tickClock();
++setInterval(tickClock, 1000);
++refresh();
++setInterval(refresh, Math.max(15, state.refreshSec || 60) * 1000);
++
++function reportEdge() {
++  const edge = state.position === 'top' ? 'top' : 'bottom';
++  try { globalThis.CoreLineNative?.setOverlayEdge?.(edge); } catch { /* no bridge yet */ }
++}
++
++function tickClock() {
++  const opts = state.clockFmt === '24'
++    ? { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }
++    : { hour: 'numeric', minute: '2-digit' };
++  $('clock').textContent = new Date().toLocaleTimeString([], opts);
++}
++
++function visible() {
++  return events
++    .filter((ev) => state.showFinals || ev.status !== 'final')
++    .sort((a, b) => {
++      const af = matchesFavorite(a, state.favorites) ? 0 : 1;
++      const bf = matchesFavorite(b, state.favorites) ? 0 : 1;
++      if (af !== bf) return af - bf;
++      return compareEvents(a, b);
++    });
++}
++
++function paint() {
++  const list = visible();
++  const live = list.filter((ev) => ev.status === 'live').length;
++  $('bugLive').textContent = live ? `${live} LIVE` : 'LINE';
++  $('chyron').classList.toggle('is-live', live > 0);
++  const html = (list.length ? list : [{ headline: 'Waiting for a slate', channels: [], status: 'upcoming' }])
++    .map(itemHtml)
++    .join('');
++  ticker.setItems(html);
++}
++
++function itemHtml(ev) {
++  const kind = ev.status === 'live' ? 'LIVE' : ev.status === 'final' ? 'FINAL' : 'UP';
++  const klass = ev.status === 'live' ? 'k' : ev.status === 'final' ? 'k final' : 'k up';
++  const channels = (ev.channels || []).join('  ');
++  const body = ev.away && ev.home
++    ? `${esc(ev.away.abbr || ev.away.name)}${ev.status !== 'upcoming' && ev.away.score != null ? ` ${esc(ev.away.score)}-${esc(ev.home.score)} ` : ' vs '}${esc(ev.home.abbr || ev.home.name)}`
++    : esc(ev.headline || ev.rawTitle || 'Listing');
++  const detail = ev.detail ? ` ${esc(ev.detail)}` : '';
++  return `<span class="tick"><span class="${klass}">${kind}</span> ${body}${detail}${channels ? ` <span class="chs">${esc(channels)}</span>` : ''}</span>`;
++}
++
++async function refresh() {
++  if (refreshing) return;
++  refreshing = true;
++  try {
++    const fresh = freshCache();
++    const data = fresh || await loadSlate();
++    if (data?.events) {
++      events = data.events;
++      paint();
++    }
++  } catch {
++    const cachedSlate = readCachedSlate();
++    if (cachedSlate?.events?.length) {
++      events = cachedSlate.events;
++      paint();
++    } else {
++      events = await localFallback();
++      paint();
++    }
++  } finally {
++    refreshing = false;
++  }
++}
++
++function freshCache() {
++  try {
++    const raw = localStorage.getItem('coreline.v1.slate');
++    if (!raw) return null;
++    const parsed = JSON.parse(raw);
++    const age = Date.now() - Number(parsed.at || 0);
++    const limit = Math.max(15, state.refreshSec || 60) * 1000;
++    if (!parsed.payload?.events?.length || age > limit) return null;
++    return parsed.payload;
++  } catch {
++    return null;
++  }
++}
++
++async function loadSlate() {
++  const feeds = [...(state.feeds || []), ...(state.sampleFeed ? [SAMPLE] : [])].slice(0, 20);
++  if (isNativeShell()) return buildClientSlate({ leagues: state.leagues, feeds });
++  const query = new URLSearchParams({
++    leagues: (state.leagues || []).join(','),
++    feeds: feeds.map((f) => `${encodeURIComponent(f.url)}|${encodeURIComponent(f.label)}`).join(','),
++  });
++  const res = await fetch(`/api/slate?${query}`);
++  if (!res.ok) throw new Error(`slate ${res.status}`);
++  return res.json();
++}
++
++async function localFallback() {
++  try {
++    const xml = await fetch('./feeds/sample-sports.xml').then((r) => r.text());
++    return mergeEvents([buildDemoSlate(), parseFeed(xml, { source: 'rss', label: 'Sample' })]);
++  } catch {
++    return buildDemoSlate();
++  }
++}
++
++function esc(value) {
++  return String(value ?? '')
++    .replace(/&/g, '&amp;')
++    .replace(/</g, '&lt;')
++    .replace(/>/g, '&gt;')
++    .replace(/"/g, '&quot;');
++}
+--- /dev/null
++++ b/ticker/public/overlay.html
+@@ -0,0 +1,68 @@
++<!doctype html>
++<html lang="en">
++<head>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width,initial-scale=1">
++  <title>Core Line</title>
++  <style>
++    @font-face {
++      font-family: "Barlow Condensed";
++      font-weight: 800;
++      font-display: swap;
++      src: url("./fonts/barlow-condensed-800.woff2") format("woff2");
++    }
++    html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
++    body { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; color: #f4f7fb; }
++    .chyron {
++      height: 100%;
++      display: grid;
++      grid-template-columns: auto 1fr auto;
++      align-items: stretch;
++      background: rgba(5, 7, 10, .92);
++    }
++    .bug {
++      display: flex; flex-direction: column; justify-content: center;
++      padding: 0 14px; min-width: 72px;
++      background: #14060a;
++      border-right: 1px solid rgba(255,255,255,.12);
++    }
++    .bug-live { font-size: .85rem; letter-spacing: .16em; font-weight: 800; color: #ff2d55; }
++    .bug-name { font-size: 1.35rem; letter-spacing: .14em; font-weight: 800; }
++    .mask { overflow: hidden; display: flex; align-items: center; }
++    .crawl { display: flex; width: max-content; will-change: transform; transform: translate3d(0,0,0); }
++    .crawl-seq { display: flex; align-items: center; white-space: nowrap; }
++    .tick { display: inline-flex; align-items: center; gap: 10px; padding: 0 22px; font-size: 1.35rem; letter-spacing: .03em; }
++    .tick .k { color: #ff2d55; font-weight: 800; letter-spacing: .12em; font-size: .9rem; }
++    .tick .k.up { color: #f5c518; }
++    .tick .k.final { color: #9aa3ad; }
++    .tick .chs { color: #00d4ff; letter-spacing: .06em; }
++    .clock {
++      min-width: 88px; display: grid; place-items: center;
++      font-size: 1.35rem; letter-spacing: .04em;
++      border-left: 1px solid rgba(255,255,255,.12);
++      background: #080b10;
++    }
++    html[data-tv] .tick { font-size: 2rem; }
++    html[data-tv] .tick .k { font-size: 1.15rem; }
++    html[data-tv] .bug-name { font-size: 1.6rem; }
++    html[data-tv] .bug-live { font-size: .85rem; }
++    html[data-tv] .clock { font-size: 2rem; min-width: 120px; }
++  </style>
++</head>
++<body>
++  <div class="chyron" id="chyron">
++    <div class="bug">
++      <span class="bug-live" id="bugLive">LINE</span>
++      <span class="bug-name">LINE</span>
++    </div>
++    <div class="mask" id="crawl-mask">
++      <div class="crawl" id="crawl">
++        <div class="crawl-seq" id="crawlA"></div>
++        <div class="crawl-seq" id="crawlB" aria-hidden="true"></div>
++      </div>
++    </div>
++    <div class="clock" id="clock">00:00</div>
++  </div>
++  <script type="module" src="./js/overlay.js"></script>
++</body>
++</html>
+--- /dev/null
++++ b/ticker/tests/favorites.test.mjs
+@@ -0,0 +1,17 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { matchesFavorite } from '../lib/favorites.mjs';
++
++test('favorites match an abbreviation exactly, or a whole word in the name', () => {
++  const chiefs = { away: { abbr: 'KC', name: 'Kansas City Chiefs' }, home: { abbr: 'BUF', name: 'Buffalo Bills' } };
++  const yankees = { away: { abbr: 'NYY', name: 'New York Yankees' }, home: { abbr: 'BOS', name: 'Boston Red Sox' } };
++  const hill = { away: { abbr: 'RIVE', name: 'Riverside' }, home: { abbr: 'OAK', name: 'Oak Hill' } };
++  assert.equal(matchesFavorite(chiefs, ['CHI']), false);
++  assert.equal(matchesFavorite(chiefs, ['KC']), true);
++  assert.equal(matchesFavorite(chiefs, 'chiefs'), true);
++  assert.equal(matchesFavorite(yankees, ['NY']), false);
++  assert.equal(matchesFavorite(yankees, ['NYY']), true);
++  assert.equal(matchesFavorite(hill, ['OAK']), true);
++  assert.equal(matchesFavorite(hill, ['HILL']), true);
++  assert.equal(matchesFavorite(hill, []), false);
++});
+--- a/ticker/tests/parser.test.mjs
++++ b/ticker/tests/parser.test.mjs
+@@ -124,6 +124,32 @@
+   assert.ok(!event.channels.includes('SN ONT NHL'));
+ });
+ 
++test('json body keeps detail, venue, and a stadium source', () => {
++  const json = JSON.stringify({
++    source: 'stadium',
++    venue: 'Riverside Gym',
++    events: [{
++      title: 'Riverside vs Oak Hill',
++      league: 'GYM',
++      status: 'live',
++      detail: 'Q2 3:12 shot 14',
++      venue: 'Court 1',
++      channels: ['GYM'],
++      away: { name: 'Riverside', abbr: 'RIVE', score: '18' },
++      home: { name: 'Oak Hill', abbr: 'OAK', score: '21' },
++    }],
++  });
++  const forced = parseFeed(json, { source: 'rss', label: 'Stadium' });
++  assert.equal(forced[0].detail, 'Q2 3:12 shot 14');
++  assert.equal(forced[0].venue, 'Court 1');
++  assert.equal(forced[0].source, 'stadium');
++  const bare = parseFeed(json);
++  assert.equal(bare[0].source, 'stadium');
++  assert.equal(bare[0].venue, 'Court 1');
++  const plain = parseFeed(JSON.stringify([{ title: 'Lakers vs Celtics' }]), { source: 'rss' });
++  assert.equal(plain[0].source, 'rss');
++});
++
+ test('toTickerText includes scores for live games', () => {
+   const text = toTickerText({
+     status: 'live',

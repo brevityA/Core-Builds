@@ -1,0 +1,30 @@
+{
+  "venue": "Riverside Gym",
+  "boards": [
+    {
+      "id": "court-1",
+      "label": "Court 1",
+      "sport": "basketball",
+      "league": "GYM",
+      "home": "Oak Hill",
+      "guest": "Riverside",
+      "channels": ["GYM"],
+      "udpPort": 21000
+    },
+    {
+      "id": "field",
+      "label": "Football field",
+      "sport": "football",
+      "league": "GYM",
+      "home": "Riverside",
+      "guest": "Lincoln",
+      "tcpPort": 21001,
+      "sportzcast": {
+        "host": "192.168.1.50",
+        "port": 1402,
+        "bot": 23,
+        "token": ""
+      }
+    }
+  ]
+}
