@@ -12,7 +12,7 @@
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "coreBuildsVersion": "3.12",
-    "coreBuildsAIOStreamsTarget": "2.31.1",
+    "coreBuildsAIOStreamsTarget": "2.34.1",
     "coreBuildsProfile": "advanced",
     "coreBuildsProfileVersion": "1"
   },
