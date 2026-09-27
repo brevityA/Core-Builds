@@ -136,3 +136,23 @@ test('payload size is measured on the config the host receives, not the wrapper'
   const wrapped = diagnoseTemplate({ metadata: { description: 'y'.repeat(5000) }, config });
   assert.equal(bare.payloadBytes, wrapped.payloadBytes);
 });
+
+test('every config in a multi-template array is scanned and redacted, not just the first', () => {
+  // The Inspector accepts arrays and the repaired download exports the WHOLE
+  // array. Structural checks are documented as first-config-only, but the
+  // credential scan must cover every element or "redacted" output silently
+  // keeps the later configs' keys (CodeRabbit finding on #771).
+  const multi = [
+    { config: { presets: [ { type:'comet', instanceId:'a', enabled:true, options:{ apiKey:'first-key' } } ] } },
+    { config: { presets: [ { type:'torrentio', instanceId:'b', enabled:true, options:{ apiKey:'second-key', url:'https://example.test/m.json?token=zzz' } } ] } },
+  ];
+  const findings = diagnoseTemplate(multi).findings;
+  const secretIds = findings.filter(f => f.id.startsWith('secret')).map(f => f.id);
+  assert.equal(secretIds.length, 3, 'both configs’ credentials must be found');
+  const fixed = applyRepairs(multi, secretIds);
+  assert.equal(fixed[0].config.presets[0].options.apiKey, '<redacted>');
+  assert.equal(fixed[1].config.presets[0].options.apiKey, '<redacted>');
+  assert.equal(new URL(fixed[1].config.presets[0].options.url).searchParams.get('token'), '<redacted>');
+  const exported = JSON.stringify(fixed);
+  assert.ok(!exported.includes('first-key') && !exported.includes('second-key') && !exported.includes('zzz'));
+});

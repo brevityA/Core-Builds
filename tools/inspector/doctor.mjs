@@ -74,8 +74,12 @@ export function diagnoseTemplate(input) {
   if (payloadBytes > MAX_PAYLOAD_BYTES) add('payload-over-limit','blocker','Payload exceeds the AIOStreams save limit',`${Math.ceil(payloadBytes/1024)} KB exceeds the 100 KB limit.`,'$',{ type:'none' });
   else if (payloadBytes > WARN_PAYLOAD_BYTES) add('payload-near-limit','advisory','Payload is close to the save limit',`${Math.ceil(payloadBytes/1024)} KB of 100 KB is already used.`,'$');
 
+  // Scan the ENTIRE input for credentials, not just the unwrapped config: a
+  // multi-template array carries sibling configs the structural checks skip,
+  // and the repaired download exports the whole file — every credential in it
+  // must be findable, or "redacted" output silently keeps the rest.
   let secretCount = 0;
-  walk(root, (key, value, path) => {
+  walk(input, (key, value, path) => {
     const isPublicRpdb = key === 'rpdbApiKey' && value === 't0-free-rpdb';
     if (!isPublicRpdb && SENSITIVE_KEY.test(key) && typeof value === 'string' && value.trim()) {
       secretCount += 1;
@@ -155,7 +159,7 @@ function redactUrl(raw) {
 /** Apply only explicitly selected, deterministic repair IDs to a clone. */
 export function applyRepairs(input, selectedIds) {
   const output = clone(input);
-  const { root, config } = unwrap(output);
+  const { config } = unwrap(output);
   const diagnosis = diagnoseTemplate(output);
   const selected = new Set(selectedIds || []);
   const repairs = diagnosis.findings.filter(f => selected.has(f.id) && f.repair && f.repair.type !== 'none');
@@ -198,9 +202,9 @@ export function applyRepairs(input, selectedIds) {
     }
   }
 
-  // Credential findings use absolute display paths recorded against the
-  // unwrapped root that diagnoseTemplate walked. Redact from that same root —
-  // walking the raw input would miss every path in an array-wrapped file.
+  // Credential findings record absolute paths against the ORIGINAL input root
+  // (diagnoseTemplate scans the whole file for secrets, wrapper and sibling
+  // configs included), so redaction walks the clone from that same root.
   if (repairs.some(r => r.repair.type === 'redact-path' || r.repair.type === 'redact-url')) {
     const selectedRepairIds = new Set(repairs.map(r=>r.id));
     const redactSelected = (value, path = '$') => {
@@ -212,7 +216,7 @@ export function applyRepairs(input, selectedIds) {
         else redactSelected(value[key], childPath);
       }
     };
-    redactSelected(root);
+    redactSelected(output);
   }
   return output;
 }
