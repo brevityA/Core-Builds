@@ -72,3 +72,67 @@ test('repair output is deterministic', () => {
   const ids = diagnoseTemplate(input).findings.filter(f=>f.repair).map(f=>f.id);
   assert.deepEqual(applyRepairs(input, ids), applyRepairs(input, ids));
 });
+
+// ── Post-merge audit fixes (v3.13) ─────────────────────────────────
+
+test('redaction works on array-wrapped imports, not only bare objects', () => {
+  // Some export paths wrap the template in an array. diagnoseTemplate unwraps
+  // it, so its finding paths are relative to the inner object — the repair
+  // walk must start from that same root or every redaction silently no-ops.
+  const wrapped = [{ config: { presets: [ { type:'comet', instanceId:'c1', enabled:true, options:{ apiKey:'leak-me' } } ] } }];
+  const findings = diagnoseTemplate(wrapped).findings;
+  const secretIds = findings.filter(f => f.id.startsWith('secret')).map(f => f.id);
+  assert.ok(secretIds.length === 1, 'the wrapped credential must be found');
+  const fixed = applyRepairs(wrapped, secretIds);
+  assert.equal(fixed[0].config.presets[0].options.apiKey, '<redacted>');
+});
+
+test('removing a preset also removes its instanceId from groups', () => {
+  // groups.groupings[].addons reference presets by instanceId; a dangling id
+  // makes AIOStreams reject the config ("Every group must have at least one
+  // addon"), which would turn a "safe repair" into a save failure.
+  const input = { config: {
+    presets: [
+      { type:'torbox-search', instanceId:'tbs', enabled:true, options:{} },
+      { type:'comet', instanceId:'c1', enabled:true, options:{} },
+      { type:'torrentio', instanceId:'t1', enabled:true, options:{} },
+    ],
+    groups: { enabled:true, groupings: [
+      { addons:['tbs','c1'] },
+      { addons:['tbs'] },
+      { addons:['t1'] },
+    ] },
+  } };
+  const removeId = diagnoseTemplate(input).findings.find(f => f.id === 'removed-preset:0').id;
+  const fixed = applyRepairs(input, [removeId]);
+  assert.equal(fixed.config.presets.length, 2);
+  assert.deepEqual(fixed.config.groups.groupings.map(g => g.addons), [['c1'], ['t1']]);
+  assert.equal(fixed.config.groups.enabled, true);
+});
+
+test('groups disable entirely when a repair empties every grouping', () => {
+  const input = { config: {
+    presets: [ { type:'torbox-search', instanceId:'tbs', enabled:true, options:{} } ],
+    groups: { enabled:true, groupings: [ { addons:['tbs'] } ] },
+  } };
+  const fixed = applyRepairs(input, ['removed-preset:0']);
+  assert.equal(fixed.config.presets.length, 0);
+  assert.deepEqual(fixed.config.groups.groupings, []);
+  assert.equal(fixed.config.groups.enabled, false);
+});
+
+test('credential-bearing URLs inside string arrays are detected and redacted', () => {
+  const input = { config: { presets: [], syncedRankedRegexUrls: ['https://example.test/regexes.json?token=abc123'] } };
+  const findings = diagnoseTemplate(input).findings;
+  const ids = findings.filter(f => f.id.startsWith('secret-url')).map(f => f.id);
+  assert.equal(ids.length, 1, 'URL inside the array must be scanned');
+  const fixed = applyRepairs(input, ids);
+  assert.equal(new URL(fixed.config.syncedRankedRegexUrls[0]).searchParams.get('token'), '<redacted>');
+});
+
+test('payload size is measured on the config the host receives, not the wrapper', () => {
+  const config = { presets: [], note: 'x'.repeat(500) };
+  const bare = diagnoseTemplate(config);
+  const wrapped = diagnoseTemplate({ metadata: { description: 'y'.repeat(5000) }, config });
+  assert.equal(bare.payloadBytes, wrapped.payloadBytes);
+});

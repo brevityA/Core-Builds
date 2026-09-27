@@ -36,6 +36,7 @@ import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-acces
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
+import { verifyAddonInstall } from '../core/install-transaction-policy.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
@@ -45,7 +46,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.12';
+const CONFIGURATOR_VERSION = '3.13';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -8204,6 +8205,18 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
     if (r.ok) steps.push('✓ ' + r.message);
     else errors.push(r.message);
   }
+
+  // Step 4: Read-back verification. The success panel tells the user the
+  // requested addons "were read back from your account" — this is the step
+  // that makes that true. A failed read-back is reported, never hidden.
+  try {
+    const expected = [aiostreamsUrl];
+    if (installAIOMetadata) expected.push(AIOMETADATA_MANIFEST);
+    const readBack = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+    const check = verifyAddonInstall({ actual: readBack?.result?.addons || [], expectedUrls: expected });
+    if (check.ok) steps.push(`✓ Verified: your account holds ${check.expectedCount === 1 ? 'the requested addon' : 'both requested addons'}`);
+    else errors.push(`Read-back check: ${check.missing.length} requested addon${check.missing.length === 1 ? ' is' : 's are'} missing from the account`);
+  } catch (e) { errors.push('Read-back check: ' + (e.message || 'could not re-read the addon collection')); }
 
   return { steps, errors, ok: errors.length === 0 };
 }
