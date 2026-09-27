@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.9.0 (2026-09-26)
+
+### Changed
+- **`nzbFailover` → `failover` across all 60 active templates** — AIOStreams renamed the key and migrates the old spelling before schema validation, passing `position` through blindly. Core Builds carried two positions outside the new enum (`first` from the before-torrents option, `after` in the base config), each of which rejected the whole save at a v2.34.1 host. Every active template now uses the live `failover` shape (`enabled`, `contentTypes: ["usenet","debrid"]`, `maxAttempts`, and `position: "beforeLimiting"` where before-torrents was intended); each affected template bumps its patch version so the update banner offers the migration.
+- **Host-preload template collection regenerated** after the dead-key purge and failover migration, so operators pinning `core-builds-template-collection.json` in `TEMPLATE_URLS` serve the same bytes as the repo.
+
+### Fixed
+- **`validate_templates.py` now rejects out-of-enum `failover.position` values** (`beforeSEL`/`beforeLimiting`/`last`), malformed `maxAttempts`/`contentTypes`/`parallel`, and warns on the legacy `nzbFailover` key outside the Legacy/Deprecated/Community lanes — so this class of save rejection cannot silently return.
+
+_This entry documents the release that shipped in versions.json as 3.9.0 on 2026-09-26; it was added retroactively in the post-merge audit._
+
 ## 3.8.0 (2026-09-22)
 
 ### Changed

@@ -442,9 +442,14 @@ def user_facing_changed(changed_files):
     return any(pat.search(f) for f in changed_files)
 
 
-def _md_anchor(version):
-    """GitHub-style heading anchor for a CHANGELOG.md '## <version> (...)' heading."""
-    slug = (" " + version + " ").strip().lower().replace(" ", "-")
+def _md_anchor(version, date):
+    """GitHub-style heading anchor for a CHANGELOG.md '## <version> (<date>)' heading.
+
+    GitHub slugs the WHOLE heading text (lowercase, punctuation stripped, spaces
+    to hyphens), so '## 3.9.0 (2026-09-26)' anchors at #390-2026-09-26 — the
+    version-only #390 this used to emit never resolved on any row.
+    """
+    slug = f"{version} ({date})".lower().replace(" ", "-")
     slug = re.sub(r"[^a-z0-9\-]", "", slug)
     return slug
 
@@ -509,7 +514,7 @@ def _first_summary_line(body):
 def gen_changelog_index_md(entries, limit=10):
     """Managed 'Recent releases' index rendered from CHANGELOG.md."""
     rows = "\n".join(
-        f"| [v{e['version']}]({REPO_BASE}/blob/main/CHANGELOG.md#{_md_anchor(e['version'])}) "
+        f"| [v{e['version']}]({REPO_BASE}/blob/main/CHANGELOG.md#{_md_anchor(e['version'], e['date'])}) "
         f"| {e['date']} | {_first_summary_line(e['body'])} |"
         for e in entries[:limit]
     )

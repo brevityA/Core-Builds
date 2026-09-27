@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.9.0 | 2026-09-26 | nzbFailover → failover across all 60 active templates — AIOStreams renamed the key and migrates the old spelling before … |
 | v3.8.0 | 2026-09-22 | Dead-key purge across all 55 active templates — maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSourc… |
 | v3.7.0 | 2026-09-05 | Standalone template regex sync (drift-fix release) — every active standalone template's inline rankedRegexPatterns, pref… |
 | v3.6.2 | 2026-08-22 | Core Badge Builder (Configurator v2.97 · tools/badges/) — a no-code Nuvio Fusion badge configurator with 111 original Co… |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.3.2 | 2026-07-17 | Subtitle Picker (Configurator v2.57) — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 3… |
 | v3.3.1 | 2026-07-17 | Free Tier Overhaul (Configurator v2.56) — comprehensive improvements to P2P and HTTP template generation: |
 | v3.3.0 | 2026-07-16 | Stream pool broadening (Configurator v2.55 + all 31 active templates) — increased maxResults, maxResultsPerResolution, a… |
-| v3.2.9 | 2026-07-15 | Template Migration Tool (Configurator v2.49) — "Update Existing Template" now shows a full visual diff of every change (… |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.

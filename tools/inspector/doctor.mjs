@@ -40,7 +40,16 @@ function finding(id, severity, title, detail, path = '', repair = null) {
 }
 
 function walk(value, visit, path = '$') {
-  if (Array.isArray(value)) return value.forEach((item, i) => walk(item, visit, `${path}[${i}]`));
+  if (Array.isArray(value)) {
+    // Visit array items too: a credential URL inside e.g. a synced-URL string
+    // array would otherwise never be scanned. The numeric key cannot match
+    // SENSITIVE_KEY, so only the URL-parameter check applies to items.
+    return value.forEach((item, i) => {
+      const itemPath = `${path}[${i}]`;
+      visit(String(i), item, itemPath);
+      walk(item, visit, itemPath);
+    });
+  }
   if (!value || typeof value !== 'object') return;
   for (const [key, child] of Object.entries(value)) {
     const childPath = `${path}.${key}`;
@@ -56,15 +65,21 @@ export function diagnoseTemplate(input) {
   const add = (...args) => findings.push(finding(...args));
 
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
-    return Object.freeze({ findings:[finding('invalid-root','blocker','No configuration object found','Import a JSON object containing `config`, or a bare AIOStreams config.','$')], summary:{blocker:1,warning:0,advisory:0,total:1}, payloadBytes:0, repairCount:0 });
+    return Object.freeze({ findings:[finding('invalid-root','blocker','No configuration object found','Import a JSON object containing `config`, or a bare AIOStreams config.','$')], summary:{blocker:1,warning:0,advisory:0,total:1}, payloadBytes:0, repairCount:0, secretCount:0 });
   }
 
-  const payloadBytes = bytes(root);
+  // The AIOStreams save limit applies to the config object the host receives,
+  // not to a template's {metadata, config} wrapper around it.
+  const payloadBytes = bytes(config);
   if (payloadBytes > MAX_PAYLOAD_BYTES) add('payload-over-limit','blocker','Payload exceeds the AIOStreams save limit',`${Math.ceil(payloadBytes/1024)} KB exceeds the 100 KB limit.`,'$',{ type:'none' });
   else if (payloadBytes > WARN_PAYLOAD_BYTES) add('payload-near-limit','advisory','Payload is close to the save limit',`${Math.ceil(payloadBytes/1024)} KB of 100 KB is already used.`,'$');
 
+  // Scan the ENTIRE input for credentials, not just the unwrapped config: a
+  // multi-template array carries sibling configs the structural checks skip,
+  // and the repaired download exports the whole file — every credential in it
+  // must be findable, or "redacted" output silently keeps the rest.
   let secretCount = 0;
-  walk(root, (key, value, path) => {
+  walk(input, (key, value, path) => {
     const isPublicRpdb = key === 'rpdbApiKey' && value === 't0-free-rpdb';
     if (!isPublicRpdb && SENSITIVE_KEY.test(key) && typeof value === 'string' && value.trim()) {
       secretCount += 1;
@@ -168,10 +183,28 @@ export function applyRepairs(input, selectedIds) {
       }
     }
   }
-  if (remove.size && Array.isArray(config.presets)) config.presets = config.presets.filter((_, i) => !remove.has(i));
+  if (remove.size && Array.isArray(config.presets)) {
+    // Groups reference presets by instanceId. Removing a preset without
+    // dropping its id from groups.groupings[].addons leaves a dangling
+    // reference AIOStreams rejects ("Every group must have at least one
+    // addon"), so the "safe repair" would break a previously saving config.
+    const removedIds = new Set(config.presets.filter((p, i) => remove.has(i) && p?.instanceId).map(p => p.instanceId));
+    config.presets = config.presets.filter((_, i) => !remove.has(i));
+    const survivingIds = new Set(config.presets.map(p => p?.instanceId).filter(Boolean));
+    const groupings = config.groups?.groupings;
+    if (removedIds.size && Array.isArray(groupings)) {
+      for (const grouping of groupings) {
+        if (!grouping || !Array.isArray(grouping.addons)) continue;
+        grouping.addons = grouping.addons.filter(id => !removedIds.has(id) || survivingIds.has(id));
+      }
+      config.groups.groupings = groupings.filter(g => !g || !Array.isArray(g.addons) || g.addons.length > 0);
+      if (config.groups.groupings.length === 0) config.groups.enabled = false;
+    }
+  }
 
-  // Credential findings use absolute display paths. Walk with the mutable parent
-  // so array indexes and nested preset options are redacted correctly.
+  // Credential findings record absolute paths against the ORIGINAL input root
+  // (diagnoseTemplate scans the whole file for secrets, wrapper and sibling
+  // configs included), so redaction walks the clone from that same root.
   if (repairs.some(r => r.repair.type === 'redact-path' || r.repair.type === 'redact-url')) {
     const selectedRepairIds = new Set(repairs.map(r=>r.id));
     const redactSelected = (value, path = '$') => {
