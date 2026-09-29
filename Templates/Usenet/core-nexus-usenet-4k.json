@@ -5,7 +5,7 @@
     "description": "Pure-usenet 4K template — no debrid, no torrents. NNTP + indexers. Tuned for Fire Stick 4K Max.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "category": "Usenet",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -1123,6 +1123,10 @@
       {
         "enabled": true,
         "expression": "/* Smart Play Pin */ pin(message(streams, 'includes', '🎯'), 'top')"
+      },
+      {
+        "expression": "/*0Cached*/ count(merge(cached(streams), type(streams, 'p2p','http','usenet','stremio-usenet')))==0?passthrough(streams,'title'):[]",
+        "enabled": true
       }
     ],
     "preferredStreamExpressions": [

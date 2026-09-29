@@ -18,7 +18,14 @@ export const SNAPSHOT_PATH = resolve(ROOT, 'snapshots/contract.source.json');
 
 export const AIOS_REPO = 'Viren070/AIOStreams';
 export const AIOS_REF = process.env.AIOS_REF || 'main';
-export const RAW_BASE = `https://raw.githubusercontent.com/${AIOS_REPO}/${AIOS_REF}/`;
+// Mirror overrides for firewalled/offline environments (e.g. audited CI
+// sandboxes where raw.githubusercontent.com and api.github.com are blocked
+// but a local git checkout can be served over loopback HTTP). Defaults keep
+// the public URLs, so CI behaviour is unchanged.
+export const RAW_BASE =
+  process.env.AIOS_RAW_BASE ||
+  `https://raw.githubusercontent.com/${AIOS_REPO}/${AIOS_REF}/`;
+export const API_BASE = process.env.AIOS_API_BASE || 'https://api.github.com';
 export const DEFAULT_HOST = process.env.AIOS_HOST || 'https://aiostreams.elfhosted.com';
 
 const UA = 'aios-regen/0.1 (+https://github.com/brevityA/Core-Builds)';
@@ -315,7 +322,7 @@ function presetIdFromMetadata(src) {
 }
 
 async function listPresetFiles() {
-  const url = `https://api.github.com/repos/${AIOS_REPO}/contents/packages/core/src/presets?ref=${AIOS_REF}`;
+  const url = `${API_BASE}/repos/${AIOS_REPO}/contents/packages/core/src/presets?ref=${AIOS_REF}`;
   const headers = {};
   if (process.env.GITHUB_TOKEN) {
     headers.authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
@@ -419,7 +426,7 @@ export async function extractSource({ includePresetOptions = true } = {}) {
 }
 
 async function fetchSourceHead() {
-  const url = `https://api.github.com/repos/${AIOS_REPO}/commits/${AIOS_REF}`;
+  const url = `${API_BASE}/repos/${AIOS_REPO}/commits/${AIOS_REF}`;
   const json = await fetchJson(url);
   return {
     sha: json.sha,

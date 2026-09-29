@@ -1,19 +1,19 @@
 {
   "kind": "source",
-  "extractedAt": "2026-09-26T00:36:25.655Z",
-  "fingerprint": "63f529cd121034f7",
+  "extractedAt": "2026-09-29T10:19:35.145Z",
+  "fingerprint": "96eb7733e1d570b3",
   "repo": "Viren070/AIOStreams",
   "ref": "main",
   "commit": {
-    "sha": "00fb93a4a19804600f5053d4a409d8d42f1fa6e7",
-    "date": "2026-09-26T00:06:53Z",
-    "message": "chore(desktop): update the web app (#1362)",
-    "url": "https://github.com/Viren070/AIOStreams/commit/00fb93a4a19804600f5053d4a409d8d42f1fa6e7"
+    "sha": "3c23fd472055b62da7d6137333eaad079c842146",
+    "date": "2026-09-28T23:33:15Z",
+    "message": "chore(desktop): release 0.7.0 (#1389)",
+    "url": "https://github.com/Viren070/AIOStreams/commit/3c23fd472055b62da7d6137333eaad079c842146"
   },
   "counts": {
-    "presets": 83,
+    "presets": 84,
     "services": 21,
-    "schemaKeys": 158,
+    "schemaKeys": 160,
     "selFunctions": 70,
     "formatterFields": 90,
     "formatters": 8,
@@ -38,6 +38,7 @@
     "eztv",
     "therarbg",
     "the-pirate-bay",
+    "tsukihime",
     "torrent-galaxy",
     "bitmagnet",
     "seadex",
@@ -278,6 +279,8 @@
     "presets",
     "addonCategoryColors",
     "catalogModifications",
+    "newCatalogsDisabled",
+    "upstreamCatalogOrder",
     "mergedCatalogs",
     "externalDownloads",
     "cacheAndPlay",
@@ -1031,6 +1034,11 @@
     },
     {
       "id": "torznab",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "tsukihime",
       "requiredOptions": [],
       "optionIds": []
     },

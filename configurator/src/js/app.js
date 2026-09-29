@@ -46,7 +46,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.13';
+const CONFIGURATOR_VERSION = '3.14';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1415,8 +1415,9 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     '2.31.1': 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.',
     '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
     '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. Matches Omni\u2019s host — the last 2.33.2 holdout; every other public host runs 2.34.1.',
-    '2.34.0': 'v2.34.0 lane: the previous pinned release. No host in the registry still runs it — kept so saved sessions keep resolving.',
-    '2.34.1': 'v2.34.1 lane: the release this configurator is pinned against (schema pin c1d044c). Default — matches the live fleet except Omni.',
+    '2.34.0': 'v2.34.0 lane: an older release. No host in the registry still runs it — kept so saved sessions keep resolving.',
+    '2.34.1': 'v2.34.1 lane: matches the live fleet except Omni (schema pin c1d044c). Pick it if your host has not upgraded to 2.35.x yet.',
+    '2.35.3': 'v2.35.3 lane: the release this configurator is pinned against (schema pin 11979c1). Default — additive over 2.34.1 (TsukiHime preset, catalog controls); imports stay valid on 2.34.1 hosts.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
