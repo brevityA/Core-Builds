@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.10.0 (2026-09-29)
+
+### Changed
+- **Host-preload collection stops serving deprecated templates** — `scripts/sync_template_collection.py` only excluded top-level `Legacy`/`Deprecated` lanes, so every lane nested under a service directory (e.g. `Templates/Torbox/Deprecated/…`) was counted as active. Fifteen deprecated templates — including the strict-matching dual-core builds that reproduce the silent "no streams found" failure mode — were being preloaded onto hosts pinning `core-builds-template-collection.json` in `TEMPLATE_URLS`. The lane check now reads every path part; the collection drops from 65 to 50 entries and carries no duplicate ids. The deprecated files stay in the repo for archive compatibility; they are simply no longer offered.
+- **`core-nexus-usenet-4k` gains the 0Cached fallback (0.1.2)** — the only active-lane template missing the `/*0Cached*/` included stream expression, which passes every stream through when nothing cached survives the filters. Without it a fully-filtered title returned an empty list instead of a degraded one. Expression is the same one the Apex and Mixed templates carry.
+
+### Fixed
+- **Validator regression gates for the silent no-results class** — active Core-owned templates now fail validation (not just warn) if they combine `titleMatching.mode: exact` with strict year and strict season/episode matching, or if they set `onlyShowCachedStreams: true` — the two failure shapes behind the v2.4.0 no-streams bug and the deprecated dual-core lane. Archived lanes keep warnings-only treatment.
+
 ## 3.9.0 (2026-09-26)
 
 ### Changed

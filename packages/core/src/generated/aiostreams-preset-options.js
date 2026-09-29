@@ -1,6 +1,6 @@
-// DO NOT EDIT — generated from AIOStreams c1d044c23b48acff9e5f0ce672c786797177e767
-// Source: https://github.com/Viren070/AIOStreams/tree/c1d044c23b48acff9e5f0ce672c786797177e767
-// Upstream version: 2.34.1
+// DO NOT EDIT — generated from AIOStreams 11979c12293b617a34009685312a75521086eba3
+// Source: https://github.com/Viren070/AIOStreams/tree/11979c12293b617a34009685312a75521086eba3
+// Upstream version: 2.35.3
 // Regenerate with: npm run sync:upstream   (see configurator/README.md)
 /** Required options beyond name,timeout,resources,url for each preset at the pinned ref. */
 
@@ -64,6 +64,9 @@ export const AIO_PRESET_REQUIRED_OPTIONS = Object.freeze({
   "peerflix": [
     "showTorrentLinks",
     "useMultipleInstances"
+  ],
+  "penguplay": [
+    "manifestUrl"
   ],
   "rpdb-catalogs": [
     "catalogs"

@@ -132,6 +132,7 @@
       "tmdbAccessToken",
       "tmdbApiKey",
       "tvdbApiKey",
+      "pmdbApiKey",
       "yearMatching",
       "titleMatching",
       "seasonEpisodeMatching",
@@ -150,13 +151,17 @@
       "presets",
       "addonCategoryColors",
       "catalogModifications",
+      "newCatalogsDisabled",
+      "upstreamCatalogOrder",
       "mergedCatalogs",
       "externalDownloads",
       "cacheAndPlay",
       "autoRemoveDownloads",
       "checkOwned",
       "failover",
-      "serviceWrap"
+      "serviceWrap",
+      "jellyfin",
+      "remuxDb"
     ]
   },
   "enums": {
@@ -254,7 +259,8 @@
       "subtitles",
       "catalog",
       "meta",
-      "addon_catalog"
+      "addon_catalog",
+      "watch_state"
     ],
     "SERVICES": [
       "realdebrid",
@@ -359,6 +365,7 @@
     "eztv",
     "therarbg",
     "the-pirate-bay",
+    "tsukihime",
     "torrent-galaxy",
     "bitmagnet",
     "seadex",
@@ -387,6 +394,7 @@
     "streamnzb",
     "davex",
     "dmm-cast",
+    "penguplay",
     "nuvio-streams",
     "webstreamr",
     "hdhub",
@@ -485,6 +493,9 @@
     "peerflix": [
       "showTorrentLinks",
       "useMultipleInstances"
+    ],
+    "penguplay": [
+      "manifestUrl"
     ],
     "rpdb-catalogs": [
       "catalogs"
@@ -614,7 +625,7 @@
   },
   "upstream": {
     "repo": "Viren070/AIOStreams",
-    "sha": "c1d044c23b48acff9e5f0ce672c786797177e767",
-    "version": "2.34.1"
+    "sha": "11979c12293b617a34009685312a75521086eba3",
+    "version": "2.35.3"
   }
 }

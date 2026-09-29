@@ -61,7 +61,10 @@ const BASE = {
   quickStart: false,
   simpleMode: false,
   outputProfile: 'auto',
-  aiostreamsVersion: '2.34.1',
+  // Tracks UPSTREAM.pin by design — the primary matrix always follows the
+  // pinned release; the compat sentinels below pin the older lanes. Bump
+  // together with the pin (and re-stamp the goldens).
+  aiostreamsVersion: '2.35.3',
   tmdbToken: '',
   tmdbApiKey: '',
 };

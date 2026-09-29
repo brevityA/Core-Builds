@@ -223,10 +223,15 @@ export function extractPresetRequiredOptions(presetSources) {
 
 /** Top-level property names of the object literal that follows `header`. */
 export function readObjectKeys(source, header) {
-  const index = source.indexOf(header);
+  // Strip comments FIRST: balanced() is string-aware but not comment-aware,
+  // and upstream now keeps commented-out schema blocks inside UserDataSchema
+  // (including ones whose text carries stray quotes/braces). Without this the
+  // brace walk runs past the object's real close and ingests later schemas.
+  const clean = stripComments(source);
+  const index = clean.indexOf(header);
   if (index === -1) return null;
-  const openIndex = source.indexOf('{', index + header.length - 1);
-  const { body } = balanced(source, openIndex, '{', '}');
+  const openIndex = clean.indexOf('{', index + header.length - 1);
+  const { body } = balanced(clean, openIndex, '{', '}');
   const keys = [];
   for (const part of splitTopLevel(body)) {
     const match = /^(?:'([^']+)'|"([^"]+)"|([A-Za-z_$][\w$]*))\s*:/.exec(part);
@@ -238,10 +243,11 @@ export function readObjectKeys(source, header) {
 /** `{ quality: 'desc', size: 'desc', ... }` read out of SORT_CRITERIA_DETAILS. */
 export function readSortDirections(source) {
   const header = 'export const SORT_CRITERIA_DETAILS';
-  const index = source.indexOf(header);
+  const clean = stripComments(source);
+  const index = clean.indexOf(header);
   if (index === -1) return null;
-  const openIndex = source.indexOf('{', source.indexOf('= {', index));
-  const { body } = balanced(source, openIndex, '{', '}');
+  const openIndex = clean.indexOf('{', clean.indexOf('= {', index));
+  const { body } = balanced(clean, openIndex, '{', '}');
   const out = {};
   for (const part of splitTopLevel(body)) {
     const key = /^(?:'([^']+)'|([A-Za-z_$][\w$]*))\s*:/.exec(part);

@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.13"
+title: "What's New — Configurator v3.14"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.13 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.14 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.13**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.14**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.14 (Sep 29 2026)
+
+<CardGroup cols={2}>
+  <Card title="Schema pin moves to AIOStreams v2.35.3" icon="sparkles">
+    the configurator now builds against the release the hosts are upgrading to, three days after the previous pin fell behind upstream (drift issue #770). The bump is additive: the TsukiHime anime preset and two catalog controls join the contract, nothing is removed, and configs generated for 2.35.3 stay importable on hosts still running 2.34.1 — unknown keys are stripped, not rejected. The default compatibility target moves with the pin; the 2.34.1 lane stays in the picker for hosts that have not upgraded, and the fleet registry keeps the versions each host actually reports.
+  </Card>
+  <Card title="A contract-extraction bug fixed before it could ship bad data" icon="bolt">
+    the walker that reads AIOStreams' config schema counted braces without ignoring comments, and upstream now keeps commented-out schema blocks (with quotes inside them) in the middle of the schema. The walk ran past the schema's real end and returned 325 'config keys' including 31 duplicates borrowed from unrelated schemas further down the file. Comments are stripped before the walk now; the same 161 real top-level keys come out on every run, and a test still fails the build the day they ever disagree again.
+  </Card>
+  <Card title="Contract tooling works in firewalled environments" icon="shield-check">
+    the aios-regen extractor accepts AIOS_RAW_BASE / AIOS_API_BASE mirror overrides (defaults unchanged), so the extract → diff → pin cycle from issue #770 completes even where raw.githubusercontent.com and api.github.com are blocked and only git access is allowed.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.13 (Sep 27 2026)
 
@@ -59,21 +75,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Debridio add-ons no longer export an invalid config" icon="shield-check">
     Debridio TMDB, TVDB and Watchtower were offered as simple on/off toggles, but each requires an API key that has no default, so switching one on produced a config the host refused. They were classified as safe by a generated options map that is missing 11 required options across 8 presets, and the test guarding that classification read the same map, so it agreed. The three now carry their key, and the check reads the live host contract instead of the map it is meant to be checking.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.10 (Sep 19 2026)
-
-<CardGroup cols={2}>
-  <Card title="Stream statistics off by default" icon="sparkles">
-    the Removal Reasons, Included Reasons and Pipeline Timing cards no longer appear among your streams. They are AIOStreams statistics output and Core Builds was asking for them: the Stable profile set statistics.enabled with addon, filter and timing stats. It was the only profile doing so, and 66 of the 69 checked-in templates already shipped them off, so the two Core Stable templates were the outliers. On Android TV the cards render above the streams, which made diagnostics the first thing on screen. hideErrors stays off, which is what actually keeps real failures visible. The Stable templates go to 1.0.1 so the update banner offers the change to anyone already running them.
-  </Card>
-  <Card title="Banner Studio contrast and clamp fixes" icon="bolt">
-    every brand now carries its own background, and an unset background picks it up rather than falling back to one shared colour. All 18 brands clear the 2.25:1 contrast floor on their own default; Disney+ was 1.98:1 and could not be fixed from the UI at all, and is now 5.83:1. The clear-space clamp reports proportionally, so the roughly 1px trim at the shipped default stops warning while a genuine 72px clamp still does, and a failing contrast check now offers a one-tap remedy instead of a bare button. The tool also gained its first tests — 69 of them, plus 15 for the Badge Builder that had never run on a pull request.
-  </Card>
-  <Card title="What's New card titles" icon="shield-check">
-    the docs site builds each release card by splitting a changelog item on its first em dash, so items written as one long sentence shipped cards with 300-character titles, or with the same paragraph printed as both title and body. Two of each went out with v3.9. The renderer now derives a short title when an item lacks one, and a blocking check refuses a malformed item in the release being cut.
   </Card>
 </CardGroup>

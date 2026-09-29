@@ -20,12 +20,12 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // hosts run it (six on stable build c1d044c2, Viren's on its nightly), with
 // Omni's the only 2.33.2 holdout. Older entries stay so existing saved
 // sessions and shared links keep resolving.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', 'unknown']);
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.3', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
 // pinned against (see UPSTREAM.pin). Single source of truth — app.js imports it
 // for the state default and every fallback that used to hard-code '2.32.0'.
-export const DEFAULT_AIOSTREAMS_VERSION = '2.34.1';
+export const DEFAULT_AIOSTREAMS_VERSION = '2.35.3';
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({
