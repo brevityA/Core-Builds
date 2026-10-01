@@ -8023,7 +8023,7 @@ async function simpleInstall(target) {
             { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true }
           );
           btn.disabled = false; btn.innerHTML = origHtml;
-          const stackHtml = stackResult.steps.length ? `<div style="margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.1);font-size:.72rem;color:#8b949e;line-height:1.6">${stackResult.steps.join('<br>')}${stackResult.errors.length ? '<br>' + stackResult.errors.map(e=>`<span style="color:#f87171">⚠ ${e}</span>`).join('<br>') : ''}</div>` : '';
+          const stackHtml = stackResult.steps.length ? `<div style="margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.1);font-size:.72rem;color:#8b949e;line-height:1.6">${stackResult.steps.join('<br>')}${stackResult.errors.length ? '<br>' + stackResult.errors.map(e=>`<span style="color:#f87171">⚠ ${escHtml(e)}</span>`).join('<br>') : ''}</div>` : '';
           if (installed === 'already') {
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div>${stackHtml}</div>`;
           } else {
