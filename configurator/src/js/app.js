@@ -46,7 +46,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.13';
+const CONFIGURATOR_VERSION = '3.14';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -5657,9 +5657,9 @@ function showShortcutsModal() {
         <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Navigate options</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">↑ ↓ ← →</kbd></div>
         <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Show this help</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">Ctrl + /</kbd></div>
         <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Filter services</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">/ (in service picker)</kbd></div>
-        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Feature flags</span><code style="font-size:.70rem;color:#8b949e">localStorage.setItem('cb-flags','pwa=1,webVitals=1')</code></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Feature flags</span><code style="font-size:.70rem;color:#8b949e">localStorage.setItem('cb-flags','webVitals=1')</code></div>
       </div>
-      <div style="margin-top:12px;font-size:.70rem;color:#6b7280;line-height:1.5">Flags: <code>pwa=0</code> disables offline cache, <code>webVitals=1</code> enables CLS/LCP beacon, <code>hostCache=0</code> disables 5-min host cache.</div>
+      <div style="margin-top:12px;font-size:.70rem;color:#6b7280;line-height:1.5">Flags: <code>webVitals=1</code> enables CLS/LCP beacon, <code>hostCache=0</code> disables 5-min host cache.</div>
     </div>`;
   document.body.appendChild(overlay);
   const close = () => { overlay.style.opacity='0'; overlay.style.transition='opacity .15s'; setTimeout(()=>overlay.remove(),160); };
@@ -5709,7 +5709,7 @@ function showRecommendedStackModal() {
         • live byte counter in Review (payloadSizeGuard)<br>
         • content-visibility:auto for 31-card carousel<br>
         • unknownConfigKeys warning on import<br>
-        • cb-flags: pwa=0, webVitals=1, sentryDsn=https://..., hostCache=0<br>
+        • cb-flags: webVitals=1, sentryDsn=https://..., hostCache=0<br>
         • PWA manifest+SW, Web Vitals beacon, Sentry optional, Ctrl+/ help, Lighthouse CI</div>
       </div>
       <div style="margin-top:14px;display:flex;gap:8px">

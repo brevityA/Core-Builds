@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.13",
+    "coreBuildsVersion": "3.14",
     "coreBuildsAIOStreamsTarget": "2.34.1",
     "coreBuildsProfile": "balanced",
     "coreBuildsProfileVersion": "1"
@@ -50,7 +50,11 @@
     ],
     "syncedRankedRegexUrls": [],
     "rankedRegexPatterns": [],
-    "excludedRegexPatterns": [],
+    "excludedRegexPatterns": [
+      "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+      "/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i",
+      "/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"
+    ],
     "addonCategoryColors": {
       "Mix": "indigo",
       "Debrid": "emerald",
@@ -287,6 +291,18 @@
         ]
       },
       {
+        "type": "zilean",
+        "instanceId": "nx-fix-04",
+        "enabled": true,
+        "options": {
+          "name": "Zilean",
+          "timeout": 6000,
+          "resources": [
+            "stream"
+          ]
+        }
+      },
+      {
         "type": "meteor",
         "instanceId": "nx-fix-02",
         "enabled": true,
@@ -331,6 +347,23 @@
         }
       },
       {
+        "type": "mediafusion",
+        "instanceId": "nx-mf-01",
+        "enabled": true,
+        "options": {
+          "name": "MediaFusion",
+          "timeout": 6000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ]
+        }
+      },
+      {
         "type": "hdhub",
         "instanceId": "hdhub-1",
         "enabled": true,
@@ -346,6 +379,44 @@
             "anime"
           ]
         }
+      },
+      {
+        "type": "eztv",
+        "instanceId": "nx-ez-01",
+        "enabled": true,
+        "options": {
+          "name": "EZTV",
+          "timeout": 6000
+        },
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "torrent-galaxy",
+        "instanceId": "nx-tg-01",
+        "enabled": true,
+        "options": {
+          "name": "Torrent Galaxy",
+          "timeout": 6000
+        },
+        "resources": [
+          "stream"
+        ]
+      },
+      {
+        "type": "knaben",
+        "instanceId": "tam-knaben",
+        "enabled": true,
+        "options": {
+          "name": "Knaben",
+          "timeout": 6000,
+          "mediaTypes": [],
+          "useMultipleInstances": false
+        },
+        "resources": [
+          "stream"
+        ]
       },
       {
         "type": "peerflix",

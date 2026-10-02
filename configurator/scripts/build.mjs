@@ -56,8 +56,7 @@ if (!webHtml.includes(`app.js?v=${assetVersions.js}`) || !webHtml.includes(`app.
   throw new Error('Web build is missing content-versioned asset URLs');
 }
 await writeFile(resolve(web, 'index.html'), webHtml);
-// PWA assets
-try { await copyFile(resolve(src, 'manifest.json'), resolve(web, 'manifest.json')); } catch(e) {}
+// sw.js is a kill switch for the retired cache-first worker; keep publishing it.
 try { await copyFile(resolve(src, 'icon.svg'), resolve(web, 'icon.svg')); } catch(e) {}
 try { await copyFile(resolve(src, 'sw.js'), resolve(web, 'sw.js')); } catch(e) {}
 
@@ -78,8 +77,7 @@ if (standalone.includes('<script type="module" src="./js/app.js"></script>')) th
 if (standalone.includes("import { ICO }")) throw new Error('Standalone build contains unresolved module imports');
 await writeFile(resolve(dist, 'index.html'), standalone);
 await writeFile(resolve(root, 'index.html'), standalone);
-// Also publish PWA assets to dist root for standalone preview
-try { await copyFile(resolve(src, 'manifest.json'), resolve(dist, 'manifest.json')); } catch(e) {}
+// Kill-switch sw.js at the dist root too: the old worker was live there.
 try { await copyFile(resolve(src, 'icon.svg'), resolve(dist, 'icon.svg')); } catch(e) {}
 try { await copyFile(resolve(src, 'sw.js'), resolve(dist, 'sw.js')); } catch(e) {}
 

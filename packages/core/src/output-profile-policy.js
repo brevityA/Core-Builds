@@ -100,6 +100,15 @@ const STABLE_STREAM_TYPES = new Set([
   'torrentio', 'sootio', 'peerflix', 'hdhub',
 ]);
 
+// Balanced is the default profile, so its source list is what most users get.
+// Restricting it to the Stable set cut a TorBox build to three torrent sources,
+// and because AIOStreams applies a template by replacing the whole preset list,
+// every update silently removed these five from configs that predated it.
+const BALANCED_STREAM_TYPES = new Set([
+  ...STABLE_STREAM_TYPES,
+  'mediafusion', 'eztv', 'torrent-galaxy', 'zilean', 'knaben',
+]);
+
 const CORE_EXTERNAL_KILL = Object.freeze({
   enabled: true,
   expression: "/* Core Stable | External stream kill */ type(streams,'youtube','external')",
@@ -187,12 +196,12 @@ function isExplicitPreset(preset, context) {
   return false;
 }
 
-function stablePresets(config, context) {
+function stablePresets(config, context, allowed = STABLE_STREAM_TYPES) {
   return values(config.presets).filter(preset => {
     if (!preset || typeof preset !== 'object') return false;
     if (!isStreamPreset(preset)) return true;
     const type = String(preset.type || '').toLowerCase();
-    return STABLE_STREAM_TYPES.has(type) || isExplicitPreset(preset, context);
+    return allowed.has(type) || isExplicitPreset(preset, context);
   });
 }
 
@@ -247,13 +256,20 @@ function stableSortCriteria(context) {
   };
 }
 
-function clearRemoteScoring(config) {
+// Remote scoring is the synced URL fields plus the override lists that only
+// re-score what those URLs deliver. Inline regex is not remote: every pattern
+// is a verbatim copy of a host-allowlisted string, so Balanced keeps it.
+function clearSyncedScoring(config) {
   for (const key of [...SYNCED_EXPRESSION_FIELDS, ...SYNCED_REGEX_FIELDS]) config[key] = [];
+  config.regexOverrides = [];
+  config.selOverrides = [];
+}
+
+function clearRemoteScoring(config) {
+  clearSyncedScoring(config);
   config.rankedRegexPatterns = [];
   config.preferredRegexPatterns = [];
   config.excludedRegexPatterns = [];
-  config.regexOverrides = [];
-  config.selOverrides = [];
 }
 
 function hasLocalRankedExpressions(config) {
@@ -282,6 +298,23 @@ function removeScoreDependentRules(config) {
 function enforceLocalExpressionPolicy(config) {
   for (const key of SYNCED_EXPRESSION_FIELDS) config[key] = [];
   removeScoreDependentRules(config);
+  removeDeadSortKeys(config);
+}
+
+// A sort key with nothing to read from is not neutral: it reads as a working
+// tiebreaker and hides that the real signal is missing. regexScore is filled
+// only by ranked regex (inline or synced). audioChannel has no case in the
+// upstream sorter (verified on main 2026-10-02) and falls through to 0; re-add
+// it here once upstream handles it. Static templates keep it — see CLAUDE.md.
+function removeDeadSortKeys(config) {
+  const hasRankedRegex = values(config.rankedRegexPatterns).length > 0
+    || values(config.syncedRankedRegexUrls).length > 0;
+  const dead = new Set(['audioChannel']);
+  if (!hasRankedRegex) dead.add('regexScore');
+  for (const [scope, sort] of Object.entries(config.sortCriteria || {})) {
+    if (!Array.isArray(sort)) continue;
+    config.sortCriteria[scope] = sort.filter(entry => !dead.has(entry?.key));
+  }
 }
 
 function disableEarlyExitAndBackgroundFetch(config, { disableAutoPlay = false } = {}) {
@@ -483,7 +516,7 @@ function applyStableProfile(template, context) {
 
 function applyBalancedProfile(template, context) {
   const config = template.config;
-  clearRemoteScoring(config);
+  clearSyncedScoring(config);
   applyNativeFilters(config, context);
   const safePse = namedEntries(
     config,
@@ -505,7 +538,7 @@ function applyBalancedProfile(template, context) {
   config.requiredStreamExpressions = [];
   config.preferredStreamExpressions = safePse;
   config.rankedStreamExpressions = [];
-  config.presets = stablePresets(config, context);
+  config.presets = stablePresets(config, context, BALANCED_STREAM_TYPES);
   setResultLimits(config, context, 'balanced');
   disableEarlyExitAndBackgroundFetch(config);
   config.hideErrors = false;

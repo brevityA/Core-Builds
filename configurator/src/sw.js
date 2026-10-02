@@ -1,56 +1,24 @@
-// Core Builds — minimal offline SW (cache-first for same-origin assets, network-first for APIs)
-// v3_10-2 bumps cache to invalidate old SW that cached index.html without e2e bypass
-const CACHE = 'cb-v3_10-2';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon.svg',
-  './styles/01-core.css',
-  './styles/02-brand-theme.css',
-  './styles/03-enhancements.css',
-  './styles/04-landing.css',
-  './styles/05-unified-ui.css',
-  './styles/06-features.css',
-  './styles/07-menu-parity.css',
-  './vendor/qrcode.min.js',
-  './js/app.js'
-];
+// Core Builds — service worker kill switch.
+//
+// The previous worker served every same-origin file cache-first and never
+// revalidated, under a cache name ('cb-v3_10-2') that was not bumped after
+// v3.10. Anyone it installed for kept running that build indefinitely. Pages
+// never served it for /configurator/ itself, but it was live under
+// /configurator/dist/ and /configurator/dist/web/.
+//
+// The page no longer registers a worker. This file stays deployed so browsers
+// that still hold the old one pick up these new bytes on their next visit,
+// then drop every cache, unregister, and reload onto the live network copy.
+// Deleting the file instead is not enough: a 404 on update does not reliably
+// evict an installed worker.
+self.addEventListener('install', () => self.skipWaiting());
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
-});
-self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
-});
-self.addEventListener('fetch', (e) => {
-  const url = new URL(e.request.url);
-  // E2E bypass — never intercept when cb-e2e=1 or e2e=1 in URL (Playwright)
-  if (url.searchParams.get('cb-e2e') === '1' || url.searchParams.get('e2e') === '1') return;
-  // Never cache AIOStreams host probes or Stremio API or paste services
-  // Use endsWith check to avoid incomplete substring sanitization (CodeQL)
-  const host = url.hostname;
-  const isBlockedHost = host === 'strem.io' || host.endsWith('.strem.io')
-    || host === 'paste.rs' || host.endsWith('.paste.rs')
-    || host === 'elfhosted.com' || host.endsWith('.elfhosted.com')
-    || host === 'viren070.me' || host.endsWith('.viren070.me')
-    || host === 'fortheweak.cloud' || host.endsWith('.fortheweak.cloud')
-    || host === 'midnightignite.me' || host.endsWith('.midnightignite.me');
-  if (url.pathname.startsWith('/api/') || isBlockedHost) {
-    return;
-  }
-  // Never cache the SW itself or any URL with query (e2e uses ?cb-e2e=1)
-  if (url.pathname.endsWith('sw.js') || url.search) return;
-  // Same-origin: cache-first
-  if (url.origin === self.location.origin) {
-    e.respondWith(
-      caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
-        if (res.ok) {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return res;
-      }))
-    );
-  }
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((key) => caches.delete(key)));
+    await self.registration.unregister();
+    const windows = await self.clients.matchAll({ type: 'window' });
+    for (const client of windows) client.navigate(client.url);
+  })());
 });
