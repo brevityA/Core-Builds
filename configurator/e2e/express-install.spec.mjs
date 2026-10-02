@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { mockSplashRequests } from './lib/mock-splash-requests.mjs';
 import { validateConfigOptions } from './lib/aiostreams-contract.mjs';
 
 // These specs drive long multi-hop chains (push → full stack → stremio) behind stubbed routes;
@@ -23,6 +24,7 @@ const UUID = '11111111-2222-4333-8444-555555555555';
 const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$|favicon|404 \(Not Found\)|Failed to load resource: the server responded with a status of 404|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
 
 async function fresh(page) {
+  await mockSplashRequests(page);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && !CORS_NOISE.test(message.text())) errors.push(message.text()); });
@@ -80,6 +82,7 @@ async function mockBackend(page, posted) {
 }
 
 test('Express door is the first splash route and opens the one-click lane', async ({ page }) => {
+  await page.route('**/api/v1/status**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ success: true, data: { version: '2.34.1' } }) }));
   const errors = await fresh(page);
   const door = page.locator('[data-action="open-express-lane"]');
   await expect(door).toBeVisible();
