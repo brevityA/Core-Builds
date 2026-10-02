@@ -8,15 +8,21 @@
 //
 // The page no longer registers a worker. This file stays deployed so browsers
 // that still hold the old one pick up these new bytes on their next visit,
-// then drop every cache, unregister, and reload onto the live network copy.
+// then drop the configurator's caches, unregister, and reload onto the live network copy.
 // Deleting the file instead is not enough: a 404 on update does not reliably
 // evict an installed worker.
+//
+// caches.keys() is origin-wide, and the same Pages origin hosts other tools
+// with their own workers (WuPlay Genie's 'wuplay-genie-v*'). Only the
+// configurator's 'cb-*' caches are ours to delete.
+const OWN_CACHE_PREFIX = 'cb-';
+
 self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map((key) => caches.delete(key)));
+    await Promise.all(keys.filter((key) => key.startsWith(OWN_CACHE_PREFIX)).map((key) => caches.delete(key)));
     await self.registration.unregister();
     const windows = await self.clients.matchAll({ type: 'window' });
     // Best effort: some browsers reject navigate() once the worker no longer
