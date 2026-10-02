@@ -33,6 +33,29 @@ export const LIBRARY_CAPABLE_SERVICE_IDS = Object.freeze([
 
 const LIBRARY_CAPABLE = new Set(LIBRARY_CAPABLE_SERVICE_IDS);
 
+/**
+ * Service ids AIOStreams' Torznab-family built-ins (EZTV, Torrent Galaxy,
+ * Knaben, Zilean) can resolve through: StremThruPreset.supportedServices at the
+ * pinned ref, re-checked on upstream main 2026-10-02. With none enabled,
+ * TorznabPreset.generateAddons throws "requires at least one usable service",
+ * and config create/update validates with skipErrorsFromAddonsOrProxies:false,
+ * so ONE such enabled preset rejects the whole save — P2P and EasyNews-only
+ * builds included. The Usenet ids above can back a Library but not these.
+ */
+export const TORRENT_DEBRID_SERVICE_IDS = Object.freeze([
+  'alldebrid', 'debridlink', 'debrider', 'easydebrid', 'offcloud',
+  'premiumize', 'pikpak', 'realdebrid', 'torbox', 'torrin',
+]);
+
+const TORRENT_DEBRID = new Set(TORRENT_DEBRID_SERVICE_IDS);
+
+/** True when at least one enabled service can back a Torznab-family built-in. */
+export function hasTorrentDebridService(services) {
+  return (Array.isArray(services) ? services : []).some(
+    service => service && service.enabled !== false && TORRENT_DEBRID.has(service.id),
+  );
+}
+
 /** True when at least one enabled service can back a Library preset. */
 export function hasLibraryCapableService(services) {
   return (Array.isArray(services) ? services : []).some(

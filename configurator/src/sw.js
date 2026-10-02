@@ -19,6 +19,8 @@ self.addEventListener('activate', (event) => {
     await Promise.all(keys.map((key) => caches.delete(key)));
     await self.registration.unregister();
     const windows = await self.clients.matchAll({ type: 'window' });
-    for (const client of windows) client.navigate(client.url);
+    // Best effort: some browsers reject navigate() once the worker no longer
+    // controls the client; the page-side cleanup still runs on its next load.
+    await Promise.all(windows.map((client) => client.navigate(client.url).catch(() => {})));
   })());
 });

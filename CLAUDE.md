@@ -1029,6 +1029,8 @@ AIOStreams uses a **stable multi-key sort** — position 1 is the primary sort; 
 
 **Core Builds uses 16 keys** (17 for Hybrid). Sections per template: `global`, `movies`, `series`, `anime`, `cachedMovies`, `uncachedMovies`, `uncachedSeries`.
 
+**Generated 4K builds (v3.14):** the configurator's 4K tier-first order leads every scope with `resolution → cached → quality` (`sort-policy.js#hoistResolution`, mirrored in the Stable profile). Keep `cached` above `quality`: with quality first, an uncached 2160p REMUX outranked a cached 2160p WEB-DL. Generated configs also emit `cachedSeries`, without which upstream never applies `uncachedSeries`. The static-template orders below are unchanged.
+
 **4K global sort (16 keys):**
 `cached → seMatched → seScore → seadex → resolution → quality → regexScore → visualTag → audioTag → audioChannel → language → encode → library → seeders → bitrate → size`
 

@@ -1042,6 +1042,72 @@
           "key": "subtitle",
           "direction": "desc"
         }
+      ],
+      "cachedSeries": [
+        {
+          "key": "cached",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionMatched",
+          "direction": "desc"
+        },
+        {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
+          "key": "library",
+          "direction": "desc"
+        },
+        {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
+          "key": "regexScore",
+          "direction": "desc"
+        },
+        {
+          "key": "visualTag",
+          "direction": "desc"
+        },
+        {
+          "key": "encode",
+          "direction": "desc"
+        },
+        {
+          "key": "audioTag",
+          "direction": "desc"
+        },
+        {
+          "key": "language",
+          "direction": "desc"
+        },
+        {
+          "key": "seeders",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
+          "direction": "desc"
+        },
+        {
+          "key": "size",
+          "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
+        }
       ]
     },
     "deduplicator": {
@@ -1218,18 +1284,6 @@
     "autoRemoveDownloads": false,
     "presets": [
       {
-        "type": "zilean",
-        "instanceId": "nx-fix-04",
-        "enabled": true,
-        "options": {
-          "name": "Zilean",
-          "timeout": 6000,
-          "resources": [
-            "stream"
-          ]
-        }
-      },
-      {
         "type": "seadex",
         "instanceId": "tam-seadex",
         "enabled": true,
@@ -1330,44 +1384,6 @@
             "anime"
           ]
         }
-      },
-      {
-        "type": "eztv",
-        "instanceId": "nx-ez-01",
-        "enabled": true,
-        "options": {
-          "name": "EZTV",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "torrent-galaxy",
-        "instanceId": "nx-tg-01",
-        "enabled": true,
-        "options": {
-          "name": "Torrent Galaxy",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "knaben",
-        "instanceId": "tam-knaben",
-        "enabled": true,
-        "options": {
-          "name": "Knaben",
-          "timeout": 6000,
-          "mediaTypes": [],
-          "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
       },
       {
         "type": "aiosubtitle",

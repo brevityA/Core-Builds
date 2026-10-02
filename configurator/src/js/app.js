@@ -30,7 +30,7 @@ import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from '../core/update-check.js';
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
-import { hasLibraryCapableService, missingDirectInstallCredentials } from '../core/install-policy.js';
+import { hasLibraryCapableService, hasTorrentDebridService, missingDirectInstallCredentials } from '../core/install-policy.js';
 import { hostRoutingDecision, autoRoutableHostKeys, hostPickerLabel } from '../core/host-routing.js';
 import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-access-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
@@ -3888,6 +3888,9 @@ function presets() {
   // library preset is emitted only when services() carries a capable service.
   // Applied here (every route reads this list), not in one lane.
   const libCapable = hasLibraryCapableService(services());
+  // EZTV / Torrent Galaxy / Knaben / Zilean throw on save without a torrent debrid
+  // service, rejecting the whole config (P2P and EasyNews-only routes): ship them off there.
+  const torrentCapable = hasTorrentDebridService(services());
   const hasDebridio = isDebridio || (isMulti && S.multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
@@ -3965,7 +3968,7 @@ function presets() {
     // or the host rejects the save outright (EasyNews-only 400, audit defect 2).
     ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
-    { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
+    { type:'zilean', instanceId:'nx-fix-04', enabled:torrentCapable, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
     ...storeSlot,
     ...(isEasynews || multiHasEasynews || isUsenet ? [
@@ -4064,9 +4067,9 @@ function presets() {
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true } },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
     { type:'hdhub', instanceId:'hdhub-1', enabled:isP2P, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], ...(!isP2P && (multiHasTorbox || svc === 'torbox-pro' || svc === 'torbox-ess') ? {tb_only:true} : {}) } },
-    { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
-    { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
-    { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
+    { type:'eztv', instanceId:'nx-ez-01', enabled:torrentCapable, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
+    { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:torrentCapable, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
+    { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
       { type:'animetosho', instanceId:'nx-at-01', enabled:S.content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },

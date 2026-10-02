@@ -291,18 +291,6 @@
         ]
       },
       {
-        "type": "zilean",
-        "instanceId": "nx-fix-04",
-        "enabled": true,
-        "options": {
-          "name": "Zilean",
-          "timeout": 6000,
-          "resources": [
-            "stream"
-          ]
-        }
-      },
-      {
         "type": "meteor",
         "instanceId": "nx-fix-02",
         "enabled": true,
@@ -379,44 +367,6 @@
             "anime"
           ]
         }
-      },
-      {
-        "type": "eztv",
-        "instanceId": "nx-ez-01",
-        "enabled": true,
-        "options": {
-          "name": "EZTV",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "torrent-galaxy",
-        "instanceId": "nx-tg-01",
-        "enabled": true,
-        "options": {
-          "name": "Torrent Galaxy",
-          "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
-        "type": "knaben",
-        "instanceId": "tam-knaben",
-        "enabled": true,
-        "options": {
-          "name": "Knaben",
-          "timeout": 6000,
-          "mediaTypes": [],
-          "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
       },
       {
         "type": "peerflix",

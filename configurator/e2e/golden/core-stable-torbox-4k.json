@@ -68,11 +68,11 @@
           "direction": "desc"
         },
         {
-          "key": "quality",
+          "key": "cached",
           "direction": "desc"
         },
         {
-          "key": "cached",
+          "key": "quality",
           "direction": "desc"
         },
         {

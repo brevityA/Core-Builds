@@ -242,10 +242,14 @@ function stableSortCriteria(context) {
   // honour the 4K-first rule itself — otherwise a Stable 4K build would fall
   // back to cached-first and a cached 1080p would outrank an uncached 2160p.
   const base = context.service === 'p2p' ? p2p : core;
+  // 4K tier-first: resolution, then cached, then quality — the same order as
+  // sort-policy.js#hoistResolution, so an uncached 2160p never outranks a
+  // cached one on quality alone.
+  const lead = ['resolution', 'cached', 'quality'];
   const global = resolutionTierFirst(context)
     ? [
-      ...base.filter(entry => entry.key === 'resolution' || entry.key === 'quality'),
-      ...base.filter(entry => entry.key !== 'resolution' && entry.key !== 'quality'),
+      ...lead.flatMap(key => base.filter(entry => entry.key === key)),
+      ...base.filter(entry => !lead.includes(entry.key)),
     ]
     : base;
   return {

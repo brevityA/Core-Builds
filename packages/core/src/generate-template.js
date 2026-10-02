@@ -9,7 +9,7 @@
  */
 
 import { templateInput, hasTmdbCredentials } from './input.js';
-import { hasLibraryCapableService } from './library-policy.js';
+import { hasLibraryCapableService, hasTorrentDebridService } from './library-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from './device-policy.js';
 import { sortPolicy } from './sort-policy.js';
 import { sizePolicy, bitratePolicy } from './filter-policy.js';
@@ -187,6 +187,9 @@ function buildPresets(input) {
   // addon from the services array and rejects the config when no enabled
   // service can back it. Gate every library emission on that rule.
   const libCapable = hasLibraryCapableService(buildServices(input));
+  // EZTV / Torrent Galaxy / Knaben / Zilean throw on save without a torrent debrid
+  // service, rejecting the whole config (P2P and EasyNews-only routes): ship them off there.
+  const torrentCapable = hasTorrentDebridService(buildServices(input));
   if (isUsenet) {
     const usenetList = [
       // The usenet route enables the `aiostreams` service, which IS
@@ -228,7 +231,7 @@ function buildPresets(input) {
   const list = [
     ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
-    { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
+    { type:'zilean', instanceId:'nx-fix-04', enabled:torrentCapable, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 hard-rejects "SeaDex requires at least one usable service",
     ...storeSlot,
     ...(isEasynews || multiHasEasynews || isUsenet ? [
@@ -305,9 +308,9 @@ function buildPresets(input) {
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true } },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
     { type:'hdhub', instanceId:'hdhub-1', enabled:isP2P, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], ...(!isP2P && (multiHasTorbox || svc === 'torbox-pro' || svc === 'torbox-ess') ? {tb_only:true} : {}) } },
-    { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
-    { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
-    { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
+    { type:'eztv', instanceId:'nx-ez-01', enabled:torrentCapable, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
+    { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:torrentCapable, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
+    { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
       { type:'animetosho', instanceId:'nx-at-01', enabled:content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },

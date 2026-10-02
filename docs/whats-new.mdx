@@ -14,18 +14,24 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
 
 <CardGroup cols={2}>
   <Card title="Default builds get their scrapers back" icon="sparkles">
-    the Balanced profile, which every standard build has used since August, kept only a fixed short list of sources: a TorBox build shipped three torrent scrapers (StremThru Torz, Meteor, Comet) where an Advanced build ships eight. AIOStreams applies a template by replacing the whole addon list, so every update also deleted MediaFusion, EZTV, Torrent Galaxy, Zilean and Knaben from configs that had them. All five are back in Balanced. Simple Mode and Quick Install keep the short Stable list on purpose. Switching on the optional Knaben card no longer adds a second copy of a source every build already includes.
+    the Balanced profile, which every standard build has used since August, kept only a fixed short list of sources: a TorBox build shipped three torrent scrapers (StremThru Torz, Meteor, Comet) where an Advanced build ships eight. AIOStreams applies a template by replacing the whole addon list, so every update also deleted MediaFusion, EZTV, Torrent Galaxy, Zilean and Knaben from configs that had them. All five are back in Balanced; on P2P and EasyNews-only builds the four that need a debrid service are left out (see below). Simple Mode and Quick Install keep the short Stable list on purpose. Switching on the optional Knaben card no longer adds a second copy of a source every build already includes.
   </Card>
   <Card title="Default builds get their release filtering back" icon="bolt">
     Balanced was meant to drop remote scoring and instead deleted every regex list, including the inline ones copied verbatim from host allowlists. Default users lost release-group ranking and the exclusions for upscaled, BR-DISK, extras and retagged releases, while the sort order kept a regexScore step that had nothing left to score. The inline lists return; synced regex URLs stay off, so nothing new depends on a remote file or a host allowlisting a URL.
   </Card>
-  <Card title="Sort steps that do nothing are removed" icon="shield-check">
+  <Card title="P2P and EasyNews-only builds save again" icon="shield-check">
+    EZTV, Torrent Galaxy, Knaben and Zilean are AIOStreams built-ins that need a torrent debrid service, and AIOStreams validates a config by building every enabled addon: one of them with no such service refuses the whole save, not just that addon. Advanced builds without debrid shipped all four switched on. They are now left out of builds with no debrid service and stay in everywhere else, so the save succeeds; rebuild after adding a debrid service to get them.
+  </Card>
+  <Card title="4K builds rank cached results first again" icon="sliders">
+    4K builds sort every 2160p above every 1080p, but the same step also put quality above cache status, so an uncached 4K REMUX outranked a cached 4K WEB-DL. On a debrid account the top result could start a download instead of playing — the likely cause of reports that sorting sometimes misbehaves. Cached now comes straight after resolution in every 4K sort list, including Simple Mode and Quick Install builds: 4K still beats 1080p, and inside each resolution cached beats uncached. 1080p series also gain the separate cached/uncached ordering movies and anime always had, so uncached episodes now rank by seeders the way uncached movies do.
+  </Card>
+  <Card title="Sort steps that do nothing are removed" icon="gauge">
     regexScore is now dropped whenever a config carries no ranked regex, and audioChannel is dropped from generated configs because AIOStreams has no sorter case for it: it compares every stream as equal. It returns once upstream handles it. Checked-in templates keep it unchanged.
   </Card>
-  <Card title="Offline mode retired, and the stale cache it could leave" icon="sliders">
+  <Card title="Offline mode retired, and the stale cache it could leave" icon="wand">
     the configurator registered a service worker that served the whole app from cache without ever checking for updates, under a cache name unchanged since v3.10. It never ran on the main configurator page, but it did install for anyone who opened the copy under /configurator/dist/, and those browsers kept running the v3.10 build. The page no longer registers one, removes any it finds, and the worker file is replaced by one that clears its cache, unregisters itself and reloads onto the current build.
   </Card>
-  <Card title="Release notes now say when generated output is unchanged" icon="gauge">
+  <Card title="Release notes now say when generated output is unchanged" icon="layers">
     3.12 to 3.13 produced byte-identical configs, and default-profile users saw none of 3.9 through 3.11 either, yet each release read as a config change: re-importing showed no changes in AIOStreams and looked broken. A new check blocks any release that changes no generated config unless its notes say so, and blocks the opposite claim when output did change.
   </Card>
 </CardGroup>
