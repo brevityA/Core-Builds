@@ -112,3 +112,25 @@ test('Anime content gets AnimeTosho on the default profile, only with a torrent 
   const balanced = applyOutputProfile(generateTemplate({ service: 'torbox-pro', content: 'anime' }, {}), 'balanced', ctx);
   assert.ok(balanced.config.presets.some(p => p.type === 'animetosho'), 'Balanced must keep AnimeTosho');
 });
+
+test('Brazuca (P2P-only) is gated on HTTP builds and allowed on P2P', () => {
+  const fnSrc = app.match(/function optionalScraperLaneBlock\(id\) \{[\s\S]*?\n\}/)?.[0];
+  const laneBlockFor = new Function('S', `${fnSrc}\nreturn optionalScraperLaneBlock;`);
+  assert.ok(laneBlockFor({ service: 'http' })('brazuca-torrents'), 'HTTP builds never emit it, so the card must say so');
+  assert.equal(laneBlockFor({ service: 'p2p' })('brazuca-torrents'), '');
+});
+
+test('both scraper pickers apply the host gate (Bitmagnet on hosts that strip it)', () => {
+  assert.match(app, /function optionalScraperHostBlock\(id\)/);
+  assert.match(app, /optionalScraperHostBlock\(d\.id\) \|\| optionalScraperLaneBlock\(d\.id\)/, 'main carousel');
+  assert.match(app, /const scraperCards=OPTIONAL_SCRAPER_DEFS\.map\(d=>\{const why=[^;]*optionalScraperHostBlock\(d\.id\)/, 'additional-services picker');
+});
+
+test('Stream Pool lists every exit threshold the builder uses', () => {
+  const src = app.match(/function streamPoolTargets\(pool\) \{[\s\S]*?\n\}/)?.[0];
+  const targets = (S, pool) => new Function('S', `${src}\nreturn streamPoolTargets;`)(S)(pool);
+  assert.deepEqual(targets({ resolution: 'ultrawide' }, 'normal').counts, [[15, '1080p'], [5, '2160p']]);
+  assert.deepEqual(targets({ resolution: 'mixed' }, 'large').counts, [[22, '1080p'], [12, '2160p']]);
+  assert.deepEqual(targets({ resolution: '4k' }, 'max'), { counts: [[25, '2160p']], ms: 10000 });
+  assert.deepEqual(targets({ resolution: '1080p' }, 'normal'), { counts: [[20, '1080p']], ms: 6000 });
+});
