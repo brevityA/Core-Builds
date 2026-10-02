@@ -9,7 +9,7 @@
  */
 
 import { templateInput, hasTmdbCredentials } from './input.js';
-import { hasLibraryCapableService } from './library-policy.js';
+import { hasLibraryCapableService, hasTorrentDebridService } from './library-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from './device-policy.js';
 import { sortPolicy } from './sort-policy.js';
 import { sizePolicy, bitratePolicy } from './filter-policy.js';
@@ -150,7 +150,7 @@ function buildPresets(input) {
   const hasExtraHttp = isMulti && multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && multiServices.includes('streamnzb');
-  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(s)));
   // Optional-extras toggles: exactly one emission site per preset. All four are *also*
   // advertised disabled on lanes that cannot satisfy them, so a toggle flips that advert's
   // `enabled` instead of emitting a second instanceId, and the keyless branch below emits only
@@ -187,6 +187,9 @@ function buildPresets(input) {
   // addon from the services array and rejects the config when no enabled
   // service can back it. Gate every library emission on that rule.
   const libCapable = hasLibraryCapableService(buildServices(input));
+  // EZTV / Torrent Galaxy / Knaben / Zilean throw on save without a torrent debrid
+  // service, rejecting the whole config (P2P and EasyNews-only routes): ship them off there.
+  const torrentCapable = hasTorrentDebridService(buildServices(input));
   if (isUsenet) {
     const usenetList = [
       // The usenet route enables the `aiostreams` service, which IS
@@ -216,19 +219,21 @@ function buildPresets(input) {
   }
 
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr'};
-  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
+  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'];
   const multiHasTorbox = isMulti && (multiServices.includes('torbox-pro') || multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews || isDebridio || isUsenet ? []
+    // Seedr: no StremThru preset supports it (only MediaFusion does), and a Store/Torz
+    // instance with no usable service fails the whole save.
+    : isP2P || isEasynews || isDebridio || isUsenet || svc === 'seedr' ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
     ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
-    { type:'zilean', instanceId:'nx-fix-04', enabled:true, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
+    { type:'zilean', instanceId:'nx-fix-04', enabled:torrentCapable, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
     { type:'seadex', instanceId:'tam-seadex', enabled:content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 hard-rejects "SeaDex requires at least one usable service",
     ...storeSlot,
     ...(isEasynews || multiHasEasynews || isUsenet ? [
@@ -305,12 +310,12 @@ function buildPresets(input) {
     { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true } },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
     { type:'hdhub', instanceId:'hdhub-1', enabled:isP2P, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], ...(!isP2P && (multiHasTorbox || svc === 'torbox-pro' || svc === 'torbox-ess') ? {tb_only:true} : {}) } },
-    { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
-    { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:true, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
-    { type:'knaben', instanceId:'tam-knaben', enabled:true, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
+    { type:'eztv', instanceId:'nx-ez-01', enabled:torrentCapable, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
+    { type:'torrent-galaxy', instanceId:'nx-tg-01', enabled:torrentCapable, options:{ name:'Torrent Galaxy', timeout:5000 }, resources:['stream'] },
+    { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
-      { type:'animetosho', instanceId:'nx-at-01', enabled:content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'animetosho', instanceId:'nx-at-01', enabled:(content === 'anime' || content === 'mixed') && torrentCapable, options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
@@ -330,7 +335,15 @@ function buildPresets(input) {
 function buildServices(input) {
   const svc = input.service, isMulti = svc === 'multi', m = input.multiServices || [];
   const creds = input.credentials || {};
-  const cred = id => creds[id] ? {apiKey: creds[id]} : {};
+  // Mirrors configurator SERVICE_CREDENTIAL_FIELDS: these services do not take a lone
+  // apiKey, and every listed field is required upstream.
+  const MULTI = { offcloud:[['offcloud','apiKey'],['offcloudEmail','email'],['offcloudPass','password']], pikpak:[['pikpak','email'],['pikpakPass','password']], seedr:[['seedr','encodedToken']] };
+  const cred = id => {
+    if (!MULTI[id]) return creds[id] ? {apiKey: creds[id]} : {};
+    const out = {};
+    for (const [key, field] of MULTI[id]) if (creds[key]) out[field] = creds[key];
+    return out;
+  };
   return [
     {id:'realdebrid', enabled: svc==='realdebrid' || svc==='hybrid' || (isMulti && m.includes('realdebrid')), credentials:cred('realdebrid')},
     {id:'alldebrid', enabled: svc==='alldebrid' || (isMulti && m.includes('alldebrid')), credentials:cred('alldebrid')},

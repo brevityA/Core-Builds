@@ -152,7 +152,10 @@ test('the 4K profile puts resolution first in every scope', () => {
   assert.ok(resolutionTierFirst(FOURK));
   for (const [scope, list] of Object.entries(criteria)) {
     assert.equal(list[0].key, 'resolution', `${scope} does not lead with resolution`);
-    assert.equal(list[1].key, 'quality', `${scope} does not follow resolution with quality`);
+    // cached outranks quality inside the tier; lists without cached (the uncached ones) go straight to quality
+    const hasCached = list.some(e => e.key === 'cached');
+    assert.equal(list[1].key, hasCached ? 'cached' : 'quality', `${scope}: wrong key after resolution`);
+    if (hasCached) assert.equal(list[2].key, 'quality', `${scope} does not follow cached with quality`);
   }
 });
 
@@ -232,6 +235,23 @@ test('within a tier the existing quality ordering is preserved', () => {
   assert.equal(compareStreams(list, remux, hdtv, prefs), -1, 'REMUX should still beat HDTV inside the 2160p tier');
 });
 
+// The case the old order got wrong: an uncached REMUX and a cached WEB-DL, both 2160p.
+// With quality hoisted above cached, the REMUX won and the top pick started a debrid
+// download instead of playing. Run for every request type the upstream comparator resolves.
+test('within a 2160p tier a cached WEB-DL beats an uncached REMUX', () => {
+  const prefs = prefsFor(FOURK);
+  const criteria = sortPolicy(FOURK);
+  const cachedWeb = { ...WORST_POSSIBLE_2160P, id: 'uhd-cached-web', quality: 'WEB-DL', cached: true };
+  const uncachedRemux = { ...WORST_POSSIBLE_2160P, id: 'uhd-uncached-remux', quality: 'BluRay REMUX', cached: false };
+  for (const type of ['movies', 'series', 'anime']) {
+    // 4K lists lead with resolution, so upstream never splits cached/uncached: one list orders both
+    const list = resolveCriteria(criteria, { type });
+    assert.equal(list[0].key, 'resolution', `${type}: expected the unsplit tier-first list`);
+    const ranked = sortStreams(list, [uncachedRemux, cachedWeb], prefs);
+    assert.equal(ranked[0].id, 'uhd-cached-web', `${type}: uncached REMUX outranked cached WEB-DL`);
+  }
+});
+
 test('within a tier cached still beats uncached', () => {
   const prefs = prefsFor(FOURK);
   const list = resolveCriteria(sortPolicy(FOURK), { type: 'movies', cached: false });
@@ -308,12 +328,25 @@ test('the Stable output profile is also 4K-tier-first', async () => {
 
   const fourK = applyOutputProfile(template(), 'stable', ctx('4k')).config.sortCriteria.global;
   assert.equal(fourK[0].key, 'resolution', 'Stable 4K must lead with resolution');
-  assert.equal(fourK[1].key, 'quality');
-  assert.ok(fourK.some(e => e.key === 'cached'), 'cached must still be in the list, just below the tier');
+  assert.equal(fourK[1].key, 'cached', 'Stable 4K: cached must outrank quality inside the tier');
+  assert.equal(fourK[2].key, 'quality');
 
   const oneEighty = applyOutputProfile(template(), 'stable', ctx('1080p')).config.sortCriteria.global;
   assert.equal(oneEighty[0].key, 'cached', 'Stable 1080p must keep cached-first');
 
   const optOut = applyOutputProfile(template(), 'stable', { ...ctx('4k'), qualityFirst: true }).config.sortCriteria.global;
   assert.equal(optOut[0].key, 'cached', 'qualityFirst must opt out of Stable tier-first too');
+});
+
+// Upstream only consults the cached/uncached lists when BOTH exist for the request type.
+// series had uncachedSeries but no cachedSeries, so the seeders-promoted order never applied
+// to an uncached episode; movies and anime were split correctly all along.
+test('1080p series now split cached/uncached like movies and anime', () => {
+  const criteria = sortPolicy(TENEIGHTY);
+  assert.ok(criteria.cachedSeries?.length, 'cachedSeries must be emitted');
+  assert.deepEqual(criteria.cachedSeries.map(e => e.key), criteria.series.map(e => e.key), 'cached series keep the series order');
+  for (const type of ['movies', 'series', 'anime']) {
+    const uncached = resolveCriteria(criteria, { type, cached: false });
+    assert.equal(uncached, criteria[`uncached${type[0].toUpperCase()}${type.slice(1)}`], `${type}: uncached list not used`);
+  }
 });

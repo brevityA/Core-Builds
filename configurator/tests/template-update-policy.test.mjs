@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeUpdateTemplate, importedSourceState, mergeImportedPresets } from '../src/core/template-update-policy.js';
+import { normalizeUpdateTemplate, importedSourceState, mergeImportedPresets, inheritUpdateCredentials } from '../src/core/template-update-policy.js';
 
 const source = (type, instanceId, options = {}, enabled = true) => ({ type, instanceId, enabled, resources: ['stream'], options: { name: instanceId, timeout: 5000, ...options } });
 
@@ -29,7 +29,9 @@ test('optional imports detect keyless toggles and extract nested Newznab keys lo
     source('newznab', 'slug', { api: { url: 'https://drunkenslug.com/api/', apiKey: 'LOCAL-SLUG' } }),
     source('debridio', 'db', { debridioApiKey: 'LOCAL-DEBRIDIO' }),
   ] });
-  assert.deepEqual(state.optionalScrapers, ['webstreamr', 'zilean', 'drunkenslug']);
+  // Zilean is not a toggle since v3.14 (always included with a torrent debrid), so it
+  // is retained as an imported preset rather than reported as an optional scraper.
+  assert.deepEqual(state.optionalScrapers, ['webstreamr', 'drunkenslug']);
   assert.equal(state.creds.drunkenslug, 'LOCAL-SLUG');
   assert.equal(state.creds.debridio, 'LOCAL-DEBRIDIO');
 });
@@ -162,4 +164,28 @@ test('cleared NZBHydra URL or previously supplied key disables it, but an origin
   }
   const keyless = [source('nzbhydra', 'public-hydra', { api: { url: 'https://public.invalid/api', apiKey: '' } })];
   assert.deepEqual(mergeImportedPresets([], keyless, importedSourceState({ presets: keyless })), keyless);
+});
+
+test('a saved key is never carried to an imported endpoint-bound preset at a new address', () => {
+  // CodeRabbit (#777): an imported NZBHydra/Jackett/Prowlarr at a new URL with a blank
+  // key inherited the previous setup's key, which a private install would send there.
+  const saved = { nzbhydra: 'https://old-hydra.invalid', nzbhydraApiKey: 'OLD-KEY', jackettUrl: 'https://old-jackett.invalid', jackett: 'OLD-J', prowlarrUrl: 'https://p.invalid', prowlarr: 'P-KEY' };
+  const imported = { nzbhydra: 'https://new-hydra.invalid', nzbhydraApiKey: '', jackettUrl: 'https://new-jackett.invalid', jackett: '', prowlarrUrl: 'https://p.invalid/', prowlarr: '' };
+  const creds = inheritUpdateCredentials(saved, imported);
+  assert.equal(creds.nzbhydra, 'https://new-hydra.invalid');
+  assert.equal(creds.nzbhydraApiKey, '', 'old NZBHydra key must not follow a new URL');
+  assert.equal(creds.jackett, '', 'old Jackett key must not follow a new URL');
+  assert.equal(creds.prowlarr, 'P-KEY', 'same endpoint keeps its key');
+
+  const presets = [
+    source('nzbhydra', 'hydra', { api: { url: 'https://new-hydra.invalid', apiKey: '' } }),
+    source('jackett', 'jk', { jackettUrl: 'https://new-jackett.invalid', jackettApiKey: '' }),
+  ];
+  // Even if a caller passes the stale saved credentials straight through, a key is
+  // only ever written next to the URL it was entered for.
+  const merged = mergeImportedPresets([], presets, { creds: saved });
+  const hydra = merged.find(p => p.type === 'nzbhydra').options.api;
+  assert.ok(hydra.apiKey === '' || hydra.url === saved.nzbhydra, `NZBHydra key ended up next to ${hydra.url}`);
+  assert.equal(merged.find(p => p.type === 'jackett').options.jackettApiKey, '', 'merge must not write a key for another URL');
+  assert.equal(merged.find(p => p.type === 'jackett').options.jackettUrl, 'https://new-jackett.invalid');
 });

@@ -64,6 +64,34 @@ const PRESET_CREDENTIALS = Object.freeze({
   subdl: ['subdl', 'subDlApiKey'],
 });
 
+// Credentials that only mean something next to one endpoint. A key entered for
+// one URL must never be written into a preset that points somewhere else: an
+// imported NZBHydra/Jackett/Prowlarr at a new address with a blank key would
+// otherwise inherit the previous setup's key and send it to that address.
+const ENDPOINT_BOUND = Object.freeze({
+  nzbhydra: Object.freeze({ urlCred: 'nzbhydra', keyCred: 'nzbhydraApiKey', url: options => options?.api?.url }),
+  jackett: Object.freeze({ urlCred: 'jackettUrl', keyCred: 'jackett', url: options => options?.jackettUrl }),
+  prowlarr: Object.freeze({ urlCred: 'prowlarrUrl', keyCred: 'prowlarr', url: options => options?.prowlarrUrl }),
+});
+const sameEndpoint = (a, b) => { const left = endpoint(a); return Boolean(left) && left === endpoint(b); };
+
+/**
+ * Credentials for an update preview: saved values, overridden by every non-empty
+ * imported value. An endpoint-bound key is inherited only while the imported
+ * endpoint is the saved one; at a new endpoint the imported key (even blank) wins.
+ */
+export function inheritUpdateCredentials(saved = {}, imported = {}) {
+  const out = { ...saved };
+  for (const [key, value] of Object.entries(imported)) if (typeof value === 'string' && value.trim()) out[key] = value;
+  for (const { urlCred, keyCred } of Object.values(ENDPOINT_BOUND)) {
+    const importedUrl = imported[urlCred];
+    if (typeof importedUrl === 'string' && importedUrl.trim() && !sameEndpoint(importedUrl, saved[urlCred])) {
+      out[keyCred] = typeof imported[keyCred] === 'string' ? imported[keyCred] : '';
+    }
+  }
+  return out;
+}
+
 export function importedSourceState(config = {}) {
   const presets = clone(config.presets || []), optionalScrapers = [], creds = {};
   // Recover disabled-source credentials too, without selecting those sources.
@@ -81,6 +109,8 @@ export function importedSourceState(config = {}) {
     }
     const credential = PRESET_CREDENTIALS[preset.type];
     if (credential && typeof preset.options?.[credential[1]] === 'string') creds[credential[0]] = preset.options[credential[1]];
+    const bound = ENDPOINT_BOUND[preset.type];
+    if (bound && preset.type !== 'nzbhydra' && typeof bound.url(preset.options) === 'string') creds[bound.urlCred] = bound.url(preset.options);
     if (preset.type === 'nzbhydra' && object(preset.options?.api)) {
       creds.nzbhydra = preset.options.api.url || '';
       creds.nzbhydraApiKey = preset.options.api.apiKey || '';
@@ -121,7 +151,8 @@ export function mergeImportedPresets(generated = [], imported, { optionalScraper
       if (!creds[definition.credKey].trim()) preset.enabled = false;
     }
     const credential = PRESET_CREDENTIALS[preset.type];
-    if (credential && credentialChanged(credential[0])) {
+    const bound = ENDPOINT_BOUND[preset.type];
+    if (credential && credentialChanged(credential[0]) && (!bound || sameEndpoint(bound.url(options), creds[bound.urlCred]))) {
       options[credential[1]] = creds[credential[0]];
       // Match the keyless generated-source policy rather than leave an enabled
       // required-key preset that the target host cannot save.
@@ -129,6 +160,8 @@ export function mergeImportedPresets(generated = [], imported, { optionalScraper
     }
     if (preset.type === 'nzbhydra' && object(options.api)) {
       for (const [key, field] of [['nzbhydra', 'url'], ['nzbhydraApiKey', 'apiKey']]) {
+        // The URL is applied first, so a key is written only next to the URL it was entered for.
+        if (field === 'apiKey' && !sameEndpoint(options.api.url, creds.nzbhydra)) continue;
         if (credentialChanged(key)) {
           options.api[field] = creds[key];
           if (!creds[key].trim()) preset.enabled = false;

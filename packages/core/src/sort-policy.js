@@ -34,10 +34,17 @@ export function resolutionTierFirst(input = {}) {
   return RESOLUTION_TIER_PROFILES.has(String(input.resolution || ''));
 }
 
-/** Move `resolution` (and the `quality` that follows it) to the front of a list. */
+/**
+ * Lead a list with the architecture's tier key (rq[0]: resolution, or quality
+ * for Apex Mixed), then `cached` where the list has it, then the other rq key.
+ * `cached` must sit directly under the tier key: with both rq keys hoisted
+ * first, an uncached 2160p REMUX outranked a cached 2160p WEB-DL, so the top
+ * pick in a 4K build could start a debrid download instead of playing.
+ */
 function hoistResolution(list, rq) {
-  const rest = list.filter(entry => entry.key !== 'resolution' && entry.key !== 'quality');
-  return [...rq, ...rest];
+  const cached = list.find(entry => entry.key === 'cached');
+  const rest = list.filter(entry => !['resolution', 'quality', 'cached'].includes(entry.key));
+  return [rq[0], ...(cached ? [cached] : []), rq[1], ...rest];
 }
 
 export function sortPolicy(input = {}) {
@@ -46,6 +53,9 @@ export function sortPolicy(input = {}) {
       if (input.service==='p2p') { return applyTierFirst({ global:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...rq,{key:'seeders',direction:d},{key:'encode',direction:d},{key:'language',direction:d},{key:'size',direction:d}] }, input, rq); }
       const isHybrid=input.service==='hybrid'||(input.service==='multi'&&input.multiServices&&input.multiServices.includes('torbox-pro')&&input.multiServices.includes('realdebrid')), svcKey=isHybrid?[{key:'service',direction:d}]:[];
       const sc = { global:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'library',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], movies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], series:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedMovies:[...rfPre,{key:'cached',direction:d},{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], anime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], cachedAnime:[...rfPre,{key:'cached',direction:d},{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rfPost,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'seeders',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedAnime:[{key:'seadex',direction:d},...svcKey,{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedMovies:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}], uncachedSeries:[{key:'streamExpressionMatched',direction:d},{key:'streamExpressionScore',direction:d},{key:'seadex',direction:d},...svcKey,{key:'library',direction:d},...rq,{key:'regexScore',direction:d},{key:'visualTag',direction:d},{key:'encode',direction:d},{key:'seeders',direction:d},{key:'audioTag',direction:d},{key:'audioChannel',direction:d},{key:'language',direction:d},{key:'bitrate',direction:d},{key:'size',direction:d},{key:'age',direction:d},{key:'subtitle',direction:d}] };
+      // Upstream only splits cached/uncached when BOTH lists exist for the request
+      // type. Without cachedSeries, uncachedSeries (seeders promoted) never applied.
+      sc.cachedSeries = sc.series.map(entry => ({ ...entry }));
       const lb = input.libraryBoost || 'default';
       if (lb === 'none') { for (const k of Object.keys(sc)) sc[k] = sc[k].filter(e => e.key !== 'library'); }
       else if (lb === 'strong') { for (const k of Object.keys(sc)) { sc[k] = sc[k].filter(e => e.key !== 'library'); sc[k].unshift({key:'library',direction:d}); } }
@@ -62,8 +72,8 @@ export function sortPolicy(input = {}) {
  * a no-op for movie and anime queries — which is exactly how a high-bitrate
  * 1080p REMUX used to reach the top of a 4K build.
  *
- * `cached` stays immediately below resolution, so cached still beats uncached
- * inside a tier; it just no longer beats a whole resolution tier.
+ * `cached` sits immediately below resolution and above quality, so cached
+ * beats uncached inside a tier; it just no longer beats a whole resolution tier.
  */
 function applyTierFirst(scopes, input, rq) {
   if (!resolutionTierFirst(input)) return scopes;

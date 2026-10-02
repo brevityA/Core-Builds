@@ -27,6 +27,14 @@ export const AGE_RATING_CERTIFICATIONS = {
  * @returns {{ enabled: boolean, expression: string } | null}
  */
 export function generateAgeRatingESE(rating) {
+  // Disabled 2026-10-02. AIOStreams' SEL has no certification() function
+  // (packages/core/src/parser/streamExpression.ts), and config validation runs
+  // every stream expression through testStreamExpression(), so emitting this
+  // made AIOStreams refuse the whole save. Kept as a null-returning stub so
+  // saved sessions carrying `ageLimit` keep loading. Restore only once upstream
+  // ships a rating filter.
+  return null;
+  // eslint-disable-next-line no-unreachable
   if (!rating || rating === 'none' || rating === 'NC-17') return null;
 
   const certs = AGE_RATING_CERTIFICATIONS[rating];

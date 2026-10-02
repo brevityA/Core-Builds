@@ -1,6 +1,7 @@
 export const OPTIONAL_SCRAPER_DEFS = [
-  { id:'knaben', label:'Knaben', desc:'Proxy search across TPB, 1337x, Nyaa.si, and more', presetType:'knaben', cat:'debrid', color:'#e11d48' },
-  { id:'zilean', label:'Zilean', desc:'DMM hashlist scraper — instant-cached results', presetType:'zilean', cat:'debrid', color:'#8b5cf6' },
+  // Knaben and Zilean are not toggles: the builder adds both whenever a torrent debrid
+  // service is configured (and neither can run without one), so a card could not change
+  // the output either way.
   { id:'jackett', label:'Jackett', desc:'Connect your Jackett instance — searches 50+ indexers', presetType:'jackett', cat:'debrid', color:'#0ea5e9', credKey:'jackett' },
   { id:'prowlarr', label:'Prowlarr', desc:'Connect your Prowlarr instance — indexer management', presetType:'prowlarr', cat:'debrid', color:'#f97316', credKey:'prowlarr' },
   { id:'nzbnoob', label:'NZBnoob', desc:'Free Newznab indexer · 1,500-day retention', presetType:'newznab', cat:'usenet', color:'#22c55e', credKey:'nzbnoob', apiUrl:'https://nzbnoob.com/api' },
@@ -13,22 +14,21 @@ export const OPTIONAL_SCRAPER_DEFS = [
   { id:'sootio', label:'Sootio', desc:'Multi-indexer debrid scraper · 10 HTTP providers', presetType:'sootio', cat:'debrid', color:'#22d3ee' },
   { id:'webstreamr', label:'WebStreamr', desc:'HTTP streaming-site scraper · no debrid needed', presetType:'webstreamr', cat:'debrid', color:'#84cc16' },
   { id:'yastream', label:'YaStream', desc:'Asian catalogs + streams (kisskh, OneTouchTV, iDrama)', presetType:'yastream', cat:'debrid', color:'#eab308' },
-  // ── 17 safe add-ons audited against v2.34.1 required-options (all simple toggles, torbox-search removed in v2.32) ──
+  // ── Simple-toggle add-ons, audited against upstream required options. Removed 2026-10-02:
+  // TorBox (addon), USA TV and Debridio Watchtower — upstream marks each removed, so any
+  // config containing one is refused on save by every host. ──
   { id:'anime-kitsu', label:'Anime Kitsu', desc:'Anime catalog using Kitsu · meta catalogs', presetType:'anime-kitsu', cat:'catalog', color:'#f43f5e' },
   { id:'argentina-tv', label:'Argentina TV', desc:'Live Argentine channels · live streams', presetType:'argentina-tv', cat:'live', color:'#38bdf8' },
-  { id:'bitmagnet', label:'Bitmagnet', desc:'Self-hosted BitTorrent indexer & DHT crawler · debrid', presetType:'bitmagnet', cat:'debrid', color:'#a3e635' },
-  { id:'brazuca-torrents', label:'Brazuca Torrents', desc:'Brazilian torrents · debrid cached', presetType:'brazuca-torrents', cat:'debrid', color:'#fb923c' },
+  { id:'bitmagnet', label:'Bitmagnet', desc:'Self-hosted BitTorrent DHT indexer · only on hosts that configure it (not ElfHosted, ATBP, Omni, Wizaardd)', presetType:'bitmagnet', cat:'debrid', color:'#a3e635' },
+  { id:'brazuca-torrents', label:'Brazuca Torrents', desc:'Dubbed movies & series (Brazilian Portuguese) · direct P2P torrents', presetType:'brazuca-torrents', cat:'p2p', color:'#fb923c' },
   { id:'content-deep-dive', label:'Content Deep Dive', desc:'Cast, reviews, production insights · stream companion', presetType:'content-deep-dive', cat:'catalog', color:'#c4b5fd' },
   { id:'debridio-tmdb', label:'Debridio TMDB', desc:'TMDB catalogs via Debridio · meta catalogs', presetType:'debridio-tmdb', credKey:'debridio', cat:'catalog', color:'#fde047' },
   { id:'debridio-tvdb', label:'Debridio TVDB', desc:'TVDB catalogs via Debridio · meta catalogs', presetType:'debridio-tvdb', credKey:'debridio', cat:'catalog', color:'#86efac' },
-  { id:'debridio-watchtower', label:'Debridio Watchtower', desc:'HTTP stream provider via Debridio · debrid/http', presetType:'debridio-watchtower', credKey:'debridio', cat:'debrid', color:'#7dd3fc' },
   { id:'doctor-who-universe', label:'Doctor Who Universe', desc:'Doctor Who catalogs + streams', presetType:'doctor-who-universe', cat:'catalog', color:'#60a5fa' },
   { id:'easynews', label:'EasyNews', desc:'Usenet search · easynews service', presetType:'easynews', cat:'usenet', color:'#fbbf24' },
   { id:'easynewsPlus', label:'EasyNews+', desc:'EasyNews + search catalog · usenet+meta', presetType:'easynewsPlus', cat:'usenet', color:'#facc15' },
   { id:'jackettio', label:'Jackettio', desc:'Jackett aggregator (hosted) · debrid results', presetType:'jackettio', cat:'debrid', color:'#34d399' },
   { id:'opensubtitles', label:'OpenSubtitles', desc:'OpenSubtitles addon · subtitles', presetType:'opensubtitles', cat:'subtitles', color:'#f87171' },
   { id:'tmdb-collections', label:'TMDB Collections', desc:'Movie collection catalogs · meta catalogs', presetType:'tmdb-collections', cat:'catalog', color:'#a78bfa' },
-  { id:'torbox', label:'TorBox', desc:'TorBox debrid search · builtin torznab', presetType:'torbox', cat:'debrid', color:'#fb7185' },
-  { id:'usa-tv', label:'USA TV', desc:'Live US channels · live streams', presetType:'usa-tv', cat:'live', color:'#4ade80' },
   { id:'usa-tv-next', label:'USA TV Next', desc:'Next-gen US live TV · live streams', presetType:'usa-tv-next', cat:'live', color:'#22d3ee' },
 ];

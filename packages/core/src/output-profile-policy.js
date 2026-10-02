@@ -17,10 +17,10 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // migration to Newznab: the two presets do not have equivalent options or
 // credential handling.
 //
-// 2.34.1 joined after the 2026-09-22 host audit: seven of the eight public
-// hosts run it (six on stable build c1d044c2, Viren's on its nightly), with
-// Omni's the only 2.33.2 holdout. Older entries stay so existing saved
-// sessions and shared links keep resolving.
+// 2.34.1 joined after the 2026-09-22 host audit and is still the schema pin.
+// By the 2026-10-02 audit every public host had moved on to 2.35.x;
+// re-pinning is tracked in #770. Older entries stay so
+// existing saved sessions and shared links keep resolving.
 export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
@@ -99,6 +99,18 @@ const STABLE_STREAM_TYPES = new Set([
   'meteor', 'comet', 'seadex',
   // Free/HTTP base paths.
   'torrentio', 'sootio', 'peerflix', 'hdhub',
+]);
+
+// Balanced is the default profile, so its source list is what most users get.
+// Restricting it to the Stable set cut a TorBox build to three torrent sources,
+// and because AIOStreams applies a template by replacing the whole preset list,
+// every update silently removed these five from configs that predated it.
+const BALANCED_STREAM_TYPES = new Set([
+  ...STABLE_STREAM_TYPES,
+  'mediafusion', 'eztv', 'torrent-galaxy', 'zilean', 'knaben',
+  // Emitted only for Anime / Movies + Anime content with a torrent debrid service;
+  // without it, choosing Anime added no anime source on the default profile.
+  'animetosho',
 ]);
 
 const CORE_EXTERNAL_KILL = Object.freeze({
@@ -191,12 +203,12 @@ function isExplicitPreset(preset, context) {
   return false;
 }
 
-function stablePresets(config, context) {
+function stablePresets(config, context, allowed = STABLE_STREAM_TYPES) {
   return values(config.presets).filter(preset => {
     if (!preset || typeof preset !== 'object') return false;
     if (!isStreamPreset(preset)) return true;
     const type = String(preset.type || '').toLowerCase();
-    return STABLE_STREAM_TYPES.has(type) || isExplicitPreset(preset, context);
+    return allowed.has(type) || isExplicitPreset(preset, context);
   });
 }
 
@@ -237,10 +249,14 @@ function stableSortCriteria(context) {
   // honour the 4K-first rule itself — otherwise a Stable 4K build would fall
   // back to cached-first and a cached 1080p would outrank an uncached 2160p.
   const base = context.service === 'p2p' ? p2p : core;
+  // 4K tier-first: resolution, then cached, then quality — the same order as
+  // sort-policy.js#hoistResolution, so an uncached 2160p never outranks a
+  // cached one on quality alone.
+  const lead = ['resolution', 'cached', 'quality'];
   const global = resolutionTierFirst(context)
     ? [
-      ...base.filter(entry => entry.key === 'resolution' || entry.key === 'quality'),
-      ...base.filter(entry => entry.key !== 'resolution' && entry.key !== 'quality'),
+      ...lead.flatMap(key => base.filter(entry => entry.key === key)),
+      ...base.filter(entry => !lead.includes(entry.key)),
     ]
     : base;
   return {
@@ -251,13 +267,20 @@ function stableSortCriteria(context) {
   };
 }
 
-function clearRemoteScoring(config) {
+// Remote scoring is the synced URL fields plus the override lists that only
+// re-score what those URLs deliver. Inline regex is not remote: every pattern
+// is a verbatim copy of a host-allowlisted string, so Balanced keeps it.
+function clearSyncedScoring(config) {
   for (const key of [...SYNCED_EXPRESSION_FIELDS, ...SYNCED_REGEX_FIELDS]) config[key] = [];
+  config.regexOverrides = [];
+  config.selOverrides = [];
+}
+
+function clearRemoteScoring(config) {
+  clearSyncedScoring(config);
   config.rankedRegexPatterns = [];
   config.preferredRegexPatterns = [];
   config.excludedRegexPatterns = [];
-  config.regexOverrides = [];
-  config.selOverrides = [];
 }
 
 function hasLocalRankedExpressions(config) {
@@ -286,6 +309,23 @@ function removeScoreDependentRules(config) {
 function enforceLocalExpressionPolicy(config) {
   for (const key of SYNCED_EXPRESSION_FIELDS) config[key] = [];
   removeScoreDependentRules(config);
+  removeDeadSortKeys(config);
+}
+
+// A sort key with nothing to read from is not neutral: it reads as a working
+// tiebreaker and hides that the real signal is missing. regexScore is filled
+// only by ranked regex (inline or synced). audioChannel has no case in the
+// upstream sorter (verified on main 2026-10-02) and falls through to 0; re-add
+// it here once upstream handles it. Static templates keep it — see CLAUDE.md.
+function removeDeadSortKeys(config) {
+  const hasRankedRegex = values(config.rankedRegexPatterns).length > 0
+    || values(config.syncedRankedRegexUrls).length > 0;
+  const dead = new Set(['audioChannel']);
+  if (!hasRankedRegex) dead.add('regexScore');
+  for (const [scope, sort] of Object.entries(config.sortCriteria || {})) {
+    if (!Array.isArray(sort)) continue;
+    config.sortCriteria[scope] = sort.filter(entry => !dead.has(entry?.key));
+  }
 }
 
 function disableEarlyExitAndBackgroundFetch(config, { disableAutoPlay = false } = {}) {
@@ -487,7 +527,7 @@ function applyStableProfile(template, context) {
 
 function applyBalancedProfile(template, context) {
   const config = template.config;
-  clearRemoteScoring(config);
+  clearSyncedScoring(config);
   applyNativeFilters(config, context);
   const safePse = namedEntries(
     config,
@@ -509,7 +549,7 @@ function applyBalancedProfile(template, context) {
   config.requiredStreamExpressions = [];
   config.preferredStreamExpressions = safePse;
   config.rankedStreamExpressions = [];
-  config.presets = stablePresets(config, context);
+  config.presets = stablePresets(config, context, BALANCED_STREAM_TYPES);
   setResultLimits(config, context, 'balanced');
   disableEarlyExitAndBackgroundFetch(config);
   config.hideErrors = false;
