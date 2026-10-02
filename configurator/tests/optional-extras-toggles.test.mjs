@@ -221,3 +221,20 @@ test('the generators keep the emission-site invariants the toggles rely on', () 
     assert.match(src, /animeContent \? null :/, `${name}: neko-bt would double-emit without the animeContent guard`);
   }
 });
+
+// Knaben and Zilean are in the base scraper list on every debrid lane. Their
+// carousel toggle must not emit a second preset: the configurator used to add
+// `knaben-1` beside the base `tam-knaben`, querying the same source twice, while
+// packages/core already skipped it. Both copies must skip it.
+test('the Knaben and Zilean toggles never add a second preset beside the base one', () => {
+  for (const [label, src] of [['configurator', appSrc], ['packages/core', coreSrc]]) {
+    assert.match(src, /if \(d\.id === 'knaben'\) return null;/, `${label}: knaben toggle must not emit`);
+    assert.match(src, /if \(d\.id === 'zilean'\) return null;/, `${label}: zilean toggle must not emit`);
+  }
+  for (const [lane, input] of Object.entries(LANES)) {
+    const presets = generateTemplate({ ...input, optionalScrapers: ['knaben', 'zilean'] }).config.presets;
+    for (const type of ['knaben', 'zilean']) {
+      assert.ok(presets.filter(p => p.type === type).length <= 1, `${lane}: at most one ${type} preset`);
+    }
+  }
+});

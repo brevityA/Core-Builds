@@ -3997,7 +3997,7 @@ function presets() {
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && !x.credKey && !x.apiUrl)).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       if (!d) return null;
-      if (d.id === 'knaben') return { type:'knaben', instanceId:'knaben-1', enabled:true, options:{ name:'Knaben', timeout:7000 }, resources:['stream'] };
+      if (d.id === 'knaben') return null;  // emitted unconditionally below as tam-knaben; a second emission duplicates the source
       if (d.id === 'zilean') return null;
       if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
       if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
@@ -5710,7 +5710,7 @@ function showRecommendedStackModal() {
         • content-visibility:auto for 31-card carousel<br>
         • unknownConfigKeys warning on import<br>
         • cb-flags: webVitals=1, sentryDsn=https://..., hostCache=0<br>
-        • PWA manifest+SW, Web Vitals beacon, Sentry optional, Ctrl+/ help, Lighthouse CI</div>
+        • Web Vitals beacon, Sentry optional, Ctrl+/ help, Lighthouse CI</div>
       </div>
       <div style="margin-top:14px;display:flex;gap:8px">
         <a href="https://github.com/brevityA/Core-Builds/blob/main/configurator/docs/best-addons.md" target="_blank" rel="noopener noreferrer" style="flex:1;padding:9px;border-radius:8px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;text-align:center;font-size:.78rem;font-weight:700;text-decoration:none">Full docs</a>
