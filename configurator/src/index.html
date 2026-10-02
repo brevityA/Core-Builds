@@ -208,9 +208,11 @@
 <script>
 // No service worker. The old one served a frozen build cache-first; remove any
 // registration left in this browser. sw.js stays deployed as a kill switch.
+// getRegistrations() is origin-wide: only touch scopes under /configurator/,
+// so other tools on this origin (WuPlay Genie) keep their own workers.
 try {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+    navigator.serviceWorker.getRegistrations().then(rs=>rs.filter(r=>new URL(r.scope).pathname.includes("/configurator/")).forEach(r=>r.unregister())).catch(()=>{});
   }
 } catch(e) {}
 </script>
