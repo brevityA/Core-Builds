@@ -150,7 +150,7 @@ function buildPresets(input) {
   const hasExtraHttp = isMulti && multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && multiServices.includes('streamnzb');
-  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(s)));
   // Optional-extras toggles: exactly one emission site per preset. All four are *also*
   // advertised disabled on lanes that cannot satisfy them, so a toggle flips that advert's
   // `enabled` instead of emitting a second instanceId, and the keyless branch below emits only
@@ -219,13 +219,15 @@ function buildPresets(input) {
   }
 
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr'};
-  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
+  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'];
   const multiHasTorbox = isMulti && (multiServices.includes('torbox-pro') || multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews || isDebridio || isUsenet ? []
+    // Seedr: no StremThru preset supports it (only MediaFusion does), and a Store/Torz
+    // instance with no usable service fails the whole save.
+    : isP2P || isEasynews || isDebridio || isUsenet || svc === 'seedr' ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
@@ -333,7 +335,15 @@ function buildPresets(input) {
 function buildServices(input) {
   const svc = input.service, isMulti = svc === 'multi', m = input.multiServices || [];
   const creds = input.credentials || {};
-  const cred = id => creds[id] ? {apiKey: creds[id]} : {};
+  // Mirrors configurator SERVICE_CREDENTIAL_FIELDS: these services do not take a lone
+  // apiKey, and every listed field is required upstream.
+  const MULTI = { offcloud:[['offcloud','apiKey'],['offcloudEmail','email'],['offcloudPass','password']], pikpak:[['pikpak','email'],['pikpakPass','password']], seedr:[['seedr','encodedToken']] };
+  const cred = id => {
+    if (!MULTI[id]) return creds[id] ? {apiKey: creds[id]} : {};
+    const out = {};
+    for (const [key, field] of MULTI[id]) if (creds[key]) out[field] = creds[key];
+    return out;
+  };
   return [
     {id:'realdebrid', enabled: svc==='realdebrid' || svc==='hybrid' || (isMulti && m.includes('realdebrid')), credentials:cred('realdebrid')},
     {id:'alldebrid', enabled: svc==='alldebrid' || (isMulti && m.includes('alldebrid')), credentials:cred('alldebrid')},

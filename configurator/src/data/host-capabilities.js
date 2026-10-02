@@ -11,10 +11,10 @@
  *    data.settings.regexAccess.level / data.settings.customHtml
  *  - the AIOStreams README / Docker Hub description for the community instance
  *
- * Checked 2026-09-22 against the live status endpoints; a probe always wins
+ * Checked 2026-10-02 against the live status endpoints; a probe always wins
  * over these defaults, which exist for the offline / CORS-blocked path.
- * ATBP and Wizaardd both report regexAccess `all` (every other host reports
- * `trusted`, ElfHosted `none`), so their defaults record `all` — the merge
+ * ATBP, Wizaardd and Viren's nightly report regexAccess `all` (every other
+ * host reports `trusted`, ElfHosted `none`), so their defaults record `all` — the merge
  * still takes the stricter of registry vs probe, so a re-restriction is
  * picked up live and can never be over-permitted by a stale default.
  */
@@ -31,6 +31,14 @@ export const REGEX_ACCESS_LEVELS = Object.freeze(['none', 'trusted', 'all']);
  */
 export const RESTRICTION_KINDS = Object.freeze(['preset', 'streamType', 'regex', 'feature']);
 
+/**
+ * Presets upstream marks `DISABLED: { removed: true }`. AIOStreams' validatePreset()
+ * throws for any config containing one, on every host, so the gate strips them
+ * everywhere (an imported or older saved config can still carry them).
+ * Source: packages/core/src/presets/{torbox,usaTv,debridioWatchtower}.ts.
+ */
+export const UPSTREAM_REMOVED_PRESET_IDS = Object.freeze(['torbox', 'usa-tv', 'debridio-watchtower']);
+
 export const HOST_CAPABILITY_OVERRIDES = Object.freeze({
   elfhosted: {
     label: 'ElfHosted (community)',
@@ -39,7 +47,9 @@ export const HOST_CAPABILITY_OVERRIDES = Object.freeze({
     // the Torrentio developer's request that hosts not scrape their instance.
     // P2P and HTTP streams are also disabled to reduce liability."
     //   -- data.settings.customHtml, https://aiostreams.elfhosted.com/api/v1/status
-    disabledPresetIds: ['torrentio', 'anime-kitsu', 'torrent-catalogs'],
+    // Bitmagnet: the host never set a Bitmagnet URL, so settings.presets marks it
+    // DISABLED ("Not configured") and a config containing it is refused.
+    disabledPresetIds: ['bitmagnet', 'torrentio', 'anime-kitsu', 'torrent-catalogs'],
     blockedStreamTypes: ['p2p', 'http'],
     regexAccess: 'none',
     // `regexAccess: 'none'` restricts regex to what the host publishes; it does
@@ -85,17 +95,19 @@ export const HOST_CAPABILITY_OVERRIDES = Object.freeze({
     rateLimited: true,
   },
   kuu: { label: "Kuu's", kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'trusted', rateLimited: true },
-  atbp: { label: 'ATBP', kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'all', rateLimited: true },
-  wizaardd: { label: 'Wizaardd', kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'all', rateLimited: true },
+  // ATBP, Wizaardd and Omni's mark Bitmagnet DISABLED ("Not configured") in settings.presets.
+  atbp: { label: 'ATBP', kind: 'community', disabledPresetIds: ['bitmagnet'], blockedStreamTypes: [], regexAccess: 'all', rateLimited: true },
+  wizaardd: { label: 'Wizaardd', kind: 'community', disabledPresetIds: ['bitmagnet'], blockedStreamTypes: [], regexAccess: 'all', rateLimited: true },
   viren: {
     label: "Viren's Nightly",
     kind: 'nightly',
-    disabledPresetIds: [],
+    // settings.presets marks Torrentio DISABLED on the nightly host (2026-10-02).
+    disabledPresetIds: ['torrentio'],
     blockedStreamTypes: [],
-    regexAccess: 'trusted',
+    regexAccess: 'all',
     rateLimited: true,
   },
-  omni: { label: "Omni's (legacy)", kind: 'community', disabledPresetIds: [], blockedStreamTypes: [], regexAccess: 'trusted', rateLimited: true },
+  omni: { label: "Omni's", kind: 'community', disabledPresetIds: ['bitmagnet'], blockedStreamTypes: [], regexAccess: 'trusted', rateLimited: true },
   torbox: {
     label: 'TorBox-hosted AIOStreams',
     kind: 'vendor',

@@ -113,7 +113,8 @@ const GATE_MATRIX = [
   { host: 'fortheweak', option: 'preset:torrentio', blocked: false },
   { host: 'fortheweak', option: 'service:p2p', blocked: false },
   { host: 'fortheweak', option: 'customRegex', blocked: false },
-  { host: 'viren', option: 'preset:torrentio', blocked: false },
+  // settings.presets marks Torrentio DISABLED on the nightly (2026-10-02).
+  { host: 'viren', option: 'preset:torrentio', blocked: true },
   { host: 'viren', option: 'service:p2p', blocked: false },
   { host: 'custom', option: 'preset:torrentio', blocked: false },
   { host: 'custom', option: 'service:p2p', blocked: false },

@@ -21,11 +21,14 @@ test('Android mobile profile is conservative', () => {
   assert.equal(profile.audio.maxChannels, '2.0');
 });
 
-test('Fire Stick HD is 1080p SDR with no DV', () => {
+test('Fire Stick HD is 1080p with HDR10/HLG and no DV', () => {
+  // The HD stick plays HDR10/HLG at 1080p (and the build's preferred visual
+  // tags already say so); it has no Dolby Vision or AV1.
   const profile = DEVICE_PROFILES['firestick-hd'];
   assert.equal(profile.video.maxResolution, '1080p');
   assert.equal(profile.video.dolbyVision, false);
-  assert.equal(profile.video.hdr.includes('SDR'), true);
+  assert.deepEqual(profile.video.hdr, ['HDR10', 'HLG']);
+  assert.ok(!profile.video.codecs.includes('AV1'));
   assert.equal(profile.playback.maxBitrate, 'capped');
 });
 

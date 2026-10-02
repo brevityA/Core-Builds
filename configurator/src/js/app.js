@@ -6,6 +6,7 @@ import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } fro
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
+import { serviceCredentialKeys, serviceCredentials } from '../data/credentials.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
 import { initContactWidget } from './contact-widget.js';
 import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
@@ -502,11 +503,11 @@ const DEFS = [
       { v:'alldebrid',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M22 6L38 34H6Z" stroke="#f97316" stroke-width="1.5" fill="#f97316" fill-opacity=".06" stroke-linejoin="round"/><path d="M22 16v10M22 30v.5" stroke="#f97316" stroke-width="2" stroke-linecap="round"/><text x="22" y="41" text-anchor="middle" fill="#f97316" font-size="4.5" font-weight="800" letter-spacing=".3">AD</text></svg>', name:'AllDebrid', desc:'AllDebrid subscribers<br><span style="color:#ea580c;font-size:.8em">e.g. Core Nexus AllDebrid · 4K AllDebrid</span>' },
       { v:'easynews',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="24" rx="4" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><path d="M12 18l10 6 10-6" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28l6-4M32 28l-6-4" stroke="#06b6d4" stroke-width="1.2" stroke-linecap="round"/><text x="22" y="9" text-anchor="middle" fill="#06b6d4" font-size="4" font-weight="700" letter-spacing=".3">EN</text></svg>', name:'EasyNews', desc:'Usenet — username &amp; password<br><span style="color:#0ea5e9;font-size:.8em">e.g. Speed EasyNews · Speed 4K+</span>' },
       { v:'premiumize',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="8" stroke="#a78bfa" stroke-width="1.5" fill="#a78bfa" fill-opacity=".06"/><path d="M16 22l4 4 8-8" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="14" r="2" fill="#a78bfa" fill-opacity=".4"/></svg>', name:'Premiumize', desc:'Premiumize subscribers<br><span style="color:#d97706;font-size:.8em">e.g. Core Nexus Premiumize</span>' },
-      { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="24" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="7" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">multi-debrid aggregator service</span>' },
+      { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="24" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="7" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">cached torrent streaming</span>' },
       { v:'debridlink',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M18 18l-4 4a5.66 5.66 0 008 8l4-4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M26 26l4-4a5.66 5.66 0 00-8-8l-4 4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="22" cy="22" r="14" stroke="#3b82f6" stroke-width="1" fill="#3b82f6" fill-opacity=".04" stroke-dasharray="3 3"/></svg>', name:'Debrid-Link', desc:'Debrid-Link subscribers<br><span style="color:#0284c7;font-size:.8em">e.g. Core Nexus Debrid-Link</span>' },
-      { v:'offcloud',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M12 28a8 8 0 0114-6.5A6 6 0 0134 24a5 5 0 01-2 9.5H14a6 6 0 01-2-5.5z" stroke="#94a3b8" stroke-width="1.5" fill="#94a3b8" fill-opacity=".06"/><path d="M18 24h8M18 28h5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>', name:'Offcloud', desc:'Cloud debrid — API key required<br><span style="color:#06b6d4;font-size:.8em">torrent + HTTP download caching</span>' },
-      { v:'pikpak',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#38bdf8" stroke-width="1.5" fill="#38bdf8" fill-opacity=".06"/><path d="M17 16l10 6-10 6z" fill="#38bdf8" fill-opacity=".6" stroke="#38bdf8" stroke-width="1.2" stroke-linejoin="round"/><text x="22" y="7" text-anchor="middle" fill="#38bdf8" font-size="4" font-weight="800" letter-spacing=".3">PIKPAK</text></svg>', name:'PikPak', desc:'PikPak cloud storage · API key<br><span style="color:#38bdf8;font-size:.8em">cloud torrent + download caching</span>' },
-      { v:'seedr',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#a3e635" stroke-width="1.5" fill="#a3e635" fill-opacity=".05"/><circle cx="22" cy="22" r="6" fill="none" stroke="#a3e635" stroke-width="1.5"/><path d="M22 16v-4M19 17l-3-3M25 17l3-3" stroke="#a3e635" stroke-width="1.3" stroke-linecap="round"/><path d="M22 28v3" stroke="#a3e635" stroke-width="1.2" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="42" text-anchor="middle" fill="#a3e635" font-size="4.5" font-weight="800" letter-spacing=".3">SEEDR</text></svg>', name:'Seedr', desc:'Seedr cloud torrent · API key<br><span style="color:#a3e635;font-size:.8em">torrent to cloud streaming</span>' },
+      { v:'offcloud',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M12 28a8 8 0 0114-6.5A6 6 0 0134 24a5 5 0 01-2 9.5H14a6 6 0 01-2-5.5z" stroke="#94a3b8" stroke-width="1.5" fill="#94a3b8" fill-opacity=".06"/><path d="M18 24h8M18 28h5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>', name:'Offcloud', desc:'Cloud debrid — API key, email &amp; password<br><span style="color:#06b6d4;font-size:.8em">torrent + HTTP download caching</span>' },
+      { v:'pikpak',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#38bdf8" stroke-width="1.5" fill="#38bdf8" fill-opacity=".06"/><path d="M17 16l10 6-10 6z" fill="#38bdf8" fill-opacity=".6" stroke="#38bdf8" stroke-width="1.2" stroke-linejoin="round"/><text x="22" y="7" text-anchor="middle" fill="#38bdf8" font-size="4" font-weight="800" letter-spacing=".3">PIKPAK</text></svg>', name:'PikPak', desc:'PikPak cloud storage · email &amp; password<br><span style="color:#38bdf8;font-size:.8em">cloud torrent + download caching</span>' },
+      { v:'seedr',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#a3e635" stroke-width="1.5" fill="#a3e635" fill-opacity=".05"/><circle cx="22" cy="22" r="6" fill="none" stroke="#a3e635" stroke-width="1.5"/><path d="M22 16v-4M19 17l-3-3M25 17l3-3" stroke="#a3e635" stroke-width="1.3" stroke-linecap="round"/><path d="M22 28v3" stroke="#a3e635" stroke-width="1.2" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="42" text-anchor="middle" fill="#a3e635" font-size="4.5" font-weight="800" letter-spacing=".3">SEEDR</text></svg>', name:'Seedr', desc:'Seedr cloud torrent · token from MediaFusion<br><span style="color:#a3e635;font-size:.8em">results via MediaFusion only</span>' },
       { v:'debridio',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#14b8a6" stroke-width="1.5" fill="#14b8a6" fill-opacity=".06"/><circle cx="19" cy="19" r="5.5" fill="none" stroke="#14b8a6" stroke-width="1.5"/><line x1="23" y1="23" x2="29" y2="29" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"/><text x="22" y="42" text-anchor="middle" fill="#14b8a6" font-size="4" font-weight="800" letter-spacing=".3">DEBRIDIO</text></svg>', name:'Debridio', desc:'Debridio scraper · API key required<br><span style="color:#14b8a6;font-size:.8em">search + caching via Debridio</span>' },
       { v:'debrider',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><text x="22" y="22" text-anchor="middle" fill="#06b6d4" font-size="7" font-weight="900" font-family="system-ui,sans-serif">DBR</text><path d="M13 30h18" stroke="#06b6d4" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="34" text-anchor="middle" fill="#06b6d4" font-size="4.5" font-weight="700" letter-spacing=".3">DEBRIDER</text></svg>', name:'Debrider', desc:'Multi-debrid aggregator · API key<br><span style="color:#06b6d4;font-size:.8em">one API for multiple debrid services</span>' },
       { v:'usenet',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="26" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">U</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="38" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">USENET</text></svg>', name:'Usenet Only', desc:'Pure usenet — no debrid, no torrents<br><span style="color:#10b981;font-size:.8em">NNTP + indexers · EasyNews optional</span>' },
@@ -520,7 +521,7 @@ const DEFS = [
     featured:['generic','onn','shield','firestick-4kmax','googletv','samsung'],
     opts:[
       { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg1"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#a78bfa" flood-opacity=".4"/></filter></defs><rect x="4" y="12" width="36" height="22" rx="2.5" stroke="#a78bfa" stroke-width="1.5" filter="url(#dg1)"/><rect x="7" y="14.5" width="30" height="17" rx="1" fill="#00d4ff" opacity=".06"/><line x1="17" y1="34" x2="14" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="34" x2="30" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="40" x2="32" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="7" r="2" stroke="#a78bfa" stroke-width="1.5" fill="none" filter="url(#dg1)"/><line x1="22" y1="9" x2="22" y2="12" stroke="#a78bfa" stroke-width="1.5"/></svg>', name:'Standard / Not Sure', desc:'Conservative video · DD+/AAC audio · broad compatibility', help:'Safe default when the exact playback hardware is unknown. Prioritises HEVC/AVC and streaming-grade DD+/AAC audio instead of assuming AV1 or lossless passthrough support.' },
-      { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg2"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#3b82f6" flood-opacity=".4"/></filter></defs><rect x="3" y="10" width="38" height="22" rx="2" stroke="#3b82f6" stroke-width="1.5" filter="url(#dg2)"/><rect x="6" y="12.5" width="32" height="17" rx="1" fill="#00d4ff" opacity=".06"/><rect x="19" y="32" width="6" height="3" rx="1" fill="#3b82f6" opacity=".5"/><path d="M13 39 Q22 36 31 39" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M28 19 Q26 17.5 24 19 Q22 20.5 20 19 Q18 17.5 16 19" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+', help:'<b>DV-Only Kill</b>: Samsung TVs have no Dolby Vision support — DV streams without an HDR10 fallback show a purple/green tint, so they are removed. <b>AV1 / VC-1 excluded</b>: 2018–2022 Samsung models lack these video decoders. <b>HDR10+</b> is Samsung&#39;s own HDR format and is prioritised.' },
+      { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg2"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#3b82f6" flood-opacity=".4"/></filter></defs><rect x="3" y="10" width="38" height="22" rx="2" stroke="#3b82f6" stroke-width="1.5" filter="url(#dg2)"/><rect x="6" y="12.5" width="32" height="17" rx="1" fill="#00d4ff" opacity=".06"/><rect x="19" y="32" width="6" height="3" rx="1" fill="#3b82f6" opacity=".5"/><path d="M13 39 Q22 36 31 39" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M28 19 Q26 17.5 24 19 Q22 20.5 20 19 Q18 17.5 16 19" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+', help:'<b>DV-Only Kill</b>: Samsung TVs have no Dolby Vision support — DV streams without an HDR10 fallback show a purple/green tint, so they are removed. <b>AV1 / VC-1 excluded</b>: Samsung models before 2020 have no AV1 decoder and VC-1 support varies, so both are excluded for safety. <b>HDR10+</b> is Samsung&#39;s own HDR format and is prioritised.' },
       { v:'appletv-old',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg3"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#9ca3af" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#9ca3af" stroke-width="1.5" filter="url(#dg3)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#9ca3af" filter="url(#dg3)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#9ca3af" stroke-width="1.5" fill="none"/><circle cx="22" cy="35" r="1" fill="#f59e0b"/></svg>', name:'Apple TV 4K Gen 1–2', desc:'DV · no AV1 · DD+/Atmos · multichannel PCM', help:'Dolby Vision is supported. Apple TV does not bitstream TrueHD or DTS-HD; compatible apps may decode them to multichannel PCM, but lossless Atmos metadata is not preserved. AV1 is excluded for reliable high-bitrate playback.' },
       { v:'appletv-new',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg4"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#60a5fa" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#60a5fa" stroke-width="1.5" filter="url(#dg4)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#60a5fa" filter="url(#dg4)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#60a5fa" stroke-width="1.5" fill="none" filter="url(#dg4)"/></svg>', name:'Apple TV 4K Gen 3',   desc:'DV · HDR10+ · no hardware AV1 · DD+/Atmos', help:'Apple TV 4K Gen 3 adds HDR10+ but the A15 does not include an AV1 hardware decoder. TrueHD/DTS-HD are not bitstreamed; compatible apps may decode to multichannel PCM.' },
       { v:'lgtv',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg5"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ef4444" flood-opacity=".4"/></filter></defs><rect x="3" y="8" width="38" height="24" rx="2" stroke="#ef4444" stroke-width="1.5" filter="url(#dg5)"/><rect x="6" y="10.5" width="32" height="19" rx="1" fill="#00d4ff" opacity=".06"/><rect x="18" y="32" width="8" height="3" rx="1" fill="#ef4444" opacity=".4"/><line x1="13" y1="39" x2="31" y2="39" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><path d="M19 20 L19 23 L24 23" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>', name:'LG TV webOS',          desc:'DV · AV1 varies · DD+/Atmos · no internal-app TrueHD', help:'LG webOS supports Dolby Vision. AV1 depends on model year. Internal TV apps generally do not pass TrueHD/DTS-HD over eARC, so the profile uses streaming-grade audio; external HDMI devices are a separate path.' },
@@ -558,7 +559,7 @@ const DEFS = [
       { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><circle cx="15" cy="16" r="4.5" fill="#ef4444" opacity="0.85"/><circle cx="29" cy="16" r="4.5" fill="#3b82f6" opacity="0.85"/><circle cx="15" cy="28" r="4.5" fill="#f9a8d4" opacity="0.85"/><circle cx="29" cy="28" r="4.5" fill="#94a3b8" opacity="0.6"/></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
       { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Movies & TV',      desc:'Films &amp; series · no anime scrapers' },
       { v:'mixed', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="15" width="18" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/><rect x="3" y="8" width="18" height="9" rx="2" fill="#ef4444"/><line x1="9" y1="8" x2="6" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="8" x2="12" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="8" x2="18" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="4" fill="#f9a8d4"/><circle cx="39" cy="19" r="4" fill="#f9a8d4"/><circle cx="37" cy="27" r="4" fill="#f9a8d4"/><circle cx="27" cy="27" r="4" fill="#f9a8d4"/><circle cx="25" cy="19" r="4" fill="#f9a8d4"/><circle cx="33" cy="22" r="5" fill="#fce7f3"/></svg>', name:'Movies + Anime',   desc:'Movies &amp; TV + SeaDex anime releases' },
-      { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
+      { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex picks ranked first · keeps dual-audio and original-language releases' },
     ]
   },
   { id:'apis', title:'Accounts & Keys', desc:'Optional — add credentials for selected providers. <strong style="color:#3fb950">Export JSON</strong> keeps the generated file local; <strong style="color:#fbbf24">Direct Install</strong> sends it to the AIOStreams host you choose.', key:null, cols:'c1', opts:[] },
@@ -975,7 +976,7 @@ function renderOpts(def) {
       'http':       'Streaming sites · no debrid required',
       'debridio':   'Debridio scraper',
       'debrider':   'Multi-debrid aggregator — one API for all',
-      'easydebrid': 'Multi-debrid aggregator',
+      'easydebrid': 'Cached torrent streaming',
       'pikpak':     'Cloud torrent + download caching',
       'seedr':      'Cloud torrent streaming',
       'nzbgeek':    'Usenet indexer',
@@ -983,8 +984,8 @@ function renderOpts(def) {
     };
     const SVC_AUTH = {
       'torbox-pro':'API key','torbox-ess':'API key','alldebrid':'API key','realdebrid':'API key',
-      'premiumize':'API key','debridlink':'API key','offcloud':'API key','debridio':'API key',
-      'debrider':'API key','easydebrid':'API key','pikpak':'API key','seedr':'API key',
+      'premiumize':'API key','debridlink':'API key','offcloud':'Key + email + pass','debridio':'API key',
+      'debrider':'API key','easydebrid':'API key','pikpak':'Email + pass','seedr':'MediaFusion token',
       'easynews':'User + pass','nzbgeek':'API key','streamnzb':'Manifest URL',
       'p2p':'Free','http':'Free',
     };
@@ -1386,6 +1387,28 @@ function outputProfileContext() {
   };
 }
 
+// Dynamic-fetch exit targets, mirroring the dynamicAddonFetching builder in
+// buildConfig(): [cached results at the target resolution, time limit in ms].
+// Ultrawide uses a fixed 1080p/2160p mix, so only its time limit varies.
+function streamPoolTargets(pool) {
+  const p = pool || 'normal', ms = p === 'max' ? 10000 : p === 'large' ? 8000 : 6000;
+  if (S.resolution === '4k') return [p === 'max' ? 25 : p === 'large' ? 15 : 8, ms];
+  if (S.resolution === 'ultrawide') return [null, ms];
+  if (S.resolution === 'mixed' || S.pseArch === 'apex-mixed') return [p === 'max' ? 35 : p === 'large' ? 22 : 12, ms];
+  return [p === 'max' ? 45 : p === 'large' ? 30 : 20, ms];
+}
+function streamPoolChoices() {
+  return [['normal','Normal'],['large','Large'],['max','Maximum']].map(([v, l]) => {
+    const [n, ms] = streamPoolTargets(v);
+    return [v, l, n == null ? `${ms / 1000}s limit` : `${n} results`];
+  });
+}
+function streamPoolSummary() {
+  if (['stable', 'balanced'].includes(activeOutputProfile())) return 'Not used on this profile';
+  const [n, ms] = streamPoolTargets(S.streamPool);
+  return n == null ? `stops after ${ms / 1000}s` : `stops at ${n} cached or ${ms / 1000}s`;
+}
+
 function activeOutputProfile() {
   return resolveOutputProfile(outputProfileContext());
 }
@@ -1414,9 +1437,9 @@ function renderOutputProfilePicker({ compact=false } = {}) {
   const TARGET_NOTES = {
     '2.31.1': 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.',
     '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
-    '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. Matches Omni\u2019s host — the last 2.33.2 holdout; every other public host runs 2.34.1.',
-    '2.34.0': 'v2.34.0 lane: the previous pinned release. No host in the registry still runs it — kept so saved sessions keep resolving.',
-    '2.34.1': 'v2.34.1 lane: the release this configurator is pinned against (schema pin c1d044c). Default — matches the live fleet except Omni.',
+    '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. No public host runs it any more — kept so saved sessions keep resolving.',
+    '2.34.0': 'v2.34.0 lane: an earlier pinned release. No public host runs it any more — kept so saved sessions keep resolving.',
+    '2.34.1': 'v2.34.1 lane (default): the release this configurator\u2019s schema is pinned to (c1d044c). Every public host now runs a newer 2.35.x build.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
@@ -1428,6 +1451,7 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     <div style="display:flex;align-items:center;gap:7px"><span style="font-size:.76rem;font-weight:800;color:#9ca3af;letter-spacing:.04em;text-transform:uppercase">Output profile</span><span style="font-size:.62rem;font-weight:700;color:${palette[active][0]};padding:2px 6px;border-radius:4px;background:${palette[active][1]};border:1px solid ${palette[active][2]}">${OUTPUT_PROFILE_INFO[active].shortLabel}</span></div>
     <div style="display:grid;grid-template-columns:repeat(${compact ? 2 : 2},minmax(0,1fr));gap:6px">${cards}</div>
     ${active === 'stable' ? `<div style="font-size:.66rem;line-height:1.45;color:#8b949e">No remote scoring or synced rules. Groups, dynamic fetch exit, background prefetch, and autoplay are disabled so import and stream problems are easier to reproduce. Stream-pool and quality-first tuning are not exported in this profile.</div>` : ''}
+    ${active === 'balanced' ? `<div style="font-size:.66rem;line-height:1.45;color:#8b949e">Waits for every source before returning: groups, dynamic fetch exit (Stream Pool), stream preloading, next-episode precache and cache-and-play are turned off. Pick Advanced to use them.</div>` : ''}
     ${active === 'labs' ? `<div style="font-size:.66rem;line-height:1.45;color:#fbbf24">Labs uses experimental behaviour. Review every warning before installing.</div>` : ''}
     ${targetControl}
     ${reset}
@@ -1496,7 +1520,7 @@ function optionalScraperLaneBlock(id) {
   // New debrid-only toggles (require a debrid service) — block on P2P/HTTP.
   // Existing exceptions that work without debrid: webstreamr, yastream, knaben, zilean, neko-bt (p2p only).
   // torbox-search removed in v2.32 — never emitted, so not listed (avoids literal that would break v232-compat test if copied).
-  const debridOnly = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
+  const debridOnly = ['bitmagnet','jackettio'];
   if (debridOnly.includes(id) && (svc === 'p2p' || svc === 'http')) {
     return `this scraper needs a debrid service — not available on the ${svc.toUpperCase()} route`;
   }
@@ -1551,7 +1575,7 @@ function renderAdvancedPanel() {
       ${renderOutputProfilePicker()}
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Limited</strong> excludes lossless formats (TrueHD, DTS-HD MA) that need high bandwidth. <strong>Full</strong> includes everything for home theater setups with proper receivers.')}</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
         <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
       </div>
 
@@ -1565,22 +1589,14 @@ function renderAdvancedPanel() {
         ${prefCard('resolutionFirst','Resolution First','Higher resolution always ranks above lower, even if lower-res is cached.')}
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
-        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Age Rating Limit</span> ${ftTip('Filter content by age certification (MPAA/TV). <strong>None</strong> shows everything. Lower ratings restrict to age-appropriate content. Requires <strong>certification()</strong> SEL support in AIOStreams.')}
-          </div>
-          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Restrict streams by age rating — useful for shared/family setups</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap">
-            ${AGE_RATINGS.map(r => { const on = S.ageLimit === r.v; return `<button data-action="set-age-limit" data-val="${r.v}" style="padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'}">${r.label.split(' — ')[0]}</button>`; }).join('')}
-          </div>
-        </div>
+        <!-- Age Rating Limit removed 2026-10-02: AIOStreams SEL has no certification() function, so the filter either failed the save (Advanced/Labs) or was silently dropped (Stable/Balanced). -->
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('How many streams AIOStreams collects before sorting and filtering. <strong>More streams = better quality picks</strong> but slower load times. Normal is good for most users. Increase if you want the absolute best quality match.')}
-            <span style="font-size:.65rem;color:#4b5563">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
+            <span style="font-size:.65rem;color:#4b5563">${streamPoolSummary()}</span>
           </div>
           <div style="display:flex;gap:5px">
-            ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
+            ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
         </div>
@@ -2504,7 +2520,7 @@ function render() {
             <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${Math.min({1:1,2:2,3:3}[step]||step, 3)} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak','seedr'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${Math.min({1:1,2:2,3:3}[step]||step, 3)} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -3362,16 +3378,6 @@ document.addEventListener('DOMContentLoaded', () => {
       S.maxFailoverNzbs = Number((e.target.closest('[data-action="set-max-failover-nzbs"]') || e.target).dataset.val);
       saveState(); render();
     }
-    if (action === 'set-age-limit') {
-      S.ageLimit = (e.target.closest('[data-action="set-age-limit"]') || e.target).dataset.val;
-      saveState();
-      document.querySelectorAll('[data-action="set-age-limit"]').forEach(btn => {
-        const on = btn.dataset.val === S.ageLimit;
-        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
-        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
-        btn.style.color       = on ? '#00d4ff' : '#6b7280';
-      });
-    }
     if (action === 'set-pse-arch') {
       S.pseArch = (e.target.closest('[data-action="set-pse-arch"]') || e.target).dataset.val;
       saveState();
@@ -3817,14 +3823,14 @@ function getDebridInputs() {
   if (m.includes('alldebrid'))  ids.push('alldebrid');
   if (m.includes('premiumize')) ids.push('premiumize');
   if (m.includes('debridlink')) ids.push('debridlink');
-  if (m.includes('offcloud'))   ids.push('offcloud');
+  if (m.includes('offcloud'))   ids.push(...serviceCredentialKeys('offcloud'));
   if (m.includes('easynews') || m.includes('usenet'))   { ids.push('easynews'); ids.push('easynewsPass'); }
   if (m.includes('nzbgeek') || m.includes('usenet')) ids.push('nzbgeek');
   if (m.includes('debridio'))   ids.push('debridio');
   if (m.includes('debrider'))   ids.push('debrider');
   if (m.includes('easydebrid')) ids.push('easydebrid');
-  if (m.includes('pikpak'))     ids.push('pikpak');
-  if (m.includes('seedr'))      ids.push('seedr');
+  if (m.includes('pikpak'))     ids.push(...serviceCredentialKeys('pikpak'));
+  if (m.includes('seedr'))      ids.push(...serviceCredentialKeys('seedr'));
   if (m.includes('nzbgeek'))    ids.push('nzbgeek');
   if (m.includes('streamnzb'))  ids.push('streamnzb');
   S.optionalScrapers.forEach(sid => {
@@ -3896,7 +3902,7 @@ function presets() {
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && S.multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && S.multiServices.includes('streamnzb');
-  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(s)));
   // Optional-extras toggles: exactly one emission site per preset. All four are *also*
   // advertised disabled on lanes that cannot satisfy them, so a toggle flips that advert's
   // `enabled` instead of emitting a second instanceId, and the keyless branch below emits only
@@ -3954,13 +3960,15 @@ function presets() {
     ...catalogPresets()
   ];
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr'};
-  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
+  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'];
   const multiHasTorbox = isMulti && (S.multiServices.includes('torbox-pro') || S.multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews || isDebridio || isUsenet ? []
+    // Seedr: no StremThru preset supports it (only MediaFusion does), and a Store/Torz
+    // instance with no usable service fails the whole save.
+    : isP2P || isEasynews || isDebridio || isUsenet || svc === 'seedr' ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
@@ -4009,7 +4017,7 @@ function presets() {
       // Lane gates for new safe add-ons: usenet indexers need usenet service, debrid-only need debrid.
       // torbox-search removed in v2.32 — never emitted.
       const usenetCatIds = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
-      const debridOnlyIds = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
+      const debridOnlyIds = ['bitmagnet','jackettio'];
       if ((isP2P || isHttp) && usenetCatIds.includes(d.id)) return null;
       if ((isP2P || isHttp) && debridOnlyIds.includes(d.id)) return null;
       const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
@@ -4090,7 +4098,9 @@ function presets() {
   return list;
 }
 
-function cred(id) { return S.creds[id] ? {apiKey: S.creds[id]} : {}; }
+// Most services take one apiKey; Offcloud, PikPak and Seedr need other/extra fields
+// (SERVICE_CREDENTIAL_FIELDS), and a missing required one fails the whole save.
+function cred(id) { return serviceCredentials(id, S.creds); }
 function services() {
   const svc = S.service, isMulti = svc === 'multi', m = S.multiServices;
   return [
@@ -5077,10 +5087,10 @@ function parseTemplateToState(tpl) {
     if (s.id === 'alldebrid' && k.apiKey) creds.alldebrid = k.apiKey;
     if (s.id === 'premiumize' && k.apiKey) creds.premiumize = k.apiKey;
     if (s.id === 'debridlink' && k.apiKey) creds.debridlink = k.apiKey;
-    if (s.id === 'offcloud' && k.apiKey) creds.offcloud = k.apiKey;
+    if (s.id === 'offcloud') { if (k.apiKey) creds.offcloud = k.apiKey; if (k.email) creds.offcloudEmail = k.email; if (k.password) creds.offcloudPass = k.password; }
     if (s.id === 'easydebrid' && k.apiKey) creds.easydebrid = k.apiKey;
-    if (s.id === 'pikpak' && k.apiKey) creds.pikpak = k.apiKey;
-    if (s.id === 'seedr' && k.apiKey) creds.seedr = k.apiKey;
+    if (s.id === 'pikpak') { if (k.email) creds.pikpak = k.email; if (k.password) creds.pikpakPass = k.password; }
+    if (s.id === 'seedr' && k.encodedToken) creds.seedr = k.encodedToken;
     if (s.id === 'easynews') { if (k.username) creds.easynews = k.username; if (k.password) creds.easynewsPass = k.password; }
   });
   st.creds = creds;
@@ -5682,38 +5692,26 @@ function showRecommendedStackModal() {
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Recommended add-on stack" style="max-width:560px;max-height:85vh;overflow-y:auto">
       <button class="modal-close" id="rsClose" aria-label="Close">×</button>
       <div class="modal-title" style="font-size:1.05rem">⭐ Recommended Stack</div>
-      <div class="modal-sub" style="margin-bottom:12px">Best add-ons per r/StremioAddons 2025-2026 + Viren070 guides</div>
+      <div class="modal-sub" style="margin-bottom:12px">What Core Builds sets up for you, and what it leaves out</div>
       <div style="font-size:.78rem;line-height:1.6;color:#8b949e">
         <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px">
-          <strong style="color:#00d4ff">Forks picker skipped:</strong> Viren070/AIOStreams is canonical. Known hosts (elfhosted, fortheweak, etc.) run same code v2.34.1 pinned c1d044c — policy differs, not code. Pick host in Advanced → Hosts, Auto = fastest healthy.
+          <strong style="color:#00d4ff">Hosts:</strong> every public host runs the same upstream AIOStreams (2.35.x when last checked, Oct 2026). They differ in policy, not code: ElfHosted disables Torrentio, P2P and HTTP streams; Viren's nightly disables Torrentio. Pick yours in Advanced → Hosts.
         </div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick ONE primary</strong><br>
-        • <b>TorBox</b> — fastest API, usenet+p2p, 1TB cache<br>
-        • <b>Real-Debrid</b> — largest cached catalog, cheapest<br>
-        • <b>AllDebrid</b> — balanced, 15+ hosters<br>
-        • <b>Premiumize</b> — private trackers via Jackettio</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Torrent scrapers (Core Builds wires 17 safe)</strong><br>
-        • <code>comet</code> — Comet + CometNet P2P metadata (no files shared)<br>
-        • <code>mediafusion</code> — universal torrent+live<br>
-        • <code>torz</code> — StremThru Torz usenet aggregator (needs TorBox/usenet creds)<br>
-        • <code>zilean</code> — DMM via Zilean<br>
-        • <code>knaben</code> — Knaben usenet (no account)<br>
-        • <code>debridio</code> — Debridio (needs key, shipped disabled)<br>
-        • <code>easynews++</code> — EasyNews++ usenet (catalog+meta, needs creds)<br>
-        • <code>jackettio</code> — Jackettio bridge to Jackett/Prowlarr (8-12 indexers)<br>
-        • HTTP fallbacks <code>hdhub</code>/<code>webstreamrmbg</code>/<code>flix-streams</code> — unreliable, fallback only, gated behind OPTIONAL_EXTRAS</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Best practice</strong><br>
-        Primary: Torrentio + Comet + MediaFusion + StremThru Torz + Debridio. HTTP only if no-debrid. EasyNews++ for reality TV. Groups fetch sequentially to avoid rate limits. Regex: Vidhin + Tamtaro SEL.</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Self-hosted</strong><br>
-        PG tuned shared_buffers 128MB, effective_cache_size 384MB, &lt;3s cache. CometNet on. Zilean + DMM ingester. FlareSolverr for CF Jackett. Jackett 8-12 indexers.</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Configurator webtools (this patch)</strong><br>
-        • svc-filter 200ms debounce + requestIdleCallback<br>
-        • host status 5-min cache + background refresh<br>
-        • live byte counter in Review (payloadSizeGuard)<br>
-        • content-visibility:auto for 31-card carousel<br>
-        • unknownConfigKeys warning on import<br>
-        • cb-flags: webVitals=1, sentryDsn=https://..., hostCache=0<br>
-        • Web Vitals beacon, Sentry optional, Ctrl+/ help, Lighthouse CI</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick one primary</strong><br>
+        TorBox, Real-Debrid, AllDebrid, Premiumize, Debrid-Link, EasyDebrid, Debrider, Offcloud and PikPak are all supported (Meteor has no PikPak support). Seedr works through MediaFusion only. No subscription? Choose P2P Free or HTTP Streams.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Added automatically with a torrent debrid service</strong><br>
+        • <code>StremThru Torz</code> (TorBox) or <code>StremThru Store</code> (other debrids)<br>
+        • <code>Comet</code>, <code>Meteor</code>, <code>MediaFusion</code> — torrent scrapers with debrid cache checks<br>
+        • <code>Zilean</code> — DMM hashlists<br>
+        • <code>Knaben</code> — indexer proxy for TPB, 1337x, YTS and Nyaa<br>
+        • <code>EZTV</code>, <code>Torrent Galaxy</code> — TV and general torrent indexes<br>
+        • <code>SeaDex</code> — best anime releases, ranked first for anime</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Optional</strong><br>
+        Jackettio, Debridio (needs a key), EasyNews (usenet), Newznab indexers, and HTTP sources such as WebStreamr, Nuvio and Flix-Streams for setups without debrid.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Left out on purpose</strong><br>
+        Torrentio — blocked on ElfHosted and Viren's nightly at its developer's request. TorBox (addon), USA TV and Debridio Watchtower — retired upstream; AIOStreams refuses any config that contains them.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Release filtering</strong><br>
+        Ranked and excluded release patterns come from Vidhin05's Releases-Regex list, scored inline so every public host accepts them.</div>
       </div>
       <div style="margin-top:14px;display:flex;gap:8px">
         <a href="https://github.com/brevityA/Core-Builds/blob/main/configurator/docs/best-addons.md" target="_blank" rel="noopener noreferrer" style="flex:1;padding:9px;border-radius:8px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;text-align:center;font-size:.78rem;font-weight:700;text-decoration:none">Full docs</a>
@@ -6438,10 +6436,10 @@ function simpleFinishHtml() {
           <div>
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
               <span style="font-size:.72rem;font-weight:700;color:#8b949e">Stream pool</span>
-              <span style="font-size:.6rem;color:#4b5563;font-weight:600">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
+              <span style="font-size:.6rem;color:#4b5563;font-weight:600">${streamPoolSummary()}</span>
             </div>
             <div style="display:flex;gap:6px">
-              ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
+              ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
           </div>
@@ -6940,7 +6938,7 @@ const TROUBLESHOOT_TREE = {
   fewStreams: {
     q: 'Fewer streams usually means filters are too aggressive:',
     tips: [
-      '🚫 <b>Excluded regex too strict</b> — The 8 default excluded regex patterns filter known-bad groups. If you added custom exclusions, try removing them.',
+      '🚫 <b>Excluded regex too strict</b> — The default excluded regex patterns (3 on Balanced) filter known-bad releases. If you added custom exclusions, try removing them.',
       '📏 <b>Size limit too low</b> — A 10GB limit will exclude most 4K content. Try 30GB or unlimited.',
       '🎯 <b>Match mode too strict</b> — "Strict" mode filters aggressively. Try "Balanced" or "Relaxed".',
       '🔍 <b>ESE killing valid streams</b> — Score IQR Guard or resolution kill ESEs may be excluding streams. Check the ESE section in your template.',
@@ -7001,7 +6999,7 @@ const TROUBLESHOOT_TREE = {
     q: 'Low quality streams appearing above better ones:',
     tips: [
       '⚖️ <b>PSE architecture</b> — Standard mode uses simple quality tiers. Switch to "Apex IQR" for statistical bitrate filtering that pushes low-quality outliers down.',
-      '📊 <b>Regex scoring inactive</b> — If rankedRegexPatterns is empty, the regexScore sort key is a no-op. Re-generate to get the 107-entry scored set.',
+      '📊 <b>Regex scoring inactive</b> — If rankedRegexPatterns is empty, the regexScore sort key is a no-op. Re-generate to get the scored set (about 80 patterns on Balanced, Advanced and Labs).',
       '🎯 <b>Sort order matters</b> — seScore should be early in sort criteria (position 3-4). If it\'s too low, quality signals are ignored.',
     ],
     action: { label: 'Enable Apex IQR mode', key: 'pseArch', val: 'iqr', desc: 'Statistical bitrate filtering for better quality ranking' }
@@ -7348,7 +7346,7 @@ function showExpressLane() {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
     if (service === 'easynews') return credInput('easynews') + credInput('easynewsPass');
     if (service === 'usenet') return credInput('easynews') + credInput('easynewsPass') + credInput('nzbgeek');
-    return credInput(service === 'torbox-pro' ? 'torbox' : service);
+    return serviceCredentialKeys(service === 'torbox-pro' ? 'torbox' : service).map(credInput).join('');
   };
   // Extra services that need a credential when added via the popout.
   const EXTRA_CRED = { debridio:'debridio', debrider:'debrider', nzbgeek:'nzbgeek', streamnzb:'streamnzb' };

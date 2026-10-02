@@ -16,10 +16,10 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // migration to Newznab: the two presets do not have equivalent options or
 // credential handling.
 //
-// 2.34.1 joined after the 2026-09-22 host audit: seven of the eight public
-// hosts run it (six on stable build c1d044c2, Viren's on its nightly), with
-// Omni's the only 2.33.2 holdout. Older entries stay so existing saved
-// sessions and shared links keep resolving.
+// 2.34.1 joined after the 2026-09-22 host audit and is still the schema pin.
+// By the 2026-10-02 audit every public host had moved on to 2.35.x;
+// re-pinning is tracked in #770. Older entries stay so
+// existing saved sessions and shared links keep resolving.
 export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is

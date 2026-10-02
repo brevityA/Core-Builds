@@ -130,19 +130,19 @@ test.describe('truthful host picker', () => {
     const elf = page.locator('#expressHost option[value="elfhosted"]');
     await expect(elf).toHaveAttribute('value', 'elfhosted');
     expect(await elf.textContent()).toContain('Debrid only — no P2P/HTTP');
-    expect(await elf.textContent()).toContain('v2.34.1');
+    expect(await elf.textContent()).toContain('v2.35.7');
     const midnight = page.locator('#expressHost option[value="midnight"]');
     expect(await midnight.textContent()).toContain('Debrid + P2P + HTTP');
-    expect(await midnight.textContent()).toContain('v2.34.1');
+    expect(await midnight.textContent()).toContain('v2.35.7');
     const ftw = page.locator('#expressHost option[value="fortheweak"]');
-    expect(await ftw.textContent()).toContain('v2.34.1');
+    expect(await ftw.textContent()).toContain('v2.35.7');
+    // Keep hosts on different versions in this row (registry, 2026-10-02).
+    // Without them every asserted option reads one value and the test stops
+    // proving the label renders the registry's version rather than a constant.
     const wiz = page.locator('#expressHost option[value="wizaardd"]');
-    expect(await wiz.textContent()).toContain('v2.34.1');
-    // Keep a host that is genuinely still on 2.33.2 in this row. Without one,
-    // every asserted option reads v2.34.1 and the test stops proving the label
-    // renders the registry's version rather than a constant.
+    expect(await wiz.textContent()).toContain('v2.35.4');
     const omni = page.locator('#expressHost option[value="omni"]');
-    expect(await omni.textContent()).toContain('v2.33.2');
+    expect(await omni.textContent()).toContain('v2.35.5');
   });
 
   test('the chip flags a pick the capability matrix blocks (P2P on ElfHosted)', async ({ page }) => {
