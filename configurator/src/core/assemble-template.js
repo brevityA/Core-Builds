@@ -1,6 +1,13 @@
 import { sanitizeAioEnumArrays } from '../config/schema-guard.js';
+import { AIO_CONFIG_KEYS } from '../config/generated/aiostreams-config-schema.js';
 
+const NON_MIGRATABLE_FIELDS = new Set([
+  'uuid', 'encryptedPassword', 'accessKey', 'ip', 'trusted', 'showChanges',
+  'appliedTemplates', 'linkedAccounts', 'healthResults',
+  'addonName', 'addonLogo', 'addonBackground', 'addonDescription',
+]);
 const ALLOWED_MIGRATION_FIELDS = new Set([
+  ...AIO_CONFIG_KEYS.filter(key => !NON_MIGRATABLE_FIELDS.has(key)),
   'services','presets','groups','sortCriteria','deduplicator','formatter',
   'parentConfig','resultLimits','excludedResolutions','includedResolutions',
   'requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes',
@@ -39,6 +46,12 @@ export function assembleTemplate(rawTemplate, options = {}) {
       if (key === 'parentConfig') template.parentConfig = clone(value);
       else config[key] = clone(value);
     }
+  }
+
+  for (const key of options.migrationRemove || []) {
+    if (!ALLOWED_MIGRATION_FIELDS.has(key)) continue;
+    if (key === 'parentConfig') delete template.parentConfig;
+    else delete config[key];
   }
 
   if (options.disabledAddons?.size && Array.isArray(config.presets)) {

@@ -230,3 +230,36 @@ test('every profile strips synced expression URLs and unusable remote-score rule
 test('published profile names remain stable', () => {
   assert.deepEqual(OUTPUT_PROFILES, ['stable','balanced','advanced','labs']);
 });
+
+test('a kept sort list and preferences survive Stable reducers unchanged', () => {
+  const template = richTemplate();
+  template.config.sortCriteria = { global: [{ key: 'size', direction: 'asc' }], cachedMovies: [{ key: 'resolution', direction: 'asc' }] };
+  template.config.preferredResolutions = ['1080p', '2160p', '720p'];
+  const result = applyOutputProfile(template, 'stable', {
+    resolution: '4k', preserveFields: ['sortCriteria', 'preferredResolutions'],
+  });
+  assert.deepEqual(result.config.sortCriteria, template.config.sortCriteria);
+  assert.deepEqual(result.config.preferredResolutions, template.config.preferredResolutions);
+});
+
+test('kept values cannot restore forbidden synced SEL or legacy presets on modern targets', () => {
+  const result = applyOutputProfile(richTemplate(), 'stable', {
+    aiostreamsVersion: '2.34.1',
+    preserveFields: ['syncedRankedStreamExpressionUrls', 'presets'],
+  });
+  assert.deepEqual(result.config.syncedRankedStreamExpressionUrls, []);
+  assert.equal(result.config.presets.some(p => p.type === 'torbox-search'), false);
+});
+
+test('an imported custom source is explicit and survives both safe profiles', () => {
+  const template = { config: { presets: [{ type: 'newznab', instanceId: 'my-indexer', enabled: true, resources: ['stream'], options: { api: { url: 'https://example.invalid/api', apiKey: 'LOCAL-ONLY' } } }] } };
+  for (const profile of ['stable', 'balanced']) {
+    const result = applyOutputProfile(template, profile, { preservedPresetIds: ['my-indexer'] });
+    assert.deepEqual(result.config.presets, template.config.presets);
+  }
+});
+
+test('originally absent fields remain absent after profile defaults', () => {
+  const result = applyOutputProfile({ config: {} }, 'stable', { removeFields: ['resultLimits'] });
+  assert.equal(Object.hasOwn(result.config, 'resultLimits'), false);
+});
