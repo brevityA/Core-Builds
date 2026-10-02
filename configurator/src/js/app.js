@@ -16,8 +16,9 @@ import { sortPolicy } from '../core/sort-policy.js';
 import { rankedSelPolicy } from '../core/ranked-sel-policy.js';
 import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
 import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
-import { generateTemplate } from '../core/generate-template.js';
-import { assembleTemplate } from '../core/assemble-template.js';
+import { assembleTemplate, ALLOWED_MIGRATION_FIELDS } from '../core/assemble-template.js';
+import { CONFIG_UPDATE_SECTIONS, diffConfigSections, migrationSelection } from '../core/config-diff.js';
+import { normalizeUpdateTemplate, importedSourceState, mergeImportedPresets, cloneUpdateValue } from '../core/template-update-policy.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
 import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals, describeWarnings } from '../core/host-capability-policy.js';
@@ -67,6 +68,8 @@ let _disabledAddons = new Set();
 let _lastInstall = { target: 'app', pwd: '' };
 let _lastAddonKey = '';
 let _pendingUpdate = null;
+let _preUpdateState = null;
+let _preUpdateMeta = null;
 function storeTemplateMeta(tpl) {
   try {
     const meta = normalizeTemplateMeta((tpl && tpl.metadata) || {});
@@ -449,6 +452,48 @@ async function selectHealthyHost(timeout=4000) {
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
 const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+// A clean template update must not inherit unrelated wizard/experimental flags.
+const INITIAL_STATE = cloneUpdateValue(S);
+function replaceState(nextState) {
+  for (const key of Object.keys(S)) delete S[key];
+  Object.assign(S, cloneUpdateValue(nextState));
+}
+function releaseMigrationFields(fields) {
+  for (const field of fields) if (S._migrationKeep) delete S._migrationKeep[field];
+  S._migrationRemove = (S._migrationRemove || []).filter(field => !fields.includes(field));
+}
+function releaseMigrationForControl(action, element) {
+  if (action === 'set-output-profile') { S._migrationKeep = null; S._migrationRemove = []; return; }
+  const key = element.dataset.key;
+  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-dropdown-change', 'clear-custom-formatter'].includes(action)) releaseMigrationFields(['formatter']);
+  if (['set-simple-quality', 'set-simple-resfirst', 'set-library-boost'].includes(action)
+    || (action === 'toggle-pref' && ['qualityFirst', 'resolutionFirst'].includes(key))) {
+    releaseMigrationFields(CONFIG_UPDATE_SECTIONS.find(section => section.key === 'sort').fields);
+  }
+  if (['toggle-service', 'toggle-carousel-service', 'toggle-optional-scraper', 'add-optional-scraper', 'remove-optional-scraper', 'toggle-catalog'].includes(action)) releaseMigrationFields(['services', 'presets', 'groups']);
+  if (action === 'update-radio' && key === 'resolution') releaseMigrationFields(['sortCriteria', 'preferredResolutions', 'excludedResolutions', 'requiredResolutions', 'includedResolutions']);
+  if (['set-simple-cache', 'set-cache-mode'].includes(action)) releaseMigrationFields(['excludeCached', 'excludeUncached']);
+  if (['set-simple-match', 'set-match-mode'].includes(action)) releaseMigrationFields(['deduplicator', 'sortCriteria']);
+  if (['toggle-lang', 'toggle-lang-exclusive'].includes(action)) releaseMigrationFields(['preferredLanguages', 'requiredLanguages']);
+  if (['set-audio', 'device-scroll-pick', 'dev-more-select'].includes(action) || (action === 'update-radio' && ['audio', 'device'].includes(key))) releaseMigrationFields(['excludedAudioTags', 'preferredAudioTags', 'preferredAudioChannels', 'excludedEncodes', 'preferredEncodes', 'preferredVisualTags']);
+  const expressionFields = CONFIG_UPDATE_SECTIONS.filter(section => ['pses', 'eses', 'ises'].includes(section.key)).flatMap(section => section.fields);
+  if (['set-audio', 'device-scroll-pick', 'dev-more-select', 'set-pse-arch', 'toggle-lang', 'toggle-lang-exclusive'].includes(action)
+    || (action === 'update-radio' && ['audio', 'device', 'resolution', 'content'].includes(key))) releaseMigrationFields(expressionFields);
+  if (['set-pool', 'set-simple-pool'].includes(action)) releaseMigrationFields(['resultLimits', 'groups', 'dynamicAddonFetching']);
+  if (action === 'set-size-limit') releaseMigrationFields(['size']);
+  if (action === 'set-addon-timeout') releaseMigrationFields(['presets']);
+  if (action === 'set-autoplay-method') releaseMigrationFields(['autoPlay']);
+
+  if (action === 'toggle-proxy-svc') releaseMigrationFields(['proxy']);
+  if (['toggle-foreign-kill', 'set-age-limit', 'update-bandwidth'].includes(action)) releaseMigrationFields(['excludedStreamExpressions', 'bitrate']);
+  if (action === 'toggle-p2p') releaseMigrationFields(['excludedStreamExpressions']);
+  if (action === 'toggle-pref') {
+    if (['exclude4K', 'excludeDV', 'foreignLangKill', 'p2pEnabled'].includes(key)) releaseMigrationFields(['excludedStreamExpressions']);
+    if (key === 'proxyEnabled') releaseMigrationFields(['proxy']);
+    if (key === 'dedupMerge') releaseMigrationFields(['deduplicator']);
+    if (key === 'preloadEnabled') releaseMigrationFields(['preloadStreams']);
+  }
+}
 const SENSITIVE_TOP_LEVEL_KEYS = new Set(['instancePassword', 'basePassword', 'stremioPassword']);
 const SENSITIVE_KEY_TOKENS = ['password', 'apikey', 'api_key', 'token', 'secret', 'credential', 'auth'];
 
@@ -697,6 +742,11 @@ function restoreBackup(idx) {
   if (!list[idx]) return;
   const snap = list[idx];
   const safe = sanitizeSharedConfig(snap);
+  // Settings-only backups must not accidentally retain overrides from a newer
+  // import. Full local Undo uses the in-memory transaction snapshot instead.
+  delete S._importedPresets;
+  S._migrationKeep = null;
+  S._migrationRemove = [];
   Object.assign(S, safe);
   S.service = deriveService();
   saveState();
@@ -784,6 +834,13 @@ function loadState() {
         if (parsed.basePassword) S.basePassword = parsed.basePassword;
         if (parsed.stremioEmail) S.stremioEmail = parsed.stremioEmail;
         if (parsed.stremioPassword) S.stremioPassword = parsed.stremioPassword;
+        if (Array.isArray(parsed._importedPresets)) {
+          S._importedPresets = normalizeUpdateTemplate({ presets: parsed._importedPresets }).config.presets;
+        }
+        if (parsed._migrationKeep && typeof parsed._migrationKeep === 'object' && !Array.isArray(parsed._migrationKeep)) {
+          S._migrationKeep = Object.fromEntries(Object.entries(parsed._migrationKeep).filter(([key]) => ALLOWED_MIGRATION_FIELDS.has(key)));
+        }
+        if (Array.isArray(parsed._migrationRemove)) S._migrationRemove = parsed._migrationRemove.filter(key => ALLOWED_MIGRATION_FIELDS.has(key));
         if (typeof parsed.cleanInstall === 'boolean') S.cleanInstall = parsed.cleanInstall;
         if (['fast','balanced','maximum'].includes(parsed.quickProfile)) S.quickProfile = parsed.quickProfile;
         const savedCustomFormatter = sanitizeCustomFormatter(parsed.customFormatter);
@@ -1383,6 +1440,9 @@ function outputProfileContext() {
     qualityFirst: Boolean(S.qualityFirst),
     resolutionFirst: Boolean(S.resolutionFirst),
     aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : DEFAULT_AIOSTREAMS_VERSION,
+    preservedPresetIds: (S._importedPresets || []).map(preset => preset.instanceId),
+    preserveFields: Object.keys(S._migrationKeep || {}),
+    removeFields: S._migrationRemove || [],
   };
 }
 
@@ -2903,6 +2963,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle all clicks
   document.addEventListener('change', (e) => {
+    if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
     if (e.target.matches('[data-action="fmt-dropdown-change"]')) {
       S.formatter = e.target.value;
       saveState();
@@ -2975,6 +3036,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
     const action = el?.dataset.action;
     if(!action) return;
+    releaseMigrationForControl(action, el);
 
     if (action === 'fmt-scroll-pick') {
       S.formatter = el.dataset.fmt;
@@ -3108,7 +3170,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'set-simple-quality') { S.qualityFirst = !S.qualityFirst; saveState(); render(); }
     if (action === 'set-simple-resfirst') { S.resolutionFirst = !S.resolutionFirst; saveState(); render(); }
     if (action === 'set-autoplay-method') { S.autoPlayMethod=el.dataset.val; saveState(); render(); }
-    if (action === 'set-addon-timeout') { S.addonTimeout=Number(el.dataset.val); saveState(); render(); }
+    if (action === 'set-addon-timeout') {
+      S.addonTimeout = Number(el.dataset.val);
+      if (S._importedPresets) S._importedPresets.forEach(preset => { preset.options.timeout = S.addonTimeout; });
+      saveState(); render();
+    }
     if (action === 'save-without-addon') { if (_lastAddonKey) _disabledAddons.add(_lastAddonKey); simpleInstall(_lastInstall.target || el.dataset.target || 'app'); }
     if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
     if (action === 'set-install-mode') {
@@ -3388,6 +3454,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const row = e.target.closest('[data-action="toggle-sub-addon"]') || e.target;
       const val = row.dataset.val;
       if (!S.subtitleAddons) S.subtitleAddons = ['aiosubtitle'];
+      const previousSourceCount = S.subtitleAddons.length;
       const idx = S.subtitleAddons.indexOf(val);
       if (idx >= 0) { if (S.subtitleAddons.length > 1) S.subtitleAddons.splice(idx, 1); }
       else {
@@ -3397,6 +3464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         S.subtitleAddons.push(val);
       }
+      if (S.subtitleAddons.length !== previousSourceCount) releaseMigrationFields(['presets', 'groups']);
       const on = S.subtitleAddons.includes(val);
       row.style.borderColor = on ? 'rgba(6,182,212,.35)' : 'rgba(255,255,255,.06)';
       row.style.background = on ? 'rgba(6,182,212,.05)' : 'transparent';
@@ -3419,6 +3487,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = e.target.closest('[data-action="toggle-sub-lang"]') || e.target;
       const val = btn.dataset.val;
       if (!S.subtitleLangs) S.subtitleLangs = ['en'];
+      const previousLanguageCount = S.subtitleLangs.length;
       const idx = S.subtitleLangs.indexOf(val);
       if (idx >= 0) { if (S.subtitleLangs.length > 1) S.subtitleLangs.splice(idx, 1); }
       else {
@@ -3427,6 +3496,14 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         S.subtitleLangs.push(val);
+      }
+      if (S.subtitleLangs.length !== previousLanguageCount) {
+        releaseMigrationFields(['presets']);
+        for (const preset of S._importedPresets || []) {
+          if (preset.type === 'aiosubtitle') preset.options.languages = [...S.subtitleLangs];
+          else if (preset.type === 'opensubtitles-v3-plus') preset.options.language = [...S.subtitleLangs];
+          else if (preset.type === 'subdl') preset.options.language = S.subtitleLangs.map(language => language.toUpperCase()).slice(0, 5);
+        }
       }
       const on = S.subtitleLangs.includes(val);
       btn.style.borderColor = on ? 'rgba(6,182,212,.4)' : 'rgba(255,255,255,.07)';
@@ -3577,6 +3654,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle inputs and changes
   document.addEventListener('change', (e) => {
+    if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
     if (e.target.dataset.action === 'set-aiostreams-target') {
       const target = e.target.value;
       if (!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(target)) return;
@@ -3690,6 +3768,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('input', (e) => {
     const a = e.target.dataset.action;
+    if (a) releaseMigrationForControl(a, e.target);
+    if (a === 'update-cred') releaseMigrationFields(['services', 'presets']);
+    if (['update-tmdb', 'update-tmdb-key'].includes(a)) releaseMigrationFields(['tmdbAccessToken', 'tmdbApiKey', 'titleMatching', 'yearMatching', 'digitalReleaseFilter', 'bitrate']);
     if (a === 'update-name') S.name = sanitizeDisplayName(e.target.value);
     else if (a === 'update-cred') {
       S.creds[e.target.dataset.service] = e.target.value;
@@ -3957,6 +4038,7 @@ function presets() {
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
+    : isP2P && S._nuvioInstant ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:true, useMultipleInstances:false }, resources:['stream'] }]
     : isP2P || isEasynews || isDebridio || isUsenet ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
@@ -4061,7 +4143,7 @@ function presets() {
       { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     ] : []),
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] } },
-    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true } },
+    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:!S._nuvioInstant } },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
     { type:'hdhub', instanceId:'hdhub-1', enabled:isP2P, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], ...(!isP2P && (multiHasTorbox || svc === 'torbox-pro' || svc === 'torbox-ess') ? {tb_only:true} : {}) } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:true, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
@@ -4081,6 +4163,10 @@ function presets() {
     ...subtitlePresets(),
     ...catalogPresets()
   ];
+  if (S._nuvioInstant) {
+    const types = new Set(['torrentio', 'comet', 'mediafusion', 'meteor', 'stremthruTorz', 'aiosubtitle', 'tmdb-addon']);
+    return list.filter(preset => types.has(preset.type));
+  }
   // The legacy built-in torbox-search preset was removed in AIOStreams v2.32
   // (TorBox Search API shut down). Emitting it — even disabled — makes the
   // config fail to save on v2.32+ hosts, so it is never generated here.
@@ -4308,9 +4394,12 @@ function build() {
   const hasTmdb = hasTmdbCredentials(input);
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
-  const globalTimeout = Number(input.addonTimeout)||6000;
+  const globalTimeout = Number(S.addonTimeout)||6000;
   const normalizedPresets = assertAddonPolicy(addonPolicy(input, presets(), { defaultTimeout: globalTimeout }));
-  const activePresets = normalizedPresets.presets;
+  const activePresets = mergeImportedPresets(normalizedPresets.presets, S._importedPresets, {
+    optionalScrapers: S.optionalScrapers || [], creds: S.creds || {},
+    multiServices: S.multiServices, catalogs: S.catalogs, subtitleAddons: S.subtitleAddons,
+  }).filter(preset => preset.enabled !== false);
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
     preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HDTV'],
@@ -4686,6 +4775,7 @@ function buildFinal() {
       disabledAddons: _disabledAddons,
       presetMatchesAddon,
       migrationKeep: S._migrationKeep,
+      migrationRemove: S._migrationRemove,
     });
     const profiled = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
     // Last stop before anything leaves the app: strip every key, preset and
@@ -4701,6 +4791,44 @@ function buildFinal() {
     logError('build', err.message, { service: S.service, device: S.device, resolution: S.resolution, stack: err.stack?.slice(0, 300) });
     throw err;
   }
+}
+
+// Build previews and specialised routes through the SAME final pipeline as
+// downloads/direct installs, without changing the active wizard or its cache.
+function buildFromState(nextState) {
+  const savedState = cloneUpdateValue(S);
+  const previousBuild = _cachedBuildResult;
+  const previousRemovals = _lastHostGateRemovals;
+  const previousWarnings = _lastHostGateWarnings;
+  try {
+    replaceState(nextState);
+    return buildFinal();
+  } finally {
+    replaceState(savedState);
+    _cachedBuildResult = previousBuild;
+    _lastHostGateRemovals = previousRemovals;
+    _lastHostGateWarnings = previousWarnings;
+  }
+}
+
+function buildNuvioTemplate(host, device = 'generic', resolution = '1080p') {
+  if (!host?.supportsNuvioInstant || !host?.supportsP2P) throw new Error('Host does not support Nuvio TorBox Instant');
+  const nextState = {
+    ...cloneUpdateValue(INITIAL_STATE),
+    service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, _nuvioInstant: true,
+    device, resolution, audio: DEVICE_AUDIO_DEFAULTS[device] || 'limited', content: 'all',
+    name: 'Core Builds — Nuvio TorBox Instant', instanceHost: host.id,
+    outputProfile: 'advanced', aiostreamsVersion: S.aiostreamsVersion,
+    langs: [...(S.langs || ['English'])], foreignLangKill: S.foreignLangKill !== false,
+    tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
+    // These are native, schema-allowlisted preferences. All final safety and
+    // compatibility gates still run after assembly. Never inherit debrid keys,
+    // custom imported sources, or unrelated migration overrides on this route.
+    _migrationKeep: { preferredStreamTypes: ['p2p'], excludedStreamTypes: ['debrid'] },
+  };
+  const template = buildFromState(nextState);
+  template.metadata.description = 'Connect TorBox in Nuvio Connected Services. Import into AIOStreams, save, then copy its manifest URL into Nuvio. Do not enter a TorBox API key in AIOStreams.';
+  return template;
 }
 
 const PARTIAL_EXPORT_FIELDS = {
@@ -4722,7 +4850,7 @@ function exportPartial(kind) {
   const fields = PARTIAL_EXPORT_FIELDS[kind];
   if (!fields) { showToast('Unknown partial export', true); return; }
   const full = buildFinal().config, config = {};
-  for (const field of fields) if (field in full) config[field] = structuredClone(full[field]);
+  for (const field of fields) if (field in full) config[field] = cloneUpdateValue(full[field]);
   if (Array.isArray(config.services)) config.services = config.services.map(service => ({...service, credentials:{}}));
   const payload = {
     metadata: { id:`core-partial-${kind}-${sid()}`, name:`Core Builds — ${kind} only`, description:`Partial Core Builds export containing ${kind} settings only.`, author:'Branding-Brevity', version:'1.0.0', category:'Utility', source:'external' },
@@ -4987,6 +5115,7 @@ function showFormatterImport() {
       const obj = JSON.parse(raw);
       if (!obj.name || typeof obj.name !== 'string') { errEl.textContent = 'Missing or invalid "name" field'; errEl.style.display = ''; return; }
       if (!obj.description || typeof obj.description !== 'string') { errEl.textContent = 'Missing or invalid "description" field'; errEl.style.display = ''; return; }
+      releaseMigrationFields(['formatter']);
       S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
       S.formatter = 'custom';
       saveState();
@@ -5012,7 +5141,7 @@ function showFormatterImport() {
 function parseTemplateToState(tpl) {
   const c = tpl.config || tpl;
   const st = {
-    service: null, device: null, resolution: null, audio: 'limited', content: null,
+    service: null, device: 'generic', resolution: null, audio: 'limited', content: 'all',
     name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
     exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
@@ -5022,26 +5151,18 @@ function parseTemplateToState(tpl) {
   if (AIOSTREAMS_COMPATIBILITY_TARGETS.includes(tpl?.metadata?.coreBuildsAIOStreamsTarget)) st.aiostreamsVersion = tpl.metadata.coreBuildsAIOStreamsTarget;
 
   const presets = c.presets || [];
-  const enabledPresets = presets.filter(p => p.enabled);
+  const enabledPresets = presets.filter(p => p.enabled !== false);
   const presetTypes = new Set(enabledPresets.map(p => p.type));
 
   // Service detection: use presets + services together for accuracy
-  const svcs = (c.services || []).filter(s => s.enabled);
+  const svcs = (c.services || []).filter(s => s.enabled !== false);
   const svcIds = new Set(svcs.map(s => s.id));
   const hasTB = svcIds.has('torbox'), hasRD = svcIds.has('realdebrid'), hasAD = svcIds.has('alldebrid');
   const hasEN = svcIds.has('easynews'), hasPM = svcIds.has('premiumize'), hasDL = svcIds.has('debridlink');
   const hasOC = svcIds.has('offcloud'), hasED = svcIds.has('easydebrid'), hasPP = svcIds.has('pikpak'), hasSR = svcIds.has('seedr');
 
-  const hasStremthruStore = presetTypes.has('stremthruStore');
-  const hasStremthruTorz = presetTypes.has('stremthruTorz');
   const hasEasyNewsPreset = presetTypes.has('easynews') || presetTypes.has('easynewsPlusPlus') || presetTypes.has('easynews-search') || presetTypes.has('easynewsPlus');
-  const hasSvcSortKey = ((c.sortCriteria && c.sortCriteria.global) || []).some(k => k.key === 'service');
-  const hasSvcPSEs = (c.preferredStreamExpressions || []).some(e => e.expression && /service\(/.test(e.expression));
-  const isHybrid = (hasTB && hasRD) || (hasTB && (hasSvcSortKey || hasSvcPSEs) && hasStremthruTorz);
-
-  if (isHybrid) { st.service = 'multi'; st.multiServices = ['torbox-pro','realdebrid']; }
-  else if (hasStremthruStore && hasTB) st.service = 'alldebrid';
-  else if (hasEN && hasEasyNewsPreset) st.service = 'easynews';
+  if (hasEN && hasEasyNewsPreset) st.service = 'easynews';
   else if (hasTB) st.service = 'torbox-pro';
   else if (hasRD) st.service = 'realdebrid';
   else if (hasAD) st.service = 'alldebrid';
@@ -5064,6 +5185,19 @@ function parseTemplateToState(tpl) {
   if (hasED) st.multiServices.push('easydebrid');
   if (hasPP) st.multiServices.push('pikpak');
   if (hasSR) st.multiServices.push('seedr');
+  if (svcIds.has('aiostreams') && !st.multiServices.length) st.multiServices.push('usenet');
+  for (const type of ['debridio', 'debrider']) {
+    if (presetTypes.has(type) && !st.multiServices.includes(type)) st.multiServices.push(type);
+  }
+  if (st.multiServices.length > 1) st.service = 'multi';
+  else if (!st.service && st.multiServices.length) st.service = st.multiServices[0];
+  if (!st.service) {
+    if (presetTypes.has('debridio')) st.service = 'debridio';
+    else if (presetTypes.has('debrider')) st.service = 'debrider';
+    else if (['torrentio', 'comet', 'jackettio', 'knaben', 'torrent-galaxy'].some(type => presetTypes.has(type))) st.service = 'p2p';
+    else if (['peerflix', 'webstreamr', 'hdhub', 'yastream'].some(type => presetTypes.has(type))) st.service = 'http';
+    if (st.service) st.multiServices = [st.service];
+  }
 
   // Credentials
   const creds = {};
@@ -5082,9 +5216,12 @@ function parseTemplateToState(tpl) {
   });
   st.creds = creds;
 
-  // NZBGeek from presets (v2.32 api shape)
-  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.api?.url||'').includes('nzbgeek'));
-  if (nzbg && nzbg.options && nzbg.options.api && nzbg.options.api.apiKey) creds.nzbgeek = nzbg.options.api.apiKey;
+  const sources = importedSourceState(c);
+  Object.assign(creds, sources.creds);
+  st._importedPresets = sources._importedPresets;
+  st.optionalScrapers = sources.optionalScrapers;
+  st.tmdbToken = typeof c.tmdbAccessToken === 'string' ? c.tmdbAccessToken : '';
+  st.tmdbApiKey = typeof c.tmdbApiKey === 'string' ? c.tmdbApiKey : '';
 
   // Resolution: check requiredResolutions, excludedResolutions, and ESEs
   const req = c.requiredResolutions || [];
@@ -5146,11 +5283,12 @@ function parseTemplateToState(tpl) {
   }
 
   // Cache mode
-  const hasP2P = presets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type) && p.enabled);
+  const hasP2P = enabledPresets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type));
   st.p2pEnabled = hasP2P;
+  st.cacheMode = c.excludeUncached === true ? 'cached' : c.excludeCached === true ? 'uncached' : 'mixed';
 
   // Max results → stream pool
-  const mr = c.maxResults || 20;
+  const mr = c.resultLimits?.global || c.maxResults || 20;
   if (mr >= 50) st.streamPool = 'max';
   else if (mr >= 30) st.streamPool = 'large';
   else st.streamPool = 'normal';
@@ -5167,7 +5305,7 @@ function parseTemplateToState(tpl) {
 
   // Foreign language kill
   const eseList = c.excludedStreamExpressions || [];
-  st.foreignLangKill = eseList.some(e => e.enabled && e.expression && e.expression.includes('Foreign Language Kill'));
+  st.foreignLangKill = eseList.some(e => e.enabled !== false && e.expression && e.expression.includes('Foreign Language Kill'));
 
   // Languages
   if (c.requiredLanguages && c.requiredLanguages.length > 0) {
@@ -5176,11 +5314,10 @@ function parseTemplateToState(tpl) {
   }
 
   // Name from metadata
-  if (tpl.metadata && tpl.metadata.name) st.name = tpl.metadata.name;
-  else if (c.addonName) st.name = c.addonName;
+  st.name = sanitizeDisplayName(tpl.metadata?.name || c.addonName || '');
 
   // Content type from presets
-  const mTypes = presets.filter(p => p.enabled && p.options && p.options.mediaTypes);
+  const mTypes = presets.filter(p => p.enabled !== false && p.options && Array.isArray(p.options.mediaTypes));
   if (mTypes.length > 0) {
     const allMt = new Set();
     mTypes.forEach(p => (p.options.mediaTypes||[]).forEach(t => allMt.add(t)));
@@ -5191,30 +5328,27 @@ function parseTemplateToState(tpl) {
   }
 
   // Exclude DV/4K from ESEs
-  st.excludeDV = eses.some(e => e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
+  st.excludeDV = eses.some(e => e.enabled !== false && e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
   st.exclude4K = has4kESEKill;
 
   // Subtitle addons & languages
   const subAddons = enabledPresets.filter(p => ['aiosubtitle', 'opensubtitles-v3-plus', 'subdl'].includes(p.type)).map(p => p.type);
-  st.subtitleAddons = subAddons.length > 0 ? subAddons : ['aiosubtitle'];
+  st.subtitleAddons = subAddons;
 
   const subPreset = enabledPresets.find(p => ['aiosubtitle', 'opensubtitles-v3-plus', 'subdl'].includes(p.type));
   if (subPreset && subPreset.options) {
     const l = subPreset.options.languages || subPreset.options.language;
-    if (Array.isArray(l) && l.length > 0) {
-      st.subtitleLangs = l;
-    } else if (typeof l === 'string' && l.trim()) {
-      st.subtitleLangs = [l.trim()];
-    } else {
-      st.subtitleLangs = ['en'];
-    }
+    const languages = Array.isArray(l) ? l : typeof l === 'string' ? [l] : [];
+    st.subtitleLangs = [...new Set(languages.filter(language => typeof language === 'string')
+      .map(language => language.trim().toLowerCase()).filter(Boolean))];
+    if (!st.subtitleLangs.length) st.subtitleLangs = ['en'];
   } else {
     st.subtitleLangs = ['en'];
   }
 
   // Catalogs
   const cats = enabledPresets.filter(p => ['tmdb-addon', 'streaming-catalogs', 'anime-catalogs', 'rpdb-catalogs', 'torrent-catalogs'].includes(p.type)).map(p => p.type);
-  st.catalogs = cats.length > 0 ? cats : ['tmdb-addon'];
+  st.catalogs = cats;
 
   // Deduplicator Merge
   if (c.deduplicator && c.deduplicator.merge) {
@@ -5232,103 +5366,21 @@ function parseTemplateToState(tpl) {
     st.proxiedServices = [];
   }
 
-  // Optional Scrapers (v2.32 api shape)
-  const optScrapers = enabledPresets.filter(p => p.type === 'newznab' && p.options && p.options.api?.url).map(p => {
-    const d = OPTIONAL_SCRAPER_DEFS.find(x => x.apiUrl && p.options.api.url.toLowerCase().includes(x.apiUrl.toLowerCase()));
-    return d ? d.id : null;
-  }).filter(Boolean);
-  st.optionalScrapers = optScrapers;
 
   return st;
 }
 
 function diffConfigs(oldCfg, newCfg) {
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const sections = [];
-  const extractLabel = expr => { const m = (expr||'').match(/\/\*\s*(.+?)\s*\*\//); return m ? m[1] : expr.slice(0,60); };
-
-  function diffExprArray(oldArr, newArr, label, icon, key) {
-    const oldLabels = (oldArr||[]).filter(e=>e.enabled!==false).map(e => extractLabel(e.expression));
-    const newLabels = (newArr||[]).filter(e=>e.enabled!==false).map(e => extractLabel(e.expression));
-    const added = newLabels.filter(l => !oldLabels.includes(l));
-    const removed = oldLabels.filter(l => !newLabels.includes(l));
-    const rows = [];
-    added.forEach(l => rows.push({type:'add', text:esc(l)}));
-    removed.forEach(l => rows.push({type:'rem', text:esc(l)}));
-    if (rows.length) sections.push({label, icon, rows, added:added.length, removed:removed.length, changed:0, key});
-  }
-
-  function diffRegexArray(oldArr, newArr, label, icon, hasScore, key) {
-    const toMap = arr => { const m = new Map(); (arr||[]).forEach((r,i) => { const n = typeof r === 'string' ? 'Pattern #'+(i+1) : (r.name||'unnamed'); m.set(n, r); }); return m; };
-    const oldMap = toMap(oldArr), newMap = toMap(newArr);
-    const rows = [];
-    for (const [name, entry] of newMap) {
-      if (!oldMap.has(name)) { rows.push({type:'add', text:esc(name) + (hasScore && entry.score != null ? ' <span style="opacity:.5">(score '+esc(entry.score)+')</span>' : '')}); }
-      else if (hasScore && entry.score != null && oldMap.get(name).score != null && entry.score !== oldMap.get(name).score) {
-        rows.push({type:'chg', text:esc(name) + ' <span style="opacity:.5">score '+esc(oldMap.get(name).score)+' &rarr; '+esc(entry.score)+'</span>'});
-      }
-    }
-    for (const [name] of oldMap) { if (!newMap.has(name)) rows.push({type:'rem', text:esc(name)}); }
-    if (rows.length) { const a = rows.filter(r=>r.type==='add').length, r = rows.filter(r=>r.type==='rem').length, c = rows.filter(r=>r.type==='chg').length; sections.push({label, icon, rows, added:a, removed:r, changed:c, key}); }
-  }
-
-  function diffSortCriteria(oldSort, newSort) {
-    const allKeys = new Set([...Object.keys(oldSort||{}), ...Object.keys(newSort||{})]);
-    const rows = [];
-    for (const sec of allKeys) {
-      const oldKeys = ((oldSort||{})[sec]||[]).map(k => k.key);
-      const newKeys = ((newSort||{})[sec]||[]).map(k => k.key);
-      if (JSON.stringify(oldKeys) !== JSON.stringify(newKeys)) {
-        const added = newKeys.filter(k => !oldKeys.includes(k));
-        const removed = oldKeys.filter(k => !newKeys.includes(k));
-        const reordered = added.length === 0 && removed.length === 0;
-        let detail = '';
-        if (added.length) detail += '+' + added.join(', ');
-        if (removed.length) detail += (detail ? ' ' : '') + '-' + removed.join(', ');
-        if (reordered) detail = 'key order changed';
-        rows.push({type: removed.length && !added.length ? 'rem' : added.length ? 'add' : 'chg', text: esc(sec) + (detail ? ' <span style="opacity:.5">('+esc(detail)+')</span>' : '')});
-      }
-    }
-    if (rows.length) sections.push({label:'Sort Criteria', icon:ICO.shuffle(14,'#a78bfa'), rows, added:rows.filter(r=>r.type==='add').length, removed:rows.filter(r=>r.type==='rem').length, changed:rows.filter(r=>r.type==='chg').length, key:'sort'});
-  }
-
-  diffExprArray(oldCfg.preferredStreamExpressions, newCfg.preferredStreamExpressions, 'PSE Tiers', ICO.crown(14,'#fbbf24'), 'pses');
-  diffExprArray(oldCfg.excludedStreamExpressions, newCfg.excludedStreamExpressions, 'Excluded Stream Expressions', ICO.bolt(14,'#f87171'), 'eses');
-  diffExprArray(oldCfg.includedStreamExpressions, newCfg.includedStreamExpressions, 'Included Stream Expressions', ICO.check(14,'#34d399'), 'ises');
-  diffRegexArray(oldCfg.rankedRegexPatterns, newCfg.rankedRegexPatterns, 'Ranked Regex Patterns', ICO.search(14,'#a78bfa'), true, 'ranked_regex');
-  diffRegexArray(oldCfg.preferredRegexPatterns, newCfg.preferredRegexPatterns, 'Preferred Regex Patterns', ICO.diamond(14,'#00d4ff'), false, 'pref_regex');
-  diffRegexArray(oldCfg.excludedRegexPatterns, newCfg.excludedRegexPatterns, 'Excluded Regex Patterns', ICO.bolt(14,'#f87171'), false, 'excl_regex');
-  diffSortCriteria(oldCfg.sortCriteria, newCfg.sortCriteria);
-
-  const miscRows = [];
-  const ddOld = oldCfg.deduplicator || {}, ddNew = newCfg.deduplicator || {};
-  if (JSON.stringify(ddOld) !== JSON.stringify(ddNew)) {
-    if (ddOld.multiGroupBehaviour !== ddNew.multiGroupBehaviour) miscRows.push({type:'chg', text:'Dedup mode: <span style="opacity:.5">'+esc(ddOld.multiGroupBehaviour||'(none)')+' &rarr; '+esc(ddNew.multiGroupBehaviour||'(none)')+'</span>'});
-    if (ddOld.smartDetectRounding !== ddNew.smartDetectRounding) miscRows.push({type:'chg', text:'Dedup rounding: <span style="opacity:.5">'+esc(ddOld.smartDetectRounding||'(none)')+' &rarr; '+esc(ddNew.smartDetectRounding||'(none)')+'</span>'});
-    if (ddOld.cached !== ddNew.cached) miscRows.push({type:'chg', text:'Dedup cached: <span style="opacity:.5">'+esc(ddOld.cached||'(none)')+' &rarr; '+esc(ddNew.cached||'(none)')+'</span>'});
-    if (JSON.stringify(ddOld.tiebreakers) !== JSON.stringify(ddNew.tiebreakers)) miscRows.push({type:'add', text:'Dedup tiebreakers updated'});
-    if (ddOld.libraryBehaviour !== ddNew.libraryBehaviour) miscRows.push({type:'chg', text:'Library behaviour: <span style="opacity:.5">'+esc(ddOld.libraryBehaviour||'ignore')+' &rarr; '+esc(ddNew.libraryBehaviour||'ignore')+'</span>'});
-  }
-  const fmtOld = oldCfg.formatter, fmtNew = newCfg.formatter;
-  if (fmtOld && fmtNew) {
-    const ovOld = fmtOld.definitions && fmtOld.definitions.overrides && fmtOld.definitions.overrides[Object.keys(fmtOld.definitions.overrides)[0]];
-    const ovNew = fmtNew.definitions && fmtNew.definitions.overrides && fmtNew.definitions.overrides[Object.keys(fmtNew.definitions.overrides)[0]];
-    if (ovOld && ovNew && ovOld.name !== ovNew.name) miscRows.push({type:'chg', text:'Formatter: <span style="opacity:.5">'+esc(ovOld.name||'unknown')+' &rarr; '+esc(ovNew.name||'unknown')+'</span>'});
-  }
-  const dafOld = oldCfg.dynamicAddonFetching, dafNew = newCfg.dynamicAddonFetching;
-  if (dafOld && dafNew && dafOld.condition !== dafNew.condition) miscRows.push({type:'chg', text:'Dynamic addon fetching condition updated'});
-  if ((oldCfg.maxResults||20) !== (newCfg.maxResults||20)) miscRows.push({type:'chg', text:'Max results: <span style="opacity:.5">'+esc(oldCfg.maxResults||20)+' &rarr; '+esc(newCfg.maxResults||20)+'</span>'});
-
-  const syncFields = ['syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls'];
-  const syncOld = syncFields.flatMap(f => oldCfg[f]||[]);
-  const syncNew = syncFields.flatMap(f => newCfg[f]||[]);
-  const addedUrls = syncNew.filter(u => !syncOld.includes(u)), removedUrls = syncOld.filter(u => !syncNew.includes(u));
-  addedUrls.forEach(u => miscRows.push({type:'add', text:'Synced URL: ' + esc(u.split('/').pop())}));
-  removedUrls.forEach(u => miscRows.push({type:'rem', text:'Synced URL: ' + esc(u.split('/').pop())}));
-
-  if (miscRows.length) sections.push({label:'Settings & Config', icon:ICO.gear(14,'#8b949e'), rows:miscRows, added:miscRows.filter(r=>r.type==='add').length, removed:miscRows.filter(r=>r.type==='rem').length, changed:miscRows.filter(r=>r.type==='chg').length, key:'settings'});
-
-  return sections;
+  const icons = {
+    pses: ICO.crown(14, '#fbbf24'), eses: ICO.bolt(14, '#f87171'),
+    ises: ICO.check(14, '#34d399'), ranked_regex: ICO.search(14, '#a78bfa'),
+    pref_regex: ICO.diamond(14, 'var(--th-accent)'), excl_regex: ICO.bolt(14, '#f87171'),
+    sort: ICO.shuffle(14, '#a78bfa'), sources: ICO.refresh(14, 'var(--th-accent)'),
+  };
+  return diffConfigSections(oldCfg, newCfg).map(section => ({
+    ...section, icon: icons[section.key] || ICO.gear(14, '#8b949e'),
+    rows: section.rows.map(row => ({ ...row, text: escHtml(row.text) })),
+  }));
 }
 
 function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConflicts = []) {
@@ -5346,7 +5398,7 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
   overlay.className = 'df-overlay';
 
   const selectAllId = 'dfSelAll';
-  const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span style="font-size:.65rem;color:#4b5563">Uncheck to keep your existing values</span></div>' : '';
+  const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span style="font-size:.65rem;color:#4b5563">Uncheck to keep existing values; host and compatibility limits still apply</span></div>' : '';
 
   const sectionsHtml = sections.length ? sections.map((sec, si) => {
     const countHtml = [];
@@ -5360,7 +5412,7 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
     }).join('');
     const cbId = 'dfSec'+si;
     return '<div class="df-section" data-sec-key="'+(sec.key||'')+'"><div class="df-sec-hdr"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;min-width:0" onclick="event.stopPropagation()"><input type="checkbox" class="df-sec-cb" id="'+cbId+'" data-sec-idx="'+si+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer;flex-shrink:0">'+sec.icon+' '+esc(sec.label)+'</label><span class="df-sec-count" style="cursor:pointer" onclick="const b=this.closest(\'.df-section\').querySelector(\'.df-sec-body\');b.style.display=b.style.display===\'none\'?\'\':\'none\'">'+countHtml.join(' ')+' <span style="font-size:.6rem;opacity:.5">&#9660;</span></span></div><div class="df-sec-body">'+rowsHtml+'</div></div>';
-  }).join('') : '<div class="df-empty">'+ICO.check(18,'#34d399')+'<br>Your template is already up to date.</div>';
+  }).join('') : '<div class="df-empty">'+ICO.check(18,'#34d399')+'<br>No configuration changes for this setup. App updates do not always change template output.</div>';
 
   const detected = [];
   if (parsed.service) detected.push(esc(parsed.service));
@@ -5404,7 +5456,8 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
     });
   });
 
-  const close = (cb) => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => { overlay.remove(); if (cb) cb(); }, 160); };
+  let closing = false;
+  const close = (cb) => { if (closing) return; closing = true; overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => { overlay.remove(); if (cb) cb(); }, 160); };
   document.getElementById('dfClose').addEventListener('click', () => close(onCancel));
   document.getElementById('dfCancel').addEventListener('click', () => close(onCancel));
   document.getElementById('dfApply').addEventListener('click', () => {
@@ -5421,79 +5474,63 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
   overlay.addEventListener('click', e => { if (e.target === overlay) close(onCancel); });
 }
 
-function upgradeToTemplate(tpl, opts = {}) {
-  // Shared apply core: parse -> preview -> diff -> commit (used by the Update
-  // modal and by one-click remote updates). Never touches credentials beyond
-  // what the template itself carries; pre-update state is backed up for Revert.
-  storeTemplateMeta(tpl);
-  savePreUpdateSnapshot();
-  const oldCfg = tpl.config || tpl;
+function upgradeToTemplate(input, opts = {}) {
+  const tpl = normalizeUpdateTemplate(input);
+  const oldCfg = tpl.config;
   const importedConflicts = findFeatureConflicts(tpl);
-  const savedState = JSON.parse(JSON.stringify(S));
-  const session = createUpdateSession(S, parseTemplateToState(tpl));
+  const savedState = cloneUpdateValue(S);
   const parsed = parseTemplateToState(tpl);
-  S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
-  S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
-  S.formatter = 'family-v4'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
-  S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
-  S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
-  S.streamPool = 'normal'; S.outputProfile = 'auto';
-  S.subtitleAddons = ['aiosubtitle']; S.subtitleLangs = ['en']; S.catalogs = ['tmdb-addon'];
-  S.dedupMerge = false; S.proxyEnabled = false; S.proxiedServices = []; S.optionalScrapers = [];
-  const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',subdl:''};
-  Object.assign(S, parsed);
-  S.creds = Object.assign(defaultCreds, parsed.creds || {});
-  S.simpleMode = false;
-  let newTpl, newCfg;
+  const nextState = { ...cloneUpdateValue(INITIAL_STATE), ...parsed };
+  // Keep the user's delivery destination/account, not unrelated wizard flags.
+  for (const key of ['instanceHost', 'instanceUrl', 'instanceUuid', 'instancePassword', 'installMode', 'stremioEmail', 'stremioPassword', 'telemetryOk']) {
+    nextState[key] = savedState[key];
+  }
+  nextState.creds = { ...INITIAL_STATE.creds, ...savedState.creds };
+  for (const [key, value] of Object.entries(parsed.creds || {})) {
+    if (typeof value === 'string' && value.trim()) nextState.creds[key] = value;
+  }
+  nextState._migrationKeep = null;
+  nextState._migrationRemove = [];
+
+  // Preview the actual download/install pipeline, then restore every temporary
+  // field and build cache even if generation fails. No storage writes here.
+  let newTpl;
   try {
-    newTpl = build();
-    newCfg = newTpl.config || newTpl;
-  } catch(buildErr) {
-    Object.assign(S, savedState);
+    newTpl = buildFromState(nextState);
+  } catch (buildErr) {
     showToast('Preview generation failed: ' + buildErr.message, true);
     return;
   }
-  Object.assign(S, savedState);
+  let session = createUpdateSession(savedState, nextState, newTpl);
   if (typeof opts.onClose === 'function') opts.onClose();
-  showDiffModal(oldCfg, newCfg, parsed, (selectedKeys, offeredKeys = new Set()) => {
-    const SECTION_FIELDS = {
-      pses: ['preferredStreamExpressions'],
-      eses: ['excludedStreamExpressions'],
-      ises: ['includedStreamExpressions'],
-      ranked_regex: ['rankedRegexPatterns'],
-      pref_regex: ['preferredRegexPatterns'],
-      excl_regex: ['excludedRegexPatterns'],
-      sort: ['sortCriteria'],
-      settings: ['deduplicator','formatter','dynamicAddonFetching','maxResults','syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls']
-    };
-    const keep = {};
-    for (const [key, fields] of Object.entries(SECTION_FIELDS)) {
-      if (offeredKeys.has(key) && !selectedKeys.has(key)) {
-        fields.forEach(f => { if (oldCfg[f] !== undefined) keep[f] = oldCfg[f]; });
-      }
-    }
-    commitUpdate(session, parsed);
-    Object.assign(S, parsed);
-    S._migrationKeep = Object.keys(keep).length ? keep : null;
-    saveState();
+  showDiffModal(oldCfg, newTpl.config, parsed, (selectedKeys, offeredKeys = new Set()) => {
+    const selection = migrationSelection(oldCfg, newTpl.config, selectedKeys, offeredKeys);
+    nextState._migrationKeep = Object.keys(selection.keep).length ? selection.keep : null;
+    nextState._migrationRemove = selection.remove;
+    session = commitUpdate(session, nextState);
+    _preUpdateState = cloneUpdateValue(S);
+    _preUpdateMeta = getStoredTemplateMeta();
+    savePreUpdateSnapshot();
+    replaceState(session.nextState);
+    storeTemplateMeta(tpl);
     _pendingUpdate = null;
-    const m = getStoredTemplateMeta();
-    if (m && tpl.metadata && tpl.metadata.sourceUrl && tpl.metadata.sourceUrl === m.sourceUrl && tpl.metadata.version) {
-      m.version = String(tpl.metadata.version); m.ts = Date.now();
-      try { localStorage.setItem('coreBuildLastTemplate', JSON.stringify(m)); } catch(e) {}
-    }
-    const skipped = Object.keys(SECTION_FIELDS).filter(k => offeredKeys.has(k) && !selectedKeys.has(k)).length;
+    const skipped = [...offeredKeys].filter(key => !selectedKeys.has(key)).length;
     step = STEPS;
-    pushStep(); render(); window.scrollTo(0,0);
-    showToast(skipped ? 'Template upgraded — '+selectedKeys.size+' section'+(selectedKeys.size!==1?'s':'')+' applied, '+skipped+' kept from original' : 'Template upgraded — review settings and generate your new template');
+    pushStep(); saveState(); render(); window.scrollTo(0,0);
+    showToast(skipped
+      ? 'Updated locally — '+skipped+' section'+(skipped !== 1 ? 's' : '')+' kept. Download and re-import to change AIOStreams.'
+      : 'Updated locally — download and re-import the JSON to change AIOStreams.');
   }, () => {
-    cancelUpdate(session);
+    session = cancelUpdate(session);
     showToast('Migration cancelled — no changes applied', true);
   }, importedConflicts);
 }
 
 function remoteUpdateBannerHtml() {
-  if (!_pendingUpdate) return '';
+  if (!_pendingUpdate) {
+    if (!_preUpdateState) return '';
+    return '<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px;font-size:.72rem;color:#8b949e">Updated in this browser only. Download and re-import the JSON to apply it in AIOStreams. <button data-action="revert-update" style="margin-left:8px;background:none;border:0;color:var(--th-accent);cursor:pointer;font:inherit;text-decoration:underline">Undo local update</button></div>';
+  }
   const p = _pendingUpdate;
   const ch = p.changelog && p.changelog.length ? `<ul style="margin:6px 0 0;padding-left:16px">${p.changelog.map(e=>`<li style="font-size:.7rem;color:#8b949e;margin:2px 0"><b style="color:#00d4ff">v${escH(e.version)}</b>${e.body.length?` — ${escH(e.body.slice(0,3).join(' · '))}`:''}</li>`).join('')}</ul>` : '';
   return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px">
@@ -5554,7 +5591,14 @@ async function applyRemoteUpdate() {
 
 function revertToPrevious() {
   _pendingUpdate = null;
-  restoreBackup(0);
+  if (!_preUpdateState) { restoreBackup(0); return; }
+  replaceState(_preUpdateState);
+  _preUpdateState = null;
+  if (_preUpdateMeta) localStorage.setItem('coreBuildLastTemplate', JSON.stringify(_preUpdateMeta));
+  else localStorage.removeItem('coreBuildLastTemplate');
+  _preUpdateMeta = null;
+  saveState(); render();
+  showToast('Local update undone. This does not change your installed AIOStreams config.');
 }
 
 function showUpdateTemplateModal() {
@@ -5569,8 +5613,8 @@ function showUpdateTemplateModal() {
       <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Setup</div>
       <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll show you exactly what changes before upgrading to the latest sort logic, regex patterns, and formatters, and flag safe rule conflicts before you apply anything.</div>
       <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.72rem;color:#8b949e;line-height:1.5">
-        <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — all rebuilt with the latest configurator logic.<br>
-        <strong style="color:#00d4ff">What's preserved:</strong> Your service, credentials, resolution, audio, and content preferences are detected and kept.
+        <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — rebuilt with the latest configurator logic. App-only updates may produce no configuration changes.<br>
+        <strong style="color:#00d4ff">What's preserved:</strong> Your existing scraper instances, options and local credentials are retained. Service, resolution, audio and content preferences are detected; unsupported host options are still removed.
       </div>
       <textarea id="updTplInput" rows="8" placeholder='Paste your full template JSON here...' style="width:100%;box-sizing:border-box;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.72rem;resize:vertical;outline:none;line-height:1.4"></textarea>
       <div style="display:flex;gap:8px;margin-top:10px">
@@ -5593,9 +5637,7 @@ function showUpdateTemplateModal() {
     errEl.style.display = 'none';
     infoEl.style.display = 'none';
     try {
-      const obj = JSON.parse(raw);
-      if (!obj.config && !obj.services && !obj.presets) { errEl.textContent = 'Not a valid AIOStreams template — missing config object'; errEl.style.display = ''; return; }
-      const tpl = obj.config ? obj : { config: obj };
+      const tpl = normalizeUpdateTemplate(JSON.parse(raw));
       const cfg = tpl.config || tpl;
       // XS/S: warn about unknown top-level keys that AIOStreams strips silently
       try {
@@ -5607,23 +5649,12 @@ function showUpdateTemplateModal() {
         }
       } catch(e) {}
       const parsed = parseTemplateToState(tpl);
-      if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
-
-      // Honesty note (Patch 33): keyed presets from the imported config (e.g. a Debridio
-      // scraper) are not regenerated by the rebuild — say so before the user wonders.
-      const keyedPresets = ((tpl.config && tpl.config.presets) || []).filter(p => p?.enabled === true && p?.options
-        && Object.keys(p.options).some(k => /api.?key|access.?token|secret|password|token/i.test(k) && (typeof p.options[k] !== 'string' || p.options[k].trim() === '' || p.options[k] === '<template_placeholder>')));
-      if (keyedPresets.length && infoEl) {
-        const prev = infoEl.innerHTML;
-        const msg = 'Heads-up: ' + keyedPresets.map(p => `“${(p.options && p.options.name) || p.type}”`).join(', ') + ' ' + (keyedPresets.length > 1 ? 'need' : 'needs') + ' their own API key — the rebuilt config ships them disabled. Add the key in AIOStreams and re-enable if you use them.';
-        infoEl.innerHTML = prev ? prev + '<br><br>' + msg : msg;
-        infoEl.style.display = '';
-      }
+      if (!parsed.service) { errEl.textContent = 'Could not detect a supported source — choose a service or free-streaming setup before updating'; errEl.style.display = ''; return; }
 
       // Build a preview from temporary state; do not commit until the user confirms.
       upgradeToTemplate(tpl, { onClose: () => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 150); } });
       return;
-    } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
+    } catch(e) { errEl.textContent = (e instanceof SyntaxError ? 'Invalid JSON: ' : 'Cannot update: ') + e.message; errEl.style.display = ''; }
   }
 
   document.getElementById('updTplApply').addEventListener('click', () => parseAndApply(textarea.value));
@@ -7301,7 +7332,7 @@ function showAdditionalServicesPicker(options={}) {
     const svc=e.target.closest('[data-extra-service]');if(svc){const id=svc.dataset.extraService;selectedServices.has(id)?selectedServices.delete(id):selectedServices.add(id);svc.classList.toggle('active',selectedServices.has(id));return;}
     const scr=e.target.closest('[data-extra-scraper]');if(scr){const id=scr.dataset.extraScraper;selectedScrapers.has(id)?selectedScrapers.delete(id):selectedScrapers.add(id);scr.classList.toggle('active',selectedScrapers.has(id));return;}
     if(e.target===overlay||e.target.closest('#extraClose')){overlay.remove();return;}
-    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
+    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}releaseMigrationFields(['services', 'presets', 'groups']);S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
   });
   document.getElementById('extraClose').focus();
 }
@@ -7577,7 +7608,7 @@ async function runExpressInstall(p) {
     try {
       // Patch 14 contract: an explicit host pick is never silently overridden — even by the
       // Nuvio-instant route. If the pick can't do Nuvio instant, say so instead of swapping.
-      const pickedId = (S.instanceHost && S.instanceHost !== 'auto' && S.instanceHost !== 'custom') ? S.instanceHost : null;
+      const pickedId = (S.instanceHost && S.instanceHost !== 'auto') ? S.instanceHost : null;
       const pickedMeta = pickedId ? HOST_META[pickedId] : null;
       let nuvioHost;
       if (pickedMeta && pickedMeta.supportsNuvioInstant && pickedMeta.supportsP2P) {
@@ -7589,21 +7620,15 @@ async function runExpressInstall(p) {
         nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
       }
       if (!nuvioHost) { result.innerHTML='<div class="td-error">No compatible Nuvio host found.</div>'; return; }
-      const tmpl = generateTemplate({
-        route: 'nuvio-torbox-instant', device: p.device || 'generic', resolution: p.resolution || '1080p',
-        host: nuvioHost, formatter: 'family-v4', langs: S.langs || ['English'], foreignLangKill: S.foreignLangKill !== false,
-        tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
-      }, {
-        host: nuvioHost,
-        deviceAv1Safe: DEVICE_AV1_SAFE, deviceDvSafe: DEVICE_DV_SAFE, deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
-      });
-      const manifestUrl = await uploadTemplateForImport(JSON.stringify(tmpl));
-      if (manifestUrl) {
+      const tmpl = buildNuvioTemplate(nuvioHost, p.device || 'generic', p.resolution || '1080p');
+      const importUrl = await uploadTemplateForImport(tmpl);
+      if (importUrl) {
         saveLastGen();
-        const safeUrl = manifestUrl.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 10px">Add this manifest URL in Nuvio (or tap an instance to import it):</div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${safeUrl}">${safeUrl}</div>${instanceChips(manifestUrl)}</div>`;
+        const configureUrl = HOST_BASE_URLS[nuvioHost.id] + '/stremio/configure?template=' + encodeURIComponent(importUrl);
+        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>`;
       } else {
-        result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not create a Nuvio import link</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 2px">Export the JSON and import it manually.</div><button data-action="generate-dl" style="margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div>';
+        result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>';
+        document.getElementById('downloadNuvioJson')?.addEventListener('click', () => downloadJsonFile(tmpl, 'core-nuvio-torbox-instant.json'));
       }
     } catch (err) {
       const errDiv = document.createElement('div');
@@ -7766,17 +7791,7 @@ function showFastLane() {
         try {
           const nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
           if (!nuvioHost) { result.innerHTML='<div class="td-error">No compatible Nuvio host found.</div>'; return; }
-          const tmpl = generateTemplate({
-            route: 'nuvio-torbox-instant', device: state.nuvioDevice, resolution: state.nuvioResolution,
-            host: nuvioHost, formatter: 'family-v4', langs: S.langs || ['English'], foreignLangKill: S.foreignLangKill !== false,
-            tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
-          }, {
-            host: nuvioHost,
-            deviceAv1Safe: DEVICE_AV1_SAFE, deviceDvSafe: DEVICE_DV_SAFE, deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
-            formatters: FORMATTERS,
-            metadata: { coreBuildsVersion: CONFIGURATOR_VERSION, generatedAt: new Date().toISOString() },
-          });
-          if (tmpl.metadata) { delete tmpl.metadata.generatedAt; }
+          const tmpl = buildNuvioTemplate(nuvioHost, state.nuvioDevice, state.nuvioResolution);
           // Nuvio uses the same public import-link transport as other routes;
           // TMDB values carried from a previous setup must not be uploaded.
           const jsonStr = JSON.stringify(sanitizeTemplateForRemoteImport(tmpl), null, 2);
@@ -8432,8 +8447,8 @@ async function uploadJsonForImport(jsonStr) {
   return url;
 }
 
-async function uploadTemplateForImport() {
-  const template = sanitizeTemplateForRemoteImport(buildFinal());
+async function uploadTemplateForImport(rawTemplate = buildFinal()) {
+  const template = sanitizeTemplateForRemoteImport(rawTemplate);
   return uploadJsonForImport(JSON.stringify(template, null, 2));
 }
 
@@ -8632,21 +8647,7 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
   window.__coreBuilds = {
     generate(overrides) {
       Object.assign(S, overrides || {});
-      // Transitional adapter: policy composition is now routed through the pure
-      // facade; legacy assembly remains the injected adapter until Part 8's
-      // full config assembly migration is complete.
-      const out = generateTemplate(S, {
-        deviceAv1Safe: DEVICE_AV1_SAFE,
-        deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
-        presets: presets(),
-        defaultTimeout: Number(S.addonTimeout) || 6000,
-        assemble: () => gateTemplateForHost(applyOutputProfile(assembleTemplate(build(), {
-          metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
-          disabledAddons: _disabledAddons,
-          presetMatchesAddon,
-          migrationKeep: S._migrationKeep,
-        }), activeOutputProfile(), outputProfileContext()), currentHostCapabilities()).template,
-      });
+      const out = buildFinal();
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp
         out.metadata.id = 'core-custom-golden';             // sid() is random per build
