@@ -1109,7 +1109,7 @@ function renderOpts(def) {
       // nothing for some of these on some routes, so an ungated card lets you tick it,
       // keeps it ticked, and exports a config without it. The reasons mirror the
       // emission matrix in presets() exactly — change one and change the other.
-      const why = active ? '' : optionalScraperLaneBlock(d.id);
+      const why = active ? '' : (optionalScraperHostBlock(d.id) || optionalScraperLaneBlock(d.id));
       return `<div class="opt-scraper-card${why ? ' opt-host-blocked' : ''}" data-active="${active}" ${why ? `aria-disabled="true" title="${escHtml(why)}"` : `data-action="toggle-optional-scraper" tabindex="0"`} data-scraper-id="${d.id}" role="checkbox" aria-checked="${active}">
         <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
@@ -1448,25 +1448,28 @@ function outputProfileContext() {
 }
 
 // Dynamic-fetch exit targets, mirroring the dynamicAddonFetching builder in
-// buildConfig(): [cached results at the target resolution, time limit in ms].
-// Ultrawide uses a fixed 1080p/2160p mix, so only its time limit varies.
+// buildConfig(): every result threshold that ends the wait (any one is enough)
+// plus the time limit. Counts are cached results except on P2P/HTTP builds.
 function streamPoolTargets(pool) {
   const p = pool || 'normal', ms = p === 'max' ? 10000 : p === 'large' ? 8000 : 6000;
-  if (S.resolution === '4k') return [p === 'max' ? 25 : p === 'large' ? 15 : 8, ms];
-  if (S.resolution === 'ultrawide') return [null, ms];
-  if (S.resolution === 'mixed' || S.pseArch === 'apex-mixed') return [p === 'max' ? 35 : p === 'large' ? 22 : 12, ms];
-  return [p === 'max' ? 45 : p === 'large' ? 30 : 20, ms];
+  if (S.resolution === '4k') return { counts: [[p === 'max' ? 25 : p === 'large' ? 15 : 8, '2160p']], ms };
+  if (S.resolution === 'ultrawide') return { counts: [[15, '1080p'], [5, '2160p']], ms };
+  if (S.resolution === 'mixed' || S.pseArch === 'apex-mixed') {
+    return { counts: [[p === 'max' ? 35 : p === 'large' ? 22 : 12, '1080p'], [p === 'max' ? 20 : p === 'large' ? 12 : 6, '2160p']], ms };
+  }
+  return { counts: [[p === 'max' ? 45 : p === 'large' ? 30 : 20, '1080p']], ms };
 }
 function streamPoolChoices() {
   return [['normal','Normal'],['large','Large'],['max','Maximum']].map(([v, l]) => {
-    const [n, ms] = streamPoolTargets(v);
-    return [v, l, n == null ? `${ms / 1000}s limit` : `${n} results`];
+    const { counts, ms } = streamPoolTargets(v);
+    return [v, l, `${counts.map(([n, r]) => `${n}×${r}`).join(' / ')} · ${ms / 1000}s`];
   });
 }
 function streamPoolSummary() {
   if (['stable', 'balanced'].includes(activeOutputProfile())) return 'Not used on this profile';
-  const [n, ms] = streamPoolTargets(S.streamPool);
-  return n == null ? `stops after ${ms / 1000}s` : `stops at ${n} cached or ${ms / 1000}s`;
+  const { counts, ms } = streamPoolTargets(S.streamPool);
+  const cached = (S.service === 'p2p' || S.service === 'http') ? '' : 'cached ';
+  return `stops at ${counts.map(([n, r]) => `${n} ${cached}${r}`).join(' or ')}, or after ${ms / 1000}s`;
 }
 
 function activeOutputProfile() {
@@ -1560,6 +1563,18 @@ function outputProfileAuditHtml() {
 // carousel happily accepts a toggle that the export then drops in silence — the
 // same class of bug as an extra being filtered back out by the output profile.
 // Keep in step with presets() and with configurator/tests/optional-extras-toggles.mjs.
+/**
+ * Reason the selected host refuses this optional scraper's preset (for example
+ * Bitmagnet on hosts that never configured it), or ''. buildFinal() would strip
+ * it anyway; gating the card keeps the picker from offering a dead choice.
+ */
+function optionalScraperHostBlock(id) {
+  const def = OPTIONAL_SCRAPER_DEFS.find(x => x.id === id);
+  if (!def) return '';
+  const entry = hostGateEntries().find(e => e.option === `preset:${def.presetType}` && e.action !== 'confirm');
+  return entry ? (entry.reason || `not available on this host`) : '';
+}
+
 function optionalScraperLaneBlock(id) {
   const svc = S.service;
   const usenetAllowed = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra','easynews','easynewsPlus'];
@@ -1569,7 +1584,7 @@ function optionalScraperLaneBlock(id) {
   if (id === 'sootio' && (svc === 'p2p' || svc === 'http')) {
     return 'AIOStreams v2.33+ accepts Sootio only with a debrid or usenet service behind it';
   }
-  if (id === 'neko-bt' && svc === 'http') {
+  if ((id === 'neko-bt' || id === 'brazuca-torrents') && svc === 'http') {
     return 'the HTTP route carries no torrent scrapers';
   }
   // Usenet indexers need a Usenet service.
@@ -7335,7 +7350,7 @@ function showAdditionalServicesPicker(options={}) {
   // serve is offered disabled, with the reason in place of the usual hint.
   const extraBlocked = (() => { const m={}; for (const e of hostGateEntries()) if (e.scope==='service') m[e.option.slice('service:'.length)] = e.reason; return m; })();
   const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';const why=selectedServices.has(id)?'':extraBlocked[id]||'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}${why?' opt-host-blocked':''}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''} data-extra-service="${id}"><b>${o.name}</b><span${why?' class="opt-host-note"':''}>${why?`Unavailable — ${escHtml(why)}`:(id==='p2p'||id==='http'?'No account required':'Credentials may be required')}</span></button>`;}).join('');
-  const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>`<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"><b>${d.label}</b><span>${d.desc}</span></button>`).join('');
+  const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>{const why=selectedScrapers.has(d.id)?'':optionalScraperHostBlock(d.id);return `<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''}><b>${d.label}</b><span>${d.desc}${why?` · Unavailable — ${escHtml(why)}`:''}</span></button>`;}).join('');
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
   document.body.appendChild(overlay);
