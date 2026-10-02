@@ -315,7 +315,7 @@ function buildPresets(input) {
     { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
-      { type:'animetosho', instanceId:'nx-at-01', enabled:content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'animetosho', instanceId:'nx-at-01', enabled:(content === 'anime' || content === 'mixed') && torrentCapable, options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle

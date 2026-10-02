@@ -107,6 +107,9 @@ const STABLE_STREAM_TYPES = new Set([
 const BALANCED_STREAM_TYPES = new Set([
   ...STABLE_STREAM_TYPES,
   'mediafusion', 'eztv', 'torrent-galaxy', 'zilean', 'knaben',
+  // Emitted only for Anime / Movies + Anime content with a torrent debrid service;
+  // without it, choosing Anime added no anime source on the default profile.
+  'animetosho',
 ]);
 
 const CORE_EXTERNAL_KILL = Object.freeze({

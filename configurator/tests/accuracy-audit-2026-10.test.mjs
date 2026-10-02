@@ -15,6 +15,7 @@ import { UPSTREAM_REMOVED_PRESET_IDS } from '../src/data/host-capabilities.js';
 import { parseHostStatus, resolveHostCapabilities, knownHostKeys } from '../src/core/host-capability-policy.js';
 import { generateAgeRatingESE } from '../src/data/agerating.js';
 import { generateTemplate } from '../../packages/core/src/generate-template.js';
+import { applyOutputProfile } from '../src/core/output-profile-policy.js';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
@@ -96,4 +97,18 @@ test('troubleshooter and Stream Pool numbers come from the build, not stale copy
   assert.doesNotMatch(app, /The 8 default excluded regex patterns/);
   assert.doesNotMatch(app, /normal:'30–35 results'/);
   assert.match(app, /function streamPoolTargets\(/);
+});
+
+test('Anime content gets AnimeTosho on the default profile, only with a torrent debrid service', () => {
+  // AnimeTosho is a Torznab built-in: with no StremThru-capable service it fails the
+  // whole save, so P2P / EasyNews anime builds must not carry it enabled.
+  const types = (input) => generateTemplate(input, {}).config.presets.filter(p => p.enabled !== false).map(p => p.type);
+  assert.ok(types({ service: 'torbox-pro', content: 'anime' }).includes('animetosho'));
+  assert.ok(types({ service: 'torbox-pro', content: 'mixed' }).includes('animetosho'));
+  assert.ok(!types({ service: 'torbox-pro', content: 'all' }).includes('animetosho'));
+  assert.ok(!types({ service: 'p2p', content: 'anime' }).includes('animetosho'));
+  assert.ok(!types({ service: 'easynews', content: 'anime' }).includes('animetosho'));
+  const ctx = { service: 'torbox-pro', resolution: '1080p', langs: ['English'], langExclusive: false, sizeLimit: 'unlimited', bandwidthMbps: 0, multiServices: ['torbox-pro'], optionalScrapers: [] };
+  const balanced = applyOutputProfile(generateTemplate({ service: 'torbox-pro', content: 'anime' }, {}), 'balanced', ctx);
+  assert.ok(balanced.config.presets.some(p => p.type === 'animetosho'), 'Balanced must keep AnimeTosho');
 });

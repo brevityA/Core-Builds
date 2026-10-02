@@ -37,13 +37,16 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Retired add-ons can no longer break a save" icon="bug">
     TorBox (addon), USA TV and Debridio Watchtower were offered as toggles, but AIOStreams marks all three removed and refuses any config containing one, on every host. They are gone from the list and stripped from older saved setups. Bitmagnet stays, but only works on hosts that configure it, so it is now stripped on ElfHosted, ATBP, Omni's and Wizaardd; the live host check also reads each host's own disabled-add-on list, which is how it now catches Viren's nightly blocking Torrentio.
   </Card>
-  <Card title="Age Rating Limit removed" icon="sparkles">
+  <Card title="Anime builds get an anime scraper on the default profile" icon="sparkles">
+    choosing Anime or Movies + Anime added AnimeTosho only on Advanced; the default Balanced profile stripped it, so the choice changed nothing. It now ships on both whenever a torrent debrid service is set. Like EZTV and Knaben, AnimeTosho cannot run without one, and an Advanced anime build on P2P or EasyNews carried it anyway, which refused the save; those builds now leave it out.
+  </Card>
+  <Card title="Age Rating Limit removed" icon="bolt">
     the filter wrote a certification() rule, but AIOStreams has no such function: on Advanced and Labs the host refused the whole config, and on Stable and Balanced the rule was silently dropped, so the control did nothing while saying it filtered. The control is gone until AIOStreams ships a rating filter; saved setups that chose a rating keep loading.
   </Card>
-  <Card title="Descriptions checked against AIOStreams and the live hosts" icon="bolt">
+  <Card title="Descriptions checked against AIOStreams and the live hosts" icon="shield-check">
     every host now shows the version it actually runs (2.35.4 to 2.35.7; the picker still said 2.34.1, and Omni's is no longer behind, so it drops 'legacy'). The Recommended Stack panel is rewritten: it called StremThru Torz and Knaben usenet sources, recommended Torrentio, and listed developer notes. Also corrected: Brazuca Torrents is P2P, not debrid (and is now selectable on P2P builds); EasyDebrid is a debrid service, not an aggregator; Samsung TVs gained AV1 in 2020; the Fire TV Stick HD plays HDR10 and HLG; the Anime option keeps dual-audio releases rather than filtering to SeaDex only; the troubleshooter quoted 8 excluded and 107 ranked patterns where Balanced ships 3 and about 80; and Stream Pool showed two contradictory sets of counts and now shows the stop count the build uses, saying plainly that Stable and Balanced ignore it.
   </Card>
-  <Card title="Release notes now say when generated output is unchanged" icon="shield-check">
+  <Card title="Release notes now say when generated output is unchanged" icon="sliders">
     3.12 to 3.13 produced byte-identical configs, and default-profile users saw none of 3.9 through 3.11 either, yet each release read as a config change: re-importing showed no changes in AIOStreams and looked broken. A new check blocks any release that changes no generated config unless its notes say so, and blocks the opposite claim when output did change.
   </Card>
 </CardGroup>

@@ -27,6 +27,12 @@ against what AIOStreams and the public hosts actually do.
 | 6 | Seedr sent `apiKey`, and emitted StremThru Store | Upstream requires `encodedToken` (issued by MediaFusion); only MediaFusion supports Seedr, so a Store instance with no usable service throws | Form asks for the token; Seedr builds emit no StremThru preset |
 | 7 | Age Rating Limit emitted `certification(...)` | No such SEL function upstream; `testStreamExpression()` rejects it. On Stable/Balanced the rule was silently dropped, so the control did nothing | Control removed; generator stub returns nothing; saved `ageLimit` still loads |
 
+## Approved follow-up (owner, 2026-10-02)
+
+| # | Finding | Fix |
+|---|---|---|
+| 23 | Choosing Anime / Movies + Anime added no anime source on Balanced: the allowlist stripped AnimeTosho. AnimeTosho is also a Torznab built-in, so Advanced anime builds on P2P/EasyNews carried an enabled preset that refused the save | Balanced keeps AnimeTosho; it is emitted for Anime and Movies + Anime only with a torrent debrid service |
+
 ## False or stale information
 
 | # | Where | Was | Now |
@@ -60,9 +66,6 @@ statements, and the four upstream descriptions behind the remaining toggles.
   targets 2.34.1. The test that required every host version to be a selectable
   target was replaced by the property that matters: every host runs at least
   the default target. #772 attempts a 2.35.3 re-pin; upstream is now 2.35.7.
-- **Anime on Balanced.** Balanced's allowlist strips AnimeTosho, so choosing
-  Anime content adds no anime scraper there. Restoring it changes output and
-  was left for approval.
 - **TCL and Hisense profiles** treat every model as having no Dolby Vision.
   Many do support it; the profile errs on the safe side and its text says
   "do not assume", which is accurate.
