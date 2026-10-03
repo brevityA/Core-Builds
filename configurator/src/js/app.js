@@ -1748,7 +1748,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>AIOSubtitle</strong> is built-in and fast. <strong>OpenSubtitles v3+</strong> has the largest database. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>AIOSubtitle</strong> is currently slow to respond, and hosts may refuse the save while it is enabled. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
           <div style="display:flex;flex-direction:column;gap:5px">

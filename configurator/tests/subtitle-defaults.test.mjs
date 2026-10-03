@@ -35,3 +35,19 @@ test('saved sessions on the old AIOSubtitle-only default move to OpenSubtitles v
   assert.deepEqual(migrate({ _schema: 4, subtitleAddons: ['aiosubtitle', 'subdl'] }).subtitleAddons, ['aiosubtitle', 'subdl'], 'an explicit mix is the user\'s choice');
   assert.deepEqual(migrate({ _schema: 5, subtitleAddons: ['aiosubtitle'] }).subtitleAddons, ['aiosubtitle'], 'runs once');
 });
+
+test('an imported keyless SubDL is switched off; an entered key is written into it', async () => {
+  const { mergeImportedPresets, importedSourceState } = await import('../src/core/template-update-policy.js');
+  const imported = [{ type: 'subdl', instanceId: 'subdl-imp', enabled: true, options: { name: 'SubDL', language: ['EN'] } }];
+  const generated = [{ type: 'opensubtitles-v3-plus', instanceId: 'osub-v3-1', enabled: true, options: {} }];
+  const ctx = { optionalScrapers: [], subtitleAddons: ['subdl'], creds: {} };
+  const keyless = mergeImportedPresets(generated, imported, ctx);
+  assert.equal(keyless.find(p => p.type === 'subdl').enabled, false, 'AIOStreams would refuse the save');
+  assert.ok(keyless.some(p => p.type === 'opensubtitles-v3-plus' && p.enabled !== false), 'subtitles still work');
+  const keyed = mergeImportedPresets(generated, imported, { ...ctx, creds: { subdl: 'k' } });
+  const subdl = keyed.find(p => p.type === 'subdl');
+  assert.equal(subdl.enabled, true);
+  assert.equal(subdl.options.subDlApiKey, 'k');
+  const withKey = [{ ...imported[0], options: { ...imported[0].options, subDlApiKey: 'imported-key' } }];
+  assert.equal(importedSourceState({ presets: withKey }).creds.subdl, 'imported-key', 'an imported key reaches the key field');
+});
