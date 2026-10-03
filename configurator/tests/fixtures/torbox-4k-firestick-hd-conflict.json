@@ -159,11 +159,11 @@
         "direction": "desc"
       },
       {
-        "key": "quality",
+        "key": "cached",
         "direction": "desc"
       },
       {
-        "key": "cached",
+        "key": "quality",
         "direction": "desc"
       },
       {
@@ -233,11 +233,11 @@
         "direction": "desc"
       },
       {
-        "key": "quality",
+        "key": "cached",
         "direction": "desc"
       },
       {
-        "key": "cached",
+        "key": "quality",
         "direction": "desc"
       },
       {
@@ -307,11 +307,11 @@
         "direction": "desc"
       },
       {
-        "key": "quality",
+        "key": "cached",
         "direction": "desc"
       },
       {
-        "key": "cached",
+        "key": "quality",
         "direction": "desc"
       },
       {
@@ -381,11 +381,11 @@
         "direction": "desc"
       },
       {
-        "key": "quality",
+        "key": "cached",
         "direction": "desc"
       },
       {
-        "key": "cached",
+        "key": "quality",
         "direction": "desc"
       },
       {
@@ -455,11 +455,11 @@
         "direction": "desc"
       },
       {
-        "key": "quality",
+        "key": "cached",
         "direction": "desc"
       },
       {
-        "key": "cached",
+        "key": "quality",
         "direction": "desc"
       },
       {
@@ -525,11 +525,11 @@
         "direction": "desc"
       },
       {
-        "key": "quality",
+        "key": "cached",
         "direction": "desc"
       },
       {
-        "key": "cached",
+        "key": "quality",
         "direction": "desc"
       },
       {
@@ -784,6 +784,80 @@
       },
       {
         "key": "language",
+        "direction": "desc"
+      },
+      {
+        "key": "bitrate",
+        "direction": "desc"
+      },
+      {
+        "key": "size",
+        "direction": "desc"
+      },
+      {
+        "key": "age",
+        "direction": "desc"
+      },
+      {
+        "key": "subtitle",
+        "direction": "desc"
+      }
+    ],
+    "cachedSeries": [
+      {
+        "key": "resolution",
+        "direction": "desc"
+      },
+      {
+        "key": "cached",
+        "direction": "desc"
+      },
+      {
+        "key": "quality",
+        "direction": "desc"
+      },
+      {
+        "key": "streamExpressionMatched",
+        "direction": "desc"
+      },
+      {
+        "key": "streamExpressionScore",
+        "direction": "desc"
+      },
+      {
+        "key": "seadex",
+        "direction": "desc"
+      },
+      {
+        "key": "library",
+        "direction": "desc"
+      },
+      {
+        "key": "regexScore",
+        "direction": "desc"
+      },
+      {
+        "key": "visualTag",
+        "direction": "desc"
+      },
+      {
+        "key": "encode",
+        "direction": "desc"
+      },
+      {
+        "key": "audioTag",
+        "direction": "desc"
+      },
+      {
+        "key": "audioChannel",
+        "direction": "desc"
+      },
+      {
+        "key": "language",
+        "direction": "desc"
+      },
+      {
+        "key": "seeders",
         "direction": "desc"
       },
       {

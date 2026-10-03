@@ -115,6 +115,9 @@ jobs:
           # token, and a persisted one is readable from .git/config by anything
           # the job runs (zizmor: artipacked).
           persist-credentials: false
+          # The output-note check compares goldens and changelog.js against the
+          # PR base, so the base branch must be in the clone.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -130,3 +133,11 @@ jobs:
       # itself on every PR.
       - name: Check card titles in the newest changelog entry
         run: python3 scripts/sync-docs.py --check-changelog
+
+      # 3.12 -> 3.13 shipped byte-identical generated configs while reading as a
+      # config release, so users re-imported and saw "no changes" in AIOStreams.
+      # A release that changes no golden must say so; one that does must not.
+      - name: Check the newest entry declares unchanged generated output
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: python3 scripts/check_output_note.py --base "origin/${BASE_REF}"

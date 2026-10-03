@@ -40,13 +40,14 @@ export const OUTPUT_PROFILE_BUDGETS = Object.freeze({
     dynamicFetching: false,
   }),
   // Balanced has a bounded local preference layer, but no remote scoring or
-  // background/early-exit fetch strategy.
+  // background/early-exit fetch strategy. Inline ranked regex is local (each
+  // pattern is a verbatim host-allowlisted string), so it shares Advanced's cap.
   balanced: Object.freeze({
     excludedExpressions: 3,
     includedExpressions: 2,
     preferredExpressions: 8,
     rankedExpressions: 0,
-    inlineRankedRegex: 0,
+    inlineRankedRegex: 120,
     syncedSelUrls: 0,
     syncedRegexUrls: 0,
     groups: false,

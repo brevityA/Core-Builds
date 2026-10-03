@@ -5,13 +5,16 @@ export const PROVIDER_CREDENTIALS = {
   premiumize:    { label: 'Premiumize API Key',     placeholder: 'XXXXXXXXXXXXXXXX',                    url: 'https://www.premiumize.me/account', linkLabel: 'Open account' },
   debridlink:    { label: 'Debrid-Link API Key',    placeholder: 'XXXXXXXXXXXXXXXX',                    url: 'https://debrid-link.com/webapp#/account/api', linkLabel: 'Get key' },
   offcloud:      { label: 'Offcloud API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://offcloud.com/#/account/api', linkLabel: 'Get key' },
+  offcloudEmail: { label: 'Offcloud Email',         placeholder: 'you@example.com',                     url: 'https://offcloud.com/#/account', linkLabel: 'Open account' },
+  offcloudPass:  { label: 'Offcloud Password',      placeholder: 'your-password',                       url: 'https://offcloud.com/#/account', linkLabel: 'Open account' },
   easynews:      { label: 'EasyNews Username',      placeholder: 'your-username',                       url: 'https://www.easynews.com/account', linkLabel: 'Open account' },
   easynewsPass:  { label: 'EasyNews Password',      placeholder: 'your-password',                       url: 'https://www.easynews.com/account', linkLabel: 'Open account' },
   nzbgeek:       { label: 'NZBGeek API Key',        placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://nzbgeek.info/dashboard.php?call=profile', linkLabel: 'Get key' },
   debridio:      { label: 'Debridio API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://debridio.com/', linkLabel: 'Open dashboard' },
   easydebrid:    { label: 'EasyDebrid API Key',     placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://easydebrid.com/', linkLabel: 'Open account' },
-  pikpak:        { label: 'PikPak API Key',         placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://mypikpak.com/', linkLabel: 'Open account' },
-  seedr:         { label: 'Seedr API Key',          placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://www.seedr.cc/', linkLabel: 'Open account' },
+  pikpak:        { label: 'PikPak Email',           placeholder: 'you@example.com',                     url: 'https://mypikpak.com/', linkLabel: 'Open account' },
+  pikpakPass:    { label: 'PikPak Password',        placeholder: 'your-password',                       url: 'https://mypikpak.com/', linkLabel: 'Open account' },
+  seedr:         { label: 'Seedr Encoded Token (from MediaFusion)', placeholder: 'paste the token MediaFusion gives you', url: 'https://mediafusion.elfhosted.com/configure', linkLabel: 'Authorise at MediaFusion' },
   debrider:      { label: 'Debrider API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://debrider.io/', linkLabel: 'Open dashboard' },
   streamnzb:     { label: 'StreamNZB Manifest URL', placeholder: 'https://your-streamnzb-instance/manifest.json', url: '', linkLabel: 'Use your manifest URL' },
   nzbnoob:       { label: 'NZBnoob API Key',        placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://nzbnoob.com', linkLabel: 'Get key' },
@@ -27,3 +30,30 @@ export const PROVIDER_CREDENTIALS = {
   nzbhydra:      { label: 'NZBHydra2 URL',           placeholder: 'http://localhost:5076',                url: 'https://github.com/theotherp/nzbhydra2', linkLabel: 'GitHub' },
   nzbhydraApiKey:{ label: 'NZBHydra2 API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://github.com/theotherp/nzbhydra2', linkLabel: 'GitHub' },
 };
+
+/**
+ * Services whose AIOStreams credentials are not a single `apiKey`. Each pair maps a
+ * PROVIDER_CREDENTIALS key (what the form stores in S.creds) to the credential id
+ * AIOStreams validates. All listed ids are `required: true` upstream
+ * (packages/core/src/utils/constants.ts, SERVICE_DETAILS), so an enabled service
+ * missing any of them makes the whole config fail to save.
+ */
+export const SERVICE_CREDENTIAL_FIELDS = Object.freeze({
+  offcloud: Object.freeze([['offcloud', 'apiKey'], ['offcloudEmail', 'email'], ['offcloudPass', 'password']]),
+  pikpak: Object.freeze([['pikpak', 'email'], ['pikpakPass', 'password']]),
+  seedr: Object.freeze([['seedr', 'encodedToken']]),
+});
+
+/** Form keys a service needs, in display order (falls back to the service id itself). */
+export function serviceCredentialKeys(serviceId) {
+  return (SERVICE_CREDENTIAL_FIELDS[serviceId] || [[serviceId]]).map(([key]) => key);
+}
+
+/** AIOStreams `credentials` object for a service, from the stored form values. */
+export function serviceCredentials(serviceId, creds = {}) {
+  const fields = SERVICE_CREDENTIAL_FIELDS[serviceId];
+  if (!fields) return creds[serviceId] ? { apiKey: creds[serviceId] } : {};
+  const out = {};
+  for (const [key, id] of fields) if (creds[key]) out[id] = creds[key];
+  return out;
+}

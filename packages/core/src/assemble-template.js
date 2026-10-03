@@ -1,6 +1,13 @@
 import { sanitizeAioEnumArrays } from './schema.js';
+import { AIO_CONFIG_KEYS } from './generated/aiostreams-config-schema.js';
 
+const NON_MIGRATABLE_FIELDS = new Set([
+  'uuid', 'encryptedPassword', 'accessKey', 'ip', 'trusted', 'showChanges',
+  'appliedTemplates', 'linkedAccounts', 'healthResults',
+  'addonName', 'addonLogo', 'addonBackground', 'addonDescription',
+]);
 const ALLOWED_MIGRATION_FIELDS = new Set([
+  ...AIO_CONFIG_KEYS.filter(key => !NON_MIGRATABLE_FIELDS.has(key)),
   'services','presets','groups','sortCriteria','deduplicator','formatter',
   'parentConfig','resultLimits','excludedResolutions','includedResolutions',
   'requiredResolutions','preferredResolutions','excludedEncodes','preferredEncodes',
@@ -35,19 +42,25 @@ export function assembleTemplate(rawTemplate, options = {}) {
   if (options.migrationKeep && typeof options.migrationKeep === 'object') {
     for (const [key, value] of Object.entries(options.migrationKeep)) {
       if (!ALLOWED_MIGRATION_FIELDS.has(key)) continue;
-      if (key === 'parentConfig') { template.parentConfig = clone(value); }
-      else { config[key] = clone(value); }
+      // AIOStreams expects parentConfig at the template root, not under config.
+      if (key === 'parentConfig') template.parentConfig = clone(value);
+      else config[key] = clone(value);
     }
+  }
+
+  for (const key of options.migrationRemove || []) {
+    if (!ALLOWED_MIGRATION_FIELDS.has(key)) continue;
+    if (key === 'parentConfig') delete template.parentConfig;
+    else delete config[key];
   }
 
   if (options.disabledAddons?.size && Array.isArray(config.presets)) {
     if (typeof options.presetMatchesAddon !== 'function') {
       throw new TypeError('presetMatchesAddon function is required when disabledAddons is set');
     }
-    const matchFn = options.presetMatchesAddon;
     const disabled = [...options.disabledAddons];
     config.presets = config.presets.filter(
-      preset => !disabled.some(name => matchFn(preset, name))
+      preset => !disabled.some(name => options.presetMatchesAddon(preset, name))
     );
   }
 
