@@ -1,19 +1,14 @@
 {
   "kind": "source",
-  "extractedAt": "2026-09-26T00:36:25.655Z",
-  "fingerprint": "63f529cd121034f7",
+  "extractedAt": "2026-10-03T03:05:38.934Z",
+  "fingerprint": "346de4681c88d005",
   "repo": "Viren070/AIOStreams",
   "ref": "main",
-  "commit": {
-    "sha": "00fb93a4a19804600f5053d4a409d8d42f1fa6e7",
-    "date": "2026-09-26T00:06:53Z",
-    "message": "chore(desktop): update the web app (#1362)",
-    "url": "https://github.com/Viren070/AIOStreams/commit/00fb93a4a19804600f5053d4a409d8d42f1fa6e7"
-  },
+  "commit": null,
   "counts": {
-    "presets": 83,
+    "presets": 84,
     "services": 21,
-    "schemaKeys": 158,
+    "schemaKeys": 160,
     "selFunctions": 70,
     "formatterFields": 90,
     "formatters": 8,
@@ -38,6 +33,7 @@
     "eztv",
     "therarbg",
     "the-pirate-bay",
+    "tsukihime",
     "torrent-galaxy",
     "bitmagnet",
     "seadex",
@@ -278,6 +274,8 @@
     "presets",
     "addonCategoryColors",
     "catalogModifications",
+    "newCatalogsDisabled",
+    "upstreamCatalogOrder",
     "mergedCatalogs",
     "externalDownloads",
     "cacheAndPlay",
@@ -623,77 +621,12 @@
   ],
   "presets": [
     {
-      "id": "astream",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "ai-companion",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "ai-search",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "aiostreams",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "aiosubtitle",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "anime-catalogs",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "anime-kitsu",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "anime-tosho-new",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "animetosho",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "argentina-tv",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "baguettio",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "bitmagnet",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "brazuca-torrents",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
       "id": "comet",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "content-deep-dive",
+      "id": "meteor",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -703,54 +636,22 @@
       "optionIds": []
     },
     {
-      "id": "davex",
-      "requiredOptions": [],
-      "optionIds": [
-        "name"
-      ]
-    },
-    {
-      "id": "dc-universe",
+      "id": "mediafusion",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "debridio-ic4a",
+      "id": "stremthruStore",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "debridio",
+      "id": "torrentio",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "debridio-tmdb",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "debridio-tv",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "debridio-tvdb",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "debridio-watchtower",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "dmm-cast",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "doctor-who-universe",
+      "id": "torbox",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -785,12 +686,177 @@
       ]
     },
     {
-      "id": "easynews-search",
+      "id": "stremthruTorz",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "eztv",
+      "id": "debridio",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "aiostreams",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "opensubtitles",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "peerflix",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "dmm-cast",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "marvel-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "jackettio",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "orion",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streamfusion",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "anime-kitsu",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "nuvio-streams",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "rpdb-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "tmdb-collections",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-watchtower",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-tmdb",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "star-wars-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-tvdb",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "dc-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-tv",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "debridio-ic4a",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torrent-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streaming-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "anime-catalogs",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "doctor-who-universe",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "webstreamr",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "tmdb-addon",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torrents-db",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "usa-tv",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "usa-tv-next",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "argentina-tv",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "opensubtitles-v3-plus",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "subsource",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "subdl",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "ai-search",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -801,6 +867,31 @@
     },
     {
       "id": "flix-streams",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "aiosubtitle",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "subhero",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "yastream",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streamasia",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "more-like-this",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -818,7 +909,52 @@
       ]
     },
     {
-      "id": "hdhub",
+      "id": "content-deep-dive",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "ai-companion",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torbox-search",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "torznab",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "astream",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "zilean",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "animetosho",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "anime-tosho-new",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "newznab",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "prowlarr",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -828,7 +964,7 @@
       "optionIds": []
     },
     {
-      "id": "jackettio",
+      "id": "nzbhydra",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -843,144 +979,7 @@
       "optionIds": []
     },
     {
-      "id": "marvel-universe",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "mediafusion",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "meteor",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "more-like-this",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "neko-bt",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "newznab",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "nuvio-streams",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "nzbhydra",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "opensubtitles-v3-plus",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "opensubtitles",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "orion",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "peerflix",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "penguplay",
-      "requiredOptions": [],
-      "optionIds": [
-        "name"
-      ]
-    },
-    {
-      "id": "prowlarr",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "rpdb-catalogs",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "seadex",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "sootio",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "star-wars-universe",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "streamasia",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "streamfusion",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "streaming-catalogs",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "streamnzb",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "stremthruStore",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "stremthruTorz",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "subdl",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "subhero",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "subsource",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "the-pirate-bay",
+      "id": "eztv",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -990,57 +989,32 @@
       "optionIds": []
     },
     {
-      "id": "tmdb-addon",
+      "id": "the-pirate-bay",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "tmdb-collections",
+      "id": "tsukihime",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "torbox",
+      "id": "bitmagnet",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "torbox-search",
+      "id": "brazuca-torrents",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "torrent-catalogs",
+      "id": "sootio",
       "requiredOptions": [],
       "optionIds": []
     },
     {
       "id": "torrent-galaxy",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "torrentio",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "torrents-db",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "torznab",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "usa-tv",
-      "requiredOptions": [],
-      "optionIds": []
-    },
-    {
-      "id": "usa-tv-next",
       "requiredOptions": [],
       "optionIds": []
     },
@@ -1052,17 +1026,46 @@
       ]
     },
     {
-      "id": "webstreamr",
+      "id": "neko-bt",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "yastream",
+      "id": "easynews-search",
       "requiredOptions": [],
       "optionIds": []
     },
     {
-      "id": "zilean",
+      "id": "seadex",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "streamnzb",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "davex",
+      "requiredOptions": [],
+      "optionIds": [
+        "name"
+      ]
+    },
+    {
+      "id": "hdhub",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "penguplay",
+      "requiredOptions": [],
+      "optionIds": [
+        "name"
+      ]
+    },
+    {
+      "id": "baguettio",
       "requiredOptions": [],
       "optionIds": []
     }

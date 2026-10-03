@@ -41,11 +41,15 @@ test('registry versions match the 2026-10-02 audit of the live fleet', () => {
   for (const [key, version] of Object.entries(expected)) assert.equal(HOST_META[key].aiostreamsVersion, version, key);
 });
 
-test('every registry host runs at least the default target, so default output fits the fleet', () => {
+test('every registry host runs a release with the pinned contract, so default output fits the fleet', async () => {
   // The output targets the schema pin; a host may run newer. What must never
-  // happen is the default target being newer than a public host.
+  // happen is a public host running a release whose contract differs from the
+  // pin's. UPSTREAM.pin records the oldest release with an identical contract.
+  const { readFile } = await import('node:fs/promises');
+  const pin = JSON.parse(await readFile(new URL('../UPSTREAM.pin', import.meta.url), 'utf8'));
+  assert.ok(isVersionAtLeast(DEFAULT_AIOSTREAMS_VERSION, pin.sameContractSince), 'sameContractSince must not be newer than the pin');
   for (const [key, meta] of Object.entries(HOST_META)) {
-    assert.ok(isVersionAtLeast(meta.aiostreamsVersion, DEFAULT_AIOSTREAMS_VERSION), `${key} (${meta.aiostreamsVersion}) is behind the default target`);
+    assert.ok(isVersionAtLeast(meta.aiostreamsVersion, pin.sameContractSince), `${key} (${meta.aiostreamsVersion}) runs a release older than the pinned contract (${pin.sameContractSince})`);
   }
   assert.ok(AIOSTREAMS_COMPATIBILITY_TARGETS.includes(DEFAULT_AIOSTREAMS_VERSION));
 });

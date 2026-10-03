@@ -1,8 +1,8 @@
 {
   "repo": "Viren070/AIOStreams",
-  "ref": "v2.34.1",
-  "sha": "c1d044c23b48acff9e5f0ce672c786797177e767",
-  "version": "2.34.1",
+  "ref": "v2.35.7",
+  "sha": "0832aa21104c335c4117aa02f75278fe25ffbca0",
+  "version": "2.35.7",
   "rawBase": "https://raw.githubusercontent.com/Viren070/AIOStreams",
   "sources": [
     "package.json",
@@ -11,5 +11,7 @@
     "packages/core/src/presets/presetManager.ts",
     "packages/core/src/streams/sorter.ts"
   ],
-  "note": "Pinned AIOStreams release tag used to regenerate src/data/generated/* and src/config/generated/*. `ref` MUST be a release tag and `sha` MUST be the commit that tag resolves to \u2014 scripts/sync-upstream.mjs verifies this against the remote and refuses to run otherwise, so the drift report always diffs release-to-release. Bump ref+sha+version together, run `npm run sync:upstream`, review the drift report, then commit the regenerated files with this pin."
+  "note": "Pinned AIOStreams release tag used to regenerate src/data/generated/* and src/config/generated/*. `ref` MUST be a release tag and `sha` MUST be the commit that tag resolves to \u2014 scripts/sync-upstream.mjs verifies this against the remote and refuses to run otherwise, so the drift report always diffs release-to-release. Bump ref+sha+version together, run `npm run sync:upstream`, review the drift report, then commit the regenerated files with this pin.",
+  "sameContractSince": "2.35.4",
+  "sameContractNote": "Oldest release whose extracted contract is identical to this pin (v2.35.4 0eccbc7 vs v2.35.7: only upstream.sha/version differ, checked 2026-10-03). Output for the pin is safe on any host at or above it; tests/host-routing.test.mjs holds every registry host to it. Re-check when bumping the pin."
 }

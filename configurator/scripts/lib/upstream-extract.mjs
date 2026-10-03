@@ -222,7 +222,10 @@ export function extractPresetRequiredOptions(presetSources) {
 }
 
 /** Top-level property names of the object literal that follows `header`. */
-export function readObjectKeys(source, header) {
+export function readObjectKeys(rawSource, header) {
+  // Comments first: an apostrophe in a trailing comment (2.35.7: "the addon's
+  // order") otherwise opens a phantom string and the walk runs past the object.
+  const source = stripComments(rawSource);
   const index = source.indexOf(header);
   if (index === -1) return null;
   const openIndex = source.indexOf('{', index + header.length - 1);

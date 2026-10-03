@@ -1,6 +1,6 @@
-// DO NOT EDIT — generated from AIOStreams c1d044c23b48acff9e5f0ce672c786797177e767
-// Source: https://github.com/Viren070/AIOStreams/tree/c1d044c23b48acff9e5f0ce672c786797177e767
-// Upstream version: 2.34.1
+// DO NOT EDIT — generated from AIOStreams 0832aa21104c335c4117aa02f75278fe25ffbca0
+// Source: https://github.com/Viren070/AIOStreams/tree/0832aa21104c335c4117aa02f75278fe25ffbca0
+// Upstream version: 2.35.7
 // Regenerate with: npm run sync:upstream   (see configurator/README.md)
 /** Sort-criteria contract: valid scopes, keys, directions and semantics. */
 

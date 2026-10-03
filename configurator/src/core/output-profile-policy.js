@@ -17,16 +17,15 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // migration to Newznab: the two presets do not have equivalent options or
 // credential handling.
 //
-// 2.34.1 joined after the 2026-09-22 host audit and is still the schema pin.
-// By the 2026-10-02 audit every public host had moved on to 2.35.x;
-// re-pinning is tracked in #770. Older entries stay so
-// existing saved sessions and shared links keep resolving.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', 'unknown']);
+// 2.35.7 is the schema pin (#770): by the 2026-10-02 audit every public host ran
+// 2.35.4 or later, and the 2.34.1 -> 2.35.7 contract drift was additive only.
+// Older entries stay so existing saved sessions and shared links keep resolving.
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.7', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
 // pinned against (see UPSTREAM.pin). Single source of truth — app.js imports it
 // for the state default and every fallback that used to hard-code '2.32.0'.
-export const DEFAULT_AIOSTREAMS_VERSION = '2.34.1';
+export const DEFAULT_AIOSTREAMS_VERSION = '2.35.7';
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({

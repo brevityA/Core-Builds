@@ -422,7 +422,8 @@ Import via AIOStreams → Formatter → Import icon → paste raw URL.
 
 - Real API keys must **NEVER** be committed
 - Personal templates are in `Templates/Personal/` — do not document or expose
-- `instancePassword` is stored in `localStorage` (unencrypted)
+- `instancePassword` and the API keys in `S.creds` are stored in `localStorage` (unencrypted) **by owner decision (2026-10-03)**, so keys stay filled in on the user's own device. Encrypting them there would be theatre: the key would sit in the same storage. This is why CodeQL's 8 `js/clear-text-storage-of-sensitive-data` alerts stay open; 7 of them are an artifact of `cloneUpdateValue`'s JSON fallback merging every `S` field with the credentials. Do not "fix" this without asking.
+- Anything from `S`, a shared link, an import or `localStorage` that is interpolated into `innerHTML` must be escaped (`escHtml`/`escH`). `label()` returns HTML and escapes every non-option value; help tooltip markup lives in `FT_TIPS`, never in the `data-fttip` attribute. Pinned by `configurator/tests/dom-xss-guards.test.mjs`.
 - `stremioPassword` is correctly excluded from `saveState()` — never persisted
 - `sanitizeSharedConfig()` strips credentials from share links
 - The CORS proxy (`cloudflare-worker/`) does not log credentials
