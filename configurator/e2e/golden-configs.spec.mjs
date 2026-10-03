@@ -42,7 +42,7 @@ const BASE = {
   p2pEnabled: false,
   instanceHost: 'elfhosted',
   subtitleLangs: ['en'],
-  subtitleAddons: ['aiosubtitle'],
+  subtitleAddons: ['opensubtitles-v3-plus'],
   catalogs: ['tmdb-addon'],
   proxyEnabled: false,
   proxiedServices: [],

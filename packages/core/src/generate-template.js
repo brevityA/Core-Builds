@@ -77,16 +77,19 @@ function buildDefaultName(input) {
 }
 
 function buildSubtitlePresets(input) {
-  const addons = input.subtitleAddons || ['aiosubtitle'];
+  const addons = input.subtitleAddons || ['opensubtitles-v3-plus'];
   const langs = input.subtitleLangs || ['en'];
   const out = [];
   if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
   if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false, movieHashPlusAutoAdjustment:false } });
-  if (addons.includes('subdl')) {
+  // SubDL refuses the save without an API key (AIOStreams marks subDlApiKey required).
+  if (addons.includes('subdl') && input.credentials?.subdl) {
     // AIOStreams SubDL accepts up to five uppercase provider language codes.
     const subdlLanguages = [...new Set(langs.map(lang => String(lang).trim().toUpperCase()).filter(Boolean))].slice(0, 5);
     out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, resources:['subtitles'], language:subdlLanguages, hearingImpairment:'hiInclude', ...(input.credentials?.subdl ? { subDlApiKey:input.credentials.subdl } : {}) } });
   }
+  // Nothing usable left (SubDL picked with no key): keep subtitles working.
+  if (!out.length && addons.length) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false, movieHashPlusAutoAdjustment:false } });
   return out;
 }
 
