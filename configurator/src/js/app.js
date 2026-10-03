@@ -48,7 +48,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.14';
+const CONFIGURATOR_VERSION = '3.15';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -767,9 +767,10 @@ function backupTimelineHtml() {
   const rows = list.map((b, i) => {
     const d = new Date(b._ts);
     const time = d.toLocaleDateString(undefined, {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
-    const svc = b.multiServices && b.multiServices.length ? b.multiServices[0] : (b.device || '?');
-    const res = b.resolution || '?';
-    return `<div class="bk-row" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .12s" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'"><span style="font-size:.68rem;color:#6b7280;min-width:110px">${time}</span><span style="font-size:.68rem;color:#8b949e;flex:1">${svc} · ${res}${b._ver?' · v'+b._ver:''}</span><button data-action="restore-backup" data-idx="${i}" style="padding:3px 10px;font-size:.65rem;font-weight:700;border-radius:5px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#3d9db5;cursor:pointer;transition:background .12s" onmouseover="this.style.background='rgba(0,212,255,.14)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Restore</button></div>`;
+    // Backups come back from localStorage: escape before they reach innerHTML.
+    const svc = escHtml(b.multiServices && b.multiServices.length ? b.multiServices[0] : (b.device || '?'));
+    const res = escHtml(b.resolution || '?');
+    return `<div class="bk-row" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .12s" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'"><span style="font-size:.68rem;color:#6b7280;min-width:110px">${time}</span><span style="font-size:.68rem;color:#8b949e;flex:1">${svc} · ${res}${b._ver?' · v'+escHtml(b._ver):''}</span><button data-action="restore-backup" data-idx="${i}" style="padding:3px 10px;font-size:.65rem;font-weight:700;border-radius:5px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#3d9db5;cursor:pointer;transition:background .12s" onmouseover="this.style.background='rgba(0,212,255,.14)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Restore</button></div>`;
   }).join('');
   return `<details class="hc-box" style="margin-top:8px"><summary class="hc-hdr" style="list-style:none;cursor:pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Backup History (${list.length}) <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></summary><div class="hc-hosts" style="max-height:240px;overflow-y:auto">${rows}</div></details>`;
 }
@@ -783,7 +784,7 @@ function lastGenDiff() {
     KEYS.forEach(([k, lbl]) => {
       const a = last[k], b = S[k];
       if (a == null || b == null || a === b) return;
-      const fmt = v => NICE[k] ? NICE[k](v) : (label(k, v) || v);
+      const fmt = v => NICE[k] ? escHtml(NICE[k](v)) : (label(k, v) || escHtml(v)); // HTML: rendered by the Install step
       out.push(lbl + ': ' + fmt(a) + ' → ' + fmt(b));
     });
     if (Array.isArray(last.multiServices) && JSON.stringify([...last.multiServices].sort()) !== JSON.stringify([...(S.multiServices||[])].sort())) out.push('Services changed');
@@ -882,17 +883,21 @@ function deriveService() {
 }
 
 /* RENDERING */
+// Returns HTML. Known option names are authored markup; anything else (an
+// unknown value from a shared link or import, a custom formatter's own label)
+// is escaped, because label() output is interpolated straight into innerHTML.
 function label(key, val) {
-  if (key === 'formatter') { if (val === 'custom') return S.customFormatter ? (S.customFormatter.label || 'Custom') : 'Custom'; const f = FORMATTERS.find(x => x.id === val); return f ? f.label : val || ''; }
-  if (key === 'audio') { const m = {lossless:'Full Lossless',standard:'DD+ / Atmos',limited:'Auto',dolby:'Dolby Only'}; return m[val] || val || ''; }
+  const raw = v => escHtml(v || '');
+  if (key === 'formatter') { if (val === 'custom') return S.customFormatter ? raw(S.customFormatter.label || 'Custom') : 'Custom'; const f = FORMATTERS.find(x => x.id === val); return f ? f.label : raw(val); }
+  if (key === 'audio') { const m = {lossless:'Full Lossless',standard:'DD+ / Atmos',limited:'Auto',dolby:'Dolby Only'}; return m[val] || raw(val); }
   if (key === 'service' && val === 'multi') {
     const d2 = DEFS.find(x => x.key === 'service');
-    if (d2) return S.multiServices.filter(s => ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','debridio','debrider','easydebrid','pikpak','seedr'].includes(s)).map(s => { const o = d2.opts.find(x => x.v === s); return o ? o.name : s; }).join(' + ');
+    if (d2) return S.multiServices.filter(s => ['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','debridio','debrider','easydebrid','pikpak','seedr'].includes(s)).map(s => { const o = d2.opts.find(x => x.v === s); return o ? o.name : raw(s); }).join(' + ');
   }
   const d = DEFS.find(x => x.key === key);
-  if (!d) return val || '';
+  if (!d) return raw(val);
   const o = d.opts.find(x => x.v === val);
-  return o ? o.name : val || '';
+  return o ? o.name : raw(val);
 }
 
 /**
@@ -1329,13 +1334,20 @@ function renderP2pToggle() {
   </div>`;
 }
 
+// Tooltip markup lives here, keyed by a small id; the icon carries only the id.
+// It used to round-trip through the data attribute and back into innerHTML, which
+// turns any DOM text in that attribute into HTML (CodeQL js/xss-through-dom).
+// Keyed by the text itself so re-renders reuse an id instead of growing the map.
+const FT_TIPS = new Map();
+const FT_TIP_IDS = new Map();
 function ftTip(text) {
-  // Text is stashed in a data attribute (entity-escaped for attribute safety). The popup
-  // itself is portaled to <body> on open (showFtTip) so it can never be clipped by an
-  // ancestor's overflow — the Fine-Tune drawer scrolls, which used to cut these help
+  // The popup is portaled to <body> on open (showFtTip) so it can never be clipped by
+  // an ancestor's overflow — the Fine-Tune drawer scrolls, which used to cut these help
   // cards off mid-sentence. Reported by the Core Crew (layering bug #2).
-  const esc = String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-  return `<i class="ft-info" data-fttip="${esc}" tabindex="0" role="button" aria-label="More information">?</i>`;
+  const html = String(text);
+  let id = FT_TIP_IDS.get(html);
+  if (!id) { id = 't' + (FT_TIP_IDS.size + 1); FT_TIP_IDS.set(html, id); FT_TIPS.set(id, html); }
+  return `<i class="ft-info" data-fttip="${id}" tabindex="0" role="button" aria-label="More information">?</i>`;
 }
 
 let _ftPop = null, _ftActiveIcon = null;
@@ -1359,7 +1371,7 @@ function hideFtTip() { if (_ftPop) _ftPop.classList.remove('active'); _ftActiveI
 function toggleFtTip(icon) { (_ftActiveIcon === icon && _ftPop && _ftPop.classList.contains('active')) ? hideFtTip() : showFtTip(icon); }
 function showFtTip(icon) {
   const pop = _ftPopup();
-  pop.innerHTML = icon.getAttribute('data-fttip') || '';
+  pop.innerHTML = FT_TIPS.get(icon.getAttribute('data-fttip')) || '';
   pop.classList.add('active');
   const iw = window.innerWidth, ih = window.innerHeight;
   const r = icon.getBoundingClientRect();
@@ -1502,7 +1514,8 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
     '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. No public host runs it any more — kept so saved sessions keep resolving.',
     '2.34.0': 'v2.34.0 lane: an earlier pinned release. No public host runs it any more — kept so saved sessions keep resolving.',
-    '2.34.1': 'v2.34.1 lane (default): the release this configurator\u2019s schema is pinned to (c1d044c). Every public host now runs a newer 2.35.x build.',
+    '2.34.1': 'v2.34.1 lane: the previous schema pin. Builds are the same as on 2.35.7; no public host runs it any more.',
+    '2.35.7': 'v2.35.7 lane (default): the release this configurator\u2019s schema is pinned to (0832aa2). Every public host runs 2.35.4 or later.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
@@ -1813,7 +1826,7 @@ function renderAdvancedPanel() {
         ${prefCard('preloadEnabled','Preload first streams','Preload cached candidates to reduce wait time. Disable to reduce background requests.')}
         <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Autoplay method</div><div style="display:flex;gap:5px">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
         <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Global addon timeout</div><div style="display:flex;gap:5px">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
-        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Bandwidth cap (Mbps) <span style="opacity:.6">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${S.bandwidthMbps||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e6edf3;font-size:.72rem;outline:none" /></div>
+        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Bandwidth cap (Mbps) <span style="opacity:.6">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e6edf3;font-size:.72rem;outline:none" /></div>
       </div>
 
       <div>
@@ -2030,7 +2043,7 @@ function splashHtml() {
 
     ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
       ${versionBannerHtml()}
-      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${_savedStep} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
+      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${Number(_savedStep)||1} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
       <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
       ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="padding:8px 13px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:800;cursor:pointer">${ICO.bolt(14,'#34d399')} Previous settings → Install</button>` : ''}
@@ -2218,7 +2231,7 @@ function render() {
         </details>
         <div class="name-row">
           <label>Template name (optional)</label>
-          <input class="name-input" id="nameIn" type="text" placeholder="${auto}"
+          <input class="name-input" id="nameIn" type="text" placeholder="${escH(auto)}"
             value="${escH(S.name)}" data-action="update-name" maxlength="60">
         </div>
         ${sizeLimitHtml()}
@@ -2324,7 +2337,7 @@ function render() {
               <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'?'display:none':''}">
                 <label>UUID</label>
                 <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
-                  value="${S.instanceUuid}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
+                  value="${escHtml(S.instanceUuid || '')}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
                 <div id="uuidStatus" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
               </div>
             </div>
@@ -2486,7 +2499,7 @@ function render() {
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.03);user-select:none" onclick="this.parentElement.querySelector('.lang-chevron').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'">
             <div style="display:flex;align-items:center;gap:10px">
               <span style="font-size:.74rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Language Preferences</span>
-              <span style="font-size:.7rem;color:#00d4ff;font-weight:600">${(S.langs||['English']).join(' · ')}</span>
+              <span style="font-size:.7rem;color:#00d4ff;font-weight:600">${(S.langs||['English']).map(escHtml).join(' · ')}</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px">
               ${S.langExclusive ? `<span style="font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--th-accent-bg);color:var(--th-accent);border:1px solid rgba(0,212,255,.25)">EXCLUSIVE</span>` : ''}
@@ -3886,10 +3899,10 @@ function insights() {
   if (!S.p2pEnabled) pts.push('<b>Raw torrents excluded</b> — direct P2P streams blocked; debrid results unaffected');
   if (S.qualityFirst) pts.push('<b>Quality over resolution</b> — REMUX ranked above resolution in sort order');
   if (S.resolutionFirst) pts.push('<b>Resolution first</b> — higher resolution always ranks above lower regardless of cache status');
-  if (S.foreignLangKill !== false && cnt !== 'anime') pts.push('<b>Foreign language kill</b> — streams not in ' + (S.langs||['English']).join('/') + ' are hard-blocked (Library &amp; SeaDex exempt)');
+  if (S.foreignLangKill !== false && cnt !== 'anime') pts.push('<b>Foreign language kill</b> — streams not in ' + (S.langs||['English']).map(escHtml).join('/') + ' are hard-blocked (Library &amp; SeaDex exempt)');
   if (S.exclude4K) pts.push('<b>4K / UHD excluded</b> — 1080p and below only');
   if (S.excludeDV) pts.push('<b>Dolby Vision excluded</b> — DV streams removed, prevents tint on unsupported screens');
-  if (S.sizeLimit !== 'unlimited') pts.push('<b>Size limit: max ' + S.sizeLimit + 'GB</b> — streams over ' + S.sizeLimit + 'GB excluded from results');
+  if (S.sizeLimit !== 'unlimited') { const gb = escHtml(S.sizeLimit); pts.push('<b>Size limit: max ' + gb + 'GB</b> — streams over ' + gb + 'GB excluded from results'); }
   if ((S.streamPool||'normal') !== 'normal') pts.push('<b>Stream pool: ' + (S.streamPool==='max'?'Maximum':'Large') + '</b> — more streams fetched for better quality picks');
   pts.push('<b>Per-Addon Flood Guard</b> — no single scraper can flood results');
   pts.push('<b>REPACK / PROPER priority</b> — fixed releases ranked above originals');
@@ -6524,14 +6537,14 @@ function simpleFinishHtml() {
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
           </div>
           <div>
-            <button data-action="set-simple-quality" data-active="${S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-quality" data-active="${!!S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Quality over resolution</span>
               <span>${S.qualityFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">A 1080p REMUX ranks above a 4K WEB-DL when enabled</div>
           </div>
           <div>
-            <button data-action="set-simple-resfirst" data-active="${S.resolutionFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.resolutionFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.resolutionFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-resfirst" data-active="${!!S.resolutionFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.resolutionFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.resolutionFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Resolution first</span>
               <span>${S.resolutionFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
