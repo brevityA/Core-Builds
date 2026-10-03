@@ -11,8 +11,8 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.14",
-    "coreBuildsAIOStreamsTarget": "2.34.1",
+    "coreBuildsVersion": "3.15",
+    "coreBuildsAIOStreamsTarget": "2.35.7",
     "coreBuildsProfile": "advanced",
     "coreBuildsProfileVersion": "1"
   },

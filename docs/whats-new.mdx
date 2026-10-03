@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.14"
+title: "What's New — Configurator v3.15"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.14 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.15 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.14**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.15**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.15 (Oct 3 2026)
+
+<CardGroup cols={2}>
+  <Card title="Built against AIOStreams 2.35.7" icon="sparkles">
+    the configurator’s schema was still read from AIOStreams 2.34.1, while every public host had moved to 2.35.4 or later. It is now read from the 2.35.7 release, which is also the new default compatibility target. Upstream only added things between the two (two new add-ons, five new settings), so no setting the configurator writes changed meaning. 2.35.4 and 2.35.5, which Wizaardd, ATBP and Omni’s run, have the same schema as 2.35.7.
+  </Card>
+  <Card title="Generated configs now say they target 2.35.7" icon="bolt">
+    the only change in generated output is the compatibility-target stamp in the template metadata, which moves from 2.34.1 to 2.35.7. Filters, sorting, scrapers and formatting are byte-for-byte the same, so re-importing changes nothing AIOStreams acts on. Saved sessions that picked a target keep it.
+  </Card>
+  <Card title="Upstream watch re-pinned" icon="shield-check">
+    the AIOStreams contract watcher had flagged additive drift since September 26 (#770). It is re-pinned, and its source extraction no longer depends on GitHub’s API, which some networks refuse.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.14 (Oct 2 2026)
 
@@ -95,21 +111,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Configuration Doctor in the Template Inspector" icon="wand">
     paste, drop or upload any AIOStreams config and get structured findings on top of the existing validation: removed presets, duplicate or missing instance IDs, embedded credentials, very long addon timeouts, strict-matching traps, oversized payloads and legacy expression syntax. Each finding that has a deterministic fix offers a selectable safe repair; selected repairs are previewed against a clone and downloaded as a separate file, the original is never modified, and everything runs locally in the browser — nothing is uploaded anywhere. Credential findings name the field, never the value.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.11 (Sep 25 2026)
-
-<CardGroup cols={2}>
-  <Card title="Configs rejected on import" icon="sparkles">
-    fixed. Vidhin05 removed the HHWEB release group from two ranked patterns, Radarr Web T3 and Sonarr Web T3, and every Core Builds surface still carried the old string. Hosts check regex by exact string equality against their allowlist, so two of the 91 patterns in a generated config no longer matched and the whole config was refused — which looks like the addons simply not being configured. Nothing shipped on our side to cause it and nothing had to: the allowlist moved underneath us. Both patterns are re-derived verbatim from upstream across the configurator, the CLI, the shared filter files and 43 templates, each of which bumps so the update banner offers the corrected version. Audited the whole fleet against the live allowlist rather than only the reported case: these two were the only mismatches.
-  </Card>
-  <Card title="The drift watcher that should have caught this" icon="bolt">
-    it ran every night and reported success while the snapshot sat stale. It piped the check into tee and then read $?, which is tee's status and always zero, so the step that opens a drift issue never ran. Worse, the 'back in sync' branch is the one that did run, and it closes an open drift issue — so a real report would have been retracted automatically. It now reads the checker's own status, and it no longer treats an unreachable upstream as proof of sync.
-  </Card>
-  <Card title="Debridio add-ons no longer export an invalid config" icon="shield-check">
-    Debridio TMDB, TVDB and Watchtower were offered as simple on/off toggles, but each requires an API key that has no default, so switching one on produced a config the host refused. They were classified as safe by a generated options map that is missing 11 required options across 8 presets, and the test guarding that classification read the same map, so it agreed. The three now carry their key, and the check reads the live host contract instead of the map it is meant to be checking.
   </Card>
 </CardGroup>

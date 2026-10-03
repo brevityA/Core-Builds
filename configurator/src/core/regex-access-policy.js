@@ -14,7 +14,10 @@
  * only later).
  *
  * This module mirrors `validateRegexes()` in AIOStreams
- * packages/core/src/utils/config.ts at the pinned ref (v2.34.1 @ c1d044c, re-verified identical):
+ * packages/core/src/utils/config.ts (written against v2.34.1 @ c1d044c). At the v2.35.7 pin
+ * (0832aa2) upstream also permits the contents of any synced regex URL the caller may
+ * fetch, and drops denied patterns on the serve path instead of skipping the check.
+ * Both only loosen the save gate, so this host-allowlist-only check stays conservative:
  * only the five top-level `*RegexPatterns` arrays are part of this gate
  * (stream expressions are NOT validated against the allowlist upstream) and
  * matching is exact-string on the deduped union. The DOM half lives in app.js

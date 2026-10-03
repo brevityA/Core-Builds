@@ -320,7 +320,17 @@ async function listPresetFiles() {
   if (process.env.GITHUB_TOKEN) {
     headers.authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
-  const listing = await fetchJson(url, { extraHeaders: headers });
+  let listing;
+  try {
+    listing = await fetchJson(url, { extraHeaders: headers });
+  } catch (err) {
+    // The contents API needs a token some networks refuse; raw files do not.
+    // presetManager.ts imports every registered preset, which is the set that matters.
+    const manager = await fetchText(RAW_BASE + 'packages/core/src/presets/presetManager.ts');
+    const names = [...manager.matchAll(/from\s+'\.\/([A-Za-z0-9_-]+)\.js'/g)].map((m) => `${m[1]}.ts`);
+    if (names.length < 20) throw err;
+    listing = [...new Set(names)].map((name) => ({ type: 'file', name, path: `packages/core/src/presets/${name}` }));
+  }
   return listing
     .filter((f) => f.type === 'file' && f.name.endsWith('.ts') && !f.name.endsWith('.test.ts'))
     .filter((f) => !['index.ts', 'preset.ts', 'presetManager.ts'].includes(f.name))

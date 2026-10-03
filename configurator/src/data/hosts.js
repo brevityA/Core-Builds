@@ -11,7 +11,7 @@ export const HOST_META = {
   // Viren's nightly on 2.35.7 (stable commit 0832aa21; the nightly on its own
   // build, dd9a87c1), ATBP and Omni's on 2.35.5 (83775623), Wizaardd on 2.35.4
   // (0eccbc78). Omni's is no longer behind, so it no longer carries "(legacy)".
-  // The configurator's schema pin is still 2.34.1 (see AIOSTREAMS target notes);
+  // The configurator's schema pin is 2.35.7 (UPSTREAM.pin, #770);
   // these lines record what each host runs, not what the output targets.
   // An entry drifting is normal: hosts upgrade on their own schedule.
   // Check /api/v1/status before trusting any line below.

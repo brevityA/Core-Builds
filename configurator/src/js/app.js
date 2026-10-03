@@ -48,7 +48,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.14';
+const CONFIGURATOR_VERSION = '3.15';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1502,7 +1502,8 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
     '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. No public host runs it any more — kept so saved sessions keep resolving.',
     '2.34.0': 'v2.34.0 lane: an earlier pinned release. No public host runs it any more — kept so saved sessions keep resolving.',
-    '2.34.1': 'v2.34.1 lane (default): the release this configurator\u2019s schema is pinned to (c1d044c). Every public host now runs a newer 2.35.x build.',
+    '2.34.1': 'v2.34.1 lane: the previous schema pin. Builds are the same as on 2.35.7; no public host runs it any more.',
+    '2.35.7': 'v2.35.7 lane (default): the release this configurator\u2019s schema is pinned to (0832aa2). Every public host runs 2.35.4 or later.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;

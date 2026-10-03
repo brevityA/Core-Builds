@@ -61,6 +61,16 @@ async function fetchOverHttp(pin) {
     if (!res.ok) throw new Error(`GET ${url} -> ${res.status} ${res.statusText}`);
     sources[path] = await res.text();
   }
+  // Preset sources feed presetRequiredOptions. Without them every required option
+  // reads as removed, so fetch each preset presetManager.ts imports (the git
+  // fallback gets the same set from the directory listing).
+  const presetDir = 'packages/core/src/presets';
+  const names = [...new Set([...sources[`${presetDir}/presetManager.ts`].matchAll(/from\s+'\.\/([A-Za-z0-9_-]+)\.js'/g)].map(m => m[1]))];
+  for (const name of names) {
+    const rel = `${presetDir}/${name}.ts`;
+    const res = await fetch(`${pin.rawBase}/${pin.sha}/${rel}`, { headers: { 'user-agent': 'Core-Builds-sync-upstream' } });
+    if (res.ok) sources[rel] = await res.text();
+  }
   return sources;
 }
 
