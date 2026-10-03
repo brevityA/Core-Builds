@@ -50,10 +50,10 @@ export const DEVICE_PROFILES = {
   },
   'firestick-hd': {
     id: 'firestick-hd', label: 'Fire TV Stick HD', family: 'fire-tv',
-    video: { maxResolution: '1080p', codecs: ['AVC','HEVC'], hdr: ['SDR'], dolbyVision: false },
+    video: { maxResolution: '1080p', codecs: ['AVC','HEVC'], hdr: ['HDR10','HLG'], dolbyVision: false },
     audio: { maxChannels: '5.1', passthrough: false, lossless: false, dolbyAtmos: false },
     playback: { maxBitrate: 'capped', preferSmallFiles: true },
-    warnings: ['1080p SDR only. No AV1, no HDR/DV. Use Stream Fire Stick, not Apex.'],
+    warnings: ['1080p only. HDR10/HLG play; no Dolby Vision, no AV1. Use Stream Fire Stick, not Apex.'],
   },
   'firestick-4kmax': {
     id: 'firestick-4kmax', label: 'Fire TV Stick 4K Max', family: 'fire-tv',

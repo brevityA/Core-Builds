@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { mockSplashRequests } from './lib/mock-splash-requests.mjs';
 
 const UUID = '11111111-2222-4333-8444-555555555555';
 
@@ -13,6 +14,7 @@ const UUID = '11111111-2222-4333-8444-555555555555';
 const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
 
 async function fresh(page) {
+  await mockSplashRequests(page);
   const errors = [];
   // Splash fetches the visit counter from the live worker. CI intermittently gets
   // throttled there (429), and the resulting console line is

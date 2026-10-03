@@ -33,6 +33,51 @@ export const LIBRARY_CAPABLE_SERVICE_IDS = Object.freeze([
 
 const LIBRARY_CAPABLE = new Set(LIBRARY_CAPABLE_SERVICE_IDS);
 
+/**
+ * Service ids AIOStreams' Torznab-family built-ins (EZTV, Torrent Galaxy,
+ * Knaben, Zilean) can resolve through: StremThruPreset.supportedServices at the
+ * pinned ref, re-checked on upstream main 2026-10-02. With none enabled,
+ * TorznabPreset.generateAddons throws "requires at least one usable service",
+ * and config create/update validates with skipErrorsFromAddonsOrProxies:false,
+ * so ONE such enabled preset rejects the whole save — P2P and EasyNews-only
+ * builds included. The Usenet ids above can back a Library but not these.
+ */
+export const TORRENT_DEBRID_SERVICE_IDS = Object.freeze([
+  'alldebrid', 'debridlink', 'debrider', 'easydebrid', 'offcloud',
+  'premiumize', 'pikpak', 'realdebrid', 'torbox', 'torrin',
+]);
+
+const TORRENT_DEBRID = new Set(TORRENT_DEBRID_SERVICE_IDS);
+
+/** True when at least one enabled service can back a Torznab-family built-in. */
+export function hasTorrentDebridService(services) {
+  return (Array.isArray(services) ? services : []).some(
+    service => service && service.enabled !== false && TORRENT_DEBRID.has(service.id),
+  );
+}
+
+/**
+ * Services an AIOStreams Newznab / NZBHydra preset can use (upstream
+ * presets/newznab.ts, nzbhydra.ts). Without one enabled, either preset fails
+ * the whole save with "requires at least one usable service".
+ */
+export const USENET_INDEXER_SERVICE_IDS = Object.freeze([
+  'torbox', 'nzbdav', 'altmount', 'stremio_nntp', 'stremthru_newz', 'aiostreams',
+]);
+
+/** Services the Debridio scraper resolves through (upstream presets/debridioScraper.ts). */
+export const DEBRIDIO_SERVICE_IDS = Object.freeze([
+  'realdebrid', 'alldebrid', 'debridlink', 'premiumize', 'torbox', 'easydebrid', 'debrider',
+]);
+
+/** True when at least one enabled service is in `ids`. */
+export function hasEnabledService(services, ids) {
+  const wanted = new Set(Array.isArray(ids) ? ids : [ids]);
+  return (Array.isArray(services) ? services : []).some(
+    service => service && service.enabled !== false && wanted.has(service.id),
+  );
+}
+
 /** True when at least one enabled service can back a Library preset. */
 export function hasLibraryCapableService(services) {
   return (Array.isArray(services) ? services : []).some(

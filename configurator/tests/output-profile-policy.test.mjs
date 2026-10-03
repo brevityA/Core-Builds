@@ -160,6 +160,48 @@ test('Balanced keeps a bounded quality stack and availability-aware pack fallbac
   assert.equal(validateOutputProfileBudget(balanced, 'balanced').ok, true);
 });
 
+// Balanced is the default. Clearing inline regex left `regexScore` sorting on
+// nothing and dropped the Upscaled/BR-DISK/Extras exclusions for every default
+// user; restricting sources to the Stable set cut a TorBox build to three
+// torrent scrapers and made every update delete MediaFusion and friends.
+test('Balanced keeps inline regex but clears every synced/remote scoring field', () => {
+  const c = applyOutputProfile(richTemplate(), 'balanced', { service:'torbox-pro', resolution:'4k', optionalScrapers:[] }).config;
+  assert.equal(c.rankedRegexPatterns.length, 1);
+  assert.equal(c.preferredRegexPatterns.length, 1);
+  assert.equal(c.excludedRegexPatterns.length, 1);
+  assert.deepEqual(c.syncedRankedRegexUrls, []);
+  assert.deepEqual(c.regexOverrides, []);
+  assert.deepEqual(c.selOverrides, []);
+});
+
+test('Balanced keeps the broad torrent sources that Stable drops', () => {
+  const ctx = { service:'torbox-pro', resolution:'1080p', optionalScrapers:[] };
+  const types = profile => applyOutputProfile(richTemplate(), profile, ctx).config.presets.map(p => p.type);
+  for (const type of ['mediafusion', 'knaben']) {
+    assert.ok(types('balanced').includes(type), `balanced keeps ${type}`);
+    assert.ok(!types('stable').includes(type), `stable still drops ${type}`);
+  }
+  assert.ok(!types('balanced').includes('torbox-search'), 'removed preset stays removed');
+});
+
+test('sort keys with nothing to read from are dropped from every profile', () => {
+  const withSort = () => {
+    const t = richTemplate();
+    t.config.sortCriteria = { global: ['cached', 'regexScore', 'audioChannel', 'audioTag'].map(key => ({ key, direction:'desc' })) };
+    return t;
+  };
+  for (const profile of ['balanced', 'advanced', 'labs']) {
+    const keys = applyOutputProfile(withSort(), profile, { service:'torbox-pro' }).config.sortCriteria.global.map(e => e.key);
+    assert.ok(!keys.includes('audioChannel'), `${profile}: audioChannel has no upstream sorter case`);
+    assert.ok(keys.includes('regexScore'), `${profile}: regexScore kept while ranked regex is present`);
+  }
+  const noRegex = withSort();
+  noRegex.config.rankedRegexPatterns = [];
+  noRegex.config.syncedRankedRegexUrls = [];
+  const keys = applyOutputProfile(noRegex, 'advanced', { service:'torbox-pro' }).config.sortCriteria.global.map(e => e.key);
+  assert.deepEqual(keys, ['cached', 'audioTag'], 'regexScore dropped when nothing fills it');
+});
+
 test('Advanced and Labs retain their local advanced policy but never stack fetch exits', () => {
   for (const profile of ['advanced', 'labs']) {
     const output = applyOutputProfile(richTemplate(), profile, { service:'torbox-pro' });
@@ -229,4 +271,37 @@ test('every profile strips synced expression URLs and unusable remote-score rule
 
 test('published profile names remain stable', () => {
   assert.deepEqual(OUTPUT_PROFILES, ['stable','balanced','advanced','labs']);
+});
+
+test('a kept sort list and preferences survive Stable reducers unchanged', () => {
+  const template = richTemplate();
+  template.config.sortCriteria = { global: [{ key: 'size', direction: 'asc' }], cachedMovies: [{ key: 'resolution', direction: 'asc' }] };
+  template.config.preferredResolutions = ['1080p', '2160p', '720p'];
+  const result = applyOutputProfile(template, 'stable', {
+    resolution: '4k', preserveFields: ['sortCriteria', 'preferredResolutions'],
+  });
+  assert.deepEqual(result.config.sortCriteria, template.config.sortCriteria);
+  assert.deepEqual(result.config.preferredResolutions, template.config.preferredResolutions);
+});
+
+test('kept values cannot restore forbidden synced SEL or legacy presets on modern targets', () => {
+  const result = applyOutputProfile(richTemplate(), 'stable', {
+    aiostreamsVersion: '2.34.1',
+    preserveFields: ['syncedRankedStreamExpressionUrls', 'presets'],
+  });
+  assert.deepEqual(result.config.syncedRankedStreamExpressionUrls, []);
+  assert.equal(result.config.presets.some(p => p.type === 'torbox-search'), false);
+});
+
+test('an imported custom source is explicit and survives both safe profiles', () => {
+  const template = { config: { presets: [{ type: 'newznab', instanceId: 'my-indexer', enabled: true, resources: ['stream'], options: { api: { url: 'https://example.invalid/api', apiKey: 'LOCAL-ONLY' } } }] } };
+  for (const profile of ['stable', 'balanced']) {
+    const result = applyOutputProfile(template, profile, { preservedPresetIds: ['my-indexer'] });
+    assert.deepEqual(result.config.presets, template.config.presets);
+  }
+});
+
+test('originally absent fields remain absent after profile defaults', () => {
+  const result = applyOutputProfile({ config: {} }, 'stable', { removeFields: ['resultLimits'] });
+  assert.equal(Object.hasOwn(result.config, 'resultLimits'), false);
 });

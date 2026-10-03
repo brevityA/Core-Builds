@@ -37,7 +37,7 @@ const corePolicySrc = await readFile(new URL('../../packages/core/src/output-pro
 
 const LANES = {
   realdebrid: { service: 'realdebrid' },
-  torbox: { service: 'torbox' },
+  torbox: { service: 'torbox-pro' },
   'multi+debrid': { service: 'multi', multiServices: ['torbox-pro', 'realdebrid'] },
   'multi+http': { service: 'multi', multiServices: ['http'] },
   p2p: { service: 'p2p' },
@@ -90,10 +90,12 @@ const EXPECT = {
   'multi+debrid': { 'neko-bt': 1, sootio: 1, webstreamr: 1, yastream: 1 },
   realdebrid:     { 'neko-bt': 1, sootio: 1, webstreamr: 1, yastream: 1 },
   torbox:         { 'neko-bt': 1, sootio: 1, webstreamr: 1, yastream: 1 },
-  'multi+http':   { 'neko-bt': 1, sootio: 1, webstreamr: 1, yastream: 1 },
-  easynews:       { 'neko-bt': 1, sootio: 1, webstreamr: 1, yastream: 1 },
+  // NekoBT resolves through a torrent debrid service: a real AIOStreams 2.35.7 refuses
+  // the save ("requires at least one usable service") on any lane without one.
+  'multi+http':   { 'neko-bt': 0, sootio: 1, webstreamr: 1, yastream: 1 },
+  easynews:       { 'neko-bt': 0, sootio: 1, webstreamr: 1, yastream: 1 },
   // Sootio: debrid/usenet-only on v2.33+, so a p2p or http route must never enable it.
-  p2p:            { 'neko-bt': 1, sootio: 0, webstreamr: 1, yastream: 1 },
+  p2p:            { 'neko-bt': 0, sootio: 0, webstreamr: 1, yastream: 1 },
   http:           { 'neko-bt': 0, sootio: 0, webstreamr: 1, yastream: 1 },
   // Usenet route returns its own list before the extras branch — see the header note.
   usenet:         { 'neko-bt': 0, sootio: 0, webstreamr: 0, yastream: 0 },
@@ -127,7 +129,7 @@ test('the carousel blocks exactly the lane/extra pairs the generator cannot emit
   const laneBlockFor = new Function('S', `${fnSrc}\nreturn optionalScraperLaneBlock;`);
 
   for (const [lane, expectation] of Object.entries(EXPECT)) {
-    const blocked = laneBlockFor({ service: LANES[lane].service });
+    const blocked = laneBlockFor({ multiServices: [], ...LANES[lane] });
     for (const [id, want] of Object.entries(expectation)) {
       const why = blocked(id);
       if (want === 0) {
@@ -218,6 +220,23 @@ test('the generators keep the emission-site invariants the toggles rely on', () 
     // Sootio must never be enabled on a route that cannot back it.
     assert.match(src, /enabled:extrasOn\('sootio'\) && !isP2P/, `${name}: the p2p guard on Sootio is load-bearing`);
     // neko-bt's anime advert and the keyless emission are mutually exclusive by this predicate.
-    assert.match(src, /animeContent \? null :/, `${name}: neko-bt would double-emit without the animeContent guard`);
+    assert.match(src, /\(?animeContent(?: \|\| !torrentCapable\))? \? null :/, `${name}: neko-bt would double-emit without the animeContent guard`);
+  }
+});
+
+// Knaben and Zilean are in the base scraper list on every debrid lane. Their
+// carousel toggle must not emit a second preset: the configurator used to add
+// `knaben-1` beside the base `tam-knaben`, querying the same source twice, while
+// packages/core already skipped it. Both copies must skip it.
+test('the Knaben and Zilean toggles never add a second preset beside the base one', () => {
+  for (const [label, src] of [['configurator', appSrc], ['packages/core', coreSrc]]) {
+    assert.match(src, /if \(d\.id === 'knaben'\) return null;/, `${label}: knaben toggle must not emit`);
+    assert.match(src, /if \(d\.id === 'zilean'\) return null;/, `${label}: zilean toggle must not emit`);
+  }
+  for (const [lane, input] of Object.entries(LANES)) {
+    const presets = generateTemplate({ ...input, optionalScrapers: ['knaben', 'zilean'] }).config.presets;
+    for (const type of ['knaben', 'zilean']) {
+      assert.ok(presets.filter(p => p.type === type).length <= 1, `${lane}: at most one ${type} preset`);
+    }
   }
 });

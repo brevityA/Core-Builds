@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.13",
+    "coreBuildsVersion": "3.14",
     "coreBuildsAIOStreamsTarget": "2.34.1",
     "coreBuildsProfile": "advanced",
     "coreBuildsProfileVersion": "1"
@@ -499,11 +499,11 @@
           "direction": "desc"
         },
         {
-          "key": "quality",
+          "key": "cached",
           "direction": "desc"
         },
         {
-          "key": "cached",
+          "key": "quality",
           "direction": "desc"
         },
         {
@@ -532,10 +532,6 @@
         },
         {
           "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
           "direction": "desc"
         },
         {
@@ -573,11 +569,11 @@
           "direction": "desc"
         },
         {
-          "key": "quality",
+          "key": "cached",
           "direction": "desc"
         },
         {
-          "key": "cached",
+          "key": "quality",
           "direction": "desc"
         },
         {
@@ -610,10 +606,6 @@
         },
         {
           "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
           "direction": "desc"
         },
         {
@@ -647,11 +639,11 @@
           "direction": "desc"
         },
         {
-          "key": "quality",
+          "key": "cached",
           "direction": "desc"
         },
         {
-          "key": "cached",
+          "key": "quality",
           "direction": "desc"
         },
         {
@@ -684,10 +676,6 @@
         },
         {
           "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
           "direction": "desc"
         },
         {
@@ -721,11 +709,11 @@
           "direction": "desc"
         },
         {
-          "key": "quality",
+          "key": "cached",
           "direction": "desc"
         },
         {
-          "key": "cached",
+          "key": "quality",
           "direction": "desc"
         },
         {
@@ -758,10 +746,6 @@
         },
         {
           "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
           "direction": "desc"
         },
         {
@@ -795,11 +779,11 @@
           "direction": "desc"
         },
         {
-          "key": "quality",
+          "key": "cached",
           "direction": "desc"
         },
         {
-          "key": "cached",
+          "key": "quality",
           "direction": "desc"
         },
         {
@@ -828,10 +812,6 @@
         },
         {
           "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
           "direction": "desc"
         },
         {
@@ -865,11 +845,11 @@
           "direction": "desc"
         },
         {
-          "key": "quality",
+          "key": "cached",
           "direction": "desc"
         },
         {
-          "key": "cached",
+          "key": "quality",
           "direction": "desc"
         },
         {
@@ -902,10 +882,6 @@
         },
         {
           "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
           "direction": "desc"
         },
         {
@@ -979,10 +955,6 @@
           "direction": "desc"
         },
         {
-          "key": "audioChannel",
-          "direction": "desc"
-        },
-        {
           "key": "language",
           "direction": "desc"
         },
@@ -1046,10 +1018,6 @@
         },
         {
           "key": "audioTag",
-          "direction": "desc"
-        },
-        {
-          "key": "audioChannel",
           "direction": "desc"
         },
         {
@@ -1119,11 +1087,77 @@
           "direction": "desc"
         },
         {
-          "key": "audioChannel",
+          "key": "language",
+          "direction": "desc"
+        },
+        {
+          "key": "bitrate",
+          "direction": "desc"
+        },
+        {
+          "key": "size",
+          "direction": "desc"
+        },
+        {
+          "key": "age",
+          "direction": "desc"
+        },
+        {
+          "key": "subtitle",
+          "direction": "desc"
+        }
+      ],
+      "cachedSeries": [
+        {
+          "key": "resolution",
+          "direction": "desc"
+        },
+        {
+          "key": "cached",
+          "direction": "desc"
+        },
+        {
+          "key": "quality",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionMatched",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
+          "key": "seadex",
+          "direction": "desc"
+        },
+        {
+          "key": "library",
+          "direction": "desc"
+        },
+        {
+          "key": "regexScore",
+          "direction": "desc"
+        },
+        {
+          "key": "visualTag",
+          "direction": "desc"
+        },
+        {
+          "key": "encode",
+          "direction": "desc"
+        },
+        {
+          "key": "audioTag",
           "direction": "desc"
         },
         {
           "key": "language",
+          "direction": "desc"
+        },
+        {
+          "key": "seeders",
           "direction": "desc"
         },
         {

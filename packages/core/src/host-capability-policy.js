@@ -16,6 +16,7 @@
 
 import {
   HOST_CAPABILITY_OVERRIDES,
+  UPSTREAM_REMOVED_PRESET_IDS,
   FEATURE_MIN_VERSIONS,
   KNOWN_DEAD_CONFIG_KEYS,
   LEGACY_MIGRATED_CONFIG_KEYS,
@@ -68,6 +69,16 @@ export function parseHostStatus(body) {
   if (/\bTorrentio\b[^.]*\bdisabled\b/i.test(html) || /\bdisabled\b[^.]*\bTorrentio\b/i.test(html)) disabledPresetIds.push('torrentio');
   if (/\bAnimeKitsu\b/i.test(html) && /\bdisabled\b/i.test(html)) disabledPresetIds.push('anime-kitsu');
   if (/\bTorrent Catalogs\b/i.test(html) && /\bdisabled\b/i.test(html)) disabledPresetIds.push('torrent-catalogs');
+  // settings.presets is the host's own preset list. DISABLED marks presets it
+  // refuses: ones upstream removed, and builtins the operator never configured
+  // (Bitmagnet without a URL reads "Not configured"). AIOStreams rejects any config
+  // containing one on save, so they gate exactly like the prose-announced ones.
+  if (Array.isArray(settings.presets)) {
+    for (const preset of settings.presets) {
+      const off = preset?.DISABLED;
+      if (typeof preset?.ID === 'string' && (off === true || off?.disabled === true)) disabledPresetIds.push(preset.ID);
+    }
+  }
   const blockedStreamTypes = [];
   if (/P2P and HTTP streams are also disabled/i.test(html)) blockedStreamTypes.push('p2p', 'http');
 
@@ -102,6 +113,7 @@ export function resolveHostCapabilities(hostKey, probe = null, options = {}) {
   const probed = probe && probe.reachable ? probe : null;
 
   const disabledPresetIds = [...new Set([
+    ...UPSTREAM_REMOVED_PRESET_IDS,
     ...(base.disabledPresetIds || []),
     ...(probed?.disabledPresetIds || []),
   ])].sort();

@@ -61,3 +61,12 @@ test('ALLOWED_MIGRATION_FIELDS covers the documented config sections', () => {
   assert.ok(!ALLOWED_MIGRATION_FIELDS.has('addonName'));
   assert.ok(!ALLOWED_MIGRATION_FIELDS.has('trusted'));
 });
+
+test('migrationRemove preserves the absence of an original field without deleting protected fields', () => {
+  const source = { config: { preferredResolutions: ['2160p'], addonName: 'Generated', trusted: false } };
+  const result = assembleTemplate(source, { migrationRemove: ['preferredResolutions', 'addonName', 'trusted'] });
+  assert.equal(Object.hasOwn(result.config, 'preferredResolutions'), false);
+  assert.equal(result.config.addonName, 'Generated');
+  assert.equal(result.config.trusted, false);
+  assert.deepEqual(source.config.preferredResolutions, ['2160p']);
+});

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { mockSplashRequests } from './lib/mock-splash-requests.mjs';
 
 // Core Score — the explainable quality number. Test Drive returns real
 // streams; each one is scored and rendered with a badge + explain panel.
@@ -13,6 +14,7 @@ import { test, expect } from '@playwright/test';
 const CORS_NOISE = /core-builds-cors-proxy.*\/api\/stats|Access-Control-Allow-Origin.*core-builds-cors-proxy|net::ERR_FAILED.*core-builds-cors-proxy|^Failed to load resource: net::ERR_FAILED$|favicon|404 \(Not Found\)|Access to fetch at '[^']*\/api\/v1\/status'[^\n]*blocked by CORS|\/api\/v1\/status[^\n]*(?:blocked by CORS|net::ERR_FAILED)/;
 
 async function fresh(page) {
+  await mockSplashRequests(page);
   await page.goto('/?cb-e2e=1');
   await page.evaluate(() => { localStorage.setItem('cb_tut_seen', '1'); });
   await page.reload();
