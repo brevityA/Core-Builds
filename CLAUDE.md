@@ -379,6 +379,7 @@ scripts/aios-regen/
 | `watch-aiostreams.yml` | 6h cron + push | AIOStreams contract drift detection (aios-regen) |
 | `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` + `npm run build` |
 | `configurator-e2e.yml` | PRs | Playwright E2E tests |
+| `aio-save-test.yml` | PRs + push to main | Saves every matrix config into a real AIOStreams at the `UPSTREAM.pin` release (open + ElfHosted-allowlist variants); fails on any refusal. See `scripts/aio-save-test/README.md` |
 | `validate.yml` | PRs | Template JSON validation |
 | `tests.yml` | PRs | pytest suite |
 | `status-check.yml` | — | **Retired 2026-08-13** — was the 6-hour instance ping cron (its 'Aggregate status check' label here was wrong; it never gated PRs) |

@@ -1,51 +1,54 @@
-# aio-save-test (spike, 2026-10-03)
+# aio-save-test
 
 Saves configurator output into a **real** AIOStreams and fails on any refusal.
 Every bug in the 2026-10-02 accuracy audit passed the existing unit and browser
 suites; each one was a config AIOStreams refuses on save. This harness asks
-AIOStreams itself.
+AIOStreams itself. CI: `.github/workflows/aio-save-test.yml`.
 
 ## How it works
 
-1. `stub-addons.mjs`: a local HTTP server that answers every external addon
-   manifest. AIOStreams fetches manifests with the user's credentials during a
-   save; pointing every `*_URL` preset env var at the stub keeps the test
-   deterministic and free of real accounts.
-2. A throwaway AIOStreams container, pinned (`ghcr.io/viren070/aiostreams:v2.35.7`),
-   dummy `SECRET_KEY`, `DISABLE_RATE_LIMITS=true`, no persistent volume.
-3. `matrix.mjs` generates configs from the built configurator (`?cb-e2e=1` hook):
-   every service x content x resolution x profile, plus each optional toggle on
-   TorBox, P2P and EasyNews. `save-test.mjs` fills dummy credentials from
-   `required.json` (upstream `SERVICE_DETAILS`) and POSTs `/api/v1/user`.
+1. `run.sh` starts a throwaway AIOStreams container at the release
+   `configurator/UPSTREAM.pin` names (dummy `SECRET_KEY`, no volume,
+   `DISABLE_RATE_LIMITS=true`).
+2. `gen-env.mjs` reads every external addon URL from that image and points it at
+   `stub-addons.mjs`, a local server that answers every manifest. AIOStreams
+   fetches manifests during a save; the stub keeps the result free of third-party
+   uptime and real accounts. Bitmagnet (disabled until a URL is set) is included.
+3. `matrix.mjs` generates configs from the built configurator (`?cb-e2e=1` hook)
+   with the golden spec's default state: every service x content x resolution x
+   profile, plus each optional toggle on TorBox, P2P and EasyNews.
+   `save-test.mjs` fills dummy credentials from `required.json` (upstream
+   `SERVICE_DETAILS`) and POSTs `/api/v1/user`.
+
+## Variants
+
+| Variant | Host rules | Cases |
+|---|---|---|
+| `open` | `REGEX_FILTER_ACCESS=all`, `SEL_SYNC_ACCESS=all` | 462 |
+| `restricted` | ElfHosted's allowlist from `allowlist.elfhosted.json` (level, synced URLs, literal patterns) | 388 (free lanes skipped: ElfHosted refuses them) |
+
+The restricted run also saves one config carrying a regex no allowlist has and
+fails unless AIOStreams refuses it, so a green run cannot mean the gate was off.
+
+Refresh the allowlist snapshot from the public status endpoint (no credentials):
+
+```bash
+node scripts/aio-save-test/snapshot-allowlist.mjs elfhosted https://aiostreams.elfhosted.com
+```
 
 ## Run locally
 
 ```bash
 npm run build --prefix configurator
-node scripts/aio-save-test/stub-addons.mjs &
-# Point every external addon at the stub. The list is read from the pinned image,
-# so it cannot drift from it (writes scripts/aio-save-test/stub.env, gitignored).
-node scripts/aio-save-test/gen-env.mjs ghcr.io/viren070/aiostreams:v2.35.7
-docker run -d --network host -e PORT=3999 -e BASE_URL=http://127.0.0.1:3999 \
-  -e INTERNAL_URL=http://127.0.0.1:3999 -e SECRET_KEY=$(openssl rand -hex 32) \
-  -e REGEX_FILTER_ACCESS=all -e SEL_SYNC_ACCESS=all -e DISABLE_RATE_LIMITS=true \
-  --env-file scripts/aio-save-test/stub.env ghcr.io/viren070/aiostreams:v2.35.7
-AIO_URL=http://127.0.0.1:3999 node scripts/aio-save-test/matrix.mjs
+scripts/aio-save-test/run.sh open
+scripts/aio-save-test/run.sh restricted
 ```
 
-## Spike result
+`AIO_IMAGE` overrides the image, `CHROMIUM_PATH` the browser, and
+`AIO_DOCKER_ARGS` adds `docker run` flags (proxy env on a restricted network).
 
-- Container ready in ~4 s; each save ~150 ms; 462 configs in ~80 s.
-- Before the fixes in #778: 100 of 462 refused (SeaDex on EasyNews/Usenet/Seedr/
-  Debridio builds, EasyNews Search auth on Usenet, several service-bound toggles).
-- After: 458 of 462 save. The remaining 4 were setup artifacts, now fixed:
-  Bitmagnet is disabled until `BUILTIN_BITMAGNET_URL` is set, and USA TV Next
-  fetches its URL as a full manifest URL. With `gen-env.mjs`, the #779 build
-  saves 477 of 477.
+## History
 
-## Still to do before this gates PRs
-
-- A host-restricted variant (`REGEX_FILTER_ACCESS=trusted` + ElfHosted's
-  allowlist) so regex allowlist failures are caught too.
-- GitHub Actions job: service container + stub + matrix, on PRs touching
-  `configurator/` or `packages/core/`.
+- Spike (2026-10-03): before the fixes in #778, 100 of 462 configs were refused
+  (SeaDex on EasyNews/Usenet/Seedr/Debridio builds, EasyNews Search auth on
+  Usenet, several service-bound toggles). After: all save.

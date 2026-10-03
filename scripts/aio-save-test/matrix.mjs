@@ -20,17 +20,23 @@ const CONTENTS = ['all', 'anime', 'live', 'mixed'];
 const RESOLUTIONS = ['1080p', '4k'];
 const ARCHS = ['standard', 'iqr', 'apex-mixed'];
 const free = s => s === 'p2p' || s === 'http';
+// MATRIX_HOST=elfhosted: every case targets that host and free lanes it refuses are skipped
+// (the restricted run, which mirrors that host's regex allowlist).
+const ONLY_HOST = process.env.MATRIX_HOST || '';
+const hostFor = s => ONLY_HOST || (free(s) ? 'fortheweak' : 'elfhosted');
 
 const cases = [];
 for (const service of SERVICES) for (const content of CONTENTS) for (const resolution of RESOLUTIONS) for (const pseArch of ARCHS) {
+  if (ONLY_HOST && free(service)) continue;
   cases.push({ name: `${service}/${content}/${resolution}/${pseArch}`, state: { service, multiServices: [service], content, resolution, pseArch,
-    p2pEnabled: service === 'p2p', instanceHost: free(service) ? 'fortheweak' : 'elfhosted', creds: DUMMY_CREDS } });
+    p2pEnabled: service === 'p2p', instanceHost: hostFor(service), creds: DUMMY_CREDS } });
 }
 // Each optional scraper toggle, alone, on a debrid and a free lane (Advanced keeps extras).
 const { OPTIONAL_SCRAPER_DEFS } = await import(ROOT + 'src/data/scrapers.js');
 for (const d of OPTIONAL_SCRAPER_DEFS) for (const service of ['torbox-pro', 'p2p', 'easynews']) {
+  if (ONLY_HOST && free(service)) continue;
   cases.push({ name: `toggle:${d.id}/${service}`, state: { service, multiServices: [service], content: 'all', resolution: '1080p', pseArch: 'iqr',
-    p2pEnabled: service === 'p2p', instanceHost: 'fortheweak', optionalScrapers: [d.id], creds: DUMMY_CREDS } });
+    p2pEnabled: service === 'p2p', instanceHost: ONLY_HOST || 'fortheweak', optionalScrapers: [d.id], creds: DUMMY_CREDS } });
 }
 
 const srv = spawn('python3', ['-m', 'http.server', '4199', '-d', DIST], { stdio: 'ignore' });
@@ -43,12 +49,24 @@ await page.waitForFunction(() => !!window.__coreBuilds);
 const failures = new Map(); let pass = 0; const t0 = Date.now();
 for (const c of cases) {
   let tpl;
-  try { tpl = await page.evaluate(s => window.__coreBuilds.generate(s), { ...BASE, aiostreamsVersion: '2.34.1', ...c.state }); }
+  try { tpl = await page.evaluate(s => window.__coreBuilds.generate(s), { ...BASE, ...c.state }); }
   catch (e) { (failures.get('GENERATE: ' + e.message.slice(0, 120)) || failures.set('GENERATE: ' + e.message.slice(0, 120), []).get('GENERATE: ' + e.message.slice(0, 120))).push(c.name); continue; }
   const r = await save(withDummyCredentials(tpl.config, required));
   if (r.ok) { pass++; continue; }
   const key = r.error.replace(/\b[0-9a-f-]{36}\b/g, '<uuid>').slice(0, 220);
   (failures.get(key) || failures.set(key, []).get(key)).push(c.name);
+}
+// Negative control for the restricted run: a pattern no allowlist carries must be
+// refused, or a green run would only mean the gate was never on.
+if (ONLY_HOST) {
+  const tpl = await page.evaluate(s => window.__coreBuilds.generate(s), { ...BASE, service: 'torbox-pro', multiServices: ['torbox-pro'], instanceHost: ONLY_HOST, creds: DUMMY_CREDS });
+  const config = withDummyCredentials(tpl.config, required);
+  config.excludedRegexPatterns = [...(config.excludedRegexPatterns || []), '/core-builds-save-test-control-[0-9]{6}/'];
+  const r = await save(config);
+  if (r.ok || !/regex/i.test(r.error)) {
+    process.exitCode = 1;
+    console.log(`FAIL control: an unlisted regex ${r.ok ? 'saved' : `was refused for another reason (${r.error.slice(0, 160)})`}; the allowlist is not being enforced`);
+  } else console.log('control: unlisted regex refused, allowlist enforced');
 }
 await browser.close(); srv.kill();
 console.log(`\n${pass}/${cases.length} saved in ${((Date.now() - t0) / 1000).toFixed(1)}s\n`);
