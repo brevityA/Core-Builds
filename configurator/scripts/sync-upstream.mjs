@@ -69,7 +69,10 @@ async function fetchOverHttp(pin) {
   for (const name of names) {
     const rel = `${presetDir}/${name}.ts`;
     const res = await fetch(`${pin.rawBase}/${pin.sha}/${rel}`, { headers: { 'user-agent': 'Core-Builds-sync-upstream' } });
-    if (res.ok) sources[rel] = await res.text();
+    // Throw rather than skip: a missing preset would read as removed required
+    // options, and throwing routes the whole fetch through the git fallback.
+    if (!res.ok) throw new Error(`GET ${pin.rawBase}/${pin.sha}/${rel} -> ${res.status} ${res.statusText}`);
+    sources[rel] = await res.text();
   }
   return sources;
 }
@@ -252,6 +255,11 @@ async function fetchSources(pin) {
       const gitPresets = await fetchPresetSourcesOverGit(pin);
       Object.assign(sources, gitPresets);
     } catch {}
+  }
+  // With no preset sources every required option reads as removed (the 2.35.7
+  // re-pin first reported 30 such false removals), so fail loudly instead.
+  if (!Object.keys(sources).some(k => k.startsWith('packages/core/src/presets/'))) {
+    throw new Error('no preset sources could be fetched (HTTP and git both failed); refusing to report every required option as removed');
   }
   return sources;
 }
