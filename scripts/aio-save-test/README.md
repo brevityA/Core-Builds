@@ -23,12 +23,13 @@ AIOStreams itself.
 ```bash
 npm run build --prefix configurator
 node scripts/aio-save-test/stub-addons.mjs &
-# Point every external addon at the stub (list from AIOStreams 2.35.7, presets.ts envBase).
-ENVS=$(while read v; do printf -- '-e %s=http://127.0.0.1:4100/%s ' "$v" "$(echo "$v" | tr 'A-Z_' 'a-z-')"; done < scripts/aio-save-test/preset-url-envs.txt)
+# Point every external addon at the stub. The list is read from the pinned image,
+# so it cannot drift from it (writes scripts/aio-save-test/stub.env, gitignored).
+node scripts/aio-save-test/gen-env.mjs ghcr.io/viren070/aiostreams:v2.35.7
 docker run -d --network host -e PORT=3999 -e BASE_URL=http://127.0.0.1:3999 \
   -e INTERNAL_URL=http://127.0.0.1:3999 -e SECRET_KEY=$(openssl rand -hex 32) \
   -e REGEX_FILTER_ACCESS=all -e SEL_SYNC_ACCESS=all -e DISABLE_RATE_LIMITS=true \
-  $ENVS ghcr.io/viren070/aiostreams:v2.35.7
+  --env-file scripts/aio-save-test/stub.env ghcr.io/viren070/aiostreams:v2.35.7
 AIO_URL=http://127.0.0.1:3999 node scripts/aio-save-test/matrix.mjs
 ```
 
@@ -37,14 +38,13 @@ AIO_URL=http://127.0.0.1:3999 node scripts/aio-save-test/matrix.mjs
 - Container ready in ~4 s; each save ~150 ms; 462 configs in ~80 s.
 - Before the fixes in #778: 100 of 462 refused (SeaDex on EasyNews/Usenet/Seedr/
   Debridio builds, EasyNews Search auth on Usenet, several service-bound toggles).
-- After: 458 of 462 save. The remaining 4 are setup artifacts: Bitmagnet is not
-  configured on the test container, and the stub does not answer the URL
-  USA TV Next requests.
+- After: 458 of 462 save. The remaining 4 were setup artifacts, now fixed:
+  Bitmagnet is disabled until `BUILTIN_BITMAGNET_URL` is set, and USA TV Next
+  fetches its URL as a full manifest URL. With `gen-env.mjs`, the #779 build
+  saves 477 of 477.
 
 ## Still to do before this gates PRs
 
-- Generate `preset-url-envs.txt` from the pinned contract instead of a one-off grep.
-- Stub Bitmagnet (`BITMAGNET_URL`) and fix the USA TV Next stub path.
 - A host-restricted variant (`REGEX_FILTER_ACCESS=trusted` + ElfHosted's
   allowlist) so regex allowlist failures are caught too.
 - GitHub Actions job: service container + stub + matrix, on PRs touching
