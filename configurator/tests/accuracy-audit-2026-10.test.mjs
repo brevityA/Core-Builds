@@ -134,3 +134,23 @@ test('Stream Pool lists every exit threshold the builder uses', () => {
   assert.deepEqual(targets({ resolution: '4k' }, 'max'), { counts: [[25, '2160p']], ms: 10000 });
   assert.deepEqual(targets({ resolution: '1080p' }, 'normal'), { counts: [[20, '1080p']], ms: 6000 });
 });
+
+test('service-bound presets are only emitted when an enabled service can back them', () => {
+  // Each case was refused by a real AIOStreams 2.35.7 before the fix
+  // ("requires at least one usable service" / "No credentials found").
+  const enabled = (input) => generateTemplate(input, {}).config.presets.filter(p => p.enabled !== false);
+  const types = (input) => enabled(input).map(p => p.type);
+  for (const service of ['easynews', 'usenet', 'seedr', 'debridio', 'p2p']) {
+    assert.ok(!types({ service, content: 'all' }).includes('seadex'), `${service}: SeaDex needs a torrent debrid service`);
+  }
+  assert.ok(types({ service: 'torbox-pro', content: 'all' }).includes('seadex'), 'debrid builds keep SeaDex');
+  const search = enabled({ service: 'usenet' }).find(p => p.type === 'easynews-search');
+  assert.deepEqual(search.options.services, ['easynews'], 'EasyNews Search must not see Stremio NNTP / AIOStreams services');
+  assert.ok(!types({ service: 'debridio', credentials: { debridio: 'k' } }).includes('debridio'), 'Debridio scraper needs a debrid service');
+  assert.ok(!types({ service: 'torbox-pro', optionalScrapers: ['easynews'] }).includes('easynews'), 'EasyNews toggle needs the EasyNews service');
+  assert.ok(types({ service: 'easynews', optionalScrapers: ['easynews'] }).includes('easynews'));
+  for (const id of ['neko-bt', 'jackettio']) {
+    assert.ok(!types({ service: 'p2p', optionalScrapers: [id] }).includes(id), `${id} needs a torrent debrid service`);
+  }
+  assert.ok(!types({ service: 'p2p', optionalScrapers: ['nzbfinder'], credentials: { nzbfinder: 'k' } }).includes('newznab'), 'Newznab needs a usenet-capable service');
+});

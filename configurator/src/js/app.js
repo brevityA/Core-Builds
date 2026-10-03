@@ -31,7 +31,7 @@ import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from '../core/update-check.js';
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
-import { hasLibraryCapableService, hasTorrentDebridService, missingDirectInstallCredentials } from '../core/install-policy.js';
+import { hasLibraryCapableService, hasTorrentDebridService, hasEnabledService, USENET_INDEXER_SERVICE_IDS, DEBRIDIO_SERVICE_IDS, missingDirectInstallCredentials } from '../core/install-policy.js';
 import { hostRoutingDecision, autoRoutableHostKeys, hostPickerLabel } from '../core/host-routing.js';
 import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-access-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
@@ -1527,6 +1527,10 @@ function optionalScraperLaneBlock(id) {
   if ((id === 'neko-bt' || id === 'brazuca-torrents') && svc === 'http') {
     return 'the HTTP route carries no torrent scrapers';
   }
+  // EasyNews / EasyNews+ read the EasyNews service's login.
+  if (['easynews','easynewsPlus'].includes(id) && !(svc === 'easynews' || svc === 'usenet' || (S.multiServices || []).includes('easynews'))) {
+    return 'needs EasyNews selected as a service first — it uses that login';
+  }
   // Usenet indexers need a Usenet service.
   const usenetCat = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
   if (usenetCat.includes(id) && (svc === 'p2p' || svc === 'http')) {
@@ -1535,9 +1539,15 @@ function optionalScraperLaneBlock(id) {
   // New debrid-only toggles (require a debrid service) — block on P2P/HTTP.
   // Existing exceptions that work without debrid: webstreamr, yastream, knaben, zilean, neko-bt (p2p only).
   // torbox-search removed in v2.32 — never emitted, so not listed (avoids literal that would break v232-compat test if copied).
-  const debridOnly = ['bitmagnet','jackettio'];
-  if (debridOnly.includes(id) && (svc === 'p2p' || svc === 'http')) {
-    return `this scraper needs a debrid service — not available on the ${svc.toUpperCase()} route`;
+  // Jackett, Prowlarr and NekoBT resolve through a torrent debrid service too. Check every
+  // selected service, not just the primary: a Multi build of HTTP alone has none either.
+  const debridOnly = ['bitmagnet','jackettio','jackett','prowlarr','neko-bt'];
+  const TORRENT_DEBRID_PICKS = ['torbox-pro','torbox-ess','hybrid','realdebrid','alldebrid','premiumize','debridlink','easydebrid','debrider','offcloud','pikpak'];
+  const picked = svc === 'multi' ? (S.multiServices || []) : [svc];
+  if (debridOnly.includes(id) && !picked.some(p => TORRENT_DEBRID_PICKS.includes(p))) {
+    return (svc === 'p2p' || svc === 'http')
+      ? `this scraper needs a debrid service — not available on the ${svc.toUpperCase()} route`
+      : 'this scraper needs a torrent debrid service (TorBox, Real-Debrid, AllDebrid…) selected above';
   }
   return '';
 }
@@ -3912,6 +3922,12 @@ function presets() {
   // EZTV / Torrent Galaxy / Knaben / Zilean throw on save without a torrent debrid
   // service, rejecting the whole config (P2P and EasyNews-only routes): ship them off there.
   const torrentCapable = hasTorrentDebridService(services());
+  // Same rule for the other service-bound presets: each fails the WHOLE save
+  // ("requires at least one usable service") when nothing enabled can back it.
+  const enabledServices = services();
+  const usenetCapable = hasEnabledService(enabledServices, USENET_INDEXER_SERVICE_IDS);
+  const debridioCapable = hasEnabledService(enabledServices, DEBRIDIO_SERVICE_IDS);
+  const easynewsEnabled = hasEnabledService(enabledServices, 'easynews');
   const hasDebridio = isDebridio || (isMulti && S.multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
@@ -3933,13 +3949,13 @@ function presets() {
       // loses the library preset automatically via `libCapable`.
       ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
-      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0', services:['easynews'] }, resources:['stream'] },
       ...(S.creds.nzbgeek ? [{ type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } }] : []),
-      ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+      ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
         const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
         return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
-      ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+      ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
         return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
       ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && ['easynews','easynewsPlus'].includes(x.id))).map(sid => {
@@ -3992,19 +4008,19 @@ function presets() {
     ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     { type:'zilean', instanceId:'nx-fix-04', enabled:torrentCapable, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
-    { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
+    { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && torrentCapable, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
     ...storeSlot,
     ...(isEasynews || multiHasEasynews || isUsenet ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
-      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0', services:['easynews'] }, resources:['stream'] },
     ] : []),
-    ...(isNzbgeek && S.creds.nzbgeek ? [
+    ...(isNzbgeek && S.creds.nzbgeek && usenetCapable ? [
       { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(hasDebridio && S.creds.debridio ? [
+    ...(hasDebridio && S.creds.debridio && debridioCapable ? [
       // AIOStreams names this option `debridioApiKey`, not a bare `apiKey` (field report
       // 2026-08-14: "Option debridioApiKey is required, got undefined" fired even WITH a key
       // entered, because we set an option the preset never reads). Confirmed against the
@@ -4026,7 +4042,7 @@ function presets() {
       if (d.id === 'knaben') return null;  // emitted unconditionally below as tam-knaben; a second emission duplicates the source
       if (d.id === 'zilean') return null;
       if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
-      if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
+      if (d.id === 'neko-bt') return (animeContent || !torrentCapable) ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
       if (d.id === 'webstreamr') return (hasExtraHttp || isHttp) ? null : { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] };
       if (d.id === 'sootio') return null;  // the debrid/multi lanes advertise it at the tail — that advert carries the toggle
       // Lane gates for new safe add-ons: usenet indexers need usenet service, debrid-only need debrid.
@@ -4034,13 +4050,19 @@ function presets() {
       const usenetCatIds = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
       const debridOnlyIds = ['bitmagnet','jackettio'];
       if ((isP2P || isHttp) && usenetCatIds.includes(d.id)) return null;
-      if ((isP2P || isHttp) && debridOnlyIds.includes(d.id)) return null;
+      if (!torrentCapable && debridOnlyIds.includes(d.id)) return null;
+      // EasyNews / EasyNews+ read the EasyNews service's login; without it enabled the
+      // host refuses the save with "No credentials found for service easynews".
+      if (['easynews','easynewsPlus'].includes(d.id) && !easynewsEnabled) return null;
       const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
       const meta = safeCats[d.cat] || { resources:['stream'] };
       return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      // Jackett and Prowlarr resolve through a torrent debrid service; without one the
+      // host refuses the whole save.
+      if (['jackett','prowlarr'].includes(d.id) && !torrentCapable) return null;
       // Per-preset option names, same contract as Debridio's `debridioApiKey`: AIOStreams
       // declares `jackettApiKey` / `prowlarrApiKey`, NOT a bare `apiKey`. Emitting `apiKey`
       // set an option the preset never reads, so the host saw its required key as undefined
@@ -4074,10 +4096,10 @@ function presets() {
       }
       return null;
     }).filter(Boolean),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+    ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
       return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+    ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
@@ -4096,7 +4118,7 @@ function presets() {
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
       { type:'animetosho', instanceId:'nx-at-01', enabled:(S.content === 'anime' || S.content === 'mixed') && torrentCapable, options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
-      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt') && torrentCapable, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
     // cannot reach it there. Neither can the HTTP branch (hardcoded false above) nor the

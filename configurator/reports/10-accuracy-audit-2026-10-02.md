@@ -74,3 +74,23 @@ statements, and the four upstream descriptions behind the remaining toggles.
 
 `tests/accuracy-audit-2026-10.test.mjs` pins each finding above. Host-routing,
 device-profile and host-capability tests were updated to the live fleet.
+
+## Found by saving into a real AIOStreams (spike, 2026-10-03)
+
+462 configs generated from the built app (every service x content x resolution x
+profile, plus each optional toggle on TorBox, P2P and EasyNews) were POSTed to a
+throwaway AIOStreams 2.35.7 container with dummy credentials and stubbed addon
+manifests. 100 were refused before these fixes:
+
+| Refusals | Cause | Fix |
+|---|---|---|
+| 54 | SeaDex on Seedr / EasyNews / Usenet / Debridio builds: it needs a torrent debrid service (`requires at least one usable service`). Live on main. | Gated on `torrentCapable` |
+| 24 | Every Usenet-route build: EasyNews Search wants `aiostreamsAuth` when it can see Stremio NNTP / AIOStreams services | `services:['easynews']` on EasyNews Search |
+| 6 | Debridio-only builds: the Debridio scraper needs a debrid service | Emitted only with a Debridio-supported service |
+| 4 | EasyNews / EasyNews+ toggles on non-EasyNews builds (`No credentials found for service easynews`) | Emitted only with the EasyNews service; card gated |
+| 5+1 | Newznab indexers / NZBHydra without a usenet-capable service | Emitted only with one (`USENET_INDEXER_SERVICE_IDS`) |
+| 3+1 | Jackett, Prowlarr, NekoBT, Jackettio without a torrent debrid service | Emitted only with one; cards gated on every selected service |
+
+The remaining refusals were test-setup artifacts (Bitmagnet unconfigured on the
+local container; the stub's manifest for USA TV Next). Golden change: only
+`easynews-1080p.json` (SeaDex removed, EasyNews Search limited to EasyNews).
