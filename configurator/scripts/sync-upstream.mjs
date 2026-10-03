@@ -225,6 +225,12 @@ async function fetchPresetSourcesOverGit(pin) {
   }
 }
 
+// A preset definition, as opposed to the shared files in the same directory:
+// presetManager.ts is a required source, so counting it would make every
+// "do we have presets?" check pass with none fetched.
+const NOT_PRESET_FILES = new Set(['presetManager.ts', 'preset.ts', 'index.ts']);
+const isPresetSource = (path) => path.startsWith('packages/core/src/presets/') && !NOT_PRESET_FILES.has(path.split('/').pop());
+
 async function fetchSources(pin) {
   const local = value('--from', null);
   if (local) {
@@ -248,7 +254,7 @@ async function fetchSources(pin) {
     presetCount = Object.keys(presets).length;
     if (presetCount) process.stderr.write(`fetched ${presetCount} preset sources\n`);
   } catch {}
-  const hasPresetKeys = Object.keys(sources).some(k => k.startsWith('packages/core/src/presets/'));
+  const hasPresetKeys = Object.keys(sources).some(isPresetSource);
   if (presetCount === 0 && !hasPresetKeys) {
     // If HTTP preset fetch failed (common in sandboxed CI), try git so --check stays green.
     try {
@@ -258,7 +264,7 @@ async function fetchSources(pin) {
   }
   // With no preset sources every required option reads as removed (the 2.35.7
   // re-pin first reported 30 such false removals), so fail loudly instead.
-  if (!Object.keys(sources).some(k => k.startsWith('packages/core/src/presets/'))) {
+  if (!Object.keys(sources).some(isPresetSource)) {
     throw new Error('no preset sources could be fetched (HTTP and git both failed); refusing to report every required option as removed');
   }
   return sources;
