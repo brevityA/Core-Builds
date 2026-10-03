@@ -1,0 +1,68 @@
+name: AIOStreams Save Test
+
+# Saves every configurator matrix config into a real, throwaway AIOStreams (the
+# release configurator/UPSTREAM.pin names) and fails on any refusal. Every bug in
+# the 2026-10-02 accuracy audit passed the unit and browser suites and was only
+# caught by AIOStreams refusing the save; this asks AIOStreams itself.
+#
+#   open        permissive host (regex + SEL sync open to all)
+#   restricted  ElfHosted's regex allowlist (scripts/aio-save-test/allowlist.elfhosted.json),
+#               with a negative control proving the allowlist is enforced
+#
+# External addons are answered by a local stub, so the result never depends on
+# third-party uptime. No credentials: every service key is a dummy value.
+
+on:
+  pull_request:
+    paths:
+      - 'configurator/**'
+      - 'packages/core/**'
+      - 'scripts/aio-save-test/**'
+      - '.github/workflows/aio-save-test.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'configurator/**'
+      - 'packages/core/**'
+      - 'scripts/aio-save-test/**'
+      - '.github/workflows/aio-save-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  save:
+    name: save (${{ matrix.variant }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [open, restricted]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: configurator/package-lock.json
+      - run: npm ci
+        working-directory: configurator
+      - run: npm run build
+        working-directory: configurator
+
+      # Same cache and unconditional install as configurator-e2e.yml: `playwright
+      # install` verifies what is on disk and only downloads what is missing.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('configurator/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+      - name: Install Playwright browser
+        working-directory: configurator
+        run: npx playwright install-deps chromium && npx playwright install chromium
+
+      - name: Save every matrix config
+        run: scripts/aio-save-test/run.sh ${{ matrix.variant }}
